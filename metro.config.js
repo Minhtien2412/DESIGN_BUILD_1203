@@ -1,0 +1,33 @@
+// Custom Metro config to exclude extremely large local videos from bundling
+// This prevents Metro from attempting to inline/transform huge MP4 files and crashing with
+// "Cannot create a string longer than 0x1fffffe8 characters".
+const { getDefaultConfig } = require('expo/metro-config');
+
+/** @type {import('metro-config').MetroConfig} */
+module.exports = (async () => {
+  const config = await getDefaultConfig(__dirname);
+
+  // Blocklist specific oversized files and an optional raw folder for uncompressed media
+  const patterns = [
+    // Exclude all video files from assets/videos directory to prevent memory issues
+    /assets\/videos\/.*\.(mp4|mov|avi|mkv|webm)$/i,
+    // Place any raw/uncompressed videos here to avoid bundling
+    /assets\/videos\/raw\/.*/i,
+  ];
+
+  config.resolver = config.resolver || {};
+  // Provide a single RegExp for blockList to avoid relying on metro-config exports
+  // Join all pattern sources with a non-capturing OR
+  const combined = new RegExp(patterns.map((r) => r.source).join('|'), 'i');
+  config.resolver.blockList = combined;
+
+  // Suppress "event-target-shim/index not listed in exports" warning
+  // by allowing Metro to resolve it file-based (the package works correctly)
+  config.resolver.disableHierarchicalLookup = false;
+
+  // Disable advanced symbolication to prevent InternalBytecode.js ENOENT errors on Windows
+  config.symbolicator = config.symbolicator || {};
+  config.symbolicator.customizeFrame = () => null;
+
+  return config;
+})();

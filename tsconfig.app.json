@@ -1,0 +1,59 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "strict": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false
+  },
+  "include": [
+    "app/**/*.ts",
+    "app/**/*.tsx",
+    "components/**/*.ts",
+    "components/**/*.tsx",
+    "context/**/*.ts",
+    "context/**/*.tsx",
+    "hooks/**/*.ts",
+    "hooks/**/*.tsx",
+    "services/**/*.ts",
+    "utils/**/*.ts",
+    "constants/**/*.ts",
+    "types/**/*.ts",
+    "types/**/*.d.ts",
+    "features/**/*.ts",
+    "features/**/*.tsx",
+    "config/**/*.ts",
+    "expo-env.d.ts"
+  ],
+  "exclude": [
+    // Exclude all archived/backup/test/script code
+    "_archived/**",
+    "__tests__/**",
+    "tests/**",
+    "scripts/**",
+    "server/**",
+    "backend-implementation/**",
+    "perfex_crm/**",
+    "prisma/**",
+    "openapi/**",
+    "domains/**",
+    "src/**",
+    "shared/**",
+    
+    // Exclude backup files
+    "**/*_BACKUP.tsx",
+    "**/*.backup.ts",
+    "**/*-old.ts",
+    "**/api-backup.ts",
+    "**/tk-api-old.ts",
+    "**/*_CORRUPTED_BACKUP.tsx",
+    "dev-backups/**",
+    "expo-skeleton/**",
+    "my-new-expo-app/**",
+    
+    // Common excludes
+    "node_modules/**",
+    "dist/**",
+    "build/**",
+    ".expo/**"
+  ]
+}

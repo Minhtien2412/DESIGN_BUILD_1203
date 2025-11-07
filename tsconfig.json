@@ -1,0 +1,46 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "jsx": "react-jsx",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "paths": {
+      "@/*": [
+        "./*"
+      ]
+    }
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    ".expo/types/**/*.ts",
+    "types/**/*.d.ts",
+    "expo-env.d.ts"
+  ],
+  "exclude": [
+    // exclude noisy backups and legacy files created during refactors
+    "**/*_BACKUP.tsx",
+    "**/*.backup.ts",
+    "**/*-old.ts",
+    "**/api-backup.ts",
+    "**/tk-api-old.ts",
+    "components/**/ModernConstructionAuthScreen_CORRUPTED_BACKUP.tsx",
+    "dev-backups",
+    "expo-skeleton",
+    "my-new-expo-app",
+  // exclude server/backend code from app typecheck
+  "server/**",
+  "backend-implementation/**",
+  "_archived/**",
+  "__tests__/**",
+  "tests/**",
+  "scripts/**",
+    // common excludes
+    "node_modules",
+    "dist",
+    "build",
+    "ios",
+    "android"
+  ]
+}

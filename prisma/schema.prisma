@@ -1,0 +1,70 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String  @id @default(uuid())
+  email    String  @unique
+  password String
+  name     String?
+  avatar   String?
+  fcmToken String? @map("fcm_token") // For push notifications
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Calls initiated by this user
+  callsInitiated Call[] @relation("Caller")
+  // Calls received by this user
+  callsReceived  Call[] @relation("Callee")
+
+  @@map("users")
+}
+
+model Call {
+  id     String @id @default(uuid())
+  roomId String @unique @map("room_id")
+
+  // Participants
+  callerId String @map("caller_id")
+  caller   User   @relation("Caller", fields: [callerId], references: [id])
+
+  calleeId String @map("callee_id")
+  callee   User   @relation("Callee", fields: [calleeId], references: [id])
+
+  // Call status
+  status CallStatus @default(INITIATED)
+
+  // Timestamps
+  startedAt  DateTime  @default(now()) @map("started_at")
+  answeredAt DateTime? @map("answered_at")
+  endedAt    DateTime? @map("ended_at")
+
+  // Duration in seconds (calculated when call ends)
+  duration Int?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([callerId])
+  @@index([calleeId])
+  @@index([status])
+  @@map("calls")
+}
+
+enum CallStatus {
+  INITIATED // Caller created room, waiting for callee
+  RINGING   // Push notification sent to callee
+  ANSWERED  // Callee joined room
+  ENDED     // Call ended by either party
+  MISSED    // Callee didn't answer
+  DECLINED  // Callee declined
+}

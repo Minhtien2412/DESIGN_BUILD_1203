@@ -1,0 +1,546 @@
+// features/call/CallScreen.tsx
+/**
+ * 1-1 Video Call Screen
+ * Full-featured video call with caller/callee flow
+ */
+
+import {
+    buildLiveKitConnectionURL,
+    endCall,
+    getLiveKitToken,
+    startCall,
+} from '@/services/call';
+import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
+import {
+    createLocalTracks,
+    LocalTrack,
+    RemoteParticipant,
+    RemoteTrackPublication,
+    Room,
+    RoomEvent,
+    Track,
+} from 'livekit-client';
+import { useEffect, useRef, useState } from 'react';
+import {
+    ActivityIndicator,
+    Alert,
+    Dimensions,
+    Pressable,
+    StyleSheet,
+    Text,
+    View,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { RTCView } from 'react-native-webrtc';
+
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+
+type CallScreenProps = {
+  // Caller mode: provide calleeId to initiate call
+  calleeId?: string;
+  calleeName?: string;
+  
+  // Callee mode: provide roomId to join existing call
+  roomId?: string;
+  
+  // User info
+  userId?: string;
+  userName?: string;
+};
+
+export default function CallScreen({
+  calleeId,
+  calleeName,
+  roomId: initialRoomId,
+  userId,
+  userName,
+}: CallScreenProps) {
+  const roomRef = useRef<Room | null>(null);
+  const [status, setStatus] = useState<'idle' | 'calling' | 'connecting' | 'connected' | 'ended' | 'error'>('idle');
+  const [roomId, setRoomId] = useState<string | undefined>(initialRoomId);
+  const [error, setError] = useState<string | null>(null);
+  
+  // Audio/Video states
+  const [isMuted, setIsMuted] = useState(false);
+  const [isVideoOff, setIsVideoOff] = useState(false);
+  
+  // Media streams
+  const [localStreamURL, setLocalStreamURL] = useState<string | null>(null);
+  const [remoteStreamURL, setRemoteStreamURL] = useState<string | null>(null);
+  
+  // Participants
+  const [remoteName, setRemoteName] = useState<string>('');
+  const [callDuration, setCallDuration] = useState(0);
+  
+  // Timer for call duration
+  useEffect(() => {
+    if (status === 'connected') {
+      const interval = setInterval(() => {
+        setCallDuration((prev) => prev + 1);
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [status]);
+  
+  // Main call flow
+  useEffect(() => {
+    let room: Room | null = null;
+    let localTracks: LocalTrack[] = [];
+    
+    const initCall = async () => {
+      try {
+        // Get user identity
+        const identity = userId || `user-${Date.now()}`;
+        const displayName = userName || 'User';
+        
+        let currentRoomId = roomId;
+        
+        // If caller mode (has calleeId), start call first
+        if (calleeId && !currentRoomId) {
+          setStatus('calling');
+          console.log('🔵 Starting call to:', calleeId);
+          currentRoomId = await startCall(calleeId);
+          setRoomId(currentRoomId);
+          console.log('✅ Room created:', currentRoomId);
+        }
+        
+        if (!currentRoomId) {
+          throw new Error('Không có room ID để tham gia');
+        }
+        
+        // Get LiveKit token
+        setStatus('connecting');
+        console.log('🔵 Fetching LiveKit token...');
+        const token = await getLiveKitToken(currentRoomId, identity, displayName);
+        console.log('✅ Token received');
+        
+        // Create room instance
+        room = new Room();
+        roomRef.current = room;
+        
+        // Setup event listeners
+        room
+          .on(RoomEvent.Connected, () => {
+            console.log('✅ Connected to room:', currentRoomId);
+            setStatus('connected');
+          })
+          .on(RoomEvent.Disconnected, () => {
+            console.log('❌ Disconnected from room');
+            setStatus('ended');
+          })
+          .on(RoomEvent.ParticipantConnected, (participant: RemoteParticipant) => {
+            console.log('👤 Participant joined:', participant.identity);
+            setRemoteName(participant.name || participant.identity);
+          })
+          .on(RoomEvent.ParticipantDisconnected, (participant: RemoteParticipant) => {
+            console.log('👋 Participant left:', participant.identity);
+            setRemoteStreamURL(null);
+          })
+          .on(RoomEvent.TrackSubscribed, (
+            track: Track,
+            publication: RemoteTrackPublication,
+            participant: RemoteParticipant
+          ) => {
+            console.log('🎥 Track subscribed:', track.kind, 'from', participant.identity);
+            
+            // Render remote video/audio
+            if (track.kind === 'video' || track.kind === 'audio') {
+              const mediaStream = track.mediaStream;
+              if (mediaStream) {
+                const url = mediaStream.toURL();
+                setRemoteStreamURL(url);
+                console.log('✅ Remote stream URL:', url);
+              }
+            }
+          })
+          .on(RoomEvent.TrackUnsubscribed, (
+            track: Track,
+            publication: RemoteTrackPublication,
+            participant: RemoteParticipant
+          ) => {
+            console.log('🔇 Track unsubscribed:', track.kind);
+          });
+        
+        // Create local tracks (audio + video)
+        console.log('🔵 Creating local tracks...');
+        localTracks = await createLocalTracks({
+          audio: true,
+          video: {
+            resolution: {
+              width: 1280,
+              height: 720,
+            },
+            facingMode: 'user', // Front camera
+          },
+        });
+        
+        // Create MediaStream for local preview
+        const mediaStreamTracks = localTracks.map(t => t.mediaStreamTrack);
+        const localMediaStream = new MediaStream(mediaStreamTracks);
+        const localURL = localMediaStream.toURL();
+        setLocalStreamURL(localURL);
+        console.log('✅ Local stream URL:', localURL);
+        
+        // Connect to room
+        const wsUrl = buildLiveKitConnectionURL(token);
+        console.log('🔵 Connecting to LiveKit...');
+        await room.connect(wsUrl);
+        
+        // Publish local tracks
+        console.log('🔵 Publishing local tracks...');
+        for (const track of localTracks) {
+          await room.localParticipant.publishTrack(track);
+        }
+        console.log('✅ All tracks published');
+        
+      } catch (err: any) {
+        console.error('❌ Call error:', err);
+        setStatus('error');
+        setError(err.message || 'Không thể kết nối cuộc gọi');
+        Alert.alert('Lỗi cuộc gọi', err.message || 'Không thể kết nối');
+      }
+    };
+    
+    initCall();
+    
+    // Cleanup
+    return () => {
+      console.log('🧹 Cleaning up call...');
+      
+      // Stop local tracks
+      localTracks.forEach(track => {
+        track.stop();
+      });
+      
+      // Disconnect room
+      if (room) {
+        room.disconnect();
+      }
+      
+      // Clear streams
+      setLocalStreamURL(null);
+      setRemoteStreamURL(null);
+    };
+  }, [calleeId, roomId, userId, userName]);
+  
+  // Toggle microphone
+  const toggleMute = async () => {
+    if (!roomRef.current) return;
+    
+    const audioTrack = roomRef.current.localParticipant.getTrack(Track.Source.Microphone);
+    if (audioTrack) {
+      if (isMuted) {
+        await audioTrack.unmute();
+      } else {
+        await audioTrack.mute();
+      }
+      setIsMuted(!isMuted);
+    }
+  };
+  
+  // Toggle camera
+  const toggleVideo = async () => {
+    if (!roomRef.current) return;
+    
+    const videoTrack = roomRef.current.localParticipant.getTrack(Track.Source.Camera);
+    if (videoTrack) {
+      if (isVideoOff) {
+        await videoTrack.unmute();
+      } else {
+        await videoTrack.mute();
+      }
+      setIsVideoOff(!isVideoOff);
+    }
+  };
+  
+  // End call
+  const handleEndCall = async () => {
+    try {
+      if (roomId) {
+        await endCall(roomId);
+      }
+      
+      if (roomRef.current) {
+        roomRef.current.disconnect();
+      }
+      
+      // Navigate back
+      router.back();
+    } catch (err) {
+      console.error('End call error:', err);
+      // Still navigate back even if API call fails
+      router.back();
+    }
+  };
+  
+  // Format call duration (MM:SS)
+  const formatDuration = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+  
+  return (
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <View style={styles.container}>
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>
+            {calleeId ? `Gọi ${calleeName || calleeId}` : 'Cuộc gọi'}
+          </Text>
+          <View style={styles.statusBadge}>
+            <View
+              style={[
+                styles.statusDot,
+                { backgroundColor: status === 'connected' ? '#4caf50' : '#999' },
+              ]}
+            />
+            <Text style={styles.statusText}>
+              {status === 'idle' && 'Đang chuẩn bị...'}
+              {status === 'calling' && 'Đang gọi...'}
+              {status === 'connecting' && 'Đang kết nối...'}
+              {status === 'connected' && formatDuration(callDuration)}
+              {status === 'ended' && 'Đã kết thúc'}
+              {status === 'error' && 'Lỗi'}
+            </Text>
+          </View>
+        </View>
+        
+        {/* Video Container */}
+        <View style={styles.videoContainer}>
+          {/* Remote Video (Full Screen) */}
+          {remoteStreamURL ? (
+            <RTCView
+              streamURL={remoteStreamURL}
+              style={styles.remoteVideo}
+              objectFit="cover"
+            />
+          ) : (
+            <View style={styles.remoteVideoPlaceholder}>
+              <Ionicons name="person" size={80} color="#999" />
+              <Text style={styles.placeholderText}>
+                {status === 'connected' ? 'Đang chờ video...' : remoteName || 'Đối phương'}
+              </Text>
+            </View>
+          )}
+          
+          {/* Local Video (Small Corner) */}
+          {localStreamURL && (
+            <View style={styles.localVideoContainer}>
+              <RTCView
+                streamURL={localStreamURL}
+                style={styles.localVideo}
+                objectFit="cover"
+                mirror={true}
+              />
+            </View>
+          )}
+          
+          {/* Loading Overlay */}
+          {(status === 'calling' || status === 'connecting') && (
+            <View style={styles.loadingOverlay}>
+              <ActivityIndicator size="large" color="#fff" />
+              <Text style={styles.loadingText}>
+                {status === 'calling' && 'Đang gọi...'}
+                {status === 'connecting' && 'Đang kết nối...'}
+              </Text>
+            </View>
+          )}
+          
+          {/* Error Overlay */}
+          {status === 'error' && error && (
+            <View style={styles.errorOverlay}>
+              <Ionicons name="alert-circle-outline" size={64} color="#f44336" />
+              <Text style={styles.errorText}>{error}</Text>
+              <Pressable style={styles.errorButton} onPress={() => router.back()}>
+                <Text style={styles.errorButtonText}>Đóng</Text>
+              </Pressable>
+            </View>
+          )}
+        </View>
+        
+        {/* Controls */}
+        {status === 'connected' && (
+          <View style={styles.controls}>
+            {/* Mute */}
+            <Pressable
+              style={[styles.controlButton, isMuted && styles.controlButtonActive]}
+              onPress={toggleMute}
+            >
+              <Ionicons
+                name={isMuted ? 'mic-off' : 'mic'}
+                size={28}
+                color={isMuted ? '#fff' : '#333'}
+              />
+            </Pressable>
+            
+            {/* Video Toggle */}
+            <Pressable
+              style={[styles.controlButton, isVideoOff && styles.controlButtonActive]}
+              onPress={toggleVideo}
+            >
+              <Ionicons
+                name={isVideoOff ? 'videocam-off' : 'videocam'}
+                size={28}
+                color={isVideoOff ? '#fff' : '#333'}
+              />
+            </Pressable>
+            
+            {/* End Call */}
+            <Pressable
+              style={[styles.controlButton, styles.endCallButton]}
+              onPress={handleEndCall}
+            >
+              <Ionicons name="call" size={28} color="#fff" />
+            </Pressable>
+          </View>
+        )}
+        
+        {/* End Call Button (for non-connected states) */}
+        {status !== 'connected' && status !== 'ended' && (
+          <View style={styles.controls}>
+            <Pressable
+              style={[styles.controlButton, styles.endCallButton]}
+              onPress={handleEndCall}
+            >
+              <Text style={styles.endCallButtonText}>Huỷ</Text>
+            </Pressable>
+          </View>
+        )}
+      </View>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#000',
+  },
+  container: {
+    flex: 1,
+  },
+  header: {
+    padding: 16,
+    paddingBottom: 8,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#fff',
+    marginBottom: 8,
+  },
+  statusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  statusDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  statusText: {
+    fontSize: 14,
+    color: '#ccc',
+  },
+  videoContainer: {
+    flex: 1,
+    backgroundColor: '#1a1a1a',
+    position: 'relative',
+  },
+  remoteVideo: {
+    width: '100%',
+    height: '100%',
+  },
+  remoteVideoPlaceholder: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 16,
+  },
+  placeholderText: {
+    fontSize: 16,
+    color: '#999',
+  },
+  localVideoContainer: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    width: 120,
+    height: 160,
+    borderRadius: 12,
+    overflow: 'hidden',
+    borderWidth: 2,
+    borderColor: '#4caf50',
+  },
+  localVideo: {
+    width: '100%',
+    height: '100%',
+  },
+  loadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 16,
+  },
+  loadingText: {
+    fontSize: 16,
+    color: '#fff',
+    fontWeight: '600',
+  },
+  errorOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 32,
+    gap: 16,
+  },
+  errorText: {
+    fontSize: 16,
+    color: '#f44336',
+    textAlign: 'center',
+  },
+  errorButton: {
+    marginTop: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+    backgroundColor: '#fff',
+    borderRadius: 24,
+  },
+  errorButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+  },
+  controls: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 24,
+    padding: 24,
+    paddingBottom: 32,
+  },
+  controlButton: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  controlButtonActive: {
+    backgroundColor: '#666',
+  },
+  endCallButton: {
+    backgroundColor: '#f44336',
+  },
+  endCallButtonText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#fff',
+  },
+});

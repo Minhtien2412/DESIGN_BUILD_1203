@@ -1,0 +1,309 @@
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# On branch master
+# Your branch is up to date with 'origin/master'.
+#
+# Changes to be committed:
+#	new file:   ,
+#	new file:   .github/copilot-instructions.md
+#	new file:   .vscode/launch.json
+#	new file:   app/(auth)/sign-in.tsx
+#	new file:   app/(auth)/sign-up.tsx
+#	modified:   app/(tabs)/_layout.tsx
+#	modified:   app/(tabs)/explore.tsx
+#	modified:   app/(tabs)/index.tsx
+#	new file:   app/(tabs)/menu2.tsx
+#	new file:   app/(tabs)/menu3.tsx
+#	new file:   app/(tabs)/menu4.tsx
+#	new file:   app/(tabs)/menu5.tsx
+#	new file:   app/(tabs)/menu6.tsx
+#	new file:   app/(tabs)/menu7.tsx
+#	new file:   app/(tabs)/menu8.tsx
+#	new file:   app/(tabs)/menu9.tsx
+#	new file:   app/(tabs)/notifications.tsx
+#	new file:   app/(tabs)/profile.tsx
+#	new file:   app/(tabs)/projects.tsx
+#	modified:   app/_layout.tsx
+#	new file:   app/cart.tsx
+#	new file:   app/mau-nha.tsx
+#	new file:   app/menu-popup.tsx
+#	new file:   app/product/[id].tsx
+#	new file:   com.facebook.react.bridge.JSBundleLoader$Companion$createFileLoader$1
+#	new file:   com.facebook.react.runtime.internal.bolts.Task$Companion
+#	new file:   components/auth-gate.tsx
+#	modified:   components/parallax-scroll-view.tsx
+#	new file:   components/ui/button.tsx
+#	new file:   components/ui/cart-badge.tsx
+#	new file:   components/ui/container.tsx
+#	modified:   components/ui/icon-symbol.tsx
+#	new file:   components/ui/info-box.tsx
+#	new file:   components/ui/input.tsx
+#	new file:   components/ui/loader.tsx
+#	new file:   components/ui/menu-card.tsx
+#	new file:   components/ui/menu-grid.tsx
+#	new file:   components/ui/product-card.tsx
+#	new file:   components/ui/product-grid.tsx
+#	new file:   components/ui/section.tsx
+#	new file:   config/index.ts
+#	new file:   constants/layout.ts
+#	modified:   constants/theme.ts
+#	new file:   context/AuthContext.tsx
+#	new file:   context/CartContext.tsx
+#	new file:   data/homeFeatures.ts
+#	new file:   data/products.ts
+#	modified:   package-lock.json
+#	modified:   package.json
+#	new file:   services/api.ts
+#	new file:   utils/storage.ts
+#
+# Changes not staged for commit:
+#	modified:   .vscode/launch.json
+#	modified:   app.json
+#	modified:   app/(auth)/sign-in.tsx
+#	modified:   app/(auth)/sign-up.tsx
+#	modified:   app/(tabs)/_layout.tsx
+#	modified:   app/(tabs)/index.tsx
+#	modified:   app/(tabs)/notifications.tsx
+#	modified:   app/(tabs)/profile.tsx
+#	modified:   app/(tabs)/projects.tsx
+#	modified:   app/_layout.tsx
+#	modified:   app/cart.tsx
+#	modified:   app/mau-nha.tsx
+#	modified:   app/menu-popup.tsx
+#	modified:   app/product/[id].tsx
+#	modified:   assets/images/android-icon-background.png
+#	modified:   assets/images/android-icon-foreground.png
+#	modified:   assets/images/android-icon-monochrome.png
+#	modified:   assets/images/favicon.png
+#	modified:   assets/images/icon.png
+#	modified:   assets/images/partial-react-logo.png
+#	modified:   assets/images/react-logo.png
+#	modified:   assets/images/react-logo@2x.png
+#	modified:   assets/images/react-logo@3x.png
+#	modified:   assets/images/splash-icon.png
+#	modified:   components/auth-gate.tsx
+#	modified:   components/ui/button.tsx
+#	modified:   components/ui/cart-badge.tsx
+#	modified:   components/ui/container.tsx
+#	modified:   components/ui/icon-symbol.tsx
+#	modified:   components/ui/info-box.tsx
+#	modified:   components/ui/input.tsx
+#	modified:   components/ui/menu-card.tsx
+#	modified:   components/ui/menu-grid.tsx
+#	modified:   components/ui/product-card.tsx
+#	modified:   components/ui/section.tsx
+#	modified:   config/index.ts
+#	modified:   context/AuthContext.tsx
+#	modified:   context/CartContext.tsx
+#	modified:   data/homeFeatures.ts
+#	modified:   data/products.ts
+#	modified:   package-lock.json
+#	modified:   package.json
+#	modified:   services/api.ts
+#	modified:   tsconfig.json
+#	modified:   utils/storage.ts
+#
+# Untracked files:
+#	.easignore
+#	.env
+#	.env.example
+#	.vscode/tasks.json
+#	README_DEV_STRUCTURE.md
+#	app/(auth)/auth-screen.tsx
+#	app/admin/
+#	app/api-key-management.tsx
+#	app/ban-an.tsx
+#	app/ban-co-dien.tsx
+#	app/ban-hoc.tsx
+#	app/bang-mau.tsx
+#	app/bid/
+#	app/bids.tsx
+#	app/biet-thu.tsx
+#	app/call-history.tsx
+#	app/call-popup.tsx
+#	app/call-settings.tsx
+#	app/camera.tsx
+#	app/category/
+#	app/chat/
+#	app/chdv.tsx
+#	app/company/
+#	app/contact-picker.tsx
+#	app/cty-noi-that.tsx
+#	app/cty-xd.tsx
+#	app/demo-users.tsx
+#	app/design/
+#	app/designs.tsx
+#	app/dich-vu-them.tsx
+#	app/dich-vu.tsx
+#	app/dien.tsx
+#	app/giam-sat.tsx
+#	app/go-live.tsx
+#	app/ho-so-mau-2.tsx
+#	app/ho-so-mau.tsx
+#	app/join-call.tsx
+#	app/khach-san.tsx
+#	app/lam-cua.tsx
+#	app/lan-can.tsx
+#	app/live.tsx
+#	app/lo-ban.tsx
+#	app/nha-pho.tsx
+#	app/nha-xuong.tsx
+#	app/notification-analytics.tsx
+#	app/notification-history.tsx
+#	app/notification-showcase.tsx
+#	app/notifications-preferences.tsx
+#	app/notifications.tsx
+#	app/nuoc.tsx
+#	app/pccc.tsx
+#	app/phieu-cong-viec.tsx
+#	app/profile/
+#	app/record.tsx
+#	app/reports/
+#	app/scheduled-notifications.tsx
+#	app/search.tsx
+#	app/sofa.tsx
+#	app/system-status.tsx
+#	app/tb-bep.tsx
+#	app/tb-vs.tsx
+#	app/test-database.tsx
+#	app/the-thanh-toan.tsx
+#	app/tho-cong.tsx
+#	app/tho-da.tsx
+#	app/tho-lat-gach.tsx
+#	app/tho-son.tsx
+#	app/tho-thach-cao.tsx
+#	app/thu-vien.tsx
+#	app/tk-nha.tsx
+#	app/tk-noi-that.tsx
+#	app/tra-cuu-xd.tsx
+#	app/tu-van-cl.tsx
+#	app/upload.tsx
+#	app/upstream-health.tsx
+#	app/user/
+#	app/van-phong.tsx
+#	app/video-call-demo.tsx
+#	app/video-call-home.tsx
+#	app/video-call.tsx
+#	app/xin-phep.tsx
+#	app/zalo-video-call.tsx
+#	"assets/images/B\341\273\230 ICON DICH V\341\273\244/"
+#	assets/images/ICON/
+#	assets/videos/
+#	babel.config.js
+#	builder.config.json
+#	components/chat/
+#	components/group-gate.tsx
+#	components/role-gate.tsx
+#	components/ui/active-call-mini-overlay.tsx
+#	components/ui/animated-grid.tsx
+#	components/ui/bottom-notice.tsx
+#	components/ui/call-action-buttons.tsx
+#	components/ui/category-header.tsx
+#	components/ui/chat-popup.tsx
+#	components/ui/design-card.tsx
+#	components/ui/design-grid.tsx
+#	components/ui/error-boundary.tsx
+#	components/ui/finish-page.tsx
+#	components/ui/global-shortcuts.tsx
+#	components/ui/incoming-call-overlay.tsx
+#	components/ui/index.ts
+#	components/ui/inline-video.tsx
+#	components/ui/live-badge.tsx
+#	components/ui/live-comments.tsx
+#	components/ui/live-video.tsx
+#	components/ui/media-viewer.tsx
+#	components/ui/notification-popup.tsx
+#	components/ui/notifications-badge.tsx
+#	components/ui/quick-call-widget.tsx
+#	components/ui/remote-icon.tsx
+#	components/ui/rich-notification.tsx
+#	components/ui/segmented-tabs.tsx
+#	components/ui/service-icon.tsx
+#	components/ui/service-image-icon.tsx
+#	components/ui/toast-provider.tsx
+#	constants/home-icons.ts
+#	constants/live.ts
+#	constants/service-icons.ts
+#	constants/service-images.ts
+#	context/ApiKeyContext.tsx
+#	context/CallSessionContext.tsx
+#	context/ChatContext.tsx
+#	context/HealthContext.tsx
+#	context/LiveContext.tsx
+#	context/NotificationsContext.tsx
+#	data/categories.ts
+#	data/chatDemo.ts
+#	data/companies.ts
+#	data/designs.ts
+#	data/index.ts
+#	data/localVideos.generated.ts
+#	data/userRoles.ts
+#	data/videos.ts
+#	docs/
+#	eas.json
+#	features/
+#	hooks/use-health.ts
+#	hooks/use-query.ts
+#	metro.config.js
+#	openapi/
+#	scripts/check-media-sizes.ps1
+#	scripts/ffmpeg-compress.ps1
+#	scripts/generate-openapi-types.cjs
+#	scripts/generate-video-manifest.cjs
+#	scripts/probe-api.ts
+#	scripts/start-video-server.ps1
+#	server/
+#	services/activityLog.ts
+#	services/aiAssist.ts
+#	services/apiKeyManager.ts
+#	services/auth.ts
+#	services/authStore.ts
+#	services/backendClient.ts
+#	services/bids.ts
+#	services/categoryPosts.ts
+#	services/chat.ts
+#	services/cloud.ts
+#	services/demoUsers.ts
+#	services/devSession.ts
+#	services/enhancedServerClient.ts
+#	services/index.ts
+#	services/messages.ts
+#	services/nav.ts
+#	services/notifications.ts
+#	services/notificationsApi.ts
+#	services/orders.ts
+#	services/payments.ts
+#	services/permissions.ts
+#	services/posts.ts
+#	services/profile.ts
+#	services/proxy.ts
+#	services/remoteAuth.ts
+#	services/remoteAuthAdapter.ts
+#	services/remoteProjects.ts
+#	services/rooms.ts
+#	services/scheduledNotifications.ts
+#	services/search.ts
+#	services/serverAuth.ts
+#	services/serverBids.ts
+#	services/serverClient.ts
+#	services/serverHealth.ts
+#	services/serverMessages.ts
+#	services/serverReports.ts
+#	services/social.ts
+#	services/storage.ts
+#	services/userGroups.ts
+#	services/videoCache.ts
+#	services/videoCall.ts
+#	services/videoCallBackend.ts
+#	services/videos.ts
+#	types/
+#	utils/files.ts
+#	utils/index.ts
+#	utils/mediaPrefs.ts
+#	utils/navigation.ts
+#	utils/time.ts
+#	utils/toast.ts
+#	utils/webrtc.ts
+#

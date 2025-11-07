@@ -1,0 +1,204 @@
+# AGGRESSIVE BUILD SIZE REDUCTION
+# Chỉ build source code app, loại bỏ tất cả phần không cần thiết
+
+# ============================================
+# GIT & VERSION CONTROL (KHÔNG CẦN)
+# ============================================
+.git/
+.github/
+.gitignore
+.gitattributes
+
+# ============================================
+# DOCUMENTATION (KHÔNG CẦN)
+# ============================================
+docs/
+*.md
+!README.md
+LICENSE
+CHANGELOG.md
+
+# ============================================
+# BACKEND & SERVER (KHÔNG CẦN)
+# ============================================
+server/
+backend-implementation/
+perfex_crm/
+prisma/
+domains/
+openapi/
+
+# ============================================
+# ARCHIVED & BACKUP (KHÔNG CẦN)
+# ============================================
+_archived/
+dev-backups/
+expo-skeleton/
+my-new-expo-app/
+**/*_BACKUP.*
+**/*.backup.*
+**/*-old.*
+
+# ============================================
+# TESTS & SCRIPTS (KHÔNG CẦN)
+# ============================================
+__tests__/
+tests/
+scripts/
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+
+# ============================================
+# GENERATED/BUILD FOLDERS
+# ============================================
+node_modules/
+.expo/
+.expo-shared/
+dist/
+web-build/
+/ios/
+/android/
+
+# ============================================
+# ASSETS (CHỈ GIỮ ICONS)
+# ============================================
+assets/
+dist-test/
+
+# Chỉ giữ icons cần thiết cho build
+!assets/icon.png
+!assets/splash.png
+!assets/adaptive-icon.png
+!assets/favicon.png
+
+# ============================================
+# VIDEO FILES (LOẠI BỎ TẤT CẢ)
+# ============================================
+**/*.mp4
+**/*.mov
+**/*.avi
+**/*.mkv
+**/*.webm
+**/*.3gp
+**/*.flv
+**/*.m4v
+**/*.wmv
+
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro
+.metro-health-check*
+
+# Debug logs
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# Env files
+.env*.local
+
+# TypeScript cache
+*.tsbuildinfo
+
+# All video files by name (regardless of location)
+phong-bep-dep-tiktok.*
+biet-thu-nha-anh-nghia-tiktok.*
+biet-thu-co-dien-co-hien-tik-tok.*
+biet-thu-song-lap-chi-nhung-verosa-park-khang-dien.*
+kiem-tra-do-suc-be-tong.*
+maika.*
+cam-nhan-khach-hang-sau-thi-cong-biet-thu-hien-dai-anh-thanh*
+VID20250920145722*
+VID20250921094034*
+den-thong-tang.*
+*phong*con*gai*nho*anh*thanh*
+
+# Large cache files and duplicates (by hash)
+6ea90aeddca2ae54ffc18a2b545a6c84*
+e4cb4bca735f085a032304d488df7621*
+6f5738cff588d58dd22ca500214edab6*
+aff6f5cbe8d2a4d0e46679e8e97092fb*
+b11a71ac09712ee4b18809f4c0ba61eb*
+11d9f72ec600e6d57bc35e3078dadaf3*
+bd8fe61a500f43c992f945b2d7cd219d*
+346f0ad8b95d9ae837732d8bb8c70817*
+684ba3f28ca7ad695c5ae12f551789e0*
+
+# Large executables and DLLs
+*.dll
+*.exe
+icudt64.dll
+esbuild.exe
+
+# Unused example/starter folders
+app-example/
+
+# Development files and configs
+.cursor/
+.vscode/
+.github/
+*.md
+!README.md
+test-*.js
+mock-*.js
+*-spec.json
+*.config.json
+builder.config.json
+
+# Stray files not needed in builds
+com.facebook.react.bridge.*
+com.facebook.react.runtime.*
+*.tsbuildinfo
+BACKEND_API_IMPLEMENTATION_REQUIREMENTS.md
+BACKEND_API_REQUIREMENTS.md
+DEVELOPER_NOTES_API_INTEGRATION.md
+README_DEV_STRUCTURE.md
+SECURITY_README.md
+AUTHORIZATION_README.md
+
+# Additional large files to exclude
+mock-api-server.js
+test-api-*.js
+test-mock-api.js
+test-production-api.js
+test-no-prefix.js
+
+# Documentation files
+*.pdf
+*.docx
+*.pptx
+FIGMA_*
+HOME_PAGE_*
+COMPONENT_*
+VIDEO_*
+UTILITY_*
+MYSQL_*
+API_*
+THIETKE_*
+HUONG_DAN_*
+TAI_NGUYEN_*
+DANH_MUC_*
+CAU_TRUC_*
+DEV_*
+REACT_*
+
+# Build configurations not needed
+builder.config.json
+backend-api-spec.json
+
+# OpenAPI and documentation
+openapi/
+docs/
