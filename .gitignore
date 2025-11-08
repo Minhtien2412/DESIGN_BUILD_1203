@@ -42,7 +42,7 @@ app-example
 
 # generated native folders
 /ios
-/android
+# /android  <-- Keep android folder for EAS Build
 
 # local dev backup files
 dev-backups/
