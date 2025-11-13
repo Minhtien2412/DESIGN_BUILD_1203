@@ -592,53 +592,39 @@ export default function HomeScreen() {
   };
 
   const handleUtilityPress = (item: any) => {
-    // Determine which type of utility based on data source and navigate with typed params
+    // Navigate to construction booking with pre-selected worker type
     const constructionItem = CONSTRUCTION_UTILITIES.find(u => u.id === item.id);
     if (constructionItem) {
+      // Map construction utilities to worker types
+      let workerType = 'mason'; // Default
       switch (item.id) {
-        case 1:
-          return router.push('/utilities/ep-coc');
-        case 2:
-          return router.push('/utilities/dao-dat');
-        case 3:
-          return router.push('/utilities/vat-lieu');
-        case 4:
-          return router.push('/utilities/nhan-cong');
-        case 5:
-          return router.push('/utilities/tho-xay');
-        case 6:
-          return router.push('/utilities/tho-coffa');
-        case 7:
-          return router.push('/utilities/tho-dien-nuoc');
-        case 8:
-          return router.push('/utilities/be-tong');
+        case 5: // Thợ xây
+          workerType = 'mason';
+          break;
+        case 7: // Thợ điện nước
+          workerType = 'electrician';
+          break;
         default:
-          return;
+          workerType = 'mason';
       }
+      return router.push(`/construction/booking?workerType=${workerType}`);
     }
 
     const finishingItem = FINISHING_UTILITIES.find(u => u.id === item.id);
     if (finishingItem) {
+      // Map finishing utilities to worker types
+      let workerType = 'mason'; // Default
       switch (item.id) {
-        case 1:
-          return router.push('/finishing/lat-gach');
-        case 2:
-          return router.push('/finishing/thach-cao');
-        case 3:
-          return router.push('/finishing/son');
-        case 4:
-          return router.push('/finishing/da');
-        case 5:
-          return router.push('/finishing/lam-cua');
-        case 6:
-          return router.push('/finishing/lan-can');
-        case 7:
-          return router.push('/finishing/tho-tong-hop');
-        case 8:
-          return router.push('/finishing/camera');
+        case 3: // Thợ sơn
+          workerType = 'painter';
+          break;
+        case 7: // Thợ công (plumber)
+          workerType = 'plumber';
+          break;
         default:
-          return;
+          workerType = 'mason';
       }
+      return router.push(`/construction/booking?workerType=${workerType}`);
     }
 
     const designItem = DESIGN_UTILITIES.find(u => u.id === item.id);

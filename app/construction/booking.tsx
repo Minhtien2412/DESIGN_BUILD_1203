@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
-import { useRef, useState } from 'react';
+import { router, useLocalSearchParams } from 'expo-router';
+import { useEffect, useRef, useState } from 'react';
 import {
     Alert,
     Animated,
@@ -65,6 +65,9 @@ const PROMO_CODES = [
 ];
 
 export default function ConstructionBookingScreen() {
+  // Get workerType from route params
+  const { workerType } = useLocalSearchParams<{ workerType?: string }>();
+  
   const [selectedWorker, setSelectedWorker] = useState<WorkerType | null>(null);
   const [address, setAddress] = useState('');
   const [workDays, setWorkDays] = useState('1');
@@ -74,6 +77,16 @@ export default function ConstructionBookingScreen() {
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'transfer'>('cash');
 
   const bottomSheetAnim = useRef(new Animated.Value(0)).current;
+
+  // Auto-select worker if workerType param provided
+  useEffect(() => {
+    if (workerType && !selectedWorker) {
+      const worker = WORKER_TYPES.find(w => w.id === workerType);
+      if (worker) {
+        setSelectedWorker(worker);
+      }
+    }
+  }, [workerType]);
 
   const calculatePrice = () => {
     if (!selectedWorker) return 0;
