@@ -8,7 +8,6 @@ import { SafeScrollView } from "@/components/ui/safe-area";
 import VoiceSearchModal from '@/components/voice/VoiceSearchModal';
 import {
     DESIGN_UTILITY_SLUGS,
-    EQUIPMENT_SHOPPING_SLUGS,
     LIBRARY_TYPES
 } from "@/constants/home-routes";
 import { Colors } from "@/constants/theme";
@@ -649,11 +648,8 @@ export default function HomeScreen() {
   };
 
   const handleEquipmentPress = (item: any) => {
-    // Navigate to shopping by category (dynamic route)
-    const category = EQUIPMENT_SHOPPING_SLUGS[item.id as keyof typeof EQUIPMENT_SHOPPING_SLUGS];
-    if (category) {
-      router.push({ pathname: '/shopping/[category]', params: { category } });
-    }
+    // Navigate to materials shopping for construction equipment
+    router.push('/materials/index');
   };
 
   const [voiceVisible, setVoiceVisible] = useState(false);
