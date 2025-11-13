@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Advanced Auth System
  * - Login: Phone/Email/Username + Password + Forgot Password (OTP)
  * - Signup: User role selection (Client vs Contractor)  
@@ -24,7 +24,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/ui/button';
 import { Loader } from '@/components/ui/loader';
-import { useEnhancedAuth } from '@/context/EnhancedAuthContext';
+import { useAuth } from '@/context/AuthContext';
 
 // User roles and permissions
 export const USER_ROLES = {
@@ -47,7 +47,7 @@ export const PERMISSIONS = {
 } as const;
 
 export default function AdvancedAuthScreen() {
-    const { signIn, signUp, loading, user } = useEnhancedAuth();
+    const { signIn, signUp, loading, user } = useAuth();
 
     // Main navigation state
     const [screen, setScreen] = React.useState<'login' | 'signup' | 'forgot'>('login');
@@ -114,17 +114,14 @@ export default function AdvancedAuthScreen() {
                     break;
             }
 
-            const result = await signIn(apiData);
-
-            if (result.success) {
-                Alert.alert('Thành công', 'Đăng nhập thành công!', [
-                    { text: 'OK', onPress: () => router.replace('/(tabs)') }
-                ]);
-            } else {
-                Alert.alert('Lỗi đăng nhập', result.error || 'Đăng nhập thất bại');
-            }
-        } catch (error) {
-            Alert.alert('Lỗi', 'Có lỗi xảy ra khi đăng nhập');
+            // signIn only accepts (email, password), convert apiData
+            const emailOrPhone = apiData.email || apiData.phone || apiData.username;
+            await signIn(emailOrPhone, loginData.password);
+            Alert.alert('Thành công', 'Đăng nhập thành công!', [
+                { text: 'OK', onPress: () => router.replace('/(tabs)') }
+            ]);
+        } catch (error: any) {
+            Alert.alert('Lỗi đăng nhập', error.message || 'Đăng nhập thất bại');
         }
     };
 
@@ -162,24 +159,18 @@ export default function AdvancedAuthScreen() {
                 return;
             }
 
-            const result = await signUp({
-                name: signupData.name.trim(),
-                email: signupData.email.trim(),
-                phone: signupData.phone.trim(),
-                username: signupData.username.trim(),
-                password: signupData.password,
-                role: signupData.role,
-            });
+            // signUp accepts (email, password, name?)
+            await signUp(
+                signupData.email.trim(),
+                signupData.password,
+                signupData.name.trim()
+            );
 
-            if (result.success) {
-                Alert.alert('Thành công', 'Đăng ký thành công!', [
-                    { text: 'OK', onPress: () => setScreen('login') }
-                ]);
-            } else {
-                Alert.alert('Lỗi đăng ký', result.error || 'Đăng ký thất bại');
-            }
-        } catch (error) {
-            Alert.alert('Lỗi', 'Có lỗi xảy ra khi đăng ký');
+            Alert.alert('Thành công', 'Đăng ký thành công!', [
+                { text: 'OK', onPress: () => setScreen('login') }
+            ]);
+        } catch (error: any) {
+            Alert.alert('Lỗi đăng ký', error.message || 'Đăng ký thất bại');
         }
     };
 

@@ -18,10 +18,10 @@ type ShortcutItem = {
 
 const SHORTCUTS: ShortcutItem[] = [
   { id: 'home', title: 'Home', icon: (color) => <Ionicons name="home-outline" size={22} color={color} />, onPress: () => router.push('/'), path: '/' },
-  { id: 'products', title: 'Đấu thầu', icon: (color) => <Feather name="grid" size={20} color={color} />, onPress: () => router.push('/projects'), path: '/projects' },
-  { id: 'live', title: 'Live/Video', icon: (color) => <MaterialCommunityIcons name="broadcast" size={20} color={color} />, onPress: () => router.push('/live'), path: '/live' },
-  { id: 'bell', title: 'Thông báo', icon: (color) => <Feather name="bell" size={20} color={color} />, onPress: () => router.push('/notifications'), path: '/notifications' },
-  { id: 'acc', title: 'Tài khoản', icon: (color) => <Ionicons name="person-circle-outline" size={22} color={color} />, onPress: () => router.push('/profile'), path: '/profile' },
+  { id: 'products', title: 'Đấu thầu', icon: (color) => <Feather name="grid" size={20} color={color} />, onPress: () => router.push('/projects' as any), path: '/projects' },
+  { id: 'live', title: 'Live/Video', icon: (color) => <MaterialCommunityIcons name="broadcast" size={20} color={color} />, onPress: () => router.push('/live' as any), path: '/live' },
+  { id: 'bell', title: 'Thông báo', icon: (color) => <Feather name="bell" size={20} color={color} />, onPress: () => router.push('/notifications' as any), path: '/notifications' },
+  { id: 'acc', title: 'Tài khoản', icon: (color) => <Ionicons name="person-circle-outline" size={22} color={color} />, onPress: () => router.push('/profile' as any), path: '/profile' },
 ];
 
 export const GlobalShortcuts = memo(function GlobalShortcuts({ mode = 'fixed' }: { mode?: 'overlay' | 'fixed' }) {

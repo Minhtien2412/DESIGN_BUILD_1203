@@ -1,4 +1,4 @@
-import { useCart } from '@/context/cart-context';
+﻿import { useCart } from '@/context/cart-context';
 import { router, Stack } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -90,7 +90,7 @@ function ShippingAddressContent() {
         type: 'error',
         message: 'Your cart is empty',
       });
-      router.push('/cart');
+      router.push('/shopping/cart');
       return;
     }
 

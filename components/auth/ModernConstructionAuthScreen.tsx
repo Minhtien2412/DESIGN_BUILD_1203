@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Modern Auth Screen - Construction Industry Design
  * Updated với MySQL Authentication và Real Email Validation
  * Removed outdated authentication methods
@@ -20,7 +20,7 @@ import {
     View
 } from 'react-native';
 
-import { useMySQLAuth } from '@/context/MySQLAuthContext';
+import { useAuth } from '@/context/AuthContext';
 import { validateEmailWithSuggestions } from '@/services/emailValidation';
 
 type AuthMode = 'login' | 'register';
@@ -33,7 +33,7 @@ interface EmailValidationState {
 }
 
 export default function ModernConstructionAuthScreen() {
-    const { signIn: contextSignIn, signUp: contextSignUp, loading: contextLoading } = useMySQLAuth();
+    const { signIn: contextSignIn, signUp: contextSignUp, loading: contextLoading } = useAuth();
     
     // State management
     const [mode, setMode] = React.useState<AuthMode>('login');
@@ -74,18 +74,13 @@ export default function ModernConstructionAuthScreen() {
 
             setLoading(true);
             
-            const result = await contextSignIn(formData.account.trim(), formData.password);
-
-            if (result.success) {
-                // Automatically redirect to home screen after successful login
-                console.log('✅ Login successful, redirecting to home...');
-                router.replace('/(tabs)');
-            } else {
-                Alert.alert('Đăng nhập thất bại', result.message || 'Tài khoản hoặc mật khẩu không đúng');
-            }
-        } catch (error) {
+            await contextSignIn(formData.account.trim(), formData.password);
+            // Automatically redirect to home screen after successful login
+            console.log('✅ Login successful, redirecting to home...');
+            router.replace('/(tabs)');
+        } catch (error: any) {
             console.error('Login error:', error);
-            Alert.alert('Lỗi', 'Có lỗi xảy ra khi đăng nhập. Vui lòng thử lại.');
+            Alert.alert('Đăng nhập thất bại', error.message || 'Có lỗi xảy ra khi đăng nhập. Vui lòng thử lại.');
         } finally {
             setLoading(false);
         }
@@ -152,25 +147,17 @@ export default function ModernConstructionAuthScreen() {
 
             setLoading(true);
 
-            const result = await contextSignUp({
-                username: formData.account.trim(),
-                email: formData.email.trim(),
-                password: formData.password,
-                fullName: formData.fullName.trim() || undefined,
-                phone: formData.phone.trim() || undefined,
-                role: selectedRole
-            });
-
-            if (result.success) {
-                // Automatically redirect to home screen after successful registration
-                console.log('✅ Registration successful, redirecting to home...');
-                router.replace('/(tabs)');
-            } else {
-                Alert.alert('Đăng ký thất bại', result.message || 'Có lỗi xảy ra trong quá trình đăng ký');
-            }
-        } catch (error) {
+            await contextSignUp(
+                formData.email.trim(),
+                formData.password,
+                formData.fullName.trim() || formData.account.trim()
+            );
+            // Automatically redirect to home screen after successful registration
+            console.log('✅ Registration successful, redirecting to home...');
+            router.replace('/(tabs)');
+        } catch (error: any) {
             console.error('Registration error:', error);
-            Alert.alert('Lỗi', 'Có lỗi xảy ra khi đăng ký. Vui lòng thử lại.');
+            Alert.alert('Đăng ký thất bại', error.message || 'Có lỗi xảy ra khi đăng ký. Vui lòng thử lại.');
         } finally {
             setLoading(false);
         }

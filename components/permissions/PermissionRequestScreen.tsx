@@ -21,8 +21,8 @@ interface PermissionCardProps {
   title: string;
   description: string;
   status: PermissionStatus;
-  onRequest: () => Promise<void>;
-  colorScheme: 'light' | 'dark';
+  onRequest: () => Promise<any>;
+  colorScheme?: 'light' | 'dark';
 }
 
 const PermissionCard: React.FC<PermissionCardProps> = ({
@@ -31,7 +31,7 @@ const PermissionCard: React.FC<PermissionCardProps> = ({
   description,
   status,
   onRequest,
-  colorScheme,
+  colorScheme = 'light',
 }) => {
   const colors = Colors[colorScheme];
   const [requesting, setRequesting] = useState(false);
@@ -65,7 +65,7 @@ const PermissionCard: React.FC<PermissionCardProps> = ({
   };
 
   return (
-    <View style={[styles.permissionCard, { backgroundColor: colors.card }]}>
+    <View style={[styles.permissionCard, { backgroundColor: colors.surface }]}>
       <View style={styles.cardHeader}>
         <View style={[styles.iconContainer, { backgroundColor: colors.accent + '20' }]}>
           <Ionicons name={icon} size={28} color={colors.accent} />
@@ -85,7 +85,7 @@ const PermissionCard: React.FC<PermissionCardProps> = ({
         </View>
       </View>
 
-      <Text style={[styles.cardDescription, { color: colors.textSecondary }]}>
+      <Text style={[styles.cardDescription, { color: colors.textMuted }]}>
         {description}
       </Text>
 
@@ -240,7 +240,7 @@ export default function PermissionRequestScreen() {
                 onPress={handleContinue}
                 activeOpacity={0.7}
               >
-                <Text style={[styles.skipButtonText, { color: colors.textSecondary }]}>
+                <Text style={[styles.skipButtonText, { color: colors.textMuted }]}>
                   Bỏ qua (không khuyến khích)
                 </Text>
               </TouchableOpacity>
@@ -258,8 +258,8 @@ export default function PermissionRequestScreen() {
         </View>
 
         <View style={styles.footer}>
-          <Ionicons name="lock-closed" size={16} color={colors.textSecondary} />
-          <Text style={[styles.footerText, { color: colors.textSecondary }]}>
+          <Ionicons name="lock-closed" size={16} color={colors.textMuted} />
+          <Text style={[styles.footerText, { color: colors.textMuted }]}>
             Chúng tôi cam kết bảo mật dữ liệu của bạn
           </Text>
         </View>

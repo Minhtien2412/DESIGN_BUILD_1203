@@ -1,10 +1,12 @@
 import { ThemedView } from '@/components/themed-view';
 import { useAuth } from '@/features/auth';
+import { ApiError, apiFetch } from '@/services/api';
 import { Ionicons } from '@expo/vector-icons';
 import { Stack, router } from 'expo-router';
 import * as React from 'react';
 import {
     Alert,
+    Platform,
     ScrollView,
     StyleSheet,
     Switch,
@@ -32,7 +34,7 @@ interface PrivacySettings {
 }
 
 export default function PrivacyScreen() {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   
   const [settings, setSettings] = React.useState<PrivacySettings>({
     profileVisibility: 'public',
@@ -122,27 +124,60 @@ export default function PrivacyScreen() {
           text: 'Xóa',
           style: 'destructive',
           onPress: () => {
-            Alert.prompt(
-              'Xác nhận xóa tài khoản',
-              `Nhập "${user?.email}" để xác nhận`,
-              [
-                { text: 'Hủy', style: 'cancel' },
-                {
-                  text: 'Xóa vĩnh viễn',
-                  style: 'destructive',
-                  onPress: (value?: string) => {
-                    if (value === user?.email) {
-                      // TODO: Call delete account API
-                      Alert.alert('Tài khoản đã được xóa', 'Cảm ơn bạn đã sử dụng dịch vụ.');
-                      router.replace('/(auth)/login');
-                    } else {
-                      Alert.alert('Lỗi', 'Email không khớp');
+            if (Platform.OS === 'ios') {
+              // iOS-only prompt
+              Alert.prompt(
+                'Xác nhận xóa tài khoản',
+                `Nhập "${user?.email}" để xác nhận`,
+                [
+                  { text: 'Hủy', style: 'cancel' },
+                  {
+                    text: 'Xóa vĩnh viễn',
+                    style: 'destructive',
+                    onPress: async (value?: string) => {
+                      if (value !== user?.email) {
+                        Alert.alert('Lỗi', 'Email không khớp');
+                        return;
+                      }
+                      try {
+                        await apiFetch('/auth/delete-account', { method: 'DELETE', data: { email: user?.email } });
+                        Alert.alert('Tài khoản đã được xóa', 'Cảm ơn bạn đã sử dụng dịch vụ.');
+                        await signOut();
+                        router.replace('/(auth)/login');
+                      } catch (e) {
+                        const msg = (e as ApiError)?.data?.message || (e as Error)?.message || 'Không thể xóa tài khoản';
+                        Alert.alert('Lỗi', msg);
+                      }
                     }
                   }
-                }
-              ],
-              'plain-text'
-            );
+                ],
+                'plain-text'
+              );
+            } else {
+              // Android: no prompt API; proceed with a final confirmation
+              Alert.alert(
+                'Xác nhận xóa tài khoản',
+                'Bạn có chắc chắn muốn xóa vĩnh viễn tài khoản này?',
+                [
+                  { text: 'Hủy', style: 'cancel' },
+                  {
+                    text: 'Xóa vĩnh viễn',
+                    style: 'destructive',
+                    onPress: async () => {
+                      try {
+                        await apiFetch('/auth/delete-account', { method: 'DELETE', data: { email: user?.email } });
+                        Alert.alert('Tài khoản đã được xóa', 'Cảm ơn bạn đã sử dụng dịch vụ.');
+                        await signOut();
+                        router.replace('/(auth)/login');
+                      } catch (e) {
+                        const msg = (e as ApiError)?.data?.message || (e as Error)?.message || 'Không thể xóa tài khoản';
+                        Alert.alert('Lỗi', msg);
+                      }
+                    }
+                  }
+                ]
+              );
+            }
           }
         }
       ]

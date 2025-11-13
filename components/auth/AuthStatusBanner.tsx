@@ -1,15 +1,15 @@
-/**
+﻿/**
  * Auth Status Banner
  * Hiển thị trạng thái authentication system
  */
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { StyleSheet, Text, View } from 'react-native';
-import { useEnhancedAuth } from '../../context/EnhancedAuthContext';
+import { useAuth } from '@/context/AuthContext';
 
 export function AuthStatusBanner() {
   try {
-    const { user, isAuthenticated, loading } = useEnhancedAuth();
+    const { user, isAuthenticated, loading } = useAuth();
 
     if (loading) {
       return (

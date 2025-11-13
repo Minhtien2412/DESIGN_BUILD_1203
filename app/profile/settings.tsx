@@ -184,9 +184,30 @@ export default function SettingsScreen() {
         {
           text: 'Xóa',
           style: 'destructive',
-          onPress: () => {
-            // TODO: Implement cache clearing
-            Alert.alert('Thành công', 'Đã xóa bộ nhớ đệm');
+          onPress: async () => {
+            try {
+              // Targeted AsyncStorage cleanup to avoid logging user out
+              const keys = await AsyncStorage.getAllKeys();
+              const removable = keys.filter(k => (
+                k.startsWith('@project_') ||
+                k.startsWith('@cache_') ||
+                k.startsWith('@app_cache_') ||
+                k === '@video_cache' ||
+                k === '@image_cache'
+              ));
+              if (removable.length > 0) {
+                await AsyncStorage.multiRemove(removable);
+              }
+
+              // Optional: remove transient SecureStore caches (keep auth token)
+              // Add known non-auth keys here if used in the future
+              // e.g., await SecureStore.deleteItemAsync('NON_AUTH_CACHE_KEY');
+
+              Alert.alert('Thành công', 'Đã xóa bộ nhớ đệm');
+            } catch (e) {
+              console.error('Cache clear failed', e);
+              Alert.alert('Lỗi', 'Không thể xóa bộ nhớ đệm');
+            }
           }
         }
       ]

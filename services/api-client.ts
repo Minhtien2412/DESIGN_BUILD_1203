@@ -63,7 +63,7 @@ const handleApiError = (error: any, url: string) => {
   // Handle 401 Unauthorized
   if (error.status === 401) {
     clearAuthToken();
-    router.replace('/(auth)/sign-in');
+    router.replace("/(auth)/sign-in" as any);
     throw new Error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
   }
 

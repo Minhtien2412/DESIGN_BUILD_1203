@@ -22,7 +22,7 @@ export function withPermission<P extends object>(
   const WithPermissionComponent = (props: P) => {
     const { hasPermission } = useAuth();
 
-    if (!hasPermission(permission)) {
+    if (!hasPermission(permission, 'read')) {
       if (FallbackComponent) {
         if (React.isValidElement(FallbackComponent)) {
           return FallbackComponent;

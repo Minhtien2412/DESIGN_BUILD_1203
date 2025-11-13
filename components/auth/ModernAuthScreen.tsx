@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Modern Auth Screen - Kết hợp giao diện đẹp với API backend thật
  * Giao diện nhỏ gọn, ngăn nắp, không có text "API" thừa thãi
  */
@@ -22,10 +22,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/ui/button';
 import { Loader } from '@/components/ui/loader';
-import { useEnhancedAuth } from '@/context/EnhancedAuthContext';
+import { useAuth } from '@/context/AuthContext';
 
 export default function ModernAuthScreen() {
-  const { signIn, signUp, loading, user } = useEnhancedAuth();
+  const { signIn, signUp, loading, user } = useAuth();
   
   // Auth modes
   const [mode, setMode] = React.useState<'login' | 'signup'>('login');
@@ -77,15 +77,10 @@ export default function ModernAuthScreen() {
           loginData.username = accountValue;
         }
 
-        const result = await signIn(loginData);
-
-        if (result.success) {
-          Alert.alert('Thành công', 'Đăng nhập thành công!', [
-            { text: 'OK', onPress: () => router.replace('/(tabs)') }
-          ]);
-        } else {
-          Alert.alert('Lỗi đăng nhập', result.error || 'Đăng nhập thất bại');
-        }
+        await signIn(loginData.email || accountValue, loginData.password);
+        Alert.alert('Thành công', 'Đăng nhập thành công!', [
+          { text: 'OK', onPress: () => router.replace('/(tabs)') }
+        ]);
       } else {
         // Phone login - simplified for now
         Alert.alert('Thông báo', 'Đăng nhập bằng số điện thoại đang được phát triển');
@@ -128,17 +123,12 @@ export default function ModernAuthScreen() {
         signupData.username = accountValue;
       }
 
-      const result = await signUp(signupData);
-
-      if (result.success) {
-        Alert.alert('Thành công', 'Đăng ký thành công!', [
-          { text: 'OK', onPress: () => setMode('login') }
-        ]);
-      } else {
-        Alert.alert('Lỗi đăng ký', result.error || 'Đăng ký thất bại');
-      }
-    } catch (error) {
-      Alert.alert('Lỗi', 'Có lỗi xảy ra khi đăng ký');
+      await signUp(signupData.email || accountValue, signupData.password, signupData.name);
+      Alert.alert('Thành công', 'Đăng ký thành công!', [
+        { text: 'OK', onPress: () => setMode('login') }
+      ]);
+    } catch (error: any) {
+      Alert.alert('Lỗi đăng ký', error.message || 'Đăng ký thất bại');
     }
   };
 

@@ -226,7 +226,7 @@ export default function ProjectDetailScreen() {
   const [showTaskForm, setShowTaskForm] = useState(false);
 
   const { project, loading, error, refresh } = useProjectDetail(id);
-  const { addExpense, addTask } = useProjectData();
+  const { addExpense, addTask, toggleTaskStatus } = useProjectData();
   const budgetData = useProjectBudget(id);
   const projectTasks = useProjectTasks(id);
 
@@ -523,13 +523,22 @@ export default function ProjectDetailScreen() {
             </Text>
             <TaskManagement
               tasks={projectTasks}
-              onTaskToggle={(taskId: string) => {
-                console.log('Toggle task:', taskId);
-                // TODO: Implement task toggle logic
+              onTaskToggle={async (taskId: string) => {
+                try {
+                  await toggleTaskStatus(id, taskId);
+                } catch (e) {
+                  Alert.alert('Lỗi', 'Không thể cập nhật trạng thái công việc');
+                }
               }}
-              onTaskPress={(task: any) => {
-                Alert.alert('Chi tiết công việc', task.title);
-                // TODO: Navigate to task detail screen
+              onTaskPress={(task) => {
+                // Navigate to a future task detail route (stub). Using alert as fallback until screen exists.
+                try {
+                  // Define a canonical task detail route helper once implemented
+                  // router.push(`/projects/${id}/task/${task.id}` as const);
+                  Alert.alert('Chi tiết công việc', `${task.title}\nTrạng thái: ${task.status}`);
+                } catch {
+                  Alert.alert('Chi tiết công việc', task.title);
+                }
               }}
               onAddTask={() => {
                 setShowTaskForm(true);

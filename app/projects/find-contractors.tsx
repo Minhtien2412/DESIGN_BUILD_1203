@@ -186,8 +186,15 @@ export default function FindContractorsScreen() {
         <TouchableOpacity
           style={[styles.selectButton, { backgroundColor: primaryColor }]}
           onPress={() => {
-            // TODO: Navigate to contractor detail or add to project
-            alert(`Đã chọn ${item.name}`);
+            // Navigate to contractor detail screen (stub route). Replace with real route when available.
+            try {
+              // Example future route: /projects/contractors/[id]
+              // router.push(`/projects/contractors/${item.id}` as const);
+              // For now, show a quick info and emulate adding to project
+              alert(`Đã chọn ${item.name}`);
+            } catch {
+              alert(`Đã chọn ${item.name}`);
+            }
           }}
         >
           <Text style={[styles.selectButtonText, { color: inverseText }]}>Chọn Thợ Này</Text>

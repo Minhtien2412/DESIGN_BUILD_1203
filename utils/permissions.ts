@@ -36,18 +36,43 @@ export interface Permission {
  * Check if current user has specific permission
  * Admin users always return true
  * 
- * @param capability - Action to check (view, create, edit, delete)
- * @param feature - Feature name (projects, invoices, etc.)
- * @param userPermissions - User's permission array (from auth context)
- * @param isAdmin - Whether user is admin
+ * Supports two call patterns:
+ * 1. hasPermission(capability, feature, userPermissions, isAdmin)
+ * 2. hasPermission(userPermissions, feature, capability) - legacy
+ * 
+ * @param capabilityOrPerms - Action to check OR user permissions array
+ * @param feature - Feature name
+ * @param userPermissionsOrCapability - User permissions OR capability string
+ * @param isAdmin - Whether user is admin (optional)
  * @returns boolean
  */
 export function hasPermission(
-  capability: Capability,
+  capabilityOrPerms: Capability | Permission[] | undefined,
   feature: Feature,
-  userPermissions?: Permission[],
+  userPermissionsOrCapability?: Permission[] | Capability,
   isAdmin?: boolean
 ): boolean {
+  // Pattern detection: if first arg is array, it's legacy pattern
+  if (Array.isArray(capabilityOrPerms)) {
+    // Legacy: hasPermission(userPermissions, feature, capability)
+    const userPermissions = capabilityOrPerms;
+    const capability = userPermissionsOrCapability as Capability;
+    
+    if (!userPermissions || userPermissions.length === 0) {
+      return false;
+    }
+
+    const featurePerms = userPermissions.find(p => p.feature === feature);
+    if (!featurePerms) {
+      return false;
+    }
+
+    return featurePerms.capabilities.includes(capability);
+  }
+
+  // New pattern: hasPermission(capability, feature, userPermissions, isAdmin)
+  const capability = capabilityOrPerms as Capability;
+  const userPermissions = userPermissionsOrCapability as Permission[] | undefined;
   // Admins have all permissions
   if (isAdmin) {
     return true;

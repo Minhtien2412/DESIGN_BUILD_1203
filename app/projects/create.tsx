@@ -10,6 +10,7 @@ import { apiFetch } from '@/services/api';
 import { uploadDocument, uploadMediaWithProgress } from '@/services/media';
 import { requireAuth } from '@/utils/auth';
 import { Ionicons } from '@expo/vector-icons';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import * as DocumentPicker from 'expo-document-picker';
 import * as ImagePicker from 'expo-image-picker';
 import { Stack, router } from 'expo-router';
@@ -28,6 +29,9 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
+// react-native-maps is not available in Expo Go. We'll lazy-load it and
+// gracefully fall back to a placeholder when running in Expo Go.
+// Do NOT use static import to avoid TurboModule errors in Expo Go.
 
 const { width: SCREEN_W } = Dimensions.get('window');
 
@@ -41,6 +45,20 @@ const PROJECT_TYPES = [
 ];
 
 export default function CreateProjectScreen() {
+  // Lazy maps module loader state
+  const [mapsModule, setMapsModule] = useState<{ MapView: any; Marker: any } | null>(null);
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const m = await import('react-native-maps');
+        if (mounted) setMapsModule({ MapView: (m as any).default, Marker: (m as any).Marker });
+      } catch (e) {
+        console.warn('[Maps] react-native-maps not available in this build');
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
   const { isAuthenticated } = useAuth();
@@ -82,6 +100,12 @@ export default function CreateProjectScreen() {
   const [loading, setLoading] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
+
+  // Pickers state
+  const [showMapModal, setShowMapModal] = useState(false);
+  const [pickedCoord, setPickedCoord] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [showDatePicker, setShowDatePicker] = useState<false | 'start' | 'end'>(false);
+  const [tempDate, setTempDate] = useState<Date>(new Date());
 
   // Owner & scope & privacy
   const [ownerName, setOwnerName] = useState('');
@@ -146,13 +170,12 @@ export default function CreateProjectScreen() {
   };
 
   const handleLocationPick = () => {
-    // TODO: Integrate with map picker
-    Alert.alert('Chọn địa điểm', 'Tính năng chọn địa điểm trên bản đồ sẽ được tích hợp với react-native-maps');
+    setShowMapModal(true);
   };
 
   const handleDatePick = (field: 'start' | 'end') => {
-    // TODO: Integrate with date picker
-    Alert.alert('Chọn ngày', 'Tính năng chọn ngày sẽ được tích hợp với @react-native-community/datetimepicker');
+    setTempDate(new Date());
+    setShowDatePicker(field);
   };
 
   const validateForm = () => {
@@ -637,6 +660,101 @@ export default function CreateProjectScreen() {
 
         <View style={{ height: 40 }} />
       </ScrollView>
+
+      {/* Map Picker Modal */}
+      <Modal visible={showMapModal} transparent animationType="slide" onRequestClose={() => setShowMapModal(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalCard, { padding: 0 }]}> 
+            <View style={{ padding: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Text style={{ fontSize: 16, fontWeight: '700', color: '#111' }}>Chọn vị trí trên bản đồ</Text>
+              <TouchableOpacity onPress={() => setShowMapModal(false)} style={{ padding: 6 }}>
+                <Ionicons name="close" size={22} color="#333" />
+              </TouchableOpacity>
+            </View>
+            <View style={{ height: 360 }}>
+              {mapsModule?.MapView ? (
+              <mapsModule.MapView
+                style={{ flex: 1 }}
+                initialRegion={{
+                  latitude: 16.047079, // Vietnam center-ish
+                  longitude: 108.206230,
+                  latitudeDelta: 8,
+                  longitudeDelta: 8,
+                }}
+                onPress={(e: any) => {
+                  const { latitude, longitude } = e.nativeEvent.coordinate;
+                  setPickedCoord({ latitude, longitude });
+                }}
+              >
+                {pickedCoord && (
+                  <mapsModule.Marker coordinate={pickedCoord} />
+                )}
+              </mapsModule.MapView>
+              ) : (
+                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+                  <Ionicons name="map" size={48} color="#90b44c" />
+                  <Text style={{ marginTop: 8, color: '#666', textAlign: 'center' }}>
+                    Bản đồ cần Development Build. Vui lòng dùng nút "Chọn trên bản đồ" trong bản dev build,
+                    hoặc nhập địa chỉ/tọa độ thủ công.
+                  </Text>
+                </View>
+              )}
+            </View>
+            <View style={{ padding: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Text style={{ color: '#555' }}>
+                {pickedCoord ? `Đã chọn: ${pickedCoord.latitude.toFixed(5)}, ${pickedCoord.longitude.toFixed(5)}` : 'Chạm vào bản đồ để chọn vị trí'}
+              </Text>
+              <TouchableOpacity
+                disabled={!pickedCoord}
+                onPress={() => {
+                  if (pickedCoord) {
+                    const value = `${pickedCoord.latitude.toFixed(6)}, ${pickedCoord.longitude.toFixed(6)}`;
+                    setLocation(value);
+                    setShowMapModal(false);
+                  }
+                }}
+                style={{
+                  backgroundColor: pickedCoord ? '#90b44c' : '#cbd5e1',
+                  paddingHorizontal: 16,
+                  paddingVertical: 10,
+                  borderRadius: 10,
+                }}
+              >
+                <Text style={{ color: '#fff', fontWeight: '700' }}>Xác nhận</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Date Picker Inline (platform-friendly) */}
+      {showDatePicker && (
+        <DateTimePicker
+          value={tempDate}
+          mode="date"
+          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+          onChange={(event, date) => {
+            if (Platform.OS === 'android') {
+              // On Android, event is undefined for old types, but community picker returns event.type
+              // If user cancels, date will be undefined
+              if (!date) {
+                setShowDatePicker(false);
+                return;
+              }
+            }
+            if (date) {
+              const iso = date.toISOString().slice(0,10);
+              if (showDatePicker === 'start') setStartDate(iso);
+              if (showDatePicker === 'end') setEndDate(iso);
+              setTempDate(date);
+            }
+            if (Platform.OS !== 'ios') {
+              setShowDatePicker(false);
+            }
+          }}
+          style={{ backgroundColor: Platform.OS === 'ios' ? '#fff' : undefined }}
+        />
+      )}
 
       {/* Preview modal */}
       <Modal visible={showPreview} transparent animationType="slide" onRequestClose={() => setShowPreview(false)}>

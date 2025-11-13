@@ -4,6 +4,6 @@
 import type { VideoItem } from './videos';
 
 export const GENERATED_VIDEOS: VideoItem[] = [
-  { id: 'local:reels:carbon', title: 'CARBON', url: require('../assets/videos/CARBON.mp4'), category: 'reels', type: 'vod' },
-  { id: 'local:reels:vid20250921094034-1', title: 'VID20250921094034 1', url: require('../assets/videos/VID20250921094034_1.mp4'), category: 'reels', type: 'vod' }
+  // No local videos (files removed or too large)
 ];
+

@@ -21,7 +21,7 @@ export default function DepartmentsManagementScreen() {
   const iconColor = useThemeColor({}, 'icon');
   const borderColor = useThemeColor({}, 'border');
   const mutedColor = useThemeColor({}, 'tabIconDefault');
-  const cardBg = useThemeColor({}, 'cardBackground');
+  const cardBg = useThemeColor({}, 'surface');
 
   // Permission check
   useEffect(() => {

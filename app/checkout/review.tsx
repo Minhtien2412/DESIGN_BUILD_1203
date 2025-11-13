@@ -1,4 +1,4 @@
-import { useCart } from '@/context/cart-context';
+﻿import { useCart } from '@/context/cart-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
@@ -91,7 +91,7 @@ function OrderReviewContent() {
   };
 
   if (items.length === 0) {
-    router.replace('/cart');
+    router.replace('/shopping/cart');
     return null;
   }
 

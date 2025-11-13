@@ -1,5 +1,6 @@
 import ENV from '@/config/env';
 import { apiFetch, clearToken as clearApiToken, setAuthToken } from '@/services/api';
+import { Permission } from '@/utils/permissions';
 import { clearToken as clearStorageToken, getToken, setToken as setStorageToken } from '@/utils/storage';
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 
@@ -11,10 +12,7 @@ export interface User {
   avatar?: string;
   role?: string;
   admin?: number; // 1 if admin, 0 otherwise
-  permissions?: Array<{
-    feature: string;
-    capabilities: string[];
-  }>;
+  permissions?: Permission[];
   staffid?: number; // For Perfex CRM staff members
   global_roles?: string[]; // Global roles for multi-role support
 }
@@ -87,6 +85,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       // Set token in API service for authenticated requests
       setAuthToken(token);
+
+      // Health check first to detect database issues
+      try {
+        const health = await apiFetch('/health');
+        if (health?.database === 'disconnected') {
+          console.warn('[Auth] ⚠️  Database offline - using cached session');
+          // Use cached token without /auth/me call
+          setState({
+            user: { id: 'cached', email: 'cached@offline', name: 'Cached User (DB Offline)' },
+            loading: false,
+            isAuthenticated: true,
+          });
+          return;
+        }
+      } catch (healthErr) {
+        console.warn('[Auth] Health check failed, attempting /auth/me anyway');
+      }
 
       // Support both nested { success, data: {...user} } and flat user responses
       const res = await apiFetch<any>('/auth/me');
@@ -359,7 +374,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const featurePermission = state.user.permissions.find(p => p.feature === feature);
     if (!featurePermission) return false;
 
-    return featurePermission.capabilities.includes(capability);
+    return featurePermission.capabilities.includes(capability as any);
   };
 
   const hasRole = (role: string | string[]): boolean => {

@@ -1,8 +1,9 @@
 import { ThemedView } from '@/components/themed-view';
 import { useAuth } from '@/features/auth';
+import { ApiError, apiFetch } from '@/services/api';
 import { Ionicons } from '@expo/vector-icons';
 import { Stack } from 'expo-router';
-import * as React from 'react';
+import { useEffect, useState } from 'react';
 import {
     ActivityIndicator,
     Alert,
@@ -14,7 +15,7 @@ import {
     Text,
     TextInput,
     TouchableOpacity,
-    View,
+    View
 } from 'react-native';
 
 interface PasswordForm {
@@ -29,31 +30,116 @@ interface PasswordErrors {
   confirmPassword?: string;
 }
 
+type PasswordStrength = 'weak' | 'medium' | 'strong';
+
 export default function SecurityScreen() {
   const { user } = useAuth();
   
-  const [passwordForm, setPasswordForm] = React.useState<PasswordForm>({
+  const [passwordForm, setPasswordForm] = useState<PasswordForm>({
     currentPassword: '',
     newPassword: '',
     confirmPassword: '',
   });
   
-  const [errors, setErrors] = React.useState<PasswordErrors>({});
-  const [showCurrentPassword, setShowCurrentPassword] = React.useState(false);
-  const [showNewPassword, setShowNewPassword] = React.useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
-  const [changingPassword, setChangingPassword] = React.useState(false);
+  const [errors, setErrors] = useState<PasswordErrors>({});
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [changingPassword, setChangingPassword] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState<PasswordStrength>('weak');
   
   // Security settings
-  const [twoFactorEnabled, setTwoFactorEnabled] = React.useState(false);
-  const [loginNotifications, setLoginNotifications] = React.useState(true);
-  const [biometricEnabled, setBiometricEnabled] = React.useState(false);
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+  const [loginNotifications, setLoginNotifications] = useState(true);
+  const [biometricEnabled, setBiometricEnabled] = useState(false);
   
   // Active sessions
-  const [sessions, setSessions] = React.useState([
-    { id: '1', device: 'iPhone 13 Pro', location: 'TP. Hồ Chí Minh', lastActive: '5 phút trước', current: true },
-    { id: '2', device: 'Chrome on Windows', location: 'Hà Nội', lastActive: '2 giờ trước', current: false },
+  const [sessions, setSessions] = useState([
+    { id: '1', device: 'iPhone 13 Pro', location: 'TP. Hồ Chí Minh', ip: '118.69.xxx.xxx', lastActive: '5 phút trước', current: true },
+    { id: '2', device: 'Chrome on Windows', location: 'Hà Nội', ip: '171.244.xxx.xxx', lastActive: '2 giờ trước', current: false },
+    { id: '3', device: 'Safari on MacBook', location: 'Đà Nẵng', ip: '14.177.xxx.xxx', lastActive: '1 ngày trước', current: false },
   ]);
+
+  // Calculate security score (0-100)
+  const calculateSecurityScore = (): number => {
+    let score = 30; // Base score
+    
+    if (twoFactorEnabled) score += 30;
+    if (biometricEnabled) score += 20;
+    if (loginNotifications) score += 10;
+    if (passwordStrength === 'strong') score += 10;
+    
+    return Math.min(score, 100);
+  };
+
+  const securityScore = calculateSecurityScore();
+
+  const getScoreColor = (score: number) => {
+    if (score >= 80) return '#10B981';
+    if (score >= 50) return '#F59E0B';
+    return '#EF4444';
+  };
+
+  const getScoreText = (score: number) => {
+    if (score >= 80) return 'Tốt';
+    if (score >= 50) return 'Trung bình';
+    return 'Yếu';
+  };
+
+  // Password strength checker
+  const checkPasswordStrength = (password: string): PasswordStrength => {
+    if (!password) return 'weak';
+    
+    let strength = 0;
+    
+    // Length
+    if (password.length >= 8) strength++;
+    if (password.length >= 12) strength++;
+    
+    // Contains uppercase
+    if (/[A-Z]/.test(password)) strength++;
+    
+    // Contains lowercase
+    if (/[a-z]/.test(password)) strength++;
+    
+    // Contains number
+    if (/[0-9]/.test(password)) strength++;
+    
+    // Contains special char
+    if (/[^A-Za-z0-9]/.test(password)) strength++;
+    
+    if (strength >= 5) return 'strong';
+    if (strength >= 3) return 'medium';
+    return 'weak';
+  };
+
+  const getStrengthColor = (strength: PasswordStrength) => {
+    switch (strength) {
+      case 'strong': return '#10B981';
+      case 'medium': return '#F59E0B';
+      case 'weak': return '#EF4444';
+    }
+  };
+
+  const getStrengthText = (strength: PasswordStrength) => {
+    switch (strength) {
+      case 'strong': return 'Mạnh';
+      case 'medium': return 'Trung bình';
+      case 'weak': return 'Yếu';
+    }
+  };
+
+  const getStrengthWidth = (strength: PasswordStrength) => {
+    switch (strength) {
+      case 'strong': return '100%';
+      case 'medium': return '66%';
+      case 'weak': return '33%';
+    }
+  };
+
+  useEffect(() => {
+    setPasswordStrength(checkPasswordStrength(passwordForm.newPassword));
+  }, [passwordForm.newPassword]);
 
   const validatePassword = (): boolean => {
     const newErrors: PasswordErrors = {};
@@ -87,11 +173,13 @@ export default function SecurityScreen() {
 
     setChangingPassword(true);
     try {
-      // TODO: Call API to change password
-      // await changePassword(passwordForm.currentPassword, passwordForm.newPassword);
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await apiFetch('/auth/change-password', {
+        method: 'POST',
+        data: {
+          currentPassword: passwordForm.currentPassword,
+          newPassword: passwordForm.newPassword,
+        },
+      });
       
       Alert.alert('Thành công', 'Đổi mật khẩu thành công', [
         {
@@ -103,7 +191,8 @@ export default function SecurityScreen() {
         }
       ]);
     } catch (error) {
-      Alert.alert('Lỗi', 'Không thể đổi mật khẩu. Vui lòng kiểm tra mật khẩu hiện tại.');
+      const detail = (error as ApiError)?.data?.message || (error as Error)?.message || 'Không thể đổi mật khẩu';
+      Alert.alert('Lỗi', detail);
     } finally {
       setChangingPassword(false);
     }
@@ -119,7 +208,6 @@ export default function SecurityScreen() {
           {
             text: 'Tiếp tục',
             onPress: () => {
-              // TODO: Navigate to 2FA setup screen
               setTwoFactorEnabled(true);
             }
           }
@@ -175,7 +263,7 @@ export default function SecurityScreen() {
     <ThemedView style={{ flex: 1 }}>
       <Stack.Screen 
         options={{ 
-          title: 'Tài khoản bảo mật',
+          title: 'Bảo mật',
           headerBackTitle: 'Quay lại',
         }} 
       />
@@ -188,6 +276,61 @@ export default function SecurityScreen() {
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
         >
+          {/* Security Score Card */}
+          <View style={styles.scoreCard}>
+            <View style={styles.scoreHeader}>
+              <Ionicons name="shield-checkmark" size={32} color={getScoreColor(securityScore)} />
+              <View style={styles.scoreTextContainer}>
+                <Text style={styles.scoreLabel}>Điểm bảo mật</Text>
+                <View style={styles.scoreRow}>
+                  <Text style={[styles.scoreValue, { color: getScoreColor(securityScore) }]}>
+                    {securityScore}/100
+                  </Text>
+                  <View style={[styles.scoreBadge, { backgroundColor: getScoreColor(securityScore) + '20' }]}>
+                    <Text style={[styles.scoreBadgeText, { color: getScoreColor(securityScore) }]}>
+                      {getScoreText(securityScore)}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            </View>
+            
+            {/* Progress Bar */}
+            <View style={styles.progressBar}>
+              <View 
+                style={[
+                  styles.progressFill, 
+                  { width: `${securityScore}%`, backgroundColor: getScoreColor(securityScore) }
+                ]} 
+              />
+            </View>
+
+            {/* Recommendations */}
+            {securityScore < 100 && (
+              <View style={styles.recommendations}>
+                <Text style={styles.recommendTitle}>Khuyến nghị:</Text>
+                {!twoFactorEnabled && (
+                  <View style={styles.recommendItem}>
+                    <Ionicons name="chevron-forward" size={16} color="#6B7280" />
+                    <Text style={styles.recommendText}>Bật xác thực 2 bước (+30 điểm)</Text>
+                  </View>
+                )}
+                {!biometricEnabled && (
+                  <View style={styles.recommendItem}>
+                    <Ionicons name="chevron-forward" size={16} color="#6B7280" />
+                    <Text style={styles.recommendText}>Bật sinh trắc học (+20 điểm)</Text>
+                  </View>
+                )}
+                {passwordStrength !== 'strong' && (
+                  <View style={styles.recommendItem}>
+                    <Ionicons name="chevron-forward" size={16} color="#6B7280" />
+                    <Text style={styles.recommendText}>Dùng mật khẩu mạnh hơn (+10 điểm)</Text>
+                  </View>
+                )}
+              </View>
+            )}
+          </View>
+
           {/* Change Password Section */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
@@ -210,6 +353,7 @@ export default function SecurityScreen() {
                     placeholder="Nhập mật khẩu hiện tại"
                     placeholderTextColor="#9CA3AF"
                     secureTextEntry={!showCurrentPassword}
+                    autoCapitalize="none"
                   />
                   <TouchableOpacity onPress={() => setShowCurrentPassword(!showCurrentPassword)}>
                     <Ionicons 
@@ -236,6 +380,7 @@ export default function SecurityScreen() {
                     placeholder="Nhập mật khẩu mới (ít nhất 6 ký tự)"
                     placeholderTextColor="#9CA3AF"
                     secureTextEntry={!showNewPassword}
+                    autoCapitalize="none"
                   />
                   <TouchableOpacity onPress={() => setShowNewPassword(!showNewPassword)}>
                     <Ionicons 
@@ -246,6 +391,26 @@ export default function SecurityScreen() {
                   </TouchableOpacity>
                 </View>
                 {errors.newPassword && <Text style={styles.errorText}>{errors.newPassword}</Text>}
+                
+                {/* Password Strength Indicator */}
+                {passwordForm.newPassword.length > 0 && (
+                  <View style={styles.strengthContainer}>
+                    <View style={styles.strengthBar}>
+                      <View 
+                        style={[
+                          styles.strengthFill, 
+                          { 
+                            width: getStrengthWidth(passwordStrength),
+                            backgroundColor: getStrengthColor(passwordStrength)
+                          }
+                        ]} 
+                      />
+                    </View>
+                    <Text style={[styles.strengthText, { color: getStrengthColor(passwordStrength) }]}>
+                      Độ mạnh: {getStrengthText(passwordStrength)}
+                    </Text>
+                  </View>
+                )}
               </View>
 
               {/* Confirm Password */}
@@ -262,6 +427,7 @@ export default function SecurityScreen() {
                     placeholder="Nhập lại mật khẩu mới"
                     placeholderTextColor="#9CA3AF"
                     secureTextEntry={!showConfirmPassword}
+                    autoCapitalize="none"
                   />
                   <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
                     <Ionicons 
@@ -283,7 +449,10 @@ export default function SecurityScreen() {
                 {changingPassword ? (
                   <ActivityIndicator size="small" color="#fff" />
                 ) : (
-                  <Text style={styles.primaryButtonText}>Đổi mật khẩu</Text>
+                  <>
+                    <Ionicons name="checkmark-circle" size={20} color="#fff" />
+                    <Text style={styles.primaryButtonText}>Đổi mật khẩu</Text>
+                  </>
                 )}
               </TouchableOpacity>
             </View>
@@ -292,14 +461,16 @@ export default function SecurityScreen() {
           {/* Security Settings */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Ionicons name="shield-checkmark" size={24} color="#10B981" />
+              <Ionicons name="settings" size={24} color="#10B981" />
               <Text style={styles.sectionTitle}>Cài đặt bảo mật</Text>
             </View>
             
             <View style={styles.card}>
               <View style={styles.settingItem}>
                 <View style={styles.settingLeft}>
-                  <Ionicons name="finger-print" size={24} color="#6B7280" />
+                  <View style={[styles.settingIconContainer, { backgroundColor: '#DBEAFE' }]}>
+                    <Ionicons name="finger-print" size={24} color="#3B82F6" />
+                  </View>
                   <View style={styles.settingText}>
                     <Text style={styles.settingTitle}>Xác thực 2 bước</Text>
                     <Text style={styles.settingDescription}>Bảo vệ tài khoản bằng mã xác thực</Text>
@@ -317,7 +488,9 @@ export default function SecurityScreen() {
 
               <View style={styles.settingItem}>
                 <View style={styles.settingLeft}>
-                  <Ionicons name="notifications" size={24} color="#6B7280" />
+                  <View style={[styles.settingIconContainer, { backgroundColor: '#FEF3C7' }]}>
+                    <Ionicons name="notifications" size={24} color="#F59E0B" />
+                  </View>
                   <View style={styles.settingText}>
                     <Text style={styles.settingTitle}>Thông báo đăng nhập</Text>
                     <Text style={styles.settingDescription}>Nhận thông báo khi có đăng nhập mới</Text>
@@ -335,7 +508,9 @@ export default function SecurityScreen() {
 
               <View style={styles.settingItem}>
                 <View style={styles.settingLeft}>
-                  <Ionicons name="scan" size={24} color="#6B7280" />
+                  <View style={[styles.settingIconContainer, { backgroundColor: '#D1FAE5' }]}>
+                    <Ionicons name="scan" size={24} color="#10B981" />
+                  </View>
                   <View style={styles.settingText}>
                     <Text style={styles.settingTitle}>Sinh trắc học</Text>
                     <Text style={styles.settingDescription}>Đăng nhập bằng vân tay/Face ID</Text>
@@ -355,39 +530,57 @@ export default function SecurityScreen() {
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Ionicons name="phone-portrait" size={24} color="#F59E0B" />
-              <Text style={styles.sectionTitle}>Phiên đăng nhập</Text>
+              <Text style={styles.sectionTitle}>Phiên đăng nhập ({sessions.length})</Text>
             </View>
             
             <View style={styles.card}>
               {sessions.map((session, index) => (
-                <React.Fragment key={session.id}>
+                <View key={session.id}>
                   <View style={styles.sessionItem}>
-                    <View style={styles.sessionIcon}>
+                    <View style={[
+                      styles.sessionIconContainer,
+                      { backgroundColor: session.current ? '#DBEAFE' : '#F3F4F6' }
+                    ]}>
                       <Ionicons 
                         name={session.device.includes('iPhone') ? 'phone-portrait' : 'desktop'} 
                         size={24} 
-                        color="#6B7280" 
+                        color={session.current ? '#3B82F6' : '#6B7280'}
                       />
                     </View>
                     <View style={styles.sessionInfo}>
                       <View style={styles.sessionHeader}>
                         <Text style={styles.sessionDevice}>{session.device}</Text>
-                        {session.current && <View style={styles.currentBadge}><Text style={styles.currentBadgeText}>Hiện tại</Text></View>}
+                        {session.current && (
+                          <View style={styles.currentBadge}>
+                            <View style={styles.currentDot} />
+                            <Text style={styles.currentBadgeText}>Hiện tại</Text>
+                          </View>
+                        )}
                       </View>
-                      <Text style={styles.sessionLocation}>{session.location}</Text>
-                      <Text style={styles.sessionTime}>{session.lastActive}</Text>
+                      <View style={styles.sessionMeta}>
+                        <Ionicons name="location" size={14} color="#9CA3AF" />
+                        <Text style={styles.sessionLocation}>{session.location}</Text>
+                      </View>
+                      <View style={styles.sessionMeta}>
+                        <Ionicons name="globe" size={14} color="#9CA3AF" />
+                        <Text style={styles.sessionIP}>{session.ip}</Text>
+                      </View>
+                      <View style={styles.sessionMeta}>
+                        <Ionicons name="time" size={14} color="#9CA3AF" />
+                        <Text style={styles.sessionTime}>{session.lastActive}</Text>
+                      </View>
                     </View>
                     {!session.current && (
                       <TouchableOpacity 
                         onPress={() => handleEndSession(session.id)}
                         style={styles.sessionEndButton}
                       >
-                        <Ionicons name="close-circle" size={24} color="#EF4444" />
+                        <Ionicons name="close-circle" size={28} color="#EF4444" />
                       </TouchableOpacity>
                     )}
                   </View>
                   {index < sessions.length - 1 && <View style={styles.divider} />}
-                </React.Fragment>
+                </View>
               ))}
 
               {sessions.length > 1 && (
@@ -412,10 +605,22 @@ export default function SecurityScreen() {
               <Ionicons name="bulb" size={20} color="#F59E0B" />
               <Text style={styles.tipsTitle}>Mẹo bảo mật</Text>
             </View>
-            <Text style={styles.tipText}>• Sử dụng mật khẩu mạnh với ít nhất 8 ký tự</Text>
-            <Text style={styles.tipText}>• Bật xác thực 2 bước để tăng cường bảo mật</Text>
-            <Text style={styles.tipText}>• Không chia sẻ mật khẩu với bất kỳ ai</Text>
-            <Text style={styles.tipText}>• Đổi mật khẩu định kỳ mỗi 3-6 tháng</Text>
+            <View style={styles.tipItem}>
+              <Ionicons name="checkmark-circle" size={16} color="#10B981" />
+              <Text style={styles.tipText}>Sử dụng mật khẩu mạnh với ít nhất 8 ký tự</Text>
+            </View>
+            <View style={styles.tipItem}>
+              <Ionicons name="checkmark-circle" size={16} color="#10B981" />
+              <Text style={styles.tipText}>Bật xác thực 2 bước để tăng cường bảo mật</Text>
+            </View>
+            <View style={styles.tipItem}>
+              <Ionicons name="checkmark-circle" size={16} color="#10B981" />
+              <Text style={styles.tipText}>Không chia sẻ mật khẩu với bất kỳ ai</Text>
+            </View>
+            <View style={styles.tipItem}>
+              <Ionicons name="checkmark-circle" size={16} color="#10B981" />
+              <Text style={styles.tipText}>Đổi mật khẩu định kỳ mỗi 3-6 tháng</Text>
+            </View>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -427,6 +632,81 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 16,
     paddingBottom: 40,
+  },
+  scoreCard: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  scoreHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+    gap: 16,
+  },
+  scoreTextContainer: {
+    flex: 1,
+  },
+  scoreLabel: {
+    fontSize: 14,
+    color: '#6B7280',
+    marginBottom: 4,
+  },
+  scoreRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  scoreValue: {
+    fontSize: 32,
+    fontWeight: '700',
+  },
+  scoreBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  scoreBadgeText: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  progressBar: {
+    height: 8,
+    backgroundColor: '#E5E7EB',
+    borderRadius: 4,
+    overflow: 'hidden',
+    marginBottom: 16,
+  },
+  progressFill: {
+    height: '100%',
+    borderRadius: 4,
+  },
+  recommendations: {
+    backgroundColor: '#F9FAFB',
+    borderRadius: 12,
+    padding: 12,
+  },
+  recommendTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#374151',
+    marginBottom: 8,
+  },
+  recommendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 4,
+  },
+  recommendText: {
+    fontSize: 13,
+    color: '#6B7280',
   },
   section: {
     marginBottom: 24,
@@ -476,6 +756,7 @@ const styles = StyleSheet.create({
   },
   inputError: {
     borderColor: '#EF4444',
+    backgroundColor: '#FEF2F2',
   },
   input: {
     flex: 1,
@@ -488,12 +769,33 @@ const styles = StyleSheet.create({
     color: '#EF4444',
     marginTop: 6,
   },
+  strengthContainer: {
+    marginTop: 8,
+  },
+  strengthBar: {
+    height: 4,
+    backgroundColor: '#E5E7EB',
+    borderRadius: 2,
+    overflow: 'hidden',
+    marginBottom: 6,
+  },
+  strengthFill: {
+    height: '100%',
+    borderRadius: 2,
+  },
+  strengthText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
   primaryButton: {
     backgroundColor: '#0891B2',
     paddingVertical: 14,
     borderRadius: 10,
     alignItems: 'center',
     marginTop: 8,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 8,
   },
   buttonDisabled: {
     opacity: 0.6,
@@ -515,6 +817,13 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: 12,
   },
+  settingIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   settingText: {
     flex: 1,
   },
@@ -531,19 +840,17 @@ const styles = StyleSheet.create({
   divider: {
     height: 1,
     backgroundColor: '#E5E7EB',
-    marginVertical: 8,
+    marginVertical: 12,
   },
   sessionItem: {
     flexDirection: 'row',
-    alignItems: 'center',
     paddingVertical: 12,
     gap: 12,
   },
-  sessionIcon: {
+  sessionIconContainer: {
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#F3F4F6',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -554,32 +861,51 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    marginBottom: 4,
+    marginBottom: 6,
   },
   sessionDevice: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '600',
     color: '#1F2937',
   },
   currentBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: '#DBEAFE',
     paddingHorizontal: 8,
     paddingVertical: 2,
-    borderRadius: 4,
+    borderRadius: 12,
+    gap: 4,
+  },
+  currentDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#3B82F6',
   },
   currentBadgeText: {
     fontSize: 11,
     fontWeight: '600',
     color: '#1E40AF',
   },
+  sessionMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginBottom: 3,
+  },
   sessionLocation: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#6B7280',
-    marginBottom: 2,
+  },
+  sessionIP: {
+    fontSize: 13,
+    color: '#6B7280',
+    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
   },
   sessionTime: {
-    fontSize: 12,
-    color: '#9CA3AF',
+    fontSize: 13,
+    color: '#6B7280',
   },
   sessionEndButton: {
     padding: 4,
@@ -590,7 +916,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 12,
     gap: 8,
-    marginTop: 8,
   },
   dangerButtonText: {
     fontSize: 15,
@@ -602,7 +927,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#FEF3C7',
+    borderColor: '#FDE68A',
   },
   tipsHeader: {
     flexDirection: 'row',
@@ -611,14 +936,20 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   tipsTitle: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '700',
     color: '#92400E',
+  },
+  tipItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+    marginBottom: 8,
   },
   tipText: {
     fontSize: 14,
     color: '#78350F',
-    marginBottom: 6,
     lineHeight: 20,
+    flex: 1,
   },
 });

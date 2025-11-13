@@ -5,8 +5,8 @@ import { Container } from '@/components/ui/container';
 import { Loader } from '@/components/ui/loader';
 import { Section } from '@/components/ui/section';
 import { useAuth } from '@/context/AuthContext';
-import { useActivityLog } from '@/hooks/useAdmin';
 import { useThemeColor } from '@/hooks/use-theme-color';
+import { useActivityLog } from '@/hooks/useAdmin';
 import { hasPermission } from '@/utils/permissions';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -52,7 +52,7 @@ export default function ActivityLogScreen() {
   const iconColor = useThemeColor({}, 'icon');
   const borderColor = useThemeColor({}, 'border');
   const mutedColor = useThemeColor({}, 'tabIconDefault');
-  const cardBg = useThemeColor({}, 'cardBackground');
+  const cardBg = useThemeColor({}, 'surface');
 
   // Permission check
   useEffect(() => {
@@ -70,7 +70,7 @@ export default function ActivityLogScreen() {
     date_to: '',
   });
 
-  const { activities, loading, hasMore, loadMore, refresh } = useActivityLog(filters);
+  const { activities, loading, hasMore, fetchMore, refresh } = useActivityLog();
 
   // Format date helper
   const formatDate = (dateString: string) => {
@@ -101,7 +101,7 @@ export default function ActivityLogScreen() {
         data={activities}
         keyExtractor={(item) => item.id.toString()}
         showsVerticalScrollIndicator={false}
-        onEndReached={loadMore}
+        onEndReached={fetchMore}
         onEndReachedThreshold={0.5}
         onRefresh={refresh}
         refreshing={loading && activities.length === 0}
@@ -224,7 +224,7 @@ export default function ActivityLogScreen() {
         ListFooterComponent={
           loading && activities.length > 0 ? (
             <View style={styles.footer}>
-              <Loader size="small" />
+              <Loader height={60} />
             </View>
           ) : null
         }

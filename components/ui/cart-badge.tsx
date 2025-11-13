@@ -12,24 +12,24 @@ interface CartBadgeProps {
 }
 
 export const CartBadge: React.FC<CartBadgeProps> = ({ href = '/cart', size = 24 }) => {
-  const { totalQty } = useCart();
+  const { totalItems } = useCart();
   const scheme = useColorScheme();
   const color = Colors[scheme ?? 'light'].tint;
   const danger = Colors[scheme ?? 'light'].danger;
 
   const content = (
-    <View style={styles.container}>
-      <IconSymbol name="cart.fill" size={size} color={color} />
-      {totalQty > 0 && (
-        <View style={[styles.badge, { backgroundColor: danger }]}> 
-          <Text style={styles.badgeText}>{totalQty > 99 ? '99+' : totalQty}</Text>
+    <View style={{ position: 'relative' }}>
+      <IconSymbol name="cart" size={size} color={color} />
+      {totalItems > 0 && (
+        <View style={[styles.badge, { backgroundColor: danger }]}>
+          <Text style={styles.badgeText}>{totalItems > 99 ? '99+' : totalItems}</Text>
         </View>
       )}
     </View>
   );
 
   return (
-    <Link href={href} asChild>
+    <Link href="/shopping/cart" asChild>
       <Pressable accessibilityRole="button" hitSlop={8} style={styles.pressable}>
         {content}
       </Pressable>

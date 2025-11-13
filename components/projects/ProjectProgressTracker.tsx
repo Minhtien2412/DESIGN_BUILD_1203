@@ -1,4 +1,4 @@
-import { Colors } from '@/constants/theme';
+﻿import { Colors } from '@/constants/theme';
 import { apiFetch } from '@/services/api';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -83,7 +83,7 @@ export default function ProjectProgressTracker({ projectId, onUpdatePress }: Pro
       case 'overdue':
         return '#F44336';
       default:
-        return colors.textSecondary;
+        return colors.textMuted;
     }
   };
 
@@ -131,9 +131,9 @@ export default function ProjectProgressTracker({ projectId, onUpdatePress }: Pro
 
   if (loading) {
     return (
-      <View style={[styles.container, styles.centerContent, { backgroundColor: colors.card }]}>
+      <View style={[styles.container, styles.centerContent, { backgroundColor: colors.surface }]}>
         <ActivityIndicator size="large" color={colors.accent} />
-        <Text style={[styles.loadingText, { color: colors.textSecondary }]}>
+        <Text style={[styles.loadingText, { color: colors.textMuted }]}>
           Đang tải tiến độ...
         </Text>
       </View>
@@ -142,7 +142,7 @@ export default function ProjectProgressTracker({ projectId, onUpdatePress }: Pro
 
   if (error) {
     return (
-      <View style={[styles.container, styles.centerContent, { backgroundColor: colors.card }]}>
+      <View style={[styles.container, styles.centerContent, { backgroundColor: colors.surface }]}>
         <Ionicons name="alert-circle" size={48} color={colors.error} />
         <Text style={[styles.errorText, { color: colors.error }]}>{error}</Text>
         <TouchableOpacity
@@ -169,7 +169,7 @@ export default function ProjectProgressTracker({ projectId, onUpdatePress }: Pro
       {/* Header Card with Progress Circle */}
       <Animated.View
         entering={FadeInDown.duration(400)}
-        style={[styles.headerCard, { backgroundColor: colors.card }]}
+        style={[styles.headerCard, { backgroundColor: colors.surface }]}
       >
         <LinearGradient
           colors={[getHealthStatusColor(project.health_status) + '20', 'transparent']}
@@ -181,7 +181,7 @@ export default function ProjectProgressTracker({ projectId, onUpdatePress }: Pro
               <Text style={[styles.progressPercentage, { color: progressColor }]}>
                 {project.completion_percentage}%
               </Text>
-              <Text style={[styles.progressLabel, { color: colors.textSecondary }]}>
+              <Text style={[styles.progressLabel, { color: colors.textMuted }]}>
                 Hoàn thành
               </Text>
             </View>
@@ -202,8 +202,8 @@ export default function ProjectProgressTracker({ projectId, onUpdatePress }: Pro
           {/* Deadline Info */}
           {project.days_until_deadline !== null && (
             <View style={styles.deadlineContainer}>
-              <Ionicons name="calendar-outline" size={18} color={colors.textSecondary} />
-              <Text style={[styles.deadlineText, { color: colors.textSecondary }]}>
+              <Ionicons name="calendar-outline" size={18} color={colors.textMuted} />
+              <Text style={[styles.deadlineText, { color: colors.textMuted }]}>
                 {project.days_until_deadline > 0
                   ? `Còn ${project.days_until_deadline} ngày`
                   : project.days_until_deadline === 0
@@ -230,7 +230,7 @@ export default function ProjectProgressTracker({ projectId, onUpdatePress }: Pro
       {/* Task Statistics */}
       <Animated.View
         entering={FadeInDown.duration(400).delay(100)}
-        style={[styles.statsCard, { backgroundColor: colors.card }]}
+        style={[styles.statsCard, { backgroundColor: colors.surface }]}
       >
         <Text style={[styles.sectionTitle, { color: colors.text }]}>Thống kê công việc</Text>
 
@@ -242,7 +242,7 @@ export default function ProjectProgressTracker({ projectId, onUpdatePress }: Pro
             <Text style={[styles.statValue, { color: colors.text }]}>
               {statistics.completed_tasks}
             </Text>
-            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>
+            <Text style={[styles.statLabel, { color: colors.textMuted }]}>
               Hoàn thành
             </Text>
           </View>
@@ -254,7 +254,7 @@ export default function ProjectProgressTracker({ projectId, onUpdatePress }: Pro
             <Text style={[styles.statValue, { color: colors.text }]}>
               {statistics.in_progress_tasks}
             </Text>
-            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>
+            <Text style={[styles.statLabel, { color: colors.textMuted }]}>
               Đang làm
             </Text>
           </View>
@@ -266,7 +266,7 @@ export default function ProjectProgressTracker({ projectId, onUpdatePress }: Pro
             <Text style={[styles.statValue, { color: colors.text }]}>
               {statistics.pending_tasks}
             </Text>
-            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>
+            <Text style={[styles.statLabel, { color: colors.textMuted }]}>
               Chờ xử lý
             </Text>
           </View>
@@ -278,7 +278,7 @@ export default function ProjectProgressTracker({ projectId, onUpdatePress }: Pro
             <Text style={[styles.statValue, { color: colors.text }]}>
               {statistics.blocked_tasks}
             </Text>
-            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>
+            <Text style={[styles.statLabel, { color: colors.textMuted }]}>
               Bị chặn
             </Text>
           </View>
@@ -287,7 +287,7 @@ export default function ProjectProgressTracker({ projectId, onUpdatePress }: Pro
         {/* Progress Bar */}
         <View style={styles.progressBarContainer}>
           <View style={styles.progressBarHeader}>
-            <Text style={[styles.progressBarLabel, { color: colors.textSecondary }]}>
+            <Text style={[styles.progressBarLabel, { color: colors.textMuted }]}>
               Tổng tiến độ
             </Text>
             <Text style={[styles.progressBarValue, { color: progressColor }]}>
@@ -309,7 +309,7 @@ export default function ProjectProgressTracker({ projectId, onUpdatePress }: Pro
       {milestones.length > 0 && (
         <Animated.View
           entering={FadeInDown.duration(400).delay(200)}
-          style={[styles.milestonesCard, { backgroundColor: colors.card }]}
+          style={[styles.milestonesCard, { backgroundColor: colors.surface }]}
         >
           <Text style={[styles.sectionTitle, { color: colors.text }]}>
             Các mốc dự án ({milestones.length})
@@ -352,7 +352,7 @@ export default function ProjectProgressTracker({ projectId, onUpdatePress }: Pro
                 <Text style={[styles.milestoneName, { color: colors.text }]}>
                   {milestone.name}
                 </Text>
-                <Text style={[styles.milestoneDate, { color: colors.textSecondary }]}>
+                <Text style={[styles.milestoneDate, { color: colors.textMuted }]}>
                   Hạn: {formatDate(milestone.due_date)}
                 </Text>
                 
@@ -369,7 +369,7 @@ export default function ProjectProgressTracker({ projectId, onUpdatePress }: Pro
                       ]}
                     />
                   </View>
-                  <Text style={[styles.milestoneProgressText, { color: colors.textSecondary }]}>
+                  <Text style={[styles.milestoneProgressText, { color: colors.textMuted }]}>
                     {milestone.completion_percentage}%
                   </Text>
                 </View>
@@ -382,11 +382,11 @@ export default function ProjectProgressTracker({ projectId, onUpdatePress }: Pro
       {/* Project Dates */}
       <Animated.View
         entering={FadeInDown.duration(400).delay(300)}
-        style={[styles.datesCard, { backgroundColor: colors.card }]}
+        style={[styles.datesCard, { backgroundColor: colors.surface }]}
       >
         <View style={styles.dateItem}>
           <Ionicons name="play-circle-outline" size={20} color={colors.accent} />
-          <Text style={[styles.dateLabel, { color: colors.textSecondary }]}>Ngày bắt đầu</Text>
+          <Text style={[styles.dateLabel, { color: colors.textMuted }]}>Ngày bắt đầu</Text>
           <Text style={[styles.dateValue, { color: colors.text }]}>
             {formatDate(project.start_date)}
           </Text>
@@ -396,7 +396,7 @@ export default function ProjectProgressTracker({ projectId, onUpdatePress }: Pro
 
         <View style={styles.dateItem}>
           <Ionicons name="flag-outline" size={20} color={colors.error} />
-          <Text style={[styles.dateLabel, { color: colors.textSecondary }]}>Deadline</Text>
+          <Text style={[styles.dateLabel, { color: colors.textMuted }]}>Deadline</Text>
           <Text style={[styles.dateValue, { color: colors.text }]}>
             {formatDate(project.deadline)}
           </Text>

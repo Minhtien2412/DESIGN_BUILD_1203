@@ -1,4 +1,4 @@
-import { useThemeColor } from '@/hooks/use-theme-color';
+﻿import { useThemeColor } from '@/hooks/use-theme-color';
 import { DeviceInfo } from '@/services/deviceSecurity';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';

@@ -86,11 +86,11 @@ class IntegratedApiService {
     if (token && socketManager) {
       socketManager.connect({
         token,
-        onMessage: (message) => {
+        onMessage: (message: any) => {
           // Handle incoming messages - can be integrated with your state management
           console.log('New message received:', message);
         },
-        onNotification: (notification) => {
+        onNotification: (notification: any) => {
           // Handle system notifications
           console.log('New notification:', notification);
         },
@@ -176,7 +176,7 @@ class IntegratedApiService {
 
   async markMessageAsRead(chatId: string, messageId: string) {
     // Send via socket for real-time update
-    socketManager.markMessageAsRead(chatId, messageId);
+    socketManager.markAsRead(chatId, messageId);
     
     // Also call REST API as backup
     try {

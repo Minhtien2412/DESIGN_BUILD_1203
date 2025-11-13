@@ -101,7 +101,7 @@ export function QuickCallWidget({ compact, style }: QuickCallWidgetProps = {}) {
 
   const handleQuickCall = (contact: QuickContact) => {
     const roomId = `quick-${Date.now()}`;
-  router.push(`/call-popup?roomId=${roomId}&kind=video&peerId=${contact.id}&peerName=${encodeURIComponent(contact.name)}`);
+  router.push(`/call-popup?roomId=${roomId}&kind=video&peerId=${contact.id}&peerName=${encodeURIComponent(contact.name)}` as any);
   };
 
   const statusColors = {
@@ -119,7 +119,7 @@ export function QuickCallWidget({ compact, style }: QuickCallWidgetProps = {}) {
           <Text style={styles.title}>Video Call</Text>
           <Pressable
             style={styles.loginButton}
-            onPress={() => router.push('/profile')}
+            onPress={() => router.push('/profile' as any)}
           >
             <Text style={styles.loginText}>Đăng nhập</Text>
           </Pressable>
@@ -158,7 +158,7 @@ export function QuickCallWidget({ compact, style }: QuickCallWidgetProps = {}) {
         <Pressable
           style={styles.moreButton}
           // Legacy video-call-home removed; go to contact-picker instead
-          onPress={() => router.push('/contact-picker')}
+          onPress={() => router.push('/contact-picker' as any)}
         >
           <Text style={styles.moreText}>Xem thêm</Text>
           <MaterialIcons name="chevron-right" size={16} color="#667eea" />
@@ -171,7 +171,7 @@ export function QuickCallWidget({ compact, style }: QuickCallWidgetProps = {}) {
           <Text style={styles.emptyText}>Chưa có liên hệ gần đây</Text>
           <Pressable
             style={styles.startButton}
-            onPress={() => router.push('/contact-picker')}
+            onPress={() => router.push('/contact-picker' as any)}
           >
             <Text style={styles.startButtonText}>Bắt đầu gọi</Text>
           </Pressable>
@@ -225,7 +225,7 @@ export function QuickCallWidget({ compact, style }: QuickCallWidgetProps = {}) {
       <View style={[styles.quickActions, compact && styles.compactQuickActions]}>
         <Pressable 
           style={styles.quickAction}
-          onPress={() => router.push('/contact-picker')}
+          onPress={() => router.push('/contact-picker' as any)}
         >
           <MaterialCommunityIcons name="account-multiple-plus" size={16} color="#667eea" />
           <Text style={styles.quickActionText}>Gọi nhóm</Text>
@@ -233,7 +233,7 @@ export function QuickCallWidget({ compact, style }: QuickCallWidgetProps = {}) {
         
         <Pressable 
           style={styles.quickAction}
-          onPress={() => router.push('/join-call')}
+          onPress={() => router.push('/join-call' as any)}
         >
           <MaterialCommunityIcons name="phone-plus" size={16} color="#667eea" />
           <Text style={styles.quickActionText}>Tham gia</Text>

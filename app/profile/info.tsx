@@ -11,16 +11,17 @@ import * as ImagePicker from 'expo-image-picker';
 import { Stack, router } from 'expo-router';
 import * as React from 'react';
 import {
-    ActivityIndicator,
-    Alert,
-    Image,
-    KeyboardAvoidingView,
-    Platform,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  Animated,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 interface FormData {
@@ -38,6 +39,9 @@ interface FormErrors {
   email?: string;
   phone?: string;
   bio?: string;
+  address?: string;
+  city?: string;
+  country?: string;
 }
 
 export default function ProfileInfoScreen() {
@@ -60,6 +64,14 @@ export default function ProfileInfoScreen() {
     resolveAvatar(user?.avatar, { userId: user?.id || 'guest', nameFallback: user?.name || 'User', size: 120 })
   );
   const [saving, setSaving] = React.useState(false);
+  const [hasChanges, setHasChanges] = React.useState(false);
+  const [showSuccess, setShowSuccess] = React.useState(false);
+  const [validFields, setValidFields] = React.useState<Set<keyof FormData>>(new Set());
+
+  // Animations
+  const successScale = React.useRef(new Animated.Value(0)).current;
+  const shakeAnim = React.useRef(new Animated.Value(0)).current;
+  const avatarScale = React.useRef(new Animated.Value(1)).current;
 
   React.useEffect(() => {
     if (user) {
@@ -74,6 +86,85 @@ export default function ProfileInfoScreen() {
       });
     }
   }, [user]);
+
+  const handleFieldChange = (field: keyof FormData, value: string) => {
+    setFormData({ ...formData, [field]: value });
+    setHasChanges(true);
+
+    // Real-time validation
+    const newErrors = { ...errors };
+    
+    // Validate based on field type
+    if (field === 'name') {
+      if (!value.trim()) {
+        newErrors.name = 'Vui lòng nhập họ tên';
+      } else if (value.trim().length < 2) {
+        newErrors.name = 'Họ tên phải có ít nhất 2 ký tự';
+      } else {
+        delete newErrors.name;
+      }
+    } else if (field === 'email') {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!value.trim()) {
+        newErrors.email = 'Vui lòng nhập email';
+      } else if (!emailRegex.test(value)) {
+        newErrors.email = 'Email không hợp lệ';
+      } else {
+        delete newErrors.email;
+      }
+    } else if (field === 'phone') {
+      const phoneRegex = /^[0-9]{10,11}$/;
+      if (value && !phoneRegex.test(value.replace(/\s/g, ''))) {
+        newErrors.phone = 'Số điện thoại không hợp lệ (10-11 số)';
+      } else {
+        delete newErrors.phone;
+      }
+    } else if (field === 'bio') {
+      if (value.length > 500) {
+        newErrors.bio = 'Giới thiệu không được quá 500 ký tự';
+      } else {
+        delete newErrors.bio;
+      }
+    }
+
+    setErrors(newErrors);
+
+    // Update valid fields set for checkmark display
+    const newValidFields = new Set(validFields);
+    if (!newErrors[field] && value.trim()) {
+      newValidFields.add(field);
+    } else {
+      newValidFields.delete(field);
+    }
+    setValidFields(newValidFields);
+  };
+
+  const shakeError = () => {
+    Animated.sequence([
+      Animated.timing(shakeAnim, { toValue: 10, duration: 100, useNativeDriver: true }),
+      Animated.timing(shakeAnim, { toValue: -10, duration: 100, useNativeDriver: true }),
+      Animated.timing(shakeAnim, { toValue: 10, duration: 100, useNativeDriver: true }),
+      Animated.timing(shakeAnim, { toValue: 0, duration: 100, useNativeDriver: true }),
+    ]).start();
+  };
+
+  const showSuccessAnimation = () => {
+    setShowSuccess(true);
+    Animated.sequence([
+      Animated.spring(successScale, {
+        toValue: 1,
+        friction: 5,
+        tension: 40,
+        useNativeDriver: true,
+      }),
+      Animated.delay(1500),
+      Animated.timing(successScale, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+    ]).start(() => setShowSuccess(false));
+  };
 
   const validate = (): boolean => {
     const newErrors: FormErrors = {};
@@ -106,6 +197,8 @@ export default function ProfileInfoScreen() {
 
   const handleSave = async () => {
     if (!validate()) {
+      shakeError();
+      Alert.alert('Lỗi', 'Vui lòng kiểm tra lại thông tin');
       return;
     }
 
@@ -146,11 +239,18 @@ export default function ProfileInfoScreen() {
           cacheBust: Date.now(),
         })
       );
-      Alert.alert('Thành công', 'Cập nhật thông tin thành công', [
-        { text: 'OK', onPress: () => router.back() }
-      ]);
+      
+      setHasChanges(false);
+      showSuccessAnimation();
+      
+      setTimeout(() => {
+        Alert.alert('Thành công', 'Thông tin đã được cập nhật', [
+          { text: 'OK', onPress: () => router.back() }
+        ]);
+      }, 300);
     } catch (error) {
       console.error('Update profile error:', error);
+      shakeError();
       Alert.alert('Lỗi', 'Không thể cập nhật thông tin. Vui lòng thử lại.');
     } finally {
       setSaving(false);
@@ -158,6 +258,12 @@ export default function ProfileInfoScreen() {
   };
 
   const pickImage = async () => {
+    // Animate avatar before picking
+    Animated.sequence([
+      Animated.timing(avatarScale, { toValue: 0.95, duration: 100, useNativeDriver: true }),
+      Animated.timing(avatarScale, { toValue: 1, duration: 100, useNativeDriver: true }),
+    ]).start();
+
     try {
       const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
       
@@ -175,8 +281,16 @@ export default function ProfileInfoScreen() {
 
       if (!result.canceled && result.assets[0]) {
         setAvatarUri(result.assets[0].uri);
+        setHasChanges(true);
+        
+        // Animate avatar change
+        Animated.sequence([
+          Animated.timing(avatarScale, { toValue: 1.1, duration: 200, useNativeDriver: true }),
+          Animated.spring(avatarScale, { toValue: 1, friction: 5, useNativeDriver: true }),
+        ]).start();
       }
     } catch (error) {
+      console.error('Image picker error:', error);
       Alert.alert('Lỗi', 'Không thể chọn ảnh. Vui lòng thử lại.');
     }
   };
@@ -198,8 +312,16 @@ export default function ProfileInfoScreen() {
 
       if (!result.canceled && result.assets[0]) {
         setAvatarUri(result.assets[0].uri);
+        setHasChanges(true);
+        
+        // Animate avatar change
+        Animated.sequence([
+          Animated.timing(avatarScale, { toValue: 1.1, duration: 200, useNativeDriver: true }),
+          Animated.spring(avatarScale, { toValue: 1, friction: 5, useNativeDriver: true }),
+        ]).start();
       }
     } catch (error) {
+      console.error('Camera error:', error);
       Alert.alert('Lỗi', 'Không thể chụp ảnh. Vui lòng thử lại.');
     }
   };
@@ -234,15 +356,19 @@ export default function ProfileInfoScreen() {
         options={{ 
           title: 'Thông tin cá nhân',
           headerBackTitle: 'Quay lại',
-          headerRight: () => (
-            <TouchableOpacity onPress={handleSave} disabled={saving}>
+          headerRight: () => hasChanges ? (
+            <TouchableOpacity 
+              onPress={handleSave} 
+              disabled={saving}
+              style={{ opacity: saving ? 0.5 : 1 }}
+            >
               {saving ? (
                 <ActivityIndicator size="small" color="#0891B2" />
               ) : (
                 <ThemedText style={styles.saveButton}>Lưu</ThemedText>
               )}
             </TouchableOpacity>
-          )
+          ) : null
         }} 
       />
       
@@ -257,37 +383,54 @@ export default function ProfileInfoScreen() {
         >
           {/* Avatar Section */}
           <View style={styles.avatarSection}>
-            <View style={styles.avatarContainer}>
-              <Image source={{ uri: avatarUri }} style={styles.avatar} />
-              <TouchableOpacity 
-                style={styles.avatarEditButton}
-                onPress={showImageOptions}
-                activeOpacity={0.8}
-              >
-                <Ionicons name="camera" size={20} color="#fff" />
-              </TouchableOpacity>
-            </View>
+            <TouchableOpacity 
+              onPress={showImageOptions}
+              activeOpacity={0.8}
+              disabled={saving}
+            >
+              <Animated.View style={{ transform: [{ scale: avatarScale }] }}>
+                <View style={styles.avatarContainer}>
+                  <Image source={{ uri: avatarUri }} style={styles.avatar} />
+                  <View style={styles.avatarEditButton}>
+                    <Ionicons name="camera" size={18} color="#fff" />
+                  </View>
+                </View>
+              </Animated.View>
+            </TouchableOpacity>
             <Text style={styles.avatarHint}>Nhấn vào ảnh để thay đổi</Text>
           </View>
 
           {/* Form Fields */}
-          <View style={styles.formSection}>
+          <Animated.View 
+            style={[
+              styles.formSection,
+              { transform: [{ translateX: shakeAnim }] }
+            ]}
+          >
             {/* Name */}
             <View style={styles.fieldContainer}>
               <Text style={styles.label}>
                 Họ và tên <Text style={styles.required}>*</Text>
               </Text>
-              <View style={[styles.inputWrapper, errors.name && styles.inputError]}>
-                <Ionicons name="person-outline" size={20} color="#6B7280" style={styles.inputIcon} />
+              <View style={[
+                styles.inputWrapper, 
+                errors.name && styles.inputError,
+                validFields.has('name') && styles.inputValid
+              ]}>
+                <Ionicons 
+                  name={validFields.has('name') ? "checkmark-circle" : "person-outline"} 
+                  size={20} 
+                  color={errors.name ? "#EF4444" : validFields.has('name') ? "#10B981" : "#6B7280"} 
+                  style={styles.inputIcon} 
+                />
                 <TextInput
                   style={styles.input}
                   value={formData.name}
-                  onChangeText={(text) => {
-                    setFormData({ ...formData, name: text });
-                    if (errors.name) setErrors({ ...errors, name: undefined });
-                  }}
-                  placeholder="Nhập họ và tên"
+                  onChangeText={(text) => handleFieldChange('name', text)}
+                  placeholder="Nhập họ và tên đầy đủ"
                   placeholderTextColor="#9CA3AF"
+                  autoCapitalize="words"
+                  editable={!saving}
                 />
               </View>
               {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
@@ -298,19 +441,26 @@ export default function ProfileInfoScreen() {
               <Text style={styles.label}>
                 Email <Text style={styles.required}>*</Text>
               </Text>
-              <View style={[styles.inputWrapper, errors.email && styles.inputError]}>
-                <Ionicons name="mail-outline" size={20} color="#6B7280" style={styles.inputIcon} />
+              <View style={[
+                styles.inputWrapper, 
+                errors.email && styles.inputError,
+                validFields.has('email') && styles.inputValid
+              ]}>
+                <Ionicons 
+                  name={validFields.has('email') ? "checkmark-circle" : "mail-outline"} 
+                  size={20} 
+                  color={errors.email ? "#EF4444" : validFields.has('email') ? "#10B981" : "#6B7280"} 
+                  style={styles.inputIcon} 
+                />
                 <TextInput
                   style={styles.input}
                   value={formData.email}
-                  onChangeText={(text) => {
-                    setFormData({ ...formData, email: text });
-                    if (errors.email) setErrors({ ...errors, email: undefined });
-                  }}
+                  onChangeText={(text) => handleFieldChange('email', text)}
                   placeholder="email@example.com"
                   placeholderTextColor="#9CA3AF"
                   keyboardType="email-address"
                   autoCapitalize="none"
+                  editable={!saving}
                 />
               </View>
               {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
@@ -319,18 +469,26 @@ export default function ProfileInfoScreen() {
             {/* Phone */}
             <View style={styles.fieldContainer}>
               <Text style={styles.label}>Số điện thoại</Text>
-              <View style={[styles.inputWrapper, errors.phone && styles.inputError]}>
-                <Ionicons name="call-outline" size={20} color="#6B7280" style={styles.inputIcon} />
+              <View style={[
+                styles.inputWrapper, 
+                errors.phone && styles.inputError,
+                validFields.has('phone') && styles.inputValid
+              ]}>
+                <Ionicons 
+                  name={validFields.has('phone') ? "checkmark-circle" : "call-outline"} 
+                  size={20} 
+                  color={errors.phone ? "#EF4444" : validFields.has('phone') ? "#10B981" : "#6B7280"} 
+                  style={styles.inputIcon} 
+                />
                 <TextInput
                   style={styles.input}
                   value={formData.phone}
-                  onChangeText={(text) => {
-                    setFormData({ ...formData, phone: text });
-                    if (errors.phone) setErrors({ ...errors, phone: undefined });
-                  }}
+                  onChangeText={(text) => handleFieldChange('phone', text)}
                   placeholder="0123456789"
                   placeholderTextColor="#9CA3AF"
                   keyboardType="phone-pad"
+                  maxLength={11}
+                  editable={!saving}
                 />
               </View>
               {errors.phone && <Text style={styles.errorText}>{errors.phone}</Text>}
@@ -338,23 +496,29 @@ export default function ProfileInfoScreen() {
 
             {/* Bio */}
             <View style={styles.fieldContainer}>
-              <Text style={styles.label}>Giới thiệu bản thân</Text>
-              <View style={[styles.inputWrapper, styles.textAreaWrapper, errors.bio && styles.inputError]}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                <Text style={styles.label}>Giới thiệu bản thân</Text>
+                <Text style={styles.charCount}>{formData.bio.length}/500</Text>
+              </View>
+              <View style={[
+                styles.inputWrapper, 
+                styles.textAreaWrapper, 
+                errors.bio && styles.inputError,
+                validFields.has('bio') && styles.inputValid
+              ]}>
                 <TextInput
                   style={[styles.input, styles.textArea]}
                   value={formData.bio}
-                  onChangeText={(text) => {
-                    setFormData({ ...formData, bio: text });
-                    if (errors.bio) setErrors({ ...errors, bio: undefined });
-                  }}
+                  onChangeText={(text) => handleFieldChange('bio', text)}
                   placeholder="Viết vài dòng về bản thân..."
                   placeholderTextColor="#9CA3AF"
                   multiline
                   numberOfLines={4}
                   textAlignVertical="top"
+                  maxLength={500}
+                  editable={!saving}
                 />
               </View>
-              <Text style={styles.charCount}>{formData.bio.length}/500</Text>
               {errors.bio && <Text style={styles.errorText}>{errors.bio}</Text>}
             </View>
 
@@ -366,9 +530,10 @@ export default function ProfileInfoScreen() {
                 <TextInput
                   style={styles.input}
                   value={formData.address}
-                  onChangeText={(text) => setFormData({ ...formData, address: text })}
+                  onChangeText={(text) => handleFieldChange('address', text)}
                   placeholder="Số nhà, tên đường"
                   placeholderTextColor="#9CA3AF"
+                  editable={!saving}
                 />
               </View>
             </View>
@@ -381,9 +546,11 @@ export default function ProfileInfoScreen() {
                 <TextInput
                   style={styles.input}
                   value={formData.city}
-                  onChangeText={(text) => setFormData({ ...formData, city: text })}
+                  onChangeText={(text) => handleFieldChange('city', text)}
                   placeholder="TP. Hồ Chí Minh"
                   placeholderTextColor="#9CA3AF"
+                  autoCapitalize="words"
+                  editable={!saving}
                 />
               </View>
             </View>
@@ -396,30 +563,55 @@ export default function ProfileInfoScreen() {
                 <TextInput
                   style={styles.input}
                   value={formData.country}
-                  onChangeText={(text) => setFormData({ ...formData, country: text })}
+                  onChangeText={(text) => handleFieldChange('country', text)}
                   placeholder="Vietnam"
                   placeholderTextColor="#9CA3AF"
+                  editable={!saving}
                 />
               </View>
             </View>
-          </View>
+          </Animated.View>
 
-          {/* Save Button (Mobile) */}
+          {/* Save Button */}
           <TouchableOpacity
-            style={[styles.submitButton, saving && styles.submitButtonDisabled]}
+            style={[
+              styles.submitButton, 
+              !hasChanges && styles.submitButtonDisabled,
+              saving && styles.submitButtonSaving
+            ]}
             onPress={handleSave}
-            disabled={saving}
+            disabled={!hasChanges || saving}
             activeOpacity={0.8}
           >
             {saving ? (
-              <ActivityIndicator size="small" color="#fff" />
+              <>
+                <ActivityIndicator size="small" color="#fff" />
+                <Text style={styles.submitButtonText}>Đang lưu...</Text>
+              </>
             ) : (
               <>
                 <Ionicons name="checkmark-circle-outline" size={24} color="#fff" />
-                <Text style={styles.submitButtonText}>Lưu thay đổi</Text>
+                <Text style={styles.submitButtonText}>
+                  {hasChanges ? 'Lưu thay đổi' : 'Không có thay đổi'}
+                </Text>
               </>
             )}
           </TouchableOpacity>
+
+          {/* Success Overlay */}
+          {showSuccess && (
+            <Animated.View 
+              style={[
+                styles.successOverlay,
+                { transform: [{ scale: successScale }] }
+              ]}
+            >
+              <View style={styles.successCard}>
+                <Ionicons name="checkmark-circle" size={60} color="#10B981" />
+                <Text style={styles.successText}>Đã lưu!</Text>
+              </View>
+            </Animated.View>
+          )}
         </SafeScrollView>
       </KeyboardAvoidingView>
     </ThemedView>
@@ -505,6 +697,11 @@ const styles = StyleSheet.create({
   },
   inputError: {
     borderColor: '#EF4444',
+    borderWidth: 2,
+  },
+  inputValid: {
+    borderColor: '#10B981',
+    borderWidth: 2,
   },
   inputIcon: {
     marginRight: 10,
@@ -545,13 +742,49 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginTop: 32,
     gap: 8,
+    shadowColor: '#0891B2',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
   submitButtonDisabled: {
-    opacity: 0.6,
+    opacity: 0.5,
+    shadowOpacity: 0,
+  },
+  submitButtonSaving: {
+    backgroundColor: '#6B7280',
   },
   submitButtonText: {
     fontSize: 17,
     fontWeight: '600',
     color: '#fff',
+  },
+  successOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  successCard: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 32,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  successText: {
+    marginTop: 16,
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#10B981',
   },
 });

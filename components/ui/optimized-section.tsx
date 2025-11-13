@@ -90,7 +90,7 @@ export default function OptimizedSection({
 
         {headerAction && (
           <TouchableOpacity
-            onPress={headerAction}
+            onPress={headerAction as any}
             style={styles.headerAction}
             activeOpacity={0.7}
           >
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.3,
   },
   subtitle: {
-    ...DesignSystem.typography.styles.caption,
+    ...DesignSystem.typography.styles.caption as any,
     marginTop: 2,
   },
   countBadge: {

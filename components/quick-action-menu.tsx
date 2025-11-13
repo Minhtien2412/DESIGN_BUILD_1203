@@ -93,6 +93,18 @@ const QUICK_ACTIONS: QuickAction[] = [
 
 const QUICK_SETTINGS: { id: string; icon: keyof typeof Ionicons.glyphMap; label: string; route: Href }[] = [
   {
+    id: 'qr-scanner',
+    icon: 'scan' as keyof typeof Ionicons.glyphMap,
+    label: 'Quét QR',
+    route: '/utilities/qr-scanner' as Href,
+  },
+  {
+    id: 'my-qr',
+    icon: 'qr-code' as keyof typeof Ionicons.glyphMap,
+    label: 'Mã QR',
+    route: '/utilities/my-qr-code' as Href,
+  },
+  {
     id: 'notifications',
     icon: 'notifications' as keyof typeof Ionicons.glyphMap,
     label: 'Thông báo',

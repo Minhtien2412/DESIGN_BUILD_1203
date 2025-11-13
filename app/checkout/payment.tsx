@@ -1,4 +1,4 @@
-import { useCart } from '@/context/cart-context';
+﻿import { useCart } from '@/context/cart-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
@@ -120,7 +120,7 @@ function PaymentMethodContent() {
         type: 'error',
         message: 'Your cart is empty',
       });
-      router.push('/cart');
+      router.push('/shopping/cart');
       return;
     }
 

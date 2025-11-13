@@ -175,7 +175,7 @@ export default function LiveVideo({ item, isActive, controlsVisible, onUserInter
     if (!playable) return;
     // Pause inline to avoid double audio
     try { player.pause(); } catch {}
-    openGlobalPlayer({ type: 'uri', uri: playable, title: item.title }, { mode: 'floating' });
+    (openGlobalPlayer as any)({ type: 'uri', uri: playable, title: item.title }, { mode: 'floating' });
   };
 
   // For HLS, wait until resolvedUrl is ready; for MP4/inline assets, allow player to mount immediately
@@ -349,7 +349,7 @@ export default function LiveVideo({ item, isActive, controlsVisible, onUserInter
 
           {/* Comments button opens in-screen comments sheet */}
           <TouchableOpacity 
-            onPress={() => { toggleCommentsVisible(true); onUserInteract?.(); }} 
+            onPress={() => { (toggleCommentsVisible as any)(true); onUserInteract?.(); }} 
             style={styles.actionButton}
           >
             <IconSymbol size={32} name="bubble.left.fill" color="white" />

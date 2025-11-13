@@ -5,13 +5,13 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import {
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 interface Participant {
@@ -96,7 +96,7 @@ export default function CreateMeetingScreen() {
               {
                 color: textColor,
                 borderColor: borderColor,
-                backgroundColor: useThemeColor({}, 'card'),
+                backgroundColor: useThemeColor({}, 'surface'),
               },
             ]}
             placeholder="Nhập tên phòng họp"
@@ -135,7 +135,7 @@ export default function CreateMeetingScreen() {
               style={[
                 styles.input,
                 styles.dateButton,
-                { borderColor: borderColor, backgroundColor: useThemeColor({}, 'card') },
+                { borderColor: borderColor, backgroundColor: useThemeColor({}, 'surface') },
               ]}
             >
               <Text style={{ color: textColor }}>
@@ -152,7 +152,7 @@ export default function CreateMeetingScreen() {
                 onPress={() => setShowStartTimePicker(true)}
                 style={[
                   styles.timeButton,
-                  { borderColor: borderColor, backgroundColor: useThemeColor({}, 'card') },
+                  { borderColor: borderColor, backgroundColor: useThemeColor({}, 'surface') },
                 ]}
               >
                 <Text style={{ color: textColor, fontSize: 12 }}>
@@ -167,7 +167,7 @@ export default function CreateMeetingScreen() {
                 onPress={() => setShowEndTimePicker(true)}
                 style={[
                   styles.timeButton,
-                  { borderColor: borderColor, backgroundColor: useThemeColor({}, 'card') },
+                  { borderColor: borderColor, backgroundColor: useThemeColor({}, 'surface') },
                 ]}
               >
                 <Text style={{ color: textColor, fontSize: 12 }}>
@@ -298,7 +298,7 @@ export default function CreateMeetingScreen() {
         {/* Create Button */}
         <Button
           onPress={handleCreateMeeting}
-          style={[styles.createButton, { backgroundColor: primaryColor }]}
+          style={[styles.createButton, { backgroundColor: primaryColor }] as any}
         >
           <Text style={styles.createButtonText}>Bắt đầu cuộc họp</Text>
         </Button>

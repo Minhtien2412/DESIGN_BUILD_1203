@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Stack, useLocalSearchParams } from 'expo-router';
+import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import {
     FlatList,
@@ -114,8 +114,13 @@ export default function ShoppingCategoryScreen() {
   };
 
   const handleProductPress = (product: any) => {
-    // TODO: Navigate to product detail
-    console.log('Product pressed:', product);
+    try {
+      if (product?.id == null) return;
+      // Navigate to dynamic product detail route
+      router.push(`/shopping/product/${product.id}`);
+    } catch (e) {
+      console.warn('Navigation error:', e);
+    }
   };
 
   const renderProduct = ({ item }: { item: any }) => (

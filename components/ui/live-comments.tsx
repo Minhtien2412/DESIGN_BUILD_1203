@@ -38,7 +38,7 @@ export default function LiveComments({ onClose, streamId }: LiveCommentsProps) {
           ).length === 0 ? (
             <Text style={styles.empty}>Chưa có bình luận nào.</Text>
           ) : (
-            (streamId ? getComments(streamId) : comments).map((c) => (
+            (streamId ? getComments(streamId) : comments).map((c: any) => (
               <View key={c.id} style={styles.commentRow}>
                 <Text style={styles.commentUser}>@{c.user}</Text>
                 <Text style={styles.commentText}>{c.text}</Text>

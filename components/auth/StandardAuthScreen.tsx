@@ -1,10 +1,10 @@
-/**
+﻿/**
  * Standard Authentication Screen
  * Clean, modern design for login/register
  * Based on official API: https://api.thietkeresort.com.vn/docs/api-docs.html
  */
 
-import { useStandardAuth } from '@/context/StandardAuthContext';
+import { useAuth } from '@/context/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
@@ -27,7 +27,7 @@ type AuthMode = 'login' | 'register';
 
 export default function StandardAuthScreen() {
   const router = useRouter();
-  const { signIn, signUp, loading } = useStandardAuth();
+  const { signIn, signUp, loading } = useAuth();
 
   const [mode, setMode] = useState<AuthMode>('login');
   const [email, setEmail] = useState('');
@@ -78,11 +78,11 @@ export default function StandardAuthScreen() {
   const handleLogin = async () => {
     if (!validateForm()) return;
 
-    const result = await signIn(email, password);
-    if (result.success) {
+    try {
+      await signIn(email, password);
       router.replace('/(tabs)');
-    } else {
-      Alert.alert('Đăng nhập thất bại', result.message);
+    } catch (error: any) {
+      Alert.alert('Đăng nhập thất bại', error.message || 'Có lỗi xảy ra');
     }
   };
 
@@ -90,16 +90,16 @@ export default function StandardAuthScreen() {
   const handleRegister = async () => {
     if (!validateForm()) return;
     
-    const result = await signUp(email, password, name, phone || undefined);
-    if (result.success) {
+    try {
+      await signUp(email, password, name, phone || undefined);
       Alert.alert('Đăng ký thành công', 'Bạn đã đăng ký thành công!', [
         {
           text: 'OK',
           onPress: () => router.replace('/(tabs)'),
         },
       ]);
-    } else {
-      Alert.alert('Đăng ký thất bại', result.message);
+    } catch (error: any) {
+      Alert.alert('Đăng ký thất bại', error.message || 'Có lỗi xảy ra');
     }
   };
 

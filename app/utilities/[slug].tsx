@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Container } from '@/components/ui/container';
 import { Section } from '@/components/ui/section';
 import { getServiceBySlug, Service } from '@/data/services';
+import { ApiError, apiFetch } from '@/services/api';
 import { Ionicons } from '@expo/vector-icons';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
@@ -53,11 +54,14 @@ export default function UtilityDetailScreen() {
     }
 
     setIsSubmitting(true);
-
-    // TODO: Call API to submit booking
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Submit booking via API wrapper (uses timeout and normalized errors)
+      const payload = {
+        serviceSlug: slug,
+        serviceName: service.name,
+        ...bookingData,
+      };
+      await apiFetch('/bookings', { method: 'POST', data: payload, timeoutMs: 10000 });
 
       Alert.alert(
         'Đặt dịch vụ thành công!',
@@ -72,8 +76,9 @@ export default function UtilityDetailScreen() {
           },
         ]
       );
-    } catch (error) {
-      Alert.alert('Lỗi', 'Không thể đặt dịch vụ. Vui lòng thử lại sau.');
+    } catch (e: any) {
+      const detail = e instanceof ApiError ? (e.data?.detail || e.message) : 'Không thể đặt dịch vụ. Vui lòng thử lại sau.';
+      Alert.alert('Lỗi', String(detail));
     } finally {
       setIsSubmitting(false);
     }

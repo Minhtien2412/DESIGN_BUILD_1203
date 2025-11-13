@@ -1,16 +1,16 @@
-import { useStandardAuth } from '@/context/StandardAuthContext';
+import { useAuth } from '@/context/AuthContext';
 import { Redirect } from 'expo-router';
 import * as React from 'react';
 
 export function AuthGate({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useStandardAuth();
+  const { user, loading } = useAuth();
   
   if (loading) {
     return null; // Could add a splash screen here
   }
   
   if (!user) {
-    return <Redirect href="/auth-screen" />;
+    return <Redirect href="/(auth)/login" />;
   }
   
   return <>{children}</>;

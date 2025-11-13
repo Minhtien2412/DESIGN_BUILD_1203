@@ -7,10 +7,10 @@ import { Platform } from 'react-native';
 
 export const Colors = {
   light: {
-    // Primary brand colors (Green palette)
-    primary: '#90B44C',           // Primary green
-    secondary: '#4B7F2A',         // Darker green
-    accent: '#66BB6A',            // Accent green
+  // Primary brand colors (Grab-like Green palette)
+  primary: '#00B14F',           // Grab primary green
+  secondary: '#008C3B',         // Darker green for emphasis
+  accent: '#00C853',            // Bright accent green
     
     // Semantic colors
     success: '#10B981',           // Green
@@ -38,20 +38,20 @@ export const Colors = {
   tabIconSelected: '#111827',   // Active black
     
     // Legacy (for compatibility)
-  tint: '#90B44C',
+  tint: '#00B14F',
   icon: '#111827',
     danger: '#EF4444',
     shadow: 'rgba(0,0,0,0.1)',
     overlay: 'rgba(0,0,0,0.5)',
-    chipBackground: '#E7F3DC',    // Soft green background
-    chipText: '#4B7F2A',
-    accentSoft: '#A3D06B',
+    chipBackground: '#E6F6EC',    // Softer green background
+    chipText: '#0E7A3E',
+    accentSoft: '#8BE6A2',
   },
   dark: {
-    // Primary brand colors (Green palette for dark mode)
-    primary: '#A3D06B',           // Lighter green for dark mode
-    secondary: '#90B44C',         // Green
-    accent: '#B7E08A',            // Bright green
+    // Primary brand colors (Grab-like for dark mode)
+    primary: '#00C853',           // Slightly brighter for dark mode
+    secondary: '#00B14F',         // Base green
+    accent: '#4EEA8B',            // Bright accent
     
     // Semantic colors
     success: '#34D399',           // Lighter green
@@ -79,14 +79,14 @@ export const Colors = {
   tabIconSelected: '#F9FAFB',   // Active white
     
     // Legacy (for compatibility)
-  tint: '#A3D06B',
+  tint: '#00C853',
   icon: '#F9FAFB',
     danger: '#F87171',
     shadow: 'rgba(0,0,0,0.3)',
     overlay: 'rgba(0,0,0,0.7)',
-    chipBackground: '#1E3A1A',
-    chipText: '#B7E08A',
-    accentSoft: '#8BC34A',
+    chipBackground: '#0A2E1A',
+    chipText: '#4EEA8B',
+    accentSoft: '#27C26A',
   },
 };
 

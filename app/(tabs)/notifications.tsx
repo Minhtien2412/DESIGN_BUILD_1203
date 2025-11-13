@@ -5,16 +5,16 @@ import { SystemNotificationCard } from '@/components/notifications/SystemNotific
 import { Colors } from '@/constants/theme';
 import { useNotifications, type Notification } from '@/context/NotificationContext';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import React from 'react';
 import {
-  ActivityIndicator,
-  RefreshControl,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  useColorScheme,
-  View,
+    ActivityIndicator, Linking, RefreshControl,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    useColorScheme,
+    View
 } from 'react-native';
 
 type TabType = 'all' | 'system' | 'event' | 'live' | 'message';
@@ -229,7 +229,35 @@ export default function NotificationsScreen() {
   const handleNotificationPress = async (id: string) => {
     // Mark as read when pressed
     await markAsRead(id);
-    // TODO: Navigate to related screen based on notification data
+    try {
+      const notification = notifications.find(n => n.id === id);
+      if (!notification) return;
+      const actionUrl = (notification as any).actionUrl || notification.data?.actionUrl || notification.data?.url;
+      if (typeof actionUrl === 'string' && actionUrl.length > 0) {
+        if (actionUrl.startsWith('/')) {
+          router.push(actionUrl as any);
+          return;
+        }
+        if (actionUrl.startsWith('http')) {
+          Linking.openURL(actionUrl);
+          return;
+        }
+      }
+      // Fallback by category/type
+      switch (notification.category) {
+        case 'message':
+          router.push('/messages' as any); return;
+        case 'live':
+          router.push('/communications' as any); return;
+        case 'event':
+          router.push('/projects' as any); return;
+        default:
+          // system or unknown: stay here, maybe expand details
+          toggleDetails(id);
+      }
+    } catch (e) {
+      console.warn('Notification navigation failed:', e);
+    }
   };
 
   const toggleDetails = (id: string) => {

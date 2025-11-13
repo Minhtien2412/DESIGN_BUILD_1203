@@ -1,5 +1,6 @@
 // CallSessionContext not implemented yet - commented out to prevent bundling errors
 // import { useCallSession } from '@/context/CallSessionContext';
+import { useCallSession } from '@/hooks/useCallSession';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import {
@@ -35,7 +36,7 @@ export function CallActionButtons({
     if (userId) {
       startVideoAndNavigate({ participantIds: [userId], participantNames: { [userId]: userName }, peerId: userId });
     } else {
-      router.push('/contact-picker');
+      router.push('/contact-picker' as any);
     }
   };
 
@@ -43,9 +44,9 @@ export function CallActionButtons({
     if (userId) {
       const roomId = `voice-${Date.now()}`;
       await startCall({ roomId, participantIds: [userId], kind: 'voice', participantNames: { [userId]: userName } });
-      router.push(`/call-popup?roomId=${roomId}&kind=voice&peerId=${userId}&peerName=${encodeURIComponent(userName)}`);
+      router.push(`/call-popup?roomId=${roomId}&kind=voice&peerId=${userId}&peerName=${encodeURIComponent(userName)}` as any);
     } else {
-      router.push('/contact-picker');
+      router.push('/contact-picker' as any);
     }
   };
 
@@ -148,9 +149,9 @@ export function QuickCallButton({
   const handleCall = () => {
     if (userId) {
       const roomId = `quick-${Date.now()}`;
-  router.push(`/call-popup?roomId=${roomId}&kind=video&peerId=${userId}`);
+  router.push(`/call-popup?roomId=${roomId}&kind=video&peerId=${userId}` as any);
     } else {
-      router.push('/contact-picker');
+      router.push('/contact-picker' as any);
     }
   };
 

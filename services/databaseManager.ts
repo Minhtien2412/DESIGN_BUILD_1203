@@ -2,6 +2,12 @@
  * Database Manager Service
  * Quản lý cơ sở dữ liệu tích hợp với API backend
  * Version: 2.0 - MySQL Production Integration
+ * 
+ * ✅ SECURITY: This service correctly uses backend API (apiFetch)
+ * ❌ DO NOT modify to use direct database connections (mysql2, pg, etc.)
+ * 
+ * All queries are sent to backend via POST /database/query endpoint.
+ * Backend handles authentication, validation, and actual DB operations.
  */
 
 import { apiFetch } from './api';

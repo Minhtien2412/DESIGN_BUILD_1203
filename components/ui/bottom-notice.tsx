@@ -4,19 +4,19 @@ import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 export function BottomNotice() {
-  const { items } = useNotifications();
+  const { notifications } = useNotifications();
   const [visible, setVisible] = React.useState(true);
-  const newest = React.useMemo(() => items.find(i => !i.read), [items]);
+  const newest = React.useMemo(() => notifications.find(i => !i.read), [notifications]);
   if (!newest || !visible) return null;
   return (
     <View pointerEvents="box-none" style={styles.wrap}>
       <View style={styles.pill}>
         <Pressable style={{ flex: 1 }} onPress={() => setVisible(false)}>
           <Text style={styles.title} numberOfLines={1}>{newest.title}</Text>
-          {newest.body ? <Text style={styles.body} numberOfLines={1}>{newest.body}</Text> : null}
+          {newest.message ? <Text style={styles.body} numberOfLines={1}>{newest.message}</Text> : null}
         </Pressable>
-        {newest.route ? (
-          <Pressable style={styles.btn} onPress={() => { setVisible(false); pushRoute(newest.route as AppKnownRoute, newest.params as any); }}>
+        {newest.data?.route ? (
+          <Pressable style={styles.btn} onPress={() => { setVisible(false); pushRoute(newest.data.route as AppKnownRoute, newest.data.params as any); }}>
             <Text style={styles.btnText}>Xem</Text>
           </Pressable>
         ) : null}

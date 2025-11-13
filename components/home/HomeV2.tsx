@@ -84,33 +84,33 @@ export default function HomeV2(props: HomeV2Props) {
   const [query, setQuery] = useState('');
 
   const categories = useMemo(() => ([
-    { key: 'design', label: 'Thiết kế', icon: 'pen-tool' as const, route: '/projects' },
-    { key: 'build', label: 'Thi công', icon: 'truck' as const, route: '/projects' },
-    { key: 'interior', label: 'Nội thất', icon: 'grid' as const, route: '/projects' },
-    { key: 'materials', label: 'Vật liệu', icon: 'package' as const, route: '/projects' },
-    { key: 'repair', label: 'Sửa chữa', icon: 'settings' as const, route: '/projects' },
-    { key: 'engineer', label: 'Kỹ sư', icon: 'briefcase' as const, route: '/projects' },
-    { key: 'architect', label: 'Kiến trúc sư', icon: 'compass' as const, route: '/projects' },
-    { key: 'cleaning', label: 'Vệ sinh', icon: 'droplet' as const, route: '/projects' },
+    { key: 'design', label: 'Thi?t k?', icon: 'pen-tool' as const, route: '/projects' },
+    { key: 'build', label: 'Thi c�ng', icon: 'truck' as const, route: '/projects' },
+    { key: 'interior', label: 'N?i th?t', icon: 'grid' as const, route: '/projects' },
+    { key: 'materials', label: 'V?t li?u', icon: 'package' as const, route: '/projects' },
+    { key: 'repair', label: 'S?a ch?a', icon: 'settings' as const, route: '/projects' },
+    { key: 'engineer', label: 'K? su', icon: 'briefcase' as const, route: '/projects' },
+    { key: 'architect', label: 'Ki?n tr�c su', icon: 'compass' as const, route: '/projects' },
+    { key: 'cleaning', label: 'V? sinh', icon: 'droplet' as const, route: '/projects' },
   ]), []);
 
   const featured = useMemo(() => ([
-    { id: 'aristo', title: 'Aristo Villa', subtitle: 'Biệt thự hiện đại • Q.7' },
-    { id: 'eden', title: 'Eden Villa', subtitle: 'Nghỉ dưỡng • Đà Lạt' },
-    { id: 'atrahi', title: 'Atrahi Design', subtitle: 'Coffee concept • Bình Thạnh' },
+    { id: 'aristo', title: 'Aristo Villa', subtitle: 'Bi?t th? hi?n d?i � Q.7' },
+    { id: 'eden', title: 'Eden Villa', subtitle: 'Ngh? du?ng � �� L?t' },
+    { id: 'atrahi', title: 'Atrahi Design', subtitle: 'Coffee concept � B�nh Th?nh' },
   ]), []);
 
   return (
     <Container style={[{ flex: 1, backgroundColor: theme.colors.background }, style]}>
       {/* Hero */}
       <View style={{ backgroundColor: theme.colors.subtle, borderRadius: theme.radii.lg, padding: theme.spacing.lg, borderWidth: 1, borderColor: theme.colors.border }}>
-        <Text style={{ color: theme.colors.textSecondary, fontSize: 12 }}>Xin chào 👋</Text>
-        <Text style={{ color: theme.colors.text, fontSize: 22, fontWeight: '800', marginTop: 2 }}>Thiết kế & Thi công</Text>
+        <Text style={{ color: theme.colors.textSecondary, fontSize: 12 }}>Xin ch�o ??</Text>
+        <Text style={{ color: theme.colors.text, fontSize: 22, fontWeight: '800', marginTop: 2 }}>Thi?t k? & Thi c�ng</Text>
         <View style={{ marginTop: theme.spacing.md, flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderColor: theme.colors.border, borderWidth: 1, borderRadius: 999, paddingHorizontal: 14, height: 44 }}>
           <Feather name="search" size={18} color={theme.colors.muted} />
           <TextInput
             style={{ flex: 1, marginLeft: 8 }}
-            placeholder="Tìm nhà thầu, dự án, sản phẩm..."
+            placeholder="T�m nh� th?u, d? �n, s?n ph?m..."
             placeholderTextColor={theme.colors.muted}
             value={query}
             onChangeText={(t) => { setQuery(t); onSearch && onSearch(t); }}
@@ -119,15 +119,15 @@ export default function HomeV2(props: HomeV2Props) {
         </View>
 
         <View style={{ flexDirection: 'row', marginTop: theme.spacing.md, columnGap: 8, rowGap: 8, flexWrap: 'wrap' }}>
-          <Chip icon="map" label="Gần bạn" onPress={() => onNavigate && onNavigate('/projects')} />
-          <Chip icon="trending-up" label="Xu hướng" onPress={() => onNavigate && onNavigate('/projects')} />
-          <Chip icon="percent" label="Ưu đãi" onPress={() => onNavigate && onNavigate('/projects')} />
-          <Chip icon="clock" label="Đang thi công" onPress={() => onNavigate && onNavigate('/live')} />
+          <Chip icon="map" label="G?n b?n" onPress={() => onNavigate && onNavigate('/projects')} />
+          <Chip icon="trending-up" label="Xu hu?ng" onPress={() => onNavigate && onNavigate('/projects')} />
+          <Chip icon="percent" label="Uu d�i" onPress={() => onNavigate && onNavigate('/projects')} />
+          <Chip icon="clock" label="�ang thi c�ng" onPress={() => onNavigate && onNavigate('/live')} />
         </View>
       </View>
 
       {/* Categories */}
-      <Section title="Danh mục dịch vụ">
+      <Section title="Danh m?c d?ch v?">
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
           {categories.map(c => (
             <IconTile key={c.key} icon={c.icon} label={c.label} onPress={() => onNavigate && onNavigate(c.route)} />
@@ -136,7 +136,7 @@ export default function HomeV2(props: HomeV2Props) {
       </Section>
 
       {/* Featured Projects */}
-      <Section title="Dự án nổi bật">
+      <Section title="D? �n n?i b?t">
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingRight: 12 }}>
           {featured.map(f => (
             <HorizontalCard key={f.id} title={f.title} subtitle={f.subtitle} onPress={() => onNavigate && onNavigate(`/projects`)} />
@@ -145,7 +145,7 @@ export default function HomeV2(props: HomeV2Props) {
       </Section>
 
       {/* Quick Access Blocks */}
-      <Section title="Tiện ích nhanh">
+      <Section title="Ti?n �ch nhanh">
         <View style={{ flexDirection: 'row', columnGap: 12 }}>
           <TouchableOpacity onPress={() => onNavigate && onNavigate('/go-live')} style={{ flex: 1, backgroundColor: theme.colors.surface, borderRadius: theme.radii.lg, padding: 14, borderWidth: 1, borderColor: theme.colors.border }}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -153,8 +153,8 @@ export default function HomeV2(props: HomeV2Props) {
                 <Feather name="camera" size={20} color={theme.colors.primary} />
               </View>
               <View>
-                <Text style={{ fontWeight: '800', color: theme.colors.text }}>Bắt đầu Live</Text>
-                <Text style={{ color: theme.colors.textSecondary, marginTop: 2 }}>Phát trực tiếp công trình</Text>
+                <Text style={{ fontWeight: '800', color: theme.colors.text }}>B?t d?u Live</Text>
+                <Text style={{ color: theme.colors.textSecondary, marginTop: 2 }}>Ph�t tr?c ti?p c�ng tr�nh</Text>
               </View>
             </View>
           </TouchableOpacity>
@@ -164,8 +164,8 @@ export default function HomeV2(props: HomeV2Props) {
                 <Feather name="shopping-bag" size={20} color={theme.colors.primary} />
               </View>
               <View>
-                <Text style={{ fontWeight: '800', color: theme.colors.text }}>Mua sắm nhanh</Text>
-                <Text style={{ color: theme.colors.textSecondary, marginTop: 2 }}>Thiết bị, vật liệu, nội thất</Text>
+                <Text style={{ fontWeight: '800', color: theme.colors.text }}>Mua s?m nhanh</Text>
+                <Text style={{ color: theme.colors.textSecondary, marginTop: 2 }}>Thi?t b?, v?t li?u, n?i th?t</Text>
               </View>
             </View>
           </TouchableOpacity>
@@ -173,12 +173,12 @@ export default function HomeV2(props: HomeV2Props) {
       </Section>
 
       {/* Editorial / Tips */}
-      <Section title="Mẹo & cảm hứng">
+      <Section title="M?o & c?m h?ng">
         <View style={{ rowGap: 12 }}>
           {[1,2,3].map(i => (
             <TouchableOpacity key={i} activeOpacity={0.9} style={{ backgroundColor: theme.colors.surface, borderRadius: theme.radii.lg, padding: 14, borderWidth: 1, borderColor: theme.colors.border }}>
-              <Text style={{ fontWeight: '800', color: theme.colors.text }}>5 lưu ý quan trọng khi chọn nhà thầu #{i}</Text>
-              <Text style={{ color: theme.colors.textSecondary, marginTop: 6 }}>Chọn nhà thầu phù hợp giúp tối ưu chi phí, đảm bảo tiến độ và chất lượng công trình...</Text>
+              <Text style={{ fontWeight: '800', color: theme.colors.text }}>5 luu � quan tr?ng khi ch?n nh� th?u #{i}</Text>
+              <Text style={{ color: theme.colors.textSecondary, marginTop: 6 }}>Ch?n nh� th?u ph� h?p gi�p t?i uu chi ph�, d?m b?o ti?n d? v� ch?t lu?ng c�ng tr�nh...</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -186,10 +186,10 @@ export default function HomeV2(props: HomeV2Props) {
 
       {/* CTA */}
       <View style={{ backgroundColor: theme.colors.primary, borderRadius: theme.radii.lg, padding: 16, alignItems: 'center', justifyContent: 'center' }}>
-        <Text style={{ color: '#fff', fontWeight: '900', fontSize: 16 }}>Bạn cần tư vấn nhanh?</Text>
-        <Text style={{ color: '#fff', opacity: 0.9, marginTop: 4 }}>Chúng tôi sẽ kết nối bạn với chuyên gia phù hợp</Text>
+        <Text style={{ color: '#fff', fontWeight: '900', fontSize: 16 }}>B?n c?n tu v?n nhanh?</Text>
+        <Text style={{ color: '#fff', opacity: 0.9, marginTop: 4 }}>Ch�ng t�i s? k?t n?i b?n v?i chuy�n gia ph� h?p</Text>
         <TouchableOpacity onPress={() => onNavigate && onNavigate('/chat')} style={{ marginTop: 10, backgroundColor: '#fff', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 999 }}>
-          <Text style={{ color: theme.colors.primary, fontWeight: '800' }}>Nhắn tin ngay</Text>
+          <Text style={{ color: theme.colors.primary, fontWeight: '800' }}>Nh?n tin ngay</Text>
         </TouchableOpacity>
       </View>
 

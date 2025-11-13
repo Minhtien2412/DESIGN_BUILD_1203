@@ -1,3 +1,4 @@
+import { FormErrorBoundary } from '@/components/FormErrorBoundary';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { NotificationProvider } from '@/context/NotificationContext';
 import { ProjectDataProvider } from '@/context/project-data-context';
@@ -41,18 +42,20 @@ function AuthNavigator() {
 
 export default function RootLayout() {
   return (
-    <AuthProvider>
-      <ProjectDataProvider>
-        <VideoInteractionsProvider>
-          <NotificationProvider>
-            <AuthNavigator />
-            <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          </Stack>
-        </NotificationProvider>
-      </VideoInteractionsProvider>
-      </ProjectDataProvider>
-    </AuthProvider>
+    <FormErrorBoundary>
+      <AuthProvider>
+        <ProjectDataProvider>
+          <VideoInteractionsProvider>
+            <NotificationProvider>
+              <AuthNavigator />
+              <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            </Stack>
+          </NotificationProvider>
+        </VideoInteractionsProvider>
+        </ProjectDataProvider>
+      </AuthProvider>
+    </FormErrorBoundary>
   );
 }

@@ -16,7 +16,7 @@ export function DeviceSecurityCard({ onPress }: DeviceSecurityCardProps) {
     if (onPress) {
       onPress();
     } else {
-      router.push('/device-management');
+      router.push('/profile/security' as any);
     }
   };
 

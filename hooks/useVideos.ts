@@ -45,8 +45,18 @@ export function useVideos(options: UseVideosOptions = {}) {
       if (category) params.append('category', category);
       if (limit) params.append('limit', limit.toString());
 
-      // Fetch from API
-      const response = await apiFetch(`/api/videos?${params.toString()}`);
+      // Fetch from API (no /api prefix per current backend routing)
+      let response: any;
+      try {
+        response = await apiFetch(`/videos?${params.toString()}`);
+      } catch (e: any) {
+        // Fallback: try legacy prefixed path if 404
+        if (e?.status === 404) {
+          response = await apiFetch(`/api/videos?${params.toString()}`);
+        } else {
+          throw e;
+        }
+      }
       
       console.log('[useVideos] API Response:', JSON.stringify(response, null, 2));
       
@@ -105,7 +115,7 @@ export function useVideos(options: UseVideosOptions = {}) {
         videoData = convertLocalVideosToVideos(getLocalVideosByCategory(category));
       }
       
-      setVideos(videoData);
+  setVideos(videoData);
       setHasMore(videoData.length >= limit);
       
     } catch (err: any) {

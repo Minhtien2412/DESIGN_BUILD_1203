@@ -53,7 +53,7 @@ export default function SettingsScreen() {
   const iconColor = useThemeColor({}, 'icon');
   const borderColor = useThemeColor({}, 'border');
   const mutedColor = useThemeColor({}, 'tabIconDefault');
-  const cardBg = useThemeColor({}, 'cardBackground');
+  const cardBg = useThemeColor({}, 'surface');
   const switchTrack = useThemeColor({}, 'tint');
 
   // Permission check

@@ -1,4 +1,4 @@
-import { useAuth } from '@/context/AuthContext';
+﻿import { useAuth } from '@/context/AuthContext';
 import * as React from 'react';
 
 type Props = {
@@ -9,7 +9,8 @@ type Props = {
 
 export function RequirePermission({ permission, fallback = null, children }: Props) {
   const { hasPermission } = useAuth();
-  if (!hasPermission(permission)) return <>{fallback}</>;
+  // hasPermission expects (feature, capability), simplified check
+  if (!hasPermission(permission, 'read')) return <>{fallback}</>;
   return <>{children}</>;
 }
 

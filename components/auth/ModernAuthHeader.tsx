@@ -1,14 +1,14 @@
-/**
+﻿/**
  * Modern Auth Header - Compact auth component for home page header
  */
 
+import { useAuth } from '@/context/AuthContext';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { useEnhancedAuth } from '../../context/EnhancedAuthContext';
 
 export function ModernAuthHeader() {
-  const { user, isAuthenticated, loading, signOut } = useEnhancedAuth();
+  const { user, isAuthenticated, loading, signOut } = useAuth();
 
   const handleAuthAction = () => {
     if (isAuthenticated) {
@@ -16,7 +16,7 @@ export function ModernAuthHeader() {
       router.push('/(tabs)/profile');
     } else {
       // Navigate to login screen
-      router.push('/auth-screen');
+      router.push('/(auth)/login' as any);
     }
   };
 

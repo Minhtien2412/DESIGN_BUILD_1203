@@ -1,15 +1,10 @@
 // Session Management Component
 // Displays active sessions and allows user to manage them
 
-import { Button } from '@/components/ui/button';
-import { Container } from '@/components/ui/container';
-import { InfoBox } from '@/components/ui/info-box';
-import { Section } from '@/components/ui/section';
-import { useAuth } from '@/context/AuthContext';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { Alert, RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Text, TouchableOpacity, View } from 'react-native';
 
 interface SessionItemProps {
   session: any; // UserSession from sessionManagement
@@ -118,126 +113,4 @@ const SessionItem: React.FC<SessionItemProps> = ({ session, isCurrentSession, on
   );
 };
 
-export const SessionManagement: React.FC = () => {
-  const { currentSession, activeSessions, revokeSession, revokeAllOtherSessions, refreshSessions, signOut } = useAuth();
-  const [refreshing, setRefreshing] = React.useState(false);
-  const textColor = useThemeColor({}, 'text');
-  const mutedColor = useThemeColor({}, 'icon');
-
-  const handleRefresh = React.useCallback(async () => {
-    setRefreshing(true);
-    try {
-      await refreshSessions();
-    } catch (error) {
-      console.error('Failed to refresh sessions:', error);
-    } finally {
-      setRefreshing(false);
-    }
-  }, [refreshSessions]);
-
-  const handleRevokeSession = React.useCallback(async (sessionId: string) => {
-    try {
-      if (currentSession && sessionId === currentSession.id) {
-        // If revoking current session, sign out completely
-        await signOut();
-      } else {
-        await revokeSession(sessionId);
-      }
-    } catch (error) {
-      Alert.alert('Lỗi', 'Không thể thu hồi phiên đăng nhập. Vui lòng thử lại.');
-    }
-  }, [currentSession, revokeSession, signOut]);
-
-  const handleRevokeAllOther = React.useCallback(() => {
-    const otherSessionsCount = activeSessions.filter(s => s.id !== currentSession?.id).length;
-    
-    if (otherSessionsCount === 0) {
-      Alert.alert('Thông báo', 'Không có phiên đăng nhập nào khác để thu hồi.');
-      return;
-    }
-
-    Alert.alert(
-      'Thu hồi tất cả phiên khác',
-      `Bạn có chắc muốn thu hồi ${otherSessionsCount} phiên đăng nhập khác không? Các thiết bị khác sẽ bị đăng xuất.`,
-      [
-        { text: 'Hủy', style: 'cancel' },
-        {
-          text: 'Thu hồi tất cả',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await revokeAllOtherSessions();
-            } catch (error) {
-              Alert.alert('Lỗi', 'Không thể thu hồi các phiên đăng nhập. Vui lòng thử lại.');
-            }
-          }
-        }
-      ]
-    );
-  }, [activeSessions, currentSession, revokeAllOtherSessions]);
-
-  React.useEffect(() => {
-    refreshSessions();
-  }, []);
-
-  return (
-    <Container>
-      <ScrollView
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-        }
-        showsVerticalScrollIndicator={false}
-      >
-        <Section title="Quản lý phiên đăng nhập">
-          <InfoBox
-            title="Bảo mật tài khoản"
-            items={[
-              "Theo dõi và quản lý các thiết bị đã đăng nhập vào tài khoản của bạn.",
-              "Thu hồi phiên đăng nhập từ các thiết bị không tin cậy."
-            ]}
-          />
-
-          {activeSessions.length === 0 ? (
-            <View style={{ padding: 24, alignItems: 'center' }}>
-              <Ionicons name="phone-portrait-outline" size={48} color={mutedColor} />
-              <Text style={{ fontSize: 16, color: mutedColor, marginTop: 12, textAlign: 'center' }}>
-                Không có phiên đăng nhập nào
-              </Text>
-            </View>
-          ) : (
-            <>
-              <Text style={{ fontSize: 18, fontWeight: '600', color: textColor, marginBottom: 16 }}>
-                Phiên đăng nhập hoạt động ({activeSessions.length})
-              </Text>
-
-              {activeSessions.map((session) => (
-                <SessionItem
-                  key={session.id}
-                  session={session}
-                  isCurrentSession={session.id === currentSession?.id}
-                  onRevoke={handleRevokeSession}
-                />
-              ))}
-
-              {activeSessions.filter(s => s.id !== currentSession?.id).length > 0 && (
-                <View style={{ marginTop: 24 }}>
-                  <Button
-                    variant="secondary"
-                    title="Thu hồi tất cả phiên khác"
-                    onPress={handleRevokeAllOther}
-                    style={{ marginBottom: 12 }}
-                  />
-                  <Text style={{ fontSize: 12, color: mutedColor, textAlign: 'center' }}>
-                    Các thiết bị khác sẽ bị đăng xuất và cần đăng nhập lại
-                  </Text>
-                </View>
-              )}
-            </>
-          )}
-        </Section>
-      </ScrollView>
-    </Container>
-  );
-};
-
-export default SessionManagement;
+export const SessionManagement: React.FC = () => { return null; };

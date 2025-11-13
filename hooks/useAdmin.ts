@@ -133,7 +133,7 @@ export function useDashboard(autoFetch = true) {
       setPendingTasks(data.pending_tasks || []);
     } catch (err: any) {
       // Silent for auth errors (401/403)
-      if (err instanceof ApiError && err.status && [401, 403].includes(err.status)) {
+      if (err instanceof ApiError && err.status && [401, 403].includes(err.status!)) {
         console.log('[Dashboard] Auth required');
       } else {
         console.error('[Dashboard] Error:', err);
@@ -198,7 +198,7 @@ export function useStaff(
         const params = new URLSearchParams({
           page: currentPage.toString(),
           limit: limit.toString(),
-          ...filters,
+          ...(filters as Record<string, string>),
         });
 
         const data = await apiFetch(`/api/admin/staff?${params}`, {
@@ -210,7 +210,7 @@ export function useStaff(
         setStaff(data.staff || []);
         setPagination(data.pagination);
       } catch (err: any) {
-        if (err instanceof ApiError && [401, 403].includes(err.status)) {
+        if (err instanceof ApiError && [401, 403].includes(err.status!)) {
           console.log('[Staff] Auth required');
         } else {
           console.error('[Staff] Error:', err);
@@ -304,7 +304,7 @@ export function useStaffDetail(staffid: number | string) {
 
       setStaff(data);
     } catch (err: any) {
-      if (err instanceof ApiError && [401, 403].includes(err.status)) {
+      if (err instanceof ApiError && [401, 403].includes(err.status!)) {
         console.log('[StaffDetail] Auth required');
       } else {
         console.error('[StaffDetail] Error:', err);
@@ -353,7 +353,7 @@ export function useRoles(autoFetch = true) {
 
       setRoles(data.roles || []);
     } catch (err: any) {
-      if (err instanceof ApiError && [401, 403].includes(err.status)) {
+      if (err instanceof ApiError && [401, 403].includes(err.status!)) {
         console.log('[Roles] Auth required');
       } else {
         console.error('[Roles] Error:', err);
@@ -439,7 +439,7 @@ export function usePermissionFeatures() {
 
       setFeatures(data.features || []);
     } catch (err: any) {
-      if (err instanceof ApiError && [401, 403].includes(err.status)) {
+      if (err instanceof ApiError && [401, 403].includes(err.status!)) {
         console.log('[PermissionFeatures] Auth required');
       } else {
         console.error('[PermissionFeatures] Error:', err);
@@ -499,7 +499,7 @@ export function useActivityLog(
         const params = new URLSearchParams({
           page: currentPage.toString(),
           limit: limit.toString(),
-          ...filters,
+          ...(filters as Record<string, string>),
         });
 
         const data = await apiFetch(`/api/admin/activity-log?${params}`, {
@@ -511,7 +511,7 @@ export function useActivityLog(
         setActivities(data.activities || []);
         setPagination(data.pagination);
       } catch (err: any) {
-        if (err instanceof ApiError && [401, 403].includes(err.status)) {
+        if (err instanceof ApiError && [401, 403].includes(err.status!)) {
           console.log('[ActivityLog] Auth required');
         } else {
           console.error('[ActivityLog] Error:', err);
@@ -567,7 +567,7 @@ export function useDepartments(autoFetch = true) {
 
       setDepartments(data.departments || []);
     } catch (err: any) {
-      if (err instanceof ApiError && [401, 403].includes(err.status)) {
+      if (err instanceof ApiError && [401, 403].includes(err.status!)) {
         console.log('[Departments] Auth required');
       } else {
         console.error('[Departments] Error:', err);

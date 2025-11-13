@@ -1,8 +1,9 @@
-/**
+﻿/**
  * Enhanced Login Screen
  * Sử dụng API backend thật
  */
 
+import { useAuth } from '@/context/AuthContext';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import {
@@ -16,7 +17,6 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
-import { useEnhancedAuth } from '../../context/EnhancedAuthContext';
 import { Button } from '../ui/button';
 import { Container } from '../ui/container';
 import { Loader } from '../ui/loader';
@@ -24,7 +24,7 @@ import { Section } from '../ui/section';
 import { DemoCredentials } from './DemoCredentials';
 
 export default function EnhancedLoginScreen() {
-  const { signIn, loading } = useEnhancedAuth();
+  const { signIn, loading } = useAuth();
   
   const [formData, setFormData] = useState({
     account: '', // email, username, or phone
@@ -88,25 +88,16 @@ export default function EnhancedLoginScreen() {
     if (!validateForm()) return;
 
     try {
-      const credentials = {
-        password: formData.password,
-        ...(loginMethod === 'email' && { email: formData.account }),
-        ...(loginMethod === 'username' && { username: formData.account }),
-        ...(loginMethod === 'phone' && { phone: formData.account }),
-      };
+      const email = loginMethod === 'email' ? formData.account : formData.account;
+      const password = formData.password;
 
-      const result = await signIn(credentials);
-
-      if (result.success) {
-        Alert.alert('Thành công', 'Đăng nhập thành công!', [
-          { text: 'OK', onPress: () => router.replace('/') }
-        ]);
-      } else {
-        Alert.alert('Lỗi đăng nhập', result.error || 'Đăng nhập thất bại');
-      }
-    } catch (error) {
+      await signIn(email, password);
+      Alert.alert('Thành công', 'Đăng nhập thành công!', [
+        { text: 'OK', onPress: () => router.replace('/') }
+      ]);
+    } catch (error: any) {
       console.error('Login error:', error);
-      Alert.alert('Lỗi', 'Có lỗi xảy ra. Vui lòng thử lại.');
+      Alert.alert('Lỗi đăng nhập', error.message || 'Có lỗi xảy ra. Vui lòng thử lại.');
     }
   };
 

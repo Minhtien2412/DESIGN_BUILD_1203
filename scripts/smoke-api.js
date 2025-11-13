@@ -22,13 +22,31 @@ if (typeof fetch === 'undefined') {
   let failed = 0;
   for (const t of tests) {
     try {
-      let ok = false; let data;
+      let ok = false; let data; let statusCode; let errorMsg;
       for (const url of t.urls) {
-        const r = await fetch(url, { headers });
-        if (r.ok) { data = await r.json().catch(() => ({})); ok = true; break; }
+        try {
+          const r = await fetch(url, { headers });
+          statusCode = r.status;
+          if (r.ok) { 
+            data = await r.json().catch(() => ({})); 
+            ok = true; 
+            break; 
+          } else {
+            errorMsg = await r.text().catch(() => r.statusText);
+          }
+        } catch (e) {
+          errorMsg = e.message;
+        }
       }
-      if (!ok) throw new Error('All candidates failed');
-      console.log(`[SMOKE] ${t.name} OK`, data && (data.status || data.success || '')); 
+      if (ok) {
+        console.log(`[SMOKE] ${t.name} OK`, data && (data.status || data.success || data.database || '')); 
+        // Warn if database disconnected
+        if (data?.database === 'disconnected') {
+          console.warn(`[SMOKE] ⚠️  ${t.name}: Database is DISCONNECTED`);
+        }
+      } else {
+        throw new Error(`HTTP ${statusCode}: ${errorMsg || 'All candidates failed'}`);
+      }
     } catch (e) {
       failed++;
       console.error(`[SMOKE] ${t.name} FAIL:`, e.message);

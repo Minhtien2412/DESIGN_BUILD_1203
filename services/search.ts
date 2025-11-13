@@ -38,7 +38,7 @@ export function searchLocal(query: string, limit = 8): SearchResult[] {
       type: 'product',
       title,
       subtitle: p.description,
-      to: (`/product/${p.id}` as const),
+      to: (`/product/${p.id}` as any),
       image: p.image,
     };
   });
@@ -48,7 +48,7 @@ export function searchLocal(query: string, limit = 8): SearchResult[] {
     type: 'design',
     title: d.title,
     subtitle: d.description,
-    to: (`/design/${d.id}` as const),
+    to: (`/design/${d.id}` as any),
     image: d.images?.[0],
   }));
 
@@ -57,7 +57,7 @@ export function searchLocal(query: string, limit = 8): SearchResult[] {
     type: 'company',
     title: c.name,
     subtitle: c.description,
-    to: (`/company/${c.slug}` as const),
+    to: (`/company/${c.slug}` as any),
   }));
 
   const categories: SearchResult[] = CATEGORIES.map((c: Category) => ({
@@ -65,7 +65,7 @@ export function searchLocal(query: string, limit = 8): SearchResult[] {
     type: 'category',
     title: c.title,
     subtitle: c.description,
-    to: categoryPath(c.slug),
+    to: categoryPath(c.slug) as any,
   }));
 
   const all = [...prod, ...designs, ...companies, ...categories];

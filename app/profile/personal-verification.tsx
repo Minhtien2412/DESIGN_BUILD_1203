@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Container } from '@/components/ui/container';
 import { useThemeColor } from '@/hooks/use-theme-color';
+import { ApiError, apiFetch } from '@/services/api';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import {
@@ -46,7 +47,7 @@ export default function PersonalVerificationScreen() {
     });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // Validation
     if (!fullName.trim()) {
       Alert.alert('Lỗi', 'Vui lòng nhập họ và tên');
@@ -73,22 +74,26 @@ export default function PersonalVerificationScreen() {
       return;
     }
 
-    // TODO: API call to submit verification
-    console.log('Submitting personal verification:', {
-      fullName,
-      idNumber,
-      address,
-      phone,
-      email,
-      accountTypes: selectedAccountTypes,
-    });
+    try {
+      await apiFetch('/profile/verification', {
+        method: 'POST',
+        data: {
+          fullName,
+          idNumber,
+          address,
+          phone,
+          email,
+          accountTypes: selectedAccountTypes,
+        },
+      });
 
-    Alert.alert('Thành công', 'Đã gửi yêu cầu xác minh tài khoản', [
-      {
-        text: 'OK',
-        onPress: () => router.back(),
-      },
-    ]);
+      Alert.alert('Thành công', 'Đã gửi yêu cầu xác minh tài khoản', [
+        { text: 'OK', onPress: () => router.back() },
+      ]);
+    } catch (e) {
+      const msg = (e as ApiError)?.data?.message || (e as Error)?.message || 'Không thể gửi xác minh';
+      Alert.alert('Lỗi', msg);
+    }
   };
 
   return (
@@ -211,11 +216,10 @@ export default function PersonalVerificationScreen() {
 
         {/* Submit Button */}
         <Button
+          title="Tiếp tục"
           onPress={handleSubmit}
-          style={[styles.submitButton, { backgroundColor: primaryColor }]}
-        >
-          <Text style={styles.submitButtonText}>Tiếp tục</Text>
-        </Button>
+          style={styles.submitButton}
+        />
       </ScrollView>
     </Container>
   );

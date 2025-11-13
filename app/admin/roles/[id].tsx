@@ -5,9 +5,9 @@ import { Container } from '@/components/ui/container';
 import { Loader } from '@/components/ui/loader';
 import { Section } from '@/components/ui/section';
 import { useAuth } from '@/context/AuthContext';
+import { useThemeColor } from '@/hooks/use-theme-color';
 import type { Role } from '@/hooks/useAdmin';
 import { usePermissionFeatures } from '@/hooks/useAdmin';
-import { useThemeColor } from '@/hooks/use-theme-color';
 import { apiFetch } from '@/services/api';
 import { hasPermission } from '@/utils/permissions';
 import { Ionicons } from '@expo/vector-icons';
@@ -21,7 +21,7 @@ export default function RoleDetailScreen() {
   const iconColor = useThemeColor({}, 'icon');
   const borderColor = useThemeColor({}, 'border');
   const mutedColor = useThemeColor({}, 'tabIconDefault');
-  const cardBg = useThemeColor({}, 'cardBackground');
+  const cardBg = useThemeColor({}, 'surface');
 
   const [role, setRole] = useState<Role | null>(null);
   const [loading, setLoading] = useState(true);

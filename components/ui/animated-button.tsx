@@ -91,7 +91,7 @@ export default function AnimatedButton({
         fullWidth && styles.fullWidth,
         isDisabled && styles.disabled,
         animatedStyle,
-      ]}
+      ] as any}
     >
       {loading ? (
         <ActivityIndicator color={variantStyle.color} />
@@ -103,7 +103,7 @@ export default function AnimatedButton({
               styles.text,
               { color: variantStyle.color, fontSize: sizeStyle.fontSize },
               icon && styles.textWithIcon,
-            ]}
+            ] as any}
           >
             {title}
           </Text>

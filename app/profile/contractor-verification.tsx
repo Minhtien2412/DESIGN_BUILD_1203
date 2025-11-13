@@ -254,7 +254,7 @@ export default function ContractorVerificationScreen() {
         {/* Submit Button */}
         <Button
           onPress={handleSubmit}
-          style={[styles.submitButton, { backgroundColor: primaryColor }]}
+          style={[styles.submitButton, { backgroundColor: primaryColor }] as any}
         >
           <Text style={styles.submitButtonText}>Tạo tài khoản</Text>
         </Button>

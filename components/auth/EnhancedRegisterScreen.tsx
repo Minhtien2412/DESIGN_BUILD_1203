@@ -1,8 +1,9 @@
-/**
+﻿/**
  * Enhanced Register Screen
  * Sử dụng API backend thật
  */
 
+import { useAuth } from '@/context/AuthContext';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import {
@@ -16,14 +17,13 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
-import { useEnhancedAuth } from '../../context/EnhancedAuthContext';
 import { Button } from '../ui/button';
 import { Container } from '../ui/container';
 import { Loader } from '../ui/loader';
 import { Section } from '../ui/section';
 
 export default function EnhancedRegisterScreen() {
-  const { signUp, loading } = useEnhancedAuth();
+  const { signUp, loading } = useAuth();
   
   const [formData, setFormData] = useState({
     name: '',
@@ -112,34 +112,20 @@ export default function EnhancedRegisterScreen() {
     if (!validateForm()) return;
 
     try {
-      const userData = {
-        name: formData.name.trim(),
-        email: formData.email.trim(),
-        password: formData.password,
-        ...(formData.phone.trim() && { phone: formData.phone.trim() }),
-        ...(formData.username.trim() && { username: formData.username.trim() }),
-        role: formData.role,
-      };
-
-      const result = await signUp(userData);
-
-      if (result.success) {
-        Alert.alert(
-          'Đăng ký thành công!', 
-          'Tài khoản của bạn đã được tạo. Vui lòng đăng nhập để tiếp tục.',
-          [
-            { 
-              text: 'OK', 
-              onPress: () => router.replace('/') // Navigate to login
-            }
-          ]
-        );
-      } else {
-        Alert.alert('Lỗi đăng ký', result.error || 'Đăng ký thất bại');
-      }
-    } catch (error) {
+      await signUp(formData.email.trim(), formData.password, formData.name.trim());
+      Alert.alert(
+        'Đăng ký thành công!', 
+        'Tài khoản của bạn đã được tạo. Vui lòng đăng nhập để tiếp tục.',
+        [
+          { 
+            text: 'OK', 
+            onPress: () => router.replace('/') // Navigate to login
+          }
+        ]
+      );
+    } catch (error: any) {
       console.error('Register error:', error);
-      Alert.alert('Lỗi', 'Có lỗi xảy ra. Vui lòng thử lại.');
+      Alert.alert('Lỗi đăng ký', error.message || 'Có lỗi xảy ra. Vui lòng thử lại.');
     }
   };
 

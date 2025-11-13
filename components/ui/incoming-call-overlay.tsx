@@ -255,7 +255,7 @@ export function useIncomingCall() {
   };
 
   const acceptCall = (call: IncomingCall) => {
-  router.push(`/call-popup?roomId=${call.roomId}&kind=video`);
+  router.push(`/call-popup?roomId=${call.roomId}&kind=video` as any);
   };
 
   const declineCall = (call: IncomingCall) => {

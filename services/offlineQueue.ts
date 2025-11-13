@@ -142,9 +142,9 @@ class OfflineQueue {
 
       if (response.ok) {
         message.status = 'sent';
-        this.emit('message:sent', { queueId: message.id, messageId: response.messageId });
+        this.emit('message:sent', { queueId: message.id, messageId: (response as any).messageId });
       } else {
-        throw new Error(response.error || 'Failed to send message');
+        throw new Error((response as any).error || 'Failed to send message');
       }
     } catch (error) {
       message.status = 'pending'; // Reset to pending for retry

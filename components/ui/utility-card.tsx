@@ -178,7 +178,7 @@ export default function UtilityCard({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create({ 
   // Default Variant
   defaultContainer: {
     backgroundColor: DesignSystem.colors.background.paper,
@@ -346,4 +346,4 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#FFFFFF',
   },
-});
+} as any);

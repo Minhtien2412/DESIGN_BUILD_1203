@@ -1,3 +1,4 @@
+import { FormErrorBoundary } from '@/components/FormErrorBoundary';
 import AuthBackground from '@/components/ui/AuthBackground';
 import ENV from '@/config/env';
 import { useAuth } from '@/context/AuthContext';
@@ -189,11 +190,12 @@ export default function RegisterScreen() {
     Animated.timing(anim, { toValue: active ? 1 : 0, duration: 180, useNativeDriver: false }).start();
 
   return (
-    <KeyboardAvoidingView 
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={{ flex: 1 }}
-    >
-      <AuthBackground>
+    <FormErrorBoundary>
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1 }}
+      >
+        <AuthBackground>
         <ScrollView 
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
@@ -412,6 +414,7 @@ export default function RegisterScreen() {
         </ScrollView>
       </AuthBackground>
     </KeyboardAvoidingView>
+    </FormErrorBoundary>
   );
 }
 

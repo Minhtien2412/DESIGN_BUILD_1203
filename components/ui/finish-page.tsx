@@ -19,7 +19,7 @@ export function FinishPage({ slug, title, description }: Props) {
     <View style={{ paddingTop: 8, paddingBottom: 6, paddingHorizontal: 16 }}>
       <Text style={styles.title}>{title}</Text>
       {description ? <Text style={styles.desc}>{description}</Text> : null}
-      <TouchableOpacity style={styles.cta} onPress={() => router.push('/bids')} accessibilityLabel="Đăng yêu cầu báo giá">
+      <TouchableOpacity style={styles.cta} onPress={() => router.push('/bids' as any)} accessibilityLabel="Đăng yêu cầu báo giá">
         <Ionicons name="flash" size={16} color="#fff" />
         <Text style={styles.ctaText}>Đăng yêu cầu báo giá</Text>
       </TouchableOpacity>
@@ -45,7 +45,7 @@ export function FinishPage({ slug, title, description }: Props) {
           </>
         }
         renderItem={({ item }) => (
-          <TouchableOpacity style={[styles.card, { marginHorizontal: 16 }]} onPress={() => router.push(`/company/${item.slug}`)}>
+          <TouchableOpacity style={[styles.card, { marginHorizontal: 16 }]} onPress={() => router.push(`/company/${item.slug}` as any)}>
             <View style={styles.avatar} />
             <View style={{ flex: 1 }}>
               <Text style={styles.cardTitle} numberOfLines={1}>{item.name}</Text>

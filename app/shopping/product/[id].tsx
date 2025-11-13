@@ -2,9 +2,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { useThemeColor } from '../../../hooks/use-theme-color';
-// import { useCart } from '../../../context/cart-provider'; // TODO: Create CartContext
+import { useCart } from '../../../context/cart-context';
 import { PRODUCTS } from '../../../data/products';
+import { useThemeColor } from '../../../hooks/use-theme-color';
 
 // Import new UI components
 import {
@@ -33,7 +33,7 @@ import { TextVariants } from '../../../constants/typography';
 const ProductDetailContent = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { showAlert } = useAlert();
-  // const { addToCart } = useCart(); // TODO: Uncomment when CartContext is created
+  const { addToCart } = useCart();
   
   const background = useThemeColor({}, 'background');
   const text = useThemeColor({}, 'text');
@@ -61,8 +61,7 @@ const ProductDetailContent = () => {
   }
 
   const handleAddToCart = () => {
-    // TODO: Implement when CartContext is ready
-    // addToCart(product, quantity);
+    addToCart(product, quantity, selectedSize[0], selectedColor[0]);
     showAlert({
       type: 'success',
       message: `Added ${quantity}x ${product.name} to cart`,
@@ -70,13 +69,8 @@ const ProductDetailContent = () => {
   };
 
   const handleBuyNow = () => {
-    // TODO: Implement when CartContext is ready
-    // addToCart(product, quantity);
-    // router.push('/cart');
-    showAlert({
-      type: 'info',
-      message: 'Cart screen coming soon!',
-    });
+    addToCart(product, quantity, selectedSize[0], selectedColor[0]);
+    router.push('/shopping/cart' as any); // Navigate to cart screen
   };
 
   // Mock data for variants

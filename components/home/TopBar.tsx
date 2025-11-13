@@ -28,7 +28,7 @@ export const TopBar = memo(function TopBar({
     if (onMenuPress) {
       onMenuPress();
     } else {
-      router.push('/menu-popup');
+      router.push('/(tabs)/profile' as any);
     }
   };
 

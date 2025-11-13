@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Enhanced Device Security Integration
  * Compatible với Enhanced Auth System
  */
@@ -6,10 +6,10 @@
 import { router } from 'expo-router';
 import React from 'react';
 import { Alert } from 'react-native';
-import { useEnhancedAuth } from '../../context/EnhancedAuthContext';
+import { useAuth } from '@/context/AuthContext';
 
 export function EnhancedDeviceSecurityIntegration() {
-  const { user, isAuthenticated } = useEnhancedAuth();
+  const { user, isAuthenticated } = useAuth();
 
   const handleChangePassword = () => {
     if (!isAuthenticated) {
