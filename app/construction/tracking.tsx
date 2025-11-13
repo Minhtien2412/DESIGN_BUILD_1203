@@ -284,6 +284,13 @@ export default function WorkerTrackingScreen() {
         {status === 'completed' && (
           <View style={styles.actionButtonsContainer}>
             <TouchableOpacity
+              style={styles.progressButton}
+              onPress={() => router.push('/construction/progress')}
+            >
+              <Ionicons name="stats-chart" size={20} color="#00B14F" />
+              <Text style={styles.progressButtonText}>Xem Tiến Độ & Thanh Toán</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
               style={styles.rateButton}
               onPress={() => Alert.alert('Đánh giá', 'Màn hình đánh giá')}
             >
@@ -489,6 +496,7 @@ const styles = StyleSheet.create({
   actionButtonsContainer: {
     padding: 16,
     marginTop: 8,
+    gap: 12,
   },
   cancelButton: {
     backgroundColor: '#fff',
@@ -503,6 +511,22 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#FF6B35',
   },
+  progressButton: {
+    backgroundColor: '#E8F5E9',
+    borderWidth: 1,
+    borderColor: '#00B14F',
+    borderRadius: 8,
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  progressButtonText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#00B14F',
+  },
   rateButton: {
     backgroundColor: '#00B14F',
     borderRadius: 8,
@@ -510,6 +534,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 8,
   },
   rateButtonText: {
     fontSize: 16,
