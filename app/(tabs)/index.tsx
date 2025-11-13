@@ -7,8 +7,8 @@ import { ReelsPlayer } from "@/components/reels-player";
 import { SafeScrollView } from "@/components/ui/safe-area";
 import VoiceSearchModal from '@/components/voice/VoiceSearchModal';
 import {
-    DESIGN_UTILITY_SLUGS,
-    LIBRARY_TYPES
+  DESIGN_UTILITY_SLUGS,
+  LIBRARY_TYPES
 } from "@/constants/home-routes";
 import { Colors } from "@/constants/theme";
 import { useSmartBackHandler } from "@/hooks/useBackHandler";
@@ -130,25 +130,34 @@ const Section = ({
 
   return (
     <View style={{ 
-      marginBottom: 20,
+      marginBottom: 28,
       backgroundColor: 'transparent'
     }}>
       <View style={{ 
         flexDirection: 'row', 
         alignItems: 'center', 
         justifyContent: 'space-between', 
-        marginBottom: 12,
+        marginBottom: 16,
         paddingHorizontal: 16
       }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           {icon && (
-            <Ionicons name={icon} size={16} color="#333" />
+            <View style={{
+              width: 28,
+              height: 28,
+              borderRadius: 8,
+              backgroundColor: Colors.light.primary + '15',
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}>
+              <Ionicons name={icon} size={16} color={Colors.light.primary} />
+            </View>
           )}
           <Text style={{ 
-            fontSize: 15, 
-            fontWeight: '600', 
+            fontSize: 16, 
+            fontWeight: '700', 
             color: '#1a1a1a',
-            letterSpacing: -0.2
+            letterSpacing: -0.3
           }}>
             {title}
           </Text>
@@ -159,18 +168,20 @@ const Section = ({
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            gap: 2,
-            paddingVertical: 4,
-            paddingHorizontal: 8
+            gap: 4,
+            paddingVertical: 6,
+            paddingHorizontal: 10,
+            backgroundColor: Colors.light.primary + '10',
+            borderRadius: 12
           }}
         >
-          <Text style={{ color: '#90B44C', fontWeight: '500', fontSize: 13 }}>
+          <Text style={{ color: Colors.light.primary, fontWeight: '600', fontSize: 12 }}>
             {expanded ? 'Thu gọn' : 'Xem thêm'}
           </Text>
           <Ionicons 
             name={expanded ? 'chevron-up' : 'chevron-forward'} 
             size={14} 
-            color="#90B44C" 
+            color={Colors.light.primary} 
           />
         </TouchableOpacity>
       </View>
@@ -191,7 +202,7 @@ const Section = ({
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{ gap: 12, paddingHorizontal: 16 }}
           decelerationRate="fast"
-          snapToInterval={80 + 12}
+          snapToInterval={84 + 12}
           snapToAlignment="start"
         >
           {displayData.map((item) => renderItem(item, expanded))}
@@ -206,10 +217,10 @@ const IconCard = ({ item, onPress }: { item: any; onPress?: () => void }) => {
 
   const handlePressIn = () => {
     Animated.spring(scaleAnim, {
-      toValue: 0.92,
+      toValue: 0.90,
       useNativeDriver: true,
       speed: 50,
-      bounciness: 4
+      bounciness: 8
     }).start();
   };
 
@@ -218,16 +229,16 @@ const IconCard = ({ item, onPress }: { item: any; onPress?: () => void }) => {
       toValue: 1,
       useNativeDriver: true,
       speed: 50,
-      bounciness: 4
+      bounciness: 8
     }).start();
   };
 
   return (
     <TouchableOpacity 
       style={{ 
-        width: 80,
+        width: 84,
         alignItems: 'center', 
-        marginBottom: 16,
+        marginBottom: 20,
       }} 
       activeOpacity={1}
       onPress={onPress}
@@ -236,29 +247,37 @@ const IconCard = ({ item, onPress }: { item: any; onPress?: () => void }) => {
     >
       <Animated.View style={{ 
         transform: [{ scale: scaleAnim }],
-        width: 64, 
-        height: 64, 
+        width: 68, 
+        height: 68, 
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: Colors.light.surfaceMuted,
-        borderRadius: 32,
-        overflow: 'hidden'
+        backgroundColor: '#fff',
+        borderRadius: 16,
+        overflow: 'hidden',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 8,
+        elevation: 3,
+        borderWidth: 1,
+        borderColor: 'rgba(0,0,0,0.05)'
       }}>
         <Image 
           source={item.icon} 
-          style={{ width: 48, height: 48 }} 
+          style={{ width: 44, height: 44 }} 
           resizeMode="contain" 
         />
       </Animated.View>
       <Text style={{ 
-        fontSize: 10, 
+        fontSize: 11, 
         textAlign: 'center', 
-        marginTop: 6, 
-        lineHeight: 13, 
+        marginTop: 8, 
+        lineHeight: 14, 
         color: '#333', 
-        fontWeight: '500',
+        fontWeight: '600',
         paddingHorizontal: 2,
-        width: 80
+        width: 84,
+        letterSpacing: -0.2
       }} numberOfLines={2}>
         {item.name}
       </Text>
@@ -271,10 +290,10 @@ const RoundIcon = ({ item, onPress }: { item: any; onPress?: () => void }) => {
 
   const handlePressIn = () => {
     Animated.spring(scaleAnim, {
-      toValue: 0.92,
+      toValue: 0.90,
       useNativeDriver: true,
       speed: 50,
-      bounciness: 4
+      bounciness: 8
     }).start();
   };
 
@@ -283,16 +302,16 @@ const RoundIcon = ({ item, onPress }: { item: any; onPress?: () => void }) => {
       toValue: 1,
       useNativeDriver: true,
       speed: 50,
-      bounciness: 4
+      bounciness: 8
     }).start();
   };
 
   return (
     <TouchableOpacity 
       style={{ 
-        width: 80,
+        width: 84,
         alignItems: 'center', 
-        marginBottom: 16 
+        marginBottom: 20 
       }} 
       activeOpacity={1}
       onPress={onPress}
@@ -301,45 +320,53 @@ const RoundIcon = ({ item, onPress }: { item: any; onPress?: () => void }) => {
     >
       <Animated.View style={{ 
         transform: [{ scale: scaleAnim }],
-        width: 64,
-        height: 64, 
+        width: 68,
+        height: 68, 
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: Colors.light.surfaceMuted,
-        borderRadius: 32,
-        overflow: 'hidden'
+        backgroundColor: '#fff',
+        borderRadius: 34,
+        overflow: 'hidden',
+        shadowColor: Colors.light.primary,
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.12,
+        shadowRadius: 8,
+        elevation: 4,
+        borderWidth: 1.5,
+        borderColor: 'rgba(0,0,0,0.04)'
       }}>
         <Image 
           source={item.icon} 
-          style={{ width: 48, height: 48 }} 
+          style={{ width: 44, height: 44 }} 
           resizeMode="contain" 
         />
       </Animated.View>
       <Text style={{ 
-        fontSize: 10, 
+        fontSize: 11, 
         textAlign: 'center', 
-        marginTop: 6, 
+        marginTop: 8, 
         color: '#333', 
-        fontWeight: '500',
+        fontWeight: '600',
         paddingHorizontal: 2,
-        width: 80
+        width: 84,
+        letterSpacing: -0.2
       }} numberOfLines={2}>
         {item.name}
       </Text>
       {item.location && (
         <View style={{ 
           marginTop: 4, 
-          paddingHorizontal: 6, 
-          paddingVertical: 2, 
-          borderRadius: 10, 
-          backgroundColor: 'transparent',
+          paddingHorizontal: 8, 
+          paddingVertical: 3, 
+          borderRadius: 12, 
+          backgroundColor: '#f0f9ff',
           flexDirection: 'row',
           alignItems: 'center',
-          gap: 2,
-          maxWidth: 80
+          gap: 3,
+          maxWidth: 84
         }}>
-          <Ionicons name="location" size={10} color="#666" />
-          <Text style={{ fontSize: 9, color: '#666', fontWeight: '400' }} numberOfLines={1}>
+          <Ionicons name="location" size={10} color={Colors.light.primary} />
+          <Text style={{ fontSize: 9, color: Colors.light.primary, fontWeight: '600' }} numberOfLines={1}>
             {item.location}
           </Text>
           <Text style={{ fontSize: 8, color: '#ccc' }}>·</Text>
@@ -649,7 +676,7 @@ export default function HomeScreen() {
 
   const handleEquipmentPress = (item: any) => {
     // Navigate to materials shopping for construction equipment
-    router.push('/materials/index');
+    router.push('/materials');
   };
 
   const [voiceVisible, setVoiceVisible] = useState(false);
@@ -896,37 +923,48 @@ export default function HomeScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Search Bar - Shopee Style */}
-      <View style={{ paddingHorizontal: 16, paddingTop: user ? 8 : 48, paddingBottom: 16 }}>
+      {/* Search Bar - Enhanced Gradient Background */}
+      <View style={{ 
+        paddingHorizontal: 16, 
+        paddingTop: user ? 8 : 48, 
+        paddingBottom: 20,
+        backgroundColor: Colors.light.primary,
+        borderBottomLeftRadius: 24,
+        borderBottomRightRadius: 24
+      }}>
         <TouchableOpacity
           activeOpacity={0.7}
           onPress={() => router.push('/search')}
           style={{ 
-          backgroundColor: '#f5f5f5', 
-          borderRadius: 20, 
-          borderWidth: 1,
-          borderColor: Colors.light.border,
+          backgroundColor: '#fff', 
+          borderRadius: 24, 
+          borderWidth: 0,
           flexDirection: 'row', 
           alignItems: 'center', 
-          paddingHorizontal: 14, 
-          paddingVertical: 10,
+          paddingHorizontal: 16, 
+          paddingVertical: 12,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.1,
+          shadowRadius: 8,
+          elevation: 3
         }}>
-          <Ionicons name="search-outline" size={18} color="#999" />
-          <Text style={{ color: '#999', flex: 1, marginLeft: 10, fontSize: 13 }}>Tìm kiếm sản phẩm, dịch vụ...</Text>
+          <Ionicons name="search-outline" size={20} color={Colors.light.primary} />
+          <Text style={{ color: '#999', flex: 1, marginLeft: 12, fontSize: 14 }}>Tìm kiếm sản phẩm, dịch vụ...</Text>
           <TouchableOpacity 
             onPress={() => setVoiceVisible(true)}
             activeOpacity={0.7}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            style={{ marginRight: 8 }}
+            style={{ marginRight: 12 }}
           >
-            <Ionicons name="mic-outline" size={18} color="#666" />
+            <Ionicons name="mic-outline" size={20} color={Colors.light.primary} />
           </TouchableOpacity>
           <TouchableOpacity 
             onPress={() => setMenuVisible(true)}
             activeOpacity={0.7}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
-            <Ionicons name="menu-outline" size={20} color="#666" />
+            <Ionicons name="menu-outline" size={22} color={Colors.light.primary} />
           </TouchableOpacity>
         </TouchableOpacity>
       </View>
@@ -938,19 +976,28 @@ export default function HomeScreen() {
         userIsAdmin={user?.role === 'admin' || false}
       />
 
-      {/* Hero Slider - Banner Top */}
-      <View style={{ paddingHorizontal: 16, marginTop: 4, marginBottom: 16 }}>
-        <HeroSlider
-          images={[
-            { id: 'banner-1', source: require('@/assets/images/banner/Rectangle 21.png') },
-            { id: 'banner-2', source: require('@/assets/images/banner/Rectangle 213.png') },
-            { id: 'banner-3', source: require('@/assets/images/banner/Rectangle 214.png') },
-          ]}
-          height={170}
-          autoPlay
-          intervalMs={4500}
-          rounded={16}
-        />
+      {/* Hero Slider - Banner Top with Enhanced Shadow */}
+      <View style={{ paddingHorizontal: 16, marginTop: -8, marginBottom: 24 }}>
+        <View style={{
+          borderRadius: 20,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.15,
+          shadowRadius: 12,
+          elevation: 5
+        }}>
+          <HeroSlider
+            images={[
+              { id: 'banner-1', source: require('@/assets/images/banner/Rectangle 21.png') },
+              { id: 'banner-2', source: require('@/assets/images/banner/Rectangle 213.png') },
+              { id: 'banner-3', source: require('@/assets/images/banner/Rectangle 214.png') },
+            ]}
+            height={180}
+            autoPlay
+            intervalMs={4500}
+            rounded={20}
+          />
+        </View>
       </View>
 
       {/* DỊCH VỤ - Grid */}

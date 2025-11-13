@@ -1,5 +1,6 @@
 import { FormErrorBoundary } from '@/components/FormErrorBoundary';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
+import { CartProvider } from '@/context/cart-context';
 import { NotificationProvider } from '@/context/NotificationContext';
 import { ProjectDataProvider } from '@/context/project-data-context';
 import { VideoInteractionsProvider } from '@/context/VideoInteractionsContext';
@@ -44,17 +45,19 @@ export default function RootLayout() {
   return (
     <FormErrorBoundary>
       <AuthProvider>
-        <ProjectDataProvider>
-          <VideoInteractionsProvider>
-            <NotificationProvider>
-              <AuthNavigator />
-              <Stack screenOptions={{ headerShown: false }}>
-                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            </Stack>
-          </NotificationProvider>
-        </VideoInteractionsProvider>
-        </ProjectDataProvider>
+        <CartProvider>
+          <ProjectDataProvider>
+            <VideoInteractionsProvider>
+              <NotificationProvider>
+                <AuthNavigator />
+                <Stack screenOptions={{ headerShown: false }}>
+                  <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+                  <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              </Stack>
+            </NotificationProvider>
+          </VideoInteractionsProvider>
+          </ProjectDataProvider>
+        </CartProvider>
       </AuthProvider>
     </FormErrorBoundary>
   );
