@@ -28,31 +28,31 @@ interface ChatUser {
   id: string;
   name: string;
   avatar: string;
-  role: 'driver' | 'restaurant' | 'support';
+  role: 'worker' | 'supplier' | 'support';
   isOnline: boolean;
   lastSeen?: Date;
 }
 
 const MOCK_USER: ChatUser = {
-  id: 'driver1',
-  name: 'Nguyễn Văn A',
+  id: 'worker1',
+  name: 'Nguyễn Văn Thợ',
   avatar: 'https://i.pravatar.cc/150?img=12',
-  role: 'driver',
+  role: 'worker',
   isOnline: true,
 };
 
 const MOCK_MESSAGES: Message[] = [
   {
     id: '1',
-    text: 'Xin chào! Tôi đang trên đường đến điểm đón',
-    senderId: 'driver1',
+    text: 'Xin chào! Tôi đang trên đường đến công trường',
+    senderId: 'worker1',
     timestamp: new Date(Date.now() - 300000),
     status: 'seen',
     type: 'text'
   },
   {
     id: '2',
-    text: 'Tôi đang ở cổng A, bạn có thể ra không?',
+    text: 'Tôi đang ở cổng chính, anh có thể vào không?',
     senderId: 'user1',
     timestamp: new Date(Date.now() - 240000),
     status: 'seen',
@@ -60,15 +60,15 @@ const MOCK_MESSAGES: Message[] = [
   },
   {
     id: '3',
-    text: 'Vâng, tôi sẽ ra ngay. Còn khoảng 2 phút',
-    senderId: 'driver1',
+    text: 'Vâng, tôi sẽ vào ngay. Còn khoảng 5 phút',
+    senderId: 'worker1',
     timestamp: new Date(Date.now() - 180000),
     status: 'seen',
     type: 'text'
   },
   {
     id: '4',
-    text: 'Cảm ơn bạn!',
+    text: 'Cảm ơn anh!',
     senderId: 'user1',
     timestamp: new Date(Date.now() - 120000),
     status: 'delivered',
@@ -109,8 +109,8 @@ export default function ChatScreen() {
         // Add simulated message
         const newMessage: Message = {
           id: Date.now().toString(),
-          text: 'Tôi đã đến rồi ạ',
-          senderId: 'driver1',
+          text: 'Tôi đã đến công trường rồi ạ',
+          senderId: 'worker1',
           timestamp: new Date(),
           status: 'sent',
           type: 'text'

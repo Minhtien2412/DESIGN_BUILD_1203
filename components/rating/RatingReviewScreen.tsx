@@ -30,10 +30,10 @@ const RATING_OPTIONS: RatingOption[] = [
 ];
 
 const QUICK_COMMENTS = [
-  'Tài xế thân thiện',
-  'Lái xe an toàn',
+  'Thợ thân thiện',
+  'Làm việc cẩn thận',
   'Đúng giờ',
-  'Xe sạch sẽ',
+  'Tay nghề tốt',
   'Chuyên nghiệp',
   'Nhiệt tình',
 ];
@@ -50,13 +50,13 @@ export default function RatingReviewScreen() {
     Array(5).fill(0).map(() => new Animated.Value(1))
   ).current;
 
-  const driver = {
-    name: 'Nguyễn Văn A',
+  const worker = {
+    name: 'Nguyễn Văn Thợ',
     avatar: 'https://i.pravatar.cc/150?img=12',
-    vehicle: 'Toyota Vios',
-    licensePlate: '59A-12345',
-    tripDate: new Date(),
-    tripCost: 85000,
+    specialty: 'Thợ Xây',
+    workDays: 5,
+    workDate: new Date(),
+    workCost: 2500000,
   };
 
   const handleRating = (value: number) => {
@@ -158,19 +158,19 @@ export default function RatingReviewScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Driver Card */}
-        <View style={styles.driverCard}>
-          <Image source={{ uri: driver.avatar }} style={styles.driverAvatar} />
-          <Text style={styles.driverName}>{driver.name}</Text>
-          <Text style={styles.driverVehicle}>
-            {driver.vehicle} • {driver.licensePlate}
+        {/* Worker Card */}
+        <View style={styles.workerCard}>
+          <Image source={{ uri: worker.avatar }} style={styles.workerAvatar} />
+          <Text style={styles.workerName}>{worker.name}</Text>
+          <Text style={styles.workerSpecialty}>
+            {worker.specialty} • {worker.workDays} ngày làm việc
           </Text>
-          <View style={styles.tripInfo}>
-            <Text style={styles.tripCost}>
-              {driver.tripCost.toLocaleString('vi-VN')}đ
+          <View style={styles.workInfo}>
+            <Text style={styles.workCost}>
+              {worker.workCost.toLocaleString('vi-VN')}đ
             </Text>
-            <Text style={styles.tripDate}>
-              {driver.tripDate.toLocaleDateString('vi-VN')}
+            <Text style={styles.workDate}>
+              {worker.workDate.toLocaleDateString('vi-VN')}
             </Text>
           </View>
         </View>
@@ -363,7 +363,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  driverCard: {
+  workerCard: {
     alignItems: 'center',
     paddingVertical: 24,
     marginHorizontal: 16,
@@ -371,35 +371,35 @@ const styles = StyleSheet.create({
     backgroundColor: '#F9FAFB',
     borderRadius: 20,
   },
-  driverAvatar: {
+  workerAvatar: {
     width: 80,
     height: 80,
     borderRadius: 40,
     backgroundColor: '#E5E7EB',
     marginBottom: 12,
   },
-  driverName: {
+  workerName: {
     fontSize: 20,
     fontWeight: '700',
     color: '#1F2937',
     marginBottom: 4,
   },
-  driverVehicle: {
+  workerSpecialty: {
     fontSize: 15,
     color: '#6B7280',
     marginBottom: 12,
   },
-  tripInfo: {
+  workInfo: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 16,
   },
-  tripCost: {
+  workCost: {
     fontSize: 18,
     fontWeight: '700',
     color: '#0891B2',
   },
-  tripDate: {
+  workDate: {
     fontSize: 14,
     color: '#9CA3AF',
   },
