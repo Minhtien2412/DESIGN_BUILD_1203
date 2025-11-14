@@ -8,7 +8,6 @@
     },
     "preview": {
       "distribution": "internal",
-      "prebuildCommand": "echo 'Skipping prebuild - using committed android folder'",
       "android": { 
         "buildType": "apk",
         "withoutCredentials": false

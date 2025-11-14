@@ -1,123 +1,225 @@
 /**
- * Authentication API Services
- * Handles user registration, login, and authentication
+ * Authentication API Service
+ * Based on FRONTEND-INTEGRATION-GUIDE.md
+ * 
+ * Endpoints:
+ * - POST /auth/register - Register new user
+ * - POST /auth/login - Login user
+ * - POST /auth/logout - Logout user
+ * - POST /auth/refresh - Refresh access token
  */
 
-import { ApiError, apiFetch } from './api';
+import { clearAuthTokens, post, setAuthTokens } from './apiClient';
 
+// ============================================================================
 // Types
-export type RegisterPayload = {
-  email: string;
-  password: string;
-  full_name: string;
-  phone?: string;
-};
+// ============================================================================
 
-export type LoginPayload = {
-  email: string;
-  password: string;
-};
-
-export type AuthResponse = {
-  token: string;
-  user: {
-    id: string;
-    email: string;
-    full_name?: string;
-    role?: string;
-    created_at?: string;
-  };
-};
-
-export type User = {
+export interface User {
   id: string;
   email: string;
-  name?: string;
-  full_name?: string;
-  role?: string;
-  created_at?: string;
-};
+  fullName: string;
+  role: string;
+  roleName: string;
+  createdAt: string;
+  isActive: boolean;
+  phone?: string;
+  avatar?: string;
+}
+
+export interface AuthResponse {
+  message: string;
+  user: User;
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: string;
+  refreshExpiresIn: string;
+}
+
+export interface RegisterData {
+  email: string;
+  password: string;
+  fullName: string;
+  role?: 'client' | 'contractor' | 'company' | 'architect';
+  phone?: string;
+}
+
+export interface LoginData {
+  email: string;
+  password: string;
+}
+
+// ============================================================================
+// Auth API Functions
+// ============================================================================
 
 /**
- * Register a new user
- * POST /api/auth/register
+ * Register new user
  */
-export async function register(payload: RegisterPayload): Promise<User> {
+export async function register(data: RegisterData): Promise<AuthResponse> {
+  console.log('[AuthAPI] Registering user:', data.email);
+  
+  const response = await post<AuthResponse>('/auth/register', {
+    email: data.email,
+    password: data.password,
+    fullName: data.fullName,
+    role: data.role || 'client',
+    phone: data.phone,
+  });
+
+  // Store tokens
+  await setAuthTokens(response.accessToken, response.refreshToken);
+
+  console.log('[AuthAPI] ✅ User registered successfully:', response.user.email);
+  
+  return response;
+}
+
+/**
+ * Login user
+ */
+export async function login(data: LoginData): Promise<AuthResponse> {
+  console.log('[AuthAPI] Logging in user:', data.email);
+  
+  const response = await post<AuthResponse>('/auth/login', {
+    email: data.email,
+    password: data.password,
+  });
+
+  // Store tokens
+  await setAuthTokens(response.accessToken, response.refreshToken);
+
+  console.log('[AuthAPI] ✅ User logged in successfully:', response.user.email);
+  
+  return response;
+}
+
+/**
+ * Logout user
+ */
+export async function logout(refreshToken: string): Promise<void> {
+  console.log('[AuthAPI] Logging out user');
+  
   try {
-    const response = await apiFetch<{ id: string; email: string; full_name?: string }>('/api/auth/register', {
-      method: 'POST',
-      data: payload,
+    await post('/auth/logout', {
+      refreshToken,
     });
-    
-    return {
-      id: response.id,
-      email: response.email,
-      name: response.full_name,
-      full_name: response.full_name,
-    };
   } catch (error) {
-    if (error instanceof ApiError) {
-      throw new Error(error.data?.error || 'Đăng ký thất bại');
-    }
-    throw new Error('Đăng ký thất bại');
+    console.warn('[AuthAPI] Logout request failed:', error);
+    // Continue with local cleanup even if server request fails
+  } finally {
+    // Clear local tokens
+    await clearAuthTokens();
+    console.log('[AuthAPI] ✅ User logged out');
   }
 }
 
 /**
- * Login user and get JWT token
- * POST /api/auth/login
+ * Refresh access token
+ * Note: This is usually called automatically by apiClient interceptor
  */
-export async function login(email: string, password: string): Promise<AuthResponse> {
-  try {
-    const response = await apiFetch<AuthResponse>('/api/auth/login', {
-      method: 'POST',
-      data: { email, password },
-    });
-    
-    if (!response.token) {
-      throw new Error('Không nhận được token từ server');
-    }
-    
-    return response;
-  } catch (error) {
-    if (error instanceof ApiError) {
-      const message = error.data?.error || error.data?.message || 'Đăng nhập thất bại';
-      throw new Error(message);
-    }
-    throw new Error('Đăng nhập thất bại. Vui lòng kiểm tra kết nối mạng.');
-  }
+export async function refreshAccessToken(refreshToken: string): Promise<{
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: string;
+  refreshExpiresIn: string;
+}> {
+  console.log('[AuthAPI] Refreshing access token');
+  
+  const response = await post('/auth/refresh', {
+    refreshToken,
+  });
+
+  // Store new tokens
+  await setAuthTokens(response.accessToken, response.refreshToken);
+
+  console.log('[AuthAPI] ✅ Token refreshed successfully');
+  
+  return response;
 }
 
 /**
- * Get current user info
- * GET /api/auth/me
+ * Get current user profile
+ * (If backend provides this endpoint)
  */
 export async function getCurrentUser(): Promise<User> {
-  try {
-    const response = await apiFetch<User>('/api/auth/me', {
-      method: 'GET',
-    });
-    
-    return response;
-  } catch (error) {
-    if (error instanceof ApiError) {
-      throw new Error(error.data?.error || 'Không thể lấy thông tin người dùng');
-    }
-    throw new Error('Không thể lấy thông tin người dùng');
-  }
+  console.log('[AuthAPI] Fetching current user profile');
+  
+  const response = await post<{ user: User }>('/auth/me');
+  
+  return response.user;
 }
 
 /**
- * Logout user (optional server-side logout endpoint)
- * POST /api/auth/logout
+ * Update user profile
+ * (If backend provides this endpoint)
  */
-export async function logout(): Promise<void> {
-  try {
-    await apiFetch('/api/auth/logout', {
-      method: 'POST',
-    });
-  } catch (error) {
-    // Ignore errors on logout - we'll clear local token anyway
-    console.warn('Logout API call failed:', error);
-  }
+export async function updateProfile(data: {
+  fullName?: string;
+  phone?: string;
+  avatar?: string;
+}): Promise<User> {
+  console.log('[AuthAPI] Updating user profile');
+  
+  const response = await post<{ user: User }>('/auth/profile', data);
+  
+  return response.user;
 }
+
+/**
+ * Change password
+ * (If backend provides this endpoint)
+ */
+export async function changePassword(data: {
+  currentPassword: string;
+  newPassword: string;
+}): Promise<void> {
+  console.log('[AuthAPI] Changing password');
+  
+  await post('/auth/change-password', data);
+  
+  console.log('[AuthAPI] ✅ Password changed successfully');
+}
+
+/**
+ * Request password reset
+ * (If backend provides this endpoint)
+ */
+export async function requestPasswordReset(email: string): Promise<void> {
+  console.log('[AuthAPI] Requesting password reset for:', email);
+  
+  await post('/auth/forgot-password', { email });
+  
+  console.log('[AuthAPI] ✅ Password reset email sent');
+}
+
+/**
+ * Reset password with token
+ * (If backend provides this endpoint)
+ */
+export async function resetPassword(data: {
+  token: string;
+  newPassword: string;
+}): Promise<void> {
+  console.log('[AuthAPI] Resetting password');
+  
+  await post('/auth/reset-password', data);
+  
+  console.log('[AuthAPI] ✅ Password reset successfully');
+}
+
+// ============================================================================
+// Export
+// ============================================================================
+
+export default {
+  register,
+  login,
+  logout,
+  refreshAccessToken,
+  getCurrentUser,
+  updateProfile,
+  changePassword,
+  requestPasswordReset,
+  resetPassword,
+};

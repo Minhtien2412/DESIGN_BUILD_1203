@@ -27,6 +27,12 @@ export default function TabsLayout() {
         }} 
       />
       <Tabs.Screen 
+        name="live" 
+        options={{ 
+          title: 'Live',
+        }} 
+      />
+      <Tabs.Screen 
         name="notifications" 
         options={{ 
           title: 'Thông báo',

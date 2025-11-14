@@ -1,7 +1,8 @@
-import ENV from '@/config/env';
-import { apiFetch, clearToken as clearApiToken, setAuthToken } from '@/services/api';
+import { clearAuthTokens, getAccessToken, getRefreshToken } from '@/services/apiClient';
+import { getCurrentUser, login, logout, register } from '@/services/authApi';
+import { handleApiError } from '@/utils/errorHandler';
 import { Permission } from '@/utils/permissions';
-import { clearToken as clearStorageToken, getToken, setToken as setStorageToken } from '@/utils/storage';
+import { router } from 'expo-router';
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 
 export interface User {
@@ -47,22 +48,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     name: u?.name ?? u?.full_name ?? u?.fullName ?? (`${u?.firstname || ''} ${u?.lastname || ''}`.trim() || undefined),
     phone: u?.phone ?? u?.phonenumber ?? undefined,
     avatar: u?.avatar ?? u?.profile_image ?? undefined,
-    role: u?.role?.name ?? u?.role ?? undefined,
+    role: u?.role?.name ?? u?.role ?? u?.roleName ?? undefined,
     admin: u?.admin ?? (u?.role?.name === 'Administrator' ? 1 : 0),
     permissions: u?.permissions ?? undefined,
     staffid: u?.staffid ?? undefined,
   });
-
-  // Helper functions to sync tokens between storage and API
-  const setToken = async (token: string) => {
-    await setStorageToken(token);
-    setAuthToken(token);
-  };
-
-  const clearToken = async () => {
-    await clearStorageToken();
-    clearApiToken();
-  };
 
   const [state, setState] = useState<AuthState>({
     user: null,
@@ -76,286 +66,146 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const loadSession = async () => {
     try {
-      const token = await getToken();
+      const token = await getAccessToken();
       if (!token) {
         // Silent: no token is expected for first-time users
         setState({ user: null, loading: false, isAuthenticated: false });
         return;
       }
 
-      // Set token in API service for authenticated requests
-      setAuthToken(token);
-
-      // Health check first to detect database issues
+      // Try to get current user from backend
       try {
-        const health = await apiFetch('/health');
-        if (health?.database === 'disconnected') {
-          console.warn('[Auth] ⚠️  Database offline - using cached session');
-          // Use cached token without /auth/me call
-          setState({
-            user: { id: 'cached', email: 'cached@offline', name: 'Cached User (DB Offline)' },
-            loading: false,
-            isAuthenticated: true,
-          });
-          return;
-        }
-      } catch (healthErr) {
-        console.warn('[Auth] Health check failed, attempting /auth/me anyway');
+        const user = await getCurrentUser();
+        setState({
+          user: mapUser(user),
+          loading: false,
+          isAuthenticated: true,
+        });
+      } catch (userError) {
+        console.warn('[Auth] Failed to get current user, clearing session');
+        await clearAuthTokens();
+        setState({ user: null, loading: false, isAuthenticated: false });
       }
-
-      // Support both nested { success, data: {...user} } and flat user responses
-      const res = await apiFetch<any>('/auth/me');
-      const rawUser = res?.data ?? res ?? null;
-      const userData: User | null = rawUser ? mapUser(rawUser) : null;
-
-      if (!userData) {
-        throw new Error('Invalid session response');
-      }
-
-      setState({
-        user: userData,
-        loading: false,
-        isAuthenticated: true,
-      });
     } catch (error) {
-      // Silent handling for auth errors - user is simply not authenticated
-      if (error instanceof Error && error.message && 
-          (error.message.includes('401') || error.message.includes('403') || 
-           error.message.includes('No token') || error.message.includes('Unauthorized'))) {
-        // Don't log - this is expected behavior
-      } else {
-        console.error('Failed to load session:', error);
-      }
-      await clearToken();
+      console.error('Failed to load session:', error);
+      await clearAuthTokens();
       setState({ user: null, loading: false, isAuthenticated: false });
     }
   };
 
   const signIn = async (email: string, password: string) => {
     try {
-      console.log('[AuthContext] signIn starting...');
-      const response = await apiFetch<{ token: string; user: User; data?: any }>('/auth/login', {
-        method: 'POST',
-        body: JSON.stringify({ email, password }),
-      });
-
-      // Handle both direct response and nested data response
-  const token = response.token || response.data?.token;
-  const user = mapUser(response.user || response.data?.user);
-
-      if (!token || !user) {
-        throw new Error('Invalid response from server');
-      }
-
-      await setToken(token);
-      console.log('[AuthContext] Setting state isAuthenticated=true');
+      setState(prev => ({ ...prev, loading: true }));
+      console.log('[AuthContext] Signing in...');
+      
+      const response = await login({ email, password });
+      
+      const user = mapUser(response.user);
+      
+      console.log('[AuthContext] Sign in successful');
       setState({
         user,
         loading: false,
         isAuthenticated: true,
       });
-      console.log('[AuthContext] State updated successfully');
     } catch (error) {
-      console.error('Sign in failed:', error);
-      throw error;
+      console.error('[AuthContext] Sign in failed:', error);
+      const errorInfo = handleApiError(error);
+      setState(prev => ({ ...prev, loading: false }));
+      throw new Error(errorInfo.message);
     }
   };
 
   const signUp = async (email: string, password: string, name?: string, role?: string) => {
     try {
-      console.log('[AuthContext] signUp starting...');
-      const response = await apiFetch<{ token: string; user: User; data?: any }>('/auth/register', {
-        method: 'POST',
-        body: JSON.stringify({ 
-          email,
-          password,
-          fullName: name || email.split('@')[0], // Server expects fullName
-          role: role || 'client', // Default to a valid role expected by server
-        }),
+      setState(prev => ({ ...prev, loading: true }));
+      console.log('[AuthContext] Signing up...');
+      
+      const response = await register({
+        email,
+        password,
+        fullName: name || email.split('@')[0],
+        role: (role as any) || 'client',
       });
 
-      // Handle both direct response and nested data response
-      const token = response.token || response.data?.token;
-      const user = mapUser(response.user || response.data?.user);
-
-      if (!token || !user) {
-        throw new Error('Invalid response from server');
-      }
-
-      await setToken(token);
-      console.log('[AuthContext] Setting state isAuthenticated=true');
+      const user = mapUser(response.user);
+      
+      console.log('[AuthContext] Sign up successful');
       setState({
         user,
         loading: false,
         isAuthenticated: true,
       });
-      console.log('[AuthContext] State updated successfully');
     } catch (error) {
-      console.error('Sign up failed:', error);
-      throw error;
+      console.error('[AuthContext] Sign up failed:', error);
+      const errorInfo = handleApiError(error);
+      setState(prev => ({ ...prev, loading: false }));
+      throw new Error(errorInfo.message);
     }
   };
 
   const signOut = async () => {
     try {
-      await apiFetch('/auth/logout', { method: 'POST' }).catch(() => {});
+      const refreshToken = await getRefreshToken();
+      if (refreshToken) {
+        await logout(refreshToken).catch(() => {
+          console.warn('[AuthContext] Logout API call failed, proceeding with local cleanup');
+        });
+      }
+    } catch (error) {
+      console.error('[AuthContext] Logout error:', error);
     } finally {
-      await clearToken();
+      await clearAuthTokens();
       setState({
         user: null,
         loading: false,
         isAuthenticated: false,
       });
+      
+      // Navigate to login screen
+      try {
+        router.replace('/(auth)/login' as any);
+      } catch (routerError) {
+        console.warn('[AuthContext] Router navigation failed:', routerError);
+      }
     }
   };
 
   const refreshUser = async () => {
     try {
-      const res = await apiFetch<any>('/auth/me');
-      const rawUser = res?.data ?? res ?? null;
-      const userData: User | null = rawUser ? mapUser(rawUser) : null;
-      if (!userData) throw new Error('Invalid session response');
+      const user = await getCurrentUser();
+      const userData = mapUser(user);
       setState(prev => ({
         ...prev,
         user: userData,
         isAuthenticated: true,
       }));
     } catch (error) {
-      console.error('Failed to refresh user:', error);
+      console.error('[AuthContext] Failed to refresh user:', error);
       await signOut();
     }
   };
 
-  // Social providers - OAuth 2.0 Authorization Code Flow (Recommended)
-  // This follows best practices from @react-oauth/google
+  // Social authentication - Currently not implemented in backend API v2.0
+  // These are stub implementations that throw errors
   const signInWithGoogle = async () => {
-    try {
-      if (!ENV.ENABLE_SOCIAL_GOOGLE) {
-        throw new Error('�ang nh?p Google dang t?t trong c?u h�nh m�i tru?ng');
-      }
-
-      // This will be called from the login screen with the actual Google OAuth flow
-      // The UI component should use useGoogleLogin hook with flow: 'auth-code'
-      throw new Error('Please use the Google Sign-In button which implements full OAuth flow');
-    } catch (error) {
-      console.error('Google sign-in failed:', error);
-      throw error;
-    }
+    throw new Error('Google Sign-In chưa được implement. Vui lòng sử dụng email/password.');
   };
 
-  // Method 1: OAuth with Authorization Code (RECOMMENDED - Most secure)
-  // Backend exchanges code for tokens (access_token, refresh_token, id_token)
   const signInWithGoogleCode = async (code: string) => {
-    try {
-      // Send authorization code to backend
-      // Backend will exchange it with Google for tokens
-      const response = await apiFetch<{ token?: string; user?: User; data?: any }>('/auth/google', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code }),
-      });
-
-      const authToken = response.token || response.data?.token;
-      const user = mapUser(response.user || response.data?.user);
-      
-      if (!authToken || !user) {
-        throw new Error('Invalid response from server');
-      }
-
-      await setToken(authToken);
-      setState({ user, loading: false, isAuthenticated: true });
-    } catch (error) {
-      const status = (error as any)?.status;
-      if (status === 404) {
-        throw new Error('�ang nh?p Google chua du?c b?t tr�n m�y ch?');
-      }
-      console.error('Google OAuth Code Exchange failed:', error);
-      throw error;
-    }
+    throw new Error('Google OAuth chưa được implement. Vui lòng sử dụng email/password.');
   };
 
-  // Method 2: OAuth with ID Token/Credential (Alternative - Good for simple use cases)
-  // Frontend gets credential JWT, backend verifies with Google
   const signInWithGoogleToken = async (credential: string, clientId?: string) => {
-    try {
-      // Send Google ID Token to backend for verification
-      const response = await apiFetch<{ token?: string; user?: User; data?: any }>('/auth/google', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          idToken: credential, // Backend expects 'idToken' field
-        }),
-      });
-
-      const authToken = response.token || response.data?.token;
-      const user = mapUser(response.user || response.data?.user);
-      
-      if (!authToken || !user) {
-        throw new Error('Invalid response from server');
-      }
-
-      await setToken(authToken);
-      setState({ user, loading: false, isAuthenticated: true });
-    } catch (error) {
-      const status = (error as any)?.status;
-      if (status === 404) {
-        throw new Error('�ang nh?p Google chua du?c b?t tr�n m�y ch?');
-      }
-      console.error('Google OAuth Token Verification failed:', error);
-      throw error;
-    }
+    throw new Error('Google Token Sign-In chưa được implement. Vui lòng sử dụng email/password.');
   };
 
-  // Method 3: Implicit Flow with Access Token (Legacy - Less secure)
-  // Used when you need to fetch user info from Google APIs directly
   const signInWithGoogleAccessToken = async (accessToken: string) => {
-    try {
-      // Backend can verify access token or we can fetch user info from Google
-      const response = await apiFetch<{ token?: string; user?: User; data?: any }>('/auth/google/token', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ accessToken }),
-      });
-
-      const authToken = response.token || response.data?.token;
-      const user = mapUser(response.user || response.data?.user);
-      
-      if (!authToken || !user) {
-        throw new Error('Invalid response from server');
-      }
-
-      await setToken(authToken);
-      setState({ user, loading: false, isAuthenticated: true });
-    } catch (error) {
-      console.error('Google OAuth Access Token failed:', error);
-      throw error;
-    }
+    throw new Error('Google Access Token Sign-In chưa được implement. Vui lòng sử dụng email/password.');
   };
 
   const signInWithFacebook = async () => {
-    try {
-      if (!ENV.ENABLE_SOCIAL_FACEBOOK) {
-        throw new Error('�ang nh?p Facebook dang t?t trong c?u h�nh m�i tru?ng');
-      }
-      const response = await apiFetch<{ token?: string; user?: User; data?: any }>(ENV.AUTH_FACEBOOK_PATH || '/auth/facebook', {
-        method: 'POST',
-        body: JSON.stringify({ access_token: 'mock_fb_token' }),
-      });
-
-      const token = response.token || response.data?.token;
-      const user = response.user || response.data?.user;
-      if (!token || !user) throw new Error('Invalid response from server');
-
-      await setToken(token);
-      setState({ user, loading: false, isAuthenticated: true });
-    } catch (error) {
-      const status = (error as any)?.status;
-      if (status === 404) {
-        throw new Error('�ang nh?p Facebook chua du?c b?t tr�n m�y ch?');
-      }
-      console.error('Facebook sign-in failed:', error);
-      throw error;
-    }
+    throw new Error('Facebook Sign-In chưa được implement. Vui lòng sử dụng email/password.');
   };
 
   const hasPermission = (feature: string, capability: string): boolean => {

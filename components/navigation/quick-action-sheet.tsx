@@ -2,18 +2,17 @@
  * Quick Action Bottom Sheet - Shopee Style
  * Opens from center tab with 4 quick actions: Live, Videos, QR, Utilities
  */
-import { Colors } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useRef } from 'react';
 import {
-    Animated,
-    Dimensions,
-    Modal,
-    Pressable,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Animated,
+  Dimensions,
+  Modal,
+  Pressable,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -25,10 +24,10 @@ interface QuickActionSheetProps {
 }
 
 const ACTIONS = [
-  { id: 'live', label: 'Live Stream', icon: 'videocam', color: Colors.light.primary, bgColor: Colors.light.chipBackground },
-  { id: 'videos', label: 'Videos', icon: 'play-circle', color: '#f57c00', bgColor: '#fff3e0' },
-  { id: 'qr', label: 'QR Code', icon: 'qr-code', color: '#1976d2', bgColor: '#e3f2fd' },
-  { id: 'utilities', label: 'Tiện ích', icon: 'apps', color: '#43a047', bgColor: '#e8f5e9' },
+  { id: 'cost-estimator', label: 'Dự toán', icon: 'calculator', color: '#1976D2', bgColor: '#E3F2FD' },
+  { id: 'store-locator', label: 'Cửa hàng', icon: 'location', color: '#43A047', bgColor: '#E8F5E9' },
+  { id: 'schedule', label: 'Lịch hẹn', icon: 'calendar', color: '#F57C00', bgColor: '#FFF3E0' },
+  { id: 'quote-request', label: 'Báo giá', icon: 'document-text', color: '#E91E63', bgColor: '#FCE4EC' },
 ];
 
 export function QuickActionSheet({ visible, onClose, onActionPress }: QuickActionSheetProps) {

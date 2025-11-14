@@ -86,3 +86,42 @@ export async function getToken() {
 export async function clearToken() {
   await deleteItem(TOKEN_KEY);
 }
+
+// ============================================
+// GENERIC STORAGE HELPERS FOR JSON DATA
+// ============================================
+
+/**
+ * Store any JSON-serializable data
+ */
+export async function setStorageItem<T>(key: string, value: T): Promise<void> {
+  try {
+    const jsonValue = JSON.stringify(value);
+    await setItem(key, jsonValue);
+  } catch (error) {
+    console.error(`Failed to store item '${key}':`, error);
+    throw error;
+  }
+}
+
+/**
+ * Retrieve and parse JSON data
+ */
+export async function getStorageItem<T>(key: string): Promise<T | null> {
+  try {
+    const jsonValue = await getItem(key);
+    if (!jsonValue) return null;
+    return JSON.parse(jsonValue) as T;
+  } catch (error) {
+    console.error(`Failed to retrieve item '${key}':`, error);
+    return null;
+  }
+}
+
+/**
+ * Delete stored item
+ */
+export async function deleteStorageItem(key: string): Promise<void> {
+  await deleteItem(key);
+}
+

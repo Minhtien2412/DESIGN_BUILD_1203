@@ -13,6 +13,7 @@ import { QuickActionSheet } from './quick-action-sheet';
 const TABS_CONFIG = [
   { name: 'index', label: 'Trang chủ', icon: 'home', activeIcon: 'home' },
   { name: 'projects', label: 'Dự án', icon: 'briefcase-outline', activeIcon: 'briefcase' },
+  { name: 'live', label: 'Live', icon: 'videocam-outline', activeIcon: 'videocam' },
   { name: 'notifications', label: 'Thông báo', icon: 'notifications-outline', activeIcon: 'notifications' },
   { name: 'profile', label: 'Cá nhân', icon: 'person-outline', activeIcon: 'person' },
 ];
@@ -70,23 +71,19 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
   };
 
   const handleActionPress = (actionId: string) => {
-    // Handle different actions
+    // Navigate to different utility pages
     switch (actionId) {
-      case 'live':
-        // Navigate to live stream
-        console.log('Open live stream');
+      case 'cost-estimator':
+        navigation.navigate('utilities/cost-estimator');
         break;
-      case 'videos':
-        // Navigate to videos
-        console.log('Open videos');
+      case 'store-locator':
+        navigation.navigate('utilities/store-locator');
         break;
-      case 'qr':
-        // Open QR scanner
-        console.log('Open QR scanner');
+      case 'schedule':
+        navigation.navigate('utilities/schedule');
         break;
-      case 'utilities':
-        // Navigate to utilities
-        navigation.navigate('menu');
+      case 'quote-request':
+        navigation.navigate('utilities/quote-request');
         break;
     }
   };
@@ -108,6 +105,7 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
       <View style={styles.gradientOverlay} />
       
       <View style={styles.tabsContainer}>
+        {/* Left tabs (Home, Projects) */}
         {TABS_CONFIG.slice(0, 2).map((tab) => {
           const routeIndex = state.routes.findIndex(r => r.name === tab.name);
           const isFocused = state.index === routeIndex;
@@ -166,8 +164,8 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
           </Animated.View>
         </TouchableOpacity>
 
-  {/* Right tabs (Notifications, Profile) */}
-  {TABS_CONFIG.slice(2).map((tab) => {
+        {/* Right tabs (Live, Notifications, Profile) */}
+        {TABS_CONFIG.slice(2).map((tab) => {
           const routeIndex = state.routes.findIndex(r => r.name === tab.name);
           const isFocused = state.index === routeIndex;
           const route = state.routes[routeIndex];

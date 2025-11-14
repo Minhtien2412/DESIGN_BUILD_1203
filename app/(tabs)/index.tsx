@@ -675,8 +675,8 @@ export default function HomeScreen() {
   };
 
   const handleEquipmentPress = (item: any) => {
-    // Navigate to materials shopping for construction equipment
-    router.push('/materials');
+    // Navigate to projects screen (materials shopping not yet implemented)
+    router.push('/projects');
   };
 
   const [voiceVisible, setVoiceVisible] = useState(false);
@@ -738,190 +738,6 @@ export default function HomeScreen() {
           </View>
         </View>
       )}
-
-      {/* Enhanced Quick Action Bar - Shopee Style */}
-      <View style={{ 
-        paddingHorizontal: 16, 
-        paddingVertical: 4,
-        marginBottom: 12,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        gap: 8
-      }}>
-        {/* Video Call */}
-        <TouchableOpacity
-          style={{
-            flex: 1,
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: 'transparent',
-            paddingVertical: 12,
-            paddingHorizontal: 10,
-            borderRadius: 12
-          }}
-          activeOpacity={0.7}
-          onPress={() => router.push('/communications')}
-        >
-          <View style={{
-            width: 40,
-            height: 40,
-            borderRadius: 20,
-            backgroundColor: 'transparent',
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginBottom: 4
-          }}>
-            <Ionicons name="videocam" size={20} color="#1976d2" />
-          </View>
-          <Text style={{ 
-            fontSize: 10, 
-            fontWeight: '600', 
-            color: '#1976d2',
-            letterSpacing: 0
-          }}>
-            Cuộc gọi
-          </Text>
-          {counts.calls > 0 && (
-            <View style={{
-              position: 'absolute',
-              top: 6,
-              right: 6,
-              backgroundColor: '#ef4444',
-              borderRadius: 10,
-              minWidth: 18,
-              height: 18,
-              justifyContent: 'center',
-              alignItems: 'center',
-              paddingHorizontal: 4
-            }}>
-              <Text style={{ 
-                color: '#fff', 
-                fontSize: 9, 
-                fontWeight: '700' 
-              }}>
-                {counts.calls > 99 ? '99+' : counts.calls}
-              </Text>
-            </View>
-          )}
-        </TouchableOpacity>
-
-        {/* Messages */}
-        <TouchableOpacity
-          style={{
-            flex: 1,
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: 'transparent',
-            paddingVertical: 12,
-            paddingHorizontal: 10,
-            borderRadius: 12
-          }}
-          activeOpacity={0.7}
-          onPress={() => router.push('/communications')}
-        >
-          <View style={{
-            width: 40,
-            height: 40,
-            borderRadius: 20,
-            backgroundColor: 'transparent',
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginBottom: 4
-          }}>
-            <Ionicons name="chatbubble-ellipses" size={20} color="#43a047" />
-          </View>
-          <Text style={{ 
-            fontSize: 10, 
-            fontWeight: '600', 
-            color: '#43a047',
-            letterSpacing: 0
-          }}>
-            Tin nhắn
-          </Text>
-          {counts.messages > 0 && (
-            <View style={{
-              position: 'absolute',
-              top: 6,
-              right: 6,
-              backgroundColor: '#ef4444',
-              borderRadius: 10,
-              minWidth: 18,
-              height: 18,
-              justifyContent: 'center',
-              alignItems: 'center',
-              paddingHorizontal: 4
-            }}>
-              <Text style={{ 
-                color: '#fff', 
-                fontSize: 9, 
-                fontWeight: '700' 
-              }}>
-                {counts.messages > 99 ? '99+' : counts.messages}
-              </Text>
-            </View>
-          )}
-        </TouchableOpacity>
-
-        {/* Notifications */}
-        <TouchableOpacity
-          style={{
-            flex: 1,
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: 'transparent',
-            paddingVertical: 12,
-            paddingHorizontal: 10,
-            borderRadius: 12
-          }}
-          activeOpacity={0.7}
-          onPress={() => router.push('/notifications')}
-        >
-          <View style={{
-            width: 40,
-            height: 40,
-            borderRadius: 20,
-            backgroundColor: 'transparent',
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginBottom: 4
-          }}>
-            <Ionicons name="notifications" size={20} color="#f57c00" />
-          </View>
-          <Text style={{ 
-            fontSize: 10, 
-            fontWeight: '600', 
-            color: '#f57c00',
-            letterSpacing: 0
-          }}>
-            Thông báo
-          </Text>
-          {counts.notifications > 0 && (
-            <View style={{
-              position: 'absolute',
-              top: 6,
-              right: 6,
-              backgroundColor: '#ef4444',
-              borderRadius: 10,
-              minWidth: 18,
-              height: 18,
-              justifyContent: 'center',
-              alignItems: 'center',
-              paddingHorizontal: 4
-            }}>
-              <Text style={{ 
-                color: '#fff', 
-                fontSize: 9, 
-                fontWeight: '700' 
-              }}>
-                {counts.notifications > 99 ? '99+' : counts.notifications}
-              </Text>
-            </View>
-          )}
-        </TouchableOpacity>
-      </View>
 
       {/* Search Bar - Enhanced Gradient Background */}
       <View style={{ 
@@ -998,6 +814,277 @@ export default function HomeScreen() {
             rounded={20}
           />
         </View>
+      </View>
+
+      {/* Promotional Banners Section */}
+      <View style={{ paddingHorizontal: 16, marginBottom: 24 }}>
+        <View style={{
+          flexDirection: 'row',
+          gap: 12,
+        }}>
+          {/* Flash Sale Banner */}
+          <TouchableOpacity
+            style={{
+              flex: 1,
+              backgroundColor: '#FF5722',
+              borderRadius: 16,
+              padding: 16,
+              shadowColor: '#FF5722',
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.3,
+              shadowRadius: 8,
+              elevation: 4
+            }}
+            onPress={() => router.push('/shopping/flash-sale')}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+              <View style={{
+                width: 32,
+                height: 32,
+                borderRadius: 16,
+                backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginRight: 8
+              }}>
+                <Ionicons name="flash" size={18} color="#FFF" />
+              </View>
+              <Text style={{
+                fontSize: 14,
+                fontWeight: '700',
+                color: '#FFF'
+              }}>Flash Sale</Text>
+            </View>
+            <Text style={{
+              fontSize: 20,
+              fontWeight: '800',
+              color: '#FFF',
+              marginBottom: 4
+            }}>Giảm 50%</Text>
+            <Text style={{
+              fontSize: 11,
+              color: 'rgba(255, 255, 255, 0.9)',
+              fontWeight: '500'
+            }}>Vật liệu xây dựng</Text>
+          </TouchableOpacity>
+
+          {/* New Customer Banner */}
+          <TouchableOpacity
+            style={{
+              flex: 1,
+              backgroundColor: '#4CAF50',
+              borderRadius: 16,
+              padding: 16,
+              shadowColor: '#4CAF50',
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.3,
+              shadowRadius: 8,
+              elevation: 4
+            }}
+            onPress={() => router.push('/shopping/new-customer-offer')}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+              <View style={{
+                width: 32,
+                height: 32,
+                borderRadius: 16,
+                backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginRight: 8
+              }}>
+                <Ionicons name="gift" size={18} color="#FFF" />
+              </View>
+              <Text style={{
+                fontSize: 14,
+                fontWeight: '700',
+                color: '#FFF'
+              }}>Khách mới</Text>
+            </View>
+            <Text style={{
+              fontSize: 20,
+              fontWeight: '800',
+              color: '#FFF',
+              marginBottom: 4
+            }}>Tặng 200K</Text>
+            <Text style={{
+              fontSize: 11,
+              color: 'rgba(255, 255, 255, 0.9)',
+              fontWeight: '500'
+            }}>Đơn đầu tiên</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* Recent Reviews Section */}
+      <View style={{ paddingHorizontal: 16, marginBottom: 24 }}>
+        <View style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 16
+        }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <View style={{
+              width: 28,
+              height: 28,
+              borderRadius: 14,
+              backgroundColor: Colors.light.primary,
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}>
+              <Ionicons name="star" size={16} color="#FFF" />
+            </View>
+            <Text style={{
+              fontSize: 16,
+              fontWeight: '700',
+              color: Colors.light.text
+            }}>ĐÁNH GIÁ GẦN ĐÂY</Text>
+          </View>
+          <TouchableOpacity onPress={() => router.push('/communications/reviews')}>
+            <Text style={{
+              fontSize: 13,
+              fontWeight: '600',
+              color: Colors.light.primary
+            }}>Xem tất cả →</Text>
+          </TouchableOpacity>
+        </View>
+
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ gap: 12 }}
+        >
+          {/* Review Card 1 */}
+          <View style={{
+            width: 280,
+            backgroundColor: '#FFF',
+            borderRadius: 16,
+            padding: 16,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.06,
+            shadowRadius: 8,
+            elevation: 2
+          }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+              <View style={{
+                width: 40,
+                height: 40,
+                borderRadius: 20,
+                backgroundColor: '#E3F2FD',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginRight: 12
+              }}>
+                <Text style={{ fontSize: 16, fontWeight: '700', color: Colors.light.primary }}>N</Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 14, fontWeight: '700', color: Colors.light.text }}>Nguyễn Văn A</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}>
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Ionicons key={star} name="star" size={12} color="#FFC107" style={{ marginRight: 2 }} />
+                  ))}
+                  <Text style={{ fontSize: 11, color: '#666', marginLeft: 4 }}>2 ngày trước</Text>
+                </View>
+              </View>
+            </View>
+            <Text style={{
+              fontSize: 13,
+              color: Colors.light.textMuted,
+              lineHeight: 18
+            }}>
+              Thợ xây rất tận tâm, làm việc chuyên nghiệp. Hoàn thành công trình đúng tiến độ và chất lượng tốt.
+            </Text>
+          </View>
+
+          {/* Review Card 2 */}
+          <View style={{
+            width: 280,
+            backgroundColor: '#FFF',
+            borderRadius: 16,
+            padding: 16,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.06,
+            shadowRadius: 8,
+            elevation: 2
+          }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+              <View style={{
+                width: 40,
+                height: 40,
+                borderRadius: 20,
+                backgroundColor: '#FCE4EC',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginRight: 12
+              }}>
+                <Text style={{ fontSize: 16, fontWeight: '700', color: '#E91E63' }}>T</Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 14, fontWeight: '700', color: Colors.light.text }}>Trần Thị B</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}>
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Ionicons key={star} name="star" size={12} color="#FFC107" style={{ marginRight: 2 }} />
+                  ))}
+                  <Text style={{ fontSize: 11, color: '#666', marginLeft: 4 }}>3 ngày trước</Text>
+                </View>
+              </View>
+            </View>
+            <Text style={{
+              fontSize: 13,
+              color: Colors.light.textMuted,
+              lineHeight: 18
+            }}>
+              Vật liệu chất lượng tốt, giá cả hợp lý. Giao hàng nhanh chóng, đóng gói cẩn thận. Rất hài lòng!
+            </Text>
+          </View>
+
+          {/* Review Card 3 */}
+          <View style={{
+            width: 280,
+            backgroundColor: '#FFF',
+            borderRadius: 16,
+            padding: 16,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.06,
+            shadowRadius: 8,
+            elevation: 2
+          }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+              <View style={{
+                width: 40,
+                height: 40,
+                borderRadius: 20,
+                backgroundColor: '#E8F5E9',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginRight: 12
+              }}>
+                <Text style={{ fontSize: 16, fontWeight: '700', color: '#4CAF50' }}>L</Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 14, fontWeight: '700', color: Colors.light.text }}>Lê Văn C</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}>
+                  {[1, 2, 3, 4].map((star) => (
+                    <Ionicons key={star} name="star" size={12} color="#FFC107" style={{ marginRight: 2 }} />
+                  ))}
+                  <Ionicons name="star-outline" size={12} color="#FFC107" />
+                  <Text style={{ fontSize: 11, color: '#666', marginLeft: 4 }}>1 tuần trước</Text>
+                </View>
+              </View>
+            </View>
+            <Text style={{
+              fontSize: 13,
+              color: Colors.light.textMuted,
+              lineHeight: 18
+            }}>
+              Dịch vụ thiết kế tốt, nhân viên tư vấn nhiệt tình. Bản vẽ chi tiết, dễ hiểu. Sẽ quay lại.
+            </Text>
+          </View>
+        </ScrollView>
       </View>
 
       {/* DỊCH VỤ - Grid */}
