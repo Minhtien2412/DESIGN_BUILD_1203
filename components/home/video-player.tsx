@@ -106,7 +106,7 @@ export function VideoPlayer({
       {/* Loading Indicator */}
       {isLoading && (
         <View style={styles.loadingOverlay}>
-          <ActivityIndicator size="large" color="#90b44c" />
+          <ActivityIndicator size="large" color="#0A6847" />
         </View>
       )}
 
@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#90b44c',
+    backgroundColor: '#0A6847',
   },
   timeText: {
     color: '#fff',

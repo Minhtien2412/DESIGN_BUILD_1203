@@ -40,7 +40,7 @@ type DocumentManagerProps = {
 
 const DOC_TYPE_CONFIG: Record<DocumentType, { label: string; icon: keyof typeof Ionicons.glyphMap; color: string }> = {
   contract: { label: 'Hợp đồng', icon: 'document-text', color: '#2196F3' },
-  design: { label: 'Thiết kế', icon: 'color-palette', color: '#9C27B0' },
+  design: { label: 'Thiết kế', icon: 'color-palette', color: '#0A6847' },
   report: { label: 'Báo cáo', icon: 'newspaper', color: '#FF9800' },
   permit: { label: 'Giấy phép', icon: 'shield-checkmark', color: '#4CAF50' },
   invoice: { label: 'Hóa đơn', icon: 'receipt', color: '#F44336' },
@@ -56,8 +56,8 @@ const FILE_ICONS: Record<string, { icon: keyof typeof Ionicons.glyphMap; color: 
   jpg: { icon: 'image', color: '#FF9800' },
   jpeg: { icon: 'image', color: '#FF9800' },
   png: { icon: 'image', color: '#FF9800' },
-  dwg: { icon: 'construct', color: '#9C27B0' },
-  zip: { icon: 'archive', color: '#607D8B' },
+  dwg: { icon: 'construct', color: '#0A6847' },
+  zip: { icon: 'archive', color: '#4A4A4A' },
   default: { icon: 'document-outline', color: '#757575' },
 };
 
@@ -282,7 +282,7 @@ export default function DocumentManager({
                 </View>
 
                 <View style={styles.previewContainer}>
-                  <Ionicons name="document-text-outline" size={80} color="#90b44c" />
+                  <Ionicons name="document-text-outline" size={80} color="#0A6847" />
                   <Text style={styles.previewText}>Xem trước tài liệu</Text>
                   <Text style={styles.previewSubtext}>
                     {formatFileSize(previewDoc.size)} • {getFileExtension(previewDoc.name).toUpperCase()}
@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#90b44c',
+    backgroundColor: '#0A6847',
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 20,
@@ -363,8 +363,8 @@ const styles = StyleSheet.create({
     borderBottomColor: 'transparent',
   },
   filterTabActive: {
-    backgroundColor: '#f0f9f4',
-    borderBottomColor: '#90b44c',
+    backgroundColor: '#E8F5E9',
+    borderBottomColor: '#0A6847',
   },
   filterTabText: {
     fontSize: 14,
@@ -373,7 +373,7 @@ const styles = StyleSheet.create({
   },
   filterTabTextActive: {
     fontWeight: '700',
-    color: '#90b44c',
+    color: '#0A6847',
   },
   documentsList: {
     gap: 0,
@@ -504,7 +504,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 10,
-    backgroundColor: '#90b44c',
+    backgroundColor: '#0A6847',
     paddingVertical: 16,
     borderRadius: 12,
   },

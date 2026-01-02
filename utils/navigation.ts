@@ -1,4 +1,20 @@
-import { router } from 'expo-router';
+import { PermissionString, Role } from '@/types/auth';
+import { Href, router, usePathname } from 'expo-router';
+
+/**
+ * Navigate to any route without type errors
+ * Use this for dynamic routes or routes not yet in typed routes
+ */
+export const navigateTo = (path: string) => {
+  router.push(path as Href);
+};
+
+/**
+ * Replace current route with new route
+ */
+export const replaceTo = (path: string) => {
+  router.replace(path as Href);
+};
 
 /**
  * Open the search screen with a prefilled hashtag filter.
@@ -13,8 +29,6 @@ export function openHashtag(tag: string) {
   }
 }
 
-import { PermissionString, Role } from '@/types/auth';
-import { usePathname } from 'expo-router';
 
 /**
  * Navigation helper for forbidden access
@@ -46,9 +60,9 @@ export function navigateToForbidden(options?: {
 
 /**
  * Check if current route is forbidden screen
- * Note: This should be used within a component that has access to hooks
+ * Note: This is a hook and must be called within a React component
  */
-export function isForbiddenRoute(): boolean {
+export function useIsForbiddenRoute(): boolean {
   const pathname = usePathname();
   return pathname === '/forbidden';
 }

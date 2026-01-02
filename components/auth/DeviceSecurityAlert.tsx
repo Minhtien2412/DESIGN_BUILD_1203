@@ -31,11 +31,7 @@ export function DeviceSecurityAlert({
   const warningColor = '#ff9500';
   const primaryColor = '#007AFF';
 
-  if (!visible || !isNewDevice) {
-    return null;
-  }
-
-  const handleShowNativeAlert = () => {
+  const handleShowNativeAlert = React.useCallback(() => {
     if (Platform.OS !== 'web') {
       Alert.alert(
         'Cảnh báo bảo mật',
@@ -60,14 +56,18 @@ export function DeviceSecurityAlert({
         ]
       );
     }
-  };
+  }, [warningMessage, onChangePassword, onViewDevices, onTrustDevice, onDismiss]);
 
   React.useEffect(() => {
     if (visible && isNewDevice && Platform.OS !== 'web') {
       // Hiển thị Alert native trên mobile
       setTimeout(handleShowNativeAlert, 500);
     }
-  }, [visible, isNewDevice]);
+  }, [visible, isNewDevice, handleShowNativeAlert]);
+
+  if (!visible || !isNewDevice) {
+    return null;
+  }
 
   // Modal cho web
   return (

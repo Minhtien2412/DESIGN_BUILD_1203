@@ -1,6 +1,5 @@
-// CallSessionContext not implemented yet - commented out to prevent bundling errors
-// import { useCallSession } from '@/context/CallSessionContext';
-import { useCallSession } from '@/hooks/useCallSession';
+// Call action buttons for video/voice calls
+import { useCall } from '@/hooks/useCall';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import {
@@ -31,10 +30,16 @@ export function CallActionButtons({
   variant = 'horizontal',
   showLabels = true,
 }: CallActionButtonsProps) {
-  const { startCall, startVideoAndNavigate } = useCallSession();
-  const handleVideoCall = () => {
+  const { startCall } = useCall();
+  
+  const handleVideoCall = async () => {
     if (userId) {
-      startVideoAndNavigate({ participantIds: [userId], participantNames: { [userId]: userName }, peerId: userId });
+      try {
+        await startCall(parseInt(userId), 'video');
+        router.push(`/call/${userId}` as any);
+      } catch (error) {
+        console.error('Failed to start video call:', error);
+      }
     } else {
       router.push('/contact-picker' as any);
     }
@@ -42,9 +47,12 @@ export function CallActionButtons({
 
   const handleVoiceCall = async () => {
     if (userId) {
-      const roomId = `voice-${Date.now()}`;
-      await startCall({ roomId, participantIds: [userId], kind: 'voice', participantNames: { [userId]: userName } });
-      router.push(`/call-popup?roomId=${roomId}&kind=voice&peerId=${userId}&peerName=${encodeURIComponent(userName)}` as any);
+      try {
+        await startCall(parseInt(userId), 'audio');
+        router.push(`/call/${userId}` as any);
+      } catch (error) {
+        console.error('Failed to start voice call:', error);
+      }
     } else {
       router.push('/contact-picker' as any);
     }
@@ -189,10 +197,10 @@ export function CallStatusIndicator({
 }) {
   const statusConfig = {
     online: { color: '#4CAF50', icon: null },
-    busy: { color: '#FF5722', icon: 'do-not-disturb-on' },
+    busy: { color: '#1A1A1A', icon: 'do-not-disturb-on' },
     away: { color: '#FF9800', icon: 'schedule' },
     offline: { color: '#9E9E9E', icon: null },
-    'in-call': { color: '#2196F3', icon: 'call' },
+    'in-call': { color: '#0A6847', icon: 'call' },
   };
 
   const config = statusConfig[status];

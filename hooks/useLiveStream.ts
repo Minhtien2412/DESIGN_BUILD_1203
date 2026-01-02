@@ -121,6 +121,13 @@ export function useLiveStream(options: UseLiveStreamOptions = {}) {
       setIsLoading(true);
       setError(null);
       
+      // First, load the stream data
+      const { getLiveStream } = await import('@/services/liveStream');
+      const streamData = await getLiveStream(streamId);
+      setStream(streamData);
+      setViewerCount(streamData.viewerCount);
+      
+      // Then join the stream
       const result = await joinStream(streamId);
       setIsJoined(true);
       

@@ -104,7 +104,7 @@ export default function LocationCheckIn({ projectId, projectLocation, onSuccess 
 
       // Launch camera
       const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ['images'],
         allowsEditing: true,
         aspect: [4, 3],
         quality: 0.8,
@@ -133,7 +133,7 @@ export default function LocationCheckIn({ projectId, projectLocation, onSuccess 
 
       // Launch image picker
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ['images'],
         allowsEditing: true,
         aspect: [4, 3],
         quality: 0.8,
@@ -301,7 +301,7 @@ export default function LocationCheckIn({ projectId, projectLocation, onSuccess 
               style={styles.photoRemoveButton}
               onPress={() => setPhoto(null)}
             >
-              <Ionicons name="close-circle" size={32} color="#F44336" />
+              <Ionicons name="close-circle" size={32} color="#1A1A1A" />
             </TouchableOpacity>
           </View>
         ) : (

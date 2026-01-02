@@ -1,13 +1,17 @@
 /**
  * Call History Screen
  * Displays call history with video/audio calls, missed/completed status
+ * Updated: 23/12/2025 - Using useCall hook
  */
 
 import Avatar from '@/components/ui/avatar';
-import { apiFetch } from '@/services/api';
+import { useCall } from '@/hooks/useCall';
+import {
+    CallHistoryItem,
+    getCallStatusColor,
+} from '@/services/api/call.service';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
 import {
     ActivityIndicator,
     FlatList,
@@ -18,82 +22,20 @@ import {
     View,
 } from 'react-native';
 
-interface OtherUser {
-  id: number;
-  name: string;
-  avatar: string | null;
-}
-
-interface Call {
-  id: number;
-  type: 'video' | 'audio';
-  status: 'missed' | 'completed' | 'declined' | 'failed';
-  duration: number; // in seconds
-  startedAt: string;
-  endedAt: string | null;
-  isIncoming: boolean;
-  otherUser: OtherUser;
-}
-
 export default function CallHistoryScreen() {
-  const [calls, setCalls] = useState<Call[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
-  const [offset, setOffset] = useState(0);
-  const limit = 20;
+  const {
+    callHistory,
+    loading,
+    refreshing,
+    hasMoreHistory,
+    refreshHistory,
+    loadMoreHistory,
+  } = useCall({ autoLoadHistory: true, historyLimit: 50 });
 
-  const fetchCalls = useCallback(async (isRefresh = false, currentOffset?: number) => {
-    try {
-      if (isRefresh) {
-        setRefreshing(true);
-      } else if (currentOffset === 0) {
-        setLoading(true);
-      } else {
-        setLoadingMore(true);
-      }
-
-      const offsetToUse = isRefresh ? 0 : (currentOffset ?? offset);
-      const data = await apiFetch(`/api/calls?limit=${limit}&offset=${offsetToUse}`);
-
-      const newCalls = data.calls || [];
-      
-      if (isRefresh || offsetToUse === 0) {
-        setCalls(newCalls);
-        setOffset(limit);
-      } else {
-        setCalls(prev => [...prev, ...newCalls]);
-        setOffset(offsetToUse + limit);
-      }
-
-      setHasMore(data.pagination?.hasMore || false);
-    } catch (error) {
-      console.error('Failed to fetch calls:', error);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-      setLoadingMore(false);
-    }
-  }, []); // REMOVE offset dependency!
-
-  useEffect(() => {
-    fetchCalls(false, 0);
-  }, [fetchCalls]);
-
-  const handleRefresh = () => {
-    fetchCalls(true, 0);
-  };
-
-  const handleLoadMore = () => {
-    if (!loadingMore && hasMore) {
-      fetchCalls(false, offset);
-    }
-  };
-
-  const handleCallPress = (call: Call) => {
-    // Start new call with the same user
-    router.push(`/call/video-call?userId=${call.otherUser.id}` as any);
+  const handleCallPress = (call: CallHistoryItem) => {
+    // Tất cả cuộc gọi thực hiện trong app
+    const otherUserId = call.otherUser.id;
+    router.push(`/call/${otherUserId}?type=${call.type}`);
   };
 
   const formatTime = (dateString: string) => {
@@ -112,51 +54,18 @@ export default function CallHistoryScreen() {
     return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
   };
 
-  const formatDuration = (seconds: number) => {
-    if (seconds === 0) return '';
+  const getCallIcon = (call: CallHistoryItem) => {
+    if (call.status === 'missed') {
+      return 'call-outline';
+    }
+    return 'call';
+  };
+
+  const renderCall = ({ item }: { item: CallHistoryItem }) => {
+    const isIncoming = !item.isOutgoing;
+    const statusColor = getCallStatusColor(item.status);
     
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
-
-    if (hours > 0) {
-      return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-    }
-    return `${minutes}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const getCallStatusText = (call: Call) => {
-    if (call.status === 'missed') {
-      return call.isIncoming ? 'Cuộc gọi nhỡ' : 'Không trả lời';
-    }
-    if (call.status === 'completed') {
-      return call.isIncoming ? 'Cuộc gọi đến' : 'Cuộc gọi đi';
-    }
-    if (call.status === 'declined') {
-      return call.isIncoming ? 'Từ chối' : 'Đã từ chối';
-    }
-    if (call.status === 'failed') {
-      return 'Cuộc gọi thất bại';
-    }
-    return '';
-  };
-
-  const getCallStatusColor = (call: Call) => {
-    if (call.status === 'missed') return '#ef4444';
-    if (call.status === 'completed') return '#22c55e';
-    if (call.status === 'declined') return '#f59e0b';
-    if (call.status === 'failed') return '#999';
-    return '#111';
-  };
-
-  const getCallIcon = (call: Call) => {
-    if (call.status === 'missed') {
-      return call.isIncoming ? 'call-outline' : 'call-outline';
-    }
-    return call.isIncoming ? 'call' : 'call';
-  };
-
-  const renderCall = ({ item }: { item: Call }) => (
+    return (
     <TouchableOpacity
       style={styles.callItem}
       onPress={() => handleCallPress(item)}
@@ -165,7 +74,7 @@ export default function CallHistoryScreen() {
       {/* Avatar */}
       <View style={styles.avatarContainer}>
         <Avatar
-          avatar={item.otherUser.avatar}
+          avatar={item.otherUser.avatar || null}
           userId={String(item.otherUser.id)}
           name={item.otherUser.name}
           pixelSize={56}
@@ -194,44 +103,45 @@ export default function CallHistoryScreen() {
           <Ionicons 
             name={getCallIcon(item)} 
             size={14} 
-            color={getCallStatusColor(item)}
+            color={statusColor}
             style={{ 
               transform: [{ 
-                rotate: item.isIncoming ? '135deg' : '-45deg' 
+                rotate: isIncoming ? '135deg' : '-45deg' 
               }] 
             }}
           />
-          <Text style={[styles.callStatus, { color: getCallStatusColor(item) }]}>
-            {getCallStatusText(item)}
+          <Text style={[styles.callStatus, { color: statusColor }]}>
+            {item.statusText}
           </Text>
-          {item.duration > 0 && (
+          {item.durationText && item.durationText !== '0:00' && (
             <>
               <Text style={styles.separator}>•</Text>
-              <Text style={styles.duration}>{formatDuration(item.duration)}</Text>
+              <Text style={styles.duration}>{item.durationText}</Text>
             </>
           )}
         </View>
 
-        <Text style={styles.timeText}>{formatTime(item.startedAt)}</Text>
+        <Text style={styles.timeText}>{formatTime(item.createdAt)}</Text>
       </View>
 
-      {/* Call action button */}
+      {/* Call action button - gọi trực tiếp trong app */}
       <TouchableOpacity 
         style={styles.callButton}
-        onPress={() => handleCallPress(item)}
+        onPress={() => router.push(`/call/${item.otherUser.id}?type=${item.type}`)}
         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
       >
         <Ionicons 
           name={item.type === 'video' ? 'videocam' : 'call'} 
           size={22} 
-          color="#3b82f6" 
+          color="#0068FF" 
         />
       </TouchableOpacity>
     </TouchableOpacity>
   );
+  };
 
   const renderFooter = () => {
-    if (!loadingMore) return null;
+    if (!hasMoreHistory || callHistory.length === 0) return null;
     return (
       <View style={styles.loadingFooter}>
         <ActivityIndicator size="small" color="#3b82f6" />
@@ -279,22 +189,22 @@ export default function CallHistoryScreen() {
 
       {/* Calls list */}
       <FlatList
-        data={calls}
+        data={callHistory}
         renderItem={renderCall}
         keyExtractor={(item) => item.id.toString()}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
-            onRefresh={handleRefresh}
+            onRefresh={refreshHistory}
             colors={['#3b82f6']}
             tintColor="#3b82f6"
           />
         }
-        onEndReached={handleLoadMore}
+        onEndReached={loadMoreHistory}
         onEndReachedThreshold={0.5}
         ListFooterComponent={renderFooter}
         ListEmptyComponent={renderEmpty}
-        contentContainerStyle={calls.length === 0 ? styles.emptyList : undefined}
+        contentContainerStyle={callHistory.length === 0 ? styles.emptyList : undefined}
       />
     </View>
   );

@@ -358,7 +358,7 @@ const styles = StyleSheet.create({
   categoryBadge: {
     paddingHorizontal: 16,
     paddingVertical: 6,
-    backgroundColor: '#90B44C',
+    backgroundColor: '#0A6847',
     borderRadius: 20,
   },
   categoryText: {
@@ -408,7 +408,7 @@ const styles = StyleSheet.create({
   pricingPrice: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#90B44C',
+    color: '#0A6847',
     marginLeft: 12,
   },
   pricingDescription: {
@@ -477,7 +477,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   ctaButton: {
-    backgroundColor: '#90B44C',
+    backgroundColor: '#0A6847',
   },
   callButton: {
     flexDirection: 'row',

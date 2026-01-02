@@ -193,7 +193,7 @@ export default function TermsOfServiceScreen() {
           </Text>
           <View style={styles.bulletList}>
             <Text style={[styles.bullet, { color: colors.text }]}>
-              • Ứng dụng được cung cấp "nguyên trạng", không đảm bảo 100% không lỗi
+              • Ứng dụng được cung cấp &quot;nguyên trạng&quot;, không đảm bảo 100% không lỗi
             </Text>
             <Text style={[styles.bullet, { color: colors.text }]}>
               • Chúng tôi không chịu trách nhiệm về chất lượng dịch vụ của nhà thầu

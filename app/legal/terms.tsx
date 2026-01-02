@@ -84,7 +84,7 @@ export default function TermsScreen() {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>8. Giới hạn trách nhiệm</Text>
             <Text style={styles.paragraph}>
-              Ứng dụng được cung cấp "như hiện có" và "như có sẵn". Chúng tôi không đảm bảo rằng ứng dụng sẽ không bị gián đoạn, an toàn hoặc không có lỗi. Trong phạm vi tối đa được pháp luật cho phép, chúng tôi từ chối mọi trách nhiệm đối với bất kỳ thiệt hại nào phát sinh từ việc sử dụng ứng dụng.
+              Ứng dụng được cung cấp &quot;như hiện có&quot; và &quot;như có sẵn&quot;. Chúng tôi không đảm bảo rằng ứng dụng sẽ không bị gián đoạn, an toàn hoặc không có lỗi. Trong phạm vi tối đa được pháp luật cho phép, chúng tôi từ chối mọi trách nhiệm đối với bất kỳ thiệt hại nào phát sinh từ việc sử dụng ứng dụng.
             </Text>
           </View>
 

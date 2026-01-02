@@ -25,51 +25,51 @@ export const AUTH_ENDPOINTS = {
 // ===== MESSAGING & CALLS =====
 export const MESSAGING_ENDPOINTS = {
   // Conversations
-  CONVERSATIONS: '/api/messages/conversations',              // GET
-  CONVERSATION: (id: string) => `/api/messages/conversations/${id}`,  // GET
-  CREATE_CONVERSATION: '/api/messages/conversations',        // POST
+  CONVERSATIONS: '/api/v1/messages/conversations',              // GET
+  CONVERSATION: (id: string) => `/api/v1/messages/conversations/${id}`,  // GET
+  CREATE_CONVERSATION: '/api/v1/messages/conversations',        // POST
   
   // Messages
-  MESSAGES: (conversationId: string) => `/api/messages/conversations/${conversationId}/messages`,  // GET
-  SEND_MESSAGE: (conversationId: string) => `/api/messages/conversations/${conversationId}/messages`,  // POST
+  MESSAGES: (conversationId: string) => `/api/v1/messages/conversations/${conversationId}/messages`,  // GET
+  SEND_MESSAGE: (conversationId: string) => `/api/v1/messages/conversations/${conversationId}/messages`,  // POST
   
   // Calls
-  CALLS: '/api/calls',                                      // GET
-  CALL: (id: string) => `/api/calls/${id}`,                // GET
-  START_CALL: '/api/calls/start',                          // POST
-  END_CALL: (id: string) => `/api/calls/${id}/end`,       // POST
+  CALLS: '/api/v1/call/history',                           // GET (fixed: backend uses /call not /calls)
+  CALL: (id: string) => `/api/v1/call/${id}`,             // GET
+  START_CALL: '/api/v1/call/start',                       // POST
+  END_CALL: (id: string) => `/api/v1/call/end`,           // POST (fixed: /call/end not /calls/:id/end)
   
   // Call Management
-  ACTIVE_CALLS: '/api/calls/active',                       // GET
-  MISSED_CALLS: '/api/calls/missed',                       // GET
+  ACTIVE_CALLS: '/api/v1/call/active',                    // GET
+  MISSED_CALLS: '/api/v1/call/missed',                    // GET
 } as const;
 
 // ===== NOTIFICATIONS =====
 export const NOTIFICATION_ENDPOINTS = {
   // Get notifications
-  LIST: '/api/notifications',                                      // GET
-  UNREAD: '/api/notifications/unread',                            // GET
-  UNREAD_COUNT: '/api/notifications/unread-counts',               // GET
+  LIST: '/api/v1/notifications',                                      // GET
+  UNREAD: '/api/v1/notifications/unread',                            // GET
+  UNREAD_COUNT: '/api/v1/notifications/unread-count',                // GET (fixed endpoint name)
   
   // Notification actions
-  MARK_READ: (id: string) => `/api/notifications/${id}/read`,    // POST
-  MARK_ALL_READ: '/api/notifications/read-all',                  // POST
-  DELETE: (id: string) => `/api/notifications/${id}`,           // DELETE
+  MARK_READ: (id: string) => `/api/v1/notifications/${id}/read`,    // PATCH
+  MARK_ALL_READ: '/api/v1/notifications/read-all',                  // PATCH
+  DELETE: (id: string) => `/api/v1/notifications/${id}`,           // DELETE (archive)
 } as const;
 
 // ===== PROJECTS =====
 export const PROJECT_ENDPOINTS = {
   // Projects CRUD
-  LIST: '/api/projects',                                    // GET
-  CREATE: '/api/projects',                                  // POST
-  DETAIL: (id: string) => `/api/projects/${id}`,          // GET
-  UPDATE: (id: string) => `/api/projects/${id}`,          // PUT
-  DELETE: (id: string) => `/api/projects/${id}`,          // DELETE
+  LIST: '/api/v1/projects',                                    // GET
+  CREATE: '/api/v1/projects',                                  // POST
+  DETAIL: (id: string) => `/api/v1/projects/${id}`,          // GET
+  UPDATE: (id: string) => `/api/v1/projects/${id}`,          // PUT
+  DELETE: (id: string) => `/api/v1/projects/${id}`,          // DELETE
   
   // Project Features
-  TIMELINE: (id: string) => `/api/projects/${id}/timeline`,  // GET
-  PAYMENTS: (id: string) => `/api/projects/${id}/payments`,  // GET
-  DOCUMENTS: (id: string) => `/api/projects/${id}/documents`,  // GET
+  TIMELINE: (id: string) => `/api/v1/projects/${id}/timeline`,  // GET
+  PAYMENTS: (id: string) => `/api/v1/projects/${id}/payments`,  // GET
+  DOCUMENTS: (id: string) => `/api/v1/projects/${id}/documents`,  // GET
 } as const;
 
 // ===== CONTRACTORS =====

@@ -9,9 +9,9 @@ import {
     View,
     ViewStyle,
 } from 'react-native';
-// Expo: gi? dòng du?i
+// Expo: gi? dï¿½ng du?i
 import { Feather } from '@expo/vector-icons';
-// React Native CLI: thay dòng import icon b?ng:
+// React Native CLI: thay dï¿½ng import icon b?ng:
 // import Feather from 'react-native-vector-icons/Feather';
 
 type Category = {
@@ -29,7 +29,7 @@ type Feature = {
 
 type Theme = {
   colors: {
-    primary: string;      // #90B44C
+    primary: string;      // #0A6847
     primaryAlt: string;   // #7FAB67
     surface: string;      // #FFFFFF
     background: string;   // #F7F7F7
@@ -46,7 +46,7 @@ type Theme = {
 
 const defaultTheme: Theme = {
   colors: {
-    primary: '#90B44C',
+    primary: '#0A6847',
     primaryAlt: '#7FAB67',
     surface: '#FFFFFF',
     background: '#F7F7F7',
@@ -69,13 +69,13 @@ const defaultTheme: Theme = {
 
 export type DesignBuildSectionProps = {
   style?: StyleProp<ViewStyle>;
-  title?: string;              // dòng tiêu d? chính, m?c d?nh "Design Build"
-  greeting?: string;           // dòng chào, m?c d?nh "Xin chào ??"
-  searchPlaceholder?: string;  // placeholder thanh tìm ki?m
+  title?: string;              // dï¿½ng tiï¿½u d? chï¿½nh, m?c d?nh "Design Build"
+  greeting?: string;           // dï¿½ng chï¿½o, m?c d?nh "Xin chï¿½o ??"
+  searchPlaceholder?: string;  // placeholder thanh tï¿½m ki?m
   categories?: Category[];     // lu?i danh m?c
-  featured?: Feature[];        // carousel d? án n?i b?t
+  featured?: Feature[];        // carousel d? ï¿½n n?i b?t
   theme?: Partial<Theme>;      // override theme
-  scrollable?: boolean;        // m?c d?nh true, set false n?u b?c trong ScrollView khác
+  scrollable?: boolean;        // m?c d?nh true, set false n?u b?c trong ScrollView khï¿½c
   onCategoryPress?: (key: string) => void;
   onCardPress?: (id: string) => void;
   onSearch?: (text: string) => void;
@@ -177,8 +177,8 @@ export default function DesignBuildSection(props: DesignBuildSectionProps) {
   const {
     style,
     title = 'Design Build',
-    greeting = 'Xin chào ??',
-    searchPlaceholder = 'Tìm nhà th?u, d? án, s?n ph?m...',
+    greeting = 'Xin chï¿½o ??',
+    searchPlaceholder = 'Tï¿½m nhï¿½ th?u, d? ï¿½n, s?n ph?m...',
     categories,
     featured,
     theme: themeOverride,
@@ -201,19 +201,19 @@ export default function DesignBuildSection(props: DesignBuildSectionProps) {
 
   const _categories = categories ?? [
     { key: 'design', label: 'Thi?t k?', icon: 'pen-tool' },
-    { key: 'build', label: 'Thi công', icon: 'truck' },
+    { key: 'build', label: 'Thi cï¿½ng', icon: 'truck' },
     { key: 'interior', label: 'N?i th?t', icon: 'grid' },
     { key: 'materials', label: 'V?t li?u', icon: 'package' },
     { key: 'repair', label: 'S?a ch?a', icon: 'settings' },
     { key: 'engineer', label: 'K? su', icon: 'briefcase' },
-    { key: 'architect', label: 'Ki?n trúc su', icon: 'compass' },
+    { key: 'architect', label: 'Ki?n trï¿½c su', icon: 'compass' },
     { key: 'cleaning', label: 'V? sinh', icon: 'droplet' },
   ];
 
   const _featured = featured ?? [
-    { id: 'aristo', title: 'Aristo Villa', subtitle: 'Bi?t th? hi?n d?i • Q.7' },
-    { id: 'eden', title: 'Eden Villa', subtitle: 'Ngh? du?ng • Ðà L?t' },
-    { id: 'atrahi', title: 'Atrahi Design', subtitle: 'Coffee concept • Bình Th?nh' },
+    { id: 'aristo', title: 'Aristo Villa', subtitle: 'Bi?t th? hi?n d?i ï¿½ Q.7' },
+    { id: 'eden', title: 'Eden Villa', subtitle: 'Ngh? du?ng ï¿½ ï¿½ï¿½ L?t' },
+    { id: 'atrahi', title: 'Atrahi Design', subtitle: 'Coffee concept ï¿½ Bï¿½nh Th?nh' },
   ];
 
   const Content = () => (
@@ -262,7 +262,7 @@ export default function DesignBuildSection(props: DesignBuildSectionProps) {
 
       {/* Featured carousel */}
       <View style={{ paddingHorizontal: 18, paddingVertical: 6, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Text style={{ fontSize: 18, fontWeight: '800', color: theme.colors.text }}>D? án n?i b?t</Text>
+        <Text style={{ fontSize: 18, fontWeight: '800', color: theme.colors.text }}>D? ï¿½n n?i b?t</Text>
         <Text style={{ color: theme.colors.primary, fontWeight: '700' }}>Xem t?t c?</Text>
       </View>
 

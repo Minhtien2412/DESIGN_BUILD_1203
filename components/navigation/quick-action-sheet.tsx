@@ -1,18 +1,20 @@
 /**
  * Quick Action Bottom Sheet - Shopee Style
- * Opens from center tab with 4 quick actions: Live, Videos, QR, Utilities
+ * Opens from center tab with quick actions: Call, Messages, Live, plus utilities
  */
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import { useEffect, useRef } from 'react';
 import {
-  Animated,
-  Dimensions,
-  Modal,
-  Pressable,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    Animated,
+    Dimensions,
+    Modal,
+    Pressable,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -23,11 +25,20 @@ interface QuickActionSheetProps {
   onActionPress?: (action: string) => void;
 }
 
-const ACTIONS = [
+// Primary communication actions
+const PRIMARY_ACTIONS = [
+  { id: 'call', label: 'Gọi điện', icon: 'call', color: '#22C55E', bgColor: '#DCFCE7' },
+  { id: 'messages', label: 'Nhắn tin', icon: 'chatbubbles', color: '#3B82F6', bgColor: '#DBEAFE' },
+  { id: 'live', label: 'Livestream', icon: 'videocam', color: '#EF4444', bgColor: '#FEE2E2' },
+  { id: 'contacts', label: 'Danh bạ', icon: 'people', color: '#8B5CF6', bgColor: '#EDE9FE' },
+];
+
+// Secondary utility actions
+const SECONDARY_ACTIONS = [
   { id: 'cost-estimator', label: 'Dự toán', icon: 'calculator', color: '#1976D2', bgColor: '#E3F2FD' },
   { id: 'store-locator', label: 'Cửa hàng', icon: 'location', color: '#43A047', bgColor: '#E8F5E9' },
   { id: 'schedule', label: 'Lịch hẹn', icon: 'calendar', color: '#F57C00', bgColor: '#FFF3E0' },
-  { id: 'quote-request', label: 'Báo giá', icon: 'document-text', color: '#E91E63', bgColor: '#FCE4EC' },
+  { id: 'quote-request', label: 'Báo giá', icon: 'document-text', color: '#0A6847', bgColor: '#E8F5E9' },
 ];
 
 export function QuickActionSheet({ visible, onClose, onActionPress }: QuickActionSheetProps) {
@@ -80,9 +91,52 @@ export function QuickActionSheet({ visible, onClose, onActionPress }: QuickActio
   }, [visible]);
 
   const handleActionPress = (actionId: string) => {
-    onActionPress?.(actionId);
     onClose();
+    
+    // Handle navigation based on action
+    switch (actionId) {
+      case 'call':
+        router.push('/call/history');
+        break;
+      case 'messages':
+        router.push('/messages');
+        break;
+      case 'live':
+        router.push('/live');
+        break;
+      case 'contacts':
+        router.push('/communication');
+        break;
+      case 'cost-estimator':
+        router.push('/utilities/cost-estimator');
+        break;
+      case 'store-locator':
+        router.push('/utilities/store-locator');
+        break;
+      case 'schedule':
+        router.push('/utilities/schedule');
+        break;
+      case 'quote-request':
+        router.push('/utilities/quote-request');
+        break;
+      default:
+        onActionPress?.(actionId);
+    }
   };
+
+  const renderActionButton = (action: typeof PRIMARY_ACTIONS[0]) => (
+    <TouchableOpacity
+      key={action.id}
+      style={styles.actionButton}
+      activeOpacity={0.7}
+      onPress={() => handleActionPress(action.id)}
+    >
+      <View style={[styles.actionIcon, { backgroundColor: action.bgColor }]}>
+        <Ionicons name={action.icon as any} size={28} color={action.color} />
+      </View>
+      <Text style={styles.actionLabel}>{action.label}</Text>
+    </TouchableOpacity>
+  );
 
   return (
     <Modal
@@ -117,25 +171,19 @@ export function QuickActionSheet({ visible, onClose, onActionPress }: QuickActio
           {/* Handle */}
           <View style={styles.handle} />
 
-          {/* Title */}
-          <Text style={styles.title}>Chức năng nhanh</Text>
+          <ScrollView showsVerticalScrollIndicator={false}>
+            {/* Primary Actions - Communication */}
+            <Text style={styles.sectionTitle}>Liên lạc</Text>
+            <View style={styles.actionsGrid}>
+              {PRIMARY_ACTIONS.map(renderActionButton)}
+            </View>
 
-          {/* Actions Grid */}
-          <View style={styles.actionsGrid}>
-            {ACTIONS.map((action) => (
-              <TouchableOpacity
-                key={action.id}
-                style={styles.actionButton}
-                activeOpacity={0.7}
-                onPress={() => handleActionPress(action.id)}
-              >
-                <View style={[styles.actionIcon, { backgroundColor: action.bgColor }]}>
-                  <Ionicons name={action.icon as any} size={28} color={action.color} />
-                </View>
-                <Text style={styles.actionLabel}>{action.label}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+            {/* Secondary Actions - Utilities */}
+            <Text style={styles.sectionTitle}>Tiện ích</Text>
+            <View style={styles.actionsGrid}>
+              {SECONDARY_ACTIONS.map(renderActionButton)}
+            </View>
+          </ScrollView>
 
           {/* Close Button */}
           <TouchableOpacity
@@ -181,12 +229,11 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginBottom: 16,
   },
-  title: {
-    fontSize: 18,
+  sectionTitle: {
+    fontSize: 16,
     fontWeight: '700',
     color: '#1a1a1a',
-    marginBottom: 20,
-    textAlign: 'center',
+    marginBottom: 12,
     letterSpacing: -0.3,
   },
   actionsGrid: {

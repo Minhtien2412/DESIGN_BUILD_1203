@@ -511,7 +511,7 @@ class EnhancedAuthService {
         };
       }
 
-      const response = await fetch(`${this.baseUrl}/auth/profile`, {
+      const response = await fetch(`${this.baseUrl}/me`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -598,11 +598,11 @@ export const enhancedAuthService = new EnhancedAuthService();
 
 // Export types
 export type {
-  ApiResponse,
-  LoginRequest,
-  LoginResponse,
-  MeResponse,
-  RegisterRequest,
-  RegisterResponse
+    ApiResponse,
+    LoginRequest,
+    LoginResponse,
+    MeResponse,
+    RegisterRequest,
+    RegisterResponse
 };
 

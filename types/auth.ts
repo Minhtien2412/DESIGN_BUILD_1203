@@ -1,14 +1,64 @@
 // Auth & Roles Type Definitions for Construction Design App
+
+/**
+ * Marketplace User Roles - Vai trò người dùng trong marketplace xây dựng/nội thất
+ */
+export type UserType = 
+  | 'buyer'       // Người mua - khách hàng cá nhân
+  | 'seller'      // Người bán cá nhân (thợ, freelancer)
+  | 'company'     // Công ty thiết kế/thi công
+  | 'contractor'  // Nhà thầu xây dựng
+  | 'architect'   // Kiến trúc sư
+  | 'designer'    // Nhà thiết kế nội thất
+  | 'supplier'    // Nhà cung cấp vật liệu
+  | 'admin';      // Quản trị viên platform
+
+/**
+ * Marketplace Role với đầy đủ thông tin và permissions
+ */
+export interface MarketplaceRole {
+  type: UserType;
+  name: string;
+  nameVi: string;
+  description: string;
+  capabilities: string[];
+  icon: string;
+  color: string;
+  verificationRequired: boolean;
+}
+
 export interface User {
   id: string;
   email: string;
   phone: string;
   password_hash: string;
   full_name: string;
-  role: string;
+  role: string; // Legacy role field
+  userType?: UserType; // Marketplace role: buyer, seller, company, contractor, architect, designer, supplier, admin
   status: 'active' | 'inactive' | 'suspended';
   created_at: string;
   updated_at: string;
+  
+  // Marketplace Profile Info
+  companyName?: string;
+  companyLogo?: string;
+  companyVerified?: boolean;
+  sellerId?: string; // Link to Seller profile
+  
+  // Role-specific fields
+  licenseNumber?: string; // For architect, contractor
+  certifications?: string[]; // Professional certifications
+  portfolio?: {
+    images: string[];
+    projects: number;
+    completedProjects: number;
+  };
+  businessAddress?: string;
+  taxCode?: string; // For companies/suppliers
+  rating?: number;
+  reviewCount?: number;
+  yearsExperience?: number;
+  specializations?: string[]; // E.g., "Modern", "Classical", "Minimalist"
 }
 
 export interface RoleData {

@@ -21,6 +21,12 @@ export default function TabsLayout() {
         }} 
       />
       <Tabs.Screen 
+        name="home-construction" 
+        options={{ 
+          title: 'Home XD',
+        }} 
+      />
+      <Tabs.Screen 
         name="projects" 
         options={{ 
           title: 'Dự án',
@@ -35,6 +41,7 @@ export default function TabsLayout() {
       <Tabs.Screen 
         name="notifications" 
         options={{ 
+          href: null, // Hidden - notifications chỉ hiển thị ở header
           title: 'Thông báo',
         }} 
       />
@@ -53,9 +60,25 @@ export default function TabsLayout() {
         }} 
       />
       
-      {/* Hidden tabs */}
+      {/* Hidden utility tabs */}
       <Tabs.Screen 
-        name="profile-new" 
+        name="call-test" 
+        options={{ 
+          href: null,
+          title: 'Call Test',
+        }} 
+      />
+      <Tabs.Screen 
+        name="contacts" 
+        options={{ 
+          href: null,
+          title: 'Liên hệ',
+        }} 
+      />
+      
+      {/* Archived variants - hidden from navigation */}
+      <Tabs.Screen 
+        name="_archive" 
         options={{ 
           href: null,
         }} 

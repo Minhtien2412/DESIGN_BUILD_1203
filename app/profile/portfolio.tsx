@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { router, Stack } from 'expo-router';
+import { Href, router, Stack } from 'expo-router';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 // Portfolio categories
@@ -130,7 +130,7 @@ export default function PortfolioScreen() {
               title={category.title}
               icon={category.icon}
               color={category.color}
-              onPress={() => router.push(category.route as any)}
+              onPress={() => router.push(category.route as Href)}
             />
           ))}
         </View>
@@ -149,7 +149,7 @@ export default function PortfolioScreen() {
               title={category.title}
               icon={category.icon}
               color={category.color}
-              onPress={() => router.push(category.route as any)}
+              onPress={() => router.push(category.route as Href)}
             />
           ))}
         </View>

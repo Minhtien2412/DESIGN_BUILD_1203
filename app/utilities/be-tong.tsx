@@ -1,11 +1,13 @@
 import { Colors } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
-import { Stack } from 'expo-router';
-import React, { useState } from 'react';
+import { router, Stack } from 'expo-router';
+import React, { useEffect, useState } from 'react';
 import {
+    ActivityIndicator,
     Alert,
     Image,
     Modal,
+    RefreshControl,
     ScrollView,
     StyleSheet,
     Text,
@@ -14,97 +16,24 @@ import {
     View,
 } from 'react-native';
 
-// Mock data - Concrete Suppliers
-const SUPPLIERS = [
-  {
-    id: 1,
-    name: 'Bê Tông Thương Mại Hòa Phát',
-    avatar: 'https://via.placeholder.com/100x100/4caf50/ffffff?text=HP',
-    rating: 4.9,
-    reviews: 234,
-    location: 'TP.HCM',
-    experience: 20,
-    price: '1.750.000₫',
-    priceUnit: '/ m³',
-    grades: ['B15', 'B20', 'B25', 'B30', 'B35'],
-    plants: 5,
-    mixerTrucks: 30,
-    completedProjects: 850,
-    featured: true,
-    availability: 'Sẵn sàng',
-    phone: '1900 1234',
-    delivery: 'Giao hàng 24/7',
-  },
-  {
-    id: 2,
-    name: 'Công Ty Bê Tông Miền Bắc',
-    avatar: 'https://via.placeholder.com/100x100/2196f3/ffffff?text=MB',
-    rating: 4.8,
-    reviews: 198,
-    location: 'Hà Nội',
-    experience: 18,
-    price: '1.680.000₫',
-    priceUnit: '/ m³',
-    grades: ['B15', 'B20', 'B25', 'B30'],
-    plants: 4,
-    mixerTrucks: 25,
-    completedProjects: 720,
-    featured: true,
-    availability: 'Sẵn sàng',
-    phone: '1900 5678',
-    delivery: 'Giao trong ngày',
-  },
-  {
-    id: 3,
-    name: 'Bê Tông Miền Trung',
-    avatar: 'https://via.placeholder.com/100x100/ff9800/ffffff?text=MT',
-    rating: 4.7,
-    reviews: 165,
-    location: 'Đà Nẵng',
-    experience: 15,
-    price: '1.620.000₫',
-    priceUnit: '/ m³',
-    grades: ['B15', 'B20', 'B25'],
-    plants: 3,
-    mixerTrucks: 20,
-    completedProjects: 580,
-    featured: false,
-    availability: 'Sẵn sàng',
-    phone: '1900 9012',
-    delivery: 'Giao hàng nhanh',
-  },
-  {
-    id: 4,
-    name: 'Bê Tông Phương Nam',
-    avatar: 'https://via.placeholder.com/100x100/9c27b0/ffffff?text=PN',
-    rating: 4.6,
-    reviews: 142,
-    location: 'Cần Thơ',
-    experience: 12,
-    price: '1.590.000₫',
-    priceUnit: '/ m³',
-    grades: ['B15', 'B20', 'B25', 'B30'],
-    plants: 2,
-    mixerTrucks: 15,
-    completedProjects: 420,
-    featured: false,
-    availability: 'Bận (khả dụng từ 05/12)',
-    phone: '1900 3456',
-    delivery: 'Giao trong 24h',
-  },
-];
+import { useLaborProviders } from '@/hooks/useLaborProviders';
+import { LaborProvider } from '@/services/api/labor.service';
 
 const LOCATIONS = ['Tất cả', 'TP.HCM', 'Hà Nội', 'Đà Nẵng', 'Cần Thơ', 'Khác'];
 const GRADES = ['Tất cả', 'B15', 'B20', 'B25', 'B30', 'B35'];
 
 interface SupplierCardProps {
-  supplier: any;
+  supplier: LaborProvider;
   onBooking: () => void;
+  onPress: () => void;
 }
 
-const SupplierCard: React.FC<SupplierCardProps> = ({ supplier, onBooking }) => {
+const SupplierCard: React.FC<SupplierCardProps> = ({ supplier, onBooking, onPress }) => {
+  const availabilityText = supplier.availability === 'available' ? 'Sẵn sàng' : supplier.availability === 'busy' ? 'Đang bận' : 'Không khả dụng';
+  const priceDisplay = `${supplier.priceRange.min.toLocaleString('vi-VN')}₫`;
+  
   return (
-    <TouchableOpacity style={styles.supplierCard} activeOpacity={0.8}>
+    <TouchableOpacity style={styles.supplierCard} activeOpacity={0.8} onPress={onPress}>
       {supplier.featured && (
         <View style={styles.featuredBadge}>
           <Ionicons name="star" size={12} color="#fff" />
@@ -121,25 +50,25 @@ const SupplierCard: React.FC<SupplierCardProps> = ({ supplier, onBooking }) => {
           <View style={styles.ratingRow}>
             <Ionicons name="star" size={14} color="#ffa41c" />
             <Text style={styles.ratingText}>{supplier.rating}</Text>
-            <Text style={styles.reviewsText}>({supplier.reviews})</Text>
+            <Text style={styles.reviewsText}>({supplier.reviewCount})</Text>
           </View>
 
           <View style={styles.locationRow}>
             <Ionicons name="location" size={12} color="#999" />
-            <Text style={styles.locationText}>{supplier.location}</Text>
+            <Text style={styles.locationText}>{supplier.city}</Text>
             <View style={styles.divider} />
             <Ionicons name="time" size={12} color="#999" />
-            <Text style={styles.experienceText}>{supplier.experience} năm</Text>
+            <Text style={styles.experienceText}>{supplier.yearExperience} năm</Text>
           </View>
         </View>
       </View>
 
       <View style={styles.gradesSection}>
-        <Text style={styles.gradesLabel}>Mác bê tông:</Text>
+        <Text style={styles.gradesLabel}>Dịch vụ:</Text>
         <View style={styles.gradesTags}>
-          {supplier.grades.map((grade: string, index: number) => (
+          {supplier.services.map((service: string, index: number) => (
             <View key={index} style={styles.gradeTag}>
-              <Text style={styles.gradeText}>{grade}</Text>
+              <Text style={styles.gradeText}>{service}</Text>
             </View>
           ))}
         </View>
@@ -148,22 +77,22 @@ const SupplierCard: React.FC<SupplierCardProps> = ({ supplier, onBooking }) => {
       <View style={styles.capacitySection}>
         <View style={styles.capacityItem}>
           <Ionicons name="business" size={16} color="#2196f3" />
-          <Text style={styles.capacityText}>{supplier.plants} trạm trộn</Text>
+          <Text style={styles.capacityText}>Nhà cung cấp uy tín</Text>
         </View>
         <View style={styles.capacityItem}>
           <Ionicons name="car" size={16} color="#4caf50" />
-          <Text style={styles.capacityText}>{supplier.mixerTrucks} xe bồn</Text>
+          <Text style={styles.capacityText}>Giao hàng nhanh</Text>
         </View>
       </View>
 
       <View style={styles.deliveryRow}>
         <Ionicons name="timer" size={16} color="#ff9800" />
-        <Text style={styles.deliveryText}>{supplier.delivery}</Text>
+        <Text style={styles.deliveryText}>{supplier.verified ? 'Đã xác minh' : 'Giao trong ngày'}</Text>
       </View>
 
       <View style={styles.statsSection}>
         <View style={styles.statItem}>
-          <Text style={styles.statValue}>{supplier.completedProjects}+</Text>
+          <Text style={styles.statValue}>{supplier.projectCount}+</Text>
           <Text style={styles.statLabel}>Công trình</Text>
         </View>
         <View style={styles.statDivider} />
@@ -171,10 +100,10 @@ const SupplierCard: React.FC<SupplierCardProps> = ({ supplier, onBooking }) => {
           <Text
             style={[
               styles.statValue,
-              supplier.availability === 'Sẵn sàng' ? styles.available : styles.busy,
+              supplier.availability === 'available' ? styles.available : styles.busy,
             ]}
           >
-            {supplier.availability}
+            {availabilityText}
           </Text>
           <Text style={styles.statLabel}>Tình trạng</Text>
         </View>
@@ -183,8 +112,8 @@ const SupplierCard: React.FC<SupplierCardProps> = ({ supplier, onBooking }) => {
       <View style={styles.priceRow}>
         <View>
           <Text style={styles.priceLabel}>Từ</Text>
-          <Text style={styles.price}>{supplier.price}</Text>
-          <Text style={styles.priceUnit}>{supplier.priceUnit}</Text>
+          <Text style={styles.price}>{priceDisplay}</Text>
+          <Text style={styles.priceUnit}>/ {supplier.priceRange.unit}</Text>
         </View>
         
         <TouchableOpacity style={styles.bookButton} onPress={onBooking}>
@@ -197,10 +126,12 @@ const SupplierCard: React.FC<SupplierCardProps> = ({ supplier, onBooking }) => {
 };
 
 export default function BeTongScreen() {
+  const { providers, loading, refreshing, refresh, searchProviders } = useLaborProviders({ type: 'be-tong' });
+  
   const [selectedLocation, setSelectedLocation] = useState('Tất cả');
   const [selectedGrade, setSelectedGrade] = useState('Tất cả');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedSupplier, setSelectedSupplier] = useState<any>(null);
+  const [selectedSupplier, setSelectedSupplier] = useState<LaborProvider | null>(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [bookingData, setBookingData] = useState({
     name: '',
@@ -212,14 +143,24 @@ export default function BeTongScreen() {
     notes: '',
   });
 
-  const filteredSuppliers = SUPPLIERS.filter((supplier) => {
-    const matchLocation = selectedLocation === 'Tất cả' || supplier.location === selectedLocation;
-    const matchGrade = selectedGrade === 'Tất cả' || supplier.grades.includes(selectedGrade);
+  const filteredSuppliers = providers.filter((supplier) => {
+    const matchLocation = selectedLocation === 'Tất cả' || supplier.city === selectedLocation || supplier.address.includes(selectedLocation);
+    const matchGrade = selectedGrade === 'Tất cả' || supplier.services.includes(selectedGrade);
     const matchSearch = searchQuery === '' || supplier.name.toLowerCase().includes(searchQuery.toLowerCase());
     return matchLocation && matchGrade && matchSearch;
   });
 
-  const handleBooking = (supplier: any) => {
+  // Handle search with debounce
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchQuery.length > 2) {
+        searchProviders(searchQuery);
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery, searchProviders]);
+
+  const handleBooking = (supplier: LaborProvider) => {
     setSelectedSupplier(supplier);
     setShowBookingModal(true);
   };
@@ -232,7 +173,7 @@ export default function BeTongScreen() {
 
     Alert.alert(
       'Đặt hàng thành công',
-      `Chúng tôi sẽ liên hệ xác nhận đơn hàng trong vòng 30 phút.\n\nNhà cung cấp: ${selectedSupplier.name}`,
+      `Chúng tôi sẽ liên hệ xác nhận đơn hàng trong vòng 30 phút.\n\nNhà cung cấp: ${selectedSupplier?.name}`,
       [
         {
           text: 'OK',
@@ -328,24 +269,39 @@ export default function BeTongScreen() {
           <Text style={styles.resultsText}>{filteredSuppliers.length} nhà cung cấp</Text>
         </View>
 
-        <ScrollView
-          style={styles.content}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.listContainer}
-        >
-          {filteredSuppliers.map((supplier) => (
-            <SupplierCard key={supplier.id} supplier={supplier} onBooking={() => handleBooking(supplier)} />
-          ))}
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#0A6847" />
+            <Text style={styles.loadingText}>Đang tải danh sách...</Text>
+          </View>
+        ) : (
+          <ScrollView
+            style={styles.content}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.listContainer}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={refresh} colors={['#0A6847']} />
+            }
+          >
+            {filteredSuppliers.map((supplier) => (
+              <SupplierCard 
+                key={supplier.id} 
+                supplier={supplier} 
+                onBooking={() => handleBooking(supplier)}
+                onPress={() => router.push(`/utilities/team-detail?id=${supplier.id}&type=be-tong`)}
+              />
+            ))}
 
-          {filteredSuppliers.length === 0 && (
-            <View style={styles.emptyState}>
-              <Ionicons name="cube-outline" size={64} color="#ccc" />
-              <Text style={styles.emptyText}>Không tìm thấy nhà cung cấp phù hợp</Text>
-            </View>
-          )}
+            {filteredSuppliers.length === 0 && (
+              <View style={styles.emptyState}>
+                <Ionicons name="cube-outline" size={64} color="#ccc" />
+                <Text style={styles.emptyText}>Không tìm thấy nhà cung cấp phù hợp</Text>
+              </View>
+            )}
 
-          <View style={{ height: 20 }} />
-        </ScrollView>
+            <View style={{ height: 20 }} />
+          </ScrollView>
+        )}
 
         <View style={styles.infoBanner}>
           <Ionicons name="shield-checkmark" size={16} color="#4caf50" />
@@ -377,7 +333,7 @@ export default function BeTongScreen() {
                     <View style={styles.selectedRating}>
                       <Ionicons name="star" size={14} color="#ffa41c" />
                       <Text style={styles.selectedRatingText}>
-                        {selectedSupplier.rating} ({selectedSupplier.reviews})
+                        {selectedSupplier.rating} ({selectedSupplier.reviewCount})
                       </Text>
                     </View>
                   </View>
@@ -498,6 +454,8 @@ const styles = StyleSheet.create({
   filterChipTextActive: { color: '#fff' },
   resultsBar: { backgroundColor: '#fff', paddingHorizontal: 16, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#f0f0f0' },
   resultsText: { fontSize: 13, fontWeight: '600', color: '#333' },
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: 60 },
+  loadingText: { marginTop: 12, fontSize: 14, color: '#666' },
   content: { flex: 1 },
   listContainer: { padding: 16 },
   supplierCard: { backgroundColor: '#fff', borderRadius: 12, padding: 16, marginBottom: 16, elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 4 },

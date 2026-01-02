@@ -2,30 +2,49 @@ import { StyleSheet, Text, type TextProps } from 'react-native';
 
 import { useThemeColor } from '@/hooks/use-theme-color';
 
+// Variant types for backward compatibility
+type TextVariant = 'body' | 'h1' | 'h2' | 'h3' | 'h4' | 'caption';
+type TextType = 'default' | 'title' | 'defaultSemiBold' | 'subtitle' | 'link';
+
 export type ThemedTextProps = TextProps & {
   lightColor?: string;
   darkColor?: string;
-  type?: 'default' | 'title' | 'defaultSemiBold' | 'subtitle' | 'link';
+  type?: TextType;
+  variant?: TextVariant; // Backward compatibility
+};
+
+// Map variant to type for backward compatibility
+const variantToType: Record<TextVariant, TextType> = {
+  body: 'default',
+  h1: 'title',
+  h2: 'subtitle',
+  h3: 'defaultSemiBold',
+  h4: 'default',
+  caption: 'default',
 };
 
 export function ThemedText({
   style,
   lightColor,
   darkColor,
-  type = 'default',
+  type,
+  variant,
   ...rest
 }: ThemedTextProps) {
   const color = useThemeColor({ light: lightColor, dark: darkColor }, 'text');
+  
+  // Use variant if provided, otherwise use type
+  const resolvedType = variant ? variantToType[variant] : (type || 'default');
 
   return (
     <Text
       style={[
         { color },
-        type === 'default' ? styles.default : undefined,
-        type === 'title' ? styles.title : undefined,
-        type === 'defaultSemiBold' ? styles.defaultSemiBold : undefined,
-        type === 'subtitle' ? styles.subtitle : undefined,
-        type === 'link' ? styles.link : undefined,
+        resolvedType === 'default' ? styles.default : undefined,
+        resolvedType === 'title' ? styles.title : undefined,
+        resolvedType === 'defaultSemiBold' ? styles.defaultSemiBold : undefined,
+        resolvedType === 'subtitle' ? styles.subtitle : undefined,
+        resolvedType === 'link' ? styles.link : undefined,
         style,
       ]}
       {...rest}
@@ -35,26 +54,28 @@ export function ThemedText({
 
 const styles = StyleSheet.create({
   default: {
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: 13,
+    lineHeight: 18,
+    fontWeight: '500',
   },
   defaultSemiBold: {
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: 13,
+    lineHeight: 18,
     fontWeight: '600',
   },
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    lineHeight: 30,
+    fontSize: 22,
+    fontWeight: '600',
+    lineHeight: 26,
   },
   subtitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 15,
+    fontWeight: '600',
   },
   link: {
-    lineHeight: 22,
-    fontSize: 14,
-    color: '#90B44C',
+    lineHeight: 20,
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#0A6847',
   },
 });

@@ -130,7 +130,7 @@ export const ColoredShadows = {
   }),
   
   secondary: (opacity: number = 0.3) => ({
-    shadowColor: '#90B44C',
+    shadowColor: '#0A6847',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: opacity,
     shadowRadius: 8,

@@ -109,7 +109,7 @@ export function BiometricAuth({ onSuccess, onError, fallbackToPassword }: Biomet
         }
       } else {
         // Authentication was cancelled or failed
-        if (result.error === 'SystemCancel' || result.error === 'UserCancel') {
+        if (result.error === 'system_cancel' || result.error === 'user_cancel') {
           // User cancelled, don't show error
           return;
         }

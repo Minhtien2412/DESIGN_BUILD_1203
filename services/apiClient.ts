@@ -154,6 +154,25 @@ const apiClient: AxiosInstance = axios.create({
 });
 
 // ============================================================================
+// Base URL Management
+// ============================================================================
+
+/**
+ * Get current API base URL
+ */
+export function getApiBaseUrl(): string {
+  return apiClient.defaults.baseURL || normalizeBaseUrl(ENV.API_BASE_URL);
+}
+
+/**
+ * Set API base URL dynamically (for fallback servers)
+ */
+export function setApiBaseUrl(url: string): void {
+  apiClient.defaults.baseURL = normalizeBaseUrl(url);
+  console.log('[ApiClient] Base URL changed to:', apiClient.defaults.baseURL);
+}
+
+// ============================================================================
 // Request Interceptor - Add Token
 // ============================================================================
 
@@ -208,7 +227,10 @@ apiClient.interceptors.response.use(
         const refresh = await getRefreshToken();
         
         if (!refresh) {
-          throw new Error('No refresh token available');
+          // No refresh token - user not logged in, silently reject
+          console.log('[ApiClient] ℹ️ No refresh token - user not authenticated');
+          isRefreshing = false;
+          return Promise.reject(new ApiError('Not authenticated', { status: 401, code: 'NO_TOKEN' }));
         }
 
         console.log('[ApiClient] 🔄 Refreshing token...');

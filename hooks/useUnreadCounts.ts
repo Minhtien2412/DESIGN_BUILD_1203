@@ -2,15 +2,13 @@
  * useUnreadCounts Hook
  * Fetches unread counts for messages, calls, and notifications from server
  * Auto-refreshes every 30 seconds
- * Fallback to individual hooks when server endpoint not available
+ * Fallback to local state when server endpoint not available
  */
 
 import { NOTIFICATION_ENDPOINTS } from '@/constants/api-endpoints';
 import { useNotifications } from '@/features/notifications';
 import { apiFetch } from '@/services/api';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useCallUnreadCount } from './useCallUnreadCount';
-import { useMessageUnreadCount } from './useMessageUnreadCount';
 
 interface UnreadCounts {
   messages: number;
@@ -28,8 +26,10 @@ interface UseUnreadCountsResult {
 
 export function useUnreadCounts(autoRefresh = true): UseUnreadCountsResult {
   const { unreadCount: localNotifUnread } = useNotifications();
-  const { count: messagesCount, refresh: refreshMessages } = useMessageUnreadCount();
-  const { count: callsCount, refresh: refreshCalls } = useCallUnreadCount();
+  
+  // Local state for unread counts (will be fetched from server)
+  const [messagesCount] = useState(0);
+  const [callsCount] = useState(0);
   
   const [counts, setCounts] = useState<UnreadCounts>({
     messages: 0,
@@ -114,12 +114,8 @@ export function useUnreadCounts(autoRefresh = true): UseUnreadCountsResult {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    await Promise.all([
-      fetchCounts(),
-      refreshMessages(),
-      refreshCalls(),
-    ]);
-  }, [fetchCounts, refreshMessages, refreshCalls]);
+    await fetchCounts();
+  }, [fetchCounts]);
 
   useEffect(() => {
     fetchCounts();

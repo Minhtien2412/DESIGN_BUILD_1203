@@ -1,11 +1,13 @@
 import { Colors } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
-import { Stack } from 'expo-router';
-import React, { useState } from 'react';
+import { router, Stack } from 'expo-router';
+import React, { useEffect, useState } from 'react';
 import {
+    ActivityIndicator,
     Alert,
     Image,
     Modal,
+    RefreshControl,
     ScrollView,
     StyleSheet,
     Text,
@@ -14,85 +16,23 @@ import {
     View,
 } from 'react-native';
 
-// Mock data - Material Suppliers
-const PROVIDERS = [
-  {
-    id: 1,
-    name: 'Vật Liệu Xây Dựng Hòa Phát',
-    avatar: 'https://via.placeholder.com/100x100/ee4d2d/ffffff?text=HP',
-    rating: 4.9,
-    reviews: 342,
-    location: 'TP.HCM',
-    experience: 20,
-    materials: ['Xi măng', 'Thép', 'Gạch', 'Đá'],
-    brands: ['Holcim', 'Hòa Phát', 'Viglacera'],
-    completedOrders: 1500,
-    featured: true,
-    availability: 'Sẵn sàng',
-    phone: '028 3850 1111',
-    delivery: 'Giao hàng miễn phí bán kính 10km',
-  },
-  {
-    id: 2,
-    name: 'Công Ty VLXD Miền Bắc',
-    avatar: 'https://via.placeholder.com/100x100/4caf50/ffffff?text=MB',
-    rating: 4.8,
-    reviews: 287,
-    location: 'Hà Nội',
-    experience: 18,
-    materials: ['Xi măng', 'Cát', 'Đá', 'Gạch'],
-    brands: ['Vissai', 'Tân Thành', 'Viglacera'],
-    completedOrders: 1200,
-    featured: true,
-    availability: 'Sẵn sàng',
-    phone: '024 3974 2222',
-    delivery: 'Giao hàng trong ngày',
-  },
-  {
-    id: 3,
-    name: 'Vật Liệu Xây Dựng Phú Cường',
-    avatar: 'https://via.placeholder.com/100x100/2196f3/ffffff?text=PC',
-    rating: 4.7,
-    reviews: 198,
-    location: 'Đà Nẵng',
-    experience: 12,
-    materials: ['Cát', 'Đá', 'Xi măng', 'Thép'],
-    brands: ['Holcim', 'Vissai', 'Pomina'],
-    completedOrders: 850,
-    featured: false,
-    availability: 'Sẵn sàng',
-    phone: '0236 3850 3333',
-    delivery: 'Giao hàng trong 24h',
-  },
-  {
-    id: 4,
-    name: 'Cửa Hàng VLXD Thành Công',
-    avatar: 'https://via.placeholder.com/100x100/ff9800/ffffff?text=TC',
-    rating: 4.6,
-    reviews: 156,
-    location: 'Cần Thơ',
-    experience: 10,
-    materials: ['Xi măng', 'Gạch', 'Ngói'],
-    brands: ['Vissai', 'Viglacera', 'Đồng Tâm'],
-    completedOrders: 620,
-    featured: false,
-    availability: 'Sẵn sàng',
-    phone: '0292 3850 4444',
-    delivery: 'Giao hàng miễn phí nội thành',
-  },
-];
+import { useLaborProviders } from '@/hooks/useLaborProviders';
+import { LaborProvider } from '@/services/api/labor.service';
 
 const LOCATIONS = ['Tất cả', 'TP.HCM', 'Hà Nội', 'Đà Nẵng', 'Cần Thơ', 'Khác'];
 const MATERIAL_TYPES = ['Tất cả', 'Xi măng', 'Cát', 'Đá', 'Thép', 'Gạch', 'Ngói'];
 
 interface ProviderCardProps {
-  provider: any;
+  provider: LaborProvider;
   onBooking: () => void;
+  onPress: () => void;
 }
 
-const ProviderCard: React.FC<ProviderCardProps> = ({ provider, onBooking }) => {
+const ProviderCard: React.FC<ProviderCardProps> = ({ provider, onBooking, onPress }) => {
+  const availabilityText = provider.availability === 'available' ? 'Sẵn sàng' : provider.availability === 'busy' ? 'Đang bận' : 'Không khả dụng';
+  
   return (
-    <TouchableOpacity style={styles.providerCard} activeOpacity={0.8}>
+    <TouchableOpacity style={styles.providerCard} activeOpacity={0.8} onPress={onPress}>
       {provider.featured && (
         <View style={styles.featuredBadge}>
           <Ionicons name="star" size={12} color="#fff" />
@@ -109,15 +49,15 @@ const ProviderCard: React.FC<ProviderCardProps> = ({ provider, onBooking }) => {
           <View style={styles.ratingRow}>
             <Ionicons name="star" size={14} color="#ffa41c" />
             <Text style={styles.ratingText}>{provider.rating}</Text>
-            <Text style={styles.reviewsText}>({provider.reviews})</Text>
+            <Text style={styles.reviewsText}>({provider.reviewCount})</Text>
           </View>
 
           <View style={styles.locationRow}>
             <Ionicons name="location" size={12} color="#999" />
-            <Text style={styles.locationText}>{provider.location}</Text>
+            <Text style={styles.locationText}>{provider.city}</Text>
             <View style={styles.divider} />
             <Ionicons name="time" size={12} color="#999" />
-            <Text style={styles.experienceText}>{provider.experience} năm</Text>
+            <Text style={styles.experienceText}>{provider.yearExperience} năm</Text>
           </View>
         </View>
       </View>
@@ -125,9 +65,9 @@ const ProviderCard: React.FC<ProviderCardProps> = ({ provider, onBooking }) => {
       <View style={styles.materialsSection}>
         <Text style={styles.materialsLabel}>Vật liệu:</Text>
         <View style={styles.materialsTags}>
-          {provider.materials.map((material: string, index: number) => (
+          {provider.services.map((service: string, index: number) => (
             <View key={index} style={styles.materialTag}>
-              <Text style={styles.materialText}>{material}</Text>
+              <Text style={styles.materialText}>{service}</Text>
             </View>
           ))}
         </View>
@@ -136,23 +76,23 @@ const ProviderCard: React.FC<ProviderCardProps> = ({ provider, onBooking }) => {
       <View style={styles.brandsRow}>
         <Ionicons name="ribbon" size={16} color="#ff9800" />
         <Text style={styles.brandsLabel}>Thương hiệu: </Text>
-        <Text style={styles.brandsText}>{provider.brands.join(', ')}</Text>
+        <Text style={styles.brandsText}>{provider.verified ? 'Đã xác minh' : 'Uy tín'}</Text>
       </View>
 
       <View style={styles.deliveryRow}>
         <Ionicons name="car" size={16} color="#4caf50" />
-        <Text style={styles.deliveryText}>{provider.delivery}</Text>
+        <Text style={styles.deliveryText}>Giao hàng nhanh</Text>
       </View>
 
       <View style={styles.statsSection}>
         <View style={styles.statItem}>
-          <Text style={styles.statValue}>{provider.completedOrders}+</Text>
+          <Text style={styles.statValue}>{provider.projectCount}+</Text>
           <Text style={styles.statLabel}>Đơn hàng</Text>
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statItem}>
-          <Text style={[styles.statValue, styles.available]}>
-            {provider.availability}
+          <Text style={[styles.statValue, provider.availability === 'available' ? styles.available : styles.busy]}>
+            {availabilityText}
           </Text>
           <Text style={styles.statLabel}>Tình trạng</Text>
         </View>
@@ -167,10 +107,12 @@ const ProviderCard: React.FC<ProviderCardProps> = ({ provider, onBooking }) => {
 };
 
 export default function VatLieuScreen() {
+  const { providers, loading, refreshing, refresh, searchProviders } = useLaborProviders({ type: 'vat-lieu' });
+  
   const [selectedLocation, setSelectedLocation] = useState('Tất cả');
   const [selectedMaterialType, setSelectedMaterialType] = useState('Tất cả');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedProvider, setSelectedProvider] = useState<any>(null);
+  const [selectedProvider, setSelectedProvider] = useState<LaborProvider | null>(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [bookingData, setBookingData] = useState({
     name: '',
@@ -182,19 +124,29 @@ export default function VatLieuScreen() {
     notes: '',
   });
 
-  const filteredProviders = PROVIDERS.filter((provider) => {
+  const filteredProviders = providers.filter((provider) => {
     const matchLocation =
-      selectedLocation === 'Tất cả' || provider.location === selectedLocation;
+      selectedLocation === 'Tất cả' || provider.city === selectedLocation || provider.address.includes(selectedLocation);
     const matchMaterialType =
       selectedMaterialType === 'Tất cả' ||
-      provider.materials.includes(selectedMaterialType);
+      provider.services.includes(selectedMaterialType);
     const matchSearch =
       searchQuery === '' ||
       provider.name.toLowerCase().includes(searchQuery.toLowerCase());
     return matchLocation && matchMaterialType && matchSearch;
   });
 
-  const handleBooking = (provider: any) => {
+  // Handle search with debounce
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchQuery.length > 2) {
+        searchProviders(searchQuery);
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery, searchProviders]);
+
+  const handleBooking = (provider: LaborProvider) => {
     setSelectedProvider(provider);
     setShowBookingModal(true);
   };
@@ -207,7 +159,7 @@ export default function VatLieuScreen() {
 
     Alert.alert(
       'Đặt hàng thành công',
-      `Chúng tôi sẽ liên hệ xác nhận đơn hàng trong vòng 1h.\n\nNhà cung cấp: ${selectedProvider.name}`,
+      `Chúng tôi sẽ liên hệ xác nhận đơn hàng trong vòng 1h.\n\nNhà cung cấp: ${selectedProvider?.name}`,
       [
         {
           text: 'OK',
@@ -317,28 +269,39 @@ export default function VatLieuScreen() {
         </View>
 
         {/* Providers List */}
-        <ScrollView
-          style={styles.content}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.listContainer}
-        >
-          {filteredProviders.map((provider) => (
-            <ProviderCard
-              key={provider.id}
-              provider={provider}
-              onBooking={() => handleBooking(provider)}
-            />
-          ))}
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={Colors.light.primary} />
+            <Text style={styles.loadingText}>Đang tải danh sách...</Text>
+          </View>
+        ) : (
+          <ScrollView
+            style={styles.content}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.listContainer}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={refresh} colors={[Colors.light.primary]} />
+            }
+          >
+            {filteredProviders.map((provider) => (
+              <ProviderCard
+                key={provider.id}
+                provider={provider}
+                onBooking={() => handleBooking(provider)}
+                onPress={() => router.push(`/utilities/team-detail?id=${provider.id}&type=vat-lieu`)}
+              />
+            ))}
 
-          {filteredProviders.length === 0 && (
-            <View style={styles.emptyState}>
-              <Ionicons name="cube-outline" size={64} color="#ccc" />
-              <Text style={styles.emptyText}>Không tìm thấy nhà cung cấp phù hợp</Text>
-            </View>
-          )}
+            {filteredProviders.length === 0 && (
+              <View style={styles.emptyState}>
+                <Ionicons name="cube-outline" size={64} color="#ccc" />
+                <Text style={styles.emptyText}>Không tìm thấy nhà cung cấp phù hợp</Text>
+              </View>
+            )}
 
-          <View style={{ height: 20 }} />
-        </ScrollView>
+            <View style={{ height: 20 }} />
+          </ScrollView>
+        )}
 
         {/* Info Banner */}
         <View style={styles.infoBanner}>
@@ -374,7 +337,7 @@ export default function VatLieuScreen() {
                     <View style={styles.selectedRating}>
                       <Ionicons name="star" size={14} color="#ffa41c" />
                       <Text style={styles.selectedRatingText}>
-                        {selectedProvider.rating} ({selectedProvider.reviews})
+                        {selectedProvider.rating} ({selectedProvider.reviewCount})
                       </Text>
                     </View>
                   </View>
@@ -496,6 +459,8 @@ const styles = StyleSheet.create({
   filterChipTextActive: { color: '#fff' },
   resultsBar: { backgroundColor: '#fff', paddingHorizontal: 16, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#f0f0f0' },
   resultsText: { fontSize: 13, fontWeight: '600', color: '#333' },
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: 60 },
+  loadingText: { marginTop: 12, fontSize: 14, color: '#666' },
   content: { flex: 1 },
   listContainer: { padding: 16 },
   providerCard: { backgroundColor: '#fff', borderRadius: 12, padding: 16, marginBottom: 16, elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 4 },
@@ -526,6 +491,7 @@ const styles = StyleSheet.create({
   statItem: { alignItems: 'center' },
   statValue: { fontSize: 15, fontWeight: '700', color: '#333', marginBottom: 4 },
   available: { color: '#4caf50' },
+  busy: { color: '#ff9800' },
   statLabel: { fontSize: 11, color: '#999' },
   statDivider: { width: 1, height: 40, backgroundColor: '#f0f0f0' },
   bookButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.light.primary, paddingVertical: 12, borderRadius: 8, gap: 6 },

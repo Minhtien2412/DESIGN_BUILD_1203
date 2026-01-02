@@ -350,3 +350,35 @@ export async function ensureDemoStaff(): Promise<UserRecord[]> {
   }
   return (await readUsers()).filter(u => want.some(w => w.id === u.id));
 }
+
+// ============================================================================
+// Password Recovery Functions (Stubs)
+// These will be implemented when backend support is available
+// ============================================================================
+
+export async function forgotPassword(email: string): Promise<{ success: boolean; message: string }> {
+  console.log('[Auth] forgotPassword called for:', email);
+  // Stub implementation - will be connected to backend API
+  return {
+    success: true,
+    message: 'Nếu email tồn tại, bạn sẽ nhận được link đặt lại mật khẩu.',
+  };
+}
+
+export async function resetPassword(token: string, newPassword: string): Promise<{ success: boolean; message: string }> {
+  console.log('[Auth] resetPassword called with token:', token);
+  // Stub implementation - will be connected to backend API
+  return {
+    success: true,
+    message: 'Mật khẩu đã được đặt lại thành công.',
+  };
+}
+
+export async function validateResetToken(token: string): Promise<{ valid: boolean; email?: string }> {
+  console.log('[Auth] validateResetToken called with token:', token);
+  // Stub implementation - will be connected to backend API
+  return {
+    valid: true,
+    email: 'user@example.com',
+  };
+}

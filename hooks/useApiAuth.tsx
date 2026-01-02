@@ -60,10 +60,10 @@ export function ApiAuthProvider({ children }: { children: ReactNode }) {
       setLoading(true);
       setError(null);
       
-      const response: AuthResponse = await apiLogin(email, password);
+      const response: AuthResponse = await apiLogin({ email, password });
       
       // Save JWT to secure storage
-      await saveJWT(response.token);
+      await saveJWT(response.accessToken);
       
       // Set user
       setUser(response.user);
@@ -84,7 +84,7 @@ export function ApiAuthProvider({ children }: { children: ReactNode }) {
       const newUser = await apiRegister({
         email,
         password,
-        full_name: fullName,
+        fullName,
       });
       
       // After registration, automatically sign in
@@ -102,8 +102,8 @@ export function ApiAuthProvider({ children }: { children: ReactNode }) {
     try {
       setLoading(true);
       
-      // Call backend logout (optional)
-      await apiLogout();
+      // Call backend logout
+      await apiLogout('');
       
       // Clear JWT from secure storage
       await removeJWT();

@@ -7,7 +7,7 @@ export function Section({ title, children, style }: { title?: string; children?:
   return (
     <View style={style}>
       {title ? (
-        <ThemedText type="title" style={{ marginTop: Spacing.xs + 2, marginBottom: Spacing.xs + 2, fontSize: 14 }}>
+        <ThemedText type="title" style={{ marginTop: Spacing.xs, marginBottom: Spacing.xs, fontSize: 13, fontWeight: '500' }}>
           {title}
         </ThemedText>
       ) : null}

@@ -312,8 +312,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     padding: 16,
-    background: 'linear-gradient(transparent, rgba(0,0,0,0.7))',
-    backgroundColor: DesignSystem.colors.overlay.light,
+    backgroundColor: 'rgba(0,0,0,0.3)',
   },
   featuredName: {
     fontSize: 18,

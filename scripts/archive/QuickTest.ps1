@@ -1,0 +1,1 @@
+﻿Write-Host "`n🧪 API CONNECTION TEST`n" -ForegroundColor Cyan; $baseUrl = "https://baotienweb.cloud/api/v1"; try { $r = Invoke-WebRequest -Uri $baseUrl -Method GET -UseBasicParsing -TimeoutSec 10; Write-Host "✅ API Health: OK (Status $($r.StatusCode))" -ForegroundColor Green } catch { Write-Host "❌ API Health: FAILED" -ForegroundColor Red }; Write-Host ""

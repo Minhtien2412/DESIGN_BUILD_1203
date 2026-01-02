@@ -9,7 +9,7 @@ type ContainerProps = Omit<ScrollViewProps, 'contentContainerStyle'> & {
 
 export function Container({ style, fullWidth, scroll = true, contentContainerStyle, ...props }: ContainerProps) {
   // Use compact default paddings; still allow fullWidth to remove horizontal padding
-  const paddingStyle = { paddingVertical: Spacing.sm, paddingHorizontal: fullWidth ? 0 : Spacing.md } as const;
+  const paddingStyle = { paddingVertical: Spacing.xs, paddingHorizontal: fullWidth ? 0 : Spacing.sm } as const;
   if (scroll) {
     return (
       <ScrollView

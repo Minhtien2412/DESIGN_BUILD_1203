@@ -34,8 +34,8 @@ const ROLE_COLORS: Record<string, string> = {
   'Chủ đầu tư': '#FF9800',
   'Giám đốc dự án': '#2196F3',
   'Kỹ sư thi công': '#4CAF50',
-  'Kiến trúc sư': '#9C27B0',
-  'Kỹ thuật viên': '#00BCD4',
+  'Kiến trúc sư': '#0A6847',
+  'Kỹ thuật viên': '#0A6847',
   'default': '#757575',
 };
 
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#90b44c',
+    backgroundColor: '#0A6847',
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 20,

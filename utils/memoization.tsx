@@ -22,6 +22,7 @@ export const MemoizedLiveStreamCard = React.memo(
     );
   }
 );
+MemoizedLiveStreamCard.displayName = 'MemoizedLiveStreamCard';
 
 /**
  * Memoized Activity Feed Item Component
@@ -39,6 +40,7 @@ export const MemoizedActivityItem = React.memo(
     );
   }
 );
+MemoizedActivityItem.displayName = 'MemoizedActivityItem';
 
 /**
  * Memoized Product Card Component
@@ -58,6 +60,7 @@ export const MemoizedProductCard = React.memo(
     );
   }
 );
+MemoizedProductCard.displayName = 'MemoizedProductCard';
 
 /**
  * Memoized Story Item Component
@@ -75,6 +78,7 @@ export const MemoizedStoryItem = React.memo(
     );
   }
 );
+MemoizedStoryItem.displayName = 'MemoizedStoryItem';
 
 /**
  * Hook: Memoized expensive calculations
@@ -178,9 +182,11 @@ export function createMemoizedRenderItem<T>(
 ) {
   const MemoizedComponent = React.memo(Component, arePropsEqual);
 
-  return ({ item, index }: { item: T; index: number }) => (
+  const RenderItem = ({ item, index }: { item: T; index: number }) => (
     <MemoizedComponent item={item} index={index} />
   );
+  RenderItem.displayName = 'MemoizedRenderItem';
+  return RenderItem;
 }
 
 /**

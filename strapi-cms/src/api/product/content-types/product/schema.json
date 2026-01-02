@@ -1,0 +1,92 @@
+{
+  "kind": "collectionType",
+  "collectionName": "products",
+  "info": {
+    "singularName": "product",
+    "pluralName": "products",
+    "displayName": "Product",
+    "description": "Products - synced with backend Prisma"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text",
+      "required": true
+    },
+    "price": {
+      "type": "decimal",
+      "required": true,
+      "min": 0
+    },
+    "category": {
+      "type": "enumeration",
+      "enum": [
+        "ELECTRONICS",
+        "FASHION",
+        "HOME",
+        "BEAUTY",
+        "SPORTS",
+        "BOOKS",
+        "TOYS",
+        "FOOD",
+        "OTHER"
+      ],
+      "required": true
+    },
+    "stock": {
+      "type": "integer",
+      "default": 0,
+      "min": 0
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": ["PENDING", "APPROVED", "REJECTED"],
+      "default": "PENDING"
+    },
+    "rejectionReason": {
+      "type": "text"
+    },
+    "images": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "viewCount": {
+      "type": "integer",
+      "default": 0,
+      "min": 0
+    },
+    "soldCount": {
+      "type": "integer",
+      "default": 0,
+      "min": 0
+    },
+    "isBestseller": {
+      "type": "boolean",
+      "default": false
+    },
+    "isNew": {
+      "type": "boolean",
+      "default": true
+    },
+    "reviewedAt": {
+      "type": "datetime"
+    },
+    "strapiId": {
+      "type": "string",
+      "unique": false
+    },
+    "backendId": {
+      "type": "integer",
+      "unique": false
+    }
+  }
+}

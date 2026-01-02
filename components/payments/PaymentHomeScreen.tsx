@@ -160,8 +160,8 @@ export default function PaymentHomeScreen() {
             </View>
 
             <View style={styles.featureItem}>
-              <View style={[styles.featureIcon, { backgroundColor: '#9C27B020' }]}>
-                <Ionicons name="analytics-outline" size={20} color="#9C27B0" />
+              <View style={[styles.featureIcon, { backgroundColor: '#E8F5E9' }]}>
+                <Ionicons name="analytics-outline" size={20} color="#0A6847" />
               </View>
               <View style={styles.featureContent}>
                 <Text style={[styles.featureTitle, { color: textColor }]}>

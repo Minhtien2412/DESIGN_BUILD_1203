@@ -88,9 +88,9 @@ export default function ResetPasswordScreen() {
                       fontSize: tokenLabel.interpolate({ inputRange: [0, 1], outputRange: [14, 12] }) as any,
                       backgroundColor: surface,
                       paddingHorizontal: 4,
+                      pointerEvents: 'none',
                     },
                   ]}
-                  pointerEvents="none"
                 >
                   Token (từ email)
                 </Animated.Text>
@@ -128,9 +128,9 @@ export default function ResetPasswordScreen() {
                     fontSize: passLabel.interpolate({ inputRange: [0, 1], outputRange: [14, 12] }) as any,
                     backgroundColor: surface,
                     paddingHorizontal: 4,
+                    pointerEvents: 'none',
                   },
                 ]}
-                pointerEvents="none"
               >
                 Mật khẩu mới
               </Animated.Text>
@@ -167,9 +167,9 @@ export default function ResetPasswordScreen() {
                     fontSize: confirmLabel.interpolate({ inputRange: [0, 1], outputRange: [14, 12] }) as any,
                     backgroundColor: surface,
                     paddingHorizontal: 4,
+                    pointerEvents: 'none',
                   },
                 ]}
-                pointerEvents="none"
               >
                 Xác nhận mật khẩu
               </Animated.Text>
@@ -213,62 +213,69 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    padding: 24,
+    paddingHorizontal: 8,
+    paddingVertical: 20,
   },
   title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    marginBottom: 16,
+    fontSize: 28,
+    fontWeight: '600',
+    marginBottom: 12,
     textAlign: 'center',
   },
   description: {
-    fontSize: 15,
+    fontSize: 14,
     textAlign: 'center',
-    marginBottom: 32,
-    paddingHorizontal: 16,
+    marginBottom: 20,
+    paddingHorizontal: 8,
   },
   form: {
     borderRadius: 16,
-    padding: 20,
+    padding: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
+    shadowOpacity: 0.04,
+    shadowRadius: 4,
+    elevation: 2,
     borderWidth: 1,
   },
-  inputContainer: { marginBottom: 16 },
-  inputIcon: { position: 'absolute', left: 14, top: 15, zIndex: 2 },
-  floatingLabel: { position: 'absolute', left: 16, zIndex: 1, backgroundColor: 'transparent', alignSelf: 'flex-start' },
+  inputContainer: { marginBottom: 12 },
+  inputIcon: { position: 'absolute', left: 12, top: 14, zIndex: 2 },
+  floatingLabel: { position: 'absolute', left: 14, zIndex: 1, backgroundColor: 'transparent', alignSelf: 'flex-start' },
   input: {
-    height: 50,
+    height: 48,
     borderWidth: 1,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingLeft: 44,
-    paddingTop: 22,
-    fontSize: 16,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingLeft: 42,
+    paddingTop: 20,
+    fontSize: 14,
   },
   button: {
-    height: 50,
+    height: 48,
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 12,
+    shadowColor: '#0A6847',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 2,
   },
   buttonDisabled: {
-    opacity: 0.6,
+    opacity: 0.5,
   },
   buttonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
   },
   backButton: {
-    marginTop: 16,
+    marginTop: 12,
   },
   backText: {
     textAlign: 'center',
-    fontSize: 15,
+    fontSize: 14,
+    fontWeight: '600',
   },
 });

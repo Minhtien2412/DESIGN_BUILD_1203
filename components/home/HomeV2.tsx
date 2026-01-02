@@ -14,7 +14,7 @@ export type HomeV2Props = {
 // Theme (align with the existing green construction vibe)
 const theme = {
   colors: {
-    primary: '#90B44C',
+    primary: '#0A6847',
     primaryAlt: '#7FAB67',
     surface: '#FFFFFF',
     background: '#F7FAF1',
@@ -85,32 +85,32 @@ export default function HomeV2(props: HomeV2Props) {
 
   const categories = useMemo(() => ([
     { key: 'design', label: 'Thi?t k?', icon: 'pen-tool' as const, route: '/projects' },
-    { key: 'build', label: 'Thi công', icon: 'truck' as const, route: '/projects' },
+    { key: 'build', label: 'Thi cï¿½ng', icon: 'truck' as const, route: '/projects' },
     { key: 'interior', label: 'N?i th?t', icon: 'grid' as const, route: '/projects' },
     { key: 'materials', label: 'V?t li?u', icon: 'package' as const, route: '/projects' },
     { key: 'repair', label: 'S?a ch?a', icon: 'settings' as const, route: '/projects' },
     { key: 'engineer', label: 'K? su', icon: 'briefcase' as const, route: '/projects' },
-    { key: 'architect', label: 'Ki?n trúc su', icon: 'compass' as const, route: '/projects' },
+    { key: 'architect', label: 'Ki?n trï¿½c su', icon: 'compass' as const, route: '/projects' },
     { key: 'cleaning', label: 'V? sinh', icon: 'droplet' as const, route: '/projects' },
   ]), []);
 
   const featured = useMemo(() => ([
-    { id: 'aristo', title: 'Aristo Villa', subtitle: 'Bi?t th? hi?n d?i • Q.7' },
-    { id: 'eden', title: 'Eden Villa', subtitle: 'Ngh? du?ng • Ðà L?t' },
-    { id: 'atrahi', title: 'Atrahi Design', subtitle: 'Coffee concept • Bình Th?nh' },
+    { id: 'aristo', title: 'Aristo Villa', subtitle: 'Bi?t th? hi?n d?i ï¿½ Q.7' },
+    { id: 'eden', title: 'Eden Villa', subtitle: 'Ngh? du?ng ï¿½ ï¿½ï¿½ L?t' },
+    { id: 'atrahi', title: 'Atrahi Design', subtitle: 'Coffee concept ï¿½ Bï¿½nh Th?nh' },
   ]), []);
 
   return (
     <Container style={[{ flex: 1, backgroundColor: theme.colors.background }, style]}>
       {/* Hero */}
       <View style={{ backgroundColor: theme.colors.subtle, borderRadius: theme.radii.lg, padding: theme.spacing.lg, borderWidth: 1, borderColor: theme.colors.border }}>
-        <Text style={{ color: theme.colors.textSecondary, fontSize: 12 }}>Xin chào ??</Text>
-        <Text style={{ color: theme.colors.text, fontSize: 22, fontWeight: '800', marginTop: 2 }}>Thi?t k? & Thi công</Text>
+        <Text style={{ color: theme.colors.textSecondary, fontSize: 12 }}>Xin chï¿½o ??</Text>
+        <Text style={{ color: theme.colors.text, fontSize: 22, fontWeight: '800', marginTop: 2 }}>Thi?t k? & Thi cï¿½ng</Text>
         <View style={{ marginTop: theme.spacing.md, flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderColor: theme.colors.border, borderWidth: 1, borderRadius: 999, paddingHorizontal: 14, height: 44 }}>
           <Feather name="search" size={18} color={theme.colors.muted} />
           <TextInput
             style={{ flex: 1, marginLeft: 8 }}
-            placeholder="Tìm nhà th?u, d? án, s?n ph?m..."
+            placeholder="Tï¿½m nhï¿½ th?u, d? ï¿½n, s?n ph?m..."
             placeholderTextColor={theme.colors.muted}
             value={query}
             onChangeText={(t) => { setQuery(t); onSearch && onSearch(t); }}
@@ -121,8 +121,8 @@ export default function HomeV2(props: HomeV2Props) {
         <View style={{ flexDirection: 'row', marginTop: theme.spacing.md, columnGap: 8, rowGap: 8, flexWrap: 'wrap' }}>
           <Chip icon="map" label="G?n b?n" onPress={() => onNavigate && onNavigate('/projects')} />
           <Chip icon="trending-up" label="Xu hu?ng" onPress={() => onNavigate && onNavigate('/projects')} />
-          <Chip icon="percent" label="Uu dãi" onPress={() => onNavigate && onNavigate('/projects')} />
-          <Chip icon="clock" label="Ðang thi công" onPress={() => onNavigate && onNavigate('/live')} />
+          <Chip icon="percent" label="Uu dï¿½i" onPress={() => onNavigate && onNavigate('/projects')} />
+          <Chip icon="clock" label="ï¿½ang thi cï¿½ng" onPress={() => onNavigate && onNavigate('/live')} />
         </View>
       </View>
 
@@ -136,7 +136,7 @@ export default function HomeV2(props: HomeV2Props) {
       </Section>
 
       {/* Featured Projects */}
-      <Section title="D? án n?i b?t">
+      <Section title="D? ï¿½n n?i b?t">
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingRight: 12 }}>
           {featured.map(f => (
             <HorizontalCard key={f.id} title={f.title} subtitle={f.subtitle} onPress={() => onNavigate && onNavigate(`/projects`)} />
@@ -145,7 +145,7 @@ export default function HomeV2(props: HomeV2Props) {
       </Section>
 
       {/* Quick Access Blocks */}
-      <Section title="Ti?n ích nhanh">
+      <Section title="Ti?n ï¿½ch nhanh">
         <View style={{ flexDirection: 'row', columnGap: 12 }}>
           <TouchableOpacity onPress={() => onNavigate && onNavigate('/go-live')} style={{ flex: 1, backgroundColor: theme.colors.surface, borderRadius: theme.radii.lg, padding: 14, borderWidth: 1, borderColor: theme.colors.border }}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -154,7 +154,7 @@ export default function HomeV2(props: HomeV2Props) {
               </View>
               <View>
                 <Text style={{ fontWeight: '800', color: theme.colors.text }}>B?t d?u Live</Text>
-                <Text style={{ color: theme.colors.textSecondary, marginTop: 2 }}>Phát tr?c ti?p công trình</Text>
+                <Text style={{ color: theme.colors.textSecondary, marginTop: 2 }}>Phï¿½t tr?c ti?p cï¿½ng trï¿½nh</Text>
               </View>
             </View>
           </TouchableOpacity>
@@ -177,8 +177,8 @@ export default function HomeV2(props: HomeV2Props) {
         <View style={{ rowGap: 12 }}>
           {[1,2,3].map(i => (
             <TouchableOpacity key={i} activeOpacity={0.9} style={{ backgroundColor: theme.colors.surface, borderRadius: theme.radii.lg, padding: 14, borderWidth: 1, borderColor: theme.colors.border }}>
-              <Text style={{ fontWeight: '800', color: theme.colors.text }}>5 luu ý quan tr?ng khi ch?n nhà th?u #{i}</Text>
-              <Text style={{ color: theme.colors.textSecondary, marginTop: 6 }}>Ch?n nhà th?u phù h?p giúp t?i uu chi phí, d?m b?o ti?n d? và ch?t lu?ng công trình...</Text>
+              <Text style={{ fontWeight: '800', color: theme.colors.text }}>5 luu ï¿½ quan tr?ng khi ch?n nhï¿½ th?u #{i}</Text>
+              <Text style={{ color: theme.colors.textSecondary, marginTop: 6 }}>Ch?n nhï¿½ th?u phï¿½ h?p giï¿½p t?i uu chi phï¿½, d?m b?o ti?n d? vï¿½ ch?t lu?ng cï¿½ng trï¿½nh...</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -187,7 +187,7 @@ export default function HomeV2(props: HomeV2Props) {
       {/* CTA */}
       <View style={{ backgroundColor: theme.colors.primary, borderRadius: theme.radii.lg, padding: 16, alignItems: 'center', justifyContent: 'center' }}>
         <Text style={{ color: '#fff', fontWeight: '900', fontSize: 16 }}>B?n c?n tu v?n nhanh?</Text>
-        <Text style={{ color: '#fff', opacity: 0.9, marginTop: 4 }}>Chúng tôi s? k?t n?i b?n v?i chuyên gia phù h?p</Text>
+        <Text style={{ color: '#fff', opacity: 0.9, marginTop: 4 }}>Chï¿½ng tï¿½i s? k?t n?i b?n v?i chuyï¿½n gia phï¿½ h?p</Text>
         <TouchableOpacity onPress={() => onNavigate && onNavigate('/chat')} style={{ marginTop: 10, backgroundColor: '#fff', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 999 }}>
           <Text style={{ color: theme.colors.primary, fontWeight: '800' }}>Nh?n tin ngay</Text>
         </TouchableOpacity>

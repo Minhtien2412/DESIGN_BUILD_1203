@@ -33,7 +33,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   return (
     <ToastContext.Provider value={{ show }}>
       {children}
-      <View pointerEvents="box-none" style={styles.container}>
+      <View style={[styles.container, { pointerEvents: 'box-none' }]}>
         {toasts.map((t) => (
           <Animated.View key={t.id} style={styles.toast}>
             {t.title ? <Text style={styles.title}>{t.title}</Text> : null}

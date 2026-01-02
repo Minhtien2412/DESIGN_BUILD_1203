@@ -227,7 +227,7 @@ export default function SupplierDetailScreen() {
             )}
           </View>
           <View style={styles.ratingRow}>
-            <Ionicons name="star" size={16} color="#FFC107" />
+            <Ionicons name="star" size={16} color="#10B981" />
             <Text style={styles.ratingText}>{supplier.rating}</Text>
           </View>
         </View>

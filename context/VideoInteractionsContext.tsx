@@ -18,7 +18,34 @@ import type {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Crypto from 'expo-crypto';
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { Platform } from 'react-native';
 import { useAuth } from './AuthContext';
+
+// Helper function to generate UUID compatible with web and native
+const generateUUID = (): string => {
+  // Try native expo-crypto first
+  try {
+    return Crypto.randomUUID();
+  } catch (nativeError) {
+    // For web, try secure crypto API (only works on localhost or https)
+    if (Platform.OS === 'web' && typeof window !== 'undefined') {
+      try {
+        if (window.crypto?.randomUUID) {
+          return window.crypto.randomUUID();
+        }
+      } catch (webCryptoError) {
+        // Web Crypto API blocked (non-secure origin), fall through
+      }
+    }
+    
+    // Fallback: Manual UUID v4 generation (works everywhere)
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+      const r = (Math.random() * 16) | 0;
+      const v = c === 'x' ? r : (r & 0x3) | 0x8;
+      return v.toString(16);
+    });
+  }
+};
 
 interface VideoInteractionsContextType {
   // Like
@@ -108,13 +135,13 @@ export const VideoInteractionsProvider: React.FC<{ children: React.ReactNode }> 
     try {
       let id = await AsyncStorage.getItem(DEVICE_ID_KEY);
       if (!id) {
-        id = Crypto.randomUUID();
+        id = generateUUID();
         await AsyncStorage.setItem(DEVICE_ID_KEY, id);
       }
       setDeviceId(id);
     } catch (error) {
       console.error('[VideoInteractions] Error loading device ID:', error);
-      setDeviceId(Crypto.randomUUID());
+      setDeviceId(generateUUID());
     }
   };
 

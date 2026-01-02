@@ -42,7 +42,7 @@ interface ProjectProgressDashboardProps {
 const StatCard = memo(({ 
   title, 
   value, 
-  color = '#2196F3',
+  color = '#0A6847',
   onPress 
 }: { 
   title: string; 
@@ -125,7 +125,7 @@ const TaskSummaryCard = memo(({
         <StatCard 
           title="Total" 
           value={taskStats.total} 
-          color="#2196F3"
+          color="#0A6847"
         />
         <StatCard 
           title="Completed" 
@@ -213,7 +213,7 @@ const PaymentSummaryCard = memo(({
         <StatCard 
           title="Total" 
           value={formatCurrency(paymentStats.total)} 
-          color="#2196F3"
+          color="#0A6847"
         />
         <StatCard 
           title="Completed" 
@@ -223,7 +223,7 @@ const PaymentSummaryCard = memo(({
         <StatCard 
           title="Pending" 
           value={formatCurrency(paymentStats.pending)} 
-          color="#FF5722"
+          color="#0A6847"
         />
       </View>
 
@@ -358,7 +358,7 @@ const ProjectProgressDashboard: React.FC<ProjectProgressDashboardProps> = ({
           <RefreshControl 
             refreshing={refreshing} 
             onRefresh={handleRefresh}
-            colors={['#2196F3']}
+            colors={['#0A6847']}
           />
         }
       >
@@ -457,7 +457,7 @@ const getStatusColor = (status: string): string => {
     case 'completed': return '#4CAF50';
     case 'in-progress': return '#FF9800';
     case 'pending': return '#9E9E9E';
-    case 'overdue': return '#F44336';
+    case 'overdue': return '#1A1A1A';
     default: return '#9E9E9E';
   }
 };
@@ -536,7 +536,7 @@ const styles = StyleSheet.create({
   progressPercentage: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#2196F3',
+    color: '#0A6847',
     marginBottom: 16,
   },
   progressBarContainer: {
@@ -554,7 +554,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 16,
     borderLeftWidth: 4,
-    borderLeftColor: '#2196F3',
+    borderLeftColor: '#0A6847',
   },
   milestoneTitle: {
     fontSize: 14,
@@ -633,7 +633,7 @@ const styles = StyleSheet.create({
   paymentAmount: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#2196F3',
+    color: '#0A6847',
   },
   paymentDue: {
     fontSize: 12,
@@ -646,7 +646,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 16,
-    color: '#f44336',
+    color: '#1A1A1A',
     textAlign: 'center',
   },
   emptyText: {

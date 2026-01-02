@@ -1,0 +1,74 @@
+﻿[
+    {
+        "Endpoint":  "/projects",
+        "Status":  "PASS",
+        "Count":  3,
+        "Feature":  "Projects"
+    },
+    {
+        "Endpoint":  "/tasks",
+        "Status":  "PASS",
+        "Count":  0,
+        "Feature":  "Tasks"
+    },
+    {
+        "Endpoint":  "/notifications",
+        "Status":  "PASS",
+        "Count":  null,
+        "Feature":  "Notifications"
+    },
+    {
+        "Endpoint":  "/messages/conversations",
+        "Status":  "PASS",
+        "Count":  0,
+        "Feature":  "Messages"
+    },
+    {
+        "Endpoint":  "/products",
+        "Status":  "PASS",
+        "Count":  null,
+        "Feature":  "Products"
+    },
+    {
+        "Endpoint":  "/auth/profile",
+        "Error":  "The remote server returned an error: (404) Not Found.",
+        "Status":  "FAIL",
+        "Feature":  "Profile"
+    },
+    {
+        "Endpoint":  "/construction/progress",
+        "Error":  "The remote server returned an error: (404) Not Found.",
+        "Status":  "FAIL",
+        "Feature":  "Construction"
+    },
+    {
+        "Endpoint":  "/documents",
+        "Error":  "The remote server returned an error: (404) Not Found.",
+        "Status":  "FAIL",
+        "Feature":  "Documents"
+    },
+    {
+        "Endpoint":  "/budget",
+        "Error":  "The remote server returned an error: (404) Not Found.",
+        "Status":  "FAIL",
+        "Feature":  "Budget"
+    },
+    {
+        "Endpoint":  "/contracts",
+        "Error":  "The remote server returned an error: (404) Not Found.",
+        "Status":  "FAIL",
+        "Feature":  "Contracts"
+    },
+    {
+        "Endpoint":  "/timeline",
+        "Error":  "The remote server returned an error: (404) Not Found.",
+        "Status":  "FAIL",
+        "Feature":  "Timeline"
+    },
+    {
+        "Endpoint":  "/analytics/dashboard",
+        "Error":  "The remote server returned an error: (404) Not Found.",
+        "Status":  "FAIL",
+        "Feature":  "Analytics"
+    }
+]

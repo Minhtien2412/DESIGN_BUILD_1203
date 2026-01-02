@@ -1,6 +1,8 @@
 import { Product } from '@/data/products';
+import { cartBadge } from '@/services/notification-badge';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import Toast from 'react-native-toast-message';
 
 // Cart Item Type
 export interface CartItem {
@@ -43,6 +45,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (isLoaded) {
       saveCart();
+      // Update cart badge
+      const totalQty = items.reduce((sum, item) => sum + item.quantity, 0);
+      cartBadge.set(totalQty).catch(err => console.warn('Failed to update cart badge:', err));
     }
   }, [items, isLoaded]);
 
@@ -103,6 +108,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
           selectedSize: size,
           selectedColor: color,
         };
+        
+        // Show success toast
+        Toast.show({
+          type: 'success',
+          text1: 'Đã thêm vào giỏ hàng',
+          text2: `${product.name} (${quantity})`,
+          position: 'bottom',
+          visibilityTime: 2000,
+        });
+        
         return [...currentItems, newItem];
       }
     });
@@ -110,7 +125,19 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // Remove item from cart
   const removeFromCart = (itemId: string) => {
+    const item = items.find(i => i.id === itemId);
     setItems((currentItems) => currentItems.filter((item) => item.id !== itemId));
+    
+    // Show toast
+    if (item) {
+      Toast.show({
+        type: 'info',
+        text1: 'Đã xóa khỏi giỏ hàng',
+        text2: item.product.name,
+        position: 'bottom',
+        visibilityTime: 2000,
+      });
+    }
   };
 
   // Update item quantity

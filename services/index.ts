@@ -1,23 +1,37 @@
-// Services barrel
+// Services barrel - Consolidated exports
 export * from './api';
 export * from './auth';
 export * from './bids';
 export * from './categoryPosts';
-export * from './chat';
 export * from './cloud';
 export * from './demoUsers';
-export * from './messages';
+export {
+    captureAndUploadConstructionPhoto, deleteUploadedFile,
+    getFileInfo, pickAndUploadDocument, uploadAvatar as uploadAvatarFile, uploadMultipleFiles, type UploadProgress,
+    type UploadResult, type UploadType
+} from './fileUpload';
 export * from './metrics';
 export * from './notifications';
 export * from './payments';
 export * from './permissions';
 export * from './posts';
-export * from './profile';
+// Explicitly export from profile avoiding conflicts with profileApi
+export {
+    getAvatarUrlFor, getProfile as getProfileLocal,
+    saveProfile, type UserProfileDetails
+} from './profile';
+export * from './profileApi';
+export * from './projects';
 export * from './remoteAuth';
-export * from './rooms';
 export * from './search';
+export * from './servicesApi';
 export * from './social';
 export * from './userGroups';
-export * from './videoCache';
-export * from './videos';
+export * from './userProfile';
+
+// Re-export from api/ folder
+export { callService } from './api/call.service';
+export { chatService } from './api/chat.service';
+export { liveStreamService } from './api/livestream.service';
+export { default as messagesApi } from './api/messagesApi';
 

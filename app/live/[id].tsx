@@ -154,7 +154,9 @@ export default function LiveStreamWatchScreen() {
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <View style={styles.commentItem}>
-              <Text style={styles.commentUser}>{item.userName}:</Text>
+              <Pressable onPress={() => router.push(`/profile/${item.userId}`)}>
+                <Text style={styles.commentUser}>{item.userName}:</Text>
+              </Pressable>
               <Text style={styles.commentText}>{item.message}</Text>
             </View>
           )}
@@ -362,9 +364,10 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   commentUser: {
-    color: '#fff',
+    color: '#4FC3F7',
     fontSize: 13,
     fontWeight: '700',
+    textDecorationLine: 'underline',
   },
   commentText: {
     color: '#fff',

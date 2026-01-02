@@ -1,10 +1,13 @@
+import { makePhoneCall, sendSMS } from '@/utils/phone-actions';
 import { Ionicons } from '@expo/vector-icons';
-import { Stack } from 'expo-router';
-import React, { useState } from 'react';
+import { router, Stack } from 'expo-router';
+import React, { useEffect, useState } from 'react';
 import {
+    ActivityIndicator,
     Alert,
     Image,
     Modal,
+    RefreshControl,
     ScrollView,
     StyleSheet,
     Text,
@@ -13,93 +16,24 @@ import {
     View,
 } from 'react-native';
 
-// Mock data - MEP (Mechanical, Electrical, Plumbing) Contractors
-const CONTRACTORS = [
-  {
-    id: 1,
-    name: 'Điện Nước Thành Đạt',
-    avatar: 'https://i.pravatar.cc/150?img=16',
-    rating: 4.9,
-    reviews: 198,
-    location: 'TP.HCM',
-    experience: 16,
-    price: '480.000₫',
-    priceUnit: '/ ngày',
-    services: ['Điện dân dụng', 'Điện công nghiệp', 'Nước sạch', 'Nước thải'],
-    certifications: ['Chứng chỉ hành nghề', 'ISO 9001'],
-    teamSize: 4,
-    completedProjects: 312,
-    featured: true,
-    availability: 'Sẵn sàng',
-    phone: '090 999 0000',
-  },
-  {
-    id: 2,
-    name: 'MEP Solutions Hà Nội',
-    avatar: 'https://i.pravatar.cc/150?img=35',
-    rating: 4.8,
-    reviews: 176,
-    location: 'Hà Nội',
-    experience: 14,
-    price: '500.000₫',
-    priceUnit: '/ ngày',
-    services: ['Điện thông minh', 'Hệ thống cấp thoát', 'PCCC'],
-    certifications: ['Chứng chỉ hành nghề', 'Chứng chỉ PCCC'],
-    teamSize: 5,
-    completedProjects: 287,
-    featured: true,
-    availability: 'Sẵn sàng',
-    phone: '091 000 1111',
-  },
-  {
-    id: 3,
-    name: 'Điện Lạnh Miền Trung',
-    avatar: 'https://i.pravatar.cc/150?img=54',
-    rating: 4.7,
-    reviews: 143,
-    location: 'Đà Nẵng',
-    experience: 11,
-    price: '450.000₫',
-    priceUnit: '/ ngày',
-    services: ['Điện dân dụng', 'Điện lạnh', 'Nước'],
-    certifications: ['Chứng chỉ hành nghề'],
-    teamSize: 3,
-    completedProjects: 198,
-    featured: false,
-    availability: 'Sẵn sàng',
-    phone: '092 111 2222',
-  },
-  {
-    id: 4,
-    name: 'Thợ Điện Nước Phương Nam',
-    avatar: 'https://i.pravatar.cc/150?img=71',
-    rating: 4.6,
-    reviews: 112,
-    location: 'Cần Thơ',
-    experience: 9,
-    price: '420.000₫',
-    priceUnit: '/ ngày',
-    services: ['Điện dân dụng', 'Nước sạch'],
-    certifications: ['Chứng chỉ hành nghề'],
-    teamSize: 2,
-    completedProjects: 156,
-    featured: false,
-    availability: 'Bận (khả dụng từ 30/11)',
-    phone: '093 222 3333',
-  },
-];
+import { useLaborProviders } from '@/hooks/useLaborProviders';
+import { LaborProvider } from '@/services/api/labor.service';
 
 const LOCATIONS = ['Tất cả', 'TP.HCM', 'Hà Nội', 'Đà Nẵng', 'Cần Thơ', 'Khác'];
 const SERVICE_TYPES = ['Tất cả', 'Điện dân dụng', 'Điện công nghiệp', 'Nước sạch', 'Nước thải', 'PCCC', 'Điện lạnh'];
 
 interface ContractorCardProps {
-  contractor: any;
+  contractor: LaborProvider;
   onBooking: () => void;
+  onPress: () => void;
 }
 
-const ContractorCard: React.FC<ContractorCardProps> = ({ contractor, onBooking }) => {
+const ContractorCard: React.FC<ContractorCardProps> = ({ contractor, onBooking, onPress }) => {
+  const availabilityText = contractor.availability === 'available' ? 'Sẵn sàng' : contractor.availability === 'busy' ? 'Đang bận' : 'Không khả dụng';
+  const priceDisplay = `${contractor.priceRange.min.toLocaleString('vi-VN')}₫`;
+  
   return (
-    <TouchableOpacity style={styles.contractorCard} activeOpacity={0.8}>
+    <TouchableOpacity style={styles.contractorCard} activeOpacity={0.8} onPress={onPress}>
       {contractor.featured && (
         <View style={styles.featuredBadge}>
           <Ionicons name="star" size={12} color="#fff" />
@@ -116,15 +50,15 @@ const ContractorCard: React.FC<ContractorCardProps> = ({ contractor, onBooking }
           <View style={styles.ratingRow}>
             <Ionicons name="star" size={14} color="#ffa41c" />
             <Text style={styles.ratingText}>{contractor.rating}</Text>
-            <Text style={styles.reviewsText}>({contractor.reviews})</Text>
+            <Text style={styles.reviewsText}>({contractor.reviewCount})</Text>
           </View>
 
           <View style={styles.locationRow}>
             <Ionicons name="location" size={12} color="#999" />
-            <Text style={styles.locationText}>{contractor.location}</Text>
+            <Text style={styles.locationText}>{contractor.city}</Text>
             <View style={styles.divider} />
             <Ionicons name="briefcase" size={12} color="#999" />
-            <Text style={styles.experienceText}>{contractor.experience} năm</Text>
+            <Text style={styles.experienceText}>{contractor.yearExperience} năm</Text>
           </View>
         </View>
       </View>
@@ -143,18 +77,18 @@ const ContractorCard: React.FC<ContractorCardProps> = ({ contractor, onBooking }
       <View style={styles.certificationsRow}>
         <Ionicons name="ribbon" size={16} color="#4caf50" />
         <Text style={styles.certificationsText}>
-          {contractor.certifications.join(' • ')}
+          {contractor.verified ? 'Đã xác minh' : 'Chứng chỉ hành nghề'}
         </Text>
       </View>
 
       <View style={styles.teamRow}>
         <Ionicons name="people" size={16} color="#2196f3" />
-        <Text style={styles.teamSizeText}>Đội {contractor.teamSize} người</Text>
+        <Text style={styles.teamSizeText}>Đội chuyên nghiệp</Text>
       </View>
 
       <View style={styles.statsSection}>
         <View style={styles.statItem}>
-          <Text style={styles.statValue}>{contractor.completedProjects}+</Text>
+          <Text style={styles.statValue}>{contractor.projectCount}+</Text>
           <Text style={styles.statLabel}>Công trình</Text>
         </View>
         <View style={styles.statDivider} />
@@ -162,10 +96,10 @@ const ContractorCard: React.FC<ContractorCardProps> = ({ contractor, onBooking }
           <Text
             style={[
               styles.statValue,
-              contractor.availability === 'Sẵn sàng' ? styles.available : styles.busy,
+              contractor.availability === 'available' ? styles.available : styles.busy,
             ]}
           >
-            {contractor.availability}
+            {availabilityText}
           </Text>
           <Text style={styles.statLabel}>Tình trạng</Text>
         </View>
@@ -173,24 +107,39 @@ const ContractorCard: React.FC<ContractorCardProps> = ({ contractor, onBooking }
 
       <View style={styles.priceRow}>
         <View>
-          <Text style={styles.price}>{contractor.price}</Text>
-          <Text style={styles.priceUnit}>{contractor.priceUnit}</Text>
+          <Text style={styles.price}>{priceDisplay}</Text>
+          <Text style={styles.priceUnit}>/ {contractor.priceRange.unit}</Text>
         </View>
         
-        <TouchableOpacity style={styles.bookButton} onPress={onBooking}>
-          <Ionicons name="call" size={16} color="#fff" />
-          <Text style={styles.bookButtonText}>Liên hệ</Text>
-        </TouchableOpacity>
+        <View style={styles.actionButtons}>
+          <TouchableOpacity 
+            style={styles.callButton} 
+            onPress={() => makePhoneCall(contractor.phone)}
+          >
+            <Ionicons name="call-outline" size={20} color="#EE4D2D" />
+            <Text style={styles.callButtonText}>Gọi điện</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={styles.contactButton} 
+            onPress={() => sendSMS(contractor.phone, `Xin chào ${contractor.name}, tôi muốn tư vấn về dịch vụ điện nước.`)}
+          >
+            <Ionicons name="chatbubble" size={20} color="#fff" />
+            <Text style={styles.contactButtonText}>Liên hệ ngay</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </TouchableOpacity>
   );
 };
 
 export default function ThoDienNuocScreen() {
+  const { providers, loading, refreshing, refresh, searchProviders } = useLaborProviders({ type: 'dien-nuoc' });
+  
   const [selectedLocation, setSelectedLocation] = useState('Tất cả');
   const [selectedServiceType, setSelectedServiceType] = useState('Tất cả');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedContractor, setSelectedContractor] = useState<any>(null);
+  const [selectedContractor, setSelectedContractor] = useState<LaborProvider | null>(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [bookingData, setBookingData] = useState({
     name: '',
@@ -202,14 +151,24 @@ export default function ThoDienNuocScreen() {
     notes: '',
   });
 
-  const filteredContractors = CONTRACTORS.filter((contractor) => {
-    const matchLocation = selectedLocation === 'Tất cả' || contractor.location === selectedLocation;
+  const filteredContractors = providers.filter((contractor) => {
+    const matchLocation = selectedLocation === 'Tất cả' || contractor.city === selectedLocation || contractor.address.includes(selectedLocation);
     const matchServiceType = selectedServiceType === 'Tất cả' || contractor.services.some((s: string) => s.includes(selectedServiceType));
     const matchSearch = searchQuery === '' || contractor.name.toLowerCase().includes(searchQuery.toLowerCase());
     return matchLocation && matchServiceType && matchSearch;
   });
 
-  const handleBooking = (contractor: any) => {
+  // Handle search with debounce
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchQuery.length > 2) {
+        searchProviders(searchQuery);
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery, searchProviders]);
+
+  const handleBooking = (contractor: LaborProvider) => {
     setSelectedContractor(contractor);
     setShowBookingModal(true);
   };
@@ -222,7 +181,7 @@ export default function ThoDienNuocScreen() {
 
     Alert.alert(
       'Gửi yêu cầu thành công',
-      `Chúng tôi sẽ kết nối bạn với thợ trong vòng 1h.\n\nThợ: ${selectedContractor.name}`,
+      `Chúng tôi sẽ kết nối bạn với thợ trong vòng 1h.\n\nThợ: ${selectedContractor?.name}`,
       [
         {
           text: 'OK',
@@ -248,7 +207,7 @@ export default function ThoDienNuocScreen() {
       <Stack.Screen
         options={{
           title: 'Thợ điện nước',
-          headerStyle: { backgroundColor: '#90B44C' },
+          headerStyle: { backgroundColor: '#0A6847' },
           headerTintColor: '#fff',
           headerTitleStyle: { fontWeight: '600' },
         }}
@@ -318,24 +277,39 @@ export default function ThoDienNuocScreen() {
           <Text style={styles.resultsText}>{filteredContractors.length} thợ</Text>
         </View>
 
-        <ScrollView
-          style={styles.content}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.listContainer}
-        >
-          {filteredContractors.map((contractor) => (
-            <ContractorCard key={contractor.id} contractor={contractor} onBooking={() => handleBooking(contractor)} />
-          ))}
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#0A6847" />
+            <Text style={styles.loadingText}>Đang tải danh sách...</Text>
+          </View>
+        ) : (
+          <ScrollView
+            style={styles.content}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.listContainer}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={refresh} colors={['#0A6847']} />
+            }
+          >
+            {filteredContractors.map((contractor) => (
+              <ContractorCard 
+                key={contractor.id} 
+                contractor={contractor} 
+                onBooking={() => handleBooking(contractor)} 
+                onPress={() => router.push(`/utilities/team-detail?id=${contractor.id}&type=dien-nuoc`)}
+              />
+            ))}
 
-          {filteredContractors.length === 0 && (
-            <View style={styles.emptyState}>
-              <Ionicons name="flash-outline" size={64} color="#ccc" />
-              <Text style={styles.emptyText}>Không tìm thấy thợ phù hợp</Text>
-            </View>
-          )}
+            {filteredContractors.length === 0 && (
+              <View style={styles.emptyState}>
+                <Ionicons name="flash-outline" size={64} color="#ccc" />
+                <Text style={styles.emptyText}>Không tìm thấy thợ phù hợp</Text>
+              </View>
+            )}
 
-          <View style={{ height: 20 }} />
-        </ScrollView>
+            <View style={{ height: 20 }} />
+          </ScrollView>
+        )}
 
         <View style={styles.infoBanner}>
           <Ionicons name="shield-checkmark" size={16} color="#4caf50" />
@@ -367,7 +341,7 @@ export default function ThoDienNuocScreen() {
                     <View style={styles.selectedRating}>
                       <Ionicons name="star" size={14} color="#ffa41c" />
                       <Text style={styles.selectedRatingText}>
-                        {selectedContractor.rating} ({selectedContractor.reviews})
+                        {selectedContractor.rating} ({selectedContractor.reviewCount})
                       </Text>
                     </View>
                   </View>
@@ -484,7 +458,7 @@ const styles = StyleSheet.create({
   filterLabel: { fontSize: 13, fontWeight: '600', color: '#666', width: 85, paddingLeft: 16 },
   filterScroll: { flex: 1 },
   filterChip: { paddingHorizontal: 14, paddingVertical: 6, borderRadius: 16, backgroundColor: '#f5f5f5', marginHorizontal: 4 },
-  filterChipActive: { backgroundColor: '#90B44C' },
+  filterChipActive: { backgroundColor: '#0A6847' },
   filterChipText: { fontSize: 12, color: '#666', fontWeight: '500' },
   filterChipTextActive: { color: '#fff' },
   resultsBar: { backgroundColor: '#fff', paddingHorizontal: 16, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#f0f0f0' },
@@ -492,7 +466,7 @@ const styles = StyleSheet.create({
   content: { flex: 1 },
   listContainer: { padding: 16 },
   contractorCard: { backgroundColor: '#fff', borderRadius: 12, padding: 16, marginBottom: 16, elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 4 },
-  featuredBadge: { position: 'absolute', top: 12, right: 12, flexDirection: 'row', alignItems: 'center', backgroundColor: '#90B44C', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 12, zIndex: 1, gap: 4 },
+  featuredBadge: { position: 'absolute', top: 12, right: 12, flexDirection: 'row', alignItems: 'center', backgroundColor: '#0A6847', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 12, zIndex: 1, gap: 4 },
   featuredText: { fontSize: 10, fontWeight: '600', color: '#fff' },
   cardHeader: { flexDirection: 'row', marginBottom: 12 },
   avatar: { width: 60, height: 60, borderRadius: 8, backgroundColor: '#f0f0f0' },
@@ -514,6 +488,8 @@ const styles = StyleSheet.create({
   certificationsText: { fontSize: 11, color: '#4caf50', fontWeight: '600', flex: 1 },
   teamRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12 },
   teamSizeText: { fontSize: 12, color: '#666', flex: 1 },
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: 60 },
+  loadingText: { marginTop: 12, fontSize: 14, color: '#666' },
   statsSection: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', paddingVertical: 12, marginBottom: 12, borderTopWidth: 1, borderBottomWidth: 1, borderColor: '#f0f0f0' },
   statItem: { alignItems: 'center' },
   statValue: { fontSize: 15, fontWeight: '700', color: '#333', marginBottom: 4 },
@@ -522,9 +498,32 @@ const styles = StyleSheet.create({
   statLabel: { fontSize: 11, color: '#999' },
   statDivider: { width: 1, height: 40, backgroundColor: '#f0f0f0' },
   priceRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  price: { fontSize: 18, fontWeight: '700', color: '#90B44C' },
+  price: { fontSize: 18, fontWeight: '700', color: '#0A6847' },
   priceUnit: { fontSize: 12, color: '#999' },
-  bookButton: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#90B44C', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 8, gap: 6 },
+  actionButtons: { flexDirection: 'row', gap: 8 },
+  callButton: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    backgroundColor: '#fff', 
+    paddingHorizontal: 12, 
+    paddingVertical: 8, 
+    borderRadius: 8, 
+    borderWidth: 1,
+    borderColor: '#EE4D2D',
+    gap: 4 
+  },
+  callButtonText: { fontSize: 12, fontWeight: '600', color: '#EE4D2D' },
+  contactButton: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    backgroundColor: '#EE4D2D', 
+    paddingHorizontal: 12, 
+    paddingVertical: 8, 
+    borderRadius: 8, 
+    gap: 4 
+  },
+  contactButtonText: { fontSize: 12, fontWeight: '600', color: '#fff' },
+  bookButton: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#0A6847', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 8, gap: 6 },
   bookButtonText: { fontSize: 14, fontWeight: '600', color: '#fff' },
   emptyState: { alignItems: 'center', justifyContent: 'center', paddingVertical: 60 },
   emptyText: { fontSize: 15, color: '#999', marginTop: 16 },
@@ -544,10 +543,10 @@ const styles = StyleSheet.create({
   form: { marginBottom: 16 },
   formGroup: { marginBottom: 16 },
   formLabel: { fontSize: 13, fontWeight: '600', color: '#333', marginBottom: 8 },
-  required: { color: '#90B44C' },
+  required: { color: '#0A6847' },
   formInput: { backgroundColor: '#f5f5f5', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 14, color: '#333', borderWidth: 1, borderColor: '#e0e0e0' },
   formTextArea: { height: 80, textAlignVertical: 'top' },
-  submitButton: { backgroundColor: '#90B44C', paddingVertical: 14, borderRadius: 8, alignItems: 'center', marginBottom: 12 },
+  submitButton: { backgroundColor: '#0A6847', paddingVertical: 14, borderRadius: 8, alignItems: 'center', marginBottom: 12 },
   submitButtonText: { fontSize: 15, fontWeight: '600', color: '#fff' },
   formNote: { fontSize: 12, color: '#999', textAlign: 'center', marginBottom: 20 },
 });

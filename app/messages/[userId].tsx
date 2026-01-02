@@ -1,17 +1,19 @@
 /**
  * Message Thread Screen
  * Chat interface between two users with bubble UI (like Zalo)
+ * Now using real backend API with WebSocket support
  */
 
 import Avatar from '@/components/ui/avatar';
-import { apiFetch } from '@/services/api';
+import { useWebSocket } from '@/context/WebSocketContext';
+import { useConversation } from '@/hooks/useMessages';
+import type { Message } from '@/services/api/messagesApi';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
     ActivityIndicator,
     FlatList,
-    Image,
     Keyboard,
     KeyboardAvoidingView,
     Platform,
@@ -22,205 +24,89 @@ import {
     View,
 } from 'react-native';
 
-interface Message {
-  id: number;
-  content: string;
-  type: string;
-  mediaUrl: string | null;
-  sentAt: string;
-  isFromMe: boolean;
-  isRead: boolean;
-  readAt: string | null;
-}
-
-interface OtherUser {
-  id: number;
-  name: string;
-  avatar: string | null;
-  isOnline: boolean;
-  lastSeen: string | null;
-}
-
 export default function MessageThreadScreen() {
   const { userId } = useLocalSearchParams<{ userId: string }>();
-  const otherUserId = parseInt(userId || '0');
+  const recipientId = parseInt(userId || '0');
 
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [otherUser, setOtherUser] = useState<OtherUser | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [sending, setSending] = useState(false);
+  // Use conversation hook for data management
+  const {
+    messages,
+    loading,
+    sending,
+    hasMore,
+    sendMessage,
+    loadMore,
+    markAllAsRead,
+    refresh
+  } = useConversation(null, recipientId);
+
+  // WebSocket for real-time updates
+  const { socket, connected } = useWebSocket();
+
   const [messageText, setMessageText] = useState('');
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
-  const [offset, setOffset] = useState(0);
   const [newMessagesCount, setNewMessagesCount] = useState(0);
-  const limit = 50;
-
   const flatListRef = useRef<FlatList>(null);
-  const pollIntervalRef = useRef<any>(null); // Use 'any' for cross-platform compatibility
-  const lastMessageIdRef = useRef<number>(0);
   const isAtBottomRef = useRef<boolean>(true);
 
-  // Fetch new messages only (for polling)
-  const fetchNewMessages = useCallback(async () => {
-    try {
-      // Fetch only recent messages (limit=20)
-      const data = await apiFetch(`/api/messages/${otherUserId}?limit=20&offset=0`);
-      
-      const newMessages = data.messages || [];
-      if (newMessages.length === 0) return;
+  // Mark messages as read when entering conversation
+  useEffect(() => {
+    if (!loading && messages.length > 0) {
+      markAllAsRead();
+    }
+  }, [loading]);
 
-      // Get the latest message ID from current state
-      const currentLastId = lastMessageIdRef.current;
-      
-      // Filter only messages newer than current last message
-      const trulyNewMessages = newMessages.filter((msg: Message) => msg.id > currentLastId);
-      
-      if (trulyNewMessages.length > 0) {
-        // Append new messages to the end
-        setMessages(prev => [...prev, ...trulyNewMessages]);
-        
-        // Update last message ID
-        const newestId = Math.max(...trulyNewMessages.map((m: Message) => m.id));
-        lastMessageIdRef.current = newestId;
-        
-        // If user is at bottom, auto-scroll. Otherwise show indicator
+  // WebSocket: Listen for new messages
+  useEffect(() => {
+    if (!socket || !connected) return;
+    
+    const handleNewMessage = (newMessage: Message) => {
+      if (newMessage.senderId === recipientId) {
+        // Auto-scroll if at bottom
         if (isAtBottomRef.current) {
           setTimeout(() => {
             flatListRef.current?.scrollToEnd({ animated: true });
           }, 100);
           setNewMessagesCount(0);
         } else {
-          setNewMessagesCount(prev => prev + trulyNewMessages.length);
+          setNewMessagesCount(prev => prev + 1);
         }
-      }
-    } catch (error) {
-      console.error('Failed to fetch new messages:', error);
-    }
-  }, []); // REMOVE otherUserId dependency!
-
-  const fetchMessages = useCallback(async (isLoadMore = false, currentOffset?: number) => {
-    try {
-      if (isLoadMore) {
-        setLoadingMore(true);
-      } else {
-        setLoading(true);
-      }
-
-      const offsetToUse = isLoadMore ? (currentOffset ?? offset) : 0;
-      const data = await apiFetch(`/api/messages/${otherUserId}?limit=${limit}&offset=${offsetToUse}`);
-
-      if (data.otherUser) {
-        setOtherUser(data.otherUser);
-      }
-
-      const newMessages = data.messages || [];
-      
-      if (isLoadMore) {
-        // Prepend older messages
-        setMessages(prev => [...newMessages, ...prev]);
-        setOffset(offsetToUse + newMessages.length);
-      } else {
-        setMessages(newMessages);
-        setOffset(newMessages.length);
-        
-        // Update last message ID for polling
-        if (newMessages.length > 0) {
-          const latestId = Math.max(...newMessages.map((m: Message) => m.id));
-          lastMessageIdRef.current = latestId;
-        }
-      }
-
-      setHasMore(data.pagination?.hasMore || false);
-    } catch (error) {
-      console.error('Failed to fetch messages:', error);
-    } finally {
-      setLoading(false);
-      setLoadingMore(false);
-    }
-  }, []); // REMOVE all dependencies to prevent re-creation
-
-  useEffect(() => {
-    if (otherUserId) {
-      fetchMessages(false, 0);
-    }
-  }, [otherUserId]); // Only depend on otherUserId, NOT fetchMessages
-
-  // Auto-refresh: Poll for new messages every 5 seconds
-  useEffect(() => {
-    if (!otherUserId || loading) return;
-
-    // Start polling after initial load
-    pollIntervalRef.current = setInterval(() => {
-      fetchNewMessages();
-    }, 5000); // Poll every 5 seconds
-
-    // Cleanup on unmount
-    return () => {
-      if (pollIntervalRef.current) {
-        clearInterval(pollIntervalRef.current);
       }
     };
-  }, [otherUserId, loading]); // REMOVE fetchNewMessages dependency!
+
+    socket.on('message:new', handleNewMessage);
+    
+    return () => {
+      socket.off('message:new', handleNewMessage);
+    };
+  }, [recipientId, socket, connected]);
+
+  // Auto-scroll to bottom on initial load
+  useEffect(() => {
+    if (!loading && messages.length > 0) {
+      setTimeout(() => {
+        flatListRef.current?.scrollToEnd({ animated: false });
+      }, 100);
+    }
+  }, [loading]);
 
   const handleSendMessage = async () => {
     if (!messageText.trim() || sending) return;
 
-    const tempMessage: Message = {
-      id: Date.now(), // Temporary ID
-      content: messageText.trim(),
-      type: 'text',
-      mediaUrl: null,
-      sentAt: new Date().toISOString(),
-      isFromMe: true,
-      isRead: false,
-      readAt: null,
-    };
-
-    // Optimistic update
-    setMessages(prev => [...prev, tempMessage]);
+    const text = messageText.trim();
     setMessageText('');
     Keyboard.dismiss();
 
-    // Scroll to bottom
-    setTimeout(() => {
-      flatListRef.current?.scrollToEnd({ animated: true });
-    }, 100);
-
     try {
-      setSending(true);
-      const data = await apiFetch('/api/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          recipientId: otherUserId,
-          content: tempMessage.content,
-          type: 'text',
-        }),
-      });
-
-      // Replace temp message with real message
-      setMessages(prev => 
-        prev.map((msg: Message) => msg.id === tempMessage.id ? data.message : msg)
-      );
+      await sendMessage(text);
       
-      // Update last message ID for polling
-      if (data.message && data.message.id) {
-        lastMessageIdRef.current = Math.max(lastMessageIdRef.current, data.message.id);
-      }
+      // Scroll to bottom after sending
+      setTimeout(() => {
+        flatListRef.current?.scrollToEnd({ animated: true });
+      }, 100);
     } catch (error) {
       console.error('Failed to send message:', error);
-      // Remove temp message on error
-      setMessages(prev => prev.filter((msg: Message) => msg.id !== tempMessage.id));
-      // TODO: Show error alert
-    } finally {
-      setSending(false);
-    }
-  };
-
-  const handleLoadMore = () => {
-    if (!loadingMore && hasMore) {
-      fetchMessages(true, offset);
+      // Restore message text on error
+      setMessageText(text);
     }
   };
 
@@ -267,22 +153,24 @@ export default function MessageThreadScreen() {
 
   const renderMessage = ({ item, index }: { item: Message; index: number }) => {
     const prevMessage = index > 0 ? messages[index - 1] : null;
-    const showAvatar = !prevMessage || prevMessage.isFromMe !== item.isFromMe;
-    const isLastInGroup = index === messages.length - 1 || messages[index + 1]?.isFromMe !== item.isFromMe;
+    const isFromMe = item.sender?.id !== recipientId;
+    const showAvatar = !prevMessage || (prevMessage.sender?.id !== recipientId) !== isFromMe;
+    const isLastInGroup = index === messages.length - 1 || 
+      (messages[index + 1]?.sender?.id !== recipientId) !== isFromMe;
 
     return (
       <View style={[
         styles.messageRow,
-        item.isFromMe ? styles.messageRowRight : styles.messageRowLeft
+        isFromMe ? styles.messageRowRight : styles.messageRowLeft
       ]}>
         {/* Avatar (left side for received messages) */}
-        {!item.isFromMe && (
+        {!isFromMe && (
           <View style={styles.avatarContainer}>
             {showAvatar ? (
               <Avatar
-                avatar={otherUser?.avatar ?? null}
-                userId={otherUser ? String(otherUser.id) : undefined}
-                name={otherUser?.name}
+                avatar={null}
+                userId={String(recipientId)}
+                name={'User'}
                 pixelSize={32}
               />
             ) : (
@@ -294,43 +182,26 @@ export default function MessageThreadScreen() {
         {/* Message bubble */}
         <View style={[
           styles.messageBubble,
-          item.isFromMe ? styles.messageBubbleRight : styles.messageBubbleLeft,
-          !showAvatar && (item.isFromMe ? styles.bubbleGroupRight : styles.bubbleGroupLeft),
+          isFromMe ? styles.messageBubbleRight : styles.messageBubbleLeft,
+          !showAvatar && (isFromMe ? styles.bubbleGroupRight : styles.bubbleGroupLeft),
         ]}>
-          {item.type === 'text' && (
-            <Text style={[
-              styles.messageText,
-              item.isFromMe ? styles.messageTextRight : styles.messageTextLeft
-            ]}>
-              {item.content}
-            </Text>
-          )}
-          
-          {item.type === 'image' && item.mediaUrl && (
-            <View>
-              <Image source={{ uri: item.mediaUrl }} style={styles.messageImage} />
-              {item.content && (
-                <Text style={[
-                  styles.messageText,
-                  item.isFromMe ? styles.messageTextRight : styles.messageTextLeft,
-                  { marginTop: 4 }
-                ]}>
-                  {item.content}
-                </Text>
-              )}
-            </View>
-          )}
+          <Text style={[
+            styles.messageText,
+            isFromMe ? styles.messageTextRight : styles.messageTextLeft
+          ]}>
+            {item.content}
+          </Text>
 
           {/* Time and read status */}
           {isLastInGroup && (
             <View style={styles.messageFooter}>
               <Text style={[
                 styles.messageTime,
-                item.isFromMe ? styles.messageTimeRight : styles.messageTimeLeft
+                isFromMe ? styles.messageTimeRight : styles.messageTimeLeft
               ]}>
-                {formatMessageTime(item.sentAt)}
+                {formatMessageTime(item.createdAt)}
               </Text>
-              {item.isFromMe && (
+              {isFromMe && (
                 <Ionicons 
                   name={item.isRead ? "checkmark-done" : "checkmark"} 
                   size={12} 
@@ -346,10 +217,14 @@ export default function MessageThreadScreen() {
   };
 
   const renderFooter = () => {
-    if (!loadingMore) return null;
+    if (!hasMore) return null;
     return (
       <View style={styles.loadingFooter}>
-        <ActivityIndicator size="small" color="#22c55e" />
+        <TouchableOpacity onPress={loadMore} disabled={loading}>
+          <Text style={styles.loadMoreText}>
+            {loading ? 'Đang tải...' : 'Tải tin nhắn cũ hơn'}
+          </Text>
+        </TouchableOpacity>
       </View>
     );
   };
@@ -357,16 +232,8 @@ export default function MessageThreadScreen() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#22c55e" />
+        <ActivityIndicator size="large" color="#0068FF" />
         <Text style={styles.loadingText}>Đang tải tin nhắn...</Text>
-      </View>
-    );
-  }
-
-  if (!otherUser) {
-    return (
-      <View style={styles.loadingContainer}>
-        <Text style={styles.errorText}>Không tìm thấy người dùng</Text>
       </View>
     );
   }
@@ -384,38 +251,49 @@ export default function MessageThreadScreen() {
           style={styles.backButton}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
-          <Ionicons name="arrow-back" size={24} color="#111" />
+          <Ionicons name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
         
-        <View style={styles.headerCenter}>
+        <TouchableOpacity 
+          style={styles.headerCenter}
+          onPress={() => router.push(`/profile/${recipientId}`)}
+          activeOpacity={0.8}
+        >
           <Avatar
-            avatar={otherUser.avatar}
-            userId={String(otherUser.id)}
-            name={otherUser.name}
+            avatar={null}
+            userId={String(recipientId)}
+            name={`User ${recipientId}`}
             pixelSize={36}
-            showBadge={otherUser.isOnline}
-            onlineStatus={otherUser.isOnline ? 'online' : undefined}
+            showBadge={connected}
           />
           <View style={styles.headerInfo}>
             <Text style={styles.headerName} numberOfLines={1}>
-              {otherUser.name}
+              User {recipientId}
             </Text>
             <Text style={styles.headerStatus}>
-              {otherUser.isOnline ? (
-                <Text style={{ color: '#22c55e' }}>● Đang online</Text>
+              {connected ? (
+                <Text style={{ color: '#7DD3FC' }}>● Đang online</Text>
               ) : (
-                formatLastSeen(otherUser.lastSeen)
+                'Offline'
               )}
             </Text>
           </View>
-        </View>
+        </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.headerButton}
-          onPress={() => router.push(`/call/video-call?userId=${otherUserId}` as any)}
+          onPress={() => router.push(`/call/${recipientId}?type=voice`)}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
-          <Ionicons name="videocam" size={24} color="#3b82f6" />
+          <Ionicons name="call" size={22} color="#fff" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.headerButton}
+          onPress={() => router.push(`/call/${recipientId}?type=video`)}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <Ionicons name="videocam" size={24} color="#fff" />
         </TouchableOpacity>
       </View>
 
@@ -427,9 +305,7 @@ export default function MessageThreadScreen() {
           renderItem={renderMessage}
           keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={styles.messagesList}
-          onEndReached={handleLoadMore}
-          onEndReachedThreshold={0.5}
-          ListFooterComponent={renderFooter}
+          ListHeaderComponent={renderFooter}
           inverted={false}
           onScroll={(e) => {
             // Track if user is at bottom
@@ -443,12 +319,6 @@ export default function MessageThreadScreen() {
             }
           }}
           scrollEventThrottle={100}
-          onContentSizeChange={() => {
-            // Auto-scroll to bottom on first load
-            if (offset === limit) {
-              flatListRef.current?.scrollToEnd({ animated: false });
-            }
-          }}
         />
         
         {/* New messages indicator */}
@@ -511,7 +381,7 @@ export default function MessageThreadScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#E8ECF1', // Zalo-like chat background
   },
   header: {
     flexDirection: 'row',
@@ -520,9 +390,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 48,
     paddingBottom: 12,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e5e5e5',
+    backgroundColor: '#0068FF', // Zalo blue header
+    borderBottomWidth: 0,
   },
   backButton: {
     width: 40,
@@ -542,7 +411,7 @@ const styles = StyleSheet.create({
     borderRadius: 18,
   },
   avatarPlaceholder: {
-    backgroundColor: '#f0f0f0',
+    backgroundColor: 'rgba(255,255,255,0.2)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -553,11 +422,11 @@ const styles = StyleSheet.create({
   headerName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#111',
+    color: '#fff', // White text on blue header
   },
   headerStatus: {
     fontSize: 12,
-    color: '#999',
+    color: 'rgba(255,255,255,0.8)', // Semi-transparent white
     marginTop: 2,
   },
   headerButton: {
@@ -605,7 +474,7 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 4,
   },
   messageBubbleRight: {
-    backgroundColor: '#22c55e',
+    backgroundColor: '#D5F1FF', // Zalo light blue for sent messages
     borderBottomRightRadius: 4,
   },
   bubbleGroupLeft: {
@@ -622,7 +491,7 @@ const styles = StyleSheet.create({
     color: '#111',
   },
   messageTextRight: {
-    color: '#fff',
+    color: '#111', // Dark text on light blue bubble
   },
   messageImage: {
     width: 200,
@@ -641,7 +510,7 @@ const styles = StyleSheet.create({
     color: '#999',
   },
   messageTimeRight: {
-    color: 'rgba(255, 255, 255, 0.8)',
+    color: '#666', // Darker for contrast on light blue
   },
   inputBar: {
     flexDirection: 'row',
@@ -672,7 +541,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#22c55e',
+    backgroundColor: '#0068FF', // Zalo blue send button
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 8,
@@ -684,7 +553,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#E8ECF1',
+  },
+  loadingIndicator: {
+    color: '#0068FF', // Use in component
   },
   loadingFooter: {
     paddingVertical: 20,
@@ -695,6 +567,11 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#999',
   },
+  loadMoreText: {
+    fontSize: 14,
+    color: '#0068FF', // Zalo blue
+    fontWeight: '500',
+  },
   errorText: {
     fontSize: 16,
     color: '#999',
@@ -703,7 +580,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 80,
     alignSelf: 'center',
-    backgroundColor: '#22c55e',
+    backgroundColor: '#0068FF', // Zalo blue
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,

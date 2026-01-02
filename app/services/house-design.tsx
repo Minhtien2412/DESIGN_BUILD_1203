@@ -185,7 +185,7 @@ export default function HouseDesignScreen() {
               style={styles.companyCard}
               onPress={() => {
                 // Navigate to company detail
-                router.push(`/services/company-detail?id=${company.id}` as any);
+                router.push(`/services/company-detail?id=${company.id}`);
               }}
             >
               {/* Company Image */}

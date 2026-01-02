@@ -21,6 +21,18 @@ const isFacebook = (u?: string) => !!u && /(facebook\.com|fb\.watch)/i.test(u);
  * - Keep muted autoplay for better compatibility.
  */
 export const VideoPlayer: React.FC<VideoPlayerProps> = ({ uri, asset, style, autoPlay = true, loop = true, muted = true }) => {
+  // Determine video source (string URL or asset number from require)
+  const videoSource = typeof asset === 'number' ? String(asset) : (uri || '');
+  
+  // Use expo-video hook - must be called unconditionally
+  const player = useVideoPlayer(videoSource || 'placeholder', (player) => {
+    player.loop = loop;
+    player.muted = muted;
+    if (autoPlay && videoSource) {
+      player.play();
+    }
+  });
+
   // Fallback for social links
   if (isYouTube(uri) || isFacebook(uri)) {
     return (
@@ -31,21 +43,9 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ uri, asset, style, aut
     );
   }
 
-  // Determine video source (string URL or asset number from require)
-  const videoSource = typeof asset === 'number' ? String(asset) : (uri || '');
-  
   if (!videoSource) {
     return <View style={[{ backgroundColor: '#111' }, style]} />;
   }
-
-  // Use expo-video hook
-  const player = useVideoPlayer(videoSource, (player) => {
-    player.loop = loop;
-    player.muted = muted;
-    if (autoPlay) {
-      player.play();
-    }
-  });
 
   return (
     <VideoView

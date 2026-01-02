@@ -5,19 +5,19 @@
 
 // Task priorities with weights
 export const TASK_PRIORITIES = {
-  critical: { weight: 4, color: '#F44336', label: 'Critical' },
+  critical: { weight: 4, color: '#1A1A1A', label: 'Critical' },
   high: { weight: 3, color: '#FF9800', label: 'High' },
-  medium: { weight: 2, color: '#2196F3', label: 'Medium' },
-  low: { weight: 1, color: '#4CAF50', label: 'Low' },
+  medium: { weight: 2, color: '#0A6847', label: 'Medium' },
+  low: { weight: 1, color: '#10B981', label: 'Low' },
 } as const;
 
 // Task statuses with colors
 export const TASK_STATUSES = {
   pending: { color: '#9E9E9E', label: 'Pending' },
   'in-progress': { color: '#FF9800', label: 'In Progress' },
-  review: { color: '#2196F3', label: 'Under Review' },
+  review: { color: '#0A6847', label: 'Under Review' },
   completed: { color: '#4CAF50', label: 'Completed' },
-  delayed: { color: '#F44336', label: 'Delayed' },
+  delayed: { color: '#1A1A1A', label: 'Delayed' },
   cancelled: { color: '#757575', label: 'Cancelled' },
 } as const;
 
@@ -25,32 +25,32 @@ export const TASK_STATUSES = {
 export const PAYMENT_STATUSES = {
   scheduled: { color: '#9E9E9E', label: 'Scheduled' },
   pending: { color: '#FF9800', label: 'Pending' },
-  processing: { color: '#2196F3', label: 'Processing' },
+  processing: { color: '#0A6847', label: 'Processing' },
   completed: { color: '#4CAF50', label: 'Completed' },
-  overdue: { color: '#F44336', label: 'Overdue' },
+  overdue: { color: '#1A1A1A', label: 'Overdue' },
   cancelled: { color: '#757575', label: 'Cancelled' },
 } as const;
 
 // Task categories
 export const TASK_CATEGORIES = {
-  foundation: { label: 'Foundation', icon: '🏗️', color: '#8D6E63' },
-  structure: { label: 'Structure', icon: '🏢', color: '#607D8B' },
+  foundation: { label: 'Foundation', icon: '🏗️', color: '#1A1A1A' },
+  structure: { label: 'Structure', icon: '🏢', color: '#1A1A1A' },
   roofing: { label: 'Roofing', icon: '🏠', color: '#795548' },
-  walls: { label: 'Walls', icon: '🧱', color: '#FF7043' },
-  electrical: { label: 'Electrical', icon: '⚡', color: '#FFC107' },
-  plumbing: { label: 'Plumbing', icon: '🚿', color: '#03A9F4' },
-  finishing: { label: 'Finishing', icon: '🎨', color: '#E91E63' },
-  landscaping: { label: 'Landscaping', icon: '🌿', color: '#4CAF50' },
+  walls: { label: 'Walls', icon: '🧱', color: '#0A6847' },
+  electrical: { label: 'Electrical', icon: '⚡', color: '#10B981' },
+  plumbing: { label: 'Plumbing', icon: '🚿', color: '#0A6847' },
+  finishing: { label: 'Finishing', icon: '🎨', color: '#0A6847' },
+  landscaping: { label: 'Landscaping', icon: '🌿', color: '#10B981' },
 } as const;
 
 // Payment categories
 export const PAYMENT_CATEGORIES = {
-  initial: { label: 'Initial Payment', percentage: 20, color: '#2196F3' },
-  foundation: { label: 'Foundation', percentage: 25, color: '#8D6E63' },
-  structure: { label: 'Structure', percentage: 25, color: '#607D8B' },
-  finishing: { label: 'Finishing', percentage: 20, color: '#E91E63' },
-  final: { label: 'Final Payment', percentage: 5, color: '#4CAF50' },
-  retention: { label: 'Retention', percentage: 5, color: '#FF9800' },
+  initial: { label: 'Initial Payment', percentage: 20, color: '#0A6847' },
+  foundation: { label: 'Foundation', percentage: 25, color: '#1A1A1A' },
+  structure: { label: 'Structure', percentage: 25, color: '#1A1A1A' },
+  finishing: { label: 'Finishing', percentage: 20, color: '#0A6847' },
+  final: { label: 'Final Payment', percentage: 5, color: '#10B981' },
+  retention: { label: 'Retention', percentage: 5, color: '#0A6847' },
 } as const;
 
 // User roles with permissions
@@ -58,27 +58,27 @@ export const USER_ROLES = {
   admin: {
     label: 'Administrator',
     permissions: ['all'],
-    color: '#F44336',
+    color: '#1A1A1A',
   },
   manager: {
     label: 'Project Manager',
     permissions: ['view_all', 'edit_tasks', 'approve_payments', 'manage_team'],
-    color: '#2196F3',
+    color: '#0A6847',
   },
   supervisor: {
     label: 'Supervisor',
     permissions: ['view_assigned', 'review_submissions', 'request_payments'],
-    color: '#FF9800',
+    color: '#0A6847',
   },
   contractor: {
     label: 'Contractor',
     permissions: ['view_assigned', 'submit_progress', 'view_payments'],
-    color: '#4CAF50',
+    color: '#10B981',
   },
   worker: {
     label: 'Worker',
     permissions: ['view_assigned', 'submit_progress'],
-    color: '#9C27B0',
+    color: '#0A6847',
   },
 } as const;
 

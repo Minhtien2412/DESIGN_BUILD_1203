@@ -29,6 +29,7 @@ export interface User {
 
 export interface AuthResponse {
   message: string;
+  success?: boolean; // Optional for compatibility with offline mock
   user: User;
   accessToken: string;
   refreshToken: string;
@@ -161,7 +162,7 @@ export async function updateProfile(data: {
 }): Promise<User> {
   console.log('[AuthAPI] Updating user profile');
   
-  const response = await post<{ user: User }>('/auth/profile', data);
+  const response = await post<{ user: User }>('/me', data);
   
   return response.user;
 }

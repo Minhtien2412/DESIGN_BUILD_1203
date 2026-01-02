@@ -1,0 +1,716 @@
+{
+  "totalRoutes": 98,
+  "passed": 98,
+  "failed": 0,
+  "totalErrors": 0,
+  "totalWarnings": 4,
+  "timestamp": "2025-12-22T07:39:32.619Z",
+  "results": [
+    {
+      "route": "/services/house-design",
+      "routeKey": "HOUSE_DESIGN",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/construction/progress",
+      "routeKey": "CONSTRUCTION_PROGRESS",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/(tabs)/projects",
+      "routeKey": "MY_PROJECTS",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/construction/tracking",
+      "routeKey": "TRACKING",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/materials/index",
+      "routeKey": "MATERIALS",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/labor/index",
+      "routeKey": "LABOR",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/utilities/quote-request",
+      "routeKey": "QUOTE_REQUEST",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/utilities/sitemap",
+      "routeKey": "SITEMAP",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/utilities/ep-coc",
+      "routeKey": "EP_COC",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/utilities/dao-dat",
+      "routeKey": "DAO_DAT",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/utilities/be-tong",
+      "routeKey": "BE_TONG",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/utilities/vat-lieu",
+      "routeKey": "VAT_LIEU",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/utilities/tho-xay",
+      "routeKey": "THO_XAY",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/utilities/tho-dien-nuoc",
+      "routeKey": "THO_DIEN_NUOC",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/utilities/tho-coffa",
+      "routeKey": "THO_COFFA",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/utilities/design-team",
+      "routeKey": "DESIGN_TEAM",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/timeline/index",
+      "routeKey": "TIMELINE",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/budget/index",
+      "routeKey": "BUDGET",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/quality-assurance/index",
+      "routeKey": "QUALITY_ASSURANCE",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/safety/index",
+      "routeKey": "SAFETY",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/documents/folders",
+      "routeKey": "DOCUMENTS",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/reports/index",
+      "routeKey": "REPORTS",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/rfi/index",
+      "routeKey": "RFI",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/submittal/index",
+      "routeKey": "SUBMITTAL",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/finishing/lat-gach",
+      "routeKey": "LAT_GACH",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/finishing/son",
+      "routeKey": "SON",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/finishing/da",
+      "routeKey": "DA",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/finishing/thach-cao",
+      "routeKey": "THACH_CAO",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/finishing/lam-cua",
+      "routeKey": "LAM_CUA",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/finishing/lan-can",
+      "routeKey": "LAN_CAN",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/finishing/camera",
+      "routeKey": "CAMERA",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/finishing/tho-tong-hop",
+      "routeKey": "THO_TONG_HOP",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/services/interior-design",
+      "routeKey": "INTERIOR_DESIGN",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/services/construction-company",
+      "routeKey": "CONSTRUCTION_COMPANY",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/services/quality-supervision",
+      "routeKey": "QUALITY_SUPERVISION",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/services/feng-shui",
+      "routeKey": "FENG_SHUI",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/utilities/cost-estimator",
+      "routeKey": "COST_ESTIMATOR",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/utilities/my-qr-code",
+      "routeKey": "MY_QR_CODE",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/construction/map-view",
+      "routeKey": "MAP_VIEW",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/utilities/store-locator",
+      "routeKey": "STORE_LOCATOR",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/ai",
+      "routeKey": "AI_HUB",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/(tabs)/live",
+      "routeKey": "LIVE_STREAM",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/videos/index",
+      "routeKey": "VIDEOS",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/messages/index",
+      "routeKey": "MESSAGES",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/shopping/index?cat=construction",
+      "routeKey": "CONSTRUCTION_MATERIALS",
+      "passed": true,
+      "errors": [],
+      "warnings": [
+        {
+          "rule": "kebab-case",
+          "message": "Route segments should use kebab-case (lowercase with hyphens)"
+        }
+      ]
+    },
+    {
+      "route": "/shopping/index?cat=electrical",
+      "routeKey": "ELECTRICAL_EQUIPMENT",
+      "passed": true,
+      "errors": [],
+      "warnings": [
+        {
+          "rule": "kebab-case",
+          "message": "Route segments should use kebab-case (lowercase with hyphens)"
+        }
+      ]
+    },
+    {
+      "route": "/shopping/index?cat=furniture",
+      "routeKey": "FURNITURE",
+      "passed": true,
+      "errors": [],
+      "warnings": [
+        {
+          "rule": "kebab-case",
+          "message": "Route segments should use kebab-case (lowercase with hyphens)"
+        }
+      ]
+    },
+    {
+      "route": "/shopping/index?cat=paint",
+      "routeKey": "PAINT_COLORS",
+      "passed": true,
+      "errors": [],
+      "warnings": [
+        {
+          "rule": "kebab-case",
+          "message": "Route segments should use kebab-case (lowercase with hyphens)"
+        }
+      ]
+    },
+    {
+      "route": "/shopping/index",
+      "routeKey": "SHOPPING_INDEX",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/cart",
+      "routeKey": "CART",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/construction/booking",
+      "routeKey": "BOOKING",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/call/active",
+      "routeKey": "VIDEO_CALL",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/(tabs)/notifications",
+      "routeKey": "NOTIFICATIONS",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/analytics",
+      "routeKey": "ANALYTICS",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/contracts/index",
+      "routeKey": "CONTRACTS",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/weather/dashboard",
+      "routeKey": "WEATHER_DASHBOARD",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/weather/index",
+      "routeKey": "WEATHER_INDEX",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/fleet/index",
+      "routeKey": "FLEET",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/food/index",
+      "routeKey": "FOOD",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/inspection/index",
+      "routeKey": "INSPECTION",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/warranty/index",
+      "routeKey": "WARRANTY",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/risk/index",
+      "routeKey": "RISK_MANAGEMENT",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/legal/index",
+      "routeKey": "LEGAL",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/(tabs)/index",
+      "routeKey": "HOME",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/(tabs)/projects",
+      "routeKey": "PROJECTS_TAB",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/(tabs)/notifications",
+      "routeKey": "NOTIFICATIONS_TAB",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/(tabs)/profile",
+      "routeKey": "PROFILE",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/(tabs)/live",
+      "routeKey": "LIVE_TAB",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/search",
+      "routeKey": "SEARCH",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/checkout",
+      "routeKey": "CHECKOUT",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/profile/menu",
+      "routeKey": "PROFILE_MENU",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/(auth)/login",
+      "routeKey": "AUTH_LOGIN",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/(auth)/register",
+      "routeKey": "AUTH_REGISTER",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/(auth)/forgot-password",
+      "routeKey": "AUTH_FORGOT_PASSWORD",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/(auth)/reset-password",
+      "routeKey": "AUTH_RESET_PASSWORD",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/projects/create",
+      "routeKey": "PROJECTS_CREATE",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/projects",
+      "routeKey": "PROJECTS_INDEX",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/live/create",
+      "routeKey": "LIVE_CREATE",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/profile/settings",
+      "routeKey": "PROFILE_SETTINGS",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/profile/edit",
+      "routeKey": "PROFILE_EDIT",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/profile/rewards",
+      "routeKey": "PROFILE_REWARDS",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/profile/info",
+      "routeKey": "PROFILE_INFO",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/profile/privacy",
+      "routeKey": "PROFILE_PRIVACY",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/profile/security",
+      "routeKey": "PROFILE_SECURITY",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/profile/portfolio",
+      "routeKey": "PROFILE_PORTFOLIO",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/profile/cloud",
+      "routeKey": "PROFILE_CLOUD",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/profile/payment",
+      "routeKey": "PROFILE_PAYMENT",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/profile/addresses",
+      "routeKey": "PROFILE_ADDRESSES",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/profile/orders",
+      "routeKey": "PROFILE_ORDERS",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/profile/favorites",
+      "routeKey": "PROFILE_FAVORITES",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/profile/reviews",
+      "routeKey": "PROFILE_REVIEWS",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/profile/help",
+      "routeKey": "PROFILE_HELP",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/admin/dashboard",
+      "routeKey": "ADMIN_DASHBOARD",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/admin/settings",
+      "routeKey": "ADMIN_SETTINGS",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/admin/staff",
+      "routeKey": "ADMIN_STAFF",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/admin/roles",
+      "routeKey": "ADMIN_ROLES",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/legal/terms",
+      "routeKey": "LEGAL_TERMS",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "route": "/legal/privacy-policy",
+      "routeKey": "LEGAL_PRIVACY",
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    }
+  ]
+}

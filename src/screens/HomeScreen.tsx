@@ -7,11 +7,11 @@ const HomeScreen = () => {
   const { user } = useAuthStore();
 
   const menuItems = [
-    { title: 'Dự án mới', icon: 'add-circle', color: '#4CAF50' },
-    { title: 'Quản lý dự án', icon: 'folder', color: '#2196F3' },
-    { title: 'Báo cáo', icon: 'bar-chart', color: '#FF9800' },
-    { title: 'Tài chính', icon: 'card', color: '#9C27B0' },
-    { title: 'Nhân sự', icon: 'people', color: '#607D8B' },
+    { title: 'Dự án mới', icon: 'add-circle', color: '#10B981' },
+    { title: 'Quản lý dự án', icon: 'folder', color: '#0A6847' },
+    { title: 'Báo cáo', icon: 'bar-chart', color: '#10B981' },
+    { title: 'Tài chính', icon: 'card', color: '#0A6847' },
+    { title: 'Nhân sự', icon: 'people', color: '#0A6847' },
     { title: 'Kho vật tư', icon: 'cube', color: '#795548' },
   ];
 

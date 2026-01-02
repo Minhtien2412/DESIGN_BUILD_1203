@@ -2,7 +2,7 @@ import { ThemedView } from '@/components/themed-view';
 import { useAuth } from '@/features/auth';
 import { ApiError, apiFetch } from '@/services/api';
 import { Ionicons } from '@expo/vector-icons';
-import { Stack, router } from 'expo-router';
+import { Href, Stack, router } from 'expo-router';
 import * as React from 'react';
 import {
     Alert,
@@ -431,7 +431,7 @@ export default function PrivacyScreen() {
           </View>
           <Text style={styles.infoText}>
             Chúng tôi cam kết bảo vệ quyền riêng tư và dữ liệu cá nhân của bạn. 
-            Đọc thêm tại <Text style={styles.linkText} onPress={() => router.push('/legal/privacy' as any)}>Chính sách bảo mật</Text>.
+            Đọc thêm tại <Text style={styles.linkText} onPress={() => router.push('/legal/privacy' as Href)}>Chính sách bảo mật</Text>.
           </Text>
         </View>
       </ScrollView>

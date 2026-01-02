@@ -7,6 +7,20 @@ export type Category = {
   icon: ComponentProps<typeof MaterialIcons>['name'];
   color: string;
   description?: string;
+  // Extended properties for CategoryInfoCard
+  trending?: boolean;
+  itemCount?: number;
+  metadata?: {
+    averageRating?: number;
+    [key: string]: unknown;
+  };
+  popularity?: number;
+  tags?: string[];
+  priceRange?: {
+    min: number;
+    max: number;
+  };
+  subcategories?: string[];
 };
 
 export const CATEGORIES: readonly Category[] = [

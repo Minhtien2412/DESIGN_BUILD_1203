@@ -97,8 +97,7 @@ const FullscreenVideoPlayer: React.FC<FullscreenVideoPlayerProps> = ({
         {showControls && (
           <LinearGradient
             colors={['rgba(0,0,0,0.6)', 'transparent', 'rgba(0,0,0,0.6)']}
-            style={styles.controlsOverlay}
-            pointerEvents="box-none"
+            style={[styles.controlsOverlay, { pointerEvents: 'box-none' }]}
           >
             <SafeAreaView style={styles.safeArea}>
               {/* Top Controls */}

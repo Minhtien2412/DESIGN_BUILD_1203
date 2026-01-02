@@ -6,6 +6,7 @@
 
 import socketManager, { ChatMessage, Notification, ProjectUpdate, TypingIndicator } from '@/services/socket';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { Platform } from 'react-native';
 import io from 'socket.io-client';
 
 // Extract Socket type from io return type
@@ -42,6 +43,12 @@ export function useSocket(): UseSocketReturn {
   const [connected, setConnected] = useState(false);
 
   const connect = useCallback(async () => {
+    // Disable socket on web platform
+    if (Platform.OS === 'web') {
+      console.log('[useSocket] Socket disabled on web platform');
+      return;
+    }
+
     try {
       const socketInstance = await socketManager.connect();
       setSocket(socketInstance);
@@ -58,6 +65,11 @@ export function useSocket(): UseSocketReturn {
   }, []);
 
   useEffect(() => {
+    // Skip socket connection on web
+    if (Platform.OS === 'web') {
+      return;
+    }
+
     // Auto-connect on mount
     connect();
 
@@ -213,7 +225,8 @@ export function useNotifications(): UseNotificationsReturn {
 
   // Listen for new notifications
   useEffect(() => {
-    if (!connected) return;
+    // Skip on web or if not connected
+    if (Platform.OS === 'web' || !connected) return;
 
     const handleNotification = (notification: Notification) => {
       setNotifications(prev => [notification, ...prev]);

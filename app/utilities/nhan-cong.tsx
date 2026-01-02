@@ -1,11 +1,13 @@
 import { Colors } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
-import { Stack } from 'expo-router';
-import React, { useState } from 'react';
+import { router, Stack } from 'expo-router';
+import React, { useEffect, useState } from 'react';
 import {
+    ActivityIndicator,
     Alert,
     Image,
     Modal,
+    RefreshControl,
     ScrollView,
     StyleSheet,
     Text,
@@ -14,93 +16,24 @@ import {
     View,
 } from 'react-native';
 
-// Mock data - Labor/Workers
-const WORKERS = [
-  {
-    id: 1,
-    name: 'Nguyễn Văn Hùng',
-    avatar: 'https://i.pravatar.cc/150?img=12',
-    rating: 4.8,
-    reviews: 145,
-    location: 'TP.HCM',
-    experience: 15,
-    price: '450.000₫',
-    priceUnit: '/ ngày',
-    skills: ['Xây tường', 'Đổ móng', 'Xây cột'],
-    languages: ['Tiếng Việt'],
-    completedProjects: 180,
-    featured: true,
-    availability: 'Sẵn sàng',
-    phone: '090 123 4567',
-    teamSize: 'Có đội 5 người',
-  },
-  {
-    id: 2,
-    name: 'Trần Văn Nam',
-    avatar: 'https://i.pravatar.cc/150?img=33',
-    rating: 4.7,
-    reviews: 128,
-    location: 'Hà Nội',
-    experience: 12,
-    price: '400.000₫',
-    priceUnit: '/ ngày',
-    skills: ['Xây nhà phố', 'Sửa chữa', 'Tô trát'],
-    languages: ['Tiếng Việt'],
-    completedProjects: 150,
-    featured: false,
-    availability: 'Sẵn sàng',
-    phone: '091 234 5678',
-    teamSize: 'Có đội 3 người',
-  },
-  {
-    id: 3,
-    name: 'Lê Văn Thành',
-    avatar: 'https://i.pravatar.cc/150?img=51',
-    rating: 4.9,
-    reviews: 167,
-    location: 'Đà Nẵng',
-    experience: 18,
-    price: '500.000₫',
-    priceUnit: '/ ngày',
-    skills: ['Xây biệt thự', 'Xây nhà cao tầng', 'Chống thấm'],
-    languages: ['Tiếng Việt', 'English'],
-    completedProjects: 220,
-    featured: true,
-    availability: 'Bận (khả dụng từ 15/11)',
-    phone: '092 345 6789',
-    teamSize: 'Có đội 8 người',
-  },
-  {
-    id: 4,
-    name: 'Phạm Văn Đức',
-    avatar: 'https://i.pravatar.cc/150?img=68',
-    rating: 4.6,
-    reviews: 98,
-    location: 'Cần Thơ',
-    experience: 10,
-    price: '380.000₫',
-    priceUnit: '/ ngày',
-    skills: ['Xây nhà cấp 4', 'Tô tường', 'Làm hàng rào'],
-    languages: ['Tiếng Việt'],
-    completedProjects: 110,
-    featured: false,
-    availability: 'Sẵn sàng',
-    phone: '093 456 7890',
-    teamSize: 'Làm đơn lẻ',
-  },
-];
+import { useLaborProviders } from '@/hooks/useLaborProviders';
+import { LaborProvider } from '@/services/api/labor.service';
 
 const LOCATIONS = ['Tất cả', 'TP.HCM', 'Hà Nội', 'Đà Nẵng', 'Cần Thơ', 'Khác'];
 const SKILLS = ['Tất cả', 'Xây tường', 'Đổ móng', 'Xây cột', 'Tô trát', 'Chống thấm'];
 
 interface WorkerCardProps {
-  worker: any;
+  worker: LaborProvider;
   onBooking: () => void;
+  onPress: () => void;
 }
 
-const WorkerCard: React.FC<WorkerCardProps> = ({ worker, onBooking }) => {
+const WorkerCard: React.FC<WorkerCardProps> = ({ worker, onBooking, onPress }) => {
+  const availabilityText = worker.availability === 'available' ? 'Sẵn sàng' : worker.availability === 'busy' ? 'Đang bận' : 'Không khả dụng';
+  const priceDisplay = `${worker.priceRange.min.toLocaleString('vi-VN')}₫`;
+  
   return (
-    <TouchableOpacity style={styles.workerCard} activeOpacity={0.8}>
+    <TouchableOpacity style={styles.workerCard} activeOpacity={0.8} onPress={onPress}>
       {worker.featured && (
         <View style={styles.featuredBadge}>
           <Ionicons name="star" size={12} color="#fff" />
@@ -117,15 +50,15 @@ const WorkerCard: React.FC<WorkerCardProps> = ({ worker, onBooking }) => {
           <View style={styles.ratingRow}>
             <Ionicons name="star" size={14} color="#ffa41c" />
             <Text style={styles.ratingText}>{worker.rating}</Text>
-            <Text style={styles.reviewsText}>({worker.reviews})</Text>
+            <Text style={styles.reviewsText}>({worker.reviewCount})</Text>
           </View>
 
           <View style={styles.locationRow}>
             <Ionicons name="location" size={12} color="#999" />
-            <Text style={styles.locationText}>{worker.location}</Text>
+            <Text style={styles.locationText}>{worker.city}</Text>
             <View style={styles.divider} />
             <Ionicons name="briefcase" size={12} color="#999" />
-            <Text style={styles.experienceText}>{worker.experience} năm</Text>
+            <Text style={styles.experienceText}>{worker.yearExperience} năm</Text>
           </View>
         </View>
       </View>
@@ -133,7 +66,7 @@ const WorkerCard: React.FC<WorkerCardProps> = ({ worker, onBooking }) => {
       <View style={styles.skillsSection}>
         <Text style={styles.skillsLabel}>Kỹ năng:</Text>
         <View style={styles.skillsTags}>
-          {worker.skills.map((skill: string, index: number) => (
+          {worker.services.map((skill: string, index: number) => (
             <View key={index} style={styles.skillTag}>
               <Text style={styles.skillText}>{skill}</Text>
             </View>
@@ -143,12 +76,12 @@ const WorkerCard: React.FC<WorkerCardProps> = ({ worker, onBooking }) => {
 
       <View style={styles.teamRow}>
         <Ionicons name="people" size={16} color="#2196f3" />
-        <Text style={styles.teamText}>{worker.teamSize}</Text>
+        <Text style={styles.teamText}>{worker.verified ? 'Đội chuyên nghiệp' : 'Làm việc đơn lẻ'}</Text>
       </View>
 
       <View style={styles.statsSection}>
         <View style={styles.statItem}>
-          <Text style={styles.statValue}>{worker.completedProjects}+</Text>
+          <Text style={styles.statValue}>{worker.projectCount}+</Text>
           <Text style={styles.statLabel}>Dự án</Text>
         </View>
         <View style={styles.statDivider} />
@@ -156,10 +89,10 @@ const WorkerCard: React.FC<WorkerCardProps> = ({ worker, onBooking }) => {
           <Text
             style={[
               styles.statValue,
-              worker.availability === 'Sẵn sàng' ? styles.available : styles.busy,
+              worker.availability === 'available' ? styles.available : styles.busy,
             ]}
           >
-            {worker.availability}
+            {availabilityText}
           </Text>
           <Text style={styles.statLabel}>Tình trạng</Text>
         </View>
@@ -167,8 +100,8 @@ const WorkerCard: React.FC<WorkerCardProps> = ({ worker, onBooking }) => {
 
       <View style={styles.priceRow}>
         <View>
-          <Text style={styles.price}>{worker.price}</Text>
-          <Text style={styles.priceUnit}>{worker.priceUnit}</Text>
+          <Text style={styles.price}>{priceDisplay}</Text>
+          <Text style={styles.priceUnit}>/ {worker.priceRange.unit}</Text>
         </View>
         
         <TouchableOpacity style={styles.bookButton} onPress={onBooking}>
@@ -181,10 +114,12 @@ const WorkerCard: React.FC<WorkerCardProps> = ({ worker, onBooking }) => {
 };
 
 export default function NhanCongScreen() {
+  const { providers, loading, refreshing, refresh, searchProviders } = useLaborProviders({ type: 'nhan-cong' });
+  
   const [selectedLocation, setSelectedLocation] = useState('Tất cả');
   const [selectedSkill, setSelectedSkill] = useState('Tất cả');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedWorker, setSelectedWorker] = useState<any>(null);
+  const [selectedWorker, setSelectedWorker] = useState<LaborProvider | null>(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [bookingData, setBookingData] = useState({
     name: '',
@@ -196,19 +131,29 @@ export default function NhanCongScreen() {
     notes: '',
   });
 
-  const filteredWorkers = WORKERS.filter((worker) => {
+  const filteredWorkers = providers.filter((worker) => {
     const matchLocation =
-      selectedLocation === 'Tất cả' || worker.location === selectedLocation;
+      selectedLocation === 'Tất cả' || worker.city === selectedLocation || worker.address.includes(selectedLocation);
     const matchSkill =
       selectedSkill === 'Tất cả' ||
-      worker.skills.some((s: string) => s.includes(selectedSkill));
+      worker.services.some((s: string) => s.includes(selectedSkill));
     const matchSearch =
       searchQuery === '' ||
       worker.name.toLowerCase().includes(searchQuery.toLowerCase());
     return matchLocation && matchSkill && matchSearch;
   });
 
-  const handleBooking = (worker: any) => {
+  // Handle search with debounce
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchQuery.length > 2) {
+        searchProviders(searchQuery);
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery, searchProviders]);
+
+  const handleBooking = (worker: LaborProvider) => {
     setSelectedWorker(worker);
     setShowBookingModal(true);
   };
@@ -221,7 +166,7 @@ export default function NhanCongScreen() {
 
     Alert.alert(
       'Gửi yêu cầu thành công',
-      `Chúng tôi sẽ kết nối bạn với thợ trong vòng 1h.\n\nThợ: ${selectedWorker.name}`,
+      `Chúng tôi sẽ kết nối bạn với thợ trong vòng 1h.\n\nThợ: ${selectedWorker?.name}`,
       [
         {
           text: 'OK',
@@ -317,16 +262,31 @@ export default function NhanCongScreen() {
           <Text style={styles.resultsText}>{filteredWorkers.length} thợ</Text>
         </View>
 
+        {loading && !refreshing ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={Colors.light.primary} />
+            <Text style={styles.loadingText}>Đang tải danh sách thợ...</Text>
+          </View>
+        ) : (
         <ScrollView
           style={styles.content}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.listContainer}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={refresh}
+              colors={[Colors.light.primary]}
+              tintColor={Colors.light.primary}
+            />
+          }
         >
           {filteredWorkers.map((worker) => (
             <WorkerCard
               key={worker.id}
               worker={worker}
               onBooking={() => handleBooking(worker)}
+              onPress={() => router.push(`/utilities/team-detail?id=${worker.id}&type=nhan-cong`)}
             />
           ))}
 
@@ -339,6 +299,7 @@ export default function NhanCongScreen() {
 
           <View style={{ height: 20 }} />
         </ScrollView>
+        )}
 
         <View style={styles.infoBanner}>
           <Ionicons name="shield-checkmark" size={16} color="#4caf50" />
@@ -372,7 +333,7 @@ export default function NhanCongScreen() {
                     <View style={styles.selectedRating}>
                       <Ionicons name="star" size={14} color="#ffa41c" />
                       <Text style={styles.selectedRatingText}>
-                        {selectedWorker.rating} ({selectedWorker.reviews})
+                        {selectedWorker.rating} ({selectedWorker.reviewCount})
                       </Text>
                     </View>
                   </View>
@@ -532,6 +493,8 @@ const styles = StyleSheet.create({
   bookButtonText: { fontSize: 14, fontWeight: '600', color: '#fff' },
   emptyState: { alignItems: 'center', justifyContent: 'center', paddingVertical: 60 },
   emptyText: { fontSize: 15, color: '#999', marginTop: 16 },
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: 60 },
+  loadingText: { marginTop: 12, fontSize: 14, color: '#666' },
   infoBanner: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#f1f8e9', paddingHorizontal: 16, paddingVertical: 10, gap: 8 },
   infoBannerText: { fontSize: 12, color: '#4caf50', flex: 1 },
   bookingModalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },

@@ -1,11 +1,13 @@
 import { Colors } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { Stack } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
+    ActivityIndicator,
     Alert,
     Image,
     Modal,
+    RefreshControl,
     ScrollView,
     StyleSheet,
     Text,
@@ -14,102 +16,8 @@ import {
     View
 } from 'react-native';
 
-// Mock data - Pile Driving Providers
-const PROVIDERS = [
-  {
-    id: 1,
-    name: 'Công ty Ép Cọc Miền Nam',
-    avatar: 'https://via.placeholder.com/100x100/ee4d2d/ffffff?text=MIEN+NAM',
-    rating: 4.8,
-    reviews: 156,
-    location: 'TP.HCM',
-    experience: 15,
-    price: '850.000₫',
-    priceUnit: '/ cây',
-    pileTypes: ['D250', 'D300', 'D350', 'D400'],
-    equipment: ['Máy ép 60 tấn', 'Máy ép 80 tấn'],
-    completedProjects: 280,
-    featured: true,
-    availability: 'Sẵn sàng',
-    phone: '028 3850 1234',
-    services: [
-      { id: 1, name: 'Ép cọc D250', price: '650.000₫', unit: '/ cây' },
-      { id: 2, name: 'Ép cọc D300', price: '850.000₫', unit: '/ cây' },
-      { id: 3, name: 'Ép cọc D350', price: '1.200.000₫', unit: '/ cây' },
-      { id: 4, name: 'Ép cọc D400', price: '1.500.000₫', unit: '/ cây' },
-    ],
-    description: 'Chuyên ép cọc bê tông ly tâm cho công trình dân dụng và công nghiệp. Đội ngũ kỹ thuật viên giàu kinh nghiệm, thiết bị hiện đại.',
-  },
-  {
-    id: 2,
-    name: 'Ép Cọc Thành Đạt',
-    avatar: 'https://via.placeholder.com/100x100/4caf50/ffffff?text=TD',
-    rating: 4.6,
-    reviews: 98,
-    location: 'Hà Nội',
-    experience: 12,
-    price: '800.000₫',
-    priceUnit: '/ cây',
-    pileTypes: ['D250', 'D300', 'D350'],
-    equipment: ['Máy ép 60 tấn', 'Máy ép 100 tấn'],
-    completedProjects: 200,
-    featured: false,
-    availability: 'Sẵn sàng',
-    phone: '024 3974 5678',
-    services: [
-      { id: 1, name: 'Ép cọc D250', price: '600.000₫', unit: '/ cây' },
-      { id: 2, name: 'Ép cọc D300', price: '800.000₫', unit: '/ cây' },
-      { id: 3, name: 'Ép cọc D350', price: '1.100.000₫', unit: '/ cây' },
-    ],
-    description: 'Thi công ép cọc nhanh chóng, an toàn. Cam kết chất lượng, bảo hành dài hạn.',
-  },
-  {
-    id: 3,
-    name: 'Xây Dựng Hòa Bình',
-    avatar: 'https://via.placeholder.com/100x100/2196f3/ffffff?text=HB',
-    rating: 4.9,
-    reviews: 215,
-    location: 'Đà Nẵng',
-    experience: 18,
-    price: '900.000₫',
-    priceUnit: '/ cây',
-    pileTypes: ['D250', 'D300', 'D350', 'D400', 'D450'],
-    equipment: ['Máy ép 80 tấn', 'Máy ép 120 tấn'],
-    completedProjects: 350,
-    featured: true,
-    availability: 'Bận (khả dụng từ 15/11)',
-    phone: '0236 3850 9012',
-    services: [
-      { id: 1, name: 'Ép cọc D250', price: '700.000₫', unit: '/ cây' },
-      { id: 2, name: 'Ép cọc D300', price: '900.000₫', unit: '/ cây' },
-      { id: 3, name: 'Ép cọc D350', price: '1.250.000₫', unit: '/ cây' },
-      { id: 4, name: 'Ép cọc D400', price: '1.600.000₫', unit: '/ cây' },
-    ],
-    description: 'Đơn vị hàng đầu miền Trung, chuyên ép cọc các công trình lớn. Có đầy đủ giấy phép và chứng chỉ.',
-  },
-  {
-    id: 4,
-    name: 'Ép Cọc Việt Tín',
-    avatar: 'https://via.placeholder.com/100x100/ff9800/ffffff?text=VT',
-    rating: 4.5,
-    reviews: 87,
-    location: 'Cần Thơ',
-    experience: 10,
-    price: '750.000₫',
-    priceUnit: '/ cây',
-    pileTypes: ['D250', 'D300'],
-    equipment: ['Máy ép 60 tấn'],
-    completedProjects: 150,
-    featured: false,
-    availability: 'Sẵn sàng',
-    phone: '0292 3850 3456',
-    services: [
-      { id: 1, name: 'Ép cọc D250', price: '580.000₫', unit: '/ cây' },
-      { id: 2, name: 'Ép cọc D300', price: '750.000₫', unit: '/ cây' },
-    ],
-    description: 'Dịch vụ ép cọc cho nhà ở riêng lẻ, nhà phố. Giá cả hợp lý, thi công nhanh.',
-  },
-];
+import { useLaborProviders } from '@/hooks/useLaborProviders';
+import { LaborProvider } from '@/services/api/labor.service';
 
 const LOCATIONS = ['Tất cả', 'TP.HCM', 'Hà Nội', 'Đà Nẵng', 'Cần Thơ', 'Khác'];
 const PILE_TYPES = ['Tất cả', 'D250', 'D300', 'D350', 'D400', 'D450'];
@@ -122,12 +30,20 @@ const SORT_OPTIONS = [
 ];
 
 interface ProviderCardProps {
-  provider: any;
+  provider: LaborProvider;
   onPress: () => void;
   onBooking: () => void;
 }
 
 const ProviderCard: React.FC<ProviderCardProps> = ({ provider, onPress, onBooking }) => {
+  const availabilityText = provider.availability === 'available' ? 'Sẵn sàng' : provider.availability === 'busy' ? 'Đang bận' : 'Không khả dụng';
+  const priceDisplay = `${provider.priceRange.min.toLocaleString('vi-VN')}₫`;
+  // Extract pile types from services (e.g., "Ép cọc D250" -> "D250")
+  const pileTypes = provider.services.filter(s => s.includes('D')).map(s => {
+    const match = s.match(/D\d+/);
+    return match ? match[0] : s;
+  });
+  
   return (
     <TouchableOpacity
       style={styles.providerCard}
@@ -150,15 +66,15 @@ const ProviderCard: React.FC<ProviderCardProps> = ({ provider, onPress, onBookin
           <View style={styles.ratingRow}>
             <Ionicons name="star" size={14} color="#ffa41c" />
             <Text style={styles.ratingText}>{provider.rating}</Text>
-            <Text style={styles.reviewsText}>({provider.reviews})</Text>
+            <Text style={styles.reviewsText}>({provider.reviewCount})</Text>
           </View>
 
           <View style={styles.locationRow}>
             <Ionicons name="location" size={12} color="#999" />
-            <Text style={styles.locationText}>{provider.location}</Text>
+            <Text style={styles.locationText}>{provider.city}</Text>
             <View style={styles.divider} />
             <Ionicons name="briefcase" size={12} color="#999" />
-            <Text style={styles.experienceText}>{provider.experience} năm</Text>
+            <Text style={styles.experienceText}>{provider.yearExperience} năm</Text>
           </View>
         </View>
       </View>
@@ -167,19 +83,19 @@ const ProviderCard: React.FC<ProviderCardProps> = ({ provider, onPress, onBookin
         <View style={styles.infoRow}>
           <Ionicons name="construct" size={16} color="#2196f3" />
           <Text style={styles.infoLabel}>Loại cọc: </Text>
-          <Text style={styles.infoValue}>{provider.pileTypes.join(', ')}</Text>
+          <Text style={styles.infoValue}>{pileTypes.length > 0 ? pileTypes.join(', ') : provider.services.slice(0, 3).join(', ')}</Text>
         </View>
         
         <View style={styles.infoRow}>
           <Ionicons name="hardware-chip" size={16} color="#4caf50" />
-          <Text style={styles.infoLabel}>Thiết bị: </Text>
-          <Text style={styles.infoValue}>{provider.equipment.join(', ')}</Text>
+          <Text style={styles.infoLabel}>Dịch vụ: </Text>
+          <Text style={styles.infoValue}>{provider.services.slice(0, 2).join(', ')}</Text>
         </View>
       </View>
 
       <View style={styles.statsSection}>
         <View style={styles.statItem}>
-          <Text style={styles.statValue}>{provider.completedProjects}+</Text>
+          <Text style={styles.statValue}>{provider.projectCount}+</Text>
           <Text style={styles.statLabel}>Dự án</Text>
         </View>
         <View style={styles.statDivider} />
@@ -187,10 +103,10 @@ const ProviderCard: React.FC<ProviderCardProps> = ({ provider, onPress, onBookin
           <Text
             style={[
               styles.statValue,
-              provider.availability === 'Sẵn sàng' ? styles.available : styles.busy,
+              provider.availability === 'available' ? styles.available : styles.busy,
             ]}
           >
-            {provider.availability}
+            {availabilityText}
           </Text>
           <Text style={styles.statLabel}>Tình trạng</Text>
         </View>
@@ -199,8 +115,8 @@ const ProviderCard: React.FC<ProviderCardProps> = ({ provider, onPress, onBookin
       <View style={styles.priceRow}>
         <View>
           <Text style={styles.priceLabel}>Từ</Text>
-          <Text style={styles.price}>{provider.price}</Text>
-          <Text style={styles.priceUnit}>{provider.priceUnit}</Text>
+          <Text style={styles.price}>{priceDisplay}</Text>
+          <Text style={styles.priceUnit}>/ {provider.priceRange.unit}</Text>
         </View>
         
         <TouchableOpacity
@@ -216,12 +132,14 @@ const ProviderCard: React.FC<ProviderCardProps> = ({ provider, onPress, onBookin
 };
 
 export default function EpCocScreen() {
+  const { providers, loading, refreshing, refresh, searchProviders } = useLaborProviders({ type: 'ep-coc' });
+  
   const [selectedLocation, setSelectedLocation] = useState('Tất cả');
   const [selectedPileType, setSelectedPileType] = useState('Tất cả');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('featured');
   const [showSortModal, setShowSortModal] = useState(false);
-  const [selectedProvider, setSelectedProvider] = useState<any>(null);
+  const [selectedProvider, setSelectedProvider] = useState<LaborProvider | null>(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [bookingData, setBookingData] = useState({
     name: '',
@@ -233,12 +151,12 @@ export default function EpCocScreen() {
     notes: '',
   });
 
-  const filteredProviders = PROVIDERS.filter((provider) => {
+  const filteredProviders = providers.filter((provider) => {
     const matchLocation =
-      selectedLocation === 'Tất cả' || provider.location === selectedLocation;
+      selectedLocation === 'Tất cả' || provider.city === selectedLocation || provider.address.includes(selectedLocation);
     const matchPileType =
       selectedPileType === 'Tất cả' ||
-      provider.pileTypes.includes(selectedPileType);
+      provider.services.some(s => s.includes(selectedPileType));
     const matchSearch =
       searchQuery === '' ||
       provider.name.toLowerCase().includes(searchQuery.toLowerCase());
@@ -251,17 +169,27 @@ export default function EpCocScreen() {
       case 'rating':
         return b.rating - a.rating;
       case 'price_asc':
-        return parseInt(a.price.replace(/\D/g, '')) - parseInt(b.price.replace(/\D/g, ''));
+        return a.priceRange.min - b.priceRange.min;
       case 'price_desc':
-        return parseInt(b.price.replace(/\D/g, '')) - parseInt(a.price.replace(/\D/g, ''));
+        return b.priceRange.min - a.priceRange.min;
       case 'experience':
-        return b.experience - a.experience;
+        return b.yearExperience - a.yearExperience;
       default:
         return 0;
     }
   });
 
-  const handleBooking = (provider: any) => {
+  // Handle search with debounce
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchQuery.length > 2) {
+        searchProviders(searchQuery);
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery, searchProviders]);
+
+  const handleBooking = (provider: LaborProvider) => {
     setSelectedProvider(provider);
     setShowBookingModal(true);
   };
@@ -274,7 +202,7 @@ export default function EpCocScreen() {
 
     Alert.alert(
       'Đặt dịch vụ thành công',
-      `Chúng tôi sẽ liên hệ với bạn trong vòng 2h.\n\nNhà cung cấp: ${selectedProvider.name}`,
+      `Chúng tôi sẽ liên hệ với bạn trong vòng 2h.\n\nNhà cung cấp: ${selectedProvider?.name}`,
       [
         {
           text: 'OK',
@@ -406,10 +334,24 @@ export default function EpCocScreen() {
         </View>
 
         {/* Providers List */}
+        {loading && !refreshing ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={Colors.light.primary} />
+            <Text style={styles.loadingText}>Đang tải danh sách nhà cung cấp...</Text>
+          </View>
+        ) : (
         <ScrollView
           style={styles.content}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.listContainer}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={refresh}
+              colors={[Colors.light.primary]}
+              tintColor={Colors.light.primary}
+            />
+          }
         >
           {filteredProviders.map((provider) => (
             <ProviderCard
@@ -440,6 +382,7 @@ export default function EpCocScreen() {
 
           <View style={{ height: 20 }} />
         </ScrollView>
+        )}
 
         {/* Info Banner */}
         <View style={styles.infoBanner}>
@@ -527,7 +470,7 @@ export default function EpCocScreen() {
                     <View style={styles.selectedRating}>
                       <Ionicons name="star" size={14} color="#ffa41c" />
                       <Text style={styles.selectedRatingText}>
-                        {selectedProvider.rating} ({selectedProvider.reviews})
+                        {selectedProvider.rating} ({selectedProvider.reviewCount})
                       </Text>
                     </View>
                   </View>
@@ -931,6 +874,17 @@ const styles = StyleSheet.create({
     color: '#999',
     marginTop: 16,
     marginBottom: 20,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 60,
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 14,
+    color: '#666',
   },
   resetButton: {
     backgroundColor: Colors.light.primary,

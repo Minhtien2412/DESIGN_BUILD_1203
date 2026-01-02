@@ -44,13 +44,13 @@ export function SurfaceCard({
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: Radii.lg,
-    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: Radii.md,
+    borderWidth: 1,
   },
   shadow: {
-    shadowOpacity: 0.12,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 6,
+    shadowOpacity: 0.02,
+    shadowRadius: 2,
+    shadowOffset: { width: 0, height: 1 },
+    elevation: 1,
   },
 });

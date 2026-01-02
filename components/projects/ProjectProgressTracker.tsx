@@ -77,7 +77,7 @@ export default function ProjectProgressTracker({ projectId, onUpdatePress }: Pro
       case 'on-track':
         return '#4CAF50';
       case 'at-risk':
-        return '#FFC107';
+        return '#0A6847';
       case 'delayed':
         return '#FF9800';
       case 'overdue':
@@ -125,7 +125,7 @@ export default function ProjectProgressTracker({ projectId, onUpdatePress }: Pro
   const getProgressColor = (percentage: number) => {
     if (percentage < 30) return '#F44336';
     if (percentage < 60) return '#FF9800';
-    if (percentage < 90) return '#FFC107';
+    if (percentage < 90) return '#0A6847';
     return '#4CAF50';
   };
 

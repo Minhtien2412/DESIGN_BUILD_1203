@@ -1,0 +1,58 @@
+{
+  "kind": "collectionType",
+  "collectionName": "projects",
+  "info": {
+    "singularName": "project",
+    "pluralName": "projects",
+    "displayName": "Project",
+    "description": "Construction projects - synced with backend Prisma"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "richtext"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": ["PLANNING", "IN_PROGRESS", "ON_HOLD", "COMPLETED", "CANCELLED"],
+      "default": "PLANNING"
+    },
+    "budget": {
+      "type": "decimal",
+      "min": 0
+    },
+    "startDate": {
+      "type": "date"
+    },
+    "endDate": {
+      "type": "date"
+    },
+    "images": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "clientId": {
+      "type": "integer"
+    },
+    "engineerId": {
+      "type": "integer"
+    },
+    "strapiId": {
+      "type": "string",
+      "unique": false
+    },
+    "backendId": {
+      "type": "integer",
+      "unique": false
+    }
+  }
+}

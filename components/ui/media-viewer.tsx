@@ -59,19 +59,8 @@ function ViewerBody({ item }: { item: MediaItem }) {
     );
   }
   if (item.type === 'video') {
-    // Minimal video viewer: inline controls inside modal
-    const player = useVideoPlayer(item.source as any, (p) => { p.loop = false; });
-    return (
-      <View style={styles.body}>
-        <VideoView
-          style={styles.media}
-          player={player}
-          contentFit="contain"
-          nativeControls
-          fullscreenOptions={{ enable: Platform.OS !== 'web' }}
-        />
-      </View>
-    );
+    // Use separate component to avoid conditional hook call
+    return <VideoViewerBody item={item} />;
   }
   // Simple doc placeholder (Word/Excel/PDF): instruct user to open externally for now
   return (
@@ -88,6 +77,22 @@ function ViewerBody({ item }: { item: MediaItem }) {
           </TouchableOpacity>
         ) : null}
       </View>
+    </View>
+  );
+}
+
+// Separate component for video to avoid conditional hook call
+function VideoViewerBody({ item }: { item: MediaItem }) {
+  const player = useVideoPlayer(item.source as any, (p) => { p.loop = false; });
+  return (
+    <View style={styles.body}>
+      <VideoView
+        style={styles.media}
+        player={player}
+        contentFit="contain"
+        nativeControls
+        fullscreenOptions={{ enable: Platform.OS !== 'web' }}
+      />
     </View>
   );
 }

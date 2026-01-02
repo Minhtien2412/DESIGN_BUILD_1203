@@ -1,6 +1,78 @@
+/**
+ * Avatar Hook - Single source of truth for avatar across app
+ * Handles: fetch, upload, cache busting, optimistic updates
+ */
+
 import { useAuth } from '@/context/AuthContext';
-import { resolveAvatar, type AvatarSource } from '@/utils/avatar';
-import { useMemo } from 'react';
+import { uploadAvatar } from '@/services/api/profileApi';
+import { resolveAvatar } from '@/utils/avatar';
+import { useMemo, useState } from 'react';
+
+export interface UseAvatarReturn {
+  avatarUrl: string;
+  upload: (uri: string) => Promise<string>;
+  uploading: boolean;
+  error: string | null;
+}
+
+export function useAvatarUpload(): UseAvatarReturn {
+  const { user, updateAvatar } = useAuth();
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [cacheBuster, setCacheBuster] = useState(Date.now());
+
+  // Resolve avatar URL with cache busting
+  const avatarUrl = useMemo(() => {
+    return resolveAvatar(user?.avatar, {
+      userId: user?.id,
+      nameFallback: user?.name,
+      size: 120,
+      cacheBust: cacheBuster,
+    });
+  }, [user?.avatar, user?.id, user?.name, cacheBuster]);
+
+  const upload = async (uri: string): Promise<string> => {
+    setUploading(true);
+    setError(null);
+
+    try {
+      // Convert local URI to Blob
+      const response = await fetch(uri);
+      const blob = await response.blob();
+
+      // Create File object for upload
+      const filename = uri.split('/').pop() || 'avatar.jpg';
+      const file = new File([blob], filename, { type: blob.type || 'image/jpeg' });
+
+      // Upload to backend
+      const newAvatarUrl = await uploadAvatar(file);
+
+      // Update global state (AuthContext)
+      await updateAvatar(newAvatarUrl);
+
+      // Force re-render with new cache buster
+      setCacheBuster(Date.now());
+
+      return newAvatarUrl;
+    } catch (err: any) {
+      const errorMessage = err?.message || 'Upload failed';
+      setError(errorMessage);
+      throw err;
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  return {
+    avatarUrl,
+    upload,
+    uploading,
+    error,
+  };
+}
+
+// Keep existing useAvatar hook for read-only usage
+import { type AvatarSource } from '@/utils/avatar';
 
 /**
  * Options for avatar resolution

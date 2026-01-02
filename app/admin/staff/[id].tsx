@@ -82,7 +82,7 @@ export default function StaffDetailScreen() {
       Alert.alert('Không có quyền', 'Bạn không có quyền chỉnh sửa nhân viên');
       return;
     }
-    router.push(`/admin/staff/${id}/edit` as any);
+    router.push(`/admin/staff/${id}/edit`);
   };
 
   const handleDelete = () => {
@@ -100,7 +100,7 @@ export default function StaffDetailScreen() {
           style: 'destructive',
           onPress: () => {
             // Navigate to transfer data screen
-            router.push(`/admin/staff/${id}/delete` as any);
+            router.push(`/admin/staff/${id}/delete`);
           },
         },
       ]

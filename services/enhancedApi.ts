@@ -243,12 +243,12 @@ class EnhancedApiClient {
 
   // Profile Management
   async getProfile(): Promise<any> {
-    const response = await this.api.get('/me');
+    const response = await this.api.get('/auth/me');
     return response.data;
   }
 
   async updateProfile(data: any): Promise<any> {
-    const response = await this.api.patch('/me/profile', data);
+    const response = await this.api.patch('/auth/me/profile', data);
     return response.data;
   }
 

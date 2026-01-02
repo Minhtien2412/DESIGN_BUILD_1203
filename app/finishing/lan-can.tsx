@@ -658,7 +658,7 @@ const styles = StyleSheet.create({
   },
   specialtyText: {
     fontSize: 11,
-    color: '#e91e63',
+    color: '#0A6847',
     fontWeight: '500',
   },
   teamSizeRow: {

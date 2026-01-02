@@ -178,6 +178,16 @@ export default function LiveVideo({ item, isActive, controlsVisible, onUserInter
     (openGlobalPlayer as any)({ type: 'uri', uri: playable, title: item.title }, { mode: 'floating' });
   };
 
+  // Follow animation - must be called unconditionally
+  const followKey = item.authorSlug || item.author || item.id;
+  const following = isFollowing(followKey);
+  const followScale = useSharedValue(1);
+  useEffect(() => {
+    followScale.value = 0.92;
+    followScale.value = withSpring(1, { damping: 12, stiffness: 160 });
+  }, [following, followScale]);
+  const followAnimStyle = useAnimatedStyle(() => ({ transform: [{ scale: followScale.value }] }));
+
   // For HLS, wait until resolvedUrl is ready; for MP4/inline assets, allow player to mount immediately
   const isHls = typeof item.url === 'string' && /\.m3u8($|\?)/i.test(item.url);
   if (isHls && !resolvedUrl && !error) {
@@ -207,15 +217,6 @@ export default function LiveVideo({ item, isActive, controlsVisible, onUserInter
     );
   }
 
-  const followKey = item.authorSlug || item.author || item.id;
-  const following = isFollowing(followKey);
-  const followScale = useSharedValue(1);
-  useEffect(() => {
-    followScale.value = 0.92;
-    followScale.value = withSpring(1, { damping: 12, stiffness: 160 });
-  }, [following, followScale]);
-  const followAnimStyle = useAnimatedStyle(() => ({ transform: [{ scale: followScale.value }] }));
-
   return (
     <>
     <View style={styles.page} onLayout={(e) => setContainerSize(e.nativeEvent.layout)}>
@@ -232,7 +233,7 @@ export default function LiveVideo({ item, isActive, controlsVisible, onUserInter
       </View>
 
       {/* Overlay UI */}
-      <View style={styles.overlay} pointerEvents="box-none">
+      <View style={[styles.overlay, { pointerEvents: 'box-none' }]}>
         {/* Tap area */}
         <Pressable
           style={StyleSheet.absoluteFill}
@@ -284,7 +285,7 @@ export default function LiveVideo({ item, isActive, controlsVisible, onUserInter
         </View>
 
         {/* Bottom-left info block: username, follow pill, audio row, caption + hashtags */}
-        <View style={styles.leftInfo} pointerEvents="box-none">
+        <View style={[styles.leftInfo, { pointerEvents: 'box-none' }]}>
           <View style={{ alignItems: 'flex-start' }}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <TouchableOpacity onPress={() => onAuthorPress?.(item.authorSlug || item.author || item.id)}>

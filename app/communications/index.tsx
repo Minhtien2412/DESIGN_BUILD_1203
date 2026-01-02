@@ -324,14 +324,14 @@ export default function CommunicationsScreen() {
       <TouchableOpacity
         style={styles.callButton}
         onPress={() => {
-          // Initiate call
-          router.push(`/call/video-call?userId=${item.otherUser.id}&type=${item.type}`);
+          // Tất cả cuộc gọi thực hiện trong app
+          router.push(`/call/${item.otherUser.id}?type=${item.type}`);
         }}
       >
         <Ionicons
           name={item.type === 'video' ? 'videocam' : 'call'}
           size={24}
-          color="#22c55e"
+          color="#0068FF"
         />
       </TouchableOpacity>
     </TouchableOpacity>

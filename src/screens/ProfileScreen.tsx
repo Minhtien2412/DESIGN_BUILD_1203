@@ -141,7 +141,7 @@ const ProfileScreen = () => {
                 <Ionicons 
                   name={user?.isVerified ? "checkmark-circle" : "close-circle"} 
                   size={16} 
-                  color={user?.isVerified ? "#4CAF50" : "#F44336"} 
+                  color={user?.isVerified ? "#10B981" : "#1A1A1A"} 
                 />
                 <Text style={[styles.infoValue, { marginLeft: 5 }]}>
                   {user?.isVerified ? 'Đã xác thực' : 'Chưa xác thực'}

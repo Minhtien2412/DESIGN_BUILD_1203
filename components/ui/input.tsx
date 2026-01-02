@@ -20,21 +20,23 @@ export function Input({ label, error, style, ...rest }: InputProps) {
 }
 
 const styles = StyleSheet.create({
-  label: { marginBottom: 4 },
+  label: { marginBottom: 3, fontWeight: '500' },
   input: {
-    borderWidth: 0.5,
-    borderColor: '#555',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
     borderRadius: Radii.md,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: 10,
-    backgroundColor: '#fff',
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: 8,
+    backgroundColor: '#FAFAFA',
+    fontWeight: '500',
   },
   inputError: {
-    borderColor: '#f66',
+    borderColor: '#404040',
   },
   error: {
-    color: '#c0392b',
-    marginTop: 4,
+    color: '#404040',
+    marginTop: 3,
     fontSize: 12,
+    fontWeight: '500',
   },
 });

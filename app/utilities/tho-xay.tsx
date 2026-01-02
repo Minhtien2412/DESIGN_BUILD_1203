@@ -1,10 +1,13 @@
+import { makePhoneCall, sendSMS } from '@/utils/phone-actions';
 import { Ionicons } from '@expo/vector-icons';
-import { Stack } from 'expo-router';
-import React, { useState } from 'react';
+import { router, Stack } from 'expo-router';
+import React, { useEffect, useState } from 'react';
 import {
+    ActivityIndicator,
     Alert,
     Image,
     Modal,
+    RefreshControl,
     ScrollView,
     StyleSheet,
     Text,
@@ -13,93 +16,25 @@ import {
     View,
 } from 'react-native';
 
-// Mock data - Mason Workers
-const MASONS = [
-  {
-    id: 1,
-    name: 'Đội Thợ Xây Minh Tuấn',
-    avatar: 'https://i.pravatar.cc/150?img=14',
-    rating: 4.9,
-    reviews: 187,
-    location: 'TP.HCM',
-    experience: 16,
-    price: '500.000₫',
-    priceUnit: '/ ngày',
-    specialties: ['Xây nhà phố', 'Xây biệt thự', 'Xây tường rào'],
-    teamSize: 5,
-    completedProjects: 245,
-    featured: true,
-    availability: 'Sẵn sàng',
-    phone: '090 111 2222',
-    pricePerSquare: '180.000₫/m²',
-  },
-  {
-    id: 2,
-    name: 'Thợ Xây Anh Dũng',
-    avatar: 'https://i.pravatar.cc/150?img=32',
-    rating: 4.8,
-    reviews: 156,
-    location: 'Hà Nội',
-    experience: 14,
-    price: '480.000₫',
-    priceUnit: '/ ngày',
-    specialties: ['Tô trát', 'Xây móng', 'Chống thấm'],
-    teamSize: 4,
-    completedProjects: 198,
-    featured: true,
-    availability: 'Sẵn sàng',
-    phone: '091 222 3333',
-    pricePerSquare: '170.000₫/m²',
-  },
-  {
-    id: 3,
-    name: 'Đội Xây Dựng Hoàng Gia',
-    avatar: 'https://i.pravatar.cc/150?img=52',
-    rating: 4.7,
-    reviews: 134,
-    location: 'Đà Nẵng',
-    experience: 12,
-    price: '450.000₫',
-    priceUnit: '/ ngày',
-    specialties: ['Xây nhà cấp 4', 'Sửa chữa', 'Nâng tầng'],
-    teamSize: 3,
-    completedProjects: 167,
-    featured: false,
-    availability: 'Sẵn sàng',
-    phone: '092 333 4444',
-    pricePerSquare: '160.000₫/m²',
-  },
-  {
-    id: 4,
-    name: 'Thợ Xây Văn Thành',
-    avatar: 'https://i.pravatar.cc/150?img=69',
-    rating: 4.6,
-    reviews: 98,
-    location: 'Cần Thơ',
-    experience: 10,
-    price: '420.000₫',
-    priceUnit: '/ ngày',
-    specialties: ['Xây tường', 'Tô tường', 'Láng xi măng'],
-    teamSize: 2,
-    completedProjects: 123,
-    featured: false,
-    availability: 'Bận (khả dụng từ 20/11)',
-    phone: '093 444 5555',
-    pricePerSquare: '150.000₫/m²',
-  },
-];
+import { useLaborProviders } from '@/hooks/useLaborProviders';
+import { LaborProvider } from '@/services/api/labor.service';
 
 const LOCATIONS = ['Tất cả', 'TP.HCM', 'Hà Nội', 'Đà Nẵng', 'Cần Thơ', 'Khác'];
 const SPECIALTIES = ['Tất cả', 'Xây nhà phố', 'Xây móng', 'Tô trát', 'Xây biệt thự', 'Chống thấm'];
 
 interface MasonCardProps {
-  mason: any;
+  mason: LaborProvider;
   onBooking: () => void;
+  onPress: () => void;
 }
 
-const MasonCard: React.FC<MasonCardProps> = ({ mason, onBooking }) => {
+const MasonCard: React.FC<MasonCardProps> = ({ mason, onBooking, onPress }) => {
+  const availabilityText = mason.availability === 'available' ? 'Sẵn sàng' : mason.availability === 'busy' ? 'Đang bận' : 'Không khả dụng';
+  const priceDisplay = `${mason.priceRange.min.toLocaleString('vi-VN')}₫`;
+  const priceSquare = mason.priceRange.max ? `${mason.priceRange.max.toLocaleString('vi-VN')}₫/m²` : '';
+
   return (
-    <TouchableOpacity style={styles.masonCard} activeOpacity={0.8}>
+    <TouchableOpacity style={styles.masonCard} activeOpacity={0.8} onPress={onPress}>
       {mason.featured && (
         <View style={styles.featuredBadge}>
           <Ionicons name="star" size={12} color="#fff" />
@@ -108,7 +43,7 @@ const MasonCard: React.FC<MasonCardProps> = ({ mason, onBooking }) => {
       )}
 
       <View style={styles.cardHeader}>
-        <Image source={{ uri: mason.avatar }} style={styles.avatar} />
+        <Image source={{ uri: mason.avatar || 'https://i.pravatar.cc/150?img=14' }} style={styles.avatar} />
         
         <View style={styles.headerInfo}>
           <Text style={styles.masonName}>{mason.name}</Text>
@@ -116,15 +51,15 @@ const MasonCard: React.FC<MasonCardProps> = ({ mason, onBooking }) => {
           <View style={styles.ratingRow}>
             <Ionicons name="star" size={14} color="#ffa41c" />
             <Text style={styles.ratingText}>{mason.rating}</Text>
-            <Text style={styles.reviewsText}>({mason.reviews})</Text>
+            <Text style={styles.reviewsText}>({mason.reviewCount})</Text>
           </View>
 
           <View style={styles.locationRow}>
             <Ionicons name="location" size={12} color="#999" />
-            <Text style={styles.locationText}>{mason.location}</Text>
+            <Text style={styles.locationText}>{mason.city || mason.address}</Text>
             <View style={styles.divider} />
             <Ionicons name="briefcase" size={12} color="#999" />
-            <Text style={styles.experienceText}>{mason.experience} năm</Text>
+            <Text style={styles.experienceText}>{mason.yearExperience} năm</Text>
           </View>
         </View>
       </View>
@@ -132,7 +67,7 @@ const MasonCard: React.FC<MasonCardProps> = ({ mason, onBooking }) => {
       <View style={styles.specialtiesSection}>
         <Text style={styles.specialtiesLabel}>Chuyên môn:</Text>
         <View style={styles.specialtiesTags}>
-          {mason.specialties.map((specialty: string, index: number) => (
+          {mason.services.slice(0, 4).map((specialty: string, index: number) => (
             <View key={index} style={styles.specialtyTag}>
               <Text style={styles.specialtyText}>{specialty}</Text>
             </View>
@@ -142,12 +77,12 @@ const MasonCard: React.FC<MasonCardProps> = ({ mason, onBooking }) => {
 
       <View style={styles.teamRow}>
         <Ionicons name="people" size={16} color="#2196f3" />
-        <Text style={styles.teamText}>Đội {mason.teamSize} người</Text>
+        <Text style={styles.teamText}>Đội chuyên nghiệp</Text>
       </View>
 
       <View style={styles.statsSection}>
         <View style={styles.statItem}>
-          <Text style={styles.statValue}>{mason.completedProjects}+</Text>
+          <Text style={styles.statValue}>{mason.projectCount}+</Text>
           <Text style={styles.statLabel}>Dự án</Text>
         </View>
         <View style={styles.statDivider} />
@@ -155,10 +90,10 @@ const MasonCard: React.FC<MasonCardProps> = ({ mason, onBooking }) => {
           <Text
             style={[
               styles.statValue,
-              mason.availability === 'Sẵn sàng' ? styles.available : styles.busy,
+              mason.availability === 'available' ? styles.available : styles.busy,
             ]}
           >
-            {mason.availability}
+            {availabilityText}
           </Text>
           <Text style={styles.statLabel}>Tình trạng</Text>
         </View>
@@ -166,25 +101,40 @@ const MasonCard: React.FC<MasonCardProps> = ({ mason, onBooking }) => {
 
       <View style={styles.priceRow}>
         <View>
-          <Text style={styles.price}>{mason.price}</Text>
-          <Text style={styles.priceUnit}>{mason.priceUnit}</Text>
-          <Text style={styles.priceSquare}>hoặc {mason.pricePerSquare}</Text>
+          <Text style={styles.price}>{priceDisplay}</Text>
+          <Text style={styles.priceUnit}>/ {mason.priceRange.unit}</Text>
+          {priceSquare ? <Text style={styles.priceSquare}>hoặc {priceSquare}</Text> : null}
         </View>
         
-        <TouchableOpacity style={styles.bookButton} onPress={onBooking}>
-          <Ionicons name="call" size={16} color="#fff" />
-          <Text style={styles.bookButtonText}>Liên hệ</Text>
-        </TouchableOpacity>
+        <View style={styles.actionButtons}>
+          <TouchableOpacity 
+            style={styles.callButton} 
+            onPress={() => makePhoneCall(mason.phone)}
+          >
+            <Ionicons name="call-outline" size={20} color="#EE4D2D" />
+            <Text style={styles.callButtonText}>Gọi điện</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={styles.contactButton} 
+            onPress={() => sendSMS(mason.phone, `Xin chào ${mason.name}, tôi muốn tư vấn về dịch vụ xây dựng.`)}
+          >
+            <Ionicons name="chatbubble" size={20} color="#fff" />
+            <Text style={styles.contactButtonText}>Liên hệ ngay</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </TouchableOpacity>
   );
 };
 
 export default function ThoXayScreen() {
+  const { providers, loading, refreshing, refresh, searchProviders } = useLaborProviders({ type: 'xay' });
+  
   const [selectedLocation, setSelectedLocation] = useState('Tất cả');
   const [selectedSpecialty, setSelectedSpecialty] = useState('Tất cả');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedMason, setSelectedMason] = useState<any>(null);
+  const [selectedMason, setSelectedMason] = useState<LaborProvider | null>(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [bookingData, setBookingData] = useState({
     name: '',
@@ -196,14 +146,25 @@ export default function ThoXayScreen() {
     notes: '',
   });
 
-  const filteredMasons = MASONS.filter((mason) => {
-    const matchLocation = selectedLocation === 'Tất cả' || mason.location === selectedLocation;
-    const matchSpecialty = selectedSpecialty === 'Tất cả' || mason.specialties.includes(selectedSpecialty);
+  // Filter providers based on local filters
+  const filteredMasons = providers.filter((mason) => {
+    const matchLocation = selectedLocation === 'Tất cả' || mason.city === selectedLocation || mason.address.includes(selectedLocation);
+    const matchSpecialty = selectedSpecialty === 'Tất cả' || mason.services.includes(selectedSpecialty);
     const matchSearch = searchQuery === '' || mason.name.toLowerCase().includes(searchQuery.toLowerCase());
     return matchLocation && matchSpecialty && matchSearch;
   });
 
-  const handleBooking = (mason: any) => {
+  // Handle search with debounce
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchQuery.length > 2) {
+        searchProviders(searchQuery);
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery, searchProviders]);
+
+  const handleBooking = (mason: LaborProvider) => {
     setSelectedMason(mason);
     setShowBookingModal(true);
   };
@@ -216,7 +177,7 @@ export default function ThoXayScreen() {
 
     Alert.alert(
       'Gửi yêu cầu thành công',
-      `Chúng tôi sẽ kết nối bạn với thợ trong vòng 1h.\n\nĐội thợ: ${selectedMason.name}`,
+      `Chúng tôi sẽ kết nối bạn với thợ trong vòng 1h.\n\nĐội thợ: ${selectedMason?.name}`,
       [
         {
           text: 'OK',
@@ -242,7 +203,7 @@ export default function ThoXayScreen() {
       <Stack.Screen
         options={{
           title: 'Thợ xây',
-          headerStyle: { backgroundColor: '#90B44C' },
+          headerStyle: { backgroundColor: '#0A6847' },
           headerTintColor: '#fff',
           headerTitleStyle: { fontWeight: '600' },
         }}
@@ -312,24 +273,39 @@ export default function ThoXayScreen() {
           <Text style={styles.resultsText}>{filteredMasons.length} đội thợ</Text>
         </View>
 
-        <ScrollView
-          style={styles.content}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.listContainer}
-        >
-          {filteredMasons.map((mason) => (
-            <MasonCard key={mason.id} mason={mason} onBooking={() => handleBooking(mason)} />
-          ))}
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#0A6847" />
+            <Text style={styles.loadingText}>Đang tải danh sách...</Text>
+          </View>
+        ) : (
+          <ScrollView
+            style={styles.content}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.listContainer}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={refresh} colors={['#0A6847']} />
+            }
+          >
+            {filteredMasons.map((mason) => (
+              <MasonCard 
+                key={mason.id} 
+                mason={mason} 
+                onBooking={() => handleBooking(mason)} 
+                onPress={() => router.push(`/utilities/team-detail?id=${mason.id}&type=xay`)}
+              />
+            ))}
 
-          {filteredMasons.length === 0 && (
-            <View style={styles.emptyState}>
-              <Ionicons name="hammer-outline" size={64} color="#ccc" />
-              <Text style={styles.emptyText}>Không tìm thấy thợ phù hợp</Text>
-            </View>
-          )}
+            {filteredMasons.length === 0 && (
+              <View style={styles.emptyState}>
+                <Ionicons name="hammer-outline" size={64} color="#ccc" />
+                <Text style={styles.emptyText}>Không tìm thấy thợ phù hợp</Text>
+              </View>
+            )}
 
-          <View style={{ height: 20 }} />
-        </ScrollView>
+            <View style={{ height: 20 }} />
+          </ScrollView>
+        )}
 
         <View style={styles.infoBanner}>
           <Ionicons name="shield-checkmark" size={16} color="#4caf50" />
@@ -361,7 +337,7 @@ export default function ThoXayScreen() {
                     <View style={styles.selectedRating}>
                       <Ionicons name="star" size={14} color="#ffa41c" />
                       <Text style={styles.selectedRatingText}>
-                        {selectedMason.rating} ({selectedMason.reviews})
+                        {selectedMason.rating} ({selectedMason.reviewCount})
                       </Text>
                     </View>
                   </View>
@@ -479,15 +455,17 @@ const styles = StyleSheet.create({
   filterLabel: { fontSize: 13, fontWeight: '600', color: '#666', width: 95, paddingLeft: 16 },
   filterScroll: { flex: 1 },
   filterChip: { paddingHorizontal: 14, paddingVertical: 6, borderRadius: 16, backgroundColor: '#f5f5f5', marginHorizontal: 4 },
-  filterChipActive: { backgroundColor: '#90B44C' },
+  filterChipActive: { backgroundColor: '#0A6847' },
   filterChipText: { fontSize: 12, color: '#666', fontWeight: '500' },
   filterChipTextActive: { color: '#fff' },
   resultsBar: { backgroundColor: '#fff', paddingHorizontal: 16, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#f0f0f0' },
   resultsText: { fontSize: 13, fontWeight: '600', color: '#333' },
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: 60 },
+  loadingText: { marginTop: 12, fontSize: 14, color: '#666' },
   content: { flex: 1 },
   listContainer: { padding: 16 },
   masonCard: { backgroundColor: '#fff', borderRadius: 12, padding: 16, marginBottom: 16, elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 4 },
-  featuredBadge: { position: 'absolute', top: 12, right: 12, flexDirection: 'row', alignItems: 'center', backgroundColor: '#90B44C', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 12, zIndex: 1, gap: 4 },
+  featuredBadge: { position: 'absolute', top: 12, right: 12, flexDirection: 'row', alignItems: 'center', backgroundColor: '#0A6847', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 12, zIndex: 1, gap: 4 },
   featuredText: { fontSize: 10, fontWeight: '600', color: '#fff' },
   cardHeader: { flexDirection: 'row', marginBottom: 12 },
   avatar: { width: 60, height: 60, borderRadius: 8, backgroundColor: '#f0f0f0' },
@@ -515,10 +493,33 @@ const styles = StyleSheet.create({
   statLabel: { fontSize: 11, color: '#999' },
   statDivider: { width: 1, height: 40, backgroundColor: '#f0f0f0' },
   priceRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  price: { fontSize: 18, fontWeight: '700', color: '#90B44C' },
+  price: { fontSize: 18, fontWeight: '700', color: '#0A6847' },
   priceUnit: { fontSize: 12, color: '#999' },
   priceSquare: { fontSize: 11, color: '#666', marginTop: 2 },
-  bookButton: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#90B44C', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 8, gap: 6 },
+  actionButtons: { flexDirection: 'row', gap: 8 },
+  callButton: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    backgroundColor: '#fff', 
+    paddingHorizontal: 12, 
+    paddingVertical: 8, 
+    borderRadius: 8, 
+    borderWidth: 1,
+    borderColor: '#EE4D2D',
+    gap: 4 
+  },
+  callButtonText: { fontSize: 12, fontWeight: '600', color: '#EE4D2D' },
+  contactButton: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    backgroundColor: '#EE4D2D', 
+    paddingHorizontal: 12, 
+    paddingVertical: 8, 
+    borderRadius: 8, 
+    gap: 4 
+  },
+  contactButtonText: { fontSize: 12, fontWeight: '600', color: '#fff' },
+  bookButton: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#0A6847', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 8, gap: 6 },
   bookButtonText: { fontSize: 14, fontWeight: '600', color: '#fff' },
   emptyState: { alignItems: 'center', justifyContent: 'center', paddingVertical: 60 },
   emptyText: { fontSize: 15, color: '#999', marginTop: 16 },
@@ -538,10 +539,10 @@ const styles = StyleSheet.create({
   form: { marginBottom: 16 },
   formGroup: { marginBottom: 16 },
   formLabel: { fontSize: 13, fontWeight: '600', color: '#333', marginBottom: 8 },
-  required: { color: '#90B44C' },
+  required: { color: '#0A6847' },
   formInput: { backgroundColor: '#f5f5f5', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 14, color: '#333', borderWidth: 1, borderColor: '#e0e0e0' },
   formTextArea: { height: 80, textAlignVertical: 'top' },
-  submitButton: { backgroundColor: '#90B44C', paddingVertical: 14, borderRadius: 8, alignItems: 'center', marginBottom: 12 },
+  submitButton: { backgroundColor: '#0A6847', paddingVertical: 14, borderRadius: 8, alignItems: 'center', marginBottom: 12 },
   submitButtonText: { fontSize: 15, fontWeight: '600', color: '#fff' },
   formNote: { fontSize: 12, color: '#999', textAlign: 'center', marginBottom: 20 },
 });

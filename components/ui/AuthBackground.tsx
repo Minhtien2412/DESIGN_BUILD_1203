@@ -46,11 +46,11 @@ export default function AuthBackground({ style, children, ...rest }: Props) {
     <View style={[styles.container, { backgroundColor: bg }, style]} {...rest}>
       {/* Subtle radial-ish layers using large blurred circles */}
       <Animated.View
-        pointerEvents="none"
         style={[
           styles.blob,
           {
             backgroundColor: primary + '33', // ~20% opacity
+            pointerEvents: 'none',
             transform: [
               { translateY: float1 },
               { translateX: float2 },
@@ -61,12 +61,12 @@ export default function AuthBackground({ style, children, ...rest }: Props) {
         ]}
       />
       <Animated.View
-        pointerEvents="none"
         style={[
           styles.blob,
           styles.blobRight,
           {
             backgroundColor: accent + '2A', // ~16% opacity
+            pointerEvents: 'none',
             transform: [
               { translateY: float2 },
               { translateX: float1 },

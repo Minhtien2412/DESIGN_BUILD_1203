@@ -20,8 +20,7 @@ export default function LiveComments({ onClose, streamId }: LiveCommentsProps) {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      style={styles.overlay}
-      pointerEvents="box-none"
+      style={[styles.overlay, { pointerEvents: 'box-none' }]}
     >
       <View style={styles.sheet}>
         <View style={styles.header}>

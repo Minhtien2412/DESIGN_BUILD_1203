@@ -1,6 +1,9 @@
+import { ENV } from '@/config/env';
 import { NOTIFICATION_ENDPOINTS } from '@/constants/api-endpoints';
 import { apiFetch } from '@/services/api';
-import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import { createContext, ReactNode, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import Toast from 'react-native-toast-message';
+import { io, Socket } from 'socket.io-client';
 import { useAuth } from './AuthContext';
 
 // Types
@@ -20,6 +23,7 @@ interface NotificationContextType {
   notifications: Notification[];
   unreadCount: number;
   loading: boolean;
+  isConnected: boolean; // WebSocket connection status
   refreshNotifications: () => Promise<void>;
   markAsRead: (id: string) => Promise<void>;
   markAllAsRead: () => Promise<void>;
@@ -33,6 +37,9 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [isConnected, setIsConnected] = useState(false);
+  
+  const socketRef = useRef<Socket | null>(null);
 
   // Fetch notifications from backend
   const fetchNotifications = async () => {
@@ -82,9 +89,9 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       );
       setUnreadCount(prev => Math.max(0, prev - 1));
 
-      // Call backend with correct endpoint
+      // Call backend with correct endpoint (PATCH not POST)
       await apiFetch(NOTIFICATION_ENDPOINTS.MARK_READ(id), {
-        method: 'POST',
+        method: 'PATCH',
       });
     } catch (error) {
       // Silently fail if backend not ready
@@ -101,9 +108,9 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       setNotifications(prev => prev.map(n => ({ ...n, read: true })));
       setUnreadCount(0);
 
-      // Call backend with correct endpoint
+      // Call backend with correct endpoint (PATCH not POST)
       await apiFetch(NOTIFICATION_ENDPOINTS.MARK_ALL_READ, {
-        method: 'POST',
+        method: 'PATCH',
       });
     } catch (error) {
       // Silently fail if backend not ready
@@ -135,7 +142,142 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  // Initial fetch and polling setup
+  // Show toast notification
+  const showNotificationToast = useCallback((notification: Notification) => {
+    Toast.show({
+      type: notification.type === 'error' ? 'error' : notification.type === 'success' ? 'success' : 'info',
+      text1: notification.title,
+      text2: notification.message,
+      position: 'top',
+      visibilityTime: 4000,
+      topOffset: 50,
+      onPress: () => {
+        // Optional: Navigate to notification detail
+        Toast.hide();
+      }
+    });
+  }, []);
+
+  // WebSocket connection setup
+  useEffect(() => {
+    if (!user) {
+      // Cleanup socket if user logs out
+      if (socketRef.current) {
+        console.log('[Notifications] User logged out - disconnecting WebSocket');
+        socketRef.current.disconnect();
+        socketRef.current = null;
+        setIsConnected(false);
+      }
+      return;
+    }
+
+    console.log('[Notifications] Setting up WebSocket connection for user:', user.id);
+
+    // Build WebSocket URL (replace /ws with /notifications)
+    const wsUrl = (ENV.WS_URL || '').replace('/ws', '/notifications');
+    if (!wsUrl) {
+      console.warn('[Notifications] WS_URL not configured, skipping WebSocket connection');
+      return;
+    }
+    console.log('[Notifications] Connecting to:', wsUrl);
+
+    // Create Socket.IO connection
+    const socket = io(wsUrl, {
+      transports: ['websocket', 'polling'], // Try WebSocket first, fallback to polling
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      timeout: 10000,
+    });
+
+    // Connection event
+    socket.on('connect', () => {
+      console.log('[Notifications] WebSocket connected - Socket ID:', socket.id);
+      setIsConnected(true);
+      
+      // Register user for notifications
+      console.log('[Notifications] Registering user:', user.id);
+      socket.emit('register', { userId: user.id });
+    });
+
+    // Connection confirmation
+    socket.on('connected', (data: { message?: string; socketId?: string }) => {
+      console.log('[Notifications] Connected to server:', data);
+    });
+
+    // Registration confirmation
+    socket.on('registered', (data: { userId?: string; success?: boolean }) => {
+      console.log('[Notifications] ✅ Registered successfully:', data);
+    });
+
+    // Receive real-time notification
+    socket.on('notification', (notification: Notification) => {
+      console.log('[Notifications] 🔔 Received real-time notification:', notification);
+      
+      // Add to state at the beginning
+      setNotifications(prev => {
+        // Avoid duplicates (check by ID)
+        const exists = prev.find(n => n.id === notification.id);
+        if (exists) return prev;
+        return [notification, ...prev];
+      });
+      
+      // Increment unread count if not read
+      if (!notification.read) {
+        setUnreadCount(prev => prev + 1);
+      }
+      
+      // Show toast
+      showNotificationToast(notification);
+    });
+
+    // Broadcast notifications (system-wide)
+    socket.on('broadcast', (notification: any) => {
+      console.log('[Notifications] 📢 Broadcast received:', notification);
+      showNotificationToast(notification);
+    });
+
+    // Disconnect event
+    socket.on('disconnect', (reason: string) => {
+      console.log('[Notifications] WebSocket disconnected:', reason);
+      setIsConnected(false);
+    });
+
+    // Connection error
+    socket.on('connect_error', (error: Error) => {
+      console.error('[Notifications] WebSocket connection error:', error.message);
+      setIsConnected(false);
+    });
+
+    // General error
+    socket.on('error', (error: Error) => {
+      console.error('[Notifications] WebSocket error:', error);
+    });
+
+    // Ping-pong for connection health check
+    const pingInterval = setInterval(() => {
+      if (socket.connected) {
+        socket.emit('ping');
+      }
+    }, 30000); // Every 30 seconds
+
+    socket.on('pong', (data: unknown) => {
+      console.log('[Notifications] Pong received:', data);
+    });
+
+    socketRef.current = socket;
+
+    // Cleanup on unmount
+    return () => {
+      console.log('[Notifications] Cleaning up WebSocket connection');
+      clearInterval(pingInterval);
+      socket.disconnect();
+      setIsConnected(false);
+    };
+  }, [user, showNotificationToast]);
+
+  // Initial fetch and polling setup (fallback if WebSocket fails)
   useEffect(() => {
     if (!user) {
       setNotifications([]);
@@ -144,32 +286,37 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     }
 
     // Delay initial fetch to ensure token is set in API service
-    // AuthContext may still be setting the token when this effect runs
     const initialFetchTimer = setTimeout(() => {
       fetchNotifications();
-    }, 100); // Small delay to let AuthContext finish setting token
+    }, 100);
 
-    // Poll every 30 seconds
+    // Poll every 60 seconds (increased since WebSocket handles real-time)
     const pollInterval = setInterval(() => {
-      fetchNotifications();
-    }, 30000); // 30 seconds
+      // Only poll if WebSocket is not connected (fallback)
+      if (!isConnected) {
+        console.log('[Notifications] WebSocket offline - polling via REST API');
+        fetchNotifications();
+      }
+    }, 60000); // 60 seconds
 
     // Cleanup
     return () => {
       clearTimeout(initialFetchTimer);
       clearInterval(pollInterval);
     };
-  }, [user]);
+  }, [user, isConnected]);
 
   const value: NotificationContextType = {
     notifications,
     unreadCount,
     loading,
+    isConnected, // Expose connection status
     refreshNotifications,
     markAsRead,
     markAllAsRead,
     deleteNotification,
   };
+
 
   return (
     <NotificationContext.Provider value={value}>

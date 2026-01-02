@@ -13,7 +13,7 @@ const MENU_ITEMS = [
     icon: 'apps-outline' as const,
     route: '/projects?tab=services',
     description: 'Xem tất cả dịch vụ',
-    color: '#90b44c'
+    color: '#0A6847'
   },
   {
     id: 2,
@@ -21,7 +21,7 @@ const MENU_ITEMS = [
     icon: 'construct-outline' as const,
     route: '/utilities',
     description: 'Công cụ xây dựng',
-    color: '#FF6B6B'
+    color: '#1A1A1A'
   },
   {
     id: 3,
@@ -196,7 +196,7 @@ export function MobileMenu({ visible, onClose, userIsAdmin = false }: MobileMenu
                 paddingHorizontal: 16,
                 paddingVertical: 8,
                 borderRadius: 20,
-                backgroundColor: activeSection === 'main' ? '#90b44c' : '#f5f5f5'
+                backgroundColor: activeSection === 'main' ? '#0A6847' : '#f5f5f5'
               }}
             >
               <Text style={{ 
@@ -214,7 +214,7 @@ export function MobileMenu({ visible, onClose, userIsAdmin = false }: MobileMenu
                 paddingHorizontal: 16,
                 paddingVertical: 8,
                 borderRadius: 20,
-                backgroundColor: activeSection === 'utilities' ? '#90b44c' : '#f5f5f5'
+                backgroundColor: activeSection === 'utilities' ? '#0A6847' : '#f5f5f5'
               }}
             >
               <Text style={{ 
@@ -232,7 +232,7 @@ export function MobileMenu({ visible, onClose, userIsAdmin = false }: MobileMenu
                 paddingHorizontal: 16,
                 paddingVertical: 8,
                 borderRadius: 20,
-                backgroundColor: activeSection === 'profile' ? '#90b44c' : '#f5f5f5'
+                backgroundColor: activeSection === 'profile' ? '#0A6847' : '#f5f5f5'
               }}
             >
               <Text style={{ 
@@ -390,11 +390,11 @@ export function MobileMenu({ visible, onClose, userIsAdmin = false }: MobileMenu
                     width: 40,
                     height: 40,
                     borderRadius: 20,
-                    backgroundColor: '#90b44c15',
+                    backgroundColor: '#E8F5E9',
                     justifyContent: 'center',
                     alignItems: 'center'
                   }}>
-                    <Ionicons name="call-outline" size={20} color="#90b44c" />
+                    <Ionicons name="call-outline" size={20} color="#0A6847" />
                   </View>
                   <View style={{ flex: 1, marginLeft: 12 }}>
                     <Text style={{ fontSize: 13, fontWeight: '600', color: '#333' }}>

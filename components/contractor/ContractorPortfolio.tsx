@@ -294,7 +294,7 @@ export function ContractorPortfolio({
                   <View style={styles.testimonialContainer}>
                     <Ionicons name="chatbubble-outline" size={20} color={primaryColor} />
                     <Text style={[styles.testimonial, { color: textColor }]}>
-                      "{selectedProject.testimonial}"
+                      &quot;{selectedProject.testimonial}&quot;
                     </Text>
                   </View>
                 </>

@@ -1,4 +1,4 @@
-﻿import { ThemedText } from '@/components/themed-text';
+import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui/button';
 import { Container } from '@/components/ui/container';
 import { SurfaceCard } from '@/components/ui/surface-card';
@@ -19,7 +19,7 @@ export function AuthGate({ children, mode = 'inline', message }: AuthGateProps) 
 
   React.useEffect(() => {
     if (!user && mode === 'redirect') {
-      router.replace('/login');
+      router.replace('/(auth)/login');
     }
   }, [user, mode, router]);
 
@@ -36,7 +36,7 @@ export function AuthGate({ children, mode = 'inline', message }: AuthGateProps) 
         <ThemedText style={{ marginBottom: 12 }}>
           {message || 'Vui lòng đăng nhập để tiếp tục sử dụng tính năng này.'}
         </ThemedText>
-        <Button title="Đăng nhập" onPress={() => router.push('/login')} />
+        <Button title="Đăng nhập" onPress={() => router.push('/(auth)/login')} />
       </SurfaceCard>
     </Container>
   );

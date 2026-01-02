@@ -6,6 +6,7 @@ export { Button } from './button';
 export { CallActionButtons, CallStatusIndicator, QuickCallButton } from './call-action-buttons';
 export { CartBadge } from './cart-badge';
 export { CategoryHeader, CategoryHeaderIcon } from './category-header';
+export { ConstructionProgressCard } from './construction-progress-card';
 export { Container } from './container';
 export { DesignGrid } from './design-grid';
 export { default as FinishPage } from './finish-page';
@@ -62,4 +63,10 @@ export { TabPanel, default as Tabs } from './tabs';
 
 export { default as CostTracker, type BudgetCategory, type CostItem } from './cost-tracker';
 export { default as TaskManagement, type Task } from './task-management';
+
+// ============================================
+// SHARED USER/CONTRACTOR INFO COMPONENTS
+// ============================================
+
+export { ContractorInfoCard, type ContractorInfoCardProps } from './contractor-info-card';
 

@@ -1,0 +1,258 @@
+{
+  "info": {
+    "name": "Timeline API",
+    "description": "Timeline & Gantt Chart API Endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Timeline",
+      "item": [
+        {
+          "name": "Get Project Timeline",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/timeline/projects/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["timeline", "projects", "1"]
+            }
+          }
+        },
+        {
+          "name": "Check Delayed Phases",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/timeline/projects/1/check-delayed",
+              "host": ["{{baseUrl}}"],
+              "path": ["timeline", "projects", "1", "check-delayed"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Phases",
+      "item": [
+        {
+          "name": "Create Phase",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectId\": 1,\n  \"name\": \"Foundation Work\",\n  \"description\": \"Laying foundation for building\",\n  \"startDate\": \"2025-01-01T00:00:00Z\",\n  \"endDate\": \"2025-02-01T00:00:00Z\",\n  \"color\": \"#4AA14A\",\n  \"icon\": \"hammer\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/timeline/phases",
+              "host": ["{{baseUrl}}"],
+              "path": ["timeline", "phases"]
+            }
+          }
+        },
+        {
+          "name": "Get Phase by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/timeline/phases/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["timeline", "phases", "1"]
+            }
+          }
+        },
+        {
+          "name": "Update Phase",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Foundation Work - Updated\",\n  \"status\": \"IN_PROGRESS\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/timeline/phases/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["timeline", "phases", "1"]
+            }
+          }
+        },
+        {
+          "name": "Delete Phase",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/timeline/phases/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["timeline", "phases", "1"]
+            }
+          }
+        },
+        {
+          "name": "Update Progress",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"progress\": 45,\n  \"note\": \"Concrete pouring completed\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/timeline/phases/1/progress",
+              "host": ["{{baseUrl}}"],
+              "path": ["timeline", "phases", "1", "progress"]
+            }
+          }
+        },
+        {
+          "name": "Reorder Phases",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phaseOrders\": [\n    { \"id\": 1, \"order\": 2 },\n    { \"id\": 2, \"order\": 1 }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/timeline/phases/reorder?projectId=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["timeline", "phases", "reorder"],
+              "query": [
+                {
+                  "key": "projectId",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Phase Tasks",
+      "item": [
+        {
+          "name": "Create Phase Task",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Excavation\",\n  \"description\": \"Dig foundation holes\",\n  \"assignedTo\": 5,\n  \"startDate\": \"2025-01-01T00:00:00Z\",\n  \"endDate\": \"2025-01-15T00:00:00Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/timeline/phases/1/tasks",
+              "host": ["{{baseUrl}}"],
+              "path": ["timeline", "phases", "1", "tasks"]
+            }
+          }
+        },
+        {
+          "name": "Update Phase Task",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"COMPLETED\",\n  \"progress\": 100\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/timeline/tasks/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["timeline", "tasks", "1"]
+            }
+          }
+        },
+        {
+          "name": "Delete Phase Task",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/timeline/tasks/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["timeline", "tasks", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "Get Project Notifications",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/timeline/projects/1/notifications?limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["timeline", "projects", "1", "notifications"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Mark Notification as Read",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/timeline/notifications/1/read",
+              "host": ["{{baseUrl}}"],
+              "path": ["timeline", "notifications", "1", "read"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://baotienweb.cloud/api/v1",
+      "type": "string"
+    }
+  ]
+}

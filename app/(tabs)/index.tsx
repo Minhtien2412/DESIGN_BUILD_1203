@@ -1,1278 +1,900 @@
-import { HeroSlider } from "@/components/home/hero-slider";
-import { MobileMenu } from "@/components/home/mobile-menu";
-import { SmartGrid } from "@/components/home/smart-grid";
-import { VideoPlayer } from "@/components/home/video-player";
-import { QuickActionMenu } from "@/components/quick-action-menu";
-import { ReelsPlayer } from "@/components/reels-player";
-import { SafeScrollView } from "@/components/ui/safe-area";
-import VoiceSearchModal from '@/components/voice/VoiceSearchModal';
+/**
+ * Home Screen v3 - European Minimal Design
+ * Clean, Modern, Information-Dense Layout
+ * @updated 2025-12-24
+ */
+
+import { ProgressSection } from '@/components/home/progress-section';
+import { useAuth } from '@/context/AuthContext';
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Href, router } from 'expo-router';
+import { memo, useCallback, useState } from 'react';
 import {
-  DESIGN_UTILITY_SLUGS,
-  LIBRARY_TYPES
-} from "@/constants/home-routes";
-import { Colors } from "@/constants/theme";
-import { useSmartBackHandler } from "@/hooks/useBackHandler";
-import { useEdgeSwipe } from "@/hooks/useGestures";
-import { useProfile } from "@/hooks/useProfile";
-import { useUnreadCounts } from "@/hooks/useUnreadCounts";
-import { useVideos } from "@/hooks/useVideos";
-import { Ionicons } from "@expo/vector-icons";
-import { router } from 'expo-router';
-import React, { useRef, useState } from "react";
-import { Animated, Dimensions, Image, RefreshControl, ScrollView, StatusBar, Text, TouchableOpacity, View } from "react-native";
+    Dimensions,
+    Platform,
+    RefreshControl,
+    ScrollView,
+    StatusBar,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-const { width: SCREEN_W } = Dimensions.get("window");
-// Fixed video size: 4 videos per row with gaps
-const VIDEO_ITEM_GAP = 8;
-const VIDEO_HORIZONTAL_PADDING = 16;
-const VIDEO_WIDTH = (SCREEN_W - (VIDEO_HORIZONTAL_PADDING * 2) - (VIDEO_ITEM_GAP * 3)) / 4;
-const VIDEO_HEIGHT = VIDEO_WIDTH * 1.4; // Vertical aspect ratio like Reels
+const { width } = Dimensions.get('window');
 
-// ===== DATA =====
-const SERVICES = [
-  { id: 1, name: "Thiết kế nhà", icon: require("@/assets/images/icon-dich-vu/thiet-ke-nha.png") },
-  { id: 2, name: "Thiết kế nội thất", icon: require("@/assets/images/icon-dich-vu/thiet-ke-noi-that.png") },
-  { id: 3, name: "Tra cứu xây dựng", icon: require("@/assets/images/icon-dich-vu/tra-cuu-xay-dung.png") },
-  { id: 4, name: "Xin phép", icon: require("@/assets/images/icon-dich-vu/xin-phep.png") },
-  { id: 5, name: "Hồ sơ mẫu", icon: require("@/assets/images/icon-dich-vu/ho-so-mau.png") },
-  { id: 6, name: "Lỗ ban", icon: require("@/assets/images/icon-dich-vu/lo-ban.png") },
-  { id: 7, name: "Bảng mẫu", icon: require("@/assets/images/icon-dich-vu/bang-mau.png") },
-  { id: 8, name: "Tư vấn chất lượng", icon: require("@/assets/images/icon-dich-vu/Tư vấn chất lượng.png") },
-  { id: 9, name: "Công ty xây dựng", icon: require("@/assets/images/icon-dich-vu/cong-ty-xay-dung.png") },
-  { id: 10, name: "Công ty nội thất", icon: require("@/assets/images/icon-dich-vu/cong-ty-noi-that.png") },
-  { id: 11, name: "Giám sát chất lượng", icon: require("@/assets/images/icon-dich-vu/giam-sat-chat-luong.png") },
-];
-
-const CONSTRUCTION_UTILITIES = [
-  { id: 1, name: "Ép cọc", location: "Hà Nội", count: 100, icon: require("@/assets/images/tien-ich-xay-dung/ep-coc.png") },
-  { id: 2, name: "Đào đất", location: "Sài Gòn", count: 50, icon: require("@/assets/images/tien-ich-xay-dung/dao-dat.png") },
-  { id: 3, name: "Vật liệu", location: "Đà Nẵng", count: 80, icon: require("@/assets/images/tien-ich-xay-dung/vat-lieu.png") },
-  { id: 4, name: "Nhân công", location: "Sài Gòn", count: 60, icon: require("@/assets/images/tien-ich-xay-dung/nhan-cong.png") },
-  { id: 5, name: "Thợ xây", location: "Hà Nội", count: 78, icon: require("@/assets/images/tien-ich-xay-dung/tho-xay.png") },
-  { id: 6, name: "Thợ coffa", location: "Sài Gòn", count: 97, icon: require("@/assets/images/tien-ich-xay-dung/tho-coffa.png") },
-  { id: 7, name: "Thợ điện nước", location: "Cần Thơ", count: 50, icon: require("@/assets/images/tien-ich-xay-dung/tho-dien-nuoc.png") },
-  { id: 8, name: "Bê tông", location: "Sài Gòn", count: 90, icon: require("@/assets/images/tien-ich-xay-dung/be-tong.png") },
-];
-
-const FINISHING_UTILITIES = [
-  { id: 1, name: "Thợ lát gạch", location: "Hà Nội", count: 100, icon: require("@/assets/images/tien-ich-hoan-thien/tho-lat-gach.png") },
-  { id: 2, name: "Thợ thạch cao", location: "Sài Gòn", count: 60, icon: require("@/assets/images/tien-ich-hoan-thien/tho-thachcao-.png") },
-  { id: 3, name: "Thợ sơn", location: "Đà Nẵng", count: 85, icon: require("@/assets/images/tien-ich-hoan-thien/tho-son.png") },
-  { id: 4, name: "Thợ đá", location: "Sài Gòn", count: 70, icon: require("@/assets/images/tien-ich-hoan-thien/tho-da.png") },
-  { id: 5, name: "Thợ làm cửa", location: "Hà Nội", count: 68, icon: require("@/assets/images/tien-ich-hoan-thien/tho-lam-cua.png") },
-  { id: 6, name: "Thợ lan can", location: "Sài Gòn", count: 95, icon: require("@/assets/images/tien-ich-hoan-thien/tho-lan-can.png") },
-  { id: 7, name: "Thợ công", location: "Cần Thơ", count: 40, icon: require("@/assets/images/tien-ich-hoan-thien/tho-cong.png") },
-  { id: 8, name: "Thợ camera", location: "Sài Gòn", count: 70, icon: require("@/assets/images/tien-ich-hoan-thien/tho-camera.png") },
-];
-
-const EQUIPMENT_SHOPPING = [
-  { id: 1, name: "Thiết bị bếp", icon: require("@/assets/images/tien-ich-mua-sam-trang-thiet-bi/thiet-bi-bep.png") },
-  { id: 2, name: "Thiết bị vệ sinh", icon: require("@/assets/images/tien-ich-mua-sam-trang-thiet-bi/thiet-bi-ve-sinh.png") },
-  { id: 3, name: "Điện", icon: require("@/assets/images/tien-ich-mua-sam-trang-thiet-bi/dien.png") },
-  { id: 4, name: "Nước", icon: require("@/assets/images/tien-ich-mua-sam-trang-thiet-bi/nuoc.png") },
-  { id: 5, name: "PCCC", icon: require("@/assets/images/tien-ich-mua-sam-trang-thiet-bi/pccc.png") },
-  { id: 6, name: "Bàn ăn", icon: require("@/assets/images/tien-ich-mua-sam-trang-thiet-bi/ban-an.png") },
-  { id: 7, name: "Bàn học", icon: require("@/assets/images/tien-ich-mua-sam-trang-thiet-bi/ban-hoc.png") },
-  { id: 8, name: "Sofa", icon: require("@/assets/images/tien-ich-mua-sam-trang-thiet-bi/sofa.png") },
-];
-
-const LIBRARY = [
-  { id: 1, name: "Văn phòng", icon: require("@/assets/images/thu-vien/van-phong.png") },
-  { id: 2, name: "Nhà phố", icon: require("@/assets/images/thu-vien/nha-pho.png") },
-  { id: 3, name: "Biệt thự", icon: require("@/assets/images/thu-vien/biet-thu.png") },
-  { id: 4, name: "Biệt thự cổ điển", icon: require("@/assets/images/thu-vien/biet-thu-co-dien.png") },
-  { id: 5, name: "Khách sạn", icon: require("@/assets/images/thu-vien/khach-san.png") },
-  { id: 6, name: "Nhà xưởng", icon: require("@/assets/images/thu-vien/nha-xuong.png") },
-  { id: 7, name: "Căn hộ dịch vụ", icon: require("@/assets/images/thu-vien/can-ho-dich-vu.png") },
-];
-
-const DESIGN_UTILITIES = [
-  { id: 1, name: "Kiến trúc sư", price: "100k", icon: require("@/assets/images/tien-ich-thiet-ke/kien-truc-su.png") },
-  { id: 2, name: "Kỹ sư giám sát", price: "80k", icon: require("@/assets/images/tien-ich-thiet-ke/ky-su-giam-sat.png") },
-  { id: 3, name: "Kỹ sư kết cấu", price: "90k", icon: require("@/assets/images/tien-ich-thiet-ke/ky-su-ket-cau.png") },
-  { id: 4, name: "Kỹ sư điện", price: "70k", icon: require("@/assets/images/tien-ich-thiet-ke/ky-su-dien.png") },
-  { id: 5, name: "Kỹ sư nước", price: "70k", icon: require("@/assets/images/tien-ich-thiet-ke/ky-su-nuoc.png") },
-  { id: 6, name: "Dự toán", price: "60k", icon: require("@/assets/images/tien-ich-thiet-ke/du-toan.png") },
-  { id: 7, name: "Nội thất", price: "100k", icon: require("@/assets/images/tien-ich-thiet-ke/kien-tru-su-noi-that.png") },
-];
-
-// Video URLs - use remote URLs instead of bundling large files
-const DESIGN_LIVE_VIDEOS = [
-  { id: 1, title: "Phòng bếp đẹp", thumbnail: require("@/assets/images/icon-dich-vu/thiet-ke-nha.png") },
-  { id: 2, title: "Đèn thông tầng", thumbnail: require("@/assets/images/icon-dich-vu/thiet-ke-noi-that.png") },
-  { id: 3, title: "Maika", thumbnail: require("@/assets/images/thu-vien/biet-thu.png") },
-  { id: 4, title: "Carbon", thumbnail: require("@/assets/images/thu-vien/van-phong.png") },
-];
-
-const CONSTRUCTION_VIDEOS = [
-  { id: 1, title: "Cảm nhận khách hàng", thumbnail: require("@/assets/images/tien-ich-xay-dung/ep-coc.png") },
-  { id: 2, title: "Kiểm tra bê tông", thumbnail: require("@/assets/images/tien-ich-xay-dung/be-tong.png") },
-  { id: 3, title: "Video 1", thumbnail: require("@/assets/images/tien-ich-xay-dung/dao-dat.png") },
-  { id: 4, title: "Video 2", thumbnail: require("@/assets/images/tien-ich-xay-dung/vat-lieu.png") },
-];
-
-// ===== COMPONENTS =====
-const Section = ({ 
-  title, 
-  data, 
-  renderItem, 
-  isGrid = false,
-  icon 
-}: { 
-  title: string; 
-  data: any[]; 
-  renderItem: (item: any, expanded: boolean) => React.ReactNode;
-  isGrid?: boolean;
-  icon?: keyof typeof Ionicons.glyphMap;
-}) => {
-  const [expanded, setExpanded] = useState(false);
-  const displayData = expanded ? data : data.slice(0, isGrid ? 8 : 4);
-
-  return (
-    <View style={{ 
-      marginBottom: 28,
-      backgroundColor: 'transparent'
-    }}>
-      <View style={{ 
-        flexDirection: 'row', 
-        alignItems: 'center', 
-        justifyContent: 'space-between', 
-        marginBottom: 16,
-        paddingHorizontal: 16
-      }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-          {icon && (
-            <View style={{
-              width: 28,
-              height: 28,
-              borderRadius: 8,
-              backgroundColor: Colors.light.primary + '15',
-              justifyContent: 'center',
-              alignItems: 'center'
-            }}>
-              <Ionicons name={icon} size={16} color={Colors.light.primary} />
-            </View>
-          )}
-          <Text style={{ 
-            fontSize: 16, 
-            fontWeight: '700', 
-            color: '#1a1a1a',
-            letterSpacing: -0.3
-          }}>
-            {title}
-          </Text>
-        </View>
-        <TouchableOpacity 
-          onPress={() => setExpanded(!expanded)} 
-          activeOpacity={0.6}
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 4,
-            paddingVertical: 6,
-            paddingHorizontal: 10,
-            backgroundColor: Colors.light.primary + '10',
-            borderRadius: 12
-          }}
-        >
-          <Text style={{ color: Colors.light.primary, fontWeight: '600', fontSize: 12 }}>
-            {expanded ? 'Thu gọn' : 'Xem thêm'}
-          </Text>
-          <Ionicons 
-            name={expanded ? 'chevron-up' : 'chevron-forward'} 
-            size={14} 
-            color={Colors.light.primary} 
-          />
-        </TouchableOpacity>
-      </View>
-      {isGrid ? (
-        <View style={{ paddingHorizontal: 16 }}>
-          <SmartGrid
-            data={displayData}
-            renderItem={(item) => renderItem(item, expanded)}
-            itemsPerRow={4}
-            showPlaceholder={!expanded}
-            placeholderTitle="Xem thêm"
-            onPlaceholderPress={() => setExpanded(true)}
-          />
-        </View>
-      ) : (
-        <ScrollView 
-          horizontal 
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ gap: 12, paddingHorizontal: 16 }}
-          decelerationRate="fast"
-          snapToInterval={84 + 12}
-          snapToAlignment="start"
-        >
-          {displayData.map((item) => renderItem(item, expanded))}
-        </ScrollView>
-      )}
-    </View>
-  );
+// ============================================================================
+// DESIGN TOKENS - European Minimal Style
+// ============================================================================
+const COLORS = {
+  bg: '#F8FAFC',
+  card: '#FFFFFF',
+  text: '#0F172A',
+  textSecondary: '#64748B',
+  textMuted: '#94A3B8',
+  accent: '#2563EB',
+  accentLight: '#EFF6FF',
+  success: '#10B981',
+  successLight: '#D1FAE5',
+  warning: '#F59E0B',
+  warningLight: '#FEF3C7',
+  border: '#E2E8F0',
+  divider: '#F1F5F9',
 };
 
-const IconCard = ({ item, onPress }: { item: any; onPress?: () => void }) => {
-  const scaleAnim = useRef(new Animated.Value(1)).current;
-
-  const handlePressIn = () => {
-    Animated.spring(scaleAnim, {
-      toValue: 0.90,
-      useNativeDriver: true,
-      speed: 50,
-      bounciness: 8
-    }).start();
-  };
-
-  const handlePressOut = () => {
-    Animated.spring(scaleAnim, {
-      toValue: 1,
-      useNativeDriver: true,
-      speed: 50,
-      bounciness: 8
-    }).start();
-  };
-
-  return (
-    <TouchableOpacity 
-      style={{ 
-        width: 84,
-        alignItems: 'center', 
-        marginBottom: 20,
-      }} 
-      activeOpacity={1}
-      onPress={onPress}
-      onPressIn={handlePressIn}
-      onPressOut={handlePressOut}
-    >
-      <Animated.View style={{ 
-        transform: [{ scale: scaleAnim }],
-        width: 68, 
-        height: 68, 
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#fff',
-        borderRadius: 16,
-        overflow: 'hidden',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.08,
-        shadowRadius: 8,
-        elevation: 3,
-        borderWidth: 1,
-        borderColor: 'rgba(0,0,0,0.05)'
-      }}>
-        <Image 
-          source={item.icon} 
-          style={{ width: 44, height: 44 }} 
-          resizeMode="contain" 
-        />
-      </Animated.View>
-      <Text style={{ 
-        fontSize: 11, 
-        textAlign: 'center', 
-        marginTop: 8, 
-        lineHeight: 14, 
-        color: '#333', 
-        fontWeight: '600',
-        paddingHorizontal: 2,
-        width: 84,
-        letterSpacing: -0.2
-      }} numberOfLines={2}>
-        {item.name}
-      </Text>
-    </TouchableOpacity>
-  );
+const SPACING = {
+  xs: 4,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 20,
+  xxl: 24,
 };
 
-const RoundIcon = ({ item, onPress }: { item: any; onPress?: () => void }) => {
-  const scaleAnim = useRef(new Animated.Value(1)).current;
+// ============================================================================
+// MAIN SERVICES DATA - Compact & Essential
+// ============================================================================
+const MAIN_SERVICES = [
+  { id: 1, label: 'Thiết kế', icon: 'home-outline', route: '/services/house-design', color: '#6366F1' },
+  { id: 2, label: 'Thi công', icon: 'construct-outline', route: '/construction/progress', color: '#F59E0B' },
+  { id: 3, label: 'Dự án', icon: 'folder-outline', route: '/(tabs)/projects', color: '#10B981' },
+  { id: 4, label: 'Tiến độ', icon: 'analytics-outline', route: '/construction/tracking', color: '#3B82F6' },
+  { id: 5, label: 'Vật liệu', icon: 'cube-outline', route: '/materials/index', color: '#EC4899' },
+  { id: 6, label: 'Báo giá', icon: 'calculator-outline', route: '/utilities/quote-request', color: '#8B5CF6' },
+];
 
-  const handlePressIn = () => {
-    Animated.spring(scaleAnim, {
-      toValue: 0.90,
-      useNativeDriver: true,
-      speed: 50,
-      bounciness: 8
-    }).start();
-  };
+// ============================================================================
+// QUICK TOOLS DATA - Most Used Features
+// ============================================================================
+const QUICK_TOOLS = [
+  { id: 1, label: 'Timeline', icon: 'git-network-outline', route: '/timeline/index' },
+  { id: 2, label: 'Ngân sách', icon: 'wallet-outline', route: '/budget/index' },
+  { id: 3, label: 'QC/QA', icon: 'checkmark-circle-outline', route: '/quality-assurance/index' },
+  { id: 4, label: 'An toàn', icon: 'shield-checkmark-outline', route: '/safety/index' },
+  { id: 5, label: 'Tài liệu', icon: 'document-outline', route: '/documents/folders' },
+  { id: 6, label: 'Báo cáo', icon: 'newspaper-outline', route: '/reports/index' },
+  { id: 7, label: 'Nhân công', icon: 'people-outline', route: '/labor/index' },
+  { id: 8, label: 'Sitemap', icon: 'map-outline', route: '/utilities/sitemap' },
+];
 
-  const handlePressOut = () => {
-    Animated.spring(scaleAnim, {
-      toValue: 1,
-      useNativeDriver: true,
-      speed: 50,
-      bounciness: 8
-    }).start();
-  };
+// ============================================================================
+// SERVICES GRID - Dịch vụ thi công
+// ============================================================================
+const CONSTRUCTION_SERVICES = [
+  { id: 1, label: 'Ép cọc', icon: '⚡', route: '/utilities/ep-coc' },
+  { id: 2, label: 'Đào đất', icon: '🚜', route: '/utilities/dao-dat' },
+  { id: 3, label: 'Bê tông', icon: '🏗️', route: '/utilities/be-tong' },
+  { id: 4, label: 'Vật liệu', icon: '📦', route: '/utilities/vat-lieu' },
+  { id: 5, label: 'Thợ xây', icon: '👷', route: '/utilities/tho-xay' },
+  { id: 6, label: 'Điện nước', icon: '💡', route: '/utilities/tho-dien-nuoc' },
+  { id: 7, label: 'Cốp pha', icon: '🔧', route: '/utilities/tho-coffa' },
+  { id: 8, label: 'Thiết kế', icon: '✏️', route: '/utilities/design-team' },
+];
 
-  return (
-    <TouchableOpacity 
-      style={{ 
-        width: 84,
-        alignItems: 'center', 
-        marginBottom: 20 
-      }} 
-      activeOpacity={1}
-      onPress={onPress}
-      onPressIn={handlePressIn}
-      onPressOut={handlePressOut}
-    >
-      <Animated.View style={{ 
-        transform: [{ scale: scaleAnim }],
-        width: 68,
-        height: 68, 
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#fff',
-        borderRadius: 34,
-        overflow: 'hidden',
-        shadowColor: Colors.light.primary,
-        shadowOffset: { width: 0, height: 3 },
-        shadowOpacity: 0.12,
-        shadowRadius: 8,
-        elevation: 4,
-        borderWidth: 1.5,
-        borderColor: 'rgba(0,0,0,0.04)'
-      }}>
-        <Image 
-          source={item.icon} 
-          style={{ width: 44, height: 44 }} 
-          resizeMode="contain" 
-        />
-      </Animated.View>
-      <Text style={{ 
-        fontSize: 11, 
-        textAlign: 'center', 
-        marginTop: 8, 
-        color: '#333', 
-        fontWeight: '600',
-        paddingHorizontal: 2,
-        width: 84,
-        letterSpacing: -0.2
-      }} numberOfLines={2}>
-        {item.name}
-      </Text>
-      {item.location && (
-        <View style={{ 
-          marginTop: 4, 
-          paddingHorizontal: 8, 
-          paddingVertical: 3, 
-          borderRadius: 12, 
-          backgroundColor: '#f0f9ff',
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: 3,
-          maxWidth: 84
-        }}>
-          <Ionicons name="location" size={10} color={Colors.light.primary} />
-          <Text style={{ fontSize: 9, color: Colors.light.primary, fontWeight: '600' }} numberOfLines={1}>
-            {item.location}
-          </Text>
-          <Text style={{ fontSize: 8, color: '#ccc' }}>·</Text>
-          <Text style={{ fontSize: 9, color: '#666', fontWeight: '400' }}>
-            {item.count}
-          </Text>
-        </View>
-      )}
-      {item.price && (
-        <View style={{ 
-          marginTop: 4, 
-          paddingHorizontal: 6, 
-          paddingVertical: 2, 
-          borderRadius: 8, 
-          backgroundColor: 'transparent'
-        }}>
-          <Text style={{ fontSize: 11, color: '#90B44C', fontWeight: '600' }}>
-            {item.price}
-          </Text>
-        </View>
-      )}
-    </TouchableOpacity>
-  );
-};
+// ============================================================================
+// UTILITY TOOLS - Tiện ích hoàn thiện
+// ============================================================================
+const UTILITY_TOOLS = [
+  { id: 1, label: 'Lát gạch', icon: 'grid-outline', route: '/finishing/lat-gach' },
+  { id: 2, label: 'Sơn', icon: 'color-fill-outline', route: '/finishing/son' },
+  { id: 3, label: 'Thạch cao', icon: 'square-outline', route: '/finishing/thach-cao' },
+  { id: 4, label: 'Cửa', icon: 'enter-outline', route: '/finishing/lam-cua' },
+  { id: 5, label: 'Camera', icon: 'videocam-outline', route: '/finishing/camera' },
+  { id: 6, label: 'Lan can', icon: 'reorder-four-outline', route: '/finishing/lan-can' },
+  { id: 7, label: 'Đá ốp', icon: 'diamond-outline', route: '/finishing/da' },
+  { id: 8, label: 'Thợ', icon: 'hammer-outline', route: '/finishing/tho-tong-hop' },
+];
 
-const VideoTile = ({ item, onPress }: { item: any; onPress?: () => void }) => (
-  <TouchableOpacity 
-    style={{ 
-      width: VIDEO_WIDTH, 
-      height: VIDEO_HEIGHT, 
-      borderRadius: 8, 
-      backgroundColor: '#f5f5f5',
-      overflow: 'hidden',
-      justifyContent: 'center',
-      alignItems: 'center'
-    }}
+// ============================================================================
+// VIDEO & SHOPPING CATEGORIES
+// ============================================================================
+const VIDEO_ITEMS = [
+  { id: 1, title: 'Thi công móng nhà', views: '12K', duration: '8:45', route: '/videos/index' },
+  { id: 2, title: 'Đổ bê tông sàn', views: '8.5K', duration: '12:30', route: '/videos/index' },
+  { id: 3, title: 'Hoàn thiện nội thất', views: '15K', duration: '15:00', route: '/videos/index' },
+];
+
+const SHOPPING_CATS = [
+  { id: 1, label: 'Vật liệu', icon: '🧱', route: '/shopping/index?cat=construction' },
+  { id: 2, label: 'Thiết bị', icon: '⚡', route: '/shopping/index?cat=electrical' },
+  { id: 3, label: 'Nội thất', icon: '🛋️', route: '/shopping/index?cat=furniture' },
+  { id: 4, label: 'Sơn màu', icon: '🎨', route: '/shopping/index?cat=paint' },
+];
+
+// ============================================================================
+// MEMOIZED COMPONENTS
+// ============================================================================
+
+// Service Card - Main grid
+const ServiceCard = memo<{
+  item: typeof MAIN_SERVICES[0];
+  onPress: (route: string) => void;
+}>(({ item, onPress }) => (
+  <TouchableOpacity
+    style={styles.serviceCard}
+    onPress={() => onPress(item.route)}
     activeOpacity={0.7}
-    onPress={onPress}
   >
-    <Image 
-      source={item.thumbnail} 
-      style={{ width: '80%', height: '80%', opacity: 0.9 }} 
-      resizeMode="contain" 
-    />
-    
-    {/* Title - Shopee style */}
-    <View style={{ 
-      position: 'absolute', 
-      bottom: 6, 
-      left: 6, 
-      right: 6,
-      backgroundColor: 'rgba(0,0,0,0.6)',
-      borderRadius: 4,
-      padding: 4
-    }}>
-      <Text style={{ 
-        fontSize: 9, 
-        color: '#fff', 
-        textAlign: 'center', 
-        fontWeight: '500'
-      }} numberOfLines={1}>
-        {item.title}
-      </Text>
+    <View style={[styles.serviceIconBox, { backgroundColor: item.color + '15' }]}>
+      <Ionicons name={item.icon as any} size={22} color={item.color} />
     </View>
-    
-    {/* Play button - minimalist */}
-    <View style={{
-      position: 'absolute',
-      backgroundColor: 'transparent',
-      borderRadius: 28,
-      width: 40,
-      height: 40,
-      justifyContent: 'center',
-      alignItems: 'center',
-      borderWidth: 2,
-      borderColor: Colors.light.primary
-    }}>
-      <Ionicons name="play" size={18} color={Colors.light.primary} style={{ marginLeft: 2 }} />
-    </View>
+    <Text style={styles.serviceLabel}>{item.label}</Text>
   </TouchableOpacity>
-);
+));
+ServiceCard.displayName = 'ServiceCard';
 
-// New VideoCard with fixed size - 4 videos per row
-const VideoCard = ({ item, autoPlay = false, onPress }: { item: any; autoPlay?: boolean; onPress?: () => void }) => (
-  <TouchableOpacity 
-    style={{ 
-      width: VIDEO_WIDTH, 
-      marginRight: VIDEO_ITEM_GAP,
-      marginBottom: VIDEO_ITEM_GAP
-    }}
-    onPress={onPress}
-    activeOpacity={0.9}
+// Tool Item - Compact grid
+const ToolItem = memo<{
+  item: typeof QUICK_TOOLS[0];
+  onPress: (route: string) => void;
+}>(({ item, onPress }) => (
+  <TouchableOpacity
+    style={styles.toolItem}
+    onPress={() => onPress(item.route)}
+    activeOpacity={0.7}
   >
-    <View style={{ 
-      width: VIDEO_WIDTH, 
-      height: VIDEO_HEIGHT,
-      borderRadius: 12,
-      overflow: 'hidden',
-      backgroundColor: '#F3F4F6'
-    }}>
-      <VideoPlayer
-        url={item.url}
-        asset={item.asset}  // Support local videos
-        thumbnail={item.thumbnail || item.thumbnailUrl}
-        title={item.title}
-        autoPlay={false}  // Don't autoplay in grid view
-        muted={true}
-        loop={true}
-        compact={true}
-        style={{ 
-          width: VIDEO_WIDTH, 
-          height: VIDEO_HEIGHT
-        }}
+    <Ionicons name={item.icon as any} size={20} color={COLORS.accent} />
+    <Text style={styles.toolLabel}>{item.label}</Text>
+  </TouchableOpacity>
+));
+ToolItem.displayName = 'ToolItem';
+
+// Construction Service Card
+const ConstructionCard = memo<{
+  item: typeof CONSTRUCTION_SERVICES[0];
+  onPress: (route: string) => void;
+}>(({ item, onPress }) => (
+  <TouchableOpacity
+    style={styles.constructionCard}
+    onPress={() => onPress(item.route)}
+    activeOpacity={0.7}
+  >
+    <View style={styles.constructionIcon}>
+      <Text style={styles.constructionEmoji}>{item.icon}</Text>
+    </View>
+    <Text style={styles.constructionLabel}>{item.label}</Text>
+  </TouchableOpacity>
+));
+ConstructionCard.displayName = 'ConstructionCard';
+
+// Utility Tool Card
+const UtilityCard = memo<{
+  item: typeof UTILITY_TOOLS[0];
+  onPress: (route: string) => void;
+}>(({ item, onPress }) => (
+  <TouchableOpacity
+    style={styles.utilityCard}
+    onPress={() => onPress(item.route)}
+    activeOpacity={0.7}
+  >
+    <Ionicons name={item.icon as any} size={22} color={COLORS.text} />
+    <Text style={styles.utilityLabel}>{item.label}</Text>
+  </TouchableOpacity>
+));
+UtilityCard.displayName = 'UtilityCard';
+
+// Video Card
+const VideoCard = memo<{
+  item: typeof VIDEO_ITEMS[0];
+  onPress: (route: string) => void;
+}>(({ item, onPress }) => (
+  <TouchableOpacity
+    style={styles.videoCard}
+    onPress={() => onPress(item.route)}
+    activeOpacity={0.8}
+  >
+    <View style={styles.videoThumbnail}>
+      <LinearGradient
+        colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.6)']}
+        style={styles.videoGradient}
       />
-    </View>
-    
-    {/* Video stats overlay */}
-    {(item.views || item.likes) && (
-      <View style={{ 
-        position: 'absolute',
-        bottom: 8,
-        left: 4,
-        right: 4,
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 6,
-        backgroundColor: 'rgba(0,0,0,0.6)',
-        paddingHorizontal: 6,
-        paddingVertical: 3,
-        borderRadius: 4
-      }}>
-        {item.views && (
-          <>
-            <Ionicons name="eye-outline" size={10} color="#fff" />
-            <Text style={{ fontSize: 9, color: '#fff', fontWeight: '600' }}>
-              {item.views >= 1000 ? `${(item.views / 1000).toFixed(1)}K` : item.views}
-            </Text>
-          </>
-        )}
-        {item.likes && (
-          <>
-            <Ionicons name="heart" size={10} color="#EF4444" style={{ marginLeft: 4 }} />
-            <Text style={{ fontSize: 9, color: '#fff', fontWeight: '600' }}>
-              {item.likes >= 1000 ? `${(item.likes / 1000).toFixed(1)}K` : item.likes}
-            </Text>
-          </>
-        )}
+      <View style={styles.playButton}>
+        <Ionicons name="play" size={20} color="#fff" />
       </View>
-    )}
+      <Text style={styles.videoDuration}>{item.duration}</Text>
+    </View>
+    <Text style={styles.videoTitle} numberOfLines={2}>{item.title}</Text>
+    <Text style={styles.videoViews}>{item.views} lượt xem</Text>
   </TouchableOpacity>
-);
+));
+VideoCard.displayName = 'VideoCard';
 
+// Shopping Category Card
+const ShoppingCard = memo<{
+  item: typeof SHOPPING_CATS[0];
+  onPress: (route: string) => void;
+}>(({ item, onPress }) => (
+  <TouchableOpacity
+    style={styles.shoppingCard}
+    onPress={() => onPress(item.route)}
+    activeOpacity={0.7}
+  >
+    <Text style={styles.shoppingEmoji}>{item.icon}</Text>
+    <Text style={styles.shoppingLabel}>{item.label}</Text>
+  </TouchableOpacity>
+));
+ShoppingCard.displayName = 'ShoppingCard';
+
+// ============================================================================
+// MAIN COMPONENT
+// ============================================================================
 export default function HomeScreen() {
-  const { user, loading, refresh } = useProfile();
-  const { counts } = useUnreadCounts(true); // Auto-refresh every 30s
+  const { user } = useAuth();
+  const insets = useSafeAreaInsets();
   const [refreshing, setRefreshing] = useState(false);
-  const [menuVisible, setMenuVisible] = useState(false);
-  const [quickMenuVisible, setQuickMenuVisible] = useState(false);
-  
-  // Reels player state
-  const [reelsVisible, setReelsVisible] = useState(false);
-  const [selectedVideo, setSelectedVideo] = useState<any>(null);
-  
-  // Sticky header state
-  const [scrollY, setScrollY] = useState(0);
-  const stickyHeaderOpacity = useRef(new Animated.Value(0)).current;
-  const stickyHeaderTranslateY = useRef(new Animated.Value(-60)).current;
-  
-  // Fetch videos from server
-  const { videos: designVideos, loading: loadingDesign } = useVideos({ category: 'design', limit: 6 });
-  const { videos: constructionVideos, loading: loadingConstruction } = useVideos({ category: 'construction', limit: 6 });
 
-  // Edge swipe gesture to open quick menu from bottom
-  const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
-  const edgeSwipe = useEdgeSwipe({
-    onSwipeFromBottom: () => setQuickMenuVisible(true),
-  });
-
-  // Smart back handler: Double back to exit on home, navigate back on other screens
-  useSmartBackHandler({
-    message: 'Nhấn lại một lần nữa để thoát ứng dụng',
-  });
-
-  // Animate sticky header based on scroll position
-  React.useEffect(() => {
-    if (scrollY > 150) {
-      // Show sticky header
-      Animated.parallel([
-        Animated.timing(stickyHeaderOpacity, {
-          toValue: 1,
-          duration: 200,
-          useNativeDriver: true
-        }),
-        Animated.spring(stickyHeaderTranslateY, {
-          toValue: 0,
-          useNativeDriver: true,
-          speed: 20,
-          bounciness: 8
-        })
-      ]).start();
-    } else {
-      // Hide sticky header
-      Animated.parallel([
-        Animated.timing(stickyHeaderOpacity, {
-          toValue: 0,
-          duration: 200,
-          useNativeDriver: true
-        }),
-        Animated.spring(stickyHeaderTranslateY, {
-          toValue: -60,
-          useNativeDriver: true,
-          speed: 20,
-          bounciness: 8
-        })
-      ]).start();
-    }
-  }, [scrollY]);
-
-  const onRefresh = async () => {
+  const handleRefresh = useCallback(async () => {
     setRefreshing(true);
-    await refresh();
-    setRefreshing(false);
-  };
+    setTimeout(() => setRefreshing(false), 1000);
+  }, []);
 
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return "Chào buổi sáng";
-    if (hour < 18) return "Chào buổi chiều";
-    return "Chào buổi tối";
-  };
-
-  const handleServicePress = (item: any) => {
-    // Push static service routes using literal strings for strong typing
-    switch (item.id) {
-      case 1: return router.push('/services/house-design');
-      case 2: return router.push('/services/interior-design');
-      case 3: return router.push('/services/construction-lookup');
-      case 4: return router.push('/services/permit');
-      case 5: return router.push('/services/sample-docs');
-      case 6: return router.push('/services/feng-shui');
-      case 7: return router.push('/services/color-chart');
-      case 8: return router.push('/services/quality-consulting');
-      case 9: return router.push('/services/construction-company');
-  case 10: return router.push('/services/company-detail');
-      case 11: return router.push('/services/quality-supervision');
-      default:
-        return;
-    }
-  };
-
-  const handleUtilityPress = (item: any) => {
-    // Navigate to construction booking with pre-selected worker type
-    const constructionItem = CONSTRUCTION_UTILITIES.find(u => u.id === item.id);
-    if (constructionItem) {
-      // Map construction utilities to worker types
-      let workerType = 'mason'; // Default
-      switch (item.id) {
-        case 5: // Thợ xây
-          workerType = 'mason';
-          break;
-        case 7: // Thợ điện nước
-          workerType = 'electrician';
-          break;
-        default:
-          workerType = 'mason';
-      }
-      return router.push(`/construction/booking?workerType=${workerType}`);
-    }
-
-    const finishingItem = FINISHING_UTILITIES.find(u => u.id === item.id);
-    if (finishingItem) {
-      // Map finishing utilities to worker types
-      let workerType = 'mason'; // Default
-      switch (item.id) {
-        case 3: // Thợ sơn
-          workerType = 'painter';
-          break;
-        case 7: // Thợ công (plumber)
-          workerType = 'plumber';
-          break;
-        default:
-          workerType = 'mason';
-      }
-      return router.push(`/construction/booking?workerType=${workerType}`);
-    }
-
-    const designItem = DESIGN_UTILITIES.find(u => u.id === item.id);
-    if (designItem) {
-      const slug = DESIGN_UTILITY_SLUGS[item.id as keyof typeof DESIGN_UTILITY_SLUGS];
-      if (slug) return router.push({ pathname: '/utilities/[slug]', params: { slug } });
-    }
-  };
-
-  const handleVideoPress = (item: any) => {
-    // Open Reels-style fullscreen video player
-    setSelectedVideo(item);
-    setReelsVisible(true);
-  };
-
-  const handleLibraryPress = (item: any) => {
-    // Navigate with query param using typed object form
-    const type = LIBRARY_TYPES[item.id as keyof typeof LIBRARY_TYPES];
-    if (type) {
-      router.push({ pathname: '/projects/architecture-portfolio', params: { type } });
-    }
-  };
-
-  const handleEquipmentPress = (item: any) => {
-    // Navigate to projects screen (materials shopping not yet implemented)
-    router.push('/projects');
-  };
-
-  const [voiceVisible, setVoiceVisible] = useState(false);
+  const navigateTo = useCallback((route: string) => {
+    router.push(route as Href);
+  }, []);
 
   return (
-    <>
-      <SafeScrollView 
-        style={{ flex: 1, backgroundColor: '#f5f5f5' }}
-        showsVerticalScrollIndicator={false}
-        hasTabBar={true}
-        extraPadding={20}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#90B44C']} />
-        }
-        onScroll={(e) => {
-          const offsetY = e.nativeEvent.contentOffset.y;
-          setScrollY(offsetY);
-        }}
-        scrollEventThrottle={16}
-        onTouchStart={(e) => edgeSwipe.handleTouchStart(e, screenWidth, screenHeight)}
-        onTouchEnd={(e) => edgeSwipe.handleTouchEnd(e, screenWidth, screenHeight)}
-      >
-        <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+    <View style={[styles.container, { paddingTop: insets.top }]}>
+      <StatusBar barStyle="dark-content" backgroundColor={COLORS.bg} />
 
-      {/* Enhanced User Greeting Banner - Modern Style */}
-      {user && (
-        <View style={{ 
-          marginHorizontal: 16,
-          marginTop: 16,
-          marginBottom: 16,
-          padding: 16,
-          backgroundColor: '#fff',
-          borderRadius: 16,
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.06,
-          shadowRadius: 8,
-          elevation: 2
-        }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <View style={{ flex: 1 }}>
-              <Text style={{ fontSize: 12, color: '#666', marginBottom: 4, fontWeight: '500' }}>
-                {getGreeting()} 👋
-              </Text>
-              <Text style={{ fontSize: 18, fontWeight: '700', color: '#1a1a1a', letterSpacing: -0.3 }}>
-                {user.name || user.email?.split('@')[0] || 'Khách hàng'}
-              </Text>
-            </View>
-            <View style={{
-              width: 44,
-              height: 44,
-              borderRadius: 22,
-              backgroundColor: '#f5f5f5',
-              justifyContent: 'center',
-              alignItems: 'center'
-            }}>
-              <Ionicons name="person" size={22} color="#666" />
-            </View>
+      {/* HEADER */}
+      <View style={styles.header}>
+        <View style={styles.headerTop}>
+          <View>
+            <Text style={styles.greeting}>
+              Xin chào{user?.name ? `, ${user.name}` : ''}
+            </Text>
+            <Text style={styles.headerSubtitle}>Hôm nay bạn cần gì?</Text>
+          </View>
+          <View style={styles.headerActions}>
+            <TouchableOpacity
+              style={styles.headerBtn}
+              onPress={() => navigateTo('/(tabs)/notifications')}
+            >
+              <Ionicons name="notifications-outline" size={22} color={COLORS.text} />
+              <View style={styles.notiBadge} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.headerBtn}
+              onPress={() => navigateTo('/cart')}
+            >
+              <Ionicons name="cart-outline" size={22} color={COLORS.text} />
+            </TouchableOpacity>
           </View>
         </View>
-      )}
 
-      {/* Search Bar - Enhanced Gradient Background */}
-      <View style={{ 
-        paddingHorizontal: 16, 
-        paddingTop: user ? 8 : 48, 
-        paddingBottom: 20,
-        backgroundColor: Colors.light.primary,
-        borderBottomLeftRadius: 24,
-        borderBottomRightRadius: 24
-      }}>
+        {/* Search Bar */}
         <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={() => router.push('/search')}
-          style={{ 
-          backgroundColor: '#fff', 
-          borderRadius: 24, 
-          borderWidth: 0,
-          flexDirection: 'row', 
-          alignItems: 'center', 
-          paddingHorizontal: 16, 
-          paddingVertical: 12,
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.1,
-          shadowRadius: 8,
-          elevation: 3
-        }}>
-          <Ionicons name="search-outline" size={20} color={Colors.light.primary} />
-          <Text style={{ color: '#999', flex: 1, marginLeft: 12, fontSize: 14 }}>Tìm kiếm sản phẩm, dịch vụ...</Text>
-          <TouchableOpacity 
-            onPress={() => setVoiceVisible(true)}
-            activeOpacity={0.7}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            style={{ marginRight: 12 }}
-          >
-            <Ionicons name="mic-outline" size={20} color={Colors.light.primary} />
-          </TouchableOpacity>
-          <TouchableOpacity 
-            onPress={() => setMenuVisible(true)}
-            activeOpacity={0.7}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
-            <Ionicons name="menu-outline" size={22} color={Colors.light.primary} />
-          </TouchableOpacity>
+          style={styles.searchBar}
+          onPress={() => navigateTo('/search')}
+          activeOpacity={0.8}
+        >
+          <Ionicons name="search-outline" size={18} color={COLORS.textMuted} />
+          <Text style={styles.searchPlaceholder}>Tìm dịch vụ, vật liệu, công nhân...</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Mobile Menu */}
-      <MobileMenu 
-        visible={menuVisible} 
-        onClose={() => setMenuVisible(false)}
-        userIsAdmin={user?.role === 'admin' || false}
-      />
-
-      {/* Hero Slider - Banner Top with Enhanced Shadow */}
-      <View style={{ paddingHorizontal: 16, marginTop: -8, marginBottom: 24 }}>
-        <View style={{
-          borderRadius: 20,
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.15,
-          shadowRadius: 12,
-          elevation: 5
-        }}>
-          <HeroSlider
-            images={[
-              { id: 'banner-1', source: require('@/assets/images/banner/Rectangle 21.png') },
-              { id: 'banner-2', source: require('@/assets/images/banner/Rectangle 213.png') },
-              { id: 'banner-3', source: require('@/assets/images/banner/Rectangle 214.png') },
-            ]}
-            height={180}
-            autoPlay
-            intervalMs={4500}
-            rounded={20}
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            tintColor={COLORS.accent}
           />
-        </View>
-      </View>
-
-      {/* Promotional Banners Section */}
-      <View style={{ paddingHorizontal: 16, marginBottom: 24 }}>
-        <View style={{
-          flexDirection: 'row',
-          gap: 12,
-        }}>
-          {/* Flash Sale Banner */}
-          <TouchableOpacity
-            style={{
-              flex: 1,
-              backgroundColor: '#FF5722',
-              borderRadius: 16,
-              padding: 16,
-              shadowColor: '#FF5722',
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.3,
-              shadowRadius: 8,
-              elevation: 4
-            }}
-            onPress={() => router.push('/shopping/flash-sale')}
+        }
+      >
+        {/* AI ASSISTANT CARD */}
+        <TouchableOpacity
+          style={styles.aiCard}
+          onPress={() => navigateTo('/ai')}
+          activeOpacity={0.9}
+        >
+          <LinearGradient
+            colors={['#2563EB', '#1D4ED8']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.aiGradient}
           >
-            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-              <View style={{
-                width: 32,
-                height: 32,
-                borderRadius: 16,
-                backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginRight: 8
-              }}>
-                <Ionicons name="flash" size={18} color="#FFF" />
+            <View style={styles.aiContent}>
+              <View style={styles.aiLeft}>
+                <View style={styles.aiIconBox}>
+                  <Ionicons name="sparkles" size={20} color="#fff" />
+                </View>
+                <View>
+                  <Text style={styles.aiTitle}>AI Assistant</Text>
+                  <Text style={styles.aiSubtitle}>Trợ lý thông minh 24/7</Text>
+                </View>
               </View>
-              <Text style={{
-                fontSize: 14,
-                fontWeight: '700',
-                color: '#FFF'
-              }}>Flash Sale</Text>
+              <View style={styles.aiStats}>
+                <View style={styles.aiStatItem}>
+                  <Text style={styles.aiStatValue}>+15%</Text>
+                  <Text style={styles.aiStatLabel}>Tiến độ</Text>
+                </View>
+                <View style={styles.aiDivider} />
+                <View style={styles.aiStatItem}>
+                  <Text style={styles.aiStatValue}>7</Text>
+                  <Text style={styles.aiStatLabel}>Công việc</Text>
+                </View>
+              </View>
             </View>
-            <Text style={{
-              fontSize: 20,
-              fontWeight: '800',
-              color: '#FFF',
-              marginBottom: 4
-            }}>Giảm 50%</Text>
-            <Text style={{
-              fontSize: 11,
-              color: 'rgba(255, 255, 255, 0.9)',
-              fontWeight: '500'
-            }}>Vật liệu xây dựng</Text>
-          </TouchableOpacity>
+          </LinearGradient>
+        </TouchableOpacity>
 
-          {/* New Customer Banner */}
-          <TouchableOpacity
-            style={{
-              flex: 1,
-              backgroundColor: '#4CAF50',
-              borderRadius: 16,
-              padding: 16,
-              shadowColor: '#4CAF50',
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.3,
-              shadowRadius: 8,
-              elevation: 4
-            }}
-            onPress={() => router.push('/shopping/new-customer-offer')}
+        {/* PROJECT PROGRESS SECTION */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <View>
+              <Text style={styles.sectionTitle}>Tiến độ dự án</Text>
+              <Text style={styles.sectionSubtitle}>Theo dõi tiến độ xây dựng</Text>
+            </View>
+            <TouchableOpacity onPress={() => navigateTo('/construction/progress')}>
+              <Text style={styles.seeAll}>Xem chi tiết</Text>
+            </TouchableOpacity>
+          </View>
+          <ProgressSection />
+        </View>
+
+        {/* MAIN SERVICES */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Dịch vụ chính</Text>
+            <TouchableOpacity onPress={() => navigateTo('/services/index')}>
+              <Text style={styles.seeAll}>Xem tất cả</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.servicesGrid}>
+            {MAIN_SERVICES.map((item) => (
+              <ServiceCard key={item.id} item={item} onPress={navigateTo} />
+            ))}
+          </View>
+        </View>
+
+        {/* QUICK TOOLS */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Công cụ quản lý</Text>
+            <TouchableOpacity onPress={() => navigateTo('/utilities/index')}>
+              <Text style={styles.seeAll}>Xem tất cả</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.toolsGrid}>
+            {QUICK_TOOLS.map((item) => (
+              <ToolItem key={item.id} item={item} onPress={navigateTo} />
+            ))}
+          </View>
+        </View>
+
+        {/* CONSTRUCTION SERVICES */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <View>
+              <Text style={styles.sectionTitle}>Dịch vụ thi công</Text>
+              <Text style={styles.sectionSubtitle}>Miễn phí tư vấn</Text>
+            </View>
+            <TouchableOpacity onPress={() => navigateTo('/construction/index')}>
+              <Text style={styles.seeAll}>Xem tất cả</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.constructionGrid}>
+            {CONSTRUCTION_SERVICES.map((item) => (
+              <ConstructionCard key={item.id} item={item} onPress={navigateTo} />
+            ))}
+          </View>
+        </View>
+
+        {/* UTILITY TOOLS - Hoàn thiện */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Hoàn thiện nội thất</Text>
+            <TouchableOpacity onPress={() => navigateTo('/finishing/index')}>
+              <Text style={styles.seeAll}>Xem tất cả</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.utilityGrid}>
+            {UTILITY_TOOLS.map((item) => (
+              <UtilityCard key={item.id} item={item} onPress={navigateTo} />
+            ))}
+          </View>
+        </View>
+
+        {/* VIDEO SECTION */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Video thi công</Text>
+            <TouchableOpacity onPress={() => navigateTo('/videos/index')}>
+              <Text style={styles.seeAll}>Xem tất cả</Text>
+            </TouchableOpacity>
+          </View>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.videoList}
           >
-            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-              <View style={{
-                width: 32,
-                height: 32,
-                borderRadius: 16,
-                backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginRight: 8
-              }}>
-                <Ionicons name="gift" size={18} color="#FFF" />
-              </View>
-              <Text style={{
-                fontSize: 14,
-                fontWeight: '700',
-                color: '#FFF'
-              }}>Khách mới</Text>
-            </View>
-            <Text style={{
-              fontSize: 20,
-              fontWeight: '800',
-              color: '#FFF',
-              marginBottom: 4
-            }}>Tặng 200K</Text>
-            <Text style={{
-              fontSize: 11,
-              color: 'rgba(255, 255, 255, 0.9)',
-              fontWeight: '500'
-            }}>Đơn đầu tiên</Text>
-          </TouchableOpacity>
+            {VIDEO_ITEMS.map((item) => (
+              <VideoCard key={item.id} item={item} onPress={navigateTo} />
+            ))}
+          </ScrollView>
         </View>
-      </View>
 
-      {/* Recent Reviews Section */}
-      <View style={{ paddingHorizontal: 16, marginBottom: 24 }}>
-        <View style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: 16
-        }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-            <View style={{
-              width: 28,
-              height: 28,
-              borderRadius: 14,
-              backgroundColor: Colors.light.primary,
-              justifyContent: 'center',
-              alignItems: 'center'
-            }}>
-              <Ionicons name="star" size={16} color="#FFF" />
-            </View>
-            <Text style={{
-              fontSize: 16,
-              fontWeight: '700',
-              color: Colors.light.text
-            }}>ĐÁNH GIÁ GẦN ĐÂY</Text>
+        {/* SHOPPING CATEGORIES */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Mua sắm thiết bị</Text>
+            <TouchableOpacity onPress={() => navigateTo('/shopping/index')}>
+              <Ionicons name="cart-outline" size={20} color={COLORS.accent} />
+            </TouchableOpacity>
           </View>
-          <TouchableOpacity onPress={() => router.push('/communications/reviews')}>
-            <Text style={{
-              fontSize: 13,
-              fontWeight: '600',
-              color: Colors.light.primary
-            }}>Xem tất cả →</Text>
+          <View style={styles.shoppingGrid}>
+            {SHOPPING_CATS.map((item) => (
+              <ShoppingCard key={item.id} item={item} onPress={navigateTo} />
+            ))}
+          </View>
+        </View>
+
+        {/* MORE FEATURES */}
+        <View style={styles.section}>
+          <View style={styles.moreGrid}>
+            <TouchableOpacity
+              style={styles.moreCard}
+              onPress={() => navigateTo('/services/interior-design')}
+            >
+              <Ionicons name="bed-outline" size={24} color={COLORS.accent} />
+              <View style={styles.moreCardContent}>
+                <Text style={styles.moreCardTitle}>Thiết kế nội thất</Text>
+                <Text style={styles.moreCardDesc}>Thiết kế chuyên nghiệp</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={18} color={COLORS.textMuted} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.moreCard}
+              onPress={() => navigateTo('/services/feng-shui')}
+            >
+              <Ionicons name="compass-outline" size={24} color={COLORS.warning} />
+              <View style={styles.moreCardContent}>
+                <Text style={styles.moreCardTitle}>Phong thủy</Text>
+                <Text style={styles.moreCardDesc}>Tư vấn chuyên sâu</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={18} color={COLORS.textMuted} />
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* ALL FEATURES BUTTON */}
+        <View style={styles.allFeaturesSection}>
+          <TouchableOpacity
+            style={styles.allFeaturesBtn}
+            onPress={() => navigateTo('/utilities/sitemap')}
+          >
+            <Ionicons name="apps-outline" size={20} color={COLORS.accent} />
+            <Text style={styles.allFeaturesText}>Tất cả tiện ích (272 chức năng)</Text>
+            <Ionicons name="chevron-forward" size={18} color={COLORS.textMuted} />
           </TouchableOpacity>
         </View>
 
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ gap: 12 }}
-        >
-          {/* Review Card 1 */}
-          <View style={{
-            width: 280,
-            backgroundColor: '#FFF',
-            borderRadius: 16,
-            padding: 16,
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.06,
-            shadowRadius: 8,
-            elevation: 2
-          }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
-              <View style={{
-                width: 40,
-                height: 40,
-                borderRadius: 20,
-                backgroundColor: '#E3F2FD',
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginRight: 12
-              }}>
-                <Text style={{ fontSize: 16, fontWeight: '700', color: Colors.light.primary }}>N</Text>
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 14, fontWeight: '700', color: Colors.light.text }}>Nguyễn Văn A</Text>
-                <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}>
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Ionicons key={star} name="star" size={12} color="#FFC107" style={{ marginRight: 2 }} />
-                  ))}
-                  <Text style={{ fontSize: 11, color: '#666', marginLeft: 4 }}>2 ngày trước</Text>
-                </View>
-              </View>
-            </View>
-            <Text style={{
-              fontSize: 13,
-              color: Colors.light.textMuted,
-              lineHeight: 18
-            }}>
-              Thợ xây rất tận tâm, làm việc chuyên nghiệp. Hoàn thành công trình đúng tiến độ và chất lượng tốt.
-            </Text>
-          </View>
-
-          {/* Review Card 2 */}
-          <View style={{
-            width: 280,
-            backgroundColor: '#FFF',
-            borderRadius: 16,
-            padding: 16,
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.06,
-            shadowRadius: 8,
-            elevation: 2
-          }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
-              <View style={{
-                width: 40,
-                height: 40,
-                borderRadius: 20,
-                backgroundColor: '#FCE4EC',
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginRight: 12
-              }}>
-                <Text style={{ fontSize: 16, fontWeight: '700', color: '#E91E63' }}>T</Text>
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 14, fontWeight: '700', color: Colors.light.text }}>Trần Thị B</Text>
-                <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}>
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Ionicons key={star} name="star" size={12} color="#FFC107" style={{ marginRight: 2 }} />
-                  ))}
-                  <Text style={{ fontSize: 11, color: '#666', marginLeft: 4 }}>3 ngày trước</Text>
-                </View>
-              </View>
-            </View>
-            <Text style={{
-              fontSize: 13,
-              color: Colors.light.textMuted,
-              lineHeight: 18
-            }}>
-              Vật liệu chất lượng tốt, giá cả hợp lý. Giao hàng nhanh chóng, đóng gói cẩn thận. Rất hài lòng!
-            </Text>
-          </View>
-
-          {/* Review Card 3 */}
-          <View style={{
-            width: 280,
-            backgroundColor: '#FFF',
-            borderRadius: 16,
-            padding: 16,
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.06,
-            shadowRadius: 8,
-            elevation: 2
-          }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
-              <View style={{
-                width: 40,
-                height: 40,
-                borderRadius: 20,
-                backgroundColor: '#E8F5E9',
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginRight: 12
-              }}>
-                <Text style={{ fontSize: 16, fontWeight: '700', color: '#4CAF50' }}>L</Text>
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 14, fontWeight: '700', color: Colors.light.text }}>Lê Văn C</Text>
-                <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}>
-                  {[1, 2, 3, 4].map((star) => (
-                    <Ionicons key={star} name="star" size={12} color="#FFC107" style={{ marginRight: 2 }} />
-                  ))}
-                  <Ionicons name="star-outline" size={12} color="#FFC107" />
-                  <Text style={{ fontSize: 11, color: '#666', marginLeft: 4 }}>1 tuần trước</Text>
-                </View>
-              </View>
-            </View>
-            <Text style={{
-              fontSize: 13,
-              color: Colors.light.textMuted,
-              lineHeight: 18
-            }}>
-              Dịch vụ thiết kế tốt, nhân viên tư vấn nhiệt tình. Bản vẽ chi tiết, dễ hiểu. Sẽ quay lại.
-            </Text>
-          </View>
-        </ScrollView>
-      </View>
-
-      {/* DỊCH VỤ - Grid */}
-      <Section
-        title="DỊCH VỤ"
-        icon="grid"
-        data={SERVICES}
-        isGrid={true}
-        renderItem={(item, expanded) => <IconCard key={item.id} item={item} onPress={() => handleServicePress(item)} />}
-      />
-
-      {/* DESIGN LIVE - Videos from Server */}
-      <Section
-        title="DESIGN LIVE"
-        icon="videocam"
-        data={loadingDesign ? DESIGN_LIVE_VIDEOS : designVideos}
-        isGrid={true}
-        renderItem={(item, expanded) => {
-          // Use VideoCard for server videos, VideoTile for fallback
-          if (item.url) {
-            return (
-              <VideoCard 
-                key={item.id} 
-                item={item} 
-                autoPlay={false}
-                onPress={() => handleVideoPress(item)}
-              />
-            );
-          }
-          return <VideoTile key={item.id} item={item} onPress={() => handleVideoPress(item)} />;
-        }}
-      />
-
-      
-
-      {/* TIỆN ÍCH XÂY DỰNG */}
-      <Section
-        title="TIỆN ÍCH XÂY DỰNG"
-        icon="construct"
-        data={CONSTRUCTION_UTILITIES}
-        isGrid={true}
-        renderItem={(item, expanded) => <RoundIcon key={item.id} item={item} onPress={() => handleUtilityPress(item)} />}
-      />
-
-      {/* VIDEO CONSTRUCTIONS - Videos from Server */}
-      <Section
-        title="VIDEO CONSTRUCTIONS"
-        icon="play-circle"
-        data={loadingConstruction ? CONSTRUCTION_VIDEOS : constructionVideos}
-        isGrid={true}
-        renderItem={(item, expanded) => {
-          // Use VideoCard for server videos, VideoTile for fallback
-          if (item.url) {
-            return (
-              <VideoCard 
-                key={item.id} 
-                item={item} 
-                autoPlay={false}
-                onPress={() => handleVideoPress(item)}
-              />
-            );
-          }
-          return <VideoTile key={item.id} item={item} onPress={() => handleVideoPress(item)} />;
-        }}
-      />
-
-      {/* TIỆN ÍCH HOÀN THIỆN */}
-      <Section
-        title="TIỆN ÍCH HOÀN THIỆN"
-        icon="color-palette"
-        data={FINISHING_UTILITIES}
-        isGrid={true}
-        renderItem={(item, expanded) => <RoundIcon key={item.id} item={item} onPress={() => handleUtilityPress(item)} />}
-      />
-
-      {/* TIỆN ÍCH MUA SẮM THIẾT BỊ - Horizontal Scroll */}
-      <Section
-        title="TIỆN ÍCH MUA SẮM THIẾT BỊ"
-        icon="cart"
-        data={EQUIPMENT_SHOPPING}
-        isGrid={false}
-        renderItem={(item, expanded) => <IconCard key={item.id} item={item} onPress={() => handleEquipmentPress(item)} />}
-      />
-
-      {/* THƯ VIỆN - Horizontal Scroll */}
-      <Section
-        title="THƯ VIỆN"
-        icon="library"
-        data={LIBRARY}
-        isGrid={false}
-        renderItem={(item, expanded) => <IconCard key={item.id} item={item} onPress={() => handleLibraryPress(item)} />}
-      />
-
-      {/* TIỆN ÍCH THIẾT KẾ */}
-      <Section
-        title="TIỆN ÍCH THIẾT KẾ"
-        icon="brush"
-        data={DESIGN_UTILITIES}
-        isGrid={true}
-        renderItem={(item, expanded) => <RoundIcon key={item.id} item={item} onPress={() => handleUtilityPress(item)} />}
-      />
-    </SafeScrollView>
-
-    {/* Reels Video Player */}
-    {selectedVideo && (
-      <ReelsPlayer
-        visible={reelsVisible}
-        videoUrl={selectedVideo.url}
-        videoAsset={selectedVideo.asset}  // Support local videos
-        videoId={selectedVideo.id}  // Add video ID for tracking
-        title={selectedVideo.title}
-        views={selectedVideo.views}
-        likes={selectedVideo.likes}
-        onClose={() => {
-          setReelsVisible(false);
-          setTimeout(() => setSelectedVideo(null), 300);
-        }}
-      />
-    )}
-
-    {/* Quick Action Menu */}
-    <QuickActionMenu 
-      visible={quickMenuVisible} 
-      onClose={() => setQuickMenuVisible(false)} 
-    />
-
-    {/* Mobile Menu */}
-    <MobileMenu visible={menuVisible} onClose={() => setMenuVisible(false)} />
-
-    {/* Sticky Search Bar */}
-    <Animated.View 
-      style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        backgroundColor: '#fff',
-        paddingHorizontal: 16,
-        paddingTop: 8,
-        paddingBottom: 12,
-        opacity: stickyHeaderOpacity,
-        transform: [{ translateY: stickyHeaderTranslateY }],
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.08,
-        shadowRadius: 8,
-        elevation: 4,
-        zIndex: 100
-      }}
-      pointerEvents={scrollY > 150 ? 'auto' : 'none'}
-    >
-      <View style={{ 
-        backgroundColor: '#f5f5f5', 
-        borderRadius: 20, 
-        borderWidth: 1,
-        borderColor: Colors.light.border,
-        flexDirection: 'row', 
-        alignItems: 'center', 
-        paddingHorizontal: 14, 
-        paddingVertical: 10,
-      }}>
-        <Ionicons name="search-outline" size={18} color="#999" />
-        <Text style={{ color: '#999', flex: 1, marginLeft: 10, fontSize: 13 }}>Tìm kiếm sản phẩm, dịch vụ...</Text>
-        <TouchableOpacity 
-          onPress={() => setVoiceVisible(true)}
-          activeOpacity={0.7}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          style={{ marginRight: 8 }}
-        >
-          <Ionicons name="mic-outline" size={18} color="#666" />
-        </TouchableOpacity>
-        <TouchableOpacity 
-          onPress={() => setMenuVisible(true)}
-          activeOpacity={0.7}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-        >
-          <Ionicons name="menu-outline" size={20} color="#666" />
-        </TouchableOpacity>
-      </View>
-    </Animated.View>
-      <VoiceSearchModal 
-        visible={voiceVisible}
-        onClose={() => setVoiceVisible(false)}
-        onResult={(text) => {
-          setVoiceVisible(false);
-          router.push({ pathname: '/search', params: { q: text } });
-        }}
-      />
-  </>
+        <View style={{ height: 100 }} />
+      </ScrollView>
+    </View>
   );
 }
+
+// ============================================================================
+// STYLES - European Minimal Design
+// ============================================================================
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.bg,
+  },
+
+  // Header
+  header: {
+    backgroundColor: COLORS.card,
+    paddingHorizontal: SPACING.lg,
+    paddingBottom: SPACING.lg,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
+  },
+  headerTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: SPACING.md,
+  },
+  greeting: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: COLORS.text,
+    letterSpacing: -0.5,
+  },
+  headerSubtitle: {
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    marginTop: 2,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    gap: SPACING.xs,
+  },
+  headerBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: COLORS.bg,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  notiBadge: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#EF4444',
+    borderWidth: 2,
+    borderColor: COLORS.bg,
+  },
+  searchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.bg,
+    borderRadius: 12,
+    paddingHorizontal: SPACING.md,
+    height: 44,
+    gap: SPACING.sm,
+  },
+  searchPlaceholder: {
+    flex: 1,
+    fontSize: 14,
+    color: COLORS.textMuted,
+  },
+
+  scrollView: {
+    flex: 1,
+  },
+
+  // AI Card
+  aiCard: {
+    marginHorizontal: SPACING.lg,
+    marginTop: SPACING.lg,
+    borderRadius: 16,
+    overflow: 'hidden',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#2563EB',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.2,
+        shadowRadius: 8,
+      },
+      android: { elevation: 4 },
+    }),
+  },
+  aiGradient: {
+    padding: SPACING.lg,
+  },
+  aiContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  aiLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.md,
+  },
+  aiIconBox: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  aiTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  aiSubtitle: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.8)',
+    marginTop: 2,
+  },
+  aiStats: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.md,
+  },
+  aiStatItem: {
+    alignItems: 'center',
+  },
+  aiStatValue: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  aiStatLabel: {
+    fontSize: 10,
+    color: 'rgba(255,255,255,0.7)',
+    marginTop: 2,
+  },
+  aiDivider: {
+    width: 1,
+    height: 24,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+  },
+
+  // Section
+  section: {
+    backgroundColor: COLORS.card,
+    marginTop: SPACING.sm,
+    paddingVertical: SPACING.lg,
+    paddingHorizontal: SPACING.lg,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: SPACING.md,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: COLORS.text,
+    letterSpacing: -0.3,
+  },
+  sectionSubtitle: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
+    marginTop: 2,
+  },
+  seeAll: {
+    fontSize: 13,
+    color: COLORS.accent,
+    fontWeight: '600',
+  },
+
+  // Services Grid (3 columns)
+  servicesGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginHorizontal: -SPACING.xs,
+  },
+  serviceCard: {
+    width: '33.33%',
+    paddingHorizontal: SPACING.xs,
+    marginBottom: SPACING.md,
+    alignItems: 'center',
+  },
+  serviceIconBox: {
+    width: 52,
+    height: 52,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: SPACING.xs,
+  },
+  serviceLabel: {
+    fontSize: 12,
+    color: COLORS.text,
+    fontWeight: '500',
+    textAlign: 'center',
+  },
+
+  // Tools Grid (4 columns)
+  toolsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: SPACING.sm,
+  },
+  toolItem: {
+    width: '25%',
+    alignItems: 'center',
+    paddingVertical: SPACING.sm,
+  },
+  toolLabel: {
+    fontSize: 11,
+    color: COLORS.textSecondary,
+    marginTop: SPACING.xs,
+    textAlign: 'center',
+  },
+
+  // Construction Grid (4 columns)
+  constructionGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginHorizontal: -SPACING.xs,
+  },
+  constructionCard: {
+    width: '25%',
+    paddingHorizontal: SPACING.xs,
+    marginBottom: SPACING.md,
+    alignItems: 'center',
+  },
+  constructionIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    backgroundColor: COLORS.bg,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: SPACING.xs,
+  },
+  constructionEmoji: {
+    fontSize: 22,
+  },
+  constructionLabel: {
+    fontSize: 11,
+    color: COLORS.text,
+    textAlign: 'center',
+  },
+
+  // Utility Grid (4 columns)
+  utilityGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginHorizontal: -SPACING.xs,
+  },
+  utilityCard: {
+    width: '25%',
+    paddingHorizontal: SPACING.xs,
+    marginBottom: SPACING.md,
+    alignItems: 'center',
+  },
+  utilityLabel: {
+    fontSize: 11,
+    color: COLORS.textSecondary,
+    marginTop: SPACING.xs,
+    textAlign: 'center',
+  },
+
+  // Video List
+  videoList: {
+    paddingRight: SPACING.lg,
+  },
+  videoCard: {
+    width: 160,
+    marginRight: SPACING.md,
+  },
+  videoThumbnail: {
+    width: '100%',
+    height: 90,
+    borderRadius: 10,
+    backgroundColor: '#1F2937',
+    overflow: 'hidden',
+    justifyContent: 'flex-end',
+  },
+  videoGradient: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  playButton: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    marginTop: -16,
+    marginLeft: -16,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  videoDuration: {
+    position: 'absolute',
+    bottom: 6,
+    right: 6,
+    fontSize: 10,
+    color: '#fff',
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  videoTitle: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: COLORS.text,
+    marginTop: SPACING.sm,
+    lineHeight: 18,
+  },
+  videoViews: {
+    fontSize: 11,
+    color: COLORS.textMuted,
+    marginTop: 2,
+  },
+
+  // Shopping Grid
+  shoppingGrid: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  shoppingCard: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: SPACING.md,
+    marginHorizontal: SPACING.xs,
+    backgroundColor: COLORS.bg,
+    borderRadius: 12,
+  },
+  shoppingEmoji: {
+    fontSize: 28,
+    marginBottom: SPACING.xs,
+  },
+  shoppingLabel: {
+    fontSize: 11,
+    color: COLORS.textSecondary,
+    fontWeight: '500',
+  },
+
+  // More Grid
+  moreGrid: {
+    gap: SPACING.sm,
+  },
+  moreCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.bg,
+    padding: SPACING.md,
+    borderRadius: 12,
+    gap: SPACING.md,
+  },
+  moreCardContent: {
+    flex: 1,
+  },
+  moreCardTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.text,
+  },
+  moreCardDesc: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
+    marginTop: 2,
+  },
+
+  // All Features
+  allFeaturesSection: {
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.lg,
+  },
+  allFeaturesBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.card,
+    paddingVertical: SPACING.md,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    gap: SPACING.sm,
+  },
+  allFeaturesText: {
+    fontSize: 14,
+    color: COLORS.text,
+    fontWeight: '500',
+  },
+});

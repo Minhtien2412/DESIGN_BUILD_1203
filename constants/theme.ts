@@ -1,94 +1,132 @@
 /**
- * Modern Design System for Construction Management App
- * Professional teal/cyan color scheme with excellent contrast
+ * Modern Minimalist Design System
+ * Emerald Green - Black - White palette
+ * Sophisticated, Clean, Timeless
  */
 
 import { Platform } from 'react-native';
 
 export const Colors = {
   light: {
-  // Primary brand colors (Grab-like Green palette)
-  primary: '#00B14F',           // Grab primary green
-  secondary: '#008C3B',         // Darker green for emphasis
-  accent: '#00C853',            // Bright accent green
+    // Primary colors (Deep Emerald Green)
+    primary: '#0A6847',           // Deep emerald green
+    secondary: '#4A4A4A',         // Charcoal gray
+    accent: '#10B981',            // Bright emerald
     
     // Semantic colors
-    success: '#10B981',           // Green
-    warning: '#F59E0B',           // Amber
-    error: '#EF4444',             // Red
-    info: '#3B82F6',              // Blue
+    success: '#10B981',           // Bright green
+    warning: '#0A6847',           // Deep green
+    error: '#1A1A1A',             // Black (minimalist)
+    info: '#0A6847',              // Deep green
     
-    // Text colors
-    text: '#111827',              // Almost black
-    textMuted: '#6B7280',         // Gray
-    textInverse: '#FFFFFF',       // White for dark backgrounds
+    // Text colors (High contrast)
+    text: '#1A1A1A',              // Soft black
+    textMuted: '#6B6B6B',         // Medium gray
+    textInverse: '#FFFFFF',       // Pure white
     
-    // Background colors
-    background: '#F9FAFB',        // Light gray
-    surface: '#FFFFFF',           // White
-    surfaceMuted: '#F3F4F6',      // Slightly darker
-    surfaceAlt: '#E5E7EB',        // Alternative surface
+    // Background colors (Clean white base)
+    background: '#FFFFFF',        // Pure white
+    surface: '#FFFFFF',           // Pure white
+    surfaceMuted: '#F8F8F8',      // Off white
+    surfaceAlt: '#F8F8F8',        // Off white
+    card: '#FFFFFF',              // Pure white cards
     
-    // Border colors
-    border: '#E5E7EB',            // Light border
-    borderStrong: '#D1D5DB',      // Stronger border
+    // Border colors (Subtle)
+    border: '#E5E5E5',            // Very light border
+    borderStrong: '#9E9E9E',      // Medium border
     
-  // Tab bar (white/black as requested)
-  tabIconDefault: '#9CA3AF',    // Inactive gray
-  tabIconSelected: '#111827',   // Active black
+    // Tab bar
+    tabIconDefault: '#6B6B6B',    // Gray
+    tabIconSelected: '#0A6847',   // Deep emerald
     
-    // Legacy (for compatibility)
-  tint: '#00B14F',
-  icon: '#111827',
-    danger: '#EF4444',
-    shadow: 'rgba(0,0,0,0.1)',
-    overlay: 'rgba(0,0,0,0.5)',
-    chipBackground: '#E6F6EC',    // Softer green background
-    chipText: '#0E7A3E',
-    accentSoft: '#8BE6A2',
+    // Legacy compatibility
+    tint: '#0A6847',              // Deep emerald
+    icon: '#1A1A1A',              // Soft black
+    danger: '#1A1A1A',
+    shadow: 'rgba(0,0,0,0.05)',   // Very subtle shadow
+    overlay: 'rgba(10,10,10,0.85)',
+    chipBackground: '#F8F8F8',
+    chipText: '#4A4A4A',
+    accentSoft: '#E6F7F1',        // Light emerald tint
+    
+    // Additional elements
+    gold: '#0A6847',
+    goldLight: '#E6F7F1',
+    goldDark: '#064E3B',
+    marble: '#F8F8F8',
+    charcoal: '#1A1A1A',
   },
   dark: {
-    // Primary brand colors (Grab-like for dark mode)
-    primary: '#00C853',           // Slightly brighter for dark mode
-    secondary: '#00B14F',         // Base green
-    accent: '#4EEA8B',            // Bright accent
+    // Primary colors (dark mode)
+    primary: '#10B981',           // Bright emerald
+    secondary: '#9E9E9E',         // Light gray
+    accent: '#10B981',            // Bright emerald
     
     // Semantic colors
-    success: '#34D399',           // Lighter green
-    warning: '#FBBF24',           // Lighter amber
-    error: '#F87171',             // Lighter red
-    info: '#60A5FA',              // Lighter blue
+    success: '#10B981',           // Bright green
+    warning: '#10B981',           // Bright green
+    error: '#E5E5E5',             // Light gray
+    info: '#10B981',              // Bright green
     
-    // Text colors
-    text: '#F9FAFB',              // Almost white
-    textMuted: '#9CA3AF',         // Light gray
-    textInverse: '#111827',       // Dark for light backgrounds
+    // Text colors (dark contrast)
+    text: '#FAFAFA',              // Off white
+    textMuted: '#9E9E9E',         // Light gray
+    textInverse: '#0A0A0A',       // Pure black
     
-    // Background colors
-    background: '#111827',        // Dark gray
-    surface: '#1F2937',           // Slightly lighter
-    surfaceMuted: '#374151',      // Even lighter
-    surfaceAlt: '#4B5563',        // Alternative surface
+    // Background colors (Deep black base)
+    background: '#0A0A0A',        // Pure black
+    surface: '#1A1A1A',           // Soft black
+    surfaceMuted: '#2D2D2D',      // Dark gray
+    surfaceAlt: '#2D2D2D',        // Dark gray
+    card: '#1A1A1A',              // Soft black cards
     
     // Border colors
-    border: '#374151',            // Dark border
-    borderStrong: '#4B5563',      // Stronger border
+    border: '#2D2D2D',            // Dark border
+    borderStrong: '#4A4A4A',      // Medium border
     
-  // Tab bar
-  tabIconDefault: '#6B7280',
-  tabIconSelected: '#F9FAFB',   // Active white
+    // Tab bar
+    tabIconDefault: '#9E9E9E',
+    tabIconSelected: '#10B981',   // Bright emerald
     
-    // Legacy (for compatibility)
-  tint: '#00C853',
-  icon: '#F9FAFB',
-    danger: '#F87171',
-    shadow: 'rgba(0,0,0,0.3)',
-    overlay: 'rgba(0,0,0,0.7)',
-    chipBackground: '#0A2E1A',
-    chipText: '#4EEA8B',
-    accentSoft: '#27C26A',
+    // Legacy compatibility
+    tint: '#10B981',
+    icon: '#FAFAFA',
+    danger: '#E5E5E5',
+    shadow: 'rgba(0,0,0,0.4)',
+    overlay: 'rgba(10,10,10,0.9)',
+    chipBackground: '#2D2D2D',
+    chipText: '#10B981',
+    accentSoft: '#0A2D20',
+    
+    // Additional elements
+    gold: '#0A6847',
+    goldLight: '#2A3A2A',
+    goldDark: '#3A8A3A',
+    marble: '#1E1E1E',
+    charcoal: '#121212',
   },
 };
+
+// Default colors export for backward compatibility
+// Use Colors.light or Colors.dark for theme-aware colors
+export const DefaultColors = Colors.light;
+
+// Common color shortcuts (default to light theme)
+export const { 
+  primary, 
+  secondary, 
+  accent, 
+  success, 
+  warning, 
+  error, 
+  info,
+  text, 
+  textMuted, 
+  textInverse,
+  background, 
+  surface, 
+  border 
+} = Colors.light;
 
 export const Fonts = Platform.select({
   ios: {

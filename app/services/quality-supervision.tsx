@@ -58,7 +58,7 @@ const PACKAGES = [
     name: 'Cao cấp',
     price: '50.000.000₫',
     priceUnit: '/ dự án',
-    color: '#9c27b0',
+    color: '#0A6847',
     popular: false,
     features: [
       { included: true, text: 'Giám sát toàn thời gian' },
@@ -248,7 +248,7 @@ export default function QualitySupervisionScreen() {
 
               <View style={styles.benefitItem}>
                 <View style={styles.benefitIcon}>
-                  <Ionicons name="document-text" size={24} color="#9c27b0" />
+                  <Ionicons name="document-text" size={24} color="#0A6847" />
                 </View>
                 <View style={styles.benefitText}>
                   <Text style={styles.benefitTitle}>Báo cáo minh bạch</Text>

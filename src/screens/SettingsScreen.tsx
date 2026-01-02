@@ -204,7 +204,7 @@ const SettingsScreen = () => {
             <TouchableOpacity style={styles.settingItem} onPress={handleLogout}>
               <View style={styles.settingItemLeft}>
                 <View style={[styles.settingIcon, styles.logoutIcon]}>
-                  <Ionicons name="log-out-outline" size={22} color="#FF6B6B" />
+                  <Ionicons name="log-out-outline" size={22} color="#1A1A1A" />
                 </View>
                 <Text style={[styles.settingItemText, styles.logoutText]}>Đăng xuất</Text>
               </View>
@@ -303,7 +303,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   logoutText: {
-    color: '#FF6B6B',
+    color: '#1A1A1A',
   },
   deleteText: {
     color: '#FF4444',

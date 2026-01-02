@@ -194,7 +194,8 @@ export async function createProject(data: CreateProjectData): Promise<Project> {
 }
 
 /**
- * Cập nhật project
+ * Cập nhật project (partial update theo BACKEND_API_SPECS)
+ * PATCH /projects/:id
  */
 export async function updateProject(
   id: number,
@@ -202,12 +203,32 @@ export async function updateProject(
 ): Promise<Project> {
   try {
     const project = await apiFetch<Project>(`/projects/${id}`, {
-      method: 'PUT',
+      method: 'PATCH',  // Changed to PATCH per backend specs
       data,
     });
     return project;
   } catch (error) {
     console.error(`[ProjectsService] Error updating project ${id}:`, error);
+    throw error;
+  }
+}
+
+/**
+ * Update project status only
+ * PATCH /projects/:id/status
+ */
+export async function updateProjectStatus(
+  id: number,
+  status: ProjectStatus
+): Promise<Project> {
+  try {
+    const project = await apiFetch<Project>(`/projects/${id}`, {
+      method: 'PATCH',
+      data: { status },
+    });
+    return project;
+  } catch (error) {
+    console.error(`[ProjectsService] Error updating project status ${id}:`, error);
     throw error;
   }
 }

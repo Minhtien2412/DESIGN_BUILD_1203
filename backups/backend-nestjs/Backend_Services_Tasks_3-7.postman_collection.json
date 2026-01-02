@@ -1,0 +1,704 @@
+{
+  "info": {
+    "name": "Backend Services API (Tasks 3-7)",
+    "_postman_id": "backend-services-tasks-3-7",
+    "description": "Complete API collection for Health Check, Scheduled Tasks, Progress Tracking, Analytics, and Comments",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://baotienweb.cloud/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "projectId",
+      "value": "1",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check API",
+      "item": [
+        {
+          "name": "Overall Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            }
+          }
+        },
+        {
+          "name": "Database Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health/database",
+              "host": ["{{baseUrl}}"],
+              "path": ["health", "database"]
+            }
+          }
+        },
+        {
+          "name": "Memory Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health/memory",
+              "host": ["{{baseUrl}}"],
+              "path": ["health", "memory"]
+            }
+          }
+        },
+        {
+          "name": "Disk Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health/disk",
+              "host": ["{{baseUrl}}"],
+              "path": ["health", "disk"]
+            }
+          }
+        },
+        {
+          "name": "System Metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health/metrics",
+              "host": ["{{baseUrl}}"],
+              "path": ["health", "metrics"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Scheduled Tasks API",
+      "item": [
+        {
+          "name": "Create Daily Reminder",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Daily Project Update Reminder\",\n  \"description\": \"Send reminder to update project progress\",\n  \"scheduleType\": \"daily\",\n  \"action\": \"send_reminder\",\n  \"parameters\": {\n    \"message\": \"Please update your project progress\",\n    \"recipients\": [\"admin@example.com\"]\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/scheduled-tasks",
+              "host": ["{{baseUrl}}"],
+              "path": ["scheduled-tasks"]
+            }
+          }
+        },
+        {
+          "name": "Create Weekly Report",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Weekly Progress Report\",\n  \"description\": \"Generate and send weekly progress report\",\n  \"scheduleType\": \"weekly\",\n  \"action\": \"generate_report\",\n  \"parameters\": {\n    \"reportType\": \"weekly_progress\",\n    \"format\": \"pdf\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/scheduled-tasks",
+              "host": ["{{baseUrl}}"],
+              "path": ["scheduled-tasks"]
+            }
+          }
+        },
+        {
+          "name": "List All Tasks",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/scheduled-tasks",
+              "host": ["{{baseUrl}}"],
+              "path": ["scheduled-tasks"]
+            }
+          }
+        },
+        {
+          "name": "Get Task Details",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/scheduled-tasks/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["scheduled-tasks", "1"]
+            }
+          }
+        },
+        {
+          "name": "Update Task",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Daily Reminder\",\n  \"status\": \"active\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/scheduled-tasks/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["scheduled-tasks", "1"]
+            }
+          }
+        },
+        {
+          "name": "Toggle Task (Pause/Resume)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/scheduled-tasks/1/toggle",
+              "host": ["{{baseUrl}}"],
+              "path": ["scheduled-tasks", "1", "toggle"]
+            }
+          }
+        },
+        {
+          "name": "Run Task Now",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/scheduled-tasks/1/run-now",
+              "host": ["{{baseUrl}}"],
+              "path": ["scheduled-tasks", "1", "run-now"]
+            }
+          }
+        },
+        {
+          "name": "Delete Task",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/scheduled-tasks/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["scheduled-tasks", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Progress Tracking API",
+      "item": [
+        {
+          "name": "Create Report Generation Task",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"report_generation\",\n  \"parameters\": {\n    \"projectId\": 1,\n    \"format\": \"pdf\"\n  },\n  \"userId\": {{userId}},\n  \"projectId\": {{projectId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/progress-tracking/background-tasks",
+              "host": ["{{baseUrl}}"],
+              "path": ["progress-tracking", "background-tasks"]
+            }
+          }
+        },
+        {
+          "name": "Create Data Export Task",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"data_export\",\n  \"parameters\": {\n    \"projectId\": 1,\n    \"rowCount\": 1000\n  },\n  \"userId\": {{userId}},\n  \"projectId\": {{projectId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/progress-tracking/background-tasks",
+              "host": ["{{baseUrl}}"],
+              "path": ["progress-tracking", "background-tasks"]
+            }
+          }
+        },
+        {
+          "name": "Get Background Task Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/progress-tracking/background-tasks/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["progress-tracking", "background-tasks", "1"]
+            }
+          }
+        },
+        {
+          "name": "Get User Tasks",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/progress-tracking/users/{{userId}}/tasks",
+              "host": ["{{baseUrl}}"],
+              "path": ["progress-tracking", "users", "{{userId}}", "tasks"]
+            }
+          }
+        },
+        {
+          "name": "Get Project Tasks",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/progress-tracking/projects/{{projectId}}/tasks",
+              "host": ["{{baseUrl}}"],
+              "path": ["progress-tracking", "projects", "{{projectId}}", "tasks"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Analytics API",
+      "item": [
+        {
+          "name": "Track Button Click Event",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category\": \"user_action\",\n  \"action\": \"button_click\",\n  \"label\": \"submit_project_form\",\n  \"userId\": {{userId}},\n  \"sessionId\": \"sess_123456\",\n  \"screen\": \"project_create\",\n  \"platform\": \"web\",\n  \"appVersion\": \"1.0.0\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/analytics/track",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "track"]
+            }
+          }
+        },
+        {
+          "name": "Track Screen View",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category\": \"screen_view\",\n  \"action\": \"view_screen\",\n  \"label\": \"project_detail\",\n  \"userId\": {{userId}},\n  \"sessionId\": \"sess_123456\",\n  \"screen\": \"project_detail\",\n  \"platform\": \"ios\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/analytics/track",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "track"]
+            }
+          }
+        },
+        {
+          "name": "Track Performance Metric",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category\": \"performance\",\n  \"action\": \"api_response_time\",\n  \"label\": \"get_projects\",\n  \"value\": 245.5,\n  \"metadata\": {\n    \"endpoint\": \"/api/v1/projects\",\n    \"method\": \"GET\"\n  },\n  \"userId\": {{userId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/analytics/track",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "track"]
+            }
+          }
+        },
+        {
+          "name": "Track Batch Events",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"category\": \"user_action\",\n    \"action\": \"button_click\",\n    \"label\": \"save_draft\",\n    \"userId\": {{userId}}\n  },\n  {\n    \"category\": \"user_action\",\n    \"action\": \"form_submit\",\n    \"label\": \"project_create\",\n    \"userId\": {{userId}}\n  }\n]"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/analytics/track-batch",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "track-batch"]
+            }
+          }
+        },
+        {
+          "name": "Get Analytics Summary",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/summary?userId={{userId}}&days=30",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "summary"],
+              "query": [
+                {
+                  "key": "userId",
+                  "value": "{{userId}}"
+                },
+                {
+                  "key": "days",
+                  "value": "30"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get User Flow",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/user-flow?userId={{userId}}&sessionId=sess_123456",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "user-flow"],
+              "query": [
+                {
+                  "key": "userId",
+                  "value": "{{userId}}"
+                },
+                {
+                  "key": "sessionId",
+                  "value": "sess_123456"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Top Features",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/top-features?days=30&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "top-features"],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "30"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Performance Metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/performance?days=7",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "performance"],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "7"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Error Statistics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/errors?days=7",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "errors"],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "7"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Active Users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/active-users?days=30",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "active-users"],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "30"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Comments API",
+      "item": [
+        {
+          "name": "Create Comment on Project",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"entityType\": \"project\",\n  \"entityId\": {{projectId}},\n  \"content\": \"Great progress on this project! @john keep up the good work 👍\",\n  \"userId\": {{userId}},\n  \"userName\": \"Jane Doe\",\n  \"userAvatar\": \"https://example.com/avatar.jpg\",\n  \"mentions\": [\"john\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/comments",
+              "host": ["{{baseUrl}}"],
+              "path": ["comments"]
+            }
+          }
+        },
+        {
+          "name": "Create Reply Comment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"entityType\": \"project\",\n  \"entityId\": {{projectId}},\n  \"content\": \"Thanks! We're making great strides.\",\n  \"userId\": 2,\n  \"userName\": \"John Smith\",\n  \"parentId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/comments",
+              "host": ["{{baseUrl}}"],
+              "path": ["comments"]
+            }
+          }
+        },
+        {
+          "name": "Get Comments for Entity",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/comments?entityType=project&entityId={{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["comments"],
+              "query": [
+                {
+                  "key": "entityType",
+                  "value": "project"
+                },
+                {
+                  "key": "entityId",
+                  "value": "{{projectId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Comment Details",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/comments/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["comments", "1"]
+            }
+          }
+        },
+        {
+          "name": "Update Comment",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Updated comment content with new information.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/comments/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["comments", "1"]
+            }
+          }
+        },
+        {
+          "name": "Delete Comment",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/comments/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["comments", "1"]
+            }
+          }
+        },
+        {
+          "name": "Add Like Reaction",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": {{userId}},\n  \"type\": \"like\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/comments/1/reactions",
+              "host": ["{{baseUrl}}"],
+              "path": ["comments", "1", "reactions"]
+            }
+          }
+        },
+        {
+          "name": "Add Love Reaction",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": {{userId}},\n  \"type\": \"love\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/comments/1/reactions",
+              "host": ["{{baseUrl}}"],
+              "path": ["comments", "1", "reactions"]
+            }
+          }
+        },
+        {
+          "name": "Get All Reactions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/comments/1/reactions",
+              "host": ["{{baseUrl}}"],
+              "path": ["comments", "1", "reactions"]
+            }
+          }
+        },
+        {
+          "name": "Remove Reaction",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/comments/1/reactions/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["comments", "1", "reactions", "{{userId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get User's Comments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/comments/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["comments", "users", "{{userId}}"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

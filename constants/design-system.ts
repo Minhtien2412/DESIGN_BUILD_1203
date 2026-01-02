@@ -15,7 +15,7 @@ export const ColorSystem = {
 
   // Secondary Colors
   secondary: {
-    main: '#90B44C',      // Green accent
+    main: '#0A6847',      // Green accent
     light: '#A8C76E',     // Green nhạt
     dark: '#7A9A3F',      // Green đậm
     contrast: '#FFFFFF',

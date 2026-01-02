@@ -28,7 +28,7 @@ export function MiniPlayerPortal() {
   const uri = state.source.type === 'uri' ? state.source.uri : `https://www.youtube.com/watch?v=${state.source.videoId}`;
 
   return (
-    <View pointerEvents="box-none" style={StyleSheet.absoluteFill}>
+    <View style={[StyleSheet.absoluteFill, { pointerEvents: 'box-none' }]}>
       <View style={containerStyle as any}>
         {/* Header bar */}
         <View style={[styles.headerBar, { backgroundColor: bg, borderColor: border }]}> 

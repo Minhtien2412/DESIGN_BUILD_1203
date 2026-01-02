@@ -1,0 +1,44 @@
+{
+  "kind": "collectionType",
+  "collectionName": "services",
+  "info": {
+    "singularName": "service",
+    "pluralName": "services",
+    "displayName": "Service",
+    "description": "Dich vu cung cap"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text"
+    },
+    "category": {
+      "type": "enumeration",
+      "enum": ["CONSTRUCTION", "DESIGN", "CONSULTING", "MAINTENANCE", "OTHER"],
+      "default": "OTHER"
+    },
+    "price": {
+      "type": "decimal"
+    },
+    "duration": {
+      "type": "string"
+    },
+    "isActive": {
+      "type": "boolean",
+      "default": true
+    },
+    "rating": {
+      "type": "decimal",
+      "default": 0
+    },
+    "features": {
+      "type": "json"
+    }
+  }
+}

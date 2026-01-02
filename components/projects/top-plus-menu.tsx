@@ -32,7 +32,7 @@ export default function TopPlusMenu({ visible, onClose }: TopPlusMenuProps) {
   return (
     <Modal transparent visible={visible} animationType="fade" onRequestClose={onClose}>
       <Pressable style={styles.overlay} onPress={onClose}>
-        <View style={styles.menu} pointerEvents="box-none">
+        <View style={[styles.menu, { pointerEvents: 'box-none' }]}>
           <View style={styles.card}>
             {ACTIONS.map((a, idx) => (
               <TouchableOpacity

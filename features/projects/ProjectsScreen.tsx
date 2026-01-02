@@ -213,7 +213,7 @@ const ProjectCard = ({
           <View style={styles.metaItem}>
             <Ionicons name="wallet-outline" size={14} color={colors.textMuted} />
             <Text style={[styles.metaText, { color: colors.textMuted }]}>
-              {formatCurrency(budgetData?.totalBudget ?? project.budget)}
+              {formatCurrency(budgetData?.totalBudget ?? project.budget ?? 0)}
             </Text>
           </View>
         ) : null}
@@ -222,10 +222,10 @@ const ProjectCard = ({
       <View style={styles.progressContainer}>
         <View style={styles.progressHeader}>
           <Text style={[styles.progressLabel, { color: colors.textMuted }]}>Tiến độ</Text>
-          <Text style={[styles.progressValue, { color: colors.accent }]}>{project.progress}%</Text>
+          <Text style={[styles.progressValue, { color: colors.accent }]}>{project.progress ?? 0}%</Text>
         </View>
         <View style={[styles.progressBar, { backgroundColor: colors.border }]}>
-          <View style={[styles.progressFill, { backgroundColor: colors.accent, width: `${project.progress}%` }]} />
+          <View style={[styles.progressFill, { backgroundColor: colors.accent, width: `${project.progress ?? 0}%` }]} />
         </View>
       </View>
 
@@ -233,7 +233,7 @@ const ProjectCard = ({
         <View style={styles.projectInfo}>
           <Ionicons name="time-outline" size={14} color={colors.textMuted} />
           <Text style={[styles.projectInfoText, { color: colors.textMuted }]}>
-            {project.start_date ? `${formatDate(project.start_date)} → ${formatDate(project.end_date)}` : formatDate(project.end_date)}
+            {project.start_date ? `${formatDate(project.start_date)} → ${formatDate(project.end_date ?? undefined)}` : formatDate(project.end_date ?? undefined)}
           </Text>
         </View>
         <View style={styles.projectStats}>
@@ -270,7 +270,7 @@ const ProjectCard = ({
           </View>
           <View style={styles.projectStat}>
             <Ionicons name="document-outline" size={14} color={colors.textMuted} />
-            <Text style={[styles.projectStatText, { color: colors.textMuted }]}>{project.documents?.length || 0}</Text>
+            <Text style={[styles.projectStatText, { color: colors.textMuted }]}>{Array.isArray(project.documents) ? project.documents.length : (project.documents || 0)}</Text>
           </View>
         </View>
       </View>
@@ -309,12 +309,12 @@ export default function ProjectsScreen() {
   });
 
   const projectCounts = useMemo(() => ({
-    all: pagination?.total || 0,
+    all: projects.length,
     active: projects.filter((p) => p.status === 'active').length,
     completed: projects.filter((p) => p.status === 'completed').length,
     planning: projects.filter((p) => p.status === 'planning').length,
     paused: projects.filter((p) => p.status === 'paused').length,
-  }), [pagination?.total, projects]);
+  }), [projects]);
 
   const displayedProjects = useMemo(() => {
     let arr = [...projects];
@@ -526,8 +526,7 @@ export default function ProjectsScreen() {
           <View>
             <Text style={styles.headerTitle}>Dự án</Text>
             <Text style={styles.headerSubtitle}>
-              {displayedProjects.length}
-              {typeof (pagination?.total) === 'number' ? ` / ${pagination?.total}` : ''} dự án
+              {displayedProjects.length} / {projects.length} dự án
             </Text>
           </View>
           <TouchableOpacity style={styles.createButton} onPress={() => setShowTopMenu(true)}>
@@ -677,7 +676,7 @@ export default function ProjectsScreen() {
             </View>
             <Text style={[styles.statLabel, { color: colors.textMuted }]}>Tiến độ TB</Text>
             <Text style={[styles.statValue, { color: colors.text }]}>
-              {projects.length > 0 ? (projects.reduce((sum, p) => sum + p.progress, 0) / projects.length).toFixed(0) : 0}%
+              {projects.length > 0 ? (projects.reduce((sum, p) => sum + (p.progress ?? 0), 0) / projects.length).toFixed(0) : 0}%
             </Text>
             <Text style={[styles.statSubtext, { color: colors.textMuted }]}>
               Trung bình {projectCounts.active} dự án
@@ -689,7 +688,7 @@ export default function ProjectsScreen() {
       {error ? (
         <View style={styles.errorBanner}>
           <Ionicons name="alert-circle" size={20} color="#FF3B30" />
-          <Text style={styles.errorText}>{error}</Text>
+          <Text style={styles.errorText}>{error.message}</Text>
           <TouchableOpacity onPress={refresh}>
             <Text style={styles.retryText}>Thử lại</Text>
           </TouchableOpacity>
@@ -699,7 +698,7 @@ export default function ProjectsScreen() {
       <FlatList
         data={displayedProjects}
         renderItem={renderProjectCard}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => String(item.id)}
         contentContainerStyle={styles.listContent}
         refreshControl={
           <RefreshControl

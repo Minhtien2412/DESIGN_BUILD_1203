@@ -1,24 +1,24 @@
-﻿/**
+/**
  * Enhanced Device Security Integration
  * Compatible với Enhanced Auth System
  */
 
-import { router } from 'expo-router';
-import React from 'react';
-import { Alert } from 'react-native';
 import { useAuth } from '@/context/AuthContext';
+import { router } from 'expo-router';
+import React, { useCallback } from 'react';
+import { Alert } from 'react-native';
 
 export function EnhancedDeviceSecurityIntegration() {
   const { user, isAuthenticated } = useAuth();
 
-  const handleChangePassword = () => {
+  const handleChangePassword = useCallback(() => {
     if (!isAuthenticated) {
       Alert.alert(
         'Chưa đăng nhập',
         'Vui lòng đăng nhập để thay đổi mật khẩu',
         [
           { text: 'Hủy', style: 'cancel' },
-          { text: 'Đăng nhập', onPress: () => router.push('/enhanced-login' as any) }
+          { text: 'Đăng nhập', onPress: () => router.push('/(auth)/login' as any) }
         ]
       );
       return;
@@ -26,27 +26,10 @@ export function EnhancedDeviceSecurityIntegration() {
 
     // Navigate to profile where user can change password
     router.push('/(tabs)/profile' as any);
-  };
-
-  const handleViewDevices = () => {
-    if (!isAuthenticated) {
-      Alert.alert(
-        'Chưa đăng nhập',
-        'Vui lòng đăng nhập để xem thiết bị',
-        [
-          { text: 'Hủy', style: 'cancel' },
-          { text: 'Đăng nhập', onPress: () => router.push('/enhanced-login' as any) }
-        ]
-      );
-      return;
-    }
-
-    // Navigate to device management screen
-    router.push('/device-management' as any);
-  };
+  }, [isAuthenticated]);
 
   // Enhanced device security alert simulation
-  const handleSecurityAlert = () => {
+  const handleSecurityAlert = useCallback(() => {
     if (!isAuthenticated || !user) return null;
 
     // Simulate device security check
@@ -77,7 +60,7 @@ export function EnhancedDeviceSecurityIntegration() {
         ]
       );
     }
-  };
+  }, [isAuthenticated, user, handleChangePassword]);
 
   // Auto check device security when user is authenticated
   React.useEffect(() => {
@@ -86,7 +69,7 @@ export function EnhancedDeviceSecurityIntegration() {
       const timer = setTimeout(handleSecurityAlert, 5000);
       return () => clearTimeout(timer);
     }
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, user, handleSecurityAlert]);
 
   // This component doesn't render anything visible
   // It's just for background security monitoring

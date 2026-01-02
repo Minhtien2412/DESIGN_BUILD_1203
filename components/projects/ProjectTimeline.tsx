@@ -117,19 +117,19 @@ export default function ProjectTimeline({ projectId, limit = 20 }: Props) {
   const getEventColor = (eventType: string) => {
     switch (eventType) {
       case 'checkin':
-        return '#2196F3';
+        return '#0A6847';
       case 'progress_update':
-        return '#4CAF50';
+        return '#10B981';
       case 'milestone_completed':
-        return '#9C27B0';
+        return '#0A6847';
       case 'task_completed':
-        return '#4CAF50';
+        return '#10B981';
       case 'comment':
-        return '#FF9800';
+        return '#0A6847';
       case 'file_upload':
-        return '#00BCD4';
+        return '#0A6847';
       case 'status_change':
-        return '#FFC107';
+        return '#10B981';
       default:
         return colors.accent;
     }

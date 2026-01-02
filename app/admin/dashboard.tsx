@@ -4,7 +4,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useDashboard } from '@/hooks/useAdmin';
 import { usePermissions } from '@/utils/permissions';
 import { Ionicons } from '@expo/vector-icons';
-import { router, Stack } from 'expo-router';
+import { Href, router, Stack } from 'expo-router';
 import { useEffect } from 'react';
 import {
     ActivityIndicator,
@@ -47,7 +47,7 @@ function RecentProjectCard({ project, colors }: any) {
   return (
     <TouchableOpacity
       style={[styles.projectCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
-      onPress={() => router.push(`/projects/${project.id}` as any)}
+      onPress={() => router.push(`/projects/${project.id}`)}
       activeOpacity={0.7}
     >
       <View style={styles.projectHeader}>
@@ -173,7 +173,7 @@ export default function AdminDashboard() {
           headerStyle: { backgroundColor: colors.accent },
           headerTintColor: '#fff',
           headerRight: () => (
-            <TouchableOpacity onPress={() => router.push('/admin/settings' as any)} style={styles.headerButton}>
+            <TouchableOpacity onPress={() => router.push('/admin/settings')} style={styles.headerButton}>
               <Ionicons name="settings-outline" size={24} color="#fff" />
             </TouchableOpacity>
           ),
@@ -201,28 +201,28 @@ export default function AdminDashboard() {
               title="Tổng dự án"
               value={stats.total_projects}
               color="#3b82f6"
-              onPress={() => router.push('/admin/projects' as any)}
+              onPress={() => router.push('/admin/projects' as Href)}
             />
             <StatCard
               icon="pulse-outline"
               title="Đang thực hiện"
               value={stats.active_projects}
               color="#22c55e"
-              onPress={() => router.push('/admin/projects?status=active' as any)}
+              onPress={() => router.push('/admin/projects?status=active' as Href)}
             />
             <StatCard
               icon="people-outline"
               title="Nhân viên"
               value={stats.total_staff}
               color="#f59e0b"
-              onPress={() => router.push('/admin/staff' as any)}
+              onPress={() => router.push('/admin/staff')}
             />
             <StatCard
               icon="person-outline"
               title="Khách hàng"
               value={stats.total_clients}
               color="#8b5cf6"
-              onPress={() => router.push('/admin/clients' as any)}
+              onPress={() => router.push('/admin/clients' as Href)}
             />
           </View>
         )}
@@ -232,7 +232,7 @@ export default function AdminDashboard() {
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Text style={[styles.sectionTitle, { color: colors.text }]}>Dự án gần đây</Text>
-              <TouchableOpacity onPress={() => router.push('/projects' as any)}>
+              <TouchableOpacity onPress={() => router.push('/projects')}>
                 <Text style={[styles.sectionLink, { color: colors.accent }]}>Xem tất cả</Text>
               </TouchableOpacity>
             </View>
@@ -247,7 +247,7 @@ export default function AdminDashboard() {
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Text style={[styles.sectionTitle, { color: colors.text }]}>Hoạt động gần đây</Text>
-              <TouchableOpacity onPress={() => router.push('/admin/activity-log' as any)}>
+              <TouchableOpacity onPress={() => router.push('/admin/activity-log' as Href)}>
                 <Text style={[styles.sectionLink, { color: colors.accent }]}>Xem tất cả</Text>
               </TouchableOpacity>
             </View>
@@ -264,7 +264,7 @@ export default function AdminDashboard() {
             {hasPermission('create', 'projects') && (
               <TouchableOpacity
                 style={[styles.quickAction, { backgroundColor: colors.surface, borderColor: colors.border }]}
-                onPress={() => router.push('/projects/create' as any)}
+                onPress={() => router.push('/projects/create')}
               >
                 <Ionicons name="add-circle-outline" size={32} color={colors.accent} />
                 <Text style={[styles.quickActionText, { color: colors.text }]}>Tạo dự án</Text>
@@ -273,7 +273,7 @@ export default function AdminDashboard() {
             {hasPermission('create', 'staff') && (
               <TouchableOpacity
                 style={[styles.quickAction, { backgroundColor: colors.surface, borderColor: colors.border }]}
-                onPress={() => router.push('/admin/staff/create' as any)}
+                onPress={() => router.push('/admin/staff/create')}
               >
                 <Ionicons name="person-add-outline" size={32} color={colors.accent} />
                 <Text style={[styles.quickActionText, { color: colors.text }]}>Thêm nhân viên</Text>
@@ -281,7 +281,7 @@ export default function AdminDashboard() {
             )}
             <TouchableOpacity
               style={[styles.quickAction, { backgroundColor: colors.surface, borderColor: colors.border }]}
-              onPress={() => router.push('/admin/reports' as any)}
+              onPress={() => router.push('/admin/reports' as Href)}
             >
               <Ionicons name="stats-chart-outline" size={32} color={colors.accent} />
               <Text style={[styles.quickActionText, { color: colors.text }]}>Báo cáo</Text>

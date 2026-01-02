@@ -1,53 +1,47 @@
-import { ApiError, apiFetch } from '@/services/api';
-import { getToken } from '@/utils/storage';
 import { useCallback, useEffect, useState } from 'react';
+import projectsApi, { Project as BackendProject } from '../services/api/projectsApi';
+import { cache, CacheTTL } from '../utils/cache';
+import { getOfflineData, saveOfflineData } from '../utils/offlineStorage';
+import { useNetworkStatus } from './useNetworkStatus';
 
+// Define backward-compatible types for existing UI code
 export type ProjectStatus = 'planning' | 'active' | 'paused' | 'completed';
 export type ProjectType = 'residential' | 'commercial' | 'landscape' | 'interior' | 'renovation';
 
-export interface Project {
-  id: string;
-  name: string;
-  description?: string;
-  type: ProjectType;
-  status: ProjectStatus;
-  progress: number;
-  location?: string;
-  budget?: number;
-  client?: {
-    id: string;
-    name: string;
-    phone?: string;
-    email?: string;
+// TeamMember type for project team
+export interface TeamMemberInfo {
+  id: number;
+  userId: number;
+  role: string;
+  user?: {
+    id: number;
+    email: string;
+    name?: string;
   };
-  team?: Array<{
-    id: string;
-    name: string;
-    role: string;
-    avatar?: string;
-  }>;
-  start_date?: string;
-  end_date?: string;
-  images?: string[];
-  documents?: Array<{
-    id: string;
-    name: string;
-    url: string;
-    size: number;
-    uploaded_at: string;
-  }>;
-  created_at?: string;
-  updated_at?: string;
 }
 
-export interface ProjectsResponse {
-  projects: Project[];
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
+// Extended Project type that combines backend data with UI expectations
+export interface Project extends Omit<BackendProject, 'status' | 'client' | 'id'> {
+  id: number | string; // Accept both for backward compatibility with mock data
+  name: string; // Maps from backend 'title'
+  type?: ProjectType; // Not in backend yet
+  location?: string; // Not in backend yet
+  progress?: number; // Not in backend yet (0-100)
+  status: ProjectStatus; // UI format (planning, active, etc)
+  // Legacy aliases for backward compatibility with UI
+  start_date?: string | null;
+  end_date?: string | null;
+  created_at?: string;
+  updated_at?: string; // Mock data format
+  client?: {
+    id: number | string;
+    name: string;
+    email: string;
+    phone?: string; // Not in backend yet
+  } | null;
+  teamMembers?: TeamMemberInfo[]; // Team members on the project
+  team?: { id: string; name: string; role: string }[]; // Mock data format
+  documents?: number | { id: string; name: string; url: string; size: number; uploaded_at: string }[]; // Document count or array for mock
 }
 
 interface UseProjectsOptions {
@@ -63,131 +57,165 @@ interface UseProjectsOptions {
 interface UseProjectsReturn {
   projects: Project[];
   loading: boolean;
-  error: string | null;
-  pagination: ProjectsResponse['pagination'] | null;
+  error: Error | null;
+  retrying: boolean;
+  pagination: null; // Backend doesn't support pagination yet, return null for compatibility
   refresh: () => Promise<void>;
-  fetchMore: () => Promise<void>;
-  hasMore: boolean;
+  refreshProjects: () => Promise<void>; // Alias for backward compatibility
+  fetchMore: () => Promise<void>; // No-op for now
+  hasMore: boolean; // Always false for now
 }
 
+/**
+ * Hook to fetch and manage list of projects from backend API
+ * Uses real API endpoint: GET /projects (protected)
+ * 
+ * Note: Currently backend doesn't support query params (status, search, type, pagination).
+ * Client-side filtering is handled by the UI component.
+ */
 export function useProjects(options: UseProjectsOptions = {}): UseProjectsReturn {
-  const { status, page = 1, limit = 20, search, autoFetch = true, mine, type } = options;
+  const { autoFetch = true } = options;
   
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(autoFetch);
-  const [error, setError] = useState<string | null>(null);
-  const [pagination, setPagination] = useState<ProjectsResponse['pagination'] | null>(null);
-  const [currentPage, setCurrentPage] = useState(page);
+  const [error, setError] = useState<Error | null>(null);
+  const [retrying, setRetrying] = useState(false);
+  const { isOffline } = useNetworkStatus();
 
-  const fetchProjects = useCallback(async (pageNum: number = 1, append: boolean = false) => {
+  const fetchProjects = useCallback(async (isRetry = false) => {
+    const CACHE_KEY = 'projects:all';
+    const OFFLINE_KEY = 'projects_offline';
+    
     try {
-      if (!append) {
+      // If offline, use offline storage
+      if (isOffline) {
+        console.log('[useProjects] Device offline, using offline storage');
+        const offlineData = await getOfflineData<Project[]>(OFFLINE_KEY);
+        if (offlineData) {
+          setProjects(offlineData);
+          setLoading(false);
+          setError(null);
+          return;
+        }
+        throw new Error('No offline data available. Please connect to the internet.');
+      }
+      
+      // Try cache first (unless retrying)
+      if (!isRetry) {
+        const cachedProjects = cache.get<Project[]>(CACHE_KEY);
+        if (cachedProjects) {
+          console.log('[useProjects] Using cached data');
+          setProjects(cachedProjects);
+          setLoading(false);
+          setError(null);
+          
+          // Background refresh
+          projectsApi.getProjects()
+            .then(response => {
+              const mappedProjects = (response.value || []).map(p => ({
+                ...p,
+                name: p.title,
+                type: 'commercial' as ProjectType,
+                location: '',
+                start_date: p.startDate,
+                end_date: p.endDate,
+                created_at: p.createdAt,
+                client: p.client ? { ...p.client, phone: '' } : undefined,
+                status: p.status === 'PLANNING' ? 'planning' as ProjectStatus
+                  : p.status === 'IN_PROGRESS' ? 'active' as ProjectStatus
+                  : p.status === 'COMPLETED' ? 'completed' as ProjectStatus
+                  : p.status === 'ON_HOLD' ? 'paused' as ProjectStatus
+                  : 'planning' as ProjectStatus,
+              })) as Project[];
+              cache.set(CACHE_KEY, mappedProjects, CacheTTL.MEDIUM);
+              saveOfflineData(OFFLINE_KEY, mappedProjects); // Persist for offline
+              setProjects(mappedProjects);
+            })
+            .catch(err => {
+              console.error('[useProjects] Background refresh failed:', err);
+            });
+          
+          return;
+        }
+      }
+      
+      if (isRetry) {
+        setRetrying(true);
+      } else {
         setLoading(true);
       }
       setError(null);
-
-      const token = await getToken();
-      if (!token) {
-        setProjects([]);
-        setLoading(false);
-        return;
-      }
-
-      // Build query params
-      const params: Record<string, string> = {
-        page: pageNum.toString(),
-        limit: limit.toString(),
-      };
-      if (status) params.status = status;
-  if (search) params.search = search;
-  if (type) params.type = type;
-      if (mine) {
-        // Support both conventions; backend will ignore unknown keys
-        params.mine = '1';
-        params.owner = 'self';
-      }
-
-      const queryString = new URLSearchParams(params).toString();
-      const response = await apiFetch<{ success: boolean; data: ProjectsResponse }>(
-        `/api/projects?${queryString}`,
-        {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        }
-      );
-
-      const data = response.data || response;
-      const rawProjects = data.projects || [];
-      // Normalize server fields: ensure we have 'name' even if API returns 'title'
-      const newProjects = rawProjects.map((p: any) => ({
+      const response = await projectsApi.getProjects();
+      // Backend returns { value: Project[], Count: number }
+      // Map backend projects to UI-compatible format
+      const mappedProjects = (response.value || []).map(p => ({
         ...p,
-        name: p?.name ?? p?.title ?? '',
+        // Map backend fields to UI expectations
+        name: p.title, // UI uses 'name', backend uses 'title'
+        type: 'commercial' as ProjectType, // Backend doesn't have type yet, default
+        location: '', // Backend doesn't have location yet
+        // Legacy aliases for backward compatibility
+        start_date: p.startDate,
+        end_date: p.endDate,
+        created_at: p.createdAt,
+        client: p.client ? {
+          ...p.client,
+          phone: '', // Backend doesn't have phone yet
+        } : undefined,
+        // Map backend status (PLANNING, IN_PROGRESS, etc) to UI status (planning, active, etc)
+        status: p.status === 'PLANNING' ? 'planning' as ProjectStatus
+          : p.status === 'IN_PROGRESS' ? 'active' as ProjectStatus
+          : p.status === 'COMPLETED' ? 'completed' as ProjectStatus
+          : p.status === 'ON_HOLD' ? 'paused' as ProjectStatus
+          : 'planning' as ProjectStatus,
       })) as Project[];
-
-      if (append) {
-        setProjects(prev => [...prev, ...newProjects]);
-      } else {
-        setProjects(newProjects);
-      }
-
-      setPagination(data.pagination);
-      setCurrentPage(pageNum);
+      
+      // Cache the mapped projects
+      cache.set(CACHE_KEY, mappedProjects, CacheTTL.MEDIUM);
+      
+      // Save to offline storage
+      await saveOfflineData(OFFLINE_KEY, mappedProjects);
+      
+      setProjects(mappedProjects);
     } catch (err) {
-      // Silent handling for auth errors
-      if (err instanceof ApiError) {
-        if (err.status === 401 || err.status === 403) {
-          setProjects([]);
-          setError(null);
-        } else {
-          setError(err.data?.message || err.message || 'Failed to load projects');
-          console.error('[useProjects] API Error:', err.status, err.data);
-        }
-      } else {
-        setError('Unknown error occurred');
-        console.error('[useProjects] Error:', err);
-      }
-      if (!append) {
-        setProjects([]);
-      }
+      const error = err instanceof Error ? err : new Error('Failed to load projects');
+      setError(error);
+      console.error('[useProjects] Error:', err);
+      setProjects([]);
     } finally {
       setLoading(false);
+      setRetrying(false);
     }
-  }, [status, limit, search]);
-
-  const refresh = useCallback(async () => {
-    setCurrentPage(1);
-    await fetchProjects(1, false);
-  }, [fetchProjects]);
-
-  const fetchMore = useCallback(async () => {
-    if (pagination && currentPage < pagination.totalPages) {
-      await fetchProjects(currentPage + 1, true);
-    }
-  }, [fetchProjects, currentPage, pagination]);
-
-  const hasMore = pagination ? currentPage < pagination.totalPages : false;
+  }, []);
 
   useEffect(() => {
     if (autoFetch) {
-      fetchProjects(1, false);
+      fetchProjects();
     }
   }, [autoFetch, fetchProjects]);
+
+  const handleRetry = useCallback(async () => {
+    await fetchProjects(true);
+  }, [fetchProjects]);
 
   return {
     projects,
     loading,
     error,
-    pagination,
-    refresh,
-    fetchMore,
-    hasMore
+    retrying,
+    pagination: null, // Backend doesn't provide pagination yet
+    refresh: handleRetry,
+    refreshProjects: handleRetry, // Alias for backward compatibility
+    fetchMore: async () => {}, // No-op: no pagination support
+    hasMore: false, // No pagination support
   };
 }
 
-// Hook for single project detail
-export function useProjectDetail(projectId: string | null) {
+/**
+ * Hook to fetch single project detail by ID
+ * Uses real API endpoint: GET /projects/:id (protected)
+ */
+export function useProjectDetail(projectId: number | null) {
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(!!projectId);
   const [error, setError] = useState<string | null>(null);
@@ -202,38 +230,32 @@ export function useProjectDetail(projectId: string | null) {
     try {
       setLoading(true);
       setError(null);
-
-      const token = await getToken();
-      if (!token) {
-        setProject(null);
-        setLoading(false);
-        return;
-      }
-
-      const response = await apiFetch<{ success: boolean; data: Project }>(
-        `/api/projects/${projectId}`,
-        {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        }
-      );
-
-      setProject(response.data || response);
+      const data = await projectsApi.getProject(projectId);
+      // Map backend project to UI format
+      const mappedProject: Project = {
+        ...data,
+        name: data.title,
+        type: 'commercial' as ProjectType,
+        location: '',
+        progress: undefined,
+        // Legacy aliases for backward compatibility
+        start_date: data.startDate,
+        end_date: data.endDate,
+        created_at: data.createdAt,
+        client: data.client ? {
+          ...data.client,
+          phone: '',
+        } : null,
+        status: data.status === 'PLANNING' ? 'planning'
+          : data.status === 'IN_PROGRESS' ? 'active'
+          : data.status === 'COMPLETED' ? 'completed'
+          : data.status === 'ON_HOLD' ? 'paused'
+          : 'planning',
+      };
+      setProject(mappedProject);
     } catch (err) {
-      if (err instanceof ApiError) {
-        if (err.status === 401 || err.status === 403) {
-          setProject(null);
-          setError(null);
-        } else {
-          setError(err.data?.message || err.message || 'Failed to load project');
-          console.error('[useProjectDetail] API Error:', err.status, err.data);
-        }
-      } else {
-        setError('Unknown error occurred');
-        console.error('[useProjectDetail] Error:', err);
-      }
+      setError(err instanceof Error ? err.message : 'Failed to load project');
+      console.error('[useProjectDetail] Error:', err);
       setProject(null);
     } finally {
       setLoading(false);
@@ -248,6 +270,6 @@ export function useProjectDetail(projectId: string | null) {
     project,
     loading,
     error,
-    refresh: fetchProject
+    refresh: fetchProject,
   };
 }

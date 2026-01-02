@@ -15,7 +15,7 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
-import { enhancedProjectApiService, ProjectApiResponse } from '../services/enhancedProjectApiServiceV2';
+import { enhancedProjectApiService, ProjectApiResponse } from '../services/enhancedProjectApiService';
 import { ConstructionProject, ProjectStatus, ProjectType } from '../types/construction';
 import { Container } from './ui/container';
 import { Section } from './ui/section';
@@ -32,7 +32,7 @@ interface SmartProjectListProps {
 }
 
 interface ApiStatusBadgeProps {
-  source: 'api' | 'fallback' | 'cache';
+  source: 'api' | 'fallback' | 'cache' | 'database';
   hasError?: boolean;
 }
 
@@ -53,9 +53,15 @@ const ApiStatusBadge: React.FC<ApiStatusBadgeProps> = ({ source, hasError }) => 
         };
       case 'fallback':
         return {
-          color: '#ff6b6b',
+          color: '#1A1A1A',
           text: 'Fallback',
           icon: 'shield'
+        };
+      case 'database':
+        return {
+          color: '#5856d6',
+          text: 'Database',
+          icon: 'server'
         };
     }
   };
@@ -317,7 +323,7 @@ export const SmartProjectList: React.FC<SmartProjectListProps> = ({
     return (
       <Container>
         <View style={styles.errorContainer}>
-          <Ionicons name="warning" size={48} color="#ff6b6b" />
+          <Ionicons name="warning" size={48} color="#1A1A1A" />
           <Text style={styles.errorText}>Không thể tải dữ liệu</Text>
           <TouchableOpacity style={styles.retryButton} onPress={loadProjects}>
             <Text style={styles.retryText}>Thử lại</Text>
@@ -362,7 +368,7 @@ export const SmartProjectList: React.FC<SmartProjectListProps> = ({
         }
         showsVerticalScrollIndicator={false}
       >
-        {displayProjects.map((project) => (
+        {displayProjects.map((project: ConstructionProject) => (
           <ProjectCard
             key={project.id}
             project={project}
@@ -404,7 +410,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontSize: 18,
     fontWeight: '600',
-    color: '#ff6b6b',
+    color: '#1A1A1A',
     textAlign: 'center',
   },
   headerRow: {

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Enhanced Login Screen
  * Sử dụng API backend thật
  */
@@ -117,14 +117,14 @@ export default function EnhancedLoginScreen() {
    * Navigate to forgot password
    */
   const handleForgotPassword = () => {
-    router.push('/forgot-password' as any);
+    router.push('/(auth)/forgot-password' as any);
   };
 
   /**
    * Navigate to register
    */
   const handleRegister = () => {
-    router.push('/register');
+    router.push('/(auth)/register');
   };
 
   if (loading) {

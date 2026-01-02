@@ -1,17 +1,41 @@
+import { IncomingCallModal } from '@/components/call';
 import { FormErrorBoundary } from '@/components/FormErrorBoundary';
+import { OfflineIndicator } from '@/components/ui/OfflineIndicator';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
+import { CallProvider } from '@/context/CallContext';
 import { CartProvider } from '@/context/cart-context';
+import { CommunicationHubProvider } from '@/context/CommunicationHubContext';
+import { FavoritesProvider } from '@/context/FavoritesContext';
 import { NotificationProvider } from '@/context/NotificationContext';
+import { NotificationsProvider } from '@/context/NotificationsContext';
+import { PerfexAuthProvider } from '@/context/PerfexAuthContext';
+import { PermissionProvider } from '@/context/PermissionContext';
+import { ProgressWebSocketProvider } from '@/context/ProgressWebSocketContext';
 import { ProjectDataProvider } from '@/context/project-data-context';
+import { PushNotificationProvider } from '@/context/PushNotificationContext';
 import { UtilitiesProvider } from '@/context/UtilitiesContext';
 import { VideoInteractionsProvider } from '@/context/VideoInteractionsContext';
+import { ViewHistoryProvider } from '@/context/ViewHistoryContext';
+import { WebSocketProvider } from '@/context/WebSocketContext';
+import { useScreenTracking } from '@/hooks/useAnalytics';
+import { useCachedResources } from '@/hooks/useCachedResources';
+import { initAnalyticsSession } from '@/utils/analytics';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { useEffect } from 'react';
+import Toast from 'react-native-toast-message';
 
 function AuthNavigator() {
   const { isAuthenticated, loading } = useAuth();
   const segments = useSegments();
   const router = useRouter();
+
+  // Auto-track screen views
+  useScreenTracking();
+
+  // Initialize analytics session
+  useEffect(() => {
+    initAnalyticsSession();
+  }, []);
 
   useEffect(() => {
     if (loading) return;
@@ -43,25 +67,61 @@ function AuthNavigator() {
 }
 
 export default function RootLayout() {
+  const isLoadingComplete = useCachedResources();
+
+  // Don't render until resources are loaded (prevents fontfaceobserver timeout on web)
+  if (!isLoadingComplete) {
+    return null;
+  }
+
   return (
     <FormErrorBoundary>
-      <AuthProvider>
-        <CartProvider>
-          <UtilitiesProvider>
-            <ProjectDataProvider>
-              <VideoInteractionsProvider>
-                <NotificationProvider>
-                  <AuthNavigator />
-                  <Stack screenOptions={{ headerShown: false }}>
-                    <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-                    <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                </Stack>
-              </NotificationProvider>
-            </VideoInteractionsProvider>
-            </ProjectDataProvider>
-          </UtilitiesProvider>
+      <PermissionProvider>
+        <AuthProvider>
+          <PerfexAuthProvider>
+            <CartProvider>
+            <FavoritesProvider>
+              <ViewHistoryProvider>
+                <CallProvider>
+                  <CommunicationHubProvider>
+                    <WebSocketProvider>
+                      <ProgressWebSocketProvider>
+                        <UtilitiesProvider>
+                          <ProjectDataProvider>
+                            <VideoInteractionsProvider>
+                              <NotificationProvider>
+                                <PushNotificationProvider>
+                                  <NotificationsProvider>
+                                  <OfflineIndicator />
+                                  <IncomingCallModal />
+                                <AuthNavigator />
+                                <Stack 
+                                  screenOptions={{ headerShown: false }}
+                                  initialRouteName="(tabs)"
+                                >
+                                  <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                                  <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+                                  <Stack.Screen name="crm" options={{ headerShown: false }} />
+                                  <Stack.Screen name="communication/index" options={{ headerShown: false }} />
+                                  <Stack.Screen name="call/active" options={{ headerShown: false, presentation: 'fullScreenModal' }} />
+                                </Stack>
+                                <Toast />
+                                  </NotificationsProvider>
+                              </PushNotificationProvider>
+                            </NotificationProvider>
+                          </VideoInteractionsProvider>
+                        </ProjectDataProvider>
+                      </UtilitiesProvider>
+                    </ProgressWebSocketProvider>
+                  </WebSocketProvider>
+                </CommunicationHubProvider>
+              </CallProvider>
+            </ViewHistoryProvider>
+          </FavoritesProvider>
         </CartProvider>
-      </AuthProvider>
-    </FormErrorBoundary>
+      </PerfexAuthProvider>
+    </AuthProvider>
+  </PermissionProvider>
+</FormErrorBoundary>
   );
 }

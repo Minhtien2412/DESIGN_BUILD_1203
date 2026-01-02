@@ -3,11 +3,36 @@
     "name": "APP_DESIGN_BUILD",
     "slug": "APP_DESIGN_BUILD",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/images/icon.png",
     "scheme": "appdesignbuild",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "intentFilters": [
+      {
+        "action": "VIEW",
+        "autoVerify": true,
+        "data": [
+          {
+            "scheme": "https",
+            "host": "*.appdesignbuild.com",
+            "pathPrefix": "/categories"
+          },
+          {
+            "scheme": "https",
+            "host": "*.appdesignbuild.com",
+            "pathPrefix": "/search"
+          }
+        ],
+        "category": [
+          "BROWSABLE",
+          "DEFAULT"
+        ]
+      }
+    ],
+    "associatedDomains": [
+      "applinks:appdesignbuild.com"
+    ],
     "splash": {
       "image": "./assets/images/splash-icon.png",
       "resizeMode": "contain",
@@ -15,7 +40,17 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.adminmarketingnx.APP_DESIGN_BUILD"
+      "bundleIdentifier": "com.adminmarketingnx.APP_DESIGN_BUILD",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Ứng dụng cần quyền camera để thực hiện video call và chụp ảnh.",
+        "NSMicrophoneUsageDescription": "Ứng dụng cần quyền microphone để thực hiện cuộc gọi thoại và video call.",
+        "UIBackgroundModes": [
+          "fetch",
+          "remote-notification",
+          "processing",
+          "voip"
+        ]
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -30,8 +65,17 @@
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.WRITE_EXTERNAL_STORAGE",
         "android.permission.ACCESS_FINE_LOCATION",
-        "android.permission.ACCESS_COARSE_LOCATION"
-      ]
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.RECEIVE_BOOT_COMPLETED",
+        "android.permission.WAKE_LOCK",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.POST_NOTIFICATIONS"
+      ],
+      "config": {
+        "googleMaps": {
+          "apiKey": "e1be4d2963f5777f13a0978b3f1736961aceb09bf798bfeccda1cf12b9119bab"
+        }
+      }
     },
     "web": {
       "bundler": "metro",

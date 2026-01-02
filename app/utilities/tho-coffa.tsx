@@ -1,10 +1,12 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Stack } from 'expo-router';
-import React, { useState } from 'react';
+import { router, Stack } from 'expo-router';
+import React, { useEffect, useState } from 'react';
 import {
+    ActivityIndicator,
     Alert,
     Image,
     Modal,
+    RefreshControl,
     ScrollView,
     StyleSheet,
     Text,
@@ -13,93 +15,25 @@ import {
     View,
 } from 'react-native';
 
-// Mock data - Formwork Teams
-const TEAMS = [
-  {
-    id: 1,
-    name: 'Đội Coffa Minh Khôi',
-    avatar: 'https://i.pravatar.cc/150?img=15',
-    rating: 4.9,
-    reviews: 176,
-    location: 'TP.HCM',
-    experience: 18,
-    price: '550.000₫',
-    priceUnit: '/ ngày',
-    structures: ['Cột', 'Dầm', 'Sàn', 'Móng'],
-    teamSize: 6,
-    completedProjects: 289,
-    featured: true,
-    availability: 'Sẵn sàng',
-    phone: '090 555 6666',
-    pricePerSquare: '120.000₫/m²',
-  },
-  {
-    id: 2,
-    name: 'Coffa Chuyên Nghiệp Hà Thành',
-    avatar: 'https://i.pravatar.cc/150?img=34',
-    rating: 4.8,
-    reviews: 154,
-    location: 'Hà Nội',
-    experience: 15,
-    price: '520.000₫',
-    priceUnit: '/ ngày',
-    structures: ['Cột', 'Dầm', 'Tường', 'Cầu thang'],
-    teamSize: 5,
-    completedProjects: 234,
-    featured: true,
-    availability: 'Sẵn sàng',
-    phone: '091 666 7777',
-    pricePerSquare: '110.000₫/m²',
-  },
-  {
-    id: 3,
-    name: 'Đội Ván Khuôn Miền Trung',
-    avatar: 'https://i.pravatar.cc/150?img=53',
-    rating: 4.7,
-    reviews: 128,
-    location: 'Đà Nẵng',
-    experience: 12,
-    price: '480.000₫',
-    priceUnit: '/ ngày',
-    structures: ['Sàn', 'Móng', 'Hố thang máy'],
-    teamSize: 4,
-    completedProjects: 187,
-    featured: false,
-    availability: 'Sẵn sàng',
-    phone: '092 777 8888',
-    pricePerSquare: '100.000₫/m²',
-  },
-  {
-    id: 4,
-    name: 'Coffa Phương Nam',
-    avatar: 'https://i.pravatar.cc/150?img=70',
-    rating: 4.6,
-    reviews: 95,
-    location: 'Cần Thơ',
-    experience: 10,
-    price: '450.000₫',
-    priceUnit: '/ ngày',
-    structures: ['Cột', 'Sàn', 'Tường'],
-    teamSize: 3,
-    completedProjects: 143,
-    featured: false,
-    availability: 'Bận (khả dụng từ 25/11)',
-    phone: '093 888 9999',
-    pricePerSquare: '95.000₫/m²',
-  },
-];
+import { useLaborProviders } from '@/hooks/useLaborProviders';
+import type { LaborProvider } from '@/services/api/labor.service';
 
 const LOCATIONS = ['Tất cả', 'TP.HCM', 'Hà Nội', 'Đà Nẵng', 'Cần Thơ', 'Khác'];
 const STRUCTURES = ['Tất cả', 'Cột', 'Dầm', 'Sàn', 'Móng', 'Tường', 'Cầu thang'];
 
 interface TeamCardProps {
-  team: any;
+  team: LaborProvider;
   onBooking: () => void;
+  onPress: () => void;
 }
 
-const TeamCard: React.FC<TeamCardProps> = ({ team, onBooking }) => {
+const TeamCard: React.FC<TeamCardProps> = ({ team, onBooking, onPress }) => {
+  const availabilityText = team.availability === 'available' ? 'Sẵn sàng' : team.availability === 'busy' ? 'Đang bận' : 'Không khả dụng';
+  const priceDisplay = `${team.priceRange.min.toLocaleString('vi-VN')}₫`;
+  const priceSquare = team.priceRange.max ? `${team.priceRange.max.toLocaleString('vi-VN')}₫/m²` : '';
+
   return (
-    <TouchableOpacity style={styles.teamCard} activeOpacity={0.8}>
+    <TouchableOpacity style={styles.teamCard} activeOpacity={0.8} onPress={onPress}>
       {team.featured && (
         <View style={styles.featuredBadge}>
           <Ionicons name="star" size={12} color="#fff" />
@@ -108,7 +42,7 @@ const TeamCard: React.FC<TeamCardProps> = ({ team, onBooking }) => {
       )}
 
       <View style={styles.cardHeader}>
-        <Image source={{ uri: team.avatar }} style={styles.avatar} />
+        <Image source={{ uri: team.avatar || 'https://i.pravatar.cc/150?img=15' }} style={styles.avatar} />
         
         <View style={styles.headerInfo}>
           <Text style={styles.teamName}>{team.name}</Text>
@@ -116,15 +50,15 @@ const TeamCard: React.FC<TeamCardProps> = ({ team, onBooking }) => {
           <View style={styles.ratingRow}>
             <Ionicons name="star" size={14} color="#ffa41c" />
             <Text style={styles.ratingText}>{team.rating}</Text>
-            <Text style={styles.reviewsText}>({team.reviews})</Text>
+            <Text style={styles.reviewsText}>({team.reviewCount})</Text>
           </View>
 
           <View style={styles.locationRow}>
             <Ionicons name="location" size={12} color="#999" />
-            <Text style={styles.locationText}>{team.location}</Text>
+            <Text style={styles.locationText}>{team.city || team.address}</Text>
             <View style={styles.divider} />
             <Ionicons name="briefcase" size={12} color="#999" />
-            <Text style={styles.experienceText}>{team.experience} năm</Text>
+            <Text style={styles.experienceText}>{team.yearExperience} năm</Text>
           </View>
         </View>
       </View>
@@ -132,7 +66,7 @@ const TeamCard: React.FC<TeamCardProps> = ({ team, onBooking }) => {
       <View style={styles.structuresSection}>
         <Text style={styles.structuresLabel}>Loại kết cấu:</Text>
         <View style={styles.structuresTags}>
-          {team.structures.map((structure: string, index: number) => (
+          {team.services.slice(0, 4).map((structure: string, index: number) => (
             <View key={index} style={styles.structureTag}>
               <Text style={styles.structureText}>{structure}</Text>
             </View>
@@ -142,12 +76,12 @@ const TeamCard: React.FC<TeamCardProps> = ({ team, onBooking }) => {
 
       <View style={styles.teamRow}>
         <Ionicons name="people" size={16} color="#2196f3" />
-        <Text style={styles.teamSizeText}>Đội {team.teamSize} người</Text>
+        <Text style={styles.teamSizeText}>Đội chuyên nghiệp</Text>
       </View>
 
       <View style={styles.statsSection}>
         <View style={styles.statItem}>
-          <Text style={styles.statValue}>{team.completedProjects}+</Text>
+          <Text style={styles.statValue}>{team.projectCount}+</Text>
           <Text style={styles.statLabel}>Công trình</Text>
         </View>
         <View style={styles.statDivider} />
@@ -155,10 +89,10 @@ const TeamCard: React.FC<TeamCardProps> = ({ team, onBooking }) => {
           <Text
             style={[
               styles.statValue,
-              team.availability === 'Sẵn sàng' ? styles.available : styles.busy,
+              team.availability === 'available' ? styles.available : styles.busy,
             ]}
           >
-            {team.availability}
+            {availabilityText}
           </Text>
           <Text style={styles.statLabel}>Tình trạng</Text>
         </View>
@@ -166,9 +100,9 @@ const TeamCard: React.FC<TeamCardProps> = ({ team, onBooking }) => {
 
       <View style={styles.priceRow}>
         <View>
-          <Text style={styles.price}>{team.price}</Text>
-          <Text style={styles.priceUnit}>{team.priceUnit}</Text>
-          <Text style={styles.priceSquare}>hoặc {team.pricePerSquare}</Text>
+          <Text style={styles.price}>{priceDisplay}</Text>
+          <Text style={styles.priceUnit}>/ {team.priceRange.unit}</Text>
+          {priceSquare ? <Text style={styles.priceSquare}>hoặc {priceSquare}</Text> : null}
         </View>
         
         <TouchableOpacity style={styles.bookButton} onPress={onBooking}>
@@ -181,10 +115,12 @@ const TeamCard: React.FC<TeamCardProps> = ({ team, onBooking }) => {
 };
 
 export default function ThoCoffaScreen() {
+  const { providers, loading, refreshing, refresh, searchProviders } = useLaborProviders({ type: 'coffa' });
+  
   const [selectedLocation, setSelectedLocation] = useState('Tất cả');
   const [selectedStructure, setSelectedStructure] = useState('Tất cả');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedTeam, setSelectedTeam] = useState<any>(null);
+  const [selectedTeam, setSelectedTeam] = useState<LaborProvider | null>(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [bookingData, setBookingData] = useState({
     name: '',
@@ -196,14 +132,25 @@ export default function ThoCoffaScreen() {
     notes: '',
   });
 
-  const filteredTeams = TEAMS.filter((team) => {
-    const matchLocation = selectedLocation === 'Tất cả' || team.location === selectedLocation;
-    const matchStructure = selectedStructure === 'Tất cả' || team.structures.includes(selectedStructure);
+  // Filter providers based on local filters
+  const filteredTeams = providers.filter((team) => {
+    const matchLocation = selectedLocation === 'Tất cả' || team.city === selectedLocation || team.address.includes(selectedLocation);
+    const matchStructure = selectedStructure === 'Tất cả' || team.services.includes(selectedStructure);
     const matchSearch = searchQuery === '' || team.name.toLowerCase().includes(searchQuery.toLowerCase());
     return matchLocation && matchStructure && matchSearch;
   });
 
-  const handleBooking = (team: any) => {
+  // Handle search with debounce
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchQuery.length > 2) {
+        searchProviders(searchQuery);
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery, searchProviders]);
+
+  const handleBooking = (team: LaborProvider) => {
     setSelectedTeam(team);
     setShowBookingModal(true);
   };
@@ -216,7 +163,7 @@ export default function ThoCoffaScreen() {
 
     Alert.alert(
       'Gửi yêu cầu thành công',
-      `Chúng tôi sẽ kết nối bạn với đội thợ trong vòng 1h.\n\nĐội: ${selectedTeam.name}`,
+      `Chúng tôi sẽ kết nối bạn với đội thợ trong vòng 1h.\n\nĐội: ${selectedTeam?.name}`,
       [
         {
           text: 'OK',
@@ -242,7 +189,7 @@ export default function ThoCoffaScreen() {
       <Stack.Screen
         options={{
           title: 'Thợ coffa',
-          headerStyle: { backgroundColor: '#90B44C' },
+          headerStyle: { backgroundColor: '#0A6847' },
           headerTintColor: '#fff',
           headerTitleStyle: { fontWeight: '600' },
         }}
@@ -309,23 +256,47 @@ export default function ThoCoffaScreen() {
         </View>
 
         <View style={styles.resultsBar}>
-          <Text style={styles.resultsText}>{filteredTeams.length} đội</Text>
+          <Text style={styles.resultsText}>
+            {loading ? 'Đang tải...' : `${filteredTeams.length} đội`}
+          </Text>
         </View>
 
         <ScrollView
           style={styles.content}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.listContainer}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={refresh}
+              colors={['#0A6847']}
+              tintColor="#0A6847"
+            />
+          }
         >
-          {filteredTeams.map((team) => (
-            <TeamCard key={team.id} team={team} onBooking={() => handleBooking(team)} />
-          ))}
-
-          {filteredTeams.length === 0 && (
-            <View style={styles.emptyState}>
-              <Ionicons name="construct-outline" size={64} color="#ccc" />
-              <Text style={styles.emptyText}>Không tìm thấy đội coffa phù hợp</Text>
+          {loading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="#0A6847" />
+              <Text style={styles.loadingText}>Đang tải danh sách...</Text>
             </View>
+          ) : (
+            <>
+              {filteredTeams.map((team) => (
+                <TeamCard 
+                  key={team.id} 
+                  team={team} 
+                  onBooking={() => handleBooking(team)} 
+                  onPress={() => router.push(`/utilities/team-detail?id=${team.id}&type=coffa`)}
+                />
+              ))}
+
+              {filteredTeams.length === 0 && (
+                <View style={styles.emptyState}>
+                  <Ionicons name="construct-outline" size={64} color="#ccc" />
+                  <Text style={styles.emptyText}>Không tìm thấy đội coffa phù hợp</Text>
+                </View>
+              )}
+            </>
           )}
 
           <View style={{ height: 20 }} />
@@ -361,7 +332,7 @@ export default function ThoCoffaScreen() {
                     <View style={styles.selectedRating}>
                       <Ionicons name="star" size={14} color="#ffa41c" />
                       <Text style={styles.selectedRatingText}>
-                        {selectedTeam.rating} ({selectedTeam.reviews})
+                        {selectedTeam.rating} ({selectedTeam.reviewCount})
                       </Text>
                     </View>
                   </View>
@@ -477,7 +448,7 @@ const styles = StyleSheet.create({
   filterLabel: { fontSize: 13, fontWeight: '600', color: '#666', width: 85, paddingLeft: 16 },
   filterScroll: { flex: 1 },
   filterChip: { paddingHorizontal: 14, paddingVertical: 6, borderRadius: 16, backgroundColor: '#f5f5f5', marginHorizontal: 4 },
-  filterChipActive: { backgroundColor: '#90B44C' },
+  filterChipActive: { backgroundColor: '#0A6847' },
   filterChipText: { fontSize: 12, color: '#666', fontWeight: '500' },
   filterChipTextActive: { color: '#fff' },
   resultsBar: { backgroundColor: '#fff', paddingHorizontal: 16, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#f0f0f0' },
@@ -485,7 +456,7 @@ const styles = StyleSheet.create({
   content: { flex: 1 },
   listContainer: { padding: 16 },
   teamCard: { backgroundColor: '#fff', borderRadius: 12, padding: 16, marginBottom: 16, elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 4 },
-  featuredBadge: { position: 'absolute', top: 12, right: 12, flexDirection: 'row', alignItems: 'center', backgroundColor: '#90B44C', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 12, zIndex: 1, gap: 4 },
+  featuredBadge: { position: 'absolute', top: 12, right: 12, flexDirection: 'row', alignItems: 'center', backgroundColor: '#0A6847', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 12, zIndex: 1, gap: 4 },
   featuredText: { fontSize: 10, fontWeight: '600', color: '#fff' },
   cardHeader: { flexDirection: 'row', marginBottom: 12 },
   avatar: { width: 60, height: 60, borderRadius: 8, backgroundColor: '#f0f0f0' },
@@ -513,13 +484,15 @@ const styles = StyleSheet.create({
   statLabel: { fontSize: 11, color: '#999' },
   statDivider: { width: 1, height: 40, backgroundColor: '#f0f0f0' },
   priceRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  price: { fontSize: 18, fontWeight: '700', color: '#90B44C' },
+  price: { fontSize: 18, fontWeight: '700', color: '#0A6847' },
   priceUnit: { fontSize: 12, color: '#999' },
   priceSquare: { fontSize: 11, color: '#666', marginTop: 2 },
-  bookButton: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#90B44C', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 8, gap: 6 },
+  bookButton: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#0A6847', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 8, gap: 6 },
   bookButtonText: { fontSize: 14, fontWeight: '600', color: '#fff' },
   emptyState: { alignItems: 'center', justifyContent: 'center', paddingVertical: 60 },
   emptyText: { fontSize: 15, color: '#999', marginTop: 16 },
+  loadingContainer: { alignItems: 'center', justifyContent: 'center', paddingVertical: 60 },
+  loadingText: { fontSize: 14, color: '#666', marginTop: 12 },
   infoBanner: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#f1f8e9', paddingHorizontal: 16, paddingVertical: 10, gap: 8 },
   infoBannerText: { fontSize: 12, color: '#4caf50', flex: 1 },
   bookingModalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
@@ -536,10 +509,10 @@ const styles = StyleSheet.create({
   form: { marginBottom: 16 },
   formGroup: { marginBottom: 16 },
   formLabel: { fontSize: 13, fontWeight: '600', color: '#333', marginBottom: 8 },
-  required: { color: '#90B44C' },
+  required: { color: '#0A6847' },
   formInput: { backgroundColor: '#f5f5f5', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 14, color: '#333', borderWidth: 1, borderColor: '#e0e0e0' },
   formTextArea: { height: 80, textAlignVertical: 'top' },
-  submitButton: { backgroundColor: '#90B44C', paddingVertical: 14, borderRadius: 8, alignItems: 'center', marginBottom: 12 },
+  submitButton: { backgroundColor: '#0A6847', paddingVertical: 14, borderRadius: 8, alignItems: 'center', marginBottom: 12 },
   submitButtonText: { fontSize: 15, fontWeight: '600', color: '#fff' },
   formNote: { fontSize: 12, color: '#999', textAlign: 'center', marginBottom: 20 },
 });

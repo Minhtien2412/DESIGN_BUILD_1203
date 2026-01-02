@@ -1,8 +1,12 @@
+import { getProducts, type Product } from '@/services/api/products.service';
 import { Ionicons } from '@expo/vector-icons';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
+    ActivityIndicator,
     FlatList,
+    Image,
+    RefreshControl,
     ScrollView,
     StyleSheet,
     Text,
@@ -11,63 +15,73 @@ import {
 } from 'react-native';
 
 // Equipment category mapping
-const CATEGORY_INFO: Record<string, { title: string; icon: string; description: string }> = {
+const CATEGORY_INFO: Record<string, { title: string; icon: string; description: string; apiCategory?: string }> = {
   'kitchen-equipment': {
     title: 'Thiết bị bếp',
     icon: '🍳',
-    description: 'Bếp, máy hút mùi, tủ lạnh, lò nướng...'
+    description: 'Bếp, máy hút mùi, tủ lạnh, lò nướng...',
+    apiCategory: 'furniture'
   },
   'sanitary-equipment': {
     title: 'Thiết bị vệ sinh',
     icon: '🚿',
-    description: 'Bồn cầu, vòi sen, chậu rửa, bồn tắm...'
+    description: 'Bồn cầu, vòi sen, chậu rửa, bồn tắm...',
+    apiCategory: 'sanitary'
   },
   'electrical': {
     title: 'Thiết bị điện',
     icon: '💡',
-    description: 'Ổ cắm, công tắc, đèn LED, quạt...'
+    description: 'Ổ cắm, công tắc, đèn LED, quạt...',
+    apiCategory: 'lighting'
   },
   'plumbing': {
     title: 'Thiết bị nước',
     icon: '💧',
-    description: 'Máy bơm, bình nóng lạnh, van khóa...'
+    description: 'Máy bơm, bình nóng lạnh, van khóa...',
+    apiCategory: 'materials'
   },
   'fire-safety': {
     title: 'Thiết bị PCCC',
     icon: '🧯',
-    description: 'Bình cứu hỏa, báo cháy, vòi phun...'
+    description: 'Bình cứu hỏa, báo cháy, vòi phun...',
+    apiCategory: 'materials'
   },
   'dining-tables': {
     title: 'Bàn ăn',
     icon: '🍽️',
-    description: 'Bàn ăn gỗ, kính, đá marble...'
+    description: 'Bàn ăn gỗ, kính, đá marble...',
+    apiCategory: 'furniture'
   },
   'study-desks': {
     title: 'Bàn học',
     icon: '📚',
-    description: 'Bàn học sinh, bàn làm việc, ghế...'
+    description: 'Bàn học sinh, bàn làm việc, ghế...',
+    apiCategory: 'furniture'
   },
   'sofas': {
     title: 'Sofa',
     icon: '🛋️',
-    description: 'Sofa da, vải, góc, giường...'
+    description: 'Sofa da, vải, góc, giường...',
+    apiCategory: 'furniture'
   },
-};
-
-// Mock product data - replace with API call
-const MOCK_PRODUCTS: Record<string, any[]> = {
-  'kitchen-equipment': [
-    { id: 1, name: 'Bếp từ 4 vùng nấu', brand: 'Bosch', price: 15900000, image: 'https://via.placeholder.com/200', rating: 4.8, reviews: 124 },
-    { id: 2, name: 'Máy hút mùi âm tủ', brand: 'Hafele', price: 8900000, image: 'https://via.placeholder.com/200', rating: 4.6, reviews: 89 },
-    { id: 3, name: 'Tủ lạnh 4 cửa', brand: 'Samsung', price: 32900000, image: 'https://via.placeholder.com/200', rating: 4.9, reviews: 256 },
-    { id: 4, name: 'Lò nướng âm tủ', brand: 'Electrolux', price: 12500000, image: 'https://via.placeholder.com/200', rating: 4.7, reviews: 142 },
-  ],
-  'sanitary-equipment': [
-    { id: 1, name: 'Bồn cầu thông minh', brand: 'TOTO', price: 18500000, image: 'https://via.placeholder.com/200', rating: 4.9, reviews: 187 },
-    { id: 2, name: 'Vòi sen cây', brand: 'Grohe', price: 5900000, image: 'https://via.placeholder.com/200', rating: 4.7, reviews: 95 },
-    { id: 3, name: 'Chậu rửa mặt lavabo', brand: 'American Standard', price: 3200000, image: 'https://via.placeholder.com/200', rating: 4.6, reviews: 78 },
-    { id: 4, name: 'Bồn tắm massage', brand: 'Caesar', price: 22900000, image: 'https://via.placeholder.com/200', rating: 4.8, reviews: 143 },
-  ],
+  'construction': {
+    title: 'Công trình đang thi công',
+    icon: '🏗️',
+    description: 'Các dự án đang thi công thực tế',
+    apiCategory: 'construction'
+  },
+  'villa': {
+    title: 'Biệt thự',
+    icon: '🏠',
+    description: 'Thiết kế biệt thự cao cấp',
+    apiCategory: 'villa'
+  },
+  'interior': {
+    title: 'Nội thất',
+    icon: '🛋️',
+    description: 'Thiết kế nội thất chuyên nghiệp',
+    apiCategory: 'interior'
+  },
 };
 
 export default function ShoppingCategoryScreen() {
@@ -75,36 +89,52 @@ export default function ShoppingCategoryScreen() {
   const categoryInfo = CATEGORY_INFO[category] || {
     title: 'Sản phẩm',
     icon: '🛒',
-    description: 'Danh sách sản phẩm'
+    description: 'Danh sách sản phẩm',
+    apiCategory: category
   };
 
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [sortBy, setSortBy] = useState<'popular' | 'price-asc' | 'price-desc' | 'rating'>('popular');
   const [filterBrand, setFilterBrand] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 100000000]);
 
-  // Get products for this category (mock data for now)
-  const products = MOCK_PRODUCTS[category] || [];
+  const loadProducts = async (isRefresh = false) => {
+    if (isRefresh) setRefreshing(true);
+    else setLoading(true);
+    
+    try {
+      const response = await getProducts({
+        category: categoryInfo.apiCategory || category,
+        sortBy: sortBy === 'price-asc' || sortBy === 'price-desc' ? 'price' : sortBy === 'rating' ? 'rating' : 'soldCount',
+        sortOrder: sortBy === 'price-desc' ? 'desc' : sortBy === 'price-asc' ? 'asc' : 'desc',
+        limit: 50,
+      });
+      setProducts(response.products);
+    } catch (error) {
+      console.error('[CategoryScreen] Error loading products:', error);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    loadProducts();
+  }, [category, sortBy]);
 
   // Extract unique brands
-  const brands = Array.from(new Set(products.map(p => p.brand)));
+  const brands = Array.from(new Set(products.map(p => p.brand).filter(Boolean)));
 
   // Apply filters
-  let filteredProducts = products;
+  let filteredProducts = [...products];
   if (filterBrand.length > 0) {
-    filteredProducts = filteredProducts.filter(p => filterBrand.includes(p.brand));
+    filteredProducts = filteredProducts.filter(p => p.brand && filterBrand.includes(p.brand));
   }
   filteredProducts = filteredProducts.filter(
     p => p.price >= priceRange[0] && p.price <= priceRange[1]
   );
-
-  // Apply sorting
-  if (sortBy === 'price-asc') {
-    filteredProducts.sort((a, b) => a.price - b.price);
-  } else if (sortBy === 'price-desc') {
-    filteredProducts.sort((a, b) => b.price - a.price);
-  } else if (sortBy === 'rating') {
-    filteredProducts.sort((a, b) => b.rating - a.rating);
-  }
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('vi-VN', {
@@ -113,40 +143,50 @@ export default function ShoppingCategoryScreen() {
     }).format(price);
   };
 
-  const handleProductPress = (product: any) => {
+  const handleProductPress = (product: Product) => {
     try {
-      if (product?.id == null) return;
-      // Navigate to dynamic product detail route
-      router.push(`/shopping/product/${product.id}`);
+      if (!product?.id) return;
+      router.push(`/product/${product.id}`);
     } catch (e) {
       console.warn('Navigation error:', e);
     }
   };
 
-  const renderProduct = ({ item }: { item: any }) => (
+  const renderProduct = ({ item }: { item: Product }) => (
     <TouchableOpacity
       style={styles.productCard}
       activeOpacity={0.8}
       onPress={() => handleProductPress(item)}
     >
       <View style={styles.productImageContainer}>
-        <View style={styles.productImagePlaceholder}>
-          <Text style={styles.productImagePlaceholderText}>📦</Text>
-        </View>
-        <View style={styles.ratingBadge}>
-          <Ionicons name="star" size={12} color="#fbbf24" />
-          <Text style={styles.ratingText}>{item.rating}</Text>
-        </View>
+        {item.image?.uri ? (
+          <Image source={{ uri: item.image.uri }} style={styles.productImage} resizeMode="cover" />
+        ) : (
+          <View style={styles.productImagePlaceholder}>
+            <Text style={styles.productImagePlaceholderText}>📦</Text>
+          </View>
+        )}
+        {item.rating && (
+          <View style={styles.ratingBadge}>
+            <Ionicons name="star" size={12} color="#fbbf24" />
+            <Text style={styles.ratingText}>{item.rating}</Text>
+          </View>
+        )}
+        {item.discountPercent && (
+          <View style={styles.discountBadge}>
+            <Text style={styles.discountText}>-{item.discountPercent}%</Text>
+          </View>
+        )}
       </View>
       
       <View style={styles.productInfo}>
-        <Text style={styles.brandText}>{item.brand}</Text>
+        <Text style={styles.brandText}>{item.brand || item.seller?.name || 'Nhà Xinh'}</Text>
         <Text style={styles.productName} numberOfLines={2}>
           {item.name}
         </Text>
         <View style={styles.productFooter}>
           <Text style={styles.productPrice}>{formatPrice(item.price)}</Text>
-          <Text style={styles.reviewCount}>({item.reviews})</Text>
+          <Text style={styles.reviewCount}>({item.reviewCount || 0})</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -226,23 +266,36 @@ export default function ShoppingCategoryScreen() {
         </ScrollView>
 
         {/* Products Grid */}
-        <FlatList
-          data={filteredProducts}
-          renderItem={renderProduct}
-          keyExtractor={(item) => item.id.toString()}
-          numColumns={2}
-          contentContainerStyle={styles.productList}
-          columnWrapperStyle={styles.productRow}
-          ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <Ionicons name="search-outline" size={64} color="#ccc" />
-              <Text style={styles.emptyText}>Không tìm thấy sản phẩm</Text>
-              <Text style={styles.emptySubtext}>
-                Thử thay đổi bộ lọc hoặc tìm kiếm khác
-              </Text>
-            </View>
-          }
-        />
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#0A6847" />
+            <Text style={styles.loadingText}>Đang tải sản phẩm...</Text>
+          </View>
+        ) : (
+          <FlatList
+            data={filteredProducts}
+            renderItem={renderProduct}
+            keyExtractor={(item) => item.id.toString()}
+            numColumns={2}
+            contentContainerStyle={styles.productList}
+            columnWrapperStyle={styles.productRow}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={() => loadProducts(true)} colors={['#0A6847']} />
+            }
+            ListHeaderComponent={
+              <Text style={styles.resultCount}>{filteredProducts.length} sản phẩm</Text>
+            }
+            ListEmptyComponent={
+              <View style={styles.emptyContainer}>
+                <Ionicons name="search-outline" size={64} color="#ccc" />
+                <Text style={styles.emptyText}>Không tìm thấy sản phẩm</Text>
+                <Text style={styles.emptySubtext}>
+                  Thử thay đổi bộ lọc hoặc tìm kiếm khác
+                </Text>
+              </View>
+            }
+          />
+        )}
       </View>
     </>
   );
@@ -307,8 +360,8 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   filterChipActive: {
-    backgroundColor: '#90b44c',
-    borderColor: '#90b44c',
+    backgroundColor: '#0A6847',
+    borderColor: '#0A6847',
   },
   filterChipText: {
     fontSize: 13,
@@ -339,6 +392,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f9fa',
     position: 'relative',
   },
+  productImage: {
+    width: '100%',
+    height: '100%',
+  },
   productImagePlaceholder: {
     width: '100%',
     height: '100%',
@@ -365,12 +422,43 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#fff',
   },
+  discountBadge: {
+    position: 'absolute',
+    top: 8,
+    left: 8,
+    backgroundColor: '#FF3B30',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  discountText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 60,
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 14,
+    color: '#666',
+  },
+  resultCount: {
+    fontSize: 13,
+    color: '#666',
+    marginBottom: 12,
+    paddingHorizontal: 4,
+  },
   productInfo: {
     padding: 12,
   },
   brandText: {
     fontSize: 11,
-    color: '#90b44c',
+    color: '#0A6847',
     fontWeight: '600',
     marginBottom: 4,
     textTransform: 'uppercase',

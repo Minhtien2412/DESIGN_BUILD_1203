@@ -101,7 +101,7 @@ export default function FoodDeliveryScreen() {
   }, []);
 
   const handleRestaurantPress = (restaurant: Restaurant) => {
-    router.push(`/food/restaurant/${restaurant.id}` as any);
+    router.push(`/food/restaurant/${restaurant.id}`);
   };
 
   const renderRestaurant = ({ item }: { item: Restaurant }) => (

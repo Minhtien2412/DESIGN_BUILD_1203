@@ -1,111 +1,49 @@
 /**
- * Messages List Screen
- * Displays conversations with unread badges (like Zalo)
+ * Messages List Screen - Modernized with Nordic Green Theme
+ * Shopee/Grab style conversation list
+ * Updated: 13/12/2025
  */
 
 import Avatar from '@/components/ui/avatar';
-import { apiFetch } from '@/services/api';
+import { ContactSection } from '@/components/ui/contact-section';
+import { MODERN_COLORS, MODERN_RADIUS, MODERN_SPACING, MODERN_TYPOGRAPHY } from '@/constants/modern-theme';
+import { useMessages } from '@/hooks/useMessages';
+import type { Conversation } from '@/services/api/messagesApi';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
+import React from 'react';
 import {
     ActivityIndicator,
     FlatList,
     RefreshControl,
+    StatusBar,
     StyleSheet,
     Text,
     TouchableOpacity,
     View,
 } from 'react-native';
 
-interface OtherUser {
-  id: number;
-  name: string;
-  avatar: string | null;
-  isOnline: boolean;
-  lastSeen: string | null;
-}
-
-interface LastMessage {
-  content: string;
-  type: string;
-  sentAt: string;
-  isFromMe: boolean;
-  isRead: boolean;
-}
-
-interface Conversation {
-  id: number;
-  otherUser: OtherUser;
-  lastMessage: LastMessage;
-  unreadCount: number;
-}
-
 export default function MessagesScreen() {
-  const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
-  const [offset, setOffset] = useState(0);
-  const limit = 20;
+  const { 
+    conversations, 
+    loading, 
+    error, 
+    unreadCount,
+    refreshConversations 
+  } = useMessages();
 
-  const fetchConversations = useCallback(async (isRefresh = false, currentOffset?: number) => {
-    try {
-      if (isRefresh) {
-        setRefreshing(true);
-      } else if (currentOffset === 0) {
-        setLoading(true);
-      } else {
-        setLoadingMore(true);
-      }
+  const [refreshing, setRefreshing] = React.useState(false);
 
-      const offsetToUse = isRefresh ? 0 : (currentOffset ?? offset);
-  const data = await apiFetch(`/api/messages?limit=${limit}&offset=${offsetToUse}`);
-
-      const newConversations = data.conversations || [];
-      
-      if (isRefresh || offsetToUse === 0) {
-        setConversations(newConversations);
-        setOffset(limit);
-      } else {
-        setConversations(prev => [...prev, ...newConversations]);
-        setOffset(offsetToUse + limit);
-      }
-
-      setHasMore(data.pagination?.hasMore || false);
-    } catch (error: any) {
-      // Gracefully handle missing endpoint during development
-      const status = error?.status ?? error?.data?.statusCode;
-      if (status === 404) {
-        setConversations([]);
-        setHasMore(false);
-      } else {
-        console.error('Failed to fetch conversations:', error);
-      }
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-      setLoadingMore(false);
-    }
-  }, []); // REMOVE offset dependency!
-
-  useEffect(() => {
-    fetchConversations(false, 0);
-  }, [fetchConversations]);
-
-  const handleRefresh = () => {
-    fetchConversations(true, 0);
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await refreshConversations();
+    setRefreshing(false);
   };
 
-  const handleLoadMore = () => {
-    if (!loadingMore && hasMore) {
-      fetchConversations(false, offset);
-    }
-  };
-
-  const handleConversationPress = (otherUserId: number) => {
-    router.push(`/messages/${otherUserId}` as any);
+  const handleConversationPress = (conversation: Conversation) => {
+    // Navigate to chat with the other participant
+    const otherParticipant = conversation.participants[0];
+    router.push(`/messages/${otherParticipant.id}`);
   };
 
   const formatTime = (dateString: string) => {
@@ -129,95 +67,166 @@ export default function MessagesScreen() {
     return content.substring(0, maxLength) + '...';
   };
 
-  const renderConversation = ({ item }: { item: Conversation }) => (
-    <TouchableOpacity
-      style={styles.conversationItem}
-      onPress={() => handleConversationPress(item.otherUser.id)}
-      activeOpacity={0.7}
-    >
-      {/* Avatar with online indicator */}
-      <View style={styles.avatarContainer}>
-        <Avatar
-          avatar={item.otherUser.avatar}
-          userId={String(item.otherUser.id)}
-          name={item.otherUser.name}
-          pixelSize={56}
-          showBadge={item.otherUser.isOnline}
-          onlineStatus={item.otherUser.isOnline ? 'online' : undefined}
-        />
-      </View>
-
-      {/* Message content */}
-      <View style={styles.messageContent}>
-        <View style={styles.headerRow}>
-          <Text style={styles.userName} numberOfLines={1}>
-            {item.otherUser.name}
-          </Text>
-          <Text style={styles.timeText}>
-            {formatTime(item.lastMessage.sentAt)}
-          </Text>
+  const renderConversation = ({ item }: { item: Conversation }) => {
+    const otherParticipant = item.participants[0];
+    const lastMsg = item.lastMessage;
+    
+    return (
+      <TouchableOpacity
+        style={styles.conversationItem}
+        onPress={() => handleConversationPress(item)}
+        activeOpacity={0.7}
+      >
+        {/* Avatar */}
+        <View style={styles.avatarContainer}>
+          <Avatar
+            avatar={null}
+            userId={String(otherParticipant.id)}
+            name={otherParticipant.name}
+            pixelSize={56}
+            showBadge={false}
+          />
         </View>
 
-        <View style={styles.messageRow}>
-          <View style={{ flex: 1 }}>
-            {item.lastMessage.type === 'image' && (
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Ionicons name="image" size={14} color="#999" style={{ marginRight: 4 }} />
-                <Text style={[styles.messageText, item.unreadCount > 0 && styles.unreadText]}>
-                  Hình ảnh
-                </Text>
-              </View>
-            )}
-            {item.lastMessage.type === 'video' && (
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Ionicons name="videocam" size={14} color="#999" style={{ marginRight: 4 }} />
-                <Text style={[styles.messageText, item.unreadCount > 0 && styles.unreadText]}>
-                  Video
-                </Text>
-              </View>
-            )}
-            {item.lastMessage.type === 'text' && (
-              <Text 
-                style={[styles.messageText, item.unreadCount > 0 && styles.unreadText]} 
-                numberOfLines={1}
-              >
-                {item.lastMessage.isFromMe && 'Bạn: '}
-                {truncateMessage(item.lastMessage.content)}
+        {/* Message content */}
+        <View style={styles.messageContent}>
+          <View style={styles.headerRow}>
+            <Text style={styles.userName} numberOfLines={1}>
+              {otherParticipant.name}
+            </Text>
+            {lastMsg && (
+              <Text style={styles.timeText}>
+                {formatTime(lastMsg.createdAt)}
               </Text>
             )}
           </View>
 
-          {item.unreadCount > 0 && (
-            <View style={styles.unreadBadge}>
-              <Text style={styles.unreadBadgeText}>
-                {item.unreadCount > 99 ? '99+' : item.unreadCount}
-              </Text>
+          <View style={styles.messageRow}>
+            <View style={{ flex: 1 }}>
+              {lastMsg ? (
+                <Text 
+                  style={[styles.messageText, item.unreadCount > 0 && styles.unreadText]} 
+                  numberOfLines={1}
+                >
+                  {truncateMessage(lastMsg.content)}
+                </Text>
+              ) : (
+                <Text style={styles.messageText}>
+                  Chưa có tin nhắn
+                </Text>
+              )}
             </View>
-          )}
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
 
-  const renderFooter = () => {
-    if (!loadingMore) return null;
-    return (
-      <View style={styles.loadingFooter}>
-        <ActivityIndicator size="small" color="#22c55e" />
-        <Text style={styles.loadingText}>Đang tải thêm...</Text>
-      </View>
+            {item.unreadCount > 0 && (
+              <View style={styles.unreadBadge}>
+                <Text style={styles.unreadBadgeText}>
+                  {item.unreadCount > 99 ? '99+' : item.unreadCount}
+                </Text>
+              </View>
+            )}
+          </View>
+        </View>
+      </TouchableOpacity>
     );
   };
 
   const renderEmpty = () => {
     if (loading) return null;
+    
+    if (error) {
+      return (
+        <View style={styles.emptyContainer}>
+          <Ionicons name="alert-circle-outline" size={64} color="#ef4444" />
+          <Text style={styles.emptyTitle}>Lỗi tải dữ liệu</Text>
+          <Text style={styles.emptySubtitle}>{error}</Text>
+          <TouchableOpacity 
+            style={styles.retryButton}
+            onPress={handleRefresh}
+          >
+            <Text style={styles.retryText}>Thử lại</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
+
     return (
       <View style={styles.emptyContainer}>
-        <Ionicons name="chatbubbles-outline" size={64} color="#ccc" />
-        <Text style={styles.emptyTitle}>Chưa có tin nhắn</Text>
-        <Text style={styles.emptySubtitle}>
-          Tin nhắn của bạn sẽ hiển thị ở đây
-        </Text>
+        <View style={styles.welcomeSection}>
+          <Ionicons name="chatbubbles" size={56} color={MODERN_COLORS.primary} />
+          <Text style={styles.welcomeTitle}>Chào mừng bạn đến với Tin nhắn!</Text>
+          <Text style={styles.welcomeSubtitle}>
+            Bắt đầu trò chuyện với AI trợ lý hoặc nhân viên hỗ trợ của chúng tôi
+          </Text>
+        </View>
+
+        {/* Suggested conversations */}
+        <View style={styles.suggestedSection}>
+          <Text style={styles.suggestedTitle}>Bắt đầu trò chuyện</Text>
+          
+          {/* AI Assistant suggestion */}
+          <TouchableOpacity
+            style={styles.suggestedItem}
+            onPress={() => router.push('/messages/ai-assistant')}
+            activeOpacity={0.7}
+          >
+            <View style={[styles.suggestedAvatar, { backgroundColor: '#8B5CF6' }]}>
+              <Ionicons name="sparkles" size={28} color="#fff" />
+            </View>
+            <View style={styles.suggestedContent}>
+              <Text style={styles.suggestedName}>AI Trợ lý Xây dựng</Text>
+              <Text style={styles.suggestedMessage}>
+                Xin chào! Tôi có thể giúp bạn về tư vấn xây dựng, báo giá, và theo dõi tiến độ 24/7
+              </Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={MODERN_COLORS.textTertiary} />
+          </TouchableOpacity>
+
+          {/* Customer Service suggestion */}
+          <TouchableOpacity
+            style={styles.suggestedItem}
+            onPress={() => router.push('/messages/customer-service')}
+            activeOpacity={0.7}
+          >
+            <View style={[styles.suggestedAvatar, { backgroundColor: MODERN_COLORS.primary }]}>
+              <Ionicons name="headset" size={28} color="#fff" />
+            </View>
+            <View style={styles.suggestedContent}>
+              <Text style={styles.suggestedName}>Nhân viên CSKH</Text>
+              <Text style={styles.suggestedMessage}>
+                Chúng tôi luôn sẵn sàng hỗ trợ bạn về dịch vụ, giải đáp thắc mắc và xử lý yêu cầu
+              </Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={MODERN_COLORS.textTertiary} />
+          </TouchableOpacity>
+        </View>
+
+        {/* Contact Section - Nhà Xinh Style */}
+        <ContactSection
+          title="Cần hỗ trợ thêm?"
+          subtitle="Liên hệ trực tiếp với chúng tôi qua các kênh sau"
+          variant="premium"
+          style={styles.contactSection}
+          methods={[
+            {
+              type: 'phone',
+              label: 'Hotline 24/7',
+              value: '1900 6789',
+              subtitle: 'Miễn phí gọi trong nước',
+            },
+            {
+              type: 'email',
+              label: 'Email hỗ trợ',
+              value: 'support@baotienweb.cloud',
+              subtitle: 'Phản hồi trong 2 giờ',
+            },
+            {
+              type: 'location',
+              label: 'Showroom',
+              value: '123 Nguyễn Huệ, Q.1, TP.HCM',
+              subtitle: 'Thứ 2 - CN: 8h00 - 20h00',
+            },
+          ]}
+        />
       </View>
     );
   };
@@ -225,14 +234,16 @@ export default function MessagesScreen() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#22c55e" />
+        <ActivityIndicator size="large" color={MODERN_COLORS.primary} />
         <Text style={styles.loadingText}>Đang tải tin nhắn...</Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <>
+      <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
+      <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
@@ -240,21 +251,23 @@ export default function MessagesScreen() {
           style={styles.backButton}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
-          <Ionicons name="arrow-back" size={24} color="#111" />
+          <Ionicons name="arrow-back" size={24} color={MODERN_COLORS.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Tin nhắn</Text>
+        <Text style={styles.headerTitle}>
+          Tin nhắn {unreadCount > 0 && `(${unreadCount})`}
+        </Text>
         <TouchableOpacity
           style={styles.headerButton}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
-          <Ionicons name="create-outline" size={24} color="#111" />
+          <Ionicons name="create-outline" size={24} color={MODERN_COLORS.text} />
         </TouchableOpacity>
       </View>
 
       {/* Search bar */}
       <View style={styles.searchContainer}>
-        <Ionicons name="search" size={18} color="#999" />
-        <Text style={styles.searchPlaceholder}>Tìm kiếm</Text>
+        <Ionicons name="search" size={20} color={MODERN_COLORS.textSecondary} />
+        <Text style={styles.searchPlaceholder}>Tìm kiếm tin nhắn</Text>
       </View>
 
       {/* Conversations list */}
@@ -266,35 +279,33 @@ export default function MessagesScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={handleRefresh}
-            colors={['#22c55e']}
-            tintColor="#22c55e"
+            colors={[MODERN_COLORS.primary]}
+            tintColor={MODERN_COLORS.primary}
           />
         }
-        onEndReached={handleLoadMore}
-        onEndReachedThreshold={0.5}
-        ListFooterComponent={renderFooter}
         ListEmptyComponent={renderEmpty}
         contentContainerStyle={conversations.length === 0 ? styles.emptyList : undefined}
       />
     </View>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: MODERN_COLORS.background,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingTop: 48,
-    paddingBottom: 12,
-    backgroundColor: '#fff',
+    paddingHorizontal: MODERN_SPACING.md,
+    paddingTop: 44,
+    paddingBottom: MODERN_SPACING.sm,
+    backgroundColor: MODERN_COLORS.surface,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: MODERN_COLORS.divider,
   },
   backButton: {
     width: 40,
@@ -303,9 +314,9 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#111',
+    fontSize: MODERN_TYPOGRAPHY.fontSize.lg,
+    fontWeight: MODERN_TYPOGRAPHY.fontWeight.bold,
+    color: MODERN_COLORS.text,
     flex: 1,
     textAlign: 'center',
   },
@@ -318,36 +329,38 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    marginHorizontal: 16,
-    marginVertical: 12,
+    backgroundColor: MODERN_COLORS.background,
+    borderRadius: MODERN_RADIUS.full,
+    paddingHorizontal: MODERN_SPACING.md,
+    paddingVertical: MODERN_SPACING.sm,
+    marginHorizontal: MODERN_SPACING.md,
+    marginVertical: MODERN_SPACING.md,
+    borderWidth: 1,
+    borderColor: MODERN_COLORS.divider,
   },
   searchPlaceholder: {
-    marginLeft: 8,
-    fontSize: 14,
-    color: '#999',
+    marginLeft: MODERN_SPACING.sm,
+    fontSize: MODERN_TYPOGRAPHY.fontSize.md,
+    color: MODERN_COLORS.textSecondary,
   },
   conversationItem: {
     flexDirection: 'row',
-    padding: 16,
-    backgroundColor: '#fff',
+    padding: MODERN_SPACING.md,
+    backgroundColor: MODERN_COLORS.surface,
     borderBottomWidth: 1,
-    borderBottomColor: '#f5f5f5',
+    borderBottomColor: MODERN_COLORS.divider,
   },
   avatarContainer: {
     position: 'relative',
-    marginRight: 12,
+    marginRight: MODERN_SPACING.md,
   },
   avatar: {
     width: 56,
     height: 56,
-    borderRadius: 28,
+    borderRadius: MODERN_RADIUS.full,
   },
   avatarPlaceholder: {
-    backgroundColor: '#f0f0f0',
+    backgroundColor: MODERN_COLORS.background,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -357,10 +370,10 @@ const styles = StyleSheet.create({
     right: 2,
     width: 14,
     height: 14,
-    borderRadius: 7,
-    backgroundColor: '#22c55e',
+    borderRadius: MODERN_RADIUS.full,
+    backgroundColor: MODERN_COLORS.primary,
     borderWidth: 2,
-    borderColor: '#fff',
+    borderColor: MODERN_COLORS.surface,
   },
   messageContent: {
     flex: 1,
@@ -370,18 +383,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: MODERN_SPACING.xxs,
   },
   userName: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#111',
+    fontSize: MODERN_TYPOGRAPHY.fontSize.md,
+    fontWeight: MODERN_TYPOGRAPHY.fontWeight.semibold,
+    color: MODERN_COLORS.text,
     flex: 1,
-    marginRight: 8,
+    marginRight: MODERN_SPACING.sm,
   },
   timeText: {
-    fontSize: 12,
-    color: '#999',
+    fontSize: MODERN_TYPOGRAPHY.fontSize.xs,
+    color: MODERN_COLORS.textSecondary,
   },
   messageRow: {
     flexDirection: 'row',
@@ -389,42 +402,43 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   messageText: {
-    fontSize: 14,
-    color: '#666',
+    fontSize: MODERN_TYPOGRAPHY.fontSize.sm,
+    color: MODERN_COLORS.textSecondary,
+    lineHeight: MODERN_TYPOGRAPHY.lineHeight.normal,
   },
   unreadText: {
-    fontWeight: '600',
-    color: '#111',
+    fontWeight: MODERN_TYPOGRAPHY.fontWeight.semibold,
+    color: MODERN_COLORS.text,
   },
   unreadBadge: {
-    backgroundColor: '#ef4444',
-    borderRadius: 12,
+    backgroundColor: MODERN_COLORS.error,
+    borderRadius: MODERN_RADIUS.full,
     minWidth: 20,
     height: 20,
-    paddingHorizontal: 6,
+    paddingHorizontal: MODERN_SPACING.xs,
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 8,
+    marginLeft: MODERN_SPACING.sm,
   },
   unreadBadgeText: {
-    color: '#fff',
-    fontSize: 11,
-    fontWeight: '700',
+    color: MODERN_COLORS.surface,
+    fontSize: MODERN_TYPOGRAPHY.fontSize.xs,
+    fontWeight: MODERN_TYPOGRAPHY.fontWeight.bold,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: MODERN_COLORS.background,
   },
   loadingFooter: {
-    paddingVertical: 20,
+    paddingVertical: MODERN_SPACING.lg,
     alignItems: 'center',
   },
   loadingText: {
-    marginTop: 8,
-    fontSize: 13,
-    color: '#999',
+    marginTop: MODERN_SPACING.sm,
+    fontSize: MODERN_TYPOGRAPHY.fontSize.sm,
+    color: MODERN_COLORS.textSecondary,
   },
   emptyList: {
     flexGrow: 1,
@@ -433,18 +447,99 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 32,
+    paddingHorizontal: MODERN_SPACING.xl,
+    paddingVertical: MODERN_SPACING.xl,
+  },
+  welcomeSection: {
+    alignItems: 'center',
+    marginBottom: MODERN_SPACING.xl,
+  },
+  welcomeTitle: {
+    fontSize: MODERN_TYPOGRAPHY.fontSize.xl,
+    fontWeight: MODERN_TYPOGRAPHY.fontWeight.bold,
+    color: MODERN_COLORS.text,
+    marginTop: MODERN_SPACING.md,
+    textAlign: 'center',
+  },
+  welcomeSubtitle: {
+    fontSize: MODERN_TYPOGRAPHY.fontSize.sm,
+    color: MODERN_COLORS.textSecondary,
+    marginTop: MODERN_SPACING.sm,
+    textAlign: 'center',
+    lineHeight: MODERN_TYPOGRAPHY.lineHeight.relaxed,
+  },
+  suggestedSection: {
+    width: '100%',
+    marginTop: MODERN_SPACING.md,
+  },
+  suggestedTitle: {
+    fontSize: MODERN_TYPOGRAPHY.fontSize.sm,
+    fontWeight: MODERN_TYPOGRAPHY.fontWeight.semibold,
+    color: MODERN_COLORS.textSecondary,
+    marginBottom: MODERN_SPACING.md,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  suggestedItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: MODERN_COLORS.surface,
+    borderRadius: MODERN_RADIUS.lg,
+    padding: MODERN_SPACING.md,
+    marginBottom: MODERN_SPACING.sm,
+    borderWidth: 1,
+    borderColor: MODERN_COLORS.divider,
+  },
+  suggestedAvatar: {
+    width: 48,
+    height: 48,
+    borderRadius: MODERN_RADIUS.full,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: MODERN_SPACING.md,
+  },
+  suggestedContent: {
+    flex: 1,
+    marginRight: MODERN_SPACING.sm,
+  },
+  suggestedName: {
+    fontSize: MODERN_TYPOGRAPHY.fontSize.md,
+    fontWeight: MODERN_TYPOGRAPHY.fontWeight.semibold,
+    color: MODERN_COLORS.text,
+    marginBottom: MODERN_SPACING.xxs,
+  },
+  suggestedMessage: {
+    fontSize: MODERN_TYPOGRAPHY.fontSize.xs,
+    color: MODERN_COLORS.textSecondary,
+    lineHeight: MODERN_TYPOGRAPHY.lineHeight.normal,
+  },
+  contactSection: {
+    width: '100%',
+    marginTop: MODERN_SPACING.xl,
   },
   emptyTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#666',
-    marginTop: 16,
+    fontSize: MODERN_TYPOGRAPHY.fontSize.lg,
+    fontWeight: MODERN_TYPOGRAPHY.fontWeight.semibold,
+    color: MODERN_COLORS.textSecondary,
+    marginTop: MODERN_SPACING.md,
   },
   emptySubtitle: {
-    fontSize: 14,
-    color: '#999',
-    marginTop: 8,
+    fontSize: MODERN_TYPOGRAPHY.fontSize.sm,
+    color: MODERN_COLORS.textSecondary,
+    marginTop: MODERN_SPACING.sm,
+    textAlign: 'center',
+  },
+  retryButton: {
+    marginTop: MODERN_SPACING.md,
+    paddingHorizontal: MODERN_SPACING.lg,
+    paddingVertical: MODERN_SPACING.sm,
+    backgroundColor: MODERN_COLORS.primary,
+    borderRadius: MODERN_RADIUS.md,
+  },
+  retryText: {
+    color: MODERN_COLORS.surface,
+    fontSize: MODERN_TYPOGRAPHY.fontSize.md,
+    fontWeight: MODERN_TYPOGRAPHY.fontWeight.semibold,
     textAlign: 'center',
   },
 });

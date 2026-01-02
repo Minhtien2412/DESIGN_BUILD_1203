@@ -21,7 +21,7 @@ const REVIEWS = [
     userName: 'Trần Thị B',
     userInitial: 'T',
     userColor: '#FCE4EC',
-    textColor: '#E91E63',
+    textColor: '#0A6847',
     rating: 5,
     date: '3 ngày trước',
     service: 'Vật liệu xây dựng',

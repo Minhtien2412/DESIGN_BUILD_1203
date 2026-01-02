@@ -225,10 +225,10 @@ export default function ProjectDetailScreen() {
   const [showExpenseForm, setShowExpenseForm] = useState(false);
   const [showTaskForm, setShowTaskForm] = useState(false);
 
-  const { project, loading, error, refresh } = useProjectDetail(id);
+  const { project, loading, error, refresh } = useProjectDetail(id ? parseInt(id) : null);
   const { addExpense, addTask, toggleTaskStatus } = useProjectData();
-  const budgetData = useProjectBudget(id);
-  const projectTasks = useProjectTasks(id);
+  const budgetData = useProjectBudget(id || '');
+  const projectTasks = useProjectTasks(id || '');
 
   const handleAddExpense = async (data: ExpenseFormData) => {
     try {
@@ -463,7 +463,7 @@ export default function ProjectDetailScreen() {
           )}
 
           {/* Team Count */}
-          {project.team && project.team.length > 0 && (
+          {project.teamMembers && project.teamMembers.length > 0 && (
             <View style={styles.detailRow}>
               <View style={styles.detailLabel}>
                 <Ionicons name="people-outline" size={20} color={colors.tint} />
@@ -472,13 +472,13 @@ export default function ProjectDetailScreen() {
                 </Text>
               </View>
               <Text style={[styles.detailValue, { color: colors.text }]}>
-                {project.team.length} người
+                {project.teamMembers.length} người
               </Text>
             </View>
           )}
 
           {/* Document Count */}
-          {project.documents && project.documents.length > 0 && (
+          {project.images && project.images.length > 0 && (
             <View style={styles.detailRow}>
               <View style={styles.detailLabel}>
                 <Ionicons name="document-text-outline" size={20} color={colors.tint} />
@@ -487,7 +487,7 @@ export default function ProjectDetailScreen() {
                 </Text>
               </View>
               <Text style={[styles.detailValue, { color: colors.text }]}>
-                {project.documents.length} file
+                {project.images.length} file
               </Text>
             </View>
           )}

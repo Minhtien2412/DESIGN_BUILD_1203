@@ -27,11 +27,17 @@ perfex_crm/
 prisma/
 domains/
 openapi/
+BE-baotienweb.cloud/
+strapi-cms/
+admin-web/
+perfex-module/
 
 # ============================================
 # ARCHIVED & BACKUP (KHÔNG CẦN)
 # ============================================
 _archived/
+_archive/
+**/_archive/
 dev-backups/
 expo-skeleton/
 my-new-expo-app/
@@ -58,17 +64,32 @@ node_modules/
 .expo-shared/
 dist/
 web-build/
-/ios/
+# Use CNG (Continuous Native Generation) - EAS will generate native folders
 /android/
+/ios/
 
 # ============================================
-# ASSETS (CHỈ GIỮ ICONS)
+# ASSETS (Only exclude large media folders)
 # ============================================
-assets/
+# Note: Keep main assets folder for icons and splash
+# assets/
 dist-test/
 
-# Chỉ giữ icons cần thiết cho build
-!assets/icon.png
+# Keep only required icons
+!assets/images/icon.png
+!assets/images/splash-icon.png
+!assets/images/adaptive-icon.png
+!assets/images/favicon.png
+!assets/images/android-icon-foreground.png
+!assets/images/android-icon-background.png
+!assets/images/android-icon-monochrome.png
+
+# Exclude large media in subfolders (commented - needed by app)
+# assets/images/banner/
+# assets/images/home/
+# assets/images/service/
+# assets/images/thu-vien/
+# assets/images/tien-ich-*/
 !assets/splash.png
 !assets/adaptive-icon.png
 !assets/favicon.png

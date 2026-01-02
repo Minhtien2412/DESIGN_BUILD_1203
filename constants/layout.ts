@@ -1,15 +1,15 @@
 export const Spacing = {
   xs: 2,
-  sm: 6,
-  md: 10,
-  lg: 14,
+  sm: 4,
+  md: 8,
+  lg: 12,
   xl: 16,
 } as const;
 
 export const Radii = {
-  sm: 6,
-  md: 8,
-  lg: 12,
+  sm: 4,
+  md: 6,
+  lg: 8,
 } as const;
 
 export const Sizes = {

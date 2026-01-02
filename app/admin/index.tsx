@@ -6,7 +6,7 @@ import { useEffect } from 'react';
  */
 export default function AdminIndex() {
   useEffect(() => {
-    router.replace('/admin/dashboard' as any);
+    router.replace('/admin/dashboard');
   }, []);
 
   return null;

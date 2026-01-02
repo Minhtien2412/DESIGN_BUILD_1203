@@ -298,7 +298,7 @@ export default function WorkDetailScreen() {
 
       <View style={styles.floorContent}>
         <View style={styles.worksList}>
-          {section.works.map((work) => renderWorkCard(work, '#4AA14A'))}
+          {section.works.map((work) => renderWorkCard(work, '#0A6847'))}
         </View>
       </View>
 
@@ -492,7 +492,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#4AA14A',
+    backgroundColor: '#0A6847',
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
@@ -509,7 +509,7 @@ const styles = StyleSheet.create({
   floorStartButton: {
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: '#4AA14A',
+    backgroundColor: '#0A6847',
     borderRadius: 8,
   },
   floorStartText: {
@@ -623,7 +623,7 @@ const styles = StyleSheet.create({
   },
   floorEndButton: {
     paddingVertical: 10,
-    backgroundColor: '#4AA14A',
+    backgroundColor: '#0A6847',
     alignItems: 'center',
   },
   floorEndText: {

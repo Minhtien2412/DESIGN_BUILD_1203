@@ -144,7 +144,7 @@ export default function StaffListScreen() {
   }
 
   const handleStaffPress = (staffid: number) => {
-    router.push(`/admin/staff/${staffid}` as any);
+    router.push(`/admin/staff/${staffid}`);
   };
 
   const handleCreateStaff = () => {
@@ -152,7 +152,7 @@ export default function StaffListScreen() {
       Alert.alert('Không có quyền', 'Bạn không có quyền tạo nhân viên mới');
       return;
     }
-    router.push('/admin/staff/create' as any);
+    router.push('/admin/staff/create');
   };
 
   const renderEmpty = () => {

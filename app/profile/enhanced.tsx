@@ -9,7 +9,7 @@ import { useAuth } from '@/context/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { LinearGradient } from 'expo-linear-gradient';
-import { router } from 'expo-router';
+import { Href, router } from 'expo-router';
 import * as React from 'react';
 import {
     ActivityIndicator,
@@ -597,7 +597,7 @@ export default function EnhancedProfileScreen() {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Hành động nhanh</Text>
         
-        <TouchableOpacity style={styles.actionRow} onPress={() => router.push('/profile/security')}>
+        <TouchableOpacity style={styles.actionRow} onPress={() => router.push('/profile/security' as Href)}>
           <Ionicons name="shield-checkmark-outline" size={24} color="#0891B2" />
           <View style={styles.actionContent}>
             <Text style={styles.actionTitle}>Bảo mật tài khoản</Text>
@@ -606,7 +606,7 @@ export default function EnhancedProfileScreen() {
           <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.actionRow} onPress={() => router.push('/profile/privacy')}>
+        <TouchableOpacity style={styles.actionRow} onPress={() => router.push('/profile/privacy' as Href)}>
           <Ionicons name="eye-off-outline" size={24} color="#0891B2" />
           <View style={styles.actionContent}>
             <Text style={styles.actionTitle}>Quyền riêng tư</Text>

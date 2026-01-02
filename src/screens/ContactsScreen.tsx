@@ -82,7 +82,7 @@ const ContactsScreen = () => {
               {item.name.split(' ').map(name => name[0]).join('').slice(0, 2)}
             </Text>
           </View>
-          <View style={[styles.statusIndicator, { backgroundColor: item.status === 'online' ? '#4CAF50' : '#ccc' }]} />
+          <View style={[styles.statusIndicator, { backgroundColor: item.status === 'online' ? '#10B981' : '#ccc' }]} />
         </View>
         <View style={styles.contactDetails}>
           <Text style={styles.contactName}>{item.name}</Text>
@@ -96,7 +96,7 @@ const ContactsScreen = () => {
           style={styles.actionButton}
           onPress={() => handleCallContact(item.phone)}
         >
-          <Ionicons name="call" size={20} color="#4CAF50" />
+          <Ionicons name="call" size={20} color="#10B981" />
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.actionButton}

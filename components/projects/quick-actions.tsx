@@ -24,7 +24,7 @@ type QuickAction = {
 };
 
 const ACTIONS: QuickAction[] = [
-  { type: 'edit', label: 'Chỉnh sửa', icon: 'create-outline', color: '#2196F3' },
+  { type: 'edit', label: 'Chỉnh sửa', icon: 'create-outline', color: '#0A6847' },
   { type: 'share', label: 'Chia sẻ', icon: 'share-social-outline', color: '#FF9800' },
   { type: 'archive', label: 'Lưu trữ', icon: 'archive-outline', color: '#9E9E9E' },
   { type: 'delete', label: 'Xóa dự án', icon: 'trash-outline', color: '#F44336', destructive: true },

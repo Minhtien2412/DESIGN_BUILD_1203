@@ -117,7 +117,7 @@ export const uploadVideo = (uri: string, filename?: string, fields?: Record<stri
 export const uploadDocument = (uri: string, filename?: string, fields?: Record<string, any>) =>
   uploadMedia('documents', uri, filename, fields);
 
-// Profile avatar update uses a different endpoint that also updates profile fields
+// Profile avatar update uses PATCH /profile endpoint
 export async function updateAvatarOnly(avatarUri: string): Promise<boolean> {
   const name = avatarUri.split('/').pop() || 'avatar.jpg';
   const type = guessMimeType(name) || 'image/jpeg';
@@ -125,9 +125,11 @@ export async function updateAvatarOnly(avatarUri: string): Promise<boolean> {
   form.append('avatar', { uri: avatarUri, name, type } as any);
 
   try {
-    await apiFetch('/profile/update', { method: 'POST', data: form, timeoutMs: 15_000 });
+    // BE uses PATCH /profile (not POST /profile/update)
+    await apiFetch('/profile', { method: 'PATCH', data: form, timeoutMs: 15_000 });
     return true;
-  } catch {
+  } catch (e) {
+    console.error('[updateAvatarOnly] Failed:', e);
     return false;
   }
 }

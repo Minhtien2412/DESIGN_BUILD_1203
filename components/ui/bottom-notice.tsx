@@ -9,7 +9,7 @@ export function BottomNotice() {
   const newest = React.useMemo(() => notifications.find(i => !i.read), [notifications]);
   if (!newest || !visible) return null;
   return (
-    <View pointerEvents="box-none" style={styles.wrap}>
+    <View style={[styles.wrap, { pointerEvents: 'box-none' }]}>
       <View style={styles.pill}>
         <Pressable style={{ flex: 1 }} onPress={() => setVisible(false)}>
           <Text style={styles.title} numberOfLines={1}>{newest.title}</Text>

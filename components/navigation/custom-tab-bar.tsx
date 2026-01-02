@@ -1,7 +1,15 @@
 /**
- * Custom Tab Bar - Modern Shopee Style
- * Features: Larger icons (24px), smaller labels (10px), smooth scale animations, center + button
- * Color scheme: White/Black (active black), minimal design
+ * Custom Tab Bar - Luxury Minimalist Design
+ * Features: 
+ * - Large icons (26px) with smooth scale animations
+ * - Small labels (11px) with proper spacing
+ * - Center FAB button (60px) elegant dark theme
+ * - Monochrome color scheme (black/gray/white)
+ * - Active: Deep black (#1a1a1a) with subtle gradient
+ * - Inactive: Neutral gray (#9ca3af)
+ * - Premium matte finish with soft shadows
+ * - 4 tabs only: Trang chủ | Home XD | Dự án | Cá nhân
+ * - Notifications moved to header only
  */
 import { Ionicons } from '@expo/vector-icons';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
@@ -12,9 +20,8 @@ import { QuickActionSheet } from './quick-action-sheet';
 
 const TABS_CONFIG = [
   { name: 'index', label: 'Trang chủ', icon: 'home', activeIcon: 'home' },
+  { name: 'home-construction', label: 'Home XD', icon: 'construct-outline', activeIcon: 'construct' },
   { name: 'projects', label: 'Dự án', icon: 'briefcase-outline', activeIcon: 'briefcase' },
-  { name: 'live', label: 'Live', icon: 'videocam-outline', activeIcon: 'videocam' },
-  { name: 'notifications', label: 'Thông báo', icon: 'notifications-outline', activeIcon: 'notifications' },
   { name: 'profile', label: 'Cá nhân', icon: 'person-outline', activeIcon: 'person' },
 ];
 
@@ -30,21 +37,26 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
     const isFocused = state.index === index;
     
     if (!isFocused) {
-      // Quick scale animation - Shopee style
-      Animated.sequence([
-        Animated.spring(scaleAnims[index], {
-          toValue: 0.85,
-          useNativeDriver: true,
-          speed: 50,
-          bounciness: 0,
-        }),
-        Animated.spring(scaleAnims[index], {
-          toValue: 1,
-          useNativeDriver: true,
-          speed: 50,
-          bounciness: 4,
-        }),
-      ]).start();
+      // Find the correct animation index from TABS_CONFIG
+      const animIndex = TABS_CONFIG.findIndex(tab => tab.name === routeName);
+      
+      if (animIndex !== -1 && scaleAnims[animIndex]) {
+        // Quick scale animation - Shopee style
+        Animated.sequence([
+          Animated.spring(scaleAnims[animIndex], {
+            toValue: 0.85,
+            useNativeDriver: true,
+            speed: 50,
+            bounciness: 0,
+          }),
+          Animated.spring(scaleAnims[animIndex], {
+            toValue: 1,
+            useNativeDriver: true,
+            speed: 50,
+            bounciness: 4,
+          }),
+        ]).start();
+      }
 
       navigation.navigate(routeName);
     }
@@ -105,8 +117,8 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
       <View style={styles.gradientOverlay} />
       
       <View style={styles.tabsContainer}>
-        {/* Left tabs (Home, Projects) */}
-        {TABS_CONFIG.slice(0, 2).map((tab) => {
+        {/* Left tabs (Home, Home XD) */}
+        {TABS_CONFIG.slice(0, 2).map((tab, configIndex) => {
           const routeIndex = state.routes.findIndex(r => r.name === tab.name);
           const isFocused = state.index === routeIndex;
           const route = state.routes[routeIndex];
@@ -121,15 +133,15 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
               <Animated.View
                 style={[
                   styles.tabContent,
-                  { transform: [{ scale: scaleAnims[routeIndex] }] },
+                  { transform: [{ scale: scaleAnims[configIndex] }] },
                 ]}
               >
                 {/* Icon */}
                 <View style={styles.iconContainer}>
                   <Ionicons
                     name={isFocused ? (tab.activeIcon as any) : (tab.icon as any)}
-                    size={24}
-                    color={isFocused ? '#111' : '#999'}
+                    size={26}
+                    color={isFocused ? '#1a1a1a' : '#9ca3af'}
                   />
                 </View>
                 
@@ -150,7 +162,7 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
 
         {/* Center + Button */}
         <TouchableOpacity
-          activeOpacity={0.7}
+          activeOpacity={0.85}
           onPress={handleCenterButtonPress}
           style={styles.centerButtonContainer}
         >
@@ -160,15 +172,16 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
               { transform: [{ scale: centerButtonScale }] },
             ]}
           >
-            <Ionicons name="add" size={28} color="#fff" />
+            <Ionicons name="add" size={30} color="#ffffff" />
           </Animated.View>
         </TouchableOpacity>
 
-        {/* Right tabs (Live, Notifications, Profile) */}
-        {TABS_CONFIG.slice(2).map((tab) => {
+        {/* Right tabs (Projects, Notifications, Profile) */}
+        {TABS_CONFIG.slice(2).map((tab, sliceIndex) => {
           const routeIndex = state.routes.findIndex(r => r.name === tab.name);
           const isFocused = state.index === routeIndex;
           const route = state.routes[routeIndex];
+          const configIndex = sliceIndex + 2; // Offset by 2 since this is slice(2)
           
           return (
             <Pressable
@@ -180,15 +193,15 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
               <Animated.View
                 style={[
                   styles.tabContent,
-                  { transform: [{ scale: scaleAnims[routeIndex] }] },
+                  { transform: [{ scale: scaleAnims[configIndex] }] },
                 ]}
               >
                 {/* Icon */}
                 <View style={styles.iconContainer}>
                   <Ionicons
                     name={isFocused ? (tab.activeIcon as any) : (tab.icon as any)}
-                    size={24}
-                    color={isFocused ? '#111' : '#999'}
+                    size={26}
+                    color={isFocused ? '#1a1a1a' : '#9ca3af'}
                   />
                 </View>
                 
@@ -220,15 +233,15 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fff',
-    borderTopWidth: 0.5,
-    borderTopColor: '#f0f0f0',
-    elevation: 8,
+    backgroundColor: '#fafafa',
+    borderTopWidth: 1,
+    borderTopColor: '#e5e7eb',
+    elevation: 12,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
+    shadowOffset: { width: 0, height: -3 },
     shadowOpacity: 0.06,
-    shadowRadius: 8,
-    paddingTop: 6,
+    shadowRadius: 10,
+    paddingTop: 2,
   },
   gradientOverlay: {
     position: 'absolute',
@@ -236,7 +249,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 1,
-    backgroundColor: 'rgba(0,0,0,0.03)',
+    backgroundColor: 'rgba(0,0,0,0.04)',
   },
   tabsContainer: {
     flexDirection: 'row',
@@ -248,44 +261,72 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 6,
+    paddingVertical: 4,
+    minHeight: 32,
   },
   tabContent: {
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 1,
   },
   iconContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 4,
+    marginBottom: 1,
+    position: 'relative',
+    width: 32,
+    height: 32,
+  },
+  badge: {
+    position: 'absolute',
+    top: -6,
+    right: -12,
+    backgroundColor: '#1a1a1a',
+    borderRadius: 10,
+    minWidth: 18,
+    height: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+    borderWidth: 2,
+    borderColor: '#fafafa',
+  },
+  badgeText: {
+    color: '#ffffff',
+    fontSize: 10,
+    fontWeight: '600',
+    lineHeight: 12,
   },
   label: {
-    fontSize: 10,
-    color: '#999',
-    fontWeight: '500',
-    letterSpacing: -0.1,
+    fontSize: 11,
+    color: '#9ca3af',
+    fontWeight: '400',
+    letterSpacing: 0.3,
+    marginTop: 1,
   },
   labelActive: {
-    color: '#111',
+    color: '#1a1a1a',
     fontWeight: '600',
   },
   centerButtonContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: -20,
-    marginHorizontal: 8,
+    marginTop: -11,
+    marginHorizontal: 12,
   },
   centerButton: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#111',
+    width: 58,
+    height: 58,
+    borderRadius: 29,
+    backgroundColor: '#2d2d2d',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#111',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.25,
     shadowRadius: 8,
     elevation: 8,
+    borderWidth: 0.5,
+    borderColor: '#4a4a4a',
   },
 });

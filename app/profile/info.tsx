@@ -11,17 +11,17 @@ import * as ImagePicker from 'expo-image-picker';
 import { Stack, router } from 'expo-router';
 import * as React from 'react';
 import {
-  ActivityIndicator,
-  Alert,
-  Animated,
-  Image,
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Alert,
+    Animated,
+    Image,
+    KeyboardAvoidingView,
+    Platform,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 
 interface FormData {
@@ -222,8 +222,9 @@ export default function ProfileInfoScreen() {
       }
 
       // Use centralized API wrapper (adds token, API key, timeout, errors)
-      await apiFetch('/profile/update', {
-        method: 'POST',
+      // BE uses PATCH /profile (not POST /profile/update)
+      await apiFetch('/profile', {
+        method: 'PATCH',
         data: formDataToSend,
         timeoutMs: 15000,
       });

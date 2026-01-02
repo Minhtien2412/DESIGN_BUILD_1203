@@ -1,10 +1,12 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Stack } from 'expo-router';
-import React, { useState } from 'react';
+import { router, Stack } from 'expo-router';
+import React, { useEffect, useState } from 'react';
 import {
+    ActivityIndicator,
     Alert,
     Image,
     Modal,
+    RefreshControl,
     ScrollView,
     StyleSheet,
     Text,
@@ -13,89 +15,24 @@ import {
     View,
 } from 'react-native';
 
-// Mock data - Excavation Providers
-const PROVIDERS = [
-  {
-    id: 1,
-    name: 'Công ty Đào đất Hoàng Long',
-    avatar: 'https://via.placeholder.com/100x100/ff9800/ffffff?text=HL',
-    rating: 4.7,
-    reviews: 142,
-    location: 'TP.HCM',
-    experience: 12,
-    price: '180.000₫',
-    priceUnit: '/ m³',
-    services: ['Đào móng', 'Đào hố thang máy', 'San lấp mặt bằng', 'Vận chuyển đất'],
-    equipment: ['Máy đào PC200', 'Máy ủi D6', 'Xe ben 15 tấn'],
-    completedProjects: 180,
-    featured: true,
-    availability: 'Sẵn sàng',
-    phone: '028 3850 2345',
-  },
-  {
-    id: 2,
-    name: 'Đào đất Miền Bắc',
-    avatar: 'https://via.placeholder.com/100x100/4caf50/ffffff?text=MB',
-    rating: 4.8,
-    reviews: 165,
-    location: 'Hà Nội',
-    experience: 15,
-    price: '200.000₫',
-    priceUnit: '/ m³',
-    services: ['Đào móng', 'Đào hầm', 'San lấp', 'Đào ao hồ'],
-    equipment: ['Máy đào PC300', 'Máy ủi D7', 'Xe ben 20 tấn'],
-    completedProjects: 250,
-    featured: true,
-    availability: 'Sẵn sàng',
-    phone: '024 3974 6789',
-  },
-  {
-    id: 3,
-    name: 'Thi Công Thành Đạt',
-    avatar: 'https://via.placeholder.com/100x100/2196f3/ffffff?text=TD',
-    rating: 4.5,
-    reviews: 98,
-    location: 'Đà Nẵng',
-    experience: 10,
-    price: '170.000₫',
-    priceUnit: '/ m³',
-    services: ['Đào móng', 'San lấp mặt bằng', 'Vận chuyển đất'],
-    equipment: ['Máy đào PC160', 'Xe ben 10 tấn'],
-    completedProjects: 120,
-    featured: false,
-    availability: 'Sẵn sàng',
-    phone: '0236 3850 5678',
-  },
-  {
-    id: 4,
-    name: 'Đào Đất Phương Nam',
-    avatar: 'https://via.placeholder.com/100x100/9c27b0/ffffff?text=PN',
-    rating: 4.6,
-    reviews: 112,
-    location: 'Cần Thơ',
-    experience: 8,
-    price: '150.000₫',
-    priceUnit: '/ m³',
-    services: ['Đào móng nhà ở', 'San lấp', 'Đào ao'],
-    equipment: ['Máy đào PC120', 'Xe ben 8 tấn'],
-    completedProjects: 95,
-    featured: false,
-    availability: 'Bận (khả dụng từ 10/11)',
-    phone: '0292 3850 7890',
-  },
-];
+import { useLaborProviders } from '@/hooks/useLaborProviders';
+import { LaborProvider } from '@/services/api/labor.service';
 
 const LOCATIONS = ['Tất cả', 'TP.HCM', 'Hà Nội', 'Đà Nẵng', 'Cần Thơ', 'Khác'];
 const SERVICE_TYPES = ['Tất cả', 'Đào móng', 'San lấp', 'Đào hầm', 'Đào ao hồ', 'Vận chuyển đất'];
 
 interface ProviderCardProps {
-  provider: any;
+  provider: LaborProvider;
   onBooking: () => void;
+  onPress: () => void;
 }
 
-const ProviderCard: React.FC<ProviderCardProps> = ({ provider, onBooking }) => {
+const ProviderCard: React.FC<ProviderCardProps> = ({ provider, onBooking, onPress }) => {
+  const availabilityText = provider.availability === 'available' ? 'Sẵn sàng' : provider.availability === 'busy' ? 'Đang bận' : 'Không khả dụng';
+  const priceDisplay = `${provider.priceRange.min.toLocaleString('vi-VN')}₫`;
+  
   return (
-    <TouchableOpacity style={styles.providerCard} activeOpacity={0.8}>
+    <TouchableOpacity style={styles.providerCard} activeOpacity={0.8} onPress={onPress}>
       {provider.featured && (
         <View style={styles.featuredBadge}>
           <Ionicons name="star" size={12} color="#fff" />
@@ -112,15 +49,15 @@ const ProviderCard: React.FC<ProviderCardProps> = ({ provider, onBooking }) => {
           <View style={styles.ratingRow}>
             <Ionicons name="star" size={14} color="#ffa41c" />
             <Text style={styles.ratingText}>{provider.rating}</Text>
-            <Text style={styles.reviewsText}>({provider.reviews})</Text>
+            <Text style={styles.reviewsText}>({provider.reviewCount})</Text>
           </View>
 
           <View style={styles.locationRow}>
             <Ionicons name="location" size={12} color="#999" />
-            <Text style={styles.locationText}>{provider.location}</Text>
+            <Text style={styles.locationText}>{provider.city}</Text>
             <View style={styles.divider} />
             <Ionicons name="briefcase" size={12} color="#999" />
-            <Text style={styles.experienceText}>{provider.experience} năm</Text>
+            <Text style={styles.experienceText}>{provider.yearExperience} năm</Text>
           </View>
         </View>
       </View>
@@ -139,13 +76,13 @@ const ProviderCard: React.FC<ProviderCardProps> = ({ provider, onBooking }) => {
       <View style={styles.equipmentRow}>
         <Ionicons name="construct" size={16} color="#2196f3" />
         <Text style={styles.equipmentText}>
-          {provider.equipment.join(', ')}
+          {provider.verified ? 'Đã xác minh' : 'Thiết bị chuyên nghiệp'}
         </Text>
       </View>
 
       <View style={styles.statsSection}>
         <View style={styles.statItem}>
-          <Text style={styles.statValue}>{provider.completedProjects}+</Text>
+          <Text style={styles.statValue}>{provider.projectCount}+</Text>
           <Text style={styles.statLabel}>Dự án</Text>
         </View>
         <View style={styles.statDivider} />
@@ -153,10 +90,10 @@ const ProviderCard: React.FC<ProviderCardProps> = ({ provider, onBooking }) => {
           <Text
             style={[
               styles.statValue,
-              provider.availability === 'Sẵn sàng' ? styles.available : styles.busy,
+              provider.availability === 'available' ? styles.available : styles.busy,
             ]}
           >
-            {provider.availability}
+            {availabilityText}
           </Text>
           <Text style={styles.statLabel}>Tình trạng</Text>
         </View>
@@ -165,8 +102,8 @@ const ProviderCard: React.FC<ProviderCardProps> = ({ provider, onBooking }) => {
       <View style={styles.priceRow}>
         <View>
           <Text style={styles.priceLabel}>Từ</Text>
-          <Text style={styles.price}>{provider.price}</Text>
-          <Text style={styles.priceUnit}>{provider.priceUnit}</Text>
+          <Text style={styles.price}>{priceDisplay}</Text>
+          <Text style={styles.priceUnit}>/ {provider.priceRange.unit}</Text>
         </View>
         
         <TouchableOpacity style={styles.bookButton} onPress={onBooking}>
@@ -179,10 +116,12 @@ const ProviderCard: React.FC<ProviderCardProps> = ({ provider, onBooking }) => {
 };
 
 export default function DaoDatScreen() {
+  const { providers, loading, refreshing, refresh, searchProviders } = useLaborProviders({ type: 'dao-dat' });
+  
   const [selectedLocation, setSelectedLocation] = useState('Tất cả');
   const [selectedServiceType, setSelectedServiceType] = useState('Tất cả');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedProvider, setSelectedProvider] = useState<any>(null);
+  const [selectedProvider, setSelectedProvider] = useState<LaborProvider | null>(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [bookingData, setBookingData] = useState({
     name: '',
@@ -194,9 +133,9 @@ export default function DaoDatScreen() {
     notes: '',
   });
 
-  const filteredProviders = PROVIDERS.filter((provider) => {
+  const filteredProviders = providers.filter((provider) => {
     const matchLocation =
-      selectedLocation === 'Tất cả' || provider.location === selectedLocation;
+      selectedLocation === 'Tất cả' || provider.city === selectedLocation || provider.address.includes(selectedLocation);
     const matchServiceType =
       selectedServiceType === 'Tất cả' ||
       provider.services.some((s: string) =>
@@ -208,7 +147,17 @@ export default function DaoDatScreen() {
     return matchLocation && matchServiceType && matchSearch;
   });
 
-  const handleBooking = (provider: any) => {
+  // Handle search with debounce
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchQuery.length > 2) {
+        searchProviders(searchQuery);
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery, searchProviders]);
+
+  const handleBooking = (provider: LaborProvider) => {
     setSelectedProvider(provider);
     setShowBookingModal(true);
   };
@@ -221,7 +170,7 @@ export default function DaoDatScreen() {
 
     Alert.alert(
       'Đặt dịch vụ thành công',
-      `Chúng tôi sẽ liên hệ với bạn trong vòng 2h.\n\nNhà cung cấp: ${selectedProvider.name}`,
+      `Chúng tôi sẽ liên hệ với bạn trong vòng 2h.\n\nNhà cung cấp: ${selectedProvider?.name}`,
       [
         {
           text: 'OK',
@@ -331,28 +280,39 @@ export default function DaoDatScreen() {
         </View>
 
         {/* Providers List */}
-        <ScrollView
-          style={styles.content}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.listContainer}
-        >
-          {filteredProviders.map((provider) => (
-            <ProviderCard
-              key={provider.id}
-              provider={provider}
-              onBooking={() => handleBooking(provider)}
-            />
-          ))}
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#ee4d2d" />
+            <Text style={styles.loadingText}>Đang tải danh sách...</Text>
+          </View>
+        ) : (
+          <ScrollView
+            style={styles.content}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.listContainer}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={refresh} colors={['#ee4d2d']} />
+            }
+          >
+            {filteredProviders.map((provider) => (
+              <ProviderCard
+                key={provider.id}
+                provider={provider}
+                onBooking={() => handleBooking(provider)}
+                onPress={() => router.push(`/utilities/team-detail?id=${provider.id}&type=dao-dat`)}
+              />
+            ))}
 
-          {filteredProviders.length === 0 && (
-            <View style={styles.emptyState}>
-              <Ionicons name="business-outline" size={64} color="#ccc" />
-              <Text style={styles.emptyText}>Không tìm thấy nhà cung cấp phù hợp</Text>
-            </View>
-          )}
+            {filteredProviders.length === 0 && (
+              <View style={styles.emptyState}>
+                <Ionicons name="business-outline" size={64} color="#ccc" />
+                <Text style={styles.emptyText}>Không tìm thấy nhà cung cấp phù hợp</Text>
+              </View>
+            )}
 
-          <View style={{ height: 20 }} />
-        </ScrollView>
+            <View style={{ height: 20 }} />
+          </ScrollView>
+        )}
 
         {/* Info Banner */}
         <View style={styles.infoBanner}>
@@ -388,7 +348,7 @@ export default function DaoDatScreen() {
                     <View style={styles.selectedRating}>
                       <Ionicons name="star" size={14} color="#ffa41c" />
                       <Text style={styles.selectedRatingText}>
-                        {selectedProvider.rating} ({selectedProvider.reviews})
+                        {selectedProvider.rating} ({selectedProvider.reviewCount})
                       </Text>
                     </View>
                   </View>
@@ -509,6 +469,8 @@ const styles = StyleSheet.create({
   filterChipTextActive: { color: '#fff' },
   resultsBar: { backgroundColor: '#fff', paddingHorizontal: 16, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#f0f0f0' },
   resultsText: { fontSize: 13, fontWeight: '600', color: '#333' },
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: 60 },
+  loadingText: { marginTop: 12, fontSize: 14, color: '#666' },
   content: { flex: 1 },
   listContainer: { padding: 16 },
   providerCard: { backgroundColor: '#fff', borderRadius: 12, padding: 16, marginBottom: 16, elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 4 },

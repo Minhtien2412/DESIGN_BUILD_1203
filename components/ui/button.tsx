@@ -73,15 +73,15 @@ export function Button({ title, children, loading, style, variant = 'primary', s
 
 const styles = StyleSheet.create({
   buttonBase: {
-    borderRadius: 8,
+    borderRadius: 6,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
     minHeight: 36,
   },
-  sizeSm: { minHeight: 32, paddingVertical: 6, paddingHorizontal: 8 },
-  sizeMd: { minHeight: 36, paddingVertical: 8, paddingHorizontal: 12 },
-  sizeLg: { minHeight: 40, paddingVertical: 10, paddingHorizontal: 16 },
+  sizeSm: { minHeight: 32, paddingVertical: 5, paddingHorizontal: 8 },
+  sizeMd: { minHeight: 36, paddingVertical: 6, paddingHorizontal: 10 },
+  sizeLg: { minHeight: 40, paddingVertical: 8, paddingHorizontal: 12 },
 
-  textBase: { fontSize: 14, fontWeight: '700' },
+  textBase: { fontSize: 14, fontWeight: '500' },
 });

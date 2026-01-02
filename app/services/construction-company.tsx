@@ -459,7 +459,7 @@ export default function ConstructionCompanyScreen() {
             <CompanyCard
               key={company.id}
               company={company}
-              onPress={() => router.push(`/services/company-detail?id=${company.id}` as any)}
+              onPress={() => router.push(`/services/company-detail?id=${company.id}`)}
             />
           ))}
 

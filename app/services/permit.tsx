@@ -104,7 +104,7 @@ const PERMIT_TYPES = [
     title: 'Sửa chữa, cải tạo',
     description: 'Thay đổi kết cấu, nâng tầng',
     icon: 'construct-outline',
-    color: '#9c27b0',
+    color: '#0A6847',
   },
 ];
 

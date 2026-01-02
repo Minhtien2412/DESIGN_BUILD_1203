@@ -1,6 +1,6 @@
 import { Colors } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
-import { Stack } from 'expo-router';
+import { Stack, router } from 'expo-router';
 import React, { useState } from 'react';
 import {
     Alert,
@@ -99,8 +99,12 @@ interface WorkerCardProps {
 }
 
 const WorkerCard: React.FC<WorkerCardProps> = ({ worker, onBooking }) => {
+  const handleCardPress = () => {
+    router.push(`/finishing/worker-profile/${worker.id}`);
+  };
+
   return (
-    <TouchableOpacity style={styles.workerCard} activeOpacity={0.8}>
+    <TouchableOpacity style={styles.workerCard} activeOpacity={0.8} onPress={handleCardPress}>
       {worker.featured && (
         <View style={styles.featuredBadge}>
           <Ionicons name="star" size={12} color="#fff" />
@@ -172,7 +176,13 @@ const WorkerCard: React.FC<WorkerCardProps> = ({ worker, onBooking }) => {
           <Text style={styles.priceDay}>hoặc {worker.pricePerDay}</Text>
         </View>
         
-        <TouchableOpacity style={styles.bookButton} onPress={onBooking}>
+        <TouchableOpacity 
+          style={styles.bookButton} 
+          onPress={(e) => {
+            e.stopPropagation();
+            onBooking();
+          }}
+        >
           <Ionicons name="call" size={16} color="#fff" />
           <Text style={styles.bookButtonText}>Liên hệ</Text>
         </TouchableOpacity>

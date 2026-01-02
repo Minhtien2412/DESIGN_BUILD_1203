@@ -340,11 +340,18 @@ class VideoService {
       console.log('[VideoService] Initialized with local defaults');
     }
 
+    // DISABLED: Remote video API (backend doesn't have /videos endpoint, only /video for calls)
+    // Using local video data only - see data/videos.ts
+    console.log('[VideoService] Using local video data (remote API disabled)');
+    console.log(`[VideoService] Video loading complete. Total videos: ${this.videos.size}`);
+    return;
+
+    /* DISABLED - Uncomment if backend implements /videos endpoint
     // Try to load from remote API (optional enhancement)
     try {
       const fullUrl = buildApiUrl('/videos');
       console.log(`[VideoService] Attempting to fetch from ${fullUrl}?limit=100`);
-      const response = await api.get(fullUrl, { params: { limit: 100 } });
+      const response = await api.get(`${fullUrl}?limit=100`);
       
       let videos: any[] | null = null;
       if (Array.isArray(response.data?.data)) {
@@ -411,6 +418,7 @@ class VideoService {
     }
 
     console.log(`[VideoService] Video loading complete. Total videos: ${this.videos.size}`);
+    */
   }
 
   async updateVideoInDatabase(id: string, updates: Partial<VideoMetadata>): Promise<void> {

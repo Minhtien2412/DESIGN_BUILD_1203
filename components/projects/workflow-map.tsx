@@ -506,7 +506,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     borderLeftWidth: 3,
-    borderLeftColor: '#90b44c',
+    borderLeftColor: '#0A6847',
   },
   verticalHeader: {
     marginBottom: 12,
@@ -514,7 +514,7 @@ const styles = StyleSheet.create({
   verticalNumber: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#90b44c',
+    color: '#0A6847',
     textTransform: 'uppercase',
     marginBottom: 4,
   },

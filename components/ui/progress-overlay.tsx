@@ -22,7 +22,7 @@ export function ProgressOverlay({ visible, title = 'Đang xử lý…', message,
     : undefined;
 
   return (
-    <View style={styles.overlay} pointerEvents="auto">
+    <View style={[styles.overlay, { pointerEvents: 'auto' }]}>
       <View style={[styles.card, { backgroundColor: surface, borderColor: border }]}> 
         <Text style={[styles.title, { color: text }]}>{title}</Text>
         {message ? <Text style={[styles.message, { color: text }]}>{message}</Text> : null}

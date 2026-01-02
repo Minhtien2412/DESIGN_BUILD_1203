@@ -47,12 +47,24 @@ export const setApiKey = (key: string | null) => {
 };
 export const getApiKey = () => apiKey;
 
+// Refresh Token management - For token refresh flow
+let refreshToken: string | null = null;
+
+export const setRefreshToken = (token: string | null) => { 
+  refreshToken = token; 
+  if (token) {
+    console.log('[API] 🔐 Refresh token updated');
+  }
+};
+export const getRefreshToken = () => refreshToken;
+
 // Small exported options type used across the codebase. Keep lightweight.
 export type ApiFetchOptions = RequestInit & {
   timeoutMs?: number;
   retries?: number;
   token?: string;
   data?: any;
+  responseType?: 'json' | 'blob' | 'text' | 'arraybuffer'; // For file downloads
 };
 
 export class ApiError {
@@ -89,6 +101,7 @@ export const clearToken = () => {
   authToken = null;
   console.log('[API] Token cleared');
 };
+export const getAuthToken = () => authToken;
 // Friendly alias for clarity at callsites
 export const setAuthToken = setToken;
 
@@ -102,41 +115,59 @@ export function setTokenPersistor(fn: ((token: string | null) => void | Promise<
   persistTokenCallback = fn;
 }
 
+// Logout callback - Called when token refresh fails completely
+let logoutCallback: (() => void | Promise<void>) | null = null;
+export function setLogoutCallback(fn: (() => void | Promise<void>) | null) {
+  logoutCallback = fn;
+}
+
 async function refreshTokenDirect(): Promise<string | null> {
-  // Prioritize the configured refresh path, keep safe fallbacks
-  const candidates = [
-    ENV.AUTH_REFRESH_PATH || '/api/auth/refresh',
-    '/auth/refresh',
-    `${ENV.AUTH_GOOGLE_PATH || '/auth/google'}/refresh`,
-  ];
+  // Must have refreshToken to proceed
+  if (!refreshToken) {
+    console.warn('[API] ⚠️ No refresh token available');
+    return null;
+  }
 
-  for (const path of candidates) {
-    try {
-      const isAbsolute = /^https?:/i.test(path);
-      const normalizedPath = path.startsWith('/') ? path : `/${path}`;
-      const prefixedPath = (!API_PREFIX || normalizedPath.startsWith(API_PREFIX + '/'))
-        ? normalizedPath
-        : `${API_PREFIX}${normalizedPath}`;
-      const url = isAbsolute ? path : `${API}${prefixedPath}`;
+  // Use configured refresh path (default: /auth/refresh)
+  const path = ENV.AUTH_REFRESH_PATH || '/auth/refresh';
+  
+  try {
+    const isAbsolute = /^https?:/i.test(path);
+    const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+    const prefixedPath = (!API_PREFIX || normalizedPath.startsWith(API_PREFIX + '/'))
+      ? normalizedPath
+      : `${API_PREFIX}${normalizedPath}`;
+    const url = isAbsolute ? path : `${API}${prefixedPath}`;
 
-      const headers: Record<string, string> = {};
-      if (apiKey) headers['X-API-Key'] = apiKey as string;
-      if (authToken) headers['Authorization'] = `Bearer ${authToken}`; // some servers require current token for refresh
+    const headers: Record<string, string> = { 
+      'Content-Type': 'application/json',
+      // Backend expects refreshToken in Authorization header (JwtRefreshAuthGuard)
+      'Authorization': `Bearer ${refreshToken}`,
+    };
+    if (apiKey) headers['X-API-Key'] = apiKey as string;
 
-      console.log('[API] 🔄 Trying token refresh via', url);
-      const r = await fetch(url, { method: 'POST', headers });
-      if (!r.ok) continue;
-      const data = await r.json().catch(() => ({}));
-      const newToken = data?.token;
-      if (typeof newToken === 'string' && newToken.length > 0) {
-        setToken(newToken); // in-memory; persistence handled by callers if needed
-        try { await persistTokenCallback?.(newToken); } catch {}
-        console.log('[API] ✅ Token refresh succeeded');
-        return newToken;
-      }
-    } catch (e) {
-      console.warn('[API] ⚠️ Refresh attempt failed at this endpoint, trying next...', e);
+    console.log('[API] 🔄 Trying token refresh via', url);
+    const r = await fetch(url, { method: 'POST', headers });
+    if (!r.ok) {
+      console.warn(`[API] ⚠️ Refresh failed with status ${r.status}`);
+      return null;
     }
+    const data = await r.json().catch(() => ({}));
+    // Backend returns { accessToken: "...", refreshToken: "..." }
+    const newAccessToken = data?.accessToken || data?.token;
+    const newRefreshToken = data?.refreshToken;
+    
+    if (typeof newAccessToken === 'string' && newAccessToken.length > 0) {
+      setToken(newAccessToken); // in-memory
+      if (typeof newRefreshToken === 'string' && newRefreshToken.length > 0) {
+        setRefreshToken(newRefreshToken); // update refresh token too
+      }
+      try { await persistTokenCallback?.(newAccessToken); } catch {}
+      console.log('[API] ✅ Token refresh succeeded');
+      return newAccessToken;
+    }
+  } catch (e) {
+    console.warn('[API] ⚠️ Refresh attempt failed:', e);
   }
   return null;
 }
@@ -200,7 +231,7 @@ export async function apiFetch<T = any>(path: string, options: ApiFetchOptions =
   }
 
   const controller = new AbortController();
-  const timeout = options.timeoutMs ?? 10000; // 10 seconds timeout
+  const timeout = options.timeoutMs ?? 20000; // Increased from 10s to 20s for slow networks
   const timeoutId = setTimeout(() => controller.abort(), timeout);
 
   const doRequest = async (): Promise<{ res: Response; data: any }> => {
@@ -231,7 +262,7 @@ export async function apiFetch<T = any>(path: string, options: ApiFetchOptions =
           headers.Authorization = `Bearer ${newToken}`;
           (options as any)._retry = true;
           // restart timeout
-          const timeout2 = options.timeoutMs ?? 10000;
+          const timeout2 = options.timeoutMs ?? 20000; // Increased to match main timeout
           const controller2 = new AbortController();
           const timeoutId2 = setTimeout(() => controller2.abort(), timeout2);
           try {
@@ -246,6 +277,20 @@ export async function apiFetch<T = any>(path: string, options: ApiFetchOptions =
             throw e;
           }
           if (res.ok) return data as T;
+        } else {
+          // Token refresh failed or no refresh token available
+          // Only trigger logout if we actually have a refresh token (user is logged in)
+          if (refreshToken) {
+            console.error('[API] ❌ Token refresh failed, signing out...');
+            try {
+              await logoutCallback?.();
+            } catch (err) {
+              console.error('[API] Logout callback error:', err);
+            }
+          } else {
+            console.warn('[API] ⚠️ No refresh token available');
+            // Don't logout - user may not be logged in yet
+          }
         }
       }
       // On 429/503/504, attempt one backoff retry if not already retried
@@ -263,7 +308,7 @@ export async function apiFetch<T = any>(path: string, options: ApiFetchOptions =
         
         await new Promise(r => setTimeout(r, delayMs));
         // restart timeout
-        const timeout2 = options.timeoutMs ?? 10000;
+        const timeout2 = options.timeoutMs ?? 20000; // Increased to match main timeout
         const controller2 = new AbortController();
         const timeoutId2 = setTimeout(() => controller2.abort(), timeout2);
         try {
@@ -393,4 +438,184 @@ export async function listCustomers(token: string, search = '', page = 1, pageSi
   });
   if (!r.ok) throw new Error(await r.text());
   return r.json(); // { page, pageSize, total, items }
+}
+
+// =============================================================================
+// PRODUCTS API
+// =============================================================================
+
+export interface ProductFilter {
+  categoryId?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  rating?: number; // Minimum rating (e.g., 4 for 4+ stars)
+  isNew?: boolean;
+  inStock?: boolean;
+  search?: string;
+  sortBy?: 'price_asc' | 'price_desc' | 'rating' | 'sold' | 'newest';
+}
+
+export interface ProductPagination {
+  page?: number;
+  limit?: number;
+}
+
+export interface Product {
+  id: string;
+  name: string;
+  description?: string;
+  price: number;
+  originalPrice?: number;
+  discount?: number;
+  image: string; // URL or URI
+  images?: string[]; // Multiple images for gallery
+  categoryId?: string;
+  categoryName?: string;
+  rating?: number;
+  reviewCount?: number;
+  sold?: number;
+  stock?: number;
+  isNew?: boolean;
+  isFavorite?: boolean;
+  variants?: ProductVariant[];
+  tags?: string[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface ProductVariant {
+  id: string;
+  name: string; // e.g., "Color", "Size"
+  options: string[]; // e.g., ["Red", "Blue"], ["S", "M", "L"]
+  price?: number; // Additional price for this variant
+}
+
+export interface ProductsResponse {
+  data: Product[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+/**
+ * Get products list with filters and pagination
+ * @param filters - Filter criteria
+ * @param pagination - Pagination options
+ * @returns Products list with pagination info
+ */
+export async function getProducts(
+  filters: ProductFilter = {},
+  pagination: ProductPagination = { page: 1, limit: 20 }
+): Promise<ProductsResponse> {
+  const params = new URLSearchParams();
+  
+  // Pagination
+  if (pagination.page) params.append('page', String(pagination.page));
+  if (pagination.limit) params.append('limit', String(pagination.limit));
+  
+  // Filters
+  if (filters.categoryId) params.append('categoryId', filters.categoryId);
+  if (filters.minPrice !== undefined) params.append('minPrice', String(filters.minPrice));
+  if (filters.maxPrice !== undefined) params.append('maxPrice', String(filters.maxPrice));
+  if (filters.rating !== undefined) params.append('rating', String(filters.rating));
+  if (filters.isNew !== undefined) params.append('isNew', String(filters.isNew));
+  if (filters.inStock !== undefined) params.append('inStock', String(filters.inStock));
+  if (filters.search) params.append('search', filters.search);
+  if (filters.sortBy) params.append('sortBy', filters.sortBy);
+
+  try {
+    const response = await apiFetch(`/products?${params.toString()}`, {
+      method: 'GET',
+    });
+    
+    return response as ProductsResponse;
+  } catch (error) {
+    console.error('[API] Error fetching products:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get single product by ID
+ * @param id - Product ID
+ * @returns Product details
+ */
+export async function getProductById(id: string): Promise<Product> {
+  try {
+    const response = await apiFetch(`/products/${id}`, {
+      method: 'GET',
+    });
+    
+    return response as Product;
+  } catch (error) {
+    console.error(`[API] Error fetching product ${id}:`, error);
+    throw error;
+  }
+}
+
+/**
+ * Search products by keyword
+ * @param query - Search keyword
+ * @param pagination - Pagination options
+ * @returns Products matching search query
+ */
+export async function searchProducts(
+  query: string,
+  pagination: ProductPagination = { page: 1, limit: 20 }
+): Promise<ProductsResponse> {
+  const params = new URLSearchParams();
+  params.append('search', query);
+  if (pagination.page) params.append('page', String(pagination.page));
+  if (pagination.limit) params.append('limit', String(pagination.limit));
+
+  try {
+    const response = await apiFetch(`/products/search?${params.toString()}`, {
+      method: 'GET',
+    });
+    
+    return response as ProductsResponse;
+  } catch (error) {
+    console.error('[API] Error searching products:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get product categories
+ * @returns List of categories
+ */
+export async function getCategories(): Promise<Array<{ id: string; name: string; icon?: string; color?: string }>> {
+  try {
+    const response = await apiFetch('/products/categories', {
+      method: 'GET',
+    });
+    
+    return response as Array<{ id: string; name: string; icon?: string; color?: string }>;
+  } catch (error) {
+    console.error('[API] Error fetching categories:', error);
+    throw error;
+  }
+}
+
+/**
+ * Toggle product favorite status
+ * @param productId - Product ID
+ * @param isFavorite - New favorite status
+ * @returns Updated favorite status
+ */
+export async function toggleFavorite(productId: string, isFavorite: boolean): Promise<{ success: boolean; isFavorite: boolean }> {
+  try {
+    const response = await apiFetch(`/products/${productId}/favorite`, {
+      method: 'POST',
+      data: { isFavorite },
+    });
+    
+    return response as { success: boolean; isFavorite: boolean };
+  } catch (error) {
+    console.error(`[API] Error toggling favorite for product ${productId}:`, error);
+    throw error;
+  }
 }

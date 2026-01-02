@@ -210,7 +210,7 @@ export default function RestaurantDetailScreen() {
       [
         {
           text: 'Theo dõi đơn hàng',
-          onPress: () => router.push('/food/order-tracking' as any),
+          onPress: () => router.push('/food/order-tracking'),
         },
         { text: 'OK' },
       ]

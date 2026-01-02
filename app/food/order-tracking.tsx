@@ -135,7 +135,7 @@ export default function OrderTrackingScreen() {
   };
 
   const handleChatDriver = () => {
-    router.push('/messages' as any);
+    router.push('/messages');
   };
 
   const handleCancelOrder = () => {

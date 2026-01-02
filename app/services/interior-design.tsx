@@ -167,10 +167,8 @@ export default function InteriorDesignScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Filter Section */}
+        {/* Filter Section - All in one row */}
         <View style={styles.filterSection}>
-          {/* Style Filter */}
-          <Text style={styles.filterLabel}>Phong cách</Text>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -195,15 +193,7 @@ export default function InteriorDesignScreen() {
                 </Text>
               </TouchableOpacity>
             ))}
-          </ScrollView>
-
-          {/* Location Filter */}
-          <Text style={styles.filterLabel}>Khu vực</Text>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.filterScroll}
-          >
+            
             {LOCATIONS.map((location) => (
               <TouchableOpacity
                 key={location}
@@ -223,15 +213,7 @@ export default function InteriorDesignScreen() {
                 </Text>
               </TouchableOpacity>
             ))}
-          </ScrollView>
-
-          {/* Price Filter */}
-          <Text style={styles.filterLabel}>Giá</Text>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.filterScroll}
-          >
+            
             {PRICE_RANGES.map((range, index) => (
               <TouchableOpacity
                 key={index}
@@ -261,7 +243,7 @@ export default function InteriorDesignScreen() {
               key={company.id}
               style={styles.companyCard}
               onPress={() => {
-                router.push(`/services/company-detail?id=${company.id}` as any);
+                router.push(`/services/company-detail?id=${company.id}`);
               }}
             >
               {/* Featured Badge */}

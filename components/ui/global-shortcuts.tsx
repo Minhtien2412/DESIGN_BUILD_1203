@@ -55,12 +55,11 @@ export const GlobalShortcuts = memo(function GlobalShortcuts({ mode = 'fixed' }:
 
   if (mode === 'overlay') {
     return (
-      <SafeAreaView pointerEvents="box-none" style={StyleSheet.absoluteFill}>
+      <SafeAreaView style={[StyleSheet.absoluteFill, { pointerEvents: 'box-none' }]}>
         <Animated.View
           entering={FadeInDown.duration(300)}
           exiting={FadeOut.duration(150)}
-          style={[styles.wrap, { bottom: bottomOffset }]}
-          pointerEvents="box-none"
+          style={[styles.wrap, { bottom: bottomOffset, pointerEvents: 'box-none' }]}
         >
           <View style={[styles.inner, { backgroundColor: bg, borderColor: iconColor }] }>
             {SHORTCUTS.filter(s => !!user).map(s => {

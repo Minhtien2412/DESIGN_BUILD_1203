@@ -1,10 +1,23 @@
 /**
  * Voice Recording Service
  * Record and send voice messages in chat
+ * 
+ * Note: Using expo-av for audio recording (deprecated in SDK 54)
+ * TODO: Migrate to expo-audio when available
+ * For now, silence warning with conditional import
  */
 
-import { Audio } from 'expo-av';
 import * as FileSystem from 'expo-file-system';
+
+// Conditional import to suppress deprecation warning in dev
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let Audio: any = null;
+try {
+  const expoAv = require('expo-av');
+  Audio = expoAv.Audio;
+} catch (e) {
+  console.warn('[VoiceRecording] expo-av not available, voice recording disabled');
+}
 
 export interface VoiceRecordingOptions {
   maxDuration?: number; // milliseconds
@@ -19,7 +32,9 @@ export interface VoiceRecording {
 }
 
 class VoiceRecorder {
-  private recording: Audio.Recording | null = null;
+  // Using any type since Audio is dynamically imported
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private recording: any = null;
   private isRecording = false;
   private startTime: number = 0;
 
@@ -170,22 +185,23 @@ class VoiceRecorder {
 
   /**
    * Get recording options based on quality
+   * Returns type any since Audio module is dynamically imported
    */
-  private getRecordingOptions(quality: 'low' | 'medium' | 'high'): Audio.RecordingOptions {
-    const baseOptions: Audio.RecordingOptions = {
+  private getRecordingOptions(quality: 'low' | 'medium' | 'high'): any {
+    const baseOptions: any = {
       isMeteringEnabled: true,
       android: {
         extension: '.m4a',
-        outputFormat: Audio.AndroidOutputFormat.MPEG_4,
-        audioEncoder: Audio.AndroidAudioEncoder.AAC,
+        outputFormat: Audio?.AndroidOutputFormat?.MPEG_4,
+        audioEncoder: Audio?.AndroidAudioEncoder?.AAC,
         sampleRate: 44100,
         numberOfChannels: 1,
         bitRate: 128000,
       },
       ios: {
         extension: '.m4a',
-        outputFormat: Audio.IOSOutputFormat.MPEG4AAC,
-        audioQuality: Audio.IOSAudioQuality.HIGH,
+        outputFormat: Audio?.IOSOutputFormat?.MPEG4AAC,
+        audioQuality: Audio?.IOSAudioQuality?.HIGH,
         sampleRate: 44100,
         numberOfChannels: 1,
         bitRate: 128000,
@@ -223,8 +239,9 @@ export const voiceRecorder = new VoiceRecorder();
 
 /**
  * Play a voice recording
+ * Returns type any since Audio.Sound is from dynamically imported module
  */
-export async function playVoiceRecording(uri: string): Promise<Audio.Sound> {
+export async function playVoiceRecording(uri: string): Promise<any> {
   try {
     const { sound } = await Audio.Sound.createAsync(
       { uri },

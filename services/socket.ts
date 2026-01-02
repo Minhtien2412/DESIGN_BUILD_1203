@@ -83,14 +83,21 @@ class SocketManager {
   private socket: Socket | null = null;
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
+  private namespace: string = '/chat'; // Default namespace
 
   /**
-   * Initialize socket connection
+   * Initialize socket connection to a specific namespace
+   * @param namespace - Socket.IO namespace ('/chat', '/call', '/progress')
    */
-  async connect(): Promise<Socket> {
-    if (this.socket?.connected) {
-      console.log('[Socket] Already connected');
+  async connect(namespace: string = '/chat'): Promise<Socket> {
+    if (this.socket?.connected && this.namespace === namespace) {
+      console.log('[Socket] Already connected to', namespace);
       return this.socket;
+    }
+
+    // Disconnect from previous namespace if different
+    if (this.socket && this.namespace !== namespace) {
+      this.disconnect();
     }
 
     const token = await getAccessToken();
@@ -98,9 +105,12 @@ class SocketManager {
       throw new Error('No access token available for socket connection');
     }
 
-    const wsUrl = this.normalizeWsUrl(ENV.WS_URL || ENV.API_BASE_URL);
+    // Use base URL + namespace (e.g., wss://baotienweb.cloud + /chat)
+    const baseUrl = this.normalizeWsUrl(ENV.WS_BASE_URL || ENV.WS_URL || ENV.API_BASE_URL);
+    const wsUrl = `${baseUrl}${namespace}`;
     
     console.log('[Socket] Connecting to:', wsUrl);
+    this.namespace = namespace;
 
     this.socket = io(wsUrl, {
       auth: { token },
@@ -114,6 +124,27 @@ class SocketManager {
     this.setupEventListeners();
 
     return this.socket;
+  }
+
+  /**
+   * Connect to Chat namespace
+   */
+  async connectChat(): Promise<Socket> {
+    return this.connect(ENV.WS_CHAT_NS || '/chat');
+  }
+
+  /**
+   * Connect to Call namespace
+   */
+  async connectCall(): Promise<Socket> {
+    return this.connect(ENV.WS_CALL_NS || '/call');
+  }
+
+  /**
+   * Connect to Progress namespace
+   */
+  async connectProgress(): Promise<Socket> {
+    return this.connect(ENV.WS_PROGRESS_NS || '/progress');
   }
 
   /**
@@ -163,17 +194,27 @@ class SocketManager {
     });
 
     this.socket.on('connect_error', (error: Error) => {
-      console.error('[Socket] Connection error:', error.message);
+      // Safely log error to prevent Babel construct.js crash
+      try {
+        console.warn('[Socket] Connection error:', error?.message || 'Unknown error');
+      } catch (e) {
+        console.warn('[Socket] Connection error occurred');
+      }
       this.reconnectAttempts++;
 
       if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-        console.error('[Socket] Max reconnection attempts reached');
+        console.warn('[Socket] Max reconnection attempts reached');
         this.disconnect();
       }
     });
 
     this.socket.on('error', (error: Error) => {
-      console.error('[Socket] Error:', error);
+      // Safely log error to prevent Babel crash
+      try {
+        console.warn('[Socket] Error:', error?.message || 'Unknown socket error');
+      } catch (e) {
+        console.warn('[Socket] Error occurred');
+      }
     });
   }
 
@@ -458,3 +499,10 @@ const socketManager = new SocketManager();
 
 export default socketManager;
 export { socketManager };
+
+/**
+ * Get socket instance (for useRealtimeLocation)
+ */
+export function getSocket(): Socket | null {
+  return socketManager.getSocket();
+}

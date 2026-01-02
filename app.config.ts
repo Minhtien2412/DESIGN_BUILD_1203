@@ -10,8 +10,8 @@ const HAS_IOS_GOOGLE_SERVICES = existsSync(IOS_GOOGLE_SERVICES);
 const IS_DEV = process.env.NODE_ENV !== 'production';
 // Default dev API points to local backend; mock server remains opt-in via .env
 const DEV_API_URL = 'http://127.0.0.1:4000';
-const PROD_API_URL = 'https://api.thietkeresort.com.vn';
-const ENV_API_BASE = process.env.EXPO_PUBLIC_API_BASE_URL || DEV_API_URL;
+const PROD_API_URL = 'https://baotienweb.cloud/api/v1';
+const ENV_API_BASE = process.env.EXPO_PUBLIC_API_BASE_URL || PROD_API_URL;
 
 export default ({ config }: { config: any }) => ({
   ...config,
@@ -19,7 +19,7 @@ export default ({ config }: { config: any }) => ({
     name: "APP_DESIGN_BUILD",
     slug: "APP_DESIGN_BUILD",
     version: "1.0.0",
-    orientation: "portrait",
+    orientation: "default",
     icon: "./assets/images/icon.png",
     scheme: "appdesignbuild",
     userInterfaceStyle: "automatic",
@@ -107,6 +107,7 @@ export default ({ config }: { config: any }) => ({
     plugins: [
       "expo-router",
       "expo-secure-store",
+      "expo-web-browser",
 
       // Enhanced notifications plugin with proper configuration
       [
@@ -155,13 +156,15 @@ export default ({ config }: { config: any }) => ({
         "expo-build-properties",
         {
           android: {
-            compileSdkVersion: 34,
+            compileSdkVersion: 35,
             targetSdkVersion: 34,
             buildToolsVersion: "34.0.0",
-            kotlinVersion: "1.9.10",
+            kotlinVersion: "2.0.21",
             enableProguardInReleaseBuilds: true,
             enableShrinkResourcesInReleaseBuilds: true,
-            extraProguardRules: "-keep class org.webrtc.** { *; }"
+            extraProguardRules: "-keep class org.webrtc.** { *; }",
+            useNextNotationsInGradleProperties: false,
+            enableWebp: false
           },
           ios: {
             deploymentTarget: "15.1",
@@ -206,7 +209,7 @@ export default ({ config }: { config: any }) => ({
       EXPO_PUBLIC_API_BASE_URL: ENV_API_BASE,
       EXPO_PUBLIC_API_PREFIX: process.env.EXPO_PUBLIC_API_PREFIX ?? '',
       EXPO_PUBLIC_NODE_API_BASE_URL: ENV_API_BASE,
-      EXPO_PUBLIC_API_KEY: process.env.EXPO_PUBLIC_API_KEY || '',
+      EXPO_PUBLIC_API_KEY: process.env.EXPO_PUBLIC_API_KEY || 'thietke-resort-api-key-2024',
       EXPO_PUBLIC_WS_URL: process.env.EXPO_PUBLIC_WS_URL || undefined,
   EXPO_PUBLIC_AUTH_GOOGLE_PATH: process.env.EXPO_PUBLIC_AUTH_GOOGLE_PATH || '/auth/google',
   EXPO_PUBLIC_AUTH_FACEBOOK_PATH: process.env.EXPO_PUBLIC_AUTH_FACEBOOK_PATH || '/auth/facebook',

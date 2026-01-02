@@ -106,7 +106,7 @@ export function QuickCallWidget({ compact, style }: QuickCallWidgetProps = {}) {
 
   const statusColors = {
     online: '#4CAF50',
-    busy: '#FF5722',
+    busy: '#1A1A1A',
     away: '#FF9800',
     offline: '#9E9E9E',
   };

@@ -18,6 +18,7 @@ const appConfig = {
     newArchEnabled: true,
     ios: {
       supportsTablet: true,
+      bundleIdentifier: "com.baotienweb.constructionmanager",
       infoPlist: {
         NSCameraUsageDescription: "Ứng dụng cần quyền camera để quay video.",
         NSMicrophoneUsageDescription: "Ứng dụng cần quyền micro để ghi âm khi quay video.",

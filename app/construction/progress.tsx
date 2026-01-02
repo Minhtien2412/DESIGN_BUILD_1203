@@ -1,6 +1,7 @@
+import { ConstructionProgressService } from '@/services/featureServiceWrapper';
 import { Ionicons } from '@expo/vector-icons';
-import { router, useLocalSearchParams } from 'expo-router';
-import { useRef, useState } from 'react';
+import { Href, router, useLocalSearchParams } from 'expo-router';
+import { useEffect, useRef, useState } from 'react';
 import {
     Alert,
     Animated,
@@ -108,12 +109,68 @@ const MOCK_MILESTONES: Milestone[] = [
 
 export default function ConstructionProgressScreen() {
   const { id } = useLocalSearchParams<{ id?: string }>();
+  const projectId = id || '1'; // Default to project 1 for testing
   
-  const [project] = useState<Project>(MOCK_PROJECT);
-  const [milestones] = useState<Milestone[]>(MOCK_MILESTONES);
+  const [project, setProject] = useState<Project>(MOCK_PROJECT);
+  const [milestones, setMilestones] = useState<Milestone[]>(MOCK_MILESTONES);
   const [selectedMilestone, setSelectedMilestone] = useState<Milestone | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [dataSource, setDataSource] = useState<'api' | 'mock'>('mock');
   
   const scrollY = useRef(new Animated.Value(0)).current;
+
+  // Load real data from API
+  useEffect(() => {
+    loadProgressData();
+  }, [projectId]);
+
+  const loadProgressData = async () => {
+    setLoading(true);
+    try {
+      const result = await ConstructionProgressService.getByProject(projectId);
+      if (result.success && result.data) {
+        const apiData = result.data;
+        
+        // Transform API data to Project format
+        setProject({
+          id: String(apiData.projectId),
+          title: apiData.name || MOCK_PROJECT.title,
+          address: apiData.description || MOCK_PROJECT.address,
+          startDate: apiData.timeline?.startDate?.split('T')[0] || MOCK_PROJECT.startDate,
+          estimatedEndDate: apiData.timeline?.endDate?.split('T')[0] || MOCK_PROJECT.estimatedEndDate,
+          totalAmount: apiData.budget?.totalAmount || MOCK_PROJECT.totalAmount,
+          paidAmount: apiData.budget?.paidAmount || MOCK_PROJECT.paidAmount,
+          workerName: apiData.engineer?.name || apiData.client?.name || MOCK_PROJECT.workerName,
+          workerPhone: MOCK_PROJECT.workerPhone,
+          workerAvatar: MOCK_PROJECT.workerAvatar,
+        });
+
+        // Transform milestones if available
+        if (apiData.milestones && Array.isArray(apiData.milestones)) {
+          const transformedMilestones: Milestone[] = apiData.milestones.map((m: any, idx: number) => ({
+            id: `m${idx + 1}`,
+            title: m.name || `Giai đoạn ${idx + 1}`,
+            description: m.description || '',
+            percentage: m.progress || 0,
+            amount: 0,
+            status: m.completed ? 'completed' : (m.progress > 0 ? 'in-progress' : 'pending'),
+            photos: [],
+          }));
+          if (transformedMilestones.length > 0) {
+            setMilestones(transformedMilestones);
+          }
+        }
+        
+        setDataSource(result.source === 'api' ? 'api' : 'mock');
+        console.log('[Progress] Loaded from:', result.source);
+      }
+    } catch (error) {
+      console.error('[Progress] Error:', error);
+      setDataSource('mock');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const completedPercentage = (project.paidAmount / project.totalAmount) * 100;
   
@@ -134,7 +191,7 @@ export default function ConstructionProgressScreen() {
             text: 'Thanh toán',
             onPress: () => {
               // Navigate to payment screen
-              router.push('/checkout/payment');
+              router.push('/checkout/payment' as Href);
             },
           },
         ]

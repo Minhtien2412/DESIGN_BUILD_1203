@@ -1,14 +1,21 @@
 import { Camera } from 'expo-camera';
+import * as ExpoConstants from 'expo-constants';
 import * as Location from 'expo-location';
 import * as MediaLibrary from 'expo-media-library';
 import { useCallback, useState } from 'react';
-import { Alert, Linking } from 'react-native';
-// Lazy load notifications to avoid Expo Go warnings
+import { Alert, Linking, Platform } from 'react-native';
+
+// Detect Expo Go environment
+const isExpoGo = ExpoConstants.default?.appOwnership === 'expo';
+
+// Lazy load notifications to avoid Expo Go crash (SDK 53+ restriction)
 let Notifications: any = null;
-try {
-  Notifications = require('expo-notifications');
-} catch (e) {
-  console.warn('[Permissions] expo-notifications not available');
+if (!isExpoGo && Platform.OS !== 'web') {
+  try {
+    Notifications = require('expo-notifications');
+  } catch (e) {
+    console.warn('[Permissions] expo-notifications not available');
+  }
 }
 
 /**

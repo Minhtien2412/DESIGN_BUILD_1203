@@ -1,6 +1,6 @@
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import React, { useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 export type ChatMessage = {
@@ -55,7 +55,7 @@ export function ChatPopup({ visible, title = 'Tư vấn trực tuyến', onClose
   }
 
   return (
-    <View pointerEvents="auto" style={containerStyle}>
+    <View style={[containerStyle, { pointerEvents: 'auto' }]}>
       {/* Backdrop: tap to close */}
       <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
       <KeyboardAvoidingView
