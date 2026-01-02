@@ -2,10 +2,10 @@
  * Shopee-style Multi-step Register Screen
  * Step 1: Phone/Email → Step 2: OTP Verification → Step 3: Profile Setup
  * 
- * UPDATED: Sử dụng PerfexAuthContext để đăng ký qua Perfex CRM
+ * UPDATED: Sử dụng AuthContext để đăng ký qua backend chính (baotienweb.cloud)
  */
 
-import { usePerfexAuth } from '@/context/PerfexAuthContext';
+import { useAuth } from '@/context/AuthContext';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Location from 'expo-location';
@@ -83,7 +83,7 @@ interface FormErrors {
 
 export default function RegisterShopeeScreen() {
   const router = useRouter();
-  const { signUp, loading: authLoading } = usePerfexAuth();
+  const { signUp, loading: authLoading } = useAuth();
   
   // State
   const [currentStep, setCurrentStep] = useState(1);
@@ -363,22 +363,16 @@ export default function RegisterShopeeScreen() {
         ? `${formData.emailOrPhone.replace(/[^0-9]/g, '')}@phone.local`
         : formData.emailOrPhone;
 
-      // Parse name into firstname and lastname
-      const nameParts = formData.name.trim().split(' ');
-      const firstname = nameParts[0];
-      const lastname = nameParts.slice(1).join(' ') || firstname;
-
-      // Call signUp from PerfexAuthContext
-      // API: signUp({ email, password, firstname, lastname, phone?, company? })
-      await signUp({
+      // Call signUp from AuthContext (backend: baotienweb.cloud)
+      // API: signUp(email, password, name?, role?, phone?, location?)
+      await signUp(
         email,
-        password: formData.password,
-        firstname,
-        lastname,
-        phone: isPhone ? formData.emailOrPhone : undefined,
-        company: formData.role, // Store role in company field for now
-        address: formData.location?.address,
-      });
+        formData.password,
+        formData.name,
+        formData.role, // CLIENT, CONTRACTOR, ENGINEER, etc.
+        isPhone ? formData.emailOrPhone : undefined,
+        formData.location
+      );
 
       // Success - navigate to home
       router.replace('/(tabs)');

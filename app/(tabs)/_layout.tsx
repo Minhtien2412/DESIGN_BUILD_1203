@@ -75,14 +75,6 @@ export default function TabsLayout() {
           title: 'Liên hệ',
         }} 
       />
-      
-      {/* Archived variants - hidden from navigation */}
-      <Tabs.Screen 
-        name="_archive" 
-        options={{ 
-          href: null,
-        }} 
-      />
     </Tabs>
   );
 }
