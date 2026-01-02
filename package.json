@@ -48,8 +48,6 @@
     "@expo/vector-icons": "^15.0.2",
     "@gorhom/bottom-sheet": "^5.2.8",
     "@hookform/resolvers": "^5.2.2",
-    "@livekit/react-native": "^2.9.6",
-    "@livekit/react-native-webrtc": "^137.0.2",
     "@nestjs/bull": "^11.0.4",
     "@nestjs/event-emitter": "^3.0.1",
     "@nestjs/schedule": "^6.1.0",
@@ -73,6 +71,7 @@
     "axios": "^1.12.2",
     "bcryptjs": "^3.0.2",
     "bull": "^4.16.5",
+    "events": "^3.3.0",
     "expo": "~54.0.30",
     "expo-auth-session": "~7.0.10",
     "expo-av": "~16.0.8",
@@ -111,7 +110,6 @@
     "expo-video": "~3.0.15",
     "expo-video-thumbnails": "~10.0.8",
     "expo-web-browser": "~15.0.10",
-    "livekit-client": "^2.15.10",
     "lottie-react-native": "^7.3.4",
     "multer": "^2.0.2",
     "node-fetch": "^3.3.2",
@@ -166,10 +164,7 @@
   "expo": {
     "doctor": {
       "reactNativeDirectoryCheck": {
-        "exclude": [
-          "@livekit/react-native",
-          "@livekit/react-native-webrtc"
-        ]
+        "exclude": []
       }
     }
   },

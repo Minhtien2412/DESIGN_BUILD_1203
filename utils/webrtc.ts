@@ -10,13 +10,9 @@ let hasNativeModule = false;
 // Only load WebRTC on native platforms (iOS/Android)
 if (Platform.OS !== 'web') {
   try {
-    // Use LiveKit's WebRTC fork
-    WebRTCModule = require('@livekit/react-native-webrtc');
-    hasNativeModule = true;
-    // Register WebRTC globals if available
-    if (WebRTCModule.registerGlobals) {
-      WebRTCModule.registerGlobals();
-    }
+    // WebRTC packages have been removed to avoid build conflicts
+    // TODO: Re-add @livekit/react-native-webrtc when needed for video call feature
+    console.warn('[WebRTC] Video call packages disabled to reduce build size');
   } catch (error) {
     console.warn('[WebRTC] Native module not available - WebRTC features disabled');
     console.warn('[WebRTC] To use WebRTC, create a development build: npx expo run:android');
