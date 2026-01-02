@@ -70,12 +70,7 @@
         "android.permission.WAKE_LOCK",
         "android.permission.FOREGROUND_SERVICE",
         "android.permission.POST_NOTIFICATIONS"
-      ],
-      "config": {
-        "googleMaps": {
-          "apiKey": "e1be4d2963f5777f13a0978b3f1736961aceb09bf798bfeccda1cf12b9119bab"
-        }
-      }
+      ]
     },
     "web": {
       "bundler": "metro",
