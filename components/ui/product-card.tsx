@@ -99,7 +99,7 @@ export function ProductCard({ product, onAddToCart, variant = 'grid' }: ProductC
             style={styles.image} 
             contentFit="cover"
             transition={300}
-            placeholder={require('@/assets/images/react-logo.png')}
+            placeholder={require('@/assets/images/react-logo.webp')}
             placeholderContentFit="cover"
             cachePolicy="memory-disk"
             onError={(error) => {

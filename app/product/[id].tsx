@@ -121,7 +121,7 @@ export default function ProductDetailScreen() {
         id: product.id.toString(),
         name: product.name,
         price: product.price,
-        image: product.images?.[0] || require('@/assets/images/react-logo.png'),
+        image: product.images?.[0] || require('@/assets/images/react-logo.webp'),
         description: product.description,
         category: product.category,
       }, quantity);
@@ -172,8 +172,8 @@ export default function ProductDetailScreen() {
   if (!displayProduct) return null;
   
   const productImage = isFromApi 
-    ? (product?.images?.[0] || require('@/assets/images/react-logo.png'))
-    : (mockProduct?.image || require('@/assets/images/react-logo.png'));
+    ? (product?.images?.[0] || require('@/assets/images/react-logo.webp'))
+    : (mockProduct?.image || require('@/assets/images/react-logo.webp'));
 
   return (
     <>

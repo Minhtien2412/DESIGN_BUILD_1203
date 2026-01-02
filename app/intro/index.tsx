@@ -20,19 +20,19 @@ const SLIDES: Slide[] = [
     key: 's1',
     title: 'Quản lý xây dựng thông minh',
     description: 'Theo dõi dự án, chi phí và tiến độ ngay trong tầm tay.',
-    image: require('@/assets/images/react-logo.png'),
+    image: require('@/assets/images/react-logo.webp'),
   },
   {
     key: 's2',
     title: 'Mua sắm & dịch vụ tiện ích',
     description: 'Kết nối nhà thầu, sản phẩm và dịch vụ một cách liền mạch.',
-    image: require('@/assets/images/placeholder-video.png'),
+    image: require('@/assets/images/placeholder-video.webp'),
   },
   {
     key: 's3',
     title: 'Trải nghiệm hiện đại',
     description: 'Giao diện đẹp, mượt mà, tối ưu cho mọi thiết bị.',
-    image: require('@/assets/images/partial-react-logo.png'),
+    image: require('@/assets/images/partial-react-logo.webp'),
   },
 ];
 

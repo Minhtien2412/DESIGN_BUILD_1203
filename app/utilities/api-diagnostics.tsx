@@ -55,14 +55,14 @@ export default function ApiDiagnosticsScreen() {
     setPercent(0);
     setBusy(true);
     try {
-      const asset = Asset.fromModule(require('../../assets/images/react-logo.png'));
+      const asset = Asset.fromModule(require('../../assets/images/react-logo.webp'));
       await asset.downloadAsync();
       const uri = asset.localUri || asset.uri;
       setUpload('Uploading...');
       const { url } = await uploadMediaWithProgress(
         'temp',
         uri,
-        'diag-react-logo.png',
+        'diag-react-logo.webp',
         { kind: 'diagnostic' },
         ({ percent }) => setPercent(Math.round(percent))
       );

@@ -27,9 +27,9 @@ const SERVICES_DATA: Record<string, any> = {
     reviewCount: 156,
     description: 'Dịch vụ thiết kế nhà phố chuyên nghiệp với đội ngũ kiến trúc sư giàu kinh nghiệm, cam kết mang đến không gian sống hoàn hảo cho gia đình bạn.',
     images: [
-      require('@/assets/images/react-logo.png'),
-      require('@/assets/images/react-logo.png'),
-      require('@/assets/images/react-logo.png'),
+      require('@/assets/images/react-logo.webp'),
+      require('@/assets/images/react-logo.webp'),
+      require('@/assets/images/react-logo.webp'),
     ],
     features: [
       { icon: 'cube-outline', text: 'Bản vẽ 3D chân thực' },
@@ -116,9 +116,9 @@ const SERVICES_DATA: Record<string, any> = {
     reviewCount: 234,
     description: 'Thiết kế nội thất theo phong cách cá nhân hóa, tối ưu không gian và công năng sử dụng.',
     images: [
-      require('@/assets/images/react-logo.png'),
-      require('@/assets/images/react-logo.png'),
-      require('@/assets/images/react-logo.png'),
+      require('@/assets/images/react-logo.webp'),
+      require('@/assets/images/react-logo.webp'),
+      require('@/assets/images/react-logo.webp'),
     ],
     features: [
       { icon: 'color-palette-outline', text: 'Phối màu chuyên nghiệp' },
@@ -196,8 +196,8 @@ const SERVICES_DATA: Record<string, any> = {
     reviewCount: 89,
     description: 'Hỗ trợ hoàn thiện hồ sơ và xin giấy phép xây dựng tại cơ quan có thẩm quyền.',
     images: [
-      require('@/assets/images/react-logo.png'),
-      require('@/assets/images/react-logo.png'),
+      require('@/assets/images/react-logo.webp'),
+      require('@/assets/images/react-logo.webp'),
     ],
     features: [
       { icon: 'document-text-outline', text: 'Chuẩn bị hồ sơ đầy đủ' },
@@ -255,8 +255,8 @@ const SERVICES_DATA: Record<string, any> = {
     reviewCount: 67,
     description: 'Tư vấn phong thủy cho nhà ở, văn phòng để mang lại sự thịnh vượng và hòa hợp.',
     images: [
-      require('@/assets/images/react-logo.png'),
-      require('@/assets/images/react-logo.png'),
+      require('@/assets/images/react-logo.webp'),
+      require('@/assets/images/react-logo.webp'),
     ],
     features: [
       { icon: 'compass-outline', text: 'Xem hướng nhà' },

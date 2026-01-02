@@ -28,7 +28,7 @@ const HERO_SLIDES = [
     title: 'Luxury Villa Design',
     subtitle: 'Modern Architecture for Your Dream Home',
     image: 'https://nhaxinhdesign.com/wp-content/uploads/2023/biet-thu-hien-dai-sieu-dep-mat-tien-duong-nguyen-luong-bang-quan-7.jpg',
-    fallbackImage: require('@/assets/images/react-logo.png'), // Fallback local
+    fallbackImage: require('@/assets/images/react-logo.webp'), // Fallback local
     cta: 'Explore Now',
     route: '/services/house-design',
   },
@@ -37,7 +37,7 @@ const HERO_SLIDES = [
     title: 'Premium Interiors',
     subtitle: 'Transform Your Space with Elegance',
     image: 'https://nhaxinhdesign.com/wp-content/uploads/2024/thiet-ke-thi-cong-noi-that-the-manhattan-glory-vinhomes-grand-park-quan-9.jpg',
-    fallbackImage: require('@/assets/images/react-logo.png'),
+    fallbackImage: require('@/assets/images/react-logo.webp'),
     cta: 'View Collection',
     route: '/services/interior-design',
   },
@@ -46,7 +46,7 @@ const HERO_SLIDES = [
     title: 'Smart Construction',
     subtitle: 'Building Tomorrow, Today',
     image: 'https://nhaxinhdesign.com/wp-content/uploads/2023/biet-thu-hien-dai-san-vuon-rong-1000m2-gan-dai-lo-binh-duong.jpg',
-    fallbackImage: require('@/assets/images/react-logo.png'),
+    fallbackImage: require('@/assets/images/react-logo.webp'),
     cta: 'Get Started',
     route: '/shopping/index',
   },

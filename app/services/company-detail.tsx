@@ -19,8 +19,8 @@ const CARD_WIDTH = (width - 48) / 2;
 const COMPANY_DETAIL = {
   id: 1,
   name: 'Công ty Thiết kế A&A',
-  logo: require('@/assets/images/icon-dich-vu/thiet-ke-nha.png'),
-  coverImage: require('@/assets/images/react-logo.png'),
+  logo: require('@/assets/images/icon-dich-vu/thiet-ke-nha.webp'),
+  coverImage: require('@/assets/images/react-logo.webp'),
   rating: 4.8,
   reviewCount: 256,
   projectCount: 150,
@@ -46,7 +46,7 @@ const COMPANY_DETAIL = {
       location: 'Hà Nội',
       area: '250m²',
       year: 2024,
-      image: require('@/assets/images/react-logo.png'),
+      image: require('@/assets/images/react-logo.webp'),
     },
     {
       id: 2,
@@ -54,7 +54,7 @@ const COMPANY_DETAIL = {
       location: 'TP.HCM',
       area: '180m²',
       year: 2024,
-      image: require('@/assets/images/react-logo.png'),
+      image: require('@/assets/images/react-logo.webp'),
     },
     {
       id: 3,
@@ -62,7 +62,7 @@ const COMPANY_DETAIL = {
       location: 'Đà Nẵng',
       area: '400m²',
       year: 2023,
-      image: require('@/assets/images/react-logo.png'),
+      image: require('@/assets/images/react-logo.webp'),
     },
     {
       id: 4,
@@ -70,14 +70,14 @@ const COMPANY_DETAIL = {
       location: 'Bình Dương',
       area: '300m²',
       year: 2023,
-      image: require('@/assets/images/react-logo.png'),
+      image: require('@/assets/images/react-logo.webp'),
     },
   ],
   reviews: [
     {
       id: 1,
       user: 'Nguyễn Văn A',
-      avatar: require('@/assets/images/icon-dich-vu/thiet-ke-nha.png'),
+      avatar: require('@/assets/images/icon-dich-vu/thiet-ke-nha.webp'),
       rating: 5,
       date: '15/10/2024',
       comment:
@@ -86,7 +86,7 @@ const COMPANY_DETAIL = {
     {
       id: 2,
       user: 'Trần Thị B',
-      avatar: require('@/assets/images/icon-dich-vu/thiet-ke-nha.png'),
+      avatar: require('@/assets/images/icon-dich-vu/thiet-ke-nha.webp'),
       rating: 4,
       date: '20/09/2024',
       comment: 'Thiết kế đẹp, thi công nhanh. Giá cả hợp lý.',
@@ -94,7 +94,7 @@ const COMPANY_DETAIL = {
     {
       id: 3,
       user: 'Lê Văn C',
-      avatar: require('@/assets/images/icon-dich-vu/thiet-ke-nha.png'),
+      avatar: require('@/assets/images/icon-dich-vu/thiet-ke-nha.webp'),
       rating: 5,
       date: '05/08/2024',
       comment: 'Rất hài lòng với dịch vụ. Sẽ giới thiệu cho bạn bè.',

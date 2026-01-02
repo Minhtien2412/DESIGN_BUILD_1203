@@ -21,7 +21,7 @@ export const SimpleHero = memo(function SimpleHero({
   return (
     <View style={[styles.heroContainer, style]}>
       <Image
-        source={imageSource || require('@/assets/images/react-logo.png')}
+        source={imageSource || require('@/assets/images/react-logo.webp')}
         style={styles.heroImage}
         resizeMode="cover"
       />

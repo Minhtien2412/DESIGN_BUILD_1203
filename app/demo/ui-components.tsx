@@ -233,7 +233,7 @@ const DemoContent = () => {
         <View style={styles.componentDemo}>
           <Text style={[TextVariants.h3, { color: text, marginBottom: 8 }]}>ProductCard</Text>
           <ProductCardNew
-            image={require('../../assets/images/react-logo.png')}
+            image={require('../../assets/images/react-logo.webp')}
             title="React Native Product"
             price="500,000₫"
             rating={4.5}
