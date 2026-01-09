@@ -154,13 +154,13 @@ export default function AdminProductsScreen() {
         {item.status === ProductStatus.PENDING && (
           <>
             <TouchableOpacity
-              style={[styles.actionButton, { backgroundColor: '#10b981' }]}
+              style={[styles.actionButton, { backgroundColor: '#0066CC' }]}
               onPress={() => handleUpdateStatus(item, 'APPROVED')}
             >
               <Ionicons name="checkmark" size={20} color="#fff" />
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.actionButton, { backgroundColor: '#ef4444' }]}
+              style={[styles.actionButton, { backgroundColor: '#000000' }]}
               onPress={() => handleUpdateStatus(item, 'REJECTED')}
             >
               <Ionicons name="close" size={20} color="#fff" />
@@ -206,7 +206,7 @@ export default function AdminProductsScreen() {
   if (loading && !productsData) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#EE4D2D" />
+        <ActivityIndicator size="large" color="#0066CC" />
         <Text style={styles.loadingText}>Đang tải sản phẩm...</Text>
       </View>
     );
@@ -221,7 +221,7 @@ export default function AdminProductsScreen() {
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Quản lý sản phẩm</Text>
         <TouchableOpacity onPress={() => router.push('/admin/products/create')}>
-          <Ionicons name="add-circle" size={28} color="#EE4D2D" />
+          <Ionicons name="add-circle" size={28} color="#0066CC" />
         </TouchableOpacity>
       </View>
 
@@ -270,7 +270,7 @@ export default function AdminProductsScreen() {
               </View>
             ) : (
               <View style={styles.quickEmpty}>
-                <Ionicons name="checkmark-circle-outline" size={36} color="#22c55e" />
+                <Ionicons name="checkmark-circle-outline" size={36} color="#0066CC" />
                 <Text style={styles.quickEmptyText}>Không có sản phẩm chờ duyệt</Text>
               </View>
             )}
@@ -427,7 +427,7 @@ const styles = StyleSheet.create({
   quickLink: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#EE4D2D',
+    color: '#0066CC',
   },
   quickList: {
     paddingHorizontal: 16,
@@ -487,8 +487,8 @@ const styles = StyleSheet.create({
     borderColor: '#e0e0e0',
   },
   categoryChipActive: {
-    backgroundColor: '#EE4D2D',
-    borderColor: '#EE4D2D',
+    backgroundColor: '#0066CC',
+    borderColor: '#0066CC',
   },
   categoryChipText: {
     fontSize: 12,
@@ -511,7 +511,7 @@ const styles = StyleSheet.create({
   },
   statsNumber: {
     fontWeight: '700',
-    color: '#EE4D2D',
+    color: '#0066CC',
   },
   list: {
     padding: 16,
@@ -553,7 +553,7 @@ const styles = StyleSheet.create({
   productPrice: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#EE4D2D',
+    color: '#0066CC',
     marginBottom: 8,
   },
   statusBadge: {
@@ -592,7 +592,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   deleteButton: {
-    backgroundColor: '#ef4444',
+    backgroundColor: '#000000',
   },
   empty: {
     alignItems: 'center',

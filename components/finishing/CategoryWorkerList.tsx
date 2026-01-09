@@ -130,7 +130,7 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
           </Text>
 
           <View style={styles.ratingRow}>
-            <Ionicons name="star" size={14} color="#ffa41c" />
+            <Ionicons name="star" size={14} color="#0066CC" />
             <Text style={styles.ratingText}>{worker.rating}</Text>
             <Text style={styles.reviewsText}>({worker.reviews})</Text>
           </View>
@@ -167,7 +167,7 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
       {/* Team Size */}
       {worker.teamSize && (
         <View style={styles.teamRow}>
-          <Ionicons name="people" size={16} color="#2196f3" />
+          <Ionicons name="people" size={16} color="#0066CC" />
           <Text style={styles.teamText}>Đội {worker.teamSize} người</Text>
         </View>
       )}
@@ -420,7 +420,7 @@ export function CategoryWorkerList({
 
       {/* Info Banner */}
       <View style={styles.infoBanner}>
-        <Ionicons name="shield-checkmark" size={16} color="#4caf50" />
+        <Ionicons name="shield-checkmark" size={16} color="#0066CC" />
         <Text style={styles.infoBannerText}>
           {config.infoBannerText || 'Thi công chuyên nghiệp • Bảo hành công trình'}
         </Text>
@@ -450,7 +450,7 @@ export function CategoryWorkerList({
                   <View style={styles.selectedWorkerText}>
                     <Text style={styles.selectedWorkerName}>{selectedWorker.name}</Text>
                     <View style={styles.selectedRating}>
-                      <Ionicons name="star" size={14} color="#ffa41c" />
+                      <Ionicons name="star" size={14} color="#0066CC" />
                       <Text style={styles.selectedRatingText}>
                         {selectedWorker.rating} ({selectedWorker.reviews})
                       </Text>
@@ -469,7 +469,7 @@ export function CategoryWorkerList({
                       style={styles.quickActionBtn}
                       onPress={() => router.push(`/messages/${selectedWorker.id}`)}
                     >
-                      <Ionicons name="chatbubble" size={20} color="#4caf50" />
+                      <Ionicons name="chatbubble" size={20} color="#0066CC" />
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -690,12 +690,12 @@ const styles = StyleSheet.create({
   specialtiesLabel: { fontSize: 12, fontWeight: '600', color: '#666', marginBottom: 6 },
   specialtiesTags: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   specialtyTag: {
-    backgroundColor: '#e3f2fd',
+    backgroundColor: '#E8F4FF',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
   },
-  specialtyText: { fontSize: 11, fontWeight: '500', color: '#2196f3' },
+  specialtyText: { fontSize: 11, fontWeight: '500', color: '#0066CC' },
 
   // Team
   teamRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12 },
@@ -714,8 +714,8 @@ const styles = StyleSheet.create({
   },
   statItem: { alignItems: 'center' },
   statValue: { fontSize: 15, fontWeight: '700', color: '#333', marginBottom: 4 },
-  available: { color: '#4caf50' },
-  busy: { color: '#ff9800' },
+  available: { color: '#0066CC' },
+  busy: { color: '#0066CC' },
   statLabel: { fontSize: 11, color: '#999' },
   statDivider: { width: 1, height: 40, backgroundColor: '#f0f0f0' },
 
@@ -736,7 +736,7 @@ const styles = StyleSheet.create({
   callButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#4caf50',
+    backgroundColor: '#0066CC',
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 8,
@@ -765,7 +765,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     gap: 8,
   },
-  infoBannerText: { fontSize: 12, color: '#4caf50', flex: 1 },
+  infoBannerText: { fontSize: 12, color: '#0066CC', flex: 1 },
 
   // Modal
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },

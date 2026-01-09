@@ -101,7 +101,7 @@ export default function ModernButton({
         ]}
       >
         <LinearGradient
-          colors={isDisabled ? ['#BDBDBD', '#9E9E9E'] : MODERN_COLORS.gradientPrimary}
+          colors={isDisabled ? ['#BDBDBD', '#999999'] : MODERN_COLORS.gradientPrimary}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
           style={[

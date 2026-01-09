@@ -75,21 +75,21 @@ export default function OMManualDetailScreen() {
       case 'DRAFT':
         return '#9CA3AF';
       case 'IN_REVIEW':
-        return '#F59E0B';
+        return '#0066CC';
       case 'APPROVED':
-        return '#10B981';
+        return '#0066CC';
       case 'SUBMITTED':
         return '#3B82F6';
       case 'REJECTED':
-        return '#EF4444';
+        return '#000000';
       case 'COMPLETED':
-        return '#10B981';
+        return '#0066CC';
       case 'ACTIVE':
-        return '#10B981';
+        return '#0066CC';
       case 'INACTIVE':
         return '#6B7280';
       case 'MAINTENANCE':
-        return '#F59E0B';
+        return '#0066CC';
       default:
         return '#6B7280';
     }
@@ -98,13 +98,13 @@ export default function OMManualDetailScreen() {
   const getCriticalityColor = (criticality?: string) => {
     switch (criticality) {
       case 'CRITICAL':
-        return '#EF4444';
+        return '#000000';
       case 'HIGH':
-        return '#F59E0B';
+        return '#0066CC';
       case 'MEDIUM':
         return '#3B82F6';
       case 'LOW':
-        return '#10B981';
+        return '#0066CC';
       default:
         return '#9CA3AF';
     }
@@ -178,19 +178,19 @@ export default function OMManualDetailScreen() {
             <Text style={[styles.statLabel, { color: textMutedColor }]}>Equipment</Text>
           </View>
           <View style={styles.statBox}>
-            <Text style={[styles.statValue, { color: '#8B5CF6' }]}>
+            <Text style={[styles.statValue, { color: '#666666' }]}>
               {pkg.totalDocuments || 0}
             </Text>
             <Text style={[styles.statLabel, { color: textMutedColor }]}>Documents</Text>
           </View>
           <View style={styles.statBox}>
-            <Text style={[styles.statValue, { color: '#10B981' }]}>
+            <Text style={[styles.statValue, { color: '#0066CC' }]}>
               {reviews.filter(r => r.status === 'APPROVED').length}
             </Text>
             <Text style={[styles.statLabel, { color: textMutedColor }]}>Approved</Text>
           </View>
           <View style={styles.statBox}>
-            <Text style={[styles.statValue, { color: '#F59E0B' }]}>
+            <Text style={[styles.statValue, { color: '#0066CC' }]}>
               {reviews.filter(r => r.status === 'PENDING').length}
             </Text>
             <Text style={[styles.statLabel, { color: textMutedColor }]}>Pending</Text>
@@ -276,7 +276,7 @@ export default function OMManualDetailScreen() {
 
                   <View style={styles.equipmentStats}>
                     <View style={styles.equipmentStat}>
-                      <Ionicons name="document-text-outline" size={16} color="#8B5CF6" />
+                      <Ionicons name="document-text-outline" size={16} color="#666666" />
                       <Text style={[styles.equipmentStatText, { color: textColor }]}>
                         {item.documents?.length || 0} docs
                       </Text>
@@ -288,7 +288,7 @@ export default function OMManualDetailScreen() {
                       </Text>
                     </View>
                     <View style={styles.equipmentStat}>
-                      <Ionicons name="calendar-outline" size={16} color="#F59E0B" />
+                      <Ionicons name="calendar-outline" size={16} color="#0066CC" />
                       <Text style={[styles.equipmentStatText, { color: textColor }]}>
                         {item.maintenanceSchedule?.length || 0} schedules
                       </Text>
@@ -297,7 +297,7 @@ export default function OMManualDetailScreen() {
 
                   {item.warrantyEndDate && (
                     <View style={styles.warrantyRow}>
-                      <Ionicons name="shield-checkmark-outline" size={14} color="#10B981" />
+                      <Ionicons name="shield-checkmark-outline" size={14} color="#0066CC" />
                       <Text style={[styles.warrantyText, { color: textMutedColor }]}>
                         Warranty until {new Date(item.warrantyEndDate).toLocaleDateString()}
                       </Text>
@@ -346,8 +346,8 @@ export default function OMManualDetailScreen() {
 
                   {review.deficienciesFound > 0 && (
                     <View style={styles.deficienciesRow}>
-                      <Ionicons name="warning-outline" size={14} color="#F59E0B" />
-                      <Text style={[styles.deficienciesText, { color: '#F59E0B' }]}>
+                      <Ionicons name="warning-outline" size={14} color="#0066CC" />
+                      <Text style={[styles.deficienciesText, { color: '#0066CC' }]}>
                         {review.deficienciesFound} deficiencies found
                       </Text>
                     </View>

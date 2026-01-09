@@ -477,7 +477,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   errorText: {
-    color: '#ef4444',
+    color: '#000000',
     fontSize: 13,
     marginBottom: 8,
   },

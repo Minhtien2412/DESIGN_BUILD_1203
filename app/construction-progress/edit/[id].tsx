@@ -91,7 +91,7 @@ export default function EditProjectScreen() {
     return (
       <SafeAreaView style={styles.container} edges={['top']}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#EE4D2D" />
+          <ActivityIndicator size="large" color="#0066CC" />
           <Text style={styles.loadingText}>Đang tải...</Text>
         </View>
       </SafeAreaView>
@@ -195,7 +195,7 @@ export default function EditProjectScreen() {
         <View style={styles.dangerZone}>
           <Text style={styles.dangerTitle}>Vùng nguy hiểm</Text>
           <TouchableOpacity style={styles.deleteBtn} onPress={handleDelete}>
-            <Ionicons name="trash-outline" size={20} color="#ef4444" />
+            <Ionicons name="trash-outline" size={20} color="#000000" />
             <Text style={styles.deleteBtnText}>Xóa dự án</Text>
           </TouchableOpacity>
         </View>
@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
   backBtn: { padding: 4 },
   headerTitle: { fontSize: 18, fontWeight: '700', color: '#000' },
   saveBtn: {
-    backgroundColor: '#EE4D2D',
+    backgroundColor: '#0066CC',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 8,
@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
   textArea: { minHeight: 100, textAlignVertical: 'top' },
   row: { flexDirection: 'row' },
   submitBtn: {
-    backgroundColor: '#EE4D2D',
+    backgroundColor: '#0066CC',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#fee2e2',
   },
-  dangerTitle: { fontSize: 14, fontWeight: '600', color: '#ef4444', marginBottom: 12 },
+  dangerTitle: { fontSize: 14, fontWeight: '600', color: '#000000', marginBottom: 12 },
   deleteBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -268,8 +268,8 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#ef4444',
+    borderColor: '#000000',
     gap: 8,
   },
-  deleteBtnText: { fontSize: 14, fontWeight: '600', color: '#ef4444' },
+  deleteBtnText: { fontSize: 14, fontWeight: '600', color: '#000000' },
 });

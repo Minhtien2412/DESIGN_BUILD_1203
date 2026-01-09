@@ -124,7 +124,7 @@ export default function MinimapEditorScreen() {
     delayed: '#E82A34',
     border: '#9CA3AF',
     selected: '#3B82F6',
-    drawing: '#8B5CF6',
+    drawing: '#666666',
   };
 
   const getStatusColor = (status: AreaStatus) => {

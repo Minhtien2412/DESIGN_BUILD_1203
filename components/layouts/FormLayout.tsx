@@ -267,8 +267,8 @@ const styles = StyleSheet.create({
     borderColor: Colors.light.primary,
   },
   stepCircleCompleted: {
-    backgroundColor: "#10B981",
-    borderColor: "#10B981",
+    backgroundColor: "#0066CC",
+    borderColor: "#0066CC",
   },
   stepNumber: {
     fontSize: 14,
@@ -288,7 +288,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   stepLabelCompleted: {
-    color: "#10B981",
+    color: "#0066CC",
   },
   stepLine: {
     position: "absolute",
@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
     borderColor: "#D1D5DB",
   },
   actionButtonDanger: {
-    backgroundColor: "#EF4444",
+    backgroundColor: "#000000",
   },
   actionButtonDisabled: {
     opacity: 0.5,

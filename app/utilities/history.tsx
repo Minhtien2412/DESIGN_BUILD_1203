@@ -57,14 +57,14 @@ export default function HistoryScreen() {
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      pending: '#F59E0B',
-      confirmed: '#10B981',
-      cancelled: '#EF4444',
+      pending: '#0066CC',
+      confirmed: '#0066CC',
+      cancelled: '#000000',
       completed: '#6B7280',
       'in-review': '#3B82F6',
-      quoted: '#8B5CF6',
-      accepted: '#10B981',
-      rejected: '#EF4444',
+      quoted: '#666666',
+      accepted: '#0066CC',
+      rejected: '#000000',
     };
     return colors[status] || '#6B7280';
   };
@@ -250,7 +250,7 @@ export default function HistoryScreen() {
                         </Text>
                       </View>
                       <TouchableOpacity onPress={() => handleDelete('estimates', estimate.id)}>
-                        <Ionicons name="trash-outline" size={20} color="#EF4444" />
+                        <Ionicons name="trash-outline" size={20} color="#000000" />
                       </TouchableOpacity>
                     </View>
 
@@ -356,7 +356,7 @@ export default function HistoryScreen() {
                         </View>
                       </View>
                       <TouchableOpacity onPress={() => handleDelete('appointments', appointment.id)}>
-                        <Ionicons name="trash-outline" size={20} color="#EF4444" />
+                        <Ionicons name="trash-outline" size={20} color="#000000" />
                       </TouchableOpacity>
                     </View>
 
@@ -449,7 +449,7 @@ export default function HistoryScreen() {
                         </View>
                       </View>
                       <TouchableOpacity onPress={() => handleDelete('quotes', quote.id)}>
-                        <Ionicons name="trash-outline" size={20} color="#EF4444" />
+                        <Ionicons name="trash-outline" size={20} color="#000000" />
                       </TouchableOpacity>
                     </View>
 

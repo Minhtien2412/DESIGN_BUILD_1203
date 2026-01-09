@@ -34,17 +34,17 @@ const FILE_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
 };
 
 const FILE_COLORS: Record<string, string> = {
-  pdf: '#ef4444',
+  pdf: '#000000',
   doc: '#3b82f6',
   docx: '#3b82f6',
-  xls: '#10b981',
-  xlsx: '#10b981',
-  ppt: '#f59e0b',
-  pptx: '#f59e0b',
-  image: '#8b5cf6',
-  jpg: '#8b5cf6',
-  jpeg: '#8b5cf6',
-  png: '#8b5cf6',
+  xls: '#0066CC',
+  xlsx: '#0066CC',
+  ppt: '#0066CC',
+  pptx: '#0066CC',
+  image: '#666666',
+  jpg: '#666666',
+  jpeg: '#666666',
+  png: '#666666',
   zip: '#6b7280',
   rar: '#6b7280',
 };
@@ -103,7 +103,7 @@ export default function DocumentCard({
         )}
         {onDelete && (
           <TouchableOpacity style={styles.actionButton} onPress={onDelete}>
-            <Ionicons name="trash-outline" size={20} color="#ef4444" />
+            <Ionicons name="trash-outline" size={20} color="#000000" />
           </TouchableOpacity>
         )}
       </View>

@@ -34,7 +34,7 @@ export function RoleCapabilities({ userType }: RoleCapabilitiesProps) {
         <ScrollView style={styles.capabilitiesList} showsVerticalScrollIndicator={false}>
           {role.capabilities.map((capability, index) => (
             <View key={index} style={styles.capabilityItem}>
-              <Ionicons name="checkmark-circle" size={20} color="#10B981" />
+              <Ionicons name="checkmark-circle" size={20} color="#0066CC" />
               <ThemedText style={styles.capabilityText}>{capability}</ThemedText>
             </View>
           ))}
@@ -43,7 +43,7 @@ export function RoleCapabilities({ userType }: RoleCapabilitiesProps) {
 
       {role.verificationRequired && (
         <View style={styles.verificationNote}>
-          <Ionicons name="shield-checkmark-outline" size={20} color="#F59E0B" />
+          <Ionicons name="shield-checkmark-outline" size={20} color="#0066CC" />
           <ThemedText style={styles.verificationText}>
             Vai trò này cần xác minh danh tính và chứng chỉ
           </ThemedText>
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
   verificationText: {
     marginLeft: 8,
     fontSize: 13,
-    color: '#F59E0B',
+    color: '#0066CC',
     flex: 1,
   },
 });

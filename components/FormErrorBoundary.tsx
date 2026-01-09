@@ -65,7 +65,7 @@ export class FormErrorBoundary extends React.Component<Props, State> {
 function ErrorFallback({ error, onReset }: { error: Error | null; onReset: () => void }) {
   const bg = useThemeColor({}, 'background');
   const text = useThemeColor({}, 'text');
-  const errorColor = '#ef4444';
+  const errorColor = '#000000';
   const buttonBg = '#3b82f6';
 
   return (

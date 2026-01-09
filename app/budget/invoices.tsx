@@ -18,37 +18,37 @@ const STATUS_CONFIG: Record<
 > = {
   DRAFT: {
     label: 'Nháp',
-    color: '#9E9E9E',
+    color: '#999999',
     bgColor: '#F5F5F5',
     icon: 'document-outline',
   },
   SENT: {
     label: 'Đã gửi',
-    color: '#2196F3',
-    bgColor: '#E3F2FD',
+    color: '#0066CC',
+    bgColor: '#E8F4FF',
     icon: 'send',
   },
   VIEWED: {
     label: 'Đã xem',
-    color: '#FF9800',
-    bgColor: '#FFF3E0',
+    color: '#0066CC',
+    bgColor: '#E8F4FF',
     icon: 'eye',
   },
   PAID: {
     label: 'Đã thanh toán',
-    color: '#4CAF50',
+    color: '#0066CC',
     bgColor: '#E8F5E9',
     icon: 'checkmark-circle',
   },
   OVERDUE: {
     label: 'Quá hạn',
-    color: '#F44336',
-    bgColor: '#FFEBEE',
+    color: '#000000',
+    bgColor: '#F5F5F5',
     icon: 'alert-circle',
   },
   CANCELLED: {
     label: 'Đã hủy',
-    color: '#607D8B',
+    color: '#666666',
     bgColor: '#ECEFF1',
     icon: 'close-circle',
   },
@@ -217,7 +217,7 @@ export default function InvoicesScreen() {
 
         <View style={styles.summaryCard}>
           <Text style={styles.summaryLabel}>Đã thu</Text>
-          <Text style={[styles.summaryValue, { color: '#4CAF50' }]}>
+          <Text style={[styles.summaryValue, { color: '#0066CC' }]}>
             {formatCurrency(
               invoices.reduce((sum, inv) => sum + inv.paidAmount, 0)
             )}
@@ -226,7 +226,7 @@ export default function InvoicesScreen() {
 
         <View style={styles.summaryCard}>
           <Text style={styles.summaryLabel}>Còn nợ</Text>
-          <Text style={[styles.summaryValue, { color: '#F44336' }]}>
+          <Text style={[styles.summaryValue, { color: '#000000' }]}>
             {formatCurrency(
               invoices.reduce((sum, inv) => sum + inv.remainingAmount, 0)
             )}
@@ -330,12 +330,12 @@ export default function InvoicesScreen() {
                     <Ionicons
                       name="time-outline"
                       size={14}
-                      color={overdue ? '#F44336' : '#666'}
+                      color={overdue ? '#000000' : '#666'}
                     />
                     <Text
                       style={[
                         styles.dateText,
-                        overdue && { color: '#F44336', fontWeight: '600' },
+                        overdue && { color: '#000000', fontWeight: '600' },
                       ]}
                     >
                       Hạn: {formatDate(new Date(invoice.dueDate).toISOString())}
@@ -386,8 +386,8 @@ export default function InvoicesScreen() {
                       router.push(`/budget/invoice/${invoice.id}?projectId=${projectId}` as Href);
                     }}
                   >
-                    <Ionicons name="eye-outline" size={14} color="#2196F3" />
-                    <Text style={[styles.actionButtonText, { color: '#2196F3' }]}>
+                    <Ionicons name="eye-outline" size={14} color="#0066CC" />
+                    <Text style={[styles.actionButtonText, { color: '#0066CC' }]}>
                       Chi tiết
                     </Text>
                   </TouchableOpacity>
@@ -399,7 +399,7 @@ export default function InvoicesScreen() {
                       handleDeleteInvoice(invoice.id, invoice.invoiceNumber);
                     }}
                   >
-                    <Ionicons name="trash-outline" size={14} color="#F44336" />
+                    <Ionicons name="trash-outline" size={14} color="#000000" />
                   </TouchableOpacity>
                 </View>
               </TouchableOpacity>
@@ -450,14 +450,14 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   filterChipActive: {
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
   },
   filterText: {
     fontSize: 13,
     color: '#666',
   },
   filterTextActive: {
-    color: '#2196F3',
+    color: '#0066CC',
     fontWeight: '600',
   },
   summaryRow: {
@@ -503,7 +503,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     paddingHorizontal: 20,
     paddingVertical: 10,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     borderRadius: 8,
   },
   emptyButtonText: {
@@ -570,12 +570,12 @@ const styles = StyleSheet.create({
   paidAmount: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#4CAF50',
+    color: '#0066CC',
   },
   remainingAmount: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#F44336',
+    color: '#000000',
   },
   datesRow: {
     flexDirection: 'row',
@@ -613,26 +613,26 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   sendButton: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     flex: 1,
     justifyContent: 'center',
   },
   paymentButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#0066CC',
     flex: 1,
     justifyContent: 'center',
   },
   viewButton: {
     backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#2196F3',
+    borderColor: '#0066CC',
     flex: 1,
     justifyContent: 'center',
   },
   deleteButton: {
     backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#F44336',
+    borderColor: '#000000',
     paddingHorizontal: 10,
   },
   actionButtonText: {
@@ -647,7 +647,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 4,

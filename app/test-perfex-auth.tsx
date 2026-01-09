@@ -13,7 +13,7 @@ import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TextInput, Touc
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const COLORS = {
-  primary: '#EE4D2D',
+  primary: '#0066CC',
   success: '#00C853',
   error: '#D32F2F',
   text: '#222',
@@ -177,12 +177,12 @@ export default function TestPerfexAuthScreen() {
               <Text style={styles.errorText}>{statsError}</Text>
             ) : stats ? (
               <View style={styles.statsGrid}>
-                <StatBox label="Dự án" value={stats.totalProjects} color="#2196F3" />
-                <StatBox label="Đang làm" value={stats.activeProjects} color="#4CAF50" />
-                <StatBox label="Hoàn thành" value={stats.completedProjects} color="#9E9E9E" />
-                <StatBox label="Tasks" value={stats.totalTasks} color="#FF9800" />
-                <StatBox label="Hóa đơn" value={stats.totalInvoices} color="#E91E63" />
-                <StatBox label="Báo giá" value={stats.totalEstimates} color="#9C27B0" />
+                <StatBox label="Dự án" value={stats.totalProjects} color="#0066CC" />
+                <StatBox label="Đang làm" value={stats.activeProjects} color="#0080FF" />
+                <StatBox label="Hoàn thành" value={stats.completedProjects} color="#999999" />
+                <StatBox label="Tasks" value={stats.totalTasks} color="#0066CC" />
+                <StatBox label="Hóa đơn" value={stats.totalInvoices} color="#666666" />
+                <StatBox label="Báo giá" value={stats.totalEstimates} color="#999999" />
               </View>
             ) : null}
           </View>
@@ -234,7 +234,7 @@ export default function TestPerfexAuthScreen() {
                 </View>
                 {invoices.slice(0, 5).map((invoice: any) => (
                   <View key={invoice.id} style={styles.listItem}>
-                    <Ionicons name="receipt" size={20} color="#E91E63" />
+                    <Ionicons name="receipt" size={20} color="#666666" />
                     <View style={styles.listItemContent}>
                       <Text style={styles.listItemTitle}>#{invoice.number || invoice.id}</Text>
                       <Text style={styles.listItemSub}>{formatMoney(parseFloat(invoice.total || '0'))}</Text>
@@ -259,7 +259,7 @@ export default function TestPerfexAuthScreen() {
             ) : (
               estimates.slice(0, 5).map((estimate: any) => (
                 <View key={estimate.id} style={styles.listItem}>
-                  <Ionicons name="document-text" size={20} color="#9C27B0" />
+                  <Ionicons name="document-text" size={20} color="#999999" />
                   <View style={styles.listItemContent}>
                     <Text style={styles.listItemTitle}>#{estimate.number || estimate.id}</Text>
                     <Text style={styles.listItemSub}>{formatMoney(parseFloat(estimate.total || '0'))}</Text>
@@ -362,7 +362,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#E8F5E9',
   },
   statusError: {
-    backgroundColor: '#FFEBEE',
+    backgroundColor: '#F5F5F5',
   },
   statusText: {
     fontSize: 14,

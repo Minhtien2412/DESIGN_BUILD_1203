@@ -21,11 +21,11 @@ interface ServiceGridProps {
 
 const defaultServices: ServiceItem[] = [
   { id: '1', title: 'Thiết kế nhà', icon: 'home-outline', route: '/tk-nha', color: '#3b82f6' },
-  { id: '2', title: 'Nội thất', icon: 'bed-outline', route: '/tk-noi-that', color: '#8b5cf6' },
-  { id: '3', title: 'Biệt thự', icon: 'business-outline', route: '/biet-thu', color: '#10b981' },
-  { id: '4', title: 'Khách sạn', icon: 'key-outline', route: '/khach-san', color: '#f59e0b' },
-  { id: '5', title: 'Nhà phố', icon: 'storefront-outline', route: '/nha-pho', color: '#ef4444' },
-  { id: '6', title: 'Văn phòng', icon: 'briefcase-outline', route: '/van-phong', color: '#6366f1' },
+  { id: '2', title: 'Nội thất', icon: 'bed-outline', route: '/tk-noi-that', color: '#666666' },
+  { id: '3', title: 'Biệt thự', icon: 'business-outline', route: '/biet-thu', color: '#0066CC' },
+  { id: '4', title: 'Khách sạn', icon: 'key-outline', route: '/khach-san', color: '#0066CC' },
+  { id: '5', title: 'Nhà phố', icon: 'storefront-outline', route: '/nha-pho', color: '#000000' },
+  { id: '6', title: 'Văn phòng', icon: 'briefcase-outline', route: '/van-phong', color: '#666666' },
   { id: '7', title: 'Thư viện', icon: 'library-outline', route: '/thu-vien', color: '#06b6d4' },
   { id: '8', title: 'Mẫu nhà', icon: 'construct-outline', route: '/mau-nha', color: '#84cc16' },
 ];

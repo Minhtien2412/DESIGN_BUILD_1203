@@ -1,8 +1,10 @@
 import { Colors } from '@/constants/theme';
+import { useUnifiedMessaging } from '@/hooks/crm/useUnifiedMessaging';
 import { Ionicons } from '@expo/vector-icons';
 import { Stack, router } from 'expo-router';
 import { useState } from 'react';
 import {
+    ActivityIndicator,
     Dimensions,
     Image,
     ScrollView,
@@ -79,6 +81,26 @@ export default function HouseDesignScreen() {
   const [selectedLocation, setSelectedLocation] = useState('Tất cả');
   const [selectedPriceRange, setSelectedPriceRange] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
+  const [consultingId, setConsultingId] = useState<number | null>(null);
+  
+  const { getOrCreateConversation } = useUnifiedMessaging();
+  
+  // Handle contact button - navigate to chat
+  const handleContact = async (company: typeof DESIGN_COMPANIES[0]) => {
+    try {
+      setConsultingId(company.id);
+      const conversationId = await getOrCreateConversation({
+        userId: company.id,
+        userName: company.name,
+        userRole: 'HOUSE_DESIGN',
+      });
+      router.push(`/messages/chat/${conversationId}` as `/messages/chat/${string}`);
+    } catch (error) {
+      console.error('Error creating conversation:', error);
+    } finally {
+      setConsultingId(null);
+    }
+  };
 
   const filteredCompanies = DESIGN_COMPANIES.filter((company) => {
     const matchLocation = selectedLocation === 'Tất cả' || company.location === selectedLocation;
@@ -236,8 +258,16 @@ export default function HouseDesignScreen() {
                     <Text style={styles.priceLabel}>Từ</Text>
                     <Text style={styles.priceValue}>{company.startPrice}₫</Text>
                   </View>
-                  <TouchableOpacity style={styles.contactButton}>
-                    <Text style={styles.contactButtonText}>Liên hệ</Text>
+                  <TouchableOpacity 
+                    style={styles.contactButton}
+                    onPress={() => handleContact(company)}
+                    disabled={consultingId === company.id}
+                  >
+                    {consultingId === company.id ? (
+                      <ActivityIndicator size="small" color="#fff" />
+                    ) : (
+                      <Text style={styles.contactButtonText}>Liên hệ</Text>
+                    )}
                   </TouchableOpacity>
                 </View>
               </View>

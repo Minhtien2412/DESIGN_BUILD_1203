@@ -276,7 +276,7 @@ export const COMPACT_STYLES = StyleSheet.create({
   },
   
   busyText: {
-    color: '#dc2626',
+    color: '#000000',
   },
   
   // Section Header - Compact

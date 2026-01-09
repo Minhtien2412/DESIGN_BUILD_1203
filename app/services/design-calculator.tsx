@@ -312,7 +312,7 @@ export default function DesignCalculatorScreen() {
       <Stack.Screen
         options={{
           title: 'Máy tính thiết kế',
-          headerStyle: { backgroundColor: '#ee4d2d' },
+          headerStyle: { backgroundColor: '#0066CC' },
           headerTintColor: '#fff',
           headerTitleStyle: { fontWeight: '600' },
         }}
@@ -320,7 +320,7 @@ export default function DesignCalculatorScreen() {
       <View style={styles.container}>
         {/* Hero */}
         <LinearGradient
-          colors={['#ee4d2d', '#ff6b3d']}
+          colors={['#0066CC', '#3399FF']}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.hero}
@@ -347,7 +347,7 @@ export default function DesignCalculatorScreen() {
                   <Ionicons
                     name={calc.icon as any}
                     size={32}
-                    color={selectedCalculator === calc.id ? '#fff' : '#ee4d2d'}
+                    color={selectedCalculator === calc.id ? '#fff' : '#0066CC'}
                   />
                   <Text
                     style={[
@@ -812,7 +812,7 @@ export default function DesignCalculatorScreen() {
           {/* Tips */}
           <View style={styles.tipsSection}>
             <View style={styles.tipsHeader}>
-              <Ionicons name="bulb" size={20} color="#FFD700" />
+              <Ionicons name="bulb" size={20} color="#FFFFFF" />
               <Text style={styles.tipsTitle}>Mẹo hữu ích</Text>
             </View>
             <View style={styles.tip}>
@@ -901,8 +901,8 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   calculatorCardActive: {
-    backgroundColor: '#ee4d2d',
-    borderColor: '#ee4d2d',
+    backgroundColor: '#0066CC',
+    borderColor: '#0066CC',
   },
   calculatorName: {
     fontSize: 12,
@@ -927,7 +927,7 @@ const styles = StyleSheet.create({
   },
   roomChipActive: {
     backgroundColor: '#fff5f0',
-    borderColor: '#ee4d2d',
+    borderColor: '#0066CC',
   },
   roomChipText: {
     fontSize: 13,
@@ -935,7 +935,7 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   roomChipTextActive: {
-    color: '#ee4d2d',
+    color: '#0066CC',
     fontWeight: '600',
   },
   roomAreaText: {
@@ -984,8 +984,8 @@ const styles = StyleSheet.create({
     borderColor: '#e8e8e8',
   },
   coatButtonActive: {
-    backgroundColor: '#ee4d2d',
-    borderColor: '#ee4d2d',
+    backgroundColor: '#0066CC',
+    borderColor: '#0066CC',
   },
   coatButtonText: {
     fontSize: 14,
@@ -1009,8 +1009,8 @@ const styles = StyleSheet.create({
     borderColor: '#e8e8e8',
   },
   sizeButtonActive: {
-    backgroundColor: '#ee4d2d',
-    borderColor: '#ee4d2d',
+    backgroundColor: '#0066CC',
+    borderColor: '#0066CC',
   },
   sizeButtonText: {
     fontSize: 13,
@@ -1039,13 +1039,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#ee4d2d',
+    backgroundColor: '#0066CC',
     marginHorizontal: 16,
     marginTop: 24,
     paddingVertical: 16,
     borderRadius: 12,
     gap: 8,
-    shadowColor: '#ee4d2d',
+    shadowColor: '#0066CC',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,

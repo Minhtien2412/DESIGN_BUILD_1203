@@ -175,16 +175,16 @@ export function LocationStatusBar({
       {/* Error Message */}
       {error && (
         <View style={styles.errorContainer}>
-          <Ionicons name="alert-circle" size={14} color="#EF4444" />
-          <Text style={[styles.errorText, { color: '#EF4444' }]}>{error}</Text>
+          <Ionicons name="alert-circle" size={14} color="#000000" />
+          <Text style={[styles.errorText, { color: '#000000' }]}>{error}</Text>
         </View>
       )}
 
       {/* Live Indicator */}
       {isTracking && (
         <View style={styles.liveIndicator}>
-          <View style={[styles.liveDot, { backgroundColor: '#10B981' }]} />
-          <Text style={[styles.liveText, { color: '#10B981' }]}>LIVE</Text>
+          <View style={[styles.liveDot, { backgroundColor: '#0066CC' }]} />
+          <Text style={[styles.liveText, { color: '#0066CC' }]}>LIVE</Text>
         </View>
       )}
     </View>

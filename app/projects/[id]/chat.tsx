@@ -1,21 +1,28 @@
 /**
  * Team Chat Screen
  * Real-time team communication with channels
+ * UPDATED: Enhanced keyboard handling & media toolbar
  */
 
 import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import {
+    ActionSheetIOS,
     ActivityIndicator,
     Alert,
+    Animated,
+    Dimensions,
     FlatList,
+    Keyboard,
     KeyboardAvoidingView,
     Platform,
     Pressable,
     ScrollView,
     StyleSheet,
     Text,
+    TouchableWithoutFeedback,
     View
 } from 'react-native';
 
@@ -28,6 +35,8 @@ import { EmojiButton } from '@/components/chat/EmojiButton';
 import { MentionInput, type MentionUser } from '@/components/chat/MentionInput';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import communicationService from '@/services/api/communication.service';
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 interface Channel {
   id: string;
@@ -81,7 +90,63 @@ export default function TeamChatScreen() {
   const [sending, setSending] = useState(false);
   const [channelMembers, setChannelMembers] = useState<MentionUser[]>([]);
   const [attachments, setAttachments] = useState<AttachmentFile[]>([]);
+  const [showMediaToolbar, setShowMediaToolbar] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+  
   const flatListRef = useRef<FlatList>(null);
+  const mediaToolbarAnim = useRef(new Animated.Value(0)).current;
+
+  // Keyboard listeners
+  useEffect(() => {
+    const showListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      (e) => {
+        setKeyboardHeight(e.endCoordinates.height);
+        setIsKeyboardVisible(true);
+        // Hide media toolbar when keyboard shows
+        if (showMediaToolbar) {
+          toggleMediaToolbar(false);
+        }
+      }
+    );
+    const hideListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+      () => {
+        setKeyboardHeight(0);
+        setIsKeyboardVisible(false);
+      }
+    );
+
+    return () => {
+      showListener.remove();
+      hideListener.remove();
+    };
+  }, [showMediaToolbar]);
+
+  // Toggle media toolbar animation
+  const toggleMediaToolbar = (show?: boolean) => {
+    const shouldShow = show !== undefined ? show : !showMediaToolbar;
+    setShowMediaToolbar(shouldShow);
+    
+    if (shouldShow) {
+      Keyboard.dismiss();
+    }
+    
+    Animated.spring(mediaToolbarAnim, {
+      toValue: shouldShow ? 1 : 0,
+      useNativeDriver: true,
+      friction: 8,
+    }).start();
+  };
+
+  // Dismiss keyboard when tap outside
+  const dismissKeyboard = () => {
+    Keyboard.dismiss();
+    if (showMediaToolbar) {
+      toggleMediaToolbar(false);
+    }
+  };
 
   useEffect(() => {
     loadChannels();
@@ -147,6 +212,97 @@ export default function TeamChatScreen() {
       setChannelMembers([]);
     }
   };
+
+  // ========== MEDIA PICKER FUNCTIONS ==========
+  
+  // Pick image from camera
+  const pickFromCamera = async () => {
+    try {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Quyền truy cập', 'Vui lòng cấp quyền truy cập camera');
+        return;
+      }
+
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: true,
+        quality: 0.8,
+        videoMaxDuration: 60,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        const asset = result.assets[0];
+        const newFile: AttachmentFile = {
+          uri: asset.uri,
+          name: asset.fileName || `camera_${Date.now()}.${asset.type === 'video' ? 'mp4' : 'jpg'}`,
+          type: asset.type === 'video' ? 'video/mp4' : 'image/jpeg',
+          size: asset.fileSize || 0,
+        };
+        setAttachments(prev => [...prev, newFile]);
+        toggleMediaToolbar(false);
+      }
+    } catch (error) {
+      console.error('Camera error:', error);
+      Alert.alert('Lỗi', 'Không thể mở camera');
+    }
+  };
+
+  // Pick image from gallery
+  const pickFromGallery = async () => {
+    try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Quyền truy cập', 'Vui lòng cấp quyền truy cập thư viện ảnh');
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsMultipleSelection: true,
+        selectionLimit: 5 - attachments.length,
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets.length > 0) {
+        const newFiles: AttachmentFile[] = result.assets.map(asset => ({
+          uri: asset.uri,
+          name: asset.fileName || `gallery_${Date.now()}.${asset.type === 'video' ? 'mp4' : 'jpg'}`,
+          type: asset.type === 'video' ? 'video/mp4' : 'image/jpeg',
+          size: asset.fileSize || 0,
+        }));
+        setAttachments(prev => [...prev, ...newFiles].slice(0, 5));
+        toggleMediaToolbar(false);
+      }
+    } catch (error) {
+      console.error('Gallery error:', error);
+      Alert.alert('Lỗi', 'Không thể mở thư viện ảnh');
+    }
+  };
+
+  // Show media options (iOS ActionSheet or Android Alert)
+  const showMediaOptions = () => {
+    if (Platform.OS === 'ios') {
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          options: ['Hủy', 'Chụp ảnh', 'Chọn từ thư viện', 'Gửi file'],
+          cancelButtonIndex: 0,
+        },
+        (buttonIndex) => {
+          if (buttonIndex === 1) pickFromCamera();
+          else if (buttonIndex === 2) pickFromGallery();
+          else if (buttonIndex === 3) {
+            // File picker handled by AttachmentPicker component
+            toggleMediaToolbar(false);
+          }
+        }
+      );
+    } else {
+      toggleMediaToolbar();
+    }
+  };
+
+  // ============================================
 
   const loadMessages = async (channelId: string) => {
     try {
@@ -339,7 +495,7 @@ export default function TeamChatScreen() {
               {channel.name}
             </Text>
             {channel.unreadCount > 0 && (
-              <View style={[styles.unreadBadge, { backgroundColor: '#EF4444' }]}>
+              <View style={[styles.unreadBadge, { backgroundColor: '#000000' }]}>
                 <Text style={styles.unreadText}>{channel.unreadCount}</Text>
               </View>
             )}
@@ -347,15 +503,18 @@ export default function TeamChatScreen() {
         ))}
       </ScrollView>
 
-      {/* Messages */}
-      <FlatList
-        ref={flatListRef}
-        data={messages}
-        renderItem={renderMessage}
-        keyExtractor={item => item.id}
-        contentContainerStyle={styles.messageList}
-        showsVerticalScrollIndicator={false}
-      />
+      {/* Messages - Tap to dismiss keyboard */}
+      <TouchableWithoutFeedback onPress={dismissKeyboard}>
+        <FlatList
+          ref={flatListRef}
+          data={messages}
+          renderItem={renderMessage}
+          keyExtractor={item => item.id}
+          contentContainerStyle={styles.messageList}
+          showsVerticalScrollIndicator={false}
+          onScrollBeginDrag={dismissKeyboard}
+        />
+      </TouchableWithoutFeedback>
 
       {/* Message Input */}
       <KeyboardAvoidingView
@@ -372,13 +531,80 @@ export default function TeamChatScreen() {
           />
         )}
 
+        {/* Enhanced Media Toolbar */}
+        <Animated.View 
+          style={[
+            styles.mediaToolbar,
+            { 
+              backgroundColor: surface, 
+              borderTopColor: border,
+              transform: [{
+                translateY: mediaToolbarAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [200, 0],
+                }),
+              }],
+              opacity: mediaToolbarAnim,
+            }
+          ]}
+          pointerEvents={showMediaToolbar ? 'auto' : 'none'}
+        >
+          <View style={styles.mediaToolbarContent}>
+            <Pressable style={styles.mediaOption} onPress={pickFromCamera}>
+              <View style={[styles.mediaIconWrapper, { backgroundColor: '#10B981' }]}>
+                <Ionicons name="camera" size={24} color="#fff" />
+              </View>
+              <Text style={[styles.mediaOptionText, { color: text }]}>Camera</Text>
+            </Pressable>
+            
+            <Pressable style={styles.mediaOption} onPress={pickFromGallery}>
+              <View style={[styles.mediaIconWrapper, { backgroundColor: '#3B82F6' }]}>
+                <Ionicons name="images" size={24} color="#fff" />
+              </View>
+              <Text style={[styles.mediaOptionText, { color: text }]}>Thư viện</Text>
+            </Pressable>
+            
+            <AttachmentPicker
+              onSelect={(files) => {
+                setAttachments(prev => [...prev, ...files].slice(0, 5));
+                toggleMediaToolbar(false);
+              }}
+              maxFiles={5 - attachments.length}
+              renderTrigger={(onPress) => (
+                <Pressable style={styles.mediaOption} onPress={onPress}>
+                  <View style={[styles.mediaIconWrapper, { backgroundColor: '#F59E0B' }]}>
+                    <Ionicons name="document" size={24} color="#fff" />
+                  </View>
+                  <Text style={[styles.mediaOptionText, { color: text }]}>Tài liệu</Text>
+                </Pressable>
+              )}
+            />
+            
+            <Pressable style={styles.mediaOption} onPress={() => {
+              toggleMediaToolbar(false);
+              Alert.alert('Vị trí', 'Tính năng chia sẻ vị trí đang phát triển');
+            }}>
+              <View style={[styles.mediaIconWrapper, { backgroundColor: '#EF4444' }]}>
+                <Ionicons name="location" size={24} color="#fff" />
+              </View>
+              <Text style={[styles.mediaOptionText, { color: text }]}>Vị trí</Text>
+            </Pressable>
+          </View>
+        </Animated.View>
+
         <View style={[styles.inputContainer, { backgroundColor: surface, borderTopColor: border }]}>
-          <AttachmentPicker
-            onSelect={(files) => {
-              setAttachments(prev => [...prev, ...files]);
-            }}
-            maxFiles={5}
-          />
+          {/* Media toggle button */}
+          <Pressable 
+            style={styles.mediaToggleBtn}
+            onPress={() => toggleMediaToolbar()}
+          >
+            <Ionicons 
+              name={showMediaToolbar ? 'close-circle' : 'add-circle'} 
+              size={28} 
+              color={showMediaToolbar ? '#EF4444' : primary} 
+            />
+          </Pressable>
+          
           <MentionInput
             value={messageText}
             onChangeText={setMessageText}
@@ -537,5 +763,43 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  // Media Toolbar Styles
+  mediaToolbar: {
+    position: 'absolute',
+    bottom: 60,
+    left: 0,
+    right: 0,
+    borderTopWidth: 1,
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+  },
+  mediaToolbarContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+  },
+  mediaOption: {
+    alignItems: 'center',
+    gap: 8,
+  },
+  mediaIconWrapper: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  mediaOptionText: {
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  mediaToggleBtn: {
+    padding: 4,
   },
 });

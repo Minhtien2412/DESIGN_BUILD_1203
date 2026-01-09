@@ -1246,10 +1246,10 @@ export function getStatusName(type: 'project' | 'invoice' | 'task' | 'lead', sta
 
 export function getStatusColor(type: 'project' | 'invoice' | 'task' | 'lead', status: string): string {
   const colors: Record<string, Record<string, string>> = {
-    project: { '1': '#6B7280', '2': '#10B981', '3': '#F59E0B', '4': '#3B82F6', '5': '#EF4444' },
-    invoice: { '1': '#F59E0B', '2': '#10B981', '3': '#3B82F6', '4': '#EF4444', '5': '#6B7280', '6': '#EF4444' },
-    task: { '1': '#6B7280', '2': '#3B82F6', '3': '#8B5CF6', '4': '#F59E0B', '5': '#10B981' },
-    lead: { '1': '#3B82F6', '2': '#F59E0B', '3': '#8B5CF6', '4': '#10B981', '5': '#EF4444' },
+    project: { '1': '#6B7280', '2': '#0066CC', '3': '#0066CC', '4': '#3B82F6', '5': '#000000' },
+    invoice: { '1': '#0066CC', '2': '#0066CC', '3': '#3B82F6', '4': '#000000', '5': '#6B7280', '6': '#000000' },
+    task: { '1': '#6B7280', '2': '#3B82F6', '3': '#666666', '4': '#0066CC', '5': '#0066CC' },
+    lead: { '1': '#3B82F6', '2': '#0066CC', '3': '#666666', '4': '#0066CC', '5': '#000000' },
   };
   return colors[type]?.[status] || '#6B7280';
 }

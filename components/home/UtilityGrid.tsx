@@ -22,9 +22,9 @@ interface UtilityGridProps {
 const defaultUtilities: UtilityItem[] = [
   { id: '1', title: 'Điện', icon: 'flash-outline', route: '/dien', color: '#eab308' },
   { id: '2', title: 'Nước', icon: 'water-outline', route: '/nuoc', color: '#3b82f6' },
-  { id: '3', title: 'PCCC', icon: 'flame-outline', route: '/pccc', color: '#dc2626' },
-  { id: '4', title: 'Giám sát', icon: 'eye-outline', route: '/giam-sat', color: '#059669' },
-  { id: '5', title: 'Thợ công', icon: 'people-outline', route: '/tho-cong', color: '#7c3aed' },
+  { id: '3', title: 'PCCC', icon: 'flame-outline', route: '/pccc', color: '#000000' },
+  { id: '4', title: 'Giám sát', icon: 'eye-outline', route: '/giam-sat', color: '#0066CC' },
+  { id: '5', title: 'Thợ công', icon: 'people-outline', route: '/tho-cong', color: '#666666' },
   { id: '6', title: 'Tư vấn', icon: 'chatbubble-outline', route: '/tu-van-cl', color: '#ea580c' },
 ];
 

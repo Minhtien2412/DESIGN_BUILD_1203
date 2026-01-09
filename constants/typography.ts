@@ -37,11 +37,11 @@ export const LineHeight = {
 } as const;
 
 export const FontWeight = {
-  normal: '400',
-  medium: '500',
-  semibold: '600',
-  bold: '700',
-  extrabold: '800',
+  normal: '500',      // Tăng từ 400
+  medium: '600',      // Tăng từ 500
+  semibold: '700',    // Tăng từ 600
+  bold: '800',        // Tăng từ 700
+  extrabold: '900',   // Tăng từ 800
 } as const;
 
 export const LetterSpacing = {
@@ -59,7 +59,7 @@ export const TextVariants = {
   display: {
     fontSize: FontSize['5xl'],
     lineHeight: LineHeight['5xl'],
-    fontWeight: FontWeight.bold,
+    fontWeight: FontWeight.extrabold,  // Tăng từ bold
     letterSpacing: LetterSpacing.tight,
   },
   
@@ -67,37 +67,37 @@ export const TextVariants = {
   h1: {
     fontSize: FontSize['4xl'],
     lineHeight: LineHeight['4xl'],
-    fontWeight: FontWeight.bold,
+    fontWeight: FontWeight.extrabold,  // Tăng từ bold
     letterSpacing: LetterSpacing.tight,
   },
   h2: {
     fontSize: FontSize['3xl'],
     lineHeight: LineHeight['3xl'],
-    fontWeight: FontWeight.bold,
+    fontWeight: FontWeight.bold,       // Giữ bold
     letterSpacing: LetterSpacing.tight,
   },
   h3: {
     fontSize: FontSize['2xl'],
     lineHeight: LineHeight['2xl'],
-    fontWeight: FontWeight.semibold,
+    fontWeight: FontWeight.bold,       // Tăng từ semibold
     letterSpacing: LetterSpacing.normal,
   },
   h4: {
     fontSize: FontSize.xl,
     lineHeight: LineHeight.xl,
-    fontWeight: FontWeight.semibold,
+    fontWeight: FontWeight.bold,       // Tăng từ semibold
     letterSpacing: LetterSpacing.normal,
   },
   h5: {
     fontSize: FontSize.lg,
     lineHeight: LineHeight.lg,
-    fontWeight: FontWeight.semibold,
+    fontWeight: FontWeight.semibold,   // Giữ semibold
     letterSpacing: LetterSpacing.normal,
   },
   h6: {
     fontSize: FontSize.md,
     lineHeight: LineHeight.md,
-    fontWeight: FontWeight.semibold,
+    fontWeight: FontWeight.semibold,   // Giữ semibold
     letterSpacing: LetterSpacing.normal,
   },
   
@@ -105,13 +105,13 @@ export const TextVariants = {
   body1: {
     fontSize: FontSize.md,
     lineHeight: LineHeight.md,
-    fontWeight: FontWeight.normal,
+    fontWeight: FontWeight.medium,     // Tăng từ normal
     letterSpacing: LetterSpacing.normal,
   },
   body2: {
     fontSize: FontSize.base,
     lineHeight: LineHeight.base,
-    fontWeight: FontWeight.normal,
+    fontWeight: FontWeight.medium,     // Tăng từ normal
     letterSpacing: LetterSpacing.normal,
   },
   
@@ -119,13 +119,13 @@ export const TextVariants = {
   caption: {
     fontSize: FontSize.sm,
     lineHeight: LineHeight.sm,
-    fontWeight: FontWeight.normal,
+    fontWeight: FontWeight.medium,     // Tăng từ normal
     letterSpacing: LetterSpacing.wide,
   },
   overline: {
     fontSize: FontSize.xs,
     lineHeight: LineHeight.xs,
-    fontWeight: FontWeight.semibold,
+    fontWeight: FontWeight.bold,       // Tăng từ semibold
     letterSpacing: LetterSpacing.widest,
     textTransform: 'uppercase' as const,
   },
@@ -134,19 +134,19 @@ export const TextVariants = {
   button: {
     fontSize: FontSize.base,
     lineHeight: LineHeight.base,
-    fontWeight: FontWeight.semibold,
+    fontWeight: FontWeight.bold,       // Tăng từ semibold
     letterSpacing: LetterSpacing.wide,
   },
   buttonLarge: {
     fontSize: FontSize.md,
     lineHeight: LineHeight.md,
-    fontWeight: FontWeight.semibold,
+    fontWeight: FontWeight.bold,       // Tăng từ semibold
     letterSpacing: LetterSpacing.wide,
   },
   buttonSmall: {
     fontSize: FontSize.sm,
     lineHeight: LineHeight.sm,
-    fontWeight: FontWeight.semibold,
+    fontWeight: FontWeight.bold,       // Tăng từ semibold
     letterSpacing: LetterSpacing.wide,
   },
 } as const;

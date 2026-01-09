@@ -49,7 +49,7 @@ export function ReviewCard({ review, onHelpful, onReport }: ReviewCardProps) {
             <Text style={styles.userName}>{review.userName}</Text>
             {review.verified && (
               <View style={styles.verifiedBadge}>
-                <Ionicons name="checkmark-circle" size={14} color="#10B981" />
+                <Ionicons name="checkmark-circle" size={14} color="#0066CC" />
                 <Text style={styles.verifiedText}>Đã mua</Text>
               </View>
             )}
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
   },
   verifiedText: {
     fontSize: 11,
-    color: '#10B981',
+    color: '#0066CC',
     marginLeft: 2,
     fontWeight: '500',
   },

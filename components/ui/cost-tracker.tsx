@@ -59,8 +59,8 @@ function BudgetOverview({ totalBudget, totalSpent }: { totalBudget: number; tota
   const isOverBudget = totalSpent > totalBudget;
 
   const getProgressColor = () => {
-    if (isOverBudget) return '#EF4444';
-    if (percentage > 80) return '#F59E0B';
+    if (isOverBudget) return '#000000';
+    if (percentage > 80) return '#0066CC';
     return primary;
   };
 
@@ -74,7 +74,7 @@ function BudgetOverview({ totalBudget, totalSpent }: { totalBudget: number; tota
           </View>
           <View style={{ alignItems: 'flex-end' }}>
             <Text style={[TextVariants.caption, { color: textMuted }]}>Remaining</Text>
-            <Text style={[TextVariants.h2, { color: isOverBudget ? '#EF4444' : '#10B981' }]}>
+            <Text style={[TextVariants.h2, { color: isOverBudget ? '#000000' : '#0066CC' }]}>
               ${Math.abs(remaining).toLocaleString()}
             </Text>
           </View>
@@ -103,8 +103,8 @@ function BudgetOverview({ totalBudget, totalSpent }: { totalBudget: number; tota
 
         {isOverBudget && (
           <View style={[styles.warningBanner, { backgroundColor: '#FEF2F2' }]}>
-            <Ionicons name="warning" size={16} color="#EF4444" />
-            <Text style={[TextVariants.caption, { color: '#DC2626', marginLeft: SpacingSemantic.xs }]}>
+            <Ionicons name="warning" size={16} color="#000000" />
+            <Text style={[TextVariants.caption, { color: '#000000', marginLeft: SpacingSemantic.xs }]}>
               Over budget by ${Math.abs(remaining).toLocaleString()}
             </Text>
           </View>
@@ -167,7 +167,7 @@ function CategoryBreakdown({
                     <Text
                       style={[
                         TextVariants.body1,
-                        { color: isOverBudget ? '#EF4444' : text, fontWeight: '600' },
+                        { color: isOverBudget ? '#000000' : text, fontWeight: '600' },
                       ]}
                     >
                       ${(category.budgeted - category.spent).toLocaleString()}
@@ -185,7 +185,7 @@ function CategoryBreakdown({
                       styles.miniProgressFill,
                       {
                         width: `${Math.min(percentage, 100)}%`,
-                        backgroundColor: isOverBudget ? '#EF4444' : category.color,
+                        backgroundColor: isOverBudget ? '#000000' : category.color,
                       },
                     ]}
                   />
@@ -249,7 +249,7 @@ function RecentTransactions({ transactions }: { transactions: CostItem[] }) {
                   <Ionicons
                     name={transaction.type === 'expense' ? 'arrow-down' : 'arrow-up'}
                     size={16}
-                    color={transaction.type === 'expense' ? '#EF4444' : '#10B981'}
+                    color={transaction.type === 'expense' ? '#000000' : '#0066CC'}
                   />
                 </View>
                 <View style={{ flex: 1 }}>
@@ -265,7 +265,7 @@ function RecentTransactions({ transactions }: { transactions: CostItem[] }) {
                     style={[
                       TextVariants.body1,
                       {
-                        color: transaction.type === 'expense' ? '#EF4444' : '#10B981',
+                        color: transaction.type === 'expense' ? '#000000' : '#0066CC',
                         fontWeight: '600',
                       },
                     ]}

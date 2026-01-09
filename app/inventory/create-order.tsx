@@ -252,7 +252,7 @@ export default function CreateOrderScreen() {
               Vật tư <Text style={styles.required}>*</Text>
             </Text>
             <TouchableOpacity style={styles.addButton} onPress={addItem}>
-              <Ionicons name="add-circle-outline" size={20} color="#2196F3" />
+              <Ionicons name="add-circle-outline" size={20} color="#0066CC" />
               <Text style={styles.addButtonText}>Thêm vật tư</Text>
             </TouchableOpacity>
           </View>
@@ -262,7 +262,7 @@ export default function CreateOrderScreen() {
               <View style={styles.itemHeader}>
                 <Text style={styles.itemNumber}>Vật tư {index + 1}</Text>
                 <TouchableOpacity onPress={() => removeItem(index)}>
-                  <Ionicons name="trash-outline" size={20} color="#F44336" />
+                  <Ionicons name="trash-outline" size={20} color="#000000" />
                 </TouchableOpacity>
               </View>
 
@@ -452,7 +452,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   required: {
-    color: '#F44336',
+    color: '#000000',
   },
   chipContainer: {
     flexGrow: 0,
@@ -467,15 +467,15 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
   },
   supplierChipActive: {
-    backgroundColor: '#E3F2FD',
-    borderColor: '#2196F3',
+    backgroundColor: '#E8F4FF',
+    borderColor: '#0066CC',
   },
   supplierChipText: {
     fontSize: 14,
     color: '#666',
   },
   supplierChipTextActive: {
-    color: '#2196F3',
+    color: '#0066CC',
     fontWeight: '600',
   },
   dateButton: {
@@ -499,7 +499,7 @@ const styles = StyleSheet.create({
   },
   addButtonText: {
     fontSize: 14,
-    color: '#2196F3',
+    color: '#0066CC',
     fontWeight: '600',
   },
   itemCard: {
@@ -542,15 +542,15 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
   },
   materialChipActive: {
-    backgroundColor: '#E3F2FD',
-    borderColor: '#2196F3',
+    backgroundColor: '#E8F4FF',
+    borderColor: '#0066CC',
   },
   materialChipText: {
     fontSize: 13,
     color: '#666',
   },
   materialChipTextActive: {
-    color: '#2196F3',
+    color: '#0066CC',
     fontWeight: '600',
   },
   row: {
@@ -592,7 +592,7 @@ const styles = StyleSheet.create({
   amountValue: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#2196F3',
+    color: '#0066CC',
   },
   calcRow: {
     flexDirection: 'row',
@@ -622,7 +622,7 @@ const styles = StyleSheet.create({
   totalValue: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#2196F3',
+    color: '#0066CC',
   },
   footer: {
     flexDirection: 'row',
@@ -649,7 +649,7 @@ const styles = StyleSheet.create({
     flex: 2,
     paddingVertical: 14,
     borderRadius: 8,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     alignItems: 'center',
   },
   saveButtonDisabled: {

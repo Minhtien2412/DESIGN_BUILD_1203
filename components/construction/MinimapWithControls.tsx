@@ -132,7 +132,7 @@ export default function MinimapWithControls({ floors, projectName, onAreaPress, 
       id: 'plan',
       icon: 'calendar',
       label: 'Kế hoạch',
-      color: '#8B5CF6',
+      color: '#666666',
       onPress: () => {
         setShowQuickActions(false);
         setShowPlanningModal(true);
@@ -156,7 +156,7 @@ export default function MinimapWithControls({ floors, projectName, onAreaPress, 
       id: 'add-floor',
       icon: 'layers',
       label: 'Thêm tầng',
-      color: '#10B981',
+      color: '#0066CC',
       onPress: () => {
         setShowFABMenu(false);
         // Handle add floor
@@ -166,7 +166,7 @@ export default function MinimapWithControls({ floors, projectName, onAreaPress, 
       id: 'planning',
       icon: 'calendar-outline',
       label: 'Lập kế hoạch',
-      color: '#8B5CF6',
+      color: '#666666',
       onPress: () => {
         setShowFABMenu(false);
         setShowPlanningModal(true);
@@ -176,7 +176,7 @@ export default function MinimapWithControls({ floors, projectName, onAreaPress, 
       id: 'export',
       icon: 'download-outline',
       label: 'Xuất báo cáo',
-      color: '#F59E0B',
+      color: '#0066CC',
       onPress: () => {
         setShowFABMenu(false);
         // Handle export

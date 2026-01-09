@@ -247,45 +247,45 @@ export const STATUS_CONFIG: Record<ProgressStatus, {
   [ProgressStatus.PENDING]: {
     label: 'Pending',
     labelVi: 'Chưa bắt đầu',
-    color: '#9E9E9E',
+    color: '#999999',
     bgColor: '#F5F5F5',
     icon: 'time-outline',
   },
   [ProgressStatus.IN_PROGRESS]: {
     label: 'In Progress',
     labelVi: 'Đang thực hiện',
-    color: '#FF9800',
-    bgColor: '#FFF3E0',
+    color: '#0066CC',
+    bgColor: '#E8F4FF',
     icon: 'construct-outline',
   },
   [ProgressStatus.COMPLETED]: {
     label: 'Completed',
     labelVi: 'Hoàn thành',
-    color: '#4CAF50',
+    color: '#0066CC',
     bgColor: '#E8F5E9',
     icon: 'checkmark-circle-outline',
   },
   [ProgressStatus.DELAYED]: {
     label: 'Delayed',
     labelVi: 'Trễ tiến độ',
-    color: '#F44336',
+    color: '#000000',
     bgColor: '#FFEBEE',
     icon: 'alert-circle-outline',
   },
   [ProgressStatus.ON_HOLD]: {
     label: 'On Hold',
     labelVi: 'Tạm dừng',
-    color: '#9C27B0',
+    color: '#999999',
     bgColor: '#F3E5F5',
     icon: 'pause-circle-outline',
   },
 };
 
 export const PRIORITY_CONFIG = {
-  low: { label: 'Thấp', color: '#9E9E9E', icon: 'arrow-down' },
-  medium: { label: 'Trung bình', color: '#2196F3', icon: 'remove' },
-  high: { label: 'Cao', color: '#FF9800', icon: 'arrow-up' },
-  critical: { label: 'Khẩn cấp', color: '#F44336', icon: 'alert' },
+  low: { label: 'Thấp', color: '#999999', icon: 'arrow-down' },
+  medium: { label: 'Trung bình', color: '#0066CC', icon: 'remove' },
+  high: { label: 'Cao', color: '#0066CC', icon: 'arrow-up' },
+  critical: { label: 'Khẩn cấp', color: '#000000', icon: 'alert' },
 };
 
 export const ROLE_PERMISSIONS: Record<UserRole, {

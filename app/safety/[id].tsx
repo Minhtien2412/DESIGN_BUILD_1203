@@ -51,9 +51,9 @@ export default function SafetyDetailScreen() {
   const getSeverityColor = (severity: IncidentSeverity) => {
     switch (severity) {
       case 'FATAL': return '#7f1d1d';
-      case 'CRITICAL': return '#dc2626';
+      case 'CRITICAL': return '#000000';
       case 'SERIOUS': return '#ea580c';
-      case 'MODERATE': return '#f59e0b';
+      case 'MODERATE': return '#0066CC';
       case 'MINOR': return '#3b82f6';
       default: return textMutedColor;
     }
@@ -61,11 +61,11 @@ export default function SafetyDetailScreen() {
 
   const getStatusColor = (status: IncidentStatus) => {
     switch (status) {
-      case 'RESOLVED': return '#22c55e';
-      case 'INVESTIGATING': return '#f59e0b';
+      case 'RESOLVED': return '#0066CC';
+      case 'INVESTIGATING': return '#0066CC';
       case 'UNDER_REVIEW': return '#3b82f6';
       case 'REPORTED': return '#6b7280';
-      case 'CLOSED': return '#10b981';
+      case 'CLOSED': return '#0066CC';
       default: return textMutedColor;
     }
   };
@@ -103,17 +103,17 @@ export default function SafetyDetailScreen() {
 
           {/* Critical Alerts */}
           {incident.injuredPerson && (
-            <View style={[styles.alertBanner, { backgroundColor: '#fee2e2', borderColor: '#dc2626' }]}>
-              <Ionicons name="medical" size={16} color="#dc2626" />
-              <ThemedText style={{ color: '#dc2626', marginLeft: 8, fontWeight: '600' }}>
+            <View style={[styles.alertBanner, { backgroundColor: '#fee2e2', borderColor: '#000000' }]}>
+              <Ionicons name="medical" size={16} color="#000000" />
+              <ThemedText style={{ color: '#000000', marginLeft: 8, fontWeight: '600' }}>
                 Injury Reported - {incident.injuredPerson.name} ({incident.injuredPerson.role})
               </ThemedText>
             </View>
           )}
           {incident.regulatoryReported && (
-            <View style={[styles.alertBanner, { backgroundColor: '#fef3c7', borderColor: '#f59e0b', marginTop: 8 }]}>
-              <Ionicons name="alert-circle" size={16} color="#f59e0b" />
-              <ThemedText style={{ color: '#f59e0b', marginLeft: 8, fontWeight: '600' }}>
+            <View style={[styles.alertBanner, { backgroundColor: '#fef3c7', borderColor: '#0066CC', marginTop: 8 }]}>
+              <Ionicons name="alert-circle" size={16} color="#0066CC" />
+              <ThemedText style={{ color: '#0066CC', marginLeft: 8, fontWeight: '600' }}>
                 Reportable to Authority
               </ThemedText>
             </View>
@@ -209,7 +209,7 @@ export default function SafetyDetailScreen() {
               <Section title="Injury Details">
                 <View style={[styles.infoCard, { backgroundColor: surfaceColor, borderColor }]}>
                   <View style={styles.injuryHeader}>
-                    <Ionicons name="medical" size={24} color="#dc2626" />
+                    <Ionicons name="medical" size={24} color="#000000" />
                     <View style={styles.injuryInfo}>
                       <ThemedText type="subtitle">{incident.injuredPerson.name}</ThemedText>
                       <ThemedText style={{ color: textMutedColor }}>
@@ -231,9 +231,9 @@ export default function SafetyDetailScreen() {
                     </View>
                   )}
                   {incident.medicalTreatment && (
-                    <View style={[styles.alertBox, { backgroundColor: '#fee2e2', borderColor: '#dc2626', marginTop: 12 }]}>
-                      <Ionicons name="warning" size={16} color="#dc2626" />
-                      <ThemedText style={{ color: '#dc2626', marginLeft: 6 }}>
+                    <View style={[styles.alertBox, { backgroundColor: '#fee2e2', borderColor: '#000000', marginTop: 12 }]}>
+                      <Ionicons name="warning" size={16} color="#000000" />
+                      <ThemedText style={{ color: '#000000', marginLeft: 6 }}>
                         Medical treatment required
                       </ThemedText>
                     </View>
@@ -386,8 +386,8 @@ export default function SafetyDetailScreen() {
                 {incident.preventiveMeasures.map((measure, index) => (
                   <View key={index} style={[styles.actionCard, { backgroundColor: surfaceColor, borderColor }]}>
                     <View style={styles.actionHeader}>
-                      <View style={[styles.actionStatusBadge, { backgroundColor: '#22c55e20' }]}>  
-                        <ThemedText style={{ color: '#22c55e', fontWeight: '600' }}>
+                      <View style={[styles.actionStatusBadge, { backgroundColor: '#0066CC20' }]}>  
+                        <ThemedText style={{ color: '#0066CC', fontWeight: '600' }}>
                           Measure #{index + 1}
                         </ThemedText>
                       </View>

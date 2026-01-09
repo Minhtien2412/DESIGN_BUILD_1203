@@ -1,91 +1,25 @@
 import Badge from '@/components/ui/badge';
 import Tabs from '@/components/ui/tabs';
+import PortfolioDocsService, {
+    type SpecItem,
+    type SpecificationGroup,
+    MOCK_SPECS,
+} from '@/services/portfolioDocsService';
 import { Stack } from 'expo-router';
 import * as React from 'react';
 import {
+    ActivityIndicator,
+    RefreshControl,
     ScrollView,
     StyleSheet,
     Text,
     View,
 } from 'react-native';
 
-type SpecItem = {
-  category: string;
-  item: string;
-  specification: string;
-  standard: string;
-  note?: string;
-};
-
-const MOCK_SPECS: { [key: string]: SpecItem[] } = {
-  'Kết cấu': [
-    {
-      category: 'Móng',
-      item: 'Bê tông móng',
-      specification: 'Bê tông M250',
-      standard: 'TCVN 3118:2021',
-      note: 'Sử dụng xi măng PCB40',
-    },
-    {
-      category: 'Cột',
-      item: 'Bê tông cột',
-      specification: 'Bê tông M300',
-      standard: 'TCVN 3118:2021',
-    },
-    {
-      category: 'Dầm',
-      item: 'Bê tông dầm',
-      specification: 'Bê tông M300',
-      standard: 'TCVN 3118:2021',
-    },
-  ],
-  'Hoàn thiện': [
-    {
-      category: 'Sàn',
-      item: 'Gạch lát sàn',
-      specification: 'Gạch granite 60x60cm',
-      standard: 'TCVN 6855:2016',
-      note: 'Màu kem, chống trơn',
-    },
-    {
-      category: 'Tường',
-      item: 'Sơn tường',
-      specification: 'Sơn Dulux nội thất cao cấp',
-      standard: 'ISO 9001:2015',
-      note: 'Màu trắng sữa',
-    },
-    {
-      category: 'Trần',
-      item: 'Trần thạch cao',
-      specification: 'Tấm Gyproc 12mm',
-      standard: 'TCVN 7398:2017',
-    },
-  ],
-  'Điện nước': [
-    {
-      category: 'Điện',
-      item: 'Dây dẫn điện',
-      specification: 'Dây Cadivi 2x2.5mm²',
-      standard: 'TCVN 6610:2013',
-    },
-    {
-      category: 'Nước',
-      item: 'Ống cấp nước',
-      specification: 'Ống PPR Tiền Phong Φ21',
-      standard: 'TCVN 6151:2009',
-    },
-    {
-      category: 'Thiết bị vệ sinh',
-      item: 'Bồn cầu',
-      specification: 'TOTO CW818W',
-      standard: 'ISO 9001',
-      note: 'Xả nhấn, tiết kiệm nước',
-    },
-  ],
-};
+// Types imported from portfolioDocsService
 
 const TabContent = ({ specs }: { specs: SpecItem[] }) => (
-  <ScrollView style={styles.tabContent}>
+  <View>
     {specs.map((spec, index) => (
       <View key={index} style={styles.specCard}>
         <View style={styles.specHeader}>
@@ -112,11 +46,41 @@ const TabContent = ({ specs }: { specs: SpecItem[] }) => (
         )}
       </View>
     ))}
-  </ScrollView>
+  </View>
 );
 
 export default function SpecScreen() {
   const [activeTab, setActiveTab] = React.useState('structure');
+  const [specs, setSpecs] = React.useState<SpecificationGroup>(MOCK_SPECS); // Start with mock
+  const [loading, setLoading] = React.useState(false); // Don't block
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  const fetchSpecs = React.useCallback(async () => {
+    try {
+      const data = await PortfolioDocsService.getSpecifications();
+      if (Object.keys(data).length > 0) {
+        setSpecs(data);
+      }
+    } catch (err) {
+      console.warn('Error fetching specs, using mock data:', err);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    // Fetch in background
+    const timer = setTimeout(() => {
+      fetchSpecs();
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [fetchSpecs]);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    fetchSpecs(true);
+  }, [fetchSpecs]);
 
   const tabs = [
     { key: 'structure', label: 'Kết cấu' },
@@ -140,9 +104,22 @@ export default function SpecScreen() {
           onChange={setActiveTab}
         />
         
-        {activeTab === 'structure' && <TabContent specs={MOCK_SPECS['Kết cấu']} />}
-        {activeTab === 'finishing' && <TabContent specs={MOCK_SPECS['Hoàn thiện']} />}
-        {activeTab === 'mep' && <TabContent specs={MOCK_SPECS['Điện nước']} />}
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#0066CC" />
+          </View>
+        ) : (
+          <ScrollView
+            style={styles.tabContent}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+          >
+            {activeTab === 'structure' && <TabContent specs={specs['Kết cấu'] || []} />}
+            {activeTab === 'finishing' && <TabContent specs={specs['Hoàn thiện'] || []} />}
+            {activeTab === 'mep' && <TabContent specs={specs['Điện nước'] || []} />}
+          </ScrollView>
+        )}
       </View>
     </>
   );
@@ -152,6 +129,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F9FAFB',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   tabContent: {
     flex: 1,
@@ -201,7 +183,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FEF3C7',
     borderRadius: 8,
     borderLeftWidth: 3,
-    borderLeftColor: '#F59E0B',
+    borderLeftColor: '#0066CC',
   },
   noteText: {
     fontSize: 13,

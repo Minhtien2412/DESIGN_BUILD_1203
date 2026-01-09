@@ -111,7 +111,7 @@ export default function VideoCallExampleScreen() {
           Meeting invites appear as notifications. Tapping them automatically joins the call.
         </Text>
         <View style={styles.notificationBadge}>
-          <Ionicons name="notifications" size={24} color="#EE4D2D" />
+          <Ionicons name="notifications" size={24} color="#0066CC" />
           {unreadCount > 0 && (
             <View style={styles.badge}>
               <Text style={styles.badgeText}>{unreadCount}</Text>
@@ -138,7 +138,7 @@ export default function VideoCallExampleScreen() {
               // This is just for UI demonstration
             }}
           >
-            <Ionicons name="videocam" size={24} color="#EE4D2D" />
+            <Ionicons name="videocam" size={24} color="#0066CC" />
             <View style={styles.meetingInfo}>
               <Text style={styles.meetingTitle}>{notification.title}</Text>
               <Text style={styles.meetingBody}>{notification.body}</Text>
@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -4,
     right: -4,
-    backgroundColor: '#EE4D2D',
+    backgroundColor: '#0066CC',
     borderRadius: 10,
     paddingHorizontal: 6,
     paddingVertical: 2,
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF9E6',
     borderRadius: 12,
     borderLeftWidth: 4,
-    borderLeftColor: '#EE4D2D',
+    borderLeftColor: '#0066CC',
   },
   notesTitle: {
     fontSize: 16,

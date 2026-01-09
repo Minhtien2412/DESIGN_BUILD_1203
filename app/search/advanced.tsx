@@ -181,7 +181,7 @@ export default function SearchScreen() {
                   style={styles.tag}
                   onPress={() => handlePopularPress(item)}
                 >
-                  <Ionicons name="trending-up" size={16} color="#FF6B35" />
+                  <Ionicons name="trending-up" size={16} color="#0066CC" />
                   <Text style={styles.tagText}>{item}</Text>
                 </TouchableOpacity>
               ))}
@@ -206,7 +206,7 @@ export default function SearchScreen() {
                   onPress={() => handlePopularPress(cat.name)}
                 >
                   <View style={styles.categoryIcon}>
-                    <Ionicons name={cat.icon as any} size={24} color="#FF6B35" />
+                    <Ionicons name={cat.icon as any} size={24} color="#0066CC" />
                   </View>
                   <Text style={styles.categoryName}>{cat.name}</Text>
                 </TouchableOpacity>
@@ -305,7 +305,7 @@ const styles = StyleSheet.create({
   },
   clearText: {
     fontSize: 13,
-    color: '#FF6B35',
+    color: '#0066CC',
   },
   tagContainer: {
     flexDirection: 'row',

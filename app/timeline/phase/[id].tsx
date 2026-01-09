@@ -1,10 +1,13 @@
 /**
  * Timeline - Phase Detail
  */
+import { Loader } from '@/components/ui/loader';
+import { MOCK_PHASE, Phase, PhaseService } from '@/services/phaseService';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
+    RefreshControl,
     ScrollView,
     StyleSheet,
     Text,
@@ -13,31 +16,53 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-const MOCK_PHASE = {
-  id: '1',
-  name: 'Giai đoạn 1: Thiết kế',
-  description: 'Hoàn thành toàn bộ hồ sơ thiết kế',
-  startDate: '2024-01-01',
-  endDate: '2024-02-15',
-  progress: 65,
-  status: 'in_progress',
-  tasks: [
-    { id: '1', title: 'Thiết kế kiến trúc', progress: 100, status: 'completed' },
-    { id: '2', title: 'Thiết kế kết cấu', progress: 80, status: 'in_progress' },
-    { id: '3', title: 'Thiết kế MEP', progress: 50, status: 'in_progress' },
-    { id: '4', title: 'Dự toán chi phí', progress: 20, status: 'pending' },
-  ],
-};
+const FALLBACK_PHASE = MOCK_PHASE;
 
 export default function PhaseDetailScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const [phase] = useState(MOCK_PHASE);
+  const [phase, setPhase] = useState<Phase>(FALLBACK_PHASE);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [dataSource, setDataSource] = useState<'api' | 'mock'>('mock');
+
+  const fetchPhase = useCallback(async (isRefresh = false) => {
+    if (!id) return;
+    
+    if (isRefresh) setRefreshing(true);
+    else setLoading(true);
+    
+    try {
+      const data = await PhaseService.getPhaseById(id);
+      if (data) {
+        setPhase(data);
+        setDataSource('api');
+      } else {
+        setPhase(FALLBACK_PHASE);
+        setDataSource('mock');
+      }
+    } catch (error) {
+      console.error('Error fetching phase:', error);
+      setPhase(FALLBACK_PHASE);
+      setDataSource('mock');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    fetchPhase();
+  }, [fetchPhase]);
+
+  const onRefresh = useCallback(() => {
+    fetchPhase(true);
+  }, [fetchPhase]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed': return '#22c55e';
-      case 'in_progress': return '#f59e0b';
+      case 'completed': return '#0066CC';
+      case 'in_progress': return '#0066CC';
       case 'pending': return '#6b7280';
       default: return '#6b7280';
     }
@@ -84,7 +109,24 @@ export default function PhaseDetailScreen() {
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      {loading ? (
+        <Loader text="Đang tải giai đoạn..." />
+      ) : (
+      <ScrollView 
+        style={styles.content} 
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        {/* Data Source Indicator */}
+        {dataSource === 'mock' && (
+          <View style={styles.mockBanner}>
+            <Ionicons name="information-circle" size={16} color="#92400E" />
+            <Text style={styles.mockBannerText}>📋 Dữ liệu mẫu</Text>
+          </View>
+        )}
+
         {/* Phase Info */}
         <View style={styles.card}>
           <Text style={styles.phaseName}>{phase.name}</Text>
@@ -121,7 +163,7 @@ export default function PhaseDetailScreen() {
             <Text style={styles.statLabel}>Hoàn thành</Text>
           </View>
           <View style={styles.statCard}>
-            <Text style={[styles.statValue, { color: '#f59e0b' }]}>{phase.tasks.filter(t => t.status === 'in_progress').length}</Text>
+            <Text style={[styles.statValue, { color: '#0066CC' }]}>{phase.tasks.filter(t => t.status === 'in_progress').length}</Text>
             <Text style={styles.statLabel}>Đang làm</Text>
           </View>
           <View style={styles.statCard}>
@@ -135,7 +177,7 @@ export default function PhaseDetailScreen() {
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Công việc ({phase.tasks.length})</Text>
             <TouchableOpacity>
-              <Ionicons name="add-circle" size={24} color="#EE4D2D" />
+              <Ionicons name="add-circle" size={24} color="#0066CC" />
             </TouchableOpacity>
           </View>
           
@@ -148,12 +190,23 @@ export default function PhaseDetailScreen() {
 
         <View style={{ height: 40 }} />
       </ScrollView>
+      )}
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f5f5f5' },
+  mockBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FEF3C7',
+    padding: 8,
+    borderRadius: 8,
+    marginBottom: 12,
+    gap: 8,
+  },
+  mockBannerText: { fontSize: 12, color: '#92400E' },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -185,10 +238,10 @@ const styles = StyleSheet.create({
   progressLabel: { fontSize: 13, color: '#666' },
   progressValue: { fontSize: 18, fontWeight: '700', color: '#000' },
   progressBar: { height: 10, backgroundColor: '#e0e0e0', borderRadius: 5, overflow: 'hidden' },
-  progressFill: { height: '100%', backgroundColor: '#EE4D2D', borderRadius: 5 },
+  progressFill: { height: '100%', backgroundColor: '#0066CC', borderRadius: 5 },
   statsRow: { flexDirection: 'row', gap: 12, marginBottom: 12 },
   statCard: { flex: 1, backgroundColor: '#fff', borderRadius: 12, padding: 16, alignItems: 'center' },
-  statValue: { fontSize: 24, fontWeight: '700', color: '#22c55e' },
+  statValue: { fontSize: 24, fontWeight: '700', color: '#0066CC' },
   statLabel: { fontSize: 12, color: '#666', marginTop: 4 },
   section: { backgroundColor: '#fff', borderRadius: 16, padding: 16, marginBottom: 12 },
   sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },

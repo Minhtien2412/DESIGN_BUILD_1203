@@ -194,7 +194,7 @@ function AlertCard({ alert, onAcknowledge, onDismiss }: AlertCardProps) {
       {/* Instruction */}
       {alert.instruction && (
         <View style={styles.instructionBox}>
-          <Ionicons name="information-circle" size={16} color="#2196F3" />
+          <Ionicons name="information-circle" size={16} color="#0066CC" />
           <Text style={styles.instructionText}>{alert.instruction}</Text>
         </View>
       )}
@@ -241,7 +241,7 @@ function AlertCard({ alert, onAcknowledge, onDismiss }: AlertCardProps) {
             <Text style={styles.acknowledgeText}>Xác nhận</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.dismissButton} onPress={onDismiss}>
-            <Ionicons name="close" size={16} color="#F44336" />
+            <Ionicons name="close" size={16} color="#000000" />
             <Text style={styles.dismissText}>Bỏ qua</Text>
           </TouchableOpacity>
         </View>
@@ -256,13 +256,13 @@ function getSeverityColor(severity: WeatherAlertSeverity): string {
     case WeatherAlertSeverity.EXTREME:
       return '#B71C1C';
     case WeatherAlertSeverity.SEVERE:
-      return '#F44336';
+      return '#000000';
     case WeatherAlertSeverity.MODERATE:
-      return '#FF9800';
+      return '#0066CC';
     case WeatherAlertSeverity.MINOR:
       return '#FDD835';
     default:
-      return '#9E9E9E';
+      return '#999999';
   }
 }
 
@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   filterTabActive: {
-    backgroundColor: '#FF9800',
+    backgroundColor: '#0066CC',
   },
   filterTabText: {
     fontSize: 13,
@@ -394,7 +394,7 @@ const styles = StyleSheet.create({
   },
   instructionBox: {
     flexDirection: 'row',
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
     padding: 12,
     borderRadius: 8,
     gap: 8,
@@ -454,7 +454,7 @@ const styles = StyleSheet.create({
   acknowledgeButton: {
     flex: 1,
     flexDirection: 'row',
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#0080FF',
     paddingVertical: 10,
     paddingHorizontal: 16,
     borderRadius: 8,
@@ -478,10 +478,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 6,
     borderWidth: 1,
-    borderColor: '#F44336',
+    borderColor: '#000000',
   },
   dismissText: {
-    color: '#F44336',
+    color: '#000000',
     fontSize: 14,
     fontWeight: 'bold',
   },

@@ -45,7 +45,7 @@ export function ContactActionButtons({
         onPress={() => makePhoneCall(phoneNumber)}
         activeOpacity={0.7}
       >
-        <Ionicons name="call-outline" size={currentSize.iconSize} color="#EE4D2D" />
+        <Ionicons name="call-outline" size={currentSize.iconSize} color="#0066CC" />
         <Text style={[styles.callButtonText, { fontSize: currentSize.fontSize }]}>
           Gọi điện
         </Text>
@@ -82,17 +82,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#EE4D2D',
+    borderColor: '#0066CC',
     gap: 4,
   },
   callButtonText: {
     fontWeight: '600',
-    color: '#EE4D2D',
+    color: '#0066CC',
   },
   contactButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#EE4D2D',
+    backgroundColor: '#0066CC',
     borderRadius: 8,
     gap: 4,
   },

@@ -51,15 +51,15 @@ export default function OMManualListScreen() {
       case 'DRAFT':
         return '#9CA3AF';
       case 'IN_REVIEW':
-        return '#F59E0B';
+        return '#0080FF';
       case 'APPROVED':
-        return '#10B981';
+        return '#0066CC';
       case 'SUBMITTED':
-        return '#3B82F6';
+        return '#0080FF';
       case 'REJECTED':
-        return '#EF4444';
+        return '#000000';
       case 'COMPLETED':
-        return '#10B981';
+        return '#0066CC';
       default:
         return '#6B7280';
     }
@@ -68,22 +68,22 @@ export default function OMManualListScreen() {
   const renderStats = () => (
     <View style={[styles.statsContainer, { backgroundColor: surfaceColor }]}>
       <View style={styles.statItem}>
-        <Ionicons name="folder-outline" size={24} color="#3B82F6" />
+        <Ionicons name="folder-outline" size={24} color="#0080FF" />
         <Text style={[styles.statValue, { color: textColor }]}>{packages.length}</Text>
         <Text style={[styles.statLabel, { color: textMutedColor }]}>Packages</Text>
       </View>
       <View style={styles.statItem}>
-        <Ionicons name="cube-outline" size={24} color="#F59E0B" />
+        <Ionicons name="cube-outline" size={24} color="#0080FF" />
         <Text style={[styles.statValue, { color: textColor }]}>{totalEquipment}</Text>
         <Text style={[styles.statLabel, { color: textMutedColor }]}>Equipment</Text>
       </View>
       <View style={styles.statItem}>
-        <Ionicons name="document-text-outline" size={24} color="#8B5CF6" />
+        <Ionicons name="document-text-outline" size={24} color="#0066CC" />
         <Text style={[styles.statValue, { color: textColor }]}>{totalDocuments}</Text>
         <Text style={[styles.statLabel, { color: textMutedColor }]}>Documents</Text>
       </View>
       <View style={styles.statItem}>
-        <Ionicons name="checkmark-circle-outline" size={24} color="#10B981" />
+        <Ionicons name="checkmark-circle-outline" size={24} color="#0066CC" />
         <Text style={[styles.statValue, { color: textColor }]}>{completedPackages}</Text>
         <Text style={[styles.statLabel, { color: textMutedColor }]}>Completed</Text>
       </View>
@@ -169,19 +169,19 @@ export default function OMManualListScreen() {
 
         <View style={styles.statsRow}>
           <View style={styles.statBox}>
-            <Text style={[styles.statBoxValue, { color: '#3B82F6' }]}>
+            <Text style={[styles.statBoxValue, { color: '#0080FF' }]}>
               {pkg.totalEquipment || 0}
             </Text>
             <Text style={[styles.statBoxLabel, { color: textMutedColor }]}>Equipment</Text>
           </View>
           <View style={styles.statBox}>
-            <Text style={[styles.statBoxValue, { color: '#8B5CF6' }]}>
+            <Text style={[styles.statBoxValue, { color: '#0066CC' }]}>
               {pkg.totalDocuments || 0}
             </Text>
             <Text style={[styles.statBoxLabel, { color: textMutedColor }]}>Documents</Text>
           </View>
           <View style={styles.statBox}>
-            <Text style={[styles.statBoxValue, { color: '#10B981' }]}>
+            <Text style={[styles.statBoxValue, { color: '#0066CC' }]}>
               {completionRate}%
             </Text>
             <Text style={[styles.statBoxLabel, { color: textMutedColor }]}>Complete</Text>
@@ -201,8 +201,8 @@ export default function OMManualListScreen() {
           </View>
           {pkg.trainingRequired && (
             <View style={styles.trainingBadge}>
-              <Ionicons name="school-outline" size={14} color="#8B5CF6" />
-              <Text style={[styles.trainingText, { color: '#8B5CF6' }]}>
+              <Ionicons name="school-outline" size={14} color="#0066CC" />
+              <Text style={[styles.trainingText, { color: '#0066CC' }]}>
                 Training Required
               </Text>
             </View>

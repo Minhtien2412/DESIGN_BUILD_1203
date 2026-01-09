@@ -33,7 +33,7 @@ export default function IncidentDetailScreen() {
   if (error || !incident) {
     return (
       <View style={styles.errorContainer}>
-        <Ionicons name="alert-circle" size={64} color="#F44336" />
+        <Ionicons name="alert-circle" size={64} color="#000000" />
         <Text style={styles.errorText}>Không thể tải thông tin sự cố</Text>
       </View>
     );
@@ -52,7 +52,7 @@ export default function IncidentDetailScreen() {
                 router.push(`/safety/incidents/edit?id=${incident.id}`)
               }
             >
-              <Ionicons name="create" size={24} color="#2196F3" style={{ marginRight: 8 }} />
+              <Ionicons name="create" size={24} color="#0066CC" style={{ marginRight: 8 }} />
             </TouchableOpacity>
           ),
         }}
@@ -103,7 +103,7 @@ export default function IncidentDetailScreen() {
             <Text style={styles.sectionTitle}>Người bị thương</Text>
             <View style={styles.injuredCard}>
               <View style={styles.injuredHeader}>
-                <Ionicons name="medical" size={24} color="#F44336" />
+                <Ionicons name="medical" size={24} color="#000000" />
                 <Text style={styles.injuredName}>{incident.injuredPerson.name}</Text>
               </View>
               <View style={styles.injuredInfo}>
@@ -140,13 +140,13 @@ export default function IncidentDetailScreen() {
                   </View>
                 )}
                 {incident.hospitalRequired && (
-                  <View style={[styles.medicalBadge, { backgroundColor: '#F44336' }]}>
+                  <View style={[styles.medicalBadge, { backgroundColor: '#000000' }]}>
                     <Ionicons name="fitness" size={14} color="#FFF" />
                     <Text style={styles.medicalBadgeText}>Nhập viện</Text>
                   </View>
                 )}
                 {incident.lostWorkDays && incident.lostWorkDays > 0 && (
-                  <View style={[styles.medicalBadge, { backgroundColor: '#FF9800' }]}>
+                  <View style={[styles.medicalBadge, { backgroundColor: '#0066CC' }]}>
                     <Ionicons name="calendar" size={14} color="#FFF" />
                     <Text style={styles.medicalBadgeText}>{incident.lostWorkDays} ngày nghỉ</Text>
                   </View>
@@ -187,7 +187,7 @@ export default function IncidentDetailScreen() {
             <Text style={styles.sectionTitle}>Hành động khắc phục</Text>
             {incident.correctiveActions.map((action, index) => (
               <View key={index} style={styles.actionItem}>
-                <Ionicons name="checkmark-circle" size={20} color="#4CAF50" />
+                <Ionicons name="checkmark-circle" size={20} color="#0066CC" />
                 <Text style={styles.actionItemText}>{action}</Text>
               </View>
             ))}
@@ -200,7 +200,7 @@ export default function IncidentDetailScreen() {
             <Text style={styles.sectionTitle}>Biện pháp phòng ngừa</Text>
             {incident.preventiveMeasures.map((measure, index) => (
               <View key={index} style={styles.actionItem}>
-                <Ionicons name="shield-checkmark" size={20} color="#2196F3" />
+                <Ionicons name="shield-checkmark" size={20} color="#0066CC" />
                 <Text style={styles.actionItemText}>{measure}</Text>
               </View>
             ))}
@@ -226,7 +226,7 @@ export default function IncidentDetailScreen() {
           <View style={styles.additionalInfo}>
             {incident.propertyDamage && incident.propertyDamage > 0 && (
               <View style={styles.additionalItem}>
-                <Ionicons name="cash" size={18} color="#F44336" />
+                <Ionicons name="cash" size={18} color="#000000" />
                 <Text style={styles.additionalText}>
                   Thiệt hại tài sản: {incident.propertyDamage.toLocaleString('vi-VN')} VNĐ
                 </Text>
@@ -234,25 +234,25 @@ export default function IncidentDetailScreen() {
             )}
             {incident.environmentalImpact && (
               <View style={styles.additionalItem}>
-                <Ionicons name="leaf" size={18} color="#4CAF50" />
+                <Ionicons name="leaf" size={18} color="#0066CC" />
                 <Text style={styles.additionalText}>Có tác động môi trường</Text>
               </View>
             )}
             {incident.osha300Required && (
               <View style={styles.additionalItem}>
-                <Ionicons name="document-text" size={18} color="#2196F3" />
+                <Ionicons name="document-text" size={18} color="#0066CC" />
                 <Text style={styles.additionalText}>Yêu cầu OSHA 300</Text>
               </View>
             )}
             {incident.regulatoryReported && (
               <View style={styles.additionalItem}>
-                <Ionicons name="shield" size={18} color="#FF9800" />
+                <Ionicons name="shield" size={18} color="#0066CC" />
                 <Text style={styles.additionalText}>Đã báo cáo cơ quan quản lý</Text>
               </View>
             )}
             {incident.insuranceClaim && (
               <View style={styles.additionalItem}>
-                <Ionicons name="shield-checkmark" size={18} color="#9C27B0" />
+                <Ionicons name="shield-checkmark" size={18} color="#999999" />
                 <Text style={styles.additionalText}>Yêu cầu bảo hiểm</Text>
               </View>
             )}
@@ -265,14 +265,14 @@ export default function IncidentDetailScreen() {
           <View style={styles.timeline}>
             <TimelineItem
               icon="create"
-              color="#2196F3"
+              color="#0066CC"
               title="Báo cáo"
               subtitle={`${incident.reportedBy} - ${new Date(incident.reportedAt).toLocaleString('vi-VN')}`}
             />
             {incident.investigatedBy && incident.investigationDate && (
               <TimelineItem
                 icon="search"
-                color="#FF9800"
+                color="#0066CC"
                 title="Điều tra"
                 subtitle={`${incident.investigatedBy} - ${new Date(incident.investigationDate).toLocaleString('vi-VN')}`}
               />
@@ -280,7 +280,7 @@ export default function IncidentDetailScreen() {
             {incident.reviewedBy && incident.reviewedAt && (
               <TimelineItem
                 icon="eye"
-                color="#9C27B0"
+                color="#999999"
                 title="Xem xét"
                 subtitle={`${incident.reviewedBy} - ${new Date(incident.reviewedAt).toLocaleString('vi-VN')}`}
               />
@@ -288,7 +288,7 @@ export default function IncidentDetailScreen() {
             {incident.closedBy && incident.closedAt && (
               <TimelineItem
                 icon="checkmark-circle"
-                color="#4CAF50"
+                color="#0066CC"
                 title="Đóng"
                 subtitle={`${incident.closedBy} - ${new Date(incident.closedAt).toLocaleString('vi-VN')}`}
               />
@@ -347,13 +347,13 @@ function getSeverityColor(severity: IncidentSeverity): string {
     case IncidentSeverity.CRITICAL:
       return '#B71C1C';
     case IncidentSeverity.SERIOUS:
-      return '#F44336';
+      return '#000000';
     case IncidentSeverity.MODERATE:
-      return '#FF9800';
+      return '#0066CC';
     case IncidentSeverity.MINOR:
-      return '#0A6847';
+      return '#0066CC';
     default:
-      return '#9E9E9E';
+      return '#999999';
   }
 }
 
@@ -371,15 +371,15 @@ function getSeverityLabel(severity: IncidentSeverity): string {
 function getStatusColor(status: IncidentStatus): string {
   switch (status) {
     case IncidentStatus.REPORTED:
-      return '#F44336';
+      return '#000000';
     case IncidentStatus.INVESTIGATING:
-      return '#FF9800';
+      return '#0066CC';
     case IncidentStatus.UNDER_REVIEW:
-      return '#2196F3';
+      return '#0066CC';
     case IncidentStatus.RESOLVED:
-      return '#4CAF50';
+      return '#0066CC';
     case IncidentStatus.CLOSED:
-      return '#9E9E9E';
+      return '#999999';
     default:
       return '#666';
   }
@@ -536,11 +536,11 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   injuredCard: {
-    backgroundColor: '#FFEBEE',
+    backgroundColor: '#F5F5F5',
     padding: 16,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#FFCDD2',
+    borderColor: '#E8E8E8',
   },
   injuredHeader: {
     flexDirection: 'row',
@@ -571,7 +571,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   bodyPartTag: {
-    backgroundColor: '#F44336',
+    backgroundColor: '#000000',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
@@ -601,11 +601,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   actionBox: {
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
     padding: 12,
     borderRadius: 8,
     borderLeftWidth: 3,
-    borderLeftColor: '#2196F3',
+    borderLeftColor: '#0066CC',
   },
   actionText: {
     fontSize: 14,
@@ -613,21 +613,21 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   investigationBox: {
-    backgroundColor: '#FFF3E0',
+    backgroundColor: '#E8F4FF',
     padding: 12,
     borderRadius: 8,
     borderLeftWidth: 3,
-    borderLeftColor: '#FF9800',
+    borderLeftColor: '#0066CC',
   },
   investigationText: {
     fontSize: 14,
-    color: '#E65100',
+    color: '#004499',
     lineHeight: 20,
     marginBottom: 8,
   },
   investigationMeta: {
     fontSize: 12,
-    color: '#F57C00',
+    color: '#0066CC',
   },
   actionItem: {
     flexDirection: 'row',

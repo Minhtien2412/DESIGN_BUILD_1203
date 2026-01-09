@@ -29,7 +29,7 @@ const COLORS = {
   text: '#0F172A',
   textSecondary: '#64748B',
   textMuted: '#94A3B8',
-  accent: '#EE4D2D', // Shopee Orange
+  accent: '#0066CC', // Shopee Orange
   border: '#E2E8F0',
 };
 
@@ -76,7 +76,7 @@ export default function CategoriesHubScreen() {
           activeOpacity={0.9}
         >
           <LinearGradient
-            colors={['#EE4D2D', '#FF6B4D']}
+            colors={['#0066CC', '#3399FF']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.featuredGradient}
@@ -172,42 +172,42 @@ const QUICK_ACCESS_ITEMS = [
     label: 'Thiết kế',
     icon: 'home-outline',
     route: '/services/house-design',
-    color: '#6366F1',
+    color: '#0066CC',
   },
   {
     id: 2,
     label: 'Thi công',
     icon: 'construct-outline',
     route: '/construction/progress',
-    color: '#F59E0B',
+    color: '#000000',
   },
   {
     id: 3,
     label: 'Vật liệu',
     icon: 'cube-outline',
     route: '/materials/index',
-    color: '#EC4899',
+    color: '#666666',
   },
   {
     id: 4,
     label: 'Hoàn thiện',
     icon: 'color-fill-outline',
     route: '/finishing/index',
-    color: '#10B981',
+    color: '#0080FF',
   },
   {
     id: 5,
     label: 'Báo cáo',
     icon: 'newspaper-outline',
     route: '/reports/index',
-    color: '#3B82F6',
+    color: '#333333',
   },
   {
     id: 6,
     label: 'AI Assistant',
     icon: 'sparkles',
     route: '/ai',
-    color: '#8B5CF6',
+    color: '#0066CC',
   },
 ];
 
@@ -258,7 +258,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     ...Platform.select({
       ios: {
-        shadowColor: '#EE4D2D',
+        shadowColor: '#0066CC',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.2,
         shadowRadius: 8,

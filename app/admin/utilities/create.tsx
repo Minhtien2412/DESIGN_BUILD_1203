@@ -24,9 +24,9 @@ import {
 
 const UTILITY_TYPES = [
   { id: 'CALCULATOR', name: 'Công cụ tính', icon: 'calculator', color: '#3B82F6' },
-  { id: 'AI', name: 'Trí tuệ nhân tạo', icon: 'sparkles', color: '#8B5CF6' },
-  { id: 'MEDIA', name: 'Đa phương tiện', icon: 'film', color: '#EF4444' },
-  { id: 'DOCUMENT', name: 'Tài liệu', icon: 'document-text', color: '#10B981' },
+  { id: 'AI', name: 'Trí tuệ nhân tạo', icon: 'sparkles', color: '#666666' },
+  { id: 'MEDIA', name: 'Đa phương tiện', icon: 'film', color: '#000000' },
+  { id: 'DOCUMENT', name: 'Tài liệu', icon: 'document-text', color: '#0066CC' },
   { id: 'OTHER', name: 'Khác', icon: 'ellipsis-horizontal', color: '#6B7280' },
 ];
 
@@ -45,13 +45,13 @@ const ICON_OPTIONS = [
 
 const COLOR_OPTIONS = [
   '#3B82F6',
-  '#8B5CF6',
-  '#10B981',
-  '#F59E0B',
-  '#EF4444',
+  '#666666',
+  '#0066CC',
+  '#0066CC',
+  '#000000',
   '#06B6D4',
-  '#EC4899',
-  '#6366F1',
+  '#666666',
+  '#666666',
 ];
 
 export default function CreateUtility() {
@@ -438,7 +438,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   required: {
-    color: '#EF4444',
+    color: '#000000',
   },
   input: {
     paddingHorizontal: 16,
@@ -449,7 +449,7 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   inputError: {
-    borderColor: '#EF4444',
+    borderColor: '#000000',
   },
   textArea: {
     minHeight: 100,
@@ -457,7 +457,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 12,
-    color: '#EF4444',
+    color: '#000000',
     marginTop: 4,
   },
   typeGrid: {

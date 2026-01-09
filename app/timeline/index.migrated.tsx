@@ -158,7 +158,7 @@ export default function TimelineScreen() {
   if (!timeline) {
     return (
       <View style={styles.errorContainer}>
-        <Ionicons name="alert-circle-outline" size={64} color="#EF4444" />
+        <Ionicons name="alert-circle-outline" size={64} color="#000000" />
         <Text style={styles.errorText}>Không thể tải timeline</Text>
         <TouchableOpacity style={styles.retryButton} onPress={fetchTimeline}>
           <Text style={styles.retryButtonText}>Thử lại</Text>

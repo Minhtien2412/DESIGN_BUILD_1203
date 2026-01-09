@@ -379,7 +379,7 @@ export default function ConstructionLookupScreen() {
 
         {/* Info Banner */}
         <View style={styles.infoBanner}>
-          <Ionicons name="information-circle" size={20} color="#2196f3" />
+          <Ionicons name="information-circle" size={20} color="#0066CC" />
           <Text style={styles.infoBannerText}>
             {activeTab === 'area' && 'Kết quả chỉ mang tính tham khảo, chưa thay thế hồ sơ thiết kế.'}
             {activeTab === 'standards' && 'Định mức vật tư tham khảo cho 1m³ bê tông'}
@@ -507,7 +507,7 @@ export default function ConstructionLookupScreen() {
 
         {/* Bottom Info */}
         <View style={styles.bottomInfo}>
-          <Ionicons name="alert-circle-outline" size={16} color="#ff9800" />
+          <Ionicons name="alert-circle-outline" size={16} color="#0066CC" />
           <Text style={styles.bottomInfoText}>
             Thông tin mang tính chất tham khảo. Liên hệ chuyên gia để được tư vấn chi tiết.
           </Text>
@@ -643,7 +643,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   infoBanner: {
-    backgroundColor: '#e3f2fd',
+    backgroundColor: '#E8F4FF',
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
@@ -726,7 +726,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   unitBadge: {
-    backgroundColor: '#e3f2fd',
+    backgroundColor: '#E8F4FF',
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 4,
@@ -744,12 +744,12 @@ const styles = StyleSheet.create({
   subItemStandard: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#4caf50',
+    color: '#0066CC',
     marginLeft: 6,
   },
   subItemRegion: {
     fontSize: 13,
-    color: '#2196f3',
+    color: '#0066CC',
     marginLeft: 6,
   },
   subItemDescription: {
@@ -835,7 +835,7 @@ const styles = StyleSheet.create({
   bottomInfo: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff8e1',
+    backgroundColor: '#F0F8FF',
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderTopWidth: 1,
@@ -844,7 +844,7 @@ const styles = StyleSheet.create({
   bottomInfoText: {
     flex: 1,
     fontSize: 11,
-    color: '#f57c00',
+    color: '#0066CC',
     marginLeft: 8,
     lineHeight: 16,
   },
@@ -899,7 +899,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   chipActive: {
-    backgroundColor: '#e3f2fd',
+    backgroundColor: '#E8F4FF',
     borderColor: '#90caf9',
   },
   chipText: {

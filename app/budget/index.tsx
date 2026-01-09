@@ -17,16 +17,16 @@ const CATEGORY_CONFIG: Record<
   BudgetCategory,
   { label: string; icon: string; color: string }
 > = {
-  LABOR: { label: 'Nhân công', icon: 'people', color: '#2196F3' },
-  MATERIALS: { label: 'Vật liệu', icon: 'cube', color: '#4CAF50' },
-  EQUIPMENT: { label: 'Thiết bị', icon: 'construct', color: '#FF9800' },
-  SUBCONTRACTOR: { label: 'Thầu phụ', icon: 'business', color: '#9C27B0' },
-  PERMITS: { label: 'Giấy phép', icon: 'document-text', color: '#F44336' },
-  UTILITIES: { label: 'Tiện ích', icon: 'flash', color: '#00BCD4' },
-  INSURANCE: { label: 'Bảo hiểm', icon: 'shield-checkmark', color: '#795548' },
-  OVERHEAD: { label: 'Chi phí chung', icon: 'ellipsis-horizontal', color: '#607D8B' },
-  CONTINGENCY: { label: 'Dự phòng', icon: 'warning', color: '#FFC107' },
-  OTHER: { label: 'Khác', icon: 'apps', color: '#9E9E9E' },
+  LABOR: { label: 'Nhân công', icon: 'people', color: '#0066CC' },
+  MATERIALS: { label: 'Vật liệu', icon: 'cube', color: '#0066CC' },
+  EQUIPMENT: { label: 'Thiết bị', icon: 'construct', color: '#0066CC' },
+  SUBCONTRACTOR: { label: 'Thầu phụ', icon: 'business', color: '#999999' },
+  PERMITS: { label: 'Giấy phép', icon: 'document-text', color: '#000000' },
+  UTILITIES: { label: 'Tiện ích', icon: 'flash', color: '#0080FF' },
+  INSURANCE: { label: 'Bảo hiểm', icon: 'shield-checkmark', color: '#666666' },
+  OVERHEAD: { label: 'Chi phí chung', icon: 'ellipsis-horizontal', color: '#666666' },
+  CONTINGENCY: { label: 'Dự phòng', icon: 'warning', color: '#0066CC' },
+  OTHER: { label: 'Khác', icon: 'apps', color: '#999999' },
 };
 
 export default function BudgetDashboardScreen() {
@@ -71,7 +71,7 @@ export default function BudgetDashboardScreen() {
           <View style={styles.summarySection}>
             <View style={styles.summaryRow}>
               <View style={[styles.summaryCard, styles.totalCard]}>
-                <Ionicons name="wallet" size={24} color="#2196F3" />
+                <Ionicons name="wallet" size={24} color="#0066CC" />
                 <Text style={styles.summaryLabel}>Tổng ngân sách</Text>
                 <Text style={styles.summaryValue}>
                   {formatCurrency(summary.totalBudget)}
@@ -81,9 +81,9 @@ export default function BudgetDashboardScreen() {
 
             <View style={styles.summaryRow}>
               <View style={[styles.summaryCard, styles.halfCard]}>
-                <Ionicons name="trending-down" size={20} color="#F44336" />
+                <Ionicons name="trending-down" size={20} color="#000000" />
                 <Text style={styles.summaryLabel}>Đã chi</Text>
-                <Text style={[styles.summaryValue, { fontSize: 18, color: '#F44336' }]}>
+                <Text style={[styles.summaryValue, { fontSize: 18, color: '#000000' }]}>
                   {formatCurrency(summary.totalSpent)}
                 </Text>
                 <Text style={styles.percentageText}>
@@ -92,9 +92,9 @@ export default function BudgetDashboardScreen() {
               </View>
 
               <View style={[styles.summaryCard, styles.halfCard]}>
-                <Ionicons name="cash" size={20} color="#4CAF50" />
+                <Ionicons name="cash" size={20} color="#0066CC" />
                 <Text style={styles.summaryLabel}>Còn lại</Text>
-                <Text style={[styles.summaryValue, { fontSize: 18, color: '#4CAF50' }]}>
+                <Text style={[styles.summaryValue, { fontSize: 18, color: '#0066CC' }]}>
                   {formatCurrency(summary.totalRemaining)}
                 </Text>
                 <Text style={styles.percentageText}>
@@ -119,10 +119,10 @@ export default function BudgetDashboardScreen() {
                       width: `${Math.min(summary.percentageUsed, 100)}%`,
                       backgroundColor:
                         summary.percentageUsed > 90
-                          ? '#F44336'
+                          ? '#000000'
                           : summary.percentageUsed > 75
-                          ? '#FF9800'
-                          : '#4CAF50',
+                          ? '#0066CC'
+                          : '#0066CC',
                     },
                   ]}
                 />
@@ -132,7 +132,7 @@ export default function BudgetDashboardScreen() {
             {/* Alerts */}
             {summary.overBudgetCategories.length > 0 && (
               <View style={styles.alertBox}>
-                <Ionicons name="alert-circle" size={18} color="#F44336" />
+                <Ionicons name="alert-circle" size={18} color="#000000" />
                 <Text style={styles.alertText}>
                   {summary.overBudgetCategories.length} hạng mục vượt ngân sách
                 </Text>
@@ -140,9 +140,9 @@ export default function BudgetDashboardScreen() {
             )}
 
             {summary.nearLimitCategories.length > 0 && (
-              <View style={[styles.alertBox, { backgroundColor: '#FFF3E0' }]}>
-                <Ionicons name="warning" size={18} color="#FF9800" />
-                <Text style={[styles.alertText, { color: '#E65100' }]}>
+              <View style={[styles.alertBox, { backgroundColor: '#E8F4FF' }]}>
+                <Ionicons name="warning" size={18} color="#0066CC" />
+                <Text style={[styles.alertText, { color: '#004499' }]}>
                   {summary.nearLimitCategories.length} hạng mục gần hết ngân sách
                 </Text>
               </View>
@@ -189,14 +189,14 @@ export default function BudgetDashboardScreen() {
                     <View style={styles.categoryRight}>
                       {isOverBudget && (
                         <View style={styles.warningBadge}>
-                          <Ionicons name="alert-circle" size={14} color="#F44336" />
+                          <Ionicons name="alert-circle" size={14} color="#000000" />
                           <Text style={styles.warningText}>Vượt</Text>
                         </View>
                       )}
                       {isNearLimit && (
-                        <View style={[styles.warningBadge, { backgroundColor: '#FFF3E0' }]}>
-                          <Ionicons name="warning" size={14} color="#FF9800" />
-                          <Text style={[styles.warningText, { color: '#FF9800' }]}>
+                        <View style={[styles.warningBadge, { backgroundColor: '#E8F4FF' }]}>
+                          <Ionicons name="warning" size={14} color="#0066CC" />
+                          <Text style={[styles.warningText, { color: '#0066CC' }]}>
                             {data.percentage.toFixed(0)}%
                           </Text>
                         </View>
@@ -216,9 +216,9 @@ export default function BudgetDashboardScreen() {
                         {
                           width: `${Math.min(data.percentage, 100)}%`,
                           backgroundColor: isOverBudget
-                            ? '#F44336'
+                            ? '#000000'
                             : isNearLimit
-                            ? '#FF9800'
+                            ? '#0066CC'
                             : config.color,
                         },
                       ]}
@@ -244,7 +244,7 @@ export default function BudgetDashboardScreen() {
               style={styles.actionCard}
               onPress={() => router.push('/budget/expenses')}
             >
-              <Ionicons name="receipt" size={28} color="#2196F3" />
+              <Ionicons name="receipt" size={28} color="#0066CC" />
               <Text style={styles.actionLabel}>Chi tiêu</Text>
             </TouchableOpacity>
 
@@ -252,7 +252,7 @@ export default function BudgetDashboardScreen() {
               style={styles.actionCard}
               onPress={() => router.push('/budget/invoices')}
             >
-              <Ionicons name="document-text" size={28} color="#4CAF50" />
+              <Ionicons name="document-text" size={28} color="#0066CC" />
               <Text style={styles.actionLabel}>Hóa đơn</Text>
             </TouchableOpacity>
 
@@ -260,7 +260,7 @@ export default function BudgetDashboardScreen() {
               style={styles.actionCard}
               onPress={() => router.push('/budget/estimates' as any)}
             >
-              <Ionicons name="calculator" size={28} color="#FF9800" />
+              <Ionicons name="calculator" size={28} color="#0066CC" />
               <Text style={styles.actionLabel}>Ước tính</Text>
             </TouchableOpacity>
 
@@ -268,7 +268,7 @@ export default function BudgetDashboardScreen() {
               style={styles.actionCard}
               onPress={() => router.push('/budget/reports' as any)}
             >
-              <Ionicons name="stats-chart" size={28} color="#9C27B0" />
+              <Ionicons name="stats-chart" size={28} color="#999999" />
               <Text style={styles.actionLabel}>Báo cáo</Text>
             </TouchableOpacity>
           </View>
@@ -281,7 +281,7 @@ export default function BudgetDashboardScreen() {
             <TouchableOpacity
               onPress={() => router.push(`/budget/create-budget?projectId=${projectId}` as any)}
             >
-              <Ionicons name="add-circle" size={24} color="#2196F3" />
+              <Ionicons name="add-circle" size={24} color="#0066CC" />
             </TouchableOpacity>
           </View>
 
@@ -407,7 +407,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: '#FFEBEE',
+    backgroundColor: '#F5F5F5',
     padding: 12,
     borderRadius: 8,
   },
@@ -434,7 +434,7 @@ const styles = StyleSheet.create({
   },
   seeAllText: {
     fontSize: 14,
-    color: '#2196F3',
+    color: '#0066CC',
     fontWeight: '500',
   },
   categoryCard: {
@@ -484,13 +484,13 @@ const styles = StyleSheet.create({
     gap: 4,
     paddingHorizontal: 8,
     paddingVertical: 4,
-    backgroundColor: '#FFEBEE',
+    backgroundColor: '#F5F5F5',
     borderRadius: 4,
   },
   warningText: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#F44336',
+    color: '#000000',
   },
   percentageLabel: {
     fontSize: 14,

@@ -205,13 +205,13 @@ export default function WeatherDashboardScreen() {
   const getSeverityColor = (severity: string) => {
     switch (severity) {
       case 'extreme':
-        return '#DC2626';
+        return '#000000';
       case 'severe':
         return '#EA580C';
       case 'moderate':
-        return '#F59E0B';
+        return '#0066CC';
       case 'minor':
-        return '#10B981';
+        return '#0066CC';
       default:
         return primary;
     }

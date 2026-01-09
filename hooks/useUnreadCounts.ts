@@ -1,4 +1,4 @@
-﻿/**
+/**
  * useUnreadCounts Hook
  * Fetches unread counts for messages, calls, and notifications from server
  * Auto-refreshes every 30 seconds

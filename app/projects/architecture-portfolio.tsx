@@ -1,11 +1,17 @@
 import { Container } from '@/components/ui/container';
 import { useThemeColor } from '@/hooks/use-theme-color';
+import PortfolioService, {
+    type ArchitectureProject,
+    PORTFOLIO_CATEGORIES,
+} from '@/services/portfolioService';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
+    ActivityIndicator,
     FlatList,
     Image,
+    RefreshControl,
     ScrollView,
     StyleSheet,
     Text,
@@ -13,57 +19,6 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
-
-interface ArchitectureProject {
-  id: string;
-  title: string;
-  location: string;
-  district: string;
-  city: string;
-  rating: number;
-  reviews: number;
-  image: string;
-  bedrooms: number;
-  bathrooms: number;
-  livingRooms: number;
-  kitchens: number;
-  area: number;
-}
-
-const CATEGORIES = ['Biệt thự', 'Nhà phố', 'Văn phòng', 'Nhà xưởng', 'Căn hộ dịch vụ'];
-
-const MOCK_PROJECTS: ArchitectureProject[] = [
-  {
-    id: '1',
-    title: 'Mẫu thiết kế biệt thự tân cổ điển 3 tầng - Phú Mỹ Hưng',
-    location: 'Phú Mỹ Hưng',
-    district: 'Quận 7',
-    city: 'Thành Phố Hồ Chí Minh',
-    rating: 4.9,
-    reviews: 139,
-    image: 'https://via.placeholder.com/400x300',
-    bedrooms: 4,
-    bathrooms: 4,
-    livingRooms: 1,
-    kitchens: 1,
-    area: 350,
-  },
-  {
-    id: '2',
-    title: 'Mẫu thiết kế nhà phố hiện đại 4 tầng',
-    location: 'Bình Thạnh',
-    district: 'Quận Bình Thạnh',
-    city: 'TP Hồ Chí Minh',
-    rating: 4.7,
-    reviews: 98,
-    image: 'https://via.placeholder.com/400x300',
-    bedrooms: 3,
-    bathrooms: 3,
-    livingRooms: 1,
-    kitchens: 1,
-    area: 250,
-  },
-];
 
 export default function ArchitecturePortfolioScreen() {
   const backgroundColor = useThemeColor({}, 'background');
@@ -79,7 +34,39 @@ export default function ArchitecturePortfolioScreen() {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Biệt thự');
-  const [projects, setProjects] = useState<ArchitectureProject[]>(MOCK_PROJECTS);
+  const [projects, setProjects] = useState<ArchitectureProject[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch projects on mount and when category/search changes
+  const fetchProjects = useCallback(async (isRefresh = false) => {
+    try {
+      if (!isRefresh) setLoading(true);
+      setError(null);
+      
+      const data = await PortfolioService.getPortfolioProjects(
+        selectedCategory,
+        searchQuery || undefined
+      );
+      setProjects(data);
+    } catch (err) {
+      console.error('Error fetching portfolio:', err);
+      setError('Không thể tải danh sách dự án');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, [selectedCategory, searchQuery]);
+
+  useEffect(() => {
+    fetchProjects();
+  }, [fetchProjects]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchProjects(true);
+  }, [fetchProjects]);
 
   const renderProjectCard = ({ item }: { item: ArchitectureProject }) => (
     <TouchableOpacity
@@ -166,12 +153,28 @@ export default function ArchitecturePortfolioScreen() {
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.container}>
+      <ScrollView 
+        style={styles.container}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        {/* Error Banner */}
+        {error && (
+          <View style={[styles.errorBanner, { backgroundColor: '#FEE2E2' }]}>
+            <Ionicons name="alert-circle" size={20} color="#DC2626" />
+            <Text style={[styles.errorText, { color: '#DC2626' }]}>{error}</Text>
+            <TouchableOpacity onPress={() => fetchProjects()}>
+              <Text style={{ color: primaryColor, fontWeight: '600' }}>Thử lại</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
         {/* Category Tabs */}
         <View style={styles.categorySection}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View style={styles.categoriesRow}>
-              {CATEGORIES.map(category => {
+              {PORTFOLIO_CATEGORIES.map(category => {
                 const isSelected = selectedCategory === category;
                 return (
                   <TouchableOpacity
@@ -209,13 +212,31 @@ export default function ArchitecturePortfolioScreen() {
           Nổi bật trong tuần
         </Text>
 
-        <FlatList
-          data={projects}
-          renderItem={renderProjectCard}
-          keyExtractor={item => item.id}
-          scrollEnabled={false}
-          contentContainerStyle={styles.listContainer}
-        />
+        {/* Loading State */}
+        {loading && !refreshing ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={primaryColor} />
+            <Text style={[styles.loadingText, { color: mutedColor }]}>
+              Đang tải...
+            </Text>
+          </View>
+        ) : (
+          <FlatList
+            data={projects}
+            renderItem={renderProjectCard}
+            keyExtractor={item => item.id}
+            scrollEnabled={false}
+            contentContainerStyle={styles.listContainer}
+            ListEmptyComponent={
+              <View style={styles.emptyContainer}>
+                <Ionicons name="home-outline" size={48} color={mutedColor} />
+                <Text style={[styles.emptyText, { color: mutedColor }]}>
+                  Chưa có dự án nào
+                </Text>
+              </View>
+            }
+          />
+        )}
 
         <TouchableOpacity
           style={[styles.viewMoreButton, { borderColor: primaryColor }]}
@@ -353,5 +374,36 @@ const styles = StyleSheet.create({
   viewMoreText: {
     fontSize: 15,
     fontWeight: '600',
+  },
+  errorBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    marginHorizontal: 16,
+    marginBottom: 12,
+    borderRadius: 8,
+    gap: 8,
+  },
+  errorText: {
+    flex: 1,
+    fontSize: 14,
+  },
+  loadingContainer: {
+    padding: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 14,
+  },
+  emptyContainer: {
+    padding: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyText: {
+    marginTop: 12,
+    fontSize: 14,
   },
 });

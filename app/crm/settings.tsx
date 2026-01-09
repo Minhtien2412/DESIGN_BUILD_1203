@@ -123,8 +123,8 @@ function SettingsContent() {
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>Trạng thái</Text>
               <View style={styles.statusBadge}>
-                <View style={[styles.statusDot, { backgroundColor: availableEndpoints.length > 0 ? '#10B981' : '#EF4444' }]} />
-                <Text style={[styles.statusText, { color: availableEndpoints.length > 0 ? '#10B981' : '#EF4444' }]}>
+                <View style={[styles.statusDot, { backgroundColor: availableEndpoints.length > 0 ? '#0066CC' : '#000000' }]} />
+                <Text style={[styles.statusText, { color: availableEndpoints.length > 0 ? '#0066CC' : '#000000' }]}>
                   {availableEndpoints.length > 0 ? 'Đã kết nối' : 'Chưa kết nối'}
                 </Text>
               </View>
@@ -193,7 +193,7 @@ function SettingsContent() {
               <Switch
                 value={autoSync}
                 onValueChange={setAutoSync}
-                trackColor={{ false: '#D1D5DB', true: '#93C5FD' }}
+                trackColor={{ false: '#D1D5DB', true: '#0080FF' }}
                 thumbColor={autoSync ? '#3B82F6' : '#9CA3AF'}
               />
             </View>
@@ -240,10 +240,10 @@ function SettingsContent() {
               disabled={isClearing}
             >
               {isClearing ? (
-                <ActivityIndicator size="small" color="#EF4444" />
+                <ActivityIndicator size="small" color="#000000" />
               ) : (
                 <>
-                  <Ionicons name="trash" size={18} color="#EF4444" />
+                  <Ionicons name="trash" size={18} color="#000000" />
                   <Text style={styles.clearCacheText}>Xóa bộ nhớ đệm</Text>
                 </>
               )}
@@ -289,8 +289,8 @@ function EndpointRow({ name, available }: { name: string; available: boolean }) 
     <View style={styles.endpointRow}>
       <Text style={styles.endpointName}>{name}</Text>
       <View style={styles.endpointStatus}>
-        <View style={[styles.endpointDot, { backgroundColor: available ? '#10B981' : '#EF4444' }]} />
-        <Text style={[styles.endpointText, { color: available ? '#10B981' : '#EF4444' }]}>
+        <View style={[styles.endpointDot, { backgroundColor: available ? '#0066CC' : '#000000' }]} />
+        <Text style={[styles.endpointText, { color: available ? '#0066CC' : '#000000' }]}>
           {available ? 'Khả dụng' : 'Không khả dụng'}
         </Text>
       </View>
@@ -436,7 +436,7 @@ const styles = StyleSheet.create({
     gap: 12,
     marginTop: 16,
     padding: 16,
-    backgroundColor: '#EFF6FF',
+    backgroundColor: '#E8F4FF',
     borderRadius: 12,
     borderWidth: 1,
     borderColor: '#BFDBFE',
@@ -480,7 +480,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#EFF6FF',
+    backgroundColor: '#E8F4FF',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -509,7 +509,7 @@ const styles = StyleSheet.create({
   clearCacheText: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#EF4444',
+    color: '#000000',
   },
   linkCard: {
     flexDirection: 'row',

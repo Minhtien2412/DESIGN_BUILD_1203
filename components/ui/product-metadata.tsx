@@ -43,7 +43,7 @@ export function ProductMetadata({
         )}
         {product.freeShipping && (
           <View style={[styles.badge, styles.shippingBadge]}>
-            <Ionicons name="car-outline" size={10} color="#10B981" />
+            <Ionicons name="car-outline" size={10} color="#0066CC" />
             <Text style={styles.shippingText}>Freeship</Text>
           </View>
         )}
@@ -87,8 +87,8 @@ export function ProductMetadata({
           {/* Stock */}
           {product.stock !== undefined && product.stock < 20 && (
             <View style={styles.stat}>
-              <Ionicons name="warning-outline" size={12} color="#EF4444" />
-              <Text style={[styles.statText, { color: '#EF4444' }]}>
+              <Ionicons name="warning-outline" size={12} color="#000000" />
+              <Text style={[styles.statText, { color: '#000000' }]}>
                 Còn {product.stock}
               </Text>
             </View>
@@ -101,7 +101,7 @@ export function ProductMetadata({
         <View style={[styles.additionalInfo, isVertical && styles.additionalInfoVertical]}>
           {product.warranty && (
             <View style={styles.infoItem}>
-              <Ionicons name="shield-checkmark-outline" size={12} color="#10B981" />
+              <Ionicons name="shield-checkmark-outline" size={12} color="#0066CC" />
               <Text style={styles.infoText}>BH: {product.warranty}</Text>
             </View>
           )}
@@ -161,15 +161,15 @@ const styles = StyleSheet.create({
     color: '#D97706',
   },
   newBadge: {
-    backgroundColor: '#DBEAFE',
+    backgroundColor: '#E8F4FF',
   },
   newText: {
     fontSize: 9,
     fontWeight: '600',
-    color: '#2563EB',
+    color: '#0066CC',
   },
   flashSaleBadge: {
-    backgroundColor: '#EF4444',
+    backgroundColor: '#000000',
   },
   flashSaleText: {
     fontSize: 9,
@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
   shippingText: {
     fontSize: 9,
     fontWeight: '600',
-    color: '#10B981',
+    color: '#0066CC',
   },
   stats: {
     flexDirection: 'row',

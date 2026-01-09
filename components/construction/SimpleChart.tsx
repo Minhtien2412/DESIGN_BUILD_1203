@@ -77,7 +77,7 @@ export function LineChart({
   data,
   height = 200,
   lineColor = '#3b82f6',
-  gradientColors = ['#3b82f6', '#dbeafe'],
+  gradientColors = ['#3b82f6', '#E8F4FF'],
   style,
 }: LineChartProps) {
   if (data.length === 0) return null;

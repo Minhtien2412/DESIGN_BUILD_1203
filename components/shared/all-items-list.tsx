@@ -25,7 +25,7 @@ const COLORS = {
   text: '#0F172A',
   textSecondary: '#64748B',
   textMuted: '#94A3B8',
-  accent: '#2563EB',
+  accent: '#0066CC',
   border: '#E2E8F0',
 };
 

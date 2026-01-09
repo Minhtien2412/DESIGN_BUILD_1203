@@ -35,3 +35,15 @@ export { chatService } from './api/chat.service';
 export { liveStreamService } from './api/livestream.service';
 export { default as messagesApi } from './api/messagesApi';
 
+// Chat services with real API integration
+export { chatAPIService } from './chatAPIService';
+export { default as ChatService } from './ChatService';
+export type {
+    Attachment, ChatMessage, ChatParticipant, ChatRoom, MessageReaction, MessageStatus, MessageType, TypingStatus
+} from './ChatService';
+
+// Notification Sync Services
+export { NotificationRealtimeService, default as notificationRealtimeService } from './notificationRealtimeService';
+export { NotificationSyncService, default as notificationSyncService } from './notificationSyncService';
+export type { CRMActivity, CRMTask, CRMTicket, SyncResult, UnifiedNotification } from './notificationSyncService';
+

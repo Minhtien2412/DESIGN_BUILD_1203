@@ -336,7 +336,7 @@ export default function CreatePayrollScreen() {
 
           <View style={[styles.calculatedRow, styles.totalRow]}>
             <Text style={styles.totalLabel}>Tổng thu nhập:</Text>
-            <Text style={[styles.totalValue, { color: '#4CAF50' }]}>
+            <Text style={[styles.totalValue, { color: '#0066CC' }]}>
               {formatCurrency(pay.grossPay)}
             </Text>
           </View>
@@ -396,7 +396,7 @@ export default function CreatePayrollScreen() {
 
           <View style={[styles.calculatedRow, styles.totalRow]}>
             <Text style={styles.totalLabel}>Tổng khấu trừ:</Text>
-            <Text style={[styles.totalValue, { color: '#F44336' }]}>
+            <Text style={[styles.totalValue, { color: '#000000' }]}>
               {formatCurrency(pay.totalDeductions)}
             </Text>
           </View>
@@ -427,7 +427,7 @@ export default function CreatePayrollScreen() {
                 <Ionicons
                   name={option.icon}
                   size={20}
-                  color={paymentMethod === option.value ? '#2196F3' : '#666'}
+                  color={paymentMethod === option.value ? '#0066CC' : '#666'}
                 />
                 <Text
                   style={[
@@ -499,7 +499,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   required: {
-    color: '#F44336',
+    color: '#000000',
   },
   chipScroll: {
     flexGrow: 0,
@@ -513,9 +513,9 @@ const styles = StyleSheet.create({
     minWidth: 120,
   },
   workerChipActive: {
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
     borderWidth: 1,
-    borderColor: '#2196F3',
+    borderColor: '#0066CC',
   },
   workerChipName: {
     fontSize: 14,
@@ -524,24 +524,24 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   workerChipNameActive: {
-    color: '#2196F3',
+    color: '#0066CC',
   },
   workerChipId: {
     fontSize: 11,
     color: '#666',
   },
   workerChipIdActive: {
-    color: '#2196F3',
+    color: '#0066CC',
   },
   rateInfo: {
     marginTop: 6,
     paddingTop: 6,
     borderTopWidth: 1,
-    borderTopColor: '#E3F2FD',
+    borderTopColor: '#E8F4FF',
   },
   rateText: {
     fontSize: 11,
-    color: '#2196F3',
+    color: '#0066CC',
     fontWeight: '600',
   },
   dateRow: {
@@ -628,7 +628,7 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 12,
     borderTopWidth: 3,
-    borderTopColor: '#2196F3',
+    borderTopColor: '#0066CC',
   },
   netPayLabel: {
     fontSize: 17,
@@ -657,8 +657,8 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   methodChipActive: {
-    backgroundColor: '#E3F2FD',
-    borderColor: '#2196F3',
+    backgroundColor: '#E8F4FF',
+    borderColor: '#0066CC',
   },
   methodLabel: {
     fontSize: 13,
@@ -666,7 +666,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   methodLabelActive: {
-    color: '#2196F3',
+    color: '#0066CC',
     fontWeight: '600',
   },
   notesInput: {
@@ -702,7 +702,7 @@ const styles = StyleSheet.create({
   saveButton: {
     flex: 1,
     paddingVertical: 12,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     borderRadius: 6,
     alignItems: 'center',
   },

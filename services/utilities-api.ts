@@ -180,7 +180,7 @@ export const utilitiesApi = {
    * @example
    * const updated = await utilitiesApi.update(1, {
    *   enabled: false,
-   *   color: '#EF4444'
+   *   color: '#000000'
    * });
    */
   update: async (id: number, data: UpdateUtilityDto): Promise<UtilityDetailResponse> => {
@@ -272,9 +272,9 @@ export const getUtilityTypeIcon = (type: UtilityType): string => {
 export const getUtilityTypeColor = (type: UtilityType): string => {
   const colors: Record<UtilityType, string> = {
     CALCULATOR: '#3B82F6', // Blue
-    AI: '#8B5CF6',         // Purple
-    MEDIA: '#EF4444',      // Red
-    DOCUMENT: '#10B981',   // Green
+    AI: '#666666',         // Purple
+    MEDIA: '#000000',      // Red
+    DOCUMENT: '#0066CC',   // Green
     OTHER: '#6B7280',      // Gray
   };
   return colors[type] || '#6B7280';
@@ -375,7 +375,7 @@ export const UTILITY_TEMPLATES: Partial<CreateUtilityDto>[] = [
     name: 'Dự toán chi phí',
     type: 'CALCULATOR',
     icon: 'cash-outline',
-    color: '#10B981',
+    color: '#0066CC',
     description: 'Ước tính chi phí xây dựng theo diện tích',
     route: '/utilities/cost-estimator',
   },
@@ -383,7 +383,7 @@ export const UTILITY_TEMPLATES: Partial<CreateUtilityDto>[] = [
     name: 'Trò chuyện AI',
     type: 'AI',
     icon: 'chatbubbles-outline',
-    color: '#8B5CF6',
+    color: '#666666',
     description: 'Tư vấn kiến trúc, xây dựng qua AI',
     route: '/utilities/ai-chat',
   },
@@ -391,7 +391,7 @@ export const UTILITY_TEMPLATES: Partial<CreateUtilityDto>[] = [
     name: 'Phân tích ảnh công trình',
     type: 'AI',
     icon: 'camera-outline',
-    color: '#EC4899',
+    color: '#666666',
     description: 'Phân tích tiến độ và chất lượng qua hình ảnh',
     route: '/utilities/ai-image-analysis',
   },
@@ -399,7 +399,7 @@ export const UTILITY_TEMPLATES: Partial<CreateUtilityDto>[] = [
     name: 'Live Stream',
     type: 'MEDIA',
     icon: 'videocam-outline',
-    color: '#EF4444',
+    color: '#000000',
     description: 'Phát trực tiếp tiến độ công trình',
     route: '/live',
   },
@@ -407,7 +407,7 @@ export const UTILITY_TEMPLATES: Partial<CreateUtilityDto>[] = [
     name: 'Video hướng dẫn',
     type: 'MEDIA',
     icon: 'play-circle-outline',
-    color: '#F59E0B',
+    color: '#0066CC',
     description: 'Thư viện video hướng dẫn thi công',
     route: '/videos',
   },
@@ -415,7 +415,7 @@ export const UTILITY_TEMPLATES: Partial<CreateUtilityDto>[] = [
     name: 'Thư viện bản vẽ mẫu',
     type: 'DOCUMENT',
     icon: 'document-text-outline',
-    color: '#10B981',
+    color: '#0066CC',
     description: 'Bản vẽ kiến trúc, kết cấu mẫu',
     route: '/utilities/drawing-library',
   },

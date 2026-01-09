@@ -1,7 +1,9 @@
+import { useUnifiedMessaging } from '@/hooks/crm/useUnifiedMessaging';
 import { Ionicons } from '@expo/vector-icons';
-import { Stack, useLocalSearchParams } from 'expo-router';
+import { Stack, router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import {
+    ActivityIndicator,
     Dimensions,
     Image,
     Linking,
@@ -112,6 +114,10 @@ const TABS = [
 export default function CompanyDetailScreen() {
   const params = useLocalSearchParams();
   const [activeTab, setActiveTab] = useState('about');
+  const [isConsulting, setIsConsulting] = useState(false);
+  const [consultingServiceId, setConsultingServiceId] = useState<number | null>(null);
+  
+  const { getOrCreateConversation } = useUnifiedMessaging();
 
   const handleCall = () => {
     Linking.openURL(`tel:${COMPANY_DETAIL.phone}`);
@@ -124,6 +130,28 @@ export default function CompanyDetailScreen() {
   const handleWebsite = () => {
     Linking.openURL(COMPANY_DETAIL.website);
   };
+  
+  // Handle consult button - navigate to chat
+  const handleConsult = async (serviceId?: number, serviceName?: string) => {
+    try {
+      if (serviceId) {
+        setConsultingServiceId(serviceId);
+      } else {
+        setIsConsulting(true);
+      }
+      const conversationId = await getOrCreateConversation({
+        userId: COMPANY_DETAIL.id,
+        userName: COMPANY_DETAIL.name,
+        userRole: serviceName ? `DESIGN_${serviceName.toUpperCase()}` : 'DESIGN_COMPANY',
+      });
+      router.push(`/messages/chat/${conversationId}` as `/messages/chat/${string}`);
+    } catch (error) {
+      console.error('Error creating conversation:', error);
+    } finally {
+      setIsConsulting(false);
+      setConsultingServiceId(null);
+    }
+  };
 
   const renderStars = (rating: number) => {
     return (
@@ -133,7 +161,7 @@ export default function CompanyDetailScreen() {
             key={star}
             name={star <= rating ? 'star' : star - 0.5 <= rating ? 'star-half' : 'star-outline'}
             size={16}
-            color="#ee4d2d"
+            color="#0066CC"
           />
         ))}
       </View>
@@ -154,7 +182,7 @@ export default function CompanyDetailScreen() {
         <View style={styles.specialtyGrid}>
           {COMPANY_DETAIL.specialties.map((specialty, idx) => (
             <View key={idx} style={styles.specialtyChip}>
-              <Ionicons name="checkmark-circle" size={16} color="#ee4d2d" />
+              <Ionicons name="checkmark-circle" size={16} color="#0066CC" />
               <Text style={styles.specialtyChipText}>{specialty}</Text>
             </View>
           ))}
@@ -202,8 +230,16 @@ export default function CompanyDetailScreen() {
               <Text style={styles.serviceName}>{service.name}</Text>
               <Text style={styles.servicePrice}>{service.price}</Text>
             </View>
-            <TouchableOpacity style={styles.serviceButton}>
-              <Text style={styles.serviceButtonText}>Tư vấn</Text>
+            <TouchableOpacity 
+              style={styles.serviceButton}
+              onPress={() => handleConsult(service.id, service.name)}
+              disabled={consultingServiceId === service.id}
+            >
+              {consultingServiceId === service.id ? (
+                <ActivityIndicator size="small" color="#0066CC" />
+              ) : (
+                <Text style={styles.serviceButtonText}>Tư vấn</Text>
+              )}
             </TouchableOpacity>
           </View>
         ))}
@@ -248,7 +284,7 @@ export default function CompanyDetailScreen() {
           </Text>
         </View>
         <TouchableOpacity style={styles.writeReviewButton}>
-          <Ionicons name="create-outline" size={18} color="#ee4d2d" />
+          <Ionicons name="create-outline" size={18} color="#0066CC" />
           <Text style={styles.writeReviewText}>Viết đánh giá</Text>
         </TouchableOpacity>
       </View>
@@ -279,7 +315,7 @@ export default function CompanyDetailScreen() {
       <Stack.Screen
         options={{
           title: COMPANY_DETAIL.name,
-          headerStyle: { backgroundColor: '#ee4d2d' },
+          headerStyle: { backgroundColor: '#0066CC' },
           headerTintColor: '#fff',
           headerTitleStyle: { fontWeight: '600' },
         }}
@@ -296,7 +332,7 @@ export default function CompanyDetailScreen() {
               <Text style={styles.companyName}>{COMPANY_DETAIL.name}</Text>
               <View style={styles.statsRow}>
                 <View style={styles.statItem}>
-                  <Ionicons name="star" size={16} color="#ee4d2d" />
+                  <Ionicons name="star" size={16} color="#0066CC" />
                   <Text style={styles.statText}>{COMPANY_DETAIL.rating}</Text>
                 </View>
                 <View style={styles.divider} />
@@ -325,7 +361,7 @@ export default function CompanyDetailScreen() {
                   <Ionicons
                     name={tab.icon as any}
                     size={18}
-                    color={activeTab === tab.id ? '#ee4d2d' : '#999'}
+                    color={activeTab === tab.id ? '#0066CC' : '#999'}
                   />
                   <Text
                     style={[
@@ -352,12 +388,22 @@ export default function CompanyDetailScreen() {
         {/* Bottom Actions */}
         <View style={styles.bottomActions}>
           <TouchableOpacity style={styles.actionButtonSecondary} onPress={handleCall}>
-            <Ionicons name="call" size={20} color="#ee4d2d" />
+            <Ionicons name="call" size={20} color="#0066CC" />
             <Text style={styles.actionButtonSecondaryText}>Gọi điện</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.actionButtonPrimary}>
-            <Ionicons name="chatbubble-ellipses" size={20} color="#fff" />
-            <Text style={styles.actionButtonPrimaryText}>Liên hệ ngay</Text>
+          <TouchableOpacity 
+            style={styles.actionButtonPrimary}
+            onPress={() => handleConsult()}
+            disabled={isConsulting}
+          >
+            {isConsulting ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <>
+                <Ionicons name="chatbubble-ellipses" size={20} color="#fff" />
+                <Text style={styles.actionButtonPrimaryText}>Liên hệ ngay</Text>
+              </>
+            )}
           </TouchableOpacity>
         </View>
       </View>
@@ -434,7 +480,7 @@ const styles = StyleSheet.create({
     borderBottomColor: 'transparent',
   },
   tabActive: {
-    borderBottomColor: '#ee4d2d',
+    borderBottomColor: '#0066CC',
   },
   tabText: {
     fontSize: 14,
@@ -443,7 +489,7 @@ const styles = StyleSheet.create({
     marginLeft: 6,
   },
   tabTextActive: {
-    color: '#ee4d2d',
+    color: '#0066CC',
     fontWeight: '600',
   },
   tabContent: {
@@ -475,14 +521,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#fff5f0',
     borderWidth: 1,
-    borderColor: '#ee4d2d',
+    borderColor: '#0066CC',
     borderRadius: 20,
     paddingHorizontal: 12,
     paddingVertical: 6,
   },
   specialtyChipText: {
     fontSize: 13,
-    color: '#ee4d2d',
+    color: '#0066CC',
     fontWeight: '600',
     marginLeft: 6,
   },
@@ -519,12 +565,12 @@ const styles = StyleSheet.create({
   servicePrice: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#ee4d2d',
+    color: '#0066CC',
   },
   serviceButton: {
     backgroundColor: '#fff5f0',
     borderWidth: 1,
-    borderColor: '#ee4d2d',
+    borderColor: '#0066CC',
     paddingHorizontal: 16,
     paddingVertical: 6,
     borderRadius: 6,
@@ -532,7 +578,7 @@ const styles = StyleSheet.create({
   serviceButtonText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#ee4d2d',
+    color: '#0066CC',
   },
   portfolioGrid: {
     flexDirection: 'row',
@@ -589,7 +635,7 @@ const styles = StyleSheet.create({
   ratingNumber: {
     fontSize: 32,
     fontWeight: '700',
-    color: '#ee4d2d',
+    color: '#0066CC',
     marginBottom: 4,
   },
   starsRow: {
@@ -605,7 +651,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#fff5f0',
     borderWidth: 1,
-    borderColor: '#ee4d2d',
+    borderColor: '#0066CC',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 8,
@@ -613,7 +659,7 @@ const styles = StyleSheet.create({
   writeReviewText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#ee4d2d',
+    color: '#0066CC',
     marginLeft: 6,
   },
   reviewCard: {
@@ -675,14 +721,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#ee4d2d',
+    borderColor: '#0066CC',
     paddingVertical: 12,
     borderRadius: 8,
   },
   actionButtonSecondaryText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#ee4d2d',
+    color: '#0066CC',
     marginLeft: 6,
   },
   actionButtonPrimary: {
@@ -690,7 +736,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#ee4d2d',
+    backgroundColor: '#0066CC',
     paddingVertical: 12,
     borderRadius: 8,
   },

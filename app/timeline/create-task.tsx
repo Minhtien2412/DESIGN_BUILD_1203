@@ -16,18 +16,18 @@ import {
 } from 'react-native';
 
 const STATUS_OPTIONS: { value: TaskStatus; label: string; color: string }[] = [
-  { value: TaskStatus.NOT_STARTED, label: 'Chưa bắt đầu', color: '#9E9E9E' },
-  { value: TaskStatus.IN_PROGRESS, label: 'Đang thực hiện', color: '#2196F3' },
-  { value: TaskStatus.ON_HOLD, label: 'Tạm dừng', color: '#FF9800' },
-  { value: TaskStatus.COMPLETED, label: 'Hoàn thành', color: '#4CAF50' },
-  { value: TaskStatus.CANCELLED, label: 'Đã hủy', color: '#F44336' },
+  { value: TaskStatus.NOT_STARTED, label: 'Chưa bắt đầu', color: '#999999' },
+  { value: TaskStatus.IN_PROGRESS, label: 'Đang thực hiện', color: '#0066CC' },
+  { value: TaskStatus.ON_HOLD, label: 'Tạm dừng', color: '#0066CC' },
+  { value: TaskStatus.COMPLETED, label: 'Hoàn thành', color: '#0066CC' },
+  { value: TaskStatus.CANCELLED, label: 'Đã hủy', color: '#000000' },
 ];
 
 const PRIORITY_OPTIONS: { value: TaskPriority; label: string; color: string }[] = [
-  { value: TaskPriority.LOW, label: 'Thấp', color: '#4CAF50' },
-  { value: TaskPriority.MEDIUM, label: 'Trung bình', color: '#2196F3' },
-  { value: TaskPriority.HIGH, label: 'Cao', color: '#FF9800' },
-  { value: TaskPriority.CRITICAL, label: 'Khẩn cấp', color: '#F44336' },
+  { value: TaskPriority.LOW, label: 'Thấp', color: '#0066CC' },
+  { value: TaskPriority.MEDIUM, label: 'Trung bình', color: '#0066CC' },
+  { value: TaskPriority.HIGH, label: 'Cao', color: '#0066CC' },
+  { value: TaskPriority.CRITICAL, label: 'Khẩn cấp', color: '#000000' },
 ];
 
 export default function CreateTaskScreen() {
@@ -206,7 +206,7 @@ export default function CreateTaskScreen() {
                 style={styles.dateButton}
                 onPress={() => setShowStartPicker(true)}
               >
-                <Ionicons name="calendar-outline" size={18} color="#2196F3" />
+                <Ionicons name="calendar-outline" size={18} color="#0066CC" />
                 <View style={styles.dateContent}>
                   <Text style={styles.dateLabel}>Bắt đầu</Text>
                   <Text style={styles.dateValue}>{formatDate(startDate)}</Text>
@@ -219,7 +219,7 @@ export default function CreateTaskScreen() {
                 style={styles.dateButton}
                 onPress={() => setShowEndPicker(true)}
               >
-                <Ionicons name="calendar-outline" size={18} color="#2196F3" />
+                <Ionicons name="calendar-outline" size={18} color="#0066CC" />
                 <View style={styles.dateContent}>
                   <Text style={styles.dateLabel}>Kết thúc</Text>
                   <Text style={styles.dateValue}>{formatDate(endDate)}</Text>
@@ -291,7 +291,7 @@ export default function CreateTaskScreen() {
               <Ionicons
                 name="flag"
                 size={20}
-                color={isMilestone ? '#FF9800' : '#999'}
+                color={isMilestone ? '#0066CC' : '#999'}
               />
               <Text style={styles.toggleLabel}>Đánh dấu là cột mốc quan trọng</Text>
             </View>
@@ -383,7 +383,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   required: {
-    color: '#F44336',
+    color: '#000000',
   },
   input: {
     backgroundColor: '#fff',
@@ -414,8 +414,8 @@ const styles = StyleSheet.create({
     borderColor: '#e0e0e0',
   },
   phaseChipSelected: {
-    backgroundColor: '#E3F2FD',
-    borderColor: '#2196F3',
+    backgroundColor: '#E8F4FF',
+    borderColor: '#0066CC',
   },
   phaseIndicator: {
     width: 4,
@@ -427,7 +427,7 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   phaseChipTextSelected: {
-    color: '#2196F3',
+    color: '#0066CC',
     fontWeight: '600',
   },
   dateRow: {
@@ -463,7 +463,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
     padding: 8,
     borderRadius: 6,
     marginTop: 8,
@@ -527,7 +527,7 @@ const styles = StyleSheet.create({
     padding: 2,
   },
   toggleActive: {
-    backgroundColor: '#FF9800',
+    backgroundColor: '#0066CC',
   },
   toggleThumb: {
     width: 24,
@@ -563,7 +563,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 14,
     borderRadius: 8,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     alignItems: 'center',
   },
   saveButtonDisabled: {

@@ -21,11 +21,11 @@ const CONTRACT_TYPE_ICONS: Record<ContractType, string> = {
 };
 
 const CONTRACT_TYPE_COLORS: Record<ContractType, string> = {
-  CONSTRUCTION: '#FF9800',
-  DESIGN: '#9C27B0',
-  CONSULTING: '#2196F3',
-  SUPPLY: '#4CAF50',
-  MAINTENANCE: '#F44336',
+  CONSTRUCTION: '#0066CC',
+  DESIGN: '#999999',
+  CONSULTING: '#0066CC',
+  SUPPLY: '#0066CC',
+  MAINTENANCE: '#000000',
 };
 
 const CONTRACT_TYPE_LABELS: Record<ContractType, string> = {
@@ -88,7 +88,7 @@ export default function CreateContractScreen() {
             onPress={handleCreateFromScratch}
           >
             <View style={styles.createButtonIcon}>
-              <Ionicons name="add-circle" size={32} color="#2196F3" />
+              <Ionicons name="add-circle" size={32} color="#0066CC" />
             </View>
             <View style={styles.createButtonContent}>
               <Text style={styles.createButtonTitle}>Tạo hợp đồng từ đầu</Text>
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#2196F3',
+    borderColor: '#0066CC',
     borderStyle: 'dashed',
   },
   createButtonIcon: {
@@ -289,7 +289,7 @@ const styles = StyleSheet.create({
   createButtonTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#2196F3',
+    color: '#0066CC',
     marginBottom: 4,
   },
   createButtonSubtitle: {

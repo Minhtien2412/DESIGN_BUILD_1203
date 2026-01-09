@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Material Testing Screen
  */
 
@@ -38,11 +38,11 @@ const STATUS_FILTERS: { value: TestStatus | 'ALL'; label: string }[] = [
 
 const STATUS_COLORS: Record<TestStatus, string> = {
   PENDING: '#6B7280',
-  IN_PROGRESS: '#F59E0B',
+  IN_PROGRESS: '#0066CC',
   COMPLETED: '#3B82F6',
-  PASSED: '#10B981',
-  FAILED: '#EF4444',
-  RETEST_REQUIRED: '#F97316',
+  PASSED: '#0066CC',
+  FAILED: '#000000',
+  RETEST_REQUIRED: '#0066CC',
   CANCELLED: '#9CA3AF',
 };
 
@@ -106,7 +106,7 @@ export default function TestsScreen() {
     <View style={styles.container}>
       {/* Stats Cards */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.statsContainer}>
-        <View style={[styles.statCard, { backgroundColor: '#EFF6FF' }]}>
+        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
           <Text style={styles.statValue}>{tests.length}</Text>
           <Text style={styles.statLabel}>Total Tests</Text>
         </View>
@@ -117,23 +117,23 @@ export default function TestsScreen() {
         </View>
 
         <View style={[styles.statCard, { backgroundColor: '#FEF3C7' }]}>
-          <Text style={[styles.statValue, { color: '#F59E0B' }]}>{inProgressCount}</Text>
+          <Text style={[styles.statValue, { color: '#0066CC' }]}>{inProgressCount}</Text>
           <Text style={styles.statLabel}>In Progress</Text>
         </View>
 
         <View style={[styles.statCard, { backgroundColor: '#D1FAE5' }]}>
-          <Text style={[styles.statValue, { color: '#10B981' }]}>{passedCount}</Text>
+          <Text style={[styles.statValue, { color: '#0066CC' }]}>{passedCount}</Text>
           <Text style={styles.statLabel}>Passed</Text>
         </View>
 
         <View style={[styles.statCard, { backgroundColor: '#FEE2E2' }]}>
-          <Text style={[styles.statValue, { color: '#EF4444' }]}>{failedCount}</Text>
+          <Text style={[styles.statValue, { color: '#000000' }]}>{failedCount}</Text>
           <Text style={styles.statLabel}>Failed</Text>
         </View>
 
         {analytics && (
           <View style={[styles.statCard, { backgroundColor: '#F3F4F6' }]}>
-            <Text style={[styles.statValue, { color: '#059669' }]}>
+            <Text style={[styles.statValue, { color: '#0066CC' }]}>
               {analytics.summary.testPassRate.toFixed(1)}%
             </Text>
             <Text style={styles.statLabel}>Pass Rate</Text>
@@ -302,7 +302,7 @@ export default function TestsScreen() {
                       <Text
                         style={[
                           styles.passRateText,
-                          { color: test.result.passRate >= 80 ? '#10B981' : '#EF4444' },
+                          { color: test.result.passRate >= 80 ? '#0066CC' : '#000000' },
                         ]}
                       >
                         {test.result.passRate.toFixed(0)}% Pass
@@ -312,7 +312,7 @@ export default function TestsScreen() {
 
                   {test.parameters.slice(0, 4).map((param, index) => {
                     const resultColor =
-                      param.result === 'PASS' ? '#10B981' : param.result === 'FAIL' ? '#EF4444' : '#6B7280';
+                      param.result === 'PASS' ? '#0066CC' : param.result === 'FAIL' ? '#000000' : '#6B7280';
 
                     return (
                       <View key={index} style={styles.parameterItem}>
@@ -368,7 +368,7 @@ export default function TestsScreen() {
 
                   {test.result.recommendations && (
                     <View style={styles.recommendationsBox}>
-                      <Ionicons name="bulb-outline" size={14} color="#F59E0B" />
+                      <Ionicons name="bulb-outline" size={14} color="#0066CC" />
                       <Text style={styles.recommendationsText}>
                         {test.result.recommendations}
                       </Text>
@@ -381,7 +381,7 @@ export default function TestsScreen() {
               {test.result?.certifiedBy && (
                 <View style={styles.certificationSection}>
                   <View style={styles.certificationRow}>
-                    <Ionicons name="ribbon-outline" size={14} color="#10B981" />
+                    <Ionicons name="ribbon-outline" size={14} color="#0066CC" />
                     <Text style={styles.certificationText}>
                       Certificate #{test.result.certificateNumber}
                     </Text>
@@ -400,7 +400,7 @@ export default function TestsScreen() {
               {/* Retest Warning */}
               {test.result?.retestRequired && test.result.retestParameters && (
                 <View style={styles.retestWarning}>
-                  <Ionicons name="alert-circle" size={16} color="#F59E0B" />
+                  <Ionicons name="alert-circle" size={16} color="#0066CC" />
                   <Text style={styles.retestWarningText}>
                     Retest required for {test.result.retestParameters.length} parameter(s)
                   </Text>
@@ -450,8 +450,8 @@ export default function TestsScreen() {
 
                 {test.certificateUrl && (
                   <TouchableOpacity style={styles.actionButton}>
-                    <Ionicons name="document-text-outline" size={18} color="#10B981" />
-                    <Text style={[styles.actionButtonText, { color: '#10B981' }]}>
+                    <Ionicons name="document-text-outline" size={18} color="#0066CC" />
+                    <Text style={[styles.actionButtonText, { color: '#0066CC' }]}>
                       Certificate
                     </Text>
                   </TouchableOpacity>
@@ -615,7 +615,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 8,
     paddingVertical: 4,
-    backgroundColor: '#DBEAFE',
+    backgroundColor: '#E8F4FF',
     borderRadius: 6,
     alignSelf: 'flex-start',
   },
@@ -777,10 +777,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#3B82F6',
   },
   actionButtonSuccess: {
-    backgroundColor: '#10B981',
+    backgroundColor: '#0066CC',
   },
   actionButtonWarning: {
-    backgroundColor: '#F59E0B',
+    backgroundColor: '#0066CC',
   },
   actionButtonText: {
     fontSize: 12,

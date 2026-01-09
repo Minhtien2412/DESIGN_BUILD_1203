@@ -1,10 +1,13 @@
 /**
  * Timeline - Task Detail
+ * 🔥 UPDATED: Now uses real data from Perfex CRM Tasks
  */
+import { PerfexTask, PerfexTasksService } from '@/services/perfexCRM';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
+    ActivityIndicator,
     ScrollView,
     StyleSheet,
     Text,
@@ -14,7 +17,22 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-const MOCK_TASK = {
+interface TaskDetail {
+  id: string;
+  title: string;
+  description: string;
+  status: 'pending' | 'in_progress' | 'completed';
+  progress: number;
+  startDate: string;
+  endDate: string;
+  assignee: string;
+  phase: string;
+  dependencies: string[];
+  isCritical: boolean;
+}
+
+// Fallback data khi CRM không khả dụng
+const FALLBACK_TASK: TaskDetail = {
   id: '1',
   title: 'Thiết kế kiến trúc',
   description: 'Hoàn thành bản vẽ thiết kế kiến trúc chi tiết',
@@ -28,19 +46,99 @@ const MOCK_TASK = {
   isCritical: true,
 };
 
+// Map Perfex task status
+function mapTaskStatus(status: number): 'pending' | 'in_progress' | 'completed' {
+  switch (status) {
+    case 5: return 'completed';
+    case 4: return 'in_progress';
+    case 2: return 'in_progress'; // Testing
+    default: return 'pending';
+  }
+}
+
+// Format date
+function formatDate(dateStr: string): string {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('vi-VN');
+}
+
+// Convert Perfex Task to TaskDetail
+function mapPerfexTask(task: PerfexTask): TaskDetail {
+  const status = mapTaskStatus(task.status);
+  const progress = status === 'completed' ? 100 : status === 'in_progress' ? 50 : 0;
+  
+  return {
+    id: task.id,
+    title: task.name,
+    description: task.description || 'Không có mô tả',
+    status,
+    progress,
+    startDate: formatDate(task.startdate),
+    endDate: formatDate(task.duedate || ''),
+    assignee: 'Đang cập nhật', // API doesn't return assignees directly
+    phase: 'Đang cập nhật', // API doesn't return milestone_name
+    dependencies: [],
+    isCritical: task.priority >= 3, // 3=High, 4=Urgent
+  };
+}
+
 export default function TaskDetailScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const [task] = useState(MOCK_TASK);
+  
+  const [loading, setLoading] = useState(true);
+  const [task, setTask] = useState<TaskDetail>(FALLBACK_TASK);
+  const [dataSource, setDataSource] = useState<'crm' | 'mock'>('mock');
+
+  // Load task from CRM
+  const loadTask = useCallback(async () => {
+    if (!id) {
+      setLoading(false);
+      return;
+    }
+    
+    try {
+      const response = await PerfexTasksService.getById(id);
+      
+      // getById returns PerfexTask directly, not wrapped in {success, data}
+      if (response && response.id) {
+        setTask(mapPerfexTask(response));
+        setDataSource('crm');
+        console.log(`✅ Loaded task ${id} from CRM`);
+      } else {
+        throw new Error('CRM không phản hồi');
+      }
+    } catch (error) {
+      console.warn('⚠️ CRM không khả dụng, sử dụng dữ liệu mẫu:', error);
+      setTask(FALLBACK_TASK);
+      setDataSource('mock');
+    } finally {
+      setLoading(false);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    loadTask();
+  }, [loadTask]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed': return '#22c55e';
-      case 'in_progress': return '#f59e0b';
+      case 'completed': return '#0066CC';
+      case 'in_progress': return '#0066CC';
       case 'pending': return '#6b7280';
       default: return '#6b7280';
     }
   };
+
+  if (loading) {
+    return (
+      <SafeAreaView style={[styles.container, styles.loadingContainer]} edges={['top']}>
+        <ActivityIndicator size="large" color="#0066CC" />
+        <Text style={styles.loadingText}>Đang tải chi tiết công việc...</Text>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -56,6 +154,13 @@ export default function TaskDetailScreen() {
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {/* Data Source Indicator */}
+        {dataSource === 'mock' && (
+          <View style={styles.mockIndicator}>
+            <Text style={styles.mockIndicatorText}>📋 Dữ liệu mẫu - CRM không khả dụng</Text>
+          </View>
+        )}
+        
         {/* Task Card */}
         <View style={styles.card}>
           <View style={styles.titleRow}>
@@ -109,16 +214,18 @@ export default function TaskDetailScreen() {
         </View>
 
         {/* Dependencies */}
-        <View style={styles.card}>
-          <Text style={styles.sectionTitle}>Công việc phụ thuộc</Text>
-          {task.dependencies.map((dep, index) => (
-            <View key={index} style={styles.depItem}>
-              <Ionicons name="git-branch-outline" size={16} color="#666" />
-              <Text style={styles.depText}>{dep}</Text>
-              <Ionicons name="checkmark-circle" size={16} color="#22c55e" />
-            </View>
-          ))}
-        </View>
+        {task.dependencies.length > 0 && (
+          <View style={styles.card}>
+            <Text style={styles.sectionTitle}>Công việc phụ thuộc</Text>
+            {task.dependencies.map((dep, index) => (
+              <View key={index} style={styles.depItem}>
+                <Ionicons name="git-branch-outline" size={16} color="#666" />
+                <Text style={styles.depText}>{dep}</Text>
+                <Ionicons name="checkmark-circle" size={16} color="#0066CC" />
+              </View>
+            ))}
+          </View>
+        )}
 
         {/* Update Progress */}
         <View style={styles.card}>
@@ -150,7 +257,7 @@ export default function TaskDetailScreen() {
       {/* Bottom Actions */}
       <View style={styles.bottomBar}>
         <TouchableOpacity style={styles.actionBtn}>
-          <Ionicons name="create-outline" size={20} color="#EE4D2D" />
+          <Ionicons name="create-outline" size={20} color="#0066CC" />
           <Text style={styles.actionBtnText}>Chỉnh sửa</Text>
         </TouchableOpacity>
         <TouchableOpacity style={[styles.actionBtn, styles.primaryBtn]}>
@@ -164,6 +271,27 @@ export default function TaskDetailScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f5f5f5' },
+  loadingContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 14,
+    color: '#6b7280',
+  },
+  mockIndicator: {
+    backgroundColor: '#FEF3C7',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    marginBottom: 12,
+    borderRadius: 8,
+  },
+  mockIndicatorText: {
+    color: '#92400E',
+    fontSize: 12,
+    textAlign: 'center',
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -192,7 +320,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4, 
     borderRadius: 6 
   },
-  criticalText: { fontSize: 10, fontWeight: '700', color: '#ef4444' },
+  criticalText: { fontSize: 10, fontWeight: '700', color: '#000000' },
   taskDesc: { fontSize: 14, color: '#666', lineHeight: 20, marginBottom: 12 },
   phaseTag: { 
     flexDirection: 'row', 
@@ -234,7 +362,7 @@ const styles = StyleSheet.create({
     borderColor: '#e0e0e0',
     alignItems: 'center',
   },
-  progressBtnActive: { backgroundColor: '#EE4D2D', borderColor: '#EE4D2D' },
+  progressBtnActive: { backgroundColor: '#0066CC', borderColor: '#0066CC' },
   progressBtnText: { fontSize: 14, fontWeight: '600', color: '#666' },
   progressBtnTextActive: { color: '#fff' },
   noteInput: { 
@@ -261,9 +389,9 @@ const styles = StyleSheet.create({
     paddingVertical: 14, 
     borderRadius: 12, 
     borderWidth: 1, 
-    borderColor: '#EE4D2D', 
+    borderColor: '#0066CC', 
     gap: 6 
   },
-  actionBtnText: { fontSize: 14, fontWeight: '600', color: '#EE4D2D' },
-  primaryBtn: { backgroundColor: '#EE4D2D', borderColor: '#EE4D2D' },
+  actionBtnText: { fontSize: 14, fontWeight: '600', color: '#0066CC' },
+  primaryBtn: { backgroundColor: '#0066CC', borderColor: '#0066CC' },
 });

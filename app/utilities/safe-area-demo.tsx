@@ -164,7 +164,7 @@ useHideTabBar(true);`}
 
             {/* Bottom indicator */}
             <View style={styles.bottomIndicator}>
-              <Ionicons name="checkmark-circle" size={24} color="#10B981" />
+              <Ionicons name="checkmark-circle" size={24} color="#0066CC" />
               <Text style={styles.bottomText}>
                 ✅ Content này không bị tab bar che!
               </Text>
@@ -176,7 +176,7 @@ useHideTabBar(true);`}
         <SafeView hasTabBar={!hideTabBar}>
           <View style={styles.staticContainer}>
             <View style={styles.header}>
-              <Ionicons name="apps" size={48} color="#8B5CF6" />
+              <Ionicons name="apps" size={48} color="#666666" />
               <Text style={styles.title}>SafeView Example</Text>
               <Text style={styles.subtitle}>Static layout (không scroll)</Text>
             </View>
@@ -370,7 +370,7 @@ const styles = StyleSheet.create({
   bottomText: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#059669',
+    color: '#0066CC',
     textAlign: 'center',
   },
   fixedBottom: {

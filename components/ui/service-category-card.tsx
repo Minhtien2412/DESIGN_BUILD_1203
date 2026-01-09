@@ -22,22 +22,22 @@ const CATEGORY_CONFIG = {
   },
   labor: { 
     label: 'Nhân công', 
-    color: '#10B981',
+    color: '#0066CC',
     icon: 'people' as const
   },
   material: { 
     label: 'Vật tư', 
-    color: '#F59E0B',
+    color: '#0066CC',
     icon: 'cube' as const
   },
   finishing: { 
     label: 'Hoàn thiện', 
-    color: '#8B5CF6',
+    color: '#666666',
     icon: 'brush' as const
   },
   tech: { 
     label: 'Kỹ thuật', 
-    color: '#EC4899',
+    color: '#666666',
     icon: 'settings' as const
   },
 };
@@ -122,7 +122,7 @@ export function ServiceCategoryCard({
         <View style={styles.features}>
           {service.features.slice(0, 3).map((feature, index) => (
             <View key={index} style={styles.featureItem}>
-              <Ionicons name="checkmark-circle" size={12} color="#10B981" />
+              <Ionicons name="checkmark-circle" size={12} color="#0066CC" />
               <Text style={styles.featureText} numberOfLines={1}>
                 {feature}
               </Text>
@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#EF4444',
+    color: '#000000',
   },
   unit: {
     fontSize: 12,

@@ -46,12 +46,12 @@ export default function FleetScreen() {
 
   const getStatusColor = (status: VehicleStatus) => {
     switch (status) {
-      case 'ACTIVE': return '#22c55e';
+      case 'ACTIVE': return '#0066CC';
       case 'INACTIVE': return '#6b7280';
-      case 'IN_MAINTENANCE': return '#f59e0b';
-      case 'IN_REPAIR': return '#ef4444';
+      case 'IN_MAINTENANCE': return '#0066CC';
+      case 'IN_REPAIR': return '#000000';
       case 'RESERVED': return '#3b82f6';
-      case 'OUT_OF_SERVICE': return '#dc2626';
+      case 'OUT_OF_SERVICE': return '#000000';
       case 'RETIRED': return '#9ca3af';
       default: return textMutedColor;
     }
@@ -77,13 +77,13 @@ export default function FleetScreen() {
             </View>
             <View style={[styles.statCard, { backgroundColor: surfaceColor, borderColor }]}>
               <ThemedText type="default" style={styles.statLabel}>Active</ThemedText>
-              <ThemedText type="title" style={[styles.statValue, { color: '#22c55e' }]}>
+              <ThemedText type="title" style={[styles.statValue, { color: '#0066CC' }]}>
                 {summary?.activeVehicles || 0}
               </ThemedText>
             </View>
             <View style={[styles.statCard, { backgroundColor: surfaceColor, borderColor }]}>
               <ThemedText type="default" style={styles.statLabel}>In Maintenance</ThemedText>
-              <ThemedText type="title" style={[styles.statValue, { color: '#f59e0b' }]}>
+              <ThemedText type="title" style={[styles.statValue, { color: '#0066CC' }]}>
                 {summary?.inMaintenanceVehicles || 0}
               </ThemedText>
             </View>

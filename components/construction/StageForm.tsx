@@ -95,14 +95,14 @@ const validateStageForm = (data: StageFormData): ValidationErrors => {
 
 const STAGE_COLORS = [
   { value: '#3B82F6', label: 'Xanh dương' },
-  { value: '#10B981', label: 'Xanh lá' },
-  { value: '#F59E0B', label: 'Vàng' },
-  { value: '#EF4444', label: 'Đỏ' },
-  { value: '#8B5CF6', label: 'Tím' },
-  { value: '#EC4899', label: 'Hồng' },
+  { value: '#0066CC', label: 'Xanh lá' },
+  { value: '#0066CC', label: 'Vàng' },
+  { value: '#000000', label: 'Đỏ' },
+  { value: '#666666', label: 'Tím' },
+  { value: '#666666', label: 'Hồng' },
   { value: '#14B8A6', label: 'Xanh ngọc' },
-  { value: '#F97316', label: 'Cam' },
-  { value: '#6366F1', label: 'Indigo' },
+  { value: '#0066CC', label: 'Cam' },
+  { value: '#666666', label: 'Indigo' },
   { value: '#6B7280', label: 'Xám' },
 ];
 
@@ -140,8 +140,8 @@ export const StageForm: React.FC<StageFormProps> = ({
   const statusOptions: Array<{ value: Stage['status']; label: string; color: string }> = [
     { value: 'pending', label: 'Chờ xử lý', color: '#9CA3AF' },
     { value: 'active', label: 'Đang thực hiện', color: '#3B82F6' },
-    { value: 'completed', label: 'Hoàn thành', color: '#10B981' },
-    { value: 'cancelled', label: 'Đã hủy', color: '#EF4444' },
+    { value: 'completed', label: 'Hoàn thành', color: '#0066CC' },
+    { value: 'cancelled', label: 'Đã hủy', color: '#000000' },
   ];
 
   // Initialize form with stage data in edit mode
@@ -505,7 +505,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   required: {
-    color: '#EF4444',
+    color: '#000000',
   },
   input: {
     borderWidth: 1,
@@ -517,7 +517,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   inputError: {
-    borderColor: '#EF4444',
+    borderColor: '#000000',
   },
   textArea: {
     height: 100,
@@ -525,7 +525,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 12,
-    color: '#EF4444',
+    color: '#000000',
     marginTop: 4,
   },
   picker: {

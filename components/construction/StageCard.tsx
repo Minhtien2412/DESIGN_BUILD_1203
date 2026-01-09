@@ -32,9 +32,9 @@ export default function StageCard({
   const isActive = stage.status === 'active';
 
   const getStatusColor = () => {
-    if (isCompleted) return '#4CAF50';
-    if (isActive) return '#2196F3';
-    return '#9E9E9E';
+    if (isCompleted) return '#0066CC';
+    if (isActive) return '#0066CC';
+    return '#999999';
   };
 
   const getStatusIcon = () => {
@@ -106,11 +106,11 @@ export default function StageCard({
             <Text style={styles.statLabel}>Total Tasks</Text>
           </View>
           <View style={styles.statItem}>
-            <Text style={[styles.statValue, { color: '#4CAF50' }]}>{completedTasks}</Text>
+            <Text style={[styles.statValue, { color: '#0066CC' }]}>{completedTasks}</Text>
             <Text style={styles.statLabel}>Completed</Text>
           </View>
           <View style={styles.statItem}>
-            <Text style={[styles.statValue, { color: '#2196F3' }]}>
+            <Text style={[styles.statValue, { color: '#0066CC' }]}>
               {taskCount - completedTasks}
             </Text>
             <Text style={styles.statLabel}>Remaining</Text>
@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
   },
   cardSelected: {
     borderWidth: 2,
-    borderColor: '#2196F3',
+    borderColor: '#0066CC',
     shadowOpacity: 0.2,
     elevation: 4,
   },
@@ -350,7 +350,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   editButton: {
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
   },
   deleteButton: {
     backgroundColor: '#FFEBEE',
@@ -377,7 +377,7 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   taskBadge: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     color: '#fff',
     fontSize: 11,
     fontWeight: '600',

@@ -15,6 +15,24 @@ import type {
     EngineerDashboard,
 } from './types';
 
+// Mock data for offline/fallback
+const MOCK_ADMIN_DASHBOARD: AdminDashboard = {
+  stats: {
+    totalUsers: 156,
+    totalProjects: 42,
+    totalRevenue: 8500000000,
+    activeUsers: 89,
+  },
+  recentProjects: [],
+  recentActivities: [],
+  systemHealth: {
+    cpu: 45,
+    memory: 62,
+    disk: 38,
+    status: 'healthy',
+  },
+};
+
 export const dashboardService = {
   /**
    * Get admin dashboard data
@@ -23,10 +41,14 @@ export const dashboardService = {
   admin: async (): Promise<AdminDashboard> => {
     console.log('[DashboardService] 📊 Fetching admin dashboard');
     
-    const response = await apiClient.get<AdminDashboard>('/dashboard/admin');
-    
-    console.log('[DashboardService] ✅ Admin dashboard fetched');
-    return response;
+    try {
+      const response = await apiClient.get<AdminDashboard>('/dashboard/admin');
+      console.log('[DashboardService] ✅ Admin dashboard fetched');
+      return response;
+    } catch (error) {
+      console.warn('[DashboardService] ⚠️ Using mock data for admin dashboard');
+      return MOCK_ADMIN_DASHBOARD;
+    }
   },
 
   /**

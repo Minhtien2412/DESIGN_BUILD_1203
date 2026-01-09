@@ -1,6 +1,6 @@
-﻿/**
+/**
  * Enhanced Register Screen
- * Sử dụng API backend thật
+ * S? d?ng API backend th?t
  */
 
 import { useAuth } from '@/context/AuthContext';
@@ -48,18 +48,18 @@ export default function EnhancedRegisterScreen() {
 
     // Name validation
     if (!formData.name.trim()) {
-      newErrors.name = 'Vui lòng nhập họ tên';
+      newErrors.name = 'Vui l�ng nh?p h? t�n';
     } else if (formData.name.trim().length < 2) {
-      newErrors.name = 'Họ tên phải có ít nhất 2 ký tự';
+      newErrors.name = 'H? t�n ph?i c� �t nh?t 2 k� t?';
     }
 
     // Email validation
     if (!formData.email.trim()) {
-      newErrors.email = 'Vui lòng nhập email';
+      newErrors.email = 'Vui l�ng nh?p email';
     } else {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(formData.email)) {
-        newErrors.email = 'Email không hợp lệ';
+        newErrors.email = 'Email kh�ng h?p l?';
       }
     }
 
@@ -67,38 +67,38 @@ export default function EnhancedRegisterScreen() {
     if (formData.phone.trim()) {
       const phoneRegex = /^(\+84|84|0)([3|5|7|8|9])+([0-9]{8})$/;
       if (!phoneRegex.test(formData.phone.replace(/\s/g, ''))) {
-        newErrors.phone = 'Số điện thoại không hợp lệ';
+        newErrors.phone = 'S? di?n tho?i kh�ng h?p l?';
       }
     }
 
     // Username validation (optional)
     if (formData.username.trim()) {
       if (formData.username.length < 3) {
-        newErrors.username = 'Username phải có ít nhất 3 ký tự';
+        newErrors.username = 'Username ph?i c� �t nh?t 3 k� t?';
       } else if (!/^[a-zA-Z0-9_]+$/.test(formData.username)) {
-        newErrors.username = 'Username chỉ được chứa chữ, số và dấu gạch dưới';
+        newErrors.username = 'Username ch? du?c ch?a ch?, s? v� d?u g?ch du?i';
       }
     }
 
     // Password validation
     if (!formData.password) {
-      newErrors.password = 'Vui lòng nhập mật khẩu';
+      newErrors.password = 'Vui l�ng nh?p m?t kh?u';
     } else if (formData.password.length < 6) {
-      newErrors.password = 'Mật khẩu phải có ít nhất 6 ký tự';
+      newErrors.password = 'M?t kh?u ph?i c� �t nh?t 6 k� t?';
     } else if (!/(?=.*[a-zA-Z])(?=.*[0-9])/.test(formData.password)) {
-      newErrors.password = 'Mật khẩu phải chứa ít nhất 1 chữ và 1 số';
+      newErrors.password = 'M?t kh?u ph?i ch?a �t nh?t 1 ch? v� 1 s?';
     }
 
     // Confirm password validation
     if (!formData.confirmPassword) {
-      newErrors.confirmPassword = 'Vui lòng xác nhận mật khẩu';
+      newErrors.confirmPassword = 'Vui l�ng x�c nh?n m?t kh?u';
     } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Mật khẩu xác nhận không khớp';
+      newErrors.confirmPassword = 'M?t kh?u x�c nh?n kh�ng kh?p';
     }
 
     // Terms validation
     if (!termsAccepted) {
-      newErrors.terms = 'Vui lòng đồng ý với điều khoản sử dụng';
+      newErrors.terms = 'Vui l�ng d?ng � v?i di?u kho?n s? d?ng';
     }
 
     setErrors(newErrors);
@@ -114,8 +114,8 @@ export default function EnhancedRegisterScreen() {
     try {
       await signUp(formData.email.trim(), formData.password, formData.name.trim());
       Alert.alert(
-        'Đăng ký thành công!', 
-        'Tài khoản của bạn đã được tạo. Vui lòng đăng nhập để tiếp tục.',
+        '�ang k� th�nh c�ng!', 
+        'T�i kho?n c?a b?n d� du?c t?o. Vui l�ng dang nh?p d? ti?p t?c.',
         [
           { 
             text: 'OK', 
@@ -125,7 +125,7 @@ export default function EnhancedRegisterScreen() {
       );
     } catch (error: any) {
       console.error('Register error:', error);
-      Alert.alert('Lỗi đăng ký', error.message || 'Có lỗi xảy ra. Vui lòng thử lại.');
+      Alert.alert('L?i dang k�', error.message || 'C� l?i x?y ra. Vui l�ng th? l?i.');
     }
   };
 
@@ -152,7 +152,7 @@ export default function EnhancedRegisterScreen() {
     return (
       <Container>
         <Loader />
-        <Text style={styles.loadingText}>Đang tạo tài khoản...</Text>
+        <Text style={styles.loadingText}>�ang t?o t�i kho?n...</Text>
       </Container>
     );
   }
@@ -170,9 +170,9 @@ export default function EnhancedRegisterScreen() {
         <Container>
           {/* Header */}
           <Section style={styles.header}>
-            <Text style={styles.title}>Đăng Ký</Text>
+            <Text style={styles.title}>�ang K�</Text>
             <Text style={styles.subtitle}>
-              Tạo tài khoản mới để bắt đầu
+              T?o t�i kho?n m?i d? b?t d?u
             </Text>
           </Section>
 
@@ -181,12 +181,12 @@ export default function EnhancedRegisterScreen() {
             <View style={styles.form}>
               {/* Name Input */}
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Họ và tên *</Text>
+                <Text style={styles.label}>H? v� t�n *</Text>
                 <TextInput
                   style={[styles.input, errors.name && styles.inputError]}
                   value={formData.name}
                   onChangeText={(value) => handleInputChange('name', value)}
-                  placeholder="Nhập họ và tên đầy đủ"
+                  placeholder="Nh?p h? v� t�n d?y d?"
                   autoCapitalize="words"
                   autoCorrect={false}
                 />
@@ -202,7 +202,7 @@ export default function EnhancedRegisterScreen() {
                   style={[styles.input, errors.email && styles.inputError]}
                   value={formData.email}
                   onChangeText={(value) => handleInputChange('email', value)}
-                  placeholder="Nhập địa chỉ email"
+                  placeholder="Nh?p d?a ch? email"
                   autoCapitalize="none"
                   autoCorrect={false}
                   keyboardType="email-address"
@@ -214,12 +214,12 @@ export default function EnhancedRegisterScreen() {
 
               {/* Phone Input */}
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Số điện thoại</Text>
+                <Text style={styles.label}>S? di?n tho?i</Text>
                 <TextInput
                   style={[styles.input, errors.phone && styles.inputError]}
                   value={formData.phone}
                   onChangeText={(value) => handleInputChange('phone', value)}
-                  placeholder="Nhập số điện thoại (tùy chọn)"
+                  placeholder="Nh?p s? di?n tho?i (t�y ch?n)"
                   autoCapitalize="none"
                   keyboardType="phone-pad"
                 />
@@ -235,7 +235,7 @@ export default function EnhancedRegisterScreen() {
                   style={[styles.input, errors.username && styles.inputError]}
                   value={formData.username}
                   onChangeText={(value) => handleInputChange('username', value)}
-                  placeholder="Tên đăng nhập (tùy chọn)"
+                  placeholder="T�n dang nh?p (t�y ch?n)"
                   autoCapitalize="none"
                   autoCorrect={false}
                 />
@@ -246,13 +246,13 @@ export default function EnhancedRegisterScreen() {
 
               {/* Password Input */}
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Mật khẩu *</Text>
+                <Text style={styles.label}>M?t kh?u *</Text>
                 <View style={styles.passwordContainer}>
                   <TextInput
                     style={[styles.input, styles.passwordInput, errors.password && styles.inputError]}
                     value={formData.password}
                     onChangeText={(value) => handleInputChange('password', value)}
-                    placeholder="Nhập mật khẩu (ít nhất 6 ký tự)"
+                    placeholder="Nh?p m?t kh?u (�t nh?t 6 k� t?)"
                     secureTextEntry={!showPassword}
                     autoCapitalize="none"
                     autoCorrect={false}
@@ -262,7 +262,7 @@ export default function EnhancedRegisterScreen() {
                     onPress={() => setShowPassword(!showPassword)}
                   >
                     <Text style={styles.passwordToggleText}>
-                      {showPassword ? '🙈' : '👁️'}
+                      {showPassword ? '??' : '???'}
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -273,13 +273,13 @@ export default function EnhancedRegisterScreen() {
 
               {/* Confirm Password Input */}
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Xác nhận mật khẩu *</Text>
+                <Text style={styles.label}>X�c nh?n m?t kh?u *</Text>
                 <View style={styles.passwordContainer}>
                   <TextInput
                     style={[styles.input, styles.passwordInput, errors.confirmPassword && styles.inputError]}
                     value={formData.confirmPassword}
                     onChangeText={(value) => handleInputChange('confirmPassword', value)}
-                    placeholder="Nhập lại mật khẩu"
+                    placeholder="Nh?p l?i m?t kh?u"
                     secureTextEntry={!showConfirmPassword}
                     autoCapitalize="none"
                     autoCorrect={false}
@@ -289,7 +289,7 @@ export default function EnhancedRegisterScreen() {
                     onPress={() => setShowConfirmPassword(!showConfirmPassword)}
                   >
                     <Text style={styles.passwordToggleText}>
-                      {showConfirmPassword ? '🙈' : '👁️'}
+                      {showConfirmPassword ? '??' : '???'}
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -310,14 +310,14 @@ export default function EnhancedRegisterScreen() {
                   }}
                 >
                   <View style={[styles.checkboxInner, termsAccepted && styles.checkboxChecked]}>
-                    {termsAccepted && <Text style={styles.checkboxText}>✓</Text>}
+                    {termsAccepted && <Text style={styles.checkboxText}>?</Text>}
                   </View>
                 </TouchableOpacity>
                 <Text style={styles.termsText}>
-                  Tôi đồng ý với{' '}
-                  <Text style={styles.termsLink}>điều khoản sử dụng</Text>
-                  {' '}và{' '}
-                  <Text style={styles.termsLink}>chính sách bảo mật</Text>
+                  T�i d?ng � v?i{' '}
+                  <Text style={styles.termsLink}>di?u kho?n s? d?ng</Text>
+                  {' '}v�{' '}
+                  <Text style={styles.termsLink}>ch�nh s�ch b?o m?t</Text>
                 </Text>
               </View>
               {errors.terms && (
@@ -326,7 +326,7 @@ export default function EnhancedRegisterScreen() {
 
               {/* Register Button */}
               <Button
-                title="Đăng Ký"
+                title="�ang K�"
                 onPress={handleRegister}
                 loading={loading}
                 style={styles.registerButton}
@@ -338,11 +338,11 @@ export default function EnhancedRegisterScreen() {
           <Section style={styles.footer}>
             <View style={styles.loginContainer}>
               <Text style={styles.loginText}>
-                Đã có tài khoản? 
+                �� c� t�i kho?n? 
               </Text>
               <TouchableOpacity onPress={handleLogin}>
                 <Text style={styles.loginLink}>
-                  Đăng nhập ngay
+                  �ang nh?p ngay
                 </Text>
               </TouchableOpacity>
             </View>
@@ -351,7 +351,7 @@ export default function EnhancedRegisterScreen() {
           {/* API Status */}
           <Section style={styles.apiStatus}>
             <Text style={styles.apiStatusText}>
-              🔗 Kết nối với API: api.thietkeresort.com.vn
+              ?? K?t n?i v?i API: api.thietkeresort.com.vn
             </Text>
           </Section>
         </Container>
@@ -412,7 +412,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f9fa',
   },
   inputError: {
-    borderColor: '#f44336',
+    borderColor: '#000000',
     backgroundColor: '#ffebee',
   },
   passwordContainer: {
@@ -431,7 +431,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   errorText: {
-    color: '#f44336',
+    color: '#000000',
     fontSize: 14,
     marginTop: 4,
   },
@@ -455,8 +455,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   checkboxChecked: {
-    backgroundColor: '#2196f3',
-    borderColor: '#2196f3',
+    backgroundColor: '#0066CC',
+    borderColor: '#0066CC',
   },
   checkboxText: {
     color: '#fff',
@@ -470,7 +470,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   termsLink: {
-    color: '#2196f3',
+    color: '#0066CC',
     textDecorationLine: 'underline',
   },
   registerButton: {
@@ -490,7 +490,7 @@ const styles = StyleSheet.create({
   },
   loginLink: {
     fontSize: 16,
-    color: '#2196f3',
+    color: '#0066CC',
     fontWeight: '600',
     marginLeft: 4,
     textDecorationLine: 'underline',
@@ -501,7 +501,7 @@ const styles = StyleSheet.create({
   },
   apiStatusText: {
     fontSize: 12,
-    color: '#4caf50',
+    color: '#0066CC',
     fontFamily: 'monospace',
   },
   loadingText: {

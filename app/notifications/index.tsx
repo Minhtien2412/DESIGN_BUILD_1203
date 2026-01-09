@@ -187,7 +187,7 @@ export default function NotificationsScreen() {
             </View>
           )}
           {!isConnected && (
-            <Ionicons name="cloud-offline-outline" size={20} color="#FF9500" style={styles.offlineIcon} />
+            <Ionicons name="cloud-offline-outline" size={20} color="#666666" style={styles.offlineIcon} />
           )}
         </View>
 
@@ -294,7 +294,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   unreadItem: {
-    backgroundColor: '#EE4D2D10',
+    backgroundColor: '#0066CC10',
   },
   checkbox: {
     marginRight: 12,

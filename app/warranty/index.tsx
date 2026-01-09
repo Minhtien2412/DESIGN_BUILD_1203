@@ -49,15 +49,15 @@ export default function WarrantyListScreen() {
   const getStatusColor = (status: WarrantyStatus) => {
     switch (status) {
       case 'ACTIVE':
-        return '#10B981';
+        return '#0066CC';
       case 'EXPIRED':
         return '#6B7280';
       case 'CANCELLED':
-        return '#EF4444';
+        return '#000000';
       case 'PENDING':
-        return '#F59E0B';
+        return '#0080FF';
       case 'SUSPENDED':
-        return '#F59E0B';
+        return '#0080FF';
       default:
         return '#9CA3AF';
     }
@@ -65,31 +65,31 @@ export default function WarrantyListScreen() {
 
   const getExpiryColor = (remainingDays?: number) => {
     if (remainingDays === undefined) return '#9CA3AF';
-    if (remainingDays <= 0) return '#EF4444';
-    if (remainingDays <= 30) return '#EF4444';
-    if (remainingDays <= 90) return '#F59E0B';
-    return '#10B981';
+    if (remainingDays <= 0) return '#000000';
+    if (remainingDays <= 30) return '#000000';
+    if (remainingDays <= 90) return '#0080FF';
+    return '#0066CC';
   };
 
   const renderStats = () => (
     <View style={[styles.statsContainer, { backgroundColor: surfaceColor }]}>
       <View style={styles.statItem}>
-        <Ionicons name="shield-checkmark-outline" size={24} color="#10B981" />
+        <Ionicons name="shield-checkmark-outline" size={24} color="#0066CC" />
         <Text style={[styles.statValue, { color: textColor }]}>{warranties.length}</Text>
         <Text style={[styles.statLabel, { color: textMutedColor }]}>Total</Text>
       </View>
       <View style={styles.statItem}>
-        <Ionicons name="checkmark-circle-outline" size={24} color="#10B981" />
+        <Ionicons name="checkmark-circle-outline" size={24} color="#0066CC" />
         <Text style={[styles.statValue, { color: textColor }]}>{activeWarranties}</Text>
         <Text style={[styles.statLabel, { color: textMutedColor }]}>Active</Text>
       </View>
       <View style={styles.statItem}>
-        <Ionicons name="time-outline" size={24} color="#F59E0B" />
+        <Ionicons name="time-outline" size={24} color="#0080FF" />
         <Text style={[styles.statValue, { color: textColor }]}>{expiringSoon}</Text>
         <Text style={[styles.statLabel, { color: textMutedColor }]}>Expiring</Text>
       </View>
       <View style={styles.statItem}>
-        <Ionicons name="alert-circle-outline" size={24} color="#3B82F6" />
+        <Ionicons name="alert-circle-outline" size={24} color="#0080FF" />
         <Text style={[styles.statValue, { color: textColor }]}>{totalClaims}</Text>
         <Text style={[styles.statLabel, { color: textMutedColor }]}>Claims</Text>
       </View>
@@ -212,9 +212,9 @@ export default function WarrantyListScreen() {
         )}
 
         {warranty.remainingDays !== undefined && warranty.remainingDays <= 0 && (
-          <View style={[styles.expiredBadge, { backgroundColor: '#EF444420' }]}>
-            <Ionicons name="alert-circle-outline" size={16} color="#EF4444" />
-            <Text style={[styles.expiredText, { color: '#EF4444' }]}>
+          <View style={[styles.expiredBadge, { backgroundColor: '#00000020' }]}>
+            <Ionicons name="alert-circle-outline" size={16} color="#000000" />
+            <Text style={[styles.expiredText, { color: '#000000' }]}>
               Expired {Math.abs(warranty.remainingDays)} days ago
             </Text>
           </View>
@@ -229,8 +229,8 @@ export default function WarrantyListScreen() {
           </View>
           {warranty.claimCount > 0 && (
             <View style={styles.claimsBadge}>
-              <Ionicons name="alert-circle-outline" size={14} color="#3B82F6" />
-              <Text style={[styles.claimsText, { color: '#3B82F6' }]}>
+              <Ionicons name="alert-circle-outline" size={14} color="#0080FF" />
+              <Text style={[styles.claimsText, { color: '#0080FF' }]}>
                 {warranty.claimCount} claims
               </Text>
             </View>

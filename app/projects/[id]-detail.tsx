@@ -39,10 +39,10 @@ const theme = Colors.light;
 
 // Status configurations
 const STATUS_CONFIG = {
-  PLANNING: { color: '#f59e0b', label: 'Lên kế hoạch', icon: 'calendar-outline' },
+  PLANNING: { color: '#0066CC', label: 'Lên kế hoạch', icon: 'calendar-outline' },
   IN_PROGRESS: { color: '#3b82f6', label: 'Đang thực hiện', icon: 'construct-outline' },
-  COMPLETED: { color: '#22c55e', label: 'Hoàn thành', icon: 'checkmark-circle-outline' },
-  ON_HOLD: { color: '#ef4444', label: 'Tạm dừng', icon: 'pause-circle-outline' },
+  COMPLETED: { color: '#0066CC', label: 'Hoàn thành', icon: 'checkmark-circle-outline' },
+  ON_HOLD: { color: '#000000', label: 'Tạm dừng', icon: 'pause-circle-outline' },
   CANCELLED: { color: '#94a3b8', label: 'Đã hủy', icon: 'close-circle-outline' },
 };
 

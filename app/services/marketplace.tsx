@@ -492,23 +492,23 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   statusBadgeInactive: {
-    backgroundColor: '#FFEBEE',
+    backgroundColor: '#F5F5F5',
   },
   statusDot: {
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#0066CC',
   },
   statusText: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#4CAF50',
+    color: '#0066CC',
   },
   statusTextInactive: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#F44336',
+    color: '#000000',
   },
   skeletonContainer: {
     padding: 16,

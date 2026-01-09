@@ -1,12 +1,19 @@
 /**
  * Progress Section Component
  * Hiển thị tiến độ xây dựng và thanh toán trên trang chủ
+ * Now supports real data from props
+ * @updated 2026-01-03
  */
 
+import {
+    PerfexProjectsService,
+    type PerfexProject
+} from '@/services/perfexCRM';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
+    ActivityIndicator,
     Dimensions,
     Image,
     Modal,
@@ -33,14 +40,15 @@ interface ProgressItem {
   photos?: string[];
 }
 
-const PROGRESS_ITEMS: ProgressItem[] = [
+// Default mock data - will be replaced by real data if available
+const DEFAULT_PROGRESS_ITEMS: ProgressItem[] = [
   {
     id: 'construction',
     title: 'Tiến độ xây dựng',
     subtitle: 'Tầng trệt - Đang thi công',
     progress: 45,
     icon: 'construct',
-    iconColor: '#8B5CF6',
+    iconColor: '#666666',
     backgroundColor: '#F3E8FF',
     route: '/construction/progress',
     status: 'on-track',
@@ -56,7 +64,7 @@ const PROGRESS_ITEMS: ProgressItem[] = [
     subtitle: '3/8 đợt đã thanh toán',
     progress: 37.5,
     icon: 'cash',
-    iconColor: '#10B981',
+    iconColor: '#0066CC',
     backgroundColor: '#D1FAE5',
     route: '/construction/payment-progress',
     status: 'on-track',
@@ -67,10 +75,68 @@ const PROGRESS_ITEMS: ProgressItem[] = [
   },
 ];
 
-export const ProgressSection: React.FC = () => {
+interface ProgressSectionProps {
+  items?: ProgressItem[];
+}
+
+export const ProgressSection: React.FC<ProgressSectionProps> = ({ items: propItems }) => {
+  const [loading, setLoading] = useState(true);
+  const [progressItems, setProgressItems] = useState<ProgressItem[]>(DEFAULT_PROGRESS_ITEMS);
+  const [dataSource, setDataSource] = useState<'api' | 'mock'>('mock');
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedPhotos, setSelectedPhotos] = useState<string[]>([]);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+
+  // Fetch real data from CRM
+  useEffect(() => {
+    const fetchRealData = async () => {
+      try {
+        const response = await PerfexProjectsService.getAll({ status: 2, limit: 5 });
+        const projects = response.data || [];
+        
+        if (projects.length > 0) {
+          console.log('[ProgressSection] ✅ Loaded', projects.length, 'projects from CRM');
+          
+          // Transform CRM projects to ProgressItems
+          const transformedItems: ProgressItem[] = projects.slice(0, 2).map((project: PerfexProject, index: number) => {
+            const progress = project.progress || 0;
+            const status: ProgressItem['status'] = 
+              progress >= 80 ? 'on-track' : 
+              progress >= 50 ? 'warning' : 
+              'delayed';
+            
+            return {
+              id: project.id,
+              title: project.name,
+              subtitle: getPhaseLabel(progress),
+              progress: progress,
+              icon: index === 0 ? 'construct' : 'cash',
+              iconColor: index === 0 ? '#666666' : '#0066CC',
+              backgroundColor: index === 0 ? '#F3E8FF' : '#D1FAE5',
+              route: `/projects/${project.id}`,
+              status,
+              photos: DEFAULT_PROGRESS_ITEMS[index]?.photos || [],
+            };
+          });
+          
+          setProgressItems(transformedItems);
+          setDataSource('api');
+        }
+      } catch (error) {
+        console.log('[ProgressSection] Using mock data (CRM unavailable)');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (propItems) {
+      setProgressItems(propItems);
+      setDataSource('api');
+      setLoading(false);
+    } else {
+      fetchRealData();
+    }
+  }, [propItems]);
 
   const handlePress = (route: string) => {
     router.push(route as any);
@@ -93,11 +159,11 @@ export const ProgressSection: React.FC = () => {
   const getStatusColor = (status: ProgressItem['status']) => {
     switch (status) {
       case 'on-track':
-        return '#10B981';
+        return '#0066CC';
       case 'warning':
-        return '#F59E0B';
+        return '#0066CC';
       case 'delayed':
-        return '#EF4444';
+        return '#000000';
     }
   };
 
@@ -112,10 +178,27 @@ export const ProgressSection: React.FC = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="small" color="#666666" />
+        <Text style={styles.loadingText}>Đang tải tiến độ...</Text>
+      </View>
+    );
+  }
+
   return (
     <>
+      {/* Data Source Indicator */}
+      {dataSource === 'api' && (
+        <View style={styles.dataSourceBadge}>
+          <View style={styles.liveDot} />
+          <Text style={styles.dataSourceText}>Dữ liệu từ CRM</Text>
+        </View>
+      )}
+      
       <View style={styles.container}>
-        {PROGRESS_ITEMS.map((item) => (
+        {progressItems.map((item) => (
           <View key={item.id} style={styles.card}>
             <TouchableOpacity
               onPress={() => handlePress(item.route)}
@@ -127,7 +210,7 @@ export const ProgressSection: React.FC = () => {
                   <Ionicons name={item.icon} size={24} color={item.iconColor} />
                 </View>
                 <View style={styles.headerText}>
-                  <Text style={styles.title}>{item.title}</Text>
+                  <Text style={styles.title} numberOfLines={1}>{item.title}</Text>
                   <Text style={styles.subtitle}>{item.subtitle}</Text>
                 </View>
                 <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
@@ -455,4 +538,48 @@ const styles = StyleSheet.create({
   nextButton: {
     right: 20,
   },
+  // New styles for loading and data source
+  loadingContainer: {
+    padding: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  loadingText: {
+    fontSize: 12,
+    color: '#6B7280',
+  },
+  dataSourceBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    backgroundColor: '#D1FAE5',
+    borderRadius: 12,
+    alignSelf: 'flex-start',
+  },
+  liveDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#0066CC',
+    marginRight: 6,
+  },
+  dataSourceText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: '#0066CC',
+  },
 });
+
+// Helper function to get phase label from progress
+function getPhaseLabel(progress: number): string {
+  if (progress < 10) return 'Chuẩn bị công trường';
+  if (progress < 25) return 'Móng - Đang thi công';
+  if (progress < 50) return 'Phần thô - Đang thi công';
+  if (progress < 75) return 'Hoàn thiện - Đang thi công';
+  if (progress < 90) return 'M&E - Đang thi công';
+  if (progress < 100) return 'Bàn giao - Kiểm tra';
+  return 'Đã hoàn thành';
+}

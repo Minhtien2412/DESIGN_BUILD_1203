@@ -26,19 +26,19 @@ const STATUS_COLORS: Record<
 > = {
   DRAFT: { bg: '#F3F4F6', text: '#6B7280', border: '#D1D5DB' },
   IN_REVIEW: { bg: '#FEF3C7', text: '#D97706', border: '#FCD34D' },
-  APPROVED: { bg: '#D1FAE5', text: '#059669', border: '#6EE7B7' },
-  ISSUED: { bg: '#DBEAFE', text: '#2563EB', border: '#93C5FD' },
-  SUPERSEDED: { bg: '#E0E7FF', text: '#6366F1', border: '#C7D2FE' },
+  APPROVED: { bg: '#D1FAE5', text: '#0066CC', border: '#6EE7B7' },
+  ISSUED: { bg: '#E8F4FF', text: '#0066CC', border: '#0080FF' },
+  SUPERSEDED: { bg: '#E0E7FF', text: '#666666', border: '#C7D2FE' },
   ARCHIVED: { bg: '#F3F4F6', text: '#4B5563', border: '#D1D5DB' },
 };
 
 const MARKUP_TYPE_COLORS: Record<MarkupType, { bg: string; text: string }> = {
-  REDLINE: { bg: '#FEE2E2', text: '#DC2626' },
-  COMMENT: { bg: '#DBEAFE', text: '#2563EB' },
-  DIMENSION: { bg: '#E0E7FF', text: '#6366F1' },
+  REDLINE: { bg: '#FEE2E2', text: '#000000' },
+  COMMENT: { bg: '#E8F4FF', text: '#0066CC' },
+  DIMENSION: { bg: '#E0E7FF', text: '#666666' },
   ANNOTATION: { bg: '#FEF3C7', text: '#D97706' },
   HIGHLIGHT: { bg: '#FEF08A', text: '#CA8A04' },
-  PHOTO_REFERENCE: { bg: '#D1FAE5', text: '#059669' },
+  PHOTO_REFERENCE: { bg: '#D1FAE5', text: '#0066CC' },
 };
 
 const REVIEW_STATUS_COLORS: Record<
@@ -46,11 +46,11 @@ const REVIEW_STATUS_COLORS: Record<
   { bg: string; text: string; border: string }
 > = {
   PENDING: { bg: '#F3F4F6', text: '#6B7280', border: '#D1D5DB' },
-  IN_PROGRESS: { bg: '#DBEAFE', text: '#2563EB', border: '#93C5FD' },
-  APPROVED: { bg: '#D1FAE5', text: '#059669', border: '#6EE7B7' },
+  IN_PROGRESS: { bg: '#E8F4FF', text: '#0066CC', border: '#0080FF' },
+  APPROVED: { bg: '#D1FAE5', text: '#0066CC', border: '#6EE7B7' },
   APPROVED_WITH_COMMENTS: { bg: '#FEF3C7', text: '#D97706', border: '#FCD34D' },
-  REJECTED: { bg: '#FEE2E2', text: '#DC2626', border: '#FCA5A5' },
-  ON_HOLD: { bg: '#E0E7FF', text: '#6366F1', border: '#C7D2FE' },
+  REJECTED: { bg: '#FEE2E2', text: '#000000', border: '#FCA5A5' },
+  ON_HOLD: { bg: '#E0E7FF', text: '#666666', border: '#C7D2FE' },
 };
 
 export default function AsBuiltDrawingDetailsScreen() {
@@ -259,7 +259,7 @@ export default function AsBuiltDrawingDetailsScreen() {
             {drawing.approvedBy && (
               <Section title="Approved By">
                 <View style={[styles.personCard, { backgroundColor: surfaceColor, borderColor }]}>
-                  <Ionicons name="checkmark-circle" size={40} color="#059669" />
+                  <Ionicons name="checkmark-circle" size={40} color="#0066CC" />
                   <View style={styles.personInfo}>
                     <Text style={[styles.personName, { color: textColor }]}>
                       {drawing.approvedBy.name}
@@ -343,10 +343,10 @@ export default function AsBuiltDrawingDetailsScreen() {
                         <View
                           style={[
                             styles.revisionTypeBadge,
-                            { backgroundColor: '#DBEAFE', borderColor: '#93C5FD' },
+                            { backgroundColor: '#E8F4FF', borderColor: '#0080FF' },
                           ]}
                         >
-                          <Text style={[styles.revisionTypeText, { color: '#2563EB' }]}>
+                          <Text style={[styles.revisionTypeText, { color: '#0066CC' }]}>
                             {revision.revisionType.replace(/_/g, ' ')}
                           </Text>
                         </View>
@@ -369,8 +369,8 @@ export default function AsBuiltDrawingDetailsScreen() {
                       </View>
                       {revision.approvedBy && (
                         <View style={styles.revisionApproval}>
-                          <Ionicons name="checkmark-circle" size={14} color="#059669" />
-                          <Text style={[styles.revisionApprovedText, { color: '#059669' }]}>
+                          <Ionicons name="checkmark-circle" size={14} color="#0066CC" />
+                          <Text style={[styles.revisionApprovedText, { color: '#0066CC' }]}>
                             Approved
                           </Text>
                         </View>
@@ -398,9 +398,9 @@ export default function AsBuiltDrawingDetailsScreen() {
                 {redlines.map((redline) => {
                   const typeStyle = MARKUP_TYPE_COLORS[redline.markupType];
                   const statusColors = {
-                    OPEN: { bg: '#FEE2E2', text: '#DC2626' },
+                    OPEN: { bg: '#FEE2E2', text: '#000000' },
                     ADDRESSED: { bg: '#FEF3C7', text: '#D97706' },
-                    INCORPORATED: { bg: '#D1FAE5', text: '#059669' },
+                    INCORPORATED: { bg: '#D1FAE5', text: '#0066CC' },
                     REJECTED: { bg: '#F3F4F6', text: '#6B7280' },
                   };
                   const statusStyle = statusColors[redline.status];

@@ -138,7 +138,7 @@ export function FeaturedProducts() {
       {/* Section Header */}
       <View style={styles.header}>
         <View style={styles.titleRow}>
-          <Ionicons name="flame" size={24} color="#10B981" />
+          <Ionicons name="flame" size={24} color="#0066CC" />
           <Text style={styles.title}>Featured Deals</Text>
           {error && <Text style={styles.errorBadge}>Offline</Text>}
         </View>
@@ -147,14 +147,14 @@ export function FeaturedProducts() {
           style={styles.viewAllBtn}
         >
           <Text style={styles.viewAllText}>View All</Text>
-          <Ionicons name="arrow-forward" size={16} color="#0A6847" />
+          <Ionicons name="arrow-forward" size={16} color="#0066CC" />
         </Pressable>
       </View>
 
       {/* Products Carousel */}
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#0A6847" />
+          <ActivityIndicator size="large" color="#0066CC" />
         </View>
       ) : (
         <Animated.FlatList
@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
   viewAllText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#0A6847',
+    color: '#0066CC',
   },
   loadingContainer: {
     height: 280,

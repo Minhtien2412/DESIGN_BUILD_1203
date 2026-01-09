@@ -144,13 +144,13 @@ export default function SiteMapScreen() {
                         )}
                         {route.requiresAuth && (
                           <View style={styles.badge}>
-                            <Ionicons name="lock-closed" size={10} color="#f59e0b" />
+                            <Ionicons name="lock-closed" size={10} color="#0066CC" />
                             <Text style={styles.badgeText}>Yêu cầu đăng nhập</Text>
                           </View>
                         )}
                         {route.requiresProject && (
                           <View style={styles.badge}>
-                            <Ionicons name="folder-open" size={10} color="#8b5cf6" />
+                            <Ionicons name="folder-open" size={10} color="#666666" />
                             <Text style={styles.badgeText}>Yêu cầu dự án</Text>
                           </View>
                         )}
@@ -190,13 +190,13 @@ export default function SiteMapScreen() {
                     )}
                     {route.requiresAuth && (
                       <View style={styles.badge}>
-                        <Ionicons name="lock-closed" size={10} color="#f59e0b" />
+                        <Ionicons name="lock-closed" size={10} color="#0066CC" />
                         <Text style={styles.badgeText}>Yêu cầu đăng nhập</Text>
                       </View>
                     )}
                     {route.requiresProject && (
                       <View style={styles.badge}>
-                        <Ionicons name="folder-open" size={10} color="#8b5cf6" />
+                        <Ionicons name="folder-open" size={10} color="#666666" />
                         <Text style={styles.badgeText}>Yêu cầu dự án</Text>
                       </View>
                     )}
@@ -354,7 +354,7 @@ const styles = StyleSheet.create({
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#eff6ff',
+    backgroundColor: '#E8F4FF',
     borderRadius: 8,
   },
   routeInfo: {
@@ -390,7 +390,7 @@ const styles = StyleSheet.create({
   badgeText: {
     fontSize: 10,
     fontWeight: '600',
-    color: '#f59e0b',
+    color: '#0066CC',
   },
   emptyState: {
     alignItems: 'center',

@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   connected: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#0080FF',
   },
   disconnected: {
     backgroundColor: '#1A1A1A',

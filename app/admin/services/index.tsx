@@ -22,11 +22,11 @@ import {
 } from 'react-native';
 
 const CATEGORIES = [
-  { id: 'DESIGN', name: 'Thiết kế', icon: 'color-palette-outline', color: '#8B5CF6' },
-  { id: 'CONSTRUCTION', name: 'Thi công', icon: 'construct-outline', color: '#F59E0B' },
+  { id: 'DESIGN', name: 'Thiết kế', icon: 'color-palette-outline', color: '#666666' },
+  { id: 'CONSTRUCTION', name: 'Thi công', icon: 'construct-outline', color: '#0066CC' },
   { id: 'CONSULTING', name: 'Tư vấn', icon: 'bulb-outline', color: '#3B82F6' },
   { id: 'MAINTENANCE', name: 'Bảo trì', icon: 'construct', color: '#06B6D4' },
-  { id: 'INSPECTION', name: 'Kiểm tra', icon: 'checkmark-circle-outline', color: '#EC4899' },
+  { id: 'INSPECTION', name: 'Kiểm tra', icon: 'checkmark-circle-outline', color: '#666666' },
   { id: 'OTHER', name: 'Khác', icon: 'ellipsis-horizontal-circle-outline', color: '#6B7280' },
 ];
 
@@ -281,7 +281,7 @@ function ServiceCard({
                   styles.statusText,
                   { 
                     color: service.status === 'ACTIVE' ? '#16A34A' : 
-                           service.status === 'INACTIVE' ? '#DC2626' : '#6B7280'
+                           service.status === 'INACTIVE' ? '#000000' : '#6B7280'
                   },
                 ]}
               >
@@ -308,7 +308,7 @@ function ServiceCard({
         </View>
         <View style={styles.actions}>
           <Link href={`/admin/services/edit/${service.id}` as any} asChild>
-            <TouchableOpacity style={[styles.actionButton, { backgroundColor: '#DBEAFE' }]}>
+            <TouchableOpacity style={[styles.actionButton, { backgroundColor: '#E8F4FF' }]}>
               <Ionicons name="create-outline" size={18} color="#3B82F6" />
             </TouchableOpacity>
           </Link>
@@ -316,7 +316,7 @@ function ServiceCard({
             style={[styles.actionButton, { backgroundColor: '#FEE2E2' }]}
             onPress={() => onDelete(service.id)}
           >
-            <Ionicons name="trash-outline" size={18} color="#EF4444" />
+            <Ionicons name="trash-outline" size={18} color="#000000" />
           </TouchableOpacity>
         </View>
       </View>
@@ -452,7 +452,7 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#10B981',
+    color: '#0066CC',
   },
   actions: {
     flexDirection: 'row',
@@ -476,7 +476,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   createButton: {
-    backgroundColor: '#10B981',
+    backgroundColor: '#0066CC',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,

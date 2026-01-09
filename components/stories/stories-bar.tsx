@@ -64,7 +64,7 @@ export function StoriesBar({ stories, onStoryPress }: StoriesBarProps) {
         style={[
           styles.avatarBorder,
           {
-            borderColor: item.hasUnviewed ? '#EF4444' : borderColor,
+            borderColor: item.hasUnviewed ? '#000000' : borderColor,
             borderWidth: item.hasUnviewed ? 2.5 : 1.5,
           },
         ]}

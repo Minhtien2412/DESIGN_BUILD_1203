@@ -94,6 +94,215 @@ function CrmDashboardContent() {
         {activeTab === 'dashboard' && (
           <ScrollView showsVerticalScrollIndicator={false}>
             <DashboardCards />
+            
+            {/* Quick Actions */}
+            <View style={styles.quickActionsSection}>
+              <Text style={styles.sectionTitle}>Truy cập nhanh</Text>
+              <View style={styles.quickActionsGrid}>
+                <TouchableOpacity 
+                  style={styles.quickActionCard}
+                  onPress={() => router.push('/crm/tasks' as any)}
+                >
+                  <View style={[styles.quickActionIcon, { backgroundColor: '#3B82F620' }]}>
+                    <Ionicons name="checkbox-outline" size={24} color="#3B82F6" />
+                  </View>
+                  <Text style={styles.quickActionLabel}>Tasks</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={styles.quickActionCard}
+                  onPress={() => router.push('/crm/leads' as any)}
+                >
+                  <View style={[styles.quickActionIcon, { backgroundColor: '#66666620' }]}>
+                    <Ionicons name="funnel-outline" size={24} color="#666666" />
+                  </View>
+                  <Text style={styles.quickActionLabel}>Leads</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={styles.quickActionCard}
+                  onPress={() => router.push('/crm/invoices' as any)}
+                >
+                  <View style={[styles.quickActionIcon, { backgroundColor: '#0066CC20' }]}>
+                    <Ionicons name="receipt-outline" size={24} color="#0066CC" />
+                  </View>
+                  <Text style={styles.quickActionLabel}>Hóa đơn</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={styles.quickActionCard}
+                  onPress={() => router.push('/crm/customers' as any)}
+                >
+                  <View style={[styles.quickActionIcon, { backgroundColor: '#0066CC20' }]}>
+                    <Ionicons name="people-outline" size={24} color="#0066CC" />
+                  </View>
+                  <Text style={styles.quickActionLabel}>Khách hàng</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+            
+            {/* Enhanced CRM Features */}
+            <View style={styles.quickActionsSection}>
+              <Text style={styles.sectionTitle}>Quản lý nâng cao</Text>
+              <View style={styles.quickActionsGrid}>
+                <TouchableOpacity 
+                  style={styles.quickActionCard}
+                  onPress={() => router.push('/crm/time-tracking' as any)}
+                >
+                  <View style={[styles.quickActionIcon, { backgroundColor: '#22c55e20' }]}>
+                    <Ionicons name="time-outline" size={24} color="#22c55e" />
+                  </View>
+                  <Text style={styles.quickActionLabel}>Chấm công</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={styles.quickActionCard}
+                  onPress={() => router.push('/crm/milestones' as any)}
+                >
+                  <View style={[styles.quickActionIcon, { backgroundColor: '#f59e0b20' }]}>
+                    <Ionicons name="flag-outline" size={24} color="#f59e0b" />
+                  </View>
+                  <Text style={styles.quickActionLabel}>Mốc dự án</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={styles.quickActionCard}
+                  onPress={() => router.push('/crm/expenses' as any)}
+                >
+                  <View style={[styles.quickActionIcon, { backgroundColor: '#ef444420' }]}>
+                    <Ionicons name="wallet-outline" size={24} color="#ef4444" />
+                  </View>
+                  <Text style={styles.quickActionLabel}>Chi phí</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={styles.quickActionCard}
+                  onPress={() => router.push('/crm/project-management' as any)}
+                >
+                  <View style={[styles.quickActionIcon, { backgroundColor: '#8b5cf620' }]}>
+                    <Ionicons name="briefcase-outline" size={24} color="#8b5cf6" />
+                  </View>
+                  <Text style={styles.quickActionLabel}>Dự án +</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Additional Perfex CRM Features */}
+            <View style={styles.quickActionsSection}>
+              <Text style={styles.sectionTitle}>Tính năng Perfex CRM</Text>
+              <View style={styles.quickActionsGrid}>
+                <TouchableOpacity 
+                  style={styles.quickActionCard}
+                  onPress={() => router.push('/crm/gantt-chart' as any)}
+                >
+                  <View style={[styles.quickActionIcon, { backgroundColor: '#3b82f620' }]}>
+                    <Ionicons name="bar-chart-outline" size={24} color="#3b82f6" />
+                  </View>
+                  <Text style={styles.quickActionLabel}>Gantt Chart</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={styles.quickActionCard}
+                  onPress={() => router.push('/crm/discussions' as any)}
+                >
+                  <View style={[styles.quickActionIcon, { backgroundColor: '#22c55e20' }]}>
+                    <Ionicons name="chatbubbles-outline" size={24} color="#22c55e" />
+                  </View>
+                  <Text style={styles.quickActionLabel}>Trao đổi</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={styles.quickActionCard}
+                  onPress={() => router.push('/crm/files' as any)}
+                >
+                  <View style={[styles.quickActionIcon, { backgroundColor: '#8b5cf620' }]}>
+                    <Ionicons name="folder-outline" size={24} color="#8b5cf6" />
+                  </View>
+                  <Text style={styles.quickActionLabel}>Tập tin</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={styles.quickActionCard}
+                  onPress={() => router.push('/crm/notes' as any)}
+                >
+                  <View style={[styles.quickActionIcon, { backgroundColor: '#f59e0b20' }]}>
+                    <Ionicons name="document-text-outline" size={24} color="#f59e0b" />
+                  </View>
+                  <Text style={styles.quickActionLabel}>Ghi chú</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={styles.quickActionCard}
+                  onPress={() => router.push('/crm/contracts' as any)}
+                >
+                  <View style={[styles.quickActionIcon, { backgroundColor: '#06b6d420' }]}>
+                    <Ionicons name="document-attach-outline" size={24} color="#06b6d4" />
+                  </View>
+                  <Text style={styles.quickActionLabel}>Hợp đồng</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={styles.quickActionCard}
+                  onPress={() => router.push('/crm/sales' as any)}
+                >
+                  <View style={[styles.quickActionIcon, { backgroundColor: '#10b98120' }]}>
+                    <Ionicons name="trending-up-outline" size={24} color="#10b981" />
+                  </View>
+                  <Text style={styles.quickActionLabel}>Doanh số</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={styles.quickActionCard}
+                  onPress={() => router.push('/crm/activity' as any)}
+                >
+                  <View style={[styles.quickActionIcon, { backgroundColor: '#ec489920' }]}>
+                    <Ionicons name="pulse-outline" size={24} color="#ec4899" />
+                  </View>
+                  <Text style={styles.quickActionLabel}>Hoạt động</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={styles.quickActionCard}
+                  onPress={() => router.push('/crm/tickets' as any)}
+                >
+                  <View style={[styles.quickActionIcon, { backgroundColor: '#f4333320' }]}>
+                    <Ionicons name="ticket-outline" size={24} color="#f43333" />
+                  </View>
+                  <Text style={styles.quickActionLabel}>Yêu cầu</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={styles.quickActionCard}
+                  onPress={() => router.push('/crm/mind-map' as any)}
+                >
+                  <View style={[styles.quickActionIcon, { backgroundColor: '#a855f720' }]}>
+                    <Ionicons name="git-network-outline" size={24} color="#a855f7" />
+                  </View>
+                  <Text style={styles.quickActionLabel}>Sơ đồ TĐ</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={styles.quickActionCard}
+                  onPress={() => router.push('/crm/reports' as any)}
+                >
+                  <View style={[styles.quickActionIcon, { backgroundColor: '#0ea5e920' }]}>
+                    <Ionicons name="analytics-outline" size={24} color="#0ea5e9" />
+                  </View>
+                  <Text style={styles.quickActionLabel}>Báo cáo</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={styles.quickActionCard}
+                  onPress={() => router.push('/crm/settings' as any)}
+                >
+                  <View style={[styles.quickActionIcon, { backgroundColor: '#6b728020' }]}>
+                    <Ionicons name="settings-outline" size={24} color="#6b7280" />
+                  </View>
+                  <Text style={styles.quickActionLabel}>Cài đặt</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Dự án gần đây</Text>
               <ProjectList onProjectPress={handleProjectPress} showHeader={false} />
@@ -448,7 +657,7 @@ const styles = StyleSheet.create({
   detailValueLarge: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#10B981',
+    color: '#0066CC',
   },
   progressWrapper: {
     flexDirection: 'row',
@@ -534,6 +743,43 @@ const styles = StyleSheet.create({
   miniProjectValue: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#10B981',
+    color: '#0066CC',
+  },
+
+  // Quick Actions Section
+  quickActionsSection: {
+    marginHorizontal: 16,
+    marginTop: 16,
+  },
+  quickActionsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    marginTop: 12,
+  },
+  quickActionCard: {
+    width: '47%',
+    backgroundColor: '#FFF',
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  quickActionIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  quickActionLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#374151',
   },
 });

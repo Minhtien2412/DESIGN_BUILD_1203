@@ -115,25 +115,25 @@ const ROLE_MENU_ITEMS: RoleMenuItem[] = [
   { id: 'messages', title: 'Tin nhắn', icon: 'chatbubbles', route: '/messages', color: '#3b82f6' },
   
   // Shopping
-  { id: 'products', title: 'Sản phẩm', icon: 'cube', route: '/shopping', color: '#f59e0b', requiredPermission: Permission.VIEW_PRODUCTS },
-  { id: 'cart', title: 'Giỏ hàng', icon: 'cart', route: '/cart', color: '#ef4444' },
-  { id: 'quote', title: 'Yêu cầu báo giá', icon: 'document-text', route: '/quote-request', color: '#8b5cf6', requiredPermission: Permission.CREATE_QUOTE },
+  { id: 'products', title: 'Sản phẩm', icon: 'cube', route: '/shopping', color: '#0066CC', requiredPermission: Permission.VIEW_PRODUCTS },
+  { id: 'cart', title: 'Giỏ hàng', icon: 'cart', route: '/cart', color: '#000000' },
+  { id: 'quote', title: 'Yêu cầu báo giá', icon: 'document-text', route: '/quote-request', color: '#666666', requiredPermission: Permission.CREATE_QUOTE },
   
   // Construction (Staff+)
-  { id: 'construction', title: 'Thi công', icon: 'hammer', route: '/construction', color: '#ec4899', requiredRole: [UserRole.STAFF, UserRole.MANAGER, UserRole.ADMIN] },
+  { id: 'construction', title: 'Thi công', icon: 'hammer', route: '/construction', color: '#666666', requiredRole: [UserRole.STAFF, UserRole.MANAGER, UserRole.ADMIN] },
   { id: 'materials', title: 'Vật liệu', icon: 'layers', route: '/materials', color: '#14b8a6', requiredRole: [UserRole.STAFF, UserRole.MANAGER, UserRole.ADMIN] },
-  { id: 'labor', title: 'Nhân công', icon: 'people', route: '/labor', color: '#f97316', requiredRole: [UserRole.STAFF, UserRole.MANAGER, UserRole.ADMIN] },
+  { id: 'labor', title: 'Nhân công', icon: 'people', route: '/labor', color: '#0066CC', requiredRole: [UserRole.STAFF, UserRole.MANAGER, UserRole.ADMIN] },
   
   // Reports
   { id: 'reports', title: 'Báo cáo', icon: 'bar-chart', route: '/reports', color: '#0ea5e9', requiredPermission: Permission.VIEW_REPORTS },
   
   // Admin
-  { id: 'moderation', title: 'Kiểm duyệt', icon: 'checkmark-done', route: '/admin/moderation', color: '#ef4444', requiredPermission: Permission.APPROVE_CONTENT },
-  { id: 'users', title: 'Quản lý người dùng', icon: 'people-circle', route: '/admin/staff', color: '#6366f1', requiredPermission: Permission.MANAGE_USERS },
+  { id: 'moderation', title: 'Kiểm duyệt', icon: 'checkmark-done', route: '/admin/moderation', color: '#000000', requiredPermission: Permission.APPROVE_CONTENT },
+  { id: 'users', title: 'Quản lý người dùng', icon: 'people-circle', route: '/admin/staff', color: '#666666', requiredPermission: Permission.MANAGE_USERS },
   { id: 'settings', title: 'Cài đặt', icon: 'settings', route: '/admin/settings', color: '#64748b', requiredPermission: Permission.MANAGE_SETTINGS },
   
   // Utilities
-  { id: 'videos', title: 'Videos', icon: 'videocam', route: '/videos', color: '#ef4444' },
+  { id: 'videos', title: 'Videos', icon: 'videocam', route: '/videos', color: '#000000' },
 ];
 
 // ============================================================================
@@ -375,7 +375,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -4,
     right: -4,
-    backgroundColor: '#ef4444',
+    backgroundColor: '#000000',
     borderRadius: 10,
     minWidth: 20,
     height: 20,

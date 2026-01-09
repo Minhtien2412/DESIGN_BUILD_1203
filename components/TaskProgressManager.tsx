@@ -204,25 +204,25 @@ const TaskProgressManager: React.FC<TaskProgressManagerProps> = ({
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed': return '#10B981';
+      case 'completed': return '#0066CC';
       case 'in-progress': return '#3B82F6';
-      case 'pending': return '#F59E0B';
-      case 'delayed': return '#EF4444';
-      case 'submitted': return '#8B5CF6';
-      case 'under-review': return '#F59E0B';
-      case 'approved': return '#10B981';
-      case 'rejected': return '#EF4444';
-      case 'revision-required': return '#F97316';
+      case 'pending': return '#0066CC';
+      case 'delayed': return '#000000';
+      case 'submitted': return '#666666';
+      case 'under-review': return '#0066CC';
+      case 'approved': return '#0066CC';
+      case 'rejected': return '#000000';
+      case 'revision-required': return '#0066CC';
       default: return '#6B7280';
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'critical': return '#DC2626';
-      case 'high': return '#EF4444';
-      case 'medium': return '#F59E0B';
-      case 'low': return '#10B981';
+      case 'critical': return '#000000';
+      case 'high': return '#000000';
+      case 'medium': return '#0066CC';
+      case 'low': return '#0066CC';
       default: return '#6B7280';
     }
   };
@@ -696,7 +696,7 @@ const styles = StyleSheet.create({
   },
   qualityScore: {
     fontSize: 10,
-    color: '#10b981',
+    color: '#0066CC',
     fontWeight: '500',
     marginTop: 2,
   },

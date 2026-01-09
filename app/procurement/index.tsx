@@ -46,21 +46,21 @@ export default function ProcurementScreen() {
   const getStatusColor = (status: PurchaseOrderStatus): string => {
     switch (status) {
       case 'DRAFT':
-        return '#9E9E9E';
+        return '#999999';
       case 'SENT':
-        return '#2196F3';
+        return '#0066CC';
       case 'CONFIRMED':
-        return '#FF9800';
+        return '#0066CC';
       case 'PARTIALLY_RECEIVED':
-        return '#0A6847';
+        return '#0066CC';
       case 'RECEIVED':
-        return '#4CAF50';
+        return '#0066CC';
       case 'CANCELLED':
-        return '#F44336';
+        return '#000000';
       case 'CLOSED':
         return '#4A4A4A';
       default:
-        return '#9E9E9E';
+        return '#999999';
     }
   };
 
@@ -125,11 +125,11 @@ export default function ProcurementScreen() {
         showsHorizontalScrollIndicator={false}
         style={styles.statsContainer}
       >
-        <View style={[styles.statCard, { backgroundColor: '#E3F2FD' }]}>
+        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
           <Text style={styles.statValue}>{stats.total}</Text>
           <Text style={styles.statLabel}>Tổng đơn</Text>
         </View>
-        <View style={[styles.statCard, { backgroundColor: '#FFF3E0' }]}>
+        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
           <Text style={styles.statValue}>{stats.sent}</Text>
           <Text style={styles.statLabel}>Đã gửi</Text>
         </View>
@@ -178,7 +178,7 @@ export default function ProcurementScreen() {
           style={[styles.filterChip, statusFilter === 'DRAFT' && styles.filterChipActive]}
           onPress={() => setStatusFilter('DRAFT' as PurchaseOrderStatus)}
         >
-          <View style={[styles.statusDot, { backgroundColor: '#9E9E9E' }]} />
+          <View style={[styles.statusDot, { backgroundColor: '#999999' }]} />
           <Text
             style={[
               styles.filterChipText,
@@ -192,7 +192,7 @@ export default function ProcurementScreen() {
           style={[styles.filterChip, statusFilter === 'SENT' && styles.filterChipActive]}
           onPress={() => setStatusFilter('SENT' as PurchaseOrderStatus)}
         >
-          <View style={[styles.statusDot, { backgroundColor: '#2196F3' }]} />
+          <View style={[styles.statusDot, { backgroundColor: '#0066CC' }]} />
           <Text
             style={[
               styles.filterChipText,
@@ -206,7 +206,7 @@ export default function ProcurementScreen() {
           style={[styles.filterChip, statusFilter === 'CONFIRMED' && styles.filterChipActive]}
           onPress={() => setStatusFilter('CONFIRMED' as PurchaseOrderStatus)}
         >
-          <View style={[styles.statusDot, { backgroundColor: '#FF9800' }]} />
+          <View style={[styles.statusDot, { backgroundColor: '#0066CC' }]} />
           <Text
             style={[
               styles.filterChipText,
@@ -220,7 +220,7 @@ export default function ProcurementScreen() {
           style={[styles.filterChip, statusFilter === 'RECEIVED' && styles.filterChipActive]}
           onPress={() => setStatusFilter('RECEIVED' as PurchaseOrderStatus)}
         >
-          <View style={[styles.statusDot, { backgroundColor: '#4CAF50' }]} />
+          <View style={[styles.statusDot, { backgroundColor: '#0066CC' }]} />
           <Text
             style={[
               styles.filterChipText,

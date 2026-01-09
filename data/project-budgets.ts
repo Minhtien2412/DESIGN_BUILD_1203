@@ -32,7 +32,7 @@ export const PROJECT_BUDGETS: Record<string, ProjectBudget> = {
         name: 'Nhân công',
         budgeted: 1500000000,
         spent: 980000000,
-        color: '#8b5cf6',
+        color: '#666666',
         icon: 'people-outline',
       },
       {
@@ -144,7 +144,7 @@ export const PROJECT_BUDGETS: Record<string, ProjectBudget> = {
         name: 'Nhân công',
         budgeted: 1000000000,
         spent: 620000000,
-        color: '#8b5cf6',
+        color: '#666666',
         icon: 'people-outline',
       },
       {
@@ -211,7 +211,7 @@ export const PROJECT_BUDGETS: Record<string, ProjectBudget> = {
         name: 'Nhân công',
         budgeted: 2400000000,
         spent: 1800000000,
-        color: '#8b5cf6',
+        color: '#666666',
         icon: 'people-outline',
       },
       {

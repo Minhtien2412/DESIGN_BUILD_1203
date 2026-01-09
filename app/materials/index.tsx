@@ -110,11 +110,11 @@ const CATEGORIES = [
   { id: '1', name: 'Tất cả', icon: 'apps-outline', color: '#00B14F' },
   { id: '2', name: 'Xi măng', icon: 'cube-outline', color: '#757575' },
   { id: '3', name: 'Gạch', icon: 'grid-outline', color: '#D84315' },
-  { id: '4', name: 'Điện', icon: 'flash-outline', color: '#10B981' },
-  { id: '5', name: 'Nước', icon: 'water-outline', color: '#2196F3' },
-  { id: '6', name: 'Sơn', icon: 'color-palette-outline', color: '#9C27B0' },
-  { id: '7', name: 'Cửa', icon: 'lock-closed-outline', color: '#795548' },
-  { id: '8', name: 'Vệ sinh', icon: 'medical-outline', color: '#0A6847' },
+  { id: '4', name: 'Điện', icon: 'flash-outline', color: '#0066CC' },
+  { id: '5', name: 'Nước', icon: 'water-outline', color: '#0066CC' },
+  { id: '6', name: 'Sơn', icon: 'color-palette-outline', color: '#999999' },
+  { id: '7', name: 'Cửa', icon: 'lock-closed-outline', color: '#666666' },
+  { id: '8', name: 'Vệ sinh', icon: 'medical-outline', color: '#0066CC' },
 ];
 
 export default function MaterialsShoppingScreen() {
@@ -247,7 +247,7 @@ export default function MaterialsShoppingScreen() {
             {item.name}
           </Text>
           <View style={styles.ratingContainer}>
-            <Ionicons name="star" size={14} color="#10B981" />
+            <Ionicons name="star" size={14} color="#0066CC" />
             <Text style={styles.ratingText}>{item.rating}</Text>
             <Text style={styles.reviewsText}>({item.reviews})</Text>
           </View>

@@ -205,7 +205,7 @@ export default function CommunicationHubScreen() {
           <Text style={[styles.contactRole, { color: textColor + '70' }]} numberOfLines={1}>
             {contact.role || contact.email}
           </Text>
-          <Text style={[styles.contactStatus, { color: online ? '#10B981' : textColor + '50' }]}>
+          <Text style={[styles.contactStatus, { color: online ? '#0066CC' : textColor + '50' }]}>
             {online ? '● Đang hoạt động' : contact.lastSeen ? `Hoạt động ${formatLastSeen(contact.lastSeen)}` : 'Offline'}
           </Text>
         </View>
@@ -213,24 +213,24 @@ export default function CommunicationHubScreen() {
         {/* Action buttons */}
         <View style={styles.actionButtons}>
           <TouchableOpacity
-            style={[styles.actionBtn, { backgroundColor: '#DBEAFE' }]}
+            style={[styles.actionBtn, { backgroundColor: '#E8F4FF' }]}
             onPress={() => handleContactPress(contact)}
           >
-            <Ionicons name="chatbubble" size={18} color="#3B82F6" />
+            <Ionicons name="chatbubble" size={18} color="#0080FF" />
           </TouchableOpacity>
           
           <TouchableOpacity
             style={[styles.actionBtn, { backgroundColor: '#D1FAE5' }]}
             onPress={() => handleCall(contact, 'audio')}
           >
-            <Ionicons name="call" size={18} color="#10B981" />
+            <Ionicons name="call" size={18} color="#0066CC" />
           </TouchableOpacity>
           
           <TouchableOpacity
             style={[styles.actionBtn, { backgroundColor: '#FEF3C7' }]}
             onPress={() => handleCall(contact, 'video')}
           >
-            <Ionicons name="videocam" size={18} color="#F59E0B" />
+            <Ionicons name="videocam" size={18} color="#0080FF" />
           </TouchableOpacity>
         </View>
       </TouchableOpacity>
@@ -350,7 +350,7 @@ export default function CommunicationHubScreen() {
                 <Ionicons
                   name={item.missedCalls ? 'arrow-down-outline' : 'arrow-up-outline'}
                   size={14}
-                  color={item.missedCalls ? '#EF4444' : '#10B981'}
+                  color={item.missedCalls ? '#000000' : '#0066CC'}
                 />
                 <Text style={[styles.callTime, { color: textColor + '60' }]}>
                   {item.missedCalls ? 'Cuộc gọi nhỡ' : 'Đã gọi'} • {formatLastSeen(item.lastCallAt || new Date().toISOString())}
@@ -488,11 +488,11 @@ export default function CommunicationHubScreen() {
             ]}>
               <View style={[
                 styles.connectionDot,
-                { backgroundColor: connected ? '#10B981' : '#EF4444' },
+                { backgroundColor: connected ? '#0066CC' : '#000000' },
               ]} />
               <Text style={[
                 styles.connectionText,
-                { color: connected ? '#10B981' : '#EF4444' },
+                { color: connected ? '#0066CC' : '#000000' },
               ]}>
                 {connected ? 'Online' : 'Offline'}
               </Text>
@@ -624,7 +624,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   badge: {
-    backgroundColor: '#EF4444',
+    backgroundColor: '#000000',
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 10,
@@ -661,7 +661,7 @@ const styles = StyleSheet.create({
     width: 14,
     height: 14,
     borderRadius: 7,
-    backgroundColor: '#10B981',
+    backgroundColor: '#0066CC',
     borderWidth: 2,
     borderColor: '#fff',
   },
@@ -680,7 +680,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   unreadBadge: {
-    backgroundColor: '#EF4444',
+    backgroundColor: '#000000',
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 10,
@@ -745,7 +745,7 @@ const styles = StyleSheet.create({
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: '#10B981',
+    backgroundColor: '#0066CC',
     borderWidth: 2,
     borderColor: '#fff',
   },

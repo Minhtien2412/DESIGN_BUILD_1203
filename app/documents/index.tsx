@@ -22,22 +22,22 @@ const CATEGORY_INFO: Record<
   DocumentCategory,
   { icon: keyof typeof Ionicons.glyphMap; color: string; label: string }
 > = {
-  [DocumentCategory.DESIGN]: { icon: 'brush', color: '#9C27B0', label: 'Thiết kế' },
-  [DocumentCategory.CONTRACT]: { icon: 'document-text', color: '#2196F3', label: 'Hợp đồng' },
-  [DocumentCategory.PERMIT]: { icon: 'checkmark-circle', color: '#4CAF50', label: 'Giấy phép' },
-  [DocumentCategory.SPECIFICATION]: { icon: 'list', color: '#FF9800', label: 'Đặc tả' },
-  [DocumentCategory.REPORT]: { icon: 'bar-chart', color: '#F44336', label: 'Báo cáo' },
-  [DocumentCategory.PHOTO]: { icon: 'image', color: '#00BCD4', label: 'Hình ảnh' },
-  [DocumentCategory.INVOICE]: { icon: 'receipt', color: '#10B981', label: 'Hóa đơn' },
-  [DocumentCategory.SCHEDULE]: { icon: 'calendar', color: '#3F51B5', label: 'Lịch trình' },
-  [DocumentCategory.SAFETY]: { icon: 'shield-checkmark', color: '#FF5722', label: 'An toàn' },
-  [DocumentCategory.QUALITY]: { icon: 'star', color: '#FFC107', label: 'Chất lượng' },
-  [DocumentCategory.MEETING]: { icon: 'people', color: '#795548', label: 'Họp' },
+  [DocumentCategory.DESIGN]: { icon: 'brush', color: '#999999', label: 'Thiết kế' },
+  [DocumentCategory.CONTRACT]: { icon: 'document-text', color: '#0066CC', label: 'Hợp đồng' },
+  [DocumentCategory.PERMIT]: { icon: 'checkmark-circle', color: '#0066CC', label: 'Giấy phép' },
+  [DocumentCategory.SPECIFICATION]: { icon: 'list', color: '#0066CC', label: 'Đặc tả' },
+  [DocumentCategory.REPORT]: { icon: 'bar-chart', color: '#000000', label: 'Báo cáo' },
+  [DocumentCategory.PHOTO]: { icon: 'image', color: '#0080FF', label: 'Hình ảnh' },
+  [DocumentCategory.INVOICE]: { icon: 'receipt', color: '#0066CC', label: 'Hóa đơn' },
+  [DocumentCategory.SCHEDULE]: { icon: 'calendar', color: '#0066CC', label: 'Lịch trình' },
+  [DocumentCategory.SAFETY]: { icon: 'shield-checkmark', color: '#000000', label: 'An toàn' },
+  [DocumentCategory.QUALITY]: { icon: 'star', color: '#0066CC', label: 'Chất lượng' },
+  [DocumentCategory.MEETING]: { icon: 'people', color: '#666666', label: 'Họp' },
   [DocumentCategory.CORRESPONDENCE]: { icon: 'mail', color: '#4A4A4A', label: 'Thư từ' },
-  [DocumentCategory.SUBMITTAL]: { icon: 'send', color: '#0A6847', label: 'Đệ trình' },
-  [DocumentCategory.WARRANTY]: { icon: 'shield', color: '#009688', label: 'Bảo hành' },
-  [DocumentCategory.MANUAL]: { icon: 'book', color: '#673AB7', label: 'Hướng dẫn' },
-  [DocumentCategory.OTHER]: { icon: 'folder', color: '#9E9E9E', label: 'Khác' },
+  [DocumentCategory.SUBMITTAL]: { icon: 'send', color: '#0066CC', label: 'Đệ trình' },
+  [DocumentCategory.WARRANTY]: { icon: 'shield', color: '#0066CC', label: 'Bảo hành' },
+  [DocumentCategory.MANUAL]: { icon: 'book', color: '#666666', label: 'Hướng dẫn' },
+  [DocumentCategory.OTHER]: { icon: 'folder', color: '#999999', label: 'Khác' },
 };
 
 export default function DocumentDashboardScreen() {
@@ -112,20 +112,20 @@ export default function DocumentDashboardScreen() {
       {/* Summary Cards */}
       <View style={styles.section}>
         <View style={styles.summaryRow}>
-          <View style={[styles.summaryCard, { backgroundColor: '#E3F2FD' }]}>
-            <Ionicons name="documents" size={28} color="#2196F3" />
+          <View style={[styles.summaryCard, { backgroundColor: '#E8F4FF' }]}>
+            <Ionicons name="documents" size={28} color="#0066CC" />
             <Text style={styles.summaryValue}>{summary?.totalDocuments || 0}</Text>
             <Text style={styles.summaryLabel}>Tài liệu</Text>
           </View>
 
-          <View style={[styles.summaryCard, { backgroundColor: '#FFF3E0' }]}>
-            <Ionicons name="cloud-upload" size={28} color="#FF9800" />
+          <View style={[styles.summaryCard, { backgroundColor: '#E8F4FF' }]}>
+            <Ionicons name="cloud-upload" size={28} color="#0066CC" />
             <Text style={styles.summaryValue}>{summary?.recentUploads || 0}</Text>
             <Text style={styles.summaryLabel}>Tải lên (7 ngày)</Text>
           </View>
 
           <View style={[styles.summaryCard, { backgroundColor: '#F3E5F5' }]}>
-            <Ionicons name="time" size={28} color="#9C27B0" />
+            <Ionicons name="time" size={28} color="#999999" />
             <Text style={styles.summaryValue}>{summary?.pendingReviews || 0}</Text>
             <Text style={styles.summaryLabel}>Chờ duyệt</Text>
           </View>
@@ -155,10 +155,10 @@ export default function DocumentDashboardScreen() {
                     width: `${Math.min(stats.percentUsed, 100)}%`,
                     backgroundColor:
                       stats.percentUsed >= 90
-                        ? '#F44336'
+                        ? '#000000'
                         : stats.percentUsed >= 75
-                        ? '#FF9800'
-                        : '#4CAF50',
+                        ? '#0066CC'
+                        : '#0066CC',
                   },
                 ]}
               />
@@ -317,8 +317,8 @@ export default function DocumentDashboardScreen() {
             style={styles.actionItem}
             onPress={() => router.push(`/documents/upload?projectId=${projectId}` as Href)}
           >
-            <View style={[styles.actionIcon, { backgroundColor: '#E3F2FD' }]}>
-              <Ionicons name="cloud-upload" size={22} color="#2196F3" />
+            <View style={[styles.actionIcon, { backgroundColor: '#E8F4FF' }]}>
+              <Ionicons name="cloud-upload" size={22} color="#0066CC" />
             </View>
             <Text style={styles.actionLabel}>Tải lên tài liệu</Text>
             <Ionicons name="chevron-forward" size={20} color="#ccc" />
@@ -328,8 +328,8 @@ export default function DocumentDashboardScreen() {
             style={styles.actionItem}
             onPress={() => router.push(`/documents/create-folder?projectId=${projectId}`)}
           >
-            <View style={[styles.actionIcon, { backgroundColor: '#FFF3E0' }]}>
-              <Ionicons name="folder" size={22} color="#FF9800" />
+            <View style={[styles.actionIcon, { backgroundColor: '#E8F4FF' }]}>
+              <Ionicons name="folder" size={22} color="#0066CC" />
             </View>
             <Text style={styles.actionLabel}>Tạo thư mục</Text>
             <Ionicons name="chevron-forward" size={20} color="#ccc" />
@@ -340,7 +340,7 @@ export default function DocumentDashboardScreen() {
             onPress={() => router.push(`/documents/folders?projectId=${projectId}`)}
           >
             <View style={[styles.actionIcon, { backgroundColor: '#F3E5F5' }]}>
-              <Ionicons name="folder-open" size={22} color="#9C27B0" />
+              <Ionicons name="folder-open" size={22} color="#999999" />
             </View>
             <Text style={styles.actionLabel}>Quản lý thư mục</Text>
             <Ionicons name="chevron-forward" size={20} color="#ccc" />
@@ -380,7 +380,7 @@ const styles = StyleSheet.create({
   },
   seeAllText: {
     fontSize: 14,
-    color: '#2196F3',
+    color: '#0066CC',
     fontWeight: '500',
   },
   summaryRow: {
@@ -495,7 +495,7 @@ const styles = StyleSheet.create({
   reviewBadge: {
     paddingHorizontal: 10,
     paddingVertical: 4,
-    backgroundColor: '#FF9800',
+    backgroundColor: '#0066CC',
     borderRadius: 12,
   },
   reviewBadgeText: {

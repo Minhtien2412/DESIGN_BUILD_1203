@@ -150,7 +150,7 @@ export default function DependenciesScreen() {
       <ScrollView style={styles.scrollView}>
         {/* Info Card */}
         <View style={styles.infoCard}>
-          <Ionicons name="information-circle" size={20} color="#2196F3" />
+          <Ionicons name="information-circle" size={20} color="#0066CC" />
           <View style={styles.infoContent}>
             <Text style={styles.infoTitle}>Về phụ thuộc công việc</Text>
             <Text style={styles.infoText}>
@@ -211,7 +211,7 @@ export default function DependenciesScreen() {
                         handleDelete(dependency.id, predecessorName, successorName)
                       }
                     >
-                      <Ionicons name="trash-outline" size={18} color="#F44336" />
+                      <Ionicons name="trash-outline" size={18} color="#000000" />
                     </TouchableOpacity>
                   </View>
 
@@ -224,7 +224,7 @@ export default function DependenciesScreen() {
                     </View>
 
                     <View style={styles.arrow}>
-                      <Ionicons name="arrow-forward" size={20} color="#2196F3" />
+                      <Ionicons name="arrow-forward" size={20} color="#0066CC" />
                     </View>
 
                     <View style={styles.taskBox}>
@@ -242,13 +242,13 @@ export default function DependenciesScreen() {
                       <Ionicons
                         name="time-outline"
                         size={14}
-                        color={dependency.lagDays > 0 ? '#FF9800' : '#4CAF50'}
+                        color={dependency.lagDays > 0 ? '#0066CC' : '#0066CC'}
                       />
                       <Text
                         style={[
                           styles.lagText,
                           {
-                            color: dependency.lagDays > 0 ? '#FF9800' : '#4CAF50',
+                            color: dependency.lagDays > 0 ? '#0066CC' : '#0066CC',
                           },
                         ]}
                       >
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
   },
   filterChipActive: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
   },
   filterChipText: {
     fontSize: 13,
@@ -316,7 +316,7 @@ const styles = StyleSheet.create({
   infoCard: {
     flexDirection: 'row',
     gap: 12,
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
     margin: 16,
     padding: 16,
     borderRadius: 8,
@@ -363,7 +363,7 @@ const styles = StyleSheet.create({
   typeBadge: {
     paddingHorizontal: 8,
     paddingVertical: 4,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     borderRadius: 4,
   },
   typeBadgeText: {
@@ -458,7 +458,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',

@@ -21,8 +21,15 @@ export default function TabsLayout() {
         }} 
       />
       <Tabs.Screen 
+        name="social" 
+        options={{ 
+          title: 'Cộng đồng',
+        }} 
+      />
+      <Tabs.Screen 
         name="home-construction" 
         options={{ 
+          href: null, // Hidden - moved to social
           title: 'Home XD',
         }} 
       />
@@ -73,6 +80,13 @@ export default function TabsLayout() {
         options={{ 
           href: null,
           title: 'Liên hệ',
+        }} 
+      />
+      <Tabs.Screen 
+        name="test-crm" 
+        options={{ 
+          href: null,
+          title: 'Test CRM',
         }} 
       />
     </Tabs>

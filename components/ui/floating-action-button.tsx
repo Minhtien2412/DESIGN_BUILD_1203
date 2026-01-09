@@ -60,7 +60,7 @@ export default function FloatingActionButton({
       id: 'projects',
       icon: 'briefcase',
       label: 'Dự án',
-      color: '#10b981',
+      color: '#0066CC',
       action: () => {
         setShowMenu(false);
         router.push('/projects');
@@ -70,7 +70,7 @@ export default function FloatingActionButton({
       id: 'notifications',
       icon: 'notifications',
       label: 'Thông báo',
-      color: '#f59e0b',
+      color: '#0066CC',
       action: () => {
         setShowMenu(false);
         router.push('/notifications');
@@ -80,7 +80,7 @@ export default function FloatingActionButton({
       id: 'profile',
       icon: 'person',
       label: 'Hồ sơ',
-      color: '#8b5cf6',
+      color: '#666666',
       action: () => {
         setShowMenu(false);
         router.push('/profile');
@@ -101,7 +101,7 @@ export default function FloatingActionButton({
         id: 'safety',
         icon: 'shield-checkmark' as keyof typeof Ionicons.glyphMap,
         label: 'An toàn',
-        color: '#ef4444',
+        color: '#000000',
         action: () => {
           setShowMenu(false);
           router.push(`/projects/${projectId}/safety/incidents`);

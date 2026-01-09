@@ -13,7 +13,7 @@ const MENU_ITEMS = [
     icon: 'apps-outline' as const,
     route: '/projects?tab=services',
     description: 'Xem tất cả dịch vụ',
-    color: '#0A6847'
+    color: '#0066CC'
   },
   {
     id: 2,
@@ -29,7 +29,7 @@ const MENU_ITEMS = [
     icon: 'briefcase-outline' as const,
     route: '/projects',
     description: 'Quản lý dự án',
-    color: '#4ECDC4'
+    color: '#0080FF'
   },
   {
     id: 4,
@@ -61,7 +61,7 @@ const MENU_ITEMS = [
     icon: 'person-outline' as const,
     route: '/profile',
     description: 'Tài khoản của tôi',
-    color: '#E74C3C'
+    color: '#000000'
   },
   {
     id: 8,
@@ -196,7 +196,7 @@ export function MobileMenu({ visible, onClose, userIsAdmin = false }: MobileMenu
                 paddingHorizontal: 16,
                 paddingVertical: 8,
                 borderRadius: 20,
-                backgroundColor: activeSection === 'main' ? '#0A6847' : '#f5f5f5'
+                backgroundColor: activeSection === 'main' ? '#0066CC' : '#f5f5f5'
               }}
             >
               <Text style={{ 
@@ -214,7 +214,7 @@ export function MobileMenu({ visible, onClose, userIsAdmin = false }: MobileMenu
                 paddingHorizontal: 16,
                 paddingVertical: 8,
                 borderRadius: 20,
-                backgroundColor: activeSection === 'utilities' ? '#0A6847' : '#f5f5f5'
+                backgroundColor: activeSection === 'utilities' ? '#0066CC' : '#f5f5f5'
               }}
             >
               <Text style={{ 
@@ -232,7 +232,7 @@ export function MobileMenu({ visible, onClose, userIsAdmin = false }: MobileMenu
                 paddingHorizontal: 16,
                 paddingVertical: 8,
                 borderRadius: 20,
-                backgroundColor: activeSection === 'profile' ? '#0A6847' : '#f5f5f5'
+                backgroundColor: activeSection === 'profile' ? '#0066CC' : '#f5f5f5'
               }}
             >
               <Text style={{ 
@@ -394,7 +394,7 @@ export function MobileMenu({ visible, onClose, userIsAdmin = false }: MobileMenu
                     justifyContent: 'center',
                     alignItems: 'center'
                   }}>
-                    <Ionicons name="call-outline" size={20} color="#0A6847" />
+                    <Ionicons name="call-outline" size={20} color="#0066CC" />
                   </View>
                   <View style={{ flex: 1, marginLeft: 12 }}>
                     <Text style={{ fontSize: 13, fontWeight: '600', color: '#333' }}>
@@ -421,11 +421,11 @@ export function MobileMenu({ visible, onClose, userIsAdmin = false }: MobileMenu
                     width: 40,
                     height: 40,
                     borderRadius: 20,
-                    backgroundColor: '#4ECDC415',
+                    backgroundColor: '#0080FF15',
                     justifyContent: 'center',
                     alignItems: 'center'
                   }}>
-                    <Ionicons name="rocket-outline" size={20} color="#4ECDC4" />
+                    <Ionicons name="rocket-outline" size={20} color="#0080FF" />
                   </View>
                   <View style={{ flex: 1, marginLeft: 12 }}>
                     <Text style={{ fontSize: 13, fontWeight: '600', color: '#333' }}>

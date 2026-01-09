@@ -41,11 +41,11 @@ export function EquipmentCard({
   const getConditionColor = (condition?: string) => {
     switch (condition) {
       case 'new':
-        return '#10B981';
+        return '#0066CC';
       case 'good':
         return '#3B82F6';
       case 'fair':
-        return '#F59E0B';
+        return '#0066CC';
       default:
         return Colors.light.textMuted;
     }
@@ -115,7 +115,7 @@ export function EquipmentCard({
         {/* Rating */}
         {equipment.rating !== undefined && (
           <View style={styles.ratingContainer}>
-            <Ionicons name="star" size={14} color="#F59E0B" />
+            <Ionicons name="star" size={14} color="#0066CC" />
             <Text style={styles.ratingText}>{equipment.rating.toFixed(1)}</Text>
           </View>
         )}

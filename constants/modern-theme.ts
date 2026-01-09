@@ -1,6 +1,6 @@
 /**
- * Modern Theme - Minimalist Emerald Green + Black + White
- * Updated: 12/15/2025
+ * Modern Theme - Minimalist Blue + Black + White
+ * Updated: 01/05/2026
  * 
  * Usage:
  * import { MODERN_COLORS } from '@/constants/modern-theme';
@@ -8,71 +8,71 @@
  */
 
 export const MODERN_COLORS = {
-  // Primary - Deep Emerald Green (Sophisticated)
-  primary: '#0A6847',
-  primaryLight: '#10B981',
-  primaryDark: '#064E3B',
-  primaryBg: '#E6F7F1',
+  // Primary - Professional Blue (Sophisticated)
+  primary: '#0066CC',
+  primaryLight: '#0080FF',
+  primaryDark: '#004C99',
+  primaryBg: '#E6F2FF',
   
   // Secondary - Charcoal Gray (Minimalist)
-  secondary: '#4A4A4A',
-  secondaryLight: '#6B6B6B',
-  secondaryDark: '#1A1A1A',
-  secondaryBg: '#F8F8F8',
+  secondary: '#333333',
+  secondaryLight: '#666666',
+  secondaryDark: '#000000',
+  secondaryBg: '#F5F5F5',
   
   // Gradients (Subtle, Modern)
-  gradientPrimary: ['#10B981', '#0A6847'],  // Emerald gradient
-  gradientSecondary: ['#4A4A4A', '#1A1A1A'], // Charcoal gradient
-  gradientPurple: ['#0A6847', '#064E3B'],   // Deep green (no purple)
-  gradientBlue: ['#10B981', '#0A6847'],     // Use green instead
+  gradientPrimary: ['#0080FF', '#0066CC'],  // Blue gradient
+  gradientSecondary: ['#333333', '#000000'], // Charcoal gradient
+  gradientPurple: ['#0066CC', '#004C99'],   // Deep blue (no purple)
+  gradientBlue: ['#0080FF', '#0066CC'],     // Use blue instead
   
-  // E-commerce Special (Emerald Theme)
-  flashSale: '#0A6847',    // Deep emerald for hot items
-  discount: '#10B981',     // Bright emerald for discounts
-  new: '#10B981',         // Bright emerald for new items
-  favorite: '#10B981',     // Bright emerald for wishlist
+  // E-commerce Special (Blue Theme)
+  flashSale: '#0066CC',    // Professional blue for hot items
+  discount: '#0080FF',     // Bright blue for discounts
+  new: '#0080FF',         // Bright blue for new items
+  favorite: '#0080FF',     // Bright blue for wishlist
   
   // Neutrals - Clean Minimalist
   background: '#FFFFFF',   // Pure white background
   surface: '#FFFFFF',      // Pure white cards
-  surfaceHover: '#F8F8F8', // Off-white hover
-  border: '#E5E5E5',       // Light gray borders
-  divider: '#E5E5E5',      // Light gray dividers
+  surfaceHover: '#F5F5F5', // Off-white hover
+  border: '#E0E0E0',       // Light gray borders
+  divider: '#E0E0E0',      // Light gray dividers
   
   // Gray Scale
   gray50: '#FAFAFA',
   gray100: '#F5F5F5',
-  gray200: '#E5E5E5',
-  gray300: '#D4D4D4',
-  gray400: '#A3A3A3',
-  gray500: '#737373',
-  gray600: '#525252',
-  gray700: '#404040',
-  gray800: '#262626',
-  gray900: '#171717',
+  gray200: '#E0E0E0',
+  gray300: '#CCCCCC',
+  gray400: '#999999',
+  gray500: '#666666',
+  gray600: '#4D4D4D',
+  gray700: '#333333',
+  gray800: '#1A1A1A',
+  gray900: '#0D0D0D',
   
-  // Orange Scale (for warnings/alerts)
-  orange50: '#FFF7ED',
-  orange500: '#F97316',
+  // Orange Scale (replaced with blue)
+  orange50: '#E6F2FF',
+  orange500: '#0080FF',
   
   // Text (High Contrast)
-  text: '#1A1A1A',         // Soft black primary text
-  textSecondary: '#4A4A4A', // Charcoal secondary text
-  textTertiary: '#737373',  // Gray tertiary text
-  textDisabled: '#9E9E9E',  // Light gray disabled
-  textOnPrimary: '#FFFFFF', // White on green
+  text: '#000000',         // Pure black primary text
+  textSecondary: '#333333', // Charcoal secondary text
+  textTertiary: '#666666',  // Gray tertiary text
+  textDisabled: '#999999',  // Light gray disabled
+  textOnPrimary: '#FFFFFF', // White on blue
   
-  // Semantic Colors (Minimalist - use blacks/greens)
-  success: '#10B981',
-  warning: '#0A6847',      // Use deep green instead of orange
-  danger: '#1A1A1A',       // Use black instead of red (minimalist)
-  info: '#0A6847',         // Use deep green
-  error: '#EF4444',        // Error red for important alerts
+  // Semantic Colors (Minimalist - use blacks/blues)
+  success: '#0066CC',
+  warning: '#0080FF',      // Use bright blue instead of orange
+  danger: '#000000',       // Use black instead of red (minimalist)
+  info: '#0066CC',         // Use professional blue
+  error: '#000000',        // Use black for errors (minimalist)
   
   // Overlays (Darker for sophistication)
-  overlay: 'rgba(10, 10, 10, 0.85)',
-  overlayLight: 'rgba(10, 10, 10, 0.3)',
-  overlayDark: 'rgba(10, 10, 10, 0.95)',
+  overlay: 'rgba(0, 0, 0, 0.85)',
+  overlayLight: 'rgba(0, 0, 0, 0.3)',
+  overlayDark: 'rgba(0, 0, 0, 0.95)',
 } as const;
 
 /**

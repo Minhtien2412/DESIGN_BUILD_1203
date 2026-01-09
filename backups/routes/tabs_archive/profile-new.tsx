@@ -123,11 +123,11 @@ export default function ProfileScreen() {
           <MenuItem
             icon={<Ionicons name="person-outline" size={22} color="#3B82F6" />}
             title="Thông tin cá nhân"
-            iconBg="#EFF6FF"
+            iconBg="#E8F4FF"
             onPress={() => router.push('/profile/info')}
           />
           <MenuItem
-            icon={<Ionicons name="shield-checkmark-outline" size={22} color="#8B5CF6" />}
+            icon={<Ionicons name="shield-checkmark-outline" size={22} color="#666666" />}
             title="Quyền riêng tư"
             iconBg="#F5F3FF"
             onPress={() => router.push('/profile/privacy')}

@@ -18,7 +18,7 @@ export default function ThoTongHopNewScreen() {
       <Stack.Screen
         options={{
           title: config?.title || 'Thợ tổng hợp',
-          headerStyle: { backgroundColor: '#EE4D2D' },
+          headerStyle: { backgroundColor: '#0066CC' },
           headerTintColor: '#fff',
         }}
       />

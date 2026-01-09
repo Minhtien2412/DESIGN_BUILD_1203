@@ -41,28 +41,28 @@ export interface DrawerItem {
 
 export const ROLE_THEMES = {
   guest: {
-    primary: '#636E72',
+    primary: '#666666',
     tabBarActiveTint: '#000000',
     tabBarInactiveTint: '#B2BEC3',
     headerBackground: '#FFFFFF',
     headerTint: '#000000',
-    accent: '#45B7D1',
+    accent: '#0066CC',
   },
   user: {
-    primary: '#EE4D2D',
-    tabBarActiveTint: '#EE4D2D',
+    primary: '#0066CC',
+    tabBarActiveTint: '#0066CC',
     tabBarInactiveTint: '#B2BEC3',
-    headerBackground: '#EE4D2D',
+    headerBackground: '#0066CC',
     headerTint: '#FFFFFF',
-    accent: '#F97316',
+    accent: '#0066CC',
   },
   employee: {
-    primary: '#4ECDC4',
-    tabBarActiveTint: '#4ECDC4',
+    primary: '#0080FF',
+    tabBarActiveTint: '#0080FF',
     tabBarInactiveTint: '#B2BEC3',
-    headerBackground: '#4ECDC4',
+    headerBackground: '#0080FF',
     headerTint: '#FFFFFF',
-    accent: '#00B894',
+    accent: '#0066CC',
   },
   admin: {
     primary: '#6C5CE7',
@@ -70,7 +70,7 @@ export const ROLE_THEMES = {
     tabBarInactiveTint: '#B2BEC3',
     headerBackground: '#6C5CE7',
     headerTint: '#FFFFFF',
-    accent: '#8B5CF6',
+    accent: '#0066CC',
   },
 };
 
@@ -514,22 +514,22 @@ export const getDrawerByRole = (role: UserRole): DrawerSection[] => {
 // ============================================================================
 
 export const USER_QUICK_ACTIONS = [
-  { id: 'shopping', title: 'Mua sắm', icon: 'cart-outline', route: '/shopping', color: '#EE4D2D' },
-  { id: 'booking', title: 'Đặt lịch', icon: 'calendar-outline', route: '/construction/booking', color: '#E91E63' },
-  { id: 'progress', title: 'Tiến độ', icon: 'trending-up-outline', route: '/construction-progress', color: '#00B894' },
-  { id: 'ai', title: 'Trợ lý AI', icon: 'sparkles-outline', route: '/ai', color: '#8B5CF6' },
+  { id: 'shopping', title: 'Mua sắm', icon: 'cart-outline', route: '/shopping', color: '#0066CC' },
+  { id: 'booking', title: 'Đặt lịch', icon: 'calendar-outline', route: '/construction/booking', color: '#666666' },
+  { id: 'progress', title: 'Tiến độ', icon: 'trending-up-outline', route: '/construction-progress', color: '#0066CC' },
+  { id: 'ai', title: 'Trợ lý AI', icon: 'sparkles-outline', route: '/ai', color: '#0066CC' },
 ];
 
 export const EMPLOYEE_QUICK_ACTIONS = [
   { id: 'tasks', title: 'Nhiệm vụ', icon: 'checkbox-outline', route: '/projects', color: '#6C5CE7' },
-  { id: 'daily', title: 'Nhật ký', icon: 'today-outline', route: '/daily-report', color: '#4ECDC4' },
-  { id: 'qa', title: 'QA/QC', icon: 'checkmark-circle-outline', route: '/quality-assurance', color: '#FDCB6E' },
+  { id: 'daily', title: 'Nhật ký', icon: 'today-outline', route: '/daily-report', color: '#0080FF' },
+  { id: 'qa', title: 'QA/QC', icon: 'checkmark-circle-outline', route: '/quality-assurance', color: '#666666' },
   { id: 'messages', title: 'Tin nhắn', icon: 'chatbubbles-outline', route: '/messages', color: '#0984E3' },
 ];
 
 export const ADMIN_QUICK_ACTIONS = [
-  { id: 'analytics', title: 'Phân tích', icon: 'bar-chart-outline', route: '/analytics', color: '#2196F3' },
-  { id: 'products', title: 'Sản phẩm', icon: 'pricetag-outline', route: '/admin/products', color: '#EE4D2D' },
+  { id: 'analytics', title: 'Phân tích', icon: 'bar-chart-outline', route: '/analytics', color: '#0066CC' },
+  { id: 'products', title: 'Sản phẩm', icon: 'pricetag-outline', route: '/admin/products', color: '#0066CC' },
   { id: 'users', title: 'Users', icon: 'people-outline', route: '/admin/staff', color: '#6C5CE7' },
   { id: 'reports', title: 'Báo cáo', icon: 'document-text-outline', route: '/reports', color: '#A29BFE' },
 ];

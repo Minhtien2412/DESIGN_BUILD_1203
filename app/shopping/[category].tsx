@@ -268,7 +268,7 @@ export default function ShoppingCategoryScreen() {
         {/* Products Grid */}
         {loading ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#0A6847" />
+            <ActivityIndicator size="large" color="#0066CC" />
             <Text style={styles.loadingText}>Đang tải sản phẩm...</Text>
           </View>
         ) : (
@@ -280,7 +280,7 @@ export default function ShoppingCategoryScreen() {
             contentContainerStyle={styles.productList}
             columnWrapperStyle={styles.productRow}
             refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={() => loadProducts(true)} colors={['#0A6847']} />
+              <RefreshControl refreshing={refreshing} onRefresh={() => loadProducts(true)} colors={['#0066CC']} />
             }
             ListHeaderComponent={
               <Text style={styles.resultCount}>{filteredProducts.length} sản phẩm</Text>
@@ -360,8 +360,8 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   filterChipActive: {
-    backgroundColor: '#0A6847',
-    borderColor: '#0A6847',
+    backgroundColor: '#0066CC',
+    borderColor: '#0066CC',
   },
   filterChipText: {
     fontSize: 13,
@@ -458,7 +458,7 @@ const styles = StyleSheet.create({
   },
   brandText: {
     fontSize: 11,
-    color: '#0A6847',
+    color: '#0066CC',
     fontWeight: '600',
     marginBottom: 4,
     textTransform: 'uppercase',
@@ -478,7 +478,7 @@ const styles = StyleSheet.create({
   productPrice: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#e74c3c',
+    color: '#000000',
   },
   reviewCount: {
     fontSize: 11,

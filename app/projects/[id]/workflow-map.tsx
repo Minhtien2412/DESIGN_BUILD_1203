@@ -25,9 +25,9 @@ const MILESTONE_SIZE = 80;
 const STATUS_COLORS = {
   'not-started': '#9ca3af',
   'in-progress': '#3b82f6',
-  'completed': '#10b981',
-  'delayed': '#ef4444',
-  'blocked': '#f59e0b'
+  'completed': '#0066CC',
+  'delayed': '#000000',
+  'blocked': '#0066CC'
 };
 
 export default function WorkflowMapScreen() {
@@ -212,7 +212,7 @@ export default function WorkflowMapScreen() {
             <Text style={styles.statLabel}>Tiến độ</Text>
           </View>
           <View style={styles.statItem}>
-            <Text style={[styles.statValue, { color: '#10b981' }]}>{stats.completedNodes}</Text>
+            <Text style={[styles.statValue, { color: '#0066CC' }]}>{stats.completedNodes}</Text>
             <Text style={styles.statLabel}>Hoàn thành</Text>
           </View>
           <View style={styles.statItem}>
@@ -384,7 +384,7 @@ export default function WorkflowMapScreen() {
                       style={styles.modalActionButton}
                       onPress={handleCompleteNode}
                     >
-                      <Ionicons name="checkmark-circle" size={20} color="#10b981" />
+                      <Ionicons name="checkmark-circle" size={20} color="#0066CC" />
                       <Text style={styles.modalActionText}>Hoàn thành</Text>
                     </TouchableOpacity>
                   )}
@@ -393,8 +393,8 @@ export default function WorkflowMapScreen() {
                     style={styles.modalActionButton}
                     onPress={handleDeleteNode}
                   >
-                    <Ionicons name="trash" size={20} color="#ef4444" />
-                    <Text style={[styles.modalActionText, { color: '#ef4444' }]}>Xóa</Text>
+                    <Ionicons name="trash" size={20} color="#000000" />
+                    <Text style={[styles.modalActionText, { color: '#000000' }]}>Xóa</Text>
                   </TouchableOpacity>
                 </View>
               </>
@@ -618,6 +618,6 @@ const styles = StyleSheet.create({
   modalActionText: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#10b981'
+    color: '#0066CC'
   }
 });

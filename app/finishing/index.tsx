@@ -54,7 +54,7 @@ const CATEGORIES: CategoryItem[] = [
     subtitle: 'Sơn tường, sơn gỗ, epoxy...',
     icon: 'color-palette-outline',
     route: '/finishing/son-new',
-    color: '#e91e63',
+    color: '#666666',
     image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?w=400',
     workerCount: 189,
   },
@@ -64,7 +64,7 @@ const CATEGORIES: CategoryItem[] = [
     subtitle: 'Trần, vách ngăn, trang trí...',
     icon: 'layers-outline',
     route: '/finishing/thach-cao-new',
-    color: '#9c27b0',
+    color: '#999999',
     image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400',
     workerCount: 145,
   },
@@ -74,7 +74,7 @@ const CATEGORIES: CategoryItem[] = [
     subtitle: 'Cửa gỗ, nhôm kính, sắt...',
     icon: 'enter-outline',
     route: '/finishing/lam-cua-new',
-    color: '#ff9800',
+    color: '#0066CC',
     image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400',
     workerCount: 178,
   },
@@ -84,7 +84,7 @@ const CATEGORIES: CategoryItem[] = [
     subtitle: 'Inox, kính cường lực...',
     icon: 'git-network-outline',
     route: '/finishing/lan-can-new',
-    color: '#607d8b',
+    color: '#666666',
     image: 'https://images.unsplash.com/photo-1600573472550-8090b5e0745e?w=400',
     workerCount: 98,
   },
@@ -94,7 +94,7 @@ const CATEGORIES: CategoryItem[] = [
     subtitle: 'Granite, marble, nhân tạo...',
     icon: 'diamond-outline',
     route: '/finishing/op-da',
-    color: '#795548',
+    color: '#666666',
     image: 'https://images.unsplash.com/photo-1600566752355-35792bedcfea?w=400',
     workerCount: 87,
   },
@@ -104,7 +104,7 @@ const CATEGORIES: CategoryItem[] = [
     subtitle: 'Điện, nước, điều hòa...',
     icon: 'flash-outline',
     route: '/finishing/dien-nuoc',
-    color: '#4caf50',
+    color: '#0066CC',
     image: 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=400',
     workerCount: 312,
   },
@@ -114,7 +114,7 @@ const CATEGORIES: CategoryItem[] = [
     subtitle: 'Lắp đặt, bảo trì camera...',
     icon: 'videocam-outline',
     route: '/finishing/camera-new',
-    color: '#f44336',
+    color: '#000000',
     image: 'https://images.unsplash.com/photo-1557597774-9d273605dfa9?w=400',
     workerCount: 67,
   },
@@ -124,7 +124,7 @@ const CATEGORIES: CategoryItem[] = [
     subtitle: 'Sửa chữa, bảo trì nhà...',
     icon: 'construct-outline',
     route: '/finishing/tho-tong-hop-new',
-    color: '#00bcd4',
+    color: '#0080FF',
     image: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=400',
     workerCount: 245,
   },
@@ -197,7 +197,7 @@ export default function FinishingIndexScreen() {
         {/* Info Section */}
         <View style={styles.infoSection}>
           <View style={styles.infoItem}>
-            <View style={[styles.infoIcon, { backgroundColor: '#e3f2fd' }]}>
+            <View style={[styles.infoIcon, { backgroundColor: '#E8F4FF' }]}>
               <Ionicons name="shield-checkmark" size={24} color="#1976d2" />
             </View>
             <View style={styles.infoText}>
@@ -208,7 +208,7 @@ export default function FinishingIndexScreen() {
 
           <View style={styles.infoItem}>
             <View style={[styles.infoIcon, { backgroundColor: '#e8f5e9' }]}>
-              <Ionicons name="cash" size={24} color="#4caf50" />
+              <Ionicons name="cash" size={24} color="#0066CC" />
             </View>
             <View style={styles.infoText}>
               <Text style={styles.infoTitle}>Giá cả minh bạch</Text>
@@ -217,8 +217,8 @@ export default function FinishingIndexScreen() {
           </View>
 
           <View style={styles.infoItem}>
-            <View style={[styles.infoIcon, { backgroundColor: '#fff3e0' }]}>
-              <Ionicons name="ribbon" size={24} color="#ff9800" />
+            <View style={[styles.infoIcon, { backgroundColor: '#E8F4FF' }]}>
+              <Ionicons name="ribbon" size={24} color="#0066CC" />
             </View>
             <View style={styles.infoText}>
               <Text style={styles.infoTitle}>Bảo hành công trình</Text>

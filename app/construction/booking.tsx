@@ -231,7 +231,7 @@ export default function ConstructionBookingScreen() {
               <Text style={styles.sectionTitle}>Mã giảm giá</Text>
               <View style={styles.promoContainer}>
                 <View style={styles.promoInputContainer}>
-                  <Ionicons name="pricetag" size={20} color="#FF6B35" />
+                  <Ionicons name="pricetag" size={20} color="#0066CC" />
                   <TextInput
                     style={styles.promoInput}
                     placeholder="Nhập mã giảm giá"
@@ -524,7 +524,7 @@ const styles = StyleSheet.create({
   },
   discountValue: {
     fontSize: 14,
-    color: '#FF6B35',
+    color: '#0066CC',
     fontWeight: '500',
   },
   divider: {

@@ -32,15 +32,15 @@ export default function ReportsScreen() {
 
   const budgetData = [
     { label: 'Vật liệu', value: 2400, color: '#3b82f6' },
-    { label: 'Nhân công', value: 1800, color: '#10b981' },
-    { label: 'Thiết bị', value: 1200, color: '#f59e0b' },
+    { label: 'Nhân công', value: 1800, color: '#0066CC' },
+    { label: 'Thiết bị', value: 1200, color: '#0066CC' },
     { label: 'Khác', value: 600, color: '#6b7280' },
   ];
 
   const categoryData = [
-    { label: 'Hoàn thành', value: 45, color: '#10b981' },
+    { label: 'Hoàn thành', value: 45, color: '#0066CC' },
     { label: 'Đang làm', value: 30, color: '#3b82f6' },
-    { label: 'Chậm tiến độ', value: 15, color: '#f59e0b' },
+    { label: 'Chậm tiến độ', value: 15, color: '#0066CC' },
     { label: 'Chưa bắt đầu', value: 10, color: '#9ca3af' },
   ];
 
@@ -85,7 +85,7 @@ export default function ReportsScreen() {
               subtitle="Đúng kế hoạch"
               trend="up"
               trendValue="+5%"
-              gradientColors={['#10b981', '#059669']}
+              gradientColors={['#0066CC', '#0066CC']}
               style={styles.metricCard}
             />
             <MetricCard
@@ -95,7 +95,7 @@ export default function ReportsScreen() {
               subtitle="VNĐ đã chi"
               trend="up"
               trendValue="+12%"
-              gradientColors={['#3b82f6', '#2563eb']}
+              gradientColors={['#3b82f6', '#0066CC']}
               style={styles.metricCard}
             />
             <MetricCard
@@ -105,7 +105,7 @@ export default function ReportsScreen() {
               subtitle="người/ngày"
               trend="down"
               trendValue="-3%"
-              gradientColors={['#f59e0b', '#d97706']}
+              gradientColors={['#0066CC', '#d97706']}
               style={styles.metricCard}
             />
             <MetricCard
@@ -115,7 +115,7 @@ export default function ReportsScreen() {
               subtitle="kiểm tra"
               trend="up"
               trendValue="+4%"
-              gradientColors={['#8b5cf6', '#7c3aed']}
+              gradientColors={['#666666', '#666666']}
               style={styles.metricCard}
             />
           </ScrollView>
@@ -133,8 +133,8 @@ export default function ReportsScreen() {
             <LineChart
               data={progressData}
               height={200}
-              lineColor="#10b981"
-              gradientColors={['#10b981', '#dcfce7']}
+              lineColor="#0066CC"
+              gradientColors={['#0066CC', '#dcfce7']}
             />
           </View>
         </Section>
@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 12,
-    backgroundColor: '#eff6ff',
+    backgroundColor: '#E8F4FF',
     justifyContent: 'center',
     alignItems: 'center',
   },

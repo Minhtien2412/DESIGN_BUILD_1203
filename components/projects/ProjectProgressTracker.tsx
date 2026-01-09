@@ -1,4 +1,4 @@
-﻿import { Colors } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 import { apiFetch } from '@/services/api';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -66,7 +66,7 @@ export default function ProjectProgressTracker({ projectId, onUpdatePress }: Pro
       setProgress(response.data);
     } catch (err: any) {
       console.error('Failed to fetch progress:', err);
-      setError(err.message || 'Không thể tải tiến độ dự án');
+      setError(err.message || 'Kh�ng th? t?i ti?n d? d? �n');
     } finally {
       setLoading(false);
     }
@@ -75,13 +75,13 @@ export default function ProjectProgressTracker({ projectId, onUpdatePress }: Pro
   const getHealthStatusColor = (status: string) => {
     switch (status) {
       case 'on-track':
-        return '#4CAF50';
+        return '#0066CC';
       case 'at-risk':
-        return '#0A6847';
+        return '#0066CC';
       case 'delayed':
-        return '#FF9800';
+        return '#0066CC';
       case 'overdue':
-        return '#F44336';
+        return '#000000';
       default:
         return colors.textMuted;
     }
@@ -90,15 +90,15 @@ export default function ProjectProgressTracker({ projectId, onUpdatePress }: Pro
   const getHealthStatusLabel = (status: string) => {
     switch (status) {
       case 'on-track':
-        return 'Đúng tiến độ';
+        return '��ng ti?n d?';
       case 'at-risk':
-        return 'Có rủi ro';
+        return 'C� r?i ro';
       case 'delayed':
-        return 'Chậm tiến độ';
+        return 'Ch?m ti?n d?';
       case 'overdue':
-        return 'Quá hạn';
+        return 'Qu� h?n';
       default:
-        return 'Không xác định';
+        return 'Kh�ng x�c d?nh';
     }
   };
 
@@ -123,10 +123,10 @@ export default function ProjectProgressTracker({ projectId, onUpdatePress }: Pro
   };
 
   const getProgressColor = (percentage: number) => {
-    if (percentage < 30) return '#F44336';
-    if (percentage < 60) return '#FF9800';
-    if (percentage < 90) return '#0A6847';
-    return '#4CAF50';
+    if (percentage < 30) return '#000000';
+    if (percentage < 60) return '#0066CC';
+    if (percentage < 90) return '#0066CC';
+    return '#0066CC';
   };
 
   if (loading) {
@@ -134,7 +134,7 @@ export default function ProjectProgressTracker({ projectId, onUpdatePress }: Pro
       <View style={[styles.container, styles.centerContent, { backgroundColor: colors.surface }]}>
         <ActivityIndicator size="large" color={colors.accent} />
         <Text style={[styles.loadingText, { color: colors.textMuted }]}>
-          Đang tải tiến độ...
+          �ang t?i ti?n d?...
         </Text>
       </View>
     );
@@ -149,7 +149,7 @@ export default function ProjectProgressTracker({ projectId, onUpdatePress }: Pro
           style={[styles.retryButton, { backgroundColor: colors.accent }]}
           onPress={fetchProgress}
         >
-          <Text style={styles.retryButtonText}>Thử lại</Text>
+          <Text style={styles.retryButtonText}>Th? l?i</Text>
         </TouchableOpacity>
       </View>
     );
@@ -182,7 +182,7 @@ export default function ProjectProgressTracker({ projectId, onUpdatePress }: Pro
                 {project.completion_percentage}%
               </Text>
               <Text style={[styles.progressLabel, { color: colors.textMuted }]}>
-                Hoàn thành
+                Ho�n th�nh
               </Text>
             </View>
           </View>
@@ -205,10 +205,10 @@ export default function ProjectProgressTracker({ projectId, onUpdatePress }: Pro
               <Ionicons name="calendar-outline" size={18} color={colors.textMuted} />
               <Text style={[styles.deadlineText, { color: colors.textMuted }]}>
                 {project.days_until_deadline > 0
-                  ? `Còn ${project.days_until_deadline} ngày`
+                  ? `C�n ${project.days_until_deadline} ng�y`
                   : project.days_until_deadline === 0
-                  ? 'Đến hạn hôm nay'
-                  : `Quá hạn ${Math.abs(project.days_until_deadline)} ngày`}
+                  ? '�?n h?n h�m nay'
+                  : `Qu� h?n ${Math.abs(project.days_until_deadline)} ng�y`}
               </Text>
             </View>
           )}
@@ -221,7 +221,7 @@ export default function ProjectProgressTracker({ projectId, onUpdatePress }: Pro
               activeOpacity={0.7}
             >
               <Ionicons name="create-outline" size={20} color="#fff" />
-              <Text style={styles.updateButtonText}>Cập nhật tiến độ</Text>
+              <Text style={styles.updateButtonText}>C?p nh?t ti?n d?</Text>
             </TouchableOpacity>
           )}
         </LinearGradient>
@@ -232,54 +232,54 @@ export default function ProjectProgressTracker({ projectId, onUpdatePress }: Pro
         entering={FadeInDown.duration(400).delay(100)}
         style={[styles.statsCard, { backgroundColor: colors.surface }]}
       >
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>Thống kê công việc</Text>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>Th?ng k� c�ng vi?c</Text>
 
         <View style={styles.statsGrid}>
           <View style={styles.statItem}>
-            <View style={[styles.statIcon, { backgroundColor: '#4CAF50' + '20' }]}>
-              <Ionicons name="checkmark-done" size={24} color="#4CAF50" />
+            <View style={[styles.statIcon, { backgroundColor: '#0066CC' + '20' }]}>
+              <Ionicons name="checkmark-done" size={24} color="#0066CC" />
             </View>
             <Text style={[styles.statValue, { color: colors.text }]}>
               {statistics.completed_tasks}
             </Text>
             <Text style={[styles.statLabel, { color: colors.textMuted }]}>
-              Hoàn thành
+              Ho�n th�nh
             </Text>
           </View>
 
           <View style={styles.statItem}>
-            <View style={[styles.statIcon, { backgroundColor: '#2196F3' + '20' }]}>
-              <Ionicons name="play-circle" size={24} color="#2196F3" />
+            <View style={[styles.statIcon, { backgroundColor: '#0066CC' + '20' }]}>
+              <Ionicons name="play-circle" size={24} color="#0066CC" />
             </View>
             <Text style={[styles.statValue, { color: colors.text }]}>
               {statistics.in_progress_tasks}
             </Text>
             <Text style={[styles.statLabel, { color: colors.textMuted }]}>
-              Đang làm
+              �ang l�m
             </Text>
           </View>
 
           <View style={styles.statItem}>
-            <View style={[styles.statIcon, { backgroundColor: '#FF9800' + '20' }]}>
-              <Ionicons name="time" size={24} color="#FF9800" />
+            <View style={[styles.statIcon, { backgroundColor: '#0066CC' + '20' }]}>
+              <Ionicons name="time" size={24} color="#0066CC" />
             </View>
             <Text style={[styles.statValue, { color: colors.text }]}>
               {statistics.pending_tasks}
             </Text>
             <Text style={[styles.statLabel, { color: colors.textMuted }]}>
-              Chờ xử lý
+              Ch? x? l�
             </Text>
           </View>
 
           <View style={styles.statItem}>
-            <View style={[styles.statIcon, { backgroundColor: '#F44336' + '20' }]}>
-              <Ionicons name="ban" size={24} color="#F44336" />
+            <View style={[styles.statIcon, { backgroundColor: '#000000' + '20' }]}>
+              <Ionicons name="ban" size={24} color="#000000" />
             </View>
             <Text style={[styles.statValue, { color: colors.text }]}>
               {statistics.blocked_tasks}
             </Text>
             <Text style={[styles.statLabel, { color: colors.textMuted }]}>
-              Bị chặn
+              B? ch?n
             </Text>
           </View>
         </View>
@@ -288,10 +288,10 @@ export default function ProjectProgressTracker({ projectId, onUpdatePress }: Pro
         <View style={styles.progressBarContainer}>
           <View style={styles.progressBarHeader}>
             <Text style={[styles.progressBarLabel, { color: colors.textMuted }]}>
-              Tổng tiến độ
+              T?ng ti?n d?
             </Text>
             <Text style={[styles.progressBarValue, { color: progressColor }]}>
-              {statistics.completed_tasks}/{statistics.total_tasks} công việc
+              {statistics.completed_tasks}/{statistics.total_tasks} c�ng vi?c
             </Text>
           </View>
           <View style={[styles.progressBarTrack, { backgroundColor: colors.border }]}>
@@ -312,7 +312,7 @@ export default function ProjectProgressTracker({ projectId, onUpdatePress }: Pro
           style={[styles.milestonesCard, { backgroundColor: colors.surface }]}
         >
           <Text style={[styles.sectionTitle, { color: colors.text }]}>
-            Các mốc dự án ({milestones.length})
+            C�c m?c d? �n ({milestones.length})
           </Text>
 
           {milestones.map((milestone, index) => (
@@ -324,9 +324,9 @@ export default function ProjectProgressTracker({ projectId, onUpdatePress }: Pro
                     {
                       backgroundColor:
                         milestone.status === 'completed'
-                          ? '#4CAF50'
+                          ? '#0066CC'
                           : milestone.status === 'in_progress'
-                          ? '#2196F3'
+                          ? '#0066CC'
                           : colors.border,
                     },
                   ]}
@@ -353,7 +353,7 @@ export default function ProjectProgressTracker({ projectId, onUpdatePress }: Pro
                   {milestone.name}
                 </Text>
                 <Text style={[styles.milestoneDate, { color: colors.textMuted }]}>
-                  Hạn: {formatDate(milestone.due_date)}
+                  H?n: {formatDate(milestone.due_date)}
                 </Text>
                 
                 {/* Milestone Progress Bar */}
@@ -386,7 +386,7 @@ export default function ProjectProgressTracker({ projectId, onUpdatePress }: Pro
       >
         <View style={styles.dateItem}>
           <Ionicons name="play-circle-outline" size={20} color={colors.accent} />
-          <Text style={[styles.dateLabel, { color: colors.textMuted }]}>Ngày bắt đầu</Text>
+          <Text style={[styles.dateLabel, { color: colors.textMuted }]}>Ng�y b?t d?u</Text>
           <Text style={[styles.dateValue, { color: colors.text }]}>
             {formatDate(project.start_date)}
           </Text>

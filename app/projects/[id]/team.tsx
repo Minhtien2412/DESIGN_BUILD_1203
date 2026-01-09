@@ -27,11 +27,11 @@ interface TeamMember {
 }
 
 const ROLE_CONFIG = {
-  owner: { label: 'Chủ dự án', color: '#FF6B35', icon: 'star' },
+  owner: { label: 'Chủ dự án', color: '#0066CC', icon: 'star' },
   architect: { label: 'Kiến trúc sư', color: '#007AFF', icon: 'easel' },
   engineer: { label: 'Kỹ sư', color: '#34C759', icon: 'construct' },
   contractor: { label: 'Nhà thầu', color: '#FFB800', icon: 'hammer' },
-  supervisor: { label: 'Giám sát', color: '#6366F1', icon: 'eye' },
+  supervisor: { label: 'Giám sát', color: '#666666', icon: 'eye' },
   worker: { label: 'Công nhân', color: '#999', icon: 'people' },
 };
 
@@ -205,7 +205,7 @@ export default function ProjectTeamScreen() {
             style={styles.actionBtn}
             onPress={() => handleRemoveMember(item.id, item.name)}
           >
-            <Ionicons name="person-remove" size={20} color="#EF4444" />
+            <Ionicons name="person-remove" size={20} color="#000000" />
             <Text style={styles.actionBtnText}>Xóa</Text>
           </TouchableOpacity>
         </View>
@@ -308,7 +308,7 @@ export default function ProjectTeamScreen() {
       {/* Team Stats */}
       <View style={styles.statsContainer}>
         <View style={styles.statCard}>
-          <Ionicons name="people" size={28} color="#FF6B35" />
+          <Ionicons name="people" size={28} color="#0066CC" />
           <Text style={styles.statValue}>{team.length}</Text>
           <Text style={styles.statLabel}>Tổng thành viên</Text>
         </View>
@@ -542,7 +542,7 @@ function AddTeamMemberModal({ visible, onClose, onAdd }: AddTeamMemberModalProps
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#0066CC',
   },
   header: {
     flexDirection: 'row',
@@ -585,7 +585,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   filterTabActive: {
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#0066CC',
   },
   filterText: {
     fontSize: 14,
@@ -606,7 +606,7 @@ const styles = StyleSheet.create({
   filterBadgeText: {
     fontSize: 12,
     fontWeight: 'bold',
-    color: '#FF6B35',
+    color: '#0066CC',
   },
   statsContainer: {
     flexDirection: 'row',
@@ -662,7 +662,7 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   avatarPlaceholder: {
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#0066CC',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -904,7 +904,7 @@ const modalStyles = StyleSheet.create({
     color: '#666',
   },
   btnSubmit: {
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#0066CC',
   },
   btnSubmitText: {
     fontSize: 15,

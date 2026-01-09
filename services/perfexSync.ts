@@ -46,47 +46,54 @@ const CACHE_KEYS = {
   SYNC_QUEUE: 'perfex_sync_queue',
 };
 
-// ==================== MOCK DATA (Demo) ====================
+// ==================== MOCK DATA (Real from Perfex CRM) ====================
+
+/**
+ * Dữ liệu thực từ Perfex CRM API
+ * GET /api/customers - 4 customers
+ * GET /api/projects - 2 projects  
+ * GET /api/invoices - 1 invoice
+ */
 
 const MOCK_CUSTOMERS: Customer[] = [
   {
     userid: '1',
-    company: 'Công ty TNHH Xây dựng Miền Nam',
-    phonenumber: '0901234567',
-    city: 'TP.HCM',
-    address: '123 Nguyễn Văn Linh, Q.7',
-    website: 'https://xaydungmiennam.vn',
-    datecreated: '2025-01-15',
+    company: 'Anh Khương Q9',
+    phonenumber: '0359777108',
+    city: 'Hồ Chí Minh',
+    address: '',
+    website: '',
+    datecreated: '2024-12-30',
     active: '1',
   },
   {
     userid: '2',
-    company: 'Resort Hội An Paradise',
-    phonenumber: '0912345678',
-    city: 'Quảng Nam',
-    address: '456 Cửa Đại, Hội An',
-    website: 'https://hoianparadise.com',
-    datecreated: '2025-02-20',
+    company: 'NHÀ XINH',
+    phonenumber: '0909452109',
+    city: '',
+    address: '',
+    website: 'nhaxinhdesign.com',
+    datecreated: '2024-12-30',
     active: '1',
   },
   {
     userid: '3',
-    company: 'Biệt thự Đà Lạt Sunrise',
-    phonenumber: '0923456789',
-    city: 'Lâm Đồng',
-    address: '789 Trần Hưng Đạo, Đà Lạt',
-    website: 'https://dalatsunrise.vn',
-    datecreated: '2025-03-10',
+    company: 'Anh Tiến',
+    phonenumber: '0342385280',
+    city: 'Tỉnh Bình Phước',
+    address: '',
+    website: '',
+    datecreated: '2024-12-30',
     active: '1',
   },
   {
     userid: '4',
-    company: 'Khách sạn Nha Trang Bay',
-    phonenumber: '0934567890',
-    city: 'Khánh Hòa',
-    address: '321 Trần Phú, Nha Trang',
-    website: 'https://nhatrangbay.com',
-    datecreated: '2025-04-05',
+    company: 'Lê Nguyên Thảo',
+    phonenumber: '0934098308',
+    city: 'Hồ Chí Minh',
+    address: '',
+    website: '',
+    datecreated: '2024-12-30',
     active: '1',
   },
 ];
@@ -94,73 +101,31 @@ const MOCK_CUSTOMERS: Customer[] = [
 const MOCK_PROJECTS: Project[] = [
   {
     id: '1',
-    name: 'Villa Resort Hội An - Giai đoạn 1',
-    description: 'Xây dựng 10 căn villa sang trọng với hồ bơi riêng',
-    status: '2', // Đang thực hiện
-    clientid: '2',
-    start_date: '2025-03-01',
-    deadline: '2025-12-31',
-    progress: '45',
-    project_cost: '15000000000',
-    company: 'Resort Hội An Paradise',
-    phonenumber: '0912345678',
-    city: 'Quảng Nam',
+    name: 'Nhà Anh Khương Quận 9',
+    description: '',
+    status: '1', // Chưa bắt đầu
+    clientid: '1',
+    start_date: '2024-12-30',
+    deadline: '2025-06-30',
+    progress: '0',
+    project_cost: '15000000000', // 15 tỷ VND
+    company: 'Anh Khương Q9',
+    phonenumber: '0359777108',
+    city: 'Hồ Chí Minh',
   },
   {
     id: '2',
-    name: 'Nhà phố hiện đại Q.7',
-    description: 'Thiết kế và xây dựng nhà phố 4 tầng phong cách minimalist',
-    status: '2',
-    clientid: '1',
-    start_date: '2025-04-15',
-    deadline: '2025-10-15',
-    progress: '70',
-    project_cost: '3500000000',
-    company: 'Công ty TNHH Xây dựng Miền Nam',
-    phonenumber: '0901234567',
-    city: 'TP.HCM',
-  },
-  {
-    id: '3',
-    name: 'Biệt thự nghỉ dưỡng Đà Lạt',
-    description: 'Biệt thự 2 tầng view đồi thông, phong cách Pháp cổ điển',
-    status: '1', // Chưa bắt đầu
+    name: 'Biệt Thự 3 Tầng Anh Tiến Quận 7',
+    description: '',
+    status: '2', // Đang thực hiện
     clientid: '3',
-    start_date: '2025-06-01',
-    deadline: '2026-02-28',
+    start_date: '2024-12-30',
+    deadline: '2025-12-31',
     progress: '0',
-    project_cost: '8500000000',
-    company: 'Biệt thự Đà Lạt Sunrise',
-    phonenumber: '0923456789',
-    city: 'Lâm Đồng',
-  },
-  {
-    id: '4',
-    name: 'Cải tạo Lobby Khách sạn',
-    description: 'Thiết kế lại lobby theo xu hướng tropical luxury',
-    status: '4', // Hoàn thành
-    clientid: '4',
-    start_date: '2025-02-01',
-    deadline: '2025-04-30',
-    progress: '100',
-    project_cost: '2800000000',
-    company: 'Khách sạn Nha Trang Bay',
-    phonenumber: '0934567890',
-    city: 'Khánh Hòa',
-  },
-  {
-    id: '5',
-    name: 'Resort Beach Club Phú Quốc',
-    description: 'Beach club với 5 bungalow và nhà hàng hải sản',
-    status: '2',
-    clientid: '2',
-    start_date: '2025-05-01',
-    deadline: '2026-05-01',
-    progress: '25',
-    project_cost: '22000000000',
-    company: 'Resort Hội An Paradise',
-    phonenumber: '0912345678',
-    city: 'Kiên Giang',
+    project_cost: '10000000000', // 10 tỷ VND
+    company: 'Anh Tiến',
+    phonenumber: '0342385280',
+    city: 'Tỉnh Bình Phước',
   },
 ];
 
@@ -599,10 +564,10 @@ export function getProjectStatusName(status: string): string {
 export function getProjectStatusColor(status: string): string {
   const colorMap: Record<string, string> = {
     '1': '#6B7280', // gray
-    '2': '#10B981', // green
-    '3': '#F59E0B', // yellow
+    '2': '#0066CC', // green
+    '3': '#0066CC', // yellow
     '4': '#3B82F6', // blue
-    '5': '#EF4444', // red
+    '5': '#000000', // red
   };
   return colorMap[status] || '#6B7280';
 }

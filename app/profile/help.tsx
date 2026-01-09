@@ -61,12 +61,12 @@ export default function HelpScreen() {
     {
       icon: 'flash-outline' as keyof typeof Ionicons.glyphMap,
       label: 'Báo lỗi',
-      color: '#EF4444',
+      color: '#000000',
     },
     {
       icon: 'star-outline' as keyof typeof Ionicons.glyphMap,
       label: 'Đánh giá',
-      color: '#F59E0B',
+      color: '#0066CC',
     },
     {
       icon: 'bulb-outline' as keyof typeof Ionicons.glyphMap,

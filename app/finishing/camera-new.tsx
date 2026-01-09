@@ -18,7 +18,7 @@ export default function CameraNewScreen() {
       <Stack.Screen
         options={{
           title: config?.title || 'Camera an ninh',
-          headerStyle: { backgroundColor: '#EE4D2D' },
+          headerStyle: { backgroundColor: '#0066CC' },
           headerTintColor: '#fff',
         }}
       />

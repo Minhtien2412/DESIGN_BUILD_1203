@@ -372,13 +372,13 @@ export default function StructureChecklistScreen() {
   const getStatusColor = (status: InspectionStatus) => {
     switch (status) {
       case 'PASS':
-        return '#4CAF50';
+        return '#0066CC';
       case 'FAIL':
-        return '#F44336';
+        return '#000000';
       case 'NA':
-        return '#9E9E9E';
+        return '#999999';
       default:
-        return '#FFC107';
+        return '#0066CC';
     }
   };
 
@@ -409,15 +409,15 @@ export default function StructureChecklistScreen() {
           </Text>
           <View style={styles.statsRow}>
             <View style={styles.statItem}>
-              <View style={[styles.statDot, { backgroundColor: '#4CAF50' }]} />
+              <View style={[styles.statDot, { backgroundColor: '#0066CC' }]} />
               <Text style={styles.statText}>Đạt: {passedCount}</Text>
             </View>
             <View style={styles.statItem}>
-              <View style={[styles.statDot, { backgroundColor: '#F44336' }]} />
+              <View style={[styles.statDot, { backgroundColor: '#000000' }]} />
               <Text style={styles.statText}>Không đạt: {failedCount}</Text>
             </View>
             <View style={styles.statItem}>
-              <View style={[styles.statDot, { backgroundColor: '#9E9E9E' }]} />
+              <View style={[styles.statDot, { backgroundColor: '#999999' }]} />
               <Text style={styles.statText}>N/A: {naCount}</Text>
             </View>
           </View>
@@ -441,7 +441,7 @@ export default function StructureChecklistScreen() {
 
                 {/* Specification */}
                 <View style={styles.specBox}>
-                  <Ionicons name="information-circle" size={16} color="#2196F3" />
+                  <Ionicons name="information-circle" size={16} color="#0066CC" />
                   <Text style={styles.specText}>{item.specification}</Text>
                 </View>
 
@@ -451,14 +451,14 @@ export default function StructureChecklistScreen() {
                     style={[
                       styles.statusButton,
                       item.status === 'PASS' && styles.statusButtonActive,
-                      { borderColor: '#4CAF50' },
+                      { borderColor: '#0066CC' },
                     ]}
                     onPress={() => handleStatusChange(item.index, InspectionStatus.PASS)}
                   >
                     <Text
                       style={[
                         styles.statusButtonText,
-                        item.status === 'PASS' && { color: '#4CAF50' },
+                        item.status === 'PASS' && { color: '#0066CC' },
                       ]}
                     >
                       Đạt
@@ -468,14 +468,14 @@ export default function StructureChecklistScreen() {
                     style={[
                       styles.statusButton,
                       item.status === 'FAIL' && styles.statusButtonActive,
-                      { borderColor: '#F44336' },
+                      { borderColor: '#000000' },
                     ]}
                     onPress={() => handleStatusChange(item.index, InspectionStatus.FAIL)}
                   >
                     <Text
                       style={[
                         styles.statusButtonText,
-                        item.status === 'FAIL' && { color: '#F44336' },
+                        item.status === 'FAIL' && { color: '#000000' },
                       ]}
                     >
                       Không đạt
@@ -485,14 +485,14 @@ export default function StructureChecklistScreen() {
                     style={[
                       styles.statusButton,
                       item.status === 'NA' && styles.statusButtonActive,
-                      { borderColor: '#9E9E9E' },
+                      { borderColor: '#999999' },
                     ]}
                     onPress={() => handleStatusChange(item.index, InspectionStatus.NA)}
                   >
                     <Text
                       style={[
                         styles.statusButtonText,
-                        item.status === 'NA' && { color: '#9E9E9E' },
+                        item.status === 'NA' && { color: '#999999' },
                       ]}
                     >
                       N/A
@@ -506,7 +506,7 @@ export default function StructureChecklistScreen() {
                     style={styles.addPhotoButton}
                     onPress={() => handlePhotoAdd(item.index)}
                   >
-                    <Ionicons name="camera" size={20} color="#2196F3" />
+                    <Ionicons name="camera" size={20} color="#0066CC" />
                     <Text style={styles.addPhotoText}>
                       Thêm ảnh ({item.photos.length})
                     </Text>
@@ -575,7 +575,7 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     height: '100%',
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
   },
   progressText: {
     fontSize: 14,
@@ -611,7 +611,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     backgroundColor: '#fff',
     borderBottomWidth: 2,
-    borderBottomColor: '#2196F3',
+    borderBottomColor: '#0066CC',
   },
   itemCard: {
     backgroundColor: '#fff',
@@ -636,7 +636,7 @@ const styles = StyleSheet.create({
   },
   specBox: {
     flexDirection: 'row',
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
     padding: 12,
     borderRadius: 6,
     marginBottom: 12,
@@ -678,13 +678,13 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 12,
     borderWidth: 1,
-    borderColor: '#2196F3',
+    borderColor: '#0066CC',
     borderRadius: 6,
     borderStyle: 'dashed',
   },
   addPhotoText: {
     fontSize: 14,
-    color: '#2196F3',
+    color: '#0066CC',
     marginLeft: 8,
   },
   notesInput: {
@@ -708,7 +708,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 14,
     borderWidth: 1,
-    borderColor: '#2196F3',
+    borderColor: '#0066CC',
     borderRadius: 8,
     marginRight: 8,
     alignItems: 'center',
@@ -716,12 +716,12 @@ const styles = StyleSheet.create({
   draftButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#2196F3',
+    color: '#0066CC',
   },
   submitButton: {
     flex: 1,
     paddingVertical: 14,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     borderRadius: 8,
     marginLeft: 8,
     alignItems: 'center',

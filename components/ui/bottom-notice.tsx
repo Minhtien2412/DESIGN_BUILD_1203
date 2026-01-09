@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
   pill: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#111', borderRadius: 999, paddingHorizontal: 12, paddingVertical: 10, maxWidth: '94%' },
   title: { color: '#fff', fontWeight: '800' },
   body: { color: '#ddd' },
-  btn: { marginLeft: 8, backgroundColor: '#2563eb', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999 },
+  btn: { marginLeft: 8, backgroundColor: '#0066CC', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999 },
   btnText: { color: '#fff', fontWeight: '700' },
 });
 

@@ -33,7 +33,7 @@ export default function AIAssistantScreen() {
       title: 'Phân tích ảnh',
       description: 'Upload ảnh công trình để AI phân tích',
       route: '/ai/photo-analysis',
-      color: '#3B82F6',
+      color: '#0080FF',
     },
     {
       id: 2,
@@ -41,7 +41,7 @@ export default function AIAssistantScreen() {
       title: 'Tạo báo cáo',
       description: 'AI tạo báo cáo tiến độ tự động',
       route: '/ai/generate-report',
-      color: '#10B981',
+      color: '#0066CC',
     },
     {
       id: 3,
@@ -49,7 +49,7 @@ export default function AIAssistantScreen() {
       title: 'Kiểm tra vật liệu',
       description: 'Phân tích chất lượng vật liệu',
       route: '/ai/material-check',
-      color: '#F59E0B',
+      color: '#0080FF',
     },
     {
       id: 4,
@@ -57,7 +57,7 @@ export default function AIAssistantScreen() {
       title: 'Dự đoán tiến độ',
       description: 'Ước tính thời gian hoàn thành',
       route: '/ai/progress-prediction',
-      color: '#8B5CF6',
+      color: '#0066CC',
     },
   ];
 
@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#10B981',
+    backgroundColor: '#0066CC',
   },
   headerTitle: {
     fontSize: 18,

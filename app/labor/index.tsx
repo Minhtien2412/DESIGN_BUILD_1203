@@ -45,19 +45,19 @@ const ROLE_ICONS: Record<WorkerRole, string> = {
 };
 
 const ROLE_COLORS: Record<WorkerRole, string> = {
-  [WorkerRole.FOREMAN]: '#FF9800',
-  [WorkerRole.SKILLED_WORKER]: '#2196F3',
-  [WorkerRole.UNSKILLED_WORKER]: '#9E9E9E',
-  [WorkerRole.EQUIPMENT_OPERATOR]: '#673AB7',
-  [WorkerRole.ELECTRICIAN]: '#FFC107',
-  [WorkerRole.PLUMBER]: '#0A6847',
-  [WorkerRole.CARPENTER]: '#795548',
-  [WorkerRole.MASON]: '#FF5722',
-  [WorkerRole.PAINTER]: '#0A6847',
+  [WorkerRole.FOREMAN]: '#0066CC',
+  [WorkerRole.SKILLED_WORKER]: '#0066CC',
+  [WorkerRole.UNSKILLED_WORKER]: '#999999',
+  [WorkerRole.EQUIPMENT_OPERATOR]: '#666666',
+  [WorkerRole.ELECTRICIAN]: '#0066CC',
+  [WorkerRole.PLUMBER]: '#0066CC',
+  [WorkerRole.CARPENTER]: '#666666',
+  [WorkerRole.MASON]: '#000000',
+  [WorkerRole.PAINTER]: '#0066CC',
   [WorkerRole.WELDER]: '#FF6F00',
-  [WorkerRole.SAFETY_OFFICER]: '#4CAF50',
-  [WorkerRole.ENGINEER]: '#009688',
-  [WorkerRole.SUPERVISOR]: '#3F51B5',
+  [WorkerRole.SAFETY_OFFICER]: '#0066CC',
+  [WorkerRole.ENGINEER]: '#0066CC',
+  [WorkerRole.SUPERVISOR]: '#0066CC',
   [WorkerRole.OTHER]: '#4A4A4A',
 };
 
@@ -88,20 +88,20 @@ export default function LaborIndexScreen() {
       <ScrollView style={styles.scrollView}>
         {/* Summary Cards */}
         <View style={styles.summaryRow}>
-          <View style={[styles.summaryCard, { backgroundColor: '#E3F2FD' }]}>
-            <Ionicons name="people" size={28} color="#2196F3" />
+          <View style={[styles.summaryCard, { backgroundColor: '#E8F4FF' }]}>
+            <Ionicons name="people" size={28} color="#0066CC" />
             <Text style={styles.summaryValue}>{workerSummary?.totalWorkers || 0}</Text>
             <Text style={styles.summaryLabel}>Tổng nhân công</Text>
           </View>
 
           <View style={[styles.summaryCard, { backgroundColor: '#E8F5E9' }]}>
-            <Ionicons name="checkmark-circle" size={28} color="#4CAF50" />
+            <Ionicons name="checkmark-circle" size={28} color="#0066CC" />
             <Text style={styles.summaryValue}>{workerSummary?.activeWorkers || 0}</Text>
             <Text style={styles.summaryLabel}>Đang làm việc</Text>
           </View>
 
-          <View style={[styles.summaryCard, { backgroundColor: '#FFF3E0' }]}>
-            <Ionicons name="time" size={28} color="#FF9800" />
+          <View style={[styles.summaryCard, { backgroundColor: '#E8F4FF' }]}>
+            <Ionicons name="time" size={28} color="#0066CC" />
             <Text style={styles.summaryValue}>{workerSummary?.onLeave || 0}</Text>
             <Text style={styles.summaryLabel}>Nghỉ phép</Text>
           </View>
@@ -124,25 +124,25 @@ export default function LaborIndexScreen() {
             <View style={styles.attendanceCard}>
               <View style={styles.attendanceRow}>
                 <View style={styles.attendanceItem}>
-                  <View style={[styles.attendanceDot, { backgroundColor: '#4CAF50' }]} />
+                  <View style={[styles.attendanceDot, { backgroundColor: '#0066CC' }]} />
                   <Text style={styles.attendanceLabel}>Có mặt</Text>
                   <Text style={styles.attendanceValue}>{attendanceSummary.present}</Text>
                 </View>
 
                 <View style={styles.attendanceItem}>
-                  <View style={[styles.attendanceDot, { backgroundColor: '#F44336' }]} />
+                  <View style={[styles.attendanceDot, { backgroundColor: '#000000' }]} />
                   <Text style={styles.attendanceLabel}>Vắng</Text>
                   <Text style={styles.attendanceValue}>{attendanceSummary.absent}</Text>
                 </View>
 
                 <View style={styles.attendanceItem}>
-                  <View style={[styles.attendanceDot, { backgroundColor: '#FF9800' }]} />
+                  <View style={[styles.attendanceDot, { backgroundColor: '#0066CC' }]} />
                   <Text style={styles.attendanceLabel}>Trễ</Text>
                   <Text style={styles.attendanceValue}>{attendanceSummary.late}</Text>
                 </View>
 
                 <View style={styles.attendanceItem}>
-                  <View style={[styles.attendanceDot, { backgroundColor: '#2196F3' }]} />
+                  <View style={[styles.attendanceDot, { backgroundColor: '#0066CC' }]} />
                   <Text style={styles.attendanceLabel}>Nghỉ</Text>
                   <Text style={styles.attendanceValue}>{attendanceSummary.onLeave}</Text>
                 </View>
@@ -163,10 +163,10 @@ export default function LaborIndexScreen() {
                       width: `${attendanceSummary.attendanceRate}%`,
                       backgroundColor:
                         attendanceSummary.attendanceRate >= 90
-                          ? '#4CAF50'
+                          ? '#0066CC'
                           : attendanceSummary.attendanceRate >= 75
-                          ? '#FF9800'
-                          : '#F44336',
+                          ? '#0066CC'
+                          : '#000000',
                     },
                   ]}
                 />
@@ -219,7 +219,7 @@ export default function LaborIndexScreen() {
               style={styles.actionCard}
               onPress={() => router.push(`/labor/workers?projectId=${projectId}` as Href)}
             >
-              <Ionicons name="people-outline" size={32} color="#2196F3" />
+              <Ionicons name="people-outline" size={32} color="#0066CC" />
               <Text style={styles.actionLabel}>Nhân công</Text>
             </TouchableOpacity>
 
@@ -229,7 +229,7 @@ export default function LaborIndexScreen() {
                 router.push(`/labor/attendance?projectId=${projectId}&date=${today}` as Href)
               }
             >
-              <Ionicons name="clipboard-outline" size={32} color="#4CAF50" />
+              <Ionicons name="clipboard-outline" size={32} color="#0066CC" />
               <Text style={styles.actionLabel}>Chấm công</Text>
             </TouchableOpacity>
 
@@ -237,7 +237,7 @@ export default function LaborIndexScreen() {
               style={styles.actionCard}
               onPress={() => router.push(`/labor/shifts?projectId=${projectId}` as Href)}
             >
-              <Ionicons name="time-outline" size={32} color="#FF9800" />
+              <Ionicons name="time-outline" size={32} color="#0066CC" />
               <Text style={styles.actionLabel}>Ca làm việc</Text>
             </TouchableOpacity>
 
@@ -245,7 +245,7 @@ export default function LaborIndexScreen() {
               style={styles.actionCard}
               onPress={() => router.push(`/labor/leave-requests?projectId=${projectId}` as Href)}
             >
-              <Ionicons name="calendar-outline" size={32} color="#9C27B0" />
+              <Ionicons name="calendar-outline" size={32} color="#999999" />
               <Text style={styles.actionLabel}>Nghỉ phép</Text>
             </TouchableOpacity>
 
@@ -253,7 +253,7 @@ export default function LaborIndexScreen() {
               style={styles.actionCard}
               onPress={() => router.push(`/labor/payroll?projectId=${projectId}` as Href)}
             >
-              <Ionicons name="cash-outline" size={32} color="#0A6847" />
+              <Ionicons name="cash-outline" size={32} color="#0066CC" />
               <Text style={styles.actionLabel}>Bảng lương</Text>
             </TouchableOpacity>
           </View>
@@ -316,7 +316,7 @@ const styles = StyleSheet.create({
   },
   seeAll: {
     fontSize: 13,
-    color: '#2196F3',
+    color: '#0066CC',
     fontWeight: '600',
   },
   attendanceCard: {
@@ -362,7 +362,7 @@ const styles = StyleSheet.create({
   attendanceRateValue: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#4CAF50',
+    color: '#0066CC',
   },
   progressBar: {
     height: 6,

@@ -196,10 +196,10 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   rejectButton: {
-    backgroundColor: '#EF4444',
+    backgroundColor: '#000000',
   },
   acceptButton: {
-    backgroundColor: '#10B981',
+    backgroundColor: '#0066CC',
   },
   buttonPressed: {
     transform: [{ scale: 0.95 }],

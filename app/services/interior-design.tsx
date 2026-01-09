@@ -1,7 +1,9 @@
+import { useUnifiedMessaging } from '@/hooks/crm/useUnifiedMessaging';
 import { Ionicons } from '@expo/vector-icons';
 import { Stack, router } from 'expo-router';
 import { useState } from 'react';
 import {
+    ActivityIndicator,
     Dimensions,
     Image,
     ScrollView,
@@ -107,6 +109,27 @@ export default function InteriorDesignScreen() {
   const [selectedPriceRange, setSelectedPriceRange] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [showFeatured, setShowFeatured] = useState(false);
+  const [consultingId, setConsultingId] = useState<number | null>(null);
+  
+  const { getOrCreateConversation } = useUnifiedMessaging();
+  
+  // Handle consult button press - navigate to chat
+  const handleConsult = async (company: typeof INTERIOR_COMPANIES[0]) => {
+    try {
+      setConsultingId(company.id);
+      const conversationId = await getOrCreateConversation({
+        userId: company.id,
+        userName: company.name,
+        userAvatar: undefined, // company.logo is a require() not a string URL
+        userRole: 'INTERIOR_DESIGN',
+      });
+      router.push(`/messages/chat/${conversationId}` as `/messages/chat/${string}`);
+    } catch (error) {
+      console.error('Error creating conversation:', error);
+    } finally {
+      setConsultingId(null);
+    }
+  };
 
   const filteredCompanies = INTERIOR_COMPANIES.filter((company) => {
     const matchLocation =
@@ -129,7 +152,7 @@ export default function InteriorDesignScreen() {
       <Stack.Screen
         options={{
           title: 'Thiết kế nội thất',
-          headerStyle: { backgroundColor: '#ee4d2d' },
+          headerStyle: { backgroundColor: '#0066CC' },
           headerTintColor: '#fff',
           headerTitleStyle: { fontWeight: '600' },
         }}
@@ -154,7 +177,7 @@ export default function InteriorDesignScreen() {
             <Ionicons
               name={showFeatured ? 'star' : 'star-outline'}
               size={18}
-              color={showFeatured ? '#fff' : '#ee4d2d'}
+              color={showFeatured ? '#fff' : '#0066CC'}
             />
             <Text
               style={[
@@ -276,7 +299,7 @@ export default function InteriorDesignScreen() {
                 {/* Rating & Projects */}
                 <View style={styles.statsRow}>
                   <View style={styles.statItem}>
-                    <Ionicons name="star" size={14} color="#ee4d2d" />
+                    <Ionicons name="star" size={14} color="#0066CC" />
                     <Text style={styles.ratingText}>{company.rating}</Text>
                     <Text style={styles.reviewText}>({company.reviewCount})</Text>
                   </View>
@@ -303,9 +326,19 @@ export default function InteriorDesignScreen() {
                     <Text style={styles.priceValue}>{company.startPrice}₫</Text>
                     <Text style={styles.priceUnit}>/m²</Text>
                   </View>
-                  <TouchableOpacity style={styles.contactButton}>
-                    <Ionicons name="chatbubble-ellipses-outline" size={16} color="#fff" />
-                    <Text style={styles.contactButtonText}>Tư vấn</Text>
+                  <TouchableOpacity 
+                    style={styles.contactButton}
+                    onPress={() => handleConsult(company)}
+                    disabled={consultingId === company.id}
+                  >
+                    {consultingId === company.id ? (
+                      <ActivityIndicator size="small" color="#fff" />
+                    ) : (
+                      <>
+                        <Ionicons name="chatbubble-ellipses-outline" size={16} color="#fff" />
+                        <Text style={styles.contactButtonText}>Tư vấn</Text>
+                      </>
+                    )}
                   </TouchableOpacity>
                 </View>
               </View>
@@ -374,18 +407,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#ee4d2d',
+    borderColor: '#0066CC',
     borderRadius: 8,
     paddingHorizontal: 12,
     height: 40,
   },
   featuredButtonActive: {
-    backgroundColor: '#ee4d2d',
+    backgroundColor: '#0066CC',
   },
   featuredButtonText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#ee4d2d',
+    color: '#0066CC',
     marginLeft: 4,
   },
   featuredButtonTextActive: {
@@ -417,7 +450,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
   },
   filterChipActive: {
-    backgroundColor: '#ee4d2d',
+    backgroundColor: '#0066CC',
   },
   filterChipText: {
     fontSize: 13,
@@ -448,7 +481,7 @@ const styles = StyleSheet.create({
     right: 8,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#ee4d2d',
+    backgroundColor: '#0066CC',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
@@ -510,7 +543,7 @@ const styles = StyleSheet.create({
   ratingText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#ee4d2d',
+    color: '#0066CC',
     marginLeft: 4,
   },
   reviewText: {
@@ -537,7 +570,7 @@ const styles = StyleSheet.create({
   styleTag: {
     backgroundColor: '#e8f5e9',
     borderWidth: 1,
-    borderColor: '#4caf50',
+    borderColor: '#0066CC',
     borderRadius: 4,
     paddingHorizontal: 8,
     paddingVertical: 4,
@@ -546,7 +579,7 @@ const styles = StyleSheet.create({
   },
   styleText: {
     fontSize: 11,
-    color: '#4caf50',
+    color: '#0066CC',
     fontWeight: '500',
   },
   footer: {
@@ -566,7 +599,7 @@ const styles = StyleSheet.create({
   priceValue: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#ee4d2d',
+    color: '#0066CC',
   },
   priceUnit: {
     fontSize: 12,
@@ -576,7 +609,7 @@ const styles = StyleSheet.create({
   contactButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#ee4d2d',
+    backgroundColor: '#0066CC',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 6,
@@ -599,7 +632,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   resetButton: {
-    backgroundColor: '#ee4d2d',
+    backgroundColor: '#0066CC',
     paddingHorizontal: 24,
     paddingVertical: 10,
     borderRadius: 8,

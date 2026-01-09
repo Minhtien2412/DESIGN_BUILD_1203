@@ -11,10 +11,10 @@ type PlusAction = {
 };
 
 const ACTIONS: PlusAction[] = [
-  { id: 'create', label: 'Tạo dự án mới', icon: 'add-circle-outline', color: '#2563EB', route: '/projects/create' },
-  { id: 'messages', label: 'Tin nhắn', icon: 'chatbubble-ellipses-outline', color: '#10B981', route: '/messages' },
-  { id: 'call', label: 'Cuộc gọi', icon: 'call-outline', color: '#F59E0B', route: '/call/history' },
-  { id: 'contact', label: 'Liên hệ', icon: 'people-outline', color: '#EF4444', route: '/communications' },
+  { id: 'create', label: 'Tạo dự án mới', icon: 'add-circle-outline', color: '#0066CC', route: '/projects/create' },
+  { id: 'messages', label: 'Tin nhắn', icon: 'chatbubble-ellipses-outline', color: '#0066CC', route: '/messages' },
+  { id: 'call', label: 'Cuộc gọi', icon: 'call-outline', color: '#0066CC', route: '/call/history' },
+  { id: 'contact', label: 'Liên hệ', icon: 'people-outline', color: '#000000', route: '/communications' },
   { id: 'help', label: 'Hướng dẫn & Trợ giúp', icon: 'help-circle-outline', color: '#6B7280', route: '/intro' },
 ];
 

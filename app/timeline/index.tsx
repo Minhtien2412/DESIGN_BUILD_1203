@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Timeline Screen - Project Progress & Milestones
  * Modern implementation with Timeline API integration + Real-time WebSocket updates
  */
@@ -48,7 +48,7 @@ export default function TimelineScreen() {
       setTimeline(data);
     } catch (error) {
       console.error('Error fetching timeline:', error);
-      Alert.alert('Lá»—i', 'KhÃ´ng thá»ƒ táº£i timeline. Vui lÃ²ng thá»­ láº¡i.');
+      Alert.alert('Lỗi', 'Không thể tải timeline. Vui lòng thử lại.');
     } finally {
       setLoading(false);
     }
@@ -184,7 +184,7 @@ export default function TimelineScreen() {
     return (
       <View style={[styles.loadingContainer, { backgroundColor }]}>
         <ActivityIndicator size="large" color="#3B82F6" />
-        <Text style={[styles.loadingText, { color: textColor }]}>Äang táº£i timeline...</Text>
+        <Text style={[styles.loadingText, { color: textColor }]}>Đang tải timeline...</Text>
       </View>
     );
   }
@@ -192,12 +192,12 @@ export default function TimelineScreen() {
   if (!timeline) {
     return (
       <View style={[styles.errorContainer, { backgroundColor }]}>
-        <Ionicons name="alert-circle-outline" size={64} color="#EF4444" />
+        <Ionicons name="alert-circle-outline" size={64} color="#000000" />
         <Text style={[styles.errorText, { color: textColor }]}>
-          KhÃ´ng thá»ƒ táº£i timeline
+          Không thể tải timeline
         </Text>
         <TouchableOpacity style={styles.retryButton} onPress={fetchTimeline}>
-          <Text style={styles.retryButtonText}>Thá»­ láº¡i</Text>
+          <Text style={styles.retryButtonText}>Thử lại</Text>
         </TouchableOpacity>
       </View>
     );
@@ -207,10 +207,10 @@ export default function TimelineScreen() {
     <View style={[styles.container, { backgroundColor }]}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={[styles.headerTitle, { color: textColor }]}>Timeline Dá»± Ãn</Text>
+        <Text style={[styles.headerTitle, { color: textColor }]}>Timeline Dự Án</Text>
         <TouchableOpacity style={styles.createButton} onPress={handleCreatePhase}>
           <Ionicons name="add-circle" size={24} color="#3B82F6" />
-          <Text style={styles.createButtonText}>Táº¡o giai Ä‘oáº¡n</Text>
+          <Text style={styles.createButtonText}>Tạo giai đoạn</Text>
         </TouchableOpacity>
       </View>
 
@@ -231,7 +231,7 @@ export default function TimelineScreen() {
               filter === 'all' && styles.filterTabTextActive,
             ]}
           >
-            Táº¥t cáº£ ({timeline.phases.length})
+            Tất cả ({timeline.phases.length})
           </Text>
         </TouchableOpacity>
 
@@ -245,7 +245,7 @@ export default function TimelineScreen() {
               filter === 'active' && styles.filterTabTextActive,
             ]}
           >
-            Äang lÃ m ({timeline.phases.filter((p) => p.status === 'IN_PROGRESS').length})
+            Đang làm ({timeline.phases.filter((p) => p.status === 'IN_PROGRESS').length})
           </Text>
         </TouchableOpacity>
 
@@ -259,7 +259,7 @@ export default function TimelineScreen() {
               filter === 'delayed' && styles.filterTabTextActive,
             ]}
           >
-            Trá»… háº¡n ({timeline.delayedPhases.length})
+            Trễ hạn ({timeline.delayedPhases.length})
           </Text>
         </TouchableOpacity>
 
@@ -273,7 +273,7 @@ export default function TimelineScreen() {
               filter === 'completed' && styles.filterTabTextActive,
             ]}
           >
-            HoÃ n thÃ nh ({timeline.phases.filter((p) => p.status === 'COMPLETED').length})
+            Hoàn thành ({timeline.phases.filter((p) => p.status === 'COMPLETED').length})
           </Text>
         </TouchableOpacity>
       </ScrollView>
@@ -287,17 +287,17 @@ export default function TimelineScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
         }
         ListHeaderComponent={
-          <ProgressDashboard phases={timeline.phases} projectName="Dá»± Ã¡n" />
+          <ProgressDashboard phases={timeline.phases} projectName="Dự án" />
         }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Ionicons name="calendar-outline" size={64} color="#9CA3AF" />
             <Text style={[styles.emptyText, { color: textColor }]}>
-              ChÆ°a cÃ³ giai Ä‘oáº¡n nÃ o
+              Chưa có giai đoạn nào
             </Text>
             <TouchableOpacity style={styles.createButton} onPress={handleCreatePhase}>
               <Ionicons name="add-circle" size={20} color="#3B82F6" />
-              <Text style={styles.createButtonText}>Táº¡o giai Ä‘oáº¡n Ä‘áº§u tiÃªn</Text>
+              <Text style={styles.createButtonText}>Tạo giai đoạn đầu tiên</Text>
             </TouchableOpacity>
           </View>
         }

@@ -124,15 +124,15 @@ export const TaskForm: React.FC<TaskFormProps> = ({
   const statusOptions: Array<{ value: Task['status']; label: string; color: string }> = [
     { value: 'pending', label: 'Chờ xử lý', color: '#9CA3AF' },
     { value: 'in-progress', label: 'Đang thực hiện', color: '#3B82F6' },
-    { value: 'completed', label: 'Hoàn thành', color: '#10B981' },
-    { value: 'blocked', label: 'Bị chặn', color: '#EF4444' },
+    { value: 'completed', label: 'Hoàn thành', color: '#0066CC' },
+    { value: 'blocked', label: 'Bị chặn', color: '#000000' },
   ];
 
   // Priority options
   const priorityOptions: Array<{ value: Task['priority']; label: string; color: string }> = [
-    { value: 'low', label: 'Thấp', color: '#10B981' },
-    { value: 'medium', label: 'Trung bình', color: '#F59E0B' },
-    { value: 'high', label: 'Cao', color: '#EF4444' },
+    { value: 'low', label: 'Thấp', color: '#0066CC' },
+    { value: 'medium', label: 'Trung bình', color: '#0066CC' },
+    { value: 'high', label: 'Cao', color: '#000000' },
   ];
 
   // Initialize form with task data in edit mode
@@ -507,7 +507,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   required: {
-    color: '#EF4444',
+    color: '#000000',
   },
   input: {
     borderWidth: 1,
@@ -519,7 +519,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   inputError: {
-    borderColor: '#EF4444',
+    borderColor: '#000000',
   },
   textArea: {
     height: 100,
@@ -527,7 +527,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 12,
-    color: '#EF4444',
+    color: '#000000',
     marginTop: 4,
   },
   picker: {

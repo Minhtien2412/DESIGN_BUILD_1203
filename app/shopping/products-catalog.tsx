@@ -316,7 +316,7 @@ function StockPill({ inStock }: { inStock?: boolean }) {
 function BadgeTag({ text }: { text: string }) {
   return (
     <View style={{ backgroundColor: '#fff0e8', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10, marginRight: 6 }}>
-      <Text style={{ fontSize: 11, color: '#ee4d2d' }}>{text}</Text>
+      <Text style={{ fontSize: 11, color: '#0066CC' }}>{text}</Text>
     </View>
   );
 }
@@ -454,7 +454,7 @@ export default function ProductsCatalogScreen() {
         style={styles.favBtn}
         activeOpacity={0.7}
       >
-        <Ionicons name={favorites[item.id] ? 'heart' : 'heart-outline'} size={18} color={favorites[item.id] ? '#ee4d2d' : '#fff'} />
+        <Ionicons name={favorites[item.id] ? 'heart' : 'heart-outline'} size={18} color={favorites[item.id] ? '#0066CC' : '#fff'} />
       </TouchableOpacity>
 
       <View style={styles.productInfo}>
@@ -509,7 +509,7 @@ export default function ProductsCatalogScreen() {
       
       {/* Header */}
       <LinearGradient
-        colors={['#ee4d2d', '#ff6b3d']}
+        colors={['#0066CC', '#3399FF']}
         style={[styles.header, { paddingTop: insets.top + 8 }]}
       >
         <View style={styles.headerRow}>
@@ -585,7 +585,7 @@ export default function ProductsCatalogScreen() {
             onPress={() => setShowFilter(true)}
             style={[styles.sortChip, showFilter && styles.sortChipActive]}
           >
-            <Ionicons name="filter" size={16} color={showFilter ? '#ee4d2d' : '#666'} />
+            <Ionicons name="filter" size={16} color={showFilter ? '#0066CC' : '#666'} />
             <Text style={[styles.sortText, showFilter && styles.sortTextActive]}>Lọc</Text>
           </TouchableOpacity>
         </ScrollView>
@@ -601,7 +601,7 @@ export default function ProductsCatalogScreen() {
       {/* Loading State */}
       {loading && products.length === 0 && (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#ee4d2d" />
+          <ActivityIndicator size="large" color="#0066CC" />
           <Text style={styles.loadingText}>Đang tải sản phẩm...</Text>
         </View>
       )}
@@ -609,7 +609,7 @@ export default function ProductsCatalogScreen() {
       {/* Error State */}
       {error && products.length === 0 && !loading && (
         <View style={styles.errorContainer}>
-          <Ionicons name="alert-circle-outline" size={48} color="#ee4d2d" />
+          <Ionicons name="alert-circle-outline" size={48} color="#0066CC" />
           <Text style={styles.errorText}>{error}</Text>
           <TouchableOpacity style={styles.retryBtn} onPress={() => loadProducts()}>
             <Text style={styles.retryText}>Thử lại</Text>
@@ -636,7 +636,7 @@ export default function ProductsCatalogScreen() {
           showsVerticalScrollIndicator={false}
           columnWrapperStyle={styles.columnWrapper}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#ee4d2d']} />
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#0066CC']} />
           }
         />
       )}
@@ -750,8 +750,8 @@ const styles = StyleSheet.create({
     borderColor: '#e0e0e0',
   },
   categoryChipActive: {
-    backgroundColor: '#ee4d2d',
-    borderColor: '#ee4d2d',
+    backgroundColor: '#0066CC',
+    borderColor: '#0066CC',
   },
   categoryText: {
     fontSize: 14,
@@ -788,14 +788,14 @@ const styles = StyleSheet.create({
   },
   sortChipActive: {
     backgroundColor: '#fff0e8',
-    borderColor: '#ee4d2d',
+    borderColor: '#0066CC',
   },
   sortText: {
     fontSize: 13,
     color: '#666',
   },
   sortTextActive: {
-    color: '#ee4d2d',
+    color: '#0066CC',
     fontWeight: '600',
   },
   productsList: {
@@ -845,7 +845,7 @@ const styles = StyleSheet.create({
   discountText: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#ee4d2d',
+    color: '#0066CC',
   },
   productInfo: {
     padding: 12,
@@ -885,7 +885,7 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#ee4d2d',
+    color: '#0066CC',
   },
   oldPrice: {
     fontSize: 12,
@@ -901,7 +901,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#ee4d2d',
+    backgroundColor: '#0066CC',
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 16,
@@ -1010,7 +1010,7 @@ const styles = StyleSheet.create({
   },
   toggleBtnActive: {
     backgroundColor: '#fff0e8',
-    borderColor: '#ee4d2d',
+    borderColor: '#0066CC',
   },
   toggleText: {
     fontSize: 12,
@@ -1018,7 +1018,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   toggleTextActive: {
-    color: '#ee4d2d',
+    color: '#0066CC',
     fontWeight: '600',
   },
   filterFooter: {
@@ -1044,7 +1044,7 @@ const styles = StyleSheet.create({
   },
   applyBtn: {
     flex: 1,
-    backgroundColor: '#ee4d2d',
+    backgroundColor: '#0066CC',
     paddingVertical: 12,
     borderRadius: 22,
     alignItems: 'center',
@@ -1081,7 +1081,7 @@ const styles = StyleSheet.create({
   },
   retryBtn: {
     marginTop: 16,
-    backgroundColor: '#ee4d2d',
+    backgroundColor: '#0066CC',
     paddingHorizontal: 24,
     paddingVertical: 10,
     borderRadius: 20,

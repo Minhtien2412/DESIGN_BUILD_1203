@@ -329,7 +329,7 @@ export default function ProductManagementScreen() {
               <Pressable
                 style={[
                   styles.filterChip,
-                  selectedFilter === 'lowStock' && { backgroundColor: '#f97316' },
+                  selectedFilter === 'lowStock' && { backgroundColor: '#0066CC' },
                   { borderColor: border },
                 ]}
                 onPress={() => setSelectedFilter('lowStock')}
@@ -337,7 +337,7 @@ export default function ProductManagementScreen() {
                 <Ionicons
                   name="alert-circle"
                   size={16}
-                  color={selectedFilter === 'lowStock' ? '#fff' : '#f97316'}
+                  color={selectedFilter === 'lowStock' ? '#fff' : '#0066CC'}
                 />
                 <ThemedText
                   style={[
@@ -355,7 +355,7 @@ export default function ProductManagementScreen() {
                   <Pressable
                     style={[
                       styles.filterChip,
-                      selectedFilter === 'pending' && { backgroundColor: '#f97316' },
+                      selectedFilter === 'pending' && { backgroundColor: '#0066CC' },
                       { borderColor: border },
                     ]}
                     onPress={() => setSelectedFilter('pending')}
@@ -363,7 +363,7 @@ export default function ProductManagementScreen() {
                     <Ionicons
                       name="shield-checkmark-outline"
                       size={16}
-                      color={selectedFilter === 'pending' ? '#fff' : '#f97316'}
+                      color={selectedFilter === 'pending' ? '#fff' : '#0066CC'}
                     />
                     <ThemedText
                       style={[
@@ -378,7 +378,7 @@ export default function ProductManagementScreen() {
                   <Pressable
                     style={[
                       styles.filterChip,
-                      selectedFilter === 'approved' && { backgroundColor: '#22c55e' },
+                      selectedFilter === 'approved' && { backgroundColor: '#0066CC' },
                       { borderColor: border },
                     ]}
                     onPress={() => setSelectedFilter('approved')}
@@ -386,7 +386,7 @@ export default function ProductManagementScreen() {
                     <Ionicons
                       name="checkmark-circle"
                       size={16}
-                      color={selectedFilter === 'approved' ? '#fff' : '#22c55e'}
+                      color={selectedFilter === 'approved' ? '#fff' : '#0066CC'}
                     />
                     <ThemedText
                       style={[
@@ -401,7 +401,7 @@ export default function ProductManagementScreen() {
                   <Pressable
                     style={[
                       styles.filterChip,
-                      selectedFilter === 'rejected' && { backgroundColor: '#ef4444' },
+                      selectedFilter === 'rejected' && { backgroundColor: '#000000' },
                       { borderColor: border },
                     ]}
                     onPress={() => setSelectedFilter('rejected')}
@@ -409,7 +409,7 @@ export default function ProductManagementScreen() {
                     <Ionicons
                       name="close-circle"
                       size={16}
-                      color={selectedFilter === 'rejected' ? '#fff' : '#ef4444'}
+                      color={selectedFilter === 'rejected' ? '#fff' : '#000000'}
                     />
                     <ThemedText
                       style={[

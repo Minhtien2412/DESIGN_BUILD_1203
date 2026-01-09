@@ -94,7 +94,7 @@ export default function EnhancedProjectManagement() {
       case 'planning': return '#3498db';
       case 'in_progress': return '#f39c12';
       case 'completed': return '#27ae60';
-      case 'on_hold': return '#e74c3c';
+      case 'on_hold': return '#000000';
       default: return '#95a5a6';
     }
   };

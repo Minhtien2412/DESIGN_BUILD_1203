@@ -219,10 +219,10 @@ export default function CommunicationsScreen() {
 
   const getCallStatusColor = (status: string) => {
     switch (status) {
-      case 'missed': return '#ef4444';
-      case 'completed': return '#22c55e';
-      case 'declined': return '#f59e0b';
-      case 'failed': return '#dc2626';
+      case 'missed': return '#000000';
+      case 'completed': return '#0066CC';
+      case 'declined': return '#0066CC';
+      case 'failed': return '#000000';
       default: return '#999';
     }
   };
@@ -356,7 +356,7 @@ export default function CommunicationsScreen() {
 
     return (
       <View style={styles.loadingFooter}>
-        <ActivityIndicator size="small" color="#22c55e" />
+        <ActivityIndicator size="small" color="#0066CC" />
       </View>
     );
   };
@@ -386,7 +386,7 @@ export default function CommunicationsScreen() {
           <Ionicons
             name="chatbubbles"
             size={20}
-            color={activeTab === 'messages' ? '#22c55e' : '#999'}
+            color={activeTab === 'messages' ? '#0066CC' : '#999'}
           />
           <Text style={[styles.tabText, activeTab === 'messages' && styles.activeTabText]}>
             Tin nhắn
@@ -400,7 +400,7 @@ export default function CommunicationsScreen() {
           <Ionicons
             name="call"
             size={20}
-            color={activeTab === 'calls' ? '#22c55e' : '#999'}
+            color={activeTab === 'calls' ? '#0066CC' : '#999'}
           />
           <Text style={[styles.tabText, activeTab === 'calls' && styles.activeTabText]}>
             Cuộc gọi
@@ -411,7 +411,7 @@ export default function CommunicationsScreen() {
       {/* Content */}
       {isLoading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#22c55e" />
+          <ActivityIndicator size="large" color="#0066CC" />
           <Text style={styles.loadingText}>Đang tải...</Text>
         </View>
       ) : activeTab === 'messages' ? (
@@ -426,8 +426,8 @@ export default function CommunicationsScreen() {
             <RefreshControl
               refreshing={isRefreshing}
               onRefresh={handleRefresh}
-              colors={['#22c55e']}
-              tintColor="#22c55e"
+              colors={['#0066CC']}
+              tintColor="#0066CC"
             />
           }
           onEndReached={handleLoadMore}
@@ -445,8 +445,8 @@ export default function CommunicationsScreen() {
             <RefreshControl
               refreshing={isRefreshing}
               onRefresh={handleRefresh}
-              colors={['#22c55e']}
-              tintColor="#22c55e"
+              colors={['#0066CC']}
+              tintColor="#0066CC"
             />
           }
           onEndReached={handleLoadMore}
@@ -500,7 +500,7 @@ const styles = StyleSheet.create({
   },
   activeTab: {
     borderBottomWidth: 2,
-    borderBottomColor: '#22c55e',
+    borderBottomColor: '#0066CC',
   },
   tabText: {
     fontSize: 15,
@@ -508,7 +508,7 @@ const styles = StyleSheet.create({
     color: '#999',
   },
   activeTabText: {
-    color: '#22c55e',
+    color: '#0066CC',
   },
   list: {
     paddingVertical: 8,
@@ -544,7 +544,7 @@ const styles = StyleSheet.create({
     width: 14,
     height: 14,
     borderRadius: 7,
-    backgroundColor: '#22c55e',
+    backgroundColor: '#0066CC',
     borderWidth: 2,
     borderColor: '#fff',
   },
@@ -587,7 +587,7 @@ const styles = StyleSheet.create({
     minWidth: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: '#ef4444',
+    backgroundColor: '#000000',
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 6,

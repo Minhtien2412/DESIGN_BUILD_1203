@@ -299,7 +299,7 @@ export default function PainterScreen() {
 
               <View style={styles.statsRow}>
                 <View style={styles.statItem}>
-                  <Ionicons name="checkmark-circle-outline" size={16} color="#4caf50" />
+                  <Ionicons name="checkmark-circle-outline" size={16} color="#0066CC" />
                   <Text style={styles.statText}>{worker.completedProjects} công trình</Text>
                 </View>
                 <View
@@ -354,7 +354,7 @@ export default function PainterScreen() {
 
         {/* Info Banner */}
         <View style={styles.infoBanner}>
-          <Ionicons name="shield-checkmark" size={20} color="#4caf50" />
+          <Ionicons name="shield-checkmark" size={20} color="#0066CC" />
           <Text style={styles.infoBannerText}>
             Thi công chuyên nghiệp • Bảo hành màng sơn
           </Text>
@@ -658,14 +658,14 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   specialtyTag: {
-    backgroundColor: '#fff3e0',
+    backgroundColor: '#E8F4FF',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
   },
   specialtyText: {
     fontSize: 11,
-    color: '#ff9800',
+    color: '#0066CC',
     fontWeight: '500',
   },
   teamSizeRow: {
@@ -705,17 +705,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#e8f5e9',
   },
   availabilityBusy: {
-    backgroundColor: '#fff3e0',
+    backgroundColor: '#E8F4FF',
   },
   availabilityText: {
     fontSize: 11,
     fontWeight: '500',
   },
   availabilityTextAvailable: {
-    color: '#4caf50',
+    color: '#0066CC',
   },
   availabilityTextBusy: {
-    color: '#ff9800',
+    color: '#0066CC',
   },
   priceRow: {
     flexDirection: 'row',

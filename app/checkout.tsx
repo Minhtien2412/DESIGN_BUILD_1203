@@ -19,11 +19,16 @@ import {
     MODERN_TYPOGRAPHY,
 } from '@/constants/modern-theme';
 import { useCart } from '@/context/cart-context';
+import AddressService, {
+    Address,
+    MOCK_ADDRESSES as FALLBACK_ADDRESSES
+} from '@/services/addressService';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
     Image,
+    RefreshControl,
     ScrollView,
     StatusBar,
     StyleSheet,
@@ -35,16 +40,6 @@ import {
 
 type CheckoutStep = 'address' | 'payment' | 'review' | 'success';
 
-interface Address {
-  id: string;
-  name: string;
-  phone: string;
-  address: string;
-  district: string;
-  city: string;
-  isDefault: boolean;
-}
-
 interface PaymentMethod {
   id: string;
   name: string;
@@ -52,26 +47,7 @@ interface PaymentMethod {
   description: string;
 }
 
-const MOCK_ADDRESSES: Address[] = [
-  {
-    id: '1',
-    name: 'Văn phòng',
-    phone: '0912345678',
-    address: '123 Nguyễn Huệ',
-    district: 'Quận 1',
-    city: 'TP. Hồ Chí Minh',
-    isDefault: true,
-  },
-  {
-    id: '2',
-    name: 'Nhà riêng',
-    phone: '0987654321',
-    address: '456 Lê Lợi',
-    district: 'Quận 3',
-    city: 'TP. Hồ Chí Minh',
-    isDefault: false,
-  },
-];
+const MOCK_ADDRESSES: Address[] = FALLBACK_ADDRESSES;
 
 const PAYMENT_METHODS: PaymentMethod[] = [
   {
@@ -103,9 +79,48 @@ const PAYMENT_METHODS: PaymentMethod[] = [
 export default function CheckoutScreen() {
   const { items, totalPrice, totalItems, clearCart } = useCart();
   const [currentStep, setCurrentStep] = useState<CheckoutStep>('address');
+  const [addresses, setAddresses] = useState<Address[]>(MOCK_ADDRESSES);
   const [selectedAddress, setSelectedAddress] = useState<Address>(MOCK_ADDRESSES[0]);
   const [selectedPayment, setSelectedPayment] = useState<PaymentMethod>(PAYMENT_METHODS[0]);
   const [note, setNote] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [dataSource, setDataSource] = useState<'api' | 'mock'>('mock');
+
+  // Fetch addresses from API
+  const fetchAddresses = useCallback(async (showLoading = true) => {
+    if (showLoading) setLoading(true);
+    try {
+      const result = await AddressService.getAddresses();
+      if (result.ok && result.data?.addresses && result.data.addresses.length > 0) {
+        setAddresses(result.data.addresses);
+        const defaultAddr = result.data.addresses.find(a => a.isDefault) || result.data.addresses[0];
+        setSelectedAddress(defaultAddr);
+        setDataSource('api');
+      } else {
+        setAddresses(MOCK_ADDRESSES);
+        setSelectedAddress(MOCK_ADDRESSES[0]);
+        setDataSource('mock');
+      }
+    } catch (error) {
+      console.error('Error fetching addresses:', error);
+      setAddresses(MOCK_ADDRESSES);
+      setSelectedAddress(MOCK_ADDRESSES[0]);
+      setDataSource('mock');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchAddresses();
+  }, [fetchAddresses]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchAddresses(false);
+  }, [fetchAddresses]);
 
   const formatPrice = (price: number) => price.toLocaleString('vi-VN');
 
@@ -169,10 +184,24 @@ export default function CheckoutScreen() {
   };
 
   const renderAddressStep = () => (
-    <ScrollView style={styles.stepContent} showsVerticalScrollIndicator={false}>
+    <ScrollView 
+      style={styles.stepContent} 
+      showsVerticalScrollIndicator={false}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       <Text style={styles.stepTitle}>Chọn địa chỉ giao hàng</Text>
 
-      {MOCK_ADDRESSES.map((address) => (
+      {/* Data Source Indicator */}
+      {dataSource === 'mock' && (
+        <View style={styles.mockBanner}>
+          <Ionicons name="information-circle" size={16} color="#92400E" />
+          <Text style={styles.mockBannerText}>📋 Địa chỉ mẫu</Text>
+        </View>
+      )}
+
+      {addresses.map((address) => (
         <TouchableOpacity
           key={address.id}
           style={[

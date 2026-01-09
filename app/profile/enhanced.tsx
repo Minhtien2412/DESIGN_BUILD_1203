@@ -625,7 +625,7 @@ export default function EnhancedProfileScreen() {
         </TouchableOpacity>
 
         <TouchableOpacity style={[styles.actionRow, styles.dangerAction]}>
-          <Ionicons name="trash-outline" size={24} color="#EF4444" />
+          <Ionicons name="trash-outline" size={24} color="#000000" />
           <View style={styles.actionContent}>
             <Text style={[styles.actionTitle, styles.dangerText]}>Xóa tài khoản</Text>
             <Text style={styles.actionDescription}>Xóa vĩnh viễn tài khoản của bạn</Text>
@@ -749,7 +749,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   saveButton: {
-    backgroundColor: '#10B981',
+    backgroundColor: '#0066CC',
   },
   actionButtonText: {
     color: '#fff',
@@ -910,7 +910,7 @@ const styles = StyleSheet.create({
   skillChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#EFF6FF',
+    backgroundColor: '#E8F4FF',
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 16,
@@ -1021,6 +1021,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0,
   },
   dangerText: {
-    color: '#EF4444',
+    color: '#000000',
   },
 });

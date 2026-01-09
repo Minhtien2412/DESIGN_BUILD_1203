@@ -18,7 +18,7 @@ export default function DaScreen() {
       <Stack.Screen
         options={{
           title: config?.title || 'Thợ ốp đá',
-          headerStyle: { backgroundColor: '#EE4D2D' },
+          headerStyle: { backgroundColor: '#0066CC' },
           headerTintColor: '#fff',
         }}
       />

@@ -117,7 +117,7 @@ export default function DocumentCommentsScreen() {
       <View key={comment.id} style={[styles.commentContainer, isReply && styles.replyContainer]}>
         <View style={styles.commentHeader}>
           <View style={styles.avatarContainer}>
-            <Ionicons name="person-circle" size={isReply ? 32 : 40} color="#2196F3" />
+            <Ionicons name="person-circle" size={isReply ? 32 : 40} color="#0066CC" />
           </View>
           <View style={styles.commentInfo}>
             <View style={styles.authorRow}>
@@ -151,8 +151,8 @@ export default function DocumentCommentsScreen() {
             style={styles.actionButton}
             onPress={() => handleDeleteComment(comment.id)}
           >
-            <Ionicons name="trash-outline" size={16} color="#F44336" />
-            <Text style={[styles.actionText, { color: '#F44336' }]}>Xóa</Text>
+            <Ionicons name="trash-outline" size={16} color="#000000" />
+            <Text style={[styles.actionText, { color: '#000000' }]}>Xóa</Text>
           </TouchableOpacity>
         </View>
 
@@ -195,7 +195,7 @@ export default function DocumentCommentsScreen() {
         <View style={[styles.inputContainer, { borderColor }]}>
           {replyingTo && (
             <View style={styles.replyingToContainer}>
-              <Ionicons name="arrow-undo-outline" size={16} color="#2196F3" />
+              <Ionicons name="arrow-undo-outline" size={16} color="#0066CC" />
               <Text style={styles.replyingToText}>Đang trả lời...</Text>
               <TouchableOpacity onPress={() => setReplyingTo(null)}>
                 <Ionicons name="close-circle" size={20} color="#999" />
@@ -364,14 +364,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
     padding: 8,
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
     borderRadius: 8,
     marginBottom: 8,
   },
   replyingToText: {
     flex: 1,
     fontSize: 13,
-    color: '#2196F3',
+    color: '#0066CC',
   },
   inputRow: {
     flexDirection: 'row',
@@ -391,7 +391,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     justifyContent: 'center',
     alignItems: 'center',
   },

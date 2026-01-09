@@ -683,9 +683,9 @@ export function getTaskStatusColor(status: TaskStatus): string {
   const colors: Record<TaskStatus, string> = {
     TODO: '#94a3b8',
     IN_PROGRESS: '#3b82f6',
-    REVIEW: '#f59e0b',
-    COMPLETED: '#22c55e',
-    BLOCKED: '#ef4444',
+    REVIEW: '#0066CC',
+    COMPLETED: '#0066CC',
+    BLOCKED: '#000000',
   };
   
   return colors[status] || '#94a3b8';
@@ -699,10 +699,10 @@ export function getTaskStatusColor(status: TaskStatus): string {
  */
 export function getTaskPriorityColor(priority: TaskPriority): string {
   const colors: Record<TaskPriority, string> = {
-    LOW: '#22c55e',
-    MEDIUM: '#f59e0b',
-    HIGH: '#f97316',
-    URGENT: '#ef4444',
+    LOW: '#0066CC',
+    MEDIUM: '#0066CC',
+    HIGH: '#0066CC',
+    URGENT: '#000000',
   };
   
   return colors[priority] || '#94a3b8';

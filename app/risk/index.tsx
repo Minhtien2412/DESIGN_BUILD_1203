@@ -97,13 +97,13 @@ export default function RiskRegisterScreen() {
       case 'CRITICAL':
         return '#B71C1C';
       case 'HIGH':
-        return '#F44336';
+        return '#000000';
       case 'MEDIUM':
-        return '#FF9800';
+        return '#0066CC';
       case 'LOW':
-        return '#4CAF50';
+        return '#0066CC';
       default:
-        return '#9E9E9E';
+        return '#999999';
     }
   };
 
@@ -125,23 +125,23 @@ export default function RiskRegisterScreen() {
   const getStatusColor = (status: RiskStatus) => {
     switch (status) {
       case 'IDENTIFIED':
-        return '#2196F3';
+        return '#0066CC';
       case 'ANALYZING':
-        return '#0A6847';
+        return '#0066CC';
       case 'PLANNING':
-        return '#0A6847';
+        return '#0066CC';
       case 'MONITORING':
-        return '#FF9800';
+        return '#0066CC';
       case 'MITIGATING':
-        return '#0A6847';
+        return '#0066CC';
       case 'RESOLVED':
-        return '#4CAF50';
+        return '#0066CC';
       case 'OCCURRED':
-        return '#F44336';
+        return '#000000';
       case 'CLOSED':
-        return '#9E9E9E';
+        return '#999999';
       default:
-        return '#9E9E9E';
+        return '#999999';
     }
   };
 
@@ -244,7 +244,7 @@ export default function RiskRegisterScreen() {
       {/* Escalation warning */}
       {item.escalationRequired && (
         <View style={styles.escalationWarning}>
-          <Ionicons name="warning" size={16} color="#F44336" />
+          <Ionicons name="warning" size={16} color="#000000" />
           <Text style={styles.escalationText}>Cần báo cáo cấp trên</Text>
         </View>
       )}
@@ -254,7 +254,7 @@ export default function RiskRegisterScreen() {
   if (loading && risks.length === 0) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#2196F3" />
+        <ActivityIndicator size="large" color="#0066CC" />
         <Text style={styles.loadingText}>Đang tải danh sách rủi ro...</Text>
       </View>
     );
@@ -268,16 +268,16 @@ export default function RiskRegisterScreen() {
           <Text style={styles.statValue}>{stats.total}</Text>
           <Text style={styles.statLabel}>Tổng</Text>
         </View>
-        <View style={[styles.statCard, { backgroundColor: '#FFEBEE' }]}>
+        <View style={[styles.statCard, { backgroundColor: '#F5F5F5' }]}>
           <Text style={[styles.statValue, { color: '#B71C1C' }]}>{stats.critical}</Text>
           <Text style={styles.statLabel}>Nghiêm trọng</Text>
         </View>
-        <View style={[styles.statCard, { backgroundColor: '#FFF3E0' }]}>
-          <Text style={[styles.statValue, { color: '#F44336' }]}>{stats.high}</Text>
+        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
+          <Text style={[styles.statValue, { color: '#000000' }]}>{stats.high}</Text>
           <Text style={styles.statLabel}>Cao</Text>
         </View>
-        <View style={[styles.statCard, { backgroundColor: '#FFF8E1' }]}>
-          <Text style={[styles.statValue, { color: '#FF9800' }]}>{stats.medium}</Text>
+        <View style={[styles.statCard, { backgroundColor: '#F0F8FF' }]}>
+          <Text style={[styles.statValue, { color: '#0066CC' }]}>{stats.medium}</Text>
           <Text style={styles.statLabel}>Trung bình</Text>
         </View>
       </View>
@@ -317,7 +317,7 @@ export default function RiskRegisterScreen() {
             <Ionicons
               name={cat.icon as any}
               size={16}
-              color={selectedCategory === cat.value ? '#2196F3' : '#666'}
+              color={selectedCategory === cat.value ? '#0066CC' : '#666'}
             />
             <Text
               style={[
@@ -407,7 +407,7 @@ export default function RiskRegisterScreen() {
                     <Ionicons
                       name={cat.icon as any}
                       size={20}
-                      color={newRisk.category === cat.value ? '#2196F3' : '#666'}
+                      color={newRisk.category === cat.value ? '#0066CC' : '#666'}
                     />
                     <Text
                       style={[
@@ -533,16 +533,16 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   filterChipActive: {
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
     borderBottomWidth: 2,
-    borderBottomColor: '#2196F3',
+    borderBottomColor: '#0066CC',
   },
   filterChipText: {
     fontSize: 13,
     color: '#666',
   },
   filterChipTextActive: {
-    color: '#2196F3',
+    color: '#0066CC',
     fontWeight: '600',
   },
   levelFilterScroll: {
@@ -701,7 +701,7 @@ const styles = StyleSheet.create({
   },
   escalationText: {
     fontSize: 12,
-    color: '#F44336',
+    color: '#000000',
     fontWeight: '600',
   },
   fab: {
@@ -711,7 +711,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
@@ -726,12 +726,12 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: '#9E9E9E',
+    color: '#999999',
     marginTop: 16,
     marginBottom: 24,
   },
   emptyButton: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
@@ -790,16 +790,16 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   categoryChipSelected: {
-    borderColor: '#2196F3',
+    borderColor: '#0066CC',
     borderWidth: 2,
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
   },
   categoryChipText: {
     fontSize: 13,
     color: '#666',
   },
   categoryChipTextSelected: {
-    color: '#2196F3',
+    color: '#0066CC',
     fontWeight: '600',
   },
   input: {
@@ -831,7 +831,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
   },
   modalButtonPrimary: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
   },
   modalButtonTextSecondary: {
     fontSize: 14,

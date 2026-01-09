@@ -6,99 +6,69 @@
 import type { StoryGroup } from '@/components/stories/stories-bar';
 import { StoryViewer } from '@/components/stories/stories-bar';
 import { viewStory } from '@/services/stories';
+import StoriesService from '@/services/storiesService';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { SafeAreaView, StyleSheet, View } from 'react-native';
-
-// Mock data - replace with actual API call
-const MOCK_STORY_GROUPS: StoryGroup[] = [
-  {
-    userId: '1',
-    userName: 'John Builder',
-    userAvatar: 'https://i.pravatar.cc/150?img=1',
-    hasUnviewed: true,
-    stories: [
-      {
-        id: 's1',
-        userId: '1',
-        userName: 'John Builder',
-        userAvatar: 'https://i.pravatar.cc/150?img=1',
-        mediaUrl: 'https://picsum.photos/1080/1920',
-        mediaType: 'image',
-        createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30 min ago
-        expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 23.5).toISOString(),
-        viewed: false,
-      },
-      {
-        id: 's2',
-        userId: '1',
-        userName: 'John Builder',
-        userAvatar: 'https://i.pravatar.cc/150?img=1',
-        mediaUrl: 'https://picsum.photos/1080/1921',
-        mediaType: 'image',
-        createdAt: new Date(Date.now() - 1000 * 60 * 15).toISOString(), // 15 min ago
-        expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 23.75).toISOString(),
-        viewed: false,
-      },
-    ],
-  },
-  {
-    userId: '2',
-    userName: 'Sarah Designer',
-    userAvatar: 'https://i.pravatar.cc/150?img=2',
-    hasUnviewed: true,
-    stories: [
-      {
-        id: 's3',
-        userId: '2',
-        userName: 'Sarah Designer',
-        userAvatar: 'https://i.pravatar.cc/150?img=2',
-        mediaUrl: 'https://picsum.photos/1080/1922',
-        mediaType: 'image',
-        createdAt: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
-        expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 23.25).toISOString(),
-        viewed: false,
-      },
-    ],
-  },
-  {
-    userId: '3',
-    userName: 'Mike Contractor',
-    userAvatar: 'https://i.pravatar.cc/150?img=3',
-    hasUnviewed: false,
-    stories: [
-      {
-        id: 's4',
-        userId: '3',
-        userName: 'Mike Contractor',
-        userAvatar: 'https://i.pravatar.cc/150?img=3',
-        mediaUrl: 'https://picsum.photos/1080/1923',
-        mediaType: 'image',
-        createdAt: new Date(Date.now() - 1000 * 60 * 120).toISOString(), // 2h ago
-        expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 22).toISOString(),
-        viewed: true,
-      },
-    ],
-  },
-];
+import { useCallback, useEffect, useState } from 'react';
+import { ActivityIndicator, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function StoriesViewerScreen() {
   const { userId } = useLocalSearchParams<{ userId: string }>();
   const [currentGroupIndex, setCurrentGroupIndex] = useState(0);
+  const [storyGroups, setStoryGroups] = useState<StoryGroup[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Find starting index
-  useEffect(() => {
-    if (userId) {
-      const index = MOCK_STORY_GROUPS.findIndex((g) => g.userId === userId);
-      if (index !== -1) {
-        setCurrentGroupIndex(index);
+  // Fetch stories from API
+  const fetchStories = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const groups = await StoriesService.getStoryGroups();
+      
+      // Convert to StoryGroup format if needed
+      const formattedGroups: StoryGroup[] = groups.map(g => ({
+        userId: g.userId,
+        userName: g.userName,
+        userAvatar: g.userAvatar,
+        hasUnviewed: g.hasUnviewed,
+        stories: g.stories.map(s => ({
+          id: s.id,
+          userId: g.userId,
+          userName: g.userName,
+          userAvatar: g.userAvatar,
+          mediaUrl: s.mediaUrl,
+          mediaType: s.mediaType,
+          createdAt: s.createdAt,
+          expiresAt: s.expiresAt,
+          viewed: s.viewed,
+        })),
+      }));
+      
+      setStoryGroups(formattedGroups);
+      
+      // Find starting index
+      if (userId) {
+        const index = formattedGroups.findIndex((g) => g.userId === userId);
+        if (index !== -1) {
+          setCurrentGroupIndex(index);
+        }
       }
+    } catch (err) {
+      console.error('Error fetching stories:', err);
+      setError('Không thể tải stories');
+    } finally {
+      setLoading(false);
     }
   }, [userId]);
 
+  useEffect(() => {
+    fetchStories();
+  }, [fetchStories]);
+
   // Mark stories as viewed
   useEffect(() => {
-    const currentGroup = MOCK_STORY_GROUPS[currentGroupIndex];
+    const currentGroup = storyGroups[currentGroupIndex];
     if (currentGroup) {
       // Mark first story as viewed when opening
       const firstStory = currentGroup.stories[0];
@@ -106,14 +76,14 @@ export default function StoriesViewerScreen() {
         viewStory(firstStory.id).catch(console.error);
       }
     }
-  }, [currentGroupIndex]);
+  }, [currentGroupIndex, storyGroups]);
 
   const handleClose = () => {
     router.back();
   };
 
   const handleNext = () => {
-    if (currentGroupIndex < MOCK_STORY_GROUPS.length - 1) {
+    if (currentGroupIndex < storyGroups.length - 1) {
       setCurrentGroupIndex(currentGroupIndex + 1);
     } else {
       router.back();
@@ -128,7 +98,36 @@ export default function StoriesViewerScreen() {
     }
   };
 
-  const currentStoryGroup = MOCK_STORY_GROUPS[currentGroupIndex];
+  // Loading state
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#FFF" />
+          <Text style={styles.loadingText}>Đang tải stories...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity style={styles.retryButton} onPress={fetchStories}>
+            <Text style={styles.retryText}>Thử lại</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.closeButton} onPress={() => router.back()}>
+            <Text style={styles.closeText}>Đóng</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  const currentStoryGroup = storyGroups[currentGroupIndex];
 
   if (!currentStoryGroup) {
     return null;
@@ -155,5 +154,38 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    color: '#FFF',
+    marginTop: 12,
+    fontSize: 14,
+  },
+  errorText: {
+    color: '#FFF',
+    fontSize: 16,
+    marginBottom: 16,
+  },
+  retryButton: {
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    backgroundColor: '#0066CC',
+    borderRadius: 8,
+    marginBottom: 12,
+  },
+  retryText: {
+    color: '#FFF',
+    fontWeight: '600',
+  },
+  closeButton: {
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+  },
+  closeText: {
+    color: '#999',
   },
 });

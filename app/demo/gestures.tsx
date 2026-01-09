@@ -66,12 +66,12 @@ export default function GesturesDemo() {
           <SwipeableCard
             leftAction={{
               label: '❤️ Like',
-              color: '#10b981',
+              color: '#0066CC',
               onPress: () => Alert.alert('Like', 'Item liked!'),
             }}
             rightAction={{
               label: '🗑️ Delete',
-              color: '#ef4444',
+              color: '#000000',
               onPress: () => Alert.alert('Delete', 'Item deleted!'),
             }}
           >

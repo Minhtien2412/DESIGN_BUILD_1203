@@ -81,7 +81,7 @@ export default function ErrorDetectionScreen() {
 
         {item.recommendations && item.recommendations.length > 0 && (
           <View style={styles.recommendationPreview}>
-            <Ionicons name="bulb-outline" size={14} color="#ff9800" />
+            <Ionicons name="bulb-outline" size={14} color="#0066CC" />
             <Text style={styles.recommendationText} numberOfLines={1}>
               {item.recommendations[0]}
             </Text>
@@ -93,7 +93,7 @@ export default function ErrorDetectionScreen() {
 
   const renderEmpty = () => (
     <View style={styles.emptyContainer}>
-      <Ionicons name="checkmark-circle-outline" size={64} color="#4caf50" />
+      <Ionicons name="checkmark-circle-outline" size={64} color="#0066CC" />
       <Text style={[styles.emptyTitle, { color: textColor }]}>
         Không phát hiện lỗi
       </Text>
@@ -130,7 +130,7 @@ export default function ErrorDetectionScreen() {
                   (i) => i.severity === 'CRITICAL' || i.severity === 'HIGH'
                 ).length
               }
-              color="#f44336"
+              color="#000000"
             />
             <StatCard
               icon="information-circle"
@@ -140,7 +140,7 @@ export default function ErrorDetectionScreen() {
                   (i) => i.severity === 'MEDIUM' || i.severity === 'LOW'
                 ).length
               }
-              color="#ff9800"
+              color="#0066CC"
             />
           </View>
         )}
@@ -215,7 +215,7 @@ export default function ErrorDetectionScreen() {
                             <Ionicons
                               name="bulb-outline"
                               size={16}
-                              color="#ff9800"
+                              color="#0066CC"
                             />
                             <Text
                               style={[
@@ -373,7 +373,7 @@ const styles = StyleSheet.create({
   recommendationText: {
     flex: 1,
     fontSize: 13,
-    color: '#ff9800',
+    color: '#0066CC',
   },
   modalContainer: {
     flex: 1,

@@ -23,7 +23,7 @@ export function BadgeIcon({
   iconColor = '#000',
   badgeCount = 0,
   maxCount = 99,
-  badgeBackgroundColor = '#EE4D2D',
+  badgeBackgroundColor = '#0066CC',
   badgeTextColor = '#FFF',
   showZero = false,
 }: BadgeIconProps) {
@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
     minWidth: 18,
     height: 18,
     borderRadius: 9,
-    backgroundColor: '#EE4D2D',
+    backgroundColor: '#0066CC',
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 4,

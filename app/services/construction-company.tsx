@@ -1,15 +1,17 @@
+import { useUnifiedMessaging } from '@/hooks/crm/useUnifiedMessaging';
 import { Ionicons } from '@expo/vector-icons';
 import { Stack, router } from 'expo-router';
 import React, { useState } from 'react';
 import {
-    Dimensions,
-    Image,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Dimensions,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 const { width } = Dimensions.get('window');
@@ -151,9 +153,11 @@ const SPECIALTIES = [
 interface CompanyCardProps {
   company: any;
   onPress: () => void;
+  onContact: () => void;
+  isContacting: boolean;
 }
 
-const CompanyCard: React.FC<CompanyCardProps> = ({ company, onPress }) => {
+const CompanyCard: React.FC<CompanyCardProps> = ({ company, onPress, onContact, isContacting }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const handlePrevImage = () => {
@@ -234,7 +238,7 @@ const CompanyCard: React.FC<CompanyCardProps> = ({ company, onPress }) => {
             <Text style={styles.companyName}>{company.name}</Text>
             
             <View style={styles.ratingRow}>
-              <Ionicons name="star" size={14} color="#ffa41c" />
+              <Ionicons name="star" size={14} color="#0066CC" />
               <Text style={styles.ratingText}>{company.rating}</Text>
               <Text style={styles.reviewsText}>({company.reviews})</Text>
             </View>
@@ -268,28 +272,38 @@ const CompanyCard: React.FC<CompanyCardProps> = ({ company, onPress }) => {
         {/* Stats */}
         <View style={styles.statsSection}>
           <View style={styles.statItem}>
-            <Ionicons name="briefcase" size={16} color="#ee4d2d" />
+            <Ionicons name="briefcase" size={16} color="#0066CC" />
             <Text style={styles.statValue}>{company.projects}+</Text>
             <Text style={styles.statLabel}>Dự án</Text>
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statItem}>
-            <Ionicons name="calendar" size={16} color="#2196f3" />
+            <Ionicons name="calendar" size={16} color="#0066CC" />
             <Text style={styles.statValue}>{new Date().getFullYear() - company.yearEstablished}</Text>
             <Text style={styles.statLabel}>Năm KN</Text>
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statItem}>
-            <Ionicons name="shield-checkmark" size={16} color="#4caf50" />
+            <Ionicons name="shield-checkmark" size={16} color="#0080FF" />
             <Text style={styles.statValue}>{company.certifications.length}</Text>
             <Text style={styles.statLabel}>Chứng chỉ</Text>
           </View>
         </View>
 
         {/* Contact Button */}
-        <TouchableOpacity style={styles.contactButton}>
-          <Ionicons name="call" size={16} color="#fff" />
-          <Text style={styles.contactButtonText}>Liên hệ báo giá</Text>
+        <TouchableOpacity 
+          style={styles.contactButton}
+          onPress={onContact}
+          disabled={isContacting}
+        >
+          {isContacting ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <>
+              <Ionicons name="chatbubble-ellipses" size={16} color="#fff" />
+              <Text style={styles.contactButtonText}>Liên hệ báo giá</Text>
+            </>
+          )}
         </TouchableOpacity>
       </View>
     </TouchableOpacity>
@@ -301,6 +315,26 @@ export default function ConstructionCompanyScreen() {
   const [selectedRegion, setSelectedRegion] = useState('Tất cả');
   const [selectedSpecialty, setSelectedSpecialty] = useState('Tất cả');
   const [searchQuery, setSearchQuery] = useState('');
+  const [contactingId, setContactingId] = useState<number | null>(null);
+  
+  const { getOrCreateConversation } = useUnifiedMessaging();
+  
+  // Handle contact button - navigate to chat
+  const handleContact = async (company: typeof COMPANIES[0]) => {
+    try {
+      setContactingId(company.id);
+      const conversationId = await getOrCreateConversation({
+        userId: company.id,
+        userName: company.name,
+        userRole: 'CONSTRUCTION_COMPANY',
+      });
+      router.push(`/messages/chat/${conversationId}` as `/messages/chat/${string}`);
+    } catch (error) {
+      console.error('Error creating conversation:', error);
+    } finally {
+      setContactingId(null);
+    }
+  };
 
   const filteredCompanies = COMPANIES.filter((company) => {
     const matchScale = selectedScale === 'Tất cả' || company.scale === selectedScale;
@@ -324,7 +358,7 @@ export default function ConstructionCompanyScreen() {
       <Stack.Screen
         options={{
           title: 'Công ty xây dựng',
-          headerStyle: { backgroundColor: '#ee4d2d' },
+          headerStyle: { backgroundColor: '#0066CC' },
           headerTintColor: '#fff',
           headerTitleStyle: { fontWeight: '600' },
         }}
@@ -460,6 +494,8 @@ export default function ConstructionCompanyScreen() {
               key={company.id}
               company={company}
               onPress={() => router.push(`/services/company-detail?id=${company.id}`)}
+              onContact={() => handleContact(company)}
+              isContacting={contactingId === company.id}
             />
           ))}
 
@@ -487,7 +523,7 @@ export default function ConstructionCompanyScreen() {
 
         {/* Info Banner */}
         <View style={styles.infoBanner}>
-          <Ionicons name="information-circle-outline" size={16} color="#2196f3" />
+          <Ionicons name="information-circle-outline" size={16} color="#0066CC" />
           <Text style={styles.infoBannerText}>
             Tất cả công ty đều được xác thực giấy phép kinh doanh
           </Text>
@@ -552,7 +588,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
   },
   filterChipActive: {
-    backgroundColor: '#ee4d2d',
+    backgroundColor: '#0066CC',
   },
   filterChipText: {
     fontSize: 12,
@@ -597,7 +633,7 @@ const styles = StyleSheet.create({
     left: 12,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#ee4d2d',
+    backgroundColor: '#0066CC',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
@@ -728,7 +764,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   specialtyTag: {
-    backgroundColor: '#e3f2fd',
+    backgroundColor: '#E8F4FF',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
@@ -736,7 +772,7 @@ const styles = StyleSheet.create({
   specialtyText: {
     fontSize: 11,
     fontWeight: '500',
-    color: '#2196f3',
+    color: '#0066CC',
   },
   statsSection: {
     flexDirection: 'row',
@@ -771,7 +807,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#ee4d2d',
+    backgroundColor: '#0066CC',
     paddingVertical: 10,
     borderRadius: 8,
     gap: 6,
@@ -793,7 +829,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   resetButton: {
-    backgroundColor: '#ee4d2d',
+    backgroundColor: '#0066CC',
     paddingHorizontal: 24,
     paddingVertical: 10,
     borderRadius: 8,
@@ -806,14 +842,14 @@ const styles = StyleSheet.create({
   infoBanner: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#e3f2fd',
+    backgroundColor: '#E8F4FF',
     paddingHorizontal: 16,
     paddingVertical: 10,
     gap: 8,
   },
   infoBannerText: {
     fontSize: 12,
-    color: '#2196f3',
+    color: '#0066CC',
     flex: 1,
   },
 });

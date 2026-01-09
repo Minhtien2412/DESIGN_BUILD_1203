@@ -2,6 +2,7 @@
  * Customer Projects Screen
  * Manager views customer list → clicks → sees their projects
  * Shopee seller-style order management interface
+ * 🔥 UPDATED: Now uses real data from Perfex CRM
  * 
  * Role-based views:
  * - ADMIN/MANAGER: See all customers and projects
@@ -10,6 +11,12 @@
  */
 
 import { useAuth } from '@/context/AuthContext';
+import {
+    PerfexCustomer,
+    PerfexCustomersService,
+    PerfexProject,
+    PerfexProjectsService,
+} from '@/services/perfexCRM';
 import {
     Customer,
     CustomerProject,
@@ -23,7 +30,6 @@ import { Stack, useRouter } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
 import {
     ActivityIndicator,
-    Alert,
     Dimensions,
     FlatList,
     Image,
@@ -34,7 +40,7 @@ import {
     Text,
     TextInput,
     TouchableOpacity,
-    View,
+    View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -42,9 +48,9 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 // Theme colors
 const COLORS = {
-  primary: '#EE4D2D',
-  primaryLight: '#FF6B4D',
-  primaryDark: '#D73211',
+  primary: '#0066CC',
+  primaryLight: '#3399FF',
+  primaryDark: '#004499',
   background: '#F5F5F5',
   surface: '#FFFFFF',
   text: '#222222',
@@ -52,27 +58,88 @@ const COLORS = {
   textMuted: '#999999',
   border: '#E0E0E0',
   success: '#14B159',
-  warning: '#FF9800',
+  warning: '#0066CC',
   error: '#E82A34',
-  info: '#2196F3',
+  info: '#0066CC',
 };
 
 // Project status config
 const PROJECT_STATUS = {
-  DRAFT: { label: 'Nháp', color: '#9E9E9E', bgColor: '#F5F5F5' },
-  PLANNING: { label: 'Lên kế hoạch', color: '#2196F3', bgColor: '#E3F2FD' },
-  IN_PROGRESS: { label: 'Đang thi công', color: '#FF9800', bgColor: '#FFF3E0' },
-  PENDING_REVIEW: { label: 'Chờ nghiệm thu', color: '#9C27B0', bgColor: '#F3E5F5' },
-  COMPLETED: { label: 'Hoàn thành', color: '#4CAF50', bgColor: '#E8F5E9' },
-  ON_HOLD: { label: 'Tạm dừng', color: '#F44336', bgColor: '#FFEBEE' },
+  DRAFT: { label: 'Nháp', color: '#999999', bgColor: '#F5F5F5' },
+  PLANNING: { label: 'Lên kế hoạch', color: '#0066CC', bgColor: '#E8F4FF' },
+  IN_PROGRESS: { label: 'Đang thi công', color: '#0066CC', bgColor: '#E8F4FF' },
+  PENDING_REVIEW: { label: 'Chờ nghiệm thu', color: '#999999', bgColor: '#F3E5F5' },
+  COMPLETED: { label: 'Hoàn thành', color: '#0066CC', bgColor: '#E8F5E9' },
+  ON_HOLD: { label: 'Tạm dừng', color: '#000000', bgColor: '#F5F5F5' },
   CANCELLED: { label: 'Đã hủy', color: '#757575', bgColor: '#EEEEEE' },
 };
 
 type ViewMode = 'customers' | 'projects' | 'my-projects';
 type ProjectFilter = 'ALL' | 'IN_PROGRESS' | 'PENDING_REVIEW' | 'COMPLETED' | 'ON_HOLD';
+type ProjectStatusKey = 'DRAFT' | 'PLANNING' | 'IN_PROGRESS' | 'PENDING_REVIEW' | 'COMPLETED' | 'ON_HOLD' | 'CANCELLED';
 
-// Mock data
-const MOCK_CUSTOMERS: Customer[] = [
+// Map Perfex status to UI status
+function mapPerfexProjectStatus(status: number): ProjectStatusKey {
+  switch (status) {
+    case 1: return 'PLANNING';
+    case 2: return 'IN_PROGRESS';
+    case 3: return 'ON_HOLD';
+    case 4: return 'CANCELLED';
+    case 5: return 'COMPLETED';
+    default: return 'DRAFT';
+  }
+}
+
+// Convert Perfex Customer to Customer
+function mapPerfexCustomer(c: PerfexCustomer): Customer {
+  return {
+    id: c.userid,
+    name: c.company || 'Khách hàng',
+    phone: c.phonenumber || '',
+    email: '', // Perfex stores email in contacts
+    avatar: 'https://randomuser.me/api/portraits/men/1.jpg',
+    address: `${c.address || ''}, ${c.city || ''}, ${c.country || ''}`.trim(),
+    companyName: c.company || undefined,
+    totalProjects: 0, // Will be calculated
+    activeProjects: 0,
+    completedProjects: 0,
+    totalValue: 0,
+    lastActivityAt: c.datecreated,
+    createdAt: c.datecreated,
+    updatedAt: c.datecreated,
+  };
+}
+
+// Convert Perfex Project to CustomerProject
+function mapPerfexProject(p: PerfexProject, customerName: string): CustomerProject {
+  return {
+    id: p.id,
+    customerId: p.clientid,
+    customerName: customerName,
+    name: p.name,
+    description: p.description || '',
+    address: '',
+    projectType: 'HOUSE',
+    status: mapPerfexProjectStatus(p.status),
+    progressPercent: p.progress_from_tasks || p.progress || 0,
+    estimatedBudget: parseFloat(p.project_cost || '0'),
+    plannedStartDate: p.start_date,
+    plannedEndDate: p.deadline || '',
+    actualStartDate: p.start_date,
+    actualEndDate: p.date_finished || undefined,
+    coverImage: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800',
+    assignedContractors: [],
+    totalNodes: 0,
+    completedNodes: 0,
+    totalTodos: 0,
+    completedTodos: 0,
+    createdAt: p.project_created,
+    updatedAt: p.project_created,
+  };
+}
+
+// Fallback mock data khi CRM không khả dụng
+const FALLBACK_CUSTOMERS: Customer[] = [
   {
     id: 'cust1',
     name: 'Nguyễn Văn A',
@@ -104,23 +171,9 @@ const MOCK_CUSTOMERS: Customer[] = [
     createdAt: '2024-03-15',
     updatedAt: '2024-12-19',
   },
-  {
-    id: 'cust3',
-    name: 'Lê Văn C',
-    phone: '0923456789',
-    avatar: 'https://randomuser.me/api/portraits/men/3.jpg',
-    address: '789 Điện Biên Phủ, Bình Thạnh, TP.HCM',
-    totalProjects: 1,
-    activeProjects: 1,
-    completedProjects: 0,
-    totalValue: 4500000000,
-    lastActivityAt: '2024-12-18T09:15:00Z',
-    createdAt: '2024-06-20',
-    updatedAt: '2024-12-18',
-  },
 ];
 
-const MOCK_PROJECTS: CustomerProject[] = [
+const FALLBACK_PROJECTS: CustomerProject[] = [
   {
     id: 'proj1',
     customerId: 'cust1',
@@ -144,98 +197,6 @@ const MOCK_PROJECTS: CustomerProject[] = [
     createdAt: '2024-01-10',
     updatedAt: '2024-12-20',
   },
-  {
-    id: 'proj2',
-    customerId: 'cust1',
-    customerName: 'Nguyễn Văn A',
-    name: 'Nhà phố Thảo Điền',
-    description: 'Xây mới nhà phố 4 tầng',
-    address: 'Thảo Điền, Quận 2, TP.HCM',
-    projectType: 'HOUSE',
-    status: 'IN_PROGRESS',
-    progressPercent: 35,
-    estimatedBudget: 3800000000,
-    plannedStartDate: '2024-06-01',
-    plannedEndDate: '2025-03-31',
-    actualStartDate: '2024-06-10',
-    coverImage: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800',
-    assignedContractors: [],
-    totalNodes: 12,
-    completedNodes: 4,
-    totalTodos: 8,
-    completedTodos: 2,
-    createdAt: '2024-05-20',
-    updatedAt: '2024-12-19',
-  },
-  {
-    id: 'proj3',
-    customerId: 'cust1',
-    customerName: 'Nguyễn Văn A',
-    name: 'Sửa chữa căn hộ Masteri',
-    description: 'Sửa chữa và nâng cấp nội thất',
-    address: 'Masteri Thảo Điền, Quận 2, TP.HCM',
-    projectType: 'RENOVATION',
-    status: 'COMPLETED',
-    progressPercent: 100,
-    estimatedBudget: 450000000,
-    plannedStartDate: '2024-02-01',
-    plannedEndDate: '2024-04-30',
-    actualStartDate: '2024-02-05',
-    actualEndDate: '2024-04-25',
-    coverImage: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800',
-    assignedContractors: [],
-    totalNodes: 8,
-    completedNodes: 8,
-    totalTodos: 5,
-    completedTodos: 5,
-    createdAt: '2024-01-25',
-    updatedAt: '2024-04-25',
-  },
-  {
-    id: 'proj4',
-    customerId: 'cust2',
-    customerName: 'Trần Thị B',
-    name: 'Văn phòng Công ty ABC',
-    description: 'Thiết kế và thi công nội thất văn phòng',
-    address: '123 Nguyễn Đình Chiểu, Q3, TP.HCM',
-    projectType: 'OFFICE',
-    status: 'PENDING_REVIEW',
-    progressPercent: 95,
-    estimatedBudget: 1200000000,
-    plannedStartDate: '2024-08-01',
-    plannedEndDate: '2024-11-30',
-    actualStartDate: '2024-08-05',
-    coverImage: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800',
-    assignedContractors: [],
-    totalNodes: 10,
-    completedNodes: 9,
-    totalTodos: 6,
-    completedTodos: 5,
-    createdAt: '2024-07-15',
-    updatedAt: '2024-12-18',
-  },
-  {
-    id: 'proj5',
-    customerId: 'cust3',
-    customerName: 'Lê Văn C',
-    name: 'Nhà ở Bình Thạnh',
-    description: 'Xây dựng nhà ở 3 tầng',
-    address: 'Điện Biên Phủ, Bình Thạnh, TP.HCM',
-    projectType: 'HOUSE',
-    status: 'PLANNING',
-    progressPercent: 10,
-    estimatedBudget: 4500000000,
-    plannedStartDate: '2025-01-15',
-    plannedEndDate: '2025-10-31',
-    coverImage: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800',
-    assignedContractors: [],
-    totalNodes: 5,
-    completedNodes: 0,
-    totalTodos: 3,
-    completedTodos: 0,
-    createdAt: '2024-12-01',
-    updatedAt: '2024-12-18',
-  },
 ];
 
 export default function CustomerProjectsScreen() {
@@ -250,6 +211,7 @@ export default function CustomerProjectsScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
   const [projectFilter, setProjectFilter] = useState<ProjectFilter>('ALL');
+  const [dataSource, setDataSource] = useState<'crm' | 'mock'>('mock');
   
   // User role - determined by actual user data
   const [userRole, setUserRole] = useState<MindmapRole>('MANAGER');
@@ -271,17 +233,59 @@ export default function CustomerProjectsScreen() {
   const loadData = async () => {
     setLoading(true);
     try {
-      // TODO: Replace with actual API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setCustomers(MOCK_CUSTOMERS);
-      setProjects(MOCK_PROJECTS);
+      // 🔥 Load from Perfex CRM
+      const [customersRes, projectsRes] = await Promise.all([
+        PerfexCustomersService.getAll({ limit: 100 }),
+        PerfexProjectsService.getAll({ limit: 100 }),
+      ]);
+      
+      if (customersRes.data && customersRes.data.length >= 0 &&
+          projectsRes.data && projectsRes.data.length >= 0) {
+        // Map Perfex data to UI types
+        const mappedCustomers = customersRes.data.map(c => mapPerfexCustomer(c));
+        
+        // Create customer lookup for project mapping
+        const customerLookup: Record<string, string> = {};
+        customersRes.data.forEach(c => {
+          customerLookup[c.userid] = c.company || 'Khách hàng';
+        });
+        
+        const mappedProjects = projectsRes.data.map(p => 
+          mapPerfexProject(p, customerLookup[p.clientid] || 'Khách hàng')
+        );
+        
+        // Calculate customer statistics
+        mappedCustomers.forEach(customer => {
+          const custProjects = mappedProjects.filter(p => p.customerId === customer.id);
+          customer.totalProjects = custProjects.length;
+          customer.activeProjects = custProjects.filter(p => 
+            p.status === 'IN_PROGRESS' || p.status === 'PLANNING'
+          ).length;
+          customer.completedProjects = custProjects.filter(p => 
+            p.status === 'COMPLETED'
+          ).length;
+          customer.totalValue = custProjects.reduce((sum, p) => 
+            sum + (p.estimatedBudget || 0), 0
+          );
+        });
+        
+        setCustomers(mappedCustomers);
+        setProjects(mappedProjects);
+        setDataSource('crm');
+        console.log(`✅ Loaded ${mappedCustomers.length} customers, ${mappedProjects.length} projects from CRM`);
+      } else {
+        throw new Error('CRM không phản hồi đúng');
+      }
       
       // Determine user role
-      // For demo, using MANAGER role
       setUserRole('MANAGER');
     } catch (error) {
-      console.error('Error loading data:', error);
-      Alert.alert('Lỗi', 'Không thể tải dữ liệu');
+      console.warn('⚠️ CRM không khả dụng, sử dụng dữ liệu mẫu:', error);
+      // Fallback to mock data
+      setCustomers(FALLBACK_CUSTOMERS);
+      setProjects(FALLBACK_PROJECTS);
+      setDataSource('mock');
+      setUserRole('MANAGER');
     } finally {
       setLoading(false);
     }
@@ -669,7 +673,7 @@ export default function CustomerProjectsScreen() {
             <Text style={styles.statCardNumber}>{stats.inProgress}</Text>
             <Text style={styles.statCardLabel}>Đang làm</Text>
           </View>
-          <View style={[styles.statCard, { borderLeftColor: '#9C27B0' }]}>
+          <View style={[styles.statCard, { borderLeftColor: '#999999' }]}>
             <Text style={styles.statCardNumber}>{stats.pendingReview}</Text>
             <Text style={styles.statCardLabel}>Chờ duyệt</Text>
           </View>
@@ -951,7 +955,7 @@ const styles = StyleSheet.create({
   },
   statBadge: {
     alignItems: 'center',
-    backgroundColor: '#FFF3E0',
+    backgroundColor: '#E8F4FF',
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 8,

@@ -1,10 +1,17 @@
+import WorkerService, {
+    type Worker,
+    type WorkerStatus,
+    STATUS_LABELS
+} from '@/services/workerService';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
+    ActivityIndicator,
     Alert,
     Animated,
     Image,
+    RefreshControl,
     ScrollView,
     StyleSheet,
     Text,
@@ -12,46 +19,54 @@ import {
     View,
 } from 'react-native';
 
-interface Worker {
-  id: string;
-  name: string;
-  phone: string;
-  avatar: string;
-  rating: number;
-  specialty: string;
-}
-
-type WorkStatus = 'finding' | 'accepted' | 'traveling' | 'working' | 'completed';
-
-const MOCK_WORKER: Worker = {
-  id: '1',
-  name: 'Nguyễn Văn Thợ',
-  phone: '0901234567',
-  avatar: 'https://i.pravatar.cc/150?img=33',
-  rating: 4.9,
-  specialty: 'Thợ Xây',
-};
-
 export default function WorkerTrackingScreen() {
-  const [status, setStatus] = useState<WorkStatus>('finding');
+  const [status, setStatus] = useState<WorkerStatus>('finding');
   const [currentStep, setCurrentStep] = useState(0);
   const [eta, setEta] = useState(15);
   const [worker, setWorker] = useState<Worker | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   const progressAnim = useRef(new Animated.Value(0)).current;
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
   const steps = [
-    { key: 'finding', label: 'Đang tìm thợ', icon: 'search' },
-    { key: 'accepted', label: 'Đã chấp nhận', icon: 'checkmark-circle' },
-    { key: 'traveling', label: 'Đang đến', icon: 'car' },
-    { key: 'working', label: 'Đang làm việc', icon: 'hammer' },
-    { key: 'completed', label: 'Hoàn thành', icon: 'checkmark-done-circle' },
+    { key: 'finding', label: STATUS_LABELS.finding, icon: 'search' },
+    { key: 'accepted', label: STATUS_LABELS.accepted, icon: 'checkmark-circle' },
+    { key: 'traveling', label: STATUS_LABELS.traveling, icon: 'car' },
+    { key: 'working', label: STATUS_LABELS.working, icon: 'hammer' },
+    { key: 'completed', label: STATUS_LABELS.completed, icon: 'checkmark-done-circle' },
   ];
 
+  // Fetch initial worker data
+  const fetchWorker = useCallback(async () => {
+    try {
+      setLoading(true);
+      // In real app, get assignment ID from params or context
+      const workers = await WorkerService.getAvailableWorkers();
+      if (workers.length > 0) {
+        setWorker(workers[0]);
+      }
+    } catch (err) {
+      console.error('Error fetching worker:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
-    // Simulate status progression
-    const statusSequence = [
+    fetchWorker();
+  }, [fetchWorker]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchWorker().finally(() => setRefreshing(false));
+  }, [fetchWorker]);
+
+  useEffect(() => {
+    // Simulate status progression for demo
+    // In real app, this would poll API or use websocket
+    const statusSequence: { status: WorkerStatus; delay: number }[] = [
       { status: 'finding', delay: 0 },
       { status: 'accepted', delay: 3000 },
       { status: 'traveling', delay: 6000 },
@@ -59,17 +74,16 @@ export default function WorkerTrackingScreen() {
       { status: 'completed', delay: 15000 },
     ];
 
-    statusSequence.forEach(({ status, delay }) => {
-      setTimeout(() => {
-        setStatus(status as WorkStatus);
-        const stepIndex = steps.findIndex((s) => s.key === status);
+    const timeouts: NodeJS.Timeout[] = [];
+
+    statusSequence.forEach(({ status: newStatus, delay }) => {
+      const timeout = setTimeout(() => {
+        setStatus(newStatus);
+        const stepIndex = steps.findIndex((s) => s.key === newStatus);
         setCurrentStep(stepIndex);
         animateProgress(stepIndex);
-
-        if (status === 'accepted') {
-          setWorker(MOCK_WORKER);
-        }
       }, delay);
+      timeouts.push(timeout);
     });
 
     // ETA countdown
@@ -93,7 +107,10 @@ export default function WorkerTrackingScreen() {
       ])
     ).start();
 
-    return () => clearInterval(etaInterval);
+    return () => {
+      clearInterval(etaInterval);
+      timeouts.forEach(t => clearTimeout(t));
+    };
   }, []);
 
   const animateProgress = (step: number) => {
@@ -114,7 +131,7 @@ export default function WorkerTrackingScreen() {
     router.push('/messages' as any);
   };
 
-  const handleCancel = () => {
+  const handleCancel = async () => {
     Alert.alert(
       'Hủy dịch vụ',
       'Bạn có chắc muốn hủy dịch vụ này?',
@@ -123,9 +140,15 @@ export default function WorkerTrackingScreen() {
         {
           text: 'Hủy dịch vụ',
           style: 'destructive',
-          onPress: () => {
-            Alert.alert('Đã hủy', 'Dịch vụ đã được hủy');
-            router.back();
+          onPress: async () => {
+            try {
+              // Call cancel API
+              await WorkerService.cancelAssignment('assignment_id', 'Khách hàng hủy');
+              Alert.alert('Đã hủy', 'Dịch vụ đã được hủy');
+              router.back();
+            } catch (err) {
+              Alert.alert('Lỗi', 'Không thể hủy dịch vụ');
+            }
           },
         },
       ]
@@ -165,7 +188,19 @@ export default function WorkerTrackingScreen() {
         <View style={{ width: 24 }} />
       </View>
 
-      <ScrollView style={styles.scrollView}>
+      <ScrollView 
+        style={styles.scrollView}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        {/* Loading state */}
+        {loading && (
+          <View style={styles.loadingOverlay}>
+            <ActivityIndicator size="large" color="#00B14F" />
+            <Text style={styles.loadingText}>Đang tải...</Text>
+          </View>
+        )}
         {/* Map Placeholder */}
         <View style={styles.mapPlaceholder}>
           <View style={styles.mapOverlay}>
@@ -229,7 +264,7 @@ export default function WorkerTrackingScreen() {
               <Text style={styles.workerName}>{worker.name}</Text>
               <Text style={styles.workerSpecialty}>{worker.specialty}</Text>
               <View style={styles.workerRating}>
-                <Ionicons name="star" size={14} color="#FFC107" />
+                <Ionicons name="star" size={14} color="#0066CC" />
                 <Text style={styles.ratingText}>{worker.rating}</Text>
               </View>
             </View>
@@ -501,7 +536,7 @@ const styles = StyleSheet.create({
   cancelButton: {
     backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#FF6B35',
+    borderColor: '#0066CC',
     borderRadius: 8,
     padding: 16,
     alignItems: 'center',
@@ -509,7 +544,7 @@ const styles = StyleSheet.create({
   cancelButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#FF6B35',
+    color: '#0066CC',
   },
   progressButton: {
     backgroundColor: '#E8F5E9',
@@ -541,5 +576,15 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#fff',
     marginLeft: 8,
+  },
+  loadingOverlay: {
+    padding: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 14,
+    color: '#666',
   },
 });

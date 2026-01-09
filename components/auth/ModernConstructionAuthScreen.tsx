@@ -1,6 +1,6 @@
-﻿/**
+/**
  * Modern Auth Screen - Construction Industry Design
- * Updated với MySQL Authentication và Real Email Validation
+ * Updated v?i MySQL Authentication v� Real Email Validation
  * Removed outdated authentication methods
  */
 
@@ -63,12 +63,12 @@ export default function ModernConstructionAuthScreen() {
     const handleLogin = async () => {
         try {
             if (!formData.account.trim() || !formData.password.trim()) {
-                Alert.alert('Thông báo', 'Vui lòng nhập đầy đủ thông tin đăng nhập');
+                Alert.alert('Th�ng b�o', 'Vui l�ng nh?p d?y d? th�ng tin dang nh?p');
                 return;
             }
 
             if (formData.account.trim().length < 3) {
-                Alert.alert('Thông báo', 'Tên đăng nhập phải có ít nhất 3 ký tự');
+                Alert.alert('Th�ng b�o', 'T�n dang nh?p ph?i c� �t nh?t 3 k� t?');
                 return;
             }
 
@@ -76,48 +76,48 @@ export default function ModernConstructionAuthScreen() {
             
             await contextSignIn(formData.account.trim(), formData.password);
             // Automatically redirect to home screen after successful login
-            console.log('✅ Login successful, redirecting to home...');
+            console.log('? Login successful, redirecting to home...');
             router.replace('/(tabs)');
         } catch (error: any) {
             console.error('Login error:', error);
-            Alert.alert('Đăng nhập thất bại', error.message || 'Có lỗi xảy ra khi đăng nhập. Vui lòng thử lại.');
+            Alert.alert('�ang nh?p th?t b?i', error.message || 'C� l?i x?y ra khi dang nh?p. Vui l�ng th? l?i.');
         } finally {
             setLoading(false);
         }
     };
 
-    // Handle MySQL registration với enhanced validation
+    // Handle MySQL registration v?i enhanced validation
     const handleRegister = async () => {
         try {
             // Comprehensive validation
             if (!formData.account.trim() || !formData.email.trim() || !formData.password.trim()) {
-                Alert.alert('Thông báo', 'Vui lòng nhập đầy đủ thông tin bắt buộc (Tên đăng nhập, Email, Mật khẩu)');
+                Alert.alert('Th�ng b�o', 'Vui l�ng nh?p d?y d? th�ng tin b?t bu?c (T�n dang nh?p, Email, M?t kh?u)');
                 return;
             }
 
             // Username validation
             if (formData.account.trim().length < 3) {
-                Alert.alert('Lỗi', 'Tên đăng nhập phải có ít nhất 3 ký tự');
+                Alert.alert('L?i', 'T�n dang nh?p ph?i c� �t nh?t 3 k� t?');
                 return;
             }
 
             if (!/^[a-zA-Z0-9_-]+$/.test(formData.account.trim())) {
-                Alert.alert('Lỗi', 'Tên đăng nhập chỉ được chứa chữ cái, số, gạch dưới và gạch ngang');
+                Alert.alert('L?i', 'T�n dang nh?p ch? du?c ch?a ch? c�i, s?, g?ch du?i v� g?ch ngang');
                 return;
             }
 
             // Email validation
             if (!emailValidation.isValid) {
                 const message = emailValidation.suggestions?.length ? 
-                    `${emailValidation.message}\n\nGợi ý: ${emailValidation.suggestions.join(', ')}` :
+                    `${emailValidation.message}\n\nG?i �: ${emailValidation.suggestions.join(', ')}` :
                     emailValidation.message;
-                Alert.alert('Email không hợp lệ', message);
+                Alert.alert('Email kh�ng h?p l?', message);
                 return;
             }
 
             // Password validation  
             if (formData.password.length < 8) {
-                Alert.alert('Lỗi', 'Mật khẩu phải có ít nhất 8 ký tự');
+                Alert.alert('L?i', 'M?t kh?u ph?i c� �t nh?t 8 k� t?');
                 return;
             }
 
@@ -130,18 +130,18 @@ export default function ModernConstructionAuthScreen() {
             const strengthScore = [hasUpperCase, hasLowerCase, hasNumbers, hasSpecialChar].filter(Boolean).length;
             
             if (strengthScore < 2) {
-                Alert.alert('Mật khẩu yếu', 'Mật khẩu phải chứa ít nhất 2 trong các yếu tố:\n• Chữ hoa (A-Z)\n• Chữ thường (a-z)\n• Số (0-9)\n• Ký tự đặc biệt (!@#$...)');
+                Alert.alert('M?t kh?u y?u', 'M?t kh?u ph?i ch?a �t nh?t 2 trong c�c y?u t?:\n� Ch? hoa (A-Z)\n� Ch? thu?ng (a-z)\n� S? (0-9)\n� K� t? d?c bi?t (!@#$...)');
                 return;
             }
 
             if (formData.password !== formData.confirmPassword) {
-                Alert.alert('Lỗi', 'Mật khẩu xác nhận không khớp');
+                Alert.alert('L?i', 'M?t kh?u x�c nh?n kh�ng kh?p');
                 return;
             }
 
             // Phone validation if provided
             if (formData.phone.trim() && !/^[0-9+\-\s()]{10,15}$/.test(formData.phone.trim())) {
-                Alert.alert('Lỗi', 'Số điện thoại không hợp lệ');
+                Alert.alert('L?i', 'S? di?n tho?i kh�ng h?p l?');
                 return;
             }
 
@@ -153,17 +153,17 @@ export default function ModernConstructionAuthScreen() {
                 formData.fullName.trim() || formData.account.trim()
             );
             // Automatically redirect to home screen after successful registration
-            console.log('✅ Registration successful, redirecting to home...');
+            console.log('? Registration successful, redirecting to home...');
             router.replace('/(tabs)');
         } catch (error: any) {
             console.error('Registration error:', error);
-            Alert.alert('Đăng ký thất bại', error.message || 'Có lỗi xảy ra khi đăng ký. Vui lòng thử lại.');
+            Alert.alert('�ang k� th?t b?i', error.message || 'C� l?i x?y ra khi dang k�. Vui l�ng th? l?i.');
         } finally {
             setLoading(false);
         }
     };
 
-    // Demo data fills (chỉ cho admin testing)
+    // Demo data fills (ch? cho admin testing)
     const fillDemoAdmin = () => {
         setFormData(prev => ({
             ...prev,
@@ -188,10 +188,10 @@ export default function ModernConstructionAuthScreen() {
 
     // Filtered roles for MySQL system
     const mysqlRoles: Array<{role: MySQLRole, display: string}> = [
-        { role: 'client', display: 'Khách hàng' },
-        { role: 'contractor', display: 'Nhà thầu' },
-        { role: 'designer', display: 'Kiến trúc sư' },
-        { role: 'manager', display: 'Quản lý' }
+        { role: 'client', display: 'Kh�ch h�ng' },
+        { role: 'contractor', display: 'Nh� th?u' },
+        { role: 'designer', display: 'Ki?n tr�c su' },
+        { role: 'manager', display: 'Qu?n l�' }
     ];
 
     return (
@@ -221,7 +221,7 @@ export default function ModernConstructionAuthScreen() {
                             onPress={() => setMode('login')}
                         >
                             <Text style={[styles.tabText, mode === 'login' && styles.tabTextActive]}>
-                                Đăng nhập
+                                �ang nh?p
                             </Text>
                         </TouchableOpacity>
                         <TouchableOpacity
@@ -229,7 +229,7 @@ export default function ModernConstructionAuthScreen() {
                             onPress={() => setMode('register')}
                         >
                             <Text style={[styles.tabText, mode === 'register' && styles.tabTextActive]}>
-                                Đăng ký
+                                �ang k�
                             </Text>
                         </TouchableOpacity>
                     </View>
@@ -243,7 +243,7 @@ export default function ModernConstructionAuthScreen() {
                                     style={styles.demoButton}
                                     onPress={fillDemoAdmin}
                                 >
-                                    <MaterialCommunityIcons name="shield-crown" size={20} color="#ff6b35" />
+                                    <MaterialCommunityIcons name="shield-crown" size={20} color="#0066CC" />
                                     <Text style={styles.demoText}>Demo Admin Login</Text>
                                 </TouchableOpacity>
                             </View>
@@ -254,7 +254,7 @@ export default function ModernConstructionAuthScreen() {
                                     <MaterialCommunityIcons name="account" size={20} color="#666" style={styles.inputIcon} />
                                     <TextInput
                                         style={styles.input}
-                                        placeholder="Tên đăng nhập hoặc email"
+                                        placeholder="T�n dang nh?p ho?c email"
                                         placeholderTextColor="#666"
                                         value={formData.account}
                                         onChangeText={(text) => setFormData(prev => ({ ...prev, account: text }))}
@@ -267,7 +267,7 @@ export default function ModernConstructionAuthScreen() {
                                     <MaterialCommunityIcons name="lock" size={20} color="#666" style={styles.inputIcon} />
                                     <TextInput
                                         style={styles.input}
-                                        placeholder="Mật khẩu"
+                                        placeholder="M?t kh?u"
                                         placeholderTextColor="#666"
                                         value={formData.password}
                                         onChangeText={(text) => setFormData(prev => ({ ...prev, password: text }))}
@@ -282,7 +282,7 @@ export default function ModernConstructionAuthScreen() {
                                 disabled={loading || contextLoading}
                             >
                                 <Text style={styles.submitButtonText}>
-                                    {loading || contextLoading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+                                    {loading || contextLoading ? '�ang dang nh?p...' : '�ang nh?p'}
                                 </Text>
                             </TouchableOpacity>
                         </View>
@@ -293,7 +293,7 @@ export default function ModernConstructionAuthScreen() {
                         <View style={styles.formContainer}>
                             {/* Role Selection */}
                             <View style={styles.roleSection}>
-                                <Text style={styles.roleTitle}>Chọn loại tài khoản:</Text>
+                                <Text style={styles.roleTitle}>Ch?n lo?i t�i kho?n:</Text>
                                 <View style={styles.roleContainer}>
                                     {mysqlRoles.map((roleOption) => (
                                         <TouchableOpacity
@@ -345,7 +345,7 @@ export default function ModernConstructionAuthScreen() {
                                     <MaterialCommunityIcons name="account" size={20} color="#666" style={styles.inputIcon} />
                                     <TextInput
                                         style={styles.input}
-                                        placeholder="Tên đăng nhập (3+ ký tự)"
+                                        placeholder="T�n dang nh?p (3+ k� t?)"
                                         placeholderTextColor="#666"
                                         value={formData.account}
                                         onChangeText={(text) => setFormData(prev => ({ ...prev, account: text }))}
@@ -361,7 +361,7 @@ export default function ModernConstructionAuthScreen() {
                                             styles.input,
                                             formData.email ? (emailValidation.isValid ? styles.inputValid : styles.inputInvalid) : null
                                         ]}
-                                        placeholder="Email (sẽ được kiểm tra thật)"
+                                        placeholder="Email (s? du?c ki?m tra th?t)"
                                         placeholderTextColor="#666"
                                         value={formData.email}
                                         onChangeText={(text) => setFormData(prev => ({ ...prev, email: text }))}
@@ -377,7 +377,7 @@ export default function ModernConstructionAuthScreen() {
                                         <MaterialCommunityIcons 
                                             name={emailValidation.isValid ? 'check-circle' : 'alert-circle'} 
                                             size={16} 
-                                            color={emailValidation.isValid ? '#4CAF50' : '#f44336'} 
+                                            color={emailValidation.isValid ? '#0066CC' : '#000000'} 
                                         />
                                         <Text style={[styles.validationText, emailValidation.isValid ? styles.validationTextSuccess : styles.validationTextError]}>
                                             {emailValidation.message}
@@ -389,7 +389,7 @@ export default function ModernConstructionAuthScreen() {
                                     <MaterialCommunityIcons name="account-details" size={20} color="#666" style={styles.inputIcon} />
                                     <TextInput
                                         style={styles.input}
-                                        placeholder="Họ và tên (tùy chọn)"
+                                        placeholder="H? v� t�n (t�y ch?n)"
                                         placeholderTextColor="#666"
                                         value={formData.fullName}
                                         onChangeText={(text) => setFormData(prev => ({ ...prev, fullName: text }))}
@@ -400,7 +400,7 @@ export default function ModernConstructionAuthScreen() {
                                     <MaterialCommunityIcons name="phone" size={20} color="#666" style={styles.inputIcon} />
                                     <TextInput
                                         style={styles.input}
-                                        placeholder="Số điện thoại (tùy chọn)"
+                                        placeholder="S? di?n tho?i (t�y ch?n)"
                                         placeholderTextColor="#666"
                                         value={formData.phone}
                                         onChangeText={(text) => setFormData(prev => ({ ...prev, phone: text }))}
@@ -412,7 +412,7 @@ export default function ModernConstructionAuthScreen() {
                                     <MaterialCommunityIcons name="lock" size={20} color="#666" style={styles.inputIcon} />
                                     <TextInput
                                         style={styles.input}
-                                        placeholder="Mật khẩu (8+ ký tự, ít nhất 2 loại)"
+                                        placeholder="M?t kh?u (8+ k� t?, �t nh?t 2 lo?i)"
                                         placeholderTextColor="#666"
                                         value={formData.password}
                                         onChangeText={(text) => setFormData(prev => ({ ...prev, password: text }))}
@@ -424,7 +424,7 @@ export default function ModernConstructionAuthScreen() {
                                     <MaterialCommunityIcons name="lock-check" size={20} color="#666" style={styles.inputIcon} />
                                     <TextInput
                                         style={styles.input}
-                                        placeholder="Xác nhận mật khẩu"
+                                        placeholder="X�c nh?n m?t kh?u"
                                         placeholderTextColor="#666"
                                         value={formData.confirmPassword}
                                         onChangeText={(text) => setFormData(prev => ({ ...prev, confirmPassword: text }))}
@@ -439,7 +439,7 @@ export default function ModernConstructionAuthScreen() {
                                 disabled={loading || contextLoading}
                             >
                                 <Text style={styles.submitButtonText}>
-                                    {loading || contextLoading ? 'Đang đăng ký...' : 'Đăng ký tài khoản'}
+                                    {loading || contextLoading ? '�ang dang k�...' : '�ang k� t�i kho?n'}
                                 </Text>
                             </TouchableOpacity>
                         </View>
@@ -522,7 +522,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#f8f9fa',
         borderRadius: 8,
         borderLeftWidth: 3,
-        borderLeftColor: '#ff6b35',
+        borderLeftColor: '#0066CC',
     },
     demoButton: {
         flexDirection: 'row',
@@ -533,12 +533,12 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         borderRadius: 6,
         borderWidth: 1,
-        borderColor: '#ff6b35',
+        borderColor: '#0066CC',
     },
     demoText: {
         marginLeft: 8,
         fontSize: 14,
-        color: '#ff6b35',
+        color: '#0066CC',
         fontWeight: '500',
     },
     demoTitle: {
@@ -589,8 +589,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     roleActive: {
-        backgroundColor: '#ff6b35',
-        borderColor: '#ff6b35',
+        backgroundColor: '#0066CC',
+        borderColor: '#0066CC',
     },
     roleText: {
         fontSize: 12,
@@ -625,11 +625,11 @@ const styles = StyleSheet.create({
         color: '#1a1a2e',
     },
     inputValid: {
-        borderColor: '#4CAF50',
+        borderColor: '#0066CC',
         borderWidth: 1,
     },
     inputInvalid: {
-        borderColor: '#f44336',
+        borderColor: '#000000',
         borderWidth: 1,
     },
     validationMessage: {
@@ -661,11 +661,11 @@ const styles = StyleSheet.create({
         color: '#c62828',
     },
     submitButton: {
-        backgroundColor: '#ff6b35',
+        backgroundColor: '#0066CC',
         paddingVertical: 16,
         borderRadius: 12,
         alignItems: 'center',
-        shadowColor: '#ff6b35',
+        shadowColor: '#0066CC',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 8,

@@ -104,23 +104,23 @@ export default function QualityMetricsScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Chỉ số Chất lượng Chính</Text>
           <View style={styles.kpiGrid}>
-            <View style={[styles.kpiCard, { borderLeftColor: '#4CAF50' }]}>
-              <Ionicons name="speedometer" size={28} color="#4CAF50" />
+            <View style={[styles.kpiCard, { borderLeftColor: '#0066CC' }]}>
+              <Ionicons name="speedometer" size={28} color="#0066CC" />
               <Text style={styles.kpiValue}>{firstTimePassRate.toFixed(1)}%</Text>
               <Text style={styles.kpiLabel}>Tỷ lệ Pass lần đầu</Text>
             </View>
-            <View style={[styles.kpiCard, { borderLeftColor: '#2196F3' }]}>
-              <Ionicons name="time" size={28} color="#2196F3" />
+            <View style={[styles.kpiCard, { borderLeftColor: '#0066CC' }]}>
+              <Ionicons name="time" size={28} color="#0066CC" />
               <Text style={styles.kpiValue}>{avgResolutionTime.toFixed(1)} ngày</Text>
               <Text style={styles.kpiLabel}>Thời gian xử lý TB</Text>
             </View>
-            <View style={[styles.kpiCard, { borderLeftColor: '#F44336' }]}>
-              <Ionicons name="alert-circle" size={28} color="#F44336" />
+            <View style={[styles.kpiCard, { borderLeftColor: '#000000' }]}>
+              <Ionicons name="alert-circle" size={28} color="#000000" />
               <Text style={styles.kpiValue}>{criticalRatio.toFixed(1)}%</Text>
               <Text style={styles.kpiLabel}>Tỷ lệ lỗi nghiêm trọng</Text>
             </View>
-            <View style={[styles.kpiCard, { borderLeftColor: '#FF9800' }]}>
-              <Ionicons name="checkmark-done" size={28} color="#FF9800" />
+            <View style={[styles.kpiCard, { borderLeftColor: '#0066CC' }]}>
+              <Ionicons name="checkmark-done" size={28} color="#0066CC" />
               <Text style={styles.kpiValue}>
                 {resolvedDefects}/{totalDefects}
               </Text>
@@ -144,7 +144,7 @@ export default function QualityMetricsScreen() {
                       {
                         height: barHeight,
                         backgroundColor:
-                          item.value > 10 ? '#F44336' : item.value > 5 ? '#FF9800' : '#4CAF50',
+                          item.value > 10 ? '#000000' : item.value > 5 ? '#0066CC' : '#0066CC',
                       },
                     ]}
                   />
@@ -171,7 +171,7 @@ export default function QualityMetricsScreen() {
               };
               const severityColors: Record<string, string> = {
                 CRITICAL: '#D32F2F',
-                MAJOR: '#F57C00',
+                MAJOR: '#0066CC',
                 MINOR: '#FBC02D',
                 COSMETIC: '#689F38',
               };
@@ -213,19 +213,19 @@ export default function QualityMetricsScreen() {
             </View>
             <View style={styles.completionDetails}>
               <View style={styles.completionRow}>
-                <View style={[styles.completionDot, { backgroundColor: '#4CAF50' }]} />
+                <View style={[styles.completionDot, { backgroundColor: '#0066CC' }]} />
                 <Text style={styles.completionText}>
                   Đã duyệt: {checklists.filter((c) => c.status === 'APPROVED').length}
                 </Text>
               </View>
               <View style={styles.completionRow}>
-                <View style={[styles.completionDot, { backgroundColor: '#FF9800' }]} />
+                <View style={[styles.completionDot, { backgroundColor: '#0066CC' }]} />
                 <Text style={styles.completionText}>
                   Đang thực hiện: {checklists.filter((c) => c.status === 'IN_PROGRESS').length}
                 </Text>
               </View>
               <View style={styles.completionRow}>
-                <View style={[styles.completionDot, { backgroundColor: '#9E9E9E' }]} />
+                <View style={[styles.completionDot, { backgroundColor: '#999999' }]} />
                 <Text style={styles.completionText}>
                   Nháp: {checklists.filter((c) => c.status === 'DRAFT').length}
                 </Text>
@@ -238,7 +238,7 @@ export default function QualityMetricsScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Nhận xét & Khuyến nghị</Text>
           <View style={styles.insightBox}>
-            <Ionicons name="bulb" size={24} color="#FF9800" />
+            <Ionicons name="bulb" size={24} color="#0066CC" />
             <View style={styles.insightContent}>
               <Text style={styles.insightTitle}>Điểm nổi bật:</Text>
               <Text style={styles.insightText}>
@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   filterButtonActive: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
   },
   filterButtonText: {
     fontSize: 13,
@@ -417,12 +417,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 4,
-    borderColor: '#4CAF50',
+    borderColor: '#0066CC',
   },
   completionPercentage: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#4CAF50',
+    color: '#0066CC',
   },
   completionLabel: {
     fontSize: 11,
@@ -449,7 +449,7 @@ const styles = StyleSheet.create({
   },
   insightBox: {
     flexDirection: 'row',
-    backgroundColor: '#FFF8E1',
+    backgroundColor: '#F0F8FF',
     padding: 16,
     borderRadius: 8,
     gap: 12,
@@ -460,7 +460,7 @@ const styles = StyleSheet.create({
   insightTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#F57C00',
+    color: '#0066CC',
     marginBottom: 8,
   },
   insightText: {

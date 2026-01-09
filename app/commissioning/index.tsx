@@ -51,43 +51,43 @@ export default function CommissioningListScreen() {
       case 'PLANNED' as CommissioningStatus:
         return '#9CA3AF';
       case 'IN_PROGRESS' as CommissioningStatus:
-        return '#F59E0B';
+        return '#0080FF';
       case 'TESTING' as CommissioningStatus:
-        return '#3B82F6';
+        return '#0080FF';
       case 'COMPLETED' as CommissioningStatus:
-        return '#10B981';
+        return '#0066CC';
       default:
         return '#6B7280';
     }
   };
 
   const getProgressColor = (progress: number) => {
-    if (progress >= 100) return '#10B981';
-    if (progress >= 50) return '#3B82F6';
-    return '#F59E0B';
+    if (progress >= 100) return '#0066CC';
+    if (progress >= 50) return '#0080FF';
+    return '#0080FF';
   };
 
   const renderStats = () => (
     <View style={[styles.statsContainer, { backgroundColor: surfaceColor }]}>
       <View style={styles.statItem}>
-        <Ionicons name="list-outline" size={24} color="#3B82F6" />
+        <Ionicons name="list-outline" size={24} color="#0080FF" />
         <Text style={[styles.statValue, { color: textColor }]}>{plans.length}</Text>
         <Text style={[styles.statLabel, { color: textMutedColor }]}>Plans</Text>
       </View>
       <View style={styles.statItem}>
-        <Ionicons name="cube-outline" size={24} color="#F59E0B" />
+        <Ionicons name="cube-outline" size={24} color="#0080FF" />
         <Text style={[styles.statValue, { color: textColor }]}>{totalSystems}</Text>
         <Text style={[styles.statLabel, { color: textMutedColor }]}>Systems</Text>
       </View>
       <View style={styles.statItem}>
-        <Ionicons name="checkmark-circle-outline" size={24} color="#10B981" />
+        <Ionicons name="checkmark-circle-outline" size={24} color="#0066CC" />
         <Text style={[styles.statValue, { color: textColor }]}>
           {totalSystems > 0 ? Math.round((completedSystems / totalSystems) * 100) : 0}%
         </Text>
         <Text style={[styles.statLabel, { color: textMutedColor }]}>Complete</Text>
       </View>
       <View style={styles.statItem}>
-        <Ionicons name="flask-outline" size={24} color="#8B5CF6" />
+        <Ionicons name="flask-outline" size={24} color="#0066CC" />
         <Text style={[styles.statValue, { color: textColor }]}>{totalTests}</Text>
         <Text style={[styles.statLabel, { color: textMutedColor }]}>Tests</Text>
       </View>
@@ -168,19 +168,19 @@ export default function CommissioningListScreen() {
             <Text style={[styles.statBoxLabel, { color: textMutedColor }]}>Systems</Text>
           </View>
           <View style={styles.statBox}>
-            <Text style={[styles.statBoxValue, { color: '#3B82F6' }]}>
+            <Text style={[styles.statBoxValue, { color: '#0080FF' }]}>
               {plan.totalTests || 0}
             </Text>
             <Text style={[styles.statBoxLabel, { color: textMutedColor }]}>Tests</Text>
           </View>
           <View style={styles.statBox}>
-            <Text style={[styles.statBoxValue, { color: '#10B981' }]}>
+            <Text style={[styles.statBoxValue, { color: '#0066CC' }]}>
               {plan.passedTests || 0}
             </Text>
             <Text style={[styles.statBoxLabel, { color: textMutedColor }]}>Passed</Text>
           </View>
           <View style={styles.statBox}>
-            <Text style={[styles.statBoxValue, { color: '#EF4444' }]}>
+            <Text style={[styles.statBoxValue, { color: '#000000' }]}>
               {plan.failedTests || 0}
             </Text>
             <Text style={[styles.statBoxLabel, { color: textMutedColor }]}>Failed</Text>
@@ -215,16 +215,16 @@ export default function CommissioningListScreen() {
           </View>
           {plan.openDeficiencies > 0 && (
             <View style={styles.deficiencyBadge}>
-              <Ionicons name="warning-outline" size={14} color="#F59E0B" />
-              <Text style={[styles.deficiencyText, { color: '#F59E0B' }]}>
+              <Ionicons name="warning-outline" size={14} color="#0080FF" />
+              <Text style={[styles.deficiencyText, { color: '#0080FF' }]}>
                 {plan.openDeficiencies} deficiencies
               </Text>
             </View>
           )}
           {plan.criticalDeficiencies > 0 && (
             <View style={styles.criticalBadge}>
-              <Ionicons name="alert-circle-outline" size={14} color="#EF4444" />
-              <Text style={[styles.criticalText, { color: '#EF4444' }]}>
+              <Ionicons name="alert-circle-outline" size={14} color="#000000" />
+              <Text style={[styles.criticalText, { color: '#000000' }]}>
                 {plan.criticalDeficiencies} critical
               </Text>
             </View>

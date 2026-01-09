@@ -1,4 +1,4 @@
-﻿import type { ID, LiveKitTokenResponse } from '../types/api';
+import type { ID, LiveKitTokenResponse } from '../types/api';
 import { ApiError, apiFetch } from './api';
 
 export interface CreateRoomRequest {
@@ -20,9 +20,9 @@ export class LiveKitService {
       return response;
     } catch (error) {
       if (error instanceof ApiError) {
-        throw new Error(`Không thể tạo phòng: ${error.message}`);
+        throw new Error(`Kh�ng th? t?o ph�ng: ${error.message}`);
       }
-      throw new Error('Không thể tạo phòng');
+      throw new Error('Kh�ng th? t?o ph�ng');
     }
   }
 
@@ -35,11 +35,11 @@ export class LiveKitService {
     } catch (error) {
       if (error instanceof ApiError) {
         if (error.status === 404) {
-          throw new Error('Không tìm thấy phòng này');
+          throw new Error('Kh�ng t�m th?y ph�ng n�y');
         }
-        throw new Error(`Không thể lấy token: ${error.message}`);
+        throw new Error(`Kh�ng th? l?y token: ${error.message}`);
       }
-      throw new Error('Không thể kết nối phòng');
+      throw new Error('Kh�ng th? k?t n?i ph�ng');
     }
   }
 

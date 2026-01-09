@@ -21,19 +21,19 @@ const CATEGORY_CONFIG: Record<
   MaterialCategory,
   { label: string; icon: string; color: string }
 > = {
-  CEMENT: { label: 'Xi măng', icon: 'cube', color: '#795548' },
+  CEMENT: { label: 'Xi măng', icon: 'cube', color: '#666666' },
   STEEL: { label: 'Thép', icon: 'git-network', color: '#1A1A1A' },
-  SAND: { label: 'Cát', icon: 'water', color: '#10B981' },
-  GRAVEL: { label: 'Đá', icon: 'shapes', color: '#9E9E9E' },
-  BRICK: { label: 'Gạch', icon: 'grid', color: '#0A6847' },
-  TILE: { label: 'Gạch lát', icon: 'apps', color: '#0A6847' },
-  PAINT: { label: 'Sơn', icon: 'color-palette', color: '#0A6847' },
-  WOOD: { label: 'Gỗ', icon: 'file-tray-stacked', color: '#0A6847' },
-  ELECTRICAL: { label: 'Điện', icon: 'flash', color: '#FF9800' },
-  PLUMBING: { label: 'Nước', icon: 'water-outline', color: '#0A6847' },
-  TOOLS: { label: 'Dụng cụ', icon: 'construct', color: '#0A6847' },
-  SAFETY_EQUIPMENT: { label: 'An toàn', icon: 'shield-checkmark', color: '#4CAF50' },
-  OTHER: { label: 'Khác', icon: 'ellipsis-horizontal', color: '#9E9E9E' },
+  SAND: { label: 'Cát', icon: 'water', color: '#0066CC' },
+  GRAVEL: { label: 'Đá', icon: 'shapes', color: '#999999' },
+  BRICK: { label: 'Gạch', icon: 'grid', color: '#0066CC' },
+  TILE: { label: 'Gạch lát', icon: 'apps', color: '#0066CC' },
+  PAINT: { label: 'Sơn', icon: 'color-palette', color: '#0066CC' },
+  WOOD: { label: 'Gỗ', icon: 'file-tray-stacked', color: '#0066CC' },
+  ELECTRICAL: { label: 'Điện', icon: 'flash', color: '#0066CC' },
+  PLUMBING: { label: 'Nước', icon: 'water-outline', color: '#0066CC' },
+  TOOLS: { label: 'Dụng cụ', icon: 'construct', color: '#0066CC' },
+  SAFETY_EQUIPMENT: { label: 'An toàn', icon: 'shield-checkmark', color: '#0066CC' },
+  OTHER: { label: 'Khác', icon: 'ellipsis-horizontal', color: '#999999' },
 };
 
 export default function InventoryDashboardScreen() {
@@ -82,7 +82,7 @@ export default function InventoryDashboardScreen() {
           <View style={styles.summarySection}>
             <View style={styles.summaryRow}>
               <View style={[styles.summaryCard, styles.fullCard]}>
-                <Ionicons name="cube-outline" size={24} color="#0A6847" />
+                <Ionicons name="cube-outline" size={24} color="#0066CC" />
                 <Text style={styles.summaryLabel}>Tổng giá trị kho</Text>
                 <Text style={styles.summaryValue}>
                   {formatCurrency(summary.totalValue)}
@@ -95,9 +95,9 @@ export default function InventoryDashboardScreen() {
 
             <View style={styles.summaryRow}>
               <View style={[styles.summaryCard, styles.halfCard]}>
-                <Ionicons name="warning" size={20} color="#FF9800" />
+                <Ionicons name="warning" size={20} color="#0066CC" />
                 <Text style={styles.summaryLabel}>Sắp hết</Text>
-                <Text style={[styles.summaryValue, { fontSize: 20, color: '#FF9800' }]}>
+                <Text style={[styles.summaryValue, { fontSize: 20, color: '#0066CC' }]}>
                   {summary.lowStockItems}
                 </Text>
                 <Text style={styles.summarySubtext}>mặt hàng</Text>
@@ -183,7 +183,7 @@ export default function InventoryDashboardScreen() {
 
                     <View style={styles.categoryRight}>
                       {isOutOfStock && (
-                        <View style={[styles.statusBadge, { backgroundColor: '#FFEBEE' }]}>
+                        <View style={[styles.statusBadge, { backgroundColor: '#F5F5F5' }]}>
                           <Ionicons name="alert-circle" size={12} color="#1A1A1A" />
                           <Text style={[styles.statusText, { color: '#1A1A1A' }]}>
                             Hết
@@ -191,9 +191,9 @@ export default function InventoryDashboardScreen() {
                         </View>
                       )}
                       {isLowStock && !isOutOfStock && (
-                        <View style={[styles.statusBadge, { backgroundColor: '#FFF3E0' }]}>
-                          <Ionicons name="warning" size={12} color="#FF9800" />
-                          <Text style={[styles.statusText, { color: '#FF9800' }]}>
+                        <View style={[styles.statusBadge, { backgroundColor: '#E8F4FF' }]}>
+                          <Ionicons name="warning" size={12} color="#0066CC" />
+                          <Text style={[styles.statusText, { color: '#0066CC' }]}>
                             Thấp
                           </Text>
                         </View>
@@ -256,9 +256,9 @@ export default function InventoryDashboardScreen() {
                           {
                             backgroundColor:
                               material.currentStock === 0
-                                ? '#FFEBEE'
+                                ? '#F5F5F5'
                                 : stockPercentage < 50
-                                ? '#FFF3E0'
+                                ? '#E8F4FF'
                                 : '#FFF9C4',
                           },
                         ]}
@@ -271,8 +271,8 @@ export default function InventoryDashboardScreen() {
                                 material.currentStock === 0
                                   ? '#1A1A1A'
                                   : stockPercentage < 50
-                                  ? '#FF9800'
-                                  : '#F57C00',
+                                  ? '#0066CC'
+                                  : '#0066CC',
                             },
                           ]}
                         >
@@ -291,8 +291,8 @@ export default function InventoryDashboardScreen() {
                               material.currentStock === 0
                                 ? '#1A1A1A'
                                 : stockPercentage < 50
-                                ? '#FF9800'
-                                : '#10B981',
+                                ? '#0066CC'
+                                : '#0066CC',
                           },
                         ]}
                       />
@@ -313,7 +313,7 @@ export default function InventoryDashboardScreen() {
               style={styles.actionCard}
               onPress={() => router.push(`/inventory/materials?projectId=${projectId}` as Href)}
             >
-              <Ionicons name="cube" size={28} color="#0A6847" />
+              <Ionicons name="cube" size={28} color="#0066CC" />
               <Text style={styles.actionLabel}>Vật liệu</Text>
             </TouchableOpacity>
 
@@ -321,7 +321,7 @@ export default function InventoryDashboardScreen() {
               style={styles.actionCard}
               onPress={() => router.push(`/inventory/orders?projectId=${projectId}` as Href)}
             >
-              <Ionicons name="document-text" size={28} color="#4CAF50" />
+              <Ionicons name="document-text" size={28} color="#0066CC" />
               <Text style={styles.actionLabel}>Đơn hàng</Text>
             </TouchableOpacity>
 
@@ -329,7 +329,7 @@ export default function InventoryDashboardScreen() {
               style={styles.actionCard}
               onPress={() => router.push(`/inventory/suppliers?projectId=${projectId}` as Href)}
             >
-              <Ionicons name="business" size={28} color="#FF9800" />
+              <Ionicons name="business" size={28} color="#0066CC" />
               <Text style={styles.actionLabel}>Nhà cung cấp</Text>
             </TouchableOpacity>
 
@@ -337,7 +337,7 @@ export default function InventoryDashboardScreen() {
               style={styles.actionCard}
               onPress={() => router.push(`/inventory/transactions?projectId=${projectId}` as Href)}
             >
-              <Ionicons name="swap-horizontal" size={28} color="#0A6847" />
+              <Ionicons name="swap-horizontal" size={28} color="#0066CC" />
               <Text style={styles.actionLabel}>Giao dịch</Text>
             </TouchableOpacity>
           </View>
@@ -447,7 +447,7 @@ const styles = StyleSheet.create({
   },
   seeAllText: {
     fontSize: 14,
-    color: '#0A6847',
+    color: '#0066CC',
     fontWeight: '500',
   },
   categoryCard: {

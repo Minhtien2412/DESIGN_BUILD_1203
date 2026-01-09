@@ -57,9 +57,9 @@ export default function QualityAssuranceDetailScreen() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'PASSED': return '#22c55e';
-      case 'FAILED': return '#ef4444';
-      case 'CONDITIONAL_PASS': return '#f97316';
+      case 'PASSED': return '#0066CC';
+      case 'FAILED': return '#000000';
+      case 'CONDITIONAL_PASS': return '#0066CC';
       case 'COMPLETED': 
       case 'IN_PROGRESS': return '#3b82f6';
       case 'SCHEDULED': return '#a855f7';
@@ -72,9 +72,9 @@ export default function QualityAssuranceDetailScreen() {
 
   const getSeverityColor = (severity?: string) => {
     switch (severity) {
-      case 'CRITICAL': return '#dc2626';
+      case 'CRITICAL': return '#000000';
       case 'MAJOR': return '#ea580c';
-      case 'MINOR': return '#f59e0b';
+      case 'MINOR': return '#0066CC';
       case 'COSMETIC': return '#3b82f6';
       default: return textMutedColor;
     }
@@ -250,12 +250,12 @@ export default function QualityAssuranceDetailScreen() {
                             </ThemedText>
                             <View style={[
                               styles.measurementResult,
-                              { backgroundColor: measurement.result === 'PASS' ? '#22c55e20' : '#ef444420' }
+                              { backgroundColor: measurement.result === 'PASS' ? '#0066CC20' : '#00000020' }
                             ]}>
                               <ThemedText 
                                 type="default" 
                                 style={{ 
-                                  color: measurement.result === 'PASS' ? '#22c55e' : '#ef4444',
+                                  color: measurement.result === 'PASS' ? '#0066CC' : '#000000',
                                   fontWeight: '600'
                                 }}
                               >
@@ -298,13 +298,13 @@ export default function QualityAssuranceDetailScreen() {
                   </View>
                   <View style={styles.inspectionStats}>
                     <View style={styles.statItem}>
-                      <ThemedText type="title" style={{ color: '#22c55e' }}>
+                      <ThemedText type="title" style={{ color: '#0066CC' }}>
                         {inspection.passedItems || 0}
                       </ThemedText>
                       <ThemedText type="default" style={{ color: textMutedColor }}>Passed</ThemedText>
                     </View>
                     <View style={styles.statItem}>
-                      <ThemedText type="title" style={{ color: '#ef4444' }}>
+                      <ThemedText type="title" style={{ color: '#000000' }}>
                         {inspection.failedItems || 0}
                       </ThemedText>
                       <ThemedText type="default" style={{ color: textMutedColor }}>Failed</ThemedText>
@@ -373,17 +373,17 @@ export default function QualityAssuranceDetailScreen() {
                     <View style={[
                       styles.checklistStatusBadge,
                       { 
-                        backgroundColor: item.status === 'PASS' ? '#22c55e20' : 
-                                       item.status === 'FAIL' ? '#ef444420' :
-                                       item.status === 'NA' ? '#6b728020' : '#f59e0b20'
+                        backgroundColor: item.status === 'PASS' ? '#0066CC20' : 
+                                       item.status === 'FAIL' ? '#00000020' :
+                                       item.status === 'NA' ? '#6b728020' : '#0066CC20'
                       }
                     ]}>
                       <ThemedText 
                         type="default" 
                         style={{ 
-                          color: item.status === 'PASS' ? '#22c55e' : 
-                                item.status === 'FAIL' ? '#ef4444' :
-                                item.status === 'NA' ? '#6b7280' : '#f59e0b',
+                          color: item.status === 'PASS' ? '#0066CC' : 
+                                item.status === 'FAIL' ? '#000000' :
+                                item.status === 'NA' ? '#6b7280' : '#0066CC',
                           fontWeight: '600'
                         }}
                       >

@@ -175,6 +175,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loading: false,
         isAuthenticated: true,
       });
+
+      // Đồng bộ với Perfex CRM sau khi đăng nhập thành công (async, không block)
+      // Sử dụng setTimeout để defer, tránh lỗi fetch trên web development
+      setTimeout(async () => {
+        try {
+          const dataSyncModule = await import('../services/dataSyncService');
+          const { dataSyncService } = dataSyncModule;
+          await dataSyncService.initialize();
+          const syncResult = await dataSyncService.syncUserAfterLogin({
+            id: user.id,
+            email: user.email,
+            name: user.name || '',
+            role: user.role || 'CLIENT',
+            phone: user.phone,
+          });
+          console.log('[AuthContext] Perfex sync result:', syncResult.linkedAccounts ? 'linked' : 'not linked');
+        } catch (syncError) {
+          // Silent fail - sync không quan trọng với luồng đăng nhập
+          console.warn('[AuthContext] Perfex sync skipped:', syncError instanceof Error ? syncError.message : 'unknown error');
+        }
+      }, 100);
     } catch (error) {
       console.error('[AuthContext] Sign in failed:', error);
       setState(prev => ({ ...prev, loading: false }));
@@ -257,10 +278,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // 2. Clear any cached user data
       await deleteItem('userData');
       
-      // 3. TODO: Close WebSocket connection when enabled
+      // 3. Clear Perfex CRM sync data (non-blocking)
+      try {
+        const dataSyncModule = await import('../services/dataSyncService');
+        dataSyncModule.dataSyncService.clearSyncData();
+        console.log('[AuthContext] Cleared Perfex CRM sync data');
+      } catch (syncError) {
+        // Silent fail - không ảnh hưởng đăng xuất
+        console.warn('[AuthContext] Sync data clear skipped');
+      }
+      
+      // 4. TODO: Close WebSocket connection when enabled
       // socketManager.disconnect();
       
-      // 4. TODO: Clear message/notification caches when integrated
+      // 5. TODO: Clear message/notification caches when integrated
       // await deleteItem('messages');
       // await deleteItem('notifications');
       
@@ -302,19 +333,96 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Social authentication - Currently not implemented in backend API v2.0
   // These are stub implementations that throw errors
   const signInWithGoogle = async () => {
-    throw new Error('Google Sign-In chưa được implement. Vui lòng sử dụng email/password.');
+    throw new Error('Vui lòng sử dụng nút "Đăng nhập với Google" trên màn hình đăng nhập.');
   };
 
   const signInWithGoogleCode = async (code: string) => {
-    throw new Error('Google OAuth chưa được implement. Vui lòng sử dụng email/password.');
+    try {
+      setState(prev => ({ ...prev, loading: true }));
+      
+      // Send authorization code to backend
+      const response = await authApi.post('/auth/google/code', { code });
+      
+      if (response.accessToken && response.user) {
+        // Save tokens
+        await saveTokens({
+          accessToken: response.accessToken,
+          refreshToken: response.refreshToken,
+          expiresIn: response.expiresIn || 3600,
+        });
+
+        // Update state with user
+        setState({
+          user: response.user,
+          loading: false,
+          isAuthenticated: true,
+        });
+      }
+    } catch (error: any) {
+      setState(prev => ({ ...prev, loading: false }));
+      throw error;
+    }
   };
 
   const signInWithGoogleToken = async (credential: string, clientId?: string) => {
-    throw new Error('Google Token Sign-In chưa được implement. Vui lòng sử dụng email/password.');
+    try {
+      setState(prev => ({ ...prev, loading: true }));
+      
+      // Send ID token to backend for verification
+      const response = await authApi.post('/auth/google/token', { 
+        credential,
+        clientId 
+      });
+      
+      if (response.accessToken && response.user) {
+        // Save tokens
+        await saveTokens({
+          accessToken: response.accessToken,
+          refreshToken: response.refreshToken,
+          expiresIn: response.expiresIn || 3600,
+        });
+
+        // Update state with user
+        setState({
+          user: response.user,
+          loading: false,
+          isAuthenticated: true,
+        });
+      }
+    } catch (error: any) {
+      setState(prev => ({ ...prev, loading: false }));
+      throw error;
+    }
   };
 
   const signInWithGoogleAccessToken = async (accessToken: string) => {
-    throw new Error('Google Access Token Sign-In chưa được implement. Vui lòng sử dụng email/password.');
+    try {
+      setState(prev => ({ ...prev, loading: true }));
+      
+      // Send Google access token to backend
+      const response = await authApi.post('/auth/google', { 
+        token: accessToken 
+      });
+      
+      if (response.accessToken && response.user) {
+        // Save tokens
+        await saveTokens({
+          accessToken: response.accessToken,
+          refreshToken: response.refreshToken,
+          expiresIn: response.expiresIn || 3600,
+        });
+
+        // Update state with user
+        setState({
+          user: response.user,
+          loading: false,
+          isAuthenticated: true,
+        });
+      }
+    } catch (error: any) {
+      setState(prev => ({ ...prev, loading: false }));
+      throw error;
+    }
   };
 
   const signInWithFacebook = async () => {

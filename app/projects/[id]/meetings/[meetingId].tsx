@@ -286,7 +286,7 @@ export default function MeetingNoteDetailScreen() {
                 <View
                   style={[
                     styles.attendeeStatus,
-                    { backgroundColor: attendee.isPresent ? '#10B981' : '#EF4444' },
+                    { backgroundColor: attendee.isPresent ? '#0066CC' : '#000000' },
                   ]}
                 >
                   <Ionicons

@@ -51,10 +51,10 @@ const ICON_MAP = {
 };
 
 const COLOR_MAP = {
-  pdf: '#EF4444',
+  pdf: '#000000',
   doc: '#3B82F6',
-  image: '#10B981',
-  folder: '#F59E0B',
+  image: '#0066CC',
+  folder: '#0066CC',
 };
 
 export default function DocumentManagementTemplate({
@@ -200,13 +200,13 @@ export default function DocumentManagementTemplate({
               style={styles.actionButton}
               onPress={() => onApprove?.(item.id)}
             >
-              <Ionicons name="checkmark" size={20} color="#10B981" />
+              <Ionicons name="checkmark" size={20} color="#0066CC" />
             </Pressable>
             <Pressable
               style={styles.actionButton}
               onPress={() => onReject?.(item.id)}
             >
-              <Ionicons name="close" size={20} color="#EF4444" />
+              <Ionicons name="close" size={20} color="#000000" />
             </Pressable>
           </>
         )}
@@ -328,26 +328,26 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   statusApproved: {
-    backgroundColor: '#10B98120',
+    backgroundColor: '#0066CC20',
   },
   statusPending: {
-    backgroundColor: '#F59E0B20',
+    backgroundColor: '#0066CC20',
   },
   statusRejected: {
-    backgroundColor: '#EF444420',
+    backgroundColor: '#00000020',
   },
   statusText: {
     fontSize: 11,
     fontWeight: '600',
   },
   statusTextApproved: {
-    color: '#10B981',
+    color: '#0066CC',
   },
   statusTextPending: {
-    color: '#F59E0B',
+    color: '#0066CC',
   },
   statusTextRejected: {
-    color: '#EF4444',
+    color: '#000000',
   },
   actions: {
     flexDirection: 'row',

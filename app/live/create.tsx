@@ -83,7 +83,7 @@ export default function CreateLiveStreamScreen() {
       >
         {/* Header */}
         <View style={styles.header}>
-          <Ionicons name="videocam" size={48} color="#EF4444" />
+          <Ionicons name="videocam" size={48} color="#000000" />
           <Text style={[styles.headerTitle, { color: textColor }]}>
             Start Live Streaming
           </Text>
@@ -128,7 +128,7 @@ export default function CreateLiveStreamScreen() {
             <Switch
               value={enableChat}
               onValueChange={setEnableChat}
-              trackColor={{ false: '#ccc', true: '#EF4444' }}
+              trackColor={{ false: '#ccc', true: '#000000' }}
               thumbColor="#fff"
             />
           </View>
@@ -145,7 +145,7 @@ export default function CreateLiveStreamScreen() {
             <Switch
               value={enableReactions}
               onValueChange={setEnableReactions}
-              trackColor={{ false: '#ccc', true: '#EF4444' }}
+              trackColor={{ false: '#ccc', true: '#000000' }}
               thumbColor="#fff"
             />
           </View>
@@ -162,7 +162,7 @@ export default function CreateLiveStreamScreen() {
             <Switch
               value={isPrivate}
               onValueChange={setIsPrivate}
-              trackColor={{ false: '#ccc', true: '#EF4444' }}
+              trackColor={{ false: '#ccc', true: '#000000' }}
               thumbColor="#fff"
             />
           </View>

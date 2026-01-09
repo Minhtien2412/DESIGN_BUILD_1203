@@ -214,12 +214,12 @@ function getModuleIcon(module: PermissionModule): keyof typeof Ionicons.glyphMap
 function getActionColor(action: PermissionAction): string {
   const colorMap: Record<string, string> = {
     [PermissionAction.VIEW]: '#3b82f6',
-    [PermissionAction.CREATE]: '#22c55e',
-    [PermissionAction.EDIT]: '#f59e0b',
-    [PermissionAction.DELETE]: '#ef4444',
-    [PermissionAction.APPROVE]: '#8b5cf6',
+    [PermissionAction.CREATE]: '#0066CC',
+    [PermissionAction.EDIT]: '#0066CC',
+    [PermissionAction.DELETE]: '#000000',
+    [PermissionAction.APPROVE]: '#666666',
     [PermissionAction.EXPORT]: '#06b6d4',
-    [PermissionAction.MANAGE]: '#f97316',
+    [PermissionAction.MANAGE]: '#0066CC',
   };
 
   return colorMap[action] || '#6b7280';

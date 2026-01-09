@@ -318,7 +318,7 @@ export default function PrivacyScreen() {
         {/* Data & Privacy */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Ionicons name="shield-checkmark-outline" size={24} color="#10B981" />
+            <Ionicons name="shield-checkmark-outline" size={24} color="#0066CC" />
             <Text style={styles.sectionTitle}>Dữ liệu & quyền riêng tư</Text>
           </View>
           
@@ -352,7 +352,7 @@ export default function PrivacyScreen() {
         {/* Communication */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Ionicons name="chatbubbles-outline" size={24} color="#F59E0B" />
+            <Ionicons name="chatbubbles-outline" size={24} color="#0066CC" />
             <Text style={styles.sectionTitle}>Giao tiếp</Text>
           </View>
           
@@ -386,7 +386,7 @@ export default function PrivacyScreen() {
         {/* Data Management */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Ionicons name="document-text-outline" size={24} color="#8B5CF6" />
+            <Ionicons name="document-text-outline" size={24} color="#666666" />
             <Text style={styles.sectionTitle}>Quản lý dữ liệu</Text>
           </View>
           
@@ -403,8 +403,8 @@ export default function PrivacyScreen() {
         {/* Danger Zone */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Ionicons name="warning-outline" size={24} color="#EF4444" />
-            <Text style={[styles.sectionTitle, { color: '#EF4444' }]}>Vùng nguy hiểm</Text>
+            <Ionicons name="warning-outline" size={24} color="#000000" />
+            <Text style={[styles.sectionTitle, { color: '#000000' }]}>Vùng nguy hiểm</Text>
           </View>
           
           <View style={[styles.card, styles.dangerCard]}>
@@ -413,12 +413,12 @@ export default function PrivacyScreen() {
               onPress={handleDeleteAccount}
               activeOpacity={0.7}
             >
-              <Ionicons name="trash-outline" size={24} color="#EF4444" />
+              <Ionicons name="trash-outline" size={24} color="#000000" />
               <View style={styles.dangerText}>
                 <Text style={styles.dangerTitle}>Xóa tài khoản</Text>
                 <Text style={styles.dangerDescription}>Xóa vĩnh viễn tài khoản và dữ liệu</Text>
               </View>
-              <Ionicons name="chevron-forward" size={20} color="#EF4444" />
+              <Ionicons name="chevron-forward" size={20} color="#000000" />
             </TouchableOpacity>
           </View>
         </View>
@@ -524,19 +524,19 @@ const styles = StyleSheet.create({
   dangerTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#EF4444',
+    color: '#000000',
     marginBottom: 2,
   },
   dangerDescription: {
     fontSize: 13,
-    color: '#DC2626',
+    color: '#000000',
   },
   infoCard: {
-    backgroundColor: '#EFF6FF',
+    backgroundColor: '#E8F4FF',
     borderRadius: 12,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#DBEAFE',
+    borderColor: '#E8F4FF',
   },
   infoHeader: {
     flexDirection: 'row',

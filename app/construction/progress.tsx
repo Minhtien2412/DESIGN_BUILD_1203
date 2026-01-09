@@ -318,8 +318,8 @@ export default function ConstructionProgressScreen() {
     const isLast = index === milestones.length - 1;
     const statusConfig = {
       pending: { icon: 'ellipse-outline', color: '#999', bg: '#f5f5f5', label: 'Chưa bắt đầu' },
-      'in-progress': { icon: 'sync', color: '#2196F3', bg: '#E3F2FD', label: 'Đang thực hiện' },
-      completed: { icon: 'checkmark-circle', color: '#4CAF50', bg: '#E8F5E9', label: 'Hoàn thành' },
+      'in-progress': { icon: 'sync', color: '#0066CC', bg: '#E8F4FF', label: 'Đang thực hiện' },
+      completed: { icon: 'checkmark-circle', color: '#0066CC', bg: '#E8F5E9', label: 'Hoàn thành' },
       paid: { icon: 'checkmark-circle', color: '#00B14F', bg: '#E8F5E9', label: 'Đã thanh toán' },
     };
 
@@ -360,7 +360,7 @@ export default function ConstructionProgressScreen() {
 
           {milestone.completionDate && (
             <View style={styles.milestoneCompletionDate}>
-              <Ionicons name="checkmark-circle" size={14} color="#4CAF50" />
+              <Ionicons name="checkmark-circle" size={14} color="#0066CC" />
               <Text style={styles.completionDateText}>
                 Hoàn thành: {milestone.completionDate}
               </Text>
@@ -553,7 +553,7 @@ const styles = StyleSheet.create({
   statusBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
@@ -563,12 +563,12 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
   },
   statusText: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#2196F3',
+    color: '#0066CC',
   },
   projectMetaRow: {
     flexDirection: 'row',
@@ -758,7 +758,7 @@ const styles = StyleSheet.create({
   },
   completionDateText: {
     fontSize: 12,
-    color: '#4CAF50',
+    color: '#0066CC',
     fontWeight: '600',
   },
   milestoneAmount: {

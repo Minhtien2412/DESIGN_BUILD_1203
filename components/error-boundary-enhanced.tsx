@@ -91,7 +91,7 @@ export class ErrorBoundary extends Component<Props, State> {
             <Ionicons
               name="alert-circle-outline"
               size={64}
-              color="#EF4444"
+              color="#000000"
               style={styles.icon}
             />
             <Text style={styles.title}>Oops! Something went wrong</Text>
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
   debugTitle: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#EF4444',
+    color: '#000000',
     marginBottom: 8,
   },
   debugText: {
@@ -227,7 +227,7 @@ export function FeedErrorBoundary({ children }: { children: ReactNode }) {
     <ErrorBoundary
       fallback={
         <View style={feedErrorStyles.feedError}>
-          <Ionicons name="alert-circle" size={48} color="#EF4444" />
+          <Ionicons name="alert-circle" size={48} color="#000000" />
           <Text style={feedErrorStyles.feedErrorText}>
             Unable to load feed. Pull to refresh.
           </Text>

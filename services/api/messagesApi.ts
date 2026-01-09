@@ -278,6 +278,48 @@ export async function getUnreadCount(): Promise<{ count: number }> {
   }
 }
 
+/**
+ * Get or create conversation with a specific user
+ * Endpoint: GET /messages/conversations/user/:recipientId
+ * Returns existing conversation or creates new one
+ */
+export async function getConversationByRecipient(recipientId: number): Promise<Conversation | null> {
+  try {
+    const headers = await getAuthHeaders();
+    const response = await fetch(`${BASE_URL}/conversations/user/${recipientId}`, {
+      method: 'GET',
+      headers
+    });
+
+    if (!response.ok) {
+      // If not found, try to get all conversations and find matching one
+      if (response.status === 404) {
+        const allConversations = await getConversations();
+        const existing = allConversations.find(conv => 
+          conv.participants.some(p => p.id === recipientId)
+        );
+        return existing || null;
+      }
+      throw new Error(`Failed to get conversation: ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('[messagesApi] getConversationByRecipient error:', error);
+    // Fallback: search in existing conversations
+    try {
+      const allConversations = await getConversations();
+      const existing = allConversations.find(conv => 
+        conv.participants.some(p => p.id === recipientId)
+      );
+      return existing || null;
+    } catch (fallbackError) {
+      console.error('[messagesApi] Fallback search failed:', fallbackError);
+      return null;
+    }
+  }
+}
+
 // ==================== EXPORTS ====================
 
 export const messagesApi = {
@@ -286,7 +328,8 @@ export const messagesApi = {
   sendMessage,
   markAsRead,
   markAllAsRead,
-  getUnreadCount
+  getUnreadCount,
+  getConversationByRecipient
 };
 
 export default messagesApi;

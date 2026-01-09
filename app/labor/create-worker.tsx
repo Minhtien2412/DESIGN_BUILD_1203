@@ -274,7 +274,7 @@ export default function CreateWorkerScreen() {
                 <Ionicons
                   name={option.icon as any}
                   size={24}
-                  color={role === option.value ? '#2196F3' : '#666'}
+                  color={role === option.value ? '#0066CC' : '#666'}
                 />
                 <Text
                   style={[styles.roleLabel, role === option.value && styles.roleLabelActive]}
@@ -431,7 +431,7 @@ export default function CreateWorkerScreen() {
               onChangeText={setCustomSkill}
             />
             <TouchableOpacity style={styles.addSkillButton} onPress={addCustomSkill}>
-              <Ionicons name="add-circle-outline" size={24} color="#2196F3" />
+              <Ionicons name="add-circle-outline" size={24} color="#0066CC" />
             </TouchableOpacity>
           </View>
 
@@ -519,7 +519,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   required: {
-    color: '#F44336',
+    color: '#000000',
   },
   input: {
     borderWidth: 1,
@@ -573,8 +573,8 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   roleCardActive: {
-    backgroundColor: '#E3F2FD',
-    borderColor: '#2196F3',
+    backgroundColor: '#E8F4FF',
+    borderColor: '#0066CC',
   },
   roleLabel: {
     fontSize: 12,
@@ -582,7 +582,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   roleLabelActive: {
-    color: '#2196F3',
+    color: '#0066CC',
     fontWeight: '600',
   },
   skillsGrid: {
@@ -599,15 +599,15 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
   },
   skillChipActive: {
-    backgroundColor: '#E3F2FD',
-    borderColor: '#2196F3',
+    backgroundColor: '#E8F4FF',
+    borderColor: '#0066CC',
   },
   skillChipText: {
     fontSize: 13,
     color: '#666',
   },
   skillChipTextActive: {
-    color: '#2196F3',
+    color: '#0066CC',
     fontWeight: '600',
   },
   customSkillRow: {
@@ -659,7 +659,7 @@ const styles = StyleSheet.create({
     flex: 2,
     paddingVertical: 14,
     borderRadius: 8,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     alignItems: 'center',
   },
   saveButtonDisabled: {

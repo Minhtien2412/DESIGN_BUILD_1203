@@ -23,7 +23,7 @@ export function AnimatedBanner({
   title,
   subtitle,
   icon = 'flash',
-  gradientColors = [Colors.light.primary, '#8B5CF6'],
+  gradientColors = [Colors.light.primary, '#666666'],
   onPress,
 }: AnimatedBannerProps) {
   const scaleAnim = useRef(new Animated.Value(0.95)).current;

@@ -29,8 +29,8 @@ interface AddTaskFormProps {
 }
 
 const PRIORITY_CONFIG = {
-  urgent: { label: 'Cấp bách', color: '#EF4444', icon: 'flash' as const },
-  high: { label: 'Cao', color: '#F59E0B', icon: 'arrow-up' as const },
+  urgent: { label: 'Cấp bách', color: '#000000', icon: 'flash' as const },
+  high: { label: 'Cao', color: '#0066CC', icon: 'arrow-up' as const },
   medium: { label: 'Trung bình', color: '#3B82F6', icon: 'remove' as const },
   low: { label: 'Thấp', color: '#6B7280', icon: 'arrow-down' as const },
 };
@@ -38,8 +38,8 @@ const PRIORITY_CONFIG = {
 const STATUS_CONFIG = {
   todo: { label: 'Cần làm', color: '#6B7280' },
   'in-progress': { label: 'Đang làm', color: '#3B82F6' },
-  completed: { label: 'Hoàn thành', color: '#10B981' },
-  blocked: { label: 'Bị chặn', color: '#EF4444' },
+  completed: { label: 'Hoàn thành', color: '#0066CC' },
+  blocked: { label: 'Bị chặn', color: '#000000' },
 };
 
 const COMMON_TAGS = [
@@ -161,7 +161,7 @@ export default function AddTaskForm({
               <Text style={[styles.label, { color: text }]}>
                 Tiêu đề <Text style={styles.required}>*</Text>
               </Text>
-              <View style={[styles.inputContainer, { borderColor: errors.title ? '#EF4444' : border }]}>
+              <View style={[styles.inputContainer, { borderColor: errors.title ? '#000000' : border }]}>
                 <Ionicons name="document-text-outline" size={20} color={textMuted} />
                 <TextInput
                   style={[styles.input, { color: text }]}
@@ -186,7 +186,7 @@ export default function AddTaskForm({
             {/* Description Input */}
             <View style={styles.field}>
               <Text style={[styles.label, { color: text }]}>Mô tả</Text>
-              <View style={[styles.inputContainer, styles.textAreaContainer, { borderColor: errors.description ? '#EF4444' : border }]}>
+              <View style={[styles.inputContainer, styles.textAreaContainer, { borderColor: errors.description ? '#000000' : border }]}>
                 <TextInput
                   style={[styles.input, styles.textArea, { color: text }]}
                   value={formData.description}
@@ -402,7 +402,7 @@ const styles = StyleSheet.create({
     marginBottom: SpacingSemantic.sm,
   },
   required: {
-    color: '#EF4444',
+    color: '#000000',
   },
   inputContainer: {
     flexDirection: 'row',
@@ -427,7 +427,7 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
   errorText: {
-    color: '#EF4444',
+    color: '#000000',
     fontSize: 12,
     marginTop: 4,
   },

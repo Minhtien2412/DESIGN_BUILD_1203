@@ -30,21 +30,21 @@ export default function AIWidget({ insights }: AIWidgetProps) {
       icon: 'chatbubble-outline',
       label: 'Chat AI',
       route: '/ai/index',
-      color: '#10B981',
+      color: '#0066CC',
     },
     {
       id: 3,
       icon: 'document-text-outline',
       label: 'Báo cáo',
       route: '/ai/generate-report',
-      color: '#F59E0B',
+      color: '#0066CC',
     },
     {
       id: 4,
       icon: 'cube-outline',
       label: 'VL Check',
       route: '/ai/material-check',
-      color: '#8B5CF6',
+      color: '#666666',
     },
   ];
 
@@ -75,7 +75,7 @@ export default function AIWidget({ insights }: AIWidgetProps) {
         <View style={styles.insightsContainer}>
           <View style={styles.insightCard}>
             <View style={styles.insightIcon}>
-              <Ionicons name="trending-up" size={16} color="#10B981" />
+              <Ionicons name="trending-up" size={16} color="#0066CC" />
             </View>
             <View style={styles.insightContent}>
               <Text style={styles.insightLabel}>Tiến độ hôm nay</Text>
@@ -99,7 +99,7 @@ export default function AIWidget({ insights }: AIWidgetProps) {
 
           <View style={styles.insightCard}>
             <View style={styles.insightIcon}>
-              <Ionicons name="bulb" size={16} color="#F59E0B" />
+              <Ionicons name="bulb" size={16} color="#0066CC" />
             </View>
             <View style={styles.insightContent}>
               <Text style={styles.insightLabel}>Gợi ý AI</Text>
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#10B981',
+    backgroundColor: '#0066CC',
     marginRight: 8,
   },
   statusText: {

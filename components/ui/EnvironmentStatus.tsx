@@ -40,7 +40,7 @@ export function EnvironmentStatus() {
 
   const getStatusColor = () => {
     if (!hasApiKey) return '#dc3545'; // red
-    if (env === 'unknown') return '#0A6847'; // emerald
+    if (env === 'unknown') return '#0066CC'; // emerald
     return '#28a745'; // green
   };
 

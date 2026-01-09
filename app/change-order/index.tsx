@@ -36,21 +36,21 @@ const STATUS_FILTERS: { value: ChangeOrderStatus | 'ALL'; label: string }[] = [
 ];
 
 const STATUS_COLORS: Record<ChangeOrderStatus, string> = {
-  DRAFT: '#6B7280',
-  SUBMITTED: '#3B82F6',
-  UNDER_REVIEW: '#F59E0B',
-  PENDING_APPROVAL: '#8B5CF6',
-  APPROVED: '#10B981',
-  REJECTED: '#EF4444',
-  IMPLEMENTED: '#059669',
-  CLOSED: '#6B7280',
-  CANCELLED: '#9CA3AF',
+  DRAFT: '#666666',
+  SUBMITTED: '#0080FF',
+  UNDER_REVIEW: '#0066CC',
+  PENDING_APPROVAL: '#0080FF',
+  APPROVED: '#000000',
+  REJECTED: '#999999',
+  IMPLEMENTED: '#0066CC',
+  CLOSED: '#666666',
+  CANCELLED: '#CCCCCC',
 };
 
 const COST_IMPACT_COLORS: Record<CostImpactType, string> = {
-  INCREASE: '#EF4444',
-  DECREASE: '#10B981',
-  NO_IMPACT: '#6B7280',
+  INCREASE: '#000000',
+  DECREASE: '#0066CC',
+  NO_IMPACT: '#666666',
 };
 
 export default function ChangeOrdersScreen() {
@@ -115,28 +115,28 @@ export default function ChangeOrdersScreen() {
     <View style={styles.container}>
       {/* Stats Cards */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.statsContainer}>
-        <View style={[styles.statCard, { backgroundColor: '#EFF6FF' }]}>
+        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
           <Text style={styles.statValue}>{changeOrders.length}</Text>
           <Text style={styles.statLabel}>Total</Text>
         </View>
 
-        <View style={[styles.statCard, { backgroundColor: '#DBEAFE' }]}>
+        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
           <Text style={[styles.statValue, { color: '#3B82F6' }]}>{submittedCount}</Text>
           <Text style={styles.statLabel}>Submitted</Text>
         </View>
 
         <View style={[styles.statCard, { backgroundColor: '#FEF3C7' }]}>
-          <Text style={[styles.statValue, { color: '#F59E0B' }]}>{underReviewCount}</Text>
+          <Text style={[styles.statValue, { color: '#0066CC' }]}>{underReviewCount}</Text>
           <Text style={styles.statLabel}>Under Review</Text>
         </View>
 
         <View style={[styles.statCard, { backgroundColor: '#D1FAE5' }]}>
-          <Text style={[styles.statValue, { color: '#10B981' }]}>{approvedCount}</Text>
+          <Text style={[styles.statValue, { color: '#0066CC' }]}>{approvedCount}</Text>
           <Text style={styles.statLabel}>Approved</Text>
         </View>
 
         <View style={[styles.statCard, { backgroundColor: '#FEE2E2', minWidth: 140 }]}>
-          <Text style={[styles.statValue, { color: '#EF4444', fontSize: 18 }]}>
+          <Text style={[styles.statValue, { color: '#000000', fontSize: 18 }]}>
             ${(totalCostIncrease / 1000).toFixed(0)}K
           </Text>
           <Text style={styles.statLabel}>Cost Increase</Text>
@@ -331,9 +331,9 @@ export default function ChangeOrdersScreen() {
                         size={16}
                         color={
                           co.scheduleImpact.type === 'DELAY'
-                            ? '#F59E0B'
+                            ? '#0066CC'
                             : co.scheduleImpact.type === 'ACCELERATION'
-                            ? '#10B981'
+                            ? '#0066CC'
                             : '#6B7280'
                         }
                       />
@@ -345,9 +345,9 @@ export default function ChangeOrdersScreen() {
                         {
                           color:
                             co.scheduleImpact.type === 'DELAY'
-                              ? '#F59E0B'
+                              ? '#0066CC'
                               : co.scheduleImpact.type === 'ACCELERATION'
-                              ? '#10B981'
+                              ? '#0066CC'
                               : '#6B7280',
                         },
                       ]}
@@ -380,11 +380,11 @@ export default function ChangeOrdersScreen() {
                             {
                               backgroundColor:
                                 approval.status === 'APPROVED'
-                                  ? '#10B981'
+                                  ? '#0066CC'
                                   : approval.status === 'REJECTED'
-                                  ? '#EF4444'
+                                  ? '#000000'
                                   : approval.status === 'IN_PROGRESS'
-                                  ? '#F59E0B'
+                                  ? '#0066CC'
                                   : '#6B7280',
                             },
                           ]}
@@ -405,7 +405,7 @@ export default function ChangeOrdersScreen() {
               {co.implementation && (
                 <View style={styles.implementationSection}>
                   <View style={styles.implementationHeader}>
-                    <Ionicons name="construct-outline" size={16} color="#8B5CF6" />
+                    <Ionicons name="construct-outline" size={16} color="#666666" />
                     <Text style={styles.implementationTitle}>Implementation</Text>
                     <Text style={styles.implementationStatus}>
                       {co.implementation.status.replace(/_/g, ' ')}
@@ -621,7 +621,7 @@ const styles = StyleSheet.create({
   typeBadgeText: {
     fontSize: 10,
     fontWeight: '600',
-    color: '#7C3AED',
+    color: '#666666',
     textTransform: 'capitalize',
   },
   infoSection: {
@@ -729,7 +729,7 @@ const styles = StyleSheet.create({
   },
   implementationStatus: {
     fontSize: 10,
-    color: '#7C3AED',
+    color: '#666666',
     textTransform: 'capitalize',
   },
   progressBarContainer: {
@@ -741,7 +741,7 @@ const styles = StyleSheet.create({
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: '#8B5CF6',
+    backgroundColor: '#666666',
   },
   progressText: {
     fontSize: 10,
@@ -765,10 +765,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#3B82F6',
   },
   actionButtonSuccess: {
-    backgroundColor: '#10B981',
+    backgroundColor: '#0066CC',
   },
   actionButtonWarning: {
-    backgroundColor: '#F59E0B',
+    backgroundColor: '#0066CC',
   },
   actionButtonText: {
     fontSize: 12,

@@ -18,8 +18,8 @@ import {
 
 const SEVERITY_COLORS = {
   'near-miss': '#3b82f6',
-  'minor': '#f59e0b',
-  'major': '#ef4444',
+  'minor': '#0066CC',
+  'major': '#000000',
   'fatal': '#7f1d1d'
 };
 
@@ -31,9 +31,9 @@ const SEVERITY_LABELS = {
 };
 
 const STATUS_COLORS = {
-  'reported': '#f59e0b',
+  'reported': '#0066CC',
   'investigating': '#3b82f6',
-  'closed': '#10b981'
+  'closed': '#0066CC'
 };
 
 const STATUS_LABELS = {
@@ -124,7 +124,7 @@ export default function SafetyIncidentsScreen() {
               label="Tổng số sự cố"
               value={stats.totalIncidents.toString()}
               icon="alert-circle"
-              gradientColors={['#3b82f6', '#2563eb']}
+              gradientColors={['#3b82f6', '#0066CC']}
             />
             <MetricCard
               label="Suýt xảy ra"
@@ -136,19 +136,19 @@ export default function SafetyIncidentsScreen() {
               label="Sự cố nhẹ"
               value={stats.minorIncidents.toString()}
               icon="warning"
-              gradientColors={['#f59e0b', '#d97706']}
+              gradientColors={['#0066CC', '#d97706']}
             />
             <MetricCard
               label="Nghiêm trọng"
               value={stats.majorIncidents.toString()}
               icon="close-circle"
-              gradientColors={['#ef4444', '#dc2626']}
+              gradientColors={['#000000', '#000000']}
             />
             <MetricCard
               label="Ngày không sự cố"
               value={stats.daysWithoutIncident.toString()}
               icon="checkmark-circle"
-              gradientColors={['#10b981', '#059669']}
+              gradientColors={['#0066CC', '#0066CC']}
             />
           </ScrollView>
         )}
@@ -219,7 +219,7 @@ export default function SafetyIncidentsScreen() {
 
           {filteredIncidents.length === 0 ? (
             <View style={styles.emptyState}>
-              <Ionicons name="checkmark-circle-outline" size={64} color="#10b981" />
+              <Ionicons name="checkmark-circle-outline" size={64} color="#0066CC" />
               <Text style={styles.emptyStateTitle}>Không có sự cố nào</Text>
               <Text style={styles.emptyStateText}>
                 Tuyệt vời! Công trình đang vận hành an toàn
@@ -294,7 +294,7 @@ export default function SafetyIncidentsScreen() {
 
                     {incident.injuryType !== 'none' && (
                       <View style={styles.warningBox}>
-                        <Ionicons name="medical" size={14} color="#ef4444" />
+                        <Ionicons name="medical" size={14} color="#000000" />
                         <Text style={styles.warningText}>
                           Có thương tích: {incident.injuryType}
                         </Text>
@@ -382,7 +382,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#ef4444',
+    backgroundColor: '#000000',
     paddingVertical: 14,
     paddingHorizontal: 20,
     borderRadius: 12,
@@ -505,7 +505,7 @@ const styles = StyleSheet.create({
   },
   warningText: {
     fontSize: 13,
-    color: '#ef4444',
+    color: '#000000',
     fontWeight: '600'
   },
   actionsBox: {
@@ -517,7 +517,7 @@ const styles = StyleSheet.create({
   actionsTitle: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#059669',
+    color: '#0066CC',
     marginBottom: 6
   },
   actionItem: {

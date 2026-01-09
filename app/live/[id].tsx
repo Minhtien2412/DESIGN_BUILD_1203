@@ -91,7 +91,7 @@ export default function LiveStreamWatchScreen() {
   if (isLoading) {
     return (
       <View style={[styles.loadingContainer, { backgroundColor }]}>
-        <ActivityIndicator size="large" color="#EF4444" />
+        <ActivityIndicator size="large" color="#000000" />
         <Text style={[styles.loadingText, { color: textColor }]}>Loading stream...</Text>
       </View>
     );
@@ -100,7 +100,7 @@ export default function LiveStreamWatchScreen() {
   if (error || !stream) {
     return (
       <View style={[styles.errorContainer, { backgroundColor }]}>
-        <Ionicons name="alert-circle-outline" size={64} color="#EF4444" />
+        <Ionicons name="alert-circle-outline" size={64} color="#000000" />
         <Text style={[styles.errorText, { color: textColor }]}>{error || 'Stream not found'}</Text>
         <Pressable style={styles.backButton} onPress={() => router.back()}>
           <Text style={styles.backButtonText}>Go Back</Text>
@@ -215,7 +215,7 @@ export default function LiveStreamWatchScreen() {
             onPress={handleSendComment}
             disabled={!commentText.trim()}
           >
-            <Ionicons name="send" size={20} color={commentText.trim() ? '#EF4444' : '#999'} />
+            <Ionicons name="send" size={20} color={commentText.trim() ? '#000000' : '#999'} />
           </Pressable>
         </View>
       </KeyboardAvoidingView>
@@ -251,7 +251,7 @@ const styles = StyleSheet.create({
     marginTop: 24,
     paddingHorizontal: 24,
     paddingVertical: 12,
-    backgroundColor: '#EF4444',
+    backgroundColor: '#000000',
     borderRadius: 20,
   },
   backButtonText: {
@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
     left: 16,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#EF4444',
+    backgroundColor: '#000000',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 6,

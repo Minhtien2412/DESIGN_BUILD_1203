@@ -421,7 +421,7 @@ export default function ProfileInfoScreen() {
                 <Ionicons 
                   name={validFields.has('name') ? "checkmark-circle" : "person-outline"} 
                   size={20} 
-                  color={errors.name ? "#EF4444" : validFields.has('name') ? "#10B981" : "#6B7280"} 
+                  color={errors.name ? "#000000" : validFields.has('name') ? "#0066CC" : "#6B7280"} 
                   style={styles.inputIcon} 
                 />
                 <TextInput
@@ -450,7 +450,7 @@ export default function ProfileInfoScreen() {
                 <Ionicons 
                   name={validFields.has('email') ? "checkmark-circle" : "mail-outline"} 
                   size={20} 
-                  color={errors.email ? "#EF4444" : validFields.has('email') ? "#10B981" : "#6B7280"} 
+                  color={errors.email ? "#000000" : validFields.has('email') ? "#0066CC" : "#6B7280"} 
                   style={styles.inputIcon} 
                 />
                 <TextInput
@@ -478,7 +478,7 @@ export default function ProfileInfoScreen() {
                 <Ionicons 
                   name={validFields.has('phone') ? "checkmark-circle" : "call-outline"} 
                   size={20} 
-                  color={errors.phone ? "#EF4444" : validFields.has('phone') ? "#10B981" : "#6B7280"} 
+                  color={errors.phone ? "#000000" : validFields.has('phone') ? "#0066CC" : "#6B7280"} 
                   style={styles.inputIcon} 
                 />
                 <TextInput
@@ -608,7 +608,7 @@ export default function ProfileInfoScreen() {
               ]}
             >
               <View style={styles.successCard}>
-                <Ionicons name="checkmark-circle" size={60} color="#10B981" />
+                <Ionicons name="checkmark-circle" size={60} color="#0066CC" />
                 <Text style={styles.successText}>Đã lưu!</Text>
               </View>
             </Animated.View>
@@ -684,7 +684,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   required: {
-    color: '#EF4444',
+    color: '#000000',
   },
   inputWrapper: {
     flexDirection: 'row',
@@ -697,11 +697,11 @@ const styles = StyleSheet.create({
     minHeight: 48,
   },
   inputError: {
-    borderColor: '#EF4444',
+    borderColor: '#000000',
     borderWidth: 2,
   },
   inputValid: {
-    borderColor: '#10B981',
+    borderColor: '#0066CC',
     borderWidth: 2,
   },
   inputIcon: {
@@ -730,7 +730,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 13,
-    color: '#EF4444',
+    color: '#000000',
     marginTop: 6,
   },
   submitButton: {
@@ -786,6 +786,6 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontSize: 24,
     fontWeight: '700',
-    color: '#10B981',
+    color: '#0066CC',
   },
 });

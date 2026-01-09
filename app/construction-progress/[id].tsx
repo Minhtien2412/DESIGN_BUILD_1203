@@ -4,6 +4,7 @@
  */
 
 import { useAuth } from '@/context/AuthContext';
+import { ConstructionProgressService, MOCK_PROJECT as FALLBACK_PROJECT, MOCK_TASKS as FALLBACK_TASKS } from '@/services/constructionProgressService';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -15,6 +16,7 @@ import {
     Dimensions,
     Image,
     Modal,
+    RefreshControl,
     ScrollView,
     StyleSheet,
     Text,
@@ -39,8 +41,8 @@ const { width } = Dimensions.get('window');
 
 // Theme colors
 const COLORS = {
-  primary: '#EE4D2D',
-  primaryDark: '#D73211',
+  primary: '#0066CC',
+  primaryDark: '#004499',
   primaryLight: '#FFF0ED',
   background: '#F5F5F5',
   surface: '#FFFFFF',
@@ -50,176 +52,17 @@ const COLORS = {
   border: '#E8E8E8',
   success: '#00C853',
   successLight: '#E8F5E9',
-  warning: '#FF9800',
-  warningLight: '#FFF3E0',
-  error: '#F44336',
-  errorLight: '#FFEBEE',
-  info: '#2196F3',
-  infoLight: '#E3F2FD',
+  warning: '#0066CC',
+  warningLight: '#E8F4FF',
+  error: '#000000',
+  errorLight: '#F5F5F5',
+  info: '#0066CC',
+  infoLight: '#E8F4FF',
 };
 
-// Mock project data
-const MOCK_PROJECT: ConstructionProject = {
-  id: '1',
-  name: 'Biệt thự Vinhomes Grand Park',
-  description: 'Xây dựng biệt thự 3 tầng phong cách hiện đại với đầy đủ nội thất cao cấp',
-  address: 'Quận 9, TP.HCM',
-  projectType: 'Biệt thự',
-  totalArea: 450,
-  totalFloors: 3,
-  estimatedBudget: 5500000000,
-  status: 'IN_PROGRESS',
-  progressPercent: 65,
-  plannedStartDate: '2024-01-15',
-  plannedEndDate: '2024-12-31',
-  actualStartDate: '2024-01-20',
-  members: [
-    { id: '1', userId: 'u1', userName: 'Nguyễn Văn A', userAvatar: undefined, role: 'MANAGER', assignedAt: '2024-01-15' },
-    { id: '2', userId: 'u2', userName: 'Trần Văn B', userAvatar: undefined, role: 'ENGINEER', assignedAt: '2024-01-15' },
-    { id: '3', userId: 'u3', userName: 'Lê Văn C', userAvatar: undefined, role: 'CONTRACTOR', assignedAt: '2024-01-15' },
-    { id: '4', userId: 'u4', userName: 'Phạm Thị D', userAvatar: undefined, role: 'CLIENT', assignedAt: '2024-01-15' },
-  ],
-  ownerId: 'u4',
-  tasks: [],
-  totalTasks: 24,
-  completedTasks: 15,
-  coverImage: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800',
-  media: [],
-  createdAt: '2024-01-10',
-  updatedAt: '2024-12-20',
-  createdBy: 'u1',
-};
-
-// Mock tasks
-const MOCK_TASKS: ConstructionTask[] = [
-  {
-    id: 't1',
-    projectId: '1',
-    name: 'Móng và nền',
-    description: 'Đổ móng, làm nền tầng trệt',
-    category: 'FOUNDATION',
-    status: 'APPROVED',
-    progressPercent: 100,
-    priority: 'HIGH',
-    plannedStartDate: '2024-01-20',
-    plannedEndDate: '2024-03-15',
-    actualStartDate: '2024-01-22',
-    actualEndDate: '2024-03-10',
-    assignedTo: [
-      { id: 'a1', userId: 'u3', userName: 'Lê Văn C', role: 'CONTRACTOR', assignedAt: '2024-01-15' }
-    ],
-    confirmations: [
-      { id: 'c1', type: 'CONTRACTOR_CONFIRM', status: 'CONFIRMED', userId: 'u3', userName: 'Lê Văn C', userRole: 'CONTRACTOR', confirmedAt: '2024-03-10' },
-      { id: 'c2', type: 'ENGINEER_CHECK', status: 'CONFIRMED', userId: 'u2', userName: 'Trần Văn B', userRole: 'ENGINEER', confirmedAt: '2024-03-12', note: 'Đạt chất lượng' },
-      { id: 'c3', type: 'CLIENT_APPROVE', status: 'CONFIRMED', userId: 'u4', userName: 'Phạm Thị D', userRole: 'CLIENT', confirmedAt: '2024-03-15' },
-    ],
-    media: [],
-    comments: [],
-    statusHistory: [],
-    order: 1,
-    createdAt: '2024-01-15',
-    updatedAt: '2024-03-15',
-  },
-  {
-    id: 't2',
-    projectId: '1',
-    name: 'Khung kết cấu',
-    description: 'Thi công khung bê tông cốt thép 3 tầng',
-    category: 'STRUCTURE',
-    status: 'APPROVED',
-    progressPercent: 100,
-    priority: 'HIGH',
-    plannedStartDate: '2024-03-16',
-    plannedEndDate: '2024-06-30',
-    actualStartDate: '2024-03-16',
-    actualEndDate: '2024-06-25',
-    assignedTo: [
-      { id: 'a2', userId: 'u3', userName: 'Lê Văn C', role: 'CONTRACTOR', assignedAt: '2024-01-15' }
-    ],
-    confirmations: [
-      { id: 'c4', type: 'CONTRACTOR_CONFIRM', status: 'CONFIRMED', userId: 'u3', userName: 'Lê Văn C', userRole: 'CONTRACTOR', confirmedAt: '2024-06-25' },
-      { id: 'c5', type: 'ENGINEER_CHECK', status: 'CONFIRMED', userId: 'u2', userName: 'Trần Văn B', userRole: 'ENGINEER', confirmedAt: '2024-06-27' },
-      { id: 'c6', type: 'CLIENT_APPROVE', status: 'CONFIRMED', userId: 'u4', userName: 'Phạm Thị D', userRole: 'CLIENT', confirmedAt: '2024-06-30' },
-    ],
-    media: [],
-    comments: [],
-    statusHistory: [],
-    order: 2,
-    createdAt: '2024-01-15',
-    updatedAt: '2024-06-30',
-  },
-  {
-    id: 't3',
-    projectId: '1',
-    name: 'Điện nước',
-    description: 'Hệ thống điện, nước toàn nhà',
-    category: 'MEP',
-    status: 'PENDING_CHECK',
-    progressPercent: 100,
-    priority: 'HIGH',
-    plannedStartDate: '2024-07-01',
-    plannedEndDate: '2024-09-30',
-    actualStartDate: '2024-07-05',
-    actualEndDate: '2024-09-28',
-    assignedTo: [
-      { id: 'a3', userId: 'u3', userName: 'Lê Văn C', role: 'CONTRACTOR', assignedAt: '2024-01-15' }
-    ],
-    confirmations: [
-      { id: 'c7', type: 'CONTRACTOR_CONFIRM', status: 'CONFIRMED', userId: 'u3', userName: 'Lê Văn C', userRole: 'CONTRACTOR', confirmedAt: '2024-09-28', note: 'Đã hoàn thành' },
-    ],
-    media: [],
-    comments: [],
-    statusHistory: [],
-    order: 3,
-    createdAt: '2024-01-15',
-    updatedAt: '2024-09-28',
-  },
-  {
-    id: 't4',
-    projectId: '1',
-    name: 'Hoàn thiện nội thất',
-    description: 'Sơn, trần thạch cao, sàn gỗ',
-    category: 'FINISHING',
-    status: 'IN_PROGRESS',
-    progressPercent: 45,
-    priority: 'MEDIUM',
-    plannedStartDate: '2024-10-01',
-    plannedEndDate: '2024-11-30',
-    actualStartDate: '2024-10-05',
-    assignedTo: [
-      { id: 'a4', userId: 'u3', userName: 'Lê Văn C', role: 'CONTRACTOR', assignedAt: '2024-01-15' }
-    ],
-    confirmations: [],
-    media: [],
-    comments: [],
-    statusHistory: [],
-    order: 4,
-    createdAt: '2024-01-15',
-    updatedAt: '2024-12-20',
-  },
-  {
-    id: 't5',
-    projectId: '1',
-    name: 'Sân vườn & cảnh quan',
-    description: 'Thiết kế sân vườn, bể bơi',
-    category: 'LANDSCAPING',
-    status: 'NOT_STARTED',
-    progressPercent: 0,
-    priority: 'LOW',
-    plannedStartDate: '2024-12-01',
-    plannedEndDate: '2024-12-20',
-    assignedTo: [
-      { id: 'a5', userId: 'u3', userName: 'Lê Văn C', role: 'CONTRACTOR', assignedAt: '2024-01-15' }
-    ],
-    confirmations: [],
-    media: [],
-    comments: [],
-    statusHistory: [],
-    order: 5,
-    createdAt: '2024-01-15',
-    updatedAt: '2024-12-20',
-  },
-];
+// Fallback data from service
+const MOCK_PROJECT = FALLBACK_PROJECT;
+const MOCK_TASKS = FALLBACK_TASKS;
 
 export default function ProjectDetailScreen() {
   const router = useRouter();
@@ -230,6 +73,8 @@ export default function ProjectDetailScreen() {
   const [project, setProject] = useState<ConstructionProject | null>(null);
   const [tasks, setTasks] = useState<ConstructionTask[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [dataSource, setDataSource] = useState<'api' | 'mock'>('mock');
   const [selectedTask, setSelectedTask] = useState<ConstructionTask | null>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [confirmNote, setConfirmNote] = useState('');
@@ -248,26 +93,35 @@ export default function ProjectDetailScreen() {
   const myProjectRole: ProgressRole = projectMember?.role || userRole;
 
   // Load project data
-  const loadProject = useCallback(async () => {
+  const loadProject = useCallback(async (isRefresh = false) => {
+    if (!id) return;
+    
     try {
-      setLoading(true);
+      if (isRefresh) setRefreshing(true);
+      else setLoading(true);
       
-      // In production, call API
-      // const response = await progressApi.getProject(id);
-      // setProject(response);
-      
-      // For demo
-      await new Promise(resolve => setTimeout(resolve, 600));
-      setProject(MOCK_PROJECT);
-      setTasks(MOCK_TASKS);
+      // Call API via service
+      const response = await ConstructionProgressService.getProject(id);
+      setProject(response.project);
+      setTasks(response.tasks);
+      setDataSource(response.dataSource);
       
     } catch (error) {
       console.error('Failed to load project:', error);
+      // Use fallback data
+      setProject(MOCK_PROJECT);
+      setTasks(MOCK_TASKS);
+      setDataSource('mock');
       Alert.alert('Lỗi', 'Không thể tải thông tin dự án');
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   }, [id]);
+
+  const onRefresh = useCallback(() => {
+    loadProject(true);
+  }, [loadProject]);
 
   useEffect(() => {
     loadProject();
@@ -350,7 +204,7 @@ export default function ProjectDetailScreen() {
     // Defensive check for status config
     const statusConfig = TASK_STATUS_CONFIG[task.status] || {
       label: task.status || 'Unknown',
-      color: '#9E9E9E',
+      color: '#999999',
       bgColor: '#F5F5F5',
       icon: 'ellipse-outline',
       step: 0,
@@ -497,7 +351,7 @@ export default function ProjectDetailScreen() {
 
   const statusConfig = PROJECT_STATUS_CONFIG[project.status] || {
     label: project.status || 'Unknown',
-    color: '#9E9E9E',
+    color: '#999999',
     bgColor: '#F5F5F5',
     icon: 'ellipse-outline',
     order: 0,
@@ -553,7 +407,21 @@ export default function ProjectDetailScreen() {
         ))}
       </View>
 
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        style={styles.scrollView} 
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        {/* Data Source Indicator */}
+        {dataSource === 'mock' && (
+          <View style={styles.mockBanner}>
+            <Ionicons name="information-circle" size={16} color="#92400E" />
+            <Text style={styles.mockBannerText}>📋 Dữ liệu mẫu</Text>
+          </View>
+        )}
+
         {activeTab === 'overview' && (
           <Animated.View style={{ opacity: fadeAnim }}>
             {/* Progress Overview Card */}
@@ -673,7 +541,7 @@ export default function ProjectDetailScreen() {
               {tasks.map((task, index) => {
                 const statusConfig = TASK_STATUS_CONFIG[task.status] || {
                   label: task.status || 'Unknown',
-                  color: '#9E9E9E',
+                  color: '#999999',
                   bgColor: '#F5F5F5',
                   icon: 'ellipse-outline',
                   step: 0,
@@ -986,6 +854,17 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
+  mockBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FEF3C7',
+    padding: 8,
+    borderRadius: 8,
+    marginHorizontal: 16,
+    marginTop: 12,
+    gap: 8,
+  },
+  mockBannerText: { fontSize: 12, color: '#92400E' },
   
   // Card
   card: {

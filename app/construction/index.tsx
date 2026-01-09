@@ -28,14 +28,23 @@ const COLORS = {
   text: '#0F172A',
   textSecondary: '#64748B',
   textMuted: '#94A3B8',
-  accent: '#EE4D2D',
-  success: '#10B981',
-  warning: '#F59E0B',
+  accent: '#0066CC',
+  success: '#0066CC',
+  warning: '#0066CC',
   border: '#E2E8F0',
 };
 
 // Dịch vụ thi công chính
 const CONSTRUCTION_SERVICES = [
+  {
+    id: 'project-info',
+    label: 'Thông tin công trình',
+    desc: 'Chi tiết dự án, ngân sách',
+    icon: 'information-circle-outline',
+    route: '/construction/project-info',
+    color: '#8B5CF6',
+    badge: 'New',
+  },
   {
     id: 'progress',
     label: 'Tiến độ thi công',
@@ -51,7 +60,7 @@ const CONSTRUCTION_SERVICES = [
     desc: 'Real-time tracking',
     icon: 'location-outline',
     route: '/construction/tracking',
-    color: '#10B981',
+    color: '#0066CC',
   },
   {
     id: 'villa',
@@ -59,7 +68,7 @@ const CONSTRUCTION_SERVICES = [
     desc: 'Villa progress tracking',
     icon: 'home-outline',
     route: '/construction/villa-progress',
-    color: '#8B5CF6',
+    color: '#666666',
   },
   {
     id: 'board',
@@ -67,7 +76,7 @@ const CONSTRUCTION_SERVICES = [
     desc: 'Kanban style board',
     icon: 'grid-outline',
     route: '/construction/progress-board',
-    color: '#F59E0B',
+    color: '#0066CC',
   },
   {
     id: 'concrete',
@@ -75,7 +84,7 @@ const CONSTRUCTION_SERVICES = [
     desc: 'Concrete schedule',
     icon: 'calendar-outline',
     route: '/construction/concrete-schedule-map',
-    color: '#EF4444',
+    color: '#000000',
   },
   {
     id: 'map-view',
@@ -91,7 +100,7 @@ const CONSTRUCTION_SERVICES = [
     desc: 'Payment progress',
     icon: 'card-outline',
     route: '/construction/payment-progress',
-    color: '#EC4899',
+    color: '#666666',
   },
   {
     id: 'booking',
@@ -99,7 +108,7 @@ const CONSTRUCTION_SERVICES = [
     desc: 'Book construction',
     icon: 'calendar-number-outline',
     route: '/construction/booking',
-    color: '#6366F1',
+    color: '#666666',
   },
 ];
 
@@ -117,10 +126,10 @@ const HIRING_SERVICES = [
 
 // Liên kết nhanh
 const QUICK_LINKS = [
-  { id: 'materials', label: 'Vật liệu', icon: 'cube-outline', route: '/materials/index', color: '#8B5CF6' },
+  { id: 'materials', label: 'Vật liệu', icon: 'cube-outline', route: '/materials/index', color: '#666666' },
   { id: 'equipment', label: 'Thiết bị', icon: 'hardware-chip-outline', route: '/equipment/index', color: '#3B82F6' },
-  { id: 'safety', label: 'An toàn', icon: 'shield-checkmark-outline', route: '/safety/index', color: '#EF4444' },
-  { id: 'quality', label: 'QC/QA', icon: 'checkmark-circle-outline', route: '/quality-assurance/index', color: '#10B981' },
+  { id: 'safety', label: 'An toàn', icon: 'shield-checkmark-outline', route: '/safety/index', color: '#000000' },
+  { id: 'quality', label: 'QC/QA', icon: 'checkmark-circle-outline', route: '/quality-assurance/index', color: '#0066CC' },
 ];
 
 export default function ConstructionMenuScreen() {
@@ -162,7 +171,7 @@ export default function ConstructionMenuScreen() {
           activeOpacity={0.9}
         >
           <LinearGradient
-            colors={['#F59E0B', '#F97316']}
+            colors={['#0066CC', '#0066CC']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.heroGradient}
@@ -268,7 +277,7 @@ export default function ConstructionMenuScreen() {
           activeOpacity={0.9}
         >
           <LinearGradient
-            colors={['#EE4D2D', '#FF6B4D']}
+            colors={['#0066CC', '#3399FF']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.ctaGradient}
@@ -339,7 +348,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     ...Platform.select({
       ios: {
-        shadowColor: '#F59E0B',
+        shadowColor: '#0066CC',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.2,
         shadowRadius: 8,
@@ -382,7 +391,7 @@ const styles = StyleSheet.create({
   heroBtnText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#F59E0B',
+    color: '#0066CC',
   },
   quickLinksSection: {
     marginBottom: 24,
@@ -519,7 +528,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     ...Platform.select({
       ios: {
-        shadowColor: '#EE4D2D',
+        shadowColor: '#0066CC',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.2,
         shadowRadius: 8,

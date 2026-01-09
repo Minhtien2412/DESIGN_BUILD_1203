@@ -99,11 +99,11 @@ export default function QCInspectionsScreen() {
         <Ionicons
           name={inspection.overallResult === 'pass' ? 'checkmark-circle' : 'close-circle'}
           size={16}
-          color={inspection.overallResult === 'pass' ? '#10b981' : '#ef4444'}
+          color={inspection.overallResult === 'pass' ? '#0066CC' : '#000000'}
         />
         <Text style={[
           styles.resultText,
-          { color: inspection.overallResult === 'pass' ? '#10b981' : '#ef4444' }
+          { color: inspection.overallResult === 'pass' ? '#0066CC' : '#000000' }
         ]}>
           {inspection.overallResult === 'pass' ? 'Đạt' : 'Không đạt'}
         </Text>
@@ -152,7 +152,7 @@ export default function QCInspectionsScreen() {
           onPress={() => router.push(`/projects/${projectId}/qc/defects`)}
           style={styles.defectsButton}
         >
-          <Ionicons name="warning-outline" size={24} color="#ef4444" />
+          <Ionicons name="warning-outline" size={24} color="#000000" />
         </TouchableOpacity>
       </View>
 
@@ -169,25 +169,25 @@ export default function QCInspectionsScreen() {
               label="Tổng số"
               value={stats.totalInspections.toString()}
               icon="list"
-              gradientColors={['#3b82f6', '#2563eb']}
+              gradientColors={['#3b82f6', '#0066CC']}
             />
             <MetricCard
               label="Hoàn thành"
               value={stats.completedInspections.toString()}
               icon="checkmark-done"
-              gradientColors={['#10b981', '#059669']}
+              gradientColors={['#0066CC', '#0066CC']}
             />
             <MetricCard
               label="Tỷ lệ đạt"
               value={`${stats.passRate}%`}
               icon="trophy"
-              gradientColors={['#f59e0b', '#d97706']}
+              gradientColors={['#0066CC', '#d97706']}
             />
             <MetricCard
               label="Lỗi nghiêm trọng"
               value={stats.criticalDefects.toString()}
               icon="alert-circle"
-              gradientColors={['#ef4444', '#dc2626']}
+              gradientColors={['#000000', '#000000']}
             />
           </ScrollView>
         )}
@@ -202,7 +202,7 @@ export default function QCInspectionsScreen() {
             <Text style={styles.actionButtonText}>Tạo kiểm tra</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.actionButton, { backgroundColor: '#10b981' }]}
+            style={[styles.actionButton, { backgroundColor: '#0066CC' }]}
             onPress={() => router.push(`/projects/${projectId}/qc/templates`)}
           >
             <Ionicons name="document-text" size={20} color="#fff" />
@@ -441,7 +441,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     paddingVertical: 12,
     paddingHorizontal: 24,
-    backgroundColor: '#eff6ff',
+    backgroundColor: '#E8F4FF',
     borderRadius: 24,
   },
   createCTAText: {

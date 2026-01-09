@@ -280,7 +280,7 @@ export default function QuoteRequestScreen() {
             flexDirection: 'row',
             gap: 12
           }}>
-            <Ionicons name="information-circle" size={24} color="#F59E0B" />
+            <Ionicons name="information-circle" size={24} color="#0066CC" />
             <View style={{ flex: 1 }}>
               <Text style={{ fontSize: 13, color: '#92400E', lineHeight: 18 }}>
                 Chúng tôi sẽ liên hệ lại với bạn trong vòng 24 giờ để trao đổi chi tiết và gửi báo giá chính xác.

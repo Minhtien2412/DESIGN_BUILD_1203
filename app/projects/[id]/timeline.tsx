@@ -1,9 +1,18 @@
+/**
+ * Project Timeline Screen
+ * 🔥 UPDATED: Now uses real data from Perfex CRM Tasks
+ */
+
 import Badge from '@/components/ui/badge';
 import { SectionHeader } from '@/components/ui/list-item';
 import { useThemeColor } from '@/hooks/use-theme-color';
+import { PerfexTask, PerfexTasksService } from '@/services/perfexCRM';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Stack, useLocalSearchParams } from 'expo-router';
+import { useCallback, useEffect, useState } from 'react';
 import {
+    ActivityIndicator,
+    RefreshControl,
     ScrollView,
     StyleSheet,
     Text,
@@ -22,7 +31,8 @@ type TimelinePhase = {
   color: string;
 };
 
-const MOCK_TIMELINE: TimelinePhase[] = [
+// Fallback data khi CRM không khả dụng
+const FALLBACK_TIMELINE: TimelinePhase[] = [
   {
     id: '1',
     name: 'Khởi công',
@@ -32,7 +42,7 @@ const MOCK_TIMELINE: TimelinePhase[] = [
     progress: 100,
     tasks: ['Khảo sát mặt bằng', 'Chuẩn bị vật tư', 'Làm móng'],
     icon: 'flag',
-    color: '#10B981',
+    color: '#0066CC',
   },
   {
     id: '2',
@@ -43,7 +53,7 @@ const MOCK_TIMELINE: TimelinePhase[] = [
     progress: 100,
     tasks: ['Đào đất', 'Đổ bê tông móng', 'Kiểm tra chất lượng'],
     icon: 'foundation',
-    color: '#10B981',
+    color: '#0066CC',
   },
   {
     id: '3',
@@ -58,27 +68,79 @@ const MOCK_TIMELINE: TimelinePhase[] = [
   },
   {
     id: '4',
-    name: 'Đổ mái',
-    status: 'pending',
-    startDate: '01/11/2024',
-    endDate: '10/11/2024',
-    progress: 0,
-    tasks: ['Dựng dàn giáo', 'Đổ bê tông sàn mái', 'Hoàn thiện mái'],
-    icon: 'home-roof',
-    color: '#6B7280',
-  },
-  {
-    id: '5',
     name: 'Hoàn thiện',
     status: 'pending',
-    startDate: '11/11/2024',
+    startDate: '01/11/2024',
     endDate: '30/11/2024',
     progress: 0,
-    tasks: ['Lát gạch', 'Sơn tường', 'Lắp đặt điện nước', 'Hoàn thiện nội thất'],
+    tasks: ['Lát gạch', 'Sơn tường', 'Lắp đặt điện nước'],
     icon: 'hammer-wrench',
     color: '#6B7280',
   },
 ];
+
+// Phase configs for grouping tasks
+const PHASE_CONFIG: Record<string, { icon: string; order: number }> = {
+  'khởi công': { icon: 'flag', order: 1 },
+  'móng': { icon: 'foundation', order: 2 },
+  'tường': { icon: 'wall', order: 3 },
+  'mái': { icon: 'home-roof', order: 4 },
+  'điện': { icon: 'flash', order: 5 },
+  'nước': { icon: 'water', order: 6 },
+  'hoàn thiện': { icon: 'hammer-wrench', order: 7 },
+};
+
+// Map Perfex task status to timeline status
+function mapTaskStatus(status: number): 'completed' | 'active' | 'pending' {
+  switch (status) {
+    case 5: return 'completed'; // Complete
+    case 4: return 'active';    // In Progress
+    case 2: return 'active';    // Testing
+    default: return 'pending';
+  }
+}
+
+// Format date from CRM
+function formatDate(dateStr: string): string {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+
+// Convert Perfex tasks to timeline phases
+function convertTasksToTimeline(tasks: PerfexTask[]): TimelinePhase[] {
+  if (!tasks.length) return FALLBACK_TIMELINE;
+  
+  // Group tasks by milestone or just show individual tasks as phases
+  const phases: TimelinePhase[] = tasks.map((task, index) => {
+    // Determine icon based on task name
+    let icon = 'checkbox-outline';
+    const lowerName = task.name.toLowerCase();
+    for (const [keyword, config] of Object.entries(PHASE_CONFIG)) {
+      if (lowerName.includes(keyword)) {
+        icon = config.icon;
+        break;
+      }
+    }
+    
+    const status = mapTaskStatus(task.status);
+    const progress = status === 'completed' ? 100 : status === 'active' ? 50 : 0;
+    
+    return {
+      id: task.id,
+      name: task.name,
+      status,
+      startDate: formatDate(task.startdate),
+      endDate: formatDate(task.duedate),
+      progress,
+      tasks: task.description ? task.description.split('\n').filter(Boolean) : ['Công việc đang thực hiện'],
+      icon,
+      color: status === 'completed' ? '#0066CC' : status === 'active' ? '#3B82F6' : '#6B7280',
+    };
+  });
+  
+  return phases;
+}
 
 const TimelineItem = ({ phase, isLast }: { phase: TimelinePhase; isLast: boolean }) => {
   const surfaceColor = useThemeColor({}, 'surface');
@@ -175,6 +237,8 @@ const TimelineItem = ({ phase, isLast }: { phase: TimelinePhase; isLast: boolean
 
 export default function ProjectTimelineScreen() {
   const params = useLocalSearchParams();
+  const projectId = params.id as string;
+  
   const backgroundColor = useThemeColor({}, 'background');
   const surfaceColor = useThemeColor({}, 'surface');
   const textColor = useThemeColor({}, 'text');
@@ -182,9 +246,55 @@ export default function ProjectTimelineScreen() {
   const borderColor = useThemeColor({}, 'border');
   const infoColor = useThemeColor({}, 'info');
   
-  const completedPhases = MOCK_TIMELINE.filter(p => p.status === 'completed').length;
-  const totalPhases = MOCK_TIMELINE.length;
-  const overallProgress = Math.round((completedPhases / totalPhases) * 100);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [timeline, setTimeline] = useState<TimelinePhase[]>(FALLBACK_TIMELINE);
+  const [dataSource, setDataSource] = useState<'crm' | 'mock'>('mock');
+  
+  // Load tasks from CRM
+  const loadTimeline = useCallback(async () => {
+    try {
+      const response = await PerfexTasksService.getByProject(projectId);
+      
+      if (response.success && response.data) {
+        const phases = convertTasksToTimeline(response.data);
+        setTimeline(phases);
+        setDataSource('crm');
+        console.log(`✅ Loaded ${phases.length} phases from CRM tasks`);
+      } else {
+        throw new Error('CRM không phản hồi');
+      }
+    } catch (error) {
+      console.warn('⚠️ CRM không khả dụng, sử dụng dữ liệu mẫu:', error);
+      setTimeline(FALLBACK_TIMELINE);
+      setDataSource('mock');
+    } finally {
+      setLoading(false);
+    }
+  }, [projectId]);
+  
+  useEffect(() => {
+    loadTimeline();
+  }, [loadTimeline]);
+  
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await loadTimeline();
+    setRefreshing(false);
+  };
+  
+  const completedPhases = timeline.filter(p => p.status === 'completed').length;
+  const totalPhases = timeline.length;
+  const overallProgress = totalPhases > 0 ? Math.round((completedPhases / totalPhases) * 100) : 0;
+
+  if (loading) {
+    return (
+      <View style={[styles.container, styles.loadingContainer, { backgroundColor }]}>
+        <ActivityIndicator size="large" color={infoColor} />
+        <Text style={[styles.loadingText, { color: mutedColor }]}>Đang tải tiến độ...</Text>
+      </View>
+    );
+  }
 
   return (
     <>
@@ -195,7 +305,19 @@ export default function ProjectTimelineScreen() {
         }}
       />
 
-      <ScrollView style={[styles.container, { backgroundColor }]}>
+      <ScrollView 
+        style={[styles.container, { backgroundColor }]}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }
+      >
+        {/* Data Source Indicator */}
+        {dataSource === 'mock' && (
+          <View style={styles.mockIndicator}>
+            <Text style={styles.mockIndicatorText}>📋 Dữ liệu mẫu - CRM không khả dụng</Text>
+          </View>
+        )}
+        
         {/* Summary Card */}
         <View style={[styles.summaryCard, { backgroundColor: surfaceColor }] }>
           <Text style={[styles.summaryTitle, { color: textColor }]}>Tổng quan tiến độ</Text>
@@ -225,11 +347,11 @@ export default function ProjectTimelineScreen() {
         <SectionHeader title="Các giai đoạn" />
         
         <View style={styles.timeline}>
-          {MOCK_TIMELINE.map((phase, index) => (
+          {timeline.map((phase, index) => (
             <TimelineItem
               key={phase.id}
               phase={phase}
-              isLast={index === MOCK_TIMELINE.length - 1}
+              isLast={index === timeline.length - 1}
             />
           ))}
         </View>
@@ -241,6 +363,28 @@ export default function ProjectTimelineScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  loadingContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 14,
+    color: '#6B7280',
+  },
+  mockIndicator: {
+    backgroundColor: '#FEF3C7',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    marginHorizontal: 16,
+    marginTop: 16,
+    borderRadius: 8,
+  },
+  mockIndicatorText: {
+    color: '#92400E',
+    fontSize: 12,
+    textAlign: 'center',
   },
   summaryCard: {
     backgroundColor: '#FFFFFF',

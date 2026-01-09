@@ -37,13 +37,13 @@ const snapToGrid = (value: number, gridSize: number): number => {
 const getStatusColor = (status: Task['status']): string => {
   switch (status) {
     case 'completed':
-      return '#10B981';
+      return '#0066CC';
     case 'in-progress':
       return '#3B82F6';
     case 'pending':
-      return '#F59E0B';
+      return '#0066CC';
     case 'blocked':
-      return '#EF4444';
+      return '#000000';
     default:
       return '#9CA3AF';
   }
@@ -52,11 +52,11 @@ const getStatusColor = (status: Task['status']): string => {
 const getPriorityColor = (priority: Task['priority']): string => {
   switch (priority) {
     case 'high':
-      return '#EF4444';
+      return '#000000';
     case 'medium':
-      return '#F59E0B';
+      return '#0066CC';
     case 'low':
-      return '#10B981';
+      return '#0066CC';
     default:
       return '#9CA3AF';
   }

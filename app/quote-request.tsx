@@ -357,7 +357,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   required: {
-    color: '#ef4444',
+    color: '#000000',
   },
   input: {
     backgroundColor: '#f9fafb',
@@ -391,7 +391,7 @@ const styles = StyleSheet.create({
   },
   infoBox: {
     flexDirection: 'row',
-    backgroundColor: '#eff6ff',
+    backgroundColor: '#E8F4FF',
     padding: 16,
     borderRadius: 12,
     marginHorizontal: 16,

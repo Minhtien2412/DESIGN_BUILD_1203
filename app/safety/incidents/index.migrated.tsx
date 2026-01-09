@@ -258,11 +258,11 @@ function getSeverityColor(severity: IncidentSeverity): string {
     case IncidentSeverity.SERIOUS:
       return '#1A1A1A';
     case IncidentSeverity.MODERATE:
-      return '#FF9800';
+      return '#0066CC';
     case IncidentSeverity.MINOR:
       return '#FDD835';
     default:
-      return '#9E9E9E';
+      return '#999999';
   }
 }
 
@@ -305,13 +305,13 @@ function getStatusColor(status: IncidentStatus): string {
     case IncidentStatus.REPORTED:
       return '#1A1A1A';
     case IncidentStatus.INVESTIGATING:
-      return '#FF9800';
+      return '#0066CC';
     case IncidentStatus.UNDER_REVIEW:
       return '#1A1A1A';
     case IncidentStatus.RESOLVED:
-      return '#4CAF50';
+      return '#0066CC';
     case IncidentStatus.CLOSED:
-      return '#9E9E9E';
+      return '#999999';
     default:
       return '#999';
   }

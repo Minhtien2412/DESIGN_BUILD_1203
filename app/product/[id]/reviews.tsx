@@ -1,12 +1,18 @@
 import { Container } from '@/components/ui/container';
+import { Loader } from '@/components/ui/loader';
 import { RatingStars } from '@/components/ui/rating-stars';
 import { Review, ReviewCard } from '@/components/ui/review-card';
+import ReviewService, {
+    Review as ApiReview,
+    MOCK_REVIEWS as FALLBACK_REVIEWS
+} from '@/services/reviewService';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
     Alert,
     FlatList,
+    RefreshControl,
     ScrollView,
     StyleSheet,
     Text,
@@ -15,42 +21,24 @@ import {
     View,
 } from 'react-native';
 
-// Mock reviews data
-const MOCK_REVIEWS: Review[] = [
-  {
-    id: '1',
-    userId: '1',
-    userName: 'Nguyễn Văn A',
-    userAvatar: 'https://via.placeholder.com/40',
-    rating: 5,
-    comment: 'Sản phẩm chất lượng tốt, giao hàng nhanh. Rất hài lòng!',
-    images: ['https://via.placeholder.com/80'],
-    createdAt: '2025-01-10T10:00:00Z',
-    helpful: 12,
-    verified: true,
-  },
-  {
-    id: '2',
-    userId: '2',
-    userName: 'Trần Thị B',
-    rating: 4,
-    comment: 'Giá hợp lý, đóng gói cẩn thận. Sẽ ủng hộ shop lâu dài.',
-    createdAt: '2025-01-09T15:30:00Z',
-    helpful: 8,
-    verified: true,
-  },
-  {
-    id: '3',
-    userId: '3',
-    userName: 'Lê Văn C',
-    rating: 5,
-    comment: 'Xuất sắc! Đúng mô tả, ship siêu tốc.',
-    images: ['https://via.placeholder.com/80', 'https://via.placeholder.com/80'],
-    createdAt: '2025-01-08T08:00:00Z',
-    helpful: 5,
-    verified: false,
-  },
-];
+// Transform API review to component format
+function transformToComponentReview(item: ApiReview): Review {
+  return {
+    id: item.id,
+    userId: item.productId || 'user',
+    userName: item.userName || 'Người dùng',
+    userAvatar: item.userAvatar,
+    rating: item.rating,
+    comment: item.comment,
+    images: item.images?.map(img => img.url),
+    createdAt: item.createdAt,
+    helpful: item.helpfulCount || 0,
+    verified: item.isVerifiedPurchase || false,
+  };
+}
+
+// Fallback mock data
+const MOCK_REVIEWS: Review[] = FALLBACK_REVIEWS.map(transformToComponentReview);
 
 export default function ReviewsScreen() {
   const router = useRouter();
@@ -63,7 +51,41 @@ export default function ReviewsScreen() {
   const [showWriteReview, setShowWriteReview] = useState(false);
   const [newRating, setNewRating] = useState(5);
   const [newComment, setNewComment] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [dataSource, setDataSource] = useState<'api' | 'mock'>('mock');
 
+  // Fetch reviews from API
+  const fetchReviews = useCallback(async (showLoading = true) => {
+    if (!productId) return;
+    if (showLoading) setLoading(true);
+    try {
+      const result = await ReviewService.getProductReviews(productId);
+      if (result.ok && result.data?.reviews) {
+        setReviews(result.data.reviews.map(transformToComponentReview));
+        setDataSource('api');
+      } else {
+        setReviews(MOCK_REVIEWS);
+        setDataSource('mock');
+      }
+    } catch (error) {
+      console.error('Error fetching product reviews:', error);
+      setReviews(MOCK_REVIEWS);
+      setDataSource('mock');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, [productId]);
+
+  useEffect(() => {
+    fetchReviews();
+  }, [fetchReviews]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchReviews(false);
+  }, [fetchReviews]);
   // Calculate stats
   const avgRating = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
   const ratingDistribution = [5, 4, 3, 2, 1].map(rating => ({
@@ -79,28 +101,44 @@ export default function ReviewsScreen() {
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
 
-  const handleSubmitReview = () => {
+  const handleSubmitReview = async () => {
     if (!newComment.trim()) {
       Alert.alert('Lỗi', 'Vui lòng nhập nội dung đánh giá');
       return;
     }
 
-    const review: Review = {
-      id: Date.now().toString(),
-      userId: 'current-user',
-      userName: 'Bạn',
-      rating: newRating,
-      comment: newComment,
-      createdAt: new Date().toISOString(),
-      helpful: 0,
-      verified: true,
-    };
+    try {
+      const result = await ReviewService.createReview({
+        productId,
+        rating: newRating,
+        comment: newComment,
+      });
 
-    setReviews([review, ...reviews]);
-    setNewComment('');
-    setNewRating(5);
-    setShowWriteReview(false);
-    Alert.alert('Thành công', 'Đánh giá của bạn đã được gửi!');
+      if (result.ok && result.data) {
+        const newReview = transformToComponentReview(result.data);
+        setReviews([newReview, ...reviews]);
+      } else {
+        // Fallback: add locally
+        const review: Review = {
+          id: Date.now().toString(),
+          userId: 'current-user',
+          userName: 'Bạn',
+          rating: newRating,
+          comment: newComment,
+          createdAt: new Date().toISOString(),
+          helpful: 0,
+          verified: true,
+        };
+        setReviews([review, ...reviews]);
+      }
+      
+      setNewComment('');
+      setNewRating(5);
+      setShowWriteReview(false);
+      Alert.alert('Thành công', 'Đánh giá của bạn đã được gửi!');
+    } catch (error) {
+      Alert.alert('Lỗi', 'Không thể gửi đánh giá. Vui lòng thử lại.');
+    }
   };
 
   const renderWriteReview = () => (
@@ -152,12 +190,26 @@ export default function ReviewsScreen() {
         <View style={{ width: 40 }} />
       </View>
 
+      {loading ? (
+        <Loader text="Đang tải đánh giá..." />
+      ) : (
       <FlatList
         data={filteredReviews}
         renderItem={({ item }) => <ReviewCard review={item} />}
         keyExtractor={item => item.id}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
         ListHeaderComponent={
           <View>
+            {/* Data Source Indicator */}
+            {dataSource === 'mock' && (
+              <View style={styles.mockBanner}>
+                <Ionicons name="information-circle" size={16} color="#92400E" />
+                <Text style={styles.mockBannerText}>📋 Dữ liệu mẫu</Text>
+              </View>
+            )}
+
             {/* Rating Summary */}
             <View style={styles.summary}>
               <View style={styles.summaryLeft}>
@@ -232,7 +284,7 @@ export default function ReviewsScreen() {
                 style={styles.writeBtn}
                 onPress={() => setShowWriteReview(true)}
               >
-                <Ionicons name="create-outline" size={20} color="#FF6B35" />
+                <Ionicons name="create-outline" size={20} color="#0066CC" />
                 <Text style={styles.writeBtnText}>Viết đánh giá của bạn</Text>
               </TouchableOpacity>
             )}
@@ -257,6 +309,7 @@ export default function ReviewsScreen() {
         }
         showsVerticalScrollIndicator={false}
       />
+      )}
     </Container>
   );
 }
@@ -264,7 +317,7 @@ export default function ReviewsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#0066CC',
   },
   header: {
     flexDirection: 'row',
@@ -353,7 +406,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   filterChipActive: {
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#0066CC',
   },
   filterChipText: {
     fontSize: 13,
@@ -376,7 +429,7 @@ const styles = StyleSheet.create({
   writeBtnText: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#FF6B35',
+    color: '#0066CC',
   },
   writeReview: {
     backgroundColor: '#fff',
@@ -432,7 +485,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 12,
     borderRadius: 8,
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#0066CC',
     alignItems: 'center',
   },
   submitBtnText: {
@@ -457,6 +510,6 @@ const styles = StyleSheet.create({
   },
   sortText: {
     fontSize: 13,
-    color: '#FF6B35',
+    color: '#0066CC',
   },
 });

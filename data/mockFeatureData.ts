@@ -327,33 +327,33 @@ export const MOCK_ANALYTICS_SUMMARY: MockAnalyticsSummary = {
 };
 
 export const MOCK_ANALYTICS_REVENUE_BY_MONTH: MockAnalyticsChart[] = [
-  { label: 'T1', value: 1500000000, color: '#4CAF50' },
-  { label: 'T2', value: 1800000000, color: '#4CAF50' },
-  { label: 'T3', value: 2100000000, color: '#4CAF50' },
-  { label: 'T4', value: 1900000000, color: '#4CAF50' },
-  { label: 'T5', value: 2300000000, color: '#4CAF50' },
-  { label: 'T6', value: 2500000000, color: '#4CAF50' },
-  { label: 'T7', value: 2200000000, color: '#4CAF50' },
-  { label: 'T8', value: 2400000000, color: '#4CAF50' },
-  { label: 'T9', value: 2100000000, color: '#4CAF50' },
-  { label: 'T10', value: 2300000000, color: '#4CAF50' },
-  { label: 'T11', value: 2000000000, color: '#4CAF50' },
-  { label: 'T12', value: 1900000000, color: '#4CAF50' },
+  { label: 'T1', value: 1500000000, color: '#0066CC' },
+  { label: 'T2', value: 1800000000, color: '#0066CC' },
+  { label: 'T3', value: 2100000000, color: '#0066CC' },
+  { label: 'T4', value: 1900000000, color: '#0066CC' },
+  { label: 'T5', value: 2300000000, color: '#0066CC' },
+  { label: 'T6', value: 2500000000, color: '#0066CC' },
+  { label: 'T7', value: 2200000000, color: '#0066CC' },
+  { label: 'T8', value: 2400000000, color: '#0066CC' },
+  { label: 'T9', value: 2100000000, color: '#0066CC' },
+  { label: 'T10', value: 2300000000, color: '#0066CC' },
+  { label: 'T11', value: 2000000000, color: '#0066CC' },
+  { label: 'T12', value: 1900000000, color: '#0066CC' },
 ];
 
 export const MOCK_ANALYTICS_PROJECT_STATUS: MockAnalyticsChart[] = [
-  { label: 'Đang thực hiện', value: 8, percentage: 53.3, color: '#2196F3' },
-  { label: 'Hoàn thành', value: 5, percentage: 33.3, color: '#4CAF50' },
-  { label: 'Tạm dừng', value: 1, percentage: 6.7, color: '#FFC107' },
+  { label: 'Đang thực hiện', value: 8, percentage: 53.3, color: '#0066CC' },
+  { label: 'Hoàn thành', value: 5, percentage: 33.3, color: '#0066CC' },
+  { label: 'Tạm dừng', value: 1, percentage: 6.7, color: '#0066CC' },
   { label: 'Hủy bỏ', value: 1, percentage: 6.7, color: '#F44336' },
 ];
 
 export const MOCK_ANALYTICS_EXPENSE_BY_CATEGORY: MockAnalyticsChart[] = [
   { label: 'Vật liệu', value: 8000000000, percentage: 43.2, color: '#FF5722' },
-  { label: 'Nhân công', value: 5500000000, percentage: 29.7, color: '#2196F3' },
-  { label: 'Thiết bị', value: 3000000000, percentage: 16.2, color: '#4CAF50' },
+  { label: 'Nhân công', value: 5500000000, percentage: 29.7, color: '#0066CC' },
+  { label: 'Thiết bị', value: 3000000000, percentage: 16.2, color: '#0066CC' },
   { label: 'Quản lý', value: 1200000000, percentage: 6.5, color: '#9C27B0' },
-  { label: 'Khác', value: 800000000, percentage: 4.4, color: '#607D8B' },
+  { label: 'Khác', value: 800000000, percentage: 4.4, color: '#666666' },
 ];
 
 // === HELPER FUNCTIONS ===
@@ -388,10 +388,10 @@ export function getDocumentIcon(type: string): string {
 
 export function getContractStatusColor(status: string): string {
   const colors: Record<string, string> = {
-    draft: '#9E9E9E',
-    pending_approval: '#FFC107',
-    active: '#4CAF50',
-    completed: '#2196F3',
+    draft: '#999999',
+    pending_approval: '#0066CC',
+    active: '#0066CC',
+    completed: '#0066CC',
     terminated: '#F44336',
     expired: '#FF5722',
   };

@@ -113,7 +113,7 @@ export default function ClientDashboardEnhanced() {
     >
       {error && (
         <View style={styles.errorBanner}>
-          <Ionicons name="alert-circle" size={20} color="#F59E0B" />
+          <Ionicons name="alert-circle" size={20} color="#0066CC" />
           <Text style={styles.errorText}>Server không khả dụng - Dùng dữ liệu demo</Text>
         </View>
       )}
@@ -139,7 +139,7 @@ export default function ClientDashboardEnhanced() {
             title="Dự án"
             value={data.projects.active}
             icon="briefcase"
-            gradientColors={['#3B82F6', '#2563EB']}
+            gradientColors={['#3B82F6', '#0066CC']}
             trend={{ value: `${data.projects.planning} đang lên kế hoạch`, isPositive: true }}
             subtitle="Đang thực hiện"
           />
@@ -147,7 +147,7 @@ export default function ClientDashboardEnhanced() {
             title="Tiến độ"
             value={`${Math.round((data.milestones.completed / data.milestones.total) * 100)}%`}
             icon="trending-up"
-            gradientColors={['#10B981', '#059669']}
+            gradientColors={['#0066CC', '#0066CC']}
             trend={{ value: `${data.milestones.completed}/${data.milestones.total}`, isPositive: true }}
             subtitle="Milestone"
           />
@@ -157,7 +157,7 @@ export default function ClientDashboardEnhanced() {
             title="Đã thanh toán"
             value={`${(data.payments.paid / 1000000000).toFixed(1)}B`}
             icon="checkmark-circle"
-            gradientColors={['#8B5CF6', '#7C3AED']}
+            gradientColors={['#666666', '#666666']}
             trend={{ value: `${Math.round((data.payments.paid / data.payments.total) * 100)}%`, isPositive: true }}
             subtitle="VNĐ"
           />
@@ -165,7 +165,7 @@ export default function ClientDashboardEnhanced() {
             title="Còn lại"
             value={`${(data.payments.pending / 1000000000).toFixed(1)}B`}
             icon="hourglass"
-            gradientColors={['#F59E0B', '#D97706']}
+            gradientColors={['#0066CC', '#D97706']}
             trend={{ value: 'Theo kế hoạch', isPositive: true }}
             subtitle="VNĐ"
           />
@@ -185,19 +185,19 @@ export default function ClientDashboardEnhanced() {
           <QuickAction
             icon="card"
             label="Thanh toán"
-            color="#10B981"
+            color="#0066CC"
             onPress={() => console.log('Payment')}
           />
           <QuickAction
             icon="calendar"
             label="Lịch hẹn"
-            color="#8B5CF6"
+            color="#666666"
             onPress={() => console.log('Schedule')}
           />
           <QuickAction
             icon="help-circle"
             label="Hỗ trợ"
-            color="#F59E0B"
+            color="#0066CC"
             badge={data.support.tickets}
             onPress={() => console.log('Support')}
           />
@@ -209,7 +209,7 @@ export default function ClientDashboardEnhanced() {
         <SimpleChart
           data={progressData}
           title="Tiến độ dự án theo tháng"
-          color="#10B981"
+          color="#0066CC"
         />
       </View>
 
@@ -282,7 +282,7 @@ export default function ClientDashboardEnhanced() {
                 <Ionicons
                   name={payment.status === 'paid' ? 'checkmark-circle' : 'time'}
                   size={20}
-                  color={payment.status === 'paid' ? '#10B981' : '#F59E0B'}
+                  color={payment.status === 'paid' ? '#0066CC' : '#0066CC'}
                 />
               </View>
               <View style={styles.paymentContent}>
@@ -359,7 +359,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 4,
     right: 4,
-    backgroundColor: '#EF4444',
+    backgroundColor: '#000000',
     borderRadius: 10,
     minWidth: 20,
     height: 20,
@@ -445,7 +445,7 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#10B981',
+    backgroundColor: '#0066CC',
     borderRadius: 3,
   },
   progressText: {

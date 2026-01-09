@@ -69,7 +69,7 @@ export function NotificationItem({
       }}
       rightAction={{
         label: '🗑️ Delete',
-        color: '#EF4444',
+        color: '#000000',
         onPress: () => onDelete?.(id),
       }}
       style={{ marginBottom: 8 }}

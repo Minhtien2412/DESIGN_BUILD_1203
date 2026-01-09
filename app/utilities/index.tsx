@@ -29,7 +29,7 @@ const COLORS = {
   text: '#0F172A',
   textSecondary: '#64748B',
   textMuted: '#94A3B8',
-  accent: '#EE4D2D', // Shopee Orange
+  accent: '#0066CC', // Shopee Orange
   border: '#E2E8F0',
 };
 
@@ -48,7 +48,7 @@ const MANAGEMENT_TOOLS = [
     label: 'Ngân sách',
     icon: 'wallet-outline',
     route: '/budget/index',
-    color: '#10B981',
+    color: '#0066CC',
     desc: 'Quản lý chi phí',
   },
   {
@@ -56,7 +56,7 @@ const MANAGEMENT_TOOLS = [
     label: 'QC/QA',
     icon: 'checkmark-circle-outline',
     route: '/quality-assurance/index',
-    color: '#8B5CF6',
+    color: '#666666',
     desc: 'Kiểm soát chất lượng',
   },
   {
@@ -64,7 +64,7 @@ const MANAGEMENT_TOOLS = [
     label: 'An toàn',
     icon: 'shield-checkmark-outline',
     route: '/safety/index',
-    color: '#EF4444',
+    color: '#000000',
     desc: 'An toàn lao động',
   },
   {
@@ -72,7 +72,7 @@ const MANAGEMENT_TOOLS = [
     label: 'Tài liệu',
     icon: 'document-outline',
     route: '/documents/folders',
-    color: '#F59E0B',
+    color: '#0066CC',
     desc: 'Quản lý văn bản',
   },
   {
@@ -88,7 +88,7 @@ const MANAGEMENT_TOOLS = [
     label: 'Nhân công',
     icon: 'people-outline',
     route: '/labor/index',
-    color: '#EC4899',
+    color: '#666666',
     desc: 'Quản lý nhân sự',
   },
   {
@@ -96,7 +96,7 @@ const MANAGEMENT_TOOLS = [
     label: 'Sitemap',
     icon: 'map-outline',
     route: '/utilities/sitemap',
-    color: '#6366F1',
+    color: '#666666',
     desc: 'Bản đồ tính năng',
   },
 ];
@@ -116,13 +116,13 @@ const CONSTRUCTION_SERVICES = [
 // Tiện ích khác
 const OTHER_UTILITIES = [
   { id: 'qr-scanner', label: 'Quét QR', icon: 'qr-code-outline', route: '/utilities/qr-scanner', color: '#3B82F6' },
-  { id: 'my-qr', label: 'QR của tôi', icon: 'qr-code', route: '/utilities/my-qr-code', color: '#8B5CF6' },
-  { id: 'schedule', label: 'Lịch công việc', icon: 'calendar-outline', route: '/utilities/schedule', color: '#10B981' },
-  { id: 'history', label: 'Lịch sử', icon: 'time-outline', route: '/utilities/history', color: '#F59E0B' },
-  { id: 'quote', label: 'Báo giá', icon: 'calculator-outline', route: '/utilities/quote-request', color: '#EF4444' },
+  { id: 'my-qr', label: 'QR của tôi', icon: 'qr-code', route: '/utilities/my-qr-code', color: '#666666' },
+  { id: 'schedule', label: 'Lịch công việc', icon: 'calendar-outline', route: '/utilities/schedule', color: '#0066CC' },
+  { id: 'history', label: 'Lịch sử', icon: 'time-outline', route: '/utilities/history', color: '#0066CC' },
+  { id: 'quote', label: 'Báo giá', icon: 'calculator-outline', route: '/utilities/quote-request', color: '#000000' },
   { id: 'cost', label: 'Ước lượng', icon: 'trending-up-outline', route: '/utilities/cost-estimator', color: '#06B6D4' },
-  { id: 'store', label: 'Cửa hàng', icon: 'storefront-outline', route: '/utilities/store-locator', color: '#EC4899' },
-  { id: 'api', label: 'API Test', icon: 'code-slash-outline', route: '/utilities/api-diagnostics', color: '#6366F1' },
+  { id: 'store', label: 'Cửa hàng', icon: 'storefront-outline', route: '/utilities/store-locator', color: '#666666' },
+  { id: 'api', label: 'API Test', icon: 'code-slash-outline', route: '/utilities/api-diagnostics', color: '#666666' },
 ];
 
 export default function UtilitiesHubScreen() {
@@ -255,7 +255,7 @@ export default function UtilitiesHubScreen() {
           onPress={() => router.push('/utilities/sitemap' as any)}
         >
           <LinearGradient
-            colors={['#EE4D2D', '#FF6B4D']}
+            colors={['#0066CC', '#3399FF']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.sitemapGradient}
@@ -448,7 +448,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     ...Platform.select({
       ios: {
-        shadowColor: '#EE4D2D',
+        shadowColor: '#0066CC',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.2,
         shadowRadius: 8,

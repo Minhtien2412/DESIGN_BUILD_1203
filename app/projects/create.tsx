@@ -472,7 +472,7 @@ const styles = StyleSheet.create({
   },
   infoBox: {
     flexDirection: 'row',
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
     borderRadius: 8,
     padding: 12,
     gap: 8,

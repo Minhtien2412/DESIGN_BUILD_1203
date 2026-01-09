@@ -53,7 +53,7 @@ export default function TrainingSessionsScreen() {
         showBackButton
         headerRight={
           <TouchableOpacity onPress={() => setModalVisible(true)}>
-            <Ionicons name="add-circle" size={28} color="#2196F3" />
+            <Ionicons name="add-circle" size={28} color="#0066CC" />
           </TouchableOpacity>
         }
         scrollable={false}
@@ -232,7 +232,7 @@ function SessionCard({ session }: SessionCardProps) {
                   {
                     width: `${attendancePercentage}%`,
                     backgroundColor:
-                      attendancePercentage >= 80 ? '#4CAF50' : attendancePercentage >= 50 ? '#FF9800' : '#F44336',
+                      attendancePercentage >= 80 ? '#0066CC' : attendancePercentage >= 50 ? '#0066CC' : '#000000',
                   },
                 ]}
               />
@@ -243,7 +243,7 @@ function SessionCard({ session }: SessionCardProps) {
         {/* Actual Duration (if completed) */}
         {session.status === TrainingStatus.COMPLETED && session.actualDuration && (
           <View style={styles.completionInfo}>
-            <Ionicons name="checkmark-circle" size={14} color="#4CAF50" />
+            <Ionicons name="checkmark-circle" size={14} color="#0066CC" />
             <Text style={styles.completionText}>
               Hoàn thành • {session.actualDuration} phút
             </Text>
@@ -414,11 +414,11 @@ function CreateSessionModal({ visible, projectId, onClose, onCreate }: CreateSes
 function getStatusColor(status: TrainingStatus): string {
   switch (status) {
     case TrainingStatus.SCHEDULED:
-      return '#2196F3';
+      return '#0066CC';
     case TrainingStatus.IN_PROGRESS:
-      return '#FF9800';
+      return '#0066CC';
     case TrainingStatus.COMPLETED:
-      return '#4CAF50';
+      return '#0066CC';
     case TrainingStatus.CANCELLED:
       return '#666';
     default:
@@ -459,7 +459,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   filterTabActive: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
   },
   filterTabText: {
     fontSize: 12,
@@ -488,12 +488,12 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 8,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     justifyContent: 'center',
     alignItems: 'center',
   },
   dateBadgePast: {
-    backgroundColor: '#9E9E9E',
+    backgroundColor: '#999999',
   },
   dateDay: {
     fontSize: 20,
@@ -522,7 +522,7 @@ const styles = StyleSheet.create({
   },
   programRef: {
     fontSize: 12,
-    color: '#2196F3',
+    color: '#0066CC',
     marginBottom: 8,
   },
   sessionInfo: {
@@ -593,7 +593,7 @@ const styles = StyleSheet.create({
   },
   completionText: {
     fontSize: 12,
-    color: '#4CAF50',
+    color: '#0066CC',
     fontWeight: '500',
   },
 
@@ -669,7 +669,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 14,
     borderRadius: 8,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     alignItems: 'center',
   },
   createButtonText: {

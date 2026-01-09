@@ -18,26 +18,26 @@ const STATUS_CONFIG: Record<
 > = {
   PENDING: {
     label: 'Chờ duyệt',
-    color: '#FF9800',
-    bgColor: '#FFF3E0',
+    color: '#0066CC',
+    bgColor: '#E8F4FF',
     icon: 'time',
   },
   APPROVED: {
     label: 'Đã duyệt',
-    color: '#4CAF50',
+    color: '#0066CC',
     bgColor: '#E8F5E9',
     icon: 'checkmark-circle',
   },
   REJECTED: {
     label: 'Từ chối',
-    color: '#F44336',
-    bgColor: '#FFEBEE',
+    color: '#000000',
+    bgColor: '#F5F5F5',
     icon: 'close-circle',
   },
   PAID: {
     label: 'Đã thanh toán',
-    color: '#2196F3',
-    bgColor: '#E3F2FD',
+    color: '#0066CC',
+    bgColor: '#E8F4FF',
     icon: 'cash',
   },
 };
@@ -231,7 +231,7 @@ export default function ExpensesScreen() {
       {/* Info Card for Pending Expenses */}
       {filterStatus === 'PENDING' && statusCounts.PENDING > 0 && (
         <View style={styles.infoCard}>
-          <Ionicons name="information-circle" size={18} color="#FF9800" />
+          <Ionicons name="information-circle" size={18} color="#0066CC" />
           <Text style={styles.infoText}>
             Có {statusCounts.PENDING} chi tiêu đang chờ duyệt. Vui lòng xem xét và
             phê duyệt hoặc từ chối.
@@ -337,7 +337,7 @@ export default function ExpensesScreen() {
                 {/* Receipt */}
                 {expense.receiptUrl && (
                   <TouchableOpacity style={styles.receiptButton}>
-                    <Ionicons name="document-attach" size={16} color="#2196F3" />
+                    <Ionicons name="document-attach" size={16} color="#0066CC" />
                     <Text style={styles.receiptText}>Xem hóa đơn đính kèm</Text>
                   </TouchableOpacity>
                 )}
@@ -345,7 +345,7 @@ export default function ExpensesScreen() {
                 {/* Rejection Reason */}
                 {expense.status === 'REJECTED' && expense.rejectionReason && (
                   <View style={styles.rejectionBox}>
-                    <Ionicons name="alert-circle" size={14} color="#F44336" />
+                    <Ionicons name="alert-circle" size={14} color="#000000" />
                     <Text style={styles.rejectionText}>
                       Lý do từ chối: {expense.rejectionReason}
                     </Text>
@@ -389,7 +389,7 @@ export default function ExpensesScreen() {
                     style={[styles.actionButton, styles.deleteButton]}
                     onPress={() => handleDelete(expense.id, expense.description)}
                   >
-                    <Ionicons name="trash-outline" size={16} color="#F44336" />
+                    <Ionicons name="trash-outline" size={16} color="#000000" />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -440,21 +440,21 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   filterChipActive: {
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
   },
   filterText: {
     fontSize: 13,
     color: '#666',
   },
   filterTextActive: {
-    color: '#2196F3',
+    color: '#0066CC',
     fontWeight: '600',
   },
   infoCard: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: '#FFF3E0',
+    backgroundColor: '#E8F4FF',
     padding: 12,
     margin: 12,
     marginBottom: 0,
@@ -463,7 +463,7 @@ const styles = StyleSheet.create({
   infoText: {
     flex: 1,
     fontSize: 12,
-    color: '#E65100',
+    color: '#004499',
   },
   scrollView: {
     flex: 1,
@@ -483,7 +483,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     paddingHorizontal: 20,
     paddingVertical: 10,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     borderRadius: 8,
   },
   emptyButtonText: {
@@ -550,7 +550,7 @@ const styles = StyleSheet.create({
   amountText: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#F44336',
+    color: '#000000',
   },
   detailText: {
     fontSize: 13,
@@ -564,14 +564,14 @@ const styles = StyleSheet.create({
   },
   receiptText: {
     fontSize: 13,
-    color: '#2196F3',
+    color: '#0066CC',
     fontWeight: '500',
   },
   rejectionBox: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 6,
-    backgroundColor: '#FFEBEE',
+    backgroundColor: '#F5F5F5',
     padding: 8,
     borderRadius: 6,
   },
@@ -603,19 +603,19 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   approveButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#0066CC',
     flex: 1,
     justifyContent: 'center',
   },
   rejectButton: {
-    backgroundColor: '#F44336',
+    backgroundColor: '#000000',
     flex: 1,
     justifyContent: 'center',
   },
   deleteButton: {
     backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#F44336',
+    borderColor: '#000000',
     paddingHorizontal: 10,
   },
   actionButtonText: {
@@ -630,7 +630,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 4,

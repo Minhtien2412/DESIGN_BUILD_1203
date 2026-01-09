@@ -58,8 +58,8 @@ const CANVAS_HEIGHT = 2000;
 
 // Theme colors - Shopee style
 const COLORS = {
-  primary: '#EE4D2D',
-  primaryLight: '#FF6B4D',
+  primary: '#0066CC',
+  primaryLight: '#3399FF',
   background: '#F5F5F5',
   surface: '#FFFFFF',
   text: '#222222',
@@ -67,11 +67,11 @@ const COLORS = {
   textMuted: '#999999',
   border: '#E0E0E0',
   success: '#14B159',
-  warning: '#FF9800',
+  warning: '#0066CC',
   error: '#E82A34',
-  progressLayer: '#2196F3',
-  contentLayer: '#FF9800',
-  todosLayer: '#4CAF50',
+  progressLayer: '#0066CC',
+  contentLayer: '#0066CC',
+  todosLayer: '#0066CC',
 };
 
 // Layer heights
@@ -358,12 +358,12 @@ export default function ConstructionProgressMindmapScreen() {
 
       // Mock connections
       const mockConnections: NodeConnection[] = [
-        { id: 'c1', projectId: id || '1', fromNodeId: 'start', toNodeId: 'phase1', type: 'SEQUENCE', style: 'SOLID', color: '#2196F3', createdBy: 'u1', createdAt: '2024-01-15' },
-        { id: 'c2', projectId: id || '1', fromNodeId: 'phase1', toNodeId: 'phase2', type: 'SEQUENCE', style: 'SOLID', color: '#2196F3', createdBy: 'u1', createdAt: '2024-01-15' },
-        { id: 'c3', projectId: id || '1', fromNodeId: 'phase2', toNodeId: 'phase3', type: 'SEQUENCE', style: 'SOLID', color: '#2196F3', createdBy: 'u1', createdAt: '2024-01-15' },
-        { id: 'c4', projectId: id || '1', fromNodeId: 'phase3', toNodeId: 'end', type: 'SEQUENCE', style: 'SOLID', color: '#2196F3', createdBy: 'u1', createdAt: '2024-01-15' },
-        { id: 'c5', projectId: id || '1', fromNodeId: 'task1-1', toNodeId: 'task1-2', type: 'SEQUENCE', style: 'SOLID', color: '#2196F3', createdBy: 'u1', createdAt: '2024-01-15' },
-        { id: 'c6', projectId: id || '1', fromNodeId: 'task2-1', toNodeId: 'task2-2', type: 'SEQUENCE', style: 'SOLID', color: '#2196F3', createdBy: 'u1', createdAt: '2024-01-15' },
+        { id: 'c1', projectId: id || '1', fromNodeId: 'start', toNodeId: 'phase1', type: 'SEQUENCE', style: 'SOLID', color: '#0066CC', createdBy: 'u1', createdAt: '2024-01-15' },
+        { id: 'c2', projectId: id || '1', fromNodeId: 'phase1', toNodeId: 'phase2', type: 'SEQUENCE', style: 'SOLID', color: '#0066CC', createdBy: 'u1', createdAt: '2024-01-15' },
+        { id: 'c3', projectId: id || '1', fromNodeId: 'phase2', toNodeId: 'phase3', type: 'SEQUENCE', style: 'SOLID', color: '#0066CC', createdBy: 'u1', createdAt: '2024-01-15' },
+        { id: 'c4', projectId: id || '1', fromNodeId: 'phase3', toNodeId: 'end', type: 'SEQUENCE', style: 'SOLID', color: '#0066CC', createdBy: 'u1', createdAt: '2024-01-15' },
+        { id: 'c5', projectId: id || '1', fromNodeId: 'task1-1', toNodeId: 'task1-2', type: 'SEQUENCE', style: 'SOLID', color: '#0066CC', createdBy: 'u1', createdAt: '2024-01-15' },
+        { id: 'c6', projectId: id || '1', fromNodeId: 'task2-1', toNodeId: 'task2-2', type: 'SEQUENCE', style: 'SOLID', color: '#0066CC', createdBy: 'u1', createdAt: '2024-01-15' },
       ];
 
       // Mock todos
@@ -552,7 +552,7 @@ export default function ConstructionProgressMindmapScreen() {
       toNodeId,
       type: 'SEQUENCE',
       style: 'SOLID',
-      color: '#2196F3',
+      color: '#0066CC',
       createdBy: user?.id || 'unknown',
       createdAt: new Date().toISOString(),
     };

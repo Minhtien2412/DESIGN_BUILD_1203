@@ -2,20 +2,23 @@
  * Construction Site Map View
  * Hiển thị vị trí công trình và người dùng trên bản đồ
  * Note: Map only works on iOS/Android, not on web
+ * UPDATED: Lấy dữ liệu thật từ Perfex CRM API
  */
 
 import { Colors } from '@/constants/theme';
+import { customersAPI, projectsAPI } from '@/services/perfexAPI';
+import type { Customer, Project } from '@/types/perfex';
 import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
 import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
     ActivityIndicator,
     Platform,
     StyleSheet,
     Text,
     TouchableOpacity,
-    View,
+    View
 } from 'react-native';
 
 // Conditionally import react-native-maps only on native platforms
@@ -38,49 +41,29 @@ if (Platform.OS !== 'web') {
   }
 }
 
-// Mock data - Thay bằng data thật từ API
-const CONSTRUCTION_SITES = [
-  {
-    id: 1,
-    name: 'Dự án Vinhomes Grand Park',
-    address: 'Quận 9, TP.HCM',
-    latitude: 10.8231,
-    longitude: 106.7197,
-    status: 'Đang thi công',
-    progress: 75,
-    type: 'Biệt thự',
-  },
-  {
-    id: 2,
-    name: 'Nhà phố Thảo Điền',
-    address: 'Quận 2, TP.HCM',
-    latitude: 10.8076,
-    longitude: 106.7441,
-    status: 'Hoàn thiện',
-    progress: 95,
-    type: 'Nhà phố',
-  },
-  {
-    id: 3,
-    name: 'Cao ốc An Phú',
-    address: 'Quận 2, TP.HCM',
-    latitude: 10.8019,
-    longitude: 106.7378,
-    status: 'Đang thi công',
-    progress: 60,
-    type: 'Chung cư',
-  },
-  {
-    id: 4,
-    name: 'Villa Landmark 81',
-    address: 'Bình Thạnh, TP.HCM',
-    latitude: 10.7944,
-    longitude: 106.7219,
-    status: 'Khởi công',
-    progress: 30,
-    type: 'Villa',
-  },
-];
+// Interface cho construction site hiển thị trên bản đồ
+interface ConstructionSite {
+  id: string;
+  name: string;
+  address: string;
+  latitude: number;
+  longitude: number;
+  status: string;
+  progress: number;
+  type: string;
+  clientName?: string;
+  startDate?: string;
+  deadline?: string;
+}
+
+// Project status mapping
+const PROJECT_STATUS: Record<string, string> = {
+  '1': 'Chưa bắt đầu',
+  '2': 'Đang thi công',
+  '3': 'Tạm dừng',
+  '4': 'Hoàn thành',
+  '5': 'Hủy bỏ',
+};
 
 export default function MapViewScreen() {
   const [userLocation, setUserLocation] = useState<{
@@ -88,43 +71,179 @@ export default function MapViewScreen() {
     longitude: number;
   } | null>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedSite, setSelectedSite] = useState<typeof CONSTRUCTION_SITES[0] | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const [constructionSites, setConstructionSites] = useState<ConstructionSite[]>([]);
+  const [selectedSite, setSelectedSite] = useState<ConstructionSite | null>(null);
   const [mapType, setMapType] = useState<'standard' | 'satellite'>('standard');
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    getUserLocation();
+    loadData();
   }, []);
 
-  const getUserLocation = async () => {
+  // Load projects and customer data from API
+  const loadData = async () => {
     try {
       setLoading(true);
-      const { status } = await Location.requestForegroundPermissionsAsync();
+      setError(null);
       
-      if (status !== 'granted') {
-        alert('Vui lòng cấp quyền truy cập vị trí');
-        setLoading(false);
-        return;
+      // Parallel load: user location + projects + customers
+      const [locationResult, projectsResult, customersResult] = await Promise.allSettled([
+        getUserLocationAsync(),
+        projectsAPI.list(),
+        customersAPI.list(),
+      ]);
+      
+      // Handle location
+      if (locationResult.status === 'fulfilled' && locationResult.value) {
+        setUserLocation(locationResult.value);
+      } else {
+        // Fallback to HCM center
+        setUserLocation({ latitude: 10.7769, longitude: 106.7009 });
       }
-
-      const location = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.High,
-      });
-
-      setUserLocation({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-      });
-    } catch (error) {
-      console.error('Error getting location:', error);
-      // Fallback to default location (TP.HCM center)
-      setUserLocation({
-        latitude: 10.7769,
-        longitude: 106.7009,
-      });
+      
+      // Handle projects
+      if (projectsResult.status === 'fulfilled') {
+        const projects = projectsResult.value;
+        const customers = customersResult.status === 'fulfilled' ? customersResult.value : [];
+        
+        console.log('[Map] Loaded', projects.length, 'projects,', customers.length, 'customers');
+        
+        // Create customer lookup map (by userid, not id)
+        const customerMap = new Map<string, Customer>();
+        customers.forEach(c => {
+          // Perfex uses 'userid' for customer ID in some places
+          const customerId = (c as any).userid || c.id;
+          customerMap.set(customerId, c);
+        });
+        
+        // Estimated coordinates based on city/address for Vietnam locations
+        const getEstimatedCoords = (customer: Customer | undefined, projectName: string): { lat: number, lng: number } => {
+          // Default HCM center
+          let lat = 10.7769;
+          let lng = 106.7009;
+          
+          const city = customer?.city?.toLowerCase() || '';
+          const address = customer?.address?.toLowerCase() || projectName.toLowerCase();
+          
+          // Match specific areas in HCM
+          if (address.includes('quận 7') || address.includes('phú mỹ hưng')) {
+            lat = 10.7295; lng = 106.7218;
+          } else if (address.includes('quận 9') || address.includes('thủ đức')) {
+            lat = 10.8480; lng = 106.7770;
+          } else if (address.includes('quận 2') || address.includes('thảo điền')) {
+            lat = 10.8017; lng = 106.7381;
+          } else if (address.includes('tân phú') || address.includes('tân kỳ')) {
+            lat = 10.7921; lng = 106.6283;
+          } else if (address.includes('bình thạnh')) {
+            lat = 10.8063; lng = 106.7023;
+          } else if (address.includes('bình phước') || city.includes('bình phước')) {
+            lat = 11.7512; lng = 106.9037;
+          } else if (city.includes('hồ chí minh') || city.includes('ho chi minh')) {
+            // Random offset within HCM
+            lat = 10.7769 + (Math.random() - 0.5) * 0.08;
+            lng = 106.7009 + (Math.random() - 0.5) * 0.08;
+          }
+          
+          // Add small random offset to prevent exact overlapping
+          lat += (Math.random() - 0.5) * 0.01;
+          lng += (Math.random() - 0.5) * 0.01;
+          
+          return { lat, lng };
+        };
+        
+        // Convert ALL projects to construction sites (no filtering)
+        const sites = projects.map(p => {
+          const customer = customerMap.get(p.clientid);
+          
+          // Try to get real coordinates first
+          let lat = parseFloat((p as any).latitude || customer?.latitude || '0');
+          let lng = parseFloat((p as any).longitude || customer?.longitude || '0');
+          
+          // If no real coords, estimate from address
+          if (!lat || !lng || lat === 0 || lng === 0) {
+            const estimated = getEstimatedCoords(customer, p.name);
+            lat = estimated.lat;
+            lng = estimated.lng;
+          }
+          
+          // Clean up address (remove HTML)
+          let cleanAddress = (customer?.address || customer?.city || 'Không có địa chỉ')
+            .replace(/<br\s*\/?>/gi, ', ')
+            .replace(/<[^>]*>/g, '')
+            .replace(/\r\n/g, ', ')
+            .trim();
+          
+          return {
+            id: p.id,
+            name: p.name,
+            address: cleanAddress,
+            latitude: lat,
+            longitude: lng,
+            status: PROJECT_STATUS[p.status] || 'Không xác định',
+            progress: parseInt(p.progress || '0', 10),
+            type: getProjectType(p),
+            clientName: customer?.company,
+            startDate: p.start_date,
+            deadline: p.deadline,
+          };
+        });
+        
+        console.log('[Map] Converted', sites.length, 'sites');
+        setConstructionSites(sites.length > 0 ? sites : getMockSites());
+      } else {
+        console.error('Failed to load projects:', projectsResult.reason);
+        setConstructionSites(getMockSites());
+      }
+    } catch (err) {
+      console.error('Error loading data:', err);
+      setError('Không thể tải dữ liệu công trình');
+      setConstructionSites(getMockSites());
     } finally {
       setLoading(false);
     }
   };
+
+  // Get user location async
+  const getUserLocationAsync = async () => {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') return null;
+    
+    const location = await Location.getCurrentPositionAsync({
+      accuracy: Location.Accuracy.High,
+    });
+    
+    return {
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude,
+    };
+  };
+
+  // Determine project type based on name/description
+  const getProjectType = (project: Project): string => {
+    const name = (project.name + ' ' + (project.description || '')).toLowerCase();
+    if (name.includes('biệt thự') || name.includes('villa')) return 'Biệt thự';
+    if (name.includes('nhà phố')) return 'Nhà phố';
+    if (name.includes('chung cư') || name.includes('căn hộ')) return 'Chung cư';
+    if (name.includes('văn phòng') || name.includes('office')) return 'Văn phòng';
+    if (name.includes('nhà xưởng') || name.includes('factory')) return 'Nhà xưởng';
+    return 'Công trình';
+  };
+
+  // Mock data fallback
+  const getMockSites = (): ConstructionSite[] => [
+    { id: '1', name: 'Dự án Vinhomes Grand Park', address: 'Quận 9, TP.HCM', latitude: 10.8231, longitude: 106.7197, status: 'Đang thi công', progress: 75, type: 'Biệt thự' },
+    { id: '2', name: 'Nhà phố Thảo Điền', address: 'Quận 2, TP.HCM', latitude: 10.8076, longitude: 106.7441, status: 'Hoàn thành', progress: 95, type: 'Nhà phố' },
+    { id: '3', name: 'Cao ốc An Phú', address: 'Quận 2, TP.HCM', latitude: 10.8019, longitude: 106.7378, status: 'Đang thi công', progress: 60, type: 'Chung cư' },
+    { id: '4', name: 'Villa Landmark 81', address: 'Bình Thạnh, TP.HCM', latitude: 10.7944, longitude: 106.7219, status: 'Chưa bắt đầu', progress: 30, type: 'Villa' },
+  ];
+
+  // Pull to refresh
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await loadData();
+    setRefreshing(false);
+  }, []);
 
   const getMarkerColor = (progress: number) => {
     if (progress >= 90) return '#10B981'; // Green - Hoàn thiện
@@ -132,7 +251,7 @@ export default function MapViewScreen() {
     return '#F59E0B'; // Orange - Mới khởi công
   };
 
-  const navigateToSite = (siteId: number) => {
+  const navigateToSite = (siteId: string | number) => {
     router.push(`/construction/progress?id=${siteId}`);
   };
 
@@ -169,7 +288,7 @@ export default function MapViewScreen() {
           {/* Construction Sites List for Web */}
           <View style={styles.sitesList}>
             <Text style={styles.sitesListTitle}>Các công trình:</Text>
-            {CONSTRUCTION_SITES.map((site) => (
+            {constructionSites.map((site) => (
               <TouchableOpacity
                 key={site.id}
                 style={styles.siteItem}
@@ -233,7 +352,7 @@ export default function MapViewScreen() {
           />
 
           {/* Construction Site Markers */}
-          {CONSTRUCTION_SITES.map((site) => (
+          {constructionSites.map((site) => (
             <Marker
               key={site.id}
               coordinate={{
@@ -303,13 +422,27 @@ export default function MapViewScreen() {
         </View>
       </View>
 
-      {/* My Location Button */}
-      <TouchableOpacity
-        style={styles.myLocationButton}
-        onPress={getUserLocation}
-      >
-        <Ionicons name="locate" size={24} color={Colors.light.primary} />
-      </TouchableOpacity>
+      {/* Refresh + My Location Buttons */}
+      <View style={styles.floatingButtons}>
+        <TouchableOpacity
+          style={styles.refreshButton}
+          onPress={onRefresh}
+        >
+          <Ionicons name="refresh" size={24} color={Colors.light.primary} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.myLocationButton}
+          onPress={loadData}
+        >
+          <Ionicons name="locate" size={24} color={Colors.light.primary} />
+        </TouchableOpacity>
+      </View>
+
+      {/* Sites count indicator */}
+      <View style={styles.siteCountBadge}>
+        <Ionicons name="business" size={14} color="#fff" />
+        <Text style={styles.siteCountText}>{constructionSites.length} công trình</Text>
+      </View>
 
       {/* Bottom Sheet - Site Info */}
       {selectedSite && (
@@ -483,7 +616,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: '#EFF6FF',
+    backgroundColor: '#E8F4FF',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 6,
@@ -555,9 +688,6 @@ const styles = StyleSheet.create({
     color: '#6B7280',
   },
   myLocationButton: {
-    position: 'absolute',
-    bottom: 120,
-    right: 16,
     width: 50,
     height: 50,
     borderRadius: 25,
@@ -738,5 +868,58 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#6B7280',
     marginTop: 4,
+  },
+  floatingButtons: {
+    position: 'absolute',
+    bottom: 120,
+    right: 16,
+    gap: 12,
+  },
+  refreshButton: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.15,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 6,
+      },
+    }),
+  },
+  siteCountBadge: {
+    position: 'absolute',
+    top: Platform.OS === 'ios' ? 110 : 80,
+    left: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: Colors.light.primary,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.15,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
+  },
+  siteCountText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#fff',
   },
 });

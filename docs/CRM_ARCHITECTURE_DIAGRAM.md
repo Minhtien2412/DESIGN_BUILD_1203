@@ -1,0 +1,294 @@
+# 📊 CRM Architecture & API Mapping Diagram
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                        PERFEX CRM API PERMISSIONS                        │
+│                     (Available API Endpoints & Capabilities)             │
+└─────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      │ HTTP Requests
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                          SERVICE LAYER                                   │
+│                      services/perfexService.ts                           │
+│                                                                          │
+│  ┌────────────┐  ┌────────────┐  ┌────────────┐  ┌────────────┐      │
+│  │ customersApi│  │ invoicesApi│  │ projectsApi│  │  tasksApi  │      │
+│  │  - list()  │  │  - list()  │  │  - list()  │  │  - list()  │      │
+│  │  - get()   │  │  - get()   │  │  - get()   │  │  - get()   │      │
+│  │  - create()│  │  - create()│  │  - create()│  │  - create()│      │
+│  │  - update()│  │  - update()│  │  - update()│  │  - update()│      │
+│  │  - delete()│  │  - delete()│  │  - delete()│  │  - delete()│      │
+│  │  - search()│  │  - search()│  │  - search()│  │  - search()│      │
+│  └────────────┘  └────────────┘  └────────────┘  └────────────┘      │
+│                                                                          │
+│  ┌────────────┐  ┌────────────┐  ┌────────────┐  ┌────────────┐      │
+│  │ ticketsApi │  │  leadsApi  │  │ expensesApi│  │ paymentsApi│      │
+│  └────────────┘  └────────────┘  └────────────┘  └────────────┘      │
+│                                                                          │
+│  ┌────────────┐  ┌────────────┐  ┌────────────┐  ┌────────────┐      │
+│  │estimatesApi│  │contractsApi│  │creditNotesApi│ │ staffsApi  │      │
+│  └────────────┘  └────────────┘  └────────────┘  └────────────┘      │
+└─────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      │ API Calls
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                          TYPE DEFINITIONS                                │
+│                          types/perfex.ts                                 │
+│                                                                          │
+│  Customer, Contact, Invoice, Product, Lead, Project,                   │
+│  Task, Ticket, Expense, Payment, Estimate, CreditNote,                 │
+│  Contract, Staff, Milestone, ExpenseCategory, PaymentMode              │
+└─────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      │ Type-safe interfaces
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                          REACT HOOKS LAYER                               │
+│                       hooks/usePerfexCRM.ts                              │
+│                                                                          │
+│  ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐    │
+│  │  useCustomers()  │  │  useInvoices()   │  │  useProjects()   │    │
+│  │  - data          │  │  - data          │  │  - data          │    │
+│  │  - loading       │  │  - loading       │  │  - loading       │    │
+│  │  - error         │  │  - error         │  │  - error         │    │
+│  │  - refresh()     │  │  - refresh()     │  │  - refresh()     │    │
+│  │  - search()      │  │  - search()      │  │  - search()      │    │
+│  │  - create()      │  │  - create()      │  │  - create()      │    │
+│  │  - update()      │  │  - update()      │  │  - update()      │    │
+│  │  - remove()      │  │  - remove()      │  │  - remove()      │    │
+│  └──────────────────┘  └──────────────────┘  └──────────────────┘    │
+│                                                                          │
+│  ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐    │
+│  │   useTasks()     │  │  useTickets()    │  │   useLeads()     │    │
+│  └──────────────────┘  └──────────────────┘  └──────────────────┘    │
+│                                                                          │
+│  ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐    │
+│  │  useExpenses()   │  │  usePayments()   │  │ useEstimates()   │    │
+│  └──────────────────┘  └──────────────────┘  └──────────────────┘    │
+└─────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      │ React State Management
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                          UI COMPONENTS                                   │
+│                      components/crm/                                     │
+│                                                                          │
+│  ┌────────────────┐  ┌────────────────┐  ┌────────────────┐           │
+│  │ CustomerCard   │  │  InvoiceCard   │  │  ProjectCard   │           │
+│  │ - Display info │  │ - Display info │  │ - Display info │           │
+│  │ - onPress      │  │ - onPress      │  │ - onPress      │           │
+│  └────────────────┘  └────────────────┘  └────────────────┘           │
+│                                                                          │
+│  ┌────────────────┐  ┌────────────────┐  ┌────────────────┐           │
+│  │   TaskCard     │  │  TicketCard    │  │   LeadCard     │           │
+│  └────────────────┘  └────────────────┘  └────────────────┘           │
+│                                                                          │
+│  ┌────────────────┐  ┌────────────────┐  ┌────────────────┐           │
+│  │  StatusBadge   │  │ PriorityBadge  │  │   SearchBar    │           │
+│  └────────────────┘  └────────────────┘  └────────────────┘           │
+└─────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      │ Render UI
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                          SCREEN LAYER                                    │
+│                          app/crm/                                        │
+│                                                                          │
+│  ┌────────────────────────────────────────────────────────────┐        │
+│  │                    CRM Dashboard (index.tsx)                │        │
+│  │  - Entry point to all CRM modules                          │        │
+│  │  - Quick stats widgets                                     │        │
+│  │  - Navigation to sub-modules                               │        │
+│  └────────────────────────────────────────────────────────────┘        │
+│                                                                          │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────┐  │
+│  │ customers.tsx│  │ invoices.tsx │  │ projects.tsx │  │tasks.tsx │  │
+│  │ - List view  │  │ - List view  │  │ - List view  │  │- List    │  │
+│  │ - Search     │  │ - Filter     │  │ - Cards      │  │- Kanban  │  │
+│  │ - CRUD ops   │  │ - CRUD ops   │  │ - CRUD ops   │  │- CRUD    │  │
+│  └──────────────┘  └──────────────┘  └──────────────┘  └──────────┘  │
+│                                                                          │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────┐  │
+│  │ tickets.tsx  │  │  leads.tsx   │  │ expenses.tsx │  │payments  │  │
+│  └──────────────┘  └──────────────┘  └──────────────┘  └──────────┘  │
+│                                                                          │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────┐  │
+│  │estimates.tsx │  │contracts.tsx │  │credit-notes  │  │ staff    │  │
+│  └──────────────┘  └──────────────┘  └──────────────┘  └──────────┘  │
+└─────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      │ expo-router
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                          NAVIGATION                                      │
+│                   app/(tabs)/_layout.tsx                                 │
+│                                                                          │
+│  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐     │
+│  │  Home   │  │Projects │  │   CRM   │  │  Notify │  │ Profile │     │
+│  └─────────┘  └─────────┘  └─────────┘  └─────────┘  └─────────┘     │
+│                                  │                                       │
+│                                  │ Navigate to CRM                      │
+│                                  ▼                                       │
+│                          app/crm/index.tsx                               │
+└─────────────────────────────────────────────────────────────────────────┘
+
+
+═══════════════════════════════════════════════════════════════════════════
+                          DATA FLOW DIAGRAM
+═══════════════════════════════════════════════════════════════════════════
+
+User Action (Search/Create/Update)
+         │
+         ▼
+┌────────────────────┐
+│  Screen Component  │  (e.g., customers.tsx)
+└────────────────────┘
+         │
+         │ Call hook method: search(), create(), update()
+         ▼
+┌────────────────────┐
+│   React Hook       │  (e.g., useCustomers())
+│  usePerfexCRM.ts   │
+└────────────────────┘
+         │
+         │ setState(loading: true)
+         ▼
+┌────────────────────┐
+│   Service Layer    │  (perfexService.ts)
+│  API Method Call   │  (e.g., customersApi.search())
+└────────────────────┘
+         │
+         │ HTTP Request with Bearer Token
+         ▼
+┌────────────────────┐
+│   Perfex CRM API   │  (https://thietkeresort.com.vn/perfex_crm/api/)
+│   Endpoint         │  (e.g., /customers?search=abc)
+└────────────────────┘
+         │
+         │ JSON Response
+         ▼
+┌────────────────────┐
+│   Service Layer    │  Parse & validate response
+│  Error Handling    │  Throw ApiError if failed
+└────────────────────┘
+         │
+         │ Return typed data
+         ▼
+┌────────────────────┐
+│   React Hook       │  setState({ data, loading: false })
+│  Update State      │
+└────────────────────┘
+         │
+         │ Re-render with new data
+         ▼
+┌────────────────────┐
+│  Screen Component  │  Display updated UI
+│  Render UI         │  (List, Cards, Details)
+└────────────────────┘
+         │
+         ▼
+    User sees data
+
+
+═══════════════════════════════════════════════════════════════════════════
+                    API PERMISSIONS MAPPING
+═══════════════════════════════════════════════════════════════════════════
+
+┌──────────────┬─────────┬────────┬────────┬────────┬────────┬────────┐
+│   Feature    │   Get   │ Search │ Create │ Update │ Delete │  Note  │
+├──────────────┼─────────┼────────┼────────┼────────┼────────┼────────┤
+│ Khách hàng   │    ✅   │   ✅   │   ✅   │   ✅   │   ✅   │  Full  │
+│ Contacts     │    ✅   │   ✅   │   ✅   │   ✅   │   ✅   │  Full  │
+│ Hóa đơn      │    ✅   │   ✅   │   ✅   │   ✅   │   ✅   │  Full  │
+│ Sản phẩm     │    ✅   │   ✅   │   ❌   │   ❌   │   ❌   │  R/O   │
+│ Leads        │    ✅   │   ✅   │   ✅   │   ✅   │   ✅   │  Full  │
+│ Milestones   │    ✅   │   ✅   │   ✅   │   ✅   │   ✅   │  Full  │
+│ Dự án        │    ✅   │   ✅   │   ✅   │   ✅   │   ✅   │  Full  │
+│ Staffs       │    ✅   │   ✅   │   ✅   │   ✅   │   ✅   │  Full  │
+│ Tasks        │    ✅   │   ✅   │   ✅   │   ✅   │   ✅   │  Full  │
+│ Tickets      │    ✅   │   ✅   │   ✅   │   ✅   │   ✅   │  Full  │
+│ Hợp đồng     │    ✅   │   ❌   │   ✅   │   ❌   │   ✅   │Limited │
+│ Credit Notes │    ✅   │   ✅   │   ✅   │   ✅   │   ✅   │  Full  │
+│ Báo giá      │    ✅   │   ✅   │   ✅   │   ✅   │   ✅   │  Full  │
+│ Chi phí      │    ✅   │   ✅   │   ✅   │   ✅   │   ✅   │  Full  │
+│ Exp Category │    ✅   │   ❌   │   ❌   │   ❌   │   ❌   │  R/O   │
+│ Thanh toán   │    ✅   │   ✅   │   ✅   │   ✅   │   ✅   │  Full  │
+│ Pay Methods  │    ✅   │   ❌   │   ❌   │   ❌   │   ❌   │  R/O   │
+└──────────────┴─────────┴────────┴────────┴────────┴────────┴────────┘
+
+Legend:
+✅ = Available permission
+❌ = Not available
+Full = Full CRUD operations
+R/O = Read-only access
+Limited = Some operations available
+
+
+═══════════════════════════════════════════════════════════════════════════
+                    SCREEN TO API MAPPING
+═══════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────┬──────────────────┬────────────────────────────┐
+│     Screen File     │   API Module     │      Hook to Use           │
+├─────────────────────┼──────────────────┼────────────────────────────┤
+│ customers.tsx       │ customersApi     │ useCustomers()             │
+│ contacts.tsx        │ contactsApi      │ useContacts()              │
+│ invoices.tsx        │ invoicesApi      │ useInvoices()              │
+│ products.tsx        │ productsApi      │ useProducts()              │
+│ leads.tsx           │ leadsApi         │ useLeads()                 │
+│ projects.tsx        │ projectsApi      │ useProjects()              │
+│ milestones.tsx      │ milestonesApi    │ useMilestones()            │
+│ staff.tsx           │ staffsApi        │ useStaffs()                │
+│ tasks.tsx           │ tasksApi         │ useTasks()                 │
+│ tickets.tsx         │ ticketsApi       │ useTickets()               │
+│ contracts.tsx       │ contractsApi     │ useContracts()             │
+│ credit-notes.tsx    │ creditNotesApi   │ useCreditNotes()           │
+│ estimates.tsx       │ estimatesApi     │ useEstimates()             │
+│ expenses.tsx        │ expensesApi      │ useExpenses()              │
+│ payments.tsx        │ paymentsApi      │ usePayments()              │
+└─────────────────────┴──────────────────┴────────────────────────────┘
+
+
+═══════════════════════════════════════════════════════════════════════════
+                    IMPLEMENTATION PRIORITY
+═══════════════════════════════════════════════════════════════════════════
+
+Priority 1 (Week 1-2): Core CRM Features
+├── Customers (Full CRUD)
+├── Invoices (Full CRUD)
+├── Projects (Full CRUD)
+└── Tasks (Full CRUD)
+
+Priority 2 (Week 3): Financial Management
+├── Expenses (Full CRUD)
+├── Payments (Full CRUD)
+├── Estimates (Full CRUD)
+└── Credit Notes (Full CRUD)
+
+Priority 3 (Week 4): Support & Sales
+├── Tickets (Full CRUD)
+├── Leads (Full CRUD)
+├── Contracts (Limited)
+└── Contacts (Full CRUD)
+
+Priority 4 (Week 5): Team & Resources
+├── Staff (Full CRUD)
+├── Milestones (Full CRUD)
+├── Products (Read-only)
+└── Categories (Read-only)
+
+Priority 5 (Week 6): Polish & Integration
+├── CRM Dashboard
+├── Search & Filter
+├── Navigation
+└── Testing & Bug Fixes
+
+
+═══════════════════════════════════════════════════════════════════════════
+```
+
+**Tác giả:** ThietKeResort Team  
+**Ngày tạo:** January 7, 2026  
+**Mục đích:** Visual guide cho CRM architecture & API integration

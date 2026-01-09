@@ -43,10 +43,10 @@ interface Task {
 // ==================== CONFIG ====================
 
 const STATUS_CONFIG: Record<TaskStatus, { label: string; color: string; bg: string; progress: number }> = {
-  pending: { label: 'Chưa bắt đầu', color: '#9e9e9e', bg: '#f0f0f0', progress: 0 },
-  in_progress: { label: 'Đang thực hiện', color: '#ffb300', bg: '#fff8e1', progress: 0.5 },
-  done: { label: 'Hoàn thành', color: '#4caf50', bg: '#e8f5e9', progress: 1 },
-  late: { label: 'Trễ tiến độ', color: '#e53935', bg: '#ffebee', progress: 0.3 },
+  pending: { label: 'Chưa bắt đầu', color: '#999999', bg: '#f0f0f0', progress: 0 },
+  in_progress: { label: 'Đang thực hiện', color: '#0066CC', bg: '#F0F8FF', progress: 0.5 },
+  done: { label: 'Hoàn thành', color: '#0066CC', bg: '#e8f5e9', progress: 1 },
+  late: { label: 'Trễ tiến độ', color: '#000000', bg: '#F5F5F5', progress: 0.3 },
 };
 
 const DEFAULT_STAGES: Stage[] = [
@@ -193,7 +193,7 @@ export default function ConstructionProgressBoard() {
       <View style={[styles.progressSummary, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
         <Text style={[styles.progressLabel, { color: colors.textMuted }]}>Tiến độ tổng thể</Text>
         <View style={[styles.progressBadge, {
-          backgroundColor: overallProgress < 40 ? '#ffebee' : overallProgress < 80 ? '#fff8e1' : '#e8f5e9'
+          backgroundColor: overallProgress < 40 ? '#F5F5F5' : overallProgress < 80 ? '#F0F8FF' : '#e8f5e9'
         }]}>
           <Text style={[styles.progressText, {
             color: overallProgress < 40 ? '#c62828' : overallProgress < 80 ? '#ef6c00' : '#2e7d32'
@@ -630,7 +630,7 @@ function TaskDetailModal({ visible, onClose, task, stage, colors, onUpdateStatus
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.deleteButton} onPress={onDelete}>
-              <Ionicons name="trash-outline" size={20} color="#e53935" />
+              <Ionicons name="trash-outline" size={20} color="#000000" />
               <Text style={styles.deleteButtonText}>Xóa hạng mục</Text>
             </TouchableOpacity>
           </ScrollView>
@@ -750,7 +750,7 @@ const styles = StyleSheet.create({
   },
   columnProgressFill: {
     height: '100%',
-    backgroundColor: '#4caf50',
+    backgroundColor: '#0066CC',
     borderRadius: 2,
   },
   columnTasks: {
@@ -968,12 +968,12 @@ const styles = StyleSheet.create({
     marginTop: 20,
     paddingVertical: 12,
     borderRadius: 10,
-    backgroundColor: '#ffebee',
+    backgroundColor: '#F5F5F5',
   },
   deleteButtonText: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#e53935',
+    color: '#000000',
   },
   modalFooter: {
     flexDirection: 'row',

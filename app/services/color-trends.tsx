@@ -201,7 +201,7 @@ export default function ColorTrendsScreen() {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <LinearGradient colors={['#ee4d2d', '#ff6b3d']} style={styles.header}>
+      <LinearGradient colors={['#0066CC', '#3399FF']} style={styles.header}>
         <View style={styles.headerTop}>
           <TouchableOpacity
             onPress={() => router.back()}
@@ -450,7 +450,7 @@ export default function ColorTrendsScreen() {
                           : 'heart-outline'
                       }
                       size={24}
-                      color="#ee4d2d"
+                      color="#0066CC"
                     />
                     <Text style={styles.actionButtonText}>Yêu thích</Text>
                   </TouchableOpacity>
@@ -458,7 +458,7 @@ export default function ColorTrendsScreen() {
                     style={styles.actionButton}
                     onPress={() => handleShare(selectedColor)}
                   >
-                    <Ionicons name="share-outline" size={24} color="#ee4d2d" />
+                    <Ionicons name="share-outline" size={24} color="#0066CC" />
                     <Text style={styles.actionButtonText}>Chia sẻ</Text>
                   </TouchableOpacity>
                 </View>
@@ -517,7 +517,7 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   yearTextActive: {
-    color: '#ee4d2d',
+    color: '#0066CC',
   },
   content: {
     flex: 1,
@@ -539,7 +539,7 @@ const styles = StyleSheet.create({
   },
   seeAllText: {
     fontSize: 14,
-    color: '#ee4d2d',
+    color: '#0066CC',
   },
   styleRow: {
     flexDirection: 'row',
@@ -557,8 +557,8 @@ const styles = StyleSheet.create({
     borderColor: '#e0e0e0',
   },
   styleChipActive: {
-    backgroundColor: '#ee4d2d',
-    borderColor: '#ee4d2d',
+    backgroundColor: '#0066CC',
+    borderColor: '#0066CC',
   },
   styleChipText: {
     fontSize: 14,
@@ -735,7 +735,7 @@ const styles = StyleSheet.create({
   },
   popularityFill: {
     height: '100%',
-    backgroundColor: '#4caf50',
+    backgroundColor: '#0066CC',
   },
   popularityLabel: {
     fontSize: 12,
@@ -752,11 +752,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#ee4d2d',
+    borderColor: '#0066CC',
   },
   roomTagText: {
     fontSize: 13,
-    color: '#ee4d2d',
+    color: '#0066CC',
   },
   combinationRow: {
     flexDirection: 'row',
@@ -791,11 +791,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: '#fff5f0',
     borderWidth: 1,
-    borderColor: '#ee4d2d',
+    borderColor: '#0066CC',
   },
   actionButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#ee4d2d',
+    color: '#0066CC',
   },
 });

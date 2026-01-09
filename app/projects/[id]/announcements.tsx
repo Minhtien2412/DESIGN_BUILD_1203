@@ -90,9 +90,9 @@ export default function AnnouncementsScreen() {
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'URGENT':
-        return '#EF4444';
+        return '#000000';
       case 'HIGH':
-        return '#F97316';
+        return '#0066CC';
       case 'NORMAL':
         return primary;
       case 'LOW':

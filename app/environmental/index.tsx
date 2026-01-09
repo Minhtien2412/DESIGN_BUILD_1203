@@ -65,22 +65,22 @@ export default function EnvironmentalScreen() {
 
   const getMonitoringStatusColor = (status: MonitoringStatus) => {
     switch (status) {
-      case 'COMPLIANT': return '#22c55e';
-      case 'NON_COMPLIANT': return '#ef4444';
-      case 'REQUIRES_ACTION': return '#f59e0b';
+      case 'COMPLIANT': return '#0066CC';
+      case 'NON_COMPLIANT': return '#000000';
+      case 'REQUIRES_ACTION': return '#0066CC';
       case 'COMPLETED': return '#3b82f6';
-      case 'IN_PROGRESS': return '#8b5cf6';
+      case 'IN_PROGRESS': return '#666666';
       case 'SCHEDULED': return '#a855f7';
-      case 'OVERDUE': return '#dc2626';
+      case 'OVERDUE': return '#000000';
       default: return textMutedColor;
     }
   };
 
   const getResultColor = (result?: 'PASS' | 'FAIL' | 'WARNING') => {
     switch (result) {
-      case 'PASS': return '#22c55e';
-      case 'FAIL': return '#ef4444';
-      case 'WARNING': return '#f59e0b';
+      case 'PASS': return '#0066CC';
+      case 'FAIL': return '#000000';
+      case 'WARNING': return '#0066CC';
       default: return textMutedColor;
     }
   };
@@ -99,7 +99,7 @@ export default function EnvironmentalScreen() {
           <View style={styles.statsGrid}>
             <View style={[styles.statCard, { backgroundColor: surfaceColor, borderColor }]}>
               <ThemedText variant="caption" style={styles.statLabel}>Compliance Rate</ThemedText>
-              <ThemedText variant="h3" style={[styles.statValue, { color: '#22c55e' }]}>
+              <ThemedText variant="h3" style={[styles.statValue, { color: '#0066CC' }]}>
                 {summary?.complianceRate?.toFixed(0) || 0}%
               </ThemedText>
             </View>
@@ -117,7 +117,7 @@ export default function EnvironmentalScreen() {
             </View>
             <View style={[styles.statCard, { backgroundColor: surfaceColor, borderColor }]}>
               <ThemedText variant="caption" style={styles.statLabel}>Incidents</ThemedText>
-              <ThemedText variant="h3" style={[styles.statValue, { color: summary?.incidents ? '#f59e0b' : '#22c55e' }]}>
+              <ThemedText variant="h3" style={[styles.statValue, { color: summary?.incidents ? '#0066CC' : '#0066CC' }]}>
                 {summary?.incidents || 0}
               </ThemedText>
             </View>

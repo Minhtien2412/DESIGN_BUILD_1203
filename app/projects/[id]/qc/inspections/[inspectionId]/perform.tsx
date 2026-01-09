@@ -202,15 +202,15 @@ export default function PerformInspectionScreen() {
             <View style={styles.statsRow}>
               <View style={styles.statItem}>
                 <Text style={styles.statValue}>{stats.pass}</Text>
-                <Text style={[styles.statLabel, { color: '#10b981' }]}>Đạt</Text>
+                <Text style={[styles.statLabel, { color: '#0066CC' }]}>Đạt</Text>
               </View>
               <View style={styles.statItem}>
                 <Text style={styles.statValue}>{stats.fail}</Text>
-                <Text style={[styles.statLabel, { color: '#ef4444' }]}>Không đạt</Text>
+                <Text style={[styles.statLabel, { color: '#000000' }]}>Không đạt</Text>
               </View>
               <View style={styles.statItem}>
                 <Text style={styles.statValue}>{stats.pending}</Text>
-                <Text style={[styles.statLabel, { color: '#f59e0b' }]}>Chưa kiểm tra</Text>
+                <Text style={[styles.statLabel, { color: '#0066CC' }]}>Chưa kiểm tra</Text>
               </View>
               <View style={styles.statItem}>
                 <Text style={[styles.statValue, { fontSize: 24, color: '#3b82f6' }]}>
@@ -221,15 +221,15 @@ export default function PerformInspectionScreen() {
             </View>
             <View style={styles.progressBar}>
               <View style={[styles.progressSegment, { 
-                backgroundColor: '#10b981', 
+                backgroundColor: '#0066CC', 
                 width: `${(stats.pass / stats.total) * 100}%` 
               }]} />
               <View style={[styles.progressSegment, { 
-                backgroundColor: '#ef4444', 
+                backgroundColor: '#000000', 
                 width: `${(stats.fail / stats.total) * 100}%` 
               }]} />
               <View style={[styles.progressSegment, { 
-                backgroundColor: '#f59e0b', 
+                backgroundColor: '#0066CC', 
                 width: `${(stats.pending / stats.total) * 100}%` 
               }]} />
             </View>

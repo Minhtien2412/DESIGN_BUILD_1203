@@ -156,7 +156,7 @@ export default function DiaryListScreen() {
                 label="Nhân công TB"
                 value={stats.avgDailyWorkforce}
                 subtitle="người/ngày"
-                gradientColors={['#3b82f6', '#2563eb']}
+                gradientColors={['#3b82f6', '#0066CC']}
                 style={styles.statCard}
               />
               <MetricCard
@@ -164,7 +164,7 @@ export default function DiaryListScreen() {
                 label="Tổng ảnh"
                 value={stats.totalPhotos}
                 subtitle="ảnh"
-                gradientColors={['#8b5cf6', '#7c3aed']}
+                gradientColors={['#666666', '#666666']}
                 style={styles.statCard}
               />
               <MetricCard
@@ -172,7 +172,7 @@ export default function DiaryListScreen() {
                 label="Sự cố"
                 value={`${stats.resolvedIncidents}/${stats.totalIncidents}`}
                 subtitle="đã xử lý"
-                gradientColors={['#f59e0b', '#d97706']}
+                gradientColors={['#0066CC', '#d97706']}
                 style={styles.statCard}
               />
             </ScrollView>

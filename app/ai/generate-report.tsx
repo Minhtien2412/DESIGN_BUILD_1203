@@ -50,9 +50,9 @@ export default function GenerateReportScreen() {
 
   const getProgressColor = (progress: number | undefined) => {
     const p = progress ?? 0;
-    if (p >= 80) return '#10B981';
+    if (p >= 80) return '#0066CC';
     if (p >= 50) return '#3B82F6';
-    return '#F59E0B';
+    return '#0066CC';
   };
 
   return (
@@ -175,7 +175,7 @@ export default function GenerateReportScreen() {
             {report.highlights && report.highlights.length > 0 && (
               <View style={styles.card}>
                 <View style={styles.cardHeader}>
-                  <Ionicons name="star" size={20} color="#F59E0B" />
+                  <Ionicons name="star" size={20} color="#0066CC" />
                   <Text style={styles.cardTitle}>Điểm nổi bật</Text>
                 </View>
                 {report.highlights.map((highlight: string, index: number) => (
@@ -191,12 +191,12 @@ export default function GenerateReportScreen() {
             {report.issues && report.issues.length > 0 && (
               <View style={styles.card}>
                 <View style={styles.cardHeader}>
-                  <Ionicons name="alert-circle" size={20} color="#EF4444" />
+                  <Ionicons name="alert-circle" size={20} color="#000000" />
                   <Text style={styles.cardTitle}>Vấn đề cần giải quyết</Text>
                 </View>
                 {report.issues.map((issue: string, index: number) => (
                   <View key={index} style={styles.issueItem}>
-                    <Ionicons name="warning" size={18} color="#EF4444" />
+                    <Ionicons name="warning" size={18} color="#000000" />
                     <Text style={styles.issueText}>{issue}</Text>
                   </View>
                 ))}
@@ -207,7 +207,7 @@ export default function GenerateReportScreen() {
             {report.nextSteps && report.nextSteps.length > 0 && (
               <View style={styles.card}>
                 <View style={styles.cardHeader}>
-                  <Ionicons name="footsteps" size={20} color="#10B981" />
+                  <Ionicons name="footsteps" size={20} color="#0066CC" />
                   <Text style={styles.cardTitle}>Bước tiếp theo</Text>
                 </View>
                 {report.nextSteps.map((step: string, index: number) => (
@@ -225,12 +225,12 @@ export default function GenerateReportScreen() {
             {report.recommendations && report.recommendations.length > 0 && (
               <View style={styles.card}>
                 <View style={styles.cardHeader}>
-                  <Ionicons name="bulb" size={20} color="#8B5CF6" />
+                  <Ionicons name="bulb" size={20} color="#666666" />
                   <Text style={styles.cardTitle}>Khuyến nghị từ AI</Text>
                 </View>
                 {report.recommendations.map((rec: string, index: number) => (
                   <View key={index} style={styles.recItem}>
-                    <Ionicons name="checkmark-circle" size={18} color="#10B981" />
+                    <Ionicons name="checkmark-circle" size={18} color="#0066CC" />
                     <Text style={styles.recText}>{rec}</Text>
                   </View>
                 ))}
@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: '#EFF6FF',
+    backgroundColor: '#E8F4FF',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
@@ -430,7 +430,7 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#F59E0B',
+    backgroundColor: '#0066CC',
     marginTop: 6,
   },
   highlightText: {
@@ -461,7 +461,7 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: '#10B981',
+    backgroundColor: '#0066CC',
     alignItems: 'center',
     justifyContent: 'center',
   },

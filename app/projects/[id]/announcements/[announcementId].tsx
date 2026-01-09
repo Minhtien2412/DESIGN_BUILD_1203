@@ -40,8 +40,8 @@ interface Announcement {
 }
 
 const PRIORITY_CONFIG: Record<Priority, { label: string; color: string; icon: string }> = {
-  URGENT: { label: 'Khẩn cấp', color: '#EF4444', icon: 'alert-circle' },
-  HIGH: { label: 'Cao', color: '#F97316', icon: 'warning' },
+  URGENT: { label: 'Khẩn cấp', color: '#000000', icon: 'alert-circle' },
+  HIGH: { label: 'Cao', color: '#0066CC', icon: 'warning' },
   NORMAL: { label: 'Bình thường', color: '#3B82F6', icon: 'information-circle' },
   LOW: { label: 'Thấp', color: '#6B7280', icon: 'chatbubble' },
 };
@@ -208,17 +208,17 @@ export default function AnnouncementDetailScreen() {
               style={[
                 styles.expirationBox,
                 {
-                  backgroundColor: isExpired ? '#EF444420' : primary + '10',
-                  borderColor: isExpired ? '#EF4444' : primary,
+                  backgroundColor: isExpired ? '#00000020' : primary + '10',
+                  borderColor: isExpired ? '#000000' : primary,
                 },
               ]}
             >
               <Ionicons
                 name={isExpired ? 'close-circle-outline' : 'time-outline'}
                 size={18}
-                color={isExpired ? '#EF4444' : primary}
+                color={isExpired ? '#000000' : primary}
               />
-              <Text style={[styles.expirationText, { color: isExpired ? '#EF4444' : primary }]}>
+              <Text style={[styles.expirationText, { color: isExpired ? '#000000' : primary }]}>
                 {isExpired
                   ? `Đã hết hạn vào ${formatDate(announcement.expiresAt)}`
                   : `Hết hạn vào ${formatDate(announcement.expiresAt)}`}
@@ -289,7 +289,7 @@ export default function AnnouncementDetailScreen() {
                         {formatDate(receipt.readAt)}
                       </Text>
                     </View>
-                    <Ionicons name="checkmark-circle" size={20} color="#10B981" />
+                    <Ionicons name="checkmark-circle" size={20} color="#0066CC" />
                   </View>
                 ))}
               </View>

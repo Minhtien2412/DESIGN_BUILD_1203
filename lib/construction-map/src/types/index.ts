@@ -143,25 +143,25 @@ export interface StatusConfig {
 
 export const STATUS_CONFIG: Record<TaskStatus, StatusConfig> = {
   pending: {
-    color: '#9e9e9e',
+    color: '#999999',
     fill: '#f0f0f0',
     progress: 0,
     label: 'Chưa bắt đầu',
   },
   'in-progress': {
-    color: '#ffb300',
-    fill: '#fff8e1',
+    color: '#0066CC',
+    fill: '#F0F8FF',
     progress: 0.5,
     label: 'Đang thực hiện',
   },
   done: {
-    color: '#4caf50',
+    color: '#0066CC',
     fill: '#e8f5e9',
     progress: 1,
     label: 'Hoàn thành',
   },
   late: {
-    color: '#e53935',
+    color: '#000000',
     fill: '#ffebee',
     progress: 0.3,
     label: 'Trễ hạn',

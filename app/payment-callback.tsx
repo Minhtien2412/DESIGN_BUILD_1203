@@ -29,7 +29,7 @@ export default function PaymentCallbackScreen() {
 
   const backgroundColor = useThemeColor({}, 'background');
   const textColor = useThemeColor({}, 'text');
-  const primaryColor = '#EE4D2D';
+  const primaryColor = '#0066CC';
 
   useEffect(() => {
     verifyPayment();

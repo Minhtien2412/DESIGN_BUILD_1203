@@ -77,17 +77,17 @@ export default function SafetyDashboardTemplate({
   ]);
 
   const getScoreColor = (score: number) => {
-    if (score >= 80) return '#10B981';
-    if (score >= 60) return '#F59E0B';
-    return '#EF4444';
+    if (score >= 80) return '#0066CC';
+    if (score >= 60) return '#0066CC';
+    return '#000000';
   };
 
   const getIncidentColor = (type: Incident['type']) => {
     switch (type) {
       case 'critical':
-        return '#EF4444';
+        return '#000000';
       case 'major':
-        return '#F59E0B';
+        return '#0066CC';
       case 'minor':
         return '#3B82F6';
     }
@@ -95,9 +95,9 @@ export default function SafetyDashboardTemplate({
 
   const getStatusBadge = (status: Incident['status']) => {
     const config = {
-      open: { label: 'Mới', color: '#EF4444' },
-      investigating: { label: 'Đang xử lý', color: '#F59E0B' },
-      resolved: { label: 'Đã giải quyết', color: '#10B981' },
+      open: { label: 'Mới', color: '#000000' },
+      investigating: { label: 'Đang xử lý', color: '#0066CC' },
+      resolved: { label: 'Đã giải quyết', color: '#0066CC' },
     };
     return config[status];
   };
@@ -134,14 +134,14 @@ export default function SafetyDashboardTemplate({
               <Text style={styles.statValue}>{stats.total}</Text>
               <Text style={styles.statLabel}>Tổng số</Text>
             </View>
-            <View style={[styles.statCard, { borderLeftColor: '#EF4444' }]}>
-              <Text style={[styles.statValue, { color: '#EF4444' }]}>
+            <View style={[styles.statCard, { borderLeftColor: '#000000' }]}>
+              <Text style={[styles.statValue, { color: '#000000' }]}>
                 {stats.critical}
               </Text>
               <Text style={styles.statLabel}>Nghiêm trọng</Text>
             </View>
-            <View style={[styles.statCard, { borderLeftColor: '#F59E0B' }]}>
-              <Text style={[styles.statValue, { color: '#F59E0B' }]}>
+            <View style={[styles.statCard, { borderLeftColor: '#0066CC' }]}>
+              <Text style={[styles.statValue, { color: '#0066CC' }]}>
                 {stats.major}
               </Text>
               <Text style={styles.statLabel}>Quan trọng</Text>
@@ -249,14 +249,14 @@ export default function SafetyDashboardTemplate({
         <Section title="Liên hệ khẩn cấp">
           <View style={styles.contactCard}>
             <View style={styles.contactRow}>
-              <Ionicons name="call" size={20} color="#EF4444" />
+              <Ionicons name="call" size={20} color="#000000" />
               <View style={styles.contactInfo}>
                 <Text style={styles.contactLabel}>Cấp cứu</Text>
                 <Text style={styles.contactNumber}>115</Text>
               </View>
             </View>
             <View style={styles.contactRow}>
-              <Ionicons name="call" size={20} color="#F59E0B" />
+              <Ionicons name="call" size={20} color="#0066CC" />
               <View style={styles.contactInfo}>
                 <Text style={styles.contactLabel}>Giám sát an toàn</Text>
                 <Text style={styles.contactNumber}>0909 123 456</Text>
@@ -275,7 +275,7 @@ function ChecklistItem({ text, checked }: { text: string; checked: boolean }) {
       <Ionicons
         name={checked ? 'checkmark-circle' : 'ellipse-outline'}
         size={20}
-        color={checked ? '#10B981' : MODERN_COLORS.border}
+        color={checked ? '#0066CC' : MODERN_COLORS.border}
       />
       <Text
         style={[
@@ -383,7 +383,7 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#10B981',
+    backgroundColor: '#0066CC',
     borderRadius: 4,
   },
   incidentCard: {

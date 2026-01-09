@@ -98,9 +98,9 @@ export default function BudgetsScreen() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'on-track': return '#10B981';
-      case 'warning': return '#F59E0B';
-      case 'over-budget': return '#EF4444';
+      case 'on-track': return '#0066CC';
+      case 'warning': return '#0066CC';
+      case 'over-budget': return '#000000';
       default: return '#94A3B8';
     }
   };
@@ -148,13 +148,13 @@ export default function BudgetsScreen() {
           </View>
           <View style={[styles.summaryCard, { backgroundColor: '#FEF3C7' }]}>
             <Text style={styles.summaryLabel}>Đã chi</Text>
-            <Text style={[styles.summaryValue, { color: '#F59E0B' }]}>
+            <Text style={[styles.summaryValue, { color: '#0066CC' }]}>
               {formatCurrency(budgets.reduce((sum, b) => sum + b.spent, 0))}
             </Text>
           </View>
           <View style={[styles.summaryCard, { backgroundColor: '#ECFDF5' }]}>
             <Text style={styles.summaryLabel}>Còn lại</Text>
-            <Text style={[styles.summaryValue, { color: '#10B981' }]}>
+            <Text style={[styles.summaryValue, { color: '#0066CC' }]}>
               {formatCurrency(budgets.reduce((sum, b) => sum + b.remaining, 0))}
             </Text>
           </View>
@@ -219,7 +219,7 @@ export default function BudgetsScreen() {
                   </View>
                   <View style={styles.statItem}>
                     <Text style={styles.statLabel}>Đã chi</Text>
-                    <Text style={[styles.statValue, { color: '#F59E0B' }]}>
+                    <Text style={[styles.statValue, { color: '#0066CC' }]}>
                       {formatCurrency(budget.spent)}
                     </Text>
                   </View>
@@ -228,7 +228,7 @@ export default function BudgetsScreen() {
                     <Text
                       style={[
                         styles.statValue,
-                        { color: budget.remaining >= 0 ? '#10B981' : '#EF4444' },
+                        { color: budget.remaining >= 0 ? '#0066CC' : '#000000' },
                       ]}
                     >
                       {formatCurrency(budget.remaining)}

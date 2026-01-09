@@ -245,9 +245,9 @@ const styles = StyleSheet.create({
   filterStats: {
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#DBEAFE',
+    backgroundColor: '#E8F4FF',
     borderBottomWidth: 1,
-    borderBottomColor: '#93C5FD',
+    borderBottomColor: '#0080FF',
   },
   filterStatsText: {
     fontSize: 14,

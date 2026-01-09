@@ -49,7 +49,7 @@ export default function CriticalPathScreen() {
   if (loading || calculating) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#2196F3" />
+        <ActivityIndicator size="large" color="#0066CC" />
         <Text style={styles.loadingText}>Đang tính toán đường găng...</Text>
       </View>
     );
@@ -77,7 +77,7 @@ export default function CriticalPathScreen() {
         {/* Summary Card */}
         <View style={styles.summaryCard}>
           <View style={styles.summaryHeader}>
-            <Ionicons name="git-network" size={24} color="#F44336" />
+            <Ionicons name="git-network" size={24} color="#000000" />
             <Text style={styles.summaryTitle}>Đường găng (Critical Path)</Text>
           </View>
 
@@ -90,14 +90,14 @@ export default function CriticalPathScreen() {
             </View>
             <View style={styles.statDivider} />
             <View style={styles.statBox}>
-              <Text style={[styles.statValue, { color: '#F44336' }]}>
+              <Text style={[styles.statValue, { color: '#000000' }]}>
                 {formatDuration(criticalPath.criticalPath.totalDuration)}
               </Text>
               <Text style={styles.statLabel}>Tổng thời gian</Text>
             </View>
             <View style={styles.statDivider} />
             <View style={styles.statBox}>
-              <Text style={[styles.statValue, { color: '#4CAF50' }]}>
+              <Text style={[styles.statValue, { color: '#0066CC' }]}>
                 {formatDuration(criticalPath.criticalPath.slack)}
               </Text>
               <Text style={styles.statLabel}>Độ trễ cho phép</Text>
@@ -105,7 +105,7 @@ export default function CriticalPathScreen() {
           </View>
 
           <View style={styles.infoBox}>
-            <Ionicons name="information-circle" size={18} color="#2196F3" />
+            <Ionicons name="information-circle" size={18} color="#0066CC" />
             <Text style={styles.infoText}>
               Đường găng là chuỗi công việc dài nhất quyết định thời gian hoàn thành dự án.
               Bất kỳ sự chậm trễ nào trên đường găng sẽ làm trễ toàn bộ dự án.
@@ -116,7 +116,7 @@ export default function CriticalPathScreen() {
             style={styles.recalculateButton}
             onPress={handleCalculate}
           >
-            <Ionicons name="refresh" size={18} color="#2196F3" />
+            <Ionicons name="refresh" size={18} color="#0066CC" />
             <Text style={styles.recalculateButtonText}>Tính toán lại</Text>
           </TouchableOpacity>
         </View>
@@ -124,7 +124,7 @@ export default function CriticalPathScreen() {
         {/* Critical Tasks */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Ionicons name="alert-circle" size={20} color="#F44336" />
+            <Ionicons name="alert-circle" size={20} color="#000000" />
             <Text style={styles.sectionTitle}>
               Công việc găng ({criticalTasks.length})
             </Text>
@@ -158,7 +158,7 @@ export default function CriticalPathScreen() {
                         <View style={styles.taskNameRow}>
                           <Text style={styles.taskName}>{task.name}</Text>
                           {task.isMilestone && (
-                            <Ionicons name="flag" size={14} color="#FF9800" />
+                            <Ionicons name="flag" size={14} color="#0066CC" />
                           )}
                         </View>
                         <Text style={styles.taskDates}>
@@ -177,7 +177,7 @@ export default function CriticalPathScreen() {
 
                     <View style={styles.taskRight}>
                       <View style={styles.durationBadge}>
-                        <Ionicons name="time-outline" size={14} color="#F44336" />
+                        <Ionicons name="time-outline" size={14} color="#000000" />
                         <Text style={styles.durationText}>{duration}d</Text>
                       </View>
                       <View style={styles.progressContainer}>
@@ -209,7 +209,7 @@ export default function CriticalPathScreen() {
         {criticalPath.nearCriticalTasks.length > 0 && (
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Ionicons name="warning" size={20} color="#FF9800" />
+              <Ionicons name="warning" size={20} color="#0066CC" />
               <Text style={styles.sectionTitle}>
                 Công việc gần găng ({criticalPath.nearCriticalTasks.length})
               </Text>
@@ -234,7 +234,7 @@ export default function CriticalPathScreen() {
                 >
                   <View style={styles.taskHeader}>
                     <View style={styles.taskLeft}>
-                      <Ionicons name="warning-outline" size={20} color="#FF9800" />
+                      <Ionicons name="warning-outline" size={20} color="#0066CC" />
                       <View style={[styles.taskInfo, { marginLeft: 8 }]}>
                         <Text style={styles.taskName}>{task.name}</Text>
                         <Text style={styles.taskDates}>
@@ -252,9 +252,9 @@ export default function CriticalPathScreen() {
                     </View>
 
                     <View style={styles.taskRight}>
-                      <View style={[styles.durationBadge, { backgroundColor: '#FFF3E0' }]}>
-                        <Ionicons name="time-outline" size={14} color="#FF9800" />
-                        <Text style={[styles.durationText, { color: '#FF9800' }]}>
+                      <View style={[styles.durationBadge, { backgroundColor: '#E8F4FF' }]}>
+                        <Ionicons name="time-outline" size={14} color="#0066CC" />
+                        <Text style={[styles.durationText, { color: '#0066CC' }]}>
                           {duration}d
                         </Text>
                       </View>
@@ -265,7 +265,7 @@ export default function CriticalPathScreen() {
                     <View
                       style={[
                         styles.progressFill,
-                        { width: `${task.progress}%`, backgroundColor: '#FF9800' },
+                        { width: `${task.progress}%`, backgroundColor: '#0066CC' },
                       ]}
                     />
                   </View>
@@ -278,26 +278,26 @@ export default function CriticalPathScreen() {
         {/* Recommendations */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Ionicons name="bulb" size={20} color="#10B981" />
+            <Ionicons name="bulb" size={20} color="#0066CC" />
             <Text style={styles.sectionTitle}>Khuyến nghị</Text>
           </View>
 
           <View style={styles.recommendationCard}>
-            <Ionicons name="checkmark-circle" size={18} color="#4CAF50" />
+            <Ionicons name="checkmark-circle" size={18} color="#0066CC" />
             <Text style={styles.recommendationText}>
               Ưu tiên theo dõi và hoàn thành đúng hạn các công việc trên đường găng
             </Text>
           </View>
 
           <View style={styles.recommendationCard}>
-            <Ionicons name="people" size={18} color="#2196F3" />
+            <Ionicons name="people" size={18} color="#0066CC" />
             <Text style={styles.recommendationText}>
               Phân bổ nguồn lực tốt nhất cho các công việc găng và gần găng
             </Text>
           </View>
 
           <View style={styles.recommendationCard}>
-            <Ionicons name="calendar" size={18} color="#0A6847" />
+            <Ionicons name="calendar" size={18} color="#0066CC" />
             <Text style={styles.recommendationText}>
               Cân nhắc tăng nguồn lực hoặc làm song song để rút ngắn đường găng
             </Text>
@@ -338,7 +338,7 @@ const styles = StyleSheet.create({
   calculateButton: {
     paddingHorizontal: 20,
     paddingVertical: 12,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     borderRadius: 8,
   },
   calculateButtonText: {
@@ -397,7 +397,7 @@ const styles = StyleSheet.create({
   infoBox: {
     flexDirection: 'row',
     gap: 8,
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
     padding: 12,
     borderRadius: 8,
     marginBottom: 12,
@@ -416,12 +416,12 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: '#2196F3',
+    borderColor: '#0066CC',
   },
   recalculateButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#2196F3',
+    color: '#0066CC',
   },
   section: {
     marginHorizontal: 16,
@@ -460,10 +460,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 8,
     borderLeftWidth: 4,
-    borderLeftColor: '#F44336',
+    borderLeftColor: '#000000',
   },
   nearCriticalCard: {
-    borderLeftColor: '#FF9800',
+    borderLeftColor: '#0066CC',
   },
   taskHeader: {
     flexDirection: 'row',
@@ -481,7 +481,7 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: '#F44336',
+    backgroundColor: '#000000',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 10,
@@ -520,13 +520,13 @@ const styles = StyleSheet.create({
     gap: 4,
     paddingHorizontal: 8,
     paddingVertical: 4,
-    backgroundColor: '#FFEBEE',
+    backgroundColor: '#F5F5F5',
     borderRadius: 4,
   },
   durationText: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#F44336',
+    color: '#000000',
   },
   progressContainer: {
     paddingHorizontal: 8,
@@ -546,7 +546,7 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#F44336',
+    backgroundColor: '#000000',
   },
   assigneeRow: {
     flexDirection: 'row',

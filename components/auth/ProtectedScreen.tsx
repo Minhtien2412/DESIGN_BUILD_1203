@@ -58,7 +58,7 @@ export function ProtectedScreen({
   if (requireAuth && !isAuthenticated) {
     return (
       <ThemedView style={styles.container}>
-        <Ionicons name="lock-closed-outline" size={64} color="#EF4444" />
+        <Ionicons name="lock-closed-outline" size={64} color="#000000" />
         <ThemedText style={styles.title}>Yêu cầu đăng nhập</ThemedText>
         <ThemedText style={styles.message}>
           Bạn cần đăng nhập để truy cập trang này
@@ -87,7 +87,7 @@ export function ProtectedScreen({
 
     return (
       <ThemedView style={styles.container}>
-        <Ionicons name="shield-outline" size={64} color="#F59E0B" />
+        <Ionicons name="shield-outline" size={64} color="#0066CC" />
         <ThemedText style={styles.title}>Không có quyền truy cập</ThemedText>
         <ThemedText style={styles.message}>
           Trang này chỉ dành cho:{'\n'}
@@ -114,7 +114,7 @@ export function ProtectedScreen({
     if (missingPermissions.length > 0) {
       return (
         <ThemedView style={styles.container}>
-          <Ionicons name="key-outline" size={64} color="#EF4444" />
+          <Ionicons name="key-outline" size={64} color="#000000" />
           <ThemedText style={styles.title}>Thiếu quyền truy cập</ThemedText>
           <ThemedText style={styles.message}>
             Bạn không có quyền thực hiện hành động này
@@ -122,7 +122,7 @@ export function ProtectedScreen({
           <View style={styles.permissionsList}>
             {missingPermissions.map(perm => (
               <View key={perm} style={styles.permissionItem}>
-                <Ionicons name="close-circle" size={16} color="#EF4444" />
+                <Ionicons name="close-circle" size={16} color="#000000" />
                 <ThemedText style={styles.permissionText}>{perm}</ThemedText>
               </View>
             ))}
@@ -141,7 +141,7 @@ export function ProtectedScreen({
   if (requireVerified && user && !user.companyVerified) {
     return (
       <ThemedView style={styles.container}>
-        <Ionicons name="shield-checkmark-outline" size={64} color="#F59E0B" />
+        <Ionicons name="shield-checkmark-outline" size={64} color="#0066CC" />
         <ThemedText style={styles.title}>Cần xác minh tài khoản</ThemedText>
         <ThemedText style={styles.message}>
           Tài khoản của bạn cần được xác minh để truy cập tính năng này

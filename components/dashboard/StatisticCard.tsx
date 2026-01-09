@@ -59,12 +59,12 @@ export function StatisticCard({
                 <Ionicons
                   name={trend.isPositive ? 'trending-up' : 'trending-down'}
                   size={14}
-                  color={trend.isPositive ? '#10B981' : '#EF4444'}
+                  color={trend.isPositive ? '#0066CC' : '#000000'}
                 />
                 <Text
                   style={[
                     styles.trendText,
-                    { color: trend.isPositive ? '#10B981' : '#EF4444' },
+                    { color: trend.isPositive ? '#0066CC' : '#000000' },
                   ]}
                 >
                   {trend.value}

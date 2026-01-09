@@ -24,7 +24,7 @@ export function MessageStatus({ status, isRead, onRetry }: MessageStatusProps) {
   if (status === 'failed') {
     return (
       <TouchableOpacity style={styles.container} onPress={onRetry}>
-        <Ionicons name="alert-circle" size={14} color="#ef4444" />
+        <Ionicons name="alert-circle" size={14} color="#000000" />
       </TouchableOpacity>
     );
   }

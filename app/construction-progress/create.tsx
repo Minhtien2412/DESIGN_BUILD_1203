@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
   backBtn: { padding: 4 },
   headerTitle: { fontSize: 18, fontWeight: '700', color: '#000' },
   saveBtn: {
-    backgroundColor: '#EE4D2D',
+    backgroundColor: '#0066CC',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 8,
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
   textArea: { minHeight: 100, textAlignVertical: 'top' },
   row: { flexDirection: 'row' },
   submitBtn: {
-    backgroundColor: '#EE4D2D',
+    backgroundColor: '#0066CC',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',

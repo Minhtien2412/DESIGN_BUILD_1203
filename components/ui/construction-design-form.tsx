@@ -848,7 +848,7 @@ const styles = StyleSheet.create({
     gap: 15,
   },
   exportButton: {
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#0066CC',
     paddingVertical: 15,
     paddingHorizontal: 30,
     borderRadius: 8,

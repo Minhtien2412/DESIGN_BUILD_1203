@@ -13,10 +13,10 @@ import { useState } from 'react';
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const STATUS_CONFIG: Record<PhaseStatus, { label: string; color: string; icon: string }> = {
-  PLANNED: { label: 'Kế hoạch', color: '#9E9E9E', icon: 'document-text-outline' },
-  ACTIVE: { label: 'Đang thực hiện', color: '#2196F3', icon: 'play-circle' },
-  COMPLETED: { label: 'Hoàn thành', color: '#4CAF50', icon: 'checkmark-circle' },
-  DELAYED: { label: 'Bị trễ', color: '#F44336', icon: 'alert-circle' },
+  PLANNED: { label: 'Kế hoạch', color: '#999999', icon: 'document-text-outline' },
+  ACTIVE: { label: 'Đang thực hiện', color: '#0066CC', icon: 'play-circle' },
+  COMPLETED: { label: 'Hoàn thành', color: '#0066CC', icon: 'checkmark-circle' },
+  DELAYED: { label: 'Bị trễ', color: '#000000', icon: 'alert-circle' },
 };
 
 export default function PhasesScreen() {
@@ -77,7 +77,7 @@ export default function PhasesScreen() {
           <TouchableOpacity
             onPress={() => router.push(`/timeline/create-phase?projectId=${projectId}`)}
           >
-            <Ionicons name="add-circle" size={28} color="#2196F3" />
+            <Ionicons name="add-circle" size={28} color="#0066CC" />
           </TouchableOpacity>
         }
       >
@@ -219,11 +219,11 @@ function PhaseCard({
                 router.push(`/timeline/edit-phase?phaseId=${phase.id}&projectId=${phase.projectId}` as any)
               }
             >
-              <Ionicons name="create-outline" size={18} color="#2196F3" />
+              <Ionicons name="create-outline" size={18} color="#0066CC" />
               <Text style={styles.editButtonText}>Sửa</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.deleteButton} onPress={onDelete}>
-              <Ionicons name="trash-outline" size={18} color="#F44336" />
+              <Ionicons name="trash-outline" size={18} color="#000000" />
               <Text style={styles.deleteButtonText}>Xóa</Text>
             </TouchableOpacity>
           </View>
@@ -320,13 +320,13 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     borderRadius: 4,
   },
   progressText: {
     fontSize: 12,
     fontWeight: 'bold',
-    color: '#2196F3',
+    color: '#0066CC',
     width: 40,
   },
   expandedContent: {
@@ -372,7 +372,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   dependencyTag: {
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
@@ -391,7 +391,7 @@ const styles = StyleSheet.create({
   editButton: {
     flex: 1,
     flexDirection: 'row',
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
     paddingVertical: 10,
     borderRadius: 8,
     alignItems: 'center',
@@ -399,14 +399,14 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   editButtonText: {
-    color: '#2196F3',
+    color: '#0066CC',
     fontSize: 14,
     fontWeight: 'bold',
   },
   deleteButton: {
     flex: 1,
     flexDirection: 'row',
-    backgroundColor: '#FFEBEE',
+    backgroundColor: '#F5F5F5',
     paddingVertical: 10,
     borderRadius: 8,
     alignItems: 'center',
@@ -414,7 +414,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   deleteButtonText: {
-    color: '#F44336',
+    color: '#000000',
     fontSize: 14,
     fontWeight: 'bold',
   },

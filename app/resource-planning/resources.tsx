@@ -35,20 +35,20 @@ const AVAILABILITY_FILTERS: { value: ResourceAvailability | 'ALL'; label: string
 ];
 
 const AVAILABILITY_COLORS: Record<ResourceAvailability, string> = {
-  AVAILABLE: '#10B981',
+  AVAILABLE: '#0066CC',
   PARTIALLY_AVAILABLE: '#3B82F6',
-  ALLOCATED: '#F59E0B',
-  OVERALLOCATED: '#EF4444',
+  ALLOCATED: '#0066CC',
+  OVERALLOCATED: '#000000',
   UNAVAILABLE: '#6B7280',
-  MAINTENANCE: '#8B5CF6',
-  RESERVED: '#F97316',
+  MAINTENANCE: '#666666',
+  RESERVED: '#0066CC',
 };
 
 const UTILIZATION_COLORS: Record<string, string> = {
-  UNDERUTILIZED: '#10B981',
+  UNDERUTILIZED: '#0066CC',
   OPTIMAL: '#3B82F6',
-  HIGH: '#F59E0B',
-  OVERUTILIZED: '#EF4444',
+  HIGH: '#0066CC',
+  OVERUTILIZED: '#000000',
 };
 
 const getUtilizationLevel = (rate: number): string => {
@@ -100,23 +100,23 @@ export default function ResourcesScreen() {
     <View style={styles.container}>
       {/* Stats Cards */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.statsContainer}>
-        <View style={[styles.statCard, { backgroundColor: '#EFF6FF' }]}>
+        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
           <Text style={styles.statValue}>{resources.length}</Text>
           <Text style={styles.statLabel}>Total Resources</Text>
         </View>
 
         <View style={[styles.statCard, { backgroundColor: '#D1FAE5' }]}>
-          <Text style={[styles.statValue, { color: '#10B981' }]}>{availableCount}</Text>
+          <Text style={[styles.statValue, { color: '#0066CC' }]}>{availableCount}</Text>
           <Text style={styles.statLabel}>Available</Text>
         </View>
 
         <View style={[styles.statCard, { backgroundColor: '#FEF3C7' }]}>
-          <Text style={[styles.statValue, { color: '#F59E0B' }]}>{allocatedCount}</Text>
+          <Text style={[styles.statValue, { color: '#0066CC' }]}>{allocatedCount}</Text>
           <Text style={styles.statLabel}>Allocated</Text>
         </View>
 
         <View style={[styles.statCard, { backgroundColor: '#FEE2E2' }]}>
-          <Text style={[styles.statValue, { color: '#EF4444' }]}>{overallocatedCount}</Text>
+          <Text style={[styles.statValue, { color: '#000000' }]}>{overallocatedCount}</Text>
           <Text style={styles.statLabel}>Overallocated</Text>
         </View>
 
@@ -344,8 +344,8 @@ export default function ResourcesScreen() {
                   )}
                   {resource.nextMaintenanceDate && (
                     <View style={styles.equipmentRow}>
-                      <Ionicons name="construct-outline" size={12} color="#F59E0B" />
-                      <Text style={[styles.equipmentValue, { color: '#F59E0B', marginLeft: 4 }]}>
+                      <Ionicons name="construct-outline" size={12} color="#0066CC" />
+                      <Text style={[styles.equipmentValue, { color: '#0066CC', marginLeft: 4 }]}>
                         Maintenance due:{' '}
                         {new Date(resource.nextMaintenanceDate).toLocaleDateString()}
                       </Text>
@@ -374,7 +374,7 @@ export default function ResourcesScreen() {
                           key={i}
                           name={i < resource.qualityRating! ? 'star' : 'star-outline'}
                           size={12}
-                          color="#F59E0B"
+                          color="#0066CC"
                         />
                       ))}
                     </View>
@@ -566,7 +566,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 8,
     paddingVertical: 4,
-    backgroundColor: '#DBEAFE',
+    backgroundColor: '#E8F4FF',
     borderRadius: 6,
     alignSelf: 'flex-start',
   },
@@ -637,7 +637,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   skillChip: {
-    backgroundColor: '#DBEAFE',
+    backgroundColor: '#E8F4FF',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,

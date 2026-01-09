@@ -2,22 +2,33 @@
  * Google OAuth Hook (Expo Auth Session)
  * Uses expo-auth-session for Expo Go compatible Google Sign-In
  * 
+ * UPDATED 2026-01-08: Fixed redirect_uri error 400
+ * - Uses AuthSession.AuthRequest with Expo proxy
+ * - Works reliably in Expo Go on Android/iOS
+ * 
+ * REQUIRED in Google Cloud Console:
+ * 1. Create OAuth 2.0 Client ID (Web application type)
+ * 2. Add redirect URI: https://auth.expo.io/@adminmarketingnx/APP_DESIGN_BUILD
+ * 
  * Backend expects:
- * POST /auth/social
- * {
- *   "provider": "google",
- *   "token": "GOOGLE_ACCESS_TOKEN"
- * }
+ * POST /auth/social { "provider": "google", "token": "GOOGLE_ACCESS_TOKEN" }
  */
 
 import ENV from '@/config/env';
-import { makeRedirectUri } from 'expo-auth-session';
-import * as Google from 'expo-auth-session/providers/google';
+import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
-import { useEffect, useState } from 'react';
-import { Alert } from 'react-native';
+import { useCallback, useState } from 'react';
+import { Platform } from 'react-native';
 
+// Complete auth session on app return
 WebBrowser.maybeCompleteAuthSession();
+
+// Google OAuth discovery document
+const discovery = {
+  authorizationEndpoint: 'https://accounts.google.com/o/oauth2/v2/auth',
+  tokenEndpoint: 'https://oauth2.googleapis.com/token',
+  revocationEndpoint: 'https://oauth2.googleapis.com/revoke',
+};
 
 interface UseGoogleAuthReturn {
   signInWithGoogle: () => Promise<{ token: string; email: string; name?: string; picture?: string }>;
@@ -25,50 +36,36 @@ interface UseGoogleAuthReturn {
 }
 
 /**
- * Google OAuth Hook using expo-auth-session
+ * Google OAuth Hook using expo-auth-session with Expo proxy
  * Works in Expo Go without native build
  */
 export function useGoogleAuth(): UseGoogleAuthReturn {
   const [loading, setLoading] = useState(false);
 
   // Get Google Client ID from env
-  const googleClientId = ENV.GOOGLE_CLIENT_ID || '702527545429-60e3mi47s816iu9aus38kb83qgkmkgna.apps.googleusercontent.com';
+  // This MUST be a Web Application OAuth Client ID
+  const googleClientId = ENV.GOOGLE_CLIENT_ID || '702679918765-ikhpcev251dh2ndd5cpqkqearkmips34.apps.googleusercontent.com';
 
-  // Configure Google OAuth request. Guard against missing provider in some environments.
-  const maybeUseAuthRequest: any = (Google && (Google as any).useAuthRequest)
-    ? (Google as any).useAuthRequest
-    : (options: any) => {
-      const fallbackPrompt = async () => {
-        const msg = 'Google Sign-in is not available in this environment. Create a development build (not Expo Go) to test native Google Sign-in, or ensure expo-auth-session is installed and configured.';
-        try { Alert.alert('Google Sign-in unavailable', msg); } catch(e) { console.warn(msg); }
-        return { type: 'error' };
-      };
-      return [null, null, fallbackPrompt];
-    };
-
-  const [request, response, promptAsync] = maybeUseAuthRequest({
-    clientId: googleClientId,
-    redirectUri: makeRedirectUri({
-      scheme: 'com.thietkeresort.app',
-    }),
-    scopes: ['profile', 'email'],
+  // Build redirect URI - use Expo proxy for mobile (required for Expo Go)
+  const redirectUri = AuthSession.makeRedirectUri({
+    // For Expo Go, useProxy creates: https://auth.expo.io/@username/slug
+    useProxy: Platform.OS !== 'web',
+    // For standalone/dev builds, use custom scheme
+    scheme: 'appdesignbuild',
   });
 
-  // Handle OAuth response
-  useEffect(() => {
-    if (response?.type === 'success') {
-      const { authentication } = response;
-      console.log('[Google OAuth] Success!');
-      console.log('Access Token:', authentication?.accessToken);
-    } else if (response?.type === 'error') {
-      // Silent log - error is expected when user cancels or OAuth fails
-      console.log('[Google OAuth] Error response:', response.error?.message || 'Unknown error');
-    } else if (response?.type === 'cancel') {
-      console.log('[Google OAuth] User cancelled login');
-    }
-  }, [response]);
+  console.log('[Google OAuth] Config:', {
+    clientId: googleClientId.substring(0, 20) + '...',
+    redirectUri,
+    platform: Platform.OS,
+    useProxy: Platform.OS !== 'web',
+  });
 
-  const signInWithGoogle = async (): Promise<{
+  /**
+   * Sign in with Google using AuthSession.AuthRequest
+   * Uses Expo proxy for Expo Go compatibility
+   */
+  const signInWithGoogle = useCallback(async (): Promise<{
     token: string;
     email: string;
     name?: string;
@@ -77,22 +74,44 @@ export function useGoogleAuth(): UseGoogleAuthReturn {
     setLoading(true);
 
     try {
-      // Prompt OAuth flow
-      const result = await promptAsync();
+      console.log('[Google OAuth] Starting OAuth flow...');
+
+      // Create auth request with proper configuration
+      const authRequest = new AuthSession.AuthRequest({
+        clientId: googleClientId,
+        scopes: ['profile', 'email', 'openid'],
+        redirectUri,
+        responseType: AuthSession.ResponseType.Token,
+        usePKCE: false, // Implicit flow doesn't use PKCE
+      });
+
+      // Prompt user to authenticate
+      const result = await authRequest.promptAsync(discovery, {
+        useProxy: Platform.OS !== 'web',
+      });
+
+      console.log('[Google OAuth] Result type:', result.type);
 
       if (result.type !== 'success') {
-        throw new Error('Đăng nhập Google bị hủy hoặc thất bại');
+        if (result.type === 'dismiss' || result.type === 'cancel') {
+          throw new Error('Đăng nhập Google bị hủy bởi người dùng');
+        }
+        throw new Error('Đăng nhập Google thất bại. Vui lòng thử lại.');
       }
 
-      const { authentication } = result;
+      // Get access token from params
+      const accessToken = result.params?.access_token;
 
-      if (!authentication?.accessToken) {
+      if (!accessToken) {
+        console.error('[Google OAuth] No access token in response:', result.params);
         throw new Error('Không nhận được access token từ Google');
       }
 
+      console.log('[Google OAuth] Got access token');
+
       // Fetch user info from Google
       const userInfoResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
-        headers: { Authorization: `Bearer ${authentication.accessToken}` },
+        headers: { Authorization: `Bearer ${accessToken}` },
       });
 
       if (!userInfoResponse.ok) {
@@ -101,24 +120,22 @@ export function useGoogleAuth(): UseGoogleAuthReturn {
 
       const userInfo = await userInfoResponse.json();
 
-      console.log('✅ Google Sign-In Success:');
-      console.log('Access Token:', authentication.accessToken);
-      console.log('User Info:', userInfo);
+      console.log('✅ Google Sign-In Success:', userInfo.email);
 
-      // Return in format expected by AuthContext
       return {
-        token: authentication.accessToken, // Backend will verify this
+        token: accessToken,
         email: userInfo.email,
         name: userInfo.name,
         picture: userInfo.picture,
       };
     } catch (error: any) {
-      console.error('useGoogleAuth Error:', error);
+      console.error('[Google OAuth] Error:', error);
       throw new Error(error.message || 'Đăng nhập Google thất bại');
     } finally {
       setLoading(false);
     }
-  };
+  }, [googleClientId, redirectUri]);
+
   return {
     signInWithGoogle,
     loading,

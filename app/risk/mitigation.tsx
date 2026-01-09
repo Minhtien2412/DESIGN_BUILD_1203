@@ -88,17 +88,17 @@ export default function MitigationActionsScreen() {
   const getStatusColor = (status: MitigationStatus) => {
     switch (status) {
       case 'PLANNED':
-        return '#2196F3';
+        return '#0066CC';
       case 'IN_PROGRESS':
-        return '#FF9800';
+        return '#0066CC';
       case 'COMPLETED':
-        return '#4CAF50';
+        return '#0080FF';
       case 'CANCELLED':
-        return '#9E9E9E';
+        return '#999999';
       case 'OVERDUE':
-        return '#F44336';
+        return '#000000';
       default:
-        return '#9E9E9E';
+        return '#999999';
     }
   };
 
@@ -124,13 +124,13 @@ export default function MitigationActionsScreen() {
       case 'CRITICAL':
         return '#B71C1C';
       case 'HIGH':
-        return '#F44336';
+        return '#000000';
       case 'MEDIUM':
-        return '#FF9800';
+        return '#0066CC';
       case 'LOW':
-        return '#4CAF50';
+        return '#0080FF';
       default:
-        return '#9E9E9E';
+        return '#999999';
     }
   };
 
@@ -170,7 +170,7 @@ export default function MitigationActionsScreen() {
             <Ionicons
               name="calendar"
               size={14}
-              color={overdue ? '#F44336' : '#666'}
+              color={overdue ? '#000000' : '#666'}
             />
             <Text style={[styles.metaText, overdue && styles.overdueText]}>
               {new Date(item.dueDate).toLocaleDateString('vi-VN')}
@@ -181,7 +181,7 @@ export default function MitigationActionsScreen() {
         {/* Cost */}
         {item.cost && (
           <View style={styles.costRow}>
-            <Ionicons name="cash-outline" size={16} color="#4CAF50" />
+            <Ionicons name="cash-outline" size={16} color="#0080FF" />
             <Text style={styles.costText}>
               {item.cost.toLocaleString('vi-VN')} VND
             </Text>
@@ -191,7 +191,7 @@ export default function MitigationActionsScreen() {
         {/* Completed info */}
         {item.status === 'COMPLETED' && item.completedAt && (
           <View style={styles.completedInfo}>
-            <Ionicons name="checkmark-circle" size={16} color="#4CAF50" />
+            <Ionicons name="checkmark-circle" size={16} color="#0080FF" />
             <Text style={styles.completedText}>
               Hoàn thành: {new Date(item.completedAt).toLocaleDateString('vi-VN')}
             </Text>
@@ -211,7 +211,7 @@ export default function MitigationActionsScreen() {
   if (loading && allActions.length === 0) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#2196F3" />
+        <ActivityIndicator size="large" color="#0066CC" />
         <Text style={styles.loadingText}>Đang tải hành động...</Text>
       </View>
     );
@@ -225,16 +225,16 @@ export default function MitigationActionsScreen() {
           <Text style={styles.statValue}>{stats.total}</Text>
           <Text style={styles.statLabel}>Tổng</Text>
         </View>
-        <View style={[styles.statCard, { backgroundColor: '#E3F2FD' }]}>
-          <Text style={[styles.statValue, { color: '#2196F3' }]}>{stats.planned}</Text>
+        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
+          <Text style={[styles.statValue, { color: '#0066CC' }]}>{stats.planned}</Text>
           <Text style={styles.statLabel}>Lên kế hoạch</Text>
         </View>
-        <View style={[styles.statCard, { backgroundColor: '#FFF3E0' }]}>
-          <Text style={[styles.statValue, { color: '#FF9800' }]}>{stats.inProgress}</Text>
+        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
+          <Text style={[styles.statValue, { color: '#0066CC' }]}>{stats.inProgress}</Text>
           <Text style={styles.statLabel}>Đang thực hiện</Text>
         </View>
-        <View style={[styles.statCard, { backgroundColor: '#FFEBEE' }]}>
-          <Text style={[styles.statValue, { color: '#F44336' }]}>{stats.overdue}</Text>
+        <View style={[styles.statCard, { backgroundColor: '#F5F5F5' }]}>
+          <Text style={[styles.statValue, { color: '#000000' }]}>{stats.overdue}</Text>
           <Text style={styles.statLabel}>Quá hạn</Text>
         </View>
       </View>
@@ -242,7 +242,7 @@ export default function MitigationActionsScreen() {
       {/* Overdue warning */}
       {stats.overdue > 0 && (
         <View style={styles.overdueWarning}>
-          <Ionicons name="warning" size={20} color="#F44336" />
+          <Ionicons name="warning" size={20} color="#000000" />
           <Text style={styles.overdueWarningText}>
             {stats.overdue} hành động quá hạn cần xử lý
           </Text>
@@ -462,7 +462,7 @@ const styles = StyleSheet.create({
   overdueWarning: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFEBEE',
+    backgroundColor: '#F5F5F5',
     paddingHorizontal: 16,
     paddingVertical: 12,
     marginHorizontal: 16,
@@ -472,7 +472,7 @@ const styles = StyleSheet.create({
   },
   overdueWarningText: {
     fontSize: 14,
-    color: '#F44336',
+    color: '#000000',
     fontWeight: '600',
     flex: 1,
   },
@@ -491,7 +491,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   tabActive: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
   },
   tabText: {
     fontSize: 11,
@@ -519,7 +519,7 @@ const styles = StyleSheet.create({
   },
   actionCardOverdue: {
     borderLeftWidth: 4,
-    borderLeftColor: '#F44336',
+    borderLeftColor: '#000000',
   },
   riskContext: {
     flexDirection: 'row',
@@ -571,7 +571,7 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   overdueText: {
-    color: '#F44336',
+    color: '#000000',
     fontWeight: '600',
   },
   costRow: {
@@ -587,7 +587,7 @@ const styles = StyleSheet.create({
   },
   costText: {
     fontSize: 13,
-    color: '#4CAF50',
+    color: '#0080FF',
     fontWeight: '600',
   },
   completedInfo: {
@@ -602,7 +602,7 @@ const styles = StyleSheet.create({
   },
   completedText: {
     fontSize: 12,
-    color: '#4CAF50',
+    color: '#0080FF',
   },
   actionNotes: {
     fontSize: 13,
@@ -617,7 +617,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
@@ -632,12 +632,12 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: '#9E9E9E',
+    color: '#999999',
     marginTop: 16,
     marginBottom: 24,
   },
   emptyButton: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
@@ -739,7 +739,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
   },
   modalButtonPrimary: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
   },
   modalButtonTextSecondary: {
     fontSize: 14,

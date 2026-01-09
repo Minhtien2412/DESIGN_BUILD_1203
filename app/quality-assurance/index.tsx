@@ -62,9 +62,9 @@ export default function QualityAssuranceScreen() {
 
   const getTestStatusColor = (status: TestStatus) => {
     switch (status) {
-      case 'PASSED': return '#22c55e';
-      case 'FAILED': return '#ef4444';
-      case 'CONDITIONAL_PASS': return '#f97316';
+      case 'PASSED': return '#0066CC';
+      case 'FAILED': return '#000000';
+      case 'CONDITIONAL_PASS': return '#0066CC';
       case 'IN_PROGRESS': return '#3b82f6';
       case 'SCHEDULED': return '#a855f7';
       case 'PENDING_RETEST': return '#eab308';
@@ -75,11 +75,11 @@ export default function QualityAssuranceScreen() {
 
   const getInspectionStatusColor = (status: InspectionStatus) => {
     switch (status) {
-      case 'PASSED': return '#22c55e';
-      case 'FAILED': return '#ef4444';
-      case 'CONDITIONAL_PASS': return '#f97316';
+      case 'PASSED': return '#0066CC';
+      case 'FAILED': return '#000000';
+      case 'CONDITIONAL_PASS': return '#0066CC';
       case 'COMPLETED': return '#3b82f6';
-      case 'IN_PROGRESS': return '#8b5cf6';
+      case 'IN_PROGRESS': return '#666666';
       case 'SCHEDULED': return '#a855f7';
       case 'RESCHEDULED': return '#eab308';
       case 'CANCELLED': return '#6b7280';
@@ -113,13 +113,13 @@ export default function QualityAssuranceScreen() {
             </View>
             <View style={[styles.statCard, { backgroundColor: surfaceColor, borderColor }]}>
               <ThemedText type="default" style={styles.statLabel}>Pass Rate</ThemedText>
-              <ThemedText type="title" style={[styles.statValue, { color: '#22c55e' }]}>
+              <ThemedText type="title" style={[styles.statValue, { color: '#0066CC' }]}>
                 {summary?.qualityMetrics?.firstTimePassRate?.toFixed(0) || 0}%
               </ThemedText>
             </View>
             <View style={[styles.statCard, { backgroundColor: surfaceColor, borderColor }]}>
               <ThemedText type="default" style={styles.statLabel}>Open Defects</ThemedText>
-              <ThemedText type="title" style={[styles.statValue, { color: '#ef4444' }]}>
+              <ThemedText type="title" style={[styles.statValue, { color: '#000000' }]}>
                 {summary?.defectsByStatus?.OPEN || 0}
               </ThemedText>
             </View>

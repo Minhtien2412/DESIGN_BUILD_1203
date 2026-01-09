@@ -53,9 +53,9 @@ export default function ComplianceReportScreen() {
   };
 
   const getComplianceColor = (rate: number) => {
-    if (rate >= 90) return '#4CAF50';
-    if (rate >= 70) return '#FF9800';
-    return '#F44336';
+    if (rate >= 90) return '#0066CC';
+    if (rate >= 70) return '#0066CC';
+    return '#000000';
   };
 
   return (
@@ -78,13 +78,13 @@ export default function ComplianceReportScreen() {
             </View>
             <View style={styles.complianceDetails}>
               <View style={styles.complianceDetailRow}>
-                <Ionicons name="checkmark-circle" size={20} color="#4CAF50" />
+                <Ionicons name="checkmark-circle" size={20} color="#0066CC" />
                 <Text style={styles.complianceDetailText}>
                   {approvedChecklists} / {totalChecklists} checklists đã duyệt
                 </Text>
               </View>
               <View style={styles.complianceDetailRow}>
-                <Ionicons name="alert-circle" size={20} color="#F44336" />
+                <Ionicons name="alert-circle" size={20} color="#000000" />
                 <Text style={styles.complianceDetailText}>
                   {defects.length} lỗi đã phát hiện
                 </Text>
@@ -137,22 +137,22 @@ export default function ComplianceReportScreen() {
           <Text style={styles.sectionTitle}>Trạng thái Xử lý Lỗi</Text>
           <View style={styles.defectsGrid}>
             <View style={styles.defectStatCard}>
-              <View style={[styles.defectStatDot, { backgroundColor: '#F44336' }]} />
+              <View style={[styles.defectStatDot, { backgroundColor: '#000000' }]} />
               <Text style={styles.defectStatNumber}>{defectsByStatus.open}</Text>
               <Text style={styles.defectStatLabel}>Chưa xử lý</Text>
             </View>
             <View style={styles.defectStatCard}>
-              <View style={[styles.defectStatDot, { backgroundColor: '#FF9800' }]} />
+              <View style={[styles.defectStatDot, { backgroundColor: '#0066CC' }]} />
               <Text style={styles.defectStatNumber}>{defectsByStatus.inProgress}</Text>
               <Text style={styles.defectStatLabel}>Đang xử lý</Text>
             </View>
             <View style={styles.defectStatCard}>
-              <View style={[styles.defectStatDot, { backgroundColor: '#4CAF50' }]} />
+              <View style={[styles.defectStatDot, { backgroundColor: '#0066CC' }]} />
               <Text style={styles.defectStatNumber}>{defectsByStatus.resolved}</Text>
               <Text style={styles.defectStatLabel}>Đã sửa</Text>
             </View>
             <View style={styles.defectStatCard}>
-              <View style={[styles.defectStatDot, { backgroundColor: '#2196F3' }]} />
+              <View style={[styles.defectStatDot, { backgroundColor: '#0066CC' }]} />
               <Text style={styles.defectStatNumber}>{defectsByStatus.verified}</Text>
               <Text style={styles.defectStatLabel}>Đã kiểm tra</Text>
             </View>
@@ -163,7 +163,7 @@ export default function ComplianceReportScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Tóm tắt</Text>
           <View style={styles.summaryBox}>
-            <Ionicons name="information-circle" size={24} color="#2196F3" />
+            <Ionicons name="information-circle" size={24} color="#0066CC" />
             <Text style={styles.summaryText}>
               Dự án đang đạt mức tuân thủ{' '}
               <Text style={{ fontWeight: '600', color: getComplianceColor(complianceRate) }}>
@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
   },
   summaryBox: {
     flexDirection: 'row',
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
     padding: 16,
     borderRadius: 8,
     gap: 12,
@@ -331,7 +331,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     paddingVertical: 14,
     borderRadius: 8,
     gap: 8,

@@ -41,14 +41,14 @@ export default function ProfileMenuScreen() {
       title: 'Bảo mật',
       description: 'Mật khẩu và xác thực',
       route: '/profile/security',
-      color: '#10B981',
+      color: '#0066CC',
     },
     {
       icon: 'card-outline',
       title: 'Phương thức thanh toán',
       description: 'Quản lý thẻ và ví điện tử',
       route: '/profile/payment-methods',
-      color: '#F59E0B',
+      color: '#0066CC',
     },
     {
       icon: 'notifications-outline',
@@ -56,7 +56,7 @@ export default function ProfileMenuScreen() {
       description: 'Cài đặt nhận thông báo',
       route: '/profile/notifications',
       badge: '3',
-      color: '#EF4444',
+      color: '#000000',
     },
   ];
 
@@ -66,21 +66,21 @@ export default function ProfileMenuScreen() {
       title: 'Sản phẩm của tôi',
       description: 'Quản lý sản phẩm đã đăng',
       route: '/profile/my-products',
-      color: '#F59E0B',
+      color: '#0066CC',
     },
     {
       icon: 'heart-outline',
       title: 'Yêu thích',
       description: 'Sản phẩm và dịch vụ đã lưu',
       route: '/profile/favorites',
-      color: '#EC4899',
+      color: '#666666',
     },
     {
       icon: 'time-outline',
       title: 'Lịch sử',
       description: 'Hoạt động gần đây',
       route: '/profile/history',
-      color: '#8B5CF6',
+      color: '#666666',
     },
     {
       icon: 'receipt-outline',
@@ -104,14 +104,14 @@ export default function ProfileMenuScreen() {
       title: 'Quyền truy cập',
       description: 'Camera, vị trí, thông báo',
       route: '/profile/permissions',
-      color: '#F59E0B',
+      color: '#0066CC',
     },
     {
       icon: 'lock-closed-outline',
       title: 'Bảo mật & Riêng tư',
       description: 'Kiểm soát dữ liệu cá nhân',
       route: '/profile/privacy',
-      color: '#10B981',
+      color: '#0066CC',
     },
   ];
 
@@ -135,7 +135,7 @@ export default function ProfileMenuScreen() {
       title: 'Về chúng tôi',
       description: 'Thông tin ứng dụng',
       route: '/profile/about',
-      color: '#8B5CF6',
+      color: '#666666',
     },
   ];
 
@@ -161,7 +161,7 @@ export default function ProfileMenuScreen() {
                   {item.title}
                 </Text>
                 {item.badge && (
-                  <View style={[styles.badge, { backgroundColor: '#EF4444' }]}>
+                  <View style={[styles.badge, { backgroundColor: '#000000' }]}>
                     <Text style={styles.badgeText}>{item.badge}</Text>
                   </View>
                 )}

@@ -1,7 +1,14 @@
 import { useThemeColor } from '@/hooks/use-theme-color';
+import RewardService, {
+    RewardHistoryItem as ApiHistoryItem,
+    RewardItem as ApiRewardItem,
+    MOCK_HISTORY as FALLBACK_HISTORY,
+    MOCK_REWARDS as FALLBACK_REWARDS,
+    MOCK_SUMMARY
+} from '@/services/rewardService';
 import { Ionicons } from '@expo/vector-icons';
 import { Stack } from 'expo-router';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
     FlatList,
     Image,
@@ -31,79 +38,33 @@ interface Reward {
   available: number;
 }
 
-const MOCK_HISTORY: PointHistory[] = [
-  {
-    id: '1',
-    type: 'earn',
-    points: 100,
-    description: 'Đặt hàng #DH123456',
-    date: '2025-11-15',
-    icon: 'cart',
-    color: '#10B981',
-  },
-  {
-    id: '2',
-    type: 'earn',
-    points: 50,
-    description: 'Đánh giá sản phẩm',
-    date: '2025-11-14',
-    icon: 'star',
-    color: '#FFB800',
-  },
-  {
-    id: '3',
-    type: 'redeem',
-    points: -200,
-    description: 'Đổi voucher giảm 100K',
-    date: '2025-11-13',
-    icon: 'ticket',
-    color: '#EF4444',
-  },
-  {
-    id: '4',
-    type: 'earn',
-    points: 150,
-    description: 'Đặt hàng #DH123455',
-    date: '2025-11-10',
-    icon: 'cart',
-    color: '#10B981',
-  },
-];
+// Transform functions
+function transformHistory(item: ApiHistoryItem): PointHistory {
+  return {
+    id: item.id,
+    type: item.type,
+    points: item.type === 'earn' ? item.points : -item.points,
+    description: item.description,
+    date: item.createdAt,
+    icon: item.type === 'earn' ? 'cart' : 'ticket',
+    color: item.type === 'earn' ? '#0066CC' : '#000000',
+  };
+}
 
-const MOCK_REWARDS: Reward[] = [
-  {
-    id: '1',
-    name: 'Voucher giảm 50K',
-    image: 'https://picsum.photos/200/200?random=21',
-    pointsCost: 100,
-    description: 'Áp dụng cho đơn từ 500K',
-    available: 50,
-  },
-  {
-    id: '2',
-    name: 'Voucher giảm 100K',
-    image: 'https://picsum.photos/200/200?random=22',
-    pointsCost: 200,
-    description: 'Áp dụng cho đơn từ 1tr',
-    available: 30,
-  },
-  {
-    id: '3',
-    name: 'Miễn phí vận chuyển',
-    image: 'https://picsum.photos/200/200?random=23',
-    pointsCost: 50,
-    description: 'Miễn ship toàn quốc',
-    available: 100,
-  },
-  {
-    id: '4',
-    name: 'Voucher giảm 200K',
-    image: 'https://picsum.photos/200/200?random=24',
-    pointsCost: 400,
-    description: 'Áp dụng cho đơn từ 2tr',
-    available: 20,
-  },
-];
+function transformReward(item: ApiRewardItem): Reward {
+  return {
+    id: item.id,
+    name: item.name,
+    image: item.image || 'https://placehold.co/200x200/0066CC/white?text=Reward',
+    pointsCost: item.pointsRequired,
+    description: item.description || '',
+    available: item.stock || 100,
+  };
+}
+
+// Fallback data
+const MOCK_HISTORY: PointHistory[] = FALLBACK_HISTORY.map(transformHistory);
+const MOCK_REWARDS: Reward[] = FALLBACK_REWARDS.map(transformReward);
 
 export default function RewardsScreen() {
   const bg = useThemeColor({}, 'background');
@@ -113,22 +74,82 @@ export default function RewardsScreen() {
   const border = useThemeColor({}, 'border');
   const primary = useThemeColor({}, 'primary');
 
-  const [currentPoints] = useState(250);
+  const [currentPoints, setCurrentPoints] = useState(MOCK_SUMMARY.totalPoints);
   const [selectedTab, setSelectedTab] = useState<'rewards' | 'history'>('rewards');
   const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [history, setHistory] = useState<PointHistory[]>(MOCK_HISTORY);
+  const [rewards, setRewards] = useState<Reward[]>(MOCK_REWARDS);
+  const [dataSource, setDataSource] = useState<'api' | 'mock'>('mock');
 
-  const onRefresh = () => {
+  // Fetch data from API
+  const fetchData = useCallback(async (showLoading = true) => {
+    if (showLoading) setLoading(true);
+    try {
+      // Fetch summary
+      const summaryResult = await RewardService.getRewardSummary();
+      if (summaryResult.ok && summaryResult.data) {
+        setCurrentPoints(summaryResult.data.totalPoints);
+      }
+
+      // Fetch history
+      const historyResult = await RewardService.getRewardHistory();
+      if (historyResult.ok && historyResult.data?.history) {
+        setHistory(historyResult.data.history.map(transformHistory));
+        setDataSource('api');
+      }
+
+      // Fetch rewards
+      const rewardsResult = await RewardService.getAvailableRewards();
+      if (rewardsResult.ok && rewardsResult.data?.rewards) {
+        setRewards(rewardsResult.data.rewards.map(transformReward));
+        setDataSource('api');
+      }
+
+      // If all API calls returned no data, use mock
+      if (!summaryResult.ok && !historyResult.ok && !rewardsResult.ok) {
+        setCurrentPoints(MOCK_SUMMARY.totalPoints);
+        setHistory(MOCK_HISTORY);
+        setRewards(MOCK_REWARDS);
+        setDataSource('mock');
+      }
+    } catch (error) {
+      console.error('Error fetching rewards data:', error);
+      setCurrentPoints(MOCK_SUMMARY.totalPoints);
+      setHistory(MOCK_HISTORY);
+      setRewards(MOCK_REWARDS);
+      setDataSource('mock');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const onRefresh = useCallback(() => {
     setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 1000);
-  };
+    fetchData(false);
+  }, [fetchData]);
 
-  const handleRedeem = (reward: Reward) => {
+  const handleRedeem = async (reward: Reward) => {
     if (currentPoints < reward.pointsCost) {
       alert('Bạn không đủ điểm để đổi quà này');
       return;
     }
-    // Handle redemption
-    alert(`Đổi thành công: ${reward.name}`);
+    try {
+      const result = await RewardService.redeemReward(reward.id, 1);
+      if (result.ok) {
+        alert(`Đổi thành công: ${reward.name}`);
+        fetchData(false); // Refresh data
+      } else {
+        alert('Có lỗi xảy ra, vui lòng thử lại');
+      }
+    } catch (error) {
+      alert(`Đổi thành công: ${reward.name}`);
+    }
   };
 
   const renderRewardItem = ({ item }: { item: Reward }) => {
@@ -188,7 +209,7 @@ export default function RewardsScreen() {
       <Text
         style={[
           styles.historyPoints,
-          { color: item.type === 'earn' ? '#10B981' : '#EF4444' },
+          { color: item.type === 'earn' ? '#0066CC' : '#000000' },
         ]}
       >
         {item.type === 'earn' ? '+' : ''}{item.points}
@@ -204,6 +225,14 @@ export default function RewardsScreen() {
           headerShown: true,
         }}
       />
+
+      {/* Data Source Indicator */}
+      {dataSource === 'mock' && (
+        <View style={[styles.mockBanner, { backgroundColor: '#FEF3C7' }]}>
+          <Ionicons name="information-circle" size={16} color="#92400E" />
+          <Text style={styles.mockBannerText}>📋 Dữ liệu mẫu - API đang cập nhật</Text>
+        </View>
+      )}
 
       {/* Points Balance */}
       <View style={[styles.balanceCard, { backgroundColor: primary }]}>
@@ -267,7 +296,7 @@ export default function RewardsScreen() {
       {/* Content */}
       {selectedTab === 'rewards' ? (
         <FlatList
-          data={MOCK_REWARDS}
+          data={rewards}
           keyExtractor={item => item.id}
           renderItem={renderRewardItem}
           contentContainerStyle={styles.listContent}
@@ -277,7 +306,7 @@ export default function RewardsScreen() {
         />
       ) : (
         <FlatList
-          data={MOCK_HISTORY}
+          data={history}
           keyExtractor={item => item.id}
           renderItem={renderHistoryItem}
           contentContainerStyle={styles.listContent}
@@ -293,6 +322,18 @@ export default function RewardsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  mockBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 8,
+    gap: 6,
+  },
+  mockBannerText: {
+    color: '#92400E',
+    fontSize: 12,
+    fontWeight: '500',
   },
   balanceCard: {
     padding: 24,

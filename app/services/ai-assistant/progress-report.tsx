@@ -46,7 +46,7 @@ export default function ProgressReportScreen() {
   if (error || !selectedReport) {
     return (
       <View style={[styles.centerContainer, { backgroundColor }]}>
-        <Ionicons name="alert-circle-outline" size={64} color="#f44336" />
+        <Ionicons name="alert-circle-outline" size={64} color="#000000" />
         <Text style={[styles.errorTitle, { color: textColor }]}>
           Không thể tải báo cáo
         </Text>

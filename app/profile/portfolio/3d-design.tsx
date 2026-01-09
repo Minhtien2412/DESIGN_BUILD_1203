@@ -1,7 +1,8 @@
 import { SectionHeader } from '@/components/ui/list-item';
+import PortfolioDocsService, { type Design3D, MOCK_DESIGNS } from '@/services/portfolioDocsService';
 import { Ionicons } from '@expo/vector-icons';
 import { Stack } from 'expo-router';
-import { useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
     ActivityIndicator,
     Animated,
@@ -15,86 +16,50 @@ import {
     View,
 } from 'react-native';
 
-type Design3D = {
-  id: string;
-  title: string;
-  room: string;
-  imageUrl: string;
-  views: number;
-  likes: number;
-};
-
 const { width } = Dimensions.get('window');
 const imageWidth = (width - 48) / 2;
 
-const MOCK_DESIGNS: Design3D[] = [
-  {
-    id: '1',
-    title: 'Phòng khách hiện đại',
-    room: 'Phòng khách',
-    imageUrl: 'https://picsum.photos/400/300?random=1',
-    views: 245,
-    likes: 38,
-  },
-  {
-    id: '2',
-    title: 'Phòng ngủ master',
-    room: 'Phòng ngủ',
-    imageUrl: 'https://picsum.photos/400/300?random=2',
-    views: 189,
-    likes: 29,
-  },
-  {
-    id: '3',
-    title: 'Bếp & phòng ăn',
-    room: 'Bếp',
-    imageUrl: 'https://picsum.photos/400/300?random=3',
-    views: 312,
-    likes: 52,
-  },
-  {
-    id: '4',
-    title: 'Phòng làm việc',
-    room: 'Phòng làm việc',
-    imageUrl: 'https://picsum.photos/400/300?random=4',
-    views: 167,
-    likes: 24,
-  },
-  {
-    id: '5',
-    title: 'Phòng tắm cao cấp',
-    room: 'Phòng tắm',
-    imageUrl: 'https://picsum.photos/400/300?random=5',
-    views: 198,
-    likes: 31,
-  },
-  {
-    id: '6',
-    title: 'Ban công xanh',
-    room: 'Ban công',
-    imageUrl: 'https://picsum.photos/400/300?random=6',
-    views: 221,
-    likes: 43,
-  },
-];
+// Types imported from portfolioDocsService
 
 export default function Design3DScreen() {
+  const [designs, setDesigns] = useState<Design3D[]>(MOCK_DESIGNS); // Start with mock
+  const [loading, setLoading] = useState(false); // Don't block
   const [refreshing, setRefreshing] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
   const [imageLoadingStates, setImageLoadingStates] = useState<Record<string, boolean>>({});
 
-  const onRefresh = () => {
-    setRefreshing(true);
-    setTimeout(() => {
+  const fetchDesigns = useCallback(async () => {
+    try {
+      const data = await PortfolioDocsService.get3DDesigns();
+      if (data.length > 0) {
+        setDesigns(data);
+      }
+    } catch (err) {
+      console.warn('Error fetching designs, using mock data:', err);
+    } finally {
+      setLoading(false);
       setRefreshing(false);
-    }, 1500);
-  };
+    }
+  }, []);
+
+  useEffect(() => {
+    // Fetch in background
+    const timer = setTimeout(() => {
+      fetchDesigns();
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [fetchDesigns]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchDesigns(true);
+  }, [fetchDesigns]);
 
   const filteredDesigns = selectedFilter
-    ? MOCK_DESIGNS.filter(d => d.room === selectedFilter)
-    : MOCK_DESIGNS;
+    ? designs.filter(d => d.room === selectedFilter)
+    : designs;
 
-  const roomTypes = Array.from(new Set(MOCK_DESIGNS.map(d => d.room)));
+  const roomTypes = Array.from(new Set(designs.map(d => d.room)));
 
   return (
     <>

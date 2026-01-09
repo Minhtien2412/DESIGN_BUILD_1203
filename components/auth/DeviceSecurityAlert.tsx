@@ -1,4 +1,4 @@
-﻿import { useThemeColor } from '@/hooks/use-theme-color';
+import { useThemeColor } from '@/hooks/use-theme-color';
 import { DeviceInfo } from '@/services/deviceSecurity';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
@@ -34,20 +34,20 @@ export function DeviceSecurityAlert({
   const handleShowNativeAlert = React.useCallback(() => {
     if (Platform.OS !== 'web') {
       Alert.alert(
-        'Cảnh báo bảo mật',
-        warningMessage || 'Phát hiện đăng nhập từ thiết bị mới!',
+        'C?nh b�o b?o m?t',
+        warningMessage || 'Ph�t hi?n dang nh?p t? thi?t b? m?i!',
         [
           {
-            text: 'Đổi mật khẩu',
+            text: '�?i m?t kh?u',
             style: 'destructive',
             onPress: onChangePassword
           },
           {
-            text: 'Xem thiết bị',
+            text: 'Xem thi?t b?',
             onPress: onViewDevices
           },
           {
-            text: 'Tin cậy thiết bị này',
+            text: 'Tin c?y thi?t b? n�y',
             onPress: () => {
               onTrustDevice();
               onDismiss();
@@ -60,7 +60,7 @@ export function DeviceSecurityAlert({
 
   React.useEffect(() => {
     if (visible && isNewDevice && Platform.OS !== 'web') {
-      // Hiển thị Alert native trên mobile
+      // Hi?n th? Alert native tr�n mobile
       setTimeout(handleShowNativeAlert, 500);
     }
   }, [visible, isNewDevice, handleShowNativeAlert]);
@@ -87,21 +87,21 @@ export function DeviceSecurityAlert({
               color={warningColor} 
             />
             <Text style={[styles.title, { color: textColor }]}>
-              Cảnh báo bảo mật
+              C?nh b�o b?o m?t
             </Text>
           </View>
 
           {/* Content */}
           <View style={styles.content}>
             <Text style={[styles.warningText, { color: textColor }]}>
-              {warningMessage || 'Phát hiện đăng nhập từ thiết bị mới!'}
+              {warningMessage || 'Ph�t hi?n dang nh?p t? thi?t b? m?i!'}
             </Text>
 
             {/* Device list */}
             {otherDevices.length > 0 && (
               <View style={styles.deviceList}>
                 <Text style={[styles.deviceListTitle, { color: textColor }]}>
-                  Thiết bị đã đăng nhập trước đó:
+                  Thi?t b? d� dang nh?p tru?c d�:
                 </Text>
                 {otherDevices.slice(0, 2).map((device, index) => (
                   <View key={device.deviceId} style={styles.deviceItem}>
@@ -120,7 +120,7 @@ export function DeviceSecurityAlert({
                 ))}
                 {otherDevices.length > 2 && (
                   <Text style={[styles.moreDevices, { color: textColor + '80' }]}>
-                    và {otherDevices.length - 2} thiết bị khác...
+                    v� {otherDevices.length - 2} thi?t b? kh�c...
                   </Text>
                 )}
               </View>
@@ -136,7 +136,7 @@ export function DeviceSecurityAlert({
                 onDismiss();
               }}
             >
-              <Text style={styles.buttonText}>Đổi mật khẩu</Text>
+              <Text style={styles.buttonText}>�?i m?t kh?u</Text>
             </Pressable>
 
             <Pressable 
@@ -146,7 +146,7 @@ export function DeviceSecurityAlert({
                 onDismiss();
               }}
             >
-              <Text style={[styles.buttonText, { color: textColor }]}>Xem tất cả thiết bị</Text>
+              <Text style={[styles.buttonText, { color: textColor }]}>Xem t?t c? thi?t b?</Text>
             </Pressable>
 
             <Pressable 
@@ -156,7 +156,7 @@ export function DeviceSecurityAlert({
                 onDismiss();
               }}
             >
-              <Text style={styles.buttonText}>Tin cậy thiết bị này</Text>
+              <Text style={styles.buttonText}>Tin c?y thi?t b? n�y</Text>
             </Pressable>
           </View>
 

@@ -347,7 +347,7 @@ export default function FileUploadDemo() {
                     'document'
                   }
                   size={32}
-                  color="#0A6847"
+                  color="#0066CC"
                 />
               </View>
               <View style={styles.selectedFileInfo}>
@@ -421,7 +421,7 @@ export default function FileUploadDemo() {
                         'document'
                       }
                       size={24}
-                      color="#0A6847"
+                      color="#0066CC"
                     />
                   </View>
                   <View style={styles.fileCardInfo}>
@@ -442,7 +442,7 @@ export default function FileUploadDemo() {
                     <Text style={styles.linkText} numberOfLines={1}>
                       {file.downloadUrl}
                     </Text>
-                    <Ionicons name="copy-outline" size={18} color="#0A6847" />
+                    <Ionicons name="copy-outline" size={18} color="#0066CC" />
                   </TouchableOpacity>
                 </View>
 
@@ -493,7 +493,7 @@ export default function FileUploadDemo() {
             <Text style={styles.instructionText}>
               4. Bạn có thể copy link, tải xuống hoặc chia sẻ
             </Text>
-            <Text style={[styles.instructionText, { marginTop: 12, color: '#EF4444' }]}>
+            <Text style={[styles.instructionText, { marginTop: 12, color: '#000000' }]}>
               ⚠️ Cần cấu hình API endpoint server trong code
             </Text>
             <Text style={[styles.instructionText, { color: '#666' }]}>
@@ -531,7 +531,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#0A6847',
+    color: '#0066CC',
     marginBottom: 8,
   },
   subtitle: {
@@ -565,10 +565,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#3B82F6',
   },
   videoButton: {
-    backgroundColor: '#8B5CF6',
+    backgroundColor: '#666666',
   },
   documentButton: {
-    backgroundColor: '#10B981',
+    backgroundColor: '#0066CC',
   },
   pickButtonText: {
     color: '#fff',
@@ -621,7 +621,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   uploadButton: {
-    backgroundColor: '#0A6847',
+    backgroundColor: '#0066CC',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -647,7 +647,7 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#0A6847',
+    backgroundColor: '#0066CC',
   },
   fileCard: {
     backgroundColor: '#fff',
@@ -708,7 +708,7 @@ const styles = StyleSheet.create({
   linkText: {
     flex: 1,
     fontSize: 13,
-    color: '#0A6847',
+    color: '#0066CC',
     fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
   },
   fileActions: {
@@ -726,13 +726,13 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   downloadActionButton: {
-    backgroundColor: '#0A6847',
+    backgroundColor: '#0066CC',
   },
   openActionButton: {
     backgroundColor: '#3B82F6',
   },
   shareActionButton: {
-    backgroundColor: '#8B5CF6',
+    backgroundColor: '#666666',
   },
   actionButtonText: {
     color: '#fff',
@@ -742,7 +742,7 @@ const styles = StyleSheet.create({
   instructionCard: {
     backgroundColor: '#FFF9DB',
     borderLeftWidth: 4,
-    borderLeftColor: '#F59E0B',
+    borderLeftColor: '#0066CC',
     padding: 16,
     borderRadius: 8,
   },

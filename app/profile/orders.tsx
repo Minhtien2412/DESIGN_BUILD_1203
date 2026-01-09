@@ -1,14 +1,16 @@
 /**
  * Orders Screen - Modern International Design
  * Quản lý đơn hàng với giao diện hiện đại quốc tế
+ * 🔥 UPDATED: Now uses real data from Backend API
  */
 
 import { Container } from '@/components/ui/container';
 import { useThemeColor } from '@/hooks/use-theme-color';
+import { Order as APIOrder, listOrders } from '@/services/orders';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Href, router, Stack } from 'expo-router';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
     Image,
     RefreshControl,
@@ -38,7 +40,8 @@ interface Order {
   paymentMethod: string;
 }
 
-const MOCK_ORDERS: Order[] = [
+// Fallback data khi API không khả dụng
+const FALLBACK_ORDERS: Order[] = [
   {
     id: '1',
     orderNumber: '#DH123456',
@@ -78,54 +81,42 @@ const MOCK_ORDERS: Order[] = [
         price: 280000,
         image: 'https://picsum.photos/200/200?random=3',
       },
-      {
-        id: '4',
-        name: 'Cát xây dựng',
-        quantity: 2,
-        price: 150000,
-        image: 'https://picsum.photos/200/200?random=4',
-      },
     ],
     shippingAddress: '456 Lê Văn B, Q.3, TP.HCM',
     paymentMethod: 'ZaloPay',
   },
-  {
-    id: '3',
-    orderNumber: '#DH123454',
-    date: '2025-11-05 16:45',
-    status: 'cancelled',
-    total: 890000,
-    items: [
-      {
-        id: '5',
-        name: 'Thép xây dựng',
-        quantity: 20,
-        price: 44500,
-        image: 'https://picsum.photos/200/200?random=5',
-      },
-    ],
-    shippingAddress: '789 Trần Văn C, Q.Tân Bình, TP.HCM',
-    paymentMethod: 'COD',
-  },
-  {
-    id: '4',
-    orderNumber: '#DH123453',
-    date: '2025-11-01 09:20',
-    status: 'pending',
-    total: 1250000,
-    items: [
-      {
-        id: '6',
-        name: 'Đá xây dựng',
-        quantity: 15,
-        price: 83333,
-        image: 'https://picsum.photos/200/200?random=6',
-      },
-    ],
-    shippingAddress: '321 Nguyễn Văn D, Q.5, TP.HCM',
-    paymentMethod: 'VNPay',
-  },
 ];
+
+// Map API order status to UI status
+function mapOrderStatus(status: string): 'pending' | 'processing' | 'shipping' | 'delivered' | 'cancelled' {
+  switch (status) {
+    case 'paid': return 'processing';
+    case 'failed': return 'cancelled';
+    case 'canceled': return 'cancelled';
+    case 'refunded': return 'cancelled';
+    default: return 'pending';
+  }
+}
+
+// Convert API Order to UI Order
+function mapAPIOrder(order: APIOrder, index: number): Order {
+  return {
+    id: order.id,
+    orderNumber: `#DH${order.id.slice(-6).toUpperCase()}`,
+    date: new Date(order.createdAt).toLocaleString('vi-VN'),
+    status: mapOrderStatus(order.status),
+    total: order.total,
+    items: order.items.map(item => ({
+      id: item.id,
+      name: item.name,
+      quantity: item.qty,
+      price: item.price,
+      image: `https://picsum.photos/200/200?random=${item.id}`,
+    })),
+    shippingAddress: 'Địa chỉ giao hàng',
+    paymentMethod: order.paymentMethodId ? 'Thẻ tín dụng' : 'COD',
+  };
+}
 
 const ORDER_STATUS_CONFIG = {
   pending: {
@@ -142,20 +133,20 @@ const ORDER_STATUS_CONFIG = {
   },
   shipping: {
     label: 'Đang giao',
-    color: '#8B5CF6',
-    bg: '#8B5CF620',
+    color: '#666666',
+    bg: '#66666620',
     icon: 'car-outline' as const,
   },
   delivered: {
     label: 'Đã giao',
-    color: '#10B981',
-    bg: '#10B98120',
+    color: '#0066CC',
+    bg: '#0066CC20',
     icon: 'checkmark-circle-outline' as const,
   },
   cancelled: {
     label: 'Đã hủy',
-    color: '#EF4444',
-    bg: '#EF444420',
+    color: '#000000',
+    bg: '#00000020',
     icon: 'close-circle-outline' as const,
   },
 };
@@ -170,38 +161,67 @@ export default function OrdersScreen() {
 
   const [selectedTab, setSelectedTab] = useState<'all' | 'pending' | 'processing' | 'shipping' | 'delivered' | 'cancelled'>('all');
   const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [orders, setOrders] = useState<Order[]>(FALLBACK_ORDERS);
+  const [dataSource, setDataSource] = useState<'api' | 'mock'>('mock');
+
+  // Load orders from API
+  const loadOrders = useCallback(async () => {
+    try {
+      const apiOrders = await listOrders();
+      if (apiOrders && apiOrders.length > 0) {
+        const mappedOrders = apiOrders.map((o, idx) => mapAPIOrder(o, idx));
+        setOrders(mappedOrders);
+        setDataSource('api');
+        console.log(`✅ Loaded ${mappedOrders.length} orders from API`);
+      } else {
+        throw new Error('No orders from API');
+      }
+    } catch (error) {
+      console.warn('⚠️ API không khả dụng, sử dụng dữ liệu mẫu:', error);
+      setOrders(FALLBACK_ORDERS);
+      setDataSource('mock');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadOrders();
+  }, [loadOrders]);
 
   const tabs = [
-    { key: 'all' as const, label: 'Tất cả', count: MOCK_ORDERS.length },
+    { key: 'all' as const, label: 'Tất cả', count: orders.length },
     { 
       key: 'pending' as const, 
       label: 'Chờ xác nhận', 
-      count: MOCK_ORDERS.filter(o => o.status === 'pending').length 
+      count: orders.filter(o => o.status === 'pending').length 
     },
     { 
       key: 'shipping' as const, 
       label: 'Đang giao', 
-      count: MOCK_ORDERS.filter(o => o.status === 'shipping').length 
+      count: orders.filter(o => o.status === 'shipping').length 
     },
     { 
       key: 'delivered' as const, 
       label: 'Đã giao', 
-      count: MOCK_ORDERS.filter(o => o.status === 'delivered').length 
+      count: orders.filter(o => o.status === 'delivered').length 
     },
     { 
       key: 'cancelled' as const, 
       label: 'Đã hủy', 
-      count: MOCK_ORDERS.filter(o => o.status === 'cancelled').length 
+      count: orders.filter(o => o.status === 'cancelled').length 
     },
   ];
 
   const filteredOrders = selectedTab === 'all'
-    ? MOCK_ORDERS
-    : MOCK_ORDERS.filter(order => order.status === selectedTab);
+    ? orders
+    : orders.filter(order => order.status === selectedTab);
 
-  const onRefresh = () => {
+  const onRefresh = async () => {
     setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 1000);
+    await loadOrders();
+    setRefreshing(false);
   };
 
   const formatCurrency = (amount: number) => {
@@ -285,7 +305,7 @@ export default function OrdersScreen() {
         <View style={[styles.orderFooter, { borderTopColor: border }]}>
           <View style={styles.totalContainer}>
             <Text style={[styles.totalLabel, { color: textMuted }]}>Tổng thanh toán:</Text>
-            <Text style={[styles.totalAmount, { color: '#EF4444' }]}>
+            <Text style={[styles.totalAmount, { color: '#000000' }]}>
               {formatCurrency(item.total)}
             </Text>
           </View>
@@ -325,11 +345,11 @@ export default function OrdersScreen() {
           {item.status === 'pending' && (
             <>
               <TouchableOpacity
-                style={[styles.actionButton, { borderColor: '#EF4444' }]}
+                style={[styles.actionButton, { borderColor: '#000000' }]}
                 onPress={() => {}}
               >
-                <Ionicons name="close-circle-outline" size={16} color="#EF4444" />
-                <Text style={[styles.actionButtonText, { color: '#EF4444' }]}>
+                <Ionicons name="close-circle-outline" size={16} color="#000000" />
+                <Text style={[styles.actionButtonText, { color: '#000000' }]}>
                   Hủy đơn
                 </Text>
               </TouchableOpacity>
@@ -377,13 +397,13 @@ export default function OrdersScreen() {
     </View>
   );
 
-  // Stats
+  // Stats - use state orders instead of undefined MOCK_ORDERS
   const stats = {
-    total: MOCK_ORDERS.length,
-    pending: MOCK_ORDERS.filter(o => o.status === 'pending').length,
-    shipping: MOCK_ORDERS.filter(o => o.status === 'shipping').length,
-    delivered: MOCK_ORDERS.filter(o => o.status === 'delivered').length,
-    totalSpent: MOCK_ORDERS.filter(o => o.status === 'delivered').reduce((sum, o) => sum + o.total, 0),
+    total: orders.length,
+    pending: orders.filter(o => o.status === 'pending').length,
+    shipping: orders.filter(o => o.status === 'shipping').length,
+    delivered: orders.filter(o => o.status === 'delivered').length,
+    totalSpent: orders.filter(o => o.status === 'delivered').reduce((sum, o) => sum + o.total, 0),
   };
 
   return (
@@ -397,7 +417,7 @@ export default function OrdersScreen() {
 
       {/* Gradient Header */}
       <LinearGradient
-        colors={['#0A6847', '#064E3B']}
+        colors={['#0066CC', '#064E3B']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.header}
@@ -437,7 +457,7 @@ export default function OrdersScreen() {
               activeOpacity={0.9}
             >
               <LinearGradient
-                colors={['#F59E0B', '#D97706']}
+                colors={['#0066CC', '#D97706']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1.2, y: 1 }}
                 style={styles.promotionGradient}
@@ -481,16 +501,16 @@ export default function OrdersScreen() {
             </View>
 
             <View style={[styles.statCard, { backgroundColor: surface, borderColor: border }]}>
-              <View style={[styles.statIconContainer, { backgroundColor: '#8B5CF610' }]}>
-                <Ionicons name="car" size={24} color="#8B5CF6" />
+              <View style={[styles.statIconContainer, { backgroundColor: '#66666610' }]}>
+                <Ionicons name="car" size={24} color="#666666" />
               </View>
               <Text style={[styles.statValue, { color: text }]}>{stats.shipping}</Text>
               <Text style={[styles.statLabel, { color: textMuted }]}>Đang giao</Text>
             </View>
 
             <View style={[styles.statCard, { backgroundColor: surface, borderColor: border }]}>
-              <View style={[styles.statIconContainer, { backgroundColor: '#10B98110' }]}>
-                <Ionicons name="checkmark-circle" size={24} color="#10B981" />
+              <View style={[styles.statIconContainer, { backgroundColor: '#0066CC10' }]}>
+                <Ionicons name="checkmark-circle" size={24} color="#0066CC" />
               </View>
               <Text style={[styles.statValue, { color: text }]}>{stats.delivered}</Text>
               <Text style={[styles.statLabel, { color: textMuted }]}>Hoàn thành</Text>
@@ -501,17 +521,17 @@ export default function OrdersScreen() {
           {stats.totalSpent > 0 && (
             <View style={[styles.totalSpentCard, { backgroundColor: surface, borderColor: border }]}>
               <View style={styles.totalSpentLeft}>
-                <Ionicons name="wallet" size={24} color="#10B981" />
+                <Ionicons name="wallet" size={24} color="#0066CC" />
                 <View style={{ marginLeft: 12 }}>
                   <Text style={[styles.totalSpentLabel, { color: textMuted }]}>
                     Tổng chi tiêu
                   </Text>
-                  <Text style={[styles.totalSpentValue, { color: '#10B981' }]}>
+                  <Text style={[styles.totalSpentValue, { color: '#0066CC' }]}>
                     {formatCurrency(stats.totalSpent)}
                   </Text>
                 </View>
               </View>
-              <Ionicons name="trending-up" size={28} color="#10B981" />
+              <Ionicons name="trending-up" size={28} color="#0066CC" />
             </View>
           )}
         </Container>

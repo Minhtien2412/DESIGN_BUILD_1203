@@ -80,7 +80,7 @@ export default function PPEInventoryScreen() {
         showBackButton
         headerRight={
           <TouchableOpacity onPress={() => setModalVisible(true)}>
-            <Ionicons name="add-circle" size={28} color="#0A6847" />
+            <Ionicons name="add-circle" size={28} color="#0066CC" />
           </TouchableOpacity>
         }
         scrollable={false}
@@ -223,14 +223,14 @@ function getConditionLabel(condition: PPECondition): string {
 
 function getConditionColor(condition: PPECondition): string {
   const colors: Record<PPECondition, string> = {
-    [PPECondition.NEW]: '#10B981',
-    [PPECondition.GOOD]: '#10B981',
-    [PPECondition.FAIR]: '#0A6847',
-    [PPECondition.WORN]: '#FF9800',
+    [PPECondition.NEW]: '#0066CC',
+    [PPECondition.GOOD]: '#0066CC',
+    [PPECondition.FAIR]: '#0066CC',
+    [PPECondition.WORN]: '#0066CC',
     [PPECondition.DAMAGED]: '#1A1A1A',
     [PPECondition.EXPIRED]: '#1A1A1A',
   };
-  return colors[condition] || '#9E9E9E';
+  return colors[condition] || '#999999';
 }
 
 // Add PPE Modal Component
@@ -309,7 +309,7 @@ function AddPPEModal({ visible, projectId, onClose, onCreate }: AddPPEModalProps
                   <Ionicons
                     name={getPPEIcon(t) as any}
                     size={24}
-                    color={type === t ? '#0A6847' : '#666'}
+                    color={type === t ? '#0066CC' : '#666'}
                   />
                   <Text
                     style={[styles.typeButtonText, type === t && styles.typeButtonTextActive]}
@@ -419,7 +419,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   filterTabActive: {
-    backgroundColor: '#0A6847',
+    backgroundColor: '#0066CC',
   },
   filterTabText: {
     fontSize: 13,
@@ -488,8 +488,8 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   typeButtonActive: {
-    borderColor: '#0A6847',
-    backgroundColor: '#E3F2FD',
+    borderColor: '#0066CC',
+    backgroundColor: '#E8F4FF',
   },
   typeButtonText: {
     fontSize: 11,
@@ -497,7 +497,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   typeButtonTextActive: {
-    color: '#0A6847',
+    color: '#0066CC',
     fontWeight: '600',
   },
   conditionGrid: {
@@ -533,7 +533,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
   },
   createButton: {
-    backgroundColor: '#0A6847',
+    backgroundColor: '#0066CC',
   },
   cancelButtonText: {
     fontSize: 16,

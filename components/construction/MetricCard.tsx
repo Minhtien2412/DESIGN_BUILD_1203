@@ -19,11 +19,11 @@ interface MetricCardProps {
 }
 
 const DEFAULT_GRADIENTS: Record<string, [string, string]> = {
-  blue: ['#3b82f6', '#2563eb'],
-  green: ['#10b981', '#059669'],
-  orange: ['#f59e0b', '#d97706'],
-  purple: ['#8b5cf6', '#7c3aed'],
-  red: ['#ef4444', '#dc2626'],
+  blue: ['#3b82f6', '#0066CC'],
+  green: ['#0066CC', '#0066CC'],
+  orange: ['#0066CC', '#d97706'],
+  purple: ['#666666', '#666666'],
+  red: ['#000000', '#000000'],
 };
 
 export default function MetricCard({
@@ -43,7 +43,7 @@ export default function MetricCard({
 
   const getTrendColor = () => {
     if (!trend || trend === 'neutral') return '#6b7280';
-    return trend === 'up' ? '#10b981' : '#ef4444';
+    return trend === 'up' ? '#0066CC' : '#000000';
   };
 
   return (

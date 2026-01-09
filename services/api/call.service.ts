@@ -286,15 +286,15 @@ export function getCallIcon(call: Call, currentUserId: number): string {
 export function getCallStatusColor(status: CallStatus): string {
   switch (status) {
     case 'active':
-      return '#4CAF50'; // green
+      return '#0066CC'; // green
     case 'ended':
       return '#666666'; // gray
     case 'missed':
-      return '#F44336'; // red
+      return '#000000'; // red
     case 'rejected':
-      return '#FF9800'; // orange
+      return '#0066CC'; // orange
     case 'pending':
-      return '#2196F3'; // blue
+      return '#0066CC'; // blue
     default:
       return '#666666';
   }

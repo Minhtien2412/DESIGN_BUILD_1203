@@ -37,22 +37,22 @@ const STATUS_FILTERS: { value: SubmittalStatus | 'ALL'; label: string }[] = [
 
 const STATUS_COLORS: Record<SubmittalStatus, string> = {
   DRAFT: '#6B7280',
-  SUBMITTED: '#3B82F6',
-  UNDER_REVIEW: '#F59E0B',
-  APPROVED: '#10B981',
-  APPROVED_AS_NOTED: '#059669',
-  REVISE_AND_RESUBMIT: '#F97316',
-  REJECTED: '#EF4444',
+  SUBMITTED: '#0080FF',
+  UNDER_REVIEW: '#0080FF',
+  APPROVED: '#0066CC',
+  APPROVED_AS_NOTED: '#0066CC',
+  REVISE_AND_RESUBMIT: '#0066CC',
+  REJECTED: '#000000',
   SUPERSEDED: '#9CA3AF',
   WITHDRAWN: '#6B7280',
 };
 
 const PRIORITY_COLORS: Record<SubmittalPriority, string> = {
-  LOW: '#10B981',
-  MEDIUM: '#3B82F6',
-  HIGH: '#F59E0B',
-  URGENT: '#F97316',
-  CRITICAL: '#EF4444',
+  LOW: '#0066CC',
+  MEDIUM: '#0080FF',
+  HIGH: '#0080FF',
+  URGENT: '#0066CC',
+  CRITICAL: '#000000',
 };
 
 export default function SubmittalsScreen() {
@@ -101,7 +101,7 @@ export default function SubmittalsScreen() {
   if (loading && !submittals.length) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#3B82F6" />
+        <ActivityIndicator size="large" color="#0080FF" />
       </View>
     );
   }
@@ -115,29 +115,29 @@ export default function SubmittalsScreen() {
     <View style={styles.container}>
       {/* Stats Cards */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.statsContainer}>
-        <View style={[styles.statCard, { backgroundColor: '#EFF6FF' }]}>
+        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
           <Text style={styles.statValue}>{submittals.length}</Text>
           <Text style={styles.statLabel}>Total</Text>
         </View>
 
-        <View style={[styles.statCard, { backgroundColor: '#DBEAFE' }]}>
-          <Text style={[styles.statValue, { color: '#3B82F6' }]}>{submittedCount}</Text>
+        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
+          <Text style={[styles.statValue, { color: '#0080FF' }]}>{submittedCount}</Text>
           <Text style={styles.statLabel}>Submitted</Text>
         </View>
 
         <View style={[styles.statCard, { backgroundColor: '#FEF3C7' }]}>
-          <Text style={[styles.statValue, { color: '#F59E0B' }]}>{underReviewCount}</Text>
+          <Text style={[styles.statValue, { color: '#0080FF' }]}>{underReviewCount}</Text>
           <Text style={styles.statLabel}>Under Review</Text>
         </View>
 
         <View style={[styles.statCard, { backgroundColor: '#D1FAE5' }]}>
-          <Text style={[styles.statValue, { color: '#10B981' }]}>{approvedCount}</Text>
+          <Text style={[styles.statValue, { color: '#0066CC' }]}>{approvedCount}</Text>
           <Text style={styles.statLabel}>Approved</Text>
         </View>
 
         {overdueCount > 0 && (
           <View style={[styles.statCard, { backgroundColor: '#FEE2E2' }]}>
-            <Text style={[styles.statValue, { color: '#EF4444' }]}>{overdueCount}</Text>
+            <Text style={[styles.statValue, { color: '#000000' }]}>{overdueCount}</Text>
             <Text style={styles.statLabel}>Overdue</Text>
           </View>
         )}
@@ -264,7 +264,7 @@ export default function SubmittalsScreen() {
                   </Text>
 
                   <View style={styles.specBadge}>
-                    <Ionicons name="book-outline" size={12} color="#8B5CF6" style={{ marginRight: 4 }} />
+                    <Ionicons name="book-outline" size={12} color="#0066CC" style={{ marginRight: 4 }} />
                     <Text style={styles.specBadgeText}>{submittal.specSection}</Text>
                   </View>
                 </View>
@@ -303,7 +303,7 @@ export default function SubmittalsScreen() {
                       {daysToReview !== null && (
                         <Text
                           style={{
-                            color: daysToReview < 0 ? '#EF4444' : daysToReview < 3 ? '#F59E0B' : '#6B7280',
+                            color: daysToReview < 0 ? '#000000' : daysToReview < 3 ? '#0080FF' : '#6B7280',
                           }}
                         >
                           {' '}
@@ -333,11 +333,11 @@ export default function SubmittalsScreen() {
                             {
                               backgroundColor:
                                 reviewer.status === 'COMPLETED'
-                                  ? '#10B981'
+                                  ? '#0066CC'
                                   : reviewer.status === 'IN_PROGRESS'
-                                  ? '#F59E0B'
+                                  ? '#0080FF'
                                   : reviewer.status === 'OVERDUE'
-                                  ? '#EF4444'
+                                  ? '#000000'
                                   : '#6B7280',
                             },
                           ]}
@@ -357,7 +357,7 @@ export default function SubmittalsScreen() {
               {/* Overdue Warning */}
               {submittal.isOverdue && (
                 <View style={styles.overdueWarning}>
-                  <Ionicons name="warning" size={16} color="#DC2626" />
+                  <Ionicons name="warning" size={16} color="#000000" />
                   <Text style={styles.overdueWarningText}>
                     {submittal.daysOverdue} day(s) overdue - Immediate attention required
                   </Text>
@@ -367,7 +367,7 @@ export default function SubmittalsScreen() {
               {/* Actions */}
               <View style={styles.actions}>
                 <TouchableOpacity style={styles.actionButton}>
-                  <Ionicons name="eye-outline" size={18} color="#3B82F6" />
+                  <Ionicons name="eye-outline" size={18} color="#0080FF" />
                   <Text style={styles.actionButtonText}>View</Text>
                 </TouchableOpacity>
 
@@ -492,8 +492,8 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   filterChipActive: {
-    backgroundColor: '#3B82F6',
-    borderColor: '#3B82F6',
+    backgroundColor: '#0080FF',
+    borderColor: '#0080FF',
   },
   filterChipText: {
     fontSize: 13,
@@ -643,7 +643,7 @@ const styles = StyleSheet.create({
   },
   overdueWarningText: {
     fontSize: 11,
-    color: '#DC2626',
+    color: '#000000',
     fontWeight: '600',
     marginLeft: 6,
     flex: 1,
@@ -662,13 +662,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#F3F4F6',
   },
   actionButtonPrimary: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#0080FF',
   },
   actionButtonSuccess: {
-    backgroundColor: '#10B981',
+    backgroundColor: '#0066CC',
   },
   actionButtonWarning: {
-    backgroundColor: '#F59E0B',
+    backgroundColor: '#0080FF',
   },
   actionButtonText: {
     fontSize: 12,

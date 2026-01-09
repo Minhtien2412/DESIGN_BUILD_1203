@@ -22,11 +22,11 @@ import {
 } from 'react-native';
 
 const CATEGORIES = [
-  { id: 'DESIGN', name: 'Thiết kế', icon: 'color-palette-outline', color: '#8B5CF6' },
-  { id: 'CONSTRUCTION', name: 'Thi công', icon: 'construct-outline', color: '#F59E0B' },
+  { id: 'DESIGN', name: 'Thiết kế', icon: 'color-palette-outline', color: '#666666' },
+  { id: 'CONSTRUCTION', name: 'Thi công', icon: 'construct-outline', color: '#0066CC' },
   { id: 'CONSULTING', name: 'Tư vấn', icon: 'bulb-outline', color: '#3B82F6' },
   { id: 'MAINTENANCE', name: 'Bảo trì', icon: 'build-outline', color: '#06B6D4' },
-  { id: 'INSPECTION', name: 'Giám sát', icon: 'eye-outline', color: '#EF4444' },
+  { id: 'INSPECTION', name: 'Giám sát', icon: 'eye-outline', color: '#000000' },
   { id: 'OTHER', name: 'Khác', icon: 'ellipsis-horizontal-circle-outline', color: '#6B7280' },
 ];
 
@@ -350,7 +350,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   required: {
-    color: '#EF4444',
+    color: '#000000',
   },
   input: {
     paddingHorizontal: 16,
@@ -361,7 +361,7 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   inputError: {
-    borderColor: '#EF4444',
+    borderColor: '#000000',
   },
   textArea: {
     minHeight: 120,
@@ -369,7 +369,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 12,
-    color: '#EF4444',
+    color: '#000000',
     marginTop: 4,
   },
   categoryGrid: {
@@ -399,7 +399,7 @@ const styles = StyleSheet.create({
     borderTopColor: '#F3F4F6',
   },
   submitButton: {
-    backgroundColor: '#8B5CF6',
+    backgroundColor: '#666666',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',

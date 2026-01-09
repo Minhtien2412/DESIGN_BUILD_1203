@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
   },
   viewAll: {
     fontSize: 13,
-    color: '#EE4D2D',
+    color: '#0066CC',
     fontWeight: '500',
   },
   scrollContent: {
@@ -142,6 +142,6 @@ const styles = StyleSheet.create({
   productPrice: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#EE4D2D',
+    color: '#0066CC',
   },
 });

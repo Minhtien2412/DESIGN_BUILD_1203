@@ -70,3 +70,10 @@ export { default as TaskManagement, type Task } from './task-management';
 
 export { ContractorInfoCard, type ContractorInfoCardProps } from './contractor-info-card';
 
+// ============================================
+// DATA SYNC / CRM INTEGRATION COMPONENTS
+// ============================================
+
+export { CRMDataList } from './CRMDataList';
+export { SyncStatusBadge } from './SyncStatusBadge';
+

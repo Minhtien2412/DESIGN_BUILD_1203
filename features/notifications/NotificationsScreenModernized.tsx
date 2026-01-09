@@ -7,9 +7,12 @@
 import { MODERN_COLORS, MODERN_RADIUS, MODERN_SHADOWS, MODERN_SPACING, MODERN_TYPOGRAPHY } from '@/constants/modern-theme';
 import { useNotifications } from '@/hooks/useNotifications';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
+import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
     ActivityIndicator,
+    Alert,
     RefreshControl,
     SafeAreaView,
     SectionList,
@@ -28,23 +31,60 @@ interface NotificationGroup {
 }
 
 export default function NotificationsScreenModernized() {
-  const { notifications, loading, unreadCount, markAsRead, markAllAsRead, refresh } = useNotifications();
+  const { notifications, loading, unreadCount, markAsRead, markAllAsRead, refresh, deleteNotification } = useNotifications();
   const [refreshing, setRefreshing] = useState(false);
   const [selectedTab, setSelectedTab] = useState<NotificationType>('all');
+  const router = useRouter();
 
   const handleRefresh = async () => {
     setRefreshing(true);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     await refresh();
     setRefreshing(false);
   };
 
   const handleMarkAllRead = async () => {
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     await markAllAsRead();
   };
 
-  const handleNotificationPress = async (id: number) => {
-    await markAsRead(id);
-    // Navigate to relevant screen based on notification type
+  const handleNotificationPress = async (item: any) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    await markAsRead(item.id);
+    
+    // Navigate based on notification type and related data
+    const relatedType = item.relatedType?.toLowerCase();
+    const relatedId = item.relatedId;
+    
+    if (relatedType === 'task' && relatedId) {
+      router.push(`/tasks/${relatedId}` as any);
+    } else if (relatedType === 'project' && relatedId) {
+      router.push(`/projects/${relatedId}` as any);
+    } else if (relatedType === 'chat' && relatedId) {
+      router.push({ pathname: '/chat/[chatId]', params: { chatId: String(relatedId) } } as any);
+    } else if (relatedType === 'payment' && relatedId) {
+      router.push(`/payments/${relatedId}` as any);
+    }
+  };
+
+  const handleNotificationLongPress = (item: any) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    Alert.alert(
+      item.title,
+      'Chọn hành động',
+      [
+        {
+          text: item.isRead ? 'Đánh dấu chưa đọc' : 'Đánh dấu đã đọc',
+          onPress: () => markAsRead(item.id),
+        },
+        {
+          text: 'Xóa',
+          style: 'destructive',
+          onPress: () => deleteNotification(item.id),
+        },
+        { text: 'Hủy', style: 'cancel' },
+      ]
+    );
   };
 
   // Group notifications by date
@@ -133,8 +173,10 @@ export default function NotificationsScreenModernized() {
           styles.notificationCard,
           isUnread && styles.notificationCardUnread,
         ]}
-        onPress={() => handleNotificationPress(item.id)}
+        onPress={() => handleNotificationPress(item)}
+        onLongPress={() => handleNotificationLongPress(item)}
         activeOpacity={0.7}
+        delayLongPress={500}
       >
         <View style={[styles.iconContainer, { backgroundColor: icon.color + '15' }]}>
           <Ionicons name={icon.name as any} size={24} color={icon.color} />
@@ -152,10 +194,24 @@ export default function NotificationsScreenModernized() {
             {item.message}
           </Text>
           
-          <Text style={styles.notificationTime}>
-            {formatTime(item.createdAt)}
-          </Text>
+          <View style={styles.notificationFooter}>
+            <Text style={styles.notificationTime}>
+              {formatTime(item.createdAt)}
+            </Text>
+            {item.relatedType && (
+              <View style={styles.typeBadge}>
+                <Text style={styles.typeBadgeText}>
+                  {item.relatedType === 'task' ? 'Công việc' : 
+                   item.relatedType === 'project' ? 'Dự án' :
+                   item.relatedType === 'chat' ? 'Tin nhắn' :
+                   item.relatedType === 'payment' ? 'Thanh toán' : ''}
+                </Text>
+              </View>
+            )}
+          </View>
         </View>
+        
+        <Ionicons name="chevron-forward" size={16} color={MODERN_COLORS.textSecondary} />
       </TouchableOpacity>
     );
   };
@@ -402,6 +458,7 @@ const styles = StyleSheet.create({
   },
   notificationCard: {
     flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: MODERN_COLORS.surface,
     paddingHorizontal: MODERN_SPACING.lg,
     paddingVertical: MODERN_SPACING.md,
@@ -449,9 +506,25 @@ const styles = StyleSheet.create({
     lineHeight: MODERN_TYPOGRAPHY.lineHeight.relaxed,
     marginBottom: MODERN_SPACING.xs,
   },
+  notificationFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
   notificationTime: {
     fontSize: MODERN_TYPOGRAPHY.fontSize.xs,
     color: MODERN_COLORS.textSecondary,
+  },
+  typeBadge: {
+    backgroundColor: MODERN_COLORS.primaryBg,
+    paddingHorizontal: MODERN_SPACING.sm,
+    paddingVertical: 2,
+    borderRadius: MODERN_RADIUS.sm,
+  },
+  typeBadgeText: {
+    fontSize: MODERN_TYPOGRAPHY.fontSize.xs,
+    color: MODERN_COLORS.primary,
+    fontWeight: MODERN_TYPOGRAPHY.fontWeight.medium,
   },
   emptyContainer: {
     flex: 1,

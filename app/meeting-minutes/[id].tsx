@@ -55,19 +55,19 @@ export default function MeetingMinuteDetailScreen() {
   // Meeting type color
   const getTypeColor = (type: MeetingType): string => {
     const colors: Record<MeetingType, string> = {
-      KICKOFF: '#8B5CF6',
+      KICKOFF: '#666666',
       PROGRESS_REVIEW: '#3B82F6',
-      COORDINATION: '#10B981',
-      SAFETY: '#EF4444',
-      DESIGN_REVIEW: '#F59E0B',
-      TECHNICAL: '#6366F1',
-      CLIENT: '#EC4899',
+      COORDINATION: '#0066CC',
+      SAFETY: '#000000',
+      DESIGN_REVIEW: '#0066CC',
+      TECHNICAL: '#666666',
+      CLIENT: '#666666',
       CONTRACTOR: '#14B8A6',
       SUBCONTRACTOR: '#84CC16',
       WEEKLY: '#06B6D4',
-      MONTHLY: '#8B5CF6',
-      EMERGENCY: '#DC2626',
-      CLOSEOUT: '#059669',
+      MONTHLY: '#666666',
+      EMERGENCY: '#000000',
+      CLOSEOUT: '#0066CC',
       OTHER: '#6B7280',
     };
     return colors[type] || '#6B7280';
@@ -76,7 +76,7 @@ export default function MeetingMinuteDetailScreen() {
   // Status colors
   const getStatusColor = (status: MeetingStatus): { bg: string; text: string } => {
     const colors: Record<MeetingStatus, { bg: string; text: string }> = {
-      SCHEDULED: { bg: '#DBEAFE', text: '#1E40AF' },
+      SCHEDULED: { bg: '#E8F4FF', text: '#1E40AF' },
       IN_PROGRESS: { bg: '#FEF3C7', text: '#92400E' },
       COMPLETED: { bg: '#D1FAE5', text: '#065F46' },
       CANCELLED: { bg: '#FEE2E2', text: '#991B1B' },
@@ -90,14 +90,14 @@ export default function MeetingMinuteDetailScreen() {
       DRAFT: { bg: '#F3F4F6', text: '#374151' },
       UNDER_REVIEW: { bg: '#FEF3C7', text: '#92400E' },
       APPROVED: { bg: '#D1FAE5', text: '#065F46' },
-      DISTRIBUTED: { bg: '#DBEAFE', text: '#1E40AF' },
+      DISTRIBUTED: { bg: '#E8F4FF', text: '#1E40AF' },
     };
     return colors[status];
   };
 
   const getActionStatusColor = (status: ActionItemStatus): { bg: string; text: string } => {
     const colors: Record<ActionItemStatus, { bg: string; text: string }> = {
-      OPEN: { bg: '#DBEAFE', text: '#1E40AF' },
+      OPEN: { bg: '#E8F4FF', text: '#1E40AF' },
       IN_PROGRESS: { bg: '#FEF3C7', text: '#92400E' },
       COMPLETED: { bg: '#D1FAE5', text: '#065F46' },
       OVERDUE: { bg: '#FEE2E2', text: '#991B1B' },
@@ -180,7 +180,7 @@ export default function MeetingMinuteDetailScreen() {
     return (
       <Container>
         <Section>
-          <ThemedText style={{ color: '#EF4444', textAlign: 'center' }}>
+          <ThemedText style={{ color: '#000000', textAlign: 'center' }}>
             Error: {error.message}
           </ThemedText>
         </Section>
@@ -389,7 +389,7 @@ export default function MeetingMinuteDetailScreen() {
                             item.status === 'COMPLETED'
                               ? '#D1FAE5'
                               : item.status === 'DISCUSSED'
-                                ? '#DBEAFE'
+                                ? '#E8F4FF'
                                 : '#F3F4F6',
                         },
                       ]}
@@ -586,10 +586,10 @@ export default function MeetingMinuteDetailScreen() {
                           width: `${action.progress}%`,
                           backgroundColor:
                             action.progress === 100
-                              ? '#10B981'
+                              ? '#0066CC'
                               : action.progress >= 50
                                 ? '#3B82F6'
-                                : '#F59E0B',
+                                : '#0066CC',
                         },
                       ]}
                     />
@@ -623,7 +623,7 @@ export default function MeetingMinuteDetailScreen() {
             <View style={[styles.keyPointsCard, { backgroundColor: cardBackground, borderColor }]}>
               {meeting.keyPoints.map((point, index) => (
                 <View key={index} style={styles.keyPointRow}>
-                  <Ionicons name="checkmark-circle" size={16} color="#10B981" />
+                  <Ionicons name="checkmark-circle" size={16} color="#0066CC" />
                   <ThemedText style={styles.keyPointText}>{point}</ThemedText>
                 </View>
               ))}

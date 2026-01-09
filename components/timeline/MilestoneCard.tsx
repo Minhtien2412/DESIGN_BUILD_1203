@@ -109,8 +109,8 @@ export function MilestoneCard({ phase, onPress }: MilestoneCardProps) {
         {/* Days Remaining or Delayed */}
         {delayed ? (
           <View style={styles.infoRow}>
-            <Ionicons name="alert-circle" size={14} color="#EF4444" />
-            <Text style={[styles.infoText, { color: '#EF4444' }]}>
+            <Ionicons name="alert-circle" size={14} color="#000000" />
+            <Text style={[styles.infoText, { color: '#000000' }]}>
               Trễ {Math.abs(daysRemaining)} ngày
             </Text>
           </View>

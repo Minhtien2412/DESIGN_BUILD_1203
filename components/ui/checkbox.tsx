@@ -71,7 +71,7 @@ const Checkbox = React.forwardRef<View, CheckboxProps>(
     const border = useThemeColor({}, 'border');
     const text = useThemeColor({}, 'text');
     const textMuted = useThemeColor({}, 'textMuted');
-    const errorColor = '#EF4444'; // Red-500
+    const errorColor = '#000000'; // Red-500
     const background = useThemeColor({}, 'background');
 
     const sizeConfig = SIZE_MAP[size];
@@ -174,7 +174,7 @@ export const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
   direction = 'vertical',
   style,
 }) => {
-  const errorColor = '#EF4444';
+  const errorColor = '#000000';
 
   const handleToggle = (optionValue: string) => {
     if (disabled) return;

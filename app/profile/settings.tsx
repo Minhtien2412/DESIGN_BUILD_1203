@@ -346,7 +346,7 @@ export default function SettingsScreen() {
         {/* Notifications */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Ionicons name="notifications-outline" size={24} color="#10B981" />
+            <Ionicons name="notifications-outline" size={24} color="#0066CC" />
             <Text style={styles.sectionTitle}>Thông báo</Text>
           </View>
           
@@ -388,7 +388,7 @@ export default function SettingsScreen() {
         {/* Privacy */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Ionicons name="shield-outline" size={24} color="#F59E0B" />
+            <Ionicons name="shield-outline" size={24} color="#0066CC" />
             <Text style={styles.sectionTitle}>Quyền riêng tư</Text>
           </View>
           
@@ -422,7 +422,7 @@ export default function SettingsScreen() {
         {/* App Behavior */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Ionicons name="phone-portrait-outline" size={24} color="#8B5CF6" />
+            <Ionicons name="phone-portrait-outline" size={24} color="#666666" />
             <Text style={styles.sectionTitle}>Ứng dụng</Text>
           </View>
           
@@ -456,7 +456,7 @@ export default function SettingsScreen() {
         {/* Storage & Cache */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Ionicons name="server-outline" size={24} color="#EF4444" />
+            <Ionicons name="server-outline" size={24} color="#000000" />
             <Text style={styles.sectionTitle}>Bộ nhớ</Text>
           </View>
           
@@ -480,7 +480,7 @@ export default function SettingsScreen() {
         {/* Save Indicator */}
         {saving && (
           <View style={styles.savingIndicator}>
-            <Ionicons name="checkmark-circle" size={16} color="#10B981" />
+            <Ionicons name="checkmark-circle" size={16} color="#0066CC" />
             <Text style={styles.savingText}>Đã lưu</Text>
           </View>
         )}

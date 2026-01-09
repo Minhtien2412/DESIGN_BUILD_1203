@@ -184,7 +184,7 @@ export default function CreateExpenseScreen() {
                 <Ionicons
                   name={option.icon as any}
                   size={20}
-                  color={category === option.value ? '#2196F3' : '#666'}
+                  color={category === option.value ? '#0066CC' : '#666'}
                 />
                 <Text
                   style={[
@@ -273,7 +273,7 @@ export default function CreateExpenseScreen() {
                 <Ionicons
                   name={method.icon as any}
                   size={22}
-                  color={paymentMethod === method.value ? '#2196F3' : '#666'}
+                  color={paymentMethod === method.value ? '#0066CC' : '#666'}
                 />
                 <Text
                   style={[
@@ -306,7 +306,7 @@ export default function CreateExpenseScreen() {
         <View style={styles.section}>
           <Text style={styles.label}>Hóa đơn đính kèm</Text>
           <TouchableOpacity style={styles.uploadButton}>
-            <Ionicons name="cloud-upload-outline" size={24} color="#2196F3" />
+            <Ionicons name="cloud-upload-outline" size={24} color="#0066CC" />
             <Text style={styles.uploadText}>Tải lên hóa đơn</Text>
             <Text style={styles.uploadHint}>(Tính năng sắp ra mắt)</Text>
           </TouchableOpacity>
@@ -357,7 +357,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   required: {
-    color: '#F44336',
+    color: '#000000',
   },
   input: {
     borderWidth: 1,
@@ -417,15 +417,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   optionCardActive: {
-    borderColor: '#2196F3',
-    backgroundColor: '#E3F2FD',
+    borderColor: '#0066CC',
+    backgroundColor: '#E8F4FF',
   },
   optionText: {
     fontSize: 13,
     color: '#666',
   },
   optionTextActive: {
-    color: '#2196F3',
+    color: '#0066CC',
     fontWeight: '600',
   },
   budgetScroll: {
@@ -441,15 +441,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   budgetChipActive: {
-    borderColor: '#2196F3',
-    backgroundColor: '#E3F2FD',
+    borderColor: '#0066CC',
+    backgroundColor: '#E8F4FF',
   },
   budgetChipText: {
     fontSize: 13,
     color: '#666',
   },
   budgetChipTextActive: {
-    color: '#2196F3',
+    color: '#0066CC',
     fontWeight: '600',
   },
   paymentGrid: {
@@ -467,15 +467,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   paymentCardActive: {
-    borderColor: '#2196F3',
-    backgroundColor: '#E3F2FD',
+    borderColor: '#0066CC',
+    backgroundColor: '#E8F4FF',
   },
   paymentText: {
     fontSize: 14,
     color: '#666',
   },
   paymentTextActive: {
-    color: '#2196F3',
+    color: '#0066CC',
     fontWeight: '600',
   },
   textArea: {
@@ -494,7 +494,7 @@ const styles = StyleSheet.create({
   },
   uploadText: {
     fontSize: 14,
-    color: '#2196F3',
+    color: '#0066CC',
     fontWeight: '500',
   },
   uploadHint: {
@@ -526,7 +526,7 @@ const styles = StyleSheet.create({
     flex: 2,
     paddingVertical: 14,
     borderRadius: 8,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     alignItems: 'center',
   },
   saveButtonDisabled: {

@@ -37,10 +37,10 @@ export default function CreateIncidentScreen() {
   const [newWitnessPhone, setNewWitnessPhone] = useState('');
 
   const severityOptions: { value: SeverityType; label: string; color: string }[] = [
-    { value: 'low', label: 'Thấp', color: '#10B981' },
-    { value: 'medium', label: 'Trung bình', color: '#F59E0B' },
-    { value: 'high', label: 'Cao', color: '#F97316' },
-    { value: 'critical', label: 'Nghiêm trọng', color: '#EF4444' },
+    { value: 'low', label: 'Thấp', color: '#0066CC' },
+    { value: 'medium', label: 'Trung bình', color: '#0080FF' },
+    { value: 'high', label: 'Cao', color: '#0066CC' },
+    { value: 'critical', label: 'Nghiêm trọng', color: '#000000' },
   ];
 
   const incidentTypes: { value: IncidentType; label: string; icon: string }[] = [
@@ -268,7 +268,7 @@ export default function CreateIncidentScreen() {
                   onPress={() => removeWitness(witness.id)}
                   style={styles.removeButton}
                 >
-                  <Ionicons name="close-circle" size={22} color="#EF4444" />
+                  <Ionicons name="close-circle" size={22} color="#000000" />
                 </TouchableOpacity>
               </View>
             ))}
@@ -385,7 +385,7 @@ const styles = StyleSheet.create({
   },
   alertText: {
     fontSize: 13,
-    color: '#DC2626',
+    color: '#000000',
     lineHeight: 18,
   },
   section: {
@@ -587,7 +587,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#EF4444',
+    backgroundColor: '#000000',
     paddingVertical: 14,
     borderRadius: 10,
     gap: 8,

@@ -68,7 +68,7 @@ const WIDGET_CONFIGS: WidgetConfig[] = [
     module: PermissionModule.PROJECTS,
     action: PermissionAction.VIEW,
     getValue: (stats) => stats?.active_projects || 0,
-    color: '#22c55e',
+    color: '#0066CC',
     route: '/admin/projects?status=active',
   },
   {
@@ -78,7 +78,7 @@ const WIDGET_CONFIGS: WidgetConfig[] = [
     module: PermissionModule.BUDGET,
     action: PermissionAction.VIEW,
     getValue: (stats) => stats?.total_budget ? `${(stats.total_budget / 1000000).toFixed(0)}M` : '0',
-    color: '#f59e0b',
+    color: '#0066CC',
     route: '/admin/budget',
   },
   {
@@ -88,7 +88,7 @@ const WIDGET_CONFIGS: WidgetConfig[] = [
     module: PermissionModule.TASKS,
     action: PermissionAction.VIEW,
     getValue: (stats) => stats?.total_tasks || 0,
-    color: '#8b5cf6',
+    color: '#666666',
     route: '/admin/tasks',
   },
   {
@@ -99,7 +99,7 @@ const WIDGET_CONFIGS: WidgetConfig[] = [
     action: PermissionAction.VIEW,
     minRoleLevel: ROLE_HIERARCHY.ADMIN,
     getValue: (stats) => stats?.total_staff || 0,
-    color: '#f59e0b',
+    color: '#0066CC',
     route: '/admin/staff',
   },
   {
@@ -110,7 +110,7 @@ const WIDGET_CONFIGS: WidgetConfig[] = [
     action: PermissionAction.VIEW,
     minRoleLevel: ROLE_HIERARCHY.PROJECT_MANAGER,
     getValue: (stats) => stats?.total_clients || 0,
-    color: '#8b5cf6',
+    color: '#666666',
     route: '/admin/clients',
   },
   {
@@ -130,7 +130,7 @@ const WIDGET_CONFIGS: WidgetConfig[] = [
     module: PermissionModule.SAFETY,
     action: PermissionAction.VIEW,
     getValue: (stats) => stats?.safety_incidents || 0,
-    color: '#ef4444',
+    color: '#000000',
     route: '/admin/safety',
   },
   {
@@ -140,7 +140,7 @@ const WIDGET_CONFIGS: WidgetConfig[] = [
     module: PermissionModule.MATERIALS,
     action: PermissionAction.VIEW,
     getValue: (stats) => stats?.total_materials || 0,
-    color: '#f97316',
+    color: '#0066CC',
     route: '/admin/materials',
   },
   {
@@ -185,10 +185,10 @@ function RoleIndicator({ colors }: { colors: any }) {
   if (!userRole) return null;
 
   const getRoleColor = () => {
-    if (roleLevel >= ROLE_HIERARCHY.ADMIN) return '#22c55e';
+    if (roleLevel >= ROLE_HIERARCHY.ADMIN) return '#0066CC';
     if (roleLevel >= ROLE_HIERARCHY.PROJECT_MANAGER) return '#3b82f6';
-    if (roleLevel >= ROLE_HIERARCHY.ENGINEER) return '#8b5cf6';
-    return '#f59e0b';
+    if (roleLevel >= ROLE_HIERARCHY.ENGINEER) return '#666666';
+    return '#0066CC';
   };
 
   return (
@@ -453,10 +453,10 @@ export default function AdminDashboardRBAC() {
 // Helper components (reused from original)
 function ProjectCard({ project, colors }: any) {
   const statusColors: any = {
-    planning: '#f97316',
+    planning: '#0066CC',
     active: '#3b82f6',
-    completed: '#22c55e',
-    paused: '#ef4444',
+    completed: '#0066CC',
+    paused: '#000000',
   };
 
   const statusLabels: any = {

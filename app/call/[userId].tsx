@@ -308,7 +308,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#555',
   },
   endCallButton: {
-    backgroundColor: '#EF4444',
+    backgroundColor: '#000000',
   },
   infoRow: {
     flexDirection: 'row',

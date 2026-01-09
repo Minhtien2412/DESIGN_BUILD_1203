@@ -47,10 +47,10 @@ const STATUS_LABELS: Record<DocumentStatus, string> = {
 };
 
 const STATUS_COLORS: Record<DocumentStatus, string> = {
-  [DocumentStatus.DRAFT]: '#9E9E9E',
-  [DocumentStatus.UNDER_REVIEW]: '#FF9800',
-  [DocumentStatus.APPROVED]: '#4CAF50',
-  [DocumentStatus.REJECTED]: '#F44336',
+  [DocumentStatus.DRAFT]: '#999999',
+  [DocumentStatus.UNDER_REVIEW]: '#0066CC',
+  [DocumentStatus.APPROVED]: '#0066CC',
+  [DocumentStatus.REJECTED]: '#000000',
   [DocumentStatus.SUPERSEDED]: '#4A4A4A',
   [DocumentStatus.ARCHIVED]: '#757575',
 };
@@ -286,7 +286,7 @@ export default function DocumentsScreen() {
                     <Ionicons
                       name={getFileTypeIcon(doc.fileType)}
                       size={28}
-                      color="#2196F3"
+                      color="#0066CC"
                     />
                   </View>
                   <View style={styles.headerInfo}>
@@ -373,7 +373,7 @@ export default function DocumentsScreen() {
               {/* Version Info */}
               {doc.version > 1 && (
                 <View style={styles.versionInfo}>
-                  <Ionicons name="git-branch-outline" size={14} color="#9C27B0" />
+                  <Ionicons name="git-branch-outline" size={14} color="#999999" />
                   <Text style={styles.versionText}>
                     Phiên bản {doc.version}
                     {doc.versionLabel && ` (${doc.versionLabel})`}
@@ -391,7 +391,7 @@ export default function DocumentsScreen() {
                     )
                   }
                 >
-                  <Ionicons name="eye-outline" size={18} color="#2196F3" />
+                  <Ionicons name="eye-outline" size={18} color="#0066CC" />
                   <Text style={styles.actionButtonText}>Xem</Text>
                 </TouchableOpacity>
 
@@ -401,7 +401,7 @@ export default function DocumentsScreen() {
                     router.push(`/documents/share?documentId=${doc.id}&projectId=${projectId}`)
                   }
                 >
-                  <Ionicons name="share-outline" size={18} color="#4CAF50" />
+                  <Ionicons name="share-outline" size={18} color="#0066CC" />
                   <Text style={styles.actionButtonText}>Chia sẻ</Text>
                 </TouchableOpacity>
 
@@ -409,8 +409,8 @@ export default function DocumentsScreen() {
                   style={styles.actionButton}
                   onPress={() => handleDelete(doc.id, doc.name)}
                 >
-                  <Ionicons name="trash-outline" size={18} color="#F44336" />
-                  <Text style={[styles.actionButtonText, { color: '#F44336' }]}>
+                  <Ionicons name="trash-outline" size={18} color="#000000" />
+                  <Text style={[styles.actionButtonText, { color: '#000000' }]}>
                     Xóa
                   </Text>
                 </TouchableOpacity>
@@ -479,7 +479,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   filterChipActive: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
   },
   filterChipText: {
     fontSize: 13,
@@ -507,7 +507,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     paddingHorizontal: 20,
     paddingVertical: 10,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     borderRadius: 8,
   },
   emptyButtonText: {
@@ -536,7 +536,7 @@ const styles = StyleSheet.create({
     width: 52,
     height: 52,
     borderRadius: 26,
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -599,12 +599,12 @@ const styles = StyleSheet.create({
   tag: {
     paddingHorizontal: 8,
     paddingVertical: 3,
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
     borderRadius: 4,
   },
   tagText: {
     fontSize: 11,
-    color: '#2196F3',
+    color: '#0066CC',
     fontWeight: '500',
   },
   moreTagsText: {
@@ -623,7 +623,7 @@ const styles = StyleSheet.create({
   },
   versionText: {
     fontSize: 12,
-    color: '#9C27B0',
+    color: '#999999',
     fontWeight: '500',
   },
   actions: {
@@ -647,7 +647,7 @@ const styles = StyleSheet.create({
   actionButtonText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#2196F3',
+    color: '#0066CC',
   },
   fab: {
     position: 'absolute',
@@ -656,7 +656,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 4,

@@ -16,10 +16,10 @@ interface StatusBadgeProps {
 }
 
 const VARIANT_COLORS = {
-  success: { bg: '#dcfce7', text: '#166534', border: '#22c55e' },
-  warning: { bg: '#fef3c7', text: '#92400e', border: '#f59e0b' },
-  error: { bg: '#fee2e2', text: '#991b1b', border: '#ef4444' },
-  info: { bg: '#dbeafe', text: '#1e40af', border: '#3b82f6' },
+  success: { bg: '#dcfce7', text: '#166534', border: '#0066CC' },
+  warning: { bg: '#fef3c7', text: '#92400e', border: '#0066CC' },
+  error: { bg: '#fee2e2', text: '#991b1b', border: '#000000' },
+  info: { bg: '#E8F4FF', text: '#1e40af', border: '#3b82f6' },
   neutral: { bg: '#f3f4f6', text: '#374151', border: '#9ca3af' },
 };
 

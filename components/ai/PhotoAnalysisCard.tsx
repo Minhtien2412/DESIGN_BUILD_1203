@@ -45,7 +45,7 @@ export function PhotoAnalysisCard({ result }: PhotoAnalysisCardProps) {
         </View>
         <View style={styles.progressDetails}>
           <View style={styles.detailRow}>
-            <Ionicons name="checkmark-circle" size={20} color="#4caf50" />
+            <Ionicons name="checkmark-circle" size={20} color="#0066CC" />
             <Text style={[styles.detailText, { color: textColor }]}>
               Tiến độ: {result.completedTasks || 0}/{result.totalTasks || result.tasks.length} công việc
             </Text>
@@ -93,7 +93,7 @@ export function PhotoAnalysisCard({ result }: PhotoAnalysisCardProps) {
           </Text>
           {result.recommendations.map((rec, index) => (
             <View key={index} style={styles.recommendationItem}>
-              <Ionicons name="bulb-outline" size={18} color="#ff9800" />
+              <Ionicons name="bulb-outline" size={18} color="#0066CC" />
               <Text style={[styles.recommendationText, { color: textColor }]}>
                 {rec}
               </Text>
@@ -166,12 +166,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 4,
-    borderColor: '#4caf50',
+    borderColor: '#0066CC',
   },
   progressPercentage: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#4caf50',
+    color: '#0066CC',
   },
   progressLabel: {
     fontSize: 12,

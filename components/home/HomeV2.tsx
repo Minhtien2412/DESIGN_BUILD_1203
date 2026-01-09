@@ -14,14 +14,14 @@ export type HomeV2Props = {
 // Theme (align with the existing green construction vibe)
 const theme = {
   colors: {
-    primary: '#0A6847',
+    primary: '#0066CC',
     primaryAlt: '#7FAB67',
     surface: '#FFFFFF',
     background: '#F7FAF1',
     text: '#111111',
     textSecondary: '#5E6B4A',
     border: '#E6F0D6',
-    muted: '#9E9E9E',
+    muted: '#999999',
     subtle: '#F0F6E5',
     chip: '#E6F0D6',
   },

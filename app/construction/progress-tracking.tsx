@@ -245,13 +245,13 @@ export default function ProgressTrackingScreen() {
   const getStatusColor = (status: Task['status']) => {
     switch (status) {
       case 'completed':
-        return '#4caf50';
+        return '#0066CC';
       case 'in-progress':
-        return '#ff9800';
+        return '#0066CC';
       case 'delayed':
-        return '#f44336';
+        return '#000000';
       default:
-        return '#9e9e9e';
+        return '#999999';
     }
   };
 
@@ -278,7 +278,7 @@ export default function ProgressTrackingScreen() {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <LinearGradient colors={['#ee4d2d', '#ff6b3d']} style={styles.header}>
+      <LinearGradient colors={['#0066CC', '#3399FF']} style={styles.header}>
         <View style={styles.headerTop}>
           <TouchableOpacity
             onPress={() => router.back()}
@@ -379,10 +379,10 @@ export default function ProgressTrackingScreen() {
                         {
                           backgroundColor:
                             phase.status === 'completed'
-                              ? '#4caf50'
+                              ? '#0066CC'
                               : phase.status === 'in-progress'
-                              ? '#ff9800'
-                              : '#9e9e9e',
+                              ? '#0066CC'
+                              : '#999999',
                         },
                       ]}
                     >
@@ -483,19 +483,19 @@ export default function ProgressTrackingScreen() {
                         <View style={styles.taskActions}>
                           {task.hasBlueprint && (
                             <View style={styles.actionChip}>
-                              <Ionicons name="document-text" size={14} color="#ff9800" />
+                              <Ionicons name="document-text" size={14} color="#0066CC" />
                               <Text style={styles.actionChipText}>Bản vẽ</Text>
                             </View>
                           )}
                           {task.hasReport && (
                             <View style={styles.actionChip}>
-                              <Ionicons name="checkmark-circle" size={14} color="#4caf50" />
+                              <Ionicons name="checkmark-circle" size={14} color="#0066CC" />
                               <Text style={styles.actionChipText}>Báo cáo</Text>
                             </View>
                           )}
                           {task.workers > 0 && (
                             <View style={styles.actionChip}>
-                              <Ionicons name="people" size={14} color="#2196f3" />
+                              <Ionicons name="people" size={14} color="#0066CC" />
                               <Text style={styles.actionChipText}>
                                 {task.workers} người
                               </Text>
@@ -661,7 +661,7 @@ export default function ProgressTrackingScreen() {
                     <Text style={styles.modalLabel}>Ghi chú</Text>
                     {selectedTask.notes.map((note, index) => (
                       <View key={index} style={styles.noteItem}>
-                        <Ionicons name="checkmark-circle" size={16} color="#4caf50" />
+                        <Ionicons name="checkmark-circle" size={16} color="#0066CC" />
                         <Text style={styles.noteText}>{note}</Text>
                       </View>
                     ))}
@@ -692,21 +692,21 @@ export default function ProgressTrackingScreen() {
                     style={styles.modalActionButton}
                     onPress={() => Alert.alert('Bản vẽ', 'Xem bản vẽ gốc')}
                   >
-                    <Ionicons name="document-text-outline" size={24} color="#ee4d2d" />
+                    <Ionicons name="document-text-outline" size={24} color="#0066CC" />
                     <Text style={styles.modalActionText}>Bản vẽ</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.modalActionButton}
                     onPress={() => Alert.alert('Báo cáo', 'Xem báo cáo tiến độ')}
                   >
-                    <Ionicons name="bar-chart-outline" size={24} color="#ee4d2d" />
+                    <Ionicons name="bar-chart-outline" size={24} color="#0066CC" />
                     <Text style={styles.modalActionText}>Báo cáo</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.modalActionButton}
                     onPress={() => Alert.alert('Ghi chú', 'Thêm ghi chú mới')}
                   >
-                    <Ionicons name="create-outline" size={24} color="#ee4d2d" />
+                    <Ionicons name="create-outline" size={24} color="#0066CC" />
                     <Text style={styles.modalActionText}>Ghi chú</Text>
                   </TouchableOpacity>
                 </View>
@@ -875,7 +875,7 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 2,
     borderLeftWidth: 3,
-    borderLeftColor: '#ee4d2d',
+    borderLeftColor: '#0066CC',
   },
   taskHeader: {
     marginBottom: 12,
@@ -989,7 +989,7 @@ const styles = StyleSheet.create({
   ganttPhaseTitle: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#ee4d2d',
+    color: '#0066CC',
     marginTop: 16,
     marginBottom: 8,
   },
@@ -1141,11 +1141,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: '#fff5f0',
     borderWidth: 1,
-    borderColor: '#ee4d2d',
+    borderColor: '#0066CC',
   },
   modalActionText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#ee4d2d',
+    color: '#0066CC',
   },
 });

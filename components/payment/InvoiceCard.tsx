@@ -111,7 +111,7 @@ export function InvoiceCard({
           </View>
           {isOverdue && (
             <View style={styles.overdueWarning}>
-              <Ionicons name="warning" size={14} color="#F44336" />
+              <Ionicons name="warning" size={14} color="#000000" />
               <Text style={styles.overdueText}>Quá hạn</Text>
             </View>
           )}
@@ -164,7 +164,7 @@ export function InvoiceCard({
                 style={[styles.actionButton, styles.remindButton]}
                 onPress={handleRemind}
               >
-                <Ionicons name="notifications-outline" size={16} color="#2196F3" />
+                <Ionicons name="notifications-outline" size={16} color="#0066CC" />
               </TouchableOpacity>
             )}
           </View>
@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
   overdueText: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#F44336',
+    color: '#000000',
   },
   methodBadge: {
     flexDirection: 'row',
@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   payButton: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
   },
   payButtonText: {
     fontSize: 13,
@@ -318,7 +318,7 @@ const styles = StyleSheet.create({
     color: '#FFF',
   },
   remindButton: {
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
   },
   transactionInfo: {
     flexDirection: 'row',

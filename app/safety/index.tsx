@@ -57,9 +57,9 @@ export default function SafetyScreen() {
   const getSeverityColor = (severity: IncidentSeverity) => {
     switch (severity) {
       case 'FATAL': return '#7f1d1d';
-      case 'CRITICAL': return '#dc2626';
+      case 'CRITICAL': return '#000000';
       case 'SERIOUS': return '#ea580c';
-      case 'MODERATE': return '#f59e0b';
+      case 'MODERATE': return '#0066CC';
       case 'MINOR': return '#3b82f6';
       default: return textMutedColor;
     }
@@ -67,11 +67,11 @@ export default function SafetyScreen() {
 
   const getStatusColor = (status: IncidentStatus) => {
     switch (status) {
-      case 'RESOLVED': return '#22c55e';
-      case 'INVESTIGATING': return '#f59e0b';
+      case 'RESOLVED': return '#0066CC';
+      case 'INVESTIGATING': return '#0066CC';
       case 'UNDER_REVIEW': return '#3b82f6';
       case 'REPORTED': return '#6b7280';
-      case 'CLOSED': return '#10b981';
+      case 'CLOSED': return '#0066CC';
       default: return textMutedColor;
     }
   };
@@ -94,7 +94,7 @@ export default function SafetyScreen() {
             </View>
             <View style={[styles.statCard, { backgroundColor: surfaceColor, borderColor }]}>
               <ThemedText  style={styles.statLabel}>Safe Days</ThemedText>
-              <ThemedText  style={[styles.statValue, { color: '#22c55e' }]}>
+              <ThemedText  style={[styles.statValue, { color: '#0066CC' }]}>
                 {summary?.safety?.daysSinceLastIncident || 0}
               </ThemedText>
             </View>
@@ -106,7 +106,7 @@ export default function SafetyScreen() {
             </View>
             <View style={[styles.statCard, { backgroundColor: surfaceColor, borderColor }]}>
               <ThemedText  style={styles.statLabel}>Near Misses</ThemedText>
-              <ThemedText  style={[styles.statValue, { color: '#f59e0b' }]}>
+              <ThemedText  style={[styles.statValue, { color: '#0066CC' }]}>
                 {summary?.incidents?.nearMisses || 0}
               </ThemedText>
             </View>
@@ -282,9 +282,9 @@ export default function SafetyScreen() {
                     </View>
 
                     {incident.injuryOccurred && (
-                      <View style={[styles.alertBanner, { backgroundColor: '#fee2e2', borderColor: '#dc2626' }]}>
-                        <Ionicons name="medical" size={14} color="#dc2626" />
-                        <ThemedText  style={{ color: '#dc2626', marginLeft: 6, fontWeight: '600' }}>
+                      <View style={[styles.alertBanner, { backgroundColor: '#fee2e2', borderColor: '#000000' }]}>
+                        <Ionicons name="medical" size={14} color="#000000" />
+                        <ThemedText  style={{ color: '#000000', marginLeft: 6, fontWeight: '600' }}>
                           Injury Reported
                         </ThemedText>
                       </View>

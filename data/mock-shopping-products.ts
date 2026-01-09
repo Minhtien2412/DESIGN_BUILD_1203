@@ -14,7 +14,7 @@ export const MOCK_CATEGORIES = [
   { id: 'beauty', name: 'Làm đẹp', icon: 'sparkles-outline' as const, color: '#FF4081' },
   { id: 'sports', name: 'Thể thao', icon: 'basketball-outline' as const, color: '#0A6847' },
   { id: 'home', name: 'Nhà cửa', icon: 'home-outline' as const, color: '#0A6847' },
-  { id: 'books', name: 'Sách', icon: 'book-outline' as const, color: '#FFB300' },
+  { id: 'books', name: 'Sách', icon: 'book-outline' as const, color: '#0066CC' },
   { id: 'toys', name: 'Đồ chơi', icon: 'game-controller-outline' as const, color: '#0A6847' },
   { id: 'food', name: 'Thực phẩm', icon: 'fast-food-outline' as const, color: '#0A6847' },
 ];

@@ -1,9 +1,14 @@
 import Badge from '@/components/ui/badge';
 import Card from '@/components/ui/card';
 import { SectionHeader } from '@/components/ui/list-item';
+import PortfolioDocsService, {
+    type BOQItem,
+    calculateBOQSummary,
+    MOCK_BOQ,
+} from '@/services/portfolioDocsService';
 import { Ionicons } from '@expo/vector-icons';
 import { Stack } from 'expo-router';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
     ActivityIndicator,
     Alert,
@@ -16,92 +21,52 @@ import {
     View,
 } from 'react-native';
 
-type BOQItem = {
-  id: string;
-  code: string;
-  name: string;
-  unit: string;
-  quantity: number;
-  unitPrice: number;
-  total: number;
-  status: 'approved' | 'pending' | 'rejected';
-};
-
-const MOCK_BOQ: BOQItem[] = [
-  {
-    id: '1',
-    code: 'A.01',
-    name: 'Đào đất móng',
-    unit: 'm³',
-    quantity: 45,
-    unitPrice: 150000,
-    total: 6750000,
-    status: 'approved',
-  },
-  {
-    id: '2',
-    code: 'A.02',
-    name: 'Đổ bê tông móng',
-    unit: 'm³',
-    quantity: 20,
-    unitPrice: 2500000,
-    total: 50000000,
-    status: 'approved',
-  },
-  {
-    id: '3',
-    code: 'A.03',
-    name: 'Xây tường gạch',
-    unit: 'm²',
-    quantity: 150,
-    unitPrice: 180000,
-    total: 27000000,
-    status: 'pending',
-  },
-  {
-    id: '4',
-    code: 'A.04',
-    name: 'Tô trát tường',
-    unit: 'm²',
-    quantity: 300,
-    unitPrice: 80000,
-    total: 24000000,
-    status: 'pending',
-  },
-  {
-    id: '5',
-    code: 'A.05',
-    name: 'Sơn tường nội thất',
-    unit: 'm²',
-    quantity: 300,
-    unitPrice: 45000,
-    total: 13500000,
-    status: 'pending',
-  },
-];
+// Types imported from portfolioDocsService
 
 export default function BOQScreen() {
+  const [boqItems, setBOQItems] = useState<BOQItem[]>(MOCK_BOQ); // Start with mock data
+  const [loading, setLoading] = useState(false); // Don't block on loading
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'approved' | 'pending' | 'rejected'>('all');
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
   const [exporting, setExporting] = useState(false);
 
-  const onRefresh = () => {
-    setRefreshing(true);
-    setTimeout(() => {
+  const fetchBOQ = useCallback(async (isRefresh = false) => {
+    try {
+      const data = await PortfolioDocsService.getBOQItems();
+      if (data.length > 0) {
+        setBOQItems(data);
+      }
+    } catch (err) {
+      console.warn('Error fetching BOQ, using mock data:', err);
+    } finally {
+      setLoading(false);
       setRefreshing(false);
-    }, 1500);
-  };
+    }
+  }, []);
+
+  useEffect(() => {
+    // Fetch in background after initial render
+    const timer = setTimeout(() => {
+      fetchBOQ();
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [fetchBOQ]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchBOQ(true);
+  }, [fetchBOQ]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'approved':
-        return '#10B981';
+        return '#0066CC';
       case 'pending':
-        return '#F59E0B';
+        return '#0066CC';
       case 'rejected':
-        return '#EF4444';
+        return '#000000';
       default:
         return '#6B7280';
     }
@@ -176,7 +141,7 @@ export default function BOQScreen() {
   };
 
   // Filter logic
-  const filteredBOQ = MOCK_BOQ.filter(item => {
+  const filteredBOQ = boqItems.filter(item => {
     const matchesSearch = 
       item.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.name.toLowerCase().includes(searchQuery.toLowerCase());
@@ -186,10 +151,17 @@ export default function BOQScreen() {
     return matchesSearch && matchesStatus;
   });
 
-  const totalAmount = filteredBOQ.reduce((sum, item) => sum + item.total, 0);
-  const approvedAmount = filteredBOQ.filter(item => item.status === 'approved').reduce((sum, item) => sum + item.total, 0);
-  const pendingAmount = filteredBOQ.filter(item => item.status === 'pending').reduce((sum, item) => sum + item.total, 0);
-  const approvalProgress = totalAmount > 0 ? (approvedAmount / totalAmount) * 100 : 0;
+  const summary = calculateBOQSummary(filteredBOQ);
+  const { totalAmount, approvedAmount, pendingAmount, approvalProgress } = summary;
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0066CC" />
+        <Text style={styles.loadingText}>Đang tải...</Text>
+      </View>
+    );
+  }
 
   return (
     <>
@@ -230,14 +202,14 @@ export default function BOQScreen() {
           
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>Đã duyệt:</Text>
-            <Text style={[styles.summaryValue, { color: '#10B981' }]}>
+            <Text style={[styles.summaryValue, { color: '#0066CC' }]}>
               {formatCurrency(approvedAmount)}
             </Text>
           </View>
           
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>Chờ duyệt:</Text>
-            <Text style={[styles.summaryValue, { color: '#F59E0B' }]}>
+            <Text style={[styles.summaryValue, { color: '#0066CC' }]}>
               {formatCurrency(pendingAmount)}
             </Text>
           </View>
@@ -295,7 +267,7 @@ export default function BOQScreen() {
             style={[styles.filterChip, statusFilter === 'approved' && styles.filterChipActive]}
             onPress={() => setStatusFilter('approved')}
           >
-            <Ionicons name="checkmark-circle" size={16} color={statusFilter === 'approved' ? '#FFFFFF' : '#10B981'} />
+            <Ionicons name="checkmark-circle" size={16} color={statusFilter === 'approved' ? '#FFFFFF' : '#0066CC'} />
             <Text style={[styles.filterText, statusFilter === 'approved' && styles.filterTextActive]}>
               Đã duyệt
             </Text>
@@ -304,7 +276,7 @@ export default function BOQScreen() {
             style={[styles.filterChip, statusFilter === 'pending' && styles.filterChipActive]}
             onPress={() => setStatusFilter('pending')}
           >
-            <Ionicons name="time" size={16} color={statusFilter === 'pending' ? '#FFFFFF' : '#F59E0B'} />
+            <Ionicons name="time" size={16} color={statusFilter === 'pending' ? '#FFFFFF' : '#0066CC'} />
             <Text style={[styles.filterText, statusFilter === 'pending' && styles.filterTextActive]}>
               Chờ duyệt
             </Text>
@@ -313,7 +285,7 @@ export default function BOQScreen() {
             style={[styles.filterChip, statusFilter === 'rejected' && styles.filterChipActive]}
             onPress={() => setStatusFilter('rejected')}
           >
-            <Ionicons name="close-circle" size={16} color={statusFilter === 'rejected' ? '#FFFFFF' : '#EF4444'} />
+            <Ionicons name="close-circle" size={16} color={statusFilter === 'rejected' ? '#FFFFFF' : '#000000'} />
             <Text style={[styles.filterText, statusFilter === 'rejected' && styles.filterTextActive]}>
               Từ chối
             </Text>
@@ -476,7 +448,7 @@ const styles = StyleSheet.create({
   progressPercent: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#10B981',
+    color: '#0066CC',
   },
   progressBarBg: {
     height: 8,
@@ -486,7 +458,7 @@ const styles = StyleSheet.create({
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: '#10B981',
+    backgroundColor: '#0066CC',
     borderRadius: 4,
   },
   searchContainer: {
@@ -646,10 +618,10 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   approveButton: {
-    backgroundColor: '#10B981',
+    backgroundColor: '#0066CC',
   },
   rejectButton: {
-    backgroundColor: '#EF4444',
+    backgroundColor: '#000000',
   },
   actionButtonText: {
     fontSize: 14,
@@ -675,5 +647,16 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
     color: '#FFFFFF',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F5F5F5',
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 14,
+    color: '#666',
   },
 });

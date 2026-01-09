@@ -14,10 +14,10 @@ import {
 // Phong thủy calculation logic (simplified)
 const ELEMENTS = {
   Kim: { color: '#ffffff', lucky: ['Thổ', 'Kim'], unlucky: ['Hỏa'] },
-  Mộc: { color: '#4caf50', lucky: ['Thủy', 'Mộc'], unlucky: ['Kim'] },
-  Thủy: { color: '#2196f3', lucky: ['Kim', 'Thủy'], unlucky: ['Thổ'] },
-  Hỏa: { color: '#f44336', lucky: ['Mộc', 'Hỏa'], unlucky: ['Thủy'] },
-  Thổ: { color: '#ff9800', lucky: ['Hỏa', 'Thổ'], unlucky: ['Mộc'] },
+  Mộc: { color: '#0066CC', lucky: ['Thủy', 'Mộc'], unlucky: ['Kim'] },
+  Thủy: { color: '#0066CC', lucky: ['Kim', 'Thủy'], unlucky: ['Thổ'] },
+  Hỏa: { color: '#000000', lucky: ['Mộc', 'Hỏa'], unlucky: ['Thủy'] },
+  Thổ: { color: '#0066CC', lucky: ['Hỏa', 'Thổ'], unlucky: ['Mộc'] },
 };
 
 const DIRECTIONS = [
@@ -135,7 +135,7 @@ export default function FengShuiScreen() {
       <Stack.Screen
         options={{
           title: 'Phong thủy nhà ở',
-          headerStyle: { backgroundColor: '#ee4d2d' },
+          headerStyle: { backgroundColor: '#0066CC' },
           headerTintColor: '#fff',
           headerTitleStyle: { fontWeight: '600' },
         }}
@@ -144,7 +144,7 @@ export default function FengShuiScreen() {
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerIcon}>
-            <Ionicons name="compass" size={32} color="#ee4d2d" />
+            <Ionicons name="compass" size={32} color="#0066CC" />
           </View>
           <Text style={styles.headerTitle}>Tư vấn phong thủy</Text>
           <Text style={styles.headerDescription}>
@@ -282,7 +282,7 @@ export default function FengShuiScreen() {
                 {result.luckyColors.map((color: string, idx: number) => (
                   <View key={idx} style={styles.colorCard}>
                     <View style={styles.colorSwatch}>
-                      <Ionicons name="color-palette" size={24} color="#ee4d2d" />
+                      <Ionicons name="color-palette" size={24} color="#0066CC" />
                     </View>
                     <Text style={styles.colorName}>{color}</Text>
                   </View>
@@ -296,7 +296,7 @@ export default function FengShuiScreen() {
               <View style={styles.itemsList}>
                 {result.luckyItems.map((item: string, idx: number) => (
                   <View key={idx} style={styles.itemCard}>
-                    <Ionicons name="checkmark-circle" size={20} color="#4caf50" />
+                    <Ionicons name="checkmark-circle" size={20} color="#0066CC" />
                     <Text style={styles.itemText}>{item}</Text>
                   </View>
                 ))}
@@ -305,7 +305,7 @@ export default function FengShuiScreen() {
 
             {/* Reset Button */}
             <TouchableOpacity style={styles.resetButton} onPress={handleReset}>
-              <Ionicons name="refresh" size={18} color="#ee4d2d" />
+              <Ionicons name="refresh" size={18} color="#0066CC" />
               <Text style={styles.resetButtonText}>Tính lại</Text>
             </TouchableOpacity>
           </>
@@ -313,7 +313,7 @@ export default function FengShuiScreen() {
 
         {/* Info Note */}
         <View style={styles.infoNote}>
-          <Ionicons name="information-circle" size={20} color="#ff9800" />
+          <Ionicons name="information-circle" size={20} color="#0066CC" />
           <Text style={styles.infoNoteText}>
             Kết quả mang tính chất tham khảo. Phong thủy là một phần trong quyết định,
             hãy cân nhắc kỹ các yếu tố khác.
@@ -352,7 +352,7 @@ export default function FengShuiScreen() {
                     setShowDirectionPicker(false);
                   }}
                 >
-                  <Ionicons name="navigate" size={20} color="#ee4d2d" />
+                  <Ionicons name="navigate" size={20} color="#0066CC" />
                   <View style={styles.directionOptionInfo}>
                     <Text style={styles.directionOptionText}>{dir}</Text>
                     <Text style={styles.directionOptionSub}>
@@ -360,7 +360,7 @@ export default function FengShuiScreen() {
                     </Text>
                   </View>
                   {direction === dir && (
-                    <Ionicons name="checkmark-circle" size={24} color="#4caf50" />
+                    <Ionicons name="checkmark-circle" size={24} color="#0066CC" />
                   )}
                 </TouchableOpacity>
               ))}
@@ -445,7 +445,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#ee4d2d',
+    backgroundColor: '#0066CC',
     paddingVertical: 14,
     borderRadius: 8,
     marginTop: 8,
@@ -529,10 +529,10 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   compatibleBadge: {
-    backgroundColor: '#4caf50',
+    backgroundColor: '#0066CC',
   },
   incompatibleBadge: {
-    backgroundColor: '#ff9800',
+    backgroundColor: '#0066CC',
   },
   compatibilityBadgeText: {
     fontSize: 12,
@@ -613,7 +613,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#ee4d2d',
+    borderColor: '#0066CC',
     paddingVertical: 12,
     borderRadius: 8,
     marginHorizontal: 16,
@@ -622,12 +622,12 @@ const styles = StyleSheet.create({
   resetButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#ee4d2d',
+    color: '#0066CC',
     marginLeft: 6,
   },
   infoNote: {
     flexDirection: 'row',
-    backgroundColor: '#fff8e1',
+    backgroundColor: '#F0F8FF',
     padding: 16,
     marginHorizontal: 16,
     borderRadius: 8,
@@ -635,7 +635,7 @@ const styles = StyleSheet.create({
   infoNoteText: {
     flex: 1,
     fontSize: 12,
-    color: '#f57c00',
+    color: '#0066CC',
     marginLeft: 10,
     lineHeight: 18,
   },

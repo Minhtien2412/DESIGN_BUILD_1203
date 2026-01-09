@@ -42,7 +42,7 @@ export default function FlashSaleScreen() {
     <View style={{ flex: 1, backgroundColor: Colors.light.background }}>
       {/* Header */}
       <View style={{
-        backgroundColor: '#0A6847',
+        backgroundColor: '#0066CC',
         paddingTop: 50,
         paddingBottom: 20,
         paddingHorizontal: 16,
@@ -81,14 +81,14 @@ export default function FlashSaleScreen() {
 
       {loading ? (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <ActivityIndicator size="large" color="#0A6847" />
+          <ActivityIndicator size="large" color="#0066CC" />
           <Text style={{ marginTop: 12, color: Colors.light.textMuted }}>Đang tải Flash Sale...</Text>
         </View>
       ) : (
         <ScrollView 
           style={{ flex: 1 }}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={() => loadProducts(true)} colors={['#0A6847']} />
+            <RefreshControl refreshing={refreshing} onRefresh={() => loadProducts(true)} colors={['#0066CC']} />
           }
         >
           <View style={{ padding: 16, gap: 12 }}>
@@ -128,7 +128,7 @@ export default function FlashSaleScreen() {
                     {product.image?.uri ? (
                       <Image source={{ uri: product.image.uri }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
                     ) : (
-                      <Ionicons name="cube-outline" size={48} color="#0A6847" />
+                      <Ionicons name="cube-outline" size={48} color="#0066CC" />
                     )}
                     {product.discountPercent && (
                       <View style={{
@@ -153,7 +153,7 @@ export default function FlashSaleScreen() {
                         {product.name}
                       </Text>
                       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                        <Text style={{ fontSize: 18, fontWeight: '800', color: '#0A6847' }}>
+                        <Text style={{ fontSize: 18, fontWeight: '800', color: '#0066CC' }}>
                           {formatPrice(salePrice)}
                         </Text>
                         {product.discountPercent && (
@@ -178,7 +178,7 @@ export default function FlashSaleScreen() {
                         <View style={{
                           width: `${Math.min((sold / (sold + stock)) * 100, 100)}%`,
                           height: '100%',
-                          backgroundColor: '#0A6847'
+                          backgroundColor: '#0066CC'
                         }} />
                       </View>
                       <Text style={{ fontSize: 11, color: Colors.light.textMuted }}>

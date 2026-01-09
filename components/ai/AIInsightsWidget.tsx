@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   secondaryButton: {
-    backgroundColor: '#eff6ff',
+    backgroundColor: '#E8F4FF',
     borderWidth: 1,
     borderColor: '#3b82f6',
   },

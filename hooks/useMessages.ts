@@ -29,6 +29,7 @@ interface UseConversationResult {
   error: string | null;
   sending: boolean;
   hasMore: boolean;
+  conversationId: number | null;
   sendMessage: (content: string) => Promise<void>;
   loadMore: () => Promise<void>;
   markAllAsRead: () => Promise<void>;
@@ -88,11 +89,14 @@ export function useMessages(): UseMessagesResult {
 /**
  * Hook for managing a single conversation
  * Usage: const { messages, sendMessage, loading } = useConversation(conversationId, recipientId);
+ * 
+ * If conversationId is null, will auto-fetch from recipientId
  */
 export function useConversation(
-  conversationId: number | null,
+  initialConversationId: number | null,
   recipientId: number
 ): UseConversationResult {
+  const [conversationId, setConversationId] = useState<number | null>(initialConversationId);
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
@@ -100,8 +104,38 @@ export function useConversation(
   const [hasMore, setHasMore] = useState(false);
   const [page, setPage] = useState(1);
 
-  const fetchMessages = useCallback(async (resetPage = false) => {
-    if (!conversationId) {
+  // Auto-fetch conversation ID from recipientId if not provided
+  const fetchConversationId = useCallback(async () => {
+    if (initialConversationId) {
+      setConversationId(initialConversationId);
+      return initialConversationId;
+    }
+
+    if (!recipientId) {
+      setLoading(false);
+      return null;
+    }
+
+    try {
+      console.log('[useConversation] Fetching conversation for recipientId:', recipientId);
+      const conversation = await messagesApi.getConversationByRecipient(recipientId);
+      
+      if (conversation) {
+        console.log('[useConversation] Found conversation:', conversation.id);
+        setConversationId(conversation.id);
+        return conversation.id;
+      }
+      
+      console.log('[useConversation] No existing conversation found');
+      return null;
+    } catch (err) {
+      console.error('[useConversation] Error fetching conversation ID:', err);
+      return null;
+    }
+  }, [initialConversationId, recipientId]);
+
+  const fetchMessages = useCallback(async (convId: number | null, resetPage = false) => {
+    if (!convId) {
       setMessages([]);
       setLoading(false);
       return;
@@ -116,7 +150,7 @@ export function useConversation(
         limit: 50
       };
 
-      const data = await messagesApi.getMessages(conversationId, params);
+      const data = await messagesApi.getMessages(convId, params);
       
       if (resetPage) {
         setMessages(data);
@@ -132,7 +166,7 @@ export function useConversation(
     } finally {
       setLoading(false);
     }
-  }, [conversationId, page]);
+  }, [page]);
 
   const sendMessageHandler = useCallback(async (content: string) => {
     if (!content.trim()) return;
@@ -148,6 +182,11 @@ export function useConversation(
 
       const newMessage = await messagesApi.sendMessage(dto);
       
+      // Update conversationId if not set (new conversation created)
+      if (!conversationId && newMessage.conversationId) {
+        setConversationId(newMessage.conversationId);
+      }
+      
       // Add new message to top of list
       setMessages(prev => [newMessage, ...prev]);
     } catch (err) {
@@ -157,7 +196,7 @@ export function useConversation(
     } finally {
       setSending(false);
     }
-  }, [recipientId]);
+  }, [recipientId, conversationId]);
 
   const loadMore = useCallback(async () => {
     if (!hasMore || loading) return;
@@ -179,18 +218,37 @@ export function useConversation(
   }, [conversationId]);
 
   const refresh = useCallback(async () => {
-    await fetchMessages(true);
-  }, [fetchMessages]);
-
-  useEffect(() => {
-    fetchMessages(true);
-  }, [conversationId]); // Only re-fetch when conversation changes
-
-  useEffect(() => {
-    if (page > 1) {
-      fetchMessages(false);
+    const convId = await fetchConversationId();
+    if (convId) {
+      await fetchMessages(convId, true);
     }
-  }, [page]); // Load more when page changes
+  }, [fetchConversationId, fetchMessages]);
+
+  // Initial load: first get conversationId, then fetch messages
+  useEffect(() => {
+    let isMounted = true;
+    
+    const init = async () => {
+      const convId = await fetchConversationId();
+      if (isMounted && convId) {
+        await fetchMessages(convId, true);
+      } else if (isMounted) {
+        setLoading(false);
+      }
+    };
+    
+    init();
+    
+    return () => {
+      isMounted = false;
+    };
+  }, [recipientId, initialConversationId]); // Re-fetch when recipient changes
+
+  useEffect(() => {
+    if (page > 1 && conversationId) {
+      fetchMessages(conversationId, false);
+    }
+  }, [page, conversationId]); // Load more when page changes
 
   return {
     messages,
@@ -198,6 +256,7 @@ export function useConversation(
     error,
     sending,
     hasMore,
+    conversationId,
     sendMessage: sendMessageHandler,
     loadMore,
     markAllAsRead: markAllAsReadHandler,

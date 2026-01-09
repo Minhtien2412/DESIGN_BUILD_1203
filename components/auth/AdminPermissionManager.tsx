@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Admin Permission Management System
  * Allows admin to assign detailed permissions to users
  */
@@ -57,7 +57,7 @@ interface AppUser {
 const MOCK_USERS: AppUser[] = [
     {
         id: '1',
-        name: 'Nguyễn Văn A',
+        name: 'Nguy?n Van A',
         email: 'nguyenvana@example.com',
         phone: '0901234567',
         role: USER_ROLES.CLIENT,
@@ -67,7 +67,7 @@ const MOCK_USERS: AppUser[] = [
     },
     {
         id: '2',
-        name: 'Trần Thị B',
+        name: 'Tr?n Th? B',
         email: 'tranthib@example.com',
         phone: '0912345678',
         role: USER_ROLES.CONTRACTOR,
@@ -77,7 +77,7 @@ const MOCK_USERS: AppUser[] = [
     },
     {
         id: '3',
-        name: 'Lê Văn C',
+        name: 'L� Van C',
         email: 'levanc@example.com',
         phone: '0923456789',
         role: USER_ROLES.CONTRACTOR,
@@ -89,23 +89,23 @@ const MOCK_USERS: AppUser[] = [
 
 // Permission groups with descriptions
 const PERMISSION_GROUPS = {
-    'Gói thầu & Dự án': [
-        { key: PERMISSIONS.VIEW_BIDS, name: 'Xem gói thầu', desc: 'Có thể xem danh sách và chi tiết gói thầu' },
-        { key: PERMISSIONS.BID_PROJECTS, name: 'Đấu thầu', desc: 'Có thể tham gia đấu thầu dự án' },
-        { key: PERMISSIONS.VIEW_PROGRESS, name: 'Xem tiến độ', desc: 'Theo dõi tiến độ thực hiện dự án' },
+    'G�i th?u & D? �n': [
+        { key: PERMISSIONS.VIEW_BIDS, name: 'Xem g�i th?u', desc: 'C� th? xem danh s�ch v� chi ti?t g�i th?u' },
+        { key: PERMISSIONS.BID_PROJECTS, name: '�?u th?u', desc: 'C� th? tham gia d?u th?u d? �n' },
+        { key: PERMISSIONS.VIEW_PROGRESS, name: 'Xem ti?n d?', desc: 'Theo d�i ti?n d? th?c hi?n d? �n' },
     ],
-    'Tài chính': [
-        { key: PERMISSIONS.VIEW_PAYMENTS, name: 'Xem thanh toán', desc: 'Truy cập thông tin thanh toán' },
-        { key: PERMISSIONS.VIEW_PRICING, name: 'Xem giá tiền', desc: 'Xem báo giá và định giá dịch vụ' },
+    'T�i ch�nh': [
+        { key: PERMISSIONS.VIEW_PAYMENTS, name: 'Xem thanh to�n', desc: 'Truy c?p th�ng tin thanh to�n' },
+        { key: PERMISSIONS.VIEW_PRICING, name: 'Xem gi� ti?n', desc: 'Xem b�o gi� v� d?nh gi� d?ch v?' },
     ],
-    'Giao tiếp & Marketing': [
-        { key: PERMISSIONS.CHAT_CUSTOMERS, name: 'Chat khách hàng', desc: 'Nhắn tin trực tiếp với khách hàng' },
-        { key: PERMISSIONS.POST_ARTICLES, name: 'Đăng bài viết', desc: 'Tạo và đăng các bài viết' },
-        { key: PERMISSIONS.LIVE_STREAM, name: 'Live stream', desc: 'Phát trực tiếp video' },
+    'Giao ti?p & Marketing': [
+        { key: PERMISSIONS.CHAT_CUSTOMERS, name: 'Chat kh�ch h�ng', desc: 'Nh?n tin tr?c ti?p v?i kh�ch h�ng' },
+        { key: PERMISSIONS.POST_ARTICLES, name: '�ang b�i vi?t', desc: 'T?o v� dang c�c b�i vi?t' },
+        { key: PERMISSIONS.LIVE_STREAM, name: 'Live stream', desc: 'Ph�t tr?c ti?p video' },
     ],
-    'Sản phẩm & Dịch vụ': [
-        { key: PERMISSIONS.POST_PRODUCTS, name: 'Đăng sản phẩm', desc: 'Đăng bán sản phẩm, vật liệu' },
-        { key: PERMISSIONS.VIEW_CUSTOMER_INFO, name: 'Thông tin khách hàng', desc: 'Xem thông tin chi tiết khách hàng' },
+    'S?n ph?m & D?ch v?': [
+        { key: PERMISSIONS.POST_PRODUCTS, name: '�ang s?n ph?m', desc: '�ang b�n s?n ph?m, v?t li?u' },
+        { key: PERMISSIONS.VIEW_CUSTOMER_INFO, name: 'Th�ng tin kh�ch h�ng', desc: 'Xem th�ng tin chi ti?t kh�ch h�ng' },
     ],
 };
 
@@ -152,7 +152,7 @@ export default function AdminPermissionManager() {
                 : user
         ));
 
-        Alert.alert('Thành công', `Đã cập nhật quyền cho ${selectedUser.name}`);
+        Alert.alert('Th�nh c�ng', `�� c?p nh?t quy?n cho ${selectedUser.name}`);
         setShowPermissionModal(false);
         setSelectedUser(null);
     };
@@ -177,24 +177,24 @@ export default function AdminPermissionManager() {
                 </View>
                 <View style={styles.userActions}>
                     <View style={[styles.roleBadge, { 
-                        backgroundColor: user.role === USER_ROLES.CLIENT ? '#E3F2FD' : 
+                        backgroundColor: user.role === USER_ROLES.CLIENT ? '#E8F4FF' : 
                                         user.role === USER_ROLES.CONTRACTOR ? '#E8F5E8' : '#FFE5E5' 
                     }]}>
                         <Text style={[styles.roleText, {
                             color: user.role === USER_ROLES.CLIENT ? '#1976D2' : 
                                    user.role === USER_ROLES.CONTRACTOR ? '#388E3C' : '#D32F2F'
                         }]}>
-                            {user.role === USER_ROLES.CLIENT ? '🏠 Khách hàng' : 
-                             user.role === USER_ROLES.CONTRACTOR ? '🔨 Nhà thầu' : '👑 Admin'}
+                            {user.role === USER_ROLES.CLIENT ? '?? Kh�ch h�ng' : 
+                             user.role === USER_ROLES.CONTRACTOR ? '?? Nh� th?u' : '?? Admin'}
                         </Text>
                     </View>
                     
                     <View style={styles.statusContainer}>
-                        <Text style={styles.statusLabel}>Hoạt động:</Text>
+                        <Text style={styles.statusLabel}>Ho?t d?ng:</Text>
                         <Switch
                             value={user.isActive}
                             onValueChange={() => toggleUserStatus(user.id)}
-                            trackColor={{ false: '#ccc', true: '#4CAF50' }}
+                            trackColor={{ false: '#ccc', true: '#0066CC' }}
                             thumbColor={user.isActive ? '#fff' : '#fff'}
                         />
                     </View>
@@ -202,7 +202,7 @@ export default function AdminPermissionManager() {
             </View>
 
             <View style={styles.permissionSummary}>
-                <Text style={styles.permissionTitle}>Quyền hiện tại ({user.permissions.length}):</Text>
+                <Text style={styles.permissionTitle}>Quy?n hi?n t?i ({user.permissions.length}):</Text>
                 <View style={styles.permissionTags}>
                     {user.permissions.slice(0, 3).map((permission: Permission, index: number) => (
                         <View key={index} style={styles.permissionTag}>
@@ -225,7 +225,7 @@ export default function AdminPermissionManager() {
                 onPress={() => openPermissionModal(user)}
             >
                 <MaterialCommunityIcons name="shield-edit" size={20} color="#007AFF" />
-                <Text style={styles.editPermissionText}>Chỉnh sửa quyền</Text>
+                <Text style={styles.editPermissionText}>Ch?nh s?a quy?n</Text>
             </TouchableOpacity>
         </View>
     );
@@ -233,8 +233,8 @@ export default function AdminPermissionManager() {
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
-                <Text style={styles.title}>Quản lý phân quyền</Text>
-                <Text style={styles.subtitle}>Phân quyền chi tiết cho người dùng</Text>
+                <Text style={styles.title}>Qu?n l� ph�n quy?n</Text>
+                <Text style={styles.subtitle}>Ph�n quy?n chi ti?t cho ngu?i d�ng</Text>
             </View>
 
             {/* Search and Filter */}
@@ -245,16 +245,16 @@ export default function AdminPermissionManager() {
                         style={styles.searchInput}
                         value={searchQuery}
                         onChangeText={setSearchQuery}
-                        placeholder="Tìm người dùng..."
+                        placeholder="T�m ngu?i d�ng..."
                         placeholderTextColor="#999"
                     />
                 </View>
 
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterContainer}>
                     {[
-                        { key: 'all', label: 'Tất cả', icon: 'people' },
-                        { key: USER_ROLES.CLIENT, label: 'Khách hàng', icon: 'home' },
-                        { key: USER_ROLES.CONTRACTOR, label: 'Nhà thầu', icon: 'hammer' },
+                        { key: 'all', label: 'T?t c?', icon: 'people' },
+                        { key: USER_ROLES.CLIENT, label: 'Kh�ch h�ng', icon: 'home' },
+                        { key: USER_ROLES.CONTRACTOR, label: 'Nh� th?u', icon: 'hammer' },
                         { key: USER_ROLES.ADMIN, label: 'Admin', icon: 'shield' },
                     ].map((filter) => (
                         <TouchableOpacity
@@ -299,14 +299,14 @@ export default function AdminPermissionManager() {
                             <Ionicons name="close" size={24} color="#666" />
                         </TouchableOpacity>
                         <View style={styles.modalHeaderInfo}>
-                            <Text style={styles.modalTitle}>Phân quyền người dùng</Text>
+                            <Text style={styles.modalTitle}>Ph�n quy?n ngu?i d�ng</Text>
                             <Text style={styles.modalSubtitle}>{selectedUser?.name}</Text>
                         </View>
                         <TouchableOpacity 
                             onPress={savePermissions}
                             style={styles.saveButton}
                         >
-                            <Text style={styles.saveButtonText}>Lưu</Text>
+                            <Text style={styles.saveButtonText}>Luu</Text>
                         </TouchableOpacity>
                     </View>
 
@@ -394,7 +394,7 @@ const styles = StyleSheet.create({
         gap: 6,
     },
     filterButtonActive: {
-        backgroundColor: '#E3F2FD',
+        backgroundColor: '#E8F4FF',
     },
     filterText: {
         fontSize: 14,

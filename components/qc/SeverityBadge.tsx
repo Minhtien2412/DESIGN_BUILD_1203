@@ -15,8 +15,8 @@ const SEVERITY_CONFIG = {
   },
   MAJOR: {
     label: 'Quan trọng',
-    color: '#F57C00',
-    backgroundColor: '#FFF3E0',
+    color: '#0066CC',
+    backgroundColor: '#E8F4FF',
   },
   MINOR: {
     label: 'Nhỏ',

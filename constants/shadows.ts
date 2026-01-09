@@ -122,7 +122,7 @@ export const createShadow = (
 // Color-specific shadows (for colored cards/buttons)
 export const ColoredShadows = {
   primary: (opacity: number = 0.3) => ({
-    shadowColor: '#FF6B35',
+    shadowColor: '#0066CC',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: opacity,
     shadowRadius: 8,
@@ -130,7 +130,7 @@ export const ColoredShadows = {
   }),
   
   secondary: (opacity: number = 0.3) => ({
-    shadowColor: '#0A6847',
+    shadowColor: '#0066CC',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: opacity,
     shadowRadius: 8,
@@ -138,7 +138,7 @@ export const ColoredShadows = {
   }),
   
   success: (opacity: number = 0.3) => ({
-    shadowColor: '#10B981',
+    shadowColor: '#0066CC',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: opacity,
     shadowRadius: 8,
@@ -146,7 +146,7 @@ export const ColoredShadows = {
   }),
   
   error: (opacity: number = 0.3) => ({
-    shadowColor: '#EF4444',
+    shadowColor: '#000000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: opacity,
     shadowRadius: 8,
@@ -154,7 +154,7 @@ export const ColoredShadows = {
   }),
   
   warning: (opacity: number = 0.3) => ({
-    shadowColor: '#F59E0B',
+    shadowColor: '#0066CC',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: opacity,
     shadowRadius: 8,

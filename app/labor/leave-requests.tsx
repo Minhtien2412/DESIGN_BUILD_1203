@@ -31,10 +31,10 @@ const STATUS_LABELS: Record<LeaveStatus, string> = {
 };
 
 const STATUS_COLORS: Record<LeaveStatus, string> = {
-  [LeaveStatus.PENDING]: '#FF9800',
-  [LeaveStatus.APPROVED]: '#4CAF50',
-  [LeaveStatus.REJECTED]: '#F44336',
-  [LeaveStatus.CANCELLED]: '#9E9E9E',
+  [LeaveStatus.PENDING]: '#0066CC',
+  [LeaveStatus.APPROVED]: '#0066CC',
+  [LeaveStatus.REJECTED]: '#000000',
+  [LeaveStatus.CANCELLED]: '#999999',
 };
 
 export default function LeaveRequestsScreen() {
@@ -184,7 +184,7 @@ export default function LeaveRequestsScreen() {
               <View style={styles.header}>
                 <View style={styles.headerLeft}>
                   <View style={styles.avatar}>
-                    <Ionicons name="person" size={24} color="#2196F3" />
+                    <Ionicons name="person" size={24} color="#0066CC" />
                   </View>
                   <View style={styles.headerInfo}>
                     <Text style={styles.workerName}>
@@ -255,7 +255,7 @@ export default function LeaveRequestsScreen() {
                       handleApprove(request.id, request.worker?.fullName || 'N/A')
                     }
                   >
-                    <Ionicons name="checkmark-circle-outline" size={16} color="#4CAF50" />
+                    <Ionicons name="checkmark-circle-outline" size={16} color="#0066CC" />
                     <Text style={styles.approveButtonText}>Duyệt</Text>
                   </TouchableOpacity>
 
@@ -265,7 +265,7 @@ export default function LeaveRequestsScreen() {
                       handleReject(request.id, request.worker?.fullName || 'N/A')
                     }
                   >
-                    <Ionicons name="close-circle-outline" size={16} color="#F44336" />
+                    <Ionicons name="close-circle-outline" size={16} color="#000000" />
                     <Text style={styles.rejectButtonText}>Từ chối</Text>
                   </TouchableOpacity>
                 </View>
@@ -329,7 +329,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   filterChipActive: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
   },
   filterChipText: {
     fontSize: 13,
@@ -357,7 +357,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     paddingHorizontal: 20,
     paddingVertical: 10,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     borderRadius: 8,
   },
   emptyButtonText: {
@@ -386,7 +386,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -444,7 +444,7 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   rejectionSection: {
-    backgroundColor: '#FFEBEE',
+    backgroundColor: '#F5F5F5',
     padding: 10,
     borderRadius: 6,
     marginTop: 4,
@@ -452,7 +452,7 @@ const styles = StyleSheet.create({
   rejectionLabel: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#F44336',
+    color: '#000000',
     marginBottom: 4,
   },
   rejectionText: {
@@ -471,13 +471,13 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingVertical: 8,
     borderWidth: 1,
-    borderColor: '#4CAF50',
+    borderColor: '#0066CC',
     borderRadius: 6,
   },
   approveButtonText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#4CAF50',
+    color: '#0066CC',
   },
   rejectButton: {
     flex: 1,
@@ -487,13 +487,13 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingVertical: 8,
     borderWidth: 1,
-    borderColor: '#F44336',
+    borderColor: '#000000',
     borderRadius: 6,
   },
   rejectButtonText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#F44336',
+    color: '#000000',
   },
   cancelButton: {
     flex: 1,
@@ -518,7 +518,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 4,

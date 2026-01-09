@@ -1,56 +1,20 @@
 import { Container } from '@/components/ui/container';
 import { useThemeColor } from '@/hooks/use-theme-color';
+import QuotationService, { MOCK_QUOTATIONS, Quotation } from '@/services/quotationService';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
-    Alert, Modal, ScrollView,
+    ActivityIndicator,
+    Alert,
+    Modal,
+    RefreshControl,
+    ScrollView,
     StyleSheet,
     Text,
     TouchableOpacity,
     View
 } from 'react-native';
-
-interface Quotation {
-  id: string;
-  companyName: string;
-  rating: number;
-  capability: string; // label for capability action
-  price: number;
-  stars: number; // star rating visual
-  pdfUrl?: string; // mock pdf url
-  selected?: boolean; // UI state
-}
-
-const MOCK_QUOTATIONS: Quotation[] = [
-  {
-    id: '1',
-    companyName: 'Công ty A',
-    rating: 5,
-    capability: 'Năng lực',
-    price: 100000,
-    stars: 5,
-    pdfUrl: 'https://example.com/a.pdf'
-  },
-  {
-    id: '2',
-    companyName: 'Công ty B',
-    rating: 4,
-    capability: 'Năng lực',
-    price: 150000,
-    stars: 4,
-    pdfUrl: 'https://example.com/b.pdf'
-  },
-  {
-    id: '3',
-    companyName: 'Công ty C',
-    rating: 4.5,
-    capability: 'Năng lực',
-    price: 200000,
-    stars: 4.5,
-    pdfUrl: 'https://example.com/c.pdf'
-  },
-];
 
 export default function QuotationListScreen() {
   const backgroundColor = useThemeColor({}, 'background');
@@ -64,9 +28,39 @@ export default function QuotationListScreen() {
   const warningColor = useThemeColor({}, 'warning');
   const inverseText = useThemeColor({}, 'textInverse');
 
-  const [quotations, setQuotations] = useState<Quotation[]>(MOCK_QUOTATIONS);
+  const [quotations, setQuotations] = useState<Quotation[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState(false);
   const [preview, setPreview] = useState<{ visible: boolean; quotation?: Quotation }>({ visible: false });
   const [submitting, setSubmitting] = useState(false);
+
+  // Load quotations from API
+  const loadQuotations = async (isRefresh = false) => {
+    try {
+      if (!isRefresh) setLoading(true);
+      setError(false);
+      
+      const data = await QuotationService.getQuotations();
+      setQuotations(data.map(q => ({ ...q, selected: false })));
+    } catch (err) {
+      console.error('Quotation load error:', err);
+      setError(true);
+      setQuotations(MOCK_QUOTATIONS.map(q => ({ ...q, selected: false })));
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    loadQuotations();
+  }, []);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    loadQuotations(true);
+  };
 
   const handleRandomize = () => {
     // Shuffle quotations
@@ -91,10 +85,15 @@ export default function QuotationListScreen() {
     }
     setSubmitting(true);
     try {
-      // Fake API submit — replace with apiFetch('/quotations/accept', { method:'POST', body: JSON.stringify(...) })
-      await new Promise(r => setTimeout(r, 800));
-      Alert.alert('Thành công', `Đã chọn ${selectedQuotations.length} báo giá`);
-      router.back();
+      const result = await QuotationService.submitQuotationSelection(
+        selectedQuotations.map(q => q.id)
+      );
+      if (result.success) {
+        Alert.alert('Thành công', result.message || `Đã chọn ${selectedQuotations.length} báo giá`);
+        router.back();
+      } else {
+        Alert.alert('Lỗi', 'Không thể gửi lựa chọn. Thử lại sau.');
+      }
     } catch (e) {
       Alert.alert('Lỗi', 'Không thể gửi lựa chọn. Thử lại sau.');
     } finally {
@@ -124,7 +123,23 @@ export default function QuotationListScreen() {
 
   return (
     <Container style={{ backgroundColor }}>
-      <ScrollView style={styles.container}>
+      {loading && !quotations.length ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={primaryColor} />
+          <Text style={[styles.loadingText, { color: mutedColor }]}>Đang tải báo giá...</Text>
+        </View>
+      ) : (
+      <ScrollView 
+        style={styles.container}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+      >
+        {error && (
+          <View style={styles.errorBanner}>
+            <Ionicons name="alert-circle" size={20} color="#0066CC" />
+            <Text style={styles.errorText}>Server không khả dụng - Dùng dữ liệu demo</Text>
+          </View>
+        )}
+        
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.back()}>
@@ -248,6 +263,7 @@ export default function QuotationListScreen() {
           </TouchableOpacity>
         </View>
       </ScrollView>
+      )}
       {/* PDF Preview Modal (mock) */}
       <Modal
         visible={preview.visible}
@@ -291,6 +307,30 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingTop: 100,
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 14,
+  },
+  errorBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#E6F0FF',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    marginBottom: 16,
+    gap: 8,
+  },
+  errorText: {
+    color: '#0066CC',
+    fontSize: 13,
   },
   header: {
     flexDirection: 'row',

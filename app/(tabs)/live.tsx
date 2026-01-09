@@ -283,7 +283,7 @@ export default function LiveStreamsScreen() {
         {/* Right Actions */}
         <View style={styles.rightActions}>
           <TouchableOpacity style={styles.actionButton} onPress={handleLike}>
-            <Ionicons name="heart" size={32} color="#EF4444" />
+            <Ionicons name="heart" size={32} color="#000000" />
             <Text style={styles.actionText}>2.5K</Text>
           </TouchableOpacity>
 
@@ -496,7 +496,7 @@ const styles = StyleSheet.create({
   createButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#EF4444',
+    backgroundColor: '#000000',
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 20,
@@ -571,7 +571,7 @@ const styles = StyleSheet.create({
     left: 8,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#EF4444',
+    backgroundColor: '#000000',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 4,
@@ -627,7 +627,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: '#EF4444',
+    backgroundColor: '#000000',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 24,
@@ -685,7 +685,7 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
     borderWidth: 2,
-    borderColor: '#EF4444',
+    borderColor: '#000000',
   },
   hostTextLive: {
     flex: 1,
@@ -705,15 +705,15 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#EF4444',
+    backgroundColor: '#000000',
   },
   liveTextLive: {
-    color: '#EF4444',
+    color: '#000000',
     fontSize: 11,
     fontWeight: 'bold',
   },
   followButton: {
-    backgroundColor: '#EF4444',
+    backgroundColor: '#000000',
     paddingHorizontal: 16,
     paddingVertical: 6,
     borderRadius: 16,
@@ -874,7 +874,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#EF4444',
+    backgroundColor: '#000000',
     alignItems: 'center',
     justifyContent: 'center',
   },

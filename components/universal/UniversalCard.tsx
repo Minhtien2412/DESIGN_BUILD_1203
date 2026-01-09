@@ -281,10 +281,10 @@ function renderStatContent(props: StatCardProps, isGradient: boolean) {
               props.trend.direction === "up"
                 ? isGradient
                   ? "#fff"
-                  : "#10B981"
+                  : "#0066CC"
                 : isGradient
                 ? "#fff"
-                : "#EF4444"
+                : "#000000"
             }
           />
           <Text
@@ -295,10 +295,10 @@ function renderStatContent(props: StatCardProps, isGradient: boolean) {
                   props.trend.direction === "up"
                     ? isGradient
                       ? "#fff"
-                      : "#10B981"
+                      : "#0066CC"
                     : isGradient
                     ? "#fff"
-                    : "#EF4444",
+                    : "#000000",
               },
             ]}
           >

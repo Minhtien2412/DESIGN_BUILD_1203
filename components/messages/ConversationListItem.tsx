@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
     color: '#999',
   },
   timeTextUnread: {
-    color: '#22c55e',
+    color: '#0066CC',
     fontWeight: '600',
   },
   messageRow: {
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
     color: '#111',
   },
   unreadBadge: {
-    backgroundColor: '#ef4444',
+    backgroundColor: '#000000',
     borderRadius: 12,
     minWidth: 20,
     height: 20,

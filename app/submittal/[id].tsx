@@ -23,25 +23,25 @@ const ACTION_CODE_OPTIONS: { value: ActionCode; label: string; color: string; ic
   {
     value: ActionCode.NO_EXCEPTION,
     label: 'No Exception',
-    color: '#10B981',
+    color: '#0066CC',
     icon: 'checkmark-circle',
   },
   {
     value: ActionCode.AS_NOTED,
     label: 'As Noted',
-    color: '#059669',
+    color: '#0066CC',
     icon: 'checkmark-circle-outline',
   },
   {
     value: ActionCode.REVISE_RESUBMIT,
     label: 'Revise & Resubmit',
-    color: '#F59E0B',
+    color: '#0066CC',
     icon: 'refresh-circle',
   },
   {
     value: ActionCode.REJECTED,
     label: 'Rejected',
-    color: '#EF4444',
+    color: '#000000',
     icon: 'close-circle',
   },
   {
@@ -54,9 +54,9 @@ const ACTION_CODE_OPTIONS: { value: ActionCode; label: string; color: string; ic
 
 const REVIEW_STATUS_COLORS: Record<ReviewStatus, string> = {
   PENDING: '#6B7280',
-  IN_PROGRESS: '#F59E0B',
-  COMPLETED: '#10B981',
-  OVERDUE: '#EF4444',
+  IN_PROGRESS: '#0066CC',
+  COMPLETED: '#0066CC',
+  OVERDUE: '#000000',
 };
 
 export default function SubmittalDetailsScreen() {
@@ -162,11 +162,11 @@ export default function SubmittalDetailsScreen() {
                 {
                   backgroundColor:
                     submittal.status === 'APPROVED'
-                      ? '#10B981'
+                      ? '#0066CC'
                       : submittal.status === 'REJECTED'
-                      ? '#EF4444'
+                      ? '#000000'
                       : submittal.status === 'UNDER_REVIEW'
-                      ? '#F59E0B'
+                      ? '#0066CC'
                       : '#3B82F6',
                 },
               ]}
@@ -180,12 +180,12 @@ export default function SubmittalDetailsScreen() {
                   {
                     backgroundColor:
                       submittal.priority === 'CRITICAL'
-                        ? '#EF4444'
+                        ? '#000000'
                         : submittal.priority === 'URGENT'
-                        ? '#F97316'
+                        ? '#0066CC'
                         : submittal.priority === 'HIGH'
-                        ? '#F59E0B'
-                        : '#10B981',
+                        ? '#0066CC'
+                        : '#0066CC',
                   },
                 ]}
               >
@@ -198,7 +198,7 @@ export default function SubmittalDetailsScreen() {
         <Text style={styles.title}>{submittal.title}</Text>
 
         <View style={styles.specBadge}>
-          <Ionicons name="book-outline" size={14} color="#8B5CF6" style={{ marginRight: 6 }} />
+          <Ionicons name="book-outline" size={14} color="#666666" style={{ marginRight: 6 }} />
           <Text style={styles.specBadgeText}>{submittal.specSection}</Text>
         </View>
 
@@ -210,7 +210,7 @@ export default function SubmittalDetailsScreen() {
       {/* Overdue Alert */}
       {submittal.isOverdue && (
         <View style={styles.alertCard}>
-          <Ionicons name="warning" size={24} color="#DC2626" />
+          <Ionicons name="warning" size={24} color="#000000" />
           <View style={{ flex: 1, marginLeft: 12 }}>
             <Text style={styles.alertTitle}>Overdue Submittal</Text>
             <Text style={styles.alertText}>
@@ -258,7 +258,7 @@ export default function SubmittalDetailsScreen() {
                 style={[
                   styles.infoValue,
                   {
-                    color: daysToReview && daysToReview < 0 ? '#EF4444' : '#1F2937',
+                    color: daysToReview && daysToReview < 0 ? '#000000' : '#1F2937',
                   },
                 ]}
               >
@@ -354,9 +354,9 @@ export default function SubmittalDetailsScreen() {
                           {
                             color:
                               daysToReview && daysToReview < 0
-                                ? '#EF4444'
+                                ? '#000000'
                                 : daysToReview && daysToReview < 3
-                                ? '#F59E0B'
+                                ? '#0066CC'
                                 : '#1F2937',
                           },
                         ]}
@@ -390,11 +390,11 @@ export default function SubmittalDetailsScreen() {
                           {
                             backgroundColor:
                               reviewer.actionCode === 'NO_EXCEPTION'
-                                ? '#10B981'
+                                ? '#0066CC'
                                 : reviewer.actionCode === 'REJECTED'
-                                ? '#EF4444'
+                                ? '#000000'
                                 : reviewer.actionCode === 'REVISE_RESUBMIT'
-                                ? '#F59E0B'
+                                ? '#0066CC'
                                 : '#3B82F6',
                           },
                         ]}
@@ -447,7 +447,7 @@ export default function SubmittalDetailsScreen() {
                   </Text>
                   {doc.isMarkedUp && (
                     <View style={styles.markupBadge}>
-                      <Ionicons name="create" size={10} color="#8B5CF6" />
+                      <Ionicons name="create" size={10} color="#666666" />
                       <Text style={styles.markupBadgeText}>Has Markups</Text>
                     </View>
                   )}
@@ -478,9 +478,9 @@ export default function SubmittalDetailsScreen() {
                   {
                     backgroundColor:
                       step.status === 'COMPLETED'
-                        ? '#10B981'
+                        ? '#0066CC'
                         : step.status === 'IN_PROGRESS'
-                        ? '#F59E0B'
+                        ? '#0066CC'
                         : step.status === 'SKIPPED'
                         ? '#9CA3AF'
                         : '#E5E7EB',
@@ -643,7 +643,7 @@ export default function SubmittalDetailsScreen() {
                           style={styles.removeChangeBtn}
                           onPress={() => removeChange(index)}
                         >
-                          <Ionicons name="close-circle" size={24} color="#EF4444" />
+                          <Ionicons name="close-circle" size={24} color="#000000" />
                         </TouchableOpacity>
                       )}
                     </View>
@@ -691,7 +691,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 14,
-    color: '#EF4444',
+    color: '#000000',
   },
   headerCard: {
     backgroundColor: '#FFFFFF',
@@ -768,12 +768,12 @@ const styles = StyleSheet.create({
     margin: 16,
     borderRadius: 12,
     borderLeftWidth: 4,
-    borderLeftColor: '#DC2626',
+    borderLeftColor: '#000000',
   },
   alertTitle: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#DC2626',
+    color: '#000000',
     marginBottom: 4,
   },
   alertText: {
@@ -832,7 +832,7 @@ const styles = StyleSheet.create({
   },
   contactRole: {
     fontSize: 12,
-    color: '#8B5CF6',
+    color: '#666666',
     marginTop: 2,
   },
   contactEmail: {
@@ -876,7 +876,7 @@ const styles = StyleSheet.create({
     color: '#1F2937',
   },
   requiredIndicator: {
-    color: '#EF4444',
+    color: '#000000',
   },
   reviewerRole: {
     fontSize: 11,
@@ -1037,13 +1037,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#3B82F6',
   },
   actionBtnSuccess: {
-    backgroundColor: '#10B981',
+    backgroundColor: '#0066CC',
   },
   actionBtnWarning: {
-    backgroundColor: '#F59E0B',
+    backgroundColor: '#0066CC',
   },
   actionBtnDanger: {
-    backgroundColor: '#EF4444',
+    backgroundColor: '#000000',
   },
   actionBtnText: {
     fontSize: 14,

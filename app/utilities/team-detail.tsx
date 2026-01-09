@@ -30,13 +30,13 @@ const { width } = Dimensions.get('window');
 
 // Colors
 const COLORS = {
-  primary: '#0A6847',
+  primary: '#0066CC',
   primaryLight: '#E8F5E9',
-  secondary: '#2196F3',
-  accent: '#FFA41C',
-  success: '#4CAF50',
-  error: '#F44336',
-  warning: '#FF9800',
+  secondary: '#0066CC',
+  accent: '#0066CC',
+  success: '#0066CC',
+  error: '#000000',
+  warning: '#0066CC',
   background: '#F5F5F5',
   surface: '#FFFFFF',
   text: '#333333',
@@ -461,7 +461,7 @@ export default function TeamDetailScreen() {
 
           <View style={[
             styles.availabilityBadge,
-            { backgroundColor: team.availability === 'Sẵn sàng' ? COLORS.primaryLight : '#FFF3E0' }
+            { backgroundColor: team.availability === 'Sẵn sàng' ? COLORS.primaryLight : '#E8F4FF' }
           ]}>
             <Ionicons
               name={team.availability === 'Sẵn sàng' ? 'checkmark-circle' : 'time'}
@@ -1059,7 +1059,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 8,

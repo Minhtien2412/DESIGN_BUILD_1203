@@ -40,7 +40,7 @@ interface UserWithActions extends User {
 const ROLE_CONFIG: Record<UserRole, { label: string; color: string; icon: keyof typeof Ionicons.glyphMap; description: string }> = {
   ADMIN: {
     label: 'Quản trị viên',
-    color: '#EF4444',
+    color: '#000000',
     icon: 'shield-checkmark',
     description: 'Toàn quyền quản lý hệ thống',
   },
@@ -52,13 +52,13 @@ const ROLE_CONFIG: Record<UserRole, { label: string; color: string; icon: keyof 
   },
   CONTRACTOR: {
     label: 'Nhà thầu',
-    color: '#F59E0B',
+    color: '#0066CC',
     icon: 'hammer',
     description: 'Thực hiện thi công dự án',
   },
   CLIENT: {
     label: 'Khách hàng',
-    color: '#10B981',
+    color: '#0066CC',
     icon: 'person',
     description: 'Người dùng thông thường',
   },
@@ -276,8 +276,8 @@ export default function AccountManagementScreen() {
               onPress={() => handleDeleteUser(user)}
               disabled={user.loading}
             >
-              <Ionicons name="trash-outline" size={18} color="#EF4444" />
-              <Text style={[styles.actionButtonText, { color: '#EF4444' }]}>Xóa</Text>
+              <Ionicons name="trash-outline" size={18} color="#000000" />
+              <Text style={[styles.actionButtonText, { color: '#000000' }]}>Xóa</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -658,7 +658,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   deleteButton: {
-    borderColor: '#EF4444',
+    borderColor: '#000000',
   },
   actionButtonText: {
     fontSize: 14,

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Meeting Home Screen - Minimal Monochrome Design
  * Clean black & white premium experience
  */
@@ -151,7 +151,7 @@ export default function MeetingListScreen() {
                 <Text style={[styles.meetingTitle, { color: colors.text }]} numberOfLines={1}>{item.title}</Text>
                 {live && <View style={styles.liveBadge}><View style={styles.liveDot} /><Text style={styles.liveText}>LIVE</Text></View>}
               </View>
-              <Text style={[styles.meetingTime, { color: colors.textSecondary }]}>{formatDateTime(item.scheduledStartTime)} · {item.duration} min</Text>
+              <Text style={[styles.meetingTime, { color: colors.textSecondary }]}>{formatDateTime(item.scheduledStartTime)} � {item.duration} min</Text>
               <View style={styles.metaRow}>
                 <View style={styles.participantsPreview}>
                   {item.participants.slice(0, 3).map((p, i) => (

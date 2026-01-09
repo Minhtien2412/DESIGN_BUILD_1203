@@ -21,7 +21,7 @@ const VARIANT_CONFIG = {
     icon: 'search-outline',
   },
   error: {
-    iconColor: '#EF4444',
+    iconColor: '#000000',
     icon: 'alert-circle-outline',
   },
   info: {
@@ -40,7 +40,7 @@ export default function EmptyState({
 }: EmptyStateProps) {
   const textColor = useThemeColor({}, 'text');
   const mutedColor = '#6B7280';
-  const primaryColor = '#FF6B35';
+  const primaryColor = '#0066CC';
   
   const config = VARIANT_CONFIG[variant];
   const displayIcon = icon || config.icon;

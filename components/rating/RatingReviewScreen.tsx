@@ -127,11 +127,11 @@ export default function RatingReviewScreen() {
 
   const getRatingLabel = () => {
     switch (rating) {
-      case 1: return { text: 'Rất tệ', color: '#EF4444' };
-      case 2: return { text: 'Tệ', color: '#F59E0B' };
-      case 3: return { text: 'Bình thường', color: '#F59E0B' };
-      case 4: return { text: 'Tốt', color: '#10B981' };
-      case 5: return { text: 'Tuyệt vời', color: '#10B981' };
+      case 1: return { text: 'Rất tệ', color: '#000000' };
+      case 2: return { text: 'Tệ', color: '#0066CC' };
+      case 3: return { text: 'Bình thường', color: '#0066CC' };
+      case 4: return { text: 'Tốt', color: '#0066CC' };
+      case 5: return { text: 'Tuyệt vời', color: '#0066CC' };
       default: return { text: 'Chọn đánh giá', color: '#6B7280' };
     }
   };
@@ -194,7 +194,7 @@ export default function RatingReviewScreen() {
                   <Ionicons
                     name={star <= (hoveredRating || rating) ? 'star' : 'star-outline'}
                     size={48}
-                    color={star <= (hoveredRating || rating) ? '#F59E0B' : '#D1D5DB'}
+                    color={star <= (hoveredRating || rating) ? '#0066CC' : '#D1D5DB'}
                   />
                 </Animated.View>
               </TouchableOpacity>
@@ -295,7 +295,7 @@ export default function RatingReviewScreen() {
                       onPress={() => removePhoto(index)}
                       activeOpacity={0.7}
                     >
-                      <Ionicons name="close-circle" size={24} color="#EF4444" />
+                      <Ionicons name="close-circle" size={24} color="#000000" />
                     </TouchableOpacity>
                   </View>
                 ))}

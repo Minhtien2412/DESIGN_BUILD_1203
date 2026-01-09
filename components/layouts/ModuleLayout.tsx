@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
     borderColor: "#D1D5DB",
   },
   footerButtonDanger: {
-    backgroundColor: "#EF4444",
+    backgroundColor: "#000000",
   },
   footerButtonDisabled: {
     opacity: 0.5,

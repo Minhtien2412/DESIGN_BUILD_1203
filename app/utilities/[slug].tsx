@@ -35,7 +35,7 @@ export default function UtilityDetailScreen() {
       <Container>
         <Stack.Screen options={{ title: 'Dịch vụ không tồn tại' }} />
         <View style={styles.errorContainer}>
-          <Ionicons name="alert-circle-outline" size={64} color="#F44336" />
+          <Ionicons name="alert-circle-outline" size={64} color="#000000" />
           <Text style={styles.errorTitle}>Không tìm thấy dịch vụ</Text>
           <Text style={styles.errorMessage}>
             Dịch vụ bạn tìm kiếm không tồn tại hoặc đã bị xóa.
@@ -159,7 +159,7 @@ export default function UtilityDetailScreen() {
         <Section title="Ưu điểm nổi bật">
           {service.features.map((feature, index) => (
             <View key={index} style={styles.featureItem}>
-              <Ionicons name="checkmark-circle" size={20} color="#4CAF50" />
+              <Ionicons name="checkmark-circle" size={20} color="#0066CC" />
               <Text style={styles.featureText}>{feature}</Text>
             </View>
           ))}
@@ -358,7 +358,7 @@ const styles = StyleSheet.create({
   categoryBadge: {
     paddingHorizontal: 16,
     paddingVertical: 6,
-    backgroundColor: '#0A6847',
+    backgroundColor: '#0066CC',
     borderRadius: 20,
   },
   categoryText: {
@@ -408,7 +408,7 @@ const styles = StyleSheet.create({
   pricingPrice: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#0A6847',
+    color: '#0066CC',
     marginLeft: 12,
   },
   pricingDescription: {
@@ -446,7 +446,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   required: {
-    color: '#F44336',
+    color: '#000000',
   },
   input: {
     borderWidth: 1,
@@ -477,13 +477,13 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   ctaButton: {
-    backgroundColor: '#0A6847',
+    backgroundColor: '#0066CC',
   },
   callButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     paddingVertical: 14,
     borderRadius: 8,
     gap: 8,

@@ -155,7 +155,7 @@ export default function ModernHomeScreen() {
           {/* Quick Actions - Calls & Contacts */}
           <View style={styles.quickActionsContainer}>
             <TouchableOpacity 
-              style={[styles.quickActionCard, { backgroundColor: '#DBEAFE' }]}
+              style={[styles.quickActionCard, { backgroundColor: '#E8F4FF' }]}
               onPress={() => router.push('/(tabs)/contacts' as any)}
               activeOpacity={0.7}
             >

@@ -9,8 +9,8 @@ export const ModernTheme = {
   colors: {
     // Primary Green (Sophisticated Emerald)
     primary: {
-      main: '#0A6847',        // Deep emerald green
-      light: '#10B981',       // Bright emerald  
+      main: '#0066CC',        // Deep emerald green
+      light: '#0066CC',       // Bright emerald  
       dark: '#064E3B',        // Forest green
       contrast: '#FFFFFF',    // White text on green
     },
@@ -22,7 +22,7 @@ export const ModernTheme = {
       gray900: '#2D2D2D',     // Dark gray
       gray700: '#4A4A4A',     // Medium gray
       gray500: '#6B6B6B',     // Mid gray
-      gray300: '#9E9E9E',     // Light gray
+      gray300: '#999999',     // Light gray
       gray100: '#E5E5E5',     // Very light gray
       white: '#FFFFFF',       // Pure white
     },
@@ -37,10 +37,10 @@ export const ModernTheme = {
     
     // Accent (minimal use)
     accent: {
-      success: '#10B981',     // Green success
+      success: '#0066CC',     // Green success
       error: '#1A1A1A',       // Black for errors (minimalist)
-      warning: '#0A6847',     // Green warning
-      info: '#0A6847',        // Green info
+      warning: '#0066CC',     // Green warning
+      info: '#0066CC',        // Green info
     },
     
     // Text
@@ -49,13 +49,13 @@ export const ModernTheme = {
       secondary: '#4A4A4A',   // Medium text
       tertiary: '#6B6B6B',    // Light text
       inverse: '#FFFFFF',     // White text
-      disabled: '#9E9E9E',    // Disabled text
+      disabled: '#999999',    // Disabled text
     },
     
     // Borders
     border: {
       light: '#E5E5E5',       // Light border
-      medium: '#9E9E9E',      // Medium border
+      medium: '#999999',      // Medium border
       dark: '#4A4A4A',        // Dark border
     },
   },

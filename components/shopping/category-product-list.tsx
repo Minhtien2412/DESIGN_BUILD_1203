@@ -132,7 +132,7 @@ export const CategoryProductList: React.FC<CategoryProductListProps> = ({
             </View>
           )}
           {item.isNew && (
-            <View style={[styles.badge, { backgroundColor: '#4CAF50' }]}>
+            <View style={[styles.badge, { backgroundColor: '#0066CC' }]}>
               <Text style={styles.badgeText}>Mới</Text>
             </View>
           )}
@@ -274,7 +274,7 @@ export const CategoryProductList: React.FC<CategoryProductListProps> = ({
               {/* Related Products Section */}
               <View style={styles.relatedSection}>
                 <View style={styles.relatedHeader}>
-                  <Ionicons name="apps-outline" size={18} color="#EE4D2D" />
+                  <Ionicons name="apps-outline" size={18} color="#0066CC" />
                   <Text style={styles.relatedTitle}>Sản phẩm liên quan</Text>
                 </View>
                 <Text style={styles.relatedSubtitle}>
@@ -289,7 +289,7 @@ export const CategoryProductList: React.FC<CategoryProductListProps> = ({
                   onPress={handleShowMore}
                 >
                   <Text style={styles.showMoreText}>Xem thêm sản phẩm</Text>
-                  <Ionicons name="chevron-down" size={16} color="#EE4D2D" />
+                  <Ionicons name="chevron-down" size={16} color="#0066CC" />
                 </TouchableOpacity>
               )}
 
@@ -503,7 +503,7 @@ const styles = StyleSheet.create({
   productPrice: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#EE4D2D',
+    color: '#0066CC',
     marginBottom: 4,
   },
   productMeta: {
@@ -518,7 +518,7 @@ const styles = StyleSheet.create({
     color: '#bbb',
   },
   badge: {
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#0066CC',
     paddingHorizontal: 4,
     paddingVertical: 2,
     borderRadius: 2,
@@ -603,12 +603,12 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     borderRadius: 4,
     borderWidth: 1,
-    borderColor: '#EE4D2D',
+    borderColor: '#0066CC',
     gap: 6,
   },
   showMoreText: {
     fontSize: 13,
-    color: '#EE4D2D',
+    color: '#0066CC',
     fontWeight: '600',
   },
   relatedGrid: {
@@ -644,7 +644,7 @@ const styles = StyleSheet.create({
   relatedPrice: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#EE4D2D',
+    color: '#0066CC',
     marginBottom: 2,
   },
   relatedMeta: {

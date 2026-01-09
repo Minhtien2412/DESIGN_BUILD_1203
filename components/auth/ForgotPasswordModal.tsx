@@ -168,7 +168,7 @@ export function ForgotPasswordModal({ visible, onClose, onSuccess }: ForgotPassw
           editable={!loading}
         />
         {formData.email.includes('@') && formData.email.includes('.') && (
-          <Ionicons name="checkmark-circle" size={20} color="#10B981" />
+          <Ionicons name="checkmark-circle" size={20} color="#0066CC" />
         )}
       </View>
 
@@ -216,7 +216,7 @@ export function ForgotPasswordModal({ visible, onClose, onSuccess }: ForgotPassw
           editable={!loading}
         />
         {formData.resetCode.length === 6 && (
-          <Ionicons name="checkmark-circle" size={20} color="#10B981" />
+          <Ionicons name="checkmark-circle" size={20} color="#0066CC" />
         )}
       </View>
 

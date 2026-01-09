@@ -450,6 +450,175 @@ export class PerfexApiIntegration {
 
     return this.call(`/projects/${id}`, { mockData });
   }
+
+  /**
+   * Get project Gantt tasks (for construction progress tracking)
+   * URL: /perfex_crm/admin/projects/view/2?group=project_gantt
+   */
+  static async getProjectGantt(projectId: string = '2'): Promise<ApiResponse<GanttTask[]>> {
+    const mockData: GanttTask[] = [
+      // Phase 1: Khởi công
+      { id: '1', name: 'Khởi công dự án', parentId: null, startDate: '2026-01-01', endDate: '2026-01-15', progress: 100, status: 'completed', phase: 'Khởi công' },
+      { id: '2', name: 'Khởi công dự án CT', parentId: '1', startDate: '2026-01-01', endDate: '2026-01-10', progress: 100, status: 'completed', phase: 'Khởi công' },
+      
+      // Phase 2: Ép cọc
+      { id: '3', name: 'Ép cọc', parentId: null, startDate: '2026-01-15', endDate: '2026-02-01', progress: 100, status: 'completed', phase: 'Móng' },
+      { id: '4', name: 'Ép cọc CT', parentId: '3', startDate: '2026-01-16', endDate: '2026-01-28', progress: 100, status: 'completed', phase: 'Móng' },
+      
+      // Phase 3: Đào móng  
+      { id: '5', name: 'Đào móng', parentId: null, startDate: '2026-02-01', endDate: '2026-02-20', progress: 100, status: 'completed', phase: 'Móng' },
+      { id: '6', name: 'Đào móng CT', parentId: '5', startDate: '2026-02-02', endDate: '2026-02-18', progress: 100, status: 'completed', phase: 'Móng' },
+      
+      // Phase 4: Làm thép móng
+      { id: '7', name: 'Làm thép móng - giằng móng', parentId: null, startDate: '2026-02-20', endDate: '2026-03-10', progress: 80, status: 'in_progress', phase: 'Móng' },
+      { id: '8', name: 'Làm thép móng - giằng móng CT', parentId: '7', startDate: '2026-02-21', endDate: '2026-03-08', progress: 80, status: 'in_progress', phase: 'Móng' },
+      
+      // Phase 5: Đổ bê tông móng
+      { id: '9', name: 'Đổ bê tông móng', parentId: null, startDate: '2026-03-10', endDate: '2026-03-25', progress: 0, status: 'pending', phase: 'Móng' },
+      { id: '10', name: 'Đổ bê tông móng CT', parentId: '9', startDate: '2026-03-11', endDate: '2026-03-23', progress: 0, status: 'pending', phase: 'Móng' },
+      
+      // Phase 6: San lấp
+      { id: '11', name: 'San lấp - đệm nền (hố ga, thoát trệt)', parentId: null, startDate: '2026-03-25', endDate: '2026-04-10', progress: 0, status: 'pending', phase: 'Nền' },
+      { id: '12', name: 'San lấp - đệm nền (hố ga, thoát trệt) CT', parentId: '11', startDate: '2026-03-26', endDate: '2026-04-08', progress: 0, status: 'pending', phase: 'Nền' },
+      
+      // Phase 7: Làm thép sàn trệt
+      { id: '13', name: 'Làm thép sàn tầng trệt', parentId: null, startDate: '2026-04-10', endDate: '2026-04-25', progress: 0, status: 'pending', phase: 'Sàn' },
+      { id: '14', name: 'Làm thép sàn tầng trệt CT', parentId: '13', startDate: '2026-04-11', endDate: '2026-04-23', progress: 0, status: 'pending', phase: 'Sàn' },
+      
+      // Phase 8: Coffa + thép cột
+      { id: '15', name: 'Coffa + thép cột tầng trệt', parentId: null, startDate: '2026-04-25', endDate: '2026-05-15', progress: 0, status: 'pending', phase: 'Kết cấu' },
+      { id: '16', name: 'Coffa + thép cột tầng trệt CT', parentId: '15', startDate: '2026-04-26', endDate: '2026-05-13', progress: 0, status: 'pending', phase: 'Kết cấu' },
+      
+      // Phase 9: Đổ bê tông sàn
+      { id: '17', name: 'Đổ bê tông sàn tầng trệt', parentId: null, startDate: '2026-05-15', endDate: '2026-05-30', progress: 0, status: 'pending', phase: 'Sàn' },
+    ];
+
+    return this.call(`/projects/${projectId}/gantt`, { mockData });
+  }
+
+  /**
+   * Get project tasks organized by phases
+   */
+  static async getProjectPhases(projectId: string = '2'): Promise<ApiResponse<ProjectPhase[]>> {
+    const mockData: ProjectPhase[] = [
+      {
+        id: 'phase-1',
+        name: 'Khởi công',
+        order: 1,
+        startDate: '2026-01-01',
+        endDate: '2026-01-15',
+        progress: 100,
+        status: 'completed',
+        color: '#0066CC',
+        tasks: [
+          { id: '1', name: 'Khởi công dự án', progress: 100, status: 'completed' },
+          { id: '2', name: 'Khởi công dự án CT', progress: 100, status: 'completed' },
+        ]
+      },
+      {
+        id: 'phase-2', 
+        name: 'Ép cọc',
+        order: 2,
+        startDate: '2026-01-15',
+        endDate: '2026-02-01',
+        progress: 100,
+        status: 'completed',
+        color: '#0066CC',
+        tasks: [
+          { id: '3', name: 'Ép cọc', progress: 100, status: 'completed' },
+          { id: '4', name: 'Ép cọc CT', progress: 100, status: 'completed' },
+        ]
+      },
+      {
+        id: 'phase-3',
+        name: 'Đào móng',
+        order: 3,
+        startDate: '2026-02-01',
+        endDate: '2026-02-20',
+        progress: 100,
+        status: 'completed',
+        color: '#0066CC',
+        tasks: [
+          { id: '5', name: 'Đào móng', progress: 100, status: 'completed' },
+          { id: '6', name: 'Đào móng CT', progress: 100, status: 'completed' },
+        ]
+      },
+      {
+        id: 'phase-4',
+        name: 'Làm thép móng',
+        order: 4,
+        startDate: '2026-02-20',
+        endDate: '2026-03-10',
+        progress: 80,
+        status: 'in_progress',
+        color: '#0066CC',
+        tasks: [
+          { id: '7', name: 'Làm thép móng - giằng móng', progress: 80, status: 'in_progress' },
+          { id: '8', name: 'Làm thép móng - giằng móng CT', progress: 80, status: 'in_progress' },
+        ]
+      },
+      {
+        id: 'phase-5',
+        name: 'Đổ bê tông móng',
+        order: 5,
+        startDate: '2026-03-10',
+        endDate: '2026-03-25',
+        progress: 0,
+        status: 'pending',
+        color: '#999999',
+        tasks: [
+          { id: '9', name: 'Đổ bê tông móng', progress: 0, status: 'pending' },
+          { id: '10', name: 'Đổ bê tông móng CT', progress: 0, status: 'pending' },
+        ]
+      },
+      {
+        id: 'phase-6',
+        name: 'San lấp - Đệm nền',
+        order: 6,
+        startDate: '2026-03-25',
+        endDate: '2026-04-10',
+        progress: 0,
+        status: 'pending',
+        color: '#999999',
+        tasks: [
+          { id: '11', name: 'San lấp - đệm nền (hố ga, thoát trệt)', progress: 0, status: 'pending' },
+          { id: '12', name: 'San lấp - đệm nền (hố ga, thoát trệt) CT', progress: 0, status: 'pending' },
+        ]
+      },
+    ];
+
+    return this.call(`/projects/${projectId}/phases`, { mockData });
+  }
+}
+
+// ==================== GANTT TYPES ====================
+
+export interface GanttTask {
+  id: string;
+  name: string;
+  parentId: string | null;
+  startDate: string;
+  endDate: string;
+  progress: number;
+  status: 'completed' | 'in_progress' | 'pending';
+  phase: string;
+}
+
+export interface ProjectPhase {
+  id: string;
+  name: string;
+  order: number;
+  startDate: string;
+  endDate: string;
+  progress: number;
+  status: 'completed' | 'in_progress' | 'pending';
+  color: string;
+  tasks: {
+    id: string;
+    name: string;
+    progress: number;
+    status: string;
+  }[];
 }
 
 // ==================== MAIN BACKEND INTEGRATION ====================

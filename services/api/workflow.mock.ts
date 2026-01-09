@@ -76,10 +76,10 @@ export interface WorkflowStats {
 
 const MOCK_PHASES: WorkflowPhase[] = [
   { id: 'phase-1', name: 'Chuẩn bị', color: '#3b82f6', order: 1 },
-  { id: 'phase-2', name: 'Móng', color: '#8b5cf6', order: 2 },
-  { id: 'phase-3', name: 'Kết cấu', color: '#10b981', order: 3 },
-  { id: 'phase-4', name: 'Hoàn thiện', color: '#f59e0b', order: 4 },
-  { id: 'phase-5', name: 'Bàn giao', color: '#ef4444', order: 5 }
+  { id: 'phase-2', name: 'Móng', color: '#666666', order: 2 },
+  { id: 'phase-3', name: 'Kết cấu', color: '#0066CC', order: 3 },
+  { id: 'phase-4', name: 'Hoàn thiện', color: '#0066CC', order: 4 },
+  { id: 'phase-5', name: 'Bàn giao', color: '#000000', order: 5 }
 ];
 
 const MOCK_NODES: WorkflowNode[] = [
@@ -151,7 +151,7 @@ const MOCK_NODES: WorkflowNode[] = [
     actualStartDate: '2025-10-11',
     actualEndDate: '2025-10-11',
     dependencies: ['node-2', 'node-3'],
-    color: '#8b5cf6',
+    color: '#666666',
     icon: 'checkmark-circle'
   },
   {
@@ -169,7 +169,7 @@ const MOCK_NODES: WorkflowNode[] = [
     actualEndDate: '2025-10-21',
     assignedTo: ['Phạm Văn D'],
     dependencies: ['node-4'],
-    color: '#8b5cf6'
+    color: '#666666'
   },
   {
     id: 'node-6',
@@ -184,7 +184,7 @@ const MOCK_NODES: WorkflowNode[] = [
     actualStartDate: '2025-10-22',
     actualEndDate: '2025-10-25',
     dependencies: ['node-5'],
-    color: '#8b5cf6'
+    color: '#666666'
   },
   {
     id: 'node-7',
@@ -201,7 +201,7 @@ const MOCK_NODES: WorkflowNode[] = [
     actualEndDate: '2025-11-04',
     assignedTo: ['Hoàng Văn E'],
     dependencies: ['node-6'],
-    color: '#8b5cf6'
+    color: '#666666'
   },
   {
     id: 'node-8',
@@ -216,7 +216,7 @@ const MOCK_NODES: WorkflowNode[] = [
     actualStartDate: '2025-11-06',
     actualEndDate: '2025-11-10',
     dependencies: ['node-7'],
-    color: '#8b5cf6'
+    color: '#666666'
   },
 
   // Phase 3: Kết cấu
@@ -233,7 +233,7 @@ const MOCK_NODES: WorkflowNode[] = [
     actualStartDate: '2025-11-11',
     actualEndDate: '2025-11-11',
     dependencies: ['node-8'],
-    color: '#10b981',
+    color: '#0066CC',
     icon: 'checkmark-done'
   },
   {
@@ -250,7 +250,7 @@ const MOCK_NODES: WorkflowNode[] = [
     actualStartDate: '2025-11-12',
     assignedTo: ['Vũ Văn F'],
     dependencies: ['node-9'],
-    color: '#10b981'
+    color: '#0066CC'
   },
   {
     id: 'node-11',
@@ -264,7 +264,7 @@ const MOCK_NODES: WorkflowNode[] = [
     endDate: '2025-11-30',
     actualStartDate: '2025-11-21',
     dependencies: ['node-10'],
-    color: '#10b981'
+    color: '#0066CC'
   },
   {
     id: 'node-12',
@@ -277,7 +277,7 @@ const MOCK_NODES: WorkflowNode[] = [
     startDate: '2025-12-01',
     endDate: '2025-12-10',
     dependencies: ['node-11'],
-    color: '#10b981'
+    color: '#0066CC'
   },
   {
     id: 'node-13',
@@ -290,7 +290,7 @@ const MOCK_NODES: WorkflowNode[] = [
     startDate: '2025-12-11',
     endDate: '2025-12-20',
     dependencies: ['node-12'],
-    color: '#10b981'
+    color: '#0066CC'
   },
   {
     id: 'node-14',
@@ -303,7 +303,7 @@ const MOCK_NODES: WorkflowNode[] = [
     startDate: '2025-12-21',
     endDate: '2025-12-30',
     dependencies: ['node-13'],
-    color: '#10b981'
+    color: '#0066CC'
   },
   {
     id: 'node-15',
@@ -316,7 +316,7 @@ const MOCK_NODES: WorkflowNode[] = [
     startDate: '2025-12-31',
     endDate: '2026-01-10',
     dependencies: ['node-14'],
-    color: '#10b981'
+    color: '#0066CC'
   },
 
   // Phase 4: Hoàn thiện
@@ -331,7 +331,7 @@ const MOCK_NODES: WorkflowNode[] = [
     startDate: '2026-01-11',
     endDate: '2026-01-11',
     dependencies: ['node-15'],
-    color: '#f59e0b',
+    color: '#0066CC',
     icon: 'build'
   },
   {
@@ -345,7 +345,7 @@ const MOCK_NODES: WorkflowNode[] = [
     startDate: '2026-01-12',
     endDate: '2026-01-25',
     dependencies: ['node-16'],
-    color: '#f59e0b'
+    color: '#0066CC'
   },
   {
     id: 'node-18',
@@ -358,7 +358,7 @@ const MOCK_NODES: WorkflowNode[] = [
     startDate: '2026-01-26',
     endDate: '2026-02-10',
     dependencies: ['node-17'],
-    color: '#f59e0b'
+    color: '#0066CC'
   },
   {
     id: 'node-19',
@@ -371,7 +371,7 @@ const MOCK_NODES: WorkflowNode[] = [
     startDate: '2026-01-20',
     endDate: '2026-02-05',
     dependencies: ['node-17'],
-    color: '#f59e0b'
+    color: '#0066CC'
   },
   {
     id: 'node-20',
@@ -384,7 +384,7 @@ const MOCK_NODES: WorkflowNode[] = [
     startDate: '2026-02-11',
     endDate: '2026-02-20',
     dependencies: ['node-18', 'node-19'],
-    color: '#f59e0b'
+    color: '#0066CC'
   },
 
   // Phase 5: Bàn giao
@@ -399,7 +399,7 @@ const MOCK_NODES: WorkflowNode[] = [
     startDate: '2026-02-25',
     endDate: '2026-02-25',
     dependencies: ['node-20'],
-    color: '#ef4444',
+    color: '#000000',
     icon: 'trophy'
   }
 ];

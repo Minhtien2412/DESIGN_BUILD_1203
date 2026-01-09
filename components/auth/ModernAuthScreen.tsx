@@ -1,6 +1,6 @@
-﻿/**
- * Modern Auth Screen - Kết hợp giao diện đẹp với API backend thật
- * Giao diện nhỏ gọn, ngăn nắp, không có text "API" thừa thãi
+/**
+ * Modern Auth Screen - K?t h?p giao di?n d?p v?i API backend th?t
+ * Giao di?n nh? g?n, ngan n?p, kh�ng c� text "API" th?a th�i
  */
 
 import { Ionicons } from '@expo/vector-icons';
@@ -61,7 +61,7 @@ export default function ModernAuthScreen() {
     try {
       if (loginMethod === 'account') {
         if (!account.trim() || !password) {
-          Alert.alert('Lỗi', 'Vui lòng điền đầy đủ thông tin');
+          Alert.alert('L?i', 'Vui l�ng di?n d?y d? th�ng tin');
           return;
         }
 
@@ -78,15 +78,15 @@ export default function ModernAuthScreen() {
         }
 
         await signIn(loginData.email || accountValue, loginData.password);
-        Alert.alert('Thành công', 'Đăng nhập thành công!', [
+        Alert.alert('Th�nh c�ng', '�ang nh?p th�nh c�ng!', [
           { text: 'OK', onPress: () => router.replace('/(tabs)') }
         ]);
       } else {
         // Phone login - simplified for now
-        Alert.alert('Thông báo', 'Đăng nhập bằng số điện thoại đang được phát triển');
+        Alert.alert('Th�ng b�o', '�ang nh?p b?ng s? di?n tho?i dang du?c ph�t tri?n');
       }
     } catch (error) {
-      Alert.alert('Lỗi', 'Có lỗi xảy ra khi đăng nhập');
+      Alert.alert('L?i', 'C� l?i x?y ra khi dang nh?p');
     }
   };
 
@@ -94,17 +94,17 @@ export default function ModernAuthScreen() {
   const handleSignup = async () => {
     try {
       if (!name.trim() || !account.trim() || !password || !confirmPassword) {
-        Alert.alert('Lỗi', 'Vui lòng điền đầy đủ thông tin');
+        Alert.alert('L?i', 'Vui l�ng di?n d?y d? th�ng tin');
         return;
       }
 
       if (password !== confirmPassword) {
-        Alert.alert('Lỗi', 'Mật khẩu xác nhận không khớp');
+        Alert.alert('L?i', 'M?t kh?u x�c nh?n kh�ng kh?p');
         return;
       }
 
       if (password.length < 6) {
-        Alert.alert('Lỗi', 'Mật khẩu phải có ít nhất 6 ký tự');
+        Alert.alert('L?i', 'M?t kh?u ph?i c� �t nh?t 6 k� t?');
         return;
       }
 
@@ -124,11 +124,11 @@ export default function ModernAuthScreen() {
       }
 
       await signUp(signupData.email || accountValue, signupData.password, signupData.name);
-      Alert.alert('Thành công', 'Đăng ký thành công!', [
+      Alert.alert('Th�nh c�ng', '�ang k� th�nh c�ng!', [
         { text: 'OK', onPress: () => setMode('login') }
       ]);
     } catch (error: any) {
-      Alert.alert('Lỗi đăng ký', error.message || 'Đăng ký thất bại');
+      Alert.alert('L?i dang k�', error.message || '�ang k� th?t b?i');
     }
   };
 
@@ -153,12 +153,12 @@ export default function ModernAuthScreen() {
           {/* Header */}
           <View style={styles.header}>
             <Text style={styles.title}>
-              {mode === 'login' ? 'Đăng Nhập' : 'Đăng Ký'}
+              {mode === 'login' ? '�ang Nh?p' : '�ang K�'}
             </Text>
             <Text style={styles.subtitle}>
               {mode === 'login' 
-                ? 'Chào mừng bạn trở lại!' 
-                : 'Tạo tài khoản mới'
+                ? 'Ch�o m?ng b?n tr? l?i!' 
+                : 'T?o t�i kho?n m?i'
               }
             </Text>
           </View>
@@ -170,7 +170,7 @@ export default function ModernAuthScreen() {
               onPress={() => setMode('login')}
             >
               <Text style={[styles.modeText, mode === 'login' && styles.modeTextActive]}>
-                Đăng Nhập
+                �ang Nh?p
               </Text>
             </Pressable>
             <Pressable
@@ -178,7 +178,7 @@ export default function ModernAuthScreen() {
               onPress={() => setMode('signup')}
             >
               <Text style={[styles.modeText, mode === 'signup' && styles.modeTextActive]}>
-                Đăng Ký
+                �ang K�
               </Text>
             </Pressable>
           </View>
@@ -186,19 +186,19 @@ export default function ModernAuthScreen() {
           {/* Quick Demo Access */}
           {mode === 'login' && (
             <View style={styles.demoContainer}>
-              <Text style={styles.demoTitle}>Truy cập nhanh:</Text>
+              <Text style={styles.demoTitle}>Truy c?p nhanh:</Text>
               <View style={styles.demoButtons}>
                 <TouchableOpacity 
                   style={styles.demoButton}
                   onPress={() => quickFillDemo('admin')}
                 >
-                  <Text style={styles.demoButtonText}>👑 Admin</Text>
+                  <Text style={styles.demoButtonText}>?? Admin</Text>
                 </TouchableOpacity>
                 <TouchableOpacity 
                   style={styles.demoButton}
                   onPress={() => quickFillDemo('user')}
                 >
-                  <Text style={styles.demoButtonText}>👤 User</Text>
+                  <Text style={styles.demoButtonText}>?? User</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -217,7 +217,7 @@ export default function ModernAuthScreen() {
                   color={loginMethod === 'account' ? '#007AFF' : '#666'} 
                 />
                 <Text style={[styles.methodText, loginMethod === 'account' && styles.methodTextActive]}>
-                  Tài khoản
+                  T�i kho?n
                 </Text>
               </Pressable>
               <Pressable
@@ -230,7 +230,7 @@ export default function ModernAuthScreen() {
                   color={loginMethod === 'phone' ? '#007AFF' : '#666'} 
                 />
                 <Text style={[styles.methodText, loginMethod === 'phone' && styles.methodTextActive]}>
-                  Số điện thoại
+                  S? di?n tho?i
                 </Text>
               </Pressable>
             </View>
@@ -241,12 +241,12 @@ export default function ModernAuthScreen() {
             {/* Name field for signup */}
             {mode === 'signup' && (
               <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Họ và tên</Text>
+                <Text style={styles.inputLabel}>H? v� t�n</Text>
                 <TextInput
                   style={styles.textInput}
                   value={name}
                   onChangeText={setName}
-                  placeholder="Nhập họ và tên"
+                  placeholder="Nh?p h? v� t�n"
                   autoCapitalize="words"
                   textContentType="name"
                 />
@@ -257,13 +257,13 @@ export default function ModernAuthScreen() {
             {(mode === 'signup' || loginMethod === 'account') && (
               <View style={styles.inputContainer}>
                 <Text style={styles.inputLabel}>
-                  {mode === 'signup' ? 'Email/Username' : 'Tài khoản'}
+                  {mode === 'signup' ? 'Email/Username' : 'T�i kho?n'}
                 </Text>
                 <TextInput
                   style={styles.textInput}
                   value={account}
                   onChangeText={setAccount}
-                  placeholder={mode === 'signup' ? 'Email hoặc username' : 'Email, username hoặc số điện thoại'}
+                  placeholder={mode === 'signup' ? 'Email ho?c username' : 'Email, username ho?c s? di?n tho?i'}
                   autoCapitalize="none"
                   keyboardType={account.includes('@') ? 'email-address' : 'default'}
                   textContentType="emailAddress"
@@ -274,12 +274,12 @@ export default function ModernAuthScreen() {
             {/* Phone field for phone login */}
             {mode === 'login' && loginMethod === 'phone' && (
               <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Số điện thoại</Text>
+                <Text style={styles.inputLabel}>S? di?n tho?i</Text>
                 <TextInput
                   style={styles.textInput}
                   value={phone}
                   onChangeText={setPhone}
-                  placeholder="Nhập số điện thoại"
+                  placeholder="Nh?p s? di?n tho?i"
                   keyboardType="phone-pad"
                   textContentType="telephoneNumber"
                 />
@@ -289,13 +289,13 @@ export default function ModernAuthScreen() {
             {/* Password field */}
             {(mode === 'signup' || loginMethod === 'account') && (
               <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Mật khẩu</Text>
+                <Text style={styles.inputLabel}>M?t kh?u</Text>
                 <View style={styles.passwordContainer}>
                   <TextInput
                     style={styles.passwordInput}
                     value={password}
                     onChangeText={setPassword}
-                    placeholder="Nhập mật khẩu"
+                    placeholder="Nh?p m?t kh?u"
                     secureTextEntry={!showPw}
                     textContentType="password"
                   />
@@ -316,12 +316,12 @@ export default function ModernAuthScreen() {
             {/* Confirm Password field for signup */}
             {mode === 'signup' && (
               <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Xác nhận mật khẩu</Text>
+                <Text style={styles.inputLabel}>X�c nh?n m?t kh?u</Text>
                 <TextInput
                   style={styles.textInput}
                   value={confirmPassword}
                   onChangeText={setConfirmPassword}
-                  placeholder="Nhập lại mật khẩu"
+                  placeholder="Nh?p l?i m?t kh?u"
                   secureTextEntry={!showPw}
                   textContentType="password"
                 />
@@ -331,12 +331,12 @@ export default function ModernAuthScreen() {
             {/* OTP field for phone login */}
             {mode === 'login' && loginMethod === 'phone' && step === 'verify' && (
               <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Mã OTP</Text>
+                <Text style={styles.inputLabel}>M� OTP</Text>
                 <TextInput
                   style={styles.textInput}
                   value={otp}
                   onChangeText={setOtp}
-                  placeholder="Nhập mã OTP"
+                  placeholder="Nh?p m� OTP"
                   keyboardType="number-pad"
                   maxLength={6}
                 />
@@ -349,24 +349,24 @@ export default function ModernAuthScreen() {
             {loading ? (
               <View style={styles.loadingContainer}>
                 <Loader />
-                <Text style={styles.loadingText}>Đang xử lý...</Text>
+                <Text style={styles.loadingText}>�ang x? l�...</Text>
               </View>
             ) : (
               <Button
                 title={
                   mode === 'signup' 
-                    ? 'Đăng Ký' 
+                    ? '�ang K�' 
                     : loginMethod === 'phone' && step === 'request'
-                      ? 'Gửi OTP'
+                      ? 'G?i OTP'
                       : loginMethod === 'phone' && step === 'verify'
-                        ? 'Xác thực OTP'
-                        : 'Đăng Nhập'
+                        ? 'X�c th?c OTP'
+                        : '�ang Nh?p'
                 }
                 onPress={
                   mode === 'signup' 
                     ? handleSignup 
                     : loginMethod === 'phone'
-                      ? () => Alert.alert('Thông báo', 'Đăng nhập bằng SĐT đang phát triển')
+                      ? () => Alert.alert('Th�ng b�o', '�ang nh?p b?ng S�T dang ph�t tri?n')
                       : handleLogin
                 }
                 loading={loading}
@@ -378,13 +378,13 @@ export default function ModernAuthScreen() {
           {/* Footer */}
           <View style={styles.footer}>
             <Text style={styles.footerText}>
-              {mode === 'login' ? 'Chưa có tài khoản? ' : 'Đã có tài khoản? '}
+              {mode === 'login' ? 'Chua c� t�i kho?n? ' : '�� c� t�i kho?n? '}
             </Text>
             <TouchableOpacity
               onPress={() => setMode(mode === 'login' ? 'signup' : 'login')}
             >
               <Text style={styles.footerLink}>
-                {mode === 'login' ? 'Đăng ký ngay' : 'Đăng nhập'}
+                {mode === 'login' ? '�ang k� ngay' : '�ang nh?p'}
               </Text>
             </TouchableOpacity>
           </View>

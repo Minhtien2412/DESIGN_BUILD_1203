@@ -137,7 +137,7 @@ export default function CreateFolderScreen() {
                 <Ionicons
                   name="home"
                   size={16}
-                  color={!selectedParentId ? '#2196F3' : '#666'}
+                  color={!selectedParentId ? '#0066CC' : '#666'}
                 />
                 <Text
                   style={[
@@ -161,7 +161,7 @@ export default function CreateFolderScreen() {
                   <Ionicons
                     name="folder"
                     size={16}
-                    color={selectedParentId === folder.id ? '#2196F3' : '#666'}
+                    color={selectedParentId === folder.id ? '#0066CC' : '#666'}
                   />
                   <Text
                     style={[
@@ -196,7 +196,7 @@ export default function CreateFolderScreen() {
                   <Ionicons
                     name={option.icon}
                     size={22}
-                    color={accessLevel === option.value ? '#2196F3' : '#666'}
+                    color={accessLevel === option.value ? '#0066CC' : '#666'}
                   />
                   <View style={styles.accessLevelInfo}>
                     <Text
@@ -213,7 +213,7 @@ export default function CreateFolderScreen() {
                   </View>
                 </View>
                 {accessLevel === option.value && (
-                  <Ionicons name="checkmark-circle" size={22} color="#2196F3" />
+                  <Ionicons name="checkmark-circle" size={22} color="#0066CC" />
                 )}
               </TouchableOpacity>
             ))}
@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   required: {
-    color: '#F44336',
+    color: '#000000',
   },
   input: {
     borderWidth: 1,
@@ -293,8 +293,8 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   folderChipActive: {
-    backgroundColor: '#E3F2FD',
-    borderColor: '#2196F3',
+    backgroundColor: '#E8F4FF',
+    borderColor: '#0066CC',
   },
   folderChipText: {
     fontSize: 13,
@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   folderChipTextActive: {
-    color: '#2196F3',
+    color: '#0066CC',
     fontWeight: '600',
   },
   accessLevelList: {
@@ -318,8 +318,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   accessLevelCardActive: {
-    borderColor: '#2196F3',
-    backgroundColor: '#E3F2FD',
+    borderColor: '#0066CC',
+    backgroundColor: '#E8F4FF',
   },
   accessLevelLeft: {
     flexDirection: 'row',
@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   accessLevelLabelActive: {
-    color: '#2196F3',
+    color: '#0066CC',
   },
   accessLevelDescription: {
     fontSize: 12,
@@ -367,7 +367,7 @@ const styles = StyleSheet.create({
   createButton: {
     flex: 1,
     paddingVertical: 12,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     borderRadius: 6,
     alignItems: 'center',
   },

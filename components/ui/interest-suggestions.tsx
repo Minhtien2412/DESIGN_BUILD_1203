@@ -44,7 +44,7 @@ export function InterestSuggestions({
       {showHeader && (
         <View style={styles.header}>
           <View style={styles.titleRow}>
-            <Ionicons name="heart-outline" size={18} color="#EE4D2D" />
+            <Ionicons name="heart-outline" size={18} color="#0066CC" />
             <Text style={styles.title}>Có thể bạn quan tâm</Text>
           </View>
         </View>

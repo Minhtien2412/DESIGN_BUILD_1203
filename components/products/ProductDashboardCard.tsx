@@ -40,9 +40,9 @@ export function ProductDashboardCard({
   const accent = useThemeColor({}, 'accent');
   const textMuted = useThemeColor({}, 'textMuted');
   const text = useThemeColor({}, 'text');
-  const success = '#22c55e';
-  const warning = '#f97316';
-  const danger = '#ef4444';
+  const success = '#0066CC';
+  const warning = '#0066CC';
+  const danger = '#000000';
 
   const hasDiscount = typeof product.discountPercent === 'number' && product.discountPercent > 0;
   const finalPrice = hasDiscount
@@ -97,7 +97,7 @@ export function ProductDashboardCard({
               </View>
             )}
             {product.isBestseller && (
-              <View style={[styles.badge, { backgroundColor: '#f59e0b' }]}>
+              <View style={[styles.badge, { backgroundColor: '#0066CC' }]}>
                 <ThemedText style={styles.badgeText}>BÁN CHẠY</ThemedText>
               </View>
             )}
@@ -215,7 +215,7 @@ export function ProductDashboardCard({
       {showMetrics && (
         <View style={[styles.metricsSection, { borderTopColor: border }]}>
           <View style={styles.metricItem}>
-            <Ionicons name="star" size={16} color="#f59e0b" />
+            <Ionicons name="star" size={16} color="#0066CC" />
             <ThemedText style={[styles.metricValue, { color: text }]}>
               {product.rating?.toFixed(1) || '0.0'}
             </ThemedText>

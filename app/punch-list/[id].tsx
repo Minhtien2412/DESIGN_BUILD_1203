@@ -54,7 +54,7 @@ export default function PunchListDetailScreen() {
   const getStatusColor = (status: PunchListStatus): { bg: string; text: string } => {
     const colors: Record<PunchListStatus, { bg: string; text: string }> = {
       DRAFT: { bg: '#F3F4F6', text: '#374151' },
-      SUBMITTED: { bg: '#DBEAFE', text: '#1E40AF' },
+      SUBMITTED: { bg: '#E8F4FF', text: '#1E40AF' },
       IN_PROGRESS: { bg: '#FEF3C7', text: '#92400E' },
       COMPLETED: { bg: '#D1FAE5', text: '#065F46' },
       CLOSED: { bg: '#E5E7EB', text: '#6B7280' },
@@ -64,7 +64,7 @@ export default function PunchListDetailScreen() {
 
   const getItemStatusColor = (status: PunchItemStatus): { bg: string; text: string } => {
     const colors: Record<PunchItemStatus, { bg: string; text: string }> = {
-      OPEN: { bg: '#DBEAFE', text: '#1E40AF' },
+      OPEN: { bg: '#E8F4FF', text: '#1E40AF' },
       IN_PROGRESS: { bg: '#FEF3C7', text: '#92400E' },
       READY_FOR_REVIEW: { bg: '#E0E7FF', text: '#3730A3' },
       REJECTED: { bg: '#FEE2E2', text: '#991B1B' },
@@ -142,7 +142,7 @@ export default function PunchListDetailScreen() {
     return (
       <Container>
         <Section>
-          <ThemedText style={{ color: '#EF4444', textAlign: 'center' }}>
+          <ThemedText style={{ color: '#000000', textAlign: 'center' }}>
             Error: {error.message}
           </ThemedText>
         </Section>
@@ -166,7 +166,7 @@ export default function PunchListDetailScreen() {
                       punchList.listType === 'FINAL'
                         ? '#FEE2E2'
                         : punchList.listType === 'SUBSTANTIAL_COMPLETION'
-                          ? '#DBEAFE'
+                          ? '#E8F4FF'
                           : '#FEF3C7',
                   },
                 ]}
@@ -249,7 +249,7 @@ export default function PunchListDetailScreen() {
               <ThemedText style={[styles.statLabel, { color: secondaryText }]}>Open</ThemedText>
             </View>
             <View style={[styles.statCard, { backgroundColor: cardBackground, borderColor }]}>
-              <ThemedText style={[styles.statValue, { color: '#F59E0B' }]}>
+              <ThemedText style={[styles.statValue, { color: '#0066CC' }]}>
                 {punchList.inProgressItems}
               </ThemedText>
               <ThemedText style={[styles.statLabel, { color: secondaryText }]}>
@@ -257,7 +257,7 @@ export default function PunchListDetailScreen() {
               </ThemedText>
             </View>
             <View style={[styles.statCard, { backgroundColor: cardBackground, borderColor }]}>
-              <ThemedText style={[styles.statValue, { color: '#10B981' }]}>
+              <ThemedText style={[styles.statValue, { color: '#0066CC' }]}>
                 {punchList.completedItems}
               </ThemedText>
               <ThemedText style={[styles.statLabel, { color: secondaryText }]}>
@@ -275,10 +275,10 @@ export default function PunchListDetailScreen() {
                   width: `${punchList.completionRate}%`,
                   backgroundColor:
                     punchList.completionRate === 100
-                      ? '#10B981'
+                      ? '#0066CC'
                       : punchList.completionRate >= 50
                         ? '#3B82F6'
-                        : '#F59E0B',
+                        : '#0066CC',
                 },
               ]}
             />
@@ -391,7 +391,7 @@ export default function PunchListDetailScreen() {
                         {
                           color:
                             new Date(item.dueDate) < new Date() && item.status !== 'COMPLETED'
-                              ? '#EF4444'
+                              ? '#000000'
                               : secondaryText,
                         },
                       ]}
@@ -412,10 +412,10 @@ export default function PunchListDetailScreen() {
                             width: `${item.percentComplete}%`,
                             backgroundColor:
                               item.percentComplete >= 75
-                                ? '#10B981'
+                                ? '#0066CC'
                                 : item.percentComplete >= 50
                                   ? '#3B82F6'
-                                  : '#F59E0B',
+                                  : '#0066CC',
                           },
                         ]}
                       />
@@ -439,8 +439,8 @@ export default function PunchListDetailScreen() {
                 {/* Rejection Count */}
                 {item.rejectionCount > 0 && (
                   <View style={styles.rejectionBadge}>
-                    <Ionicons name="alert-circle" size={14} color="#EF4444" />
-                    <ThemedText style={{ color: '#EF4444', fontSize: 11, fontWeight: '600' }}>
+                    <Ionicons name="alert-circle" size={14} color="#000000" />
+                    <ThemedText style={{ color: '#000000', fontSize: 11, fontWeight: '600' }}>
                       Rejected {item.rejectionCount} time{item.rejectionCount > 1 ? 's' : ''}
                     </ThemedText>
                   </View>
@@ -472,7 +472,7 @@ export default function PunchListDetailScreen() {
                   <TouchableOpacity
                     style={[
                       styles.resultButton,
-                      inspectionResult === 'PASS' && { backgroundColor: '#10B981' },
+                      inspectionResult === 'PASS' && { backgroundColor: '#0066CC' },
                       { borderColor },
                     ]}
                     onPress={() => setInspectionResult('PASS')}
@@ -489,7 +489,7 @@ export default function PunchListDetailScreen() {
                   <TouchableOpacity
                     style={[
                       styles.resultButton,
-                      inspectionResult === 'FAIL' && { backgroundColor: '#EF4444' },
+                      inspectionResult === 'FAIL' && { backgroundColor: '#000000' },
                       { borderColor },
                     ]}
                     onPress={() => setInspectionResult('FAIL')}

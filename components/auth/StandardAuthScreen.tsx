@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Standard Authentication Screen
  * Clean, modern design for login/register
  * Based on official API: https://api.thietkeresort.com.vn/docs/api-docs.html
@@ -48,25 +48,25 @@ export default function StandardAuthScreen() {
     const newErrors: Record<string, string> = {};
 
     if (!email) {
-      newErrors.email = 'Email là bắt buộc';
+      newErrors.email = 'Email l� b?t bu?c';
     } else if (!validateEmail(email)) {
-      newErrors.email = 'Email không hợp lệ';
+      newErrors.email = 'Email kh�ng h?p l?';
     }
 
     if (!password) {
-      newErrors.password = 'Mật khẩu là bắt buộc';
+      newErrors.password = 'M?t kh?u l� b?t bu?c';
     } else if (password.length < 6) {
-      newErrors.password = 'Mật khẩu phải có ít nhất 6 ký tự';
+      newErrors.password = 'M?t kh?u ph?i c� �t nh?t 6 k� t?';
     }
 
     if (mode === 'register') {
       if (!name) {
-        newErrors.name = 'Tên là bắt buộc';
+        newErrors.name = 'T�n l� b?t bu?c';
       }
       if (!confirmPassword) {
-        newErrors.confirmPassword = 'Vui lòng xác nhận mật khẩu';
+        newErrors.confirmPassword = 'Vui l�ng x�c nh?n m?t kh?u';
       } else if (password !== confirmPassword) {
-        newErrors.confirmPassword = 'Mật khẩu không khớp';
+        newErrors.confirmPassword = 'M?t kh?u kh�ng kh?p';
       }
     }
 
@@ -82,7 +82,7 @@ export default function StandardAuthScreen() {
       await signIn(email, password);
       router.replace('/(tabs)');
     } catch (error: any) {
-      Alert.alert('Đăng nhập thất bại', error.message || 'Có lỗi xảy ra');
+      Alert.alert('�ang nh?p th?t b?i', error.message || 'C� l?i x?y ra');
     }
   };
 
@@ -92,14 +92,14 @@ export default function StandardAuthScreen() {
     
     try {
       await signUp(email, password, name, phone || undefined);
-      Alert.alert('Đăng ký thành công', 'Bạn đã đăng ký thành công!', [
+      Alert.alert('�ang k� th�nh c�ng', 'B?n d� dang k� th�nh c�ng!', [
         {
           text: 'OK',
           onPress: () => router.replace('/(tabs)'),
         },
       ]);
     } catch (error: any) {
-      Alert.alert('Đăng ký thất bại', error.message || 'Có lỗi xảy ra');
+      Alert.alert('�ang k� th?t b?i', error.message || 'C� l?i x?y ra');
     }
   };
 
@@ -137,9 +137,9 @@ export default function StandardAuthScreen() {
             >
               <Ionicons name="home" size={40} color="#fff" />
             </LinearGradient>
-            <Text style={styles.title}>Thiết Kế Resort</Text>
+            <Text style={styles.title}>Thi?t K? Resort</Text>
             <Text style={styles.subtitle}>
-              {mode === 'login' ? 'Đăng nhập vào tài khoản' : 'Tạo tài khoản mới'}
+              {mode === 'login' ? '�ang nh?p v�o t�i kho?n' : 'T?o t�i kho?n m?i'}
             </Text>
           </View>
 
@@ -149,12 +149,12 @@ export default function StandardAuthScreen() {
             {mode === 'register' && (
               <>
                 <View style={styles.inputGroup}>
-                  <Text style={styles.label}>Họ và tên</Text>
+                  <Text style={styles.label}>H? v� t�n</Text>
                   <View style={[styles.inputContainer, errors.name && styles.inputError]}>
                     <Ionicons name="person-outline" size={20} color="#666" style={styles.inputIcon} />
                     <TextInput
                       style={styles.input}
-                      placeholder="Nhập họ và tên"
+                      placeholder="Nh?p h? v� t�n"
                       placeholderTextColor="#999"
                       value={name}
                       onChangeText={setName}
@@ -165,12 +165,12 @@ export default function StandardAuthScreen() {
                 </View>
 
                 <View style={styles.inputGroup}>
-                  <Text style={styles.label}>Số điện thoại (tùy chọn)</Text>
+                  <Text style={styles.label}>S? di?n tho?i (t�y ch?n)</Text>
                   <View style={[styles.inputContainer, errors.phone && styles.inputError]}>
                     <Ionicons name="call-outline" size={20} color="#666" style={styles.inputIcon} />
                     <TextInput
                       style={styles.input}
-                      placeholder="Nhập số điện thoại"
+                      placeholder="Nh?p s? di?n tho?i"
                       placeholderTextColor="#999"
                       value={phone}
                       onChangeText={setPhone}
@@ -204,12 +204,12 @@ export default function StandardAuthScreen() {
 
             {/* Password field */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Mật khẩu</Text>
+              <Text style={styles.label}>M?t kh?u</Text>
               <View style={[styles.inputContainer, errors.password && styles.inputError]}>
                 <Ionicons name="lock-closed-outline" size={20} color="#666" style={styles.inputIcon} />
                 <TextInput
                   style={styles.input}
-                  placeholder="Nhập mật khẩu"
+                  placeholder="Nh?p m?t kh?u"
                   placeholderTextColor="#999"
                   value={password}
                   onChangeText={setPassword}
@@ -230,12 +230,12 @@ export default function StandardAuthScreen() {
             {/* Confirm password (register only) */}
             {mode === 'register' && (
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Xác nhận mật khẩu</Text>
+                <Text style={styles.label}>X�c nh?n m?t kh?u</Text>
                 <View style={[styles.inputContainer, errors.confirmPassword && styles.inputError]}>
                   <Ionicons name="lock-closed-outline" size={20} color="#666" style={styles.inputIcon} />
                   <TextInput
                     style={styles.input}
-                    placeholder="Nhập lại mật khẩu"
+                    placeholder="Nh?p l?i m?t kh?u"
                     placeholderTextColor="#999"
                     value={confirmPassword}
                     onChangeText={setConfirmPassword}
@@ -252,7 +252,7 @@ export default function StandardAuthScreen() {
             {/* Forgot password (login only) */}
             {mode === 'login' && (
               <Pressable style={styles.forgotPassword}>
-                <Text style={styles.forgotPasswordText}>Quên mật khẩu?</Text>
+                <Text style={styles.forgotPasswordText}>Qu�n m?t kh?u?</Text>
               </Pressable>
             )}
 
@@ -272,7 +272,7 @@ export default function StandardAuthScreen() {
                   <ActivityIndicator color="#fff" />
                 ) : (
                   <Text style={styles.submitButtonText}>
-                    {mode === 'login' ? 'Đăng nhập' : 'Đăng ký'}
+                    {mode === 'login' ? '�ang nh?p' : '�ang k�'}
                   </Text>
                 )}
               </LinearGradient>
@@ -281,11 +281,11 @@ export default function StandardAuthScreen() {
             {/* Mode toggle */}
             <View style={styles.toggleContainer}>
               <Text style={styles.toggleText}>
-                {mode === 'login' ? 'Chưa có tài khoản?' : 'Đã có tài khoản?'}
+                {mode === 'login' ? 'Chua c� t�i kho?n?' : '�� c� t�i kho?n?'}
               </Text>
               <Pressable onPress={toggleMode}>
                 <Text style={styles.toggleLink}>
-                  {mode === 'login' ? 'Đăng ký ngay' : 'Đăng nhập'}
+                  {mode === 'login' ? '�ang k� ngay' : '�ang nh?p'}
                 </Text>
               </Pressable>
             </View>
@@ -294,7 +294,7 @@ export default function StandardAuthScreen() {
           {/* Divider */}
           <View style={styles.divider}>
             <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>HOẶC</Text>
+            <Text style={styles.dividerText}>HO?C</Text>
             <View style={styles.dividerLine} />
           </View>
 

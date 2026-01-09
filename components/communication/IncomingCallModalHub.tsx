@@ -210,10 +210,10 @@ const styles = StyleSheet.create({
     borderRadius: 40,
   },
   rejectBtn: {
-    backgroundColor: '#EF4444',
+    backgroundColor: '#000000',
   },
   acceptBtn: {
-    backgroundColor: '#10B981',
+    backgroundColor: '#0066CC',
   },
   actionText: {
     color: '#fff',

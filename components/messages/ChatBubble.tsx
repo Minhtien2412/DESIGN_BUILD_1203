@@ -109,7 +109,7 @@ export default function ChatBubble({
               <Ionicons 
                 name="document-attach" 
                 size={24} 
-                color={isFromMe ? '#fff' : '#22c55e'} 
+                color={isFromMe ? '#fff' : '#0066CC'} 
               />
             </View>
             <View style={{ flex: 1, marginLeft: 12 }}>
@@ -140,7 +140,7 @@ export default function ChatBubble({
               <Ionicons 
                 name="play" 
                 size={20} 
-                color={isFromMe ? '#22c55e' : '#fff'} 
+                color={isFromMe ? '#0066CC' : '#fff'} 
               />
             </View>
             <View style={styles.audioWaveform}>
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 4,
   },
   messageBubbleRight: {
-    backgroundColor: '#22c55e',
+    backgroundColor: '#0066CC',
     borderBottomRightRadius: 4,
   },
   bubbleGroupLeft: {

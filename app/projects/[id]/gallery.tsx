@@ -6,9 +6,13 @@
 import { Container } from '@/components/ui/container';
 import { Loader } from '@/components/ui/loader';
 import { useThemeColor } from '@/hooks/use-theme-color';
+import GalleryService, {
+    MOCK_PHOTOS as FALLBACK_PHOTOS,
+    GalleryPhoto,
+} from '@/services/galleryService';
 import { Ionicons } from '@expo/vector-icons';
 import { Stack, useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
     Alert,
     Dimensions,
@@ -16,6 +20,7 @@ import {
     Image,
     Modal,
     Pressable,
+    RefreshControl,
     StyleSheet,
     Text,
     TouchableOpacity,
@@ -34,55 +39,20 @@ interface Photo {
   uploadedBy: string;
 }
 
-// Mock data
-const MOCK_PHOTOS: Photo[] = [
-  {
-    id: '1',
-    url: 'https://picsum.photos/800/600?random=1',
-    thumbnail: 'https://picsum.photos/200/200?random=1',
-    caption: 'Đào móng ngày 1',
-    uploadedAt: '2025-01-05T09:00:00Z',
-    uploadedBy: 'Nguyễn Văn A',
-  },
-  {
-    id: '2',
-    url: 'https://picsum.photos/800/600?random=2',
-    thumbnail: 'https://picsum.photos/200/200?random=2',
-    caption: 'Đổ bê tông móng',
-    uploadedAt: '2025-01-08T14:30:00Z',
-    uploadedBy: 'Trần Thị B',
-  },
-  {
-    id: '3',
-    url: 'https://picsum.photos/800/600?random=3',
-    thumbnail: 'https://picsum.photos/200/200?random=3',
-    caption: 'Dựng cốt thép',
-    uploadedAt: '2025-01-10T11:15:00Z',
-    uploadedBy: 'Lê Văn C',
-  },
-  {
-    id: '4',
-    url: 'https://picsum.photos/800/600?random=4',
-    thumbnail: 'https://picsum.photos/200/200?random=4',
-    uploadedAt: '2025-01-12T16:45:00Z',
-    uploadedBy: 'Phạm Văn D',
-  },
-  {
-    id: '5',
-    url: 'https://picsum.photos/800/600?random=5',
-    thumbnail: 'https://picsum.photos/200/200?random=5',
-    caption: 'Tường tầng 1 hoàn thành',
-    uploadedAt: '2025-01-15T10:00:00Z',
-    uploadedBy: 'Nguyễn Văn A',
-  },
-  {
-    id: '6',
-    url: 'https://picsum.photos/800/600?random=6',
-    thumbnail: 'https://picsum.photos/200/200?random=6',
-    uploadedAt: '2025-01-17T13:20:00Z',
-    uploadedBy: 'Hoàng Thị E',
-  },
-];
+// Transform function
+function transformPhoto(item: GalleryPhoto): Photo {
+  return {
+    id: item.id,
+    url: item.url,
+    thumbnail: item.thumbnail || item.url,
+    caption: item.caption,
+    uploadedAt: item.uploadedAt,
+    uploadedBy: item.uploadedBy || 'Chưa rõ',
+  };
+}
+
+// Mock data fallback
+const MOCK_PHOTOS: Photo[] = FALLBACK_PHOTOS.map(transformPhoto);
 
 export default function ProjectGalleryScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -94,7 +64,49 @@ export default function ProjectGalleryScreen() {
 
   const [photos, setPhotos] = useState<Photo[]>(MOCK_PHOTOS);
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [dataSource, setDataSource] = useState<'api' | 'mock'>('mock');
+
+  // Fetch photos from API
+  const fetchPhotos = useCallback(async (showLoading = true) => {
+    if (!id) return;
+    if (showLoading) setLoading(true);
+    try {
+      // Try backend API first
+      const result = await GalleryService.getProjectPhotos(id);
+      if (result.ok && result.data?.photos && result.data.photos.length > 0) {
+        setPhotos(result.data.photos.map(transformPhoto));
+        setDataSource('api');
+      } else {
+        // Try Perfex CRM as fallback
+        const perfexPhotos = await GalleryService.getProjectPhotosFromPerfex(id);
+        if (perfexPhotos.length > 0) {
+          setPhotos(perfexPhotos.map(transformPhoto));
+          setDataSource('api');
+        } else {
+          setPhotos(MOCK_PHOTOS);
+          setDataSource('mock');
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching gallery photos:', error);
+      setPhotos(MOCK_PHOTOS);
+      setDataSource('mock');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    fetchPhotos();
+  }, [fetchPhotos]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchPhotos(false);
+  }, [fetchPhotos]);
 
   const handleUploadPhoto = async () => {
     // TODO: Integrate with ImagePicker
@@ -127,9 +139,17 @@ export default function ProjectGalleryScreen() {
         {
           text: 'Xoá',
           style: 'destructive',
-          onPress: () => {
-            setPhotos((prev) => prev.filter((p) => p.id !== photoId));
-            Alert.alert('Thành công', 'Đã xoá ảnh');
+          onPress: async () => {
+            try {
+              if (dataSource === 'api') {
+                await GalleryService.deletePhoto(photoId);
+              }
+              setPhotos((prev) => prev.filter((p) => p.id !== photoId));
+              setSelectedPhoto(null);
+              Alert.alert('Thành công', 'Đã xoá ảnh');
+            } catch (error) {
+              Alert.alert('Lỗi', 'Không thể xoá ảnh');
+            }
           },
         },
       ]
@@ -169,6 +189,14 @@ export default function ProjectGalleryScreen() {
         }}
       />
       <Container fullWidth>
+        {/* Data Source Indicator */}
+        {dataSource === 'mock' && (
+          <View style={[styles.mockBanner, { backgroundColor: '#FEF3C7' }]}>
+            <Ionicons name="information-circle" size={16} color="#92400E" />
+            <Text style={styles.mockBannerText}>📋 Dữ liệu mẫu - API đang cập nhật</Text>
+          </View>
+        )}
+
         {/* Stats */}
         <View style={[styles.statsRow, { backgroundColor: surface, borderBottomColor: border }]}>
           <View style={styles.stat}>
@@ -213,6 +241,9 @@ export default function ProjectGalleryScreen() {
             numColumns={3}
             contentContainerStyle={styles.grid}
             showsVerticalScrollIndicator={false}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
           />
         )}
 
@@ -273,6 +304,18 @@ export default function ProjectGalleryScreen() {
 }
 
 const styles = StyleSheet.create({
+  mockBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 8,
+    gap: 6,
+  },
+  mockBannerText: {
+    color: '#92400E',
+    fontSize: 12,
+    fontWeight: '500',
+  },
   statsRow: {
     flexDirection: 'row',
     paddingVertical: 16,

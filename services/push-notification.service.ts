@@ -101,7 +101,7 @@ class PushNotificationService {
           name: 'Calls',
           importance: Notifications.AndroidImportance.MAX,
           vibrationPattern: [0, 500, 250, 500],
-          lightColor: '#10b981',
+          lightColor: '#0066CC',
           sound: 'default',
         });
       }

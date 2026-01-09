@@ -156,21 +156,21 @@ export default function ModerationScreen() {
         <StatCard
           label="Chờ duyệt"
           value={stats.pending}
-          color="#f59e0b"
+          color="#0066CC"
           active={selectedFilter === ApprovalStatus.PENDING}
           onPress={() => setSelectedFilter(ApprovalStatus.PENDING)}
         />
         <StatCard
           label="AI đã duyệt"
           value={stats.aiApproved}
-          color="#10b981"
+          color="#0066CC"
           active={selectedFilter === ApprovalStatus.AI_APPROVED}
           onPress={() => setSelectedFilter(ApprovalStatus.AI_APPROVED)}
         />
         <StatCard
           label="Cần xem xét"
           value={stats.needsReview}
-          color="#ef4444"
+          color="#000000"
           active={selectedFilter === ApprovalStatus.NEEDS_ADMIN_REVIEW}
           onPress={() => setSelectedFilter(ApprovalStatus.NEEDS_ADMIN_REVIEW)}
         />
@@ -266,11 +266,11 @@ function SubmissionCard({
   const getStatusColor = (status: ApprovalStatus) => {
     switch (status) {
       case ApprovalStatus.AI_APPROVED:
-        return '#10b981';
+        return '#0066CC';
       case ApprovalStatus.NEEDS_ADMIN_REVIEW:
-        return '#ef4444';
+        return '#000000';
       case ApprovalStatus.PENDING:
-        return '#f59e0b';
+        return '#0066CC';
       default:
         return '#64748b';
     }
@@ -343,7 +343,7 @@ function SubmissionCard({
         </View>
         {submission.aiScore !== undefined && (
           <View style={styles.aiScore}>
-            <Ionicons name="sparkles" size={14} color="#8b5cf6" />
+            <Ionicons name="sparkles" size={14} color="#666666" />
             <Text style={styles.aiScoreText}>{submission.aiScore}/100</Text>
           </View>
         )}
@@ -588,7 +588,7 @@ const styles = StyleSheet.create({
   },
   aiScoreText: {
     fontSize: 12,
-    color: '#8b5cf6',
+    color: '#666666',
     marginLeft: 4,
     fontWeight: '600',
   },
@@ -649,7 +649,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#8b5cf6',
+    backgroundColor: '#666666',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,
@@ -700,10 +700,10 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   rejectButton: {
-    backgroundColor: '#ef4444',
+    backgroundColor: '#000000',
   },
   approveButton: {
-    backgroundColor: '#10b981',
+    backgroundColor: '#0066CC',
   },
   actionButtonText: {
     color: '#fff',

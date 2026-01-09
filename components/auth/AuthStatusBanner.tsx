@@ -1,6 +1,6 @@
-﻿/**
+/**
  * Auth Status Banner
- * Hiển thị trạng thái authentication system
+ * Hi?n th? tr?ng th�i authentication system
  */
 
 import { useAuth } from '@/context/AuthContext';
@@ -15,7 +15,7 @@ export function AuthStatusBanner() {
     return (
       <View style={[styles.banner, styles.loadingBanner]}>
         <MaterialCommunityIcons name="loading" size={16} color="#666" />
-        <Text style={styles.loadingText}>Đang khởi tạo hệ thống...</Text>
+        <Text style={styles.loadingText}>�ang kh?i t?o h? th?ng...</Text>
       </View>
     );
   }
@@ -23,9 +23,9 @@ export function AuthStatusBanner() {
   if (isAuthenticated && user) {
     return (
       <View style={[styles.banner, styles.successBanner]}>
-        <MaterialCommunityIcons name="check-circle" size={16} color="#4caf50" />
+        <MaterialCommunityIcons name="check-circle" size={16} color="#0066CC" />
         <Text style={styles.successText}>
-          Đã đăng nhập: {user.name || user.email || 'Unknown'}
+          �� dang nh?p: {user.name || user.email || 'Unknown'}
         </Text>
         <Text style={styles.roleText}>
           ({user.role || 'No role'})
@@ -36,9 +36,9 @@ export function AuthStatusBanner() {
 
   return (
     <View style={[styles.banner, styles.infoBanner]}>
-      <MaterialCommunityIcons name="shield-check" size={16} color="#2196f3" />
+      <MaterialCommunityIcons name="shield-check" size={16} color="#0066CC" />
       <Text style={styles.infoText}>
-        Hệ thống xác thực đã sẵn sàng
+        H? th?ng x�c th?c d� s?n s�ng
       </Text>
     </View>
   );
@@ -61,11 +61,11 @@ const styles = StyleSheet.create({
   },
   successBanner: {
     backgroundColor: '#e8f5e8',
-    borderColor: '#4caf50',
+    borderColor: '#0066CC',
   },
   infoBanner: {
-    backgroundColor: '#e3f2fd',
-    borderColor: '#2196f3',
+    backgroundColor: '#E8F4FF',
+    borderColor: '#0066CC',
   },
   loadingText: {
     fontSize: 14,
@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
   },
   successText: {
     fontSize: 14,
-    color: '#4caf50',
+    color: '#0066CC',
     fontWeight: '600',
     marginLeft: 8,
   },
@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
   },
   infoText: {
     fontSize: 14,
-    color: '#2196f3',
+    color: '#0066CC',
     marginLeft: 8,
   },
 });

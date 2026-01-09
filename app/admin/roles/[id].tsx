@@ -191,7 +191,7 @@ export default function RoleDetailScreen() {
                           <Ionicons
                             name={hasCapability ? 'checkmark-circle' : 'close-circle-outline'}
                             size={16}
-                            color={hasCapability ? '#10b981' : mutedColor}
+                            color={hasCapability ? '#0066CC' : mutedColor}
                           />
                           <ThemedText
                             style={[
@@ -301,7 +301,7 @@ const styles = StyleSheet.create({
   },
   capabilityActive: {
     backgroundColor: 'rgba(16, 185, 129, 0.1)',
-    borderColor: '#10b981',
+    borderColor: '#0066CC',
   },
   capabilityText: {
     fontSize: 13,

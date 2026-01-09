@@ -53,15 +53,15 @@ export default function DefectsListScreen() {
   const getStatusColor = (status: DefectStatus) => {
     switch (status) {
       case 'OPEN':
-        return '#F44336';
+        return '#000000';
       case 'IN_PROGRESS':
-        return '#FF9800';
+        return '#0066CC';
       case 'RESOLVED':
-        return '#4CAF50';
+        return '#0066CC';
       case 'VERIFIED':
-        return '#2196F3';
+        return '#0066CC';
       case 'CLOSED':
-        return '#9E9E9E';
+        return '#999999';
       default:
         return '#757575';
     }
@@ -72,7 +72,7 @@ export default function DefectsListScreen() {
       case 'CRITICAL':
         return '#D32F2F';
       case 'MAJOR':
-        return '#F57C00';
+        return '#0066CC';
       case 'MINOR':
         return '#FBC02D';
       case 'COSMETIC':
@@ -178,16 +178,16 @@ export default function DefectsListScreen() {
     <View style={styles.container}>
       {/* Stats Cards */}
       <View style={styles.statsContainer}>
-        <View style={[styles.statCard, { backgroundColor: '#E3F2FD' }]}>
+        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
           <Text style={styles.statNumber}>{stats.total}</Text>
           <Text style={styles.statLabel}>Tổng số lỗi</Text>
         </View>
-        <View style={[styles.statCard, { backgroundColor: '#FFEBEE' }]}>
-          <Text style={[styles.statNumber, { color: '#F44336' }]}>{stats.open}</Text>
+        <View style={[styles.statCard, { backgroundColor: '#F5F5F5' }]}>
+          <Text style={[styles.statNumber, { color: '#000000' }]}>{stats.open}</Text>
           <Text style={styles.statLabel}>Chưa xử lý</Text>
         </View>
-        <View style={[styles.statCard, { backgroundColor: '#FFF3E0' }]}>
-          <Text style={[styles.statNumber, { color: '#FF9800' }]}>{stats.inProgress}</Text>
+        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
+          <Text style={[styles.statNumber, { color: '#0066CC' }]}>{stats.inProgress}</Text>
           <Text style={styles.statLabel}>Đang xử lý</Text>
         </View>
         <View style={[styles.statCard, { backgroundColor: '#FCE4EC' }]}>
@@ -321,7 +321,7 @@ const styles = StyleSheet.create({
   statNumber: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#2196F3',
+    color: '#0066CC',
   },
   statLabel: {
     fontSize: 11,
@@ -366,8 +366,8 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   filterChipActive: {
-    backgroundColor: '#2196F3',
-    borderColor: '#2196F3',
+    backgroundColor: '#0066CC',
+    borderColor: '#0066CC',
   },
   filterChipText: {
     fontSize: 13,
@@ -420,7 +420,7 @@ const styles = StyleSheet.create({
   },
   defectId: {
     fontSize: 12,
-    color: '#9E9E9E',
+    color: '#999999',
     fontFamily: 'monospace',
   },
   defectTitle: {
@@ -463,7 +463,7 @@ const styles = StyleSheet.create({
   },
   reportedDate: {
     fontSize: 12,
-    color: '#9E9E9E',
+    color: '#999999',
   },
   emptyContainer: {
     alignItems: 'center',
@@ -472,7 +472,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: '#9E9E9E',
+    color: '#999999',
     marginTop: 16,
   },
   fab: {
@@ -482,7 +482,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#F44336',
+    backgroundColor: '#000000',
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 4,

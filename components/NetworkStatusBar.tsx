@@ -49,7 +49,7 @@ export function NetworkStatusBar({ showWhenOnline = false }: NetworkStatusBarPro
     }
     if (isSyncing) {
       return {
-        backgroundColor: '#4ECDC4',
+        backgroundColor: '#0080FF',
         icon: 'sync-outline' as const,
         text: `Đang đồng bộ ${pendingCount} mục...`,
       };

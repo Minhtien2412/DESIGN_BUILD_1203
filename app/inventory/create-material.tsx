@@ -173,7 +173,7 @@ export default function CreateMaterialScreen() {
                 <Ionicons
                   name={option.icon as any}
                   size={18}
-                  color={category === option.value ? '#2196F3' : '#666'}
+                  color={category === option.value ? '#0066CC' : '#666'}
                 />
                 <Text
                   style={[
@@ -260,7 +260,7 @@ export default function CreateMaterialScreen() {
           </View>
 
           <View style={styles.infoBox}>
-            <Ionicons name="information-circle" size={16} color="#2196F3" />
+            <Ionicons name="information-circle" size={16} color="#0066CC" />
             <Text style={styles.infoText}>
               Khi tồn kho giảm xuống dưới mức tối thiểu, hệ thống sẽ tự động tạo
               cảnh báo.
@@ -406,7 +406,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   required: {
-    color: '#F44336',
+    color: '#000000',
   },
   input: {
     borderWidth: 1,
@@ -457,15 +457,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   optionCardActive: {
-    borderColor: '#2196F3',
-    backgroundColor: '#E3F2FD',
+    borderColor: '#0066CC',
+    backgroundColor: '#E8F4FF',
   },
   optionText: {
     fontSize: 13,
     color: '#666',
   },
   optionTextActive: {
-    color: '#2196F3',
+    color: '#0066CC',
     fontWeight: '600',
   },
   unitGrid: {
@@ -480,22 +480,22 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   unitCardActive: {
-    borderColor: '#2196F3',
-    backgroundColor: '#E3F2FD',
+    borderColor: '#0066CC',
+    backgroundColor: '#E8F4FF',
   },
   unitText: {
     fontSize: 14,
     color: '#666',
   },
   unitTextActive: {
-    color: '#2196F3',
+    color: '#0066CC',
     fontWeight: '600',
   },
   infoBox: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 8,
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
     padding: 10,
     borderRadius: 8,
   },
@@ -517,15 +517,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   supplierChipActive: {
-    borderColor: '#2196F3',
-    backgroundColor: '#E3F2FD',
+    borderColor: '#0066CC',
+    backgroundColor: '#E8F4FF',
   },
   supplierChipText: {
     fontSize: 13,
     color: '#666',
   },
   supplierChipTextActive: {
-    color: '#2196F3',
+    color: '#0066CC',
     fontWeight: '600',
   },
   footer: {
@@ -553,7 +553,7 @@ const styles = StyleSheet.create({
     flex: 2,
     paddingVertical: 14,
     borderRadius: 8,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     alignItems: 'center',
   },
   saveButtonDisabled: {

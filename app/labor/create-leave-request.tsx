@@ -21,13 +21,13 @@ const LEAVE_TYPE_OPTIONS: Array<{
   icon: keyof typeof Ionicons.glyphMap;
   color: string;
 }> = [
-  { value: LeaveType.ANNUAL, label: 'Phép năm', icon: 'calendar', color: '#4CAF50' },
-  { value: LeaveType.SICK, label: 'Nghỉ ốm', icon: 'medkit', color: '#F44336' },
-  { value: LeaveType.PERSONAL, label: 'Cá nhân', icon: 'person', color: '#2196F3' },
-  { value: LeaveType.MATERNITY, label: 'Thai sản', icon: 'woman', color: '#0A6847' },
-  { value: LeaveType.PATERNITY, label: 'Thai sản (bố)', icon: 'man', color: '#3F51B5' },
-  { value: LeaveType.UNPAID, label: 'Không lương', icon: 'cash-outline', color: '#9E9E9E' },
-  { value: LeaveType.EMERGENCY, label: 'Khẩn cấp', icon: 'warning', color: '#FF9800' },
+  { value: LeaveType.ANNUAL, label: 'Phép năm', icon: 'calendar', color: '#0066CC' },
+  { value: LeaveType.SICK, label: 'Nghỉ ốm', icon: 'medkit', color: '#000000' },
+  { value: LeaveType.PERSONAL, label: 'Cá nhân', icon: 'person', color: '#0066CC' },
+  { value: LeaveType.MATERNITY, label: 'Thai sản', icon: 'woman', color: '#0066CC' },
+  { value: LeaveType.PATERNITY, label: 'Thai sản (bố)', icon: 'man', color: '#0066CC' },
+  { value: LeaveType.UNPAID, label: 'Không lương', icon: 'cash-outline', color: '#999999' },
+  { value: LeaveType.EMERGENCY, label: 'Khẩn cấp', icon: 'warning', color: '#0066CC' },
   { value: LeaveType.OTHER, label: 'Khác', icon: 'ellipsis-horizontal', color: '#4A4A4A' },
 ];
 
@@ -241,7 +241,7 @@ export default function CreateLeaveRequestScreen() {
           </View>
 
           <View style={styles.totalDays}>
-            <Ionicons name="time-outline" size={20} color="#2196F3" />
+            <Ionicons name="time-outline" size={20} color="#0066CC" />
             <Text style={styles.totalDaysText}>
               Tổng số ngày: <Text style={styles.totalDaysValue}>{calculateTotalDays()}</Text>
             </Text>
@@ -317,7 +317,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   required: {
-    color: '#F44336',
+    color: '#000000',
   },
   chipScroll: {
     flexGrow: 0,
@@ -331,9 +331,9 @@ const styles = StyleSheet.create({
     minWidth: 120,
   },
   workerChipActive: {
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
     borderWidth: 1,
-    borderColor: '#2196F3',
+    borderColor: '#0066CC',
   },
   workerChipName: {
     fontSize: 14,
@@ -342,14 +342,14 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   workerChipNameActive: {
-    color: '#2196F3',
+    color: '#0066CC',
   },
   workerChipId: {
     fontSize: 11,
     color: '#666',
   },
   workerChipIdActive: {
-    color: '#2196F3',
+    color: '#0066CC',
   },
   typeGrid: {
     flexDirection: 'row',
@@ -404,7 +404,7 @@ const styles = StyleSheet.create({
     gap: 8,
     marginTop: 12,
     padding: 12,
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
     borderRadius: 6,
   },
   totalDaysText: {
@@ -413,7 +413,7 @@ const styles = StyleSheet.create({
   },
   totalDaysValue: {
     fontWeight: '600',
-    color: '#2196F3',
+    color: '#0066CC',
     fontSize: 16,
   },
   reasonInput: {
@@ -470,7 +470,7 @@ const styles = StyleSheet.create({
   saveButton: {
     flex: 1,
     paddingVertical: 12,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     borderRadius: 6,
     alignItems: 'center',
   },

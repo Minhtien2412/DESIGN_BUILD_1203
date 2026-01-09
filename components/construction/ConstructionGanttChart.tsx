@@ -35,7 +35,7 @@ type Props = {
 };
 
 const COLORS = {
-  phaseMarker: '#0A6847',
+  phaseMarker: '#0066CC',
   originalBar: '#FFA84D',
   progressBar: '#14B159',
   notStarted: '#E82A34',

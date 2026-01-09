@@ -23,10 +23,10 @@ import {
 const STATUS_COLORS: Record<string, string> = {
   DRAFT: '#6B7280',
   SUBMITTED: '#3B82F6',
-  UNDER_REVIEW: '#F59E0B',
-  APPROVED: '#10B981',
-  REJECTED: '#EF4444',
-  REVISED: '#8B5CF6',
+  UNDER_REVIEW: '#0066CC',
+  APPROVED: '#0066CC',
+  REJECTED: '#000000',
+  REVISED: '#666666',
 };
 
 const WEATHER_ICONS: Record<WeatherCondition, string> = {
@@ -128,7 +128,7 @@ export default function DailyReportDetailsScreen() {
           <Text style={styles.sectionTitle}>Weather Conditions</Text>
           <View style={styles.weatherCard}>
             <View style={styles.weatherHeader}>
-              <Ionicons name={weatherIcon as any} size={48} color="#F59E0B" />
+              <Ionicons name={weatherIcon as any} size={48} color="#0066CC" />
               <View style={styles.weatherInfo}>
                 <Text style={styles.weatherCondition}>
                   {dailyReport.weather.condition.replace(/_/g, ' ')}
@@ -154,7 +154,7 @@ export default function DailyReportDetailsScreen() {
 
             {dailyReport.weather.weatherImpact && (
               <View style={styles.weatherImpact}>
-                <Ionicons name="warning" size={20} color="#F59E0B" />
+                <Ionicons name="warning" size={20} color="#0066CC" />
                 <View style={styles.impactInfo}>
                   <Text style={styles.impactText}>
                     {dailyReport.weather.weatherImpactDescription}
@@ -195,7 +195,7 @@ export default function DailyReportDetailsScreen() {
             {dailyReport.workingHours.overtimeHours && (
               <View style={styles.hoursItem}>
                 <Text style={styles.hoursLabel}>Overtime</Text>
-                <Text style={[styles.hoursValue, { color: '#F59E0B' }]}>
+                <Text style={[styles.hoursValue, { color: '#0066CC' }]}>
                   {dailyReport.workingHours.overtimeHours}h
                 </Text>
               </View>
@@ -304,10 +304,10 @@ export default function DailyReportDetailsScreen() {
                         {
                           color:
                             eq.status === 'OPERATIONAL'
-                              ? '#10B981'
+                              ? '#0066CC'
                               : eq.status === 'BREAKDOWN'
-                              ? '#EF4444'
-                              : '#F59E0B',
+                              ? '#000000'
+                              : '#0066CC',
                         },
                       ]}
                     >
@@ -347,12 +347,12 @@ export default function DailyReportDetailsScreen() {
                     <Ionicons
                       name={mat.qualityAccepted ? 'checkmark-circle' : 'close-circle'}
                       size={16}
-                      color={mat.qualityAccepted ? '#10B981' : '#EF4444'}
+                      color={mat.qualityAccepted ? '#0066CC' : '#000000'}
                     />
                     <Text
                       style={[
                         styles.qualityText,
-                        { color: mat.qualityAccepted ? '#10B981' : '#EF4444' },
+                        { color: mat.qualityAccepted ? '#0066CC' : '#000000' },
                       ]}
                     >
                       {mat.qualityAccepted ? 'Accepted' : 'Rejected'}
@@ -381,7 +381,7 @@ export default function DailyReportDetailsScreen() {
                   <Text
                     style={[
                       styles.progressVariance,
-                      { color: prog.variance >= 0 ? '#10B981' : '#EF4444' },
+                      { color: prog.variance >= 0 ? '#0066CC' : '#000000' },
                     ]}
                   >
                     {prog.variance >= 0 ? '+' : ''}
@@ -407,7 +407,7 @@ export default function DailyReportDetailsScreen() {
                           styles.progressBarFill,
                           {
                             width: `${prog.actualProgress}%`,
-                            backgroundColor: prog.variance >= 0 ? '#10B981' : '#EF4444',
+                            backgroundColor: prog.variance >= 0 ? '#0066CC' : '#000000',
                           },
                         ]}
                       />
@@ -426,7 +426,7 @@ export default function DailyReportDetailsScreen() {
           <View style={styles.safetyCard}>
             <View style={styles.safetyGrid}>
               <View style={styles.safetyItem}>
-                <Ionicons name="shield-checkmark" size={24} color="#10B981" />
+                <Ionicons name="shield-checkmark" size={24} color="#0066CC" />
                 <Text style={styles.safetyValue}>{dailyReport.safety.daysWithoutIncident}</Text>
                 <Text style={styles.safetyLabel}>Days w/o Incident</Text>
               </View>
@@ -434,12 +434,12 @@ export default function DailyReportDetailsScreen() {
                 <Ionicons
                   name="alert-circle"
                   size={24}
-                  color={dailyReport.safety.incidentCount > 0 ? '#EF4444' : '#10B981'}
+                  color={dailyReport.safety.incidentCount > 0 ? '#000000' : '#0066CC'}
                 />
                 <Text
                   style={[
                     styles.safetyValue,
-                    { color: dailyReport.safety.incidentCount > 0 ? '#EF4444' : '#10B981' },
+                    { color: dailyReport.safety.incidentCount > 0 ? '#000000' : '#0066CC' },
                   ]}
                 >
                   {dailyReport.safety.incidentCount}
@@ -447,7 +447,7 @@ export default function DailyReportDetailsScreen() {
                 <Text style={styles.safetyLabel}>Incidents</Text>
               </View>
               <View style={styles.safetyItem}>
-                <Ionicons name="warning" size={24} color="#F59E0B" />
+                <Ionicons name="warning" size={24} color="#0066CC" />
                 <Text style={styles.safetyValue}>{dailyReport.safety.nearMissCount}</Text>
                 <Text style={styles.safetyLabel}>Near Misses</Text>
               </View>
@@ -495,10 +495,10 @@ export default function DailyReportDetailsScreen() {
                         {
                           color:
                             issue.severity === 'CRITICAL'
-                              ? '#DC2626'
+                              ? '#000000'
                               : issue.severity === 'HIGH'
                               ? '#EA580C'
-                              : '#F59E0B',
+                              : '#0066CC',
                         },
                       ]}
                     >
@@ -513,7 +513,7 @@ export default function DailyReportDetailsScreen() {
                           issue.status === 'RESOLVED'
                             ? '#D1FAE5'
                             : issue.status === 'IN_PROGRESS'
-                            ? '#DBEAFE'
+                            ? '#E8F4FF'
                             : '#F3F4F6',
                       },
                     ]}
@@ -524,7 +524,7 @@ export default function DailyReportDetailsScreen() {
                         {
                           color:
                             issue.status === 'RESOLVED'
-                              ? '#10B981'
+                              ? '#0066CC'
                               : issue.status === 'IN_PROGRESS'
                               ? '#3B82F6'
                               : '#6B7280',
@@ -893,7 +893,7 @@ const styles = StyleSheet.create({
   activityTypeText: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#7C3AED',
+    color: '#666666',
     textTransform: 'capitalize',
   },
   progressCircle: {
@@ -907,7 +907,7 @@ const styles = StyleSheet.create({
   progressText: {
     fontSize: 13,
     fontWeight: 'bold',
-    color: '#10B981',
+    color: '#0066CC',
   },
   activityDesc: {
     fontSize: 13,
@@ -1002,7 +1002,7 @@ const styles = StyleSheet.create({
   },
   breakdownText: {
     fontSize: 12,
-    color: '#DC2626',
+    color: '#000000',
     marginTop: 6,
     fontStyle: 'italic',
   },
@@ -1043,7 +1043,7 @@ const styles = StyleSheet.create({
   },
   rejectionText: {
     fontSize: 11,
-    color: '#DC2626',
+    color: '#000000',
     marginTop: 6,
     fontStyle: 'italic',
   },
@@ -1132,7 +1132,7 @@ const styles = StyleSheet.create({
   safetyMeeting: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#DBEAFE',
+    backgroundColor: '#E8F4FF',
     padding: 10,
     borderRadius: 8,
   },
@@ -1206,7 +1206,7 @@ const styles = StyleSheet.create({
   delayDuration: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#F59E0B',
+    color: '#0066CC',
   },
   delayCategory: {
     fontSize: 11,
@@ -1290,10 +1290,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#3B82F6',
   },
   approveBtn: {
-    backgroundColor: '#10B981',
+    backgroundColor: '#0066CC',
   },
   rejectBtn: {
-    backgroundColor: '#EF4444',
+    backgroundColor: '#000000',
   },
   exportBtn: {
     backgroundColor: '#F3F4F6',

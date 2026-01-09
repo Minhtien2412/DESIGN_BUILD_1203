@@ -294,13 +294,13 @@ export default function FoundationChecklistScreen() {
   const getStatusColor = (status: InspectionStatus) => {
     switch (status) {
       case InspectionStatus.PASS:
-        return '#10b981';
+        return '#0066CC';
       case InspectionStatus.FAIL:
-        return '#ef4444';
+        return '#000000';
       case InspectionStatus.NA:
         return '#6b7280';
       default:
-        return '#f59e0b';
+        return '#0066CC';
     }
   };
 
@@ -357,11 +357,11 @@ export default function FoundationChecklistScreen() {
           </View>
           <View style={styles.statsRow}>
             <View style={styles.statItem}>
-              <View style={[styles.statDot, { backgroundColor: '#10b981' }]} />
+              <View style={[styles.statDot, { backgroundColor: '#0066CC' }]} />
               <Text style={styles.statLabel}>Đạt: {passedCount}</Text>
             </View>
             <View style={styles.statItem}>
-              <View style={[styles.statDot, { backgroundColor: '#ef4444' }]} />
+              <View style={[styles.statDot, { backgroundColor: '#000000' }]} />
               <Text style={styles.statLabel}>Không đạt: {failedCount}</Text>
             </View>
             <View style={styles.statItem}>
@@ -402,7 +402,7 @@ export default function FoundationChecklistScreen() {
                       styles.statusButton,
                       item.status === InspectionStatus.PASS &&
                         styles.statusButtonActive,
-                      { borderColor: '#10b981' },
+                      { borderColor: '#0066CC' },
                     ]}
                     onPress={() =>
                       handleStatusChange(item.index, InspectionStatus.PASS)
@@ -414,7 +414,7 @@ export default function FoundationChecklistScreen() {
                       color={
                         item.status === InspectionStatus.PASS
                           ? '#fff'
-                          : '#10b981'
+                          : '#0066CC'
                       }
                     />
                     <Text
@@ -422,7 +422,7 @@ export default function FoundationChecklistScreen() {
                         styles.statusButtonText,
                         item.status === InspectionStatus.PASS &&
                           styles.statusButtonTextActive,
-                        { color: item.status === InspectionStatus.PASS ? '#fff' : '#10b981' },
+                        { color: item.status === InspectionStatus.PASS ? '#fff' : '#0066CC' },
                       ]}
                     >
                       Đạt
@@ -434,7 +434,7 @@ export default function FoundationChecklistScreen() {
                       styles.statusButton,
                       item.status === InspectionStatus.FAIL &&
                         styles.statusButtonActive,
-                      { borderColor: '#ef4444' },
+                      { borderColor: '#000000' },
                     ]}
                     onPress={() =>
                       handleStatusChange(item.index, InspectionStatus.FAIL)
@@ -446,7 +446,7 @@ export default function FoundationChecklistScreen() {
                       color={
                         item.status === InspectionStatus.FAIL
                           ? '#fff'
-                          : '#ef4444'
+                          : '#000000'
                       }
                     />
                     <Text
@@ -454,7 +454,7 @@ export default function FoundationChecklistScreen() {
                         styles.statusButtonText,
                         item.status === InspectionStatus.FAIL &&
                           styles.statusButtonTextActive,
-                        { color: item.status === InspectionStatus.FAIL ? '#fff' : '#ef4444' },
+                        { color: item.status === InspectionStatus.FAIL ? '#fff' : '#000000' },
                       ]}
                     >
                       Không đạt
@@ -659,7 +659,7 @@ const styles = StyleSheet.create({
   specBox: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    backgroundColor: '#eff6ff',
+    backgroundColor: '#E8F4FF',
     padding: 10,
     borderRadius: 8,
     marginBottom: 12,
@@ -739,7 +739,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 14,
     borderRadius: 10,
-    backgroundColor: '#eff6ff',
+    backgroundColor: '#E8F4FF',
     borderWidth: 1,
     borderColor: '#3b82f6',
     gap: 8,

@@ -36,9 +36,9 @@ const COLORS = {
   text: '#0F172A',
   textSecondary: '#64748B',
   textMuted: '#94A3B8',
-  success: '#10B981',
-  error: '#EF4444',
-  warning: '#F59E0B',
+  success: '#0066CC',
+  error: '#000000',
+  warning: '#0066CC',
   border: '#E2E8F0',
 };
 

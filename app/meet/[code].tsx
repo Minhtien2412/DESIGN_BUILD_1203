@@ -201,7 +201,7 @@ export default function MeetingRoomScreen() {
           {item.name}
         </Text>
         {item.isAudioMuted && (
-          <Ionicons name="mic-off" size={14} color="#EF4444" />
+          <Ionicons name="mic-off" size={14} color="#000000" />
         )}
       </View>
     </View>
@@ -433,10 +433,10 @@ export default function MeetingRoomScreen() {
                 </View>
                 <View style={styles.participantActions}>
                   {item.isAudioMuted && (
-                    <Ionicons name="mic-off" size={16} color="#EF4444" />
+                    <Ionicons name="mic-off" size={16} color="#000000" />
                   )}
                   {item.isVideoOff && (
-                    <Ionicons name="videocam-off" size={16} color="#EF4444" />
+                    <Ionicons name="videocam-off" size={16} color="#000000" />
                   )}
                 </View>
               </View>
@@ -495,7 +495,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 8,
     right: 8,
-    backgroundColor: '#EF4444',
+    backgroundColor: '#000000',
     borderRadius: 10,
     padding: 4,
   },
@@ -559,7 +559,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#3B82F6',
   },
   endCallButton: {
-    backgroundColor: '#EF4444',
+    backgroundColor: '#000000',
     width: 56,
     height: 56,
     borderRadius: 28,
@@ -568,7 +568,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -4,
     right: -4,
-    backgroundColor: '#EF4444',
+    backgroundColor: '#000000',
     borderRadius: 10,
     minWidth: 18,
     height: 18,

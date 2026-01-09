@@ -21,10 +21,10 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 type ProjectStatus = 'planning' | 'active' | 'completed' | 'paused';
 
 const STATUS_CONFIG = {
-  planning: { color: '#F59E0B', label: 'Lên kế hoạch', icon: 'calendar-outline' as const },
+  planning: { color: '#0066CC', label: 'Lên kế hoạch', icon: 'calendar-outline' as const },
   active: { color: '#3B82F6', label: 'Đang thực hiện', icon: 'hammer-outline' as const },
-  completed: { color: '#22C55E', label: 'Hoàn thành', icon: 'checkmark-circle-outline' as const },
-  paused: { color: '#EF4444', label: 'Tạm dừng', icon: 'pause-circle-outline' as const },
+  completed: { color: '#0066CC', label: 'Hoàn thành', icon: 'checkmark-circle-outline' as const },
+  paused: { color: '#000000', label: 'Tạm dừng', icon: 'pause-circle-outline' as const },
 };
 
 function formatDate(dateStr: string): string {
@@ -104,7 +104,7 @@ export default function ProjectDetailScreen() {
     return (
       <SafeAreaView style={[styles.centerContainer, { backgroundColor: background }]}>
         <Stack.Screen options={{ title: 'Chi tiết dự án', headerShown: false }} />
-        <Ionicons name="alert-circle-outline" size={64} color="#EF4444" />
+        <Ionicons name="alert-circle-outline" size={64} color="#000000" />
         <Text style={[styles.errorText, { color: text }]}>Không thể tải dự án</Text>
         <TouchableOpacity style={[styles.retryButton, { backgroundColor: tint }]} onPress={refresh}>
           <Text style={styles.retryButtonText}>Thử lại</Text>
@@ -157,10 +157,10 @@ export default function ProjectDetailScreen() {
 
         {/* Stats Grid */}
         <View style={styles.statsGrid}>
-          <StatCard label="Ngân sách" value={formatCurrency(350000000)} icon="wallet-outline" color="#10B981" />
-          <StatCard label="Thời gian" value="6 tháng" icon="time-outline" color="#F59E0B" />
+          <StatCard label="Ngân sách" value={formatCurrency(350000000)} icon="wallet-outline" color="#0066CC" />
+          <StatCard label="Thời gian" value="6 tháng" icon="time-outline" color="#0066CC" />
           <StatCard label="Thành viên" value="12 người" icon="people-outline" color="#3B82F6" />
-          <StatCard label="Nhiệm vụ" value="45/83" icon="checkbox-outline" color="#8B5CF6" />
+          <StatCard label="Nhiệm vụ" value="45/83" icon="checkbox-outline" color="#666666" />
         </View>
 
         {/* Quick Actions */}
@@ -170,7 +170,7 @@ export default function ProjectDetailScreen() {
             icon="cash-outline"
             title="Tiến độ thanh toán"
             subtitle="Xem chi tiết các khoản thanh toán"
-            color="#10B981"
+            color="#0066CC"
             onPress={() => router.push(constructionPaymentProgressRoute(id) as any)}
           />
           <QuickActionCard
@@ -184,14 +184,14 @@ export default function ProjectDetailScreen() {
             icon="images-outline"
             title="Thư viện ảnh"
             subtitle="24 ảnh tiến độ thi công"
-            color="#F59E0B"
+            color="#0066CC"
             onPress={() => router.push(`/projects/${id}/gallery` as any)}
           />
           <QuickActionCard
             icon="document-text-outline"
             title="Tài liệu dự án"
             subtitle="Hợp đồng, bản vẽ, báo cáo"
-            color="#8B5CF6"
+            color="#666666"
             onPress={() => router.push(`/projects/${id}/documents` as any)}
           />
         </View>
@@ -241,7 +241,7 @@ export default function ProjectDetailScreen() {
           </View>
           <View style={styles.progressMilestones}>
             <View style={styles.milestone}>
-              <View style={[styles.milestoneMarker, { backgroundColor: '#22C55E' }]} />
+              <View style={[styles.milestoneMarker, { backgroundColor: '#0066CC' }]} />
               <Text style={[styles.milestoneText, { color: textMuted }]}>Móng</Text>
             </View>
             <View style={styles.milestone}>

@@ -24,10 +24,10 @@ type QuickAction = {
 };
 
 const ACTIONS: QuickAction[] = [
-  { type: 'edit', label: 'Chỉnh sửa', icon: 'create-outline', color: '#0A6847' },
-  { type: 'share', label: 'Chia sẻ', icon: 'share-social-outline', color: '#FF9800' },
-  { type: 'archive', label: 'Lưu trữ', icon: 'archive-outline', color: '#9E9E9E' },
-  { type: 'delete', label: 'Xóa dự án', icon: 'trash-outline', color: '#F44336', destructive: true },
+  { type: 'edit', label: 'Chỉnh sửa', icon: 'create-outline', color: '#0066CC' },
+  { type: 'share', label: 'Chia sẻ', icon: 'share-social-outline', color: '#0066CC' },
+  { type: 'archive', label: 'Lưu trữ', icon: 'archive-outline', color: '#999999' },
+  { type: 'delete', label: 'Xóa dự án', icon: 'trash-outline', color: '#000000', destructive: true },
 ];
 
 type ProjectQuickActionsProps = {
@@ -204,6 +204,6 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   actionLabelDestructive: {
-    color: '#F44336',
+    color: '#000000',
   },
 });

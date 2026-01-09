@@ -1,109 +1,109 @@
 /**
  * Modern Minimalist Design System
- * Emerald Green - Black - White palette
- * Sophisticated, Clean, Timeless
+ * Blue - Black - White palette (Professional & Clean)
+ * Sophisticated, Simple, Timeless
  */
 
 import { Platform } from 'react-native';
 
 export const Colors = {
   light: {
-    // Primary colors (Deep Emerald Green)
-    primary: '#0A6847',           // Deep emerald green
-    secondary: '#4A4A4A',         // Charcoal gray
-    accent: '#10B981',            // Bright emerald
+    // Primary colors (Professional Blue)
+    primary: '#0066CC',           // Professional blue
+    secondary: '#333333',         // Charcoal gray
+    accent: '#0080FF',            // Bright blue
     
     // Semantic colors
-    success: '#10B981',           // Bright green
-    warning: '#0A6847',           // Deep green
-    error: '#1A1A1A',             // Black (minimalist)
-    info: '#0A6847',              // Deep green
+    success: '#0066CC',           // Blue
+    warning: '#0080FF',           // Bright blue
+    error: '#000000',             // Black
+    info: '#0066CC',              // Professional blue
     
     // Text colors (High contrast)
-    text: '#1A1A1A',              // Soft black
-    textMuted: '#6B6B6B',         // Medium gray
+    text: '#000000',              // Pure black
+    textMuted: '#666666',         // Medium gray
     textInverse: '#FFFFFF',       // Pure white
     
     // Background colors (Clean white base)
     background: '#FFFFFF',        // Pure white
     surface: '#FFFFFF',           // Pure white
-    surfaceMuted: '#F8F8F8',      // Off white
-    surfaceAlt: '#F8F8F8',        // Off white
+    surfaceMuted: '#F5F5F5',      // Off white
+    surfaceAlt: '#F5F5F5',        // Off white
     card: '#FFFFFF',              // Pure white cards
     
     // Border colors (Subtle)
-    border: '#E5E5E5',            // Very light border
-    borderStrong: '#9E9E9E',      // Medium border
+    border: '#E0E0E0',            // Light gray border
+    borderStrong: '#999999',      // Medium border
     
     // Tab bar
-    tabIconDefault: '#6B6B6B',    // Gray
-    tabIconSelected: '#0A6847',   // Deep emerald
+    tabIconDefault: '#666666',    // Gray
+    tabIconSelected: '#0066CC',   // Professional blue
     
     // Legacy compatibility
-    tint: '#0A6847',              // Deep emerald
-    icon: '#1A1A1A',              // Soft black
-    danger: '#1A1A1A',
-    shadow: 'rgba(0,0,0,0.05)',   // Very subtle shadow
-    overlay: 'rgba(10,10,10,0.85)',
-    chipBackground: '#F8F8F8',
-    chipText: '#4A4A4A',
-    accentSoft: '#E6F7F1',        // Light emerald tint
+    tint: '#0066CC',              // Professional blue
+    icon: '#000000',              // Pure black
+    danger: '#000000',
+    shadow: 'rgba(0,0,0,0.08)',   // Subtle shadow
+    overlay: 'rgba(0,0,0,0.85)',
+    chipBackground: '#F5F5F5',
+    chipText: '#333333',
+    accentSoft: '#E6F2FF',        // Light blue tint
     
     // Additional elements
-    gold: '#0A6847',
-    goldLight: '#E6F7F1',
-    goldDark: '#064E3B',
-    marble: '#F8F8F8',
-    charcoal: '#1A1A1A',
+    gold: '#0066CC',
+    goldLight: '#E6F2FF',
+    goldDark: '#004C99',
+    marble: '#F5F5F5',
+    charcoal: '#000000',
   },
   dark: {
     // Primary colors (dark mode)
-    primary: '#10B981',           // Bright emerald
-    secondary: '#9E9E9E',         // Light gray
-    accent: '#10B981',            // Bright emerald
+    primary: '#0080FF',           // Bright blue
+    secondary: '#999999',         // Light gray
+    accent: '#0080FF',            // Bright blue
     
     // Semantic colors
-    success: '#10B981',           // Bright green
-    warning: '#10B981',           // Bright green
-    error: '#E5E5E5',             // Light gray
-    info: '#10B981',              // Bright green
+    success: '#0080FF',           // Bright blue
+    warning: '#0080FF',           // Bright blue
+    error: '#E0E0E0',             // Light gray
+    info: '#0080FF',              // Bright blue
     
     // Text colors (dark contrast)
-    text: '#FAFAFA',              // Off white
-    textMuted: '#9E9E9E',         // Light gray
-    textInverse: '#0A0A0A',       // Pure black
+    text: '#FFFFFF',              // Pure white
+    textMuted: '#999999',         // Light gray
+    textInverse: '#000000',       // Pure black
     
     // Background colors (Deep black base)
-    background: '#0A0A0A',        // Pure black
+    background: '#000000',        // Pure black
     surface: '#1A1A1A',           // Soft black
-    surfaceMuted: '#2D2D2D',      // Dark gray
-    surfaceAlt: '#2D2D2D',        // Dark gray
+    surfaceMuted: '#2A2A2A',      // Dark gray
+    surfaceAlt: '#2A2A2A',        // Dark gray
     card: '#1A1A1A',              // Soft black cards
     
     // Border colors
-    border: '#2D2D2D',            // Dark border
-    borderStrong: '#4A4A4A',      // Medium border
+    border: '#2A2A2A',            // Dark border
+    borderStrong: '#404040',      // Medium border
     
     // Tab bar
-    tabIconDefault: '#9E9E9E',
-    tabIconSelected: '#10B981',   // Bright emerald
+    tabIconDefault: '#999999',
+    tabIconSelected: '#0080FF',   // Bright blue
     
     // Legacy compatibility
-    tint: '#10B981',
-    icon: '#FAFAFA',
-    danger: '#E5E5E5',
-    shadow: 'rgba(0,0,0,0.4)',
-    overlay: 'rgba(10,10,10,0.9)',
-    chipBackground: '#2D2D2D',
-    chipText: '#10B981',
-    accentSoft: '#0A2D20',
+    tint: '#0080FF',
+    icon: '#FFFFFF',
+    danger: '#E0E0E0',
+    shadow: 'rgba(0,0,0,0.5)',
+    overlay: 'rgba(0,0,0,0.9)',
+    chipBackground: '#2A2A2A',
+    chipText: '#0080FF',
+    accentSoft: '#0D1F33',
     
     // Additional elements
-    gold: '#0A6847',
-    goldLight: '#2A3A2A',
-    goldDark: '#3A8A3A',
-    marble: '#1E1E1E',
-    charcoal: '#121212',
+    gold: '#0066CC',
+    goldLight: '#1A2A3A',
+    goldDark: '#0080FF',
+    marble: '#1A1A1A',
+    charcoal: '#0A0A0A',
   },
 };
 

@@ -28,7 +28,7 @@ const sampleCategories: BudgetCategory[] = [
     name: 'Labor',
     budgeted: 80000,
     spent: 72000,
-    color: '#10B981',
+    color: '#0066CC',
     icon: 'people-outline',
   },
   {
@@ -36,7 +36,7 @@ const sampleCategories: BudgetCategory[] = [
     name: 'Equipment',
     budgeted: 30000,
     spent: 28500,
-    color: '#F59E0B',
+    color: '#0066CC',
     icon: 'build-outline',
   },
   {
@@ -44,7 +44,7 @@ const sampleCategories: BudgetCategory[] = [
     name: 'Permits & Fees',
     budgeted: 15000,
     spent: 16200,
-    color: '#EF4444',
+    color: '#000000',
     icon: 'document-text-outline',
   },
   {
@@ -52,7 +52,7 @@ const sampleCategories: BudgetCategory[] = [
     name: 'Transportation',
     budgeted: 10000,
     spent: 5400,
-    color: '#8B5CF6',
+    color: '#666666',
     icon: 'car-outline',
   },
 ];

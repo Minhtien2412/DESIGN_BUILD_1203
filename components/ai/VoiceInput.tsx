@@ -202,7 +202,7 @@ export default function VoiceInput({ onTextReceived, language = 'vi-VN' }: Voice
                 style={[styles.actionButton, styles.cancelButton]}
                 onPress={cancelListening}
               >
-                <Ionicons name="close" size={24} color="#EF4444" />
+                <Ionicons name="close" size={24} color="#000000" />
                 <Text style={styles.cancelButtonText}>Hủy</Text>
               </TouchableOpacity>
 
@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#EFF6FF',
+    backgroundColor: '#E8F4FF',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -318,7 +318,7 @@ const styles = StyleSheet.create({
   cancelButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#EF4444',
+    color: '#000000',
   },
   confirmButton: {
     backgroundColor: Colors.light.primary,

@@ -1,11 +1,14 @@
 import { Container } from '@/components/ui/container';
 import { useThemeColor } from '@/hooks/use-theme-color';
+import PortfolioService, { type ArchitectureProject } from '@/services/portfolioService';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
+    ActivityIndicator,
     Dimensions,
     Image,
+    RefreshControl,
     ScrollView,
     StyleSheet,
     Text,
@@ -15,56 +18,43 @@ import {
 
 const { width } = Dimensions.get('window');
 
-interface ProjectDetail {
-  id: string;
-  title: string;
-  location: string;
-  rating: number;
-  reviews: number;
-  images: string[];
-  description: string;
-  bedrooms: number;
-  bathrooms: number;
-  livingRooms: number;
-  kitchens: number;
-  area: number;
-  features: string[];
-}
-
-const MOCK_PROJECT: ProjectDetail = {
-  id: '1',
-  title: 'Mẫu thiết kế biệt thự tân cổ điển 3 tầng',
-  location: 'Phú Mỹ Hưng - Quận 7, Thành Phố Hồ Chí Minh',
-  rating: 4.9,
-  reviews: 139,
-  images: [
-    'https://via.placeholder.com/400x300',
-    'https://via.placeholder.com/400x300/ff0000',
-    'https://via.placeholder.com/400x300/00ff00',
-    'https://via.placeholder.com/400x300/0000ff',
-  ],
-  description:
-    'Biệt thự 3 tầng được thiết kế theo phong cách tân cổ điển sang trọng, nổi bật với hệ thống vòm cửa, cột trụ và gờ chỉ trang trí tinh tế. Không gian sống mang lại cảm giác sang trọng, hiện đại nhưng vẫn giữ được nét truyền thống, quý phái với hệ thống vòm của, cột trụ và gờ chỉ trang trí tinh tế.',
-  bedrooms: 4,
-  bathrooms: 4,
-  livingRooms: 1,
-  kitchens: 1,
-  area: 350,
-  features: [
-    'Tối ưu công năng và không gian',
-    'Hệ thống thông gió tự nhiên tốt',
-    'Phong cách kiến trúc độc đáo',
-  ],
-};
-
 export default function ArchitectureDetailScreen() {
-  const params = useLocalSearchParams();
+  const params = useLocalSearchParams<{ id: string }>();
   const backgroundColor = useThemeColor({}, 'background');
   const textColor = useThemeColor({}, 'text');
   const primaryColor = useThemeColor({}, 'tint');
+  const mutedColor = useThemeColor({}, 'textMuted');
 
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const project = MOCK_PROJECT;
+  const [project, setProject] = useState<ArchitectureProject | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchProject = useCallback(async (isRefresh = false) => {
+    try {
+      if (!isRefresh) setLoading(true);
+      setError(null);
+      
+      const data = await PortfolioService.getProjectById(params.id || '1');
+      setProject(data);
+    } catch (err) {
+      console.error('Error fetching project:', err);
+      setError('Không thể tải thông tin dự án');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, [params.id]);
+
+  useEffect(() => {
+    fetchProject();
+  }, [fetchProject]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchProject(true);
+  }, [fetchProject]);
 
   const handleViewFloorPlan = () => {
     alert('Xem mặt bằng dự án');
@@ -72,13 +62,61 @@ export default function ArchitectureDetailScreen() {
   };
 
   const handleContactDesigner = () => {
-    alert('Liên hệ nhà thiết kế');
-    // TODO: Open contact form or chat
+    if (project?.designer?.phone) {
+      alert(`Liên hệ: ${project.designer.name}\nSĐT: ${project.designer.phone}`);
+    } else {
+      alert('Liên hệ nhà thiết kế');
+    }
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <Container style={{ backgroundColor }}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={primaryColor} />
+          <Text style={[styles.loadingText, { color: mutedColor }]}>Đang tải...</Text>
+        </View>
+      </Container>
+    );
+  }
+
+  // Error state
+  if (error || !project) {
+    return (
+      <Container style={{ backgroundColor }}>
+        <View style={styles.errorContainer}>
+          <Ionicons name="alert-circle" size={48} color="#DC2626" />
+          <Text style={[styles.errorText, { color: textColor }]}>
+            {error || 'Không tìm thấy dự án'}
+          </Text>
+          <TouchableOpacity
+            style={[styles.retryButton, { backgroundColor: primaryColor }]}
+            onPress={() => fetchProject()}
+          >
+            <Text style={styles.retryButtonText}>Thử lại</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.backLink}
+            onPress={() => router.back()}
+          >
+            <Text style={{ color: primaryColor }}>Quay lại</Text>
+          </TouchableOpacity>
+        </View>
+      </Container>
+    );
+  }
+
+  const images = project.images || [project.image];
 
   return (
     <Container style={{ backgroundColor }}>
-      <ScrollView style={styles.container}>
+      <ScrollView 
+        style={styles.container}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
@@ -89,7 +127,7 @@ export default function ArchitectureDetailScreen() {
         {/* Main Image Gallery */}
         <View style={styles.imageGallery}>
           <Image
-            source={{ uri: project.images[selectedImageIndex] }}
+            source={{ uri: images[selectedImageIndex] }}
             style={styles.mainImage}
             resizeMode="cover"
           />
@@ -97,7 +135,7 @@ export default function ArchitectureDetailScreen() {
           {/* Image Counter */}
           <View style={styles.imageCounter}>
             <Text style={styles.imageCounterText}>
-              {selectedImageIndex + 1} / {project.images.length}
+              {selectedImageIndex + 1} / {images.length}
             </Text>
           </View>
         </View>
@@ -108,7 +146,7 @@ export default function ArchitectureDetailScreen() {
           showsHorizontalScrollIndicator={false}
           style={styles.thumbnailContainer}
         >
-          {project.images.map((image, index) => (
+          {images.map((image, index) => (
             <TouchableOpacity
               key={index}
               onPress={() => setSelectedImageIndex(index)}
@@ -136,13 +174,13 @@ export default function ArchitectureDetailScreen() {
           <View style={styles.locationRow}>
             <Ionicons name="location-outline" size={18} color="#666" />
             <Text style={[styles.locationText, { color: '#666' }]}>
-              {project.location}
+              {project.location} - {project.district}, {project.city}
             </Text>
           </View>
 
           {/* Rating */}
           <View style={styles.ratingRow}>
-            <Ionicons name="star" size={18} color="#FFD700" />
+            <Ionicons name="star" size={18} color="#FFFFFF" />
             <Text style={[styles.ratingText, { color: textColor }]}>
               {project.rating}
             </Text>
@@ -195,9 +233,22 @@ export default function ArchitectureDetailScreen() {
         <View style={styles.contentSection}>
           <Text style={[styles.sectionTitle, { color: textColor }]}>Mô tả</Text>
           <Text style={[styles.descriptionText, { color: '#666' }]}>
-            {project.description}
+            {project.description || 'Chưa có mô tả'}
           </Text>
         </View>
+
+        {/* Features */}
+        {project.features && project.features.length > 0 && (
+          <View style={styles.contentSection}>
+            <Text style={[styles.sectionTitle, { color: textColor }]}>Đặc điểm nổi bật</Text>
+            {project.features.map((feature, index) => (
+              <View key={index} style={styles.featureRow}>
+                <Ionicons name="checkmark-circle" size={18} color={primaryColor} />
+                <Text style={[styles.featureText, { color: '#666' }]}>{feature}</Text>
+              </View>
+            ))}
+          </View>
+        )}
 
         {/* Location Section */}
         <View style={styles.contentSection}>
@@ -304,7 +355,7 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   thumbnailActive: {
-    borderColor: '#4CAF50',
+    borderColor: '#0066CC',
   },
   thumbnailImage: {
     width: '100%',
@@ -415,7 +466,7 @@ const styles = StyleSheet.create({
   },
   outlineButton: {
     borderWidth: 2,
-    borderColor: '#4CAF50',
+    borderColor: '#0066CC',
     backgroundColor: 'transparent',
   },
   outlineButtonText: {
@@ -426,5 +477,50 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 15,
     fontWeight: '600',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 14,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  errorText: {
+    marginTop: 16,
+    fontSize: 16,
+    textAlign: 'center',
+  },
+  retryButton: {
+    marginTop: 16,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  retryButtonText: {
+    color: '#FFF',
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  backLink: {
+    marginTop: 16,
+    padding: 8,
+  },
+  featureRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 8,
+  },
+  featureText: {
+    fontSize: 14,
+    flex: 1,
   },
 });

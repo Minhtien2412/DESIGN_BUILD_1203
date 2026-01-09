@@ -202,10 +202,10 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
   // Get status color
   const getStatusColor = (status: TaskStatus): string => {
     switch (status) {
-      case 'pending': return '#F59E0B';
+      case 'pending': return '#0066CC';
       case 'in-progress': return '#3B82F6';
-      case 'completed': return '#10B981';
-      case 'blocked': return '#EF4444';
+      case 'completed': return '#0066CC';
+      case 'blocked': return '#000000';
       default: return '#6B7280';
     }
   };
@@ -213,9 +213,9 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
   // Get priority color
   const getPriorityColor = (priority: TaskPriority): string => {
     switch (priority) {
-      case 'low': return '#10B981';
-      case 'medium': return '#F59E0B';
-      case 'high': return '#EF4444';
+      case 'low': return '#0066CC';
+      case 'medium': return '#0066CC';
+      case 'high': return '#000000';
       default: return '#6B7280';
     }
   };
@@ -433,7 +433,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                         setFilters((prev) => ({ ...prev, startDateFrom: undefined }))
                       }
                     >
-                      <Ionicons name="close-circle" size={20} color="#EF4444" />
+                      <Ionicons name="close-circle" size={20} color="#000000" />
                     </TouchableOpacity>
                   )}
                 </View>
@@ -456,7 +456,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                         setFilters((prev) => ({ ...prev, startDateTo: undefined }))
                       }
                     >
-                      <Ionicons name="close-circle" size={20} color="#EF4444" />
+                      <Ionicons name="close-circle" size={20} color="#000000" />
                     </TouchableOpacity>
                   )}
                 </View>
@@ -506,7 +506,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                         <TouchableOpacity
                           onPress={() => onDeletePreset(preset.id)}
                         >
-                          <Ionicons name="trash-outline" size={18} color="#EF4444" />
+                          <Ionicons name="trash-outline" size={18} color="#000000" />
                         </TouchableOpacity>
                       )}
                     </View>
@@ -689,7 +689,7 @@ const styles = StyleSheet.create({
     color: '#111827',
   },
   badge: {
-    backgroundColor: '#DBEAFE',
+    backgroundColor: '#E8F4FF',
     borderRadius: 10,
     paddingHorizontal: 6,
     paddingVertical: 2,
@@ -830,11 +830,11 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#EF4444',
+    borderColor: '#000000',
     alignItems: 'center',
   },
   clearButtonText: {
-    color: '#EF4444',
+    color: '#000000',
     fontSize: 14,
     fontWeight: '600',
   },

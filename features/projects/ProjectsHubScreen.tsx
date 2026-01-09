@@ -10,12 +10,14 @@
 
 import { MODERN_COLORS, MODERN_RADIUS, MODERN_SHADOWS, MODERN_SPACING } from '@/constants/modern-theme';
 import { useAuth } from '@/context/AuthContext';
+import { useProjectsHub } from '@/hooks/useProjectsHub';
 import { MINDMAP_ROLE_PERMISSIONS, MindmapRole } from '@/types/project-mindmap';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useCallback, useState } from 'react';
 import {
+    ActivityIndicator,
     Dimensions,
     Image,
     RefreshControl,
@@ -27,7 +29,7 @@ import {
 } from 'react-native';
 
 const { width } = Dimensions.get('window');
-const SHOPEE_ORANGE = '#EE4D2D';
+const SHOPEE_ORANGE = '#0066CC';
 const SHOPEE_ORANGE_LIGHT = '#FF6533';
 
 // Quick Action Cards for different roles
@@ -47,7 +49,7 @@ const QUICK_ACTIONS: QuickAction[] = [
     title: 'Khách hàng',
     subtitle: 'Quản lý khách hàng & dự án',
     icon: 'people',
-    color: '#4CAF50',
+    color: '#0066CC',
     route: '/projects/customer-projects',
     roles: ['ADMIN', 'MANAGER'],
   },
@@ -65,7 +67,7 @@ const QUICK_ACTIONS: QuickAction[] = [
     title: 'Công trình của tôi',
     subtitle: 'Dự án được giao',
     icon: 'briefcase',
-    color: '#2196F3',
+    color: '#0066CC',
     route: '/projects/customer-projects?view=my-projects',
     roles: ['CONTRACTOR', 'WORKER', 'ENGINEER'],
   },
@@ -74,7 +76,7 @@ const QUICK_ACTIONS: QuickAction[] = [
     title: 'Việc cần làm',
     subtitle: 'Todo & Tasks được giao',
     icon: 'checkbox',
-    color: '#FF9800',
+    color: '#0066CC',
     route: '/projects/timeline-mindmap?tab=todos',
     roles: ['CONTRACTOR', 'WORKER', 'ENGINEER'],
   },
@@ -98,46 +100,12 @@ const QUICK_ACTIONS: QuickAction[] = [
   },
 ];
 
-// Mock data - In production, this would come from API
-const MOCK_STATS = {
-  totalProjects: 12,
-  activeProjects: 5,
-  completedProjects: 6,
-  pendingTodos: 15,
-  overdueTodos: 3,
-  totalCustomers: 8,
-};
-
-const RECENT_PROJECTS = [
-  {
-    id: '1',
-    name: 'Biệt thự Đại Phúc',
-    customerName: 'Nguyễn Văn A',
-    progress: 75,
-    status: 'IN_PROGRESS',
-    image: null,
-  },
-  {
-    id: '2',
-    name: 'Nhà phố 3 tầng',
-    customerName: 'Trần Văn B',
-    progress: 45,
-    status: 'IN_PROGRESS',
-    image: null,
-  },
-  {
-    id: '3',
-    name: 'Văn phòng XYZ',
-    customerName: 'Công ty ABC',
-    progress: 100,
-    status: 'COMPLETED',
-    image: null,
-  },
-];
-
 export default function ProjectsHubScreen() {
   const { user } = useAuth();
   const [refreshing, setRefreshing] = useState(false);
+  
+  // Fetch real data from CRM
+  const { stats, recentProjects, loading, dataSource, refresh } = useProjectsHub();
   
   // Determine user's role (default to MANAGER for demo)
   const currentRole: MindmapRole = (user?.role?.toUpperCase() as MindmapRole) || 'MANAGER';
@@ -145,8 +113,7 @@ export default function ProjectsHubScreen() {
   
   const handleRefresh = useCallback(async () => {
     setRefreshing(true);
-    // Simulate refresh
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await refresh();
     setRefreshing(false);
   }, []);
 
@@ -171,10 +138,10 @@ export default function ProjectsHubScreen() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'IN_PROGRESS': return SHOPEE_ORANGE;
-      case 'COMPLETED': return '#4CAF50';
-      case 'PLANNING': return '#2196F3';
-      case 'ON_HOLD': return '#FF9800';
-      default: return '#9E9E9E';
+      case 'COMPLETED': return '#0066CC';
+      case 'PLANNING': return '#0066CC';
+      case 'ON_HOLD': return '#0066CC';
+      default: return '#999999';
     }
   };
 
@@ -207,15 +174,24 @@ export default function ProjectsHubScreen() {
             onPress={() => router.push('/notifications' as any)}
           >
             <Ionicons name="notifications" size={22} color="#fff" />
-            {MOCK_STATS.overdueTodos > 0 && (
+            {stats.overdueTodos > 0 && (
               <View style={styles.notificationBadge}>
                 <Text style={styles.notificationBadgeText}>
-                  {MOCK_STATS.overdueTodos}
+                  {stats.overdueTodos}
                 </Text>
               </View>
             )}
           </TouchableOpacity>
         </View>
+      </View>
+
+      {/* Data Source Badge */}
+      <View style={styles.dataSourceBadge}>
+        <View style={[styles.dataSourceDot, { backgroundColor: dataSource === 'crm' ? '#0066CC' : '#0066CC' }]} />
+        <Text style={styles.dataSourceText}>
+          {dataSource === 'crm' ? 'Live CRM' : 'Demo'}
+        </Text>
+        {loading && <ActivityIndicator size="small" color="#fff" style={{ marginLeft: 8 }} />}
       </View>
 
       {/* Stats Cards */}
@@ -226,23 +202,23 @@ export default function ProjectsHubScreen() {
       >
         <View style={styles.statCard}>
           <Ionicons name="folder-open" size={24} color={SHOPEE_ORANGE} />
-          <Text style={styles.statValue}>{MOCK_STATS.totalProjects}</Text>
+          <Text style={styles.statValue}>{stats.totalProjects}</Text>
           <Text style={styles.statLabel}>Tổng dự án</Text>
         </View>
         <View style={styles.statCard}>
-          <Ionicons name="play-circle" size={24} color="#4CAF50" />
-          <Text style={styles.statValue}>{MOCK_STATS.activeProjects}</Text>
+          <Ionicons name="play-circle" size={24} color="#0066CC" />
+          <Text style={styles.statValue}>{stats.activeProjects}</Text>
           <Text style={styles.statLabel}>Đang thực hiện</Text>
         </View>
         <View style={styles.statCard}>
-          <Ionicons name="checkbox" size={24} color="#2196F3" />
-          <Text style={styles.statValue}>{MOCK_STATS.pendingTodos}</Text>
+          <Ionicons name="checkbox" size={24} color="#0066CC" />
+          <Text style={styles.statValue}>{stats.pendingTodos}</Text>
           <Text style={styles.statLabel}>Việc cần làm</Text>
         </View>
         {(currentRole === 'ADMIN' || currentRole === 'MANAGER') && (
           <View style={styles.statCard}>
             <Ionicons name="people" size={24} color="#9C27B0" />
-            <Text style={styles.statValue}>{MOCK_STATS.totalCustomers}</Text>
+            <Text style={styles.statValue}>{stats.totalCustomers}</Text>
             <Text style={styles.statLabel}>Khách hàng</Text>
           </View>
         )}
@@ -290,7 +266,7 @@ export default function ProjectsHubScreen() {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.recentProjectsContainer}
       >
-        {RECENT_PROJECTS.map((project) => (
+        {recentProjects.map((project) => (
           <TouchableOpacity
             key={project.id}
             style={styles.recentProjectCard}
@@ -448,6 +424,27 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '700',
     color: SHOPEE_ORANGE,
+  },
+  dataSourceBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    marginTop: 8,
+  },
+  dataSourceDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginRight: 6,
+  },
+  dataSourceText: {
+    fontSize: 11,
+    color: '#fff',
+    fontWeight: '600',
   },
   statsContainer: {
     paddingHorizontal: 4,

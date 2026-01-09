@@ -361,10 +361,10 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   approveButton: {
-    backgroundColor: '#10b981',
+    backgroundColor: '#0066CC',
   },
   cancelButton: {
-    backgroundColor: '#ef4444',
+    backgroundColor: '#000000',
   },
   actionButtonText: {
     fontSize: 14,
@@ -389,7 +389,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     paddingVertical: 12,
     paddingHorizontal: 24,
-    backgroundColor: '#eff6ff',
+    backgroundColor: '#E8F4FF',
     borderRadius: 24,
   },
   createCTAText: {

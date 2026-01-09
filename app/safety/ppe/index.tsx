@@ -71,7 +71,7 @@ export default function PPEInventoryScreen() {
           title: 'Quản lý PPE',
           headerRight: () => (
             <TouchableOpacity onPress={() => setModalVisible(true)}>
-              <Ionicons name="add-circle" size={28} color="#2196F3" style={{ marginRight: 8 }} />
+              <Ionicons name="add-circle" size={28} color="#0066CC" style={{ marginRight: 8 }} />
             </TouchableOpacity>
           ),
         }}
@@ -85,12 +85,12 @@ export default function PPEInventoryScreen() {
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statItem}>
-          <Text style={[styles.statValue, { color: '#4CAF50' }]}>{goodCondition.length}</Text>
+          <Text style={[styles.statValue, { color: '#0066CC' }]}>{goodCondition.length}</Text>
           <Text style={styles.statLabel}>Tốt</Text>
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statItem}>
-          <Text style={[styles.statValue, { color: '#F44336' }]}>
+          <Text style={[styles.statValue, { color: '#000000' }]}>
             {needsReplacement.length}
           </Text>
           <Text style={styles.statLabel}>Cần thay</Text>
@@ -219,7 +219,7 @@ function PPECard({ item }: PPECardProps) {
 
       {item.expiryDate && (
         <View style={styles.expiryInfo}>
-          <Ionicons name="time" size={14} color="#FF9800" />
+          <Ionicons name="time" size={14} color="#0066CC" />
           <Text style={styles.expiryText}>
             Hết hạn: {new Date(item.expiryDate).toLocaleDateString('vi-VN')}
           </Text>
@@ -403,17 +403,17 @@ function AddPPEModal({ visible, projectId, onClose, onCreate }: AddPPEModalProps
 function getConditionColor(condition: PPECondition): string {
   switch (condition) {
     case PPECondition.NEW:
-      return '#4CAF50';
+      return '#0066CC';
     case PPECondition.GOOD:
-      return '#10B981';
+      return '#0066CC';
     case PPECondition.FAIR:
-      return '#FF9800';
+      return '#0066CC';
     case PPECondition.WORN:
-      return '#F44336';
+      return '#000000';
     case PPECondition.DAMAGED:
       return '#B71C1C';
     case PPECondition.EXPIRED:
-      return '#9E9E9E';
+      return '#999999';
     default:
       return '#666';
   }
@@ -501,7 +501,7 @@ const styles = StyleSheet.create({
     borderBottomColor: 'transparent',
   },
   filterTabActive: {
-    borderBottomColor: '#2196F3',
+    borderBottomColor: '#0066CC',
   },
   filterTabText: {
     fontSize: 13,
@@ -509,7 +509,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   filterTabTextActive: {
-    color: '#2196F3',
+    color: '#0066CC',
     fontWeight: 'bold',
   },
   listContent: {
@@ -576,14 +576,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#FFF3E0',
+    backgroundColor: '#E8F4FF',
     padding: 8,
     borderRadius: 6,
     marginTop: 12,
   },
   expiryText: {
     fontSize: 12,
-    color: '#E65100',
+    color: '#004499',
     fontWeight: '500',
   },
   emptyContainer: {
@@ -598,7 +598,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   addButton: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
@@ -668,8 +668,8 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   typeChipActive: {
-    backgroundColor: '#2196F3',
-    borderColor: '#2196F3',
+    backgroundColor: '#0066CC',
+    borderColor: '#0066CC',
   },
   typeChipText: {
     fontSize: 12,
@@ -723,7 +723,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 14,
     borderRadius: 8,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     alignItems: 'center',
   },
   createButtonText: {

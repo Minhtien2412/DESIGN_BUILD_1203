@@ -28,7 +28,7 @@ export default function ProgressTrackingScreen() {
     <Container>
       <ScrollView showsVerticalScrollIndicator={false}>
         <LinearGradient
-          colors={['#10b981', '#059669']}
+          colors={['#0066CC', '#0066CC']}
           style={styles.header}
         >
           <TouchableOpacity
@@ -53,7 +53,7 @@ export default function ProgressTrackingScreen() {
                 progress={project.progress}
                 width={null}
                 height={8}
-                color="#10b981"
+                color="#0066CC"
                 unfilledColor="#e5e7eb"
                 borderWidth={0}
                 borderRadius={4}
@@ -72,7 +72,7 @@ export default function ProgressTrackingScreen() {
                   <Ionicons
                     name={task.status === 'completed' ? 'checkmark-circle' : 'time-outline'}
                     size={24}
-                    color={task.status === 'completed' ? '#10b981' : '#f59e0b'}
+                    color={task.status === 'completed' ? '#0066CC' : '#0066CC'}
                   />
                   <Text style={styles.taskName}>{task.name}</Text>
                 </View>
@@ -82,7 +82,7 @@ export default function ProgressTrackingScreen() {
                 progress={task.progress / 100}
                 width={null}
                 height={6}
-                color={task.status === 'completed' ? '#10b981' : '#3b82f6'}
+                color={task.status === 'completed' ? '#0066CC' : '#3b82f6'}
                 unfilledColor="#e5e7eb"
                 borderWidth={0}
                 borderRadius={3}
@@ -94,23 +94,23 @@ export default function ProgressTrackingScreen() {
 
         <Section title="Tính năng">
           <View style={styles.featureItem}>
-            <Ionicons name="checkmark-circle" size={24} color="#10b981" />
+            <Ionicons name="checkmark-circle" size={24} color="#0066CC" />
             <Text style={styles.featureText}>Real-time progress updates qua WebSocket</Text>
           </View>
           <View style={styles.featureItem}>
-            <Ionicons name="checkmark-circle" size={24} color="#10b981" />
+            <Ionicons name="checkmark-circle" size={24} color="#0066CC" />
             <Text style={styles.featureText}>Track background jobs với Bull Queue</Text>
           </View>
           <View style={styles.featureItem}>
-            <Ionicons name="checkmark-circle" size={24} color="#10b981" />
+            <Ionicons name="checkmark-circle" size={24} color="#0066CC" />
             <Text style={styles.featureText}>Tiến độ theo phases & milestones</Text>
           </View>
           <View style={styles.featureItem}>
-            <Ionicons name="checkmark-circle" size={24} color="#10b981" />
+            <Ionicons name="checkmark-circle" size={24} color="#0066CC" />
             <Text style={styles.featureText}>Export báo cáo PDF/Excel</Text>
           </View>
           <View style={styles.featureItem}>
-            <Ionicons name="checkmark-circle" size={24} color="#10b981" />
+            <Ionicons name="checkmark-circle" size={24} color="#0066CC" />
             <Text style={styles.featureText}>Subscribe to progress events</Text>
           </View>
         </Section>
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
   projectPercent: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#10b981',
+    color: '#0066CC',
   },
   progressBar: {
     marginVertical: 8,
@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
     marginLeft: 12,
   },
   infoCard: {
-    backgroundColor: '#dbeafe',
+    backgroundColor: '#E8F4FF',
     padding: 16,
     borderRadius: 12,
   },

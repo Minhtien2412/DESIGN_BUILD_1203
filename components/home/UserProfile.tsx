@@ -45,11 +45,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#0A6847',
+    borderColor: '#0066CC',
   },
   avatarText: {
     fontWeight: '700',
-    color: '#0A6847',
+    color: '#0066CC',
     fontSize: 12,
   },
   textContainer: {

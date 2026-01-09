@@ -125,7 +125,7 @@ export default function FoodDeliveryScreen() {
         
         <View style={styles.restaurantMeta}>
           <View style={styles.ratingContainer}>
-            <Ionicons name="star" size={14} color="#F59E0B" />
+            <Ionicons name="star" size={14} color="#0080FF" />
             <Text style={styles.ratingText}>
               {item.rating} ({item.reviews}+)
             </Text>
@@ -239,7 +239,7 @@ export default function FoodDeliveryScreen() {
       {/* Promo Banner */}
       <Animated.View style={[styles.promoBanner, { opacity: fadeAnim }]}>
         <View style={styles.promoContent}>
-          <Ionicons name="gift" size={32} color="#F59E0B" />
+          <Ionicons name="gift" size={32} color="#0080FF" />
           <View style={styles.promoInfo}>
             <Text style={styles.promoTitle}>Ưu đãi hôm nay</Text>
             <Text style={styles.promoSubtitle}>Giảm đến 50% cho đơn đầu tiên</Text>
@@ -327,7 +327,7 @@ const styles = StyleSheet.create({
     minWidth: 18,
     height: 18,
     borderRadius: 9,
-    backgroundColor: '#EF4444',
+    backgroundColor: '#000000',
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 4,
@@ -437,7 +437,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 12,
     left: 12,
-    backgroundColor: '#EF4444',
+    backgroundColor: '#000000',
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 8,

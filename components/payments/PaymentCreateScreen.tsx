@@ -138,7 +138,7 @@ export default function PaymentCreateScreen() {
         {payment && (
           <View style={[styles.resultCard, styles.successCard]}>
             <View style={styles.resultHeader}>
-              <Ionicons name="checkmark-circle" size={32} color="#4CAF50" />
+              <Ionicons name="checkmark-circle" size={32} color="#0066CC" />
               <Text style={styles.successTitle}>Tạo thành công!</Text>
             </View>
             
@@ -162,14 +162,14 @@ export default function PaymentCreateScreen() {
               
               <View style={styles.resultItem}>
                 <Text style={styles.resultLabel}>Trạng thái:</Text>
-                <View style={[styles.statusBadge, { backgroundColor: '#4CAF5020' }]}>
-                  <Text style={[styles.statusText, { color: '#4CAF50' }]}>{payment.status}</Text>
+                <View style={[styles.statusBadge, { backgroundColor: '#0066CC20' }]}>
+                  <Text style={[styles.statusText, { color: '#0066CC' }]}>{payment.status}</Text>
                 </View>
               </View>
             </View>
             
             <TouchableOpacity 
-              style={[styles.resetButton, { backgroundColor: '#4CAF50' }]} 
+              style={[styles.resetButton, { backgroundColor: '#0066CC' }]} 
               onPress={handleReset}
             >
               <Ionicons name="add-outline" size={20} color="white" />
@@ -182,7 +182,7 @@ export default function PaymentCreateScreen() {
         {error && (
           <View style={[styles.resultCard, styles.errorCard]}>
             <View style={styles.resultHeader}>
-              <Ionicons name="alert-circle" size={32} color="#F44336" />
+              <Ionicons name="alert-circle" size={32} color="#000000" />
               <Text style={styles.errorTitle}>Có lỗi xảy ra</Text>
             </View>
             <Text style={styles.errorText}>{error}</Text>
@@ -358,12 +358,12 @@ const styles = StyleSheet.create({
   successTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#4CAF50',
+    color: '#0066CC',
   },
   errorTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#F44336',
+    color: '#000000',
   },
   resultDetails: {
     gap: 12,
@@ -405,7 +405,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   errorText: {
-    color: '#F44336',
+    color: '#000000',
     fontSize: 14,
     lineHeight: 20,
   },

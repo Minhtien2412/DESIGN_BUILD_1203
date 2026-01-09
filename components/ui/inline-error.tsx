@@ -66,7 +66,7 @@ export function InlineError({ message, visible = false }: InlineErrorProps) {
         },
       ]}
     >
-      <Ionicons name="alert-circle" size={16} color="#EF4444" />
+      <Ionicons name="alert-circle" size={16} color="#000000" />
       <Text style={styles.errorText}>{message}</Text>
     </Animated.View>
   );
@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   errorText: {
-    color: '#EF4444',
+    color: '#000000',
     fontSize: 13,
     marginLeft: 6,
     flex: 1,

@@ -1,9 +1,10 @@
 /**
  * Timeline - Edit Phase
  */
+import { MOCK_PHASE, PhaseService } from '@/services/phaseService';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
     ActivityIndicator,
     Alert,
@@ -12,23 +13,19 @@ import {
     Text,
     TextInput,
     TouchableOpacity,
-    View,
+    View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-const MOCK_PHASE = {
-  id: '1',
-  name: 'Giai đoạn 1: Thiết kế',
-  description: 'Hoàn thành toàn bộ hồ sơ thiết kế bao gồm kiến trúc, kết cấu và MEP',
-  startDate: '2024-01-01',
-  endDate: '2024-02-15',
-  color: '#EE4D2D',
-};
+const FALLBACK_PHASE = MOCK_PHASE;
 
 export default function EditPhaseScreen() {
   const router = useRouter();
   const { phaseId, projectId } = useLocalSearchParams<{ phaseId: string; projectId: string }>();
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [dataSource, setDataSource] = useState<'api' | 'mock'>('mock');
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -36,27 +33,81 @@ export default function EditPhaseScreen() {
     endDate: '',
   });
 
-  useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
+  const fetchPhase = useCallback(async () => {
+    if (!phaseId) {
       setFormData({
-        name: MOCK_PHASE.name,
-        description: MOCK_PHASE.description,
-        startDate: MOCK_PHASE.startDate,
-        endDate: MOCK_PHASE.endDate,
+        name: FALLBACK_PHASE.name,
+        description: FALLBACK_PHASE.description || '',
+        startDate: FALLBACK_PHASE.startDate,
+        endDate: FALLBACK_PHASE.endDate,
       });
+      setDataSource('mock');
       setLoading(false);
-    }, 500);
+      return;
+    }
+
+    try {
+      const data = await PhaseService.getPhaseById(phaseId);
+      if (data) {
+        setFormData({
+          name: data.name,
+          description: data.description || '',
+          startDate: data.startDate,
+          endDate: data.endDate,
+        });
+        setDataSource('api');
+      } else {
+        setFormData({
+          name: FALLBACK_PHASE.name,
+          description: FALLBACK_PHASE.description || '',
+          startDate: FALLBACK_PHASE.startDate,
+          endDate: FALLBACK_PHASE.endDate,
+        });
+        setDataSource('mock');
+      }
+    } catch (error) {
+      console.error('Error fetching phase:', error);
+      setFormData({
+        name: FALLBACK_PHASE.name,
+        description: FALLBACK_PHASE.description || '',
+        startDate: FALLBACK_PHASE.startDate,
+        endDate: FALLBACK_PHASE.endDate,
+      });
+      setDataSource('mock');
+    } finally {
+      setLoading(false);
+    }
   }, [phaseId]);
 
-  const handleSubmit = () => {
+  useEffect(() => {
+    fetchPhase();
+  }, [fetchPhase]);
+
+  const handleSubmit = async () => {
     if (!formData.name.trim()) {
       Alert.alert('Lỗi', 'Vui lòng nhập tên giai đoạn');
       return;
     }
-    Alert.alert('Thành công', 'Đã cập nhật giai đoạn', [
-      { text: 'OK', onPress: () => router.back() }
-    ]);
+
+    setSaving(true);
+    try {
+      if (phaseId && dataSource === 'api') {
+        await PhaseService.updatePhase(phaseId, {
+          name: formData.name,
+          description: formData.description,
+          startDate: formData.startDate,
+          endDate: formData.endDate,
+        });
+      }
+      Alert.alert('Thành công', 'Đã cập nhật giai đoạn', [
+        { text: 'OK', onPress: () => router.back() }
+      ]);
+    } catch (error) {
+      console.error('Error updating phase:', error);
+      Alert.alert('Lỗi', 'Không thể cập nhật giai đoạn. Vui lòng thử lại.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleDelete = () => {
@@ -68,10 +119,28 @@ export default function EditPhaseScreen() {
         { 
           text: 'Xóa', 
           style: 'destructive',
-          onPress: () => {
-            Alert.alert('Đã xóa', 'Giai đoạn đã được xóa', [
-              { text: 'OK', onPress: () => router.back() }
-            ]);
+          onPress: async () => {
+            if (!phaseId) {
+              Alert.alert('Đã xóa', 'Giai đoạn đã được xóa', [
+                { text: 'OK', onPress: () => router.back() }
+              ]);
+              return;
+            }
+
+            setDeleting(true);
+            try {
+              if (dataSource === 'api') {
+                await PhaseService.deletePhase(phaseId);
+              }
+              Alert.alert('Đã xóa', 'Giai đoạn đã được xóa', [
+                { text: 'OK', onPress: () => router.back() }
+              ]);
+            } catch (error) {
+              console.error('Error deleting phase:', error);
+              Alert.alert('Lỗi', 'Không thể xóa giai đoạn. Vui lòng thử lại.');
+            } finally {
+              setDeleting(false);
+            }
           }
         },
       ]
@@ -82,7 +151,7 @@ export default function EditPhaseScreen() {
     return (
       <SafeAreaView style={styles.container} edges={['top']}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#EE4D2D" />
+          <ActivityIndicator size="large" color="#0066CC" />
           <Text style={styles.loadingText}>Đang tải...</Text>
         </View>
       </SafeAreaView>
@@ -97,12 +166,28 @@ export default function EditPhaseScreen() {
           <Ionicons name="close" size={24} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Chỉnh sửa giai đoạn</Text>
-        <TouchableOpacity onPress={handleSubmit} style={styles.saveBtn}>
-          <Text style={styles.saveBtnText}>Lưu</Text>
+        <TouchableOpacity 
+          onPress={handleSubmit} 
+          style={[styles.saveBtn, saving && styles.saveBtnDisabled]}
+          disabled={saving}
+        >
+          {saving ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <Text style={styles.saveBtnText}>Lưu</Text>
+          )}
         </TouchableOpacity>
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {/* Data Source Indicator */}
+        {dataSource === 'mock' && (
+          <View style={styles.mockBanner}>
+            <Ionicons name="information-circle" size={16} color="#92400E" />
+            <Text style={styles.mockBannerText}>📋 Dữ liệu mẫu</Text>
+          </View>
+        )}
+
         <View style={styles.formGroup}>
           <Text style={styles.label}>Tên giai đoạn *</Text>
           <TextInput
@@ -146,17 +231,33 @@ export default function EditPhaseScreen() {
           </View>
         </View>
 
-        <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit}>
-          <Ionicons name="checkmark-circle" size={20} color="#fff" />
-          <Text style={styles.submitBtnText}>Cập nhật giai đoạn</Text>
+        <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit} disabled={saving}>
+          {saving ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <>
+              <Ionicons name="checkmark-circle" size={20} color="#fff" />
+              <Text style={styles.submitBtnText}>Cập nhật giai đoạn</Text>
+            </>
+          )}
         </TouchableOpacity>
 
         {/* Danger Zone */}
         <View style={styles.dangerZone}>
           <Text style={styles.dangerTitle}>Vùng nguy hiểm</Text>
-          <TouchableOpacity style={styles.deleteBtn} onPress={handleDelete}>
-            <Ionicons name="trash-outline" size={20} color="#ef4444" />
-            <Text style={styles.deleteBtnText}>Xóa giai đoạn</Text>
+          <TouchableOpacity 
+            style={[styles.deleteBtn, deleting && styles.deleteBtnDisabled]} 
+            onPress={handleDelete}
+            disabled={deleting}
+          >
+            {deleting ? (
+              <ActivityIndicator size="small" color="#000" />
+            ) : (
+              <>
+                <Ionicons name="trash-outline" size={20} color="#000000" />
+                <Text style={styles.deleteBtnText}>Xóa giai đoạn</Text>
+              </>
+            )}
           </TouchableOpacity>
         </View>
 
@@ -170,6 +271,16 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
   loadingContainer: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   loadingText: { marginTop: 12, color: '#666' },
+  mockBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FEF3C7',
+    padding: 8,
+    borderRadius: 8,
+    marginBottom: 16,
+    gap: 8,
+  },
+  mockBannerText: { fontSize: 12, color: '#92400E' },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -182,11 +293,14 @@ const styles = StyleSheet.create({
   backBtn: { padding: 4 },
   headerTitle: { fontSize: 18, fontWeight: '700', color: '#000' },
   saveBtn: {
-    backgroundColor: '#EE4D2D',
+    backgroundColor: '#0066CC',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 8,
+    minWidth: 50,
+    alignItems: 'center',
   },
+  saveBtnDisabled: { opacity: 0.6 },
   saveBtnText: { color: '#fff', fontWeight: '600', fontSize: 14 },
   content: { flex: 1, padding: 16 },
   formGroup: { marginBottom: 16 },
@@ -204,7 +318,7 @@ const styles = StyleSheet.create({
   textArea: { minHeight: 100, textAlignVertical: 'top' },
   row: { flexDirection: 'row' },
   submitBtn: {
-    backgroundColor: '#EE4D2D',
+    backgroundColor: '#0066CC',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -220,7 +334,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#fee2e2',
   },
-  dangerTitle: { fontSize: 14, fontWeight: '600', color: '#ef4444', marginBottom: 12 },
+  dangerTitle: { fontSize: 14, fontWeight: '600', color: '#000000', marginBottom: 12 },
   deleteBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -228,8 +342,9 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#ef4444',
+    borderColor: '#000000',
     gap: 8,
   },
-  deleteBtnText: { fontSize: 14, fontWeight: '600', color: '#ef4444' },
+  deleteBtnDisabled: { opacity: 0.6 },
+  deleteBtnText: { fontSize: 14, fontWeight: '600', color: '#000000' },
 });

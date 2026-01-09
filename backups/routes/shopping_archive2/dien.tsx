@@ -315,7 +315,7 @@ export default function BuildingMaterialsScreen() {
 
         {/* Info Banner */}
         <View style={styles.infoBanner}>
-          <Ionicons name="shield-checkmark" size={20} color="#4caf50" />
+          <Ionicons name="shield-checkmark" size={20} color="#0066CC" />
           <Text style={styles.infoBannerText}>
             Giao hàng nhanh • Đảm bảo chất lượng
           </Text>

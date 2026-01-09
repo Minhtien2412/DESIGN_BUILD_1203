@@ -1,7 +1,11 @@
 import { useThemeColor } from '@/hooks/use-theme-color';
+import ReviewService, {
+    Review as ApiReview,
+    MOCK_REVIEWS as FALLBACK_REVIEWS,
+} from '@/services/reviewService';
 import { Ionicons } from '@expo/vector-icons';
 import { Href, router, Stack } from 'expo-router';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
     FlatList,
     Image,
@@ -28,42 +32,26 @@ interface Review {
   };
 }
 
-const MOCK_REVIEWS: Review[] = [
-  {
-    id: '1',
-    productId: '1',
-    productName: 'Xi măng PCB40 - Bao 50kg',
-    productImage: 'https://picsum.photos/200/200?random=1',
-    rating: 5,
-    comment: 'Sản phẩm chất lượng tốt, giao hàng nhanh. Sẽ ủng hộ shop lần sau.',
-    date: '2025-11-10',
-    images: ['https://picsum.photos/300/300?random=11', 'https://picsum.photos/300/300?random=12'],
-    response: {
-      text: 'Cảm ơn bạn đã ủng hộ shop!',
-      date: '2025-11-11',
-    },
-  },
-  {
-    id: '2',
-    productId: '2',
-    productName: 'Gạch ốp lát Viglacera 60x60',
-    productImage: 'https://picsum.photos/200/200?random=2',
-    rating: 4,
-    comment: 'Gạch đẹp, màu sắc như hình. Hơi lâu ship.',
-    date: '2025-11-05',
-    images: [],
-  },
-  {
-    id: '3',
-    productId: '3',
-    productName: 'Sơn Dulux 5L',
-    productImage: 'https://picsum.photos/200/200?random=3',
-    rating: 5,
-    comment: 'Sơn tốt, phủ kín, không mùi. Rất hài lòng!',
-    date: '2025-10-28',
-    images: ['https://picsum.photos/300/300?random=13'],
-  },
-];
+// Transform function
+function transformReview(item: ApiReview): Review {
+  return {
+    id: item.id,
+    productId: item.productId || '',
+    productName: item.productName || 'Sản phẩm',
+    productImage: item.productImage || 'https://placehold.co/200x200/0066CC/white?text=Product',
+    rating: item.rating,
+    comment: item.comment,
+    date: item.createdAt,
+    images: item.images?.map(img => img.url) || [],
+    response: item.response ? {
+      text: item.response.content,
+      date: item.response.createdAt,
+    } : undefined,
+  };
+}
+
+// Fallback mock
+const MOCK_REVIEWS: Review[] = FALLBACK_REVIEWS.map(transformReview);
 
 export default function ReviewsScreen() {
   const bg = useThemeColor({}, 'background');
@@ -74,23 +62,52 @@ export default function ReviewsScreen() {
   const primary = useThemeColor({}, 'primary');
 
   const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [reviews, setReviews] = useState<Review[]>(MOCK_REVIEWS);
   const [selectedFilter, setSelectedFilter] = useState<'all' | 5 | 4 | 3 | 2 | 1>('all');
+  const [dataSource, setDataSource] = useState<'api' | 'mock'>('mock');
+
+  // Fetch reviews from API
+  const fetchReviews = useCallback(async (showLoading = true) => {
+    if (showLoading) setLoading(true);
+    try {
+      const result = await ReviewService.getMyReviews();
+      if (result.ok && result.data?.reviews) {
+        setReviews(result.data.reviews.map(transformReview));
+        setDataSource('api');
+      } else {
+        setReviews(MOCK_REVIEWS);
+        setDataSource('mock');
+      }
+    } catch (error) {
+      console.error('Error fetching reviews:', error);
+      setReviews(MOCK_REVIEWS);
+      setDataSource('mock');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchReviews();
+  }, [fetchReviews]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchReviews(false);
+  }, [fetchReviews]);
 
   const filters = [
-    { key: 'all' as const, label: 'Tất cả', count: MOCK_REVIEWS.length },
-    { key: 5 as const, label: '5 sao', count: 2 },
-    { key: 4 as const, label: '4 sao', count: 1 },
-    { key: 3 as const, label: '3 sao', count: 0 },
+    { key: 'all' as const, label: 'Tất cả', count: reviews.length },
+    { key: 5 as const, label: '5 sao', count: reviews.filter(r => r.rating === 5).length },
+    { key: 4 as const, label: '4 sao', count: reviews.filter(r => r.rating === 4).length },
+    { key: 3 as const, label: '3 sao', count: reviews.filter(r => r.rating === 3).length },
   ];
 
   const filteredReviews = selectedFilter === 'all'
-    ? MOCK_REVIEWS
-    : MOCK_REVIEWS.filter(r => r.rating === selectedFilter);
-
-  const onRefresh = () => {
-    setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 1000);
-  };
+    ? reviews
+    : reviews.filter(r => r.rating === selectedFilter);
 
   const renderStars = (rating: number) => {
     return (
@@ -180,6 +197,10 @@ export default function ReviewsScreen() {
     </View>
   );
 
+  if (loading) {
+    return <Loader text="Đang tải đánh giá..." />;
+  }
+
   return (
     <View style={[styles.container, { backgroundColor: bg }]}>
       <Stack.Screen
@@ -188,6 +209,14 @@ export default function ReviewsScreen() {
           headerShown: true,
         }}
       />
+
+      {/* Data Source Indicator */}
+      {dataSource === 'mock' && (
+        <View style={[styles.mockBanner, { backgroundColor: '#FEF3C7' }]}>
+          <Ionicons name="information-circle" size={16} color="#92400E" />
+          <Text style={styles.mockBannerText}>📋 Dữ liệu mẫu - API đang cập nhật</Text>
+        </View>
+      )}
 
       {/* Filters */}
       <ScrollView
@@ -253,6 +282,18 @@ export default function ReviewsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  mockBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 8,
+    gap: 6,
+  },
+  mockBannerText: {
+    color: '#92400E',
+    fontSize: 12,
+    fontWeight: '500',
   },
   filtersContainer: {
     borderBottomWidth: 1,

@@ -17,7 +17,7 @@ export default function ReportsIndexScreen() {
       title: 'Báo cáo Tuân thủ',
       description: 'Báo cáo chi tiết về mức độ tuân thủ các tiêu chuẩn QC/QA',
       icon: 'document-text',
-      color: '#2196F3',
+      color: '#0066CC',
       route: `/projects/${projectId}/qc-qa/reports/compliance`,
     },
     {
@@ -25,7 +25,7 @@ export default function ReportsIndexScreen() {
       title: 'Chỉ số Chất lượng',
       description: 'Biểu đồ và thống kê về chất lượng công trình',
       icon: 'stats-chart',
-      color: '#4CAF50',
+      color: '#0066CC',
       route: `/projects/${projectId}/qc-qa/reports/quality-metrics`,
     },
     {
@@ -33,7 +33,7 @@ export default function ReportsIndexScreen() {
       title: 'Tổng hợp Lỗi',
       description: 'Báo cáo tổng hợp về các lỗi đã phát hiện và xử lý',
       icon: 'alert-circle',
-      color: '#F44336',
+      color: '#000000',
       route: `/projects/${projectId}/qc-qa/reports/defects-summary`,
     },
     {
@@ -41,7 +41,7 @@ export default function ReportsIndexScreen() {
       title: 'Lịch sử Kiểm tra',
       description: 'Lịch sử tất cả các checklist và inspection',
       icon: 'time',
-      color: '#FF9800',
+      color: '#0066CC',
       route: `/projects/${projectId}/qc-qa/reports/inspection-history`,
     },
   ];

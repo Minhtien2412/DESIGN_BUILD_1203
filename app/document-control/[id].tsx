@@ -26,22 +26,22 @@ const STATUS_COLORS: Record<
 > = {
   DRAFT: { bg: '#F3F4F6', text: '#6B7280', border: '#D1D5DB' },
   IN_REVIEW: { bg: '#FEF3C7', text: '#D97706', border: '#FCD34D' },
-  APPROVED: { bg: '#D1FAE5', text: '#059669', border: '#6EE7B7' },
-  ISSUED: { bg: '#DBEAFE', text: '#2563EB', border: '#93C5FD' },
-  SUPERSEDED: { bg: '#E0E7FF', text: '#6366F1', border: '#C7D2FE' },
+  APPROVED: { bg: '#D1FAE5', text: '#0066CC', border: '#6EE7B7' },
+  ISSUED: { bg: '#E8F4FF', text: '#0066CC', border: '#0080FF' },
+  SUPERSEDED: { bg: '#E0E7FF', text: '#666666', border: '#C7D2FE' },
   ARCHIVED: { bg: '#F3F4F6', text: '#4B5563', border: '#D1D5DB' },
-  VOID: { bg: '#FEE2E2', text: '#DC2626', border: '#FCA5A5' },
+  VOID: { bg: '#FEE2E2', text: '#000000', border: '#FCA5A5' },
 };
 
 const ACCESS_LEVEL_COLORS: Record<
   AccessLevel,
   { bg: string; text: string }
 > = {
-  PUBLIC: { bg: '#D1FAE5', text: '#059669' },
-  INTERNAL: { bg: '#DBEAFE', text: '#2563EB' },
+  PUBLIC: { bg: '#D1FAE5', text: '#0066CC' },
+  INTERNAL: { bg: '#E8F4FF', text: '#0066CC' },
   CONFIDENTIAL: { bg: '#FEF3C7', text: '#D97706' },
   RESTRICTED: { bg: '#FED7AA', text: '#EA580C' },
-  HIGHLY_CONFIDENTIAL: { bg: '#FEE2E2', text: '#DC2626' },
+  HIGHLY_CONFIDENTIAL: { bg: '#FEE2E2', text: '#000000' },
 };
 
 export default function DocumentControlDetailsScreen() {
@@ -279,7 +279,7 @@ export default function DocumentControlDetailsScreen() {
             {document.approvedBy && (
               <Section title="Approved By">
                 <View style={[styles.personCard, { backgroundColor: surfaceColor, borderColor }]}>
-                  <Ionicons name="checkmark-circle" size={40} color="#059669" />
+                  <Ionicons name="checkmark-circle" size={40} color="#0066CC" />
                   <View style={styles.personInfo}>
                     <Text style={[styles.personName, { color: textColor }]}>
                       {document.approvedBy.name}
@@ -384,7 +384,7 @@ export default function DocumentControlDetailsScreen() {
                                 : '#F3F4F6',
                             borderColor:
                               revision.impactLevel === 'CRITICAL'
-                                ? '#DC2626'
+                                ? '#000000'
                                 : revision.impactLevel === 'MAJOR'
                                 ? '#D97706'
                                 : '#6B7280',
@@ -397,7 +397,7 @@ export default function DocumentControlDetailsScreen() {
                             {
                               color:
                                 revision.impactLevel === 'CRITICAL'
-                                  ? '#DC2626'
+                                  ? '#000000'
                                   : revision.impactLevel === 'MAJOR'
                                   ? '#D97706'
                                   : '#6B7280',
@@ -418,8 +418,8 @@ export default function DocumentControlDetailsScreen() {
                       </View>
                       {revision.approvedBy && (
                         <View style={styles.revisionApproval}>
-                          <Ionicons name="checkmark-circle" size={14} color="#059669" />
-                          <Text style={[styles.revisionApprovedText, { color: '#059669' }]}>
+                          <Ionicons name="checkmark-circle" size={14} color="#0066CC" />
+                          <Text style={[styles.revisionApprovedText, { color: '#0066CC' }]}>
                             Approved
                           </Text>
                         </View>
@@ -447,9 +447,9 @@ export default function DocumentControlDetailsScreen() {
                 {reviews.map((review) => {
                   const statusColors = {
                     PENDING: { bg: '#F3F4F6', text: '#6B7280' },
-                    IN_PROGRESS: { bg: '#DBEAFE', text: '#2563EB' },
-                    COMPLETED: { bg: '#D1FAE5', text: '#059669' },
-                    CANCELLED: { bg: '#FEE2E2', text: '#DC2626' },
+                    IN_PROGRESS: { bg: '#E8F4FF', text: '#0066CC' },
+                    COMPLETED: { bg: '#D1FAE5', text: '#0066CC' },
+                    CANCELLED: { bg: '#FEE2E2', text: '#000000' },
                   };
                   const statusStyle = statusColors[review.status];
 
@@ -485,10 +485,10 @@ export default function DocumentControlDetailsScreen() {
                       <View
                         style={[
                           styles.reviewTypeBadge,
-                          { backgroundColor: '#E0E7FF', borderColor: '#6366F1' },
+                          { backgroundColor: '#E0E7FF', borderColor: '#666666' },
                         ]}
                       >
-                        <Text style={[styles.reviewTypeText, { color: '#6366F1' }]}>
+                        <Text style={[styles.reviewTypeText, { color: '#666666' }]}>
                           {review.reviewType.replace(/_/g, ' ')}
                         </Text>
                       </View>
@@ -519,9 +519,9 @@ export default function DocumentControlDetailsScreen() {
                               {
                                 color:
                                   review.decision === 'APPROVE'
-                                    ? '#059669'
+                                    ? '#0066CC'
                                     : review.decision === 'REJECT'
-                                    ? '#DC2626'
+                                    ? '#000000'
                                     : '#D97706',
                               },
                             ]}
@@ -563,11 +563,11 @@ export default function DocumentControlDetailsScreen() {
               <View style={styles.distributionsList}>
                 {distributions.map((distribution) => {
                   const statusColors = {
-                    SENT: { bg: '#DBEAFE', text: '#2563EB' },
+                    SENT: { bg: '#E8F4FF', text: '#0066CC' },
                     DELIVERED: { bg: '#FEF3C7', text: '#D97706' },
-                    READ: { bg: '#E0E7FF', text: '#6366F1' },
-                    ACKNOWLEDGED: { bg: '#D1FAE5', text: '#059669' },
-                    FAILED: { bg: '#FEE2E2', text: '#DC2626' },
+                    READ: { bg: '#E0E7FF', text: '#666666' },
+                    ACKNOWLEDGED: { bg: '#D1FAE5', text: '#0066CC' },
+                    FAILED: { bg: '#FEE2E2', text: '#000000' },
                   };
                   const statusStyle = statusColors[distribution.deliveryStatus];
 

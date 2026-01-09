@@ -32,11 +32,11 @@ const CATEGORY_LABELS: Record<EquipmentCategory, string> = {
 };
 
 const STATUS_COLORS: Record<EquipmentStatus, string> = {
-  available: '#10b981',
+  available: '#0066CC',
   'in-use': '#3b82f6',
-  maintenance: '#f59e0b',
-  broken: '#ef4444',
-  reserved: '#8b5cf6',
+  maintenance: '#0066CC',
+  broken: '#000000',
+  reserved: '#666666',
 };
 
 const STATUS_LABELS: Record<EquipmentStatus, string> = {
@@ -48,10 +48,10 @@ const STATUS_LABELS: Record<EquipmentStatus, string> = {
 };
 
 const CONDITION_COLORS = {
-  excellent: '#10b981',
+  excellent: '#0066CC',
   good: '#3b82f6',
-  fair: '#f59e0b',
-  poor: '#ef4444',
+  fair: '#0066CC',
+  poor: '#000000',
 };
 
 export default function EquipmentScreen() {
@@ -207,7 +207,7 @@ export default function EquipmentScreen() {
               <Ionicons 
                 name="construct-outline" 
                 size={16} 
-                color={maintenanceStatus === 'overdue' ? '#ef4444' : maintenanceStatus === 'soon' ? '#f59e0b' : '#6b7280'} 
+                color={maintenanceStatus === 'overdue' ? '#000000' : maintenanceStatus === 'soon' ? '#0066CC' : '#6b7280'} 
               />
               <Text style={[
                 styles.maintenanceText,
@@ -269,25 +269,25 @@ export default function EquipmentScreen() {
             label="Tổng số"
             value={stats.total.toString()}
             icon="hardware-chip"
-            gradientColors={['#3b82f6', '#2563eb']}
+            gradientColors={['#3b82f6', '#0066CC']}
           />
           <MetricCard
             label="Sẵn sàng"
             value={stats.available.toString()}
             icon="checkmark-circle"
-            gradientColors={['#10b981', '#059669']}
+            gradientColors={['#0066CC', '#0066CC']}
           />
           <MetricCard
             label="Đang dùng"
             value={stats.inUse.toString()}
             icon="play-circle"
-            gradientColors={['#f59e0b', '#d97706']}
+            gradientColors={['#0066CC', '#d97706']}
           />
           <MetricCard
             label="Cần bảo trì"
             value={stats.needMaintenance.toString()}
             icon="construct"
-            gradientColors={['#ef4444', '#dc2626']}
+            gradientColors={['#000000', '#000000']}
           />
         </ScrollView>
 
@@ -543,11 +543,11 @@ const styles = StyleSheet.create({
     color: '#6b7280',
   },
   maintenanceSoon: {
-    color: '#f59e0b',
+    color: '#0066CC',
     fontWeight: '600',
   },
   maintenanceOverdue: {
-    color: '#ef4444',
+    color: '#000000',
     fontWeight: '600',
   },
   emptyState: {

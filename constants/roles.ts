@@ -45,7 +45,7 @@ export const MARKETPLACE_ROLES: Record<UserType, MarketplaceRole> = {
       'Xem thống kê bán hàng',
     ],
     icon: 'hammer-outline',
-    color: '#10B981',
+    color: '#0066CC',
     verificationRequired: true,
   },
 
@@ -65,7 +65,7 @@ export const MARKETPLACE_ROLES: Record<UserType, MarketplaceRole> = {
       'API integration',
     ],
     icon: 'business-outline',
-    color: '#8B5CF6',
+    color: '#666666',
     verificationRequired: true,
   },
 
@@ -85,7 +85,7 @@ export const MARKETPLACE_ROLES: Record<UserType, MarketplaceRole> = {
       'Compliance và giấy phép',
     ],
     icon: 'construct-outline',
-    color: '#F59E0B',
+    color: '#0066CC',
     verificationRequired: true,
   },
 
@@ -105,7 +105,7 @@ export const MARKETPLACE_ROLES: Record<UserType, MarketplaceRole> = {
       'Showcase portfolio',
     ],
     icon: 'shapes-outline',
-    color: '#EC4899',
+    color: '#666666',
     verificationRequired: true,
   },
 
@@ -125,7 +125,7 @@ export const MARKETPLACE_ROLES: Record<UserType, MarketplaceRole> = {
       'Theo dõi thi công nội thất',
     ],
     icon: 'color-palette-outline',
-    color: '#EF4444',
+    color: '#000000',
     verificationRequired: true,
   },
 
@@ -165,7 +165,7 @@ export const MARKETPLACE_ROLES: Record<UserType, MarketplaceRole> = {
       'System maintenance',
     ],
     icon: 'shield-checkmark-outline',
-    color: '#DC2626',
+    color: '#000000',
     verificationRequired: false,
   },
 };
@@ -404,38 +404,38 @@ export const ROLE_BADGES: Record<UserType, {
 }> = {
   buyer: {
     text: 'Khách hàng',
-    bgColor: '#EFF6FF',
+    bgColor: '#E8F4FF',
     textColor: '#3B82F6',
     icon: 'person-outline',
   },
   seller: {
     text: 'Thợ',
     bgColor: '#F0FDF4',
-    textColor: '#10B981',
+    textColor: '#0066CC',
     icon: 'hammer-outline',
   },
   company: {
     text: 'Công ty',
     bgColor: '#F5F3FF',
-    textColor: '#8B5CF6',
+    textColor: '#666666',
     icon: 'business-outline',
   },
   contractor: {
     text: 'Nhà thầu',
     bgColor: '#FFFBEB',
-    textColor: '#F59E0B',
+    textColor: '#0066CC',
     icon: 'construct-outline',
   },
   architect: {
     text: 'KTS',
     bgColor: '#FCE7F3',
-    textColor: '#EC4899',
+    textColor: '#666666',
     icon: 'shapes-outline',
   },
   designer: {
     text: 'Thiết kế',
     bgColor: '#FEE2E2',
-    textColor: '#EF4444',
+    textColor: '#000000',
     icon: 'color-palette-outline',
   },
   supplier: {
@@ -447,7 +447,7 @@ export const ROLE_BADGES: Record<UserType, {
   admin: {
     text: 'Admin',
     bgColor: '#FEE2E2',
-    textColor: '#DC2626',
+    textColor: '#000000',
     icon: 'shield-checkmark-outline',
   },
 };

@@ -18,9 +18,9 @@ interface AnimatedButtonProps {
 
 const VARIANT_STYLES = {
   primary: {
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#0066CC',
     color: '#FFF',
-    borderColor: '#FF6B35',
+    borderColor: '#0066CC',
   },
   secondary: {
     backgroundColor: '#6B7280',
@@ -29,13 +29,13 @@ const VARIANT_STYLES = {
   },
   outline: {
     backgroundColor: 'transparent',
-    color: '#FF6B35',
-    borderColor: '#FF6B35',
+    color: '#0066CC',
+    borderColor: '#0066CC',
   },
   danger: {
-    backgroundColor: '#EF4444',
+    backgroundColor: '#000000',
     color: '#FFF',
-    borderColor: '#EF4444',
+    borderColor: '#000000',
   },
 };
 

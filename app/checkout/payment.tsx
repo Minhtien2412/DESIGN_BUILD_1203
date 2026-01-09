@@ -86,7 +86,7 @@ export default function CheckoutPaymentScreen() {
     { id: 'momo', type: 'wallet', name: 'MoMo', icon: 'wallet', color: '#A50064', badge: 'Giảm 50K', logo: '💜' },
     { id: 'zalopay', type: 'wallet', name: 'ZaloPay', icon: 'wallet', color: '#0068FF', badge: 'Hoàn 5%', logo: '💙' },
     { id: 'vnpay', type: 'wallet', name: 'VNPay QR', icon: 'qr-code', color: '#1A1F71', logo: '🔵' },
-    { id: 'shopeepay', type: 'wallet', name: 'ShopeePay', icon: 'wallet', color: '#EE4D2D', badge: 'Xu x2', logo: '🧡' },
+    { id: 'shopeepay', type: 'wallet', name: 'ShopeePay', icon: 'wallet', color: '#0066CC', badge: 'Xu x2', logo: '🧡' },
     { id: 'viettelpay', type: 'wallet', name: 'Viettel Money', icon: 'wallet', color: '#E50019', logo: '❤️' },
     // Cards
     { id: 'visa', type: 'card', name: 'Visa ****4242', last4: '4242', icon: 'card', color: '#1A1F71', logo: '💳' },
@@ -99,7 +99,7 @@ export default function CheckoutPaymentScreen() {
     { id: 'googlepay', type: 'wallet', name: 'Google Pay', icon: 'logo-google', color: '#4285F4', logo: '🟢' },
     { id: 'samsungpay', type: 'wallet', name: 'Samsung Pay', icon: 'phone-portrait', color: '#1428A0', logo: '💠' },
     // COD
-    { id: 'cod', type: 'cod', name: 'Thanh toán khi nhận hàng', icon: 'cash', color: '#10B981', logo: '💵' },
+    { id: 'cod', type: 'cod', name: 'Thanh toán khi nhận hàng', icon: 'cash', color: '#0066CC', logo: '💵' },
   ];
 
   const cartItems: CartItem[] = [
@@ -283,7 +283,7 @@ export default function CheckoutPaymentScreen() {
               />
               {promoApplied ? (
                 <View style={styles.promoSuccess}>
-                  <Ionicons name="checkmark-circle" size={22} color="#10B981" />
+                  <Ionicons name="checkmark-circle" size={22} color="#0066CC" />
                 </View>
               ) : (
                 <TouchableOpacity 
@@ -301,7 +301,7 @@ export default function CheckoutPaymentScreen() {
             </Animated.View>
             {promoApplied && (
               <View style={styles.promoAppliedBadge}>
-                <Ionicons name="gift" size={16} color="#10B981" />
+                <Ionicons name="gift" size={16} color="#0066CC" />
                 <Text style={styles.promoAppliedText}>Giảm {formatCurrency(promoDiscount)}</Text>
                 <TouchableOpacity onPress={() => { setPromoApplied(false); setPromoCode(''); }}>
                   <Ionicons name="close-circle" size={18} color="#94A3B8" />
@@ -455,10 +455,10 @@ export default function CheckoutPaymentScreen() {
             {promoApplied && (
               <View style={styles.priceRow}>
                 <View style={styles.discountLabel}>
-                  <Ionicons name="pricetag" size={14} color="#10B981" />
-                  <Text style={[styles.priceLabel, { color: '#10B981' }]}>Giảm giá</Text>
+                  <Ionicons name="pricetag" size={14} color="#0066CC" />
+                  <Text style={[styles.priceLabel, { color: '#0066CC' }]}>Giảm giá</Text>
                 </View>
-                <Text style={[styles.priceValue, { color: '#10B981' }]}>-{formatCurrency(promoDiscount)}</Text>
+                <Text style={[styles.priceValue, { color: '#0066CC' }]}>-{formatCurrency(promoDiscount)}</Text>
               </View>
             )}
             <View style={[styles.priceRow, styles.totalRow]}>
@@ -471,15 +471,15 @@ export default function CheckoutPaymentScreen() {
           <View style={styles.securityInfo}>
             <View style={styles.securityBadges}>
               <View style={styles.securityBadge}>
-                <Ionicons name="shield-checkmark" size={16} color="#10B981" />
+                <Ionicons name="shield-checkmark" size={16} color="#0066CC" />
                 <Text style={styles.securityBadgeText}>SSL 256-bit</Text>
               </View>
               <View style={styles.securityBadge}>
-                <Ionicons name="lock-closed" size={16} color="#10B981" />
+                <Ionicons name="lock-closed" size={16} color="#0066CC" />
                 <Text style={styles.securityBadgeText}>PCI DSS</Text>
               </View>
               <View style={styles.securityBadge}>
-                <Ionicons name="finger-print" size={16} color="#10B981" />
+                <Ionicons name="finger-print" size={16} color="#0066CC" />
                 <Text style={styles.securityBadgeText}>3D Secure</Text>
               </View>
             </View>
@@ -551,7 +551,7 @@ export default function CheckoutPaymentScreen() {
 
               <TouchableOpacity style={styles.modalOption} onPress={() => handleAddPaymentMethod('bank')}>
                 <View style={[styles.modalOptionIcon, { backgroundColor: '#ECFDF5' }]}>
-                  <Ionicons name="business" size={24} color="#10B981" />
+                  <Ionicons name="business" size={24} color="#0066CC" />
                 </View>
                 <View style={styles.modalOptionInfo}>
                   <Text style={styles.modalOptionTitle}>Liên kết ngân hàng</Text>
@@ -562,7 +562,7 @@ export default function CheckoutPaymentScreen() {
 
               <TouchableOpacity style={styles.modalOption} onPress={() => handleAddPaymentMethod('wallet')}>
                 <View style={[styles.modalOptionIcon, { backgroundColor: '#FEF3C7' }]}>
-                  <Ionicons name="wallet" size={24} color="#F59E0B" />
+                  <Ionicons name="wallet" size={24} color="#0080FF" />
                 </View>
                 <View style={styles.modalOptionInfo}>
                   <Text style={styles.modalOptionTitle}>Ví điện tử</Text>
@@ -599,7 +599,7 @@ export default function CheckoutPaymentScreen() {
               <Text style={styles.qrAmount}>{formatCurrency(total)}</Text>
               <Text style={styles.qrHint}>Mở ứng dụng ngân hàng hoặc ví điện tử và quét mã QR</Text>
               <View style={styles.qrExpiry}>
-                <Ionicons name="time" size={16} color="#F59E0B" />
+                <Ionicons name="time" size={16} color="#0080FF" />
                 <Text style={styles.qrExpiryText}>Mã có hiệu lực trong 5 phút</Text>
               </View>
             </View>
@@ -834,7 +834,7 @@ const styles = StyleSheet.create({
     borderColor: '#e5e5e5',
   },
   promoInputSuccess: {
-    borderColor: '#10B981',
+    borderColor: '#0066CC',
     backgroundColor: '#ECFDF5',
   },
   promoButton: {
@@ -867,7 +867,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 13,
     fontWeight: '600',
-    color: '#10B981',
+    color: '#0066CC',
   },
   // Payment Methods
   methodGroupTitle: {
@@ -1068,7 +1068,7 @@ const styles = StyleSheet.create({
   },
   securityBadgeText: {
     fontSize: 11,
-    color: '#10B981',
+    color: '#0066CC',
     fontWeight: '600',
   },
   securityText: {

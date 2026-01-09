@@ -16,7 +16,7 @@ export const ApiStatusBanner: React.FC<ApiStatusBannerProps> = ({
   const getStatusColor = () => {
     if (status.isChecking) return '#f39c12';
     if (status.isConnected) return '#27ae60';
-    return '#e74c3c';
+    return '#000000';
   };
 
   const getStatusIcon = () => {

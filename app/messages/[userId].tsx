@@ -8,9 +8,10 @@ import Avatar from '@/components/ui/avatar';
 import { useWebSocket } from '@/context/WebSocketContext';
 import { useConversation } from '@/hooks/useMessages';
 import type { Message } from '@/services/api/messagesApi';
+import messagesApi from '@/services/api/messagesApi';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
     ActivityIndicator,
     FlatList,
@@ -24,16 +25,29 @@ import {
     View,
 } from 'react-native';
 
+// Recipient info type
+interface RecipientInfo {
+  id: number;
+  name: string;
+  email?: string;
+  avatar?: string;
+}
+
 export default function MessageThreadScreen() {
   const { userId } = useLocalSearchParams<{ userId: string }>();
   const recipientId = parseInt(userId || '0');
+  
+  // State for recipient info (fetched from conversation or API)
+  const [recipientInfo, setRecipientInfo] = useState<RecipientInfo | null>(null);
 
   // Use conversation hook for data management
+  // Hook will auto-fetch conversationId from recipientId if not provided
   const {
     messages,
     loading,
     sending,
     hasMore,
+    conversationId,
     sendMessage,
     loadMore,
     markAllAsRead,
@@ -48,12 +62,57 @@ export default function MessageThreadScreen() {
   const flatListRef = useRef<FlatList>(null);
   const isAtBottomRef = useRef<boolean>(true);
 
+  // Fetch recipient info from conversation or messages
+  useEffect(() => {
+    const fetchRecipientInfo = async () => {
+      // First try to get from messages
+      if (messages.length > 0) {
+        const otherUserMessage = messages.find(m => m.senderId === recipientId);
+        if (otherUserMessage?.sender) {
+          setRecipientInfo({
+            id: otherUserMessage.sender.id,
+            name: otherUserMessage.sender.name,
+            email: otherUserMessage.sender.email,
+          });
+          return;
+        }
+      }
+      
+      // Then try to get from conversation
+      try {
+        const conversation = await messagesApi.getConversationByRecipient(recipientId);
+        if (conversation) {
+          const recipient = conversation.participants.find(p => p.id === recipientId);
+          if (recipient) {
+            setRecipientInfo({
+              id: recipient.id,
+              name: recipient.name,
+              email: recipient.email,
+            });
+          }
+        }
+      } catch (err) {
+        console.log('[MessageThread] Could not fetch recipient info:', err);
+      }
+    };
+
+    if (recipientId) {
+      fetchRecipientInfo();
+    }
+  }, [recipientId, messages]);
+
+  // Derive display name
+  const displayName = useMemo(() => {
+    if (recipientInfo?.name) return recipientInfo.name;
+    return `User ${recipientId}`;
+  }, [recipientInfo, recipientId]);
+
   // Mark messages as read when entering conversation
   useEffect(() => {
-    if (!loading && messages.length > 0) {
+    if (!loading && messages.length > 0 && conversationId) {
       markAllAsRead();
     }
-  }, [loading]);
+  }, [loading, conversationId]);
 
   // WebSocket: Listen for new messages
   useEffect(() => {
@@ -260,15 +319,15 @@ export default function MessageThreadScreen() {
           activeOpacity={0.8}
         >
           <Avatar
-            avatar={null}
+            avatar={recipientInfo?.avatar || null}
             userId={String(recipientId)}
-            name={`User ${recipientId}`}
+            name={displayName}
             pixelSize={36}
             showBadge={connected}
           />
           <View style={styles.headerInfo}>
             <Text style={styles.headerName} numberOfLines={1}>
-              User {recipientId}
+              {displayName}
             </Text>
             <Text style={styles.headerStatus}>
               {connected ? (

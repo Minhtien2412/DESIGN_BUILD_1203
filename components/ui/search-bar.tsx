@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   searchBtn: {
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#0066CC',
     paddingHorizontal: 16,
     paddingVertical: 6,
     borderRadius: 6,

@@ -1,4 +1,4 @@
-﻿// API base default (production). Can be overridden by EXPO_PUBLIC_API_BASE_URL for local/dev runs.
+// API base default (production). Can be overridden by EXPO_PUBLIC_API_BASE_URL for local/dev runs.
 // Backend: Fastify on 127.0.0.1:4000, public via Nginx at https://api.thietkeresort.com.vn
 import ENV from '@/config/env';
 import { Platform } from 'react-native';
@@ -34,15 +34,15 @@ export const API_BASE = API;
 let apiKey: string | null = ENV.API_KEY;
 
 if (apiKey) {
-  console.log('[API] ✅ API key initialized:', apiKey.substring(0, 15) + '...');
+  console.log('[API] ? API key initialized:', apiKey.substring(0, 15) + '...');
 } else {
-  console.error('[API] ❌ CRITICAL: No API key! Requests will fail!');
+  console.error('[API] ? CRITICAL: No API key! Requests will fail!');
 }
 
 export const setApiKey = (key: string | null) => { 
   apiKey = key; 
   if (key) {
-    console.log('[API] ✅ API key updated:', key.substring(0, 15) + '...');
+    console.log('[API] ? API key updated:', key.substring(0, 15) + '...');
   }
 };
 export const getApiKey = () => apiKey;
@@ -53,7 +53,7 @@ let refreshToken: string | null = null;
 export const setRefreshToken = (token: string | null) => { 
   refreshToken = token; 
   if (token) {
-    console.log('[API] 🔐 Refresh token updated');
+    console.log('[API] ?? Refresh token updated');
   }
 };
 export const getRefreshToken = () => refreshToken;
@@ -124,7 +124,7 @@ export function setLogoutCallback(fn: (() => void | Promise<void>) | null) {
 async function refreshTokenDirect(): Promise<string | null> {
   // Must have refreshToken to proceed
   if (!refreshToken) {
-    console.warn('[API] ⚠️ No refresh token available');
+    console.warn('[API] ?? No refresh token available');
     return null;
   }
 
@@ -146,10 +146,10 @@ async function refreshTokenDirect(): Promise<string | null> {
     };
     if (apiKey) headers['X-API-Key'] = apiKey as string;
 
-    console.log('[API] 🔄 Trying token refresh via', url);
+    console.log('[API] ?? Trying token refresh via', url);
     const r = await fetch(url, { method: 'POST', headers });
     if (!r.ok) {
-      console.warn(`[API] ⚠️ Refresh failed with status ${r.status}`);
+      console.warn(`[API] ?? Refresh failed with status ${r.status}`);
       return null;
     }
     const data = await r.json().catch(() => ({}));
@@ -163,11 +163,11 @@ async function refreshTokenDirect(): Promise<string | null> {
         setRefreshToken(newRefreshToken); // update refresh token too
       }
       try { await persistTokenCallback?.(newAccessToken); } catch {}
-      console.log('[API] ✅ Token refresh succeeded');
+      console.log('[API] ? Token refresh succeeded');
       return newAccessToken;
     }
   } catch (e) {
-    console.warn('[API] ⚠️ Refresh attempt failed:', e);
+    console.warn('[API] ?? Refresh attempt failed:', e);
   }
   return null;
 }
@@ -281,14 +281,14 @@ export async function apiFetch<T = any>(path: string, options: ApiFetchOptions =
           // Token refresh failed or no refresh token available
           // Only trigger logout if we actually have a refresh token (user is logged in)
           if (refreshToken) {
-            console.error('[API] ❌ Token refresh failed, signing out...');
+            console.error('[API] ? Token refresh failed, signing out...');
             try {
               await logoutCallback?.();
             } catch (err) {
               console.error('[API] Logout callback error:', err);
             }
           } else {
-            console.warn('[API] ⚠️ No refresh token available');
+            console.warn('[API] ?? No refresh token available');
             // Don't logout - user may not be logged in yet
           }
         }
@@ -330,8 +330,8 @@ export async function apiFetch<T = any>(path: string, options: ApiFetchOptions =
   } catch (err: any) {
     clearTimeout(timeoutId);
     if (err instanceof ApiError) throw err;
-    if (err && err.name === 'AbortError') throw new ApiError('Kết nối quá chậm', { code: 'TIMEOUT' });
-    throw new ApiError('Lỗi kết nối', { code: 'NETWORK_ERROR' });
+    if (err && err.name === 'AbortError') throw new ApiError('K?t n?i qu� ch?m', { code: 'TIMEOUT' });
+    throw new ApiError('L?i k?t n?i', { code: 'NETWORK_ERROR' });
   }
 }
 

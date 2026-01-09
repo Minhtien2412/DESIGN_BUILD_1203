@@ -12,7 +12,7 @@ import { ActivityIndicator, StyleSheet, View } from 'react-native';
  */
 export function LazyLoadingFallback() {
   const backgroundColor = useThemeColor({}, 'background');
-  const primaryColor = '#EE4D2D';
+  const primaryColor = '#0066CC';
 
   return (
     <View style={[styles.loadingContainer, { backgroundColor }]}>

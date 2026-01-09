@@ -42,7 +42,7 @@ export default function SellerDashboardScreen() {
             <ThemedText style={styles.sectionTitle}>Thống kê</ThemedText>
             <View style={styles.statsGrid}>
               <View style={styles.statCard}>
-                <Ionicons name="cube-outline" size={32} color="#10B981" />
+                <Ionicons name="cube-outline" size={32} color="#0066CC" />
                 <ThemedText style={styles.statValue}>24</ThemedText>
                 <ThemedText style={styles.statLabel}>Sản phẩm</ThemedText>
               </View>
@@ -54,13 +54,13 @@ export default function SellerDashboardScreen() {
               </View>
 
               <View style={styles.statCard}>
-                <Ionicons name="star-outline" size={32} color="#F59E0B" />
+                <Ionicons name="star-outline" size={32} color="#0066CC" />
                 <ThemedText style={styles.statValue}>4.8</ThemedText>
                 <ThemedText style={styles.statLabel}>Đánh giá</ThemedText>
               </View>
 
               <View style={styles.statCard}>
-                <Ionicons name="cash-outline" size={32} color="#EF4444" />
+                <Ionicons name="cash-outline" size={32} color="#000000" />
                 <ThemedText style={styles.statValue}>45M</ThemedText>
                 <ThemedText style={styles.statLabel}>Doanh thu</ThemedText>
               </View>
@@ -74,8 +74,8 @@ export default function SellerDashboardScreen() {
             {/* Create Product - Requires permission */}
             <PermissionGuard permission="product.create">
               <Pressable style={styles.actionButton} onPress={() => router.push('/products/create' as Href)}>
-                <View style={[styles.actionIcon, { backgroundColor: '#10B98115' }]}>
-                  <Ionicons name="add-circle" size={24} color="#10B981" />
+                <View style={[styles.actionIcon, { backgroundColor: '#0066CC15' }]}>
+                  <Ionicons name="add-circle" size={24} color="#0066CC" />
                 </View>
                 <View style={styles.actionContent}>
                   <ThemedText style={styles.actionTitle}>Tạo sản phẩm mới</ThemedText>
@@ -105,8 +105,8 @@ export default function SellerDashboardScreen() {
               fallback={null}
             >
               <Pressable style={styles.actionButton} onPress={() => router.push('/analytics' as Href)}>
-                <View style={[styles.actionIcon, { backgroundColor: '#8B5CF615' }]}>
-                  <Ionicons name="analytics" size={24} color="#8B5CF6" />
+                <View style={[styles.actionIcon, { backgroundColor: '#66666615' }]}>
+                  <Ionicons name="analytics" size={24} color="#666666" />
                 </View>
                 <View style={styles.actionContent}>
                   <ThemedText style={styles.actionTitle}>Phân tích nâng cao</ThemedText>
@@ -122,8 +122,8 @@ export default function SellerDashboardScreen() {
               fallback={null}
             >
               <Pressable style={styles.actionButton} onPress={() => router.push('/team' as Href)}>
-                <View style={[styles.actionIcon, { backgroundColor: '#EC489915' }]}>
-                  <Ionicons name="people" size={24} color="#EC4899" />
+                <View style={[styles.actionIcon, { backgroundColor: '#66666615' }]}>
+                  <Ionicons name="people" size={24} color="#666666" />
                 </View>
                 <View style={styles.actionContent}>
                   <ThemedText style={styles.actionTitle}>Quản lý nhân viên</ThemedText>

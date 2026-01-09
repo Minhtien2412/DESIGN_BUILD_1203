@@ -64,7 +64,7 @@ const ProviderCard: React.FC<ProviderCardProps> = ({ provider, onPress, onBookin
           <Text style={styles.providerName}>{provider.name}</Text>
           
           <View style={styles.ratingRow}>
-            <Ionicons name="star" size={14} color="#ffa41c" />
+            <Ionicons name="star" size={14} color="#0066CC" />
             <Text style={styles.ratingText}>{provider.rating}</Text>
             <Text style={styles.reviewsText}>({provider.reviewCount})</Text>
           </View>
@@ -81,13 +81,13 @@ const ProviderCard: React.FC<ProviderCardProps> = ({ provider, onPress, onBookin
 
       <View style={styles.infoSection}>
         <View style={styles.infoRow}>
-          <Ionicons name="construct" size={16} color="#2196f3" />
+          <Ionicons name="construct" size={16} color="#0066CC" />
           <Text style={styles.infoLabel}>Loại cọc: </Text>
           <Text style={styles.infoValue}>{pileTypes.length > 0 ? pileTypes.join(', ') : provider.services.slice(0, 3).join(', ')}</Text>
         </View>
         
         <View style={styles.infoRow}>
-          <Ionicons name="hardware-chip" size={16} color="#4caf50" />
+          <Ionicons name="hardware-chip" size={16} color="#0066CC" />
           <Text style={styles.infoLabel}>Dịch vụ: </Text>
           <Text style={styles.infoValue}>{provider.services.slice(0, 2).join(', ')}</Text>
         </View>
@@ -386,7 +386,7 @@ export default function EpCocScreen() {
 
         {/* Info Banner */}
         <View style={styles.infoBanner}>
-          <Ionicons name="information-circle-outline" size={16} color="#2196f3" />
+          <Ionicons name="information-circle-outline" size={16} color="#0066CC" />
           <Text style={styles.infoBannerText}>
             Hỗ trợ tư vấn miễn phí • Hotline: 1900 123 456
           </Text>
@@ -468,7 +468,7 @@ export default function EpCocScreen() {
                       {selectedProvider.name}
                     </Text>
                     <View style={styles.selectedRating}>
-                      <Ionicons name="star" size={14} color="#ffa41c" />
+                      <Ionicons name="star" size={14} color="#0066CC" />
                       <Text style={styles.selectedRatingText}>
                         {selectedProvider.rating} ({selectedProvider.reviewCount})
                       </Text>
@@ -818,10 +818,10 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   available: {
-    color: '#4caf50',
+    color: '#0066CC',
   },
   busy: {
-    color: '#ff9800',
+    color: '#0066CC',
   },
   statLabel: {
     fontSize: 11,
@@ -900,14 +900,14 @@ const styles = StyleSheet.create({
   infoBanner: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#e3f2fd',
+    backgroundColor: '#E8F4FF',
     paddingHorizontal: 16,
     paddingVertical: 10,
     gap: 8,
   },
   infoBannerText: {
     fontSize: 12,
-    color: '#2196f3',
+    color: '#0066CC',
     flex: 1,
   },
   modalOverlay: {

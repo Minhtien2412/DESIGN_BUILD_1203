@@ -100,9 +100,9 @@ export default function BudgetReportsScreen() {
   const getTypeColor = (type: string) => {
     switch (type) {
       case 'daily': return '#3B82F6';
-      case 'weekly': return '#10B981';
-      case 'monthly': return '#F59E0B';
-      case 'quarterly': return '#8B5CF6';
+      case 'weekly': return '#0066CC';
+      case 'monthly': return '#0066CC';
+      case 'quarterly': return '#666666';
       default: return '#94A3B8';
     }
   };
@@ -149,19 +149,19 @@ export default function BudgetReportsScreen() {
         {/* Summary */}
         <View style={styles.summaryContainer}>
           <View style={styles.summaryCard}>
-            <Ionicons name="arrow-down-circle" size={24} color="#EF4444" />
+            <Ionicons name="arrow-down-circle" size={24} color="#000000" />
             <View style={styles.summaryContent}>
               <Text style={styles.summaryLabel}>Tổng chi</Text>
-              <Text style={[styles.summaryValue, { color: '#EF4444' }]}>
+              <Text style={[styles.summaryValue, { color: '#000000' }]}>
                 {formatCurrency(reports.reduce((sum, r) => sum + r.totalExpense, 0))}
               </Text>
             </View>
           </View>
           <View style={styles.summaryCard}>
-            <Ionicons name="arrow-up-circle" size={24} color="#10B981" />
+            <Ionicons name="arrow-up-circle" size={24} color="#0066CC" />
             <View style={styles.summaryContent}>
               <Text style={styles.summaryLabel}>Tổng thu</Text>
-              <Text style={[styles.summaryValue, { color: '#10B981' }]}>
+              <Text style={[styles.summaryValue, { color: '#0066CC' }]}>
                 {formatCurrency(reports.reduce((sum, r) => sum + r.totalIncome, 0))}
               </Text>
             </View>
@@ -225,7 +225,7 @@ export default function BudgetReportsScreen() {
                     </Text>
                   </View>
                   <View style={[styles.statusBadge, { backgroundColor: report.status === 'completed' ? '#ECFDF5' : '#FEF3C7' }]}>
-                    <Text style={[styles.statusText, { color: report.status === 'completed' ? '#10B981' : '#F59E0B' }]}>
+                    <Text style={[styles.statusText, { color: report.status === 'completed' ? '#0066CC' : '#0066CC' }]}>
                       {report.status === 'completed' ? 'Hoàn thành' : 'Nháp'}
                     </Text>
                   </View>
@@ -237,19 +237,19 @@ export default function BudgetReportsScreen() {
                 <View style={styles.statsRow}>
                   <View style={styles.statItem}>
                     <Text style={styles.statLabel}>Chi</Text>
-                    <Text style={[styles.statValue, { color: '#EF4444' }]}>
+                    <Text style={[styles.statValue, { color: '#000000' }]}>
                       {formatCurrency(report.totalExpense)}
                     </Text>
                   </View>
                   <View style={styles.statItem}>
                     <Text style={styles.statLabel}>Thu</Text>
-                    <Text style={[styles.statValue, { color: '#10B981' }]}>
+                    <Text style={[styles.statValue, { color: '#0066CC' }]}>
                       {formatCurrency(report.totalIncome)}
                     </Text>
                   </View>
                   <View style={styles.statItem}>
                     <Text style={styles.statLabel}>Số dư</Text>
-                    <Text style={[styles.statValue, { color: report.balance >= 0 ? '#10B981' : '#EF4444' }]}>
+                    <Text style={[styles.statValue, { color: report.balance >= 0 ? '#0066CC' : '#000000' }]}>
                       {formatCurrency(report.balance)}
                     </Text>
                   </View>

@@ -59,7 +59,7 @@ export default function PPEDistributionsScreen() {
         showBackButton
         headerRight={
           <TouchableOpacity onPress={() => setModalVisible(true)}>
-            <Ionicons name="add-circle" size={28} color="#0A6847" />
+            <Ionicons name="add-circle" size={28} color="#0066CC" />
           </TouchableOpacity>
         }
         scrollable={false}
@@ -144,7 +144,7 @@ function DistributionCard({ distribution }: DistributionCardProps) {
     <View style={[styles.distributionCard, !isActive && styles.distributionCardInactive]}>
       <View style={styles.distributionHeader}>
         <View style={styles.workerInfo}>
-          <Ionicons name="person-circle" size={48} color="#0A6847" />
+          <Ionicons name="person-circle" size={48} color="#0066CC" />
           <View style={{ flex: 1 }}>
             <Text style={styles.workerName}>{distribution.workerName}</Text>
             <Text style={styles.workerId}>ID: {distribution.workerId}</Text>
@@ -191,9 +191,9 @@ function DistributionCard({ distribution }: DistributionCardProps) {
         {distribution.returnedAt && (
           <>
             <View style={styles.timeRow}>
-              <Ionicons name="log-in" size={14} color="#4CAF50" />
+              <Ionicons name="log-in" size={14} color="#0066CC" />
               <Text style={styles.timeLabel}>Hoàn trả:</Text>
-              <Text style={[styles.timeValue, { color: '#4CAF50' }]}>
+              <Text style={[styles.timeValue, { color: '#0066CC' }]}>
                 {new Date(distribution.returnedAt).toLocaleString('vi-VN')}
               </Text>
             </View>
@@ -212,7 +212,7 @@ function DistributionCard({ distribution }: DistributionCardProps) {
 
       {distribution.signature && (
         <View style={styles.signatureInfo}>
-          <Ionicons name="checkmark-done" size={16} color="#4CAF50" />
+          <Ionicons name="checkmark-done" size={16} color="#0066CC" />
           <Text style={styles.signatureText}>Đã ký nhận</Text>
         </View>
       )}
@@ -356,7 +356,7 @@ function DistributePPEModal({ visible, projectId, onClose, onDistribute }: Distr
             />
 
             <View style={styles.infoBox}>
-              <Ionicons name="information-circle" size={20} color="#0A6847" />
+              <Ionicons name="information-circle" size={20} color="#0066CC" />
               <Text style={styles.infoBoxText}>
                 Người nhận sẽ chịu trách nhiệm bảo quản thiết bị và hoàn trả khi hết nhiệm vụ.
               </Text>
@@ -387,17 +387,17 @@ function DistributePPEModal({ visible, projectId, onClose, onDistribute }: Distr
 function getConditionColor(condition: PPECondition): string {
   switch (condition) {
     case PPECondition.NEW:
-      return '#4CAF50';
+      return '#0066CC';
     case PPECondition.GOOD:
-      return '#10B981';
+      return '#0066CC';
     case PPECondition.FAIR:
-      return '#FF9800';
+      return '#0066CC';
     case PPECondition.WORN:
       return '#1A1A1A';
     case PPECondition.DAMAGED:
       return '#B71C1C';
     case PPECondition.EXPIRED:
-      return '#9E9E9E';
+      return '#999999';
     default:
       return '#666';
   }
@@ -433,7 +433,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   filterTabActive: {
-    backgroundColor: '#0A6847',
+    backgroundColor: '#0066CC',
   },
   filterTabText: {
     fontSize: 13,
@@ -481,7 +481,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   activeBadge: {
-    backgroundColor: '#0A6847',
+    backgroundColor: '#0066CC',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
@@ -638,7 +638,7 @@ const styles = StyleSheet.create({
   infoBox: {
     flexDirection: 'row',
     gap: 10,
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
     padding: 12,
     borderRadius: 8,
     marginTop: 16,
@@ -672,7 +672,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 14,
     borderRadius: 8,
-    backgroundColor: '#0A6847',
+    backgroundColor: '#0066CC',
     alignItems: 'center',
   },
   distributeButtonText: {

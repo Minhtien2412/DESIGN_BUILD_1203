@@ -56,11 +56,11 @@ export default function HealthCheckScreen() {
       case 'ok':
       case 'up':
       case 'connected':
-        return '#10b981';
+        return '#0066CC';
       case 'degraded':
-        return '#f59e0b';
+        return '#0080FF';
       default:
-        return '#ef4444';
+        return '#000000';
     }
   };
 
@@ -68,7 +68,7 @@ export default function HealthCheckScreen() {
     <Container>
       <ScrollView showsVerticalScrollIndicator={false}>
         <LinearGradient
-          colors={['#ef4444', '#dc2626']}
+          colors={['#000000', '#000000']}
           style={styles.header}
         >
           <TouchableOpacity
@@ -85,10 +85,10 @@ export default function HealthCheckScreen() {
         <Section title="System Status">
           <View style={[styles.statusCard, { backgroundColor: '#ecfdf5' }]}>
             <View style={styles.statusRow}>
-              <Ionicons name="checkmark-circle" size={32} color="#10b981" />
+              <Ionicons name="checkmark-circle" size={32} color="#0066CC" />
               <View style={styles.statusInfo}>
                 <Text style={styles.statusLabel}>Status</Text>
-                <Text style={[styles.statusValue, { color: '#10b981' }]}>
+                <Text style={[styles.statusValue, { color: '#0066CC' }]}>
                   {systemHealth.status.toUpperCase()}
                 </Text>
               </View>
@@ -127,7 +127,7 @@ export default function HealthCheckScreen() {
         <Section title="Database">
           <View style={styles.metricCard}>
             <Text style={styles.metricLabel}>Status</Text>
-            <Text style={[styles.metricValue, { color: '#10b981' }]}>
+            <Text style={[styles.metricValue, { color: '#0066CC' }]}>
               {database.status.toUpperCase()}
             </Text>
           </View>
@@ -189,27 +189,27 @@ export default function HealthCheckScreen() {
 
         <Section title="Tính năng">
           <View style={styles.featureItem}>
-            <Ionicons name="checkmark-circle" size={24} color="#10b981" />
+            <Ionicons name="checkmark-circle" size={24} color="#0066CC" />
             <Text style={styles.featureText}>Real-time health monitoring với @nestjs/terminus</Text>
           </View>
           <View style={styles.featureItem}>
-            <Ionicons name="checkmark-circle" size={24} color="#10b981" />
+            <Ionicons name="checkmark-circle" size={24} color="#0066CC" />
             <Text style={styles.featureText}>Database connection checks</Text>
           </View>
           <View style={styles.featureItem}>
-            <Ionicons name="checkmark-circle" size={24} color="#10b981" />
+            <Ionicons name="checkmark-circle" size={24} color="#0066CC" />
             <Text style={styles.featureText}>Memory & disk usage tracking</Text>
           </View>
           <View style={styles.featureItem}>
-            <Ionicons name="checkmark-circle" size={24} color="#10b981" />
+            <Ionicons name="checkmark-circle" size={24} color="#0066CC" />
             <Text style={styles.featureText}>Service availability checks</Text>
           </View>
           <View style={styles.featureItem}>
-            <Ionicons name="checkmark-circle" size={24} color="#10b981" />
+            <Ionicons name="checkmark-circle" size={24} color="#0066CC" />
             <Text style={styles.featureText}>Auto alert khi có vấn đề</Text>
           </View>
           <View style={styles.featureItem}>
-            <Ionicons name="checkmark-circle" size={24} color="#10b981" />
+            <Ionicons name="checkmark-circle" size={24} color="#0066CC" />
             <Text style={styles.featureText}>WebSocket updates real-time</Text>
           </View>
         </Section>
@@ -363,7 +363,7 @@ const styles = StyleSheet.create({
   resourcePercent: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#10b981',
+    color: '#0066CC',
   },
   progressBar: {
     marginVertical: 8,

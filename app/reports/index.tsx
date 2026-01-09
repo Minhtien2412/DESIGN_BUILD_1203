@@ -107,19 +107,19 @@ export default function ReportsListScreen() {
   const getStatusColor = (status: ReportStatus) => {
     switch (status) {
       case 'DRAFT':
-        return '#9E9E9E';
+        return '#999999';
       case 'GENERATING':
-        return '#FF9800';
+        return '#0066CC';
       case 'READY':
-        return '#4CAF50';
+        return '#0066CC';
       case 'DELIVERED':
-        return '#2196F3';
+        return '#0066CC';
       case 'ARCHIVED':
         return '#757575';
       case 'FAILED':
-        return '#F44336';
+        return '#000000';
       default:
-        return '#9E9E9E';
+        return '#999999';
     }
   };
 
@@ -198,7 +198,7 @@ export default function ReportsListScreen() {
         <View style={styles.formatsRow}>
           {item.formats.map((format: ReportFormat, index: number) => (
             <View key={index} style={styles.formatBadge}>
-              <Ionicons name="document-outline" size={12} color="#2196F3" />
+              <Ionicons name="document-outline" size={12} color="#0066CC" />
               <Text style={styles.formatText}>{format}</Text>
             </View>
           ))}
@@ -223,15 +223,15 @@ export default function ReportsListScreen() {
       {item.status === 'READY' && (
         <View style={styles.actionButtons}>
           <TouchableOpacity style={styles.actionButton}>
-            <Ionicons name="eye" size={18} color="#2196F3" />
+            <Ionicons name="eye" size={18} color="#0066CC" />
             <Text style={styles.actionButtonText}>Xem</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionButton}>
-            <Ionicons name="download" size={18} color="#4CAF50" />
+            <Ionicons name="download" size={18} color="#0066CC" />
             <Text style={styles.actionButtonText}>Tải về</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionButton}>
-            <Ionicons name="send" size={18} color="#FF9800" />
+            <Ionicons name="send" size={18} color="#0066CC" />
             <Text style={styles.actionButtonText}>Gửi</Text>
           </TouchableOpacity>
         </View>
@@ -240,7 +240,7 @@ export default function ReportsListScreen() {
       {/* Generating indicator */}
       {item.status === 'GENERATING' && (
         <View style={styles.generatingRow}>
-          <ActivityIndicator size="small" color="#FF9800" />
+          <ActivityIndicator size="small" color="#0066CC" />
           <Text style={styles.generatingText}>Đang tạo báo cáo...</Text>
         </View>
       )}
@@ -248,7 +248,7 @@ export default function ReportsListScreen() {
       {/* Error */}
       {item.status === 'FAILED' && item.error && (
         <View style={styles.errorRow}>
-          <Ionicons name="alert-circle" size={16} color="#F44336" />
+          <Ionicons name="alert-circle" size={16} color="#000000" />
           <Text style={styles.errorText}>{item.error}</Text>
         </View>
       )}
@@ -258,7 +258,7 @@ export default function ReportsListScreen() {
   if (loading && reports.length === 0) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#2196F3" />
+        <ActivityIndicator size="large" color="#0066CC" />
         <Text style={styles.loadingText}>Đang tải báo cáo...</Text>
       </View>
     );
@@ -273,15 +273,15 @@ export default function ReportsListScreen() {
           <Text style={styles.statLabel}>Tổng</Text>
         </View>
         <View style={[styles.statCard, { backgroundColor: '#E8F5E9' }]}>
-          <Text style={[styles.statValue, { color: '#4CAF50' }]}>{stats.ready}</Text>
+          <Text style={[styles.statValue, { color: '#0066CC' }]}>{stats.ready}</Text>
           <Text style={styles.statLabel}>Sẵn sàng</Text>
         </View>
-        <View style={[styles.statCard, { backgroundColor: '#FFF3E0' }]}>
-          <Text style={[styles.statValue, { color: '#FF9800' }]}>{stats.generating}</Text>
+        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
+          <Text style={[styles.statValue, { color: '#0066CC' }]}>{stats.generating}</Text>
           <Text style={styles.statLabel}>Đang tạo</Text>
         </View>
-        <View style={[styles.statCard, { backgroundColor: '#FFEBEE' }]}>
-          <Text style={[styles.statValue, { color: '#F44336' }]}>{stats.failed}</Text>
+        <View style={[styles.statCard, { backgroundColor: '#F5F5F5' }]}>
+          <Text style={[styles.statValue, { color: '#000000' }]}>{stats.failed}</Text>
           <Text style={styles.statLabel}>Thất bại</Text>
         </View>
       </View>
@@ -321,7 +321,7 @@ export default function ReportsListScreen() {
             <Ionicons
               name={type.icon as any}
               size={16}
-              color={selectedType === type.value ? '#2196F3' : '#666'}
+              color={selectedType === type.value ? '#0066CC' : '#666'}
             />
             <Text
               style={[
@@ -384,7 +384,7 @@ export default function ReportsListScreen() {
                     <Ionicons
                       name={getTypeIcon(template.type) as any}
                       size={20}
-                      color={newReport.templateId === template.id ? '#2196F3' : '#666'}
+                      color={newReport.templateId === template.id ? '#0066CC' : '#666'}
                     />
                     <Text
                       style={[
@@ -554,16 +554,16 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   filterChipActive: {
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
     borderBottomWidth: 2,
-    borderBottomColor: '#2196F3',
+    borderBottomColor: '#0066CC',
   },
   filterChipText: {
     fontSize: 13,
     color: '#666',
   },
   filterChipTextActive: {
-    color: '#2196F3',
+    color: '#0066CC',
     fontWeight: '600',
   },
   listContent: {
@@ -654,12 +654,12 @@ const styles = StyleSheet.create({
     gap: 4,
     paddingHorizontal: 8,
     paddingVertical: 4,
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
     borderRadius: 4,
   },
   formatText: {
     fontSize: 11,
-    color: '#2196F3',
+    color: '#0066CC',
     fontWeight: '600',
   },
   footer: {
@@ -704,11 +704,11 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#FFF3E0',
+    borderTopColor: '#E8F4FF',
   },
   generatingText: {
     fontSize: 13,
-    color: '#FF9800',
+    color: '#0066CC',
     fontWeight: '600',
   },
   errorRow: {
@@ -717,12 +717,12 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#FFEBEE',
+    borderTopColor: '#F5F5F5',
   },
   errorText: {
     flex: 1,
     fontSize: 12,
-    color: '#F44336',
+    color: '#000000',
   },
   fab: {
     position: 'absolute',
@@ -731,7 +731,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
@@ -746,12 +746,12 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: '#9E9E9E',
+    color: '#999999',
     marginTop: 16,
     marginBottom: 24,
   },
   emptyButton: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
@@ -810,16 +810,16 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   templateChipSelected: {
-    borderColor: '#2196F3',
+    borderColor: '#0066CC',
     borderWidth: 2,
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
   },
   templateChipText: {
     fontSize: 13,
     color: '#666',
   },
   templateChipTextSelected: {
-    color: '#2196F3',
+    color: '#0066CC',
     fontWeight: '600',
   },
   input: {
@@ -875,7 +875,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
   },
   modalButtonPrimary: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
   },
   modalButtonTextSecondary: {
     fontSize: 14,

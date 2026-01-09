@@ -105,10 +105,10 @@ export default function DocumentDetailScreen() {
   }
 
   const statusColors: Record<DocumentStatus, string> = {
-    DRAFT: '#9E9E9E',
-    UNDER_REVIEW: '#FF9800',
-    APPROVED: '#4CAF50',
-    REJECTED: '#F44336',
+    DRAFT: '#999999',
+    UNDER_REVIEW: '#0066CC',
+    APPROVED: '#0066CC',
+    REJECTED: '#000000',
     SUPERSEDED: '#4A4A4A',
     ARCHIVED: '#757575',
   };
@@ -173,7 +173,7 @@ export default function DocumentDetailScreen() {
               <Ionicons
                 name="cloud-download-outline"
                 size={24}
-                color="#2196F3"
+                color="#0066CC"
               />
             </TouchableOpacity>
           ),
@@ -187,7 +187,7 @@ export default function DocumentDetailScreen() {
               <Ionicons
                 name={fileTypeIcons[document.fileType] as any}
                 size={40}
-                color="#2196F3"
+                color="#0066CC"
               />
             </View>
             <View style={styles.fileInfo}>
@@ -305,7 +305,7 @@ export default function DocumentDetailScreen() {
             </Text>
             {document.status === 'APPROVED' && document.approvedBy && (
               <View style={styles.approvalInfo}>
-                <Ionicons name="checkmark-circle" size={20} color="#4CAF50" />
+                <Ionicons name="checkmark-circle" size={20} color="#0066CC" />
                 <Text style={[styles.approvalText, { color: textColor }]}>
                   Đã duyệt bởi {document.approvedByName}
                 </Text>
@@ -319,7 +319,7 @@ export default function DocumentDetailScreen() {
             {document.status === 'REJECTED' && document.rejectedBy && (
               <>
                 <View style={styles.approvalInfo}>
-                  <Ionicons name="close-circle" size={20} color="#F44336" />
+                  <Ionicons name="close-circle" size={20} color="#000000" />
                   <Text style={[styles.approvalText, { color: textColor }]}>
                     Từ chối bởi {document.rejectedByName}
                   </Text>
@@ -393,7 +393,7 @@ export default function DocumentDetailScreen() {
               style={[styles.actionButton, { borderColor }]}
               onPress={handleShare}
             >
-              <Ionicons name="share-social-outline" size={24} color="#4CAF50" />
+              <Ionicons name="share-social-outline" size={24} color="#0066CC" />
               <Text style={[styles.actionLabel, { color: textColor }]}>
                 Chia sẻ
               </Text>
@@ -402,7 +402,7 @@ export default function DocumentDetailScreen() {
               style={[styles.actionButton, { borderColor }]}
               onPress={handleCreateVersion}
             >
-              <Ionicons name="git-branch-outline" size={24} color="#2196F3" />
+              <Ionicons name="git-branch-outline" size={24} color="#0066CC" />
               <Text style={[styles.actionLabel, { color: textColor }]}>
                 Tạo phiên bản
               </Text>
@@ -411,7 +411,7 @@ export default function DocumentDetailScreen() {
               style={[styles.actionButton, { borderColor }]}
               onPress={handleDelete}
             >
-              <Ionicons name="trash-outline" size={24} color="#F44336" />
+              <Ionicons name="trash-outline" size={24} color="#000000" />
               <Text style={[styles.actionLabel, { color: textColor }]}>
                 Xóa
               </Text>
@@ -493,7 +493,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -556,7 +556,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   metadataValueLink: {
-    color: '#2196F3',
+    color: '#0066CC',
   },
   tagsContainer: {
     flexDirection: 'row',
@@ -564,14 +564,14 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   tag: {
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
   },
   tagText: {
     fontSize: 12,
-    color: '#2196F3',
+    color: '#0066CC',
   },
   cardTitle: {
     fontSize: 16,
@@ -586,7 +586,7 @@ const styles = StyleSheet.create({
   },
   seeAllLink: {
     fontSize: 14,
-    color: '#2196F3',
+    color: '#0066CC',
   },
   approvalInfo: {
     flexDirection: 'row',
@@ -606,7 +606,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     marginTop: 8,
     padding: 12,
-    backgroundColor: '#FFEBEE',
+    backgroundColor: '#F5F5F5',
     borderRadius: 8,
   },
   comment: {
@@ -636,7 +636,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     marginTop: 6,
     marginRight: 12,
   },

@@ -166,7 +166,7 @@ export default function AddExpenseForm({
                   style={[
                     styles.typeButton,
                     { borderColor: border, backgroundColor: chipBackground },
-                    formData.type === 'income' && { backgroundColor: '#10B981', borderColor: '#10B981' },
+                    formData.type === 'income' && { backgroundColor: '#0066CC', borderColor: '#0066CC' },
                   ]}
                   onPress={() => setFormData(prev => ({ ...prev, type: 'income' }))}
                 >
@@ -238,7 +238,7 @@ export default function AddExpenseForm({
               <Text style={[styles.label, { color: text }]}>
                 Số tiền (VND) <Text style={styles.required}>*</Text>
               </Text>
-              <View style={[styles.inputContainer, { borderColor: errors.amount ? '#EF4444' : border }]}>
+              <View style={[styles.inputContainer, { borderColor: errors.amount ? '#000000' : border }]}>
                 <Ionicons name="cash-outline" size={20} color={textMuted} />
                 <TextInput
                   style={[styles.input, { color: text }]}
@@ -263,7 +263,7 @@ export default function AddExpenseForm({
               <Text style={[styles.label, { color: text }]}>
                 Mô tả <Text style={styles.required}>*</Text>
               </Text>
-              <View style={[styles.inputContainer, { borderColor: errors.description ? '#EF4444' : border }]}>
+              <View style={[styles.inputContainer, { borderColor: errors.description ? '#000000' : border }]}>
                 <Ionicons name="document-text-outline" size={20} color={textMuted} />
                 <TextInput
                   style={[styles.input, { color: text }]}
@@ -288,7 +288,7 @@ export default function AddExpenseForm({
               <Text style={[styles.label, { color: text }]}>
                 Ngày <Text style={styles.required}>*</Text>
               </Text>
-              <View style={[styles.inputContainer, { borderColor: errors.date ? '#EF4444' : border }]}>
+              <View style={[styles.inputContainer, { borderColor: errors.date ? '#000000' : border }]}>
                 <Ionicons name="calendar-outline" size={20} color={textMuted} />
                 <TextInput
                   style={[styles.input, { color: text }]}
@@ -390,7 +390,7 @@ const styles = StyleSheet.create({
     marginBottom: SpacingSemantic.sm,
   },
   required: {
-    color: '#EF4444',
+    color: '#000000',
   },
   inputContainer: {
     flexDirection: 'row',
@@ -407,7 +407,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   errorText: {
-    color: '#EF4444',
+    color: '#000000',
     fontSize: 12,
     marginTop: 4,
   },

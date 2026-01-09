@@ -25,7 +25,7 @@ export default function FilterBar({
   showCount = false,
   counts = {},
 }: FilterBarProps) {
-  const primaryColor = '#FF6B35';
+  const primaryColor = '#0066CC';
   const textColor = useThemeColor({}, 'text');
   const borderColor = useThemeColor({}, 'border');
 

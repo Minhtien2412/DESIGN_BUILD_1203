@@ -82,7 +82,7 @@ function MiniMapTile({ task, size, bounds, initial, onCommit, onPress }: TilePro
 
   const status = STATUS_CONFIG[task.status] || {
     label: task.status || 'Unknown',
-    color: '#9E9E9E',
+    color: '#999999',
     bgColor: '#F5F5F5',
     icon: 'ellipse-outline',
   };

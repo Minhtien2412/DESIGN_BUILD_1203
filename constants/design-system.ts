@@ -5,19 +5,19 @@
 
 // ===== COLOR SYSTEM =====
 export const ColorSystem = {
-  // Primary Brand Colors
+  // Primary Brand Colors (Professional Blue)
   primary: {
-    main: '#FF6B35',      // Orange chính
-    light: '#FF8C5A',     // Orange nhạt
-    dark: '#E5511D',      // Orange đậm
+    main: '#0066CC',      // Professional blue
+    light: '#3399FF',     // Light blue
+    dark: '#004C99',      // Dark blue
     contrast: '#FFFFFF',   // Text trên primary
   },
 
-  // Secondary Colors
+  // Secondary Colors (Neutral Gray)
   secondary: {
-    main: '#0A6847',      // Green accent
-    light: '#A8C76E',     // Green nhạt
-    dark: '#7A9A3F',      // Green đậm
+    main: '#333333',      // Dark gray
+    light: '#666666',     // Medium gray
+    dark: '#000000',      // Pure black
     contrast: '#FFFFFF',
   },
 
@@ -28,40 +28,40 @@ export const ColorSystem = {
     200: '#EEEEEE',
     300: '#E0E0E0',
     400: '#BDBDBD',
-    500: '#9E9E9E',
+    500: '#999999',
     600: '#757575',
     700: '#616161',
     800: '#424242',
     900: '#212121',
   },
 
-  // Semantic Colors
+  // Semantic Colors (Blue tones only)
   success: {
-    main: '#10B981',
-    light: '#34D399',
-    dark: '#059669',
-    bg: '#D1FAE5',
+    main: '#0066CC',
+    light: '#3399FF',
+    dark: '#004C99',
+    bg: '#E6F2FF',
   },
 
   error: {
-    main: '#EF4444',
-    light: '#F87171',
-    dark: '#DC2626',
-    bg: '#FEE2E2',
+    main: '#000000',
+    light: '#333333',
+    dark: '#000000',
+    bg: '#F5F5F5',
   },
 
   warning: {
-    main: '#F59E0B',
-    light: '#FBBF24',
-    dark: '#D97706',
-    bg: '#FEF3C7',
+    main: '#0080FF',
+    light: '#33A3FF',
+    dark: '#0066CC',
+    bg: '#E6F2FF',
   },
 
   info: {
-    main: '#3B82F6',
-    light: '#60A5FA',
-    dark: '#2563EB',
-    bg: '#DBEAFE',
+    main: '#0066CC',
+    light: '#3399FF',
+    dark: '#004C99',
+    bg: '#E6F2FF',
   },
 
   // Background Colors
@@ -141,62 +141,62 @@ export const Typography = {
     relaxed: 1.75,
   },
 
-  // Font Weights
+  // Font Weights (Stronger by default)
   fontWeight: {
-    regular: '400',
-    medium: '500',
-    semibold: '600',
-    bold: '700',
-    extrabold: '800',
+    regular: '500',      // Increased from 400
+    medium: '600',       // Increased from 500
+    semibold: '700',     // Increased from 600
+    bold: '800',         // Increased from 700
+    extrabold: '900',    // Increased from 800
   },
 
-  // Text Styles
+  // Text Styles (Bolder fonts)
   styles: {
     h1: {
       fontSize: 32,
-      fontWeight: '700',
+      fontWeight: '800',   // Increased
       lineHeight: 1.2,
       color: ColorSystem.text.primary,
     },
     h2: {
       fontSize: 24,
-      fontWeight: '700',
+      fontWeight: '800',   // Increased
       lineHeight: 1.3,
       color: ColorSystem.text.primary,
     },
     h3: {
       fontSize: 20,
-      fontWeight: '600',
+      fontWeight: '700',   // Increased
       lineHeight: 1.4,
       color: ColorSystem.text.primary,
     },
     h4: {
       fontSize: 18,
-      fontWeight: '600',
+      fontWeight: '700',   // Increased
       lineHeight: 1.4,
       color: ColorSystem.text.primary,
     },
     body1: {
       fontSize: 16,
-      fontWeight: '400',
+      fontWeight: '500',   // Increased from 400
       lineHeight: 1.5,
       color: ColorSystem.text.primary,
     },
     body2: {
       fontSize: 14,
-      fontWeight: '400',
+      fontWeight: '500',   // Increased from 400
       lineHeight: 1.5,
       color: ColorSystem.text.primary,
     },
     caption: {
       fontSize: 12,
-      fontWeight: '400',
+      fontWeight: '500',   // Increased from 400
       lineHeight: 1.4,
       color: ColorSystem.text.secondary,
     },
     overline: {
       fontSize: 11,
-      fontWeight: '600',
+      fontWeight: '700',   // Increased
       lineHeight: 1.5,
       letterSpacing: 1,
       textTransform: 'uppercase',

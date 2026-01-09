@@ -58,28 +58,28 @@ export default function EnvironmentalDetailScreen() {
 
   const getStatusColor = (status: string) => {
     const statusMap: Record<string, string> = {
-      COMPLIANT: '#22c55e',
-      NON_COMPLIANT: '#ef4444',
-      REQUIRES_ACTION: '#f59e0b',
+      COMPLIANT: '#0066CC',
+      NON_COMPLIANT: '#000000',
+      REQUIRES_ACTION: '#0066CC',
       COMPLETED: '#3b82f6',
-      IN_PROGRESS: '#8b5cf6',
+      IN_PROGRESS: '#666666',
       SCHEDULED: '#a855f7',
-      OVERDUE: '#dc2626',
+      OVERDUE: '#000000',
       GENERATED: '#6b7280',
       STORED: '#3b82f6',
-      COLLECTED: '#f59e0b',
-      IN_TRANSIT: '#8b5cf6',
-      DISPOSED: '#22c55e',
-      RECYCLED: '#10b981',
+      COLLECTED: '#0066CC',
+      IN_TRANSIT: '#666666',
+      DISPOSED: '#0066CC',
+      RECYCLED: '#0066CC',
     };
     return statusMap[status] || textMutedColor;
   };
 
   const getResultColor = (result?: 'PASS' | 'FAIL' | 'WARNING') => {
     switch (result) {
-      case 'PASS': return '#22c55e';
-      case 'FAIL': return '#ef4444';
-      case 'WARNING': return '#f59e0b';
+      case 'PASS': return '#0066CC';
+      case 'FAIL': return '#000000';
+      case 'WARNING': return '#0066CC';
       default: return textMutedColor;
     }
   };
@@ -249,7 +249,7 @@ export default function EnvironmentalDetailScreen() {
                     {(record as any).exceedancePercentage !== undefined && (
                       <View style={styles.infoRow}>
                         <ThemedText variant="body" style={{ color: textMutedColor }}>Exceedance</ThemedText>
-                        <ThemedText variant="body" style={{ color: (record as any).exceedancePercentage > 0 ? '#ef4444' : '#22c55e' }}>
+                        <ThemedText variant="body" style={{ color: (record as any).exceedancePercentage > 0 ? '#000000' : '#0066CC' }}>
                           {(record as any).exceedancePercentage.toFixed(1)}%
                         </ThemedText>
                       </View>
@@ -447,7 +447,7 @@ export default function EnvironmentalDetailScreen() {
                   <View style={styles.measurementHeader}>
                     <ThemedText variant="body" style={{ fontWeight: '600' }}>{measurement.parameter}</ThemedText>
                     {measurement.compliant !== undefined && (
-                      <View style={[styles.smallBadge, { backgroundColor: measurement.compliant ? '#22c55e' : '#ef4444' }]}>
+                      <View style={[styles.smallBadge, { backgroundColor: measurement.compliant ? '#0066CC' : '#000000' }]}>
                         <ThemedText variant="caption" style={styles.badgeText}>
                           {measurement.compliant ? 'PASS' : 'FAIL'}
                         </ThemedText>

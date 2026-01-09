@@ -24,9 +24,9 @@ import {
 
 const UTILITY_TYPES = [
   { id: 'CALCULATOR', name: 'Công cụ tính', icon: 'calculator', color: '#3B82F6' },
-  { id: 'AI', name: 'Trí tuệ nhân tạo', icon: 'sparkles', color: '#8B5CF6' },
-  { id: 'MEDIA', name: 'Đa phương tiện', icon: 'film', color: '#EF4444' },
-  { id: 'DOCUMENT', name: 'Tài liệu', icon: 'document-text', color: '#10B981' },
+  { id: 'AI', name: 'Trí tuệ nhân tạo', icon: 'sparkles', color: '#666666' },
+  { id: 'MEDIA', name: 'Đa phương tiện', icon: 'film', color: '#000000' },
+  { id: 'DOCUMENT', name: 'Tài liệu', icon: 'document-text', color: '#0066CC' },
   { id: 'OTHER', name: 'Khác', icon: 'ellipsis-horizontal', color: '#6B7280' },
 ];
 
@@ -287,7 +287,7 @@ function UtilityCard({
         </View>
         <View style={styles.actions}>
           <Link href={`/admin/utilities/edit/${utility.id}` as any} asChild>
-            <TouchableOpacity style={[styles.actionButton, { backgroundColor: '#DBEAFE' }]}>
+            <TouchableOpacity style={[styles.actionButton, { backgroundColor: '#E8F4FF' }]}>
               <Ionicons name="settings-outline" size={18} color="#3B82F6" />
             </TouchableOpacity>
           </Link>
@@ -295,7 +295,7 @@ function UtilityCard({
             style={[styles.actionButton, { backgroundColor: '#FEE2E2' }]}
             onPress={() => onDelete(utility.id)}
           >
-            <Ionicons name="trash-outline" size={18} color="#EF4444" />
+            <Ionicons name="trash-outline" size={18} color="#000000" />
           </TouchableOpacity>
         </View>
       </View>
@@ -452,7 +452,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     paddingHorizontal: 24,
     paddingVertical: 12,
-    backgroundColor: '#8B5CF6',
+    backgroundColor: '#666666',
     borderRadius: 8,
   },
   createButtonText: {
@@ -471,7 +471,7 @@ const styles = StyleSheet.create({
   paginationButton: {
     paddingHorizontal: 20,
     paddingVertical: 10,
-    backgroundColor: '#8B5CF6',
+    backgroundColor: '#666666',
     borderRadius: 8,
   },
   paginationButtonDisabled: {

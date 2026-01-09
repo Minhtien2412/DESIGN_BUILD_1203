@@ -44,14 +44,14 @@ const PAYMENT_METHODS = [
     id: 'cod',
     name: 'Thanh toán khi nhận hàng (COD)',
     icon: 'cash-outline',
-    color: '#10B981',
+    color: '#0066CC',
     enabled: true,
   },
   {
     id: 'credit',
     name: 'Thẻ tín dụng/Ghi nợ',
     icon: 'card',
-    color: '#6366F1',
+    color: '#666666',
     enabled: false,
   },
 ];
@@ -135,7 +135,7 @@ export default function PaymentMethodsScreen() {
           <Text style={styles.sectionTitle}>Ưu đãi thanh toán</Text>
           <View style={styles.benefitCard}>
             <View style={styles.benefitIcon}>
-              <Ionicons name="gift-outline" size={24} color="#FF6B35" />
+              <Ionicons name="gift-outline" size={24} color="#0066CC" />
             </View>
             <View style={styles.benefitInfo}>
               <Text style={styles.benefitTitle}>Giảm 50K cho đơn đầu</Text>
@@ -159,7 +159,7 @@ export default function PaymentMethodsScreen() {
 
         {/* Security Info */}
         <View style={styles.securityInfo}>
-          <Ionicons name="shield-checkmark" size={20} color="#10B981" />
+          <Ionicons name="shield-checkmark" size={20} color="#0066CC" />
           <Text style={styles.securityText}>
             Giao dịch được bảo mật với tiêu chuẩn PCI DSS
           </Text>
@@ -179,7 +179,7 @@ export default function PaymentMethodsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#0066CC',
   },
   header: {
     flexDirection: 'row',
@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
   },
   methodCardActive: {
     backgroundColor: '#FFF5F0',
-    borderColor: '#FF6B35',
+    borderColor: '#0066CC',
   },
   methodCardDisabled: {
     opacity: 0.5,
@@ -263,13 +263,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   radioActive: {
-    borderColor: '#FF6B35',
+    borderColor: '#0066CC',
   },
   radioDot: {
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#0066CC',
   },
   benefitCard: {
     flexDirection: 'row',
@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
   },
   securityText: {
     fontSize: 13,
-    color: '#10B981',
+    color: '#0066CC',
   },
   footer: {
     backgroundColor: '#fff',
@@ -320,7 +320,7 @@ const styles = StyleSheet.create({
     borderTopColor: '#e0e0e0',
   },
   continueBtn: {
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#0066CC',
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',

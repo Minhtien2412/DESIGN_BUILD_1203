@@ -25,15 +25,15 @@ export default function TaskCard({
   const getStatusColor = (status: Task['status']) => {
     switch (status) {
       case 'completed':
-        return '#4CAF50';
+        return '#0066CC';
       case 'in-progress':
-        return '#2196F3';
+        return '#0066CC';
       case 'pending':
-        return '#0A6847';
+        return '#0066CC';
       case 'blocked':
-        return '#F44336';
+        return '#000000';
       default:
-        return '#9E9E9E';
+        return '#999999';
     }
   };
 
@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
   },
   cardSelected: {
     borderWidth: 2,
-    borderColor: '#2196F3',
+    borderColor: '#0066CC',
     shadowOpacity: 0.2,
     elevation: 4,
   },
@@ -335,7 +335,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   editButton: {
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
   },
   deleteButton: {
     backgroundColor: '#FFEBEE',

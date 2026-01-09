@@ -63,7 +63,7 @@ export default function TrainingProgramsScreen() {
           title: 'Đào tạo An toàn',
           headerRight: () => (
             <TouchableOpacity onPress={() => setModalVisible(true)}>
-              <Ionicons name="add-circle" size={28} color="#2196F3" style={{ marginRight: 8 }} />
+              <Ionicons name="add-circle" size={28} color="#0066CC" style={{ marginRight: 8 }} />
             </TouchableOpacity>
           ),
         }}
@@ -77,12 +77,12 @@ export default function TrainingProgramsScreen() {
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statItem}>
-          <Text style={[styles.statValue, { color: '#F44336' }]}>{mandatoryPrograms.length}</Text>
+          <Text style={[styles.statValue, { color: '#000000' }]}>{mandatoryPrograms.length}</Text>
           <Text style={styles.statLabel}>Bắt buộc</Text>
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statItem}>
-          <Text style={[styles.statValue, { color: '#2196F3' }]}>{optionalPrograms.length}</Text>
+          <Text style={[styles.statValue, { color: '#0066CC' }]}>{optionalPrograms.length}</Text>
           <Text style={styles.statLabel}>Tùy chọn</Text>
         </View>
       </View>
@@ -157,7 +157,7 @@ interface ProgramCardProps {
 
 function ProgramCard({ program }: ProgramCardProps) {
   const typeIcon = getTrainingIcon(program.type);
-  const typeColor = program.isMandatory ? '#F44336' : '#2196F3';
+  const typeColor = program.isMandatory ? '#000000' : '#0066CC';
 
   return (
     <TouchableOpacity
@@ -224,7 +224,7 @@ function ProgramCard({ program }: ProgramCardProps) {
 
       {program.certificationIssued && (
         <View style={styles.certificationBadge}>
-          <Ionicons name="ribbon" size={14} color="#FF9800" />
+          <Ionicons name="ribbon" size={14} color="#0066CC" />
           <Text style={styles.certificationText}>Cấp chứng chỉ</Text>
         </View>
       )}
@@ -367,7 +367,7 @@ function AddProgramModal({ visible, projectId, onClose, onCreate }: AddProgramMo
               <Ionicons
                 name={isMandatory ? 'checkbox' : 'square-outline'}
                 size={24}
-                color={isMandatory ? '#F44336' : '#666'}
+                color={isMandatory ? '#000000' : '#666'}
               />
               <Text style={styles.checkboxLabel}>Bắt buộc</Text>
             </TouchableOpacity>
@@ -379,7 +379,7 @@ function AddProgramModal({ visible, projectId, onClose, onCreate }: AddProgramMo
               <Ionicons
                 name={certificationIssued ? 'checkbox' : 'square-outline'}
                 size={24}
-                color={certificationIssued ? '#FF9800' : '#666'}
+                color={certificationIssued ? '#0066CC' : '#666'}
               />
               <Text style={styles.checkboxLabel}>Cấp chứng chỉ</Text>
             </TouchableOpacity>
@@ -474,7 +474,7 @@ const styles = StyleSheet.create({
     borderBottomColor: 'transparent',
   },
   filterTabActive: {
-    borderBottomColor: '#2196F3',
+    borderBottomColor: '#0066CC',
   },
   filterTabText: {
     fontSize: 13,
@@ -482,7 +482,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   filterTabTextActive: {
-    color: '#2196F3',
+    color: '#0066CC',
     fontWeight: 'bold',
   },
   listContent: {
@@ -522,7 +522,7 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   mandatoryBadge: {
-    backgroundColor: '#F44336',
+    backgroundColor: '#000000',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
@@ -569,7 +569,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   roleTag: {
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
@@ -583,14 +583,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#FFF3E0',
+    backgroundColor: '#E8F4FF',
     padding: 8,
     borderRadius: 6,
     marginTop: 12,
   },
   certificationText: {
     fontSize: 12,
-    color: '#E65100',
+    color: '#004499',
     fontWeight: '500',
   },
   emptyContainer: {
@@ -605,7 +605,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   addButton: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
@@ -679,8 +679,8 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   typeChipActive: {
-    backgroundColor: '#2196F3',
-    borderColor: '#2196F3',
+    backgroundColor: '#0066CC',
+    borderColor: '#0066CC',
   },
   typeChipText: {
     fontSize: 12,
@@ -725,7 +725,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 14,
     borderRadius: 8,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     alignItems: 'center',
   },
   createButtonText: {

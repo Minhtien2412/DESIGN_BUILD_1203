@@ -156,18 +156,18 @@ export default function PaymentScreen() {
 
   const getTransactionColor = (type: Transaction['type']) => {
     switch (type) {
-      case 'deposit': return '#10B981';
-      case 'withdraw': return '#EF4444';
-      case 'payment': return '#F59E0B';
+      case 'deposit': return '#0066CC';
+      case 'withdraw': return '#000000';
+      case 'payment': return '#0066CC';
       case 'refund': return '#0891B2';
     }
   };
 
   const getStatusColor = (status: Transaction['status']) => {
     switch (status) {
-      case 'completed': return '#10B981';
-      case 'pending': return '#F59E0B';
-      case 'failed': return '#EF4444';
+      case 'completed': return '#0066CC';
+      case 'pending': return '#0066CC';
+      case 'failed': return '#000000';
     }
   };
 
@@ -364,7 +364,7 @@ export default function PaymentScreen() {
         {/* Quick Actions */}
         <View style={styles.quickActions}>
           <TouchableOpacity style={styles.quickActionButton} onPress={handleDeposit}>
-            <View style={[styles.quickActionIcon, { backgroundColor: '#DBEAFE' }]}>
+            <View style={[styles.quickActionIcon, { backgroundColor: '#E8F4FF' }]}>
               <Ionicons name="add-circle" size={28} color="#3B82F6" />
             </View>
             <Text style={styles.quickActionText}>Nạp tiền</Text>
@@ -372,21 +372,21 @@ export default function PaymentScreen() {
           
           <TouchableOpacity style={styles.quickActionButton} onPress={handleWithdraw}>
             <View style={[styles.quickActionIcon, { backgroundColor: '#FEE2E2' }]}>
-              <Ionicons name="arrow-up-circle" size={28} color="#EF4444" />
+              <Ionicons name="arrow-up-circle" size={28} color="#000000" />
             </View>
             <Text style={styles.quickActionText}>Rút tiền</Text>
           </TouchableOpacity>
           
           <TouchableOpacity style={styles.quickActionButton}>
             <View style={[styles.quickActionIcon, { backgroundColor: '#D1FAE5' }]}>
-              <Ionicons name="receipt" size={28} color="#10B981" />
+              <Ionicons name="receipt" size={28} color="#0066CC" />
             </View>
             <Text style={styles.quickActionText}>Lịch sử</Text>
           </TouchableOpacity>
           
           <TouchableOpacity style={styles.quickActionButton}>
             <View style={[styles.quickActionIcon, { backgroundColor: '#FEF3C7' }]}>
-              <Ionicons name="settings" size={28} color="#F59E0B" />
+              <Ionicons name="settings" size={28} color="#0066CC" />
             </View>
             <Text style={styles.quickActionText}>Cài đặt</Text>
           </TouchableOpacity>
@@ -460,7 +460,7 @@ export default function PaymentScreen() {
         {/* Transaction History with Filters */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Ionicons name="time-outline" size={24} color="#10B981" />
+            <Ionicons name="time-outline" size={24} color="#0066CC" />
             <Text style={styles.sectionTitle}>Lịch sử giao dịch</Text>
           </View>
 
@@ -483,7 +483,7 @@ export default function PaymentScreen() {
               style={[styles.filterChip, selectedTypeFilter === 'deposit' && styles.filterChipActive]}
               onPress={() => setSelectedTypeFilter('deposit')}
             >
-              <Ionicons name="arrow-down-circle" size={16} color={selectedTypeFilter === 'deposit' ? '#FFFFFF' : '#10B981'} />
+              <Ionicons name="arrow-down-circle" size={16} color={selectedTypeFilter === 'deposit' ? '#FFFFFF' : '#0066CC'} />
               <Text style={[styles.filterText, selectedTypeFilter === 'deposit' && styles.filterTextActive]}>
                 Nạp tiền
               </Text>
@@ -492,7 +492,7 @@ export default function PaymentScreen() {
               style={[styles.filterChip, selectedTypeFilter === 'withdraw' && styles.filterChipActive]}
               onPress={() => setSelectedTypeFilter('withdraw')}
             >
-              <Ionicons name="arrow-up-circle" size={16} color={selectedTypeFilter === 'withdraw' ? '#FFFFFF' : '#EF4444'} />
+              <Ionicons name="arrow-up-circle" size={16} color={selectedTypeFilter === 'withdraw' ? '#FFFFFF' : '#000000'} />
               <Text style={[styles.filterText, selectedTypeFilter === 'withdraw' && styles.filterTextActive]}>
                 Rút tiền
               </Text>
@@ -501,7 +501,7 @@ export default function PaymentScreen() {
               style={[styles.filterChip, selectedTypeFilter === 'payment' && styles.filterChipActive]}
               onPress={() => setSelectedTypeFilter('payment')}
             >
-              <Ionicons name="card" size={16} color={selectedTypeFilter === 'payment' ? '#FFFFFF' : '#F59E0B'} />
+              <Ionicons name="card" size={16} color={selectedTypeFilter === 'payment' ? '#FFFFFF' : '#0066CC'} />
               <Text style={[styles.filterText, selectedTypeFilter === 'payment' && styles.filterTextActive]}>
                 Thanh toán
               </Text>
@@ -536,7 +536,7 @@ export default function PaymentScreen() {
               style={[styles.filterChip, selectedStatusFilter === 'completed' && styles.filterChipActive]}
               onPress={() => setSelectedStatusFilter('completed')}
             >
-              <Ionicons name="checkmark-circle" size={16} color={selectedStatusFilter === 'completed' ? '#FFFFFF' : '#10B981'} />
+              <Ionicons name="checkmark-circle" size={16} color={selectedStatusFilter === 'completed' ? '#FFFFFF' : '#0066CC'} />
               <Text style={[styles.filterText, selectedStatusFilter === 'completed' && styles.filterTextActive]}>
                 Hoàn thành
               </Text>
@@ -545,7 +545,7 @@ export default function PaymentScreen() {
               style={[styles.filterChip, selectedStatusFilter === 'pending' && styles.filterChipActive]}
               onPress={() => setSelectedStatusFilter('pending')}
             >
-              <Ionicons name="time" size={16} color={selectedStatusFilter === 'pending' ? '#FFFFFF' : '#F59E0B'} />
+              <Ionicons name="time" size={16} color={selectedStatusFilter === 'pending' ? '#FFFFFF' : '#0066CC'} />
               <Text style={[styles.filterText, selectedStatusFilter === 'pending' && styles.filterTextActive]}>
                 Đang xử lý
               </Text>
@@ -554,7 +554,7 @@ export default function PaymentScreen() {
               style={[styles.filterChip, selectedStatusFilter === 'failed' && styles.filterChipActive]}
               onPress={() => setSelectedStatusFilter('failed')}
             >
-              <Ionicons name="close-circle" size={16} color={selectedStatusFilter === 'failed' ? '#FFFFFF' : '#EF4444'} />
+              <Ionicons name="close-circle" size={16} color={selectedStatusFilter === 'failed' ? '#FFFFFF' : '#000000'} />
               <Text style={[styles.filterText, selectedStatusFilter === 'failed' && styles.filterTextActive]}>
                 Thất bại
               </Text>
@@ -606,7 +606,7 @@ export default function PaymentScreen() {
                         <Text 
                           style={[
                             styles.transactionAmount,
-                            { color: transaction.amount > 0 ? '#10B981' : '#EF4444' }
+                            { color: transaction.amount > 0 ? '#0066CC' : '#000000' }
                           ]}
                         >
                           {transaction.amount > 0 ? '+' : ''}{formatCurrency(transaction.amount)}
@@ -625,7 +625,7 @@ export default function PaymentScreen() {
         {/* Security Notice */}
         <View style={styles.securityCard}>
           <View style={styles.securityHeader}>
-            <Ionicons name="shield-checkmark" size={20} color="#10B981" />
+            <Ionicons name="shield-checkmark" size={20} color="#0066CC" />
             <Text style={styles.securityTitle}>Thanh toán an toàn</Text>
           </View>
           <Text style={styles.securityText}>
@@ -813,7 +813,7 @@ const styles = StyleSheet.create({
   defaultBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#DBEAFE',
+    backgroundColor: '#E8F4FF',
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 12,

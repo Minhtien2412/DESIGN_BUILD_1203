@@ -141,7 +141,7 @@ export default function StaffDetailScreen() {
           <Text style={[styles.profileRole, { color: colors.textMuted }]}>
             {staff.role?.name || 'N/A'}
           </Text>
-          <View style={[styles.profileStatus, { backgroundColor: isActive ? '#22c55e' : '#ef4444' }]}>
+          <View style={[styles.profileStatus, { backgroundColor: isActive ? '#0066CC' : '#000000' }]}>
             <Text style={styles.profileStatusText}>{isActive ? 'Active' : 'Inactive'}</Text>
           </View>
         </View>
@@ -262,7 +262,7 @@ export default function StaffDetailScreen() {
         {/* Delete Button */}
         {hasPermission('delete', 'staff') && (
           <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
-            <Ionicons name="trash-outline" size={20} color="#ef4444" />
+            <Ionicons name="trash-outline" size={20} color="#000000" />
             <Text style={styles.deleteButtonText}>Xóa nhân viên</Text>
           </TouchableOpacity>
         )}
@@ -449,11 +449,11 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#ef4444',
+    borderColor: '#000000',
     marginTop: 8,
   },
   deleteButtonText: {
-    color: '#ef4444',
+    color: '#000000',
     fontSize: 15,
     fontWeight: '600',
   },

@@ -134,7 +134,7 @@ const ProductDetailContent = () => {
           <Ionicons
             name={isFavorite ? 'heart' : 'heart-outline'}
             size={24}
-            color={isFavorite ? '#EF4444' : text}
+            color={isFavorite ? '#000000' : text}
           />
         </Pressable>
       </View>

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Inspection & Testing List Screen
  */
 
@@ -39,26 +39,26 @@ const STATUS_FILTERS: { value: InspectionStatus | 'ALL'; label: string }[] = [
 
 const STATUS_COLORS: Record<InspectionStatus, string> = {
   SCHEDULED: '#3B82F6',
-  IN_PROGRESS: '#F59E0B',
-  PASSED: '#10B981',
-  FAILED: '#EF4444',
-  CONDITIONAL_PASS: '#F97316',
+  IN_PROGRESS: '#0066CC',
+  PASSED: '#0066CC',
+  FAILED: '#000000',
+  CONDITIONAL_PASS: '#0066CC',
   CANCELLED: '#6B7280',
-  RESCHEDULED: '#8B5CF6',
+  RESCHEDULED: '#666666',
   PENDING: '#9CA3AF',
-  PASS: '#10B981',
-  FAIL: '#EF4444',
+  PASS: '#0066CC',
+  FAIL: '#000000',
   NA: '#6B7280',
   COMPLETED: '#3B82F6',
-  APPROVED: '#22C55E',
-  REJECTED: '#DC2626',
+  APPROVED: '#0066CC',
+  REJECTED: '#000000',
 };
 
 const SEVERITY_COLORS = {
-  MINOR: '#10B981',
-  MODERATE: '#F59E0B',
-  MAJOR: '#F97316',
-  CRITICAL: '#EF4444',
+  MINOR: '#0066CC',
+  MODERATE: '#0066CC',
+  MAJOR: '#0066CC',
+  CRITICAL: '#000000',
 };
 
 export default function InspectionsScreen() {
@@ -120,29 +120,29 @@ export default function InspectionsScreen() {
     <View style={styles.container}>
       {/* Stats Cards */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.statsContainer}>
-        <View style={[styles.statCard, { backgroundColor: '#EFF6FF' }]}>
+        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
           <Text style={styles.statValue}>{inspections.length}</Text>
           <Text style={styles.statLabel}>Total</Text>
         </View>
 
-        <View style={[styles.statCard, { backgroundColor: '#DBEAFE' }]}>
+        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
           <Text style={[styles.statValue, { color: '#3B82F6' }]}>{scheduledCount}</Text>
           <Text style={styles.statLabel}>Scheduled</Text>
         </View>
 
         <View style={[styles.statCard, { backgroundColor: '#FEF3C7' }]}>
-          <Text style={[styles.statValue, { color: '#F59E0B' }]}>{inProgressCount}</Text>
+          <Text style={[styles.statValue, { color: '#0066CC' }]}>{inProgressCount}</Text>
           <Text style={styles.statLabel}>In Progress</Text>
         </View>
 
         <View style={[styles.statCard, { backgroundColor: '#D1FAE5' }]}>
-          <Text style={[styles.statValue, { color: '#10B981' }]}>{passedCount}</Text>
+          <Text style={[styles.statValue, { color: '#0066CC' }]}>{passedCount}</Text>
           <Text style={styles.statLabel}>Passed</Text>
         </View>
 
         {analytics && (
           <View style={[styles.statCard, { backgroundColor: '#F3F4F6' }]}>
-            <Text style={[styles.statValue, { color: '#059669' }]}>
+            <Text style={[styles.statValue, { color: '#0066CC' }]}>
               {analytics.summary.passRate.toFixed(1)}%
             </Text>
             <Text style={styles.statLabel}>Pass Rate</Text>
@@ -264,7 +264,7 @@ export default function InspectionsScreen() {
                         'list-outline'
                       }
                       size={12}
-                      color="#10B981"
+                      color="#0066CC"
                       style={{ marginRight: 4 }}
                     />
                     <Text style={styles.typeBadgeText}>{inspection.type}</Text>
@@ -304,7 +304,7 @@ export default function InspectionsScreen() {
                     </View>
 
                     <View style={styles.resultItem}>
-                      <Text style={[styles.resultValue, { color: '#EF4444' }]}>
+                      <Text style={[styles.resultValue, { color: '#000000' }]}>
                         {inspection.result.failedItems}
                       </Text>
                       <Text style={styles.resultLabel}>Failed</Text>
@@ -318,7 +318,7 @@ export default function InspectionsScreen() {
                     </View>
 
                     <View style={styles.resultItem}>
-                      <Text style={[styles.resultValue, { color: '#10B981' }]}>
+                      <Text style={[styles.resultValue, { color: '#0066CC' }]}>
                         {inspection.result.passRate.toFixed(0)}%
                       </Text>
                       <Text style={styles.resultLabel}>Pass Rate</Text>
@@ -367,7 +367,7 @@ export default function InspectionsScreen() {
               {/* Critical Warning */}
               {hasCriticalFindings && (
                 <View style={styles.criticalWarning}>
-                  <Ionicons name="warning" size={16} color="#DC2626" />
+                  <Ionicons name="warning" size={16} color="#000000" />
                   <Text style={styles.criticalWarningText}>
                     {inspection.result!.criticalFindings} critical finding
                     {inspection.result!.criticalFindings > 1 ? 's' : ''} require immediate attention
@@ -583,7 +583,7 @@ const styles = StyleSheet.create({
   typeBadgeText: {
     fontSize: 10,
     fontWeight: '600',
-    color: '#059669',
+    color: '#0066CC',
   },
   infoSection: {
     marginBottom: 12,
@@ -614,7 +614,7 @@ const styles = StyleSheet.create({
   resultValue: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#10B981',
+    color: '#0066CC',
     marginBottom: 2,
   },
   resultLabel: {
@@ -667,7 +667,7 @@ const styles = StyleSheet.create({
   },
   criticalWarningText: {
     fontSize: 11,
-    color: '#DC2626',
+    color: '#000000',
     fontWeight: '600',
     marginLeft: 6,
     flex: 1,
@@ -689,10 +689,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#3B82F6',
   },
   actionButtonSuccess: {
-    backgroundColor: '#10B981',
+    backgroundColor: '#0066CC',
   },
   actionButtonWarning: {
-    backgroundColor: '#F59E0B',
+    backgroundColor: '#0066CC',
   },
   actionButtonText: {
     fontSize: 12,

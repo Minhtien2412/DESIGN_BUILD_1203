@@ -1,11 +1,18 @@
+import MaterialsCatalogService, {
+    Material,
+    MATERIAL_CATEGORIES,
+    MOCK_MATERIALS
+} from '@/services/materialsCatalogService';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Stack } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
+    ActivityIndicator,
     Dimensions,
     Image,
     Modal,
+    RefreshControl,
     ScrollView,
     StyleSheet,
     Text,
@@ -17,143 +24,52 @@ import {
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 36) / 2;
 
-// Material Categories
-const MATERIAL_CATEGORIES = [
-  { id: 'all', name: 'Tất cả', icon: 'apps' },
-  { id: 'tiles', name: 'Gạch', icon: 'grid' },
-  { id: 'stone', name: 'Đá', icon: 'diamond' },
-  { id: 'wood', name: 'Gỗ', icon: 'leaf' },
-  { id: 'glass', name: 'Kính', icon: 'square-outline' },
-  { id: 'metal', name: 'Kim loại', icon: 'hardware-chip' },
-  { id: 'concrete', name: 'Bê tông', icon: 'cube' },
-];
-
-// Mock Materials Data
-const MATERIALS = [
-  {
-    id: 1,
-    name: 'Gạch Granite Bóng Kiếng 60x60',
-    category: 'tiles',
-    brand: 'Đồng Tâm',
-    price: '180.000₫',
-    unit: 'm²',
-    image: require('@/assets/images/react-logo.webp'),
-    rating: 4.8,
-    reviews: 245,
-    inStock: true,
-    arAvailable: true,
-    specs: {
-      size: '60x60cm',
-      thickness: '10mm',
-      finish: 'Bóng kiếng',
-      origin: 'Việt Nam',
-    },
-  },
-  {
-    id: 2,
-    name: 'Gạch Granite Vân Đá 80x80',
-    category: 'tiles',
-    brand: 'Viglacera',
-    price: '220.000₫',
-    unit: 'm²',
-    image: require('@/assets/images/react-logo.webp'),
-    rating: 4.9,
-    reviews: 312,
-    inStock: true,
-    arAvailable: true,
-    specs: {
-      size: '80x80cm',
-      thickness: '11mm',
-      finish: 'Vân đá tự nhiên',
-      origin: 'Việt Nam',
-    },
-  },
-  {
-    id: 3,
-    name: 'Đá Granite Trắng Bắc Hà',
-    category: 'stone',
-    brand: 'Đá Việt',
-    price: '450.000₫',
-    unit: 'm²',
-    image: require('@/assets/images/react-logo.webp'),
-    rating: 4.7,
-    reviews: 156,
-    inStock: true,
-    arAvailable: false,
-    specs: {
-      thickness: '2cm',
-      finish: 'Mài bóng',
-      hardness: 'Cao',
-      origin: 'Việt Nam',
-    },
-  },
-  {
-    id: 4,
-    name: 'Gỗ Sàn Công Nghiệp Đức',
-    category: 'wood',
-    brand: 'Kronoswiss',
-    price: '380.000₫',
-    unit: 'm²',
-    image: require('@/assets/images/react-logo.webp'),
-    rating: 4.9,
-    reviews: 428,
-    inStock: true,
-    arAvailable: true,
-    specs: {
-      thickness: '12mm',
-      waterResist: 'AC4',
-      warranty: '20 năm',
-      origin: 'Đức',
-    },
-  },
-  {
-    id: 5,
-    name: 'Kính Cường Lực 10mm',
-    category: 'glass',
-    brand: 'Việt Nhật',
-    price: '650.000₫',
-    unit: 'm²',
-    image: require('@/assets/images/react-logo.webp'),
-    rating: 4.6,
-    reviews: 89,
-    inStock: true,
-    arAvailable: false,
-    specs: {
-      thickness: '10mm',
-      type: 'Cường lực',
-      safety: 'An toàn',
-      origin: 'Việt Nam',
-    },
-  },
-  {
-    id: 6,
-    name: 'Thép Không Gỉ 304',
-    category: 'metal',
-    brand: 'Posco',
-    price: '850.000₫',
-    unit: 'm²',
-    image: require('@/assets/images/react-logo.webp'),
-    rating: 4.8,
-    reviews: 134,
-    inStock: true,
-    arAvailable: false,
-    specs: {
-      grade: '304',
-      thickness: '2mm',
-      finish: 'Hairline',
-      origin: 'Hàn Quốc',
-    },
-  },
-];
-
 export default function MaterialsCatalogScreen() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedMaterial, setSelectedMaterial] = useState<any>(null);
+  const [selectedMaterial, setSelectedMaterial] = useState<Material | null>(null);
   const [sortBy, setSortBy] = useState('popular');
   const [showARPreview, setShowARPreview] = useState(false);
+  const [materials, setMaterials] = useState<Material[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState(false);
 
-  const filteredMaterials = MATERIALS.filter((material) => {
+  // Load materials from API
+  const loadMaterials = async (isRefresh = false) => {
+    try {
+      if (!isRefresh) setLoading(true);
+      setError(false);
+      
+      const data = await MaterialsCatalogService.getMaterials(
+        selectedCategory as any,
+        searchQuery || undefined
+      );
+      setMaterials(data);
+    } catch (err) {
+      console.error('Materials load error:', err);
+      setError(true);
+      setMaterials(MOCK_MATERIALS);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    loadMaterials();
+  }, [selectedCategory]);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    loadMaterials(true);
+  };
+
+  const handleSearch = () => {
+    loadMaterials();
+  };
+
+  const filteredMaterials = materials.filter((material) => {
     const matchCategory = selectedCategory === 'all' || material.category === selectedCategory;
     const matchSearch =
       searchQuery === '' ||
@@ -180,7 +96,7 @@ export default function MaterialsCatalogScreen() {
       <Stack.Screen
         options={{
           title: 'Catalog Vật Liệu',
-          headerStyle: { backgroundColor: '#ee4d2d' },
+          headerStyle: { backgroundColor: '#0066CC' },
           headerTintColor: '#fff',
           headerTitleStyle: { fontWeight: '600' },
         }}
@@ -188,11 +104,18 @@ export default function MaterialsCatalogScreen() {
       <View style={styles.container}>
         {/* Hero Section */}
         <LinearGradient
-          colors={['#ee4d2d', '#ff6b3d']}
+          colors={['#0066CC', '#3399FF']}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.hero}
         >
+          {error && (
+            <View style={styles.errorBanner}>
+              <Ionicons name="alert-circle" size={18} color="#fff" />
+              <Text style={styles.errorText}>Server không khả dụng - Dùng dữ liệu demo</Text>
+            </View>
+          )}
+          
           <Text style={styles.heroTitle}>Khám phá vật liệu xây dựng</Text>
           <Text style={styles.heroSubtitle}>Hơn 10,000+ sản phẩm chất lượng</Text>
 
@@ -205,6 +128,8 @@ export default function MaterialsCatalogScreen() {
               placeholderTextColor="#999"
               value={searchQuery}
               onChangeText={setSearchQuery}
+              onSubmitEditing={handleSearch}
+              returnKeyType="search"
             />
             {searchQuery !== '' && (
               <TouchableOpacity onPress={() => setSearchQuery('')}>
@@ -214,6 +139,13 @@ export default function MaterialsCatalogScreen() {
           </View>
         </LinearGradient>
 
+        {loading && !materials.length ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#0066CC" />
+            <Text style={styles.loadingText}>Đang tải vật liệu...</Text>
+          </View>
+        ) : (
+        <>
         {/* Categories */}
         <View style={styles.categoriesSection}>
           <ScrollView
@@ -272,7 +204,7 @@ export default function MaterialsCatalogScreen() {
                 <Ionicons
                   name={option.icon as any}
                   size={14}
-                  color={sortBy === option.id ? '#fff' : '#ee4d2d'}
+                  color={sortBy === option.id ? '#fff' : '#0066CC'}
                 />
                 <Text
                   style={[
@@ -289,7 +221,11 @@ export default function MaterialsCatalogScreen() {
         </View>
 
         {/* Materials Grid */}
-        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        <ScrollView 
+          style={styles.content} 
+          showsVerticalScrollIndicator={false}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        >
           <View style={styles.grid}>
             {sortedMaterials.map((material) => (
               <TouchableOpacity
@@ -324,7 +260,7 @@ export default function MaterialsCatalogScreen() {
 
                   {/* Rating */}
                   <View style={styles.rating}>
-                    <Ionicons name="star" size={12} color="#FFD700" />
+                    <Ionicons name="star" size={12} color="#FFFFFF" />
                     <Text style={styles.ratingText}>{material.rating}</Text>
                     <Text style={styles.reviewsText}>({material.reviews})</Text>
                   </View>
@@ -344,6 +280,8 @@ export default function MaterialsCatalogScreen() {
             ))}
           </View>
         </ScrollView>
+        </>
+        )}
       </View>
 
       {/* Material Detail Modal */}
@@ -372,7 +310,7 @@ export default function MaterialsCatalogScreen() {
                       <Text style={styles.modalBrandText}>{selectedMaterial.brand}</Text>
                     </View>
                     <View style={styles.modalRating}>
-                      <Ionicons name="star" size={16} color="#FFD700" />
+                      <Ionicons name="star" size={16} color="#FFFFFF" />
                       <Text style={styles.modalRatingText}>{selectedMaterial.rating}</Text>
                     </View>
                   </View>
@@ -411,7 +349,7 @@ export default function MaterialsCatalogScreen() {
                           setShowARPreview(true);
                         }}
                       >
-                        <Ionicons name="cube" size={20} color="#ee4d2d" />
+                        <Ionicons name="cube" size={20} color="#0066CC" />
                         <Text style={styles.arButtonText}>Xem AR</Text>
                       </TouchableOpacity>
                     )}
@@ -475,6 +413,32 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f8f9fa',
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingTop: 100,
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 14,
+    color: '#666',
+  },
+  errorBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    marginBottom: 12,
+    alignSelf: 'flex-start',
+    gap: 6,
+  },
+  errorText: {
+    color: '#fff',
+    fontSize: 12,
+  },
   hero: {
     paddingHorizontal: 16,
     paddingTop: 20,
@@ -532,7 +496,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   categoryChipActive: {
-    backgroundColor: '#ee4d2d',
+    backgroundColor: '#0066CC',
   },
   categoryText: {
     fontSize: 13,
@@ -563,16 +527,16 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#ee4d2d',
+    borderColor: '#0066CC',
     gap: 4,
   },
   sortChipActive: {
-    backgroundColor: '#ee4d2d',
+    backgroundColor: '#0066CC',
   },
   sortText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#ee4d2d',
+    color: '#0066CC',
   },
   sortTextActive: {
     color: '#fff',
@@ -645,7 +609,7 @@ const styles = StyleSheet.create({
   brandText: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#ee4d2d',
+    color: '#0066CC',
     marginBottom: 4,
   },
   materialName: {
@@ -678,14 +642,14 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#ee4d2d',
+    color: '#0066CC',
   },
   unit: {
     fontSize: 11,
     color: '#999',
   },
   addButton: {
-    backgroundColor: '#ee4d2d',
+    backgroundColor: '#0066CC',
     width: 32,
     height: 32,
     borderRadius: 16,
@@ -735,7 +699,7 @@ const styles = StyleSheet.create({
   modalBrandText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#ee4d2d',
+    color: '#0066CC',
   },
   modalRating: {
     flexDirection: 'row',
@@ -793,7 +757,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#fff5f0',
     borderWidth: 1,
-    borderColor: '#ee4d2d',
+    borderColor: '#0066CC',
     paddingVertical: 12,
     borderRadius: 8,
     gap: 6,
@@ -801,7 +765,7 @@ const styles = StyleSheet.create({
   arButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#ee4d2d',
+    color: '#0066CC',
   },
   contactButton: {
     flex: 1,
@@ -829,7 +793,7 @@ const styles = StyleSheet.create({
   modalPrice: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#ee4d2d',
+    color: '#0066CC',
   },
   modalUnit: {
     fontSize: 13,
@@ -838,7 +802,7 @@ const styles = StyleSheet.create({
   addToCartButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#ee4d2d',
+    backgroundColor: '#0066CC',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 24,

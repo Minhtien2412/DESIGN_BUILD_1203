@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Advanced Auth System
  * - Login: Phone/Email/Username + Password + Forgot Password (OTP)
  * - Signup: User role selection (Client vs Contractor)  
@@ -28,22 +28,22 @@ import { useAuth } from '@/context/AuthContext';
 
 // User roles and permissions
 export const USER_ROLES = {
-    CLIENT: 'client', // Khách hàng có nhu cầu thiết kế nhà
-    CONTRACTOR: 'contractor', // Nhà thầu xây dựng
-    ADMIN: 'admin', // Quản trị viên
+    CLIENT: 'client', // Kh�ch h�ng c� nhu c?u thi?t k? nh�
+    CONTRACTOR: 'contractor', // Nh� th?u x�y d?ng
+    ADMIN: 'admin', // Qu?n tr? vi�n
 } as const;
 
 export const PERMISSIONS = {
-    VIEW_BIDS: 'view_bids', // Xem gói thầu
-    VIEW_PROGRESS: 'view_progress', // Xem tiến độ
-    VIEW_PAYMENTS: 'view_payments', // Xem thanh toán
-    VIEW_PRICING: 'view_pricing', // Xem giá tiền
-    CHAT_CUSTOMERS: 'chat_customers', // Chat với khách hàng
-    POST_ARTICLES: 'post_articles', // Đăng bài viết
+    VIEW_BIDS: 'view_bids', // Xem g�i th?u
+    VIEW_PROGRESS: 'view_progress', // Xem ti?n d?
+    VIEW_PAYMENTS: 'view_payments', // Xem thanh to�n
+    VIEW_PRICING: 'view_pricing', // Xem gi� ti?n
+    CHAT_CUSTOMERS: 'chat_customers', // Chat v?i kh�ch h�ng
+    POST_ARTICLES: 'post_articles', // �ang b�i vi?t
     LIVE_STREAM: 'live_stream', // Live stream
-    POST_PRODUCTS: 'post_products', // Đăng sản phẩm
-    BID_PROJECTS: 'bid_projects', // Đấu thầu
-    VIEW_CUSTOMER_INFO: 'view_customer_info', // Xem thông tin khách hàng
+    POST_PRODUCTS: 'post_products', // �ang s?n ph?m
+    BID_PROJECTS: 'bid_projects', // �?u th?u
+    VIEW_CUSTOMER_INFO: 'view_customer_info', // Xem th�ng tin kh�ch h�ng
 } as const;
 
 export default function AdvancedAuthScreen() {
@@ -94,7 +94,7 @@ export default function AdvancedAuthScreen() {
     const handleLogin = async () => {
         try {
             if (!loginData.account.trim() || !loginData.password) {
-                Alert.alert('Lỗi', 'Vui lòng điền đầy đủ thông tin');
+                Alert.alert('L?i', 'Vui l�ng di?n d?y d? th�ng tin');
                 return;
             }
 
@@ -117,11 +117,11 @@ export default function AdvancedAuthScreen() {
             // signIn only accepts (email, password), convert apiData
             const emailOrPhone = apiData.email || apiData.phone || apiData.username;
             await signIn(emailOrPhone, loginData.password);
-            Alert.alert('Thành công', 'Đăng nhập thành công!', [
+            Alert.alert('Th�nh c�ng', '�ang nh?p th�nh c�ng!', [
                 { text: 'OK', onPress: () => router.replace('/(tabs)') }
             ]);
         } catch (error: any) {
-            Alert.alert('Lỗi đăng nhập', error.message || 'Đăng nhập thất bại');
+            Alert.alert('L?i dang nh?p', error.message || '�ang nh?p th?t b?i');
         }
     };
 
@@ -132,30 +132,30 @@ export default function AdvancedAuthScreen() {
             if (!signupData.name.trim() || !signupData.email.trim() || 
                 !signupData.phone.trim() || !signupData.username.trim() || 
                 !signupData.password || !signupData.confirmPassword) {
-                Alert.alert('Lỗi', 'Vui lòng điền đầy đủ thông tin');
+                Alert.alert('L?i', 'Vui l�ng di?n d?y d? th�ng tin');
                 return;
             }
 
             if (signupData.password !== signupData.confirmPassword) {
-                Alert.alert('Lỗi', 'Mật khẩu xác nhận không khớp');
+                Alert.alert('L?i', 'M?t kh?u x�c nh?n kh�ng kh?p');
                 return;
             }
 
             if (signupData.password.length < 6) {
-                Alert.alert('Lỗi', 'Mật khẩu phải có ít nhất 6 ký tự');
+                Alert.alert('L?i', 'M?t kh?u ph?i c� �t nh?t 6 k� t?');
                 return;
             }
 
             // Email validation
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(signupData.email.trim())) {
-                Alert.alert('Lỗi', 'Email không hợp lệ');
+                Alert.alert('L?i', 'Email kh�ng h?p l?');
                 return;
             }
 
             // Phone validation
             if (!/^\d{10,11}$/.test(signupData.phone.trim())) {
-                Alert.alert('Lỗi', 'Số điện thoại không hợp lệ');
+                Alert.alert('L?i', 'S? di?n tho?i kh�ng h?p l?');
                 return;
             }
 
@@ -166,11 +166,11 @@ export default function AdvancedAuthScreen() {
                 signupData.name.trim()
             );
 
-            Alert.alert('Thành công', 'Đăng ký thành công!', [
+            Alert.alert('Th�nh c�ng', '�ang k� th�nh c�ng!', [
                 { text: 'OK', onPress: () => setScreen('login') }
             ]);
         } catch (error: any) {
-            Alert.alert('Lỗi đăng ký', error.message || 'Đăng ký thất bại');
+            Alert.alert('L?i dang k�', error.message || '�ang k� th?t b?i');
         }
     };
 
@@ -178,19 +178,19 @@ export default function AdvancedAuthScreen() {
     const handleForgotRequest = async () => {
         try {
             if (!forgotData.contact.trim()) {
-                Alert.alert('Lỗi', 'Vui lòng nhập email hoặc số điện thoại');
+                Alert.alert('L?i', 'Vui l�ng nh?p email ho?c s? di?n tho?i');
                 return;
             }
 
             // TODO: Integrate with real OTP API
             // For now, simulate OTP request
-            Alert.alert('OTP đã gửi', 
-                `Mã OTP đã được gửi đến ${forgotData.contact}. ` +
-                `Vui lòng kiểm tra ${forgotData.method === 'email' ? 'email' : 'tin nhắn'} của bạn.`
+            Alert.alert('OTP d� g?i', 
+                `M� OTP d� du?c g?i d?n ${forgotData.contact}. ` +
+                `Vui l�ng ki?m tra ${forgotData.method === 'email' ? 'email' : 'tin nh?n'} c?a b?n.`
             );
             setForgotStep('verify');
         } catch (error) {
-            Alert.alert('Lỗi', 'Có lỗi xảy ra khi gửi OTP');
+            Alert.alert('L?i', 'C� l?i x?y ra khi g?i OTP');
         }
     };
 
@@ -198,7 +198,7 @@ export default function AdvancedAuthScreen() {
     const handleForgotVerify = async () => {
         try {
             if (!forgotData.otp.trim()) {
-                Alert.alert('Lỗi', 'Vui lòng nhập mã OTP');
+                Alert.alert('L?i', 'Vui l�ng nh?p m� OTP');
                 return;
             }
 
@@ -207,10 +207,10 @@ export default function AdvancedAuthScreen() {
             if (forgotData.otp === '123456') { // Demo OTP
                 setForgotStep('reset');
             } else {
-                Alert.alert('Lỗi', 'Mã OTP không chính xác');
+                Alert.alert('L?i', 'M� OTP kh�ng ch�nh x�c');
             }
         } catch (error) {
-            Alert.alert('Lỗi', 'Có lỗi xảy ra khi xác thực OTP');
+            Alert.alert('L?i', 'C� l?i x?y ra khi x�c th?c OTP');
         }
     };
 
@@ -218,22 +218,22 @@ export default function AdvancedAuthScreen() {
     const handlePasswordReset = async () => {
         try {
             if (!forgotData.newPassword || !forgotData.confirmNewPassword) {
-                Alert.alert('Lỗi', 'Vui lòng điền đầy đủ mật khẩu mới');
+                Alert.alert('L?i', 'Vui l�ng di?n d?y d? m?t kh?u m?i');
                 return;
             }
 
             if (forgotData.newPassword !== forgotData.confirmNewPassword) {
-                Alert.alert('Lỗi', 'Mật khẩu xác nhận không khớp');
+                Alert.alert('L?i', 'M?t kh?u x�c nh?n kh�ng kh?p');
                 return;
             }
 
             if (forgotData.newPassword.length < 6) {
-                Alert.alert('Lỗi', 'Mật khẩu phải có ít nhất 6 ký tự');
+                Alert.alert('L?i', 'M?t kh?u ph?i c� �t nh?t 6 k� t?');
                 return;
             }
 
             // TODO: Integrate with real password reset API
-            Alert.alert('Thành công', 'Đặt lại mật khẩu thành công!', [
+            Alert.alert('Th�nh c�ng', '�?t l?i m?t kh?u th�nh c�ng!', [
                 { 
                     text: 'OK', 
                     onPress: () => {
@@ -244,7 +244,7 @@ export default function AdvancedAuthScreen() {
                 }
             ]);
         } catch (error) {
-            Alert.alert('Lỗi', 'Có lỗi xảy ra khi đặt lại mật khẩu');
+            Alert.alert('L?i', 'C� l?i x?y ra khi d?t l?i m?t kh?u');
         }
     };
 
@@ -280,12 +280,12 @@ export default function AdvancedAuthScreen() {
                     {/* Header */}
                     <View style={styles.header}>
                         <Text style={styles.title}>
-                            {screen === 'login' ? 'Đăng Nhập' : 
-                             screen === 'signup' ? 'Đăng Ký' : 'Quên Mật Khẩu'}
+                            {screen === 'login' ? '�ang Nh?p' : 
+                             screen === 'signup' ? '�ang K�' : 'Qu�n M?t Kh?u'}
                         </Text>
                         <Text style={styles.subtitle}>
-                            {screen === 'login' ? 'Chào mừng bạn trở lại!' : 
-                             screen === 'signup' ? 'Tạo tài khoản mới' : 'Khôi phục mật khẩu'}
+                            {screen === 'login' ? 'Ch�o m?ng b?n tr? l?i!' : 
+                             screen === 'signup' ? 'T?o t�i kho?n m?i' : 'Kh�i ph?c m?t kh?u'}
                         </Text>
                     </View>
 
@@ -296,7 +296,7 @@ export default function AdvancedAuthScreen() {
                             onPress={() => setScreen('login')}
                         >
                             <Text style={[styles.screenNavText, screen === 'login' && styles.screenNavTextActive]}>
-                                Đăng Nhập
+                                �ang Nh?p
                             </Text>
                         </Pressable>
                         <Pressable
@@ -304,7 +304,7 @@ export default function AdvancedAuthScreen() {
                             onPress={() => setScreen('signup')}
                         >
                             <Text style={[styles.screenNavText, screen === 'signup' && styles.screenNavTextActive]}>
-                                Đăng Ký
+                                �ang K�
                             </Text>
                         </Pressable>
                     </View>
@@ -314,25 +314,25 @@ export default function AdvancedAuthScreen() {
                         <>
                             {/* Quick Demo Access */}
                             <View style={styles.demoContainer}>
-                                <Text style={styles.demoTitle}>Truy cập nhanh (Demo):</Text>
+                                <Text style={styles.demoTitle}>Truy c?p nhanh (Demo):</Text>
                                 <View style={styles.demoButtons}>
                                     <TouchableOpacity 
                                         style={[styles.demoButton, { backgroundColor: '#FFE5E5' }]}
                                         onPress={() => quickFillDemo('admin')}
                                     >
-                                        <Text style={styles.demoButtonText}>👑 Admin</Text>
+                                        <Text style={styles.demoButtonText}>?? Admin</Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity 
                                         style={[styles.demoButton, { backgroundColor: '#E5F3FF' }]}
                                         onPress={() => quickFillDemo('client')}
                                     >
-                                        <Text style={styles.demoButtonText}>🏠 Khách hàng</Text>
+                                        <Text style={styles.demoButtonText}>?? Kh�ch h�ng</Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity 
                                         style={[styles.demoButton, { backgroundColor: '#E5FFE5' }]}
                                         onPress={() => quickFillDemo('contractor')}
                                     >
-                                        <Text style={styles.demoButtonText}>🔨 Nhà thầu</Text>
+                                        <Text style={styles.demoButtonText}>?? Nh� th?u</Text>
                                     </TouchableOpacity>
                                 </View>
                             </View>
@@ -340,30 +340,30 @@ export default function AdvancedAuthScreen() {
                             {/* Login Form */}
                             <View style={styles.formContainer}>
                                 <View style={styles.inputContainer}>
-                                    <Text style={styles.inputLabel}>Tài khoản</Text>
+                                    <Text style={styles.inputLabel}>T�i kho?n</Text>
                                     <TextInput
                                         style={styles.textInput}
                                         value={loginData.account}
                                         onChangeText={(text) => setLoginData({ ...loginData, account: text })}
-                                        placeholder="Email, Số điện thoại hoặc Username"
+                                        placeholder="Email, S? di?n tho?i ho?c Username"
                                         autoCapitalize="none"
                                         keyboardType={loginData.account.includes('@') ? 'email-address' : 'default'}
                                     />
                                     <Text style={styles.inputHint}>
-                                        Phát hiện: {detectAccountType(loginData.account) === 'email' ? '📧 Email' : 
-                                                  detectAccountType(loginData.account) === 'phone' ? '📱 Số điện thoại' : 
-                                                  '👤 Username'}
+                                        Ph�t hi?n: {detectAccountType(loginData.account) === 'email' ? '?? Email' : 
+                                                  detectAccountType(loginData.account) === 'phone' ? '?? S? di?n tho?i' : 
+                                                  '?? Username'}
                                     </Text>
                                 </View>
 
                                 <View style={styles.inputContainer}>
-                                    <Text style={styles.inputLabel}>Mật khẩu</Text>
+                                    <Text style={styles.inputLabel}>M?t kh?u</Text>
                                     <View style={styles.passwordContainer}>
                                         <TextInput
                                             style={styles.passwordInput}
                                             value={loginData.password}
                                             onChangeText={(text) => setLoginData({ ...loginData, password: text })}
-                                            placeholder="Nhập mật khẩu"
+                                            placeholder="Nh?p m?t kh?u"
                                             secureTextEntry={!showPassword}
                                         />
                                         <TouchableOpacity
@@ -384,13 +384,13 @@ export default function AdvancedAuthScreen() {
                                     style={styles.forgotLink}
                                     onPress={() => setScreen('forgot')}
                                 >
-                                    <Text style={styles.forgotText}>Quên mật khẩu?</Text>
+                                    <Text style={styles.forgotText}>Qu�n m?t kh?u?</Text>
                                 </TouchableOpacity>
                             </View>
 
                             {/* Login Button */}
                             <Button
-                                title="Đăng Nhập"
+                                title="�ang Nh?p"
                                 onPress={handleLogin}
                                 loading={loading}
                                 style={styles.actionButton}
@@ -403,7 +403,7 @@ export default function AdvancedAuthScreen() {
                         <>
                             {/* Role Selection */}
                             <View style={styles.roleContainer}>
-                                <Text style={styles.roleTitle}>Bạn là:</Text>
+                                <Text style={styles.roleTitle}>B?n l�:</Text>
                                 <View style={styles.roleButtons}>
                                     <Pressable
                                         style={[
@@ -421,10 +421,10 @@ export default function AdvancedAuthScreen() {
                                             styles.roleButtonText,
                                             signupData.role === USER_ROLES.CLIENT && styles.roleButtonTextActive
                                         ]}>
-                                            Khách hàng
+                                            Kh�ch h�ng
                                         </Text>
                                         <Text style={styles.roleButtonDesc}>
-                                            Có nhu cầu thiết kế nhà
+                                            C� nhu c?u thi?t k? nh�
                                         </Text>
                                     </Pressable>
 
@@ -444,10 +444,10 @@ export default function AdvancedAuthScreen() {
                                             styles.roleButtonText,
                                             signupData.role === USER_ROLES.CONTRACTOR && styles.roleButtonTextActive
                                         ]}>
-                                            Nhà thầu
+                                            Nh� th?u
                                         </Text>
                                         <Text style={styles.roleButtonDesc}>
-                                            Xây dựng & kết nối khách hàng
+                                            X�y d?ng & k?t n?i kh�ch h�ng
                                         </Text>
                                     </Pressable>
                                 </View>
@@ -456,12 +456,12 @@ export default function AdvancedAuthScreen() {
                             {/* Signup Form */}
                             <View style={styles.formContainer}>
                                 <View style={styles.inputContainer}>
-                                    <Text style={styles.inputLabel}>Họ và tên *</Text>
+                                    <Text style={styles.inputLabel}>H? v� t�n *</Text>
                                     <TextInput
                                         style={styles.textInput}
                                         value={signupData.name}
                                         onChangeText={(text) => setSignupData({ ...signupData, name: text })}
-                                        placeholder="Nhập họ và tên đầy đủ"
+                                        placeholder="Nh?p h? v� t�n d?y d?"
                                         autoCapitalize="words"
                                     />
                                 </View>
@@ -480,7 +480,7 @@ export default function AdvancedAuthScreen() {
                                     </View>
 
                                     <View style={[styles.inputContainer, styles.inputHalf]}>
-                                        <Text style={styles.inputLabel}>Số điện thoại *</Text>
+                                        <Text style={styles.inputLabel}>S? di?n tho?i *</Text>
                                         <TextInput
                                             style={styles.textInput}
                                             value={signupData.phone}
@@ -497,29 +497,29 @@ export default function AdvancedAuthScreen() {
                                         style={styles.textInput}
                                         value={signupData.username}
                                         onChangeText={(text) => setSignupData({ ...signupData, username: text })}
-                                        placeholder="username (không dấu, không khoảng trắng)"
+                                        placeholder="username (kh�ng d?u, kh�ng kho?ng tr?ng)"
                                         autoCapitalize="none"
                                     />
                                 </View>
 
                                 <View style={styles.inputContainer}>
-                                    <Text style={styles.inputLabel}>Mật khẩu *</Text>
+                                    <Text style={styles.inputLabel}>M?t kh?u *</Text>
                                     <TextInput
                                         style={styles.textInput}
                                         value={signupData.password}
                                         onChangeText={(text) => setSignupData({ ...signupData, password: text })}
-                                        placeholder="Tối thiểu 6 ký tự"
+                                        placeholder="T?i thi?u 6 k� t?"
                                         secureTextEntry={!showPassword}
                                     />
                                 </View>
 
                                 <View style={styles.inputContainer}>
-                                    <Text style={styles.inputLabel}>Xác nhận mật khẩu *</Text>
+                                    <Text style={styles.inputLabel}>X�c nh?n m?t kh?u *</Text>
                                     <TextInput
                                         style={styles.textInput}
                                         value={signupData.confirmPassword}
                                         onChangeText={(text) => setSignupData({ ...signupData, confirmPassword: text })}
-                                        placeholder="Nhập lại mật khẩu"
+                                        placeholder="Nh?p l?i m?t kh?u"
                                         secureTextEntry={!showPassword}
                                     />
                                 </View>
@@ -527,7 +527,7 @@ export default function AdvancedAuthScreen() {
 
                             {/* Signup Button */}
                             <Button
-                                title="Đăng Ký Tài Khoản"
+                                title="�ang K� T�i Kho?n"
                                 onPress={handleSignup}
                                 loading={loading}
                                 style={styles.actionButton}
@@ -543,13 +543,13 @@ export default function AdvancedAuthScreen() {
                                     <View style={styles.forgotInfo}>
                                         <MaterialCommunityIcons name="lock-reset" size={48} color="#007AFF" />
                                         <Text style={styles.forgotInfoText}>
-                                            Nhập email hoặc số điện thoại để nhận mã OTP khôi phục mật khẩu
+                                            Nh?p email ho?c s? di?n tho?i d? nh?n m� OTP kh�i ph?c m?t kh?u
                                         </Text>
                                     </View>
 
                                     <View style={styles.formContainer}>
                                         <View style={styles.inputContainer}>
-                                            <Text style={styles.inputLabel}>Email hoặc Số điện thoại</Text>
+                                            <Text style={styles.inputLabel}>Email ho?c S? di?n tho?i</Text>
                                             <TextInput
                                                 style={styles.textInput}
                                                 value={forgotData.contact}
@@ -560,17 +560,17 @@ export default function AdvancedAuthScreen() {
                                                         method: text.includes('@') ? 'email' : 'phone'
                                                     });
                                                 }}
-                                                placeholder="Nhập email hoặc số điện thoại"
+                                                placeholder="Nh?p email ho?c s? di?n tho?i"
                                                 keyboardType={forgotData.contact.includes('@') ? 'email-address' : 'phone-pad'}
                                             />
                                             <Text style={styles.inputHint}>
-                                                OTP sẽ được gửi qua: {forgotData.method === 'email' ? '📧 Email' : '📱 SMS'}
+                                                OTP s? du?c g?i qua: {forgotData.method === 'email' ? '?? Email' : '?? SMS'}
                                             </Text>
                                         </View>
                                     </View>
 
                                     <Button
-                                        title="Gửi mã OTP"
+                                        title="G?i m� OTP"
                                         onPress={handleForgotRequest}
                                         loading={loading}
                                         style={styles.actionButton}
@@ -583,21 +583,21 @@ export default function AdvancedAuthScreen() {
                                     <View style={styles.forgotInfo}>
                                         <MaterialCommunityIcons name="message-processing" size={48} color="#007AFF" />
                                         <Text style={styles.forgotInfoText}>
-                                            Mã OTP đã được gửi đến {forgotData.contact}
+                                            M� OTP d� du?c g?i d?n {forgotData.contact}
                                         </Text>
                                         <Text style={styles.forgotSubText}>
-                                            Vui lòng kiểm tra {forgotData.method === 'email' ? 'email' : 'tin nhắn'} và nhập mã OTP
+                                            Vui l�ng ki?m tra {forgotData.method === 'email' ? 'email' : 'tin nh?n'} v� nh?p m� OTP
                                         </Text>
                                     </View>
 
                                     <View style={styles.formContainer}>
                                         <View style={styles.inputContainer}>
-                                            <Text style={styles.inputLabel}>Mã OTP</Text>
+                                            <Text style={styles.inputLabel}>M� OTP</Text>
                                             <TextInput
                                                 style={[styles.textInput, styles.otpInput]}
                                                 value={forgotData.otp}
                                                 onChangeText={(text) => setForgotData({ ...forgotData, otp: text })}
-                                                placeholder="Nhập mã OTP (Demo: 123456)"
+                                                placeholder="Nh?p m� OTP (Demo: 123456)"
                                                 keyboardType="number-pad"
                                                 maxLength={6}
                                             />
@@ -605,7 +605,7 @@ export default function AdvancedAuthScreen() {
                                     </View>
 
                                     <Button
-                                        title="Xác thực OTP"
+                                        title="X�c th?c OTP"
                                         onPress={handleForgotVerify}
                                         loading={loading}
                                         style={styles.actionButton}
@@ -615,7 +615,7 @@ export default function AdvancedAuthScreen() {
                                         style={styles.backButton}
                                         onPress={() => setForgotStep('request')}
                                     >
-                                        <Text style={styles.backButtonText}>← Quay lại</Text>
+                                        <Text style={styles.backButtonText}>? Quay l?i</Text>
                                     </TouchableOpacity>
                                 </>
                             )}
@@ -623,38 +623,38 @@ export default function AdvancedAuthScreen() {
                             {forgotStep === 'reset' && (
                                 <>
                                     <View style={styles.forgotInfo}>
-                                        <MaterialCommunityIcons name="lock-open" size={48} color="#4CAF50" />
+                                        <MaterialCommunityIcons name="lock-open" size={48} color="#0066CC" />
                                         <Text style={styles.forgotInfoText}>
-                                            OTP chính xác! Bây giờ bạn có thể đặt mật khẩu mới
+                                            OTP ch�nh x�c! B�y gi? b?n c� th? d?t m?t kh?u m?i
                                         </Text>
                                     </View>
 
                                     <View style={styles.formContainer}>
                                         <View style={styles.inputContainer}>
-                                            <Text style={styles.inputLabel}>Mật khẩu mới</Text>
+                                            <Text style={styles.inputLabel}>M?t kh?u m?i</Text>
                                             <TextInput
                                                 style={styles.textInput}
                                                 value={forgotData.newPassword}
                                                 onChangeText={(text) => setForgotData({ ...forgotData, newPassword: text })}
-                                                placeholder="Nhập mật khẩu mới (tối thiểu 6 ký tự)"
+                                                placeholder="Nh?p m?t kh?u m?i (t?i thi?u 6 k� t?)"
                                                 secureTextEntry={!showPassword}
                                             />
                                         </View>
 
                                         <View style={styles.inputContainer}>
-                                            <Text style={styles.inputLabel}>Xác nhận mật khẩu mới</Text>
+                                            <Text style={styles.inputLabel}>X�c nh?n m?t kh?u m?i</Text>
                                             <TextInput
                                                 style={styles.textInput}
                                                 value={forgotData.confirmNewPassword}
                                                 onChangeText={(text) => setForgotData({ ...forgotData, confirmNewPassword: text })}
-                                                placeholder="Nhập lại mật khẩu mới"
+                                                placeholder="Nh?p l?i m?t kh?u m?i"
                                                 secureTextEntry={!showPassword}
                                             />
                                         </View>
                                     </View>
 
                                     <Button
-                                        title="Đặt lại mật khẩu"
+                                        title="�?t l?i m?t kh?u"
                                         onPress={handlePasswordReset}
                                         loading={loading}
                                         style={styles.actionButton}
@@ -669,7 +669,7 @@ export default function AdvancedAuthScreen() {
                                     setForgotStep('request');
                                 }}
                             >
-                                <Text style={styles.backToLoginText}>← Quay lại đăng nhập</Text>
+                                <Text style={styles.backToLoginText}>? Quay l?i dang nh?p</Text>
                             </TouchableOpacity>
                         </>
                     )}
@@ -678,7 +678,7 @@ export default function AdvancedAuthScreen() {
                     {loading && (
                         <View style={styles.loadingOverlay}>
                             <Loader />
-                            <Text style={styles.loadingText}>Đang xử lý...</Text>
+                            <Text style={styles.loadingText}>�ang x? l�...</Text>
                         </View>
                     )}
                 </ScrollView>

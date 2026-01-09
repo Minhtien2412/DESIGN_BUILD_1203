@@ -160,7 +160,7 @@ export default function MaterialsListScreen() {
                 label="Tổng giá trị"
                 value={`${formatCurrency(stats.totalValue / 1000000)}M`}
                 subtitle="VNĐ"
-                gradientColors={['#3b82f6', '#2563eb']}
+                gradientColors={['#3b82f6', '#0066CC']}
                 style={styles.statCard}
               />
               <MetricCard
@@ -169,7 +169,7 @@ export default function MaterialsListScreen() {
                 value={stats.lowStockCount}
                 subtitle="loại vật liệu"
                 trend={stats.lowStockCount > 0 ? 'down' : 'neutral'}
-                gradientColors={['#ef4444', '#dc2626']}
+                gradientColors={['#000000', '#000000']}
                 style={styles.statCard}
               />
               <MetricCard
@@ -177,7 +177,7 @@ export default function MaterialsListScreen() {
                 label="Yêu cầu chờ"
                 value={stats.pendingRequests}
                 subtitle="đơn hàng"
-                gradientColors={['#f59e0b', '#d97706']}
+                gradientColors={['#0066CC', '#d97706']}
                 style={styles.statCard}
               />
               <MetricCard
@@ -185,7 +185,7 @@ export default function MaterialsListScreen() {
                 label="Giao dịch"
                 value={stats.recentTransactions}
                 subtitle="7 ngày qua"
-                gradientColors={['#10b981', '#059669']}
+                gradientColors={['#0066CC', '#0066CC']}
                 style={styles.statCard}
               />
             </ScrollView>
@@ -259,11 +259,11 @@ export default function MaterialsListScreen() {
                     onPress={() => router.push(`/projects/${projectId}/materials/${material.id}`)}
                   >
                     <View style={styles.materialHeader}>
-                      <View style={[styles.materialIcon, { backgroundColor: status === 'low' ? '#fee2e2' : '#eff6ff' }]}>
+                      <View style={[styles.materialIcon, { backgroundColor: status === 'low' ? '#fee2e2' : '#E8F4FF' }]}>
                         <Ionicons 
                           name={CATEGORY_ICONS[material.category]} 
                           size={24} 
-                          color={status === 'low' ? '#ef4444' : '#3b82f6'} 
+                          color={status === 'low' ? '#000000' : '#3b82f6'} 
                         />
                       </View>
 
@@ -310,10 +310,10 @@ export default function MaterialsListScreen() {
                       showPercentage={false}
                       gradientColors={
                         status === 'low' 
-                          ? ['#ef4444', '#dc2626'] 
+                          ? ['#000000', '#000000'] 
                           : status === 'medium' 
-                          ? ['#f59e0b', '#d97706'] 
-                          : ['#10b981', '#059669']
+                          ? ['#0066CC', '#d97706'] 
+                          : ['#0066CC', '#0066CC']
                       }
                       style={styles.stockProgress}
                     />

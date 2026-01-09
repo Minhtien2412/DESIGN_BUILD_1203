@@ -338,16 +338,16 @@ export const PROJECT_TYPE_CONFIG: Record<MindmapProjectType, {
   icon: string;
   color: string;
 }> = {
-  HOUSE: { label: 'Nhà ở', icon: 'home-outline', color: '#4CAF50' },
-  VILLA: { label: 'Biệt thự', icon: 'business-outline', color: '#9C27B0' },
-  APARTMENT: { label: 'Căn hộ', icon: 'layers-outline', color: '#2196F3' },
-  OFFICE: { label: 'Văn phòng', icon: 'briefcase-outline', color: '#FF9800' },
-  COMMERCIAL: { label: 'Thương mại', icon: 'storefront-outline', color: '#E91E63' },
-  INDUSTRIAL: { label: 'Công nghiệp', icon: 'construct-outline', color: '#607D8B' },
-  RENOVATION: { label: 'Sửa chữa', icon: 'hammer-outline', color: '#795548' },
-  INTERIOR: { label: 'Nội thất', icon: 'bed-outline', color: '#00BCD4' },
+  HOUSE: { label: 'Nhà ở', icon: 'home-outline', color: '#0066CC' },
+  VILLA: { label: 'Biệt thự', icon: 'business-outline', color: '#999999' },
+  APARTMENT: { label: 'Căn hộ', icon: 'layers-outline', color: '#0066CC' },
+  OFFICE: { label: 'Văn phòng', icon: 'briefcase-outline', color: '#0066CC' },
+  COMMERCIAL: { label: 'Thương mại', icon: 'storefront-outline', color: '#666666' },
+  INDUSTRIAL: { label: 'Công nghiệp', icon: 'construct-outline', color: '#666666' },
+  RENOVATION: { label: 'Sửa chữa', icon: 'hammer-outline', color: '#666666' },
+  INTERIOR: { label: 'Nội thất', icon: 'bed-outline', color: '#0080FF' },
   LANDSCAPE: { label: 'Cảnh quan', icon: 'leaf-outline', color: '#8BC34A' },
-  OTHER: { label: 'Khác', icon: 'ellipsis-horizontal', color: '#9E9E9E' },
+  OTHER: { label: 'Khác', icon: 'ellipsis-horizontal', color: '#999999' },
 };
 
 // ==================== MINDMAP NODE SYSTEM ====================
@@ -386,21 +386,21 @@ export const NODE_STATUS_CONFIG: Record<NodeStatus, {
 }> = {
   NOT_STARTED: { 
     label: 'Chưa bắt đầu', 
-    color: '#9E9E9E', 
+    color: '#999999', 
     bgColor: '#F5F5F5', 
     borderColor: '#E0E0E0',
     icon: 'ellipse-outline' 
   },
   IN_PROGRESS: { 
     label: 'Đang thực hiện', 
-    color: '#FF9800', 
-    bgColor: '#FFF3E0', 
+    color: '#0066CC', 
+    bgColor: '#E8F4FF', 
     borderColor: '#FFA84D',
     icon: 'construct-outline' 
   },
   PENDING_CHECK: { 
     label: 'Chờ kiểm tra', 
-    color: '#9C27B0', 
+    color: '#999999', 
     bgColor: '#F3E5F5', 
     borderColor: '#AB47BC',
     icon: 'search-outline' 
@@ -423,21 +423,21 @@ export const NODE_STATUS_CONFIG: Record<NodeStatus, {
     label: 'Bị từ chối', 
     color: '#E82A34', 
     bgColor: '#FFEBEE', 
-    borderColor: '#F44336',
+    borderColor: '#000000',
     icon: 'close-circle-outline' 
   },
   ON_HOLD: { 
     label: 'Tạm dừng', 
-    color: '#FFC107', 
-    bgColor: '#FFF8E1', 
+    color: '#0066CC', 
+    bgColor: '#F0F8FF', 
     borderColor: '#FFCA28',
     icon: 'pause-circle-outline' 
   },
   BLOCKED: { 
     label: 'Bị chặn', 
     color: '#D32F2F', 
-    bgColor: '#FFCDD2', 
-    borderColor: '#EF5350',
+    bgColor: '#E8E8E8', 
+    borderColor: '#000000',
     icon: 'alert-circle-outline' 
   },
 };
@@ -448,14 +448,14 @@ export const NODE_TYPE_CONFIG: Record<NodeType, {
   defaultColor: string;
   layer: MindmapLayer;
 }> = {
-  START: { label: 'Bắt đầu', icon: 'play-circle', defaultColor: '#4CAF50', layer: 'PROGRESS' },
-  END: { label: 'Kết thúc', icon: 'stop-circle', defaultColor: '#F44336', layer: 'PROGRESS' },
-  MILESTONE: { label: 'Cột mốc', icon: 'flag', defaultColor: '#2196F3', layer: 'PROGRESS' },
-  PHASE: { label: 'Giai đoạn', icon: 'layers', defaultColor: '#9C27B0', layer: 'PROGRESS' },
-  CHECKPOINT: { label: 'Kiểm tra', icon: 'shield-checkmark', defaultColor: '#FF9800', layer: 'PROGRESS' },
+  START: { label: 'Bắt đầu', icon: 'play-circle', defaultColor: '#0066CC', layer: 'PROGRESS' },
+  END: { label: 'Kết thúc', icon: 'stop-circle', defaultColor: '#000000', layer: 'PROGRESS' },
+  MILESTONE: { label: 'Cột mốc', icon: 'flag', defaultColor: '#0066CC', layer: 'PROGRESS' },
+  PHASE: { label: 'Giai đoạn', icon: 'layers', defaultColor: '#999999', layer: 'PROGRESS' },
+  CHECKPOINT: { label: 'Kiểm tra', icon: 'shield-checkmark', defaultColor: '#0066CC', layer: 'PROGRESS' },
   TASK: { label: 'Công việc', icon: 'construct', defaultColor: '#D39878', layer: 'CONTENT' },
-  SUBTASK: { label: 'Việc phụ', icon: 'git-branch', defaultColor: '#795548', layer: 'CONTENT' },
-  TODO: { label: 'Todo', icon: 'checkbox', defaultColor: '#607D8B', layer: 'TODOS' },
+  SUBTASK: { label: 'Việc phụ', icon: 'git-branch', defaultColor: '#666666', layer: 'CONTENT' },
+  TODO: { label: 'Todo', icon: 'checkbox', defaultColor: '#666666', layer: 'TODOS' },
 };
 
 export interface MindmapPosition {
@@ -564,11 +564,11 @@ export const CONNECTION_TYPE_CONFIG: Record<ConnectionType, {
   style: ConnectionStyle;
   icon: string;
 }> = {
-  SEQUENCE: { label: 'Tuần tự', color: '#2196F3', style: 'SOLID', icon: 'arrow-forward' },
-  DEPENDENCY: { label: 'Phụ thuộc', color: '#F44336', style: 'SOLID', icon: 'link' },
-  PARALLEL: { label: 'Song song', color: '#4CAF50', style: 'DASHED', icon: 'git-branch' },
-  OPTIONAL: { label: 'Tùy chọn', color: '#9E9E9E', style: 'DOTTED', icon: 'help-circle' },
-  BRANCH: { label: 'Rẽ nhánh', color: '#FF9800', style: 'DASHED', icon: 'git-merge' },
+  SEQUENCE: { label: 'Tuần tự', color: '#0066CC', style: 'SOLID', icon: 'arrow-forward' },
+  DEPENDENCY: { label: 'Phụ thuộc', color: '#000000', style: 'SOLID', icon: 'link' },
+  PARALLEL: { label: 'Song song', color: '#0066CC', style: 'DASHED', icon: 'git-branch' },
+  OPTIONAL: { label: 'Tùy chọn', color: '#999999', style: 'DOTTED', icon: 'help-circle' },
+  BRANCH: { label: 'Rẽ nhánh', color: '#0066CC', style: 'DASHED', icon: 'git-merge' },
 };
 
 // ==================== TODO SYSTEM (Admin/Manager creates, Contractor executes) ====================
@@ -628,10 +628,10 @@ export const TODO_PRIORITY_CONFIG: Record<TodoPriority, {
   bgColor: string;
   icon: string;
 }> = {
-  LOW: { label: 'Thấp', color: '#9E9E9E', bgColor: '#F5F5F5', icon: 'arrow-down' },
-  MEDIUM: { label: 'Trung bình', color: '#FF9800', bgColor: '#FFF3E0', icon: 'remove' },
-  HIGH: { label: 'Cao', color: '#F44336', bgColor: '#FFEBEE', icon: 'arrow-up' },
-  URGENT: { label: 'Khẩn cấp', color: '#D32F2F', bgColor: '#FFCDD2', icon: 'alert' },
+  LOW: { label: 'Thấp', color: '#999999', bgColor: '#F5F5F5', icon: 'arrow-down' },
+  MEDIUM: { label: 'Trung bình', color: '#0066CC', bgColor: '#E8F4FF', icon: 'remove' },
+  HIGH: { label: 'Cao', color: '#000000', bgColor: '#FFEBEE', icon: 'arrow-up' },
+  URGENT: { label: 'Khẩn cấp', color: '#D32F2F', bgColor: '#E8E8E8', icon: 'alert' },
 };
 
 export const TODO_STATUS_CONFIG: Record<TodoStatus, {
@@ -640,10 +640,10 @@ export const TODO_STATUS_CONFIG: Record<TodoStatus, {
   bgColor: string;
   icon: string;
 }> = {
-  TODO: { label: 'Cần làm', color: '#9E9E9E', bgColor: '#F5F5F5', icon: 'checkbox-outline' },
-  IN_PROGRESS: { label: 'Đang làm', color: '#2196F3', bgColor: '#E3F2FD', icon: 'construct-outline' },
-  REVIEW: { label: 'Chờ duyệt', color: '#9C27B0', bgColor: '#F3E5F5', icon: 'eye-outline' },
-  DONE: { label: 'Hoàn thành', color: '#4CAF50', bgColor: '#E8F5E9', icon: 'checkmark-circle' },
+  TODO: { label: 'Cần làm', color: '#999999', bgColor: '#F5F5F5', icon: 'checkbox-outline' },
+  IN_PROGRESS: { label: 'Đang làm', color: '#0066CC', bgColor: '#E8F4FF', icon: 'construct-outline' },
+  REVIEW: { label: 'Chờ duyệt', color: '#999999', bgColor: '#F3E5F5', icon: 'eye-outline' },
+  DONE: { label: 'Hoàn thành', color: '#0066CC', bgColor: '#E8F5E9', icon: 'checkmark-circle' },
   CANCELLED: { label: 'Đã hủy', color: '#757575', bgColor: '#EEEEEE', icon: 'close-circle' },
 };
 

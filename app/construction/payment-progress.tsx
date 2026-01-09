@@ -257,8 +257,8 @@ function formatCurrency(amount: number): string {
 function MilestoneCard({ milestone }: { milestone: PaymentMilestone }) {
   const getStatusColor = () => {
     switch (milestone.status) {
-      case 'paid': return { bg: '#F0FDF4', border: '#22c55e', text: '#22c55e' };
-      case 'approved': return { bg: '#FEF3C7', border: '#F59E0B', text: '#F59E0B' };
+      case 'paid': return { bg: '#F0FDF4', border: '#0066CC', text: '#0066CC' };
+      case 'approved': return { bg: '#FEF3C7', border: '#0066CC', text: '#0066CC' };
       default: return { bg: '#F3F4F6', border: '#9CA3AF', text: '#6B7280' };
     }
   };
@@ -272,14 +272,14 @@ function MilestoneCard({ milestone }: { milestone: PaymentMilestone }) {
           <Text style={[styles.milestoneTitle, { color: statusColors.text }]}>{milestone.title}</Text>
           {milestone.status === 'paid' && (
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 }}>
-              <Ionicons name="checkmark-circle" size={14} color="#22c55e" />
-              <Text style={{ fontSize: 11, color: '#22c55e', fontWeight: '500' }}>Đã thanh toán</Text>
+              <Ionicons name="checkmark-circle" size={14} color="#0066CC" />
+              <Text style={{ fontSize: 11, color: '#0066CC', fontWeight: '500' }}>Đã thanh toán</Text>
             </View>
           )}
           {milestone.status === 'approved' && milestone.accountantApproved && (
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 }}>
-              <Ionicons name="time-outline" size={14} color="#F59E0B" />
-              <Text style={{ fontSize: 11, color: '#F59E0B', fontWeight: '500' }}>Chờ thanh toán</Text>
+              <Ionicons name="time-outline" size={14} color="#0066CC" />
+              <Text style={{ fontSize: 11, color: '#0066CC', fontWeight: '500' }}>Chờ thanh toán</Text>
             </View>
           )}
         </View>
@@ -404,9 +404,9 @@ export default function PaymentProgressScreen() {
                 <Text style={styles.activePhaseTitle}>{phase.name}</Text>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                   {phase.status === 'completed' && (
-                    <Ionicons name="checkmark-circle" size={20} color="#22c55e" />
+                    <Ionicons name="checkmark-circle" size={20} color="#0066CC" />
                   )}
-                  <Text style={[styles.activePhaseTotalAmount, { color: phase.status === 'completed' ? '#22c55e' : '#13B157' }]}>
+                  <Text style={[styles.activePhaseTotalAmount, { color: phase.status === 'completed' ? '#0066CC' : '#13B157' }]}>
                     {formatCurrency(phase.totalAmount)}
                   </Text>
                 </View>

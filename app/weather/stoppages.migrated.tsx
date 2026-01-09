@@ -98,7 +98,7 @@ export default function WorkStoppageScreen() {
         padding={false}
         headerRight={
           <TouchableOpacity onPress={() => setModalVisible(true)}>
-            <Ionicons name="add-circle" size={28} color="#2196F3" />
+            <Ionicons name="add-circle" size={28} color="#0066CC" />
           </TouchableOpacity>
         }
       >
@@ -243,7 +243,7 @@ function StoppageCard({ stoppage, onComplete, onCancel }: StoppageCardProps) {
         </View>
         {stoppage.impact.estimatedDelay && (
           <View style={styles.impactRow}>
-            <Ionicons name="time" size={16} color="#F44336" />
+            <Ionicons name="time" size={16} color="#000000" />
             <Text style={styles.impactText}>Trễ {stoppage.impact.estimatedDelay} giờ</Text>
           </View>
         )}
@@ -280,7 +280,7 @@ function StoppageCard({ stoppage, onComplete, onCancel }: StoppageCardProps) {
             <Text style={styles.completeButtonText}>Kết thúc</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.cancelButton} onPress={onCancel}>
-            <Ionicons name="close-circle" size={18} color="#F44336" />
+            <Ionicons name="close-circle" size={18} color="#000000" />
             <Text style={styles.cancelButtonText}>Hủy</Text>
           </TouchableOpacity>
         </View>
@@ -496,15 +496,15 @@ function CreateStoppageModal({
 function getStatusColor(status: StopageStatus): string {
   switch (status) {
     case StopageStatus.ACTIVE:
-      return '#F44336';
+      return '#000000';
     case StopageStatus.PLANNED:
-      return '#FF9800';
+      return '#0066CC';
     case StopageStatus.COMPLETED:
-      return '#4CAF50';
+      return '#0066CC';
     case StopageStatus.CANCELLED:
-      return '#9E9E9E';
+      return '#999999';
     default:
-      return '#9E9E9E';
+      return '#999999';
   }
 }
 
@@ -627,15 +627,15 @@ function getActivityLabel(activity: WorkActivityType): string {
 function getSafetyRiskColor(risk: string): string {
   switch (risk) {
     case 'LOW':
-      return '#4CAF50';
+      return '#0066CC';
     case 'MEDIUM':
-      return '#FF9800';
+      return '#0066CC';
     case 'HIGH':
-      return '#F44336';
+      return '#000000';
     case 'CRITICAL':
       return '#B71C1C';
     default:
-      return '#9E9E9E';
+      return '#999999';
   }
 }
 
@@ -673,7 +673,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   filterTabActive: {
-    backgroundColor: '#FF9800',
+    backgroundColor: '#0066CC',
   },
   filterTabText: {
     fontSize: 12,
@@ -756,7 +756,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   activityTag: {
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
@@ -821,7 +821,7 @@ const styles = StyleSheet.create({
   completeButton: {
     flex: 1,
     flexDirection: 'row',
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#0066CC',
     paddingVertical: 10,
     borderRadius: 8,
     alignItems: 'center',
@@ -843,10 +843,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 6,
     borderWidth: 1,
-    borderColor: '#F44336',
+    borderColor: '#000000',
   },
   cancelButtonText: {
-    color: '#F44336',
+    color: '#000000',
     fontSize: 14,
     fontWeight: 'bold',
   },
@@ -898,7 +898,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
   },
   reasonChipActive: {
-    backgroundColor: '#FF9800',
+    backgroundColor: '#0066CC',
   },
   reasonChipText: {
     fontSize: 13,
@@ -923,7 +923,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   activityChipActive: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
   },
   activityChipText: {
     fontSize: 13,
@@ -988,7 +988,7 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   modalButtonCreate: {
-    backgroundColor: '#FF9800',
+    backgroundColor: '#0066CC',
   },
   modalButtonCreateText: {
     fontSize: 15,

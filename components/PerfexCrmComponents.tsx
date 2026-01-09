@@ -60,12 +60,12 @@ export function SyncStatusBanner() {
           </>
         ) : lastError ? (
           <>
-            <Ionicons name="alert-circle" size={16} color="#EF4444" />
+            <Ionicons name="alert-circle" size={16} color="#000000" />
             <Text style={[styles.syncText, styles.syncTextError]}>Lỗi: {lastError}</Text>
           </>
         ) : (
           <>
-            <Ionicons name="checkmark-circle" size={16} color="#10B981" />
+            <Ionicons name="checkmark-circle" size={16} color="#0066CC" />
             <Text style={styles.syncText}>Đồng bộ: {formatLastSync()}</Text>
           </>
         )}
@@ -102,7 +102,7 @@ export function DashboardCards() {
   if (error && !dashboard) {
     return (
       <View style={styles.errorContainer}>
-        <Ionicons name="alert-circle-outline" size={48} color="#EF4444" />
+        <Ionicons name="alert-circle-outline" size={48} color="#000000" />
         <Text style={styles.errorText}>{error}</Text>
         <TouchableOpacity style={styles.retryButton} onPress={refresh}>
           <Text style={styles.retryText}>Thử lại</Text>
@@ -123,19 +123,19 @@ export function DashboardCards() {
         icon="folder"
         title="Dự án"
         value={dashboard?.totalProjects || 0}
-        color="#10B981"
+        color="#0066CC"
       />
       <DashboardCard
         icon="play-circle"
         title="Đang thực hiện"
         value={dashboard?.activeProjects || 0}
-        color="#F59E0B"
+        color="#0066CC"
       />
       <DashboardCard
         icon="cash"
         title="Tổng giá trị"
         value={formatVND(dashboard?.totalValue || 0)}
-        color="#8B5CF6"
+        color="#666666"
         isLarge
       />
     </View>
@@ -211,12 +211,13 @@ export function ProjectList({ customerId, onProjectPress, showHeader = true }: P
       </View>
       
       <View style={styles.projectFooter}>
-        <Text style={styles.projectDate}>
-          <Ionicons name="calendar" size={12} color="#9CA3AF" /> {formatDate(item.start_date)}
-        </Text>
+        <View style={styles.projectDateRow}>
+          <Ionicons name="calendar" size={12} color="#9CA3AF" />
+          <Text style={styles.projectDate}>{formatDate(item.start_date)}</Text>
+        </View>
         <View style={styles.progressContainer}>
-          <View style={[styles.progressBar, { width: `${item.progress}%` }]} />
-          <Text style={styles.progressText}>{item.progress}%</Text>
+          <View style={[styles.progressBar, { width: `${item.progress || 0}%` as any }]} />
+          <Text style={styles.progressText}>{item.progress || 0}%</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -370,7 +371,7 @@ const styles = StyleSheet.create({
     color: '#6B7280',
   },
   syncTextError: {
-    color: '#EF4444',
+    color: '#000000',
   },
   syncButton: {
     padding: 4,
@@ -391,7 +392,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 14,
-    color: '#EF4444',
+    color: '#000000',
     marginTop: 8,
     textAlign: 'center',
   },
@@ -530,6 +531,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  projectDateRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   projectDate: {
     fontSize: 12,

@@ -119,7 +119,7 @@ export class ErrorBoundary extends Component<Props, State> {
           >
             {/* Error Icon */}
             <View style={styles.iconContainer}>
-              <Ionicons name="alert-circle" size={80} color="#EF4444" />
+              <Ionicons name="alert-circle" size={80} color="#000000" />
             </View>
 
             {/* Error Title */}
@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
   errorDetailsTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#EF4444',
+    color: '#000000',
     marginBottom: 8,
   },
   errorDetailsBox: {
@@ -233,12 +233,12 @@ const styles = StyleSheet.create({
   errorName: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#DC2626',
+    color: '#000000',
     marginBottom: 4,
   },
   errorMessage: {
     fontSize: 13,
-    color: '#EF4444',
+    color: '#000000',
     marginBottom: 8,
   },
   errorStack: {

@@ -42,7 +42,7 @@ interface ProjectProgressDashboardProps {
 const StatCard = memo(({ 
   title, 
   value, 
-  color = '#0A6847',
+  color = '#0066CC',
   onPress 
 }: { 
   title: string; 
@@ -67,7 +67,7 @@ const StatCard = memo(({
  */
 const ProgressBar = memo(({ 
   progress, 
-  color = '#4CAF50',
+  color = '#0080FF',
   height = 8 
 }: { 
   progress: number; 
@@ -125,22 +125,22 @@ const TaskSummaryCard = memo(({
         <StatCard 
           title="Total" 
           value={taskStats.total} 
-          color="#0A6847"
+          color="#0066CC"
         />
         <StatCard 
           title="Completed" 
           value={taskStats.completed} 
-          color="#4CAF50"
+          color="#0080FF"
         />
         <StatCard 
           title="In Progress" 
           value={taskStats.inProgress} 
-          color="#FF9800"
+          color="#0066CC"
         />
         <StatCard 
           title="Pending" 
           value={taskStats.pending} 
-          color="#9E9E9E"
+          color="#999999"
         />
       </View>
 
@@ -213,17 +213,17 @@ const PaymentSummaryCard = memo(({
         <StatCard 
           title="Total" 
           value={formatCurrency(paymentStats.total)} 
-          color="#0A6847"
+          color="#0066CC"
         />
         <StatCard 
           title="Completed" 
           value={formatCurrency(paymentStats.completed)} 
-          color="#4CAF50"
+          color="#0080FF"
         />
         <StatCard 
           title="Pending" 
           value={formatCurrency(paymentStats.pending)} 
-          color="#0A6847"
+          color="#0066CC"
         />
       </View>
 
@@ -358,7 +358,7 @@ const ProjectProgressDashboard: React.FC<ProjectProgressDashboardProps> = ({
           <RefreshControl 
             refreshing={refreshing} 
             onRefresh={handleRefresh}
-            colors={['#0A6847']}
+            colors={['#0066CC']}
           />
         }
       >
@@ -436,12 +436,12 @@ const ProjectProgressDashboard: React.FC<ProjectProgressDashboardProps> = ({
               <StatCard 
                 title="Schedule Performance" 
                 value={`${dashboard.kpis?.schedulePerformance || 0}%`}
-                color="#4CAF50"
+                color="#0080FF"
               />
               <StatCard 
                 title="Cost Performance" 
                 value={`${dashboard.kpis?.costPerformance || 0}%`}
-                color="#FF9800"
+                color="#0066CC"
               />
             </View>
           </View>
@@ -454,11 +454,11 @@ const ProjectProgressDashboard: React.FC<ProjectProgressDashboardProps> = ({
 // Helper function
 const getStatusColor = (status: string): string => {
   switch (status) {
-    case 'completed': return '#4CAF50';
-    case 'in-progress': return '#FF9800';
-    case 'pending': return '#9E9E9E';
+    case 'completed': return '#0080FF';
+    case 'in-progress': return '#0066CC';
+    case 'pending': return '#999999';
     case 'overdue': return '#1A1A1A';
-    default: return '#9E9E9E';
+    default: return '#999999';
   }
 };
 
@@ -536,7 +536,7 @@ const styles = StyleSheet.create({
   progressPercentage: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#0A6847',
+    color: '#0066CC',
     marginBottom: 16,
   },
   progressBarContainer: {
@@ -550,11 +550,11 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   milestoneCard: {
-    backgroundColor: '#e3f2fd',
+    backgroundColor: '#E8F4FF',
     borderRadius: 8,
     padding: 16,
     borderLeftWidth: 4,
-    borderLeftColor: '#0A6847',
+    borderLeftColor: '#0066CC',
   },
   milestoneTitle: {
     fontSize: 14,
@@ -633,7 +633,7 @@ const styles = StyleSheet.create({
   paymentAmount: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#0A6847',
+    color: '#0066CC',
   },
   paymentDue: {
     fontSize: 12,

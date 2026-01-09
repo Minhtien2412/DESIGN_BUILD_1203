@@ -60,7 +60,7 @@ export function ApiErrorDisplay({
           icon: 'lock-closed-outline' as const,
           title: 'Phiên đăng nhập hết hạn',
           message: 'Vui lòng đăng nhập lại để tiếp tục.',
-          color: '#F59E0B',
+          color: '#0080FF',
           canRetry: false,
         };
       }
@@ -90,7 +90,7 @@ export function ApiErrorDisplay({
           icon: 'alert-circle-outline' as const,
           title: 'Dữ liệu không hợp lệ',
           message: 'Thông tin bạn cung cấp không đúng định dạng. Vui lòng kiểm tra lại.',
-          color: '#F59E0B',
+          color: '#0080FF',
           canRetry: false,
         };
       }
@@ -152,10 +152,10 @@ export function ApiErrorDisplay({
       {/* Error Details (Dev Only) */}
       {showDetails && error instanceof Error && (
         <View style={[styles.detailsBox, { backgroundColor: '#FEF2F2', borderColor: '#FEE2E2' }]}>
-          <Text style={[styles.detailsLabel, { color: '#DC2626' }]}>
+          <Text style={[styles.detailsLabel, { color: '#000000' }]}>
             Chi tiết lỗi (Dev mode):
           </Text>
-          <Text style={[styles.detailsValue, { color: '#EF4444' }]}>
+          <Text style={[styles.detailsValue, { color: '#000000' }]}>
             {error.message}
           </Text>
           {error.stack && (

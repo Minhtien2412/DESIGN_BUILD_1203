@@ -63,9 +63,9 @@ export default function MaterialCheckScreen() {
   };
 
   const getQualityColor = (quality: string) => {
-    if (quality.includes('Tốt') || quality.includes('Xuất sắc')) return '#10B981';
-    if (quality.includes('Trung bình')) return '#F59E0B';
-    return '#EF4444';
+    if (quality.includes('Tốt') || quality.includes('Xuất sắc')) return '#0066CC';
+    if (quality.includes('Trung bình')) return '#0066CC';
+    return '#000000';
   };
 
   return (
@@ -139,7 +139,7 @@ export default function MaterialCheckScreen() {
               <Ionicons
                 name={result.isCompliant ? 'checkmark-circle' : 'warning'}
                 size={24}
-                color={result.isCompliant ? '#10B981' : '#F59E0B'}
+                color={result.isCompliant ? '#0066CC' : '#0066CC'}
               />
               <Text style={styles.resultTitle}>
                 {result.isCompliant ? 'Đạt chuẩn' : 'Cần kiểm tra thêm'}
@@ -179,7 +179,7 @@ export default function MaterialCheckScreen() {
                 <Text style={styles.cardLabel}>Vấn đề phát hiện</Text>
                 {result.issues.map((issue, index) => (
                   <View key={index} style={styles.issueItem}>
-                    <Ionicons name="alert-circle" size={18} color="#EF4444" />
+                    <Ionicons name="alert-circle" size={18} color="#000000" />
                     <Text style={styles.issueText}>{issue}</Text>
                   </View>
                 ))}
@@ -192,7 +192,7 @@ export default function MaterialCheckScreen() {
                 <Text style={styles.cardLabel}>Khuyến nghị</Text>
                 {result.recommendations.map((rec, index) => (
                   <View key={index} style={styles.recItem}>
-                    <Ionicons name="checkmark-circle" size={18} color="#10B981" />
+                    <Ionicons name="checkmark-circle" size={18} color="#0066CC" />
                     <Text style={styles.recText}>{rec}</Text>
                   </View>
                 ))}
@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: '#EFF6FF',
+    backgroundColor: '#E8F4FF',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,

@@ -1,10 +1,12 @@
 /**
  * Call History Screen
  * Displays call history with video/audio calls, missed/completed status
- * Updated: 23/12/2025 - Using useCall hook
+ * + Badge sync với UnifiedBadgeContext (Zalo-style)
+ * Updated: 03/01/2026
  */
 
 import Avatar from '@/components/ui/avatar';
+import { useUnifiedBadge } from '@/context/UnifiedBadgeContext';
 import { useCall } from '@/hooks/useCall';
 import {
     CallHistoryItem,
@@ -12,6 +14,7 @@ import {
 } from '@/services/api/call.service';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import { useEffect } from 'react';
 import {
     ActivityIndicator,
     FlatList,
@@ -23,6 +26,9 @@ import {
 } from 'react-native';
 
 export default function CallHistoryScreen() {
+  // Unified Badge Context - clear missed calls badge khi xem lịch sử
+  const { clearBadge, badges } = useUnifiedBadge();
+
   const {
     callHistory,
     loading,
@@ -31,6 +37,13 @@ export default function CallHistoryScreen() {
     refreshHistory,
     loadMoreHistory,
   } = useCall({ autoLoadHistory: true, historyLimit: 50 });
+
+  // Clear missed calls badge khi vào màn hình này (Zalo-style)
+  useEffect(() => {
+    if (badges.missedCalls > 0) {
+      clearBadge('missedCalls');
+    }
+  }, [badges.missedCalls, clearBadge]);
 
   const handleCallPress = (call: CallHistoryItem) => {
     // Tất cả cuộc gọi thực hiện trong app
@@ -281,7 +294,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#3b82f6',
   },
   audioBadge: {
-    backgroundColor: '#22c55e',
+    backgroundColor: '#0066CC',
   },
   callInfo: {
     flex: 1,

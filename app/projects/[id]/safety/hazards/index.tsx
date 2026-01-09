@@ -16,8 +16,8 @@ import {
 
 const SEVERITY_COLORS = {
   low: '#3b82f6',
-  medium: '#f59e0b',
-  high: '#ef4444',
+  medium: '#0066CC',
+  high: '#000000',
   critical: '#7f1d1d'
 };
 
@@ -29,9 +29,9 @@ const SEVERITY_LABELS = {
 };
 
 const STATUS_COLORS = {
-  identified: '#f59e0b',
+  identified: '#0066CC',
   mitigating: '#3b82f6',
-  resolved: '#10b981'
+  resolved: '#0066CC'
 };
 
 const STATUS_LABELS = {
@@ -134,19 +134,19 @@ export default function SafetyHazardsScreen() {
               label="Tổng nguy cơ"
               value={stats.totalHazards.toString()}
               icon="warning"
-              gradientColors={['#f59e0b', '#d97706']}
+              gradientColors={['#0066CC', '#d97706']}
             />
             <MetricCard
               label="Nghiêm trọng"
               value={stats.criticalHazards.toString()}
               icon="alert-circle"
-              gradientColors={['#ef4444', '#dc2626']}
+              gradientColors={['#000000', '#000000']}
             />
             <MetricCard
               label="Đã giải quyết"
               value={stats.resolvedHazards.toString()}
               icon="checkmark-circle"
-              gradientColors={['#10b981', '#059669']}
+              gradientColors={['#0066CC', '#0066CC']}
             />
           </ScrollView>
         )}
@@ -254,7 +254,7 @@ export default function SafetyHazardsScreen() {
         <View style={styles.section}>
           {hazards.length === 0 ? (
             <View style={styles.emptyState}>
-              <Ionicons name="shield-checkmark-outline" size={64} color="#10b981" />
+              <Ionicons name="shield-checkmark-outline" size={64} color="#0066CC" />
               <Text style={styles.emptyStateTitle}>Không có nguy cơ nào</Text>
               <Text style={styles.emptyStateText}>
                 Tuyệt vời! Không phát hiện nguy cơ an toàn nào
@@ -316,9 +316,9 @@ export default function SafetyHazardsScreen() {
                           {
                             color:
                               hazard.riskRating >= 15
-                                ? '#ef4444'
+                                ? '#000000'
                                 : hazard.riskRating >= 10
-                                ? '#f59e0b'
+                                ? '#0066CC'
                                 : '#3b82f6'
                           }
                         ]}
@@ -388,7 +388,7 @@ export default function SafetyHazardsScreen() {
 
                   {hazard.status === 'resolved' && hazard.resolvedDate && (
                     <View style={styles.resolvedBox}>
-                      <Ionicons name="checkmark-circle" size={16} color="#059669" />
+                      <Ionicons name="checkmark-circle" size={16} color="#0066CC" />
                       <Text style={styles.resolvedText}>
                         Đã giải quyết - {new Date(hazard.resolvedDate).toLocaleDateString('vi-VN')}
                       </Text>
@@ -566,7 +566,7 @@ const styles = StyleSheet.create({
     color: '#6b7280'
   },
   mitigationBox: {
-    backgroundColor: '#eff6ff',
+    backgroundColor: '#E8F4FF',
     padding: 12,
     borderRadius: 8,
     marginBottom: 12
@@ -593,7 +593,7 @@ const styles = StyleSheet.create({
   },
   resolveButton: {
     borderWidth: 1,
-    borderColor: '#10b981',
+    borderColor: '#0066CC',
     borderRadius: 8,
     paddingVertical: 10,
     alignItems: 'center'
@@ -601,7 +601,7 @@ const styles = StyleSheet.create({
   resolveButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#10b981'
+    color: '#0066CC'
   },
   resolvedBox: {
     flexDirection: 'row',
@@ -614,7 +614,7 @@ const styles = StyleSheet.create({
   resolvedText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#059669'
+    color: '#0066CC'
   },
   emptyState: {
     alignItems: 'center',

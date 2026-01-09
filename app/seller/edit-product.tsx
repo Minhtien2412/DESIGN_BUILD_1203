@@ -262,7 +262,7 @@ export default function EditProductScreen() {
                   <Ionicons
                     name={cat.icon as any}
                     size={24}
-                    color={category === cat.id ? '#FF6B35' : '#999'}
+                    color={category === cat.id ? '#0066CC' : '#999'}
                   />
                   <Text
                     style={[
@@ -291,7 +291,7 @@ export default function EditProductScreen() {
                 autoCapitalize="none"
               />
               <TouchableOpacity style={styles.addImageBtn} onPress={handleAddImage}>
-                <Ionicons name="add-circle" size={28} color="#FF6B35" />
+                <Ionicons name="add-circle" size={28} color="#0066CC" />
               </TouchableOpacity>
             </View>
 
@@ -305,7 +305,7 @@ export default function EditProductScreen() {
                       style={styles.removeImageBtn}
                       onPress={() => handleRemoveImage(index)}
                     >
-                      <Ionicons name="close-circle" size={24} color="#EF4444" />
+                      <Ionicons name="close-circle" size={24} color="#000000" />
                     </TouchableOpacity>
                   </View>
                 ))}
@@ -348,7 +348,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 50,
     paddingBottom: 12,
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#0066CC',
   },
   backBtn: {
     width: 40,
@@ -415,8 +415,8 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   unitChipActive: {
-    backgroundColor: '#FF6B35',
-    borderColor: '#FF6B35',
+    backgroundColor: '#0066CC',
+    borderColor: '#0066CC',
   },
   unitText: {
     fontSize: 14,
@@ -444,9 +444,9 @@ const styles = StyleSheet.create({
     borderColor: '#e0e0e0',
   },
   categoryCardActive: {
-    borderColor: '#FF6B35',
+    borderColor: '#0066CC',
     borderWidth: 2,
-    backgroundColor: '#FF6B3510',
+    backgroundColor: '#0066CC10',
   },
   categoryLabel: {
     fontSize: 13,
@@ -454,7 +454,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   categoryLabelActive: {
-    color: '#FF6B35',
+    color: '#0066CC',
     fontWeight: '700',
   },
   imageInputRow: {
@@ -513,7 +513,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
     paddingVertical: 14,
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#0066CC',
     borderRadius: 12,
   },
   submitBtnDisabled: {

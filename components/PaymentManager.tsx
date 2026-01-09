@@ -233,10 +233,10 @@ const PaymentManager: React.FC<PaymentManagerProps> = ({
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed': return '#10B981';
+      case 'completed': return '#0066CC';
       case 'processing': return '#3B82F6';
-      case 'pending': return '#F59E0B';
-      case 'overdue': return '#EF4444';
+      case 'pending': return '#0066CC';
+      case 'overdue': return '#000000';
       case 'scheduled': return '#6B7280';
       case 'cancelled': return '#9CA3AF';
       default: return '#6B7280';
@@ -245,10 +245,10 @@ const PaymentManager: React.FC<PaymentManagerProps> = ({
 
   const getApprovalStatusColor = (status: string) => {
     switch (status) {
-      case 'admin-approved': return '#10B981';
+      case 'admin-approved': return '#0066CC';
       case 'manager-approved': return '#3B82F6';
-      case 'pending': return '#F59E0B';
-      case 'rejected': return '#EF4444';
+      case 'pending': return '#0066CC';
+      case 'rejected': return '#000000';
       default: return '#6B7280';
     }
   };
@@ -336,19 +336,19 @@ const PaymentManager: React.FC<PaymentManagerProps> = ({
               </View>
               <View style={styles.overviewItem}>
                 <Text style={styles.overviewLabel}>Total Paid</Text>
-                <Text style={[styles.overviewValue, { color: '#10B981' }]}>
+                <Text style={[styles.overviewValue, { color: '#0066CC' }]}>
                   {formatCurrency(paymentSchedule.totalPaid)}
                 </Text>
               </View>
               <View style={styles.overviewItem}>
                 <Text style={styles.overviewLabel}>Pending</Text>
-                <Text style={[styles.overviewValue, { color: '#F59E0B' }]}>
+                <Text style={[styles.overviewValue, { color: '#0066CC' }]}>
                   {formatCurrency(paymentSchedule.totalPending)}
                 </Text>
               </View>
               <View style={styles.overviewItem}>
                 <Text style={styles.overviewLabel}>Overdue</Text>
-                <Text style={[styles.overviewValue, { color: '#EF4444' }]}>
+                <Text style={[styles.overviewValue, { color: '#000000' }]}>
                   {formatCurrency(paymentSchedule.totalOverdue)}
                 </Text>
               </View>
@@ -363,7 +363,7 @@ const PaymentManager: React.FC<PaymentManagerProps> = ({
                     styles.progressFill,
                     { 
                       width: `${(paymentSchedule.totalPaid / paymentSchedule.totalBudget) * 100}%`,
-                      backgroundColor: '#10B981'
+                      backgroundColor: '#0066CC'
                     }
                   ]} 
                 />
@@ -486,7 +486,7 @@ const PaymentManager: React.FC<PaymentManagerProps> = ({
               <Text style={styles.sectionTitle}>⚠️ Budget Variance</Text>
               <View style={styles.varianceCard}>
                 <Text style={[styles.varianceAmount, {
-                  color: paymentSchedule.budgetVariance > 0 ? '#EF4444' : '#10B981'
+                  color: paymentSchedule.budgetVariance > 0 ? '#000000' : '#0066CC'
                 }]}>
                   {paymentSchedule.budgetVariance > 0 ? '+' : ''}
                   {formatCurrency(paymentSchedule.budgetVariance)}
@@ -724,7 +724,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 16,
-    color: '#EF4444',
+    color: '#000000',
     textAlign: 'center',
     marginBottom: 16,
   },
@@ -814,7 +814,7 @@ const styles = StyleSheet.create({
   budgetPercentage: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#10b981',
+    color: '#0066CC',
     textAlign: 'right',
   },
   breakdownCard: {
@@ -896,7 +896,7 @@ const styles = StyleSheet.create({
   paymentAmount: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#10b981',
+    color: '#0066CC',
     marginBottom: 12,
   },
   paymentDetails: {
@@ -916,7 +916,7 @@ const styles = StyleSheet.create({
   rejectionLabel: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#dc2626',
+    color: '#000000',
     marginBottom: 4,
   },
   rejectionReason: {
@@ -929,7 +929,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   approveButton: {
-    backgroundColor: '#10b981',
+    backgroundColor: '#0066CC',
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 12,
@@ -1079,7 +1079,7 @@ const styles = StyleSheet.create({
   paymentSummaryAmount: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#10b981',
+    color: '#0066CC',
     marginBottom: 8,
   },
   paymentSummaryCategory: {

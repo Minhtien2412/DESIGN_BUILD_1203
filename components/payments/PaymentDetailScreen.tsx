@@ -20,10 +20,10 @@ export default function PaymentDetailScreen({ paymentId, onBack }: PaymentDetail
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'paid': return '#4CAF50';
-      case 'failed': return '#F44336';
-      case 'canceled': return '#FF9800';
-      default: return '#2196F3';
+      case 'paid': return '#0066CC';
+      case 'failed': return '#000000';
+      case 'canceled': return '#0066CC';
+      default: return '#0066CC';
     }
   };
 
@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   retryButton: {
-    backgroundColor: '#F44336',
+    backgroundColor: '#000000',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 6,
@@ -273,7 +273,7 @@ const styles = StyleSheet.create({
     marginVertical: 16,
   },
   confirmButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#0066CC',
     borderRadius: 8,
     padding: 16,
     alignItems: 'center',

@@ -106,7 +106,7 @@ export function ContactActionCard({
             {contact.name}
           </Text>
           {contact.isFavorite && (
-            <Ionicons name="star" size={14} color="#F59E0B" />
+            <Ionicons name="star" size={14} color="#0066CC" />
           )}
           {contact.unreadMessages && contact.unreadMessages > 0 && (
             <View style={styles.unreadBadge}>
@@ -144,14 +144,14 @@ export function ContactActionCard({
             style={[styles.actionBtn, styles.callBtn]}
             onPress={handleCall}
           >
-            <Ionicons name="call" size={18} color="#10B981" />
+            <Ionicons name="call" size={18} color="#0066CC" />
           </TouchableOpacity>
           
           <TouchableOpacity
             style={[styles.actionBtn, styles.videoBtn]}
             onPress={handleVideoCall}
           >
-            <Ionicons name="videocam" size={18} color="#F59E0B" />
+            <Ionicons name="videocam" size={18} color="#0066CC" />
           </TouchableOpacity>
         </View>
       )}
@@ -163,9 +163,9 @@ export function ContactActionCard({
 
 function getStatusColor(status: Contact['status']): string {
   switch (status) {
-    case 'online': return '#10B981';
-    case 'busy': return '#EF4444';
-    case 'away': return '#F59E0B';
+    case 'online': return '#0066CC';
+    case 'busy': return '#000000';
+    case 'away': return '#0066CC';
     default: return '#9CA3AF';
   }
 }
@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
     width: 14,
     height: 14,
     borderRadius: 7,
-    backgroundColor: '#10B981',
+    backgroundColor: '#0066CC',
     borderWidth: 2,
     borderColor: '#fff',
   },
@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   unreadBadge: {
-    backgroundColor: '#EF4444',
+    backgroundColor: '#000000',
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 10,
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   chatBtn: {
-    backgroundColor: '#DBEAFE',
+    backgroundColor: '#E8F4FF',
   },
   callBtn: {
     backgroundColor: '#D1FAE5',
@@ -303,7 +303,7 @@ const styles = StyleSheet.create({
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: '#10B981',
+    backgroundColor: '#0066CC',
     borderWidth: 2,
     borderColor: '#fff',
   },

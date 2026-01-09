@@ -29,14 +29,14 @@ type Feature = {
 
 type Theme = {
   colors: {
-    primary: string;      // #0A6847
+    primary: string;      // #0066CC
     primaryAlt: string;   // #7FAB67
     surface: string;      // #FFFFFF
     background: string;   // #F7F7F7
     text: string;         // #111111
     textSecondary: string;// #4A4A4A
     border: string;       // #EAEAEA
-    muted: string;        // #9E9E9E
+    muted: string;        // #999999
     subtle: string;       // #F6F9D0
   };
   radii: { sm: number; md: number; lg: number; xl: number; };
@@ -46,14 +46,14 @@ type Theme = {
 
 const defaultTheme: Theme = {
   colors: {
-    primary: '#0A6847',
+    primary: '#0066CC',
     primaryAlt: '#7FAB67',
     surface: '#FFFFFF',
     background: '#F7F7F7',
     text: '#111111',
     textSecondary: '#4A4A4A',
     border: '#EAEAEA',
-    muted: '#9E9E9E',
+    muted: '#999999',
     subtle: '#F6F9D0', // brand fill
   },
   radii: { sm: 10, md: 14, lg: 20, xl: 28 },

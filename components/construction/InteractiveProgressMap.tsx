@@ -47,10 +47,10 @@ type Props = {
 };
 
 const STATUS_CONFIG = {
-  pending: { label: 'Chưa bắt đầu', color: '#9e9e9e', fill: '#f0f0f0', progress: 0 },
-  'in-progress': { label: 'Đang thực hiện', color: '#ffb300', fill: '#fff8e1', progress: 0.5 },
-  done: { label: 'Hoàn thành', color: '#4caf50', fill: '#e8f5e9', progress: 1 },
-  late: { label: 'Trễ tiến độ', color: '#e53935', fill: '#ffebee', progress: 0.3 },
+  pending: { label: 'Chưa bắt đầu', color: '#999999', fill: '#f0f0f0', progress: 0 },
+  'in-progress': { label: 'Đang thực hiện', color: '#0066CC', fill: '#F0F8FF', progress: 0.5 },
+  done: { label: 'Hoàn thành', color: '#0066CC', fill: '#e8f5e9', progress: 1 },
+  late: { label: 'Trễ tiến độ', color: '#000000', fill: '#ffebee', progress: 0.3 },
 };
 
 const TASK_WIDTH = 170;
@@ -706,7 +706,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffebee',
   },
   progressMedium: {
-    backgroundColor: '#fff8e1',
+    backgroundColor: '#F0F8FF',
   },
   progressHigh: {
     backgroundColor: '#e8f5e9',

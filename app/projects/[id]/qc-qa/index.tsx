@@ -50,11 +50,11 @@ export default function QCQAIndexScreen() {
   };
 
   const checklistTypes = [
-    { type: 'FOUNDATION', name: 'Móng', icon: 'construct', color: '#795548' },
+    { type: 'FOUNDATION', name: 'Móng', icon: 'construct', color: '#666666' },
     { type: 'STRUCTURE', name: 'Kết cấu', icon: 'business', color: '#1A1A1A' },
-    { type: 'MEP', name: 'M&E', icon: 'flash', color: '#FF9800' },
-    { type: 'FINISHING', name: 'Hoàn thiện', icon: 'color-palette', color: '#2196F3' },
-    { type: 'LANDSCAPE', name: 'Cảnh quan', icon: 'leaf', color: '#4CAF50' },
+    { type: 'MEP', name: 'M&E', icon: 'flash', color: '#0066CC' },
+    { type: 'FINISHING', name: 'Hoàn thiện', icon: 'color-palette', color: '#0066CC' },
+    { type: 'LANDSCAPE', name: 'Cảnh quan', icon: 'leaf', color: '#0066CC' },
   ];
 
   return (
@@ -66,12 +66,12 @@ export default function QCQAIndexScreen() {
         {/* Header Stats */}
         <View style={styles.headerStats}>
           <View style={styles.statCard}>
-            <Ionicons name="checkmark-circle" size={32} color="#4CAF50" />
+            <Ionicons name="checkmark-circle" size={32} color="#0066CC" />
             <Text style={styles.statNumber}>{checklistStats.approved}</Text>
             <Text style={styles.statLabel}>Checklists đã duyệt</Text>
           </View>
           <View style={styles.statCard}>
-            <Ionicons name="alert-circle" size={32} color="#F44336" />
+            <Ionicons name="alert-circle" size={32} color="#000000" />
             <Text style={styles.statNumber}>{defectStats.open}</Text>
             <Text style={styles.statLabel}>Lỗi chưa xử lý</Text>
           </View>
@@ -81,20 +81,20 @@ export default function QCQAIndexScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Tổng quan QC/QA</Text>
           <View style={styles.statsGrid}>
-            <View style={[styles.miniStatCard, { backgroundColor: '#E3F2FD' }]}>
-              <Text style={[styles.miniStatNumber, { color: '#2196F3' }]}>
+            <View style={[styles.miniStatCard, { backgroundColor: '#E8F4FF' }]}>
+              <Text style={[styles.miniStatNumber, { color: '#0066CC' }]}>
                 {checklistStats.total}
               </Text>
               <Text style={styles.miniStatLabel}>Tổng Checklists</Text>
             </View>
-            <View style={[styles.miniStatCard, { backgroundColor: '#FFF3E0' }]}>
-              <Text style={[styles.miniStatNumber, { color: '#FF9800' }]}>
+            <View style={[styles.miniStatCard, { backgroundColor: '#E8F4FF' }]}>
+              <Text style={[styles.miniStatNumber, { color: '#0066CC' }]}>
                 {checklistStats.inProgress}
               </Text>
               <Text style={styles.miniStatLabel}>Đang thực hiện</Text>
             </View>
-            <View style={[styles.miniStatCard, { backgroundColor: '#FFEBEE' }]}>
-              <Text style={[styles.miniStatNumber, { color: '#F44336' }]}>
+            <View style={[styles.miniStatCard, { backgroundColor: '#F5F5F5' }]}>
+              <Text style={[styles.miniStatNumber, { color: '#000000' }]}>
                 {defectStats.total}
               </Text>
               <Text style={styles.miniStatLabel}>Tổng lỗi</Text>
@@ -156,7 +156,7 @@ export default function QCQAIndexScreen() {
               onPress={() => router.push(`/projects/${projectId}/qc-qa/defects/list`)}
             >
               <View style={styles.defectSummaryHeader}>
-                <Ionicons name="warning" size={24} color="#F44336" />
+                <Ionicons name="warning" size={24} color="#000000" />
                 <Text style={styles.defectSummaryTitle}>Lỗi cần xử lý</Text>
               </View>
               <Text style={styles.defectSummaryNumber}>
@@ -174,10 +174,10 @@ export default function QCQAIndexScreen() {
               onPress={() => router.push(`/projects/${projectId}/qc-qa/defects/create`)}
             >
               <View style={styles.defectSummaryHeader}>
-                <Ionicons name="add-circle" size={24} color="#2196F3" />
+                <Ionicons name="add-circle" size={24} color="#0066CC" />
                 <Text style={styles.defectSummaryTitle}>Báo cáo lỗi</Text>
               </View>
-              <Text style={[styles.defectSummaryNumber, { color: '#2196F3' }]}>+</Text>
+              <Text style={[styles.defectSummaryNumber, { color: '#0066CC' }]}>+</Text>
               <View style={styles.defectSummaryFooter}>
                 <Text style={styles.defectSummaryDetail}>Thêm lỗi mới</Text>
               </View>
@@ -205,7 +205,7 @@ export default function QCQAIndexScreen() {
                             defect.severity === 'CRITICAL'
                               ? '#D32F2F'
                               : defect.severity === 'MAJOR'
-                              ? '#F57C00'
+                              ? '#0066CC'
                               : defect.severity === 'MINOR'
                               ? '#FBC02D'
                               : '#689F38',
@@ -236,7 +236,7 @@ export default function QCQAIndexScreen() {
                 router.push(`/projects/${projectId}/qc-qa/reports/compliance`)
               }
             >
-              <Ionicons name="document-text" size={32} color="#2196F3" />
+              <Ionicons name="document-text" size={32} color="#0066CC" />
               <Text style={styles.actionCardText}>Báo cáo tuân thủ</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -245,7 +245,7 @@ export default function QCQAIndexScreen() {
                 router.push(`/projects/${projectId}/qc-qa/reports/quality-metrics`)
               }
             >
-              <Ionicons name="stats-chart" size={32} color="#4CAF50" />
+              <Ionicons name="stats-chart" size={32} color="#0066CC" />
               <Text style={styles.actionCardText}>Chỉ số chất lượng</Text>
             </TouchableOpacity>
           </View>
@@ -316,7 +316,7 @@ const styles = StyleSheet.create({
   },
   viewAllText: {
     fontSize: 14,
-    color: '#2196F3',
+    color: '#0066CC',
     fontWeight: '500',
   },
   statsGrid: {
@@ -400,7 +400,7 @@ const styles = StyleSheet.create({
   defectSummaryNumber: {
     fontSize: 36,
     fontWeight: 'bold',
-    color: '#F44336',
+    color: '#000000',
     marginBottom: 8,
   },
   defectSummaryFooter: {
@@ -421,7 +421,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 8,
     borderLeftWidth: 3,
-    borderLeftColor: '#F44336',
+    borderLeftColor: '#000000',
   },
   defectItemHeader: {
     flexDirection: 'row',

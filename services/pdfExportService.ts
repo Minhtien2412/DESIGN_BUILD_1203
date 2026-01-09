@@ -97,7 +97,7 @@ class PDFExportService {
     }
     .progress-fill {
       height: 100%;
-      background: linear-gradient(90deg, #3B82F6, #10B981);
+      background: linear-gradient(90deg, #3B82F6, #0066CC);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -117,7 +117,7 @@ class PDFExportService {
       border-bottom: 2px solid #E5E7EB;
     }
     .summary {
-      background: #EFF6FF;
+      background: #E8F4FF;
       padding: 20px;
       border-radius: 8px;
       border-left: 4px solid #3B82F6;
@@ -135,15 +135,15 @@ class PDFExportService {
       border-left: 3px solid #3B82F6;
     }
     .list-item.success {
-      border-left-color: #10B981;
+      border-left-color: #0066CC;
       background: #ECFDF5;
     }
     .list-item.warning {
-      border-left-color: #F59E0B;
+      border-left-color: #0066CC;
       background: #FFFBEB;
     }
     .list-item.error {
-      border-left-color: #EF4444;
+      border-left-color: #000000;
       background: #FEF2F2;
     }
     .icon {

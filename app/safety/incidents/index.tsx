@@ -59,7 +59,7 @@ export default function IncidentsListScreen() {
             <TouchableOpacity
               onPress={() => router.push(`/safety/incidents/create?projectId=${projectId}`)}
             >
-              <Ionicons name="add-circle" size={28} color="#2196F3" style={{ marginRight: 8 }} />
+              <Ionicons name="add-circle" size={28} color="#0066CC" style={{ marginRight: 8 }} />
             </TouchableOpacity>
           ),
         }}
@@ -119,7 +119,7 @@ export default function IncidentsListScreen() {
         }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Ionicons name="shield-checkmark" size={64} color="#4CAF50" />
+            <Ionicons name="shield-checkmark" size={64} color="#0066CC" />
             <Text style={styles.emptyText}>Không có sự cố nào</Text>
             <Text style={styles.emptyHint}>Môi trường làm việc an toàn</Text>
           </View>
@@ -198,7 +198,7 @@ function IncidentCard({ incident }: IncidentCardProps) {
       {/* Injury Indicator */}
       {incident.injuredPerson && (
         <View style={styles.injuryBanner}>
-          <Ionicons name="medical" size={16} color="#F44336" />
+          <Ionicons name="medical" size={16} color="#000000" />
           <Text style={styles.injuryText}>
             Có người bị thương: {incident.injuredPerson.name}
           </Text>
@@ -235,13 +235,13 @@ function getSeverityColor(severity: IncidentSeverity): string {
     case IncidentSeverity.CRITICAL:
       return '#B71C1C';
     case IncidentSeverity.SERIOUS:
-      return '#F44336';
+      return '#000000';
     case IncidentSeverity.MODERATE:
-      return '#FF9800';
+      return '#0066CC';
     case IncidentSeverity.MINOR:
-      return '#0A6847';
+      return '#0066CC';
     default:
-      return '#9E9E9E';
+      return '#999999';
   }
 }
 
@@ -259,15 +259,15 @@ function getSeverityLabel(severity: IncidentSeverity): string {
 function getStatusColor(status: IncidentStatus): string {
   switch (status) {
     case IncidentStatus.REPORTED:
-      return '#F44336';
+      return '#000000';
     case IncidentStatus.INVESTIGATING:
-      return '#FF9800';
+      return '#0066CC';
     case IncidentStatus.UNDER_REVIEW:
-      return '#2196F3';
+      return '#0066CC';
     case IncidentStatus.RESOLVED:
-      return '#4CAF50';
+      return '#0066CC';
     case IncidentStatus.CLOSED:
-      return '#9E9E9E';
+      return '#999999';
     default:
       return '#666';
   }
@@ -320,10 +320,10 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   statValueWarning: {
-    color: '#FF9800',
+    color: '#0066CC',
   },
   statValueCritical: {
-    color: '#F44336',
+    color: '#000000',
   },
   statLabel: {
     fontSize: 12,
@@ -348,7 +348,7 @@ const styles = StyleSheet.create({
     borderBottomColor: 'transparent',
   },
   filterTabActive: {
-    borderBottomColor: '#2196F3',
+    borderBottomColor: '#0066CC',
   },
   filterTabText: {
     fontSize: 11,
@@ -356,7 +356,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   filterTabTextActive: {
-    color: '#2196F3',
+    color: '#0066CC',
     fontWeight: 'bold',
   },
   listContent: {
@@ -436,7 +436,7 @@ const styles = StyleSheet.create({
   injuryBanner: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFEBEE',
+    backgroundColor: '#F5F5F5',
     padding: 10,
     borderRadius: 6,
     gap: 8,
@@ -449,7 +449,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   medicalBadge: {
-    backgroundColor: '#F44336',
+    backgroundColor: '#000000',
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 10,

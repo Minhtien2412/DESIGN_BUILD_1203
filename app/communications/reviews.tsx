@@ -9,7 +9,7 @@ const REVIEWS = [
     id: '1',
     userName: 'Nguyễn Văn A',
     userInitial: 'N',
-    userColor: '#E3F2FD',
+    userColor: '#E8F4FF',
     textColor: Colors.light.primary,
     rating: 5,
     date: '2 ngày trước',
@@ -21,7 +21,7 @@ const REVIEWS = [
     userName: 'Trần Thị B',
     userInitial: 'T',
     userColor: '#FCE4EC',
-    textColor: '#0A6847',
+    textColor: '#0066CC',
     rating: 5,
     date: '3 ngày trước',
     service: 'Vật liệu xây dựng',
@@ -32,7 +32,7 @@ const REVIEWS = [
     userName: 'Lê Văn C',
     userInitial: 'L',
     userColor: '#E8F5E9',
-    textColor: '#4CAF50',
+    textColor: '#0066CC',
     rating: 4,
     date: '1 tuần trước',
     service: 'Thiết kế',
@@ -42,8 +42,8 @@ const REVIEWS = [
     id: '4',
     userName: 'Phạm Thị D',
     userInitial: 'P',
-    userColor: '#FFF3E0',
-    textColor: '#F57C00',
+    userColor: '#E8F4FF',
+    textColor: '#0066CC',
     rating: 5,
     date: '1 tuần trước',
     service: 'Thợ điện',
@@ -54,7 +54,7 @@ const REVIEWS = [
     userName: 'Hoàng Văn E',
     userInitial: 'H',
     userColor: '#F3E5F5',
-    textColor: '#9C27B0',
+    textColor: '#999999',
     rating: 5,
     date: '2 tuần trước',
     service: 'Vật liệu hoàn thiện',
@@ -167,7 +167,7 @@ export default function ReviewsScreen() {
               <Ionicons 
                 name="star" 
                 size={14} 
-                color={filter === rating ? '#FFF' : '#FFC107'} 
+                color={filter === rating ? '#FFF' : '#0066CC'} 
               />
             </TouchableOpacity>
           ))}
@@ -215,7 +215,7 @@ export default function ReviewsScreen() {
                         key={i}
                         name={i < review.rating ? 'star' : 'star-outline'}
                         size={14}
-                        color="#FFC107"
+                        color="#0066CC"
                         style={{ marginRight: 2 }}
                       />
                     ))}

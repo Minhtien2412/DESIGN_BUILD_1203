@@ -19,8 +19,8 @@ export function ConstructionProgressCard({
   totalTasks = 0,
   completedTasks = 0,
 }: ConstructionProgressCardProps) {
-  const progressColor = progress < 40 ? '#e53935' : progress < 80 ? '#ffb300' : '#4caf50';
-  const progressBg = progress < 40 ? '#ffebee' : progress < 80 ? '#fff8e1' : '#e8f5e9';
+  const progressColor = progress < 40 ? '#000000' : progress < 80 ? '#0066CC' : '#0066CC';
+  const progressBg = progress < 40 ? '#ffebee' : progress < 80 ? '#F0F8FF' : '#e8f5e9';
 
   const handlePress = () => {
     router.push('/construction-progress' as any);
@@ -61,11 +61,11 @@ export function ConstructionProgressCard({
 
       <View style={styles.footer}>
         <View style={styles.stat}>
-          <Ionicons name="checkbox" size={16} color="#4caf50" />
+          <Ionicons name="checkbox" size={16} color="#0066CC" />
           <Text style={styles.statText}>{completedTasks} hoàn thành</Text>
         </View>
         <View style={styles.stat}>
-          <Ionicons name="time" size={16} color="#ffb300" />
+          <Ionicons name="time" size={16} color="#0066CC" />
           <Text style={styles.statText}>{totalTasks - completedTasks} đang làm</Text>
         </View>
       </View>

@@ -30,7 +30,7 @@ const GUIDE_SECTIONS: GuideSection[] = [
   {
     title: 'Bắt đầu với Dự án',
     icon: 'rocket',
-    color: ['#667eea', '#764ba2'],
+    color: ['#0066CC', '#004499'],
     steps: [
       {
         icon: 'add-circle',
@@ -86,7 +86,7 @@ const GUIDE_SECTIONS: GuideSection[] = [
   {
     title: 'Quản lý Ngân sách',
     icon: 'cash',
-    color: ['#f093fb', '#f5576c'],
+    color: ['#0080FF', '#f5576c'],
     steps: [
       {
         icon: 'wallet',
@@ -140,7 +140,7 @@ const GUIDE_SECTIONS: GuideSection[] = [
   {
     title: 'Giao tiếp & Báo cáo',
     icon: 'chatbubbles',
-    color: ['#667eea', '#764ba2'],
+    color: ['#0066CC', '#004499'],
     steps: [
       {
         icon: 'chatbox',
@@ -167,7 +167,7 @@ const GUIDE_SECTIONS: GuideSection[] = [
   {
     title: 'Mẹo Nâng cao',
     icon: 'bulb',
-    color: ['#FF6B35', '#F7931E'],
+    color: ['#0066CC', '#F7931E'],
     steps: [
       {
         icon: 'copy',
@@ -221,7 +221,7 @@ export default function ProjectGuide({ visible, onClose }: ProjectGuideProps) {
     <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         {/* Header */}
-        <LinearGradient colors={['#667eea', '#764ba2']} style={styles.header}>
+        <LinearGradient colors={['#0066CC', '#004499']} style={styles.header}>
           <View style={styles.headerContent}>
             <View>
               <Text style={styles.headerTitle}>Hướng dẫn Dự án</Text>
@@ -238,7 +238,7 @@ export default function ProjectGuide({ visible, onClose }: ProjectGuideProps) {
           {/* Introduction Banner */}
           <View style={styles.introBanner}>
             <LinearGradient
-              colors={['#FF6B35', '#F7931E']}
+              colors={['#0066CC', '#F7931E']}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={styles.introBannerGradient}
@@ -319,7 +319,7 @@ export default function ProjectGuide({ visible, onClose }: ProjectGuideProps) {
           {/* Quick Tips Card */}
           <View style={[styles.tipsCard, { backgroundColor: '#fff' }]}>
             <View style={styles.tipsHeader}>
-              <Ionicons name="flash" size={24} color="#F59E0B" />
+              <Ionicons name="flash" size={24} color="#0066CC" />
               <Text style={[styles.tipsTitle, { color: colors.text }]}>Mẹo nhanh</Text>
             </View>
             <View style={styles.tipsList}>
@@ -358,7 +358,7 @@ export default function ProjectGuide({ visible, onClose }: ProjectGuideProps) {
 
           {/* Support Card */}
           <View style={[styles.supportCard, { backgroundColor: '#fff' }]}>
-            <Ionicons name="help-circle" size={32} color="#667eea" style={{ marginBottom: 8 }} />
+            <Ionicons name="help-circle" size={32} color="#0066CC" style={{ marginBottom: 8 }} />
             <Text style={[styles.supportTitle, { color: colors.text }]}>Cần hỗ trợ thêm?</Text>
             <Text style={[styles.supportText, { color: colors.textMuted }]}>
               Liên hệ đội ngũ hỗ trợ 24/7 qua hotline hoặc email
@@ -366,7 +366,7 @@ export default function ProjectGuide({ visible, onClose }: ProjectGuideProps) {
             <View style={styles.supportActions}>
               <TouchableOpacity style={styles.supportButton}>
                 <LinearGradient
-                  colors={['#667eea', '#764ba2']}
+                  colors={['#0066CC', '#004499']}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
                   style={styles.supportButtonGradient}
@@ -574,7 +574,7 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#F59E0B',
+    backgroundColor: '#0066CC',
     marginTop: 7,
     marginRight: 10,
   },

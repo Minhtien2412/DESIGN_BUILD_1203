@@ -158,7 +158,7 @@ export default function AIAssistantScreen() {
         {/* Error Message */}
         {error && !loading && (
           <View style={styles.errorContainer}>
-            <Ionicons name="alert-circle-outline" size={16} color="#f44336" />
+            <Ionicons name="alert-circle-outline" size={16} color="#000000" />
             <Text style={styles.errorText}>{error}</Text>
           </View>
         )}
@@ -222,11 +222,11 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: '#ffebee',
+    backgroundColor: '#F5F5F5',
   },
   errorText: {
     flex: 1,
     fontSize: 13,
-    color: '#f44336',
+    color: '#000000',
   },
 });

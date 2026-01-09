@@ -60,7 +60,7 @@ export function ProjectListExample() {
   if (error) {
     return (
       <View style={styles.center}>
-        <Ionicons name="alert-circle" size={48} color="#EF4444" />
+        <Ionicons name="alert-circle" size={48} color="#000000" />
         <Text style={styles.errorText}>{error.message}</Text>
         <TouchableOpacity style={styles.retryButton} onPress={refetch}>
           <Text style={styles.retryText}>Thử lại</Text>
@@ -240,7 +240,7 @@ export function CreateProjectExample() {
 
       {success && (
         <View style={styles.successBanner}>
-          <Ionicons name="checkmark-circle" size={20} color="#10B981" />
+          <Ionicons name="checkmark-circle" size={20} color="#0066CC" />
           <Text style={styles.successText}>Đã tạo thành công!</Text>
         </View>
       )}
@@ -348,7 +348,7 @@ const styles = StyleSheet.create({
   errorText: {
     marginTop: 12,
     fontSize: 14,
-    color: '#EF4444',
+    color: '#000000',
     textAlign: 'center',
   },
   retryButton: {
@@ -382,10 +382,10 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   source_api: {
-    backgroundColor: '#10B981',
+    backgroundColor: '#0066CC',
   },
   source_cache: {
-    backgroundColor: '#F59E0B',
+    backgroundColor: '#0066CC',
   },
   source_mock: {
     backgroundColor: '#6B7280',
@@ -476,7 +476,7 @@ const styles = StyleSheet.create({
   },
   formError: {
     marginTop: 12,
-    color: '#EF4444',
+    color: '#000000',
     fontSize: 14,
   },
   successBanner: {
@@ -551,11 +551,11 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#10B981',
+    backgroundColor: '#0066CC',
   },
   liveText: {
     fontSize: 12,
-    color: '#10B981',
+    color: '#0066CC',
     fontWeight: '600',
   },
   

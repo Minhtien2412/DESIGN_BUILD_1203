@@ -38,15 +38,15 @@ const { width } = Dimensions.get('window');
 const COLORS = {
   primary: '#03a9f4',
   primaryDark: '#0288d1',
-  secondary: '#00bcd4',
+  secondary: '#0080FF',
   background: '#f5f7fa',
   surface: '#ffffff',
   text: '#2c3e50',
   textMuted: '#7f8c8d',
   border: '#e0e0e0',
-  success: '#4caf50',
-  error: '#f44336',
-  orange: '#ff9800',
+  success: '#0066CC',
+  error: '#000000',
+  orange: '#0066CC',
 };
 
 type UserType = 'staff' | 'customer';
@@ -452,7 +452,7 @@ const styles = StyleSheet.create({
   generalError: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#ffebee',
+    backgroundColor: '#F5F5F5',
     padding: 12,
     borderRadius: 8,
     gap: 8,

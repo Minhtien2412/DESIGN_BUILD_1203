@@ -57,9 +57,9 @@ export default function ScheduledTasksScreen() {
 
   const getColorForType = (type: string) => {
     switch (type) {
-      case 'reminder': return '#f59e0b';
+      case 'reminder': return '#0066CC';
       case 'report': return '#3b82f6';
-      case 'backup': return '#10b981';
+      case 'backup': return '#0066CC';
       default: return '#6b7280';
     }
   };
@@ -68,7 +68,7 @@ export default function ScheduledTasksScreen() {
     <Container>
       <ScrollView showsVerticalScrollIndicator={false}>
         <LinearGradient
-          colors={['#f59e0b', '#d97706']}
+          colors={['#0066CC', '#d97706']}
           style={styles.header}
         >
           <TouchableOpacity
@@ -111,7 +111,7 @@ export default function ScheduledTasksScreen() {
         </Section>
 
         <Section title="Quick Actions">
-          <TouchableOpacity style={[styles.actionButton, { backgroundColor: '#f59e0b' }]}>
+          <TouchableOpacity style={[styles.actionButton, { backgroundColor: '#0066CC' }]}>
             <Ionicons name="add-circle-outline" size={24} color="#fff" />
             <Text style={styles.actionText}>Tạo nhắc nhở hàng ngày</Text>
           </TouchableOpacity>
@@ -121,7 +121,7 @@ export default function ScheduledTasksScreen() {
             <Text style={styles.actionText}>Tạo báo cáo tuần tự động</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={[styles.actionButton, { backgroundColor: '#10b981' }]}>
+          <TouchableOpacity style={[styles.actionButton, { backgroundColor: '#0066CC' }]}>
             <Ionicons name="save-outline" size={24} color="#fff" />
             <Text style={styles.actionText}>Thiết lập backup hàng ngày</Text>
           </TouchableOpacity>
@@ -129,27 +129,27 @@ export default function ScheduledTasksScreen() {
 
         <Section title="Tính năng">
           <View style={styles.featureItem}>
-            <Ionicons name="checkmark-circle" size={24} color="#10b981" />
+            <Ionicons name="checkmark-circle" size={24} color="#0066CC" />
             <Text style={styles.featureText}>Cron job scheduling với @nestjs/schedule</Text>
           </View>
           <View style={styles.featureItem}>
-            <Ionicons name="checkmark-circle" size={24} color="#10b981" />
+            <Ionicons name="checkmark-circle" size={24} color="#0066CC" />
             <Text style={styles.featureText}>Daily, weekly, monthly patterns</Text>
           </View>
           <View style={styles.featureItem}>
-            <Ionicons name="checkmark-circle" size={24} color="#10b981" />
+            <Ionicons name="checkmark-circle" size={24} color="#0066CC" />
             <Text style={styles.featureText}>Custom cron expressions</Text>
           </View>
           <View style={styles.featureItem}>
-            <Ionicons name="checkmark-circle" size={24} color="#10b981" />
+            <Ionicons name="checkmark-circle" size={24} color="#0066CC" />
             <Text style={styles.featureText}>Nhắc nhở deadline dự án</Text>
           </View>
           <View style={styles.featureItem}>
-            <Ionicons name="checkmark-circle" size={24} color="#10b981" />
+            <Ionicons name="checkmark-circle" size={24} color="#0066CC" />
             <Text style={styles.featureText}>Báo cáo tự động (PDF/Excel)</Text>
           </View>
           <View style={styles.featureItem}>
-            <Ionicons name="checkmark-circle" size={24} color="#10b981" />
+            <Ionicons name="checkmark-circle" size={24} color="#0066CC" />
             <Text style={styles.featureText}>Manual trigger ngay lập tức</Text>
           </View>
         </Section>

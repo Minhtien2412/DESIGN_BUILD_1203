@@ -47,7 +47,7 @@ const ProviderCard: React.FC<ProviderCardProps> = ({ provider, onBooking, onPres
           <Text style={styles.providerName}>{provider.name}</Text>
           
           <View style={styles.ratingRow}>
-            <Ionicons name="star" size={14} color="#ffa41c" />
+            <Ionicons name="star" size={14} color="#0066CC" />
             <Text style={styles.ratingText}>{provider.rating}</Text>
             <Text style={styles.reviewsText}>({provider.reviewCount})</Text>
           </View>
@@ -74,7 +74,7 @@ const ProviderCard: React.FC<ProviderCardProps> = ({ provider, onBooking, onPres
       </View>
 
       <View style={styles.equipmentRow}>
-        <Ionicons name="construct" size={16} color="#2196f3" />
+        <Ionicons name="construct" size={16} color="#0066CC" />
         <Text style={styles.equipmentText}>
           {provider.verified ? 'Đã xác minh' : 'Thiết bị chuyên nghiệp'}
         </Text>
@@ -196,7 +196,7 @@ export default function DaoDatScreen() {
       <Stack.Screen
         options={{
           title: 'Dịch vụ Đào đất',
-          headerStyle: { backgroundColor: '#ee4d2d' },
+          headerStyle: { backgroundColor: '#0066CC' },
           headerTintColor: '#fff',
           headerTitleStyle: { fontWeight: '600' },
         }}
@@ -282,7 +282,7 @@ export default function DaoDatScreen() {
         {/* Providers List */}
         {loading ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#ee4d2d" />
+            <ActivityIndicator size="large" color="#0066CC" />
             <Text style={styles.loadingText}>Đang tải danh sách...</Text>
           </View>
         ) : (
@@ -291,7 +291,7 @@ export default function DaoDatScreen() {
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.listContainer}
             refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={refresh} colors={['#ee4d2d']} />
+              <RefreshControl refreshing={refreshing} onRefresh={refresh} colors={['#0066CC']} />
             }
           >
             {filteredProviders.map((provider) => (
@@ -316,7 +316,7 @@ export default function DaoDatScreen() {
 
         {/* Info Banner */}
         <View style={styles.infoBanner}>
-          <Ionicons name="information-circle-outline" size={16} color="#2196f3" />
+          <Ionicons name="information-circle-outline" size={16} color="#0066CC" />
           <Text style={styles.infoBannerText}>
             Báo giá miễn phí • Hotline: 1900 123 456
           </Text>
@@ -346,7 +346,7 @@ export default function DaoDatScreen() {
                   <View style={styles.selectedProviderText}>
                     <Text style={styles.selectedProviderName}>{selectedProvider.name}</Text>
                     <View style={styles.selectedRating}>
-                      <Ionicons name="star" size={14} color="#ffa41c" />
+                      <Ionicons name="star" size={14} color="#0066CC" />
                       <Text style={styles.selectedRatingText}>
                         {selectedProvider.rating} ({selectedProvider.reviewCount})
                       </Text>
@@ -464,7 +464,7 @@ const styles = StyleSheet.create({
   filterLabel: { fontSize: 13, fontWeight: '600', color: '#666', width: 85, paddingLeft: 16 },
   filterScroll: { flex: 1 },
   filterChip: { paddingHorizontal: 14, paddingVertical: 6, borderRadius: 16, backgroundColor: '#f5f5f5', marginHorizontal: 4 },
-  filterChipActive: { backgroundColor: '#ee4d2d' },
+  filterChipActive: { backgroundColor: '#0066CC' },
   filterChipText: { fontSize: 12, color: '#666', fontWeight: '500' },
   filterChipTextActive: { color: '#fff' },
   resultsBar: { backgroundColor: '#fff', paddingHorizontal: 16, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#f0f0f0' },
@@ -474,7 +474,7 @@ const styles = StyleSheet.create({
   content: { flex: 1 },
   listContainer: { padding: 16 },
   providerCard: { backgroundColor: '#fff', borderRadius: 12, padding: 16, marginBottom: 16, elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 4 },
-  featuredBadge: { position: 'absolute', top: 12, right: 12, flexDirection: 'row', alignItems: 'center', backgroundColor: '#ee4d2d', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 12, zIndex: 1, gap: 4 },
+  featuredBadge: { position: 'absolute', top: 12, right: 12, flexDirection: 'row', alignItems: 'center', backgroundColor: '#0066CC', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 12, zIndex: 1, gap: 4 },
   featuredText: { fontSize: 10, fontWeight: '600', color: '#fff' },
   cardHeader: { flexDirection: 'row', marginBottom: 12 },
   avatar: { width: 60, height: 60, borderRadius: 8, backgroundColor: '#f0f0f0' },
@@ -490,27 +490,27 @@ const styles = StyleSheet.create({
   servicesSection: { marginBottom: 12 },
   servicesLabel: { fontSize: 12, fontWeight: '600', color: '#666', marginBottom: 6 },
   servicesTags: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
-  serviceTag: { backgroundColor: '#e3f2fd', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
-  serviceText: { fontSize: 11, fontWeight: '500', color: '#2196f3' },
+  serviceTag: { backgroundColor: '#E8F4FF', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
+  serviceText: { fontSize: 11, fontWeight: '500', color: '#0066CC' },
   equipmentRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12 },
   equipmentText: { fontSize: 12, color: '#666', flex: 1 },
   statsSection: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', paddingVertical: 12, marginBottom: 12, borderTopWidth: 1, borderBottomWidth: 1, borderColor: '#f0f0f0' },
   statItem: { alignItems: 'center' },
   statValue: { fontSize: 15, fontWeight: '700', color: '#333', marginBottom: 4 },
-  available: { color: '#4caf50' },
-  busy: { color: '#ff9800' },
+  available: { color: '#0066CC' },
+  busy: { color: '#0066CC' },
   statLabel: { fontSize: 11, color: '#999' },
   statDivider: { width: 1, height: 40, backgroundColor: '#f0f0f0' },
   priceRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   priceLabel: { fontSize: 12, color: '#999' },
-  price: { fontSize: 18, fontWeight: '700', color: '#ee4d2d' },
+  price: { fontSize: 18, fontWeight: '700', color: '#0066CC' },
   priceUnit: { fontSize: 12, color: '#999' },
-  bookButton: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#ee4d2d', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 8, gap: 6 },
+  bookButton: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#0066CC', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 8, gap: 6 },
   bookButtonText: { fontSize: 14, fontWeight: '600', color: '#fff' },
   emptyState: { alignItems: 'center', justifyContent: 'center', paddingVertical: 60 },
   emptyText: { fontSize: 15, color: '#999', marginTop: 16 },
-  infoBanner: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#e3f2fd', paddingHorizontal: 16, paddingVertical: 10, gap: 8 },
-  infoBannerText: { fontSize: 12, color: '#2196f3', flex: 1 },
+  infoBanner: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#E8F4FF', paddingHorizontal: 16, paddingVertical: 10, gap: 8 },
+  infoBannerText: { fontSize: 12, color: '#0066CC', flex: 1 },
   bookingModalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
   bookingModalContent: { backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '90%' },
   bookingModalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: '#f0f0f0' },
@@ -525,10 +525,10 @@ const styles = StyleSheet.create({
   form: { marginBottom: 16 },
   formGroup: { marginBottom: 16 },
   formLabel: { fontSize: 13, fontWeight: '600', color: '#333', marginBottom: 8 },
-  required: { color: '#ee4d2d' },
+  required: { color: '#0066CC' },
   formInput: { backgroundColor: '#f5f5f5', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 14, color: '#333', borderWidth: 1, borderColor: '#e0e0e0' },
   formTextArea: { height: 80, textAlignVertical: 'top' },
-  submitButton: { backgroundColor: '#ee4d2d', paddingVertical: 14, borderRadius: 8, alignItems: 'center', marginBottom: 12 },
+  submitButton: { backgroundColor: '#0066CC', paddingVertical: 14, borderRadius: 8, alignItems: 'center', marginBottom: 12 },
   submitButtonText: { fontSize: 15, fontWeight: '600', color: '#fff' },
   formNote: { fontSize: 12, color: '#999', textAlign: 'center', marginBottom: 20 },
 });

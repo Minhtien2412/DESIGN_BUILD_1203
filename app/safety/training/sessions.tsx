@@ -60,7 +60,7 @@ export default function TrainingSessionsScreen() {
           title: 'Buổi đào tạo',
           headerRight: () => (
             <TouchableOpacity onPress={() => setModalVisible(true)}>
-              <Ionicons name="add-circle" size={28} color="#2196F3" style={{ marginRight: 8 }} />
+              <Ionicons name="add-circle" size={28} color="#0066CC" style={{ marginRight: 8 }} />
             </TouchableOpacity>
           ),
         }}
@@ -74,12 +74,12 @@ export default function TrainingSessionsScreen() {
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statItem}>
-          <Text style={[styles.statValue, { color: '#2196F3' }]}>{scheduledCount}</Text>
+          <Text style={[styles.statValue, { color: '#0066CC' }]}>{scheduledCount}</Text>
           <Text style={styles.statLabel}>Sắp tới</Text>
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statItem}>
-          <Text style={[styles.statValue, { color: '#4CAF50' }]}>{completedCount}</Text>
+          <Text style={[styles.statValue, { color: '#0066CC' }]}>{completedCount}</Text>
           <Text style={styles.statLabel}>Hoàn thành</Text>
         </View>
       </View>
@@ -249,7 +249,7 @@ function SessionCard({ session }: SessionCardProps) {
 
       {session.actualDuration && (
         <View style={styles.durationInfo}>
-          <Ionicons name="hourglass" size={14} color="#FF9800" />
+          <Ionicons name="hourglass" size={14} color="#0066CC" />
           <Text style={styles.durationText}>
             Thời lượng thực tế: {session.actualDuration} phút
           </Text>
@@ -422,15 +422,15 @@ function CreateSessionModal({
 function getStatusColor(status: TrainingStatus): string {
   switch (status) {
     case TrainingStatus.SCHEDULED:
-      return '#2196F3';
+      return '#0066CC';
     case TrainingStatus.IN_PROGRESS:
-      return '#FF9800';
+      return '#0066CC';
     case TrainingStatus.COMPLETED:
-      return '#4CAF50';
+      return '#0066CC';
     case TrainingStatus.CANCELLED:
-      return '#9E9E9E';
+      return '#999999';
     case TrainingStatus.EXPIRED:
-      return '#F44336';
+      return '#000000';
     default:
       return '#666';
   }
@@ -487,7 +487,7 @@ const styles = StyleSheet.create({
     borderBottomColor: 'transparent',
   },
   filterTabActive: {
-    borderBottomColor: '#2196F3',
+    borderBottomColor: '#0066CC',
   },
   filterTabText: {
     fontSize: 11,
@@ -495,7 +495,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   filterTabTextActive: {
-    color: '#2196F3',
+    color: '#0066CC',
     fontWeight: 'bold',
   },
   listContent: {
@@ -523,13 +523,13 @@ const styles = StyleSheet.create({
   dateBadge: {
     width: 64,
     height: 64,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
   },
   dateBadgePast: {
-    backgroundColor: '#9E9E9E',
+    backgroundColor: '#999999',
   },
   dateDay: {
     fontSize: 24,
@@ -602,7 +602,7 @@ const styles = StyleSheet.create({
   },
   attendanceProgress: {
     height: '100%',
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#0066CC',
   },
   attendanceStats: {
     flexDirection: 'row',
@@ -618,14 +618,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#FFF3E0',
+    backgroundColor: '#E8F4FF',
     padding: 8,
     borderRadius: 6,
     marginTop: 12,
   },
   durationText: {
     fontSize: 12,
-    color: '#E65100',
+    color: '#004499',
     fontWeight: '500',
   },
   emptyContainer: {
@@ -640,7 +640,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   addButton: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
@@ -731,7 +731,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 14,
     borderRadius: 8,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     alignItems: 'center',
   },
   createButtonText: {

@@ -2,9 +2,14 @@
  * Construction Progress Dashboard Screen
  * Main screen showing all projects with progress, status, role-based actions
  * UI inspired by Shopee order management
+ * 🔥 UPDATED: Now uses real data from Perfex CRM
  */
 
 import { useAuth } from '@/context/AuthContext';
+import {
+    PerfexProject,
+    PerfexProjectsService,
+} from '@/services/perfexCRM';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
@@ -36,8 +41,8 @@ const { width } = Dimensions.get('window');
 
 // Theme colors
 const COLORS = {
-  primary: '#EE4D2D',
-  primaryDark: '#D73211',
+  primary: '#0066CC',
+  primaryDark: '#004499',
   background: '#F5F5F5',
   surface: '#FFFFFF',
   text: '#222222',
@@ -45,9 +50,9 @@ const COLORS = {
   textMuted: '#999999',
   border: '#E8E8E8',
   success: '#00C853',
-  warning: '#FF9800',
-  error: '#F44336',
-  info: '#2196F3',
+  warning: '#0066CC',
+  error: '#000000',
+  info: '#0066CC',
 };
 
 // Status tabs
@@ -59,91 +64,46 @@ const STATUS_TABS: { key: ProjectStatus | 'ALL'; label: string }[] = [
   { key: 'ON_HOLD', label: 'Tạm dừng' },
 ];
 
-// Mock data for demo
-const MOCK_PROJECTS: ConstructionProject[] = [
-  {
-    id: '1',
-    name: 'Biệt thự Vinhomes Grand Park',
-    description: 'Xây dựng biệt thự 3 tầng phong cách hiện đại',
-    address: 'Quận 9, TP.HCM',
-    projectType: 'Biệt thự',
-    totalArea: 450,
-    totalFloors: 3,
-    estimatedBudget: 5500000000,
-    status: 'IN_PROGRESS',
-    progressPercent: 65,
-    plannedStartDate: '2024-01-15',
-    plannedEndDate: '2024-12-31',
-    actualStartDate: '2024-01-20',
-    members: [
-      { id: '1', userId: 'u1', userName: 'Nguyễn Văn A', role: 'MANAGER', assignedAt: '2024-01-15' },
-      { id: '2', userId: 'u2', userName: 'Trần Văn B', role: 'ENGINEER', assignedAt: '2024-01-15' },
-      { id: '3', userId: 'u3', userName: 'Lê Văn C', role: 'CONTRACTOR', assignedAt: '2024-01-15' },
-    ],
-    ownerId: 'client1',
+// Map Perfex status to UI status
+function mapPerfexStatus(status: number): ProjectStatus {
+  switch (status) {
+    case 1: return 'PLANNING';
+    case 2: return 'IN_PROGRESS';
+    case 3: return 'ON_HOLD';
+    case 4: return 'PLANNING'; // Cancelled mapped to Planning
+    case 5: return 'COMPLETED';
+    default: return 'PLANNING';
+  }
+}
+
+// Convert Perfex Project to ConstructionProject
+function mapPerfexToConstruction(p: PerfexProject): ConstructionProject {
+  return {
+    id: p.id,
+    name: p.name,
+    description: p.description || '',
+    address: '', // Not in Perfex by default
+    projectType: 'Dự án',
+    totalArea: 0,
+    estimatedBudget: parseFloat(p.project_cost || '0'),
+    status: mapPerfexStatus(p.status),
+    progressPercent: p.progress_from_tasks || p.progress || 0,
+    plannedStartDate: p.start_date,
+    plannedEndDate: p.deadline || '',
+    actualStartDate: p.start_date,
+    actualEndDate: p.date_finished || undefined,
+    members: [],
+    ownerId: p.clientid,
     tasks: [],
-    totalTasks: 24,
-    completedTasks: 15,
+    totalTasks: 0,
+    completedTasks: 0,
     coverImage: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800',
     media: [],
-    createdAt: '2024-01-10',
-    updatedAt: '2024-12-20',
-    createdBy: 'manager1',
-  },
-  {
-    id: '2',
-    name: 'Nhà phố Thảo Điền',
-    description: 'Xây mới nhà phố 4 tầng',
-    address: 'Thảo Điền, Quận 2, TP.HCM',
-    projectType: 'Nhà phố',
-    totalArea: 180,
-    totalFloors: 4,
-    estimatedBudget: 3200000000,
-    status: 'PENDING_REVIEW',
-    progressPercent: 95,
-    plannedStartDate: '2024-03-01',
-    plannedEndDate: '2024-11-30',
-    actualStartDate: '2024-03-05',
-    members: [
-      { id: '4', userId: 'u1', userName: 'Nguyễn Văn A', role: 'MANAGER', assignedAt: '2024-03-01' },
-    ],
-    ownerId: 'client2',
-    tasks: [],
-    totalTasks: 18,
-    completedTasks: 17,
-    coverImage: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800',
-    media: [],
-    createdAt: '2024-02-25',
-    updatedAt: '2024-12-18',
-    createdBy: 'manager1',
-  },
-  {
-    id: '3',
-    name: 'Văn phòng ABC Corp',
-    description: 'Nội thất văn phòng 500m2',
-    address: 'Quận 1, TP.HCM',
-    projectType: 'Văn phòng',
-    totalArea: 500,
-    estimatedBudget: 1800000000,
-    status: 'COMPLETED',
-    progressPercent: 100,
-    plannedStartDate: '2024-06-01',
-    plannedEndDate: '2024-09-30',
-    actualStartDate: '2024-06-01',
-    actualEndDate: '2024-09-28',
-    members: [],
-    ownerId: 'client3',
-    tasks: [],
-    totalTasks: 12,
-    completedTasks: 12,
-    coverImage: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800',
-    media: [],
-    averageRating: 4.8,
-    createdAt: '2024-05-20',
-    updatedAt: '2024-09-28',
-    createdBy: 'manager1',
-  },
-];
+    createdAt: p.project_created,
+    updatedAt: p.project_created,
+    createdBy: String(p.addedfrom),
+  };
+}
 
 export default function ProgressDashboardScreen() {
   const router = useRouter();
@@ -154,6 +114,7 @@ export default function ProgressDashboardScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [selectedTab, setSelectedTab] = useState<ProjectStatus | 'ALL'>('ALL');
+  const [dataSource, setDataSource] = useState<'crm' | 'mock'>('mock');
   const [stats, setStats] = useState({
     total: 0,
     active: 0,
@@ -169,30 +130,71 @@ export default function ProgressDashboardScreen() {
   const userRole: ProgressRole = (user?.role as ProgressRole) || 'MANAGER';
   const permissions = ROLE_PERMISSIONS[userRole];
 
-  // Load projects
+  // Load projects from CRM
   const loadProjects = useCallback(async (isRefresh = false) => {
     try {
       if (isRefresh) setRefreshing(true);
       else setLoading(true);
       
-      // In production, call API
-      // const response = await progressApi.getProjects();
-      // setProjects(response.projects);
+      // 🔥 Fetch từ Perfex CRM
+      const response = await PerfexProjectsService.getAll({ limit: 100 });
       
-      // For demo, use mock data
-      await new Promise(resolve => setTimeout(resolve, 800));
-      setProjects(MOCK_PROJECTS);
-      
-      // Calculate stats
-      setStats({
-        total: MOCK_PROJECTS.length,
-        active: MOCK_PROJECTS.filter(p => p.status === 'IN_PROGRESS').length,
-        completed: MOCK_PROJECTS.filter(p => p.status === 'COMPLETED').length,
-        pendingActions: MOCK_PROJECTS.filter(p => p.status === 'PENDING_REVIEW').length,
-      });
+      if (response.data && response.data.length > 0) {
+        const mappedProjects = response.data.map(mapPerfexToConstruction);
+        setProjects(mappedProjects);
+        setDataSource('crm');
+        
+        // Calculate stats từ real data
+        setStats({
+          total: mappedProjects.length,
+          active: mappedProjects.filter(p => p.status === 'IN_PROGRESS').length,
+          completed: mappedProjects.filter(p => p.status === 'COMPLETED').length,
+          pendingActions: mappedProjects.filter(p => p.status === 'PENDING_REVIEW' || p.status === 'ON_HOLD').length,
+        });
+        
+        console.log(`✅ Loaded ${mappedProjects.length} projects from CRM`);
+      } else {
+        throw new Error('No data from CRM');
+      }
       
     } catch (error) {
-      console.error('Failed to load projects:', error);
+      console.warn('⚠️ CRM failed, using fallback mock data:', error);
+      // Fallback mock data nếu CRM fail
+      const FALLBACK_PROJECTS: ConstructionProject[] = [
+        {
+          id: '1',
+          name: 'Biệt thự Vinhomes Grand Park',
+          description: 'Xây dựng biệt thự 3 tầng phong cách hiện đại',
+          address: 'Quận 9, TP.HCM',
+          projectType: 'Biệt thự',
+          totalArea: 450,
+          totalFloors: 3,
+          estimatedBudget: 5500000000,
+          status: 'IN_PROGRESS',
+          progressPercent: 65,
+          plannedStartDate: '2024-01-15',
+          plannedEndDate: '2024-12-31',
+          actualStartDate: '2024-01-20',
+          members: [],
+          ownerId: 'client1',
+          tasks: [],
+          totalTasks: 24,
+          completedTasks: 15,
+          coverImage: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800',
+          media: [],
+          createdAt: '2024-01-10',
+          updatedAt: '2024-12-20',
+          createdBy: 'manager1',
+        },
+      ];
+      setProjects(FALLBACK_PROJECTS);
+      setDataSource('mock');
+      setStats({
+        total: FALLBACK_PROJECTS.length,
+        active: FALLBACK_PROJECTS.filter(p => p.status === 'IN_PROGRESS').length,
+        completed: FALLBACK_PROJECTS.filter(p => p.status === 'COMPLETED').length,
+        pendingActions: 0,
+      });
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -259,7 +261,7 @@ export default function ProgressDashboardScreen() {
   const renderProjectCard = ({ item, index }: { item: ConstructionProject; index: number }) => {
     const statusConfig = PROJECT_STATUS_CONFIG[item.status] || {
       label: item.status || 'Unknown',
-      color: '#9E9E9E',
+      color: '#999999',
       bgColor: '#F5F5F5',
       icon: 'ellipse-outline',
       order: 0,
@@ -394,7 +396,7 @@ export default function ProgressDashboardScreen() {
             {/* Rating (for completed projects) */}
             {item.status === 'COMPLETED' && item.averageRating && (
               <View style={styles.ratingRow}>
-                <Ionicons name="star" size={16} color="#FFC107" />
+                <Ionicons name="star" size={16} color="#0066CC" />
                 <Text style={styles.ratingText}>{item.averageRating.toFixed(1)}</Text>
                 <Text style={styles.ratingLabel}>Đánh giá</Text>
               </View>
@@ -463,7 +465,7 @@ export default function ProgressDashboardScreen() {
           {renderStatCard('folder-open', 'Tổng dự án', stats.total, '#FFF', 0)}
           {renderStatCard('hammer', 'Đang làm', stats.active, '#FFF', 50)}
           {renderStatCard('checkmark-circle', 'Hoàn thành', stats.completed, '#FFF', 100)}
-          {renderStatCard('alert-circle', 'Chờ xử lý', stats.pendingActions, '#FFC107', 150)}
+          {renderStatCard('alert-circle', 'Chờ xử lý', stats.pendingActions, '#0066CC', 150)}
         </View>
       </LinearGradient>
 
@@ -608,7 +610,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     right: 0,
-    backgroundColor: '#FFC107',
+    backgroundColor: '#0066CC',
     borderRadius: 10,
     minWidth: 18,
     height: 18,

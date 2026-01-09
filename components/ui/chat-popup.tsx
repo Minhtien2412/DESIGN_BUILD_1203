@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
   },
   bubbleUser: {
     alignSelf: 'flex-end',
-    backgroundColor: '#dbeafe',
+    backgroundColor: '#E8F4FF',
   },
   bubbleAgent: {
     alignSelf: 'flex-start',

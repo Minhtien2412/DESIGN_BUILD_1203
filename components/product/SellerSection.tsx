@@ -57,7 +57,7 @@ export function SellerSection({ seller, soldCount, location }: SellerSectionProp
                 {seller.name}
               </ThemedText>
               {seller.verified && (
-                <Ionicons name="checkmark-circle" size={16} color="#10B981" />
+                <Ionicons name="checkmark-circle" size={16} color="#0066CC" />
               )}
             </View>
             <ThemedText style={[styles.sellerType, { color: textMuted }]}>

@@ -450,7 +450,7 @@ const styles = StyleSheet.create({
   },
   weatherOptionActive: {
     borderColor: '#3b82f6',
-    backgroundColor: '#eff6ff',
+    backgroundColor: '#E8F4FF',
   },
   weatherLabel: {
     fontSize: 12,

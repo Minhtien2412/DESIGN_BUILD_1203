@@ -94,8 +94,8 @@ export default function ProgressPredictionScreen() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed': return '#10B981';
-      case 'in-progress': return '#F59E0B';
+      case 'completed': return '#0066CC';
+      case 'in-progress': return '#0066CC';
       case 'upcoming': return '#94A3B8';
       default: return '#94A3B8';
     }
@@ -243,8 +243,8 @@ export default function ProgressPredictionScreen() {
             {/* Risk Factors */}
             <View style={styles.riskCard}>
               <View style={styles.cardHeader}>
-                <Ionicons name="warning" size={20} color="#F59E0B" />
-                <Text style={[styles.cardTitle, { color: '#F59E0B' }]}>Yếu tố rủi ro</Text>
+                <Ionicons name="warning" size={20} color="#0066CC" />
+                <Text style={[styles.cardTitle, { color: '#0066CC' }]}>Yếu tố rủi ro</Text>
               </View>
               {prediction.riskFactors.map((risk, index) => (
                 <View key={index} style={styles.listItem}>
@@ -257,8 +257,8 @@ export default function ProgressPredictionScreen() {
             {/* Recommendations */}
             <View style={styles.recommendCard}>
               <View style={styles.cardHeader}>
-                <Ionicons name="bulb" size={20} color="#10B981" />
-                <Text style={[styles.cardTitle, { color: '#10B981' }]}>Khuyến nghị</Text>
+                <Ionicons name="bulb" size={20} color="#0066CC" />
+                <Text style={[styles.cardTitle, { color: '#0066CC' }]}>Khuyến nghị</Text>
               </View>
               {prediction.recommendations.map((rec, index) => (
                 <View key={index} style={styles.listItem}>
@@ -469,13 +469,13 @@ const styles = StyleSheet.create({
   },
   confidenceFill: {
     height: '100%',
-    backgroundColor: '#10B981',
+    backgroundColor: '#0066CC',
     borderRadius: 4,
   },
   confidenceValue: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#10B981',
+    color: '#0066CC',
     width: 45,
     textAlign: 'right',
   },

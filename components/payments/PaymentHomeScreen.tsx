@@ -57,7 +57,7 @@ export default function PaymentHomeScreen() {
             <Text style={[styles.statusTitle, { color: textColor }]}>Trạng thái hệ thống</Text>
             <View style={[
               styles.statusIndicator,
-              { backgroundColor: loading ? '#FF9800' : isHealthy ? '#4CAF50' : '#F44336' }
+              { backgroundColor: loading ? '#0066CC' : isHealthy ? '#0066CC' : '#000000' }
             ]}>
               <Ionicons 
                 name={loading ? 'time-outline' : isHealthy ? 'checkmark-circle' : 'alert-circle'} 
@@ -101,8 +101,8 @@ export default function PaymentHomeScreen() {
               style={[styles.actionCard, { backgroundColor: cardColor, borderColor }]}
               onPress={navigateToList}
             >
-              <View style={[styles.actionIcon, { backgroundColor: '#22c55e20' }]}>
-                <Ionicons name="list-outline" size={32} color="#22c55e" />
+              <View style={[styles.actionIcon, { backgroundColor: '#0066CC20' }]}>
+                <Ionicons name="list-outline" size={32} color="#0066CC" />
               </View>
               <Text style={[styles.actionTitle, { color: textColor }]}>Lịch sử</Text>
               <Text style={[styles.actionSubtitle, { color: textColor }]}>
@@ -118,8 +118,8 @@ export default function PaymentHomeScreen() {
           
           <View style={styles.featuresList}>
             <View style={styles.featureItem}>
-              <View style={[styles.featureIcon, { backgroundColor: '#4CAF5020' }]}>
-                <Ionicons name="card-outline" size={20} color="#4CAF50" />
+              <View style={[styles.featureIcon, { backgroundColor: '#0066CC20' }]}>
+                <Ionicons name="card-outline" size={20} color="#0066CC" />
               </View>
               <View style={styles.featureContent}>
                 <Text style={[styles.featureTitle, { color: textColor }]}>
@@ -132,8 +132,8 @@ export default function PaymentHomeScreen() {
             </View>
 
             <View style={styles.featureItem}>
-              <View style={[styles.featureIcon, { backgroundColor: '#2196F320' }]}>
-                <Ionicons name="flash-outline" size={20} color="#2196F3" />
+              <View style={[styles.featureIcon, { backgroundColor: '#0066CC20' }]}>
+                <Ionicons name="flash-outline" size={20} color="#0066CC" />
               </View>
               <View style={styles.featureContent}>
                 <Text style={[styles.featureTitle, { color: textColor }]}>
@@ -146,8 +146,8 @@ export default function PaymentHomeScreen() {
             </View>
 
             <View style={styles.featureItem}>
-              <View style={[styles.featureIcon, { backgroundColor: '#FF980020' }]}>
-                <Ionicons name="shield-checkmark-outline" size={20} color="#FF9800" />
+              <View style={[styles.featureIcon, { backgroundColor: '#0066CC20' }]}>
+                <Ionicons name="shield-checkmark-outline" size={20} color="#0066CC" />
               </View>
               <View style={styles.featureContent}>
                 <Text style={[styles.featureTitle, { color: textColor }]}>
@@ -161,7 +161,7 @@ export default function PaymentHomeScreen() {
 
             <View style={styles.featureItem}>
               <View style={[styles.featureIcon, { backgroundColor: '#E8F5E9' }]}>
-                <Ionicons name="analytics-outline" size={20} color="#0A6847" />
+                <Ionicons name="analytics-outline" size={20} color="#0066CC" />
               </View>
               <View style={styles.featureContent}>
                 <Text style={[styles.featureTitle, { color: textColor }]}>

@@ -36,7 +36,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'Sản phẩm',
     icon: 'cube',
     route: '/shopping',
-    color: '#f59e0b',
+    color: '#0066CC',
     requiredPermission: Permission.VIEW_PRODUCTS,
   },
   {
@@ -44,14 +44,14 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'Giỏ hàng',
     icon: 'cart',
     route: '/cart',
-    color: '#ef4444',
+    color: '#000000',
   },
   {
     id: 'quote',
     title: 'Yêu cầu báo giá',
     icon: 'document-text',
     route: '/quote-request',
-    color: '#8b5cf6',
+    color: '#666666',
     requiredPermission: Permission.CREATE_QUOTE,
   },
   
@@ -61,7 +61,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'Thi công',
     icon: 'hammer',
     route: '/construction',
-    color: '#ec4899',
+    color: '#666666',
     requiredRole: [UserRole.STAFF, UserRole.MANAGER, UserRole.ADMIN],
   },
   {
@@ -77,7 +77,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'Nhân công',
     icon: 'people',
     route: '/labor',
-    color: '#f97316',
+    color: '#0066CC',
     requiredRole: [UserRole.STAFF, UserRole.MANAGER, UserRole.ADMIN],
   },
   
@@ -87,7 +87,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'Tài liệu',
     icon: 'folder',
     route: '/documents',
-    color: '#6366f1',
+    color: '#666666',
     requiredRole: [UserRole.STAFF, UserRole.MANAGER, UserRole.ADMIN],
   },
   {
@@ -103,7 +103,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'Kiểm soát tài liệu',
     icon: 'document-lock-outline',
     route: '/document-control',
-    color: '#ec4899',
+    color: '#666666',
     requiredRole: [UserRole.MANAGER, UserRole.ADMIN],
   },
   {
@@ -119,7 +119,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'RFI',
     icon: 'help-circle-outline',
     route: '/rfi',
-    color: '#f59e0b',
+    color: '#0066CC',
     requiredRole: [UserRole.STAFF, UserRole.MANAGER, UserRole.ADMIN],
   },
   {
@@ -127,7 +127,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'Lệnh thay đổi',
     icon: 'swap-horizontal-outline',
     route: '/change-order',
-    color: '#ef4444',
+    color: '#000000',
     requiredRole: [UserRole.MANAGER, UserRole.ADMIN],
   },
   {
@@ -135,7 +135,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'Quản lý thay đổi',
     icon: 'git-compare-outline',
     route: '/change-management',
-    color: '#8b5cf6',
+    color: '#666666',
     requiredRole: [UserRole.MANAGER, UserRole.ADMIN],
   },
   {
@@ -151,7 +151,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'Sổ tay O&M',
     icon: 'book-outline',
     route: '/om-manuals',
-    color: '#10b981',
+    color: '#0066CC',
     requiredRole: [UserRole.STAFF, UserRole.MANAGER, UserRole.ADMIN],
   },
   
@@ -169,7 +169,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'Biên bản họp',
     icon: 'people-outline',
     route: '/meeting-minutes',
-    color: '#6366f1',
+    color: '#666666',
     requiredRole: [UserRole.STAFF, UserRole.MANAGER, UserRole.ADMIN],
   },
   {
@@ -177,7 +177,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'Mua sắm',
     icon: 'bag-handle-outline',
     route: '/procurement',
-    color: '#f59e0b',
+    color: '#0066CC',
     requiredRole: [UserRole.MANAGER, UserRole.ADMIN],
   },
   {
@@ -185,7 +185,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'Thiết bị',
     icon: 'construct-outline',
     route: '/equipment',
-    color: '#ef4444',
+    color: '#000000',
     requiredRole: [UserRole.STAFF, UserRole.MANAGER, UserRole.ADMIN],
   },
   {
@@ -201,7 +201,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'Kế hoạch tài nguyên',
     icon: 'calendar-outline',
     route: '/resource-planning',
-    color: '#ec4899',
+    color: '#666666',
     requiredRole: [UserRole.MANAGER, UserRole.ADMIN],
   },
   
@@ -211,7 +211,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'Nghiệm thu',
     icon: 'checkmark-done-circle-outline',
     route: '/commissioning',
-    color: '#10b981',
+    color: '#0066CC',
     requiredRole: [UserRole.MANAGER, UserRole.ADMIN],
   },
   {
@@ -227,7 +227,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'Rủi ro',
     icon: 'alert-circle-outline',
     route: '/risk',
-    color: '#ef4444',
+    color: '#000000',
     requiredRole: [UserRole.MANAGER, UserRole.ADMIN],
   },
   {
@@ -235,7 +235,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'Môi trường',
     icon: 'leaf-outline',
     route: '/environmental',
-    color: '#10b981',
+    color: '#0066CC',
     requiredRole: [UserRole.STAFF, UserRole.MANAGER, UserRole.ADMIN],
   },
   
@@ -245,7 +245,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'QC/QA',
     icon: 'shield-checkmark-outline',
     route: '/quality-assurance',
-    color: '#10b981',
+    color: '#0066CC',
     requiredRole: [UserRole.STAFF, UserRole.MANAGER, UserRole.ADMIN],
   },
   {
@@ -253,7 +253,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'An toàn',
     icon: 'warning-outline',
     route: '/safety',
-    color: '#ef4444',
+    color: '#000000',
     requiredRole: [UserRole.STAFF, UserRole.MANAGER, UserRole.ADMIN],
   },
   {
@@ -261,7 +261,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'Kiểm tra',
     icon: 'search-outline',
     route: '/inspection',
-    color: '#8b5cf6',
+    color: '#666666',
     requiredRole: [UserRole.STAFF, UserRole.MANAGER, UserRole.ADMIN],
   },
   {
@@ -269,7 +269,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'Danh sách khuyết tật',
     icon: 'list-outline',
     route: '/punch-list',
-    color: '#f97316',
+    color: '#0066CC',
     requiredRole: [UserRole.STAFF, UserRole.MANAGER, UserRole.ADMIN],
   },
   {
@@ -293,7 +293,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'Đường găng',
     icon: 'git-network-outline',
     route: '/timeline/critical-path',
-    color: '#dc2626',
+    color: '#000000',
     requiredRole: [UserRole.MANAGER, UserRole.ADMIN],
   },
   {
@@ -301,7 +301,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'Phụ thuộc',
     icon: 'git-branch-outline',
     route: '/timeline/dependencies',
-    color: '#7c3aed',
+    color: '#666666',
     requiredRole: [UserRole.STAFF, UserRole.MANAGER, UserRole.ADMIN],
   },
   
@@ -311,7 +311,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'Ngân sách',
     icon: 'wallet-outline',
     route: '/budget',
-    color: '#f59e0b',
+    color: '#0066CC',
     requiredRole: [UserRole.MANAGER, UserRole.ADMIN],
   },
   {
@@ -319,7 +319,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'Chi phí',
     icon: 'cash-outline',
     route: '/budget/expenses',
-    color: '#ef4444',
+    color: '#000000',
     requiredRole: [UserRole.MANAGER, UserRole.ADMIN],
   },
   {
@@ -327,7 +327,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'Hóa đơn',
     icon: 'receipt-outline',
     route: '/budget/invoices',
-    color: '#10b981',
+    color: '#0066CC',
     requiredRole: [UserRole.MANAGER, UserRole.ADMIN],
   },
   {
@@ -351,7 +351,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'Đơn hàng',
     icon: 'cart-outline',
     route: '/inventory/orders',
-    color: '#8b5cf6',
+    color: '#666666',
     requiredRole: [UserRole.STAFF, UserRole.MANAGER, UserRole.ADMIN],
   },
   {
@@ -359,7 +359,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'Nhà cung cấp',
     icon: 'business-outline',
     route: '/inventory/suppliers',
-    color: '#ec4899',
+    color: '#666666',
     requiredRole: [UserRole.MANAGER, UserRole.ADMIN],
   },
   
@@ -379,7 +379,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'Kiểm duyệt',
     icon: 'checkmark-done',
     route: '/admin/moderation',
-    color: '#ef4444',
+    color: '#000000',
     requiredPermission: Permission.APPROVE_CONTENT,
     badge: 0, // Will be updated with pending count
   },
@@ -388,7 +388,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'Quản lý người dùng',
     icon: 'people-circle',
     route: '/admin/staff',
-    color: '#6366f1',
+    color: '#666666',
     requiredPermission: Permission.MANAGE_USERS,
   },
   {
@@ -406,7 +406,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'Videos',
     icon: 'videocam',
     route: '/videos',
-    color: '#ef4444',
+    color: '#000000',
   },
 ];
 
@@ -674,7 +674,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -4,
     right: -4,
-    backgroundColor: '#ef4444',
+    backgroundColor: '#000000',
     borderRadius: 10,
     minWidth: 20,
     height: 20,

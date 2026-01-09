@@ -43,7 +43,7 @@ export function CategoryInfoCard({
           </Text>
           {category.trending && (
             <View style={styles.trendingBadge}>
-              <MaterialIcons name="trending-up" size={12} color="#EF4444" />
+              <MaterialIcons name="trending-up" size={12} color="#000000" />
               <Text style={styles.trendingText}>Trending</Text>
             </View>
           )}
@@ -78,7 +78,7 @@ export function CategoryInfoCard({
           )}
           {category.popularity && (
             <View style={styles.stat}>
-              <MaterialIcons name="local-fire-department" size={14} color="#10B981" />
+              <MaterialIcons name="local-fire-department" size={14} color="#0066CC" />
               <Text style={styles.statText}>
                 {category.popularity}/5
               </Text>
@@ -104,7 +104,7 @@ export function CategoryInfoCard({
       {/* Price Range */}
       {!compact && category.priceRange && (
         <View style={styles.priceRange}>
-          <MaterialIcons name="attach-money" size={14} color="#10B981" />
+          <MaterialIcons name="attach-money" size={14} color="#0066CC" />
           <Text style={styles.priceText}>
             {(category.priceRange.min / 1000000).toFixed(1)}tr - {(category.priceRange.max / 1000000).toFixed(0)}tr
           </Text>
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
   trendingText: {
     fontSize: 10,
     fontWeight: '600',
-    color: '#EF4444',
+    color: '#000000',
   },
   description: {
     fontSize: 13,
@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
   },
   priceText: {
     fontSize: 13,
-    color: '#10B981',
+    color: '#0066CC',
     fontWeight: '600',
   },
   subcategories: {

@@ -23,8 +23,8 @@ import {
 
 // Theme colors
 const COLORS = {
-  primary: '#EE4D2D',
-  primaryDark: '#D73211',
+  primary: '#0066CC',
+  primaryDark: '#004499',
   primaryLight: '#FFF0ED',
   background: '#F5F5F5',
   surface: '#FFFFFF',
@@ -34,12 +34,12 @@ const COLORS = {
   border: '#E8E8E8',
   success: '#00C853',
   successLight: '#E8F5E9',
-  warning: '#FF9800',
-  warningLight: '#FFF3E0',
-  error: '#F44336',
+  warning: '#0066CC',
+  warningLight: '#E8F4FF',
+  error: '#000000',
   errorLight: '#FFEBEE',
-  info: '#2196F3',
-  infoLight: '#E3F2FD',
+  info: '#0066CC',
+  infoLight: '#E8F4FF',
 };
 
 // ============================================================================
@@ -67,7 +67,7 @@ export function TaskCard({
 }: TaskCardProps) {
   const statusConfig = TASK_STATUS_CONFIG[task.status] || {
     label: task.status || 'Unknown',
-    color: '#9E9E9E',
+    color: '#999999',
     bgColor: '#F5F5F5',
     icon: 'ellipse-outline',
     step: 0,
@@ -529,7 +529,7 @@ interface StatusBadgeProps {
 export function StatusBadge({ status, size = 'medium' }: StatusBadgeProps) {
   const config = TASK_STATUS_CONFIG[status] || {
     label: status || 'Unknown',
-    color: '#9E9E9E',
+    color: '#999999',
     bgColor: '#F5F5F5',
     icon: 'ellipse-outline',
     step: 0,

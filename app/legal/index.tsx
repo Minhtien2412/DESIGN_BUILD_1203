@@ -333,7 +333,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FF6B6B',
   },
   badgeNew: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#0066CC',
   },
   badgeText: {
     fontSize: 10,

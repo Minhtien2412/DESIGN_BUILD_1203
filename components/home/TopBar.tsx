@@ -35,7 +35,7 @@ export const TopBar = memo(function TopBar({
   return (
     <View style={[styles.topBar, style]}>
       <View style={styles.brandSection}>
-        <Ionicons name="business-outline" size={24} color="#2563eb" />
+        <Ionicons name="business-outline" size={24} color="#0066CC" />
         <Text style={styles.brandText}>{title}</Text>
       </View>
       
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
   brandText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#2563eb',
+    color: '#0066CC',
     marginLeft: 8,
   },
   actionButtons: {

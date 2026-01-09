@@ -8,7 +8,7 @@
  * - Active: Deep black (#1a1a1a) with subtle gradient
  * - Inactive: Neutral gray (#9ca3af)
  * - Premium matte finish with soft shadows
- * - 4 tabs only: Trang chủ | Home XD | Dự án | Cá nhân
+ * - 4 tabs only: Trang chủ | Cộng đồng | Dự án | Cá nhân
  * - Notifications moved to header only
  */
 import { Ionicons } from '@expo/vector-icons';
@@ -20,7 +20,7 @@ import { QuickActionSheet } from './quick-action-sheet';
 
 const TABS_CONFIG = [
   { name: 'index', label: 'Trang chủ', icon: 'home', activeIcon: 'home' },
-  { name: 'home-construction', label: 'Home XD', icon: 'construct-outline', activeIcon: 'construct' },
+  { name: 'social', label: 'Cộng đồng', icon: 'people-outline', activeIcon: 'people' },
   { name: 'projects', label: 'Dự án', icon: 'briefcase-outline', activeIcon: 'briefcase' },
   { name: 'profile', label: 'Cá nhân', icon: 'person-outline', activeIcon: 'person' },
 ];

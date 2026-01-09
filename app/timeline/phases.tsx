@@ -16,10 +16,10 @@ const STATUS_CONFIG: Record<
   PhaseStatus,
   { label: string; color: string; icon: string }
 > = {
-  PLANNED: { label: 'Kế hoạch', color: '#9E9E9E', icon: 'document-text-outline' },
-  ACTIVE: { label: 'Đang thực hiện', color: '#2196F3', icon: 'play-circle' },
-  COMPLETED: { label: 'Hoàn thành', color: '#4CAF50', icon: 'checkmark-circle' },
-  DELAYED: { label: 'Bị trễ', color: '#F44336', icon: 'alert-circle' },
+  PLANNED: { label: 'Kế hoạch', color: '#999999', icon: 'document-text-outline' },
+  ACTIVE: { label: 'Đang thực hiện', color: '#0066CC', icon: 'play-circle' },
+  COMPLETED: { label: 'Hoàn thành', color: '#0066CC', icon: 'checkmark-circle' },
+  DELAYED: { label: 'Bị trễ', color: '#000000', icon: 'alert-circle' },
 };
 
 export default function PhasesScreen() {
@@ -204,7 +204,7 @@ export default function PhasesScreen() {
                             style={styles.viewButton}
                             onPress={() => router.push(`/timeline/phase/${phase.id}` as any)}
                           >
-                            <Ionicons name="eye-outline" size={18} color="#2196F3" />
+                            <Ionicons name="eye-outline" size={18} color="#0066CC" />
                             <Text style={styles.actionButtonText}>Xem chi tiết</Text>
                           </TouchableOpacity>
 
@@ -212,8 +212,8 @@ export default function PhasesScreen() {
                             style={[styles.actionButton, styles.deleteButton]}
                             onPress={() => handleDelete(phase.id, phase.name)}
                           >
-                            <Ionicons name="trash-outline" size={18} color="#F44336" />
-                            <Text style={[styles.actionButtonText, { color: '#F44336' }]}>
+                            <Ionicons name="trash-outline" size={18} color="#000000" />
+                            <Text style={[styles.actionButtonText, { color: '#000000' }]}>
                               Xóa
                             </Text>
                           </TouchableOpacity>
@@ -266,7 +266,7 @@ const styles = StyleSheet.create({
   createButton: {
     paddingHorizontal: 20,
     paddingVertical: 10,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     borderRadius: 8,
   },
   createButtonText: {
@@ -418,7 +418,7 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingVertical: 10,
     borderRadius: 6,
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
   },
   actionButton: {
     flex: 1,
@@ -428,15 +428,15 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingVertical: 10,
     borderRadius: 6,
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
   },
   deleteButton: {
-    backgroundColor: '#FFEBEE',
+    backgroundColor: '#F5F5F5',
   },
   actionButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#2196F3',
+    color: '#0066CC',
   },
   fab: {
     position: 'absolute',
@@ -445,7 +445,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',

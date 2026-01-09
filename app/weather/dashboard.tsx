@@ -35,7 +35,7 @@ export default function WeatherDashboardScreen() {
     return (
       <Container>
         <View style={styles.errorContainer}>
-          <Ionicons name="alert-circle" size={64} color="#F44336" />
+          <Ionicons name="alert-circle" size={64} color="#000000" />
           <Text style={styles.errorText}>{error}</Text>
           <TouchableOpacity style={styles.retryButton} onPress={refresh}>
             <Text style={styles.retryText}>Thử lại</Text>
@@ -61,7 +61,7 @@ export default function WeatherDashboardScreen() {
               <Ionicons
                 name="refresh"
                 size={24}
-                color={refreshing ? '#ccc' : '#2196F3'}
+                color={refreshing ? '#ccc' : '#0066CC'}
                 style={{ marginRight: 8 }}
               />
             </TouchableOpacity>
@@ -77,7 +77,7 @@ export default function WeatherDashboardScreen() {
         {/* Active Alerts Banner */}
         {alerts && alerts.length > 0 && (
           <View style={styles.alertsBanner}>
-            <Ionicons name="warning" size={20} color="#F44336" />
+            <Ionicons name="warning" size={20} color="#000000" />
             <Text style={styles.alertsText}>
               {alerts.length} cảnh báo thời tiết
             </Text>
@@ -114,37 +114,37 @@ export default function WeatherDashboardScreen() {
           {/* Current Weather Details Grid */}
           <View style={styles.detailsGrid}>
             <View style={styles.detailItem}>
-              <Ionicons name="water" size={20} color="#2196F3" />
+              <Ionicons name="water" size={20} color="#0066CC" />
               <Text style={styles.detailLabel}>Độ ẩm</Text>
               <Text style={styles.detailValue}>{current.humidity}%</Text>
             </View>
 
             <View style={styles.detailItem}>
-              <Ionicons name="speedometer" size={20} color="#2196F3" />
+              <Ionicons name="speedometer" size={20} color="#0066CC" />
               <Text style={styles.detailLabel}>Áp suất</Text>
               <Text style={styles.detailValue}>{current.pressure} hPa</Text>
             </View>
 
             <View style={styles.detailItem}>
-              <Ionicons name="navigate" size={20} color="#2196F3" />
+              <Ionicons name="navigate" size={20} color="#0066CC" />
               <Text style={styles.detailLabel}>Gió</Text>
               <Text style={styles.detailValue}>{current.windSpeed} km/h</Text>
             </View>
 
             <View style={styles.detailItem}>
-              <Ionicons name="eye" size={20} color="#2196F3" />
+              <Ionicons name="eye" size={20} color="#0066CC" />
               <Text style={styles.detailLabel}>Tầm nhìn</Text>
               <Text style={styles.detailValue}>{current.visibility} km</Text>
             </View>
 
             <View style={styles.detailItem}>
-              <Ionicons name="rainy" size={20} color="#2196F3" />
+              <Ionicons name="rainy" size={20} color="#0066CC" />
               <Text style={styles.detailLabel}>Mưa</Text>
               <Text style={styles.detailValue}>{current.precipitation} mm</Text>
             </View>
 
             <View style={styles.detailItem}>
-              <Ionicons name="sunny" size={20} color="#2196F3" />
+              <Ionicons name="sunny" size={20} color="#0066CC" />
               <Text style={styles.detailLabel}>UV</Text>
               <Text style={styles.detailValue}>{current.uvIndex}</Text>
             </View>
@@ -180,11 +180,11 @@ export default function WeatherDashboardScreen() {
 
                 <View style={styles.dayTemp}>
                   <View style={styles.tempRange}>
-                    <Ionicons name="arrow-up" size={16} color="#F44336" />
+                    <Ionicons name="arrow-up" size={16} color="#000000" />
                     <Text style={styles.tempMax}>{Math.round(day.temperatureMax)}°</Text>
                   </View>
                   <View style={styles.tempRange}>
-                    <Ionicons name="arrow-down" size={16} color="#2196F3" />
+                    <Ionicons name="arrow-down" size={16} color="#0066CC" />
                     <Text style={styles.tempMin}>{Math.round(day.temperatureMin)}°</Text>
                   </View>
                 </View>
@@ -210,7 +210,7 @@ export default function WeatherDashboardScreen() {
 
                 {day.precipitation > 0 && (
                   <View style={styles.rainInfo}>
-                    <Ionicons name="rainy" size={16} color="#2196F3" />
+                    <Ionicons name="rainy" size={16} color="#0066CC" />
                     <Text style={styles.rainText}>
                       Lượng mưa: {day.precipitation} mm
                     </Text>
@@ -219,7 +219,7 @@ export default function WeatherDashboardScreen() {
 
                 <View style={styles.sunInfo}>
                   <View style={styles.sunItem}>
-                    <Ionicons name="sunny-outline" size={14} color="#FF9800" />
+                    <Ionicons name="sunny-outline" size={14} color="#0066CC" />
                     <Text style={styles.sunText}>
                       {new Date(day.sunrise).toLocaleTimeString('vi-VN', {
                         hour: '2-digit',
@@ -279,28 +279,28 @@ function getWeatherColor(condition: WeatherCondition): string {
     case WeatherCondition.CLEAR:
     case WeatherCondition.PARTLY_CLOUDY:
     case WeatherCondition.HOT:
-      return '#FF9800';
+      return '#0066CC';
     case WeatherCondition.CLOUDY:
     case WeatherCondition.OVERCAST:
     case WeatherCondition.FOG:
     case WeatherCondition.MIST:
     case WeatherCondition.HAZE:
-      return '#9E9E9E';
+      return '#999999';
     case WeatherCondition.LIGHT_RAIN:
     case WeatherCondition.DRIZZLE:
-      return '#2196F3';
+      return '#0066CC';
     case WeatherCondition.RAIN:
     case WeatherCondition.HEAVY_RAIN:
       return '#1976D2';
     case WeatherCondition.THUNDERSTORM:
-      return '#673AB7';
+      return '#666666';
     case WeatherCondition.SNOW:
     case WeatherCondition.SLEET:
-      return '#0A6847';
+      return '#0066CC';
     case WeatherCondition.WINDY:
       return '#4A4A4A';
     default:
-      return '#9E9E9E';
+      return '#999999';
   }
 }
 
@@ -347,7 +347,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   retryButton: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
@@ -360,19 +360,19 @@ const styles = StyleSheet.create({
   alertsBanner: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFEBEE',
+    backgroundColor: '#F5F5F5',
     padding: 12,
     gap: 8,
   },
   alertsText: {
     flex: 1,
     fontSize: 14,
-    color: '#F44336',
+    color: '#000000',
     fontWeight: '600',
   },
   alertsLink: {
     fontSize: 14,
-    color: '#2196F3',
+    color: '#0066CC',
     fontWeight: 'bold',
   },
   currentCard: {
@@ -494,12 +494,12 @@ const styles = StyleSheet.create({
   tempMax: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#F44336',
+    color: '#000000',
   },
   tempMin: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#2196F3',
+    color: '#0066CC',
   },
   dayDetails: {
     flexDirection: 'row',
@@ -519,7 +519,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
     padding: 8,
     borderRadius: 6,
     marginBottom: 8,

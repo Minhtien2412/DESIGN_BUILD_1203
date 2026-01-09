@@ -22,7 +22,7 @@ export default function InputBar({ value, onChangeText, onSend, placeholder = 'T
           style={{ flex: 1, height: 40 }}
         />
         <Pressable onPress={onSend} hitSlop={8} disabled={disabled}>
-          <IconSymbol name="paperplane.fill" size={18} color={disabled ? '#9ca3af' : '#2563eb'} />
+          <IconSymbol name="paperplane.fill" size={18} color={disabled ? '#9ca3af' : '#0066CC'} />
         </Pressable>
       </View>
     </View>

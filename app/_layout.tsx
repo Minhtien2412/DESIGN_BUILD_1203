@@ -1,5 +1,6 @@
 import { IncomingCallModal } from '@/components/call';
 import { FormErrorBoundary } from '@/components/FormErrorBoundary';
+import { NotificationToast } from '@/components/notifications/NotificationToast';
 import { OfflineIndicator } from '@/components/ui/OfflineIndicator';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { CallProvider } from '@/context/CallContext';
@@ -13,6 +14,7 @@ import { PermissionProvider } from '@/context/PermissionContext';
 import { ProgressWebSocketProvider } from '@/context/ProgressWebSocketContext';
 import { ProjectDataProvider } from '@/context/project-data-context';
 import { PushNotificationProvider } from '@/context/PushNotificationContext';
+import { UnifiedBadgeProvider } from '@/context/UnifiedBadgeContext';
 import { UtilitiesProvider } from '@/context/UtilitiesContext';
 import { VideoInteractionsProvider } from '@/context/VideoInteractionsContext';
 import { ViewHistoryProvider } from '@/context/ViewHistoryContext';
@@ -92,8 +94,10 @@ export default function RootLayout() {
                               <NotificationProvider>
                                 <PushNotificationProvider>
                                   <NotificationsProvider>
+                                    <UnifiedBadgeProvider>
                                   <OfflineIndicator />
                                   <IncomingCallModal />
+                                  <NotificationToast />
                                 <AuthNavigator />
                                 <Stack 
                                   screenOptions={{ headerShown: false }}
@@ -106,6 +110,7 @@ export default function RootLayout() {
                                   <Stack.Screen name="call/active" options={{ headerShown: false, presentation: 'fullScreenModal' }} />
                                 </Stack>
                                 <Toast />
+                                    </UnifiedBadgeProvider>
                                   </NotificationsProvider>
                               </PushNotificationProvider>
                             </NotificationProvider>

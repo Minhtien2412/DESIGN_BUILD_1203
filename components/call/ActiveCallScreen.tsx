@@ -161,7 +161,7 @@ export function ActiveCallScreen() {
             <Ionicons
               name={isMuted ? 'mic-off' : 'mic'}
               size={28}
-              color={isMuted ? '#EF4444' : '#FFFFFF'}
+              color={isMuted ? '#000000' : '#FFFFFF'}
             />
           </Pressable>
 
@@ -178,7 +178,7 @@ export function ActiveCallScreen() {
               <Ionicons
                 name={isVideoOff ? 'videocam-off' : 'videocam'}
                 size={28}
-                color={isVideoOff ? '#EF4444' : '#FFFFFF'}
+                color={isVideoOff ? '#000000' : '#FFFFFF'}
               />
             </Pressable>
           )}
@@ -195,7 +195,7 @@ export function ActiveCallScreen() {
             <Ionicons
               name={isSpeakerOn ? 'volume-high' : 'volume-mute'}
               size={28}
-              color={isSpeakerOn ? '#10B981' : '#FFFFFF'}
+              color={isSpeakerOn ? '#0066CC' : '#FFFFFF'}
             />
           </Pressable>
         </View>
@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#EF4444',
+    backgroundColor: '#000000',
     paddingVertical: 16,
     paddingHorizontal: 32,
     borderRadius: 32,

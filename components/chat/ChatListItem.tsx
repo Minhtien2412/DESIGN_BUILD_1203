@@ -19,7 +19,7 @@ export default function ChatListItem({ title, subtitle, unread = 0, onPress }: C
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <ThemedText style={{ fontWeight: '700' }}>{title}</ThemedText>
           {unread > 0 ? (
-            <View style={{ minWidth: 20, paddingHorizontal: 6, height: 20, borderRadius: 10, backgroundColor: '#2563eb', alignItems: 'center', justifyContent: 'center', marginLeft: 8 }}>
+            <View style={{ minWidth: 20, paddingHorizontal: 6, height: 20, borderRadius: 10, backgroundColor: '#0066CC', alignItems: 'center', justifyContent: 'center', marginLeft: 8 }}>
               <ThemedText style={{ color: '#fff', fontSize: 12 }}>{unread}</ThemedText>
             </View>
           ) : null}

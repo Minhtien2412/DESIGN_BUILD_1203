@@ -34,19 +34,19 @@ export default function WarrantyDetailScreen() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'ACTIVE':
-        return '#10B981';
+        return '#0066CC';
       case 'EXPIRED':
         return '#6B7280';
       case 'CANCELLED':
-        return '#EF4444';
+        return '#000000';
       case 'PENDING':
       case 'UNDER_REVIEW':
-        return '#F59E0B';
+        return '#0066CC';
       case 'APPROVED':
       case 'COMPLETED':
-        return '#10B981';
+        return '#0066CC';
       case 'REJECTED':
-        return '#EF4444';
+        return '#000000';
       case 'SUBMITTED':
       case 'IN_PROGRESS':
         return '#3B82F6';
@@ -58,15 +58,15 @@ export default function WarrantyDetailScreen() {
   const getPriorityColor = (priority: ClaimPriority) => {
     switch (priority) {
       case 'EMERGENCY':
-        return '#DC2626';
+        return '#000000';
       case 'URGENT':
-        return '#EF4444';
+        return '#000000';
       case 'HIGH':
-        return '#F59E0B';
+        return '#0066CC';
       case 'MEDIUM':
         return '#3B82F6';
       case 'LOW':
-        return '#10B981';
+        return '#0066CC';
       default:
         return '#9CA3AF';
     }
@@ -74,10 +74,10 @@ export default function WarrantyDetailScreen() {
 
   const getExpiryColor = (remainingDays?: number) => {
     if (remainingDays === undefined) return '#9CA3AF';
-    if (remainingDays <= 0) return '#EF4444';
-    if (remainingDays <= 30) return '#EF4444';
-    if (remainingDays <= 90) return '#F59E0B';
-    return '#10B981';
+    if (remainingDays <= 0) return '#000000';
+    if (remainingDays <= 30) return '#000000';
+    if (remainingDays <= 90) return '#0066CC';
+    return '#0066CC';
   };
 
   if (warrantyLoading) {

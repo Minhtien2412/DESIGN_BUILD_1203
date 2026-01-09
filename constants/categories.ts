@@ -30,8 +30,8 @@ export const CATEGORIES: Category[] = [
     label: '🚀 Tính năng mới',
     description: 'Các công cụ mới và tiện ích',
     icon: 'rocket-outline',
-    color: '#8b5cf6',
-    gradient: ['#FFFFFF', '#8b5cf6'],
+    color: '#0066CC',
+    gradient: ['#FFFFFF', '#0066CC'],
     modules: [
       {
         id: 'file-upload',
@@ -75,8 +75,8 @@ export const CATEGORIES: Category[] = [
     label: 'Quản lý thi công',
     description: 'Dự án, tiến độ, timeline, ngân sách',
     icon: 'hammer-outline',
-    color: '#0A6847',
-    gradient: ['#FFFFFF', '#0A6847'],
+    color: '#000000',
+    gradient: ['#FFFFFF', '#333333'],
     modules: [
       {
         id: 'projects',
@@ -148,8 +148,8 @@ export const CATEGORIES: Category[] = [
     label: 'Giao tiếp & Hợp tác',
     description: 'Nhắn tin, cuộc gọi, livestream',
     icon: 'chatbubbles-outline',
-    color: '#4ECDC4',
-    gradient: ['#4ECDC4', '#6FE7DE'],
+    color: '#0080FF',
+    gradient: ['#0080FF', '#00A3FF'],
     modules: [
       {
         id: 'messages',
@@ -193,8 +193,8 @@ export const CATEGORIES: Category[] = [
     label: 'Quản lý tài liệu',
     description: 'Documents, folders, version control',
     icon: 'folder-open-outline',
-    color: '#95E1D3',
-    gradient: ['#95E1D3', '#AAE3D8'],
+    color: '#666666',
+    gradient: ['#999999', '#AAAAAA'],
     modules: [
       {
         id: 'documents',
@@ -231,8 +231,8 @@ export const CATEGORIES: Category[] = [
     label: 'Mua sắm & Nguồn lực',
     description: 'Shopping, vật liệu, thiết bị, nhân lực',
     icon: 'cart-outline',
-    color: '#0A6847',
-    gradient: ['#FFFFFF', '#0A6847'],
+    color: '#000000',
+    gradient: ['#FFFFFF', '#333333'],
     modules: [
       {
         id: 'shopping',
@@ -304,8 +304,8 @@ export const CATEGORIES: Category[] = [
     label: 'Hợp đồng & Thay đổi',
     description: 'Contracts, change orders, payments',
     icon: 'document-text-outline',
-    color: '#AA96DA',
-    gradient: ['#AA96DA', '#BBA9E2'],
+    color: '#333333',
+    gradient: ['#666666', '#999999'],
     modules: [
       {
         id: 'contracts',
@@ -342,8 +342,8 @@ export const CATEGORIES: Category[] = [
     label: 'An toàn & Tuân thủ',
     description: 'Safety, environment, risk, legal',
     icon: 'shield-outline',
-    color: '#FCBAD3',
-    gradient: ['#FCBAD3', '#FDC7DD'],
+    color: '#000000',
+    gradient: ['#333333', '#666666'],
     modules: [
       {
         id: 'safety',
@@ -387,8 +387,8 @@ export const CATEGORIES: Category[] = [
     label: 'Báo cáo & Phân tích',
     description: 'Reports, analytics, dashboard',
     icon: 'bar-chart-outline',
-    color: '#FFE66D',
-    gradient: ['#FFE66D', '#FFEB8A'],
+    color: '#0066CC',
+    gradient: ['#0066CC', '#3399FF'],
     modules: [
       {
         id: 'reports',
@@ -418,8 +418,8 @@ export const CATEGORIES: Category[] = [
     label: 'Media & Nội dung',
     description: 'Videos, photos, stories',
     icon: 'play-circle-outline',
-    color: '#10B981',
-    gradient: ['#0A6847', '#10B981'],
+    color: '#0080FF',
+    gradient: ['#0066CC', '#0080FF'],
     modules: [
       {
         id: 'videos',
@@ -449,8 +449,8 @@ export const CATEGORIES: Category[] = [
     label: 'Tiện ích & Dịch vụ',
     description: 'Tools, services, resources',
     icon: 'apps-outline',
-    color: '#C7CEEA',
-    gradient: ['#C7CEEA', '#D5DAEF'],
+    color: '#999999',
+    gradient: ['#CCCCCC', '#DDDDDD'],
     modules: [
       {
         id: 'utilities',
@@ -529,48 +529,48 @@ export const QUICK_ACTIONS = [
     label: 'Sản phẩm',
     icon: 'storefront-outline',
     route: '/shopping/products-from-backend',
-    color: '#f59e0b',
+    color: '#0066CC',
   },
   {
     id: 'file-upload',
     label: 'Upload File',
     icon: 'cloud-upload-outline',
     route: '/file-upload',
-    color: '#3b82f6',
+    color: '#0080FF',
   },
   {
     id: 'progress-tracking',
     label: 'Theo dõi tiến độ',
     icon: 'stats-chart-outline',
     route: '/progress-tracking',
-    color: '#10b981',
+    color: '#0066CC',
   },
   {
     id: 'create-project',
     label: 'Tạo dự án',
     icon: 'add-circle-outline',
     route: '/projects/create',
-    color: '#0A6847',
+    color: '#000000',
   },
   {
     id: 'new-message',
     label: 'Tin nhắn',
     icon: 'mail-outline',
     route: '/messages',
-    color: '#4ECDC4',
+    color: '#0080FF',
   },
   {
     id: 'analytics',
     label: 'Phân tích',
     icon: 'analytics-outline',
     route: '/analytics',
-    color: '#8b5cf6',
+    color: '#0066CC',
   },
   {
     id: 'daily-report',
     label: 'Báo cáo',
     icon: 'document-outline',
     route: '/daily-report/create',
-    color: '#95E1D3',
+    color: '#666666',
   },
 ];

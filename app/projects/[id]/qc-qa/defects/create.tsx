@@ -25,7 +25,7 @@ export default function CreateDefectScreen() {
 
   const severityOptions: { value: DefectSeverity; label: string; color: string }[] = [
     { value: DefectSeverity.CRITICAL, label: 'Nghiêm trọng', color: '#D32F2F' },
-    { value: DefectSeverity.MAJOR, label: 'Quan trọng', color: '#F57C00' },
+    { value: DefectSeverity.MAJOR, label: 'Quan trọng', color: '#0066CC' },
     { value: DefectSeverity.MINOR, label: 'Nhỏ', color: '#FBC02D' },
     { value: DefectSeverity.COSMETIC, label: 'Thẩm mỹ', color: '#689F38' },
   ];
@@ -210,25 +210,25 @@ export default function CreateDefectScreen() {
             {photos.map((photo, index) => (
               <View key={index} style={styles.photoPreview}>
                 <View style={styles.photoPlaceholder}>
-                  <Ionicons name="image" size={32} color="#9E9E9E" />
+                  <Ionicons name="image" size={32} color="#999999" />
                 </View>
                 <TouchableOpacity
                   style={styles.removePhotoButton}
                   onPress={() => handleRemovePhoto(index)}
                 >
-                  <Ionicons name="close-circle" size={24} color="#F44336" />
+                  <Ionicons name="close-circle" size={24} color="#000000" />
                 </TouchableOpacity>
               </View>
             ))}
             <TouchableOpacity style={styles.addPhotoButton} onPress={handleAddPhoto}>
-              <Ionicons name="camera" size={32} color="#2196F3" />
+              <Ionicons name="camera" size={32} color="#0066CC" />
               <Text style={styles.addPhotoText}>Thêm ảnh</Text>
             </TouchableOpacity>
           </View>
         </View>
 
         <View style={styles.infoBox}>
-          <Ionicons name="information-circle" size={20} color="#2196F3" />
+          <Ionicons name="information-circle" size={20} color="#0066CC" />
           <Text style={styles.infoText}>
             Lỗi sẽ được gửi đến quản lý dự án để xử lý. Bạn sẽ nhận được thông báo khi
             có cập nhật về trạng thái lỗi.
@@ -278,7 +278,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   required: {
-    color: '#F44336',
+    color: '#000000',
   },
   input: {
     borderWidth: 1,
@@ -349,22 +349,22 @@ const styles = StyleSheet.create({
   addPhotoButton: {
     width: 100,
     height: 100,
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
     borderRadius: 8,
     borderWidth: 2,
-    borderColor: '#2196F3',
+    borderColor: '#0066CC',
     borderStyle: 'dashed',
     alignItems: 'center',
     justifyContent: 'center',
   },
   addPhotoText: {
     fontSize: 12,
-    color: '#2196F3',
+    color: '#0066CC',
     marginTop: 4,
   },
   infoBox: {
     flexDirection: 'row',
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
     padding: 16,
     margin: 16,
     borderRadius: 8,
@@ -400,7 +400,7 @@ const styles = StyleSheet.create({
   submitButton: {
     flex: 1,
     paddingVertical: 14,
-    backgroundColor: '#F44336',
+    backgroundColor: '#000000',
     borderRadius: 8,
     alignItems: 'center',
   },

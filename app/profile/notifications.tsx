@@ -14,10 +14,10 @@ import {
 } from 'react-native';
 
 const NOTIFICATION_ICONS = {
-  order: { name: 'receipt', color: '#FF6B35' },
+  order: { name: 'receipt', color: '#0066CC' },
   promotion: { name: 'gift', color: '#FFB800' },
-  system: { name: 'information-circle', color: '#6366F1' },
-  chat: { name: 'chatbubble', color: '#10B981' },
+  system: { name: 'information-circle', color: '#666666' },
+  chat: { name: 'chatbubble', color: '#0066CC' },
 };
 
 export default function NotificationsScreen() {
@@ -217,7 +217,7 @@ export default function NotificationsScreen() {
       {unreadCount > 0 && (
         <View style={styles.actionsBar}>
           <TouchableOpacity style={styles.actionBtn} onPress={markAllAsRead}>
-            <Ionicons name="checkmark-done" size={18} color="#FF6B35" />
+            <Ionicons name="checkmark-done" size={18} color="#0066CC" />
             <Text style={styles.actionBtnText}>Đánh dấu đã đọc tất cả</Text>
           </TouchableOpacity>
         </View>
@@ -239,7 +239,7 @@ export default function NotificationsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#0066CC',
   },
   header: {
     flexDirection: 'row',
@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
   headerBadgeText: {
     fontSize: 12,
     fontWeight: 'bold',
-    color: '#FF6B35',
+    color: '#0066CC',
   },
   headerBtn: {
     padding: 8,
@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   filterTabActive: {
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#0066CC',
   },
   filterText: {
     fontSize: 14,
@@ -319,7 +319,7 @@ const styles = StyleSheet.create({
   filterBadgeText: {
     fontSize: 11,
     fontWeight: 'bold',
-    color: '#FF6B35',
+    color: '#0066CC',
   },
   actionsBar: {
     backgroundColor: '#fff',
@@ -335,7 +335,7 @@ const styles = StyleSheet.create({
   },
   actionBtnText: {
     fontSize: 14,
-    color: '#FF6B35',
+    color: '#0066CC',
     fontWeight: '500',
   },
   listContent: {
@@ -379,7 +379,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#0066CC',
   },
   notificationBody: {
     fontSize: 14,

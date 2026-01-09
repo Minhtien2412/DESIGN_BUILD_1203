@@ -43,13 +43,13 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onPress }) => {
     switch (status) {
       case 'approved':
       case 'completed':
-        return '#10b981'; // green
+        return '#0066CC'; // green
       case 'in_progress':
         return '#3b82f6'; // blue
       case 'pending_review':
-        return '#f59e0b'; // yellow
+        return '#0066CC'; // yellow
       case 'on_hold':
-        return '#ef4444'; // red
+        return '#000000'; // red
       case 'cancelled':
         return '#6b7280'; // gray
       default:

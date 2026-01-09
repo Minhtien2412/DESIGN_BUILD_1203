@@ -20,9 +20,9 @@ import {
 
 // Theme colors
 const COLORS = {
-  primary: '#EE4D2D', // Shopee orange
+  primary: '#0066CC', // Shopee orange
   primaryLight: 'rgba(238, 77, 45, 0.1)',
-  success: '#0A6847',
+  success: '#0066CC',
   successLight: 'rgba(10, 104, 71, 0.1)',
   text: '#222',
   textSecondary: '#666',
@@ -30,7 +30,7 @@ const COLORS = {
   background: '#fff',
   border: '#f0f0f0',
   star: '#fbbf24',
-  online: '#22c55e',
+  online: '#0066CC',
 };
 
 export interface ContractorInfoCardProps {

@@ -28,10 +28,10 @@ export default function ProgressCard({
 }: ProgressCardProps) {
   const getProgressColor = (): [string, string] => {
     if (gradientColors) return gradientColors;
-    if (progress >= 80) return ['#10b981', '#059669'];
-    if (progress >= 50) return ['#3b82f6', '#2563eb'];
-    if (progress >= 25) return ['#f59e0b', '#d97706'];
-    return ['#ef4444', '#dc2626'];
+    if (progress >= 80) return ['#0066CC', '#0066CC'];
+    if (progress >= 50) return ['#3b82f6', '#0066CC'];
+    if (progress >= 25) return ['#0066CC', '#d97706'];
+    return ['#000000', '#000000'];
   };
 
   const colors = getProgressColor();

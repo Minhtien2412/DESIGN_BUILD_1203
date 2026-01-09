@@ -517,12 +517,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   aiAvatar: {
-    backgroundColor: '#8b5cf6',
+    backgroundColor: '#666666',
     justifyContent: 'center',
     alignItems: 'center',
   },
   adminAvatar: {
-    backgroundColor: '#f59e0b',
+    backgroundColor: '#0066CC',
     justifyContent: 'center',
     alignItems: 'center',
   },

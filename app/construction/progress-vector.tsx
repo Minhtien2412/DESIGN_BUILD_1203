@@ -172,13 +172,13 @@ const DEFAULT_SETTINGS: AppSettings = {
 };
 
 const STATUS_COLORS: Record<string, { bg: string; border: string; text: string }> = {
-  pending: { bg: '#F5F5F5', border: '#9E9E9E', text: '#616161' },
-  in_progress: { bg: '#FFF8E1', border: '#FFB300', text: '#FF8F00' },
-  completed: { bg: '#E8F5E9', border: '#4CAF50', text: '#2E7D32' },
-  delayed: { bg: '#FFEBEE', border: '#F44336', text: '#C62828' },
+  pending: { bg: '#F5F5F5', border: '#999999', text: '#616161' },
+  in_progress: { bg: '#F0F8FF', border: '#0066CC', text: '#FF8F00' },
+  completed: { bg: '#E8F5E9', border: '#0066CC', text: '#2E7D32' },
+  delayed: { bg: '#F5F5F5', border: '#000000', text: '#C62828' },
 };
 
-const CONNECTION_COLORS = ['#2196F3', '#4CAF50', '#FF9800', '#F44336', '#9C27B0', '#00BCD4'];
+const CONNECTION_COLORS = ['#0066CC', '#0066CC', '#0066CC', '#000000', '#999999', '#0080FF'];
 
 // ==================== PROJECT TEMPLATES ====================
 
@@ -197,30 +197,30 @@ const PROJECT_TEMPLATES: ProjectTemplate[] = [
     description: 'Template cho xây dựng nhà phố 3-5 tầng',
     icon: 'home-outline',
     nodes: [
-      { id: 'START', x: 100, y: 80, label: 'Khởi công', status: 'pending', progress: 0, type: 'circle', color: '#4CAF50' },
+      { id: 'START', x: 100, y: 80, label: 'Khởi công', status: 'pending', progress: 0, type: 'circle', color: '#0066CC' },
       { id: 'MONG', x: 280, y: 80, label: 'Móng & Cọc', status: 'pending', progress: 0, type: 'rect', color: '#FFECB3' },
       { id: 'KHUNG', x: 460, y: 80, label: 'Khung kết cấu', status: 'pending', progress: 0, type: 'rect', color: '#FFECB3' },
       { id: 'MAI', x: 640, y: 80, label: 'Mái & Chống thấm', status: 'pending', progress: 0, type: 'rect', color: '#FFECB3' },
-      { id: 'TUONG', x: 280, y: 200, label: 'Xây tường bao', status: 'pending', progress: 0, type: 'pill', color: '#E3F2FD' },
-      { id: 'ME', x: 460, y: 200, label: 'Hệ thống ME', status: 'pending', progress: 0, type: 'pill', color: '#E3F2FD' },
+      { id: 'TUONG', x: 280, y: 200, label: 'Xây tường bao', status: 'pending', progress: 0, type: 'pill', color: '#E8F4FF' },
+      { id: 'ME', x: 460, y: 200, label: 'Hệ thống ME', status: 'pending', progress: 0, type: 'pill', color: '#E8F4FF' },
       { id: 'HOAN_THIEN', x: 640, y: 200, label: 'Hoàn thiện', status: 'pending', progress: 0, type: 'group', color: '#C8E6C9' },
       { id: 'SON', x: 650, y: 280, label: 'Sơn', status: 'pending', progress: 0, type: 'pill', color: '#A5D6A7' },
       { id: 'GACH', x: 650, y: 310, label: 'Ốp lát gạch', status: 'pending', progress: 0, type: 'pill', color: '#A5D6A7' },
       { id: 'CUA', x: 650, y: 340, label: 'Cửa & Kính', status: 'pending', progress: 0, type: 'pill', color: '#A5D6A7' },
-      { id: 'NGHIEM_THU', x: 460, y: 400, label: 'Nghiệm thu', status: 'pending', progress: 0, type: 'circle', color: '#2196F3' },
+      { id: 'NGHIEM_THU', x: 460, y: 400, label: 'Nghiệm thu', status: 'pending', progress: 0, type: 'circle', color: '#0066CC' },
     ],
     connections: [
-      { id: 'C1', fromNodeId: 'START', toNodeId: 'MONG', type: 'direct', color: '#2196F3' },
-      { id: 'C2', fromNodeId: 'MONG', toNodeId: 'KHUNG', type: 'direct', color: '#2196F3' },
-      { id: 'C3', fromNodeId: 'KHUNG', toNodeId: 'MAI', type: 'direct', color: '#2196F3' },
-      { id: 'C4', fromNodeId: 'KHUNG', toNodeId: 'TUONG', type: 'bezier', color: '#FF9800' },
-      { id: 'C5', fromNodeId: 'TUONG', toNodeId: 'ME', type: 'direct', color: '#FF9800' },
-      { id: 'C6', fromNodeId: 'ME', toNodeId: 'HOAN_THIEN', type: 'direct', color: '#FF9800' },
-      { id: 'C7', fromNodeId: 'HOAN_THIEN', toNodeId: 'SON', type: 'direct', color: '#4CAF50' },
-      { id: 'C8', fromNodeId: 'HOAN_THIEN', toNodeId: 'GACH', type: 'direct', color: '#4CAF50' },
-      { id: 'C9', fromNodeId: 'HOAN_THIEN', toNodeId: 'CUA', type: 'direct', color: '#4CAF50' },
-      { id: 'C10', fromNodeId: 'MAI', toNodeId: 'NGHIEM_THU', type: 'bezier', color: '#2196F3', style: 'dashed' },
-      { id: 'C11', fromNodeId: 'CUA', toNodeId: 'NGHIEM_THU', type: 'bezier', color: '#4CAF50', style: 'dashed' },
+      { id: 'C1', fromNodeId: 'START', toNodeId: 'MONG', type: 'direct', color: '#0066CC' },
+      { id: 'C2', fromNodeId: 'MONG', toNodeId: 'KHUNG', type: 'direct', color: '#0066CC' },
+      { id: 'C3', fromNodeId: 'KHUNG', toNodeId: 'MAI', type: 'direct', color: '#0066CC' },
+      { id: 'C4', fromNodeId: 'KHUNG', toNodeId: 'TUONG', type: 'bezier', color: '#0066CC' },
+      { id: 'C5', fromNodeId: 'TUONG', toNodeId: 'ME', type: 'direct', color: '#0066CC' },
+      { id: 'C6', fromNodeId: 'ME', toNodeId: 'HOAN_THIEN', type: 'direct', color: '#0066CC' },
+      { id: 'C7', fromNodeId: 'HOAN_THIEN', toNodeId: 'SON', type: 'direct', color: '#0066CC' },
+      { id: 'C8', fromNodeId: 'HOAN_THIEN', toNodeId: 'GACH', type: 'direct', color: '#0066CC' },
+      { id: 'C9', fromNodeId: 'HOAN_THIEN', toNodeId: 'CUA', type: 'direct', color: '#0066CC' },
+      { id: 'C10', fromNodeId: 'MAI', toNodeId: 'NGHIEM_THU', type: 'bezier', color: '#0066CC', style: 'dashed' },
+      { id: 'C11', fromNodeId: 'CUA', toNodeId: 'NGHIEM_THU', type: 'bezier', color: '#0066CC', style: 'dashed' },
     ],
   },
   {
@@ -229,30 +229,30 @@ const PROJECT_TEMPLATES: ProjectTemplate[] = [
     description: 'Template cho dự án chung cư nhiều tầng',
     icon: 'business-outline',
     nodes: [
-      { id: 'CHUAN_BI', x: 100, y: 100, label: 'Chuẩn bị mặt bằng', status: 'pending', progress: 0, type: 'circle', color: '#4CAF50' },
+      { id: 'CHUAN_BI', x: 100, y: 100, label: 'Chuẩn bị mặt bằng', status: 'pending', progress: 0, type: 'circle', color: '#0066CC' },
       { id: 'EP_COC', x: 300, y: 100, label: 'Ép cọc', status: 'pending', progress: 0, type: 'rect', color: '#FFECB3' },
       { id: 'MONG', x: 500, y: 100, label: 'Đài móng', status: 'pending', progress: 0, type: 'rect', color: '#FFECB3' },
       { id: 'HAM', x: 700, y: 100, label: 'Tầng hầm', status: 'pending', progress: 0, type: 'rect', color: '#FFECB3' },
-      { id: 'THAN', x: 400, y: 250, label: 'Phần thân', status: 'pending', progress: 0, type: 'group', color: '#E3F2FD' },
-      { id: 'TANG_1_5', x: 410, y: 300, label: 'Tầng 1-5', status: 'pending', progress: 0, type: 'pill', color: '#BBDEFB' },
-      { id: 'TANG_6_10', x: 410, y: 330, label: 'Tầng 6-10', status: 'pending', progress: 0, type: 'pill', color: '#BBDEFB' },
-      { id: 'TANG_11_15', x: 410, y: 360, label: 'Tầng 11-15', status: 'pending', progress: 0, type: 'pill', color: '#BBDEFB' },
+      { id: 'THAN', x: 400, y: 250, label: 'Phần thân', status: 'pending', progress: 0, type: 'group', color: '#E8F4FF' },
+      { id: 'TANG_1_5', x: 410, y: 300, label: 'Tầng 1-5', status: 'pending', progress: 0, type: 'pill', color: '#E8F4FF' },
+      { id: 'TANG_6_10', x: 410, y: 330, label: 'Tầng 6-10', status: 'pending', progress: 0, type: 'pill', color: '#E8F4FF' },
+      { id: 'TANG_11_15', x: 410, y: 360, label: 'Tầng 11-15', status: 'pending', progress: 0, type: 'pill', color: '#E8F4FF' },
       { id: 'MAI_ROOF', x: 600, y: 250, label: 'Mái & Kỹ thuật', status: 'pending', progress: 0, type: 'rect', color: '#FFECB3' },
       { id: 'NOI_THAT', x: 400, y: 450, label: 'Nội thất căn hộ', status: 'pending', progress: 0, type: 'group', color: '#C8E6C9' },
-      { id: 'BAN_GIAO', x: 600, y: 450, label: 'Bàn giao', status: 'pending', progress: 0, type: 'circle', color: '#2196F3' },
+      { id: 'BAN_GIAO', x: 600, y: 450, label: 'Bàn giao', status: 'pending', progress: 0, type: 'circle', color: '#0066CC' },
     ],
     connections: [
-      { id: 'CC1', fromNodeId: 'CHUAN_BI', toNodeId: 'EP_COC', type: 'direct', color: '#2196F3' },
-      { id: 'CC2', fromNodeId: 'EP_COC', toNodeId: 'MONG', type: 'direct', color: '#2196F3' },
-      { id: 'CC3', fromNodeId: 'MONG', toNodeId: 'HAM', type: 'direct', color: '#2196F3' },
-      { id: 'CC4', fromNodeId: 'HAM', toNodeId: 'THAN', type: 'bezier', color: '#FF9800' },
-      { id: 'CC5', fromNodeId: 'THAN', toNodeId: 'TANG_1_5', type: 'direct', color: '#4CAF50' },
-      { id: 'CC6', fromNodeId: 'THAN', toNodeId: 'TANG_6_10', type: 'direct', color: '#4CAF50' },
-      { id: 'CC7', fromNodeId: 'THAN', toNodeId: 'TANG_11_15', type: 'direct', color: '#4CAF50' },
-      { id: 'CC8', fromNodeId: 'THAN', toNodeId: 'MAI_ROOF', type: 'direct', color: '#2196F3' },
-      { id: 'CC9', fromNodeId: 'TANG_11_15', toNodeId: 'NOI_THAT', type: 'bezier', color: '#FF9800', style: 'dashed' },
-      { id: 'CC10', fromNodeId: 'NOI_THAT', toNodeId: 'BAN_GIAO', type: 'direct', color: '#4CAF50' },
-      { id: 'CC11', fromNodeId: 'MAI_ROOF', toNodeId: 'BAN_GIAO', type: 'bezier', color: '#2196F3', style: 'dashed' },
+      { id: 'CC1', fromNodeId: 'CHUAN_BI', toNodeId: 'EP_COC', type: 'direct', color: '#0066CC' },
+      { id: 'CC2', fromNodeId: 'EP_COC', toNodeId: 'MONG', type: 'direct', color: '#0066CC' },
+      { id: 'CC3', fromNodeId: 'MONG', toNodeId: 'HAM', type: 'direct', color: '#0066CC' },
+      { id: 'CC4', fromNodeId: 'HAM', toNodeId: 'THAN', type: 'bezier', color: '#0066CC' },
+      { id: 'CC5', fromNodeId: 'THAN', toNodeId: 'TANG_1_5', type: 'direct', color: '#0066CC' },
+      { id: 'CC6', fromNodeId: 'THAN', toNodeId: 'TANG_6_10', type: 'direct', color: '#0066CC' },
+      { id: 'CC7', fromNodeId: 'THAN', toNodeId: 'TANG_11_15', type: 'direct', color: '#0066CC' },
+      { id: 'CC8', fromNodeId: 'THAN', toNodeId: 'MAI_ROOF', type: 'direct', color: '#0066CC' },
+      { id: 'CC9', fromNodeId: 'TANG_11_15', toNodeId: 'NOI_THAT', type: 'bezier', color: '#0066CC', style: 'dashed' },
+      { id: 'CC10', fromNodeId: 'NOI_THAT', toNodeId: 'BAN_GIAO', type: 'direct', color: '#0066CC' },
+      { id: 'CC11', fromNodeId: 'MAI_ROOF', toNodeId: 'BAN_GIAO', type: 'bezier', color: '#0066CC', style: 'dashed' },
     ],
   },
   {
@@ -261,33 +261,33 @@ const PROJECT_TEMPLATES: ProjectTemplate[] = [
     description: 'Template cho xây dựng biệt thự với sân vườn',
     icon: 'leaf-outline',
     nodes: [
-      { id: 'KHOI_CONG', x: 100, y: 150, label: 'Khởi công', status: 'pending', progress: 0, type: 'circle', color: '#4CAF50' },
+      { id: 'KHOI_CONG', x: 100, y: 150, label: 'Khởi công', status: 'pending', progress: 0, type: 'circle', color: '#0066CC' },
       { id: 'SAN_VUON', x: 100, y: 300, label: 'Sân vườn', status: 'pending', progress: 0, type: 'group', color: '#C8E6C9' },
       { id: 'HO_BOI', x: 110, y: 350, label: 'Hồ bơi', status: 'pending', progress: 0, type: 'pill', color: '#A5D6A7' },
       { id: 'CAY_XANH', x: 110, y: 380, label: 'Cây xanh', status: 'pending', progress: 0, type: 'pill', color: '#A5D6A7' },
       { id: 'MONG_BT', x: 300, y: 100, label: 'Móng biệt thự', status: 'pending', progress: 0, type: 'rect', color: '#FFECB3' },
       { id: 'KHUNG_BT', x: 500, y: 100, label: 'Khung kết cấu', status: 'pending', progress: 0, type: 'rect', color: '#FFECB3' },
       { id: 'MAI_BT', x: 700, y: 100, label: 'Mái ngói/kính', status: 'pending', progress: 0, type: 'rect', color: '#FFECB3' },
-      { id: 'NOI_THAT_BT', x: 500, y: 250, label: 'Nội thất cao cấp', status: 'pending', progress: 0, type: 'group', color: '#E3F2FD' },
-      { id: 'PHONG_KHACH', x: 510, y: 300, label: 'Phòng khách', status: 'pending', progress: 0, type: 'pill', color: '#BBDEFB' },
-      { id: 'PHONG_NGU', x: 510, y: 330, label: 'Phòng ngủ', status: 'pending', progress: 0, type: 'pill', color: '#BBDEFB' },
-      { id: 'BEP', x: 510, y: 360, label: 'Bếp & Ăn', status: 'pending', progress: 0, type: 'pill', color: '#BBDEFB' },
-      { id: 'HOAN_TAT', x: 500, y: 450, label: 'Hoàn tất', status: 'pending', progress: 0, type: 'circle', color: '#2196F3' },
+      { id: 'NOI_THAT_BT', x: 500, y: 250, label: 'Nội thất cao cấp', status: 'pending', progress: 0, type: 'group', color: '#E8F4FF' },
+      { id: 'PHONG_KHACH', x: 510, y: 300, label: 'Phòng khách', status: 'pending', progress: 0, type: 'pill', color: '#E8F4FF' },
+      { id: 'PHONG_NGU', x: 510, y: 330, label: 'Phòng ngủ', status: 'pending', progress: 0, type: 'pill', color: '#E8F4FF' },
+      { id: 'BEP', x: 510, y: 360, label: 'Bếp & Ăn', status: 'pending', progress: 0, type: 'pill', color: '#E8F4FF' },
+      { id: 'HOAN_TAT', x: 500, y: 450, label: 'Hoàn tất', status: 'pending', progress: 0, type: 'circle', color: '#0066CC' },
     ],
     connections: [
-      { id: 'BT1', fromNodeId: 'KHOI_CONG', toNodeId: 'MONG_BT', type: 'direct', color: '#2196F3' },
-      { id: 'BT2', fromNodeId: 'KHOI_CONG', toNodeId: 'SAN_VUON', type: 'bezier', color: '#4CAF50' },
-      { id: 'BT3', fromNodeId: 'SAN_VUON', toNodeId: 'HO_BOI', type: 'direct', color: '#4CAF50' },
-      { id: 'BT4', fromNodeId: 'SAN_VUON', toNodeId: 'CAY_XANH', type: 'direct', color: '#4CAF50' },
-      { id: 'BT5', fromNodeId: 'MONG_BT', toNodeId: 'KHUNG_BT', type: 'direct', color: '#2196F3' },
-      { id: 'BT6', fromNodeId: 'KHUNG_BT', toNodeId: 'MAI_BT', type: 'direct', color: '#2196F3' },
-      { id: 'BT7', fromNodeId: 'KHUNG_BT', toNodeId: 'NOI_THAT_BT', type: 'bezier', color: '#FF9800' },
-      { id: 'BT8', fromNodeId: 'NOI_THAT_BT', toNodeId: 'PHONG_KHACH', type: 'direct', color: '#9C27B0' },
-      { id: 'BT9', fromNodeId: 'NOI_THAT_BT', toNodeId: 'PHONG_NGU', type: 'direct', color: '#9C27B0' },
-      { id: 'BT10', fromNodeId: 'NOI_THAT_BT', toNodeId: 'BEP', type: 'direct', color: '#9C27B0' },
-      { id: 'BT11', fromNodeId: 'MAI_BT', toNodeId: 'HOAN_TAT', type: 'bezier', color: '#2196F3', style: 'dashed' },
-      { id: 'BT12', fromNodeId: 'BEP', toNodeId: 'HOAN_TAT', type: 'bezier', color: '#9C27B0', style: 'dashed' },
-      { id: 'BT13', fromNodeId: 'CAY_XANH', toNodeId: 'HOAN_TAT', type: 'bezier', color: '#4CAF50', style: 'dashed' },
+      { id: 'BT1', fromNodeId: 'KHOI_CONG', toNodeId: 'MONG_BT', type: 'direct', color: '#0066CC' },
+      { id: 'BT2', fromNodeId: 'KHOI_CONG', toNodeId: 'SAN_VUON', type: 'bezier', color: '#0066CC' },
+      { id: 'BT3', fromNodeId: 'SAN_VUON', toNodeId: 'HO_BOI', type: 'direct', color: '#0066CC' },
+      { id: 'BT4', fromNodeId: 'SAN_VUON', toNodeId: 'CAY_XANH', type: 'direct', color: '#0066CC' },
+      { id: 'BT5', fromNodeId: 'MONG_BT', toNodeId: 'KHUNG_BT', type: 'direct', color: '#0066CC' },
+      { id: 'BT6', fromNodeId: 'KHUNG_BT', toNodeId: 'MAI_BT', type: 'direct', color: '#0066CC' },
+      { id: 'BT7', fromNodeId: 'KHUNG_BT', toNodeId: 'NOI_THAT_BT', type: 'bezier', color: '#0066CC' },
+      { id: 'BT8', fromNodeId: 'NOI_THAT_BT', toNodeId: 'PHONG_KHACH', type: 'direct', color: '#999999' },
+      { id: 'BT9', fromNodeId: 'NOI_THAT_BT', toNodeId: 'PHONG_NGU', type: 'direct', color: '#999999' },
+      { id: 'BT10', fromNodeId: 'NOI_THAT_BT', toNodeId: 'BEP', type: 'direct', color: '#999999' },
+      { id: 'BT11', fromNodeId: 'MAI_BT', toNodeId: 'HOAN_TAT', type: 'bezier', color: '#0066CC', style: 'dashed' },
+      { id: 'BT12', fromNodeId: 'BEP', toNodeId: 'HOAN_TAT', type: 'bezier', color: '#999999', style: 'dashed' },
+      { id: 'BT13', fromNodeId: 'CAY_XANH', toNodeId: 'HOAN_TAT', type: 'bezier', color: '#0066CC', style: 'dashed' },
     ],
   },
   {
@@ -296,28 +296,28 @@ const PROJECT_TEMPLATES: ProjectTemplate[] = [
     description: 'Template cho xây dựng nhà xưởng, kho bãi',
     icon: 'construct-outline',
     nodes: [
-      { id: 'SAN_LAP', x: 100, y: 150, label: 'San lấp mặt bằng', status: 'pending', progress: 0, type: 'circle', color: '#4CAF50' },
+      { id: 'SAN_LAP', x: 100, y: 150, label: 'San lấp mặt bằng', status: 'pending', progress: 0, type: 'circle', color: '#0066CC' },
       { id: 'MONG_NX', x: 300, y: 150, label: 'Móng công nghiệp', status: 'pending', progress: 0, type: 'rect', color: '#FFECB3' },
-      { id: 'KHUNG_THEP', x: 500, y: 150, label: 'Khung thép', status: 'pending', progress: 0, type: 'rect', color: '#E3F2FD' },
-      { id: 'MAI_PANEL', x: 700, y: 150, label: 'Mái panel', status: 'pending', progress: 0, type: 'rect', color: '#E3F2FD' },
-      { id: 'HE_THONG', x: 400, y: 300, label: 'Hệ thống kỹ thuật', status: 'pending', progress: 0, type: 'group', color: '#FFF3E0' },
-      { id: 'DIEN_CN', x: 410, y: 350, label: 'Điện công nghiệp', status: 'pending', progress: 0, type: 'pill', color: '#FFE0B2' },
-      { id: 'PCCC', x: 410, y: 380, label: 'PCCC', status: 'pending', progress: 0, type: 'pill', color: '#FFE0B2' },
-      { id: 'NUOC_THAI', x: 410, y: 410, label: 'Xử lý nước thải', status: 'pending', progress: 0, type: 'pill', color: '#FFE0B2' },
+      { id: 'KHUNG_THEP', x: 500, y: 150, label: 'Khung thép', status: 'pending', progress: 0, type: 'rect', color: '#E8F4FF' },
+      { id: 'MAI_PANEL', x: 700, y: 150, label: 'Mái panel', status: 'pending', progress: 0, type: 'rect', color: '#E8F4FF' },
+      { id: 'HE_THONG', x: 400, y: 300, label: 'Hệ thống kỹ thuật', status: 'pending', progress: 0, type: 'group', color: '#E8F4FF' },
+      { id: 'DIEN_CN', x: 410, y: 350, label: 'Điện công nghiệp', status: 'pending', progress: 0, type: 'pill', color: '#E8F4FF' },
+      { id: 'PCCC', x: 410, y: 380, label: 'PCCC', status: 'pending', progress: 0, type: 'pill', color: '#E8F4FF' },
+      { id: 'NUOC_THAI', x: 410, y: 410, label: 'Xử lý nước thải', status: 'pending', progress: 0, type: 'pill', color: '#E8F4FF' },
       { id: 'SAN_NEN', x: 600, y: 300, label: 'Sàn nền công nghiệp', status: 'pending', progress: 0, type: 'rect', color: '#FFECB3' },
-      { id: 'VAN_HANH', x: 500, y: 450, label: 'Vận hành', status: 'pending', progress: 0, type: 'circle', color: '#2196F3' },
+      { id: 'VAN_HANH', x: 500, y: 450, label: 'Vận hành', status: 'pending', progress: 0, type: 'circle', color: '#0066CC' },
     ],
     connections: [
-      { id: 'NX1', fromNodeId: 'SAN_LAP', toNodeId: 'MONG_NX', type: 'direct', color: '#2196F3' },
-      { id: 'NX2', fromNodeId: 'MONG_NX', toNodeId: 'KHUNG_THEP', type: 'direct', color: '#2196F3' },
-      { id: 'NX3', fromNodeId: 'KHUNG_THEP', toNodeId: 'MAI_PANEL', type: 'direct', color: '#2196F3' },
-      { id: 'NX4', fromNodeId: 'KHUNG_THEP', toNodeId: 'HE_THONG', type: 'bezier', color: '#FF9800' },
-      { id: 'NX5', fromNodeId: 'HE_THONG', toNodeId: 'DIEN_CN', type: 'direct', color: '#F44336' },
-      { id: 'NX6', fromNodeId: 'HE_THONG', toNodeId: 'PCCC', type: 'direct', color: '#F44336' },
-      { id: 'NX7', fromNodeId: 'HE_THONG', toNodeId: 'NUOC_THAI', type: 'direct', color: '#F44336' },
-      { id: 'NX8', fromNodeId: 'MAI_PANEL', toNodeId: 'SAN_NEN', type: 'bezier', color: '#2196F3' },
-      { id: 'NX9', fromNodeId: 'SAN_NEN', toNodeId: 'VAN_HANH', type: 'bezier', color: '#4CAF50', style: 'dashed' },
-      { id: 'NX10', fromNodeId: 'NUOC_THAI', toNodeId: 'VAN_HANH', type: 'bezier', color: '#F44336', style: 'dashed' },
+      { id: 'NX1', fromNodeId: 'SAN_LAP', toNodeId: 'MONG_NX', type: 'direct', color: '#0066CC' },
+      { id: 'NX2', fromNodeId: 'MONG_NX', toNodeId: 'KHUNG_THEP', type: 'direct', color: '#0066CC' },
+      { id: 'NX3', fromNodeId: 'KHUNG_THEP', toNodeId: 'MAI_PANEL', type: 'direct', color: '#0066CC' },
+      { id: 'NX4', fromNodeId: 'KHUNG_THEP', toNodeId: 'HE_THONG', type: 'bezier', color: '#0066CC' },
+      { id: 'NX5', fromNodeId: 'HE_THONG', toNodeId: 'DIEN_CN', type: 'direct', color: '#000000' },
+      { id: 'NX6', fromNodeId: 'HE_THONG', toNodeId: 'PCCC', type: 'direct', color: '#000000' },
+      { id: 'NX7', fromNodeId: 'HE_THONG', toNodeId: 'NUOC_THAI', type: 'direct', color: '#000000' },
+      { id: 'NX8', fromNodeId: 'MAI_PANEL', toNodeId: 'SAN_NEN', type: 'bezier', color: '#0066CC' },
+      { id: 'NX9', fromNodeId: 'SAN_NEN', toNodeId: 'VAN_HANH', type: 'bezier', color: '#0066CC', style: 'dashed' },
+      { id: 'NX10', fromNodeId: 'NUOC_THAI', toNodeId: 'VAN_HANH', type: 'bezier', color: '#000000', style: 'dashed' },
     ],
   },
 ];
@@ -329,13 +329,13 @@ const DEFAULT_NODES: VectorNode[] = [
   { id: 'INT_SUMMARY', x: 40, y: 280, label: 'Phần nội thất', status: 'in_progress', progress: 60, description: 'Tổng quan tiến độ phần nội thất', type: 'circle', color: '#FFB74D' },
 
   // Các nhóm chính ở giữa giống sơ đồ ngoài trời
-  { id: 'N1', x: 120, y: 100, label: 'Khởi công', status: 'completed', progress: 100, description: 'Chuẩn bị mặt bằng, giấy phép xây dựng', type: 'circle', color: '#4CAF50' },
-  { id: 'N2', x: 320, y: 100, label: 'Móng & Cọc', status: 'completed', progress: 100, description: 'Đào móng, ép cọc, đổ bê tông móng', type: 'circle', color: '#4CAF50' },
+  { id: 'N1', x: 120, y: 100, label: 'Khởi công', status: 'completed', progress: 100, description: 'Chuẩn bị mặt bằng, giấy phép xây dựng', type: 'circle', color: '#0066CC' },
+  { id: 'N2', x: 320, y: 100, label: 'Móng & Cọc', status: 'completed', progress: 100, description: 'Đào móng, ép cọc, đổ bê tông móng', type: 'circle', color: '#0066CC' },
   { id: 'N3', x: 520, y: 100, label: 'Khung kết cấu', status: 'in_progress', progress: 65, description: 'Cột, dầm, sàn các tầng', type: 'circle', color: '#FFCA28' },
   { id: 'N4', x: 720, y: 100, label: 'Mái & Chống thấm', status: 'pending', progress: 0, description: 'Đổ sàn mái, chống thấm', type: 'circle', color: '#FFCA28' },
 
   // Nhánh hoàn thiện & nội thất (pill)
-  { id: 'FINISH', x: 260, y: 520, label: 'Phần hoàn thiện', status: 'pending', progress: 0, description: 'Các đội thợ hoàn thiện', type: 'circle', color: '#FB8C00' },
+  { id: 'FINISH', x: 260, y: 520, label: 'Phần hoàn thiện', status: 'pending', progress: 0, description: 'Các đội thợ hoàn thiện', type: 'circle', color: '#0066CC' },
   { id: 'CREW_WALL', x: 240, y: 390, label: 'Thợ xây tường - tô', status: 'pending', progress: 0, type: 'pill', color: '#FFECB3' },
   { id: 'CREW_ME', x: 240, y: 420, label: 'Thợ ME', status: 'pending', progress: 0, type: 'pill', color: '#FFECB3' },
   { id: 'CREW_AC', x: 240, y: 450, label: 'Thợ máy lạnh', status: 'pending', progress: 0, type: 'pill', color: '#FFECB3' },
@@ -356,34 +356,34 @@ const DEFAULT_NODES: VectorNode[] = [
 
 const DEFAULT_CONNECTIONS: VectorConnection[] = [
   // Main flow: Khởi công → Móng → Khung → Mái (High importance - chính)
-  { id: 'C1', fromNodeId: 'N1', toNodeId: 'N2', type: 'direct', color: '#2196F3', importance: 5, relationshipType: 'flow', label: 'Bước 1' },
-  { id: 'C2', fromNodeId: 'N2', toNodeId: 'N3', type: 'direct', color: '#2196F3', importance: 5, relationshipType: 'flow', label: 'Bước 2' },
-  { id: 'C3', fromNodeId: 'N3', toNodeId: 'N4', type: 'direct', color: '#2196F3', importance: 5, relationshipType: 'flow', label: 'Bước 3' },
+  { id: 'C1', fromNodeId: 'N1', toNodeId: 'N2', type: 'direct', color: '#0066CC', importance: 5, relationshipType: 'flow', label: 'Bước 1' },
+  { id: 'C2', fromNodeId: 'N2', toNodeId: 'N3', type: 'direct', color: '#0066CC', importance: 5, relationshipType: 'flow', label: 'Bước 2' },
+  { id: 'C3', fromNodeId: 'N3', toNodeId: 'N4', type: 'direct', color: '#0066CC', importance: 5, relationshipType: 'flow', label: 'Bước 3' },
 
   // Phần nội thất → các crews (Medium importance - parent-child)
-  { id: 'C_INT_1', fromNodeId: 'INT_SUMMARY', toNodeId: 'CREW_WALL', type: 'bezier', color: '#4CAF50', importance: 3, relationshipType: 'parent-child' },
-  { id: 'C_INT_2', fromNodeId: 'INT_SUMMARY', toNodeId: 'CREW_ME', type: 'bezier', color: '#4CAF50', importance: 3, relationshipType: 'parent-child' },
-  { id: 'C_INT_3', fromNodeId: 'INT_SUMMARY', toNodeId: 'CREW_AC', type: 'bezier', color: '#4CAF50', importance: 3, relationshipType: 'parent-child' },
-  { id: 'C_INT_4', fromNodeId: 'INT_SUMMARY', toNodeId: 'CREW_TILE_WC', type: 'bezier', color: '#4CAF50', importance: 3, relationshipType: 'parent-child' },
-  { id: 'C_INT_5', fromNodeId: 'INT_SUMMARY', toNodeId: 'CREW_GYPSUM', type: 'bezier', color: '#4CAF50', importance: 3, relationshipType: 'parent-child' },
-  { id: 'C_INT_6', fromNodeId: 'INT_SUMMARY', toNodeId: 'CREW_PAINT', type: 'bezier', color: '#4CAF50', importance: 3, relationshipType: 'parent-child' },
+  { id: 'C_INT_1', fromNodeId: 'INT_SUMMARY', toNodeId: 'CREW_WALL', type: 'bezier', color: '#0066CC', importance: 3, relationshipType: 'parent-child' },
+  { id: 'C_INT_2', fromNodeId: 'INT_SUMMARY', toNodeId: 'CREW_ME', type: 'bezier', color: '#0066CC', importance: 3, relationshipType: 'parent-child' },
+  { id: 'C_INT_3', fromNodeId: 'INT_SUMMARY', toNodeId: 'CREW_AC', type: 'bezier', color: '#0066CC', importance: 3, relationshipType: 'parent-child' },
+  { id: 'C_INT_4', fromNodeId: 'INT_SUMMARY', toNodeId: 'CREW_TILE_WC', type: 'bezier', color: '#0066CC', importance: 3, relationshipType: 'parent-child' },
+  { id: 'C_INT_5', fromNodeId: 'INT_SUMMARY', toNodeId: 'CREW_GYPSUM', type: 'bezier', color: '#0066CC', importance: 3, relationshipType: 'parent-child' },
+  { id: 'C_INT_6', fromNodeId: 'INT_SUMMARY', toNodeId: 'CREW_PAINT', type: 'bezier', color: '#0066CC', importance: 3, relationshipType: 'parent-child' },
 
   // Phần hoàn thiện → crews (dependency - dashed)
-  { id: 'C_FIN_1', fromNodeId: 'FINISH', toNodeId: 'CREW_WALL', type: 'bezier', color: '#FF9800', style: 'dashed', importance: 2, relationshipType: 'dependency' },
-  { id: 'C_FIN_2', fromNodeId: 'FINISH', toNodeId: 'CREW_PAINT', type: 'bezier', color: '#FF9800', style: 'dashed', importance: 2, relationshipType: 'dependency' },
+  { id: 'C_FIN_1', fromNodeId: 'FINISH', toNodeId: 'CREW_WALL', type: 'bezier', color: '#0066CC', style: 'dashed', importance: 2, relationshipType: 'dependency' },
+  { id: 'C_FIN_2', fromNodeId: 'FINISH', toNodeId: 'CREW_PAINT', type: 'bezier', color: '#0066CC', style: 'dashed', importance: 2, relationshipType: 'dependency' },
 
   // Order group → các order items (parent-child hierarchy)
-  { id: 'C_ORD_1', fromNodeId: 'ORDER_GROUP', toNodeId: 'ORDER_SANITARY', type: 'direct', color: '#4CAF50', importance: 2, relationshipType: 'parent-child' },
-  { id: 'C_ORD_2', fromNodeId: 'ORDER_GROUP', toNodeId: 'ORDER_ELECTRIC', type: 'direct', color: '#4CAF50', importance: 2, relationshipType: 'parent-child' },
-  { id: 'C_ORD_3', fromNodeId: 'ORDER_GROUP', toNodeId: 'ORDER_LOCK', type: 'direct', color: '#4CAF50', importance: 2, relationshipType: 'parent-child' },
-  { id: 'C_ORD_4', fromNodeId: 'ORDER_GROUP', toNodeId: 'ORDER_KITCHEN', type: 'direct', color: '#4CAF50', importance: 2, relationshipType: 'parent-child' },
-  { id: 'C_ORD_5', fromNodeId: 'ORDER_GROUP', toNodeId: 'ORDER_STEEL', type: 'direct', color: '#4CAF50', importance: 2, relationshipType: 'parent-child' },
-  { id: 'C_ORD_6', fromNodeId: 'ORDER_GROUP', toNodeId: 'ORDER_WARDROBE', type: 'direct', color: '#4CAF50', importance: 2, relationshipType: 'parent-child' },
-  { id: 'C_ORD_7', fromNodeId: 'ORDER_GROUP', toNodeId: 'ORDER_KITCHEN_CAB', type: 'direct', color: '#4CAF50', importance: 2, relationshipType: 'parent-child' },
+  { id: 'C_ORD_1', fromNodeId: 'ORDER_GROUP', toNodeId: 'ORDER_SANITARY', type: 'direct', color: '#0066CC', importance: 2, relationshipType: 'parent-child' },
+  { id: 'C_ORD_2', fromNodeId: 'ORDER_GROUP', toNodeId: 'ORDER_ELECTRIC', type: 'direct', color: '#0066CC', importance: 2, relationshipType: 'parent-child' },
+  { id: 'C_ORD_3', fromNodeId: 'ORDER_GROUP', toNodeId: 'ORDER_LOCK', type: 'direct', color: '#0066CC', importance: 2, relationshipType: 'parent-child' },
+  { id: 'C_ORD_4', fromNodeId: 'ORDER_GROUP', toNodeId: 'ORDER_KITCHEN', type: 'direct', color: '#0066CC', importance: 2, relationshipType: 'parent-child' },
+  { id: 'C_ORD_5', fromNodeId: 'ORDER_GROUP', toNodeId: 'ORDER_STEEL', type: 'direct', color: '#0066CC', importance: 2, relationshipType: 'parent-child' },
+  { id: 'C_ORD_6', fromNodeId: 'ORDER_GROUP', toNodeId: 'ORDER_WARDROBE', type: 'direct', color: '#0066CC', importance: 2, relationshipType: 'parent-child' },
+  { id: 'C_ORD_7', fromNodeId: 'ORDER_GROUP', toNodeId: 'ORDER_KITCHEN_CAB', type: 'direct', color: '#0066CC', importance: 2, relationshipType: 'parent-child' },
 
   // Cross connections between main phases (reference - lower importance)
-  { id: 'C_CROSS_1', fromNodeId: 'N3', toNodeId: 'ORDER_GROUP', type: 'bezier', color: '#9C27B0', style: 'dashed', importance: 1, relationshipType: 'reference' },
-  { id: 'C_CROSS_2', fromNodeId: 'N4', toNodeId: 'FINISH', type: 'bezier', color: '#9C27B0', style: 'dashed', importance: 1, relationshipType: 'reference', showStartArrow: true },
+  { id: 'C_CROSS_1', fromNodeId: 'N3', toNodeId: 'ORDER_GROUP', type: 'bezier', color: '#999999', style: 'dashed', importance: 1, relationshipType: 'reference' },
+  { id: 'C_CROSS_2', fromNodeId: 'N4', toNodeId: 'FINISH', type: 'bezier', color: '#999999', style: 'dashed', importance: 1, relationshipType: 'reference', showStartArrow: true },
 ];
 
 // ==================== MAIN COMPONENT ====================
@@ -1498,15 +1498,15 @@ export default function ProgressVectorEditor() {
   const getConnectionColorByType = (relationshipType?: VectorConnection['relationshipType']): string => {
     switch (relationshipType) {
       case 'parent-child':
-        return '#4CAF50'; // Green - hierarchical
+        return '#0066CC'; // Green - hierarchical
       case 'dependency':
-        return '#FF9800'; // Orange - dependencies
+        return '#0066CC'; // Orange - dependencies
       case 'reference':
-        return '#9C27B0'; // Purple - references
+        return '#999999'; // Purple - references
       case 'flow':
-        return '#2196F3'; // Blue - flow/sequence
+        return '#0066CC'; // Blue - flow/sequence
       default:
-        return '#2196F3'; // Default blue
+        return '#0066CC'; // Default blue
     }
   };
 
@@ -1665,12 +1665,12 @@ export default function ProgressVectorEditor() {
 
         {/* Search */}
         <TouchableOpacity style={styles.zoomBtn} onPress={() => setShowSearch(!showSearch)}>
-          <Ionicons name="search" size={18} color={showSearch ? '#2196F3' : colors.text} />
+          <Ionicons name="search" size={18} color={showSearch ? '#0066CC' : colors.text} />
         </TouchableOpacity>
 
         {/* Add Node */}
         <TouchableOpacity style={styles.addNodeBtn} onPress={() => setShowAddNodeModal(true)}>
-          <Ionicons name="add-circle" size={20} color="#4CAF50" />
+          <Ionicons name="add-circle" size={20} color="#0066CC" />
         </TouchableOpacity>
       </View>
       )}
@@ -1703,7 +1703,7 @@ export default function ProgressVectorEditor() {
         {/* Selection count */}
         {selectedNodeIds.length > 0 && (
           <View style={styles.selectionInfo}>
-            <Text style={{ fontSize: 12, color: '#2196F3', fontWeight: '600' }}>
+            <Text style={{ fontSize: 12, color: '#0066CC', fontWeight: '600' }}>
               {selectedNodeIds.length} đã chọn
             </Text>
             <TouchableOpacity onPress={handleClearSelection} style={{ marginLeft: 8 }}>
@@ -1714,7 +1714,7 @@ export default function ProgressVectorEditor() {
 
         {/* Duplicate */}
         <TouchableOpacity
-          style={[styles.toolBtn, { backgroundColor: selectedNodeIds.length > 0 ? '#E3F2FD' : '#F5F5F5' }]}
+          style={[styles.toolBtn, { backgroundColor: selectedNodeIds.length > 0 ? '#E8F4FF' : '#F5F5F5' }]}
           onPress={handleDuplicateNodes}
         >
           <Ionicons name="copy" size={16} color={selectedNodeIds.length > 0 ? '#1976D2' : '#999'} />
@@ -1723,11 +1723,11 @@ export default function ProgressVectorEditor() {
 
         {/* Color Picker */}
         <TouchableOpacity
-          style={[styles.toolBtn, { backgroundColor: selectedNodeIds.length > 0 ? '#FFF3E0' : '#F5F5F5' }]}
+          style={[styles.toolBtn, { backgroundColor: selectedNodeIds.length > 0 ? '#E8F4FF' : '#F5F5F5' }]}
           onPress={() => selectedNodeIds.length > 0 && setShowColorPicker(true)}
         >
-          <Ionicons name="color-palette" size={16} color={selectedNodeIds.length > 0 ? '#E65100' : '#999'} />
-          <Text style={[styles.toolText, { color: selectedNodeIds.length > 0 ? '#E65100' : '#999' }]}>Màu</Text>
+          <Ionicons name="color-palette" size={16} color={selectedNodeIds.length > 0 ? '#004499' : '#999'} />
+          <Text style={[styles.toolText, { color: selectedNodeIds.length > 0 ? '#004499' : '#999' }]}>Màu</Text>
         </TouchableOpacity>
 
         {/* Group/Ungroup */}
@@ -1904,11 +1904,11 @@ export default function ProgressVectorEditor() {
               <Text style={[styles.connTypeText, editingConnection.showStartArrow && { color: '#fff' }]}>2 chiều</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.connActionBtn, { backgroundColor: '#FFEBEE' }]}
+              style={[styles.connActionBtn, { backgroundColor: '#F5F5F5' }]}
               onPress={handleDeleteConnection}
             >
-              <Ionicons name="trash-outline" size={18} color="#F44336" />
-              <Text style={[styles.connTypeText, { color: '#F44336' }]}>Xóa</Text>
+              <Ionicons name="trash-outline" size={18} color="#000000" />
+              <Text style={[styles.connTypeText, { color: '#000000' }]}>Xóa</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.connActionBtn}
@@ -2106,7 +2106,7 @@ export default function ProgressVectorEditor() {
                   key={`${selectedConnection.id}-cp-${idx}`}
                   x={p.x}
                   y={p.y}
-                  color={selectedConnection.color || '#2196F3'}
+                  color={selectedConnection.color || '#0066CC'}
                   onDrag={(dx, dy) => handleControlPointDrag(selectedConnection.id, idx, dx, dy)}
                 />
               ))}
@@ -2164,12 +2164,12 @@ export default function ProgressVectorEditor() {
             </View>
             <View style={{ padding: 16, flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
               {[
-                '#F44336', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5', '#2196F3',
-                '#03A9F4', '#00BCD4', '#009688', '#4CAF50', '#8BC34A', '#CDDC39',
-                '#FFEB3B', '#FFC107', '#FF9800', '#FF5722', '#795548', '#9E9E9E',
-                '#607D8B', '#FFCDD2', '#F8BBD9', '#E1BEE7', '#C5CAE9', '#BBDEFB',
+                '#000000', '#666666', '#999999', '#666666', '#0066CC', '#0066CC',
+                '#03A9F4', '#0080FF', '#0066CC', '#0066CC', '#8BC34A', '#0066CC',
+                '#0066CC', '#0066CC', '#0066CC', '#000000', '#666666', '#999999',
+                '#666666', '#E8E8E8', '#E8E8E8', '#E8E8E8', '#E8F4FF', '#E8F4FF',
                 '#B2EBF2', '#B2DFDB', '#C8E6C9', '#DCEDC8', '#F0F4C3', '#FFF9C4',
-                '#FFECB3', '#FFE0B2', '#FFCCBC', '#D7CCC8', '#CFD8DC', '#FAFAFA',
+                '#FFECB3', '#E8F4FF', '#FFCCBC', '#D7CCC8', '#CFD8DC', '#FAFAFA',
               ].map(c => (
                 <TouchableOpacity
                   key={c}
@@ -2314,7 +2314,7 @@ export default function ProgressVectorEditor() {
               style={styles.quickActionItem}
               onPress={() => handleAddNodeAtPosition(quickActionsPos.x, quickActionsPos.y, 'rect')}
             >
-              <Ionicons name="square-outline" size={20} color="#2196F3" />
+              <Ionicons name="square-outline" size={20} color="#0066CC" />
               <Text style={styles.quickActionText}>Thêm Node (Hình chữ nhật)</Text>
             </TouchableOpacity>
             
@@ -2322,7 +2322,7 @@ export default function ProgressVectorEditor() {
               style={styles.quickActionItem}
               onPress={() => handleAddNodeAtPosition(quickActionsPos.x, quickActionsPos.y, 'circle')}
             >
-              <Ionicons name="ellipse-outline" size={20} color="#4CAF50" />
+              <Ionicons name="ellipse-outline" size={20} color="#0066CC" />
               <Text style={styles.quickActionText}>Thêm Node (Hình tròn)</Text>
             </TouchableOpacity>
             
@@ -2330,7 +2330,7 @@ export default function ProgressVectorEditor() {
               style={styles.quickActionItem}
               onPress={() => handleAddNodeAtPosition(quickActionsPos.x, quickActionsPos.y, 'pill')}
             >
-              <Ionicons name="tablet-landscape-outline" size={20} color="#9C27B0" />
+              <Ionicons name="tablet-landscape-outline" size={20} color="#999999" />
               <Text style={styles.quickActionText}>Thêm Node (Pill)</Text>
             </TouchableOpacity>
 
@@ -2345,7 +2345,7 @@ export default function ProgressVectorEditor() {
                 }
               }}
             >
-              <Ionicons name="layers-outline" size={20} color={selectedNodeIds.length >= 2 ? '#FF9800' : '#ccc'} />
+              <Ionicons name="layers-outline" size={20} color={selectedNodeIds.length >= 2 ? '#0066CC' : '#ccc'} />
               <Text style={[styles.quickActionText, selectedNodeIds.length < 2 && styles.quickActionTextDisabled]}>
                 Nhóm các Node ({selectedNodeIds.length})
               </Text>
@@ -2358,7 +2358,7 @@ export default function ProgressVectorEditor() {
                 setShowQuickActions(false);
               }}
             >
-              <Ionicons name="git-branch-outline" size={20} color={nodes.find(n => n.id === selectedNodeIds[0] && n.type === 'group') ? '#E91E63' : '#ccc'} />
+              <Ionicons name="git-branch-outline" size={20} color={nodes.find(n => n.id === selectedNodeIds[0] && n.type === 'group') ? '#666666' : '#ccc'} />
               <Text style={[styles.quickActionText, !nodes.find(n => n.id === selectedNodeIds[0] && n.type === 'group') && styles.quickActionTextDisabled]}>
                 Tách nhóm
               </Text>
@@ -2373,7 +2373,7 @@ export default function ProgressVectorEditor() {
                 setShowQuickActions(false);
               }}
             >
-              <Ionicons name="expand-outline" size={20} color="#607D8B" />
+              <Ionicons name="expand-outline" size={20} color="#666666" />
               <Text style={styles.quickActionText}>Zoom vừa màn hình</Text>
             </TouchableOpacity>
 
@@ -2384,7 +2384,7 @@ export default function ProgressVectorEditor() {
                 setShowQuickActions(false);
               }}
             >
-              <Ionicons name="resize-outline" size={20} color="#607D8B" />
+              <Ionicons name="resize-outline" size={20} color="#666666" />
               <Text style={styles.quickActionText}>Reset Zoom</Text>
             </TouchableOpacity>
 
@@ -2397,7 +2397,7 @@ export default function ProgressVectorEditor() {
                 }
               }}
             >
-              <Ionicons name="copy-outline" size={20} color={selectedNodeIds.length > 0 ? '#00BCD4' : '#ccc'} />
+              <Ionicons name="copy-outline" size={20} color={selectedNodeIds.length > 0 ? '#0080FF' : '#ccc'} />
               <Text style={[styles.quickActionText, selectedNodeIds.length === 0 && styles.quickActionTextDisabled]}>
                 Nhân đôi ({selectedNodeIds.length})
               </Text>
@@ -2412,7 +2412,7 @@ export default function ProgressVectorEditor() {
                 setShowQuickActions(false);
               }}
             >
-              <Ionicons name="save-outline" size={20} color="#4CAF50" />
+              <Ionicons name="save-outline" size={20} color="#0066CC" />
               <Text style={styles.quickActionText}>Lưu dự án</Text>
             </TouchableOpacity>
 
@@ -2420,8 +2420,8 @@ export default function ProgressVectorEditor() {
               style={[styles.quickActionItem, styles.quickActionCancel]}
               onPress={() => setShowQuickActions(false)}
             >
-              <Ionicons name="close" size={20} color="#f44336" />
-              <Text style={[styles.quickActionText, { color: '#f44336' }]}>Đóng</Text>
+              <Ionicons name="close" size={20} color="#000000" />
+              <Text style={[styles.quickActionText, { color: '#000000' }]}>Đóng</Text>
             </TouchableOpacity>
           </View>
         </TouchableOpacity>
@@ -2565,9 +2565,9 @@ function DraggableNode({ node, selected, isMultiSelected, editMode, onPress, onL
 
   // Determine border color: multi-selected (purple), single selected (blue), or status color
   const borderColor = isMultiSelected
-    ? '#9C27B0'
+    ? '#999999'
     : selected
-    ? '#2196F3'
+    ? '#0066CC'
     : statusColors.border;
 
   return (
@@ -2586,7 +2586,7 @@ function DraggableNode({ node, selected, isMultiSelected, editMode, onPress, onL
           transform: [{ translateX: pan.x }, { translateY: pan.y }],
         },
         extraStyle,
-        isMultiSelected && { shadowColor: '#9C27B0', shadowOpacity: 0.4, elevation: 8 },
+        isMultiSelected && { shadowColor: '#999999', shadowOpacity: 0.4, elevation: 8 },
       ]}
       {...panResponder.panHandlers}
     >
@@ -2642,7 +2642,7 @@ function DraggableNode({ node, selected, isMultiSelected, editMode, onPress, onL
         {/* Prototype link indicator */}
         {node.prototypeLink && (
           <View style={styles.nodeLinkBadge}>
-            <Ionicons name="link" size={12} color="#2196F3" />
+            <Ionicons name="link" size={12} color="#0066CC" />
           </View>
         )}
       </TouchableOpacity>
@@ -2840,7 +2840,7 @@ function NodeEditModal({ visible, node, onClose, onUpdate, onDelete }: NodeEditM
             <View style={styles.imagesHeaderRow}>
               <Text style={styles.inputLabel}>Hình ảnh ({images.length})</Text>
               <TouchableOpacity style={styles.addImageBtn} onPress={() => setShowImageOptions(true)}>
-                <Ionicons name="add-circle" size={18} color="#4CAF50" />
+                <Ionicons name="add-circle" size={18} color="#0066CC" />
                 <Text style={styles.addImageText}>Thêm hình</Text>
               </TouchableOpacity>
             </View>
@@ -2849,11 +2849,11 @@ function NodeEditModal({ visible, node, onClose, onUpdate, onDelete }: NodeEditM
             {showImageOptions && (
               <View style={styles.imageOptionsMenu}>
                 <TouchableOpacity style={styles.imageOptionBtn} onPress={handleTakePhoto}>
-                  <Ionicons name="camera" size={24} color="#2196F3" />
+                  <Ionicons name="camera" size={24} color="#0066CC" />
                   <Text style={styles.imageOptionText}>Chụp ảnh</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.imageOptionBtn} onPress={handlePickFromLibrary}>
-                  <Ionicons name="images" size={24} color="#4CAF50" />
+                  <Ionicons name="images" size={24} color="#0066CC" />
                   <Text style={styles.imageOptionText}>Chọn từ thư viện</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.imageOptionBtnCancel} onPress={() => setShowImageOptions(false)}>
@@ -2993,7 +2993,7 @@ function NodeEditModal({ visible, node, onClose, onUpdate, onDelete }: NodeEditM
 
           <View style={styles.modalFooter}>
             <TouchableOpacity style={styles.deleteBtn} onPress={onDelete}>
-              <Ionicons name="trash" size={18} color="#F44336" />
+              <Ionicons name="trash" size={18} color="#000000" />
               <Text style={styles.deleteBtnText}>Xóa</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -3080,7 +3080,7 @@ function AddNodeModal({ visible, onClose, onAdd }: AddNodeModalProps) {
                       marginRight: 8,
                     },
                     type === t && {
-                      backgroundColor: '#2196F3',
+                      backgroundColor: '#0066CC',
                       borderColor: '#1976D2',
                     },
                   ]}
@@ -3131,7 +3131,7 @@ interface ConnectionEditModalProps {
 
 function ConnectionEditModal({ visible, connection, nodes, onClose, onUpdate, onDelete }: ConnectionEditModalProps) {
   const [type, setType] = useState<VectorConnection['type']>('direct');
-  const [color, setColor] = useState('#2196F3');
+  const [color, setColor] = useState('#0066CC');
   const [style, setStyle] = useState<VectorConnection['style']>('solid');
   const [importance, setImportance] = useState<VectorConnection['importance']>(3);
   const [relationshipType, setRelationshipType] = useState<VectorConnection['relationshipType']>('flow');
@@ -3141,7 +3141,7 @@ function ConnectionEditModal({ visible, connection, nodes, onClose, onUpdate, on
   useEffect(() => {
     if (connection) {
       setType(connection.type);
-      setColor(connection.color || '#2196F3');
+      setColor(connection.color || '#0066CC');
       setStyle(connection.style || 'solid');
       setImportance(connection.importance || 3);
       setRelationshipType(connection.relationshipType || 'flow');
@@ -3156,10 +3156,10 @@ function ConnectionEditModal({ visible, connection, nodes, onClose, onUpdate, on
   const toNode = nodes.find(n => n.id === connection.toNodeId);
 
   const RELATIONSHIP_TYPES: { value: VectorConnection['relationshipType']; label: string; color: string }[] = [
-    { value: 'parent-child', label: 'Cha-Con', color: '#4CAF50' },
-    { value: 'dependency', label: 'Phụ thuộc', color: '#FF9800' },
-    { value: 'reference', label: 'Tham chiếu', color: '#9C27B0' },
-    { value: 'flow', label: 'Luồng', color: '#2196F3' },
+    { value: 'parent-child', label: 'Cha-Con', color: '#0066CC' },
+    { value: 'dependency', label: 'Phụ thuộc', color: '#0066CC' },
+    { value: 'reference', label: 'Tham chiếu', color: '#999999' },
+    { value: 'flow', label: 'Luồng', color: '#0066CC' },
   ];
 
   return (
@@ -3179,12 +3179,12 @@ function ConnectionEditModal({ visible, connection, nodes, onClose, onUpdate, on
               <View style={styles.connectionInfoBox}>
                 <View style={styles.connectionInfoRow}>
                   <View style={styles.connectionNodeBadge}>
-                    <Ionicons name="ellipse" size={10} color="#4CAF50" />
+                    <Ionicons name="ellipse" size={10} color="#0066CC" />
                     <Text style={styles.connectionNodeText}>{fromNode?.label}</Text>
                   </View>
                   <Ionicons name="arrow-forward" size={16} color="#666" />
                   <View style={styles.connectionNodeBadge}>
-                    <Ionicons name="ellipse" size={10} color="#F44336" />
+                    <Ionicons name="ellipse" size={10} color="#000000" />
                     <Text style={styles.connectionNodeText}>{toNode?.label}</Text>
                   </View>
                 </View>
@@ -3242,7 +3242,7 @@ function ConnectionEditModal({ visible, connection, nodes, onClose, onUpdate, on
                       styles.importanceLine,
                       { 
                         height: level * 0.8 + 0.5, 
-                        backgroundColor: importance === level ? '#2196F3' : '#999',
+                        backgroundColor: importance === level ? '#0066CC' : '#999',
                         opacity: 0.5 + level * 0.1
                       }
                     ]} />
@@ -3317,7 +3317,7 @@ function ConnectionEditModal({ visible, connection, nodes, onClose, onUpdate, on
 
             <View style={styles.modalFooter}>
               <TouchableOpacity style={styles.deleteBtn} onPress={onDelete}>
-                <Ionicons name="trash" size={18} color="#F44336" />
+                <Ionicons name="trash" size={18} color="#000000" />
                 <Text style={styles.deleteBtnText}>Xóa</Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -3381,7 +3381,7 @@ function ProjectsModal({
           <ScrollView style={styles.modalBody}>
             {/* New Project Button */}
             <TouchableOpacity style={styles.newProjectBtn} onPress={onNewProject}>
-              <Ionicons name="add-circle" size={24} color="#4CAF50" />
+              <Ionicons name="add-circle" size={24} color="#0066CC" />
               <Text style={styles.newProjectBtnText}>Tạo dự án mới</Text>
             </TouchableOpacity>
 
@@ -3399,7 +3399,7 @@ function ProjectsModal({
                   <Ionicons 
                     name={currentProjectId === project.id ? 'folder-open' : 'folder-outline'} 
                     size={24} 
-                    color={currentProjectId === project.id ? '#2196F3' : '#666'} 
+                    color={currentProjectId === project.id ? '#0066CC' : '#666'} 
                   />
                 </View>
                 <View style={styles.projectItemCenter}>
@@ -3426,7 +3426,7 @@ function ProjectsModal({
                     <Ionicons name="pencil" size={18} color="#666" />
                   </TouchableOpacity>
                   <TouchableOpacity onPress={() => onDeleteProject(project.id)} style={styles.projectActionBtn}>
-                    <Ionicons name="trash-outline" size={18} color="#F44336" />
+                    <Ionicons name="trash-outline" size={18} color="#000000" />
                   </TouchableOpacity>
                 </View>
               </TouchableOpacity>
@@ -3474,7 +3474,7 @@ function TemplatesModal({ visible, templates, onClose, onSelectTemplate }: Templ
                 onPress={() => onSelectTemplate(template.id)}
               >
                 <View style={styles.templateIcon}>
-                  <Ionicons name={template.icon as any} size={32} color="#2196F3" />
+                  <Ionicons name={template.icon as any} size={32} color="#0066CC" />
                 </View>
                 <View style={styles.templateInfo}>
                   <Text style={styles.templateName}>{template.name}</Text>
@@ -3611,7 +3611,7 @@ function SettingsModal({ visible, settings, onClose, onSave, onExport }: Setting
             <View style={styles.settingSection}>
               <Text style={styles.settingSectionTitle}>Dữ liệu</Text>
               <TouchableOpacity style={styles.settingActionBtn} onPress={onExport}>
-                <Ionicons name="download-outline" size={20} color="#2196F3" />
+                <Ionicons name="download-outline" size={20} color="#0066CC" />
                 <Text style={styles.settingActionText}>Xuất dự án (JSON)</Text>
               </TouchableOpacity>
             </View>
@@ -3668,7 +3668,7 @@ const styles = StyleSheet.create({
     marginRight: 4,
   },
   unsavedText: {
-    color: '#FF9800',
+    color: '#0066CC',
     fontSize: 16,
   },
   saveBtn: {
@@ -3706,7 +3706,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
   },
   toolBtnActive: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
   },
   toolText: {
     fontSize: 12,
@@ -3729,7 +3729,7 @@ const styles = StyleSheet.create({
   selectionInfo: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
@@ -3738,10 +3738,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
     padding: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#BBDEFB',
+    borderBottomColor: '#E8F4FF',
   },
   connectingText: {
     fontSize: 13,
@@ -3750,7 +3750,7 @@ const styles = StyleSheet.create({
   },
   cancelConnectText: {
     fontSize: 13,
-    color: '#F44336',
+    color: '#000000',
     fontWeight: '600',
   },
   canvasScroll: {
@@ -3854,7 +3854,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
   },
   connTypeBtnActive: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
   },
   connTypeText: {
     fontSize: 11,
@@ -3986,7 +3986,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: '#fff',
     borderWidth: 2,
-    borderColor: '#2196F3',
+    borderColor: '#0066CC',
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
@@ -4039,7 +4039,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#0066CC',
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 20,
@@ -4259,7 +4259,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   progressBtnActive: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
   },
   progressBtnText: {
     fontSize: 12,
@@ -4300,7 +4300,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   linkTypeBtnActive: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
   },
   linkTypeText: {
     fontSize: 12,
@@ -4328,7 +4328,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   typeOptionActive: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
   },
   typeOptionText: {
     fontSize: 13,
@@ -4366,10 +4366,10 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#F44336',
+    borderColor: '#000000',
   },
   deleteBtnText: {
-    color: '#F44336',
+    color: '#000000',
     fontWeight: '600',
   },
   cancelBtn: {
@@ -4386,7 +4386,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingVertical: 10,
     borderRadius: 10,
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#0066CC',
   },
   updateBtnText: {
     color: '#fff',
@@ -4402,7 +4402,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   chipActive: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     borderColor: '#1976D2',
   },
   chipText: {
@@ -4455,9 +4455,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
   },
   projectItemActive: {
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
     borderWidth: 1,
-    borderColor: '#2196F3',
+    borderColor: '#0066CC',
   },
   projectItemLeft: {
     marginRight: 12,
@@ -4487,7 +4487,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     padding: 4,
     borderBottomWidth: 1,
-    borderBottomColor: '#2196F3',
+    borderBottomColor: '#0066CC',
   },
   emptyState: {
     alignItems: 'center',
@@ -4513,7 +4513,7 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 12,
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 16,
@@ -4564,7 +4564,7 @@ const styles = StyleSheet.create({
     padding: 2,
   },
   settingToggleActive: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#0066CC',
   },
   settingToggleThumb: {
     width: 24,
@@ -4587,7 +4587,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
   },
   gridSizeBtnActive: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
   },
   gridSizeBtnText: {
     fontSize: 13,
@@ -4609,7 +4609,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
   },
   nodeTypeBtnActive: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
   },
   nodeTypeBtnText: {
     fontSize: 12,
@@ -4638,13 +4638,13 @@ const styles = StyleSheet.create({
     gap: 10,
     paddingVertical: 12,
     paddingHorizontal: 16,
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
     borderRadius: 10,
     marginBottom: 8,
   },
   settingActionText: {
     fontSize: 14,
-    color: '#2196F3',
+    color: '#0066CC',
     fontWeight: '600',
   },
   // Floating Action Button
@@ -4655,7 +4655,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 6,
@@ -4743,7 +4743,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   inputDialogBtnConfirm: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
   },
   inputDialogBtnConfirmText: {
     fontSize: 14,
@@ -4819,7 +4819,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
   },
   importanceBtnActive: {
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
   },
   importanceLine: {
     width: 30,
@@ -4831,7 +4831,7 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   importanceTextActive: {
-    color: '#2196F3',
+    color: '#0066CC',
     fontWeight: '600',
   },
   importanceHint: {
@@ -4857,8 +4857,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   checkboxActive: {
-    backgroundColor: '#2196F3',
-    borderColor: '#2196F3',
+    backgroundColor: '#0066CC',
+    borderColor: '#0066CC',
   },
   checkboxLabel: {
     fontSize: 14,

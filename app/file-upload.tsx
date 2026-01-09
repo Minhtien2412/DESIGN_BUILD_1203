@@ -62,7 +62,7 @@ export default function FileUploadScreen() {
     <Container>
       <ScrollView showsVerticalScrollIndicator={false}>
         <LinearGradient
-          colors={['#3b82f6', '#2563eb']}
+          colors={['#3b82f6', '#0066CC']}
           style={styles.header}
         >
           <TouchableOpacity
@@ -95,12 +95,12 @@ export default function FileUploadScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.uploadCard, { backgroundColor: '#10b981' }]}
+            style={[styles.uploadCard, { backgroundColor: '#0066CC' }]}
             onPress={handleUploadDocument}
             disabled={uploading}
           >
             <View style={styles.iconCircle}>
-              <Ionicons name="document-text-outline" size={32} color="#10b981" />
+              <Ionicons name="document-text-outline" size={32} color="#0066CC" />
             </View>
             <View style={styles.cardContent}>
               <Text style={styles.cardTitle}>Upload Document</Text>
@@ -112,12 +112,12 @@ export default function FileUploadScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.uploadCard, { backgroundColor: '#f59e0b' }]}
+            style={[styles.uploadCard, { backgroundColor: '#0066CC' }]}
             onPress={handleCapturePhoto}
             disabled={uploading}
           >
             <View style={styles.iconCircle}>
-              <Ionicons name="camera-outline" size={32} color="#f59e0b" />
+              <Ionicons name="camera-outline" size={32} color="#0066CC" />
             </View>
             <View style={styles.cardContent}>
               <Text style={styles.cardTitle}>Chụp ảnh công trường</Text>
@@ -131,34 +131,34 @@ export default function FileUploadScreen() {
 
         <Section title="Tính năng">
           <View style={styles.featureItem}>
-            <Ionicons name="checkmark-circle" size={24} color="#10b981" />
+            <Ionicons name="checkmark-circle" size={24} color="#0066CC" />
             <Text style={styles.featureText}>Auto-resize ảnh avatar (512x512)</Text>
           </View>
           <View style={styles.featureItem}>
-            <Ionicons name="checkmark-circle" size={24} color="#10b981" />
+            <Ionicons name="checkmark-circle" size={24} color="#0066CC" />
             <Text style={styles.featureText}>Tạo thumbnail tự động (120x120)</Text>
           </View>
           <View style={styles.featureItem}>
-            <Ionicons name="checkmark-circle" size={24} color="#10b981" />
+            <Ionicons name="checkmark-circle" size={24} color="#0066CC" />
             <Text style={styles.featureText}>Lưu trữ trên AWS S3</Text>
           </View>
           <View style={styles.featureItem}>
-            <Ionicons name="checkmark-circle" size={24} color="#10b981" />
+            <Ionicons name="checkmark-circle" size={24} color="#0066CC" />
             <Text style={styles.featureText}>Lưu GPS location cho ảnh công trường</Text>
           </View>
           <View style={styles.featureItem}>
-            <Ionicons name="checkmark-circle" size={24} color="#10b981" />
+            <Ionicons name="checkmark-circle" size={24} color="#0066CC" />
             <Text style={styles.featureText}>Upload progress tracking</Text>
           </View>
           <View style={styles.featureItem}>
-            <Ionicons name="checkmark-circle" size={24} color="#10b981" />
+            <Ionicons name="checkmark-circle" size={24} color="#0066CC" />
             <Text style={styles.featureText}>Batch upload multiple files</Text>
           </View>
         </Section>
 
         <Section title="Backend Status">
           <View style={styles.statusCard}>
-            <Ionicons name="construct-outline" size={32} color="#f59e0b" />
+            <Ionicons name="construct-outline" size={32} color="#0066CC" />
             <Text style={styles.statusTitle}>Backend đang được phát triển</Text>
             <Text style={styles.statusDescription}>
               Cần implement các endpoints sau:{'\n\n'}

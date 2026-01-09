@@ -3,6 +3,7 @@
  * ==============================
  * 
  * Màn hình quản lý khách hàng từ Perfex CRM
+ * Updated: January 7, 2026 - Using new API hooks
  */
 
 import { Ionicons } from '@expo/vector-icons';
@@ -10,6 +11,7 @@ import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useMemo, useState } from 'react';
 import {
+    ActivityIndicator,
     Alert,
     FlatList,
     Linking,
@@ -22,23 +24,36 @@ import {
     View,
 } from 'react-native';
 
-import { PerfexFullSyncProvider, usePerfexCustomers, usePerfexFullSync } from '@/context/PerfexFullSyncContext';
-import { Customer, formatDate } from '@/services/perfexFullSync';
+import { useCustomers } from '@/hooks/usePerfexAPI';
+import type { Customer } from '@/types/perfex';
 
 function CustomersContent() {
-  const { customers, isLoading, refresh } = usePerfexCustomers();
-  const { getProjectsByCustomer } = usePerfexFullSync();
+  const { customers, stats, loading, error, refresh, search } = useCustomers();
   
   const [searchQuery, setSearchQuery] = useState('');
   const [refreshing, setRefreshing] = useState(false);
 
-  // Filtered customers
+  // Handle search with debounce
+  const handleSearch = useCallback((query: string) => {
+    setSearchQuery(query);
+    if (query.trim().length > 2) {
+      // Debounce search - call API after user stops typing
+      const timeoutId = setTimeout(() => {
+        search(query);
+      }, 500);
+      return () => clearTimeout(timeoutId);
+    } else if (query.trim() === '') {
+      refresh(); // Reset to full list
+    }
+  }, [search, refresh]);
+
+  // Filtered customers (local filter for quick response)
   const filteredCustomers = useMemo(() => {
     if (!searchQuery.trim()) return customers;
     
     const q = searchQuery.toLowerCase();
     return customers.filter(c =>
-      c.company.toLowerCase().includes(q) ||
+      c.company?.toLowerCase().includes(q) ||
       c.phonenumber?.includes(q) ||
       c.city?.toLowerCase().includes(q)
     );
@@ -64,22 +79,14 @@ function CustomersContent() {
     });
   };
 
-  // Stats
-  const stats = useMemo(() => ({
-    total: customers.length,
-    active: customers.filter(c => c.active === '1').length,
-  }), [customers]);
-
   const renderCustomer = ({ item }: { item: Customer }) => {
-    const projectCount = getProjectsByCustomer(item.userid).length;
-    
     return (
       <TouchableOpacity style={styles.customerCard} activeOpacity={0.7}>
         <View style={styles.customerHeader}>
           <View style={styles.avatarContainer}>
             <View style={styles.avatar}>
               <Text style={styles.avatarText}>
-                {item.company.charAt(0).toUpperCase()}
+                {item.company?.charAt(0).toUpperCase() || '?'}
               </Text>
             </View>
             {item.active === '1' && <View style={styles.activeIndicator} />}
@@ -92,9 +99,9 @@ function CustomersContent() {
           
           <TouchableOpacity 
             style={styles.callButton}
-            onPress={() => handleCall(item.phonenumber)}
+            onPress={() => item.phonenumber && handleCall(item.phonenumber)}
           >
-            <Ionicons name="call" size={18} color="#10B981" />
+            <Ionicons name="call" size={18} color="#0066CC" />
           </TouchableOpacity>
         </View>
 
@@ -123,14 +130,43 @@ function CustomersContent() {
           <View style={styles.footerLeft}>
             <View style={styles.projectBadge}>
               <Ionicons name="folder" size={12} color="#3B82F6" />
-              <Text style={styles.projectCount}>{projectCount} dự án</Text>
+              <Text style={styles.projectCount}>Khách hàng</Text>
             </View>
           </View>
-          <Text style={styles.dateCreated}>Tạo: {formatDate(item.datecreated)}</Text>
+          <Text style={styles.dateCreated}>
+            ID: {item.userid}
+          </Text>
         </View>
       </TouchableOpacity>
     );
   };
+
+  // Show loading on initial fetch
+  if (loading && customers.length === 0) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#0066CC" />
+          <Text style={styles.loadingText}>Đang tải khách hàng...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Show error
+  if (error) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.errorContainer}>
+          <Ionicons name="alert-circle-outline" size={48} color="#EF4444" />
+          <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity style={styles.retryButton} onPress={refresh}>
+            <Text style={styles.retryButtonText}>Thử lại</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -156,7 +192,7 @@ function CustomersContent() {
         <View style={styles.statDivider} />
         <View style={styles.statItem}>
           <Text style={[styles.statValue, { color: '#10B981' }]}>{stats.active}</Text>
-          <Text style={styles.statLabel}>Hoạt động</Text>
+          <Text style={styles.statLabel}>Đang hoạt động</Text>
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statItem}>
@@ -207,18 +243,47 @@ function CustomersContent() {
   );
 }
 
-export default function CustomersScreen() {
-  return (
-    <PerfexFullSyncProvider>
-      <CustomersContent />
-    </PerfexFullSyncProvider>
-  );
-}
+// Main export - no longer needs Provider wrapper
+export default CustomersContent;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F3F4F6',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 14,
+    color: '#6B7280',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 32,
+  },
+  errorText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: '#EF4444',
+    textAlign: 'center',
+  },
+  retryButton: {
+    marginTop: 16,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    backgroundColor: '#0066CC',
+    borderRadius: 8,
+  },
+  retryButtonText: {
+    color: '#FFF',
+    fontSize: 14,
+    fontWeight: '600',
   },
   header: {
     flexDirection: 'row',
@@ -328,7 +393,7 @@ const styles = StyleSheet.create({
     width: 14,
     height: 14,
     borderRadius: 7,
-    backgroundColor: '#10B981',
+    backgroundColor: '#0066CC',
     borderWidth: 2,
     borderColor: '#FFF',
   },
@@ -388,7 +453,7 @@ const styles = StyleSheet.create({
     gap: 4,
     paddingHorizontal: 8,
     paddingVertical: 4,
-    backgroundColor: '#EFF6FF',
+    backgroundColor: '#E8F4FF',
     borderRadius: 6,
   },
   projectCount: {

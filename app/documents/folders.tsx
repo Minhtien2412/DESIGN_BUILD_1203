@@ -95,7 +95,7 @@ export default function FoldersScreen() {
               <View style={styles.header}>
                 <View style={styles.headerLeft}>
                   <View style={styles.folderIcon}>
-                    <Ionicons name="folder" size={32} color="#FF9800" />
+                    <Ionicons name="folder" size={32} color="#0066CC" />
                   </View>
                   <View style={styles.headerInfo}>
                     <Text style={styles.folderName}>{folder.name}</Text>
@@ -166,7 +166,7 @@ export default function FoldersScreen() {
                     )
                   }
                 >
-                  <Ionicons name="enter-outline" size={18} color="#2196F3" />
+                  <Ionicons name="enter-outline" size={18} color="#0066CC" />
                   <Text style={styles.actionButtonText}>Mở</Text>
                 </TouchableOpacity>
 
@@ -178,7 +178,7 @@ export default function FoldersScreen() {
                     )
                   }
                 >
-                  <Ionicons name="cloud-upload-outline" size={18} color="#4CAF50" />
+                  <Ionicons name="cloud-upload-outline" size={18} color="#0066CC" />
                   <Text style={styles.actionButtonText}>Tải lên</Text>
                 </TouchableOpacity>
 
@@ -186,8 +186,8 @@ export default function FoldersScreen() {
                   style={styles.actionButton}
                   onPress={() => handleDelete(folder.id, folder.name)}
                 >
-                  <Ionicons name="trash-outline" size={18} color="#F44336" />
-                  <Text style={[styles.actionButtonText, { color: '#F44336' }]}>
+                  <Ionicons name="trash-outline" size={18} color="#000000" />
+                  <Text style={[styles.actionButtonText, { color: '#000000' }]}>
                     Xóa
                   </Text>
                 </TouchableOpacity>
@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     paddingHorizontal: 20,
     paddingVertical: 10,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     borderRadius: 8,
   },
   emptyButtonText: {
@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
     width: 52,
     height: 52,
     borderRadius: 26,
-    backgroundColor: '#FFF3E0',
+    backgroundColor: '#E8F4FF',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -350,7 +350,7 @@ const styles = StyleSheet.create({
   actionButtonText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#2196F3',
+    color: '#0066CC',
   },
   fab: {
     position: 'absolute',
@@ -359,7 +359,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#FF9800',
+    backgroundColor: '#0066CC',
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 4,

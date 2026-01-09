@@ -41,7 +41,7 @@ export const QuickAccessButton: React.FC<QuickAccessButtonProps> = ({
   icon,
   route,
   onPress,
-  color = '#4ECDC4',
+  color = '#0080FF',
   loading = false,
   disabled = false,
   style,

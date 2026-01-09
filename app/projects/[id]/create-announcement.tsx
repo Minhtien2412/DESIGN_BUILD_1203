@@ -28,8 +28,8 @@ type Priority = 'LOW' | 'NORMAL' | 'HIGH' | 'URGENT';
 const PRIORITIES: { value: Priority; label: string; color: string; icon: string }[] = [
   { value: 'LOW', label: 'Thấp', color: '#6B7280', icon: 'chatbubble-outline' },
   { value: 'NORMAL', label: 'Bình thường', color: '#3B82F6', icon: 'information-circle-outline' },
-  { value: 'HIGH', label: 'Cao', color: '#F97316', icon: 'warning-outline' },
-  { value: 'URGENT', label: 'Khẩn cấp', color: '#EF4444', icon: 'alert-circle-outline' },
+  { value: 'HIGH', label: 'Cao', color: '#0066CC', icon: 'warning-outline' },
+  { value: 'URGENT', label: 'Khẩn cấp', color: '#000000', icon: 'alert-circle-outline' },
 ];
 
 export default function CreateAnnouncementScreen() {
@@ -269,7 +269,7 @@ export default function CreateAnnouncementScreen() {
                         </View>
                       </View>
                       <Pressable onPress={() => handleRemoveAttachment(index)}>
-                        <Ionicons name="close-circle" size={24} color="#EF4444" />
+                        <Ionicons name="close-circle" size={24} color="#000000" />
                       </Pressable>
                     </View>
                   ))}

@@ -36,7 +36,7 @@ const mockActivities = [
     title: 'Task hoàn thành',
     description: 'Kiểm tra chất lượng bê tông',
     timestamp: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
-    color: '#10B981',
+    color: '#0066CC',
   },
   {
     id: '2',
@@ -116,7 +116,7 @@ export default function EngineerDashboardEnhanced() {
     >
       {error && (
         <View style={styles.errorBanner}>
-          <Ionicons name="alert-circle" size={20} color="#F59E0B" />
+          <Ionicons name="alert-circle" size={20} color="#0066CC" />
           <Text style={styles.errorText}>Server không khả dụng - Dùng dữ liệu demo</Text>
         </View>
       )}
@@ -142,7 +142,7 @@ export default function EngineerDashboardEnhanced() {
             title="Task đang làm"
             value={data.tasks.inProgress}
             icon="build"
-            gradientColors={['#3B82F6', '#2563EB']}
+            gradientColors={['#3B82F6', '#0066CC']}
             trend={{ value: `${data.tasks.pending} chờ`, isPositive: false }}
             subtitle="Ưu tiên cao"
           />
@@ -150,7 +150,7 @@ export default function EngineerDashboardEnhanced() {
             title="Dự án"
             value={data.projects.active}
             icon="briefcase"
-            gradientColors={['#8B5CF6', '#7C3AED']}
+            gradientColors={['#666666', '#666666']}
             trend={{ value: `${data.projects.thisWeek} tuần này`, isPositive: true }}
             subtitle="Đang thực hiện"
           />
@@ -160,7 +160,7 @@ export default function EngineerDashboardEnhanced() {
             title="Báo cáo"
             value={data.reports.submitted}
             icon="document-text"
-            gradientColors={['#10B981', '#059669']}
+            gradientColors={['#0066CC', '#0066CC']}
             trend={{ value: `${data.reports.pending} chờ duyệt`, isPositive: false }}
             subtitle="Đã gửi"
           />
@@ -168,7 +168,7 @@ export default function EngineerDashboardEnhanced() {
             title="An toàn"
             value={`${data.safety.score}%`}
             icon="shield-checkmark"
-            gradientColors={['#F59E0B', '#D97706']}
+            gradientColors={['#0066CC', '#D97706']}
             trend={{ value: `${data.safety.incidents} sự cố`, isPositive: true }}
             subtitle="Điểm tuân thủ"
           />
@@ -188,19 +188,19 @@ export default function EngineerDashboardEnhanced() {
           <QuickAction
             icon="camera"
             label="Chụp hiện trường"
-            color="#10B981"
+            color="#0066CC"
             onPress={() => console.log('Camera')}
           />
           <QuickAction
             icon="document"
             label="Báo cáo"
-            color="#F59E0B"
+            color="#0066CC"
             onPress={() => console.log('Report')}
           />
           <QuickAction
             icon="warning"
             label="Sự cố"
-            color="#EF4444"
+            color="#000000"
             badge={data.safety.incidents}
             onPress={() => console.log('Incidents')}
           />
@@ -314,7 +314,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 4,
     right: 4,
-    backgroundColor: '#EF4444',
+    backgroundColor: '#000000',
     borderRadius: 10,
     minWidth: 20,
     height: 20,

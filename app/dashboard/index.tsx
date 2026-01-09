@@ -33,7 +33,7 @@ export default function DashboardIndexScreen() {
       desc: 'Quản lý hệ thống, người dùng, báo cáo tổng hợp',
       icon: 'shield-checkmark-outline',
       route: '/dashboard/admin',
-      color: '#EE4D2D',
+      color: '#0066CC',
       roles: ['admin'],
     },
     {
@@ -43,7 +43,7 @@ export default function DashboardIndexScreen() {
       desc: 'Quản lý dự án, tiến độ, chất lượng công trình',
       icon: 'construct-outline',
       route: '/dashboard/engineer',
-      color: '#4ECDC4',
+      color: '#0080FF',
       roles: ['engineer', 'employee'],
     },
     {
@@ -53,7 +53,7 @@ export default function DashboardIndexScreen() {
       desc: 'Theo dõi dự án, tiến độ, thanh toán',
       icon: 'home-outline',
       route: '/dashboard/client',
-      color: '#45B7D1',
+      color: '#0066CC',
       roles: ['user', 'client'],
     },
   ];
@@ -112,7 +112,7 @@ export default function DashboardIndexScreen() {
                 style={styles.quickItem}
                 onPress={() => router.push('/reports/index' as any)}
               >
-                <Ionicons name="stats-chart-outline" size={24} color="#00B894" />
+                <Ionicons name="stats-chart-outline" size={24} color="#0066CC" />
                 <Text style={styles.quickLabel}>Báo cáo</Text>
               </TouchableOpacity>
               <TouchableOpacity 
@@ -126,7 +126,7 @@ export default function DashboardIndexScreen() {
                 style={styles.quickItem}
                 onPress={() => router.push('/budget/index' as any)}
               >
-                <Ionicons name="wallet-outline" size={24} color="#FDCB6E" />
+                <Ionicons name="wallet-outline" size={24} color="#666666" />
                 <Text style={styles.quickLabel}>Ngân sách</Text>
               </TouchableOpacity>
             </View>

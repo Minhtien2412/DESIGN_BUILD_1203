@@ -325,7 +325,7 @@ export default function UserProfileScreen() {
               onPress={handleVideoCall}
               activeOpacity={0.8}
             >
-              <View style={[styles.actionIconWrapper, { backgroundColor: '#8B5CF6' }]}>
+              <View style={[styles.actionIconWrapper, { backgroundColor: '#666666' }]}>
                 <Ionicons name="videocam" size={24} color={COLORS.white} />
               </View>
               <Text style={styles.actionLabel}>Gọi video</Text>

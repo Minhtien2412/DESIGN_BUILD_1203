@@ -45,28 +45,28 @@ interface Decision {
 }
 
 const CATEGORY_CONFIG: Record<DecisionCategory, { label: string; icon: string; color: string }> = {
-  DESIGN: { label: 'Thiết kế', icon: 'color-palette', color: '#8B5CF6' },
-  TECHNICAL: { label: 'Kỹ thuật', icon: 'construct', color: '#F59E0B' },
-  BUDGET: { label: 'Ngân sách', icon: 'cash', color: '#10B981' },
+  DESIGN: { label: 'Thiết kế', icon: 'color-palette', color: '#666666' },
+  TECHNICAL: { label: 'Kỹ thuật', icon: 'construct', color: '#0066CC' },
+  BUDGET: { label: 'Ngân sách', icon: 'cash', color: '#0066CC' },
   SCHEDULE: { label: 'Tiến độ', icon: 'time', color: '#3B82F6' },
-  SAFETY: { label: 'An toàn', icon: 'shield-checkmark', color: '#EF4444' },
+  SAFETY: { label: 'An toàn', icon: 'shield-checkmark', color: '#000000' },
   QUALITY: { label: 'Chất lượng', icon: 'star', color: '#06B6D4' },
   OTHER: { label: 'Khác', icon: 'ellipsis-horizontal', color: '#6B7280' },
 };
 
 const IMPACT_CONFIG: Record<DecisionImpact, { label: string; color: string }> = {
-  LOW: { label: 'Thấp', color: '#10B981' },
-  MEDIUM: { label: 'Trung bình', color: '#F59E0B' },
-  HIGH: { label: 'Cao', color: '#F97316' },
-  CRITICAL: { label: 'Nghiêm trọng', color: '#DC2626' },
+  LOW: { label: 'Thấp', color: '#0066CC' },
+  MEDIUM: { label: 'Trung bình', color: '#0066CC' },
+  HIGH: { label: 'Cao', color: '#0066CC' },
+  CRITICAL: { label: 'Nghiêm trọng', color: '#000000' },
 };
 
 const STATUS_CONFIG: Record<DecisionStatus, { label: string; color: string }> = {
   PROPOSED: { label: 'Đề xuất', color: '#6B7280' },
-  APPROVED: { label: 'Phê duyệt', color: '#10B981' },
-  REJECTED: { label: 'Từ chối', color: '#EF4444' },
+  APPROVED: { label: 'Phê duyệt', color: '#0066CC' },
+  REJECTED: { label: 'Từ chối', color: '#000000' },
   IMPLEMENTED: { label: 'Đã triển khai', color: '#3B82F6' },
-  REVIEWED: { label: 'Đã đánh giá', color: '#8B5CF6' },
+  REVIEWED: { label: 'Đã đánh giá', color: '#666666' },
 };
 
 export default function DecisionLogScreen() {

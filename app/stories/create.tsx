@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
     color: '#1A1A1A',
   },
   postButton: {
-    backgroundColor: '#EE4D2D',
+    backgroundColor: '#0066CC',
     paddingHorizontal: 20,
     paddingVertical: 8,
     borderRadius: 20,
@@ -260,12 +260,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: '#EE4D2D',
+    backgroundColor: '#0066CC',
     paddingVertical: 14,
     borderRadius: 12,
   },
   cameraButton: {
-    backgroundColor: '#4ECDC4',
+    backgroundColor: '#0080FF',
   },
   pickerButtonText: {
     color: '#FFF',
@@ -307,7 +307,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#EE4D2D',
+    backgroundColor: '#0066CC',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,

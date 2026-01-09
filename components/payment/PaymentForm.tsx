@@ -219,7 +219,7 @@ export function PaymentForm({ amount, description, onSuccess, onCancel }: Paymen
           maxLength={19}
         />
         {cardInfo.number.length >= 13 && (
-          <Ionicons name="checkmark-circle" size={20} color="#10B981" />
+          <Ionicons name="checkmark-circle" size={20} color="#0066CC" />
         )}
       </View>
 
@@ -236,7 +236,7 @@ export function PaymentForm({ amount, description, onSuccess, onCancel }: Paymen
             maxLength={5}
           />
           {cardInfo.expiry.length === 5 && (
-            <Ionicons name="checkmark-circle" size={20} color="#10B981" />
+            <Ionicons name="checkmark-circle" size={20} color="#0066CC" />
           )}
         </View>
         <View style={[styles.inputContainer, { flex: 1, marginLeft: 8 }]}>
@@ -252,7 +252,7 @@ export function PaymentForm({ amount, description, onSuccess, onCancel }: Paymen
             secureTextEntry
           />
           {cardInfo.cvv.length >= 3 && (
-            <Ionicons name="checkmark-circle" size={20} color="#10B981" />
+            <Ionicons name="checkmark-circle" size={20} color="#0066CC" />
           )}
         </View>
       </View>
@@ -268,7 +268,7 @@ export function PaymentForm({ amount, description, onSuccess, onCancel }: Paymen
           autoCapitalize="words"
         />
         {cardInfo.holderName.length >= 2 && (
-          <Ionicons name="checkmark-circle" size={20} color="#10B981" />
+          <Ionicons name="checkmark-circle" size={20} color="#0066CC" />
         )}
       </View>
 
@@ -433,7 +433,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     borderLeftWidth: 4,
-    borderLeftColor: '#10B981',
+    borderLeftColor: '#0066CC',
   },
   bankTitle: {
     fontSize: 16,

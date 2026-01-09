@@ -199,7 +199,7 @@ export default function CreateSupplierScreen() {
                 <Ionicons
                   name={rating && star <= rating ? 'star' : 'star-outline'}
                   size={32}
-                  color="#FFC107"
+                  color="#0066CC"
                 />
               </TouchableOpacity>
             ))}
@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   required: {
-    color: '#F44336',
+    color: '#000000',
   },
   input: {
     borderWidth: 1,
@@ -341,7 +341,7 @@ const styles = StyleSheet.create({
     flex: 2,
     paddingVertical: 14,
     borderRadius: 8,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     alignItems: 'center',
   },
   saveButtonDisabled: {

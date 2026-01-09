@@ -118,7 +118,7 @@ export function ProductCard({ product, onAddToCart, variant = 'grid' }: ProductC
               </BlurView>
             )}
             {product.flashSale && (
-              <View style={[styles.flashTag, { backgroundColor: '#0A6847' }]}>
+              <View style={[styles.flashTag, { backgroundColor: '#0066CC' }]}>
                 <Ionicons name="flash" size={10} color="#FFF" />
                 <ThemedText style={styles.flashText}>HOT</ThemedText>
               </View>
@@ -136,7 +136,7 @@ export function ProductCard({ product, onAddToCart, variant = 'grid' }: ProductC
                 <Ionicons 
                   name={isWishlisted ? "heart" : "heart-outline"} 
                   size={18} 
-                  color={isWishlisted ? "#10B981" : text}
+                  color={isWishlisted ? "#0066CC" : text}
                 />
               </Animated.View>
             </BlurView>
@@ -175,7 +175,7 @@ export function ProductCard({ product, onAddToCart, variant = 'grid' }: ProductC
               {product.seller.name}
             </ThemedText>
             {product.seller.verified && (
-              <Ionicons name="checkmark-circle" size={14} color="#10B981" />
+              <Ionicons name="checkmark-circle" size={14} color="#0066CC" />
             )}
           </View>
         )}
@@ -430,7 +430,7 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingVertical: 10,
     borderRadius: 10,
-    shadowColor: '#0A6847',
+    shadowColor: '#0066CC',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,

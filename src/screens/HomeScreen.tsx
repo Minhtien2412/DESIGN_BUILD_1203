@@ -12,7 +12,7 @@ const HomeScreen = () => {
     { title: 'Báo cáo', icon: 'bar-chart', color: '#10B981' },
     { title: 'Tài chính', icon: 'card', color: '#0A6847' },
     { title: 'Nhân sự', icon: 'people', color: '#0A6847' },
-    { title: 'Kho vật tư', icon: 'cube', color: '#795548' },
+    { title: 'Kho vật tư', icon: 'cube', color: '#666666' },
   ];
 
   return (

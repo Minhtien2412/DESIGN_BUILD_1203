@@ -108,7 +108,7 @@ export function ContractorPortfolio({
               <Ionicons name="create-outline" size={16} color="white" />
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.actionButton, { backgroundColor: '#EF4444' }]}
+              style={[styles.actionButton, { backgroundColor: '#000000' }]}
               onPress={(e) => {
                 e.stopPropagation();
                 Alert.alert(
@@ -645,7 +645,7 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 8,
     borderLeftWidth: 3,
-    borderLeftColor: '#10B981',
+    borderLeftColor: '#0066CC',
   },
   testimonial: {
     flex: 1,

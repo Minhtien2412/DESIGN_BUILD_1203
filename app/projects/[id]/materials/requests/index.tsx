@@ -36,9 +36,9 @@ const STATUS_CONFIG: Record<RequestStatus, {
 };
 
 const URGENCY_CONFIG = {
-  low: { label: 'Thấp', color: '#10b981' },
-  medium: { label: 'Trung bình', color: '#f59e0b' },
-  high: { label: 'Cao', color: '#ef4444' },
+  low: { label: 'Thấp', color: '#0066CC' },
+  medium: { label: 'Trung bình', color: '#0066CC' },
+  high: { label: 'Cao', color: '#000000' },
 };
 
 export default function MaterialRequestsScreen() {
@@ -426,10 +426,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   approveButton: {
-    backgroundColor: '#10b981',
+    backgroundColor: '#0066CC',
   },
   rejectButton: {
-    backgroundColor: '#ef4444',
+    backgroundColor: '#000000',
   },
   actionButtonText: {
     fontSize: 13,

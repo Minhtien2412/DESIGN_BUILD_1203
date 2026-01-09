@@ -41,9 +41,9 @@ interface ProjectProgress {
 
 const STATUS_CONFIG = {
   pending: { label: 'Chờ', color: '#999', icon: 'time-outline' },
-  'in-progress': { label: 'Đang làm', color: '#2196F3', icon: 'sync-outline' },
-  completed: { label: 'Hoàn thành', color: '#4CAF50', icon: 'checkmark-circle' },
-  delayed: { label: 'Trễ', color: '#f44336', icon: 'alert-circle' },
+  'in-progress': { label: 'Đang làm', color: '#0066CC', icon: 'sync-outline' },
+  completed: { label: 'Hoàn thành', color: '#0066CC', icon: 'checkmark-circle' },
+  delayed: { label: 'Trễ', color: '#000000', icon: 'alert-circle' },
 };
 
 export function ProgressTrackingTemplate({
@@ -159,8 +159,8 @@ export function ProgressTrackingTemplate({
           </View>
           {milestone.actualEndDate && (
             <View style={styles.dateItem}>
-              <Ionicons name="checkmark-circle-outline" size={14} color="#4CAF50" />
-              <Text style={[styles.dateText, { color: '#4CAF50' }]}>
+              <Ionicons name="checkmark-circle-outline" size={14} color="#0066CC" />
+              <Text style={[styles.dateText, { color: '#0066CC' }]}>
                 Hoàn thành: {new Date(milestone.actualEndDate).toLocaleDateString('vi-VN')}
               </Text>
             </View>

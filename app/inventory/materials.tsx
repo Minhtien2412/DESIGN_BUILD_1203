@@ -17,19 +17,19 @@ const CATEGORY_CONFIG: Record<
   MaterialCategory,
   { label: string; icon: string; color: string }
 > = {
-  CEMENT: { label: 'Xi măng', icon: 'cube', color: '#795548' },
+  CEMENT: { label: 'Xi măng', icon: 'cube', color: '#666666' },
   STEEL: { label: 'Thép', icon: 'git-network', color: '#1A1A1A' },
-  SAND: { label: 'Cát', icon: 'water', color: '#10B981' },
-  GRAVEL: { label: 'Đá', icon: 'shapes', color: '#9E9E9E' },
-  BRICK: { label: 'Gạch', icon: 'grid', color: '#0A6847' },
-  TILE: { label: 'Gạch lát', icon: 'apps', color: '#0A6847' },
-  PAINT: { label: 'Sơn', icon: 'color-palette', color: '#0A6847' },
-  WOOD: { label: 'Gỗ', icon: 'file-tray-stacked', color: '#0A6847' },
-  ELECTRICAL: { label: 'Điện', icon: 'flash', color: '#FF9800' },
-  PLUMBING: { label: 'Nước', icon: 'water-outline', color: '#0A6847' },
-  TOOLS: { label: 'Dụng cụ', icon: 'construct', color: '#0A6847' },
-  SAFETY_EQUIPMENT: { label: 'An toàn', icon: 'shield-checkmark', color: '#4CAF50' },
-  OTHER: { label: 'Khác', icon: 'ellipsis-horizontal', color: '#9E9E9E' },
+  SAND: { label: 'Cát', icon: 'water', color: '#0066CC' },
+  GRAVEL: { label: 'Đá', icon: 'shapes', color: '#999999' },
+  BRICK: { label: 'Gạch', icon: 'grid', color: '#0066CC' },
+  TILE: { label: 'Gạch lát', icon: 'apps', color: '#0066CC' },
+  PAINT: { label: 'Sơn', icon: 'color-palette', color: '#0066CC' },
+  WOOD: { label: 'Gỗ', icon: 'file-tray-stacked', color: '#0066CC' },
+  ELECTRICAL: { label: 'Điện', icon: 'flash', color: '#0066CC' },
+  PLUMBING: { label: 'Nước', icon: 'water-outline', color: '#0066CC' },
+  TOOLS: { label: 'Dụng cụ', icon: 'construct', color: '#0066CC' },
+  SAFETY_EQUIPMENT: { label: 'An toàn', icon: 'shield-checkmark', color: '#0066CC' },
+  OTHER: { label: 'Khác', icon: 'ellipsis-horizontal', color: '#999999' },
 };
 
 const UNIT_LABELS: Record<MaterialUnit, string> = {
@@ -246,21 +246,21 @@ export default function MaterialsScreen() {
                   </View>
 
                   {status === StockStatus.OUT_OF_STOCK && (
-                    <View style={[styles.statusBadge, { backgroundColor: '#FFEBEE' }]}>
+                    <View style={[styles.statusBadge, { backgroundColor: '#F5F5F5' }]}>
                       <Ionicons name="alert-circle" size={12} color="#1A1A1A" />
                       <Text style={[styles.statusText, { color: '#1A1A1A' }]}>Hết</Text>
                     </View>
                   )}
                   {status === StockStatus.LOW_STOCK && (
-                    <View style={[styles.statusBadge, { backgroundColor: '#FFF3E0' }]}>
-                      <Ionicons name="warning" size={12} color="#FF9800" />
-                      <Text style={[styles.statusText, { color: '#FF9800' }]}>Thấp</Text>
+                    <View style={[styles.statusBadge, { backgroundColor: '#E8F4FF' }]}>
+                      <Ionicons name="warning" size={12} color="#0066CC" />
+                      <Text style={[styles.statusText, { color: '#0066CC' }]}>Thấp</Text>
                     </View>
                   )}
                   {status === StockStatus.IN_STOCK && (
                     <View style={[styles.statusBadge, { backgroundColor: '#E8F5E9' }]}>
-                      <Ionicons name="checkmark-circle" size={12} color="#4CAF50" />
-                      <Text style={[styles.statusText, { color: '#4CAF50' }]}>Đủ</Text>
+                      <Ionicons name="checkmark-circle" size={12} color="#0066CC" />
+                      <Text style={[styles.statusText, { color: '#0066CC' }]}>Đủ</Text>
                     </View>
                   )}
                 </View>
@@ -278,8 +278,8 @@ export default function MaterialsScreen() {
                               material.currentStock === 0
                                 ? '#1A1A1A'
                                 : material.currentStock <= material.minStock
-                                ? '#FF9800'
-                                : '#4CAF50',
+                                ? '#0066CC'
+                                : '#0066CC',
                           },
                         ]}
                       >
@@ -312,8 +312,8 @@ export default function MaterialsScreen() {
                             material.currentStock === 0
                               ? '#1A1A1A'
                               : material.currentStock <= material.minStock
-                              ? '#FF9800'
-                              : '#4CAF50',
+                              ? '#0066CC'
+                              : '#0066CC',
                         },
                       ]}
                     />
@@ -355,8 +355,8 @@ export default function MaterialsScreen() {
                       router.push(`/inventory/material/${material.id}?projectId=${projectId}` as Href)
                     }
                   >
-                    <Ionicons name="eye-outline" size={14} color="#0A6847" />
-                    <Text style={[styles.actionButtonText, { color: '#0A6847' }]}>
+                    <Ionicons name="eye-outline" size={14} color="#0066CC" />
+                    <Text style={[styles.actionButtonText, { color: '#0066CC' }]}>
                       Chi tiết
                     </Text>
                   </TouchableOpacity>
@@ -434,14 +434,14 @@ const styles = StyleSheet.create({
     marginRight: 6,
   },
   filterChipActive: {
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
   },
   filterText: {
     fontSize: 12,
     color: '#666',
   },
   filterTextActive: {
-    color: '#0A6847',
+    color: '#0066CC',
     fontWeight: '600',
   },
   scrollView: {
@@ -462,7 +462,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     paddingHorizontal: 20,
     paddingVertical: 10,
-    backgroundColor: '#0A6847',
+    backgroundColor: '#0066CC',
     borderRadius: 8,
   },
   emptyButtonText: {
@@ -595,7 +595,7 @@ const styles = StyleSheet.create({
   viewButton: {
     backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#0A6847',
+    borderColor: '#0066CC',
     flex: 1,
     justifyContent: 'center',
   },
@@ -616,7 +616,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#0A6847',
+    backgroundColor: '#0066CC',
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 4,

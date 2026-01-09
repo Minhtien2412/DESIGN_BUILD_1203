@@ -23,13 +23,13 @@ const STATUS_LABELS: Record<OrderStatus, string> = {
 };
 
 const STATUS_COLORS: Record<OrderStatus, string> = {
-  [OrderStatus.DRAFT]: '#9E9E9E',
-  [OrderStatus.PENDING]: '#FF9800',
-  [OrderStatus.APPROVED]: '#2196F3',
-  [OrderStatus.ORDERED]: '#673AB7',
-  [OrderStatus.PARTIALLY_RECEIVED]: '#0A6847',
-  [OrderStatus.RECEIVED]: '#4CAF50',
-  [OrderStatus.CANCELLED]: '#F44336',
+  [OrderStatus.DRAFT]: '#999999',
+  [OrderStatus.PENDING]: '#0066CC',
+  [OrderStatus.APPROVED]: '#0066CC',
+  [OrderStatus.ORDERED]: '#666666',
+  [OrderStatus.PARTIALLY_RECEIVED]: '#0066CC',
+  [OrderStatus.RECEIVED]: '#0066CC',
+  [OrderStatus.CANCELLED]: '#000000',
 };
 
 export default function OrdersScreen() {
@@ -220,14 +220,14 @@ export default function OrdersScreen() {
                       style={styles.approveButton}
                       onPress={() => handleApprove(order.id, order.orderNo)}
                     >
-                      <Ionicons name="checkmark-circle-outline" size={16} color="#4CAF50" />
+                      <Ionicons name="checkmark-circle-outline" size={16} color="#0066CC" />
                       <Text style={styles.approveButtonText}>Duyệt</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={styles.cancelButton}
                       onPress={() => handleCancel(order.id, order.orderNo)}
                     >
-                      <Ionicons name="close-circle-outline" size={16} color="#F44336" />
+                      <Ionicons name="close-circle-outline" size={16} color="#000000" />
                       <Text style={styles.cancelButtonText}>Hủy</Text>
                     </TouchableOpacity>
                   </>
@@ -240,7 +240,7 @@ export default function OrdersScreen() {
                       router.push(`/inventory/order-detail?orderId=${order.id}&projectId=${projectId}` as Href)
                     }
                   >
-                    <Ionicons name="eye-outline" size={16} color="#2196F3" />
+                    <Ionicons name="eye-outline" size={16} color="#0066CC" />
                     <Text style={styles.viewButtonText}>Xem chi tiết</Text>
                   </TouchableOpacity>
                 )}
@@ -253,7 +253,7 @@ export default function OrdersScreen() {
                       router.push(`/inventory/order-detail?orderId=${order.id}&projectId=${projectId}` as Href)
                     }
                   >
-                    <Ionicons name="download-outline" size={16} color="#2196F3" />
+                    <Ionicons name="download-outline" size={16} color="#0066CC" />
                     <Text style={styles.receiveButtonText}>Nhận hàng</Text>
                   </TouchableOpacity>
                 )}
@@ -313,7 +313,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   filterChipActive: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
   },
   filterChipText: {
     fontSize: 13,
@@ -341,7 +341,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     paddingHorizontal: 20,
     paddingVertical: 10,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     borderRadius: 8,
   },
   emptyButtonText: {
@@ -425,7 +425,7 @@ const styles = StyleSheet.create({
   totalValue: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#2196F3',
+    color: '#0066CC',
   },
   actions: {
     flexDirection: 'row',
@@ -439,13 +439,13 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingVertical: 8,
     borderWidth: 1,
-    borderColor: '#4CAF50',
+    borderColor: '#0066CC',
     borderRadius: 6,
   },
   approveButtonText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#4CAF50',
+    color: '#0066CC',
   },
   cancelButton: {
     flex: 1,
@@ -455,13 +455,13 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingVertical: 8,
     borderWidth: 1,
-    borderColor: '#F44336',
+    borderColor: '#000000',
     borderRadius: 6,
   },
   cancelButtonText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#F44336',
+    color: '#000000',
   },
   viewButton: {
     flex: 1,
@@ -471,13 +471,13 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingVertical: 8,
     borderWidth: 1,
-    borderColor: '#2196F3',
+    borderColor: '#0066CC',
     borderRadius: 6,
   },
   viewButtonText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#2196F3',
+    color: '#0066CC',
   },
   receiveButton: {
     flex: 1,
@@ -486,7 +486,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 6,
     paddingVertical: 8,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     borderRadius: 6,
   },
   receiveButtonText: {
@@ -510,7 +510,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 4,

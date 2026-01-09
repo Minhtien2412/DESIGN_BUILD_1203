@@ -37,7 +37,7 @@ export default function CostEstimatorScreen() {
   const backgroundColor = useThemeColor({}, 'background');
   const textColor = useThemeColor({}, 'text');
   const cardColor = useThemeColor({}, 'card');
-  const primaryColor = '#EE4D2D';
+  const primaryColor = '#0066CC';
 
   const handleEstimate = async () => {
     if (!area || !location) return;

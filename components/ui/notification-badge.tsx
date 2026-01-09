@@ -25,7 +25,7 @@ export function NotificationBadge({ size = 18, style, maxCount = 99 }: Notificat
 
 const styles = StyleSheet.create({
   badge: {
-    backgroundColor: '#EF4444',
+    backgroundColor: '#000000',
     alignItems: 'center',
     justifyContent: 'center',
     minWidth: 18,

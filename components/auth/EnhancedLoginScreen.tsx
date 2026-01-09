@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f9fa',
   },
   inputError: {
-    borderColor: '#f44336',
+    borderColor: '#000000',
     backgroundColor: '#ffebee',
   },
   passwordContainer: {
@@ -341,7 +341,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   errorText: {
-    color: '#f44336',
+    color: '#000000',
     fontSize: 14,
     marginTop: 4,
   },
@@ -350,7 +350,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   forgotPasswordText: {
-    color: '#2196f3',
+    color: '#0066CC',
     fontSize: 14,
     textDecorationLine: 'underline',
   },
@@ -382,7 +382,7 @@ const styles = StyleSheet.create({
   },
   registerLink: {
     fontSize: 16,
-    color: '#2196f3',
+    color: '#0066CC',
     fontWeight: '600',
     marginLeft: 4,
     textDecorationLine: 'underline',
@@ -393,7 +393,7 @@ const styles = StyleSheet.create({
   },
   apiStatusText: {
     fontSize: 12,
-    color: '#4caf50',
+    color: '#0066CC',
     fontFamily: 'monospace',
   },
   loadingText: {

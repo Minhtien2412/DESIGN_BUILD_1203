@@ -46,19 +46,19 @@ export default function MeetingMinutesScreen() {
   // Meeting type badge colors
   const getTypeColor = (type: MeetingType): string => {
     const colors: Record<MeetingType, string> = {
-      KICKOFF: '#8B5CF6',
+      KICKOFF: '#666666',
       PROGRESS_REVIEW: '#3B82F6',
-      COORDINATION: '#10B981',
-      SAFETY: '#EF4444',
-      DESIGN_REVIEW: '#F59E0B',
-      TECHNICAL: '#6366F1',
-      CLIENT: '#EC4899',
+      COORDINATION: '#0066CC',
+      SAFETY: '#000000',
+      DESIGN_REVIEW: '#0066CC',
+      TECHNICAL: '#666666',
+      CLIENT: '#666666',
       CONTRACTOR: '#14B8A6',
       SUBCONTRACTOR: '#84CC16',
       WEEKLY: '#06B6D4',
-      MONTHLY: '#8B5CF6',
-      EMERGENCY: '#DC2626',
-      CLOSEOUT: '#059669',
+      MONTHLY: '#666666',
+      EMERGENCY: '#000000',
+      CLOSEOUT: '#0066CC',
       OTHER: '#6B7280',
     };
     return colors[type] || '#6B7280';
@@ -67,7 +67,7 @@ export default function MeetingMinutesScreen() {
   // Meeting status badge colors
   const getStatusColor = (status: MeetingStatus): { bg: string; text: string } => {
     const colors: Record<MeetingStatus, { bg: string; text: string }> = {
-      SCHEDULED: { bg: '#DBEAFE', text: '#1E40AF' },
+      SCHEDULED: { bg: '#E8F4FF', text: '#1E40AF' },
       IN_PROGRESS: { bg: '#FEF3C7', text: '#92400E' },
       COMPLETED: { bg: '#D1FAE5', text: '#065F46' },
       CANCELLED: { bg: '#FEE2E2', text: '#991B1B' },
@@ -82,7 +82,7 @@ export default function MeetingMinutesScreen() {
       DRAFT: { bg: '#F3F4F6', text: '#374151' },
       UNDER_REVIEW: { bg: '#FEF3C7', text: '#92400E' },
       APPROVED: { bg: '#D1FAE5', text: '#065F46' },
-      DISTRIBUTED: { bg: '#DBEAFE', text: '#1E40AF' },
+      DISTRIBUTED: { bg: '#E8F4FF', text: '#1E40AF' },
     };
     return colors[status];
   };
@@ -121,7 +121,7 @@ export default function MeetingMinutesScreen() {
     return (
       <Container>
         <Section>
-          <ThemedText style={{ color: '#EF4444', textAlign: 'center' }}>
+          <ThemedText style={{ color: '#000000', textAlign: 'center' }}>
             Error: {error.message}
           </ThemedText>
         </Section>
@@ -150,21 +150,21 @@ export default function MeetingMinutesScreen() {
                 </ThemedText>
               </View>
               <View style={[styles.statCard, { backgroundColor: cardBackground, borderColor }]}>
-                <Ionicons name="checkmark-circle-outline" size={24} color="#10B981" />
+                <Ionicons name="checkmark-circle-outline" size={24} color="#0066CC" />
                 <ThemedText style={styles.statValue}>{summary.actionItemCompletionRate}%</ThemedText>
                 <ThemedText style={[styles.statLabel, { color: secondaryText }]}>
                   Action Completion
                 </ThemedText>
               </View>
               <View style={[styles.statCard, { backgroundColor: cardBackground, borderColor }]}>
-                <Ionicons name="list-outline" size={24} color="#F59E0B" />
+                <Ionicons name="list-outline" size={24} color="#0066CC" />
                 <ThemedText style={styles.statValue}>{summary.overdueActionItems}</ThemedText>
                 <ThemedText style={[styles.statLabel, { color: secondaryText }]}>
                   Overdue Actions
                 </ThemedText>
               </View>
               <View style={[styles.statCard, { backgroundColor: cardBackground, borderColor }]}>
-                <Ionicons name="people-outline" size={24} color="#8B5CF6" />
+                <Ionicons name="people-outline" size={24} color="#666666" />
                 <ThemedText style={styles.statValue}>{summary.averageAttendanceRate}%</ThemedText>
                 <ThemedText style={[styles.statLabel, { color: secondaryText }]}>
                   Avg Attendance
@@ -339,13 +339,13 @@ export default function MeetingMinutesScreen() {
                     </ThemedText>
                   </View>
                   <View style={styles.statItem}>
-                    <Ionicons name="list-outline" size={16} color="#F59E0B" />
+                    <Ionicons name="list-outline" size={16} color="#0066CC" />
                     <ThemedText style={[styles.statItemText, { color: secondaryText }]}>
                       {meeting.actionItems?.length || 0} actions
                     </ThemedText>
                   </View>
                   <View style={styles.statItem}>
-                    <Ionicons name="checkmark-circle-outline" size={16} color="#10B981" />
+                    <Ionicons name="checkmark-circle-outline" size={16} color="#0066CC" />
                     <ThemedText style={[styles.statItemText, { color: secondaryText }]}>
                       {meeting.decisions?.length || 0} decisions
                     </ThemedText>

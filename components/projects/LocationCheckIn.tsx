@@ -256,7 +256,7 @@ export default function LocationCheckIn({ projectId, projectLocation, onSuccess 
               <View
                 style={[
                   styles.distanceBadge,
-                  { backgroundColor: isWithinRange ? '#4CAF50' : '#FF9800' },
+                  { backgroundColor: isWithinRange ? '#0066CC' : '#0066CC' },
                 ]}
               >
                 <Ionicons
@@ -370,7 +370,7 @@ export default function LocationCheckIn({ projectId, projectLocation, onSuccess 
 
       {!isWithinRange && location && (
         <View style={styles.warningContainer}>
-          <Ionicons name="warning" size={20} color="#FF9800" />
+          <Ionicons name="warning" size={20} color="#0066CC" />
           <Text style={[styles.warningText, { color: colors.textMuted }]}>
             Bạn đang ở ngoài phạm vi công trình (&gt;500m). Check-in vẫn được ghi nhận nhưng có thể
             cần xác minh.
@@ -527,7 +527,7 @@ const styles = StyleSheet.create({
     gap: 8,
     marginTop: 12,
     padding: 12,
-    backgroundColor: '#FFF3E0',
+    backgroundColor: '#E8F4FF',
     borderRadius: 8,
   },
   warningText: {

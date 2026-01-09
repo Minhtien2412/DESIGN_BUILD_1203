@@ -22,7 +22,7 @@ export default function SearchBar({ value, onChangeText, onCompose, placeholder 
       />
       {onCompose ? (
         <Pressable onPress={onCompose} hitSlop={8}>
-          <IconSymbol name="square.and.pencil" size={20} color="#2563eb" />
+          <IconSymbol name="square.and.pencil" size={20} color="#0066CC" />
         </Pressable>
       ) : null}
     </View>

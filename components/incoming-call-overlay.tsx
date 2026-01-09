@@ -193,7 +193,7 @@ export default function IncomingCallOverlay({
               style={[styles.actionButton, styles.rejectButton]}
               onPress={handleReject}
             >
-              <View style={[styles.buttonInner, { backgroundColor: '#EF4444' }]}>
+              <View style={[styles.buttonInner, { backgroundColor: '#000000' }]}>
                 <Ionicons name="close" size={32} color="#fff" />
               </View>
               <Text style={styles.actionText}>Từ chối</Text>
@@ -204,7 +204,7 @@ export default function IncomingCallOverlay({
               style={[styles.actionButton, styles.acceptButton]}
               onPress={handleAccept}
             >
-              <View style={[styles.buttonInner, { backgroundColor: '#22C55E' }]}>
+              <View style={[styles.buttonInner, { backgroundColor: '#0066CC' }]}>
                 <Ionicons name="call" size={32} color="#fff" />
               </View>
               <Text style={styles.actionText}>Trả lời</Text>

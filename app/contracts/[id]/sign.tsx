@@ -37,11 +37,11 @@ export default function SignContractScreen() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'SIGNED':
-        return '#4CAF50';
+        return '#0066CC';
       case 'REJECTED':
-        return '#F44336';
+        return '#000000';
       default:
-        return '#FF9800';
+        return '#0066CC';
     }
   };
 
@@ -149,14 +149,14 @@ export default function SignContractScreen() {
           
           {allSigned && (
             <View style={styles.completeBadge}>
-              <Ionicons name="checkmark-circle" size={20} color="#4CAF50" />
+              <Ionicons name="checkmark-circle" size={20} color="#0066CC" />
               <Text style={styles.completeText}>Tất cả bên đã ký</Text>
             </View>
           )}
           
           {!allSigned && (
             <View style={styles.progressBadge}>
-              <Ionicons name="time" size={20} color="#FF9800" />
+              <Ionicons name="time" size={20} color="#0066CC" />
               <Text style={styles.progressText}>
                 {signedCount}/{signatures.length} bên đã ký
               </Text>
@@ -202,7 +202,7 @@ export default function SignContractScreen() {
 
               {mySignature.status === 'SIGNED' && mySignature.signedAt && (
                 <View style={styles.signedInfo}>
-                  <Ionicons name="checkmark-circle" size={16} color="#4CAF50" />
+                  <Ionicons name="checkmark-circle" size={16} color="#0066CC" />
                   <Text style={styles.signedText}>
                     Đã ký vào {formatDate(mySignature.signedAt)}
                   </Text>
@@ -211,7 +211,7 @@ export default function SignContractScreen() {
 
               {mySignature.status === 'REJECTED' && mySignature.rejectionReason && (
                 <View style={styles.rejectedInfo}>
-                  <Ionicons name="close-circle" size={16} color="#F44336" />
+                  <Ionicons name="close-circle" size={16} color="#000000" />
                   <Text style={styles.rejectedText}>
                     Lý do: {mySignature.rejectionReason}
                   </Text>
@@ -242,10 +242,10 @@ export default function SignContractScreen() {
                           {
                             backgroundColor:
                               signature.status === 'SIGNED'
-                                ? '#4CAF50'
+                                ? '#0066CC'
                                 : signature.status === 'REJECTED'
-                                ? '#F44336'
-                                : '#FF9800',
+                                ? '#000000'
+                                : '#0066CC',
                           },
                         ]}
                       >
@@ -257,7 +257,7 @@ export default function SignContractScreen() {
                             styles.signatureLine,
                             {
                               backgroundColor:
-                                signature.status === 'SIGNED' ? '#4CAF50' : '#E0E0E0',
+                                signature.status === 'SIGNED' ? '#0066CC' : '#E0E0E0',
                             },
                           ]}
                         />
@@ -280,13 +280,13 @@ export default function SignContractScreen() {
                           ]}
                         >
                           {signature.status === 'SIGNED' && (
-                            <Ionicons name="checkmark-circle" size={16} color="#4CAF50" />
+                            <Ionicons name="checkmark-circle" size={16} color="#0066CC" />
                           )}
                           {signature.status === 'REJECTED' && (
-                            <Ionicons name="close-circle" size={16} color="#F44336" />
+                            <Ionicons name="close-circle" size={16} color="#000000" />
                           )}
                           {signature.status === 'PENDING' && (
-                            <Ionicons name="time" size={16} color="#FF9800" />
+                            <Ionicons name="time" size={16} color="#0066CC" />
                           )}
                         </View>
                       </View>
@@ -325,14 +325,14 @@ export default function SignContractScreen() {
             <Text style={styles.previewText}>Xem toàn bộ nội dung hợp đồng</Text>
             <TouchableOpacity style={styles.previewButton}>
               <Text style={styles.previewButtonText}>Xem chi tiết</Text>
-              <Ionicons name="chevron-forward" size={20} color="#2196F3" />
+              <Ionicons name="chevron-forward" size={20} color="#0066CC" />
             </TouchableOpacity>
           </View>
         </View>
 
         {/* Important Notice */}
         <View style={styles.noticeBox}>
-          <Ionicons name="information-circle" size={24} color="#2196F3" />
+          <Ionicons name="information-circle" size={24} color="#0066CC" />
           <Text style={styles.noticeText}>
             Chữ ký điện tử của bạn có giá trị pháp lý như chữ ký tay. Vui lòng đọc kỹ
             nội dung hợp đồng trước khi ký.
@@ -348,7 +348,7 @@ export default function SignContractScreen() {
             onPress={handleReject}
             disabled={signing}
           >
-            <Ionicons name="close-circle" size={20} color="#F44336" />
+            <Ionicons name="close-circle" size={20} color="#000000" />
             <Text style={styles.rejectButtonText}>Từ chối</Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -394,7 +394,7 @@ const styles = StyleSheet.create({
   },
   contractNumber: {
     fontSize: 13,
-    color: '#2196F3',
+    color: '#0066CC',
     marginBottom: 12,
   },
   completeBadge: {
@@ -410,13 +410,13 @@ const styles = StyleSheet.create({
   completeText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#4CAF50',
+    color: '#0066CC',
   },
   progressBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: '#FFF3E0',
+    backgroundColor: '#E8F4FF',
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 8,
@@ -425,7 +425,7 @@ const styles = StyleSheet.create({
   progressText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#FF9800',
+    color: '#0066CC',
   },
   section: {
     backgroundColor: '#fff',
@@ -484,7 +484,7 @@ const styles = StyleSheet.create({
   },
   signedText: {
     fontSize: 12,
-    color: '#4CAF50',
+    color: '#0066CC',
   },
   rejectedInfo: {
     flexDirection: 'row',
@@ -494,7 +494,7 @@ const styles = StyleSheet.create({
   rejectedText: {
     flex: 1,
     fontSize: 12,
-    color: '#F44336',
+    color: '#000000',
   },
   signatureItem: {
     flexDirection: 'row',
@@ -561,11 +561,11 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   rejectionBox: {
-    backgroundColor: '#FFEBEE',
+    backgroundColor: '#F5F5F5',
     padding: 10,
     borderRadius: 6,
     borderLeftWidth: 3,
-    borderLeftColor: '#F44336',
+    borderLeftColor: '#000000',
   },
   rejectionReason: {
     fontSize: 12,
@@ -594,11 +594,11 @@ const styles = StyleSheet.create({
   previewButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#2196F3',
+    color: '#0066CC',
   },
   noticeBox: {
     flexDirection: 'row',
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
     padding: 16,
     margin: 16,
     borderRadius: 8,
@@ -628,12 +628,12 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#F44336',
+    borderColor: '#000000',
   },
   rejectButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#F44336',
+    color: '#000000',
   },
   signButton: {
     flex: 2,
@@ -643,7 +643,7 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingVertical: 14,
     borderRadius: 8,
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#0066CC',
   },
   signButtonText: {
     fontSize: 16,

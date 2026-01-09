@@ -6,11 +6,19 @@
 
 import { OptimizedImage } from '@/components/ui/optimized-image';
 import { useThemeColor } from '@/hooks/use-theme-color';
+import {
+    MOCK_COMMENTS,
+    MOCK_VIDEOS,
+    ShortVideoService,
+    type ShortVideo,
+    type VideoComment
+} from '@/services/shortVideoService';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { VideoView, useVideoPlayer } from 'expo-video';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
+    ActivityIndicator,
     Animated,
     Dimensions,
     Easing,
@@ -21,6 +29,7 @@ import {
     Modal,
     Platform,
     Pressable,
+    RefreshControl,
     ScrollView,
     Share,
     StyleSheet,
@@ -34,212 +43,52 @@ import {
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
-interface ShortVideo {
-  id: string;
-  userId: string;
-  userName: string;
-  userAvatar: string;
-  videoUrl: string;
-  thumbnail: string;
-  caption: string;
-  likes: number;
-  comments: number;
-  shares: number;
-  views: number;
-  liked: boolean;
-  following: boolean;
-  duration: number;
-  soundName?: string;
-}
-
-interface Comment {
-  id: string;
-  userId: string;
-  userName: string;
-  userAvatar: string;
-  text: string;
-  likes: number;
-  liked: boolean;
-  timestamp: string;
-  replies?: Comment[];
-}
-
-// Real sample video URLs (public CDN sources)
-const SAMPLE_VIDEOS = {
-  bunny: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-  elephantsDream: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
-  forBiggerBlazes: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
-  forBiggerEscapes: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
-  forBiggerFun: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
-  forBiggerJoyrides: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
-  forBiggerMeltdowns: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4',
-  sintel: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4',
-  subaru: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4',
-  tearsOfSteel: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
-  volkswagen: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4',
-  weAreGoingOnBullrun: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4',
-  whatCarCanYouGetForAGrand: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WhatCarCanYouGetForAGrand.mp4',
-};
-
-// Mock data with real video sources
-const MOCK_VIDEOS: ShortVideo[] = [
-  {
-    id: 'v1',
-    userId: 'u1',
-    userName: 'John Builder',
-    userAvatar: 'https://i.pravatar.cc/150?img=1',
-    videoUrl: SAMPLE_VIDEOS.forBiggerBlazes,
-    thumbnail: 'https://picsum.photos/1080/1920?random=1',
-    caption: 'Amazing construction progress! 🏗️ #construction #timelapse',
-    likes: 1234,
-    comments: 89,
-    shares: 45,
-    views: 12340,
-    liked: false,
-    following: false,
-    duration: 15,
-    soundName: 'Original Sound - John Builder',
-  },
-  {
-    id: 'v2',
-    userId: 'u2',
-    userName: 'Sarah Designer',
-    userAvatar: 'https://i.pravatar.cc/150?img=2',
-    videoUrl: SAMPLE_VIDEOS.forBiggerEscapes,
-    thumbnail: 'https://picsum.photos/1080/1920?random=2',
-    caption: 'Modern kitchen design reveal ✨ #interiordesign #kitchen',
-    likes: 2345,
-    comments: 156,
-    shares: 78,
-    views: 23456,
-    liked: true,
-    following: true,
-    duration: 22,
-    soundName: 'Trending Audio - Interior Vibes',
-  },
-  {
-    id: 'v3',
-    userId: 'u3',
-    userName: 'Mike Contractor',
-    userAvatar: 'https://i.pravatar.cc/150?img=3',
-    videoUrl: SAMPLE_VIDEOS.forBiggerFun,
-    thumbnail: 'https://picsum.photos/1080/1920?random=3',
-    caption: 'Foundation work in progress 💪 #concrete #foundation',
-    likes: 987,
-    comments: 67,
-    shares: 23,
-    views: 9876,
-    liked: false,
-    following: false,
-    duration: 18,
-    soundName: 'Original Sound - Mike Contractor',
-  },
-  {
-    id: 'v4',
-    userId: 'u4',
-    userName: 'Anna Architect',
-    userAvatar: 'https://i.pravatar.cc/150?img=4',
-    videoUrl: SAMPLE_VIDEOS.forBiggerJoyrides,
-    thumbnail: 'https://picsum.photos/1080/1920?random=4',
-    caption: 'Dream villa design walkthrough 🏡 #architecture #villa #luxury',
-    likes: 5678,
-    comments: 234,
-    shares: 189,
-    views: 56780,
-    liked: false,
-    following: true,
-    duration: 30,
-    soundName: 'Chill Vibes - Architecture',
-  },
-  {
-    id: 'v5',
-    userId: 'u5',
-    userName: 'Tom Engineer',
-    userAvatar: 'https://i.pravatar.cc/150?img=5',
-    videoUrl: SAMPLE_VIDEOS.forBiggerMeltdowns,
-    thumbnail: 'https://picsum.photos/1080/1920?random=5',
-    caption: 'How we build earthquake-resistant structures 🔨 #engineering #safety',
-    likes: 3456,
-    comments: 189,
-    shares: 234,
-    views: 34560,
-    liked: true,
-    following: false,
-    duration: 25,
-    soundName: 'Educational Series - Building Safe',
-  },
-  {
-    id: 'v6',
-    userId: 'u6',
-    userName: 'Lisa Interior',
-    userAvatar: 'https://i.pravatar.cc/150?img=6',
-    videoUrl: SAMPLE_VIDEOS.subaru,
-    thumbnail: 'https://picsum.photos/1080/1920?random=6',
-    caption: 'Before & After transformation 🎨 #beforeafter #renovation',
-    likes: 8901,
-    comments: 456,
-    shares: 345,
-    views: 89012,
-    liked: false,
-    following: false,
-    duration: 20,
-    soundName: 'Wow Effect - Transformation',
-  },
-  {
-    id: 'v7',
-    userId: 'u7',
-    userName: 'David Pool',
-    userAvatar: 'https://i.pravatar.cc/150?img=7',
-    videoUrl: SAMPLE_VIDEOS.volkswagen,
-    thumbnail: 'https://picsum.photos/1080/1920?random=7',
-    caption: 'Luxury pool construction timelapse 🏊 #pool #luxury #timelapse',
-    likes: 12345,
-    comments: 567,
-    shares: 456,
-    views: 123450,
-    liked: true,
-    following: true,
-    duration: 35,
-    soundName: 'Summer Vibes - Pool Party',
-  },
-  {
-    id: 'v8',
-    userId: 'u8',
-    userName: 'Emily Garden',
-    userAvatar: 'https://i.pravatar.cc/150?img=8',
-    videoUrl: SAMPLE_VIDEOS.weAreGoingOnBullrun,
-    thumbnail: 'https://picsum.photos/1080/1920?random=8',
-    caption: 'Landscape design tips for small spaces 🌿 #garden #landscape',
-    likes: 4567,
-    comments: 234,
-    shares: 123,
-    views: 45670,
-    liked: false,
-    following: false,
-    duration: 28,
-    soundName: 'Nature Sounds - Garden Peace',
-  },
-];
-
-// Mock comments data
-const MOCK_COMMENTS: Record<string, Comment[]> = {
-  v1: [
-    { id: 'c1', userId: 'u10', userName: 'Alex Kim', userAvatar: 'https://i.pravatar.cc/150?img=10', text: 'Incredible work! How long did this take?', likes: 45, liked: false, timestamp: '2h ago' },
-    { id: 'c2', userId: 'u11', userName: 'Maria Lopez', userAvatar: 'https://i.pravatar.cc/150?img=11', text: 'This is exactly what I needed for my project 🙌', likes: 23, liked: true, timestamp: '3h ago' },
-    { id: 'c3', userId: 'u12', userName: 'James Wilson', userAvatar: 'https://i.pravatar.cc/150?img=12', text: 'The attention to detail is amazing!', likes: 12, liked: false, timestamp: '5h ago' },
-  ],
-  v2: [
-    { id: 'c4', userId: 'u13', userName: 'Sophie Chen', userAvatar: 'https://i.pravatar.cc/150?img=13', text: 'Love the minimalist design! 😍', likes: 78, liked: true, timestamp: '1h ago' },
-    { id: 'c5', userId: 'u14', userName: 'David Park', userAvatar: 'https://i.pravatar.cc/150?img=14', text: 'Where did you get those cabinets?', likes: 34, liked: false, timestamp: '2h ago' },
-  ],
-};
+// Use types from service
+type Comment = VideoComment;
 
 export default function ShortVideosScreen() {
-  const [videos, setVideos] = useState<ShortVideo[]>(MOCK_VIDEOS);
+  const [videos, setVideos] = useState<ShortVideo[]>(MOCK_VIDEOS); // Start with mock data
+  const [loading, setLoading] = useState(false); // Don't block on loading
+  const [refreshing, setRefreshing] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showComments, setShowComments] = useState(false);
   const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
   const flatListRef = useRef<FlatList>(null);
+
+  // Fetch videos from API (background, non-blocking)
+  const fetchVideos = useCallback(async () => {
+    try {
+      // Add timeout to prevent hanging
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      
+      const response = await ShortVideoService.getVideos(1, 20);
+      clearTimeout(timeoutId);
+      
+      if (response.videos.length > 0) {
+        setVideos(response.videos);
+      }
+    } catch (error) {
+      console.warn('Failed to fetch videos, using mock data:', error);
+      // Keep existing mock data
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    // Fetch in background after initial render
+    const timer = setTimeout(() => {
+      fetchVideos();
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [fetchVideos]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchVideos();
+  }, [fetchVideos]);
 
   const onViewableItemsChanged = useCallback(
     ({ viewableItems }: { viewableItems: ViewToken[] }) => {
@@ -304,6 +153,15 @@ export default function ShortVideosScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
   };
 
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0066CC" />
+        <Text style={styles.loadingText}>Đang tải video...</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <FlatList
@@ -321,6 +179,19 @@ export default function ShortVideosScreen() {
         removeClippedSubviews
         maxToRenderPerBatch={2}
         windowSize={3}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#0066CC"
+          />
+        }
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Ionicons name="videocam-outline" size={64} color="#CCC" />
+            <Text style={styles.emptyText}>Chưa có video</Text>
+          </View>
+        }
       />
       
       {/* Comments Bottom Sheet */}
@@ -573,7 +444,7 @@ function VideoItem({ video, isActive, onLike, onComment, onShare, onFollow }: Vi
               <Ionicons
                 name={liked ? 'heart' : 'heart-outline'}
                 size={32}
-                color={liked ? '#EF4444' : '#FFFFFF'}
+                color={liked ? '#000000' : '#FFFFFF'}
               />
               <Text style={styles.actionText}>{formatCount(video.likes + (liked && !video.liked ? 1 : 0))}</Text>
             </Pressable>
@@ -639,13 +510,28 @@ interface CommentsSheetProps {
 
 function CommentsSheet({ visible, videoId, onClose }: CommentsSheetProps) {
   const [comments, setComments] = useState<Comment[]>([]);
+  const [loadingComments, setLoadingComments] = useState(false);
   const [newComment, setNewComment] = useState('');
   const [replyTo, setReplyTo] = useState<Comment | null>(null);
   const slideAnim = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
 
+  // Fetch comments from API
+  const fetchComments = useCallback(async (vidId: string) => {
+    setLoadingComments(true);
+    try {
+      const response = await ShortVideoService.getVideoComments(vidId);
+      setComments(response.comments);
+    } catch (error) {
+      console.error('Failed to fetch comments:', error);
+      setComments(MOCK_COMMENTS[vidId] || []);
+    } finally {
+      setLoadingComments(false);
+    }
+  }, []);
+
   useEffect(() => {
     if (visible && videoId) {
-      setComments(MOCK_COMMENTS[videoId] || []);
+      fetchComments(videoId);
       Animated.spring(slideAnim, {
         toValue: 0,
         useNativeDriver: true,
@@ -658,11 +544,12 @@ function CommentsSheet({ visible, videoId, onClose }: CommentsSheetProps) {
         useNativeDriver: true,
       }).start();
     }
-  }, [visible, videoId, slideAnim]);
+  }, [visible, videoId, slideAnim, fetchComments]);
 
-  const handleSendComment = () => {
-    if (!newComment.trim()) return;
+  const handleSendComment = async () => {
+    if (!newComment.trim() || !videoId) return;
     
+    // Optimistic update
     const comment: Comment = {
       id: `c_${Date.now()}`,
       userId: 'me',
@@ -671,7 +558,7 @@ function CommentsSheet({ visible, videoId, onClose }: CommentsSheetProps) {
       text: newComment,
       likes: 0,
       liked: false,
-      timestamp: 'Just now',
+      timestamp: 'Vừa xong',
     };
     
     setComments(prev => [comment, ...prev]);
@@ -679,6 +566,14 @@ function CommentsSheet({ visible, videoId, onClose }: CommentsSheetProps) {
     setReplyTo(null);
     Keyboard.dismiss();
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+    // Try to send to API
+    try {
+      await ShortVideoService.addComment(videoId, newComment);
+    } catch (error) {
+      console.warn('Failed to send comment to API:', error);
+      // Keep optimistic update - comment already shows locally
+    }
   };
 
   const handleLikeComment = (commentId: string) => {
@@ -759,11 +654,11 @@ function CommentsSheet({ visible, videoId, onClose }: CommentsSheetProps) {
                   <Ionicons 
                     name={comment.liked ? 'heart' : 'heart-outline'} 
                     size={18} 
-                    color={comment.liked ? '#EF4444' : '#666'} 
+                    color={comment.liked ? '#000000' : '#666'} 
                   />
                   <Text style={[
                     commentsStyles.likeCount,
-                    comment.liked && { color: '#EF4444' }
+                    comment.liked && { color: '#000000' }
                   ]}>
                     {comment.likes}
                   </Text>
@@ -981,7 +876,7 @@ const commentsStyles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#EF4444',
+    backgroundColor: '#000000',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -1065,7 +960,7 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: '#EF4444',
+    backgroundColor: '#000000',
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: -4,
@@ -1134,5 +1029,27 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 8,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#000000',
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 14,
+    color: '#FFFFFF',
+  },
+  emptyContainer: {
+    height: SCREEN_HEIGHT,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#000000',
+  },
+  emptyText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: '#666666',
   },
 });

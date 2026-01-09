@@ -1,6 +1,6 @@
-﻿/**
+/**
  * Demo Credentials Component
- * Hiển thị credentials demo cho testing
+ * Hi?n th? credentials demo cho testing
  */
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -18,7 +18,7 @@ export function DemoCredentials({ onFillCredentials }: DemoCredentialsProps) {
       email: 'admin@example.com',
       password: 'Admin@123',
       role: 'Admin',
-      color: '#f44336',
+      color: '#000000',
       icon: 'shield-account' as const,
     },
     {
@@ -27,7 +27,7 @@ export function DemoCredentials({ onFillCredentials }: DemoCredentialsProps) {
       email: 'user@example.com',
       password: 'User@123',
       role: 'User',
-      color: '#4caf50',
+      color: '#0066CC',
       icon: 'account' as const,
     },
   ];
@@ -35,11 +35,11 @@ export function DemoCredentials({ onFillCredentials }: DemoCredentialsProps) {
   const handleSelectAccount = (account: typeof demoAccounts[0]) => {
     Alert.alert(
       'Demo Account',
-      `Sử dụng tài khoản ${account.role}?\n\nEmail: ${account.email}\nPassword: ${account.password}`,
+      `S? d?ng t�i kho?n ${account.role}?\n\nEmail: ${account.email}\nPassword: ${account.password}`,
       [
-        { text: 'Hủy', style: 'cancel' },
+        { text: 'H?y', style: 'cancel' },
         { 
-          text: 'Sử dụng', 
+          text: 'S? d?ng', 
           onPress: () => onFillCredentials(account.email, account.password)
         }
       ]
@@ -81,7 +81,7 @@ export function DemoCredentials({ onFillCredentials }: DemoCredentialsProps) {
       </View>
       
       <Text style={styles.note}>
-        💡 Tap để auto-fill credentials cho testing
+        ?? Tap d? auto-fill credentials cho testing
       </Text>
     </View>
   );

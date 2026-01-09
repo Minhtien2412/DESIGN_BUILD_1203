@@ -39,10 +39,10 @@ const STATUS_LABELS: Record<WorkerStatus, string> = {
 };
 
 const STATUS_COLORS: Record<WorkerStatus, string> = {
-  [WorkerStatus.ACTIVE]: '#4CAF50',
-  [WorkerStatus.INACTIVE]: '#9E9E9E',
-  [WorkerStatus.ON_LEAVE]: '#FF9800',
-  [WorkerStatus.SUSPENDED]: '#F44336',
+  [WorkerStatus.ACTIVE]: '#0066CC',
+  [WorkerStatus.INACTIVE]: '#999999',
+  [WorkerStatus.ON_LEAVE]: '#0066CC',
+  [WorkerStatus.SUSPENDED]: '#000000',
   [WorkerStatus.TERMINATED]: '#4A4A4A',
 };
 
@@ -221,7 +221,7 @@ export default function WorkersScreen() {
               <View style={styles.header}>
                 <View style={styles.headerLeft}>
                   <View style={styles.avatar}>
-                    <Ionicons name="person" size={24} color="#2196F3" />
+                    <Ionicons name="person" size={24} color="#0066CC" />
                   </View>
                   <View style={styles.headerInfo}>
                     <Text style={styles.workerName}>{worker.fullName}</Text>
@@ -295,7 +295,7 @@ export default function WorkersScreen() {
                     )
                   }
                 >
-                  <Ionicons name="eye-outline" size={16} color="#2196F3" />
+                  <Ionicons name="eye-outline" size={16} color="#0066CC" />
                   <Text style={styles.viewButtonText}>Chi tiết</Text>
                 </TouchableOpacity>
 
@@ -303,7 +303,7 @@ export default function WorkersScreen() {
                   style={styles.deleteButton}
                   onPress={() => handleDelete(worker.id, worker.fullName)}
                 >
-                  <Ionicons name="trash-outline" size={16} color="#F44336" />
+                  <Ionicons name="trash-outline" size={16} color="#000000" />
                   <Text style={styles.deleteButtonText}>Xóa</Text>
                 </TouchableOpacity>
               </View>
@@ -366,7 +366,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   filterChipActive: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
   },
   filterChipText: {
     fontSize: 13,
@@ -394,7 +394,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     paddingHorizontal: 20,
     paddingVertical: 10,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     borderRadius: 8,
   },
   emptyButtonText: {
@@ -423,7 +423,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -479,11 +479,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 4,
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
   },
   skillText: {
     fontSize: 11,
-    color: '#2196F3',
+    color: '#0066CC',
   },
   moreSkills: {
     fontSize: 11,
@@ -502,13 +502,13 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingVertical: 8,
     borderWidth: 1,
-    borderColor: '#2196F3',
+    borderColor: '#0066CC',
     borderRadius: 6,
   },
   viewButtonText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#2196F3',
+    color: '#0066CC',
   },
   deleteButton: {
     flex: 1,
@@ -518,13 +518,13 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingVertical: 8,
     borderWidth: 1,
-    borderColor: '#F44336',
+    borderColor: '#000000',
     borderRadius: 6,
   },
   deleteButtonText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#F44336',
+    color: '#000000',
   },
   fab: {
     position: 'absolute',
@@ -533,7 +533,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 4,

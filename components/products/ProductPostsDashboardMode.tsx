@@ -74,21 +74,21 @@ const styles = StyleSheet.create({
   },
   pending: {
     backgroundColor: '#fef3c7',
-    borderColor: '#f59e0b',
+    borderColor: '#0066CC',
   },
   pendingText: {
     color: '#92400e',
   },
   approved: {
     backgroundColor: '#d1fae5',
-    borderColor: '#10b981',
+    borderColor: '#0066CC',
   },
   approvedText: {
     color: '#065f46',
   },
   rejected: {
     backgroundColor: '#fee2e2',
-    borderColor: '#ef4444',
+    borderColor: '#000000',
   },
   rejectedText: {
     color: '#991b1b',

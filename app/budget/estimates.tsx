@@ -103,10 +103,10 @@ export default function EstimatesScreen() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'approved': return '#10B981';
-      case 'pending': return '#F59E0B';
+      case 'approved': return '#0066CC';
+      case 'pending': return '#0066CC';
       case 'draft': return '#94A3B8';
-      case 'rejected': return '#EF4444';
+      case 'rejected': return '#000000';
       default: return '#94A3B8';
     }
   };
@@ -166,13 +166,13 @@ export default function EstimatesScreen() {
             <Text style={styles.summaryLabel}>Tổng dự toán</Text>
           </View>
           <View style={styles.summaryCard}>
-            <Text style={[styles.summaryNumber, { color: '#F59E0B' }]}>
+            <Text style={[styles.summaryNumber, { color: '#0066CC' }]}>
               {estimates.filter(e => e.status === 'pending').length}
             </Text>
             <Text style={styles.summaryLabel}>Chờ duyệt</Text>
           </View>
           <View style={styles.summaryCard}>
-            <Text style={[styles.summaryNumber, { color: '#10B981' }]}>
+            <Text style={[styles.summaryNumber, { color: '#0066CC' }]}>
               {estimates.filter(e => e.status === 'approved').length}
             </Text>
             <Text style={styles.summaryLabel}>Đã duyệt</Text>

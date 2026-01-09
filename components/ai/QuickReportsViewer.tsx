@@ -42,9 +42,9 @@ export default function QuickReportsViewer({
       case 'PROGRESS':
         return '#3b82f6';
       case 'QUALITY':
-        return '#10b981';
+        return '#0066CC';
       case 'SAFETY':
-        return '#f59e0b';
+        return '#0066CC';
       default:
         return '#6b7280';
     }
@@ -99,7 +99,7 @@ export default function QuickReportsViewer({
           <Text style={styles.title}>Báo cáo AI gần đây</Text>
         </View>
         <View style={styles.errorContainer}>
-          <Ionicons name="alert-circle" size={40} color="#ef4444" />
+          <Ionicons name="alert-circle" size={40} color="#000000" />
           <Text style={styles.errorText}>Lỗi tải báo cáo</Text>
           <TouchableOpacity
             style={styles.retryButton}

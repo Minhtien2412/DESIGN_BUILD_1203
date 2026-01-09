@@ -24,11 +24,11 @@ const CONTRACT_TYPES: { value: ContractType | 'ALL'; label: string }[] = [
 
 const CONTRACT_STATUSES: { value: ContractStatus | 'ALL'; label: string; color: string }[] = [
   { value: 'ALL', label: 'Tất cả', color: '#666' },
-  { value: 'DRAFT', label: 'Nháp', color: '#9E9E9E' },
-  { value: 'PENDING_SIGNATURE', label: 'Chờ ký', color: '#FF9800' },
-  { value: 'ACTIVE', label: 'Đang thực hiện', color: '#4CAF50' },
-  { value: 'COMPLETED', label: 'Hoàn thành', color: '#2196F3' },
-  { value: 'TERMINATED', label: 'Chấm dứt', color: '#F44336' },
+  { value: 'DRAFT', label: 'Nháp', color: '#999999' },
+  { value: 'PENDING_SIGNATURE', label: 'Chờ ký', color: '#0066CC' },
+  { value: 'ACTIVE', label: 'Đang thực hiện', color: '#0066CC' },
+  { value: 'COMPLETED', label: 'Hoàn thành', color: '#0066CC' },
+  { value: 'TERMINATED', label: 'Chấm dứt', color: '#000000' },
   { value: 'EXPIRED', label: 'Hết hạn', color: '#757575' },
 ];
 
@@ -120,13 +120,13 @@ export default function ContractsListScreen() {
 
         <View style={styles.contractFooter}>
           <View style={styles.progressInfo}>
-            <Ionicons name="create-outline" size={16} color="#2196F3" />
+            <Ionicons name="create-outline" size={16} color="#0066CC" />
             <Text style={styles.progressText}>
               Chữ ký: {signedCount}/{totalSignatures}
             </Text>
           </View>
           <View style={styles.milestoneInfo}>
-            <Ionicons name="flag-outline" size={16} color="#4CAF50" />
+            <Ionicons name="flag-outline" size={16} color="#0066CC" />
             <Text style={styles.progressText}>{item.milestones.length} cột mốc</Text>
           </View>
         </View>
@@ -144,11 +144,11 @@ export default function ContractsListScreen() {
             <Text style={styles.statLabel}>Tổng hợp đồng</Text>
           </View>
           <View style={styles.statCard}>
-            <Text style={[styles.statValue, { color: '#4CAF50' }]}>{stats.active}</Text>
+            <Text style={[styles.statValue, { color: '#0066CC' }]}>{stats.active}</Text>
             <Text style={styles.statLabel}>Đang thực hiện</Text>
           </View>
           <View style={styles.statCard}>
-            <Text style={[styles.statValue, { color: '#FF9800' }]}>
+            <Text style={[styles.statValue, { color: '#0066CC' }]}>
               {stats.pendingSignature}
             </Text>
             <Text style={styles.statLabel}>Chờ ký</Text>
@@ -331,8 +331,8 @@ const styles = StyleSheet.create({
     borderColor: '#E0E0E0',
   },
   filterChipActive: {
-    backgroundColor: '#2196F3',
-    borderColor: '#2196F3',
+    backgroundColor: '#0066CC',
+    borderColor: '#0066CC',
   },
   filterChipText: {
     fontSize: 13,
@@ -369,7 +369,7 @@ const styles = StyleSheet.create({
   contractNumber: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#2196F3',
+    color: '#0066CC',
   },
   statusBadge: {
     paddingHorizontal: 10,
@@ -441,7 +441,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',

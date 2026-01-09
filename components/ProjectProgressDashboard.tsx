@@ -70,10 +70,10 @@ const ProjectProgressDashboard: React.FC<ProgressDashboardProps> = ({
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed': return '#10B981';
+      case 'completed': return '#0066CC';
       case 'in-progress': return '#3B82F6';
-      case 'pending': return '#F59E0B';
-      case 'delayed': return '#EF4444';
+      case 'pending': return '#0066CC';
+      case 'delayed': return '#000000';
       case 'cancelled': return '#6B7280';
       default: return '#6B7280';
     }
@@ -81,9 +81,9 @@ const ProjectProgressDashboard: React.FC<ProgressDashboardProps> = ({
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'critical': return '#DC2626';
-      case 'error': return '#EF4444';
-      case 'warning': return '#F59E0B';
+      case 'critical': return '#000000';
+      case 'error': return '#000000';
+      case 'warning': return '#0066CC';
       case 'info': return '#3B82F6';
       default: return '#6B7280';
     }
@@ -114,7 +114,7 @@ const ProjectProgressDashboard: React.FC<ProgressDashboardProps> = ({
     return (
       <Container>
         <View style={styles.errorContainer}>
-          <Ionicons name="alert-circle" size={48} color="#EF4444" />
+          <Ionicons name="alert-circle" size={48} color="#000000" />
           <Text style={styles.errorText}>{error || 'No data available'}</Text>
           <Button title="Retry" onPress={() => loadDashboard()} />
         </View>
@@ -179,7 +179,7 @@ const ProjectProgressDashboard: React.FC<ProgressDashboardProps> = ({
                   <Text style={styles.taskLabel}>Pending</Text>
                 </View>
                 <View style={styles.taskStat}>
-                  <Text style={[styles.taskNumber, { color: '#EF4444' }]}>
+                  <Text style={[styles.taskNumber, { color: '#000000' }]}>
                     {dashboard.progress.delayedTasks}
                   </Text>
                   <Text style={styles.taskLabel}>Delayed</Text>
@@ -228,13 +228,13 @@ const ProjectProgressDashboard: React.FC<ProgressDashboardProps> = ({
                   <Text style={styles.paymentLabel}>Total Paid</Text>
                 </View>
                 <View style={styles.paymentStat}>
-                  <Text style={[styles.paymentAmount, { color: '#F59E0B' }]}>
+                  <Text style={[styles.paymentAmount, { color: '#0066CC' }]}>
                     {formatCurrency(dashboard.paymentSchedule.totalPending)}
                   </Text>
                   <Text style={styles.paymentLabel}>Pending</Text>
                 </View>
                 <View style={styles.paymentStat}>
-                  <Text style={[styles.paymentAmount, { color: '#EF4444' }]}>
+                  <Text style={[styles.paymentAmount, { color: '#000000' }]}>
                     {formatCurrency(dashboard.paymentSchedule.totalOverdue)}
                   </Text>
                   <Text style={styles.paymentLabel}>Overdue</Text>
@@ -249,7 +249,7 @@ const ProjectProgressDashboard: React.FC<ProgressDashboardProps> = ({
                       styles.progressFill,
                       { 
                         width: `${dashboard.progress.budgetUtilization}%`,
-                        backgroundColor: dashboard.progress.budgetUtilization > 100 ? '#EF4444' : '#10B981'
+                        backgroundColor: dashboard.progress.budgetUtilization > 100 ? '#000000' : '#0066CC'
                       }
                     ]} 
                   />
@@ -444,7 +444,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 16,
-    color: '#EF4444',
+    color: '#000000',
     textAlign: 'center',
     marginVertical: 16,
   },
@@ -594,7 +594,7 @@ const styles = StyleSheet.create({
   paymentAmount: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#10b981',
+    color: '#0066CC',
     textAlign: 'center',
   },
   paymentLabel: {
@@ -699,7 +699,7 @@ const styles = StyleSheet.create({
   paymentItemAmount: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#10b981',
+    color: '#0066CC',
     marginBottom: 4,
   },
   paymentDueDate: {

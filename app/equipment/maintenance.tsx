@@ -61,7 +61,7 @@ export default function EquipmentMaintenanceScreen() {
           title: 'Bảo trì thiết bị',
           headerRight: () => (
             <TouchableOpacity onPress={() => setModalVisible(true)}>
-              <Ionicons name="add-circle" size={28} color="#2196F3" style={{ marginRight: 8 }} />
+              <Ionicons name="add-circle" size={28} color="#0066CC" style={{ marginRight: 8 }} />
             </TouchableOpacity>
           ),
         }}
@@ -75,17 +75,17 @@ export default function EquipmentMaintenanceScreen() {
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statItem}>
-          <Text style={[styles.statValue, { color: '#2196F3' }]}>{scheduledCount}</Text>
+          <Text style={[styles.statValue, { color: '#0066CC' }]}>{scheduledCount}</Text>
           <Text style={styles.statLabel}>Đã lên lịch</Text>
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statItem}>
-          <Text style={[styles.statValue, { color: '#FF9800' }]}>{inProgressCount}</Text>
+          <Text style={[styles.statValue, { color: '#0066CC' }]}>{inProgressCount}</Text>
           <Text style={styles.statLabel}>Đang thực hiện</Text>
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statItem}>
-          <Text style={[styles.statValue, { color: '#F44336' }]}>{overdueCount}</Text>
+          <Text style={[styles.statValue, { color: '#000000' }]}>{overdueCount}</Text>
           <Text style={styles.statLabel}>Quá hạn</Text>
         </View>
       </View>
@@ -218,7 +218,7 @@ function MaintenanceCard({ record }: MaintenanceCardProps) {
         )}
         {record.downtimeHours && (
           <View style={styles.infoRow}>
-            <Ionicons name="time" size={14} color="#FF9800" />
+            <Ionicons name="time" size={14} color="#0066CC" />
             <Text style={styles.infoLabel}>Thời gian ngừng:</Text>
             <Text style={styles.infoValue}>{record.downtimeHours} giờ</Text>
           </View>
@@ -227,7 +227,7 @@ function MaintenanceCard({ record }: MaintenanceCardProps) {
 
       {record.completedAt && (
         <View style={styles.completedInfo}>
-          <Ionicons name="checkmark-circle" size={16} color="#4CAF50" />
+          <Ionicons name="checkmark-circle" size={16} color="#0066CC" />
           <Text style={styles.completedText}>
             Hoàn thành: {new Date(record.completedAt).toLocaleDateString('vi-VN')}
           </Text>
@@ -399,15 +399,15 @@ function AddMaintenanceModal({ visible, equipmentId, onClose, onCreate }: AddMai
 function getStatusColor(status: MaintenanceStatus): string {
   switch (status) {
     case MaintenanceStatus.SCHEDULED:
-      return '#2196F3';
+      return '#0066CC';
     case MaintenanceStatus.IN_PROGRESS:
-      return '#FF9800';
+      return '#0066CC';
     case MaintenanceStatus.COMPLETED:
-      return '#4CAF50';
+      return '#0066CC';
     case MaintenanceStatus.CANCELLED:
-      return '#9E9E9E';
+      return '#999999';
     case MaintenanceStatus.OVERDUE:
-      return '#F44336';
+      return '#000000';
     default:
       return '#666';
   }
@@ -488,7 +488,7 @@ const styles = StyleSheet.create({
     borderBottomColor: 'transparent',
   },
   filterTabActive: {
-    borderBottomColor: '#2196F3',
+    borderBottomColor: '#0066CC',
   },
   filterTabText: {
     fontSize: 11,
@@ -496,7 +496,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   filterTabTextActive: {
-    color: '#2196F3',
+    color: '#0066CC',
     fontWeight: 'bold',
   },
   listContent: {
@@ -515,7 +515,7 @@ const styles = StyleSheet.create({
   },
   maintenanceCardOverdue: {
     borderLeftWidth: 4,
-    borderLeftColor: '#F44336',
+    borderLeftColor: '#000000',
   },
   cardHeader: {
     flexDirection: 'row',
@@ -545,7 +545,7 @@ const styles = StyleSheet.create({
   },
   typeLabel: {
     fontSize: 11,
-    color: '#2196F3',
+    color: '#0066CC',
     fontWeight: '600',
   },
   statusBadge: {
@@ -592,7 +592,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   partsInfo: {
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
     padding: 8,
     borderRadius: 6,
     marginTop: 8,
@@ -614,7 +614,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   addButton: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
@@ -688,8 +688,8 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   typeChipActive: {
-    backgroundColor: '#2196F3',
-    borderColor: '#2196F3',
+    backgroundColor: '#0066CC',
+    borderColor: '#0066CC',
   },
   typeChipText: {
     fontSize: 12,
@@ -737,7 +737,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 14,
     borderRadius: 8,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     alignItems: 'center',
   },
   createButtonText: {

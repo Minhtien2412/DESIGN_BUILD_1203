@@ -1,9 +1,17 @@
+/**
+ * Payment Progress Screen
+ * 🔥 UPDATED: Now uses real data from Perfex CRM Invoices
+ */
+
 import { Container } from '@/components/ui/container';
 import { useThemeColor } from '@/hooks/use-theme-color';
+import { PerfexInvoice, PerfexInvoicesService } from '@/services/perfexCRM';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
+    ActivityIndicator,
+    RefreshControl,
     ScrollView,
     StyleSheet,
     Text,
@@ -30,7 +38,8 @@ interface ChecklistItem {
   completed: boolean;
 }
 
-const MOCK_PAYMENT_PHASES: PaymentPhase[] = [
+// Fallback data khi CRM không khả dụng
+const FALLBACK_PAYMENT_PHASES: PaymentPhase[] = [
   {
     id: '1',
     name: 'P-Wall (Sơn tường bao)',
@@ -67,8 +76,46 @@ const MOCK_PAYMENT_PHASES: PaymentPhase[] = [
   },
 ];
 
+// Map Perfex invoice status to payment status
+function mapInvoiceStatus(status: number): 'approved' | 'pending' | 'rejected' {
+  switch (status) {
+    case 2: return 'approved'; // Paid
+    case 3: return 'approved'; // Partially Paid  
+    case 4: return 'rejected'; // Overdue
+    case 5: return 'rejected'; // Cancelled
+    default: return 'pending'; // Unpaid, Draft
+  }
+}
+
+// Format date from CRM
+function formatDate(dateStr: string): string {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+
+// Convert Perfex Invoice to PaymentPhase
+function mapInvoiceToPhase(invoice: PerfexInvoice, index: number, total: number): PaymentPhase {
+  const amount = parseFloat(invoice.total) || 0;
+  const percentage = total > 0 ? Math.round((amount / total) * 100) : 0;
+  
+  return {
+    id: invoice.id,
+    name: `Đợt ${index + 1} - ${invoice.number || `INV-${invoice.id}`}`,
+    percentage,
+    amount,
+    conditions: invoice.adminnote || '',
+    checklist: [],
+    approver: invoice.sale_agent_name || undefined,
+    approvalDate: invoice.datepaid ? formatDate(invoice.datepaid) : undefined,
+    paymentStatus: mapInvoiceStatus(invoice.status),
+  };
+}
+
 export default function PaymentProgressScreen() {
   const params = useLocalSearchParams();
+  const projectId = params.id as string;
+  
   const backgroundColor = useThemeColor({}, 'background');
   const textColor = useThemeColor({}, 'text');
   const borderColor = useThemeColor({}, 'border');
@@ -82,10 +129,51 @@ export default function PaymentProgressScreen() {
   const errorColor = useThemeColor({}, 'error');
   const inverseText = useThemeColor({}, 'textInverse');
 
-  const totalAmount = 300000000;
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [phases, setPhases] = useState<PaymentPhase[]>(FALLBACK_PAYMENT_PHASES);
+  const [dataSource, setDataSource] = useState<'crm' | 'mock'>('mock');
+  const [expandedPhaseId, setExpandedPhaseId] = useState<string | null>(null);
+
+  const totalAmount = phases.reduce((sum, p) => sum + p.amount, 0);
   const totalPercentage = 100;
 
-  const [expandedPhaseId, setExpandedPhaseId] = useState<string | null>('1');
+  // Load invoices from CRM
+  const loadPayments = useCallback(async () => {
+    try {
+      const response = await PerfexInvoicesService.getByProject(projectId);
+      
+      if (response.success && response.data && response.data.length > 0) {
+        const totalValue = response.data.reduce((sum, inv) => sum + parseFloat(inv.total || '0'), 0);
+        const mappedPhases = response.data.map((inv, idx) => 
+          mapInvoiceToPhase(inv, idx, totalValue)
+        );
+        setPhases(mappedPhases);
+        setExpandedPhaseId(mappedPhases[0]?.id || null);
+        setDataSource('crm');
+        console.log(`✅ Loaded ${mappedPhases.length} payment phases from CRM`);
+      } else {
+        throw new Error('Không có dữ liệu hóa đơn');
+      }
+    } catch (error) {
+      console.warn('⚠️ CRM không khả dụng, sử dụng dữ liệu mẫu:', error);
+      setPhases(FALLBACK_PAYMENT_PHASES);
+      setExpandedPhaseId('1');
+      setDataSource('mock');
+    } finally {
+      setLoading(false);
+    }
+  }, [projectId]);
+
+  useEffect(() => {
+    loadPayments();
+  }, [loadPayments]);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await loadPayments();
+    setRefreshing(false);
+  };
 
   const togglePhase = (phaseId: string) => {
     setExpandedPhaseId(expandedPhaseId === phaseId ? null : phaseId);
@@ -117,9 +205,25 @@ export default function PaymentProgressScreen() {
     }
   };
 
+  if (loading) {
+    return (
+      <Container style={{ backgroundColor }}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={primaryColor} />
+          <Text style={[styles.loadingText, { color: mutedColor }]}>Đang tải tiến độ thanh toán...</Text>
+        </View>
+      </Container>
+    );
+  }
+
   return (
     <Container style={{ backgroundColor }}>
-      <ScrollView style={styles.container}>
+      <ScrollView 
+        style={styles.container}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }
+      >
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.back()}>
@@ -130,6 +234,13 @@ export default function PaymentProgressScreen() {
           </Text>
           <View style={{ width: 24 }} />
         </View>
+
+        {/* Data Source Indicator */}
+        {dataSource === 'mock' && (
+          <View style={styles.mockIndicator}>
+            <Text style={styles.mockIndicatorText}>📋 Dữ liệu mẫu - CRM không khả dụng</Text>
+          </View>
+        )}
 
         {/* Total Summary */}
         <View style={[styles.summaryCard, { backgroundColor: primaryColor + '20' }]}>
@@ -150,7 +261,7 @@ export default function PaymentProgressScreen() {
         </View>
 
         {/* Payment Phases */}
-        {MOCK_PAYMENT_PHASES.map(phase => {
+        {phases.map(phase => {
           const isExpanded = expandedPhaseId === phase.id;
           const statusColor = getStatusColor(phase.paymentStatus);
           const statusText = getStatusText(phase.paymentStatus);
@@ -276,6 +387,27 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 14,
+  },
+  mockIndicator: {
+    backgroundColor: '#FEF3C7',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    marginBottom: 16,
+    borderRadius: 8,
+  },
+  mockIndicatorText: {
+    color: '#92400E',
+    fontSize: 12,
+    textAlign: 'center',
   },
   header: {
     flexDirection: 'row',

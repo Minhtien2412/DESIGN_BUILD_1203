@@ -36,30 +36,30 @@ export function FeatureStatusBanner({
       case 'available':
         return {
           bgColor: '#E8F5E9',
-          borderColor: '#4CAF50',
+          borderColor: '#0066CC',
           iconName: 'checkmark-circle' as const,
-          iconColor: '#4CAF50',
+          iconColor: '#0066CC',
         };
       case 'degraded':
         return {
-          bgColor: '#FFF3E0',
-          borderColor: '#FF9800',
+          bgColor: '#E8F4FF',
+          borderColor: '#0066CC',
           iconName: 'warning' as const,
-          iconColor: '#FF9800',
+          iconColor: '#0066CC',
         };
       case 'coming_soon':
         return {
-          bgColor: '#E3F2FD',
-          borderColor: '#2196F3',
+          bgColor: '#E8F4FF',
+          borderColor: '#0066CC',
           iconName: 'time' as const,
-          iconColor: '#2196F3',
+          iconColor: '#0066CC',
         };
       default:
         return {
           bgColor: '#FFEBEE',
-          borderColor: '#F44336',
+          borderColor: '#000000',
           iconName: 'close-circle' as const,
-          iconColor: '#F44336',
+          iconColor: '#000000',
         };
     }
   };
@@ -118,7 +118,7 @@ export function OfflineIndicator({
     <TouchableOpacity
       style={[
         styles.offlineIndicator,
-        { backgroundColor: isConnected ? '#4CAF50' : '#F44336' },
+        { backgroundColor: isConnected ? '#0066CC' : '#000000' },
       ]}
       onPress={onPress}
     >
@@ -155,7 +155,7 @@ export function ComingSoonOverlay({ featureKey, children }: ComingSoonOverlayPro
       {children}
       <View style={styles.overlay}>
         <View style={styles.overlayContent}>
-          <Ionicons name="construct" size={48} color="#2196F3" />
+          <Ionicons name="construct" size={48} color="#0066CC" />
           <Text style={styles.overlayTitle}>Sắp ra mắt</Text>
           <Text style={styles.overlayMessage}>{message}</Text>
         </View>
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
   overlayTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#2196F3',
+    color: '#0066CC',
     marginTop: 16,
     marginBottom: 8,
   },

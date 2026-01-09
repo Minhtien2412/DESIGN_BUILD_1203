@@ -16,7 +16,7 @@ import {
     USER_SITEMAP,
     type SitemapNode,
     type UserRole,
-} from '@/constants/sitemap-tree';
+} from '@/constants/sitemap-tree-v2';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';

@@ -67,7 +67,7 @@ export function LongPressMenu({ children, menuItems, style }: LongPressMenuProps
                 <Text
                   style={[
                     styles.menuText,
-                    { color: item.destructive ? '#ef4444' : item.color || text },
+                    { color: item.destructive ? '#000000' : item.color || text },
                   ]}
                 >
                   {item.icon && `${item.icon} `}

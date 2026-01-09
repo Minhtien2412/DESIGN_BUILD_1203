@@ -28,11 +28,11 @@ type ApprovalDecision = 'APPROVE' | 'REJECT' | 'CONDITIONAL_APPROVE' | 'REQUEST_
 const STATUS_COLORS: Record<string, string> = {
   DRAFT: '#6B7280',
   SUBMITTED: '#3B82F6',
-  UNDER_REVIEW: '#F59E0B',
-  PENDING_APPROVAL: '#8B5CF6',
-  APPROVED: '#10B981',
-  REJECTED: '#EF4444',
-  IMPLEMENTED: '#059669',
+  UNDER_REVIEW: '#0066CC',
+  PENDING_APPROVAL: '#666666',
+  APPROVED: '#0066CC',
+  REJECTED: '#000000',
+  IMPLEMENTED: '#0066CC',
   CLOSED: '#6B7280',
   CANCELLED: '#9CA3AF',
 };
@@ -71,9 +71,9 @@ export default function ChangeOrderDetailsScreen() {
   const statusColor = STATUS_COLORS[changeOrder.status];
   const costImpactColor =
     changeOrder.costImpact.type === 'INCREASE'
-      ? '#EF4444'
+      ? '#000000'
       : changeOrder.costImpact.type === 'DECREASE'
-      ? '#10B981'
+      ? '#0066CC'
       : '#6B7280';
 
   const handleSubmit = async () => {
@@ -252,10 +252,10 @@ export default function ChangeOrderDetailsScreen() {
             {changeOrder.scopeChange.deletions &&
               changeOrder.scopeChange.deletions.length > 0 && (
                 <View style={styles.changesList}>
-                  <Text style={[styles.changesTitle, { color: '#EF4444' }]}>Deletions:</Text>
+                  <Text style={[styles.changesTitle, { color: '#000000' }]}>Deletions:</Text>
                   {changeOrder.scopeChange.deletions.map((item, index) => (
                     <View key={index} style={styles.changesItem}>
-                      <Ionicons name="remove-circle" size={16} color="#EF4444" />
+                      <Ionicons name="remove-circle" size={16} color="#000000" />
                       <Text style={styles.changesText}>{item}</Text>
                     </View>
                   ))}
@@ -264,10 +264,10 @@ export default function ChangeOrderDetailsScreen() {
 
             {changeOrder.scopeChange.additions && changeOrder.scopeChange.additions.length > 0 && (
               <View style={styles.changesList}>
-                <Text style={[styles.changesTitle, { color: '#10B981' }]}>Additions:</Text>
+                <Text style={[styles.changesTitle, { color: '#0066CC' }]}>Additions:</Text>
                 {changeOrder.scopeChange.additions.map((item, index) => (
                   <View key={index} style={styles.changesItem}>
-                    <Ionicons name="add-circle" size={16} color="#10B981" />
+                    <Ionicons name="add-circle" size={16} color="#0066CC" />
                     <Text style={styles.changesText}>{item}</Text>
                   </View>
                 ))}
@@ -277,10 +277,10 @@ export default function ChangeOrderDetailsScreen() {
             {changeOrder.scopeChange.modifications &&
               changeOrder.scopeChange.modifications.length > 0 && (
                 <View style={styles.changesList}>
-                  <Text style={[styles.changesTitle, { color: '#F59E0B' }]}>Modifications:</Text>
+                  <Text style={[styles.changesTitle, { color: '#0066CC' }]}>Modifications:</Text>
                   {changeOrder.scopeChange.modifications.map((item, index) => (
                     <View key={index} style={styles.changesItem}>
-                      <Ionicons name="swap-horizontal" size={16} color="#F59E0B" />
+                      <Ionicons name="swap-horizontal" size={16} color="#0066CC" />
                       <Text style={styles.changesText}>{item}</Text>
                     </View>
                   ))}
@@ -370,7 +370,7 @@ export default function ChangeOrderDetailsScreen() {
                 Estimated by: {changeOrder.costImpact.estimatedBy} on{' '}
                 {new Date(changeOrder.costImpact.estimatedDate).toLocaleDateString()}
                 {changeOrder.costImpact.verified && (
-                  <Text style={{ color: '#10B981' }}>
+                  <Text style={{ color: '#0066CC' }}>
                     {' '}
                     • Verified by {changeOrder.costImpact.verifiedBy}
                   </Text>
@@ -389,9 +389,9 @@ export default function ChangeOrderDetailsScreen() {
               {
                 borderColor:
                   changeOrder.scheduleImpact.type === 'DELAY'
-                    ? '#F59E0B'
+                    ? '#0066CC'
                     : changeOrder.scheduleImpact.type === 'ACCELERATION'
-                    ? '#10B981'
+                    ? '#0066CC'
                     : '#6B7280',
               },
             ]}
@@ -431,9 +431,9 @@ export default function ChangeOrderDetailsScreen() {
                   {
                     color:
                       changeOrder.scheduleImpact.type === 'DELAY'
-                        ? '#F59E0B'
+                        ? '#0066CC'
                         : changeOrder.scheduleImpact.type === 'ACCELERATION'
-                        ? '#10B981'
+                        ? '#0066CC'
                         : '#6B7280',
                   },
                 ]}
@@ -506,11 +506,11 @@ export default function ChangeOrderDetailsScreen() {
                       size={24}
                       color={
                         approval.status === 'APPROVED'
-                          ? '#10B981'
+                          ? '#0066CC'
                           : approval.status === 'REJECTED'
-                          ? '#EF4444'
+                          ? '#000000'
                           : approval.status === 'IN_PROGRESS'
-                          ? '#F59E0B'
+                          ? '#0066CC'
                           : '#9CA3AF'
                       }
                     />
@@ -550,11 +550,11 @@ export default function ChangeOrderDetailsScreen() {
                         {
                           color:
                             approval.decision === 'APPROVE'
-                              ? '#10B981'
+                              ? '#0066CC'
                               : approval.decision === 'REJECT'
-                              ? '#EF4444'
+                              ? '#000000'
                               : approval.decision === 'CONDITIONAL_APPROVE'
-                              ? '#F59E0B'
+                              ? '#0066CC'
                               : '#3B82F6',
                         },
                       ]}
@@ -857,7 +857,7 @@ export default function ChangeOrderDetailsScreen() {
                   <View key={index} style={styles.conditionItem}>
                     <Text style={styles.conditionItemText}>{condition}</Text>
                     <TouchableOpacity onPress={() => removeCondition(index)}>
-                      <Ionicons name="close-circle" size={20} color="#EF4444" />
+                      <Ionicons name="close-circle" size={20} color="#000000" />
                     </TouchableOpacity>
                   </View>
                 ))}
@@ -1009,7 +1009,7 @@ const styles = StyleSheet.create({
   typeText: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#7C3AED',
+    color: '#666666',
     textTransform: 'capitalize',
   },
   section: {
@@ -1240,7 +1240,7 @@ const styles = StyleSheet.create({
   requiredText: {
     fontSize: 10,
     fontWeight: '600',
-    color: '#DC2626',
+    color: '#000000',
   },
   decisionBadge: {
     paddingHorizontal: 10,
@@ -1296,13 +1296,13 @@ const styles = StyleSheet.create({
   implementStatus: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#7C3AED',
+    color: '#666666',
     textTransform: 'capitalize',
   },
   implementProgress: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#7C3AED',
+    color: '#666666',
   },
   progressBar: {
     height: 8,
@@ -1313,7 +1313,7 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#8B5CF6',
+    backgroundColor: '#666666',
   },
   implementAssigned: {
     fontSize: 12,
@@ -1432,16 +1432,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#3B82F6',
   },
   approveBtn: {
-    backgroundColor: '#10B981',
+    backgroundColor: '#0066CC',
   },
   rejectBtn: {
-    backgroundColor: '#EF4444',
+    backgroundColor: '#000000',
   },
   implementBtn: {
-    backgroundColor: '#8B5CF6',
+    backgroundColor: '#666666',
   },
   completeBtn: {
-    backgroundColor: '#059669',
+    backgroundColor: '#0066CC',
   },
   exportBtn: {
     backgroundColor: '#F3F4F6',
@@ -1553,7 +1553,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 8,
-    backgroundColor: '#EFF6FF',
+    backgroundColor: '#E8F4FF',
     justifyContent: 'center',
     alignItems: 'center',
   },

@@ -444,7 +444,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 12,
-    color: '#F44336',
+    color: '#000000',
   },
   noticeBox: {
     flexDirection: 'row',
@@ -481,7 +481,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -500,7 +500,7 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   unreadBadge: {
-    backgroundColor: '#F44336',
+    backgroundColor: '#000000',
     borderRadius: 10,
     minWidth: 20,
     height: 20,

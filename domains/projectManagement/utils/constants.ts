@@ -6,27 +6,27 @@
 // Task priorities with weights
 export const TASK_PRIORITIES = {
   critical: { weight: 4, color: '#1A1A1A', label: 'Critical' },
-  high: { weight: 3, color: '#FF9800', label: 'High' },
+  high: { weight: 3, color: '#0066CC', label: 'High' },
   medium: { weight: 2, color: '#0A6847', label: 'Medium' },
   low: { weight: 1, color: '#10B981', label: 'Low' },
 } as const;
 
 // Task statuses with colors
 export const TASK_STATUSES = {
-  pending: { color: '#9E9E9E', label: 'Pending' },
-  'in-progress': { color: '#FF9800', label: 'In Progress' },
+  pending: { color: '#999999', label: 'Pending' },
+  'in-progress': { color: '#0066CC', label: 'In Progress' },
   review: { color: '#0A6847', label: 'Under Review' },
-  completed: { color: '#4CAF50', label: 'Completed' },
+  completed: { color: '#0066CC', label: 'Completed' },
   delayed: { color: '#1A1A1A', label: 'Delayed' },
   cancelled: { color: '#757575', label: 'Cancelled' },
 } as const;
 
 // Payment statuses with colors
 export const PAYMENT_STATUSES = {
-  scheduled: { color: '#9E9E9E', label: 'Scheduled' },
-  pending: { color: '#FF9800', label: 'Pending' },
+  scheduled: { color: '#999999', label: 'Scheduled' },
+  pending: { color: '#0066CC', label: 'Pending' },
   processing: { color: '#0A6847', label: 'Processing' },
-  completed: { color: '#4CAF50', label: 'Completed' },
+  completed: { color: '#0066CC', label: 'Completed' },
   overdue: { color: '#1A1A1A', label: 'Overdue' },
   cancelled: { color: '#757575', label: 'Cancelled' },
 } as const;
@@ -35,7 +35,7 @@ export const PAYMENT_STATUSES = {
 export const TASK_CATEGORIES = {
   foundation: { label: 'Foundation', icon: '🏗️', color: '#1A1A1A' },
   structure: { label: 'Structure', icon: '🏢', color: '#1A1A1A' },
-  roofing: { label: 'Roofing', icon: '🏠', color: '#795548' },
+  roofing: { label: 'Roofing', icon: '🏠', color: '#666666' },
   walls: { label: 'Walls', icon: '🧱', color: '#0A6847' },
   electrical: { label: 'Electrical', icon: '⚡', color: '#10B981' },
   plumbing: { label: 'Plumbing', icon: '🚿', color: '#0A6847' },

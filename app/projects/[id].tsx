@@ -9,16 +9,22 @@ import { Colors } from '@/constants/theme';
 import { useProjectBudget, useProjectData, useProjectTasks } from '@/context/project-data-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useProjectDetail } from '@/hooks/useProjects';
+import {
+    MOCK_DOCUMENTS,
+    MOCK_TEAM,
+    MOCK_WORKFLOW,
+    ProjectDetailService
+} from '@/services/projectDetailService';
 import { Ionicons } from '@expo/vector-icons';
 import { Stack, useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const STATUS_COLORS = {
-  planning: '#f97316',
+  planning: '#0066CC',
   active: '#3b82f6',
-  completed: '#22c55e',
-  paused: '#ef4444',
+  completed: '#0066CC',
+  paused: '#000000',
 };
 
 const STATUS_LABELS = {
@@ -28,185 +34,10 @@ const STATUS_LABELS = {
   paused: 'Tạm dừng',
 };
 
-// Mock workflow phases - replace with real data from API
-const MOCK_WORKFLOW: WorkflowPhase[] = [
-  {
-    id: '1',
-    name: 'Khảo sát & Thiết kế',
-    status: 'completed',
-    progress: 100,
-    startDate: '2024-01-01',
-    endDate: '2024-02-15',
-    tasks: 12,
-    completedTasks: 12,
-  },
-  {
-    id: '2',
-    name: 'Chuẩn bị mặt bằng',
-    status: 'completed',
-    progress: 100,
-    startDate: '2024-02-16',
-    endDate: '2024-03-10',
-    tasks: 8,
-    completedTasks: 8,
-  },
-  {
-    id: '3',
-    name: 'Đổ móng & Kết cấu',
-    status: 'active',
-    progress: 65,
-    startDate: '2024-03-11',
-    endDate: '2024-05-20',
-    tasks: 15,
-    completedTasks: 10,
-  },
-  {
-    id: '4',
-    name: 'Xây tường & Trát',
-    status: 'pending',
-    progress: 0,
-    startDate: '2024-05-21',
-    endDate: '2024-07-15',
-    tasks: 20,
-    completedTasks: 0,
-  },
-  {
-    id: '5',
-    name: 'Lắp đặt điện nước',
-    status: 'pending',
-    progress: 0,
-    startDate: '2024-07-16',
-    endDate: '2024-08-30',
-    tasks: 18,
-    completedTasks: 0,
-  },
-  {
-    id: '6',
-    name: 'Hoàn thiện & Bàn giao',
-    status: 'pending',
-    progress: 0,
-    startDate: '2024-09-01',
-    endDate: '2024-10-15',
-    tasks: 10,
-    completedTasks: 0,
-  },
-];
-
-// Mock team members - replace with real data from API
-const MOCK_TEAM: TeamMember[] = [
-  {
-    id: '1',
-    name: 'Nguyễn Văn A',
-    role: 'Giám đốc dự án',
-    phone: '0901234567',
-    email: 'nguyenvana@example.com',
-    joinedAt: '2024-01-01',
-  },
-  {
-    id: '2',
-    name: 'Trần Thị B',
-    role: 'Kiến trúc sư',
-    phone: '0907654321',
-    email: 'tranthib@example.com',
-    joinedAt: '2024-01-05',
-  },
-  {
-    id: '3',
-    name: 'Lê Văn C',
-    role: 'Kỹ sư thi công',
-    phone: '0909876543',
-    email: 'levanc@example.com',
-    joinedAt: '2024-01-10',
-  },
-  {
-    id: '4',
-    name: 'Phạm Thị D',
-    role: 'Kỹ thuật viên',
-    phone: '0908765432',
-    joinedAt: '2024-02-01',
-  },
-];
-
-// Mock documents - replace with real data from API
-const MOCK_DOCUMENTS: ProjectDocument[] = [
-  {
-    id: '1',
-    name: 'Hợp đồng thi công.pdf',
-    type: 'contract',
-    size: 2457600, // 2.4 MB
-    mimeType: 'application/pdf',
-    url: '/documents/contract.pdf',
-    uploadedBy: 'Nguyễn Văn A',
-    uploadedAt: '2024-01-15',
-    tags: ['hợp đồng', 'quan trọng'],
-  },
-  {
-    id: '2',
-    name: 'Bản vẽ thiết kế tổng thể.dwg',
-    type: 'design',
-    size: 8945000, // 8.9 MB
-    mimeType: 'application/acad',
-    url: '/documents/design-master.dwg',
-    uploadedBy: 'Trần Thị B',
-    uploadedAt: '2024-01-20',
-    tags: ['thiết kế', 'bản vẽ'],
-  },
-  {
-    id: '3',
-    name: 'Báo cáo tiến độ tháng 3.docx',
-    type: 'report',
-    size: 1024000, // 1 MB
-    mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    url: '/documents/report-mar.docx',
-    uploadedBy: 'Lê Văn C',
-    uploadedAt: '2024-03-31',
-    tags: ['báo cáo', 'tháng 3'],
-  },
-  {
-    id: '4',
-    name: 'Giấy phép xây dựng.pdf',
-    type: 'permit',
-    size: 512000, // 512 KB
-    mimeType: 'application/pdf',
-    url: '/documents/building-permit.pdf',
-    uploadedBy: 'Nguyễn Văn A',
-    uploadedAt: '2024-01-10',
-    tags: ['giấy phép', 'pháp lý'],
-  },
-  {
-    id: '5',
-    name: 'Hóa đơn vật tư tháng 3.xlsx',
-    type: 'invoice',
-    size: 768000, // 768 KB
-    mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    url: '/documents/invoice-mar.xlsx',
-    uploadedBy: 'Phạm Thị D',
-    uploadedAt: '2024-03-15',
-    tags: ['hóa đơn', 'vật tư'],
-  },
-  {
-    id: '6',
-    name: 'Bản vẽ móng.pdf',
-    type: 'design',
-    size: 3456000, // 3.5 MB
-    mimeType: 'application/pdf',
-    url: '/documents/foundation-plan.pdf',
-    uploadedBy: 'Trần Thị B',
-    uploadedAt: '2024-02-05',
-    tags: ['thiết kế', 'móng'],
-  },
-  {
-    id: '7',
-    name: 'Báo cáo khảo sát địa chất.pdf',
-    type: 'report',
-    size: 5120000, // 5 MB
-    mimeType: 'application/pdf',
-    url: '/documents/geological-survey.pdf',
-    uploadedBy: 'Lê Văn C',
-    uploadedAt: '2024-01-25',
-    tags: ['báo cáo', 'khảo sát'],
-  },
-];
+// Types from service are now exported
+type WorkflowPhaseData = WorkflowPhase;
+type TeamMemberData = TeamMember;
+type ProjectDocumentData = ProjectDocument;
 
 function formatDate(dateStr: string): string {
   const date = new Date(dateStr);
@@ -224,11 +55,53 @@ export default function ProjectDetailScreen() {
   const [workflowOrientation, setWorkflowOrientation] = useState<'horizontal' | 'vertical'>('horizontal');
   const [showExpenseForm, setShowExpenseForm] = useState(false);
   const [showTaskForm, setShowTaskForm] = useState(false);
+  
+  // State for API data - initialize with mock data immediately
+  const [workflowPhases, setWorkflowPhases] = useState<WorkflowPhase[]>(MOCK_WORKFLOW);
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>(MOCK_TEAM);
+  const [documents, setDocuments] = useState<ProjectDocument[]>(MOCK_DOCUMENTS);
+  const [loadingDetails, setLoadingDetails] = useState(false); // Don't block on loading
 
   const { project, loading, error, refresh } = useProjectDetail(id ? parseInt(id) : null);
   const { addExpense, addTask, toggleTaskStatus } = useProjectData();
   const budgetData = useProjectBudget(id || '');
   const projectTasks = useProjectTasks(id || '');
+
+  // Fetch project details (workflow, team, documents) - non-blocking background fetch
+  const fetchProjectDetails = useCallback(async () => {
+    if (!id) return;
+    
+    try {
+      // Add timeout to prevent hanging
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+      const [workflowRes, teamRes, docsRes] = await Promise.all([
+        ProjectDetailService.getProjectWorkflow(id),
+        ProjectDetailService.getProjectTeam(id),
+        ProjectDetailService.getProjectDocuments(id),
+      ]);
+      
+      clearTimeout(timeoutId);
+      
+      setWorkflowPhases(workflowRes.phases);
+      setTeamMembers(teamRes.members);
+      setDocuments(docsRes.documents);
+    } catch (error) {
+      console.warn('Failed to fetch project details, using mock data:', error);
+      // Keep existing mock data
+    } finally {
+      setLoadingDetails(false);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    // Fetch in background after initial render
+    const timer = setTimeout(() => {
+      fetchProjectDetails();
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [fetchProjectDetails]);
 
   const handleAddExpense = async (data: ExpenseFormData) => {
     try {
@@ -551,16 +424,35 @@ export default function ProjectDetailScreen() {
 
         {/* Team Management Section */}
         <TeamManagement
-          members={MOCK_TEAM}
+          members={teamMembers}
           editable={true}
-          onAddMember={() => {
+          onAddMember={async () => {
+            // TODO: Show add member modal
             Alert.alert('Thêm thành viên', 'Tính năng thêm thành viên sẽ được tích hợp');
           }}
           onMemberPress={(member) => {
             Alert.alert('Thông tin', `${member.name} - ${member.role}`);
           }}
-          onRemoveMember={(member) => {
-            Alert.alert('Xác nhận', `Xóa ${member.name} khỏi dự án?`);
+          onRemoveMember={async (member) => {
+            Alert.alert(
+              'Xác nhận', 
+              `Xóa ${member.name} khỏi dự án?`,
+              [
+                { text: 'Hủy', style: 'cancel' },
+                { 
+                  text: 'Xóa', 
+                  style: 'destructive',
+                  onPress: async () => {
+                    try {
+                      await ProjectDetailService.removeTeamMember(id!, member.id);
+                      setTeamMembers(prev => prev.filter(m => m.id !== member.id));
+                    } catch (error) {
+                      Alert.alert('Lỗi', 'Không thể xóa thành viên');
+                    }
+                  }
+                }
+              ]
+            );
           }}
         />
 
@@ -600,7 +492,7 @@ export default function ProjectDetailScreen() {
             </View>
           </View>
 
-          <WorkflowMap phases={MOCK_WORKFLOW} orientation={workflowOrientation} />
+          <WorkflowMap phases={workflowPhases} orientation={workflowOrientation} />
         </View>
       </ScrollView>
 

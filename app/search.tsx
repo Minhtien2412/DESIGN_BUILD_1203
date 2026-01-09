@@ -1,3 +1,3 @@
-﻿import SearchResultsScreen from '@/features/search/SearchResultsScreen';
+import SearchResultsScreen from '@/features/search/SearchResultsScreen';
 
 export default SearchResultsScreen;

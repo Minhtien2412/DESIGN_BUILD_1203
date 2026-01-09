@@ -1,10 +1,19 @@
 import { Container } from '@/components/ui/container';
 import { useThemeColor } from '@/hooks/use-theme-color';
+import ContractorService, {
+    Contractor,
+    CONTRACTOR_CATEGORIES,
+    CONTRACTOR_FILTERS,
+    LOCATIONS,
+    MOCK_CONTRACTORS
+} from '@/services/contractorService';
 import { Ionicons } from '@expo/vector-icons';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
+    ActivityIndicator,
     FlatList,
     Image,
+    RefreshControl,
     ScrollView,
     StyleSheet,
     Text,
@@ -12,90 +21,6 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
-
-interface Contractor {
-  id: string;
-  name: string;
-  type: string;
-  image: string;
-  price: number;
-  unit: string;
-  rating: number;
-  experience: number;
-  projects: number;
-  status: 'available' | 'busy';
-}
-
-const CATEGORIES = [
-  'Ép cọc',
-  'Đào đất',
-  'Nhân công',
-  'Vật liệu',
-  'Điện nước',
-];
-
-const FILTERS = [
-  'Khớp yêu cầu',
-  'Được chọn nhiều',
-  'Giá +',
-  '4 sao trở lên',
-  'Nhiều dự án',
-  'Trên 10 Năm kinh nghiệm',
-  '1-5 Năm Kinh Nghiệm',
-];
-
-const LOCATIONS = ['Tất cả', 'Hà Nội', 'Hồ Chí Minh'];
-
-const MOCK_CONTRACTORS: Contractor[] = [
-  {
-    id: '1',
-    name: 'Thợ tô trát tường - Đội A',
-    type: 'Tô trát',
-    image: 'https://via.placeholder.com/300x200',
-    price: 150000,
-    unit: 'd/m2',
-    rating: 4.7,
-    experience: 15,
-    projects: 500,
-    status: 'available',
-  },
-  {
-    id: '2',
-    name: 'Thợ ép cọc - Đội B',
-    type: 'Ép cọc',
-    image: 'https://via.placeholder.com/300x200',
-    price: 100000,
-    unit: 'd/m2',
-    rating: 4.5,
-    experience: 10,
-    projects: 254,
-    status: 'available',
-  },
-  {
-    id: '3',
-    name: 'Thợ xây tường - Đội C',
-    type: 'Xây dựng',
-    image: 'https://via.placeholder.com/300x200',
-    price: 120000,
-    unit: 'd/m2',
-    rating: 4.2,
-    experience: 5,
-    projects: 200,
-    status: 'busy',
-  },
-  {
-    id: '4',
-    name: 'Thợ cofa - Đội C',
-    type: 'Nội thất',
-    image: 'https://via.placeholder.com/300x200',
-    price: 70000,
-    unit: 'd/m2',
-    rating: 4.4,
-    experience: 7,
-    projects: 300,
-    status: 'available',
-  },
-];
 
 export default function FindContractorsScreen() {
   const backgroundColor = useThemeColor({}, 'background');
@@ -114,7 +39,48 @@ export default function FindContractorsScreen() {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
   const [selectedLocation, setSelectedLocation] = useState('Tất cả');
-  const [contractors, setContractors] = useState<Contractor[]>(MOCK_CONTRACTORS);
+  const [contractors, setContractors] = useState<Contractor[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState(false);
+
+  // Load contractors from API
+  const loadContractors = async (isRefresh = false) => {
+    try {
+      if (!isRefresh) setLoading(true);
+      setError(false);
+      
+      const data = await ContractorService.searchContractors({
+        category: selectedCategory || undefined,
+        location: selectedLocation,
+        search: searchQuery || undefined,
+        minRating: selectedFilters.includes('4 sao trở lên') ? 4 : undefined,
+        minExperience: selectedFilters.includes('Trên 10 Năm kinh nghiệm') ? 10 :
+                       selectedFilters.includes('1-5 Năm Kinh Nghiệm') ? 1 : undefined,
+      });
+      setContractors(data);
+    } catch (err) {
+      console.error('Contractor load error:', err);
+      setError(true);
+      setContractors(MOCK_CONTRACTORS);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    loadContractors();
+  }, [selectedCategory, selectedLocation, selectedFilters]);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    loadContractors(true);
+  };
+
+  const handleSearch = () => {
+    loadContractors();
+  };
 
   const toggleFilter = (filter: string) => {
     setSelectedFilters(prev => {
@@ -215,6 +181,8 @@ export default function FindContractorsScreen() {
             placeholderTextColor={mutedColor}
             value={searchQuery}
             onChangeText={setSearchQuery}
+            onSubmitEditing={handleSearch}
+            returnKeyType="search"
           />
         </View>
         <TouchableOpacity style={styles.searchIconButton}>
@@ -222,12 +190,28 @@ export default function FindContractorsScreen() {
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.container}>
+      {loading && !contractors.length ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={primaryColor} />
+          <Text style={[styles.loadingText, { color: mutedColor }]}>Đang tìm nhà thầu...</Text>
+        </View>
+      ) : (
+      <ScrollView 
+        style={styles.container}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+      >
+        {error && (
+          <View style={styles.errorBanner}>
+            <Ionicons name="alert-circle" size={20} color="#0066CC" />
+            <Text style={styles.errorText}>Server không khả dụng - Dùng dữ liệu demo</Text>
+          </View>
+        )}
+        
         {/* Categories */}
         <View style={styles.section}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View style={styles.categoriesRow}>
-              {CATEGORIES.map(category => {
+              {CONTRACTOR_CATEGORIES.map(category => {
                 const isSelected = selectedCategory === category;
                 return (
                   <TouchableOpacity
@@ -262,7 +246,7 @@ export default function FindContractorsScreen() {
         <View style={styles.section}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View style={styles.filtersRow}>
-              {FILTERS.map(filter => {
+              {CONTRACTOR_FILTERS.map(filter => {
                 const isSelected = selectedFilters.includes(filter);
                 return (
                   <TouchableOpacity
@@ -334,6 +318,7 @@ export default function FindContractorsScreen() {
           contentContainerStyle={styles.listContainer}
         />
       </ScrollView>
+      )}
     </Container>
   );
 }
@@ -344,6 +329,31 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
     gap: 12,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingTop: 100,
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 14,
+  },
+  errorBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#E6F0FF',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    marginHorizontal: 16,
+    marginBottom: 12,
+    gap: 8,
+  },
+  errorText: {
+    color: '#0066CC',
+    fontSize: 13,
   },
   searchBar: {
     flex: 1,

@@ -46,15 +46,15 @@ export default function DefectDetailScreen() {
   const getStatusColor = (status: DefectStatus) => {
     switch (status) {
       case 'OPEN':
-        return '#F44336';
+        return '#000000';
       case 'IN_PROGRESS':
-        return '#FF9800';
+        return '#0066CC';
       case 'RESOLVED':
-        return '#4CAF50';
+        return '#0066CC';
       case 'VERIFIED':
-        return '#2196F3';
+        return '#0066CC';
       case 'CLOSED':
-        return '#9E9E9E';
+        return '#999999';
       default:
         return '#757575';
     }
@@ -65,7 +65,7 @@ export default function DefectDetailScreen() {
       case 'CRITICAL':
         return '#D32F2F';
       case 'MAJOR':
-        return '#F57C00';
+        return '#0066CC';
       case 'MINOR':
         return '#FBC02D';
       case 'COSMETIC':
@@ -214,7 +214,7 @@ export default function DefectDetailScreen() {
                 {defect.photos.map((photo, index) => (
                   <View key={index} style={styles.photoContainer}>
                     <View style={styles.photoPlaceholder}>
-                      <Ionicons name="image" size={48} color="#9E9E9E" />
+                      <Ionicons name="image" size={48} color="#999999" />
                     </View>
                   </View>
                 ))}
@@ -248,7 +248,7 @@ export default function DefectDetailScreen() {
         {defect.assignedTo && (
           <View style={styles.section}>
             <View style={styles.infoRow}>
-              <Ionicons name="person-circle" size={20} color="#2196F3" />
+              <Ionicons name="person-circle" size={20} color="#0066CC" />
               <View style={styles.infoContent}>
                 <Text style={styles.infoLabel}>Người phụ trách</Text>
                 <Text style={styles.infoValue}>{defect.assignedToName || defect.assignedTo}</Text>
@@ -410,7 +410,7 @@ const styles = StyleSheet.create({
   },
   defectId: {
     fontSize: 13,
-    color: '#9E9E9E',
+    color: '#999999',
     fontFamily: 'monospace',
   },
   section: {
@@ -548,7 +548,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     paddingVertical: 12,
     borderRadius: 8,
     gap: 8,

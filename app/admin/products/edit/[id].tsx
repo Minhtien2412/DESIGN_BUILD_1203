@@ -110,7 +110,7 @@ export default function EditProductScreen() {
   if (loading) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#EE4D2D" />
+        <ActivityIndicator size="large" color="#0066CC" />
       </View>
     );
   }
@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   required: {
-    color: '#ef4444',
+    color: '#000000',
   },
   input: {
     backgroundColor: '#fff',
@@ -311,8 +311,8 @@ const styles = StyleSheet.create({
     borderColor: '#e0e0e0',
   },
   categoryButtonActive: {
-    backgroundColor: '#EE4D2D',
-    borderColor: '#EE4D2D',
+    backgroundColor: '#0066CC',
+    borderColor: '#0066CC',
   },
   categoryButtonText: {
     fontSize: 13,
@@ -323,7 +323,7 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   submitButton: {
-    backgroundColor: '#EE4D2D',
+    backgroundColor: '#0066CC',
     borderRadius: 8,
     paddingVertical: 16,
     alignItems: 'center',

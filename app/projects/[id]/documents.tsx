@@ -27,8 +27,8 @@ interface Document {
 }
 
 const DOCUMENT_TYPES = {
-  pdf: { icon: 'document-text', color: '#EF4444' },
-  image: { icon: 'image', color: '#10B981' },
+  pdf: { icon: 'document-text', color: '#000000' },
+  image: { icon: 'image', color: '#0066CC' },
   dwg: { icon: 'cube', color: '#007AFF' },
   doc: { icon: 'document', color: '#007AFF' },
   xls: { icon: 'grid', color: '#34C759' },
@@ -180,7 +180,7 @@ export default function ProjectDocumentsScreen() {
             onPress={() => handleDelete(item.id, item.name)}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
-            <Ionicons name="trash-outline" size={20} color="#EF4444" />
+            <Ionicons name="trash-outline" size={20} color="#000000" />
           </TouchableOpacity>
         </View>
       </TouchableOpacity>
@@ -251,7 +251,7 @@ export default function ProjectDocumentsScreen() {
       {/* Document Stats */}
       <View style={styles.statsContainer}>
         <View style={styles.statCard}>
-          <Ionicons name="documents" size={24} color="#FF6B35" />
+          <Ionicons name="documents" size={24} color="#0066CC" />
           <Text style={styles.statValue}>{documents.length}</Text>
           <Text style={styles.statLabel}>Tổng tài liệu</Text>
         </View>
@@ -300,7 +300,7 @@ export default function ProjectDocumentsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#0066CC',
   },
   header: {
     flexDirection: 'row',
@@ -343,7 +343,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f0f0f0',
   },
   categoryChipActive: {
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#0066CC',
   },
   categoryText: {
     fontSize: 14,
@@ -364,7 +364,7 @@ const styles = StyleSheet.create({
   categoryBadgeText: {
     fontSize: 12,
     fontWeight: 'bold',
-    color: '#FF6B35',
+    color: '#0066CC',
   },
   statsContainer: {
     flexDirection: 'row',

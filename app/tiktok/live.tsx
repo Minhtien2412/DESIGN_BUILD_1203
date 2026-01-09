@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
   goLiveButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#EF4444',
+    backgroundColor: '#000000',
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 20,
@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
   liveBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#EF4444',
+    backgroundColor: '#000000',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 4,

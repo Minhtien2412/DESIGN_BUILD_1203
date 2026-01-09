@@ -31,11 +31,11 @@ type TeamManagementProps = {
 };
 
 const ROLE_COLORS: Record<string, string> = {
-  'Chủ đầu tư': '#FF9800',
-  'Giám đốc dự án': '#2196F3',
-  'Kỹ sư thi công': '#4CAF50',
-  'Kiến trúc sư': '#0A6847',
-  'Kỹ thuật viên': '#0A6847',
+  'Chủ đầu tư': '#0066CC',
+  'Giám đốc dự án': '#0066CC',
+  'Kỹ sư thi công': '#0066CC',
+  'Kiến trúc sư': '#0066CC',
+  'Kỹ thuật viên': '#0066CC',
   'default': '#757575',
 };
 
@@ -106,7 +106,7 @@ export default function TeamManagement({
                     onRemoveMember(member);
                   }}
                 >
-                  <Ionicons name="close-circle" size={24} color="#F44336" />
+                  <Ionicons name="close-circle" size={24} color="#000000" />
                 </TouchableOpacity>
               )}
             </View>
@@ -127,12 +127,12 @@ export default function TeamManagement({
             <View style={styles.contactIcons}>
               {member.phone && (
                 <View style={styles.contactIcon}>
-                  <Ionicons name="call" size={14} color="#4CAF50" />
+                  <Ionicons name="call" size={14} color="#0066CC" />
                 </View>
               )}
               {member.email && (
                 <View style={styles.contactIcon}>
-                  <Ionicons name="mail" size={14} color="#2196F3" />
+                  <Ionicons name="mail" size={14} color="#0066CC" />
                 </View>
               )}
             </View>
@@ -180,12 +180,12 @@ export default function TeamManagement({
             <View style={styles.listActions}>
               {member.phone && (
                 <TouchableOpacity style={styles.actionButton}>
-                  <Ionicons name="call-outline" size={20} color="#4CAF50" />
+                  <Ionicons name="call-outline" size={20} color="#0066CC" />
                 </TouchableOpacity>
               )}
               {member.email && (
                 <TouchableOpacity style={styles.actionButton}>
-                  <Ionicons name="mail-outline" size={20} color="#2196F3" />
+                  <Ionicons name="mail-outline" size={20} color="#0066CC" />
                 </TouchableOpacity>
               )}
             </View>
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#0A6847',
+    backgroundColor: '#0066CC',
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 20,

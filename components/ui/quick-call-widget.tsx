@@ -105,17 +105,17 @@ export function QuickCallWidget({ compact, style }: QuickCallWidgetProps = {}) {
   };
 
   const statusColors = {
-    online: '#4CAF50',
+    online: '#0066CC',
     busy: '#1A1A1A',
-    away: '#FF9800',
-    offline: '#9E9E9E',
+    away: '#0066CC',
+    offline: '#999999',
   };
 
   if (!isAuthenticated) {
     return (
       <View style={styles.container}>
         <View style={styles.header}>
-          <MaterialCommunityIcons name="video" size={20} color="#667eea" />
+          <MaterialCommunityIcons name="video" size={20} color="#0066CC" />
           <Text style={styles.title}>Video Call</Text>
           <Pressable
             style={styles.loginButton}
@@ -137,7 +137,7 @@ export function QuickCallWidget({ compact, style }: QuickCallWidgetProps = {}) {
     return (
       <View style={styles.container}>
         <View style={styles.header}>
-          <MaterialCommunityIcons name="video" size={20} color="#667eea" />
+          <MaterialCommunityIcons name="video" size={20} color="#0066CC" />
           <Text style={styles.title}>Video Call</Text>
         </View>
         
@@ -152,7 +152,7 @@ export function QuickCallWidget({ compact, style }: QuickCallWidgetProps = {}) {
   return (
     <View style={[styles.container, compact && styles.compactContainer, style]}>
       <View style={styles.header}>
-        <MaterialCommunityIcons name="video" size={20} color="#667eea" />
+        <MaterialCommunityIcons name="video" size={20} color="#0066CC" />
         <Text style={styles.title}>Video Call</Text>
         
         <Pressable
@@ -161,7 +161,7 @@ export function QuickCallWidget({ compact, style }: QuickCallWidgetProps = {}) {
           onPress={() => router.push('/contact-picker' as any)}
         >
           <Text style={styles.moreText}>Xem thêm</Text>
-          <MaterialIcons name="chevron-right" size={16} color="#667eea" />
+          <MaterialIcons name="chevron-right" size={16} color="#0066CC" />
         </Pressable>
       </View>
 
@@ -227,7 +227,7 @@ export function QuickCallWidget({ compact, style }: QuickCallWidgetProps = {}) {
           style={styles.quickAction}
           onPress={() => router.push('/contact-picker' as any)}
         >
-          <MaterialCommunityIcons name="account-multiple-plus" size={16} color="#667eea" />
+          <MaterialCommunityIcons name="account-multiple-plus" size={16} color="#0066CC" />
           <Text style={styles.quickActionText}>Gọi nhóm</Text>
         </Pressable>
         
@@ -235,7 +235,7 @@ export function QuickCallWidget({ compact, style }: QuickCallWidgetProps = {}) {
           style={styles.quickAction}
           onPress={() => router.push('/join-call' as any)}
         >
-          <MaterialCommunityIcons name="phone-plus" size={16} color="#667eea" />
+          <MaterialCommunityIcons name="phone-plus" size={16} color="#0066CC" />
           <Text style={styles.quickActionText}>Tham gia</Text>
         </Pressable>
       </View>
@@ -292,7 +292,7 @@ const styles = StyleSheet.create({
   },
   moreText: {
     fontSize: 14,
-    color: '#667eea',
+    color: '#0066CC',
     fontWeight: '500',
   },
   loginButton: {
@@ -303,7 +303,7 @@ const styles = StyleSheet.create({
   },
   loginText: {
     fontSize: 12,
-    color: '#667eea',
+    color: '#0066CC',
     fontWeight: '500',
   },
   authPrompt: {
@@ -342,7 +342,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 16,
-    backgroundColor: '#667eea',
+    backgroundColor: '#0066CC',
   },
   startButtonText: {
     fontSize: 12,
@@ -370,7 +370,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#667eea',
+    backgroundColor: '#0066CC',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -396,7 +396,7 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#0066CC',
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
@@ -437,7 +437,7 @@ const styles = StyleSheet.create({
   },
   quickActionText: {
     fontSize: 11,
-    color: '#667eea',
+    color: '#0066CC',
     fontWeight: '500',
   },
 });

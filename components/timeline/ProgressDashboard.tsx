@@ -57,22 +57,22 @@ export function ProgressDashboard({ phases, projectName }: ProgressDashboardProp
 
         {/* Completed */}
         <View style={[styles.statCard, { backgroundColor, borderColor }]}>
-          <Ionicons name="checkmark-circle" size={24} color="#10B981" />
-          <Text style={[styles.statValue, { color: '#10B981' }]}>{completedPhases}</Text>
+          <Ionicons name="checkmark-circle" size={24} color="#0066CC" />
+          <Text style={[styles.statValue, { color: '#0066CC' }]}>{completedPhases}</Text>
           <Text style={[styles.statLabel, { color: textColor }]}>Hoàn thành</Text>
         </View>
 
         {/* In Progress */}
         <View style={[styles.statCard, { backgroundColor, borderColor }]}>
-          <Ionicons name="play-circle" size={24} color="#3B82F6" />
-          <Text style={[styles.statValue, { color: '#3B82F6' }]}>{inProgressPhases}</Text>
+          <Ionicons name="play-circle" size={24} color="#0080FF" />
+          <Text style={[styles.statValue, { color: '#0080FF' }]}>{inProgressPhases}</Text>
           <Text style={[styles.statLabel, { color: textColor }]}>Đang làm</Text>
         </View>
 
         {/* Delayed */}
         <View style={[styles.statCard, { backgroundColor, borderColor }]}>
-          <Ionicons name="alert-circle" size={24} color="#EF4444" />
-          <Text style={[styles.statValue, { color: '#EF4444' }]}>{delayedPhases}</Text>
+          <Ionicons name="alert-circle" size={24} color="#000000" />
+          <Text style={[styles.statValue, { color: '#000000' }]}>{delayedPhases}</Text>
           <Text style={[styles.statLabel, { color: textColor }]}>Trễ hạn</Text>
         </View>
       </View>
@@ -83,7 +83,7 @@ export function ProgressDashboard({ phases, projectName }: ProgressDashboardProp
           <Text style={[styles.progressBarLabel, { color: textColor }]}>
             Tỷ lệ hoàn thành
           </Text>
-          <Text style={[styles.progressBarValue, { color: '#10B981' }]}>
+          <Text style={[styles.progressBarValue, { color: '#0066CC' }]}>
             {completionRate}%
           </Text>
         </View>
@@ -91,7 +91,7 @@ export function ProgressDashboard({ phases, projectName }: ProgressDashboardProp
           <View
             style={[
               styles.progressBarFill,
-              { width: `${completionRate}%`, backgroundColor: '#10B981' },
+              { width: `${completionRate}%`, backgroundColor: '#0066CC' },
             ]}
           />
         </View>
@@ -111,7 +111,7 @@ export function ProgressDashboard({ phases, projectName }: ProgressDashboardProp
                 styles.statusSegment,
                 {
                   width: `${(completedPhases / totalPhases) * 100}%`,
-                  backgroundColor: '#10B981',
+                  backgroundColor: '#0066CC',
                 },
               ]}
             />
@@ -122,7 +122,7 @@ export function ProgressDashboard({ phases, projectName }: ProgressDashboardProp
                 styles.statusSegment,
                 {
                   width: `${(inProgressPhases / totalPhases) * 100}%`,
-                  backgroundColor: '#3B82F6',
+                  backgroundColor: '#0080FF',
                 },
               ]}
             />
@@ -133,7 +133,7 @@ export function ProgressDashboard({ phases, projectName }: ProgressDashboardProp
                 styles.statusSegment,
                 {
                   width: `${(delayedPhases / totalPhases) * 100}%`,
-                  backgroundColor: '#EF4444',
+                  backgroundColor: '#000000',
                 },
               ]}
             />
@@ -154,7 +154,7 @@ export function ProgressDashboard({ phases, projectName }: ProgressDashboardProp
         <View style={styles.legend}>
           {completedPhases > 0 && (
             <View style={styles.legendItem}>
-              <View style={[styles.legendDot, { backgroundColor: '#10B981' }]} />
+              <View style={[styles.legendDot, { backgroundColor: '#0066CC' }]} />
               <Text style={[styles.legendText, { color: textColor }]}>
                 Hoàn thành ({completedPhases})
               </Text>
@@ -162,7 +162,7 @@ export function ProgressDashboard({ phases, projectName }: ProgressDashboardProp
           )}
           {inProgressPhases > 0 && (
             <View style={styles.legendItem}>
-              <View style={[styles.legendDot, { backgroundColor: '#3B82F6' }]} />
+              <View style={[styles.legendDot, { backgroundColor: '#0080FF' }]} />
               <Text style={[styles.legendText, { color: textColor }]}>
                 Đang làm ({inProgressPhases})
               </Text>
@@ -170,7 +170,7 @@ export function ProgressDashboard({ phases, projectName }: ProgressDashboardProp
           )}
           {delayedPhases > 0 && (
             <View style={styles.legendItem}>
-              <View style={[styles.legendDot, { backgroundColor: '#EF4444' }]} />
+              <View style={[styles.legendDot, { backgroundColor: '#000000' }]} />
               <Text style={[styles.legendText, { color: textColor }]}>
                 Trễ hạn ({delayedPhases})
               </Text>
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
     height: 120,
     borderRadius: 60,
     borderWidth: 8,
-    borderColor: '#3B82F6',
+    borderColor: '#0080FF',
     justifyContent: 'center',
     alignItems: 'center',
   },

@@ -15,9 +15,9 @@ import {
 } from 'react-native';
 
 const STATUS_COLORS = {
-  pending: '#f59e0b',
-  completed: '#10b981',
-  failed: '#ef4444'
+  pending: '#0066CC',
+  completed: '#0066CC',
+  failed: '#000000'
 };
 
 const STATUS_LABELS = {
@@ -101,25 +101,25 @@ export default function SafetyChecklistsScreen() {
               label="Hoàn thành"
               value={stats.checklistsCompleted.toString()}
               icon="checkmark-circle"
-              gradientColors={['#10b981', '#059669']}
+              gradientColors={['#0066CC', '#0066CC']}
             />
             <MetricCard
               label="Chờ kiểm tra"
               value={stats.checklistsPending.toString()}
               icon="time"
-              gradientColors={['#f59e0b', '#d97706']}
+              gradientColors={['#0066CC', '#d97706']}
             />
             <MetricCard
               label="Tuân thủ PPE"
               value={`${stats.avgPPECompliance}%`}
               icon="shield-checkmark"
-              gradientColors={['#3b82f6', '#2563eb']}
+              gradientColors={['#3b82f6', '#0066CC']}
             />
             <MetricCard
               label="Họp An toàn"
               value={stats.meetingsHeld.toString()}
               icon="people"
-              gradientColors={['#8b5cf6', '#7c3aed']}
+              gradientColors={['#666666', '#666666']}
             />
           </ScrollView>
         )}
@@ -184,21 +184,21 @@ export default function SafetyChecklistsScreen() {
                         <View style={styles.progressContainer}>
                           <View style={styles.statsRow}>
                             <View style={styles.statItem}>
-                              <Text style={[styles.statValue, { color: '#10b981' }]}>
+                              <Text style={[styles.statValue, { color: '#0066CC' }]}>
                                 {passCount}
                               </Text>
                               <Text style={styles.statLabel}>Đạt</Text>
                             </View>
 
                             <View style={styles.statItem}>
-                              <Text style={[styles.statValue, { color: '#ef4444' }]}>
+                              <Text style={[styles.statValue, { color: '#000000' }]}>
                                 {failCount}
                               </Text>
                               <Text style={styles.statLabel}>Không đạt</Text>
                             </View>
 
                             <View style={styles.statItem}>
-                              <Text style={[styles.statValue, { color: '#f59e0b' }]}>
+                              <Text style={[styles.statValue, { color: '#0066CC' }]}>
                                 {pendingCount}
                               </Text>
                               <Text style={styles.statLabel}>Chờ</Text>
@@ -219,7 +219,7 @@ export default function SafetyChecklistsScreen() {
                                 style={[
                                   styles.progressSegment,
                                   {
-                                    backgroundColor: '#10b981',
+                                    backgroundColor: '#0066CC',
                                     width: `${(passCount / totalCount) * 100}%`
                                   }
                                 ]}
@@ -230,7 +230,7 @@ export default function SafetyChecklistsScreen() {
                                 style={[
                                   styles.progressSegment,
                                   {
-                                    backgroundColor: '#ef4444',
+                                    backgroundColor: '#000000',
                                     width: `${(failCount / totalCount) * 100}%`
                                   }
                                 ]}
@@ -241,7 +241,7 @@ export default function SafetyChecklistsScreen() {
                                 style={[
                                   styles.progressSegment,
                                   {
-                                    backgroundColor: '#f59e0b',
+                                    backgroundColor: '#0066CC',
                                     width: `${(pendingCount / totalCount) * 100}%`
                                   }
                                 ]}
@@ -352,7 +352,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#10b981',
+    backgroundColor: '#0066CC',
     paddingVertical: 14,
     paddingHorizontal: 20,
     borderRadius: 12,

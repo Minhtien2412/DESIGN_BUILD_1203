@@ -23,12 +23,14 @@ interface EnvConfig {
   ENABLE_SOCIAL_FACEBOOK?: boolean;
   GOOGLE_CLIENT_ID?: string;
   GOOGLE_WEB_CLIENT_ID?: string;
+  GOOGLE_CLIENT_SECRET?: string;
   GOOGLE_ANDROID_CLIENT_ID?: string;
   GOOGLE_IOS_CLIENT_ID?: string;
   BACKOFF_BASE_MS?: number;
   BACKOFF_JITTER_MS?: number;
   // AI
   OPENAI_API_KEY?: string;
+  GEMINI_API_KEY?: string;
   // Perfex CRM Integration
   PERFEX_CRM_URL?: string;
   PERFEX_API_TOKEN?: string;
@@ -61,8 +63,9 @@ export const ENV: EnvConfig = {
   AUTH_FACEBOOK_PATH: extra.EXPO_PUBLIC_AUTH_FACEBOOK_PATH || '/auth/facebook',
   ENABLE_SOCIAL_GOOGLE: (extra.EXPO_PUBLIC_ENABLE_SOCIAL_GOOGLE ?? '1') !== '0',
   ENABLE_SOCIAL_FACEBOOK: (extra.EXPO_PUBLIC_ENABLE_SOCIAL_FACEBOOK ?? '1') !== '0',
-  GOOGLE_CLIENT_ID: extra.EXPO_PUBLIC_GOOGLE_CLIENT_ID || '702527545429-60e3mi47s816iu9aus38kb83qgkmkgna.apps.googleusercontent.com',
+  GOOGLE_CLIENT_ID: extra.EXPO_PUBLIC_GOOGLE_CLIENT_ID || '702679918765-ikhpcev251dh2ndd5cpqkqearkmips34.apps.googleusercontent.com',
   GOOGLE_WEB_CLIENT_ID: extra.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID || extra.EXPO_PUBLIC_GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET: extra.EXPO_PUBLIC_GOOGLE_CLIENT_SECRET || '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',
   GOOGLE_ANDROID_CLIENT_ID: extra.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
   GOOGLE_IOS_CLIENT_ID: extra.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
   BACKOFF_BASE_MS: parseInt(extra.EXPO_PUBLIC_BACKOFF_BASE_MS || '500', 10),
@@ -70,6 +73,7 @@ export const ENV: EnvConfig = {
   
   // AI Configuration
   OPENAI_API_KEY: extra.EXPO_PUBLIC_OPENAI_API_KEY || process.env.OPENAI_API_KEY,
+  GEMINI_API_KEY: extra.EXPO_PUBLIC_GEMINI_API_KEY || process.env.GEMINI_API_KEY,
   
   // Perfex CRM Integration (API Module đã kích hoạt)
   // TESTED: Token 2 works - 2 Customers, 1 Project available
@@ -89,6 +93,7 @@ console.log('[ENV] WS_BASE_URL:', ENV.WS_BASE_URL);
 console.log('[ENV] WS Namespaces:', ENV.WS_CHAT_NS, ENV.WS_CALL_NS, ENV.WS_PROGRESS_NS);
 console.log('[ENV] AUTH_REFRESH_PATH:', ENV.AUTH_REFRESH_PATH);
 console.log('[ENV] OPENAI_API_KEY:', ENV.OPENAI_API_KEY ? '✅ Configured' : '❌ NOT SET');
+console.log('[ENV] GEMINI_API_KEY:', ENV.GEMINI_API_KEY ? '✅ Configured' : '❌ NOT SET');
 console.log('[ENV] ENABLE_SOCIAL (G, F):', ENV.ENABLE_SOCIAL_GOOGLE, ENV.ENABLE_SOCIAL_FACEBOOK);
 
 // Validate critical values

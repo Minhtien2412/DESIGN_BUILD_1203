@@ -51,7 +51,7 @@ function StaffCard({ staff, colors, onPress }: { staff: StaffMember; colors: any
             <Text style={[styles.staffPhone, { color: colors.textMuted }]}>📞 {staff.phonenumber}</Text>
           )}
         </View>
-        <View style={[styles.staffStatus, { backgroundColor: isActive ? '#22c55e' : '#ef4444' }]}>
+        <View style={[styles.staffStatus, { backgroundColor: isActive ? '#0066CC' : '#000000' }]}>
           <Text style={styles.staffStatusText}>{isActive ? 'Active' : 'Inactive'}</Text>
         </View>
       </View>
@@ -227,10 +227,10 @@ export default function StaffListScreen() {
         {/* Error Banner */}
         {error && (
           <View style={[styles.errorBanner, { backgroundColor: '#fee2e2' }]}>
-            <Ionicons name="warning-outline" size={20} color="#ef4444" />
-            <Text style={[styles.errorText, { color: '#ef4444' }]}>{error}</Text>
+            <Ionicons name="warning-outline" size={20} color="#000000" />
+            <Text style={[styles.errorText, { color: '#000000' }]}>{error}</Text>
             <TouchableOpacity onPress={() => refresh()}>
-              <Text style={[styles.retryText, { color: '#ef4444' }]}>Thử lại</Text>
+              <Text style={[styles.retryText, { color: '#000000' }]}>Thử lại</Text>
             </TouchableOpacity>
           </View>
         )}

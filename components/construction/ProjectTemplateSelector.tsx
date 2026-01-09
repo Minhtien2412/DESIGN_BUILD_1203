@@ -56,7 +56,7 @@ const TEMPLATES: ProjectTemplate[] = [
     name: 'Biệt Thự Cao Cấp',
     description: 'Dự án xây dựng biệt thự từ 2-3 tầng với đầy đủ tiện nghi',
     icon: 'home',
-    color: '#10B981',
+    color: '#0066CC',
     category: 'residential',
     estimatedDuration: 180,
     complexity: 'complex',
@@ -106,7 +106,7 @@ const TEMPLATES: ProjectTemplate[] = [
     name: 'Văn Phòng Thương Mại',
     description: 'Tòa nhà văn phòng 3-5 tầng',
     icon: 'briefcase',
-    color: '#F59E0B',
+    color: '#0066CC',
     category: 'commercial',
     estimatedDuration: 240,
     complexity: 'complex',
@@ -130,7 +130,7 @@ const TEMPLATES: ProjectTemplate[] = [
     name: 'Hạ Tầng Giao Thông',
     description: 'Đường giao thông, cầu, hạ tầng kỹ thuật',
     icon: 'car',
-    color: '#EF4444',
+    color: '#000000',
     category: 'infrastructure',
     estimatedDuration: 300,
     complexity: 'complex',
@@ -205,11 +205,11 @@ export const ProjectTemplateSelector: React.FC<ProjectTemplateSelectorProps> = (
   const getComplexityColor = (complexity: string): string => {
     switch (complexity) {
       case 'simple':
-        return '#10B981';
+        return '#0066CC';
       case 'medium':
-        return '#F59E0B';
+        return '#0066CC';
       case 'complex':
-        return '#EF4444';
+        return '#000000';
       default:
         return '#6B7280';
     }
@@ -326,14 +326,14 @@ export const ProjectTemplateSelector: React.FC<ProjectTemplateSelectorProps> = (
                   </Text>
                 </View>
                 <View style={styles.detailsStat}>
-                  <Ionicons name="layers-outline" size={20} color="#10B981" />
+                  <Ionicons name="layers-outline" size={20} color="#0066CC" />
                   <Text style={styles.detailsStatLabel}>Số giai đoạn</Text>
                   <Text style={styles.detailsStatValue}>
                     {selectedTemplate?.defaultStages.length || 0}
                   </Text>
                 </View>
                 <View style={styles.detailsStat}>
-                  <Ionicons name="list-outline" size={20} color="#F59E0B" />
+                  <Ionicons name="list-outline" size={20} color="#0066CC" />
                   <Text style={styles.detailsStatLabel}>Công việc mẫu</Text>
                   <Text style={styles.detailsStatValue}>
                     {selectedTemplate?.defaultTasks.length || 0}

@@ -305,12 +305,12 @@ export function formatProjectType(type: ProjectType): string {
 export function getStatusColor(status: ProjectStatus): string {
   const colorMap: Record<ProjectStatus, string> = {
     planning: '#3B82F6',    // Blue
-    design: '#8B5CF6',      // Purple
-    bidding: '#F59E0B',     // Amber
-    in_progress: '#10B981', // Green
+    design: '#666666',      // Purple
+    bidding: '#0066CC',     // Amber
+    in_progress: '#0066CC', // Green
     paused: '#6B7280',      // Gray
-    completed: '#059669',   // Emerald
-    cancelled: '#EF4444',   // Red
+    completed: '#0066CC',   // Emerald
+    cancelled: '#000000',   // Red
   };
   return colorMap[status] || '#6B7280';
 }

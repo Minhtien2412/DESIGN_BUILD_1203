@@ -14,7 +14,7 @@ export default function WeatherIndexScreen() {
       description: 'Dự báo thời tiết chi tiết',
       icon: 'sunny-outline' as const,
       route: '/weather/dashboard',
-      color: '#FFD700',
+      color: '#FFFFFF',
     },
     {
       id: 2,
@@ -30,7 +30,7 @@ export default function WeatherIndexScreen() {
       description: 'Quản lý ngày dừng do thời tiết',
       icon: 'pause-circle-outline' as const,
       route: '/weather/stoppages',
-      color: '#4ECDC4',
+      color: '#0080FF',
     },
   ];
 

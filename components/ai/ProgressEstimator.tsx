@@ -20,11 +20,11 @@ export function ProgressEstimator({
   showDetails = true,
 }: ProgressEstimatorProps) {
   const getProgressColor = (percent: number): string => {
-    if (percent >= 90) return '#4caf50';
-    if (percent >= 70) return '#10B981';
-    if (percent >= 50) return '#ff9800';
-    if (percent >= 30) return '#ff9800';
-    return '#f44336';
+    if (percent >= 90) return '#0066CC';
+    if (percent >= 70) return '#0066CC';
+    if (percent >= 50) return '#0066CC';
+    if (percent >= 30) return '#0066CC';
+    return '#000000';
   };
 
   const getProgressIcon = (percent: number): string => {

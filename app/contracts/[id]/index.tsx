@@ -15,15 +15,15 @@ const STATUS_CONFIG: Record<
   ContractStatus,
   { label: string; color: string; icon: string }
 > = {
-  DRAFT: { label: 'Nháp', color: '#9E9E9E', icon: 'document-outline' },
+  DRAFT: { label: 'Nháp', color: '#999999', icon: 'document-outline' },
   PENDING_SIGNATURE: {
     label: 'Chờ ký',
-    color: '#FF9800',
+    color: '#0066CC',
     icon: 'create-outline',
   },
-  ACTIVE: { label: 'Đang thực hiện', color: '#4CAF50', icon: 'checkmark-circle' },
-  COMPLETED: { label: 'Hoàn thành', color: '#2196F3', icon: 'checkmark-done' },
-  TERMINATED: { label: 'Chấm dứt', color: '#F44336', icon: 'close-circle' },
+  ACTIVE: { label: 'Đang thực hiện', color: '#0066CC', icon: 'checkmark-circle' },
+  COMPLETED: { label: 'Hoàn thành', color: '#0066CC', icon: 'checkmark-done' },
+  TERMINATED: { label: 'Chấm dứt', color: '#000000', icon: 'close-circle' },
   EXPIRED: { label: 'Hết hạn', color: '#757575', icon: 'time-outline' },
 };
 
@@ -114,12 +114,12 @@ export default function ContractDetailScreen() {
         {/* Quick Stats */}
         <View style={styles.statsSection}>
           <View style={styles.statCard}>
-            <Ionicons name="cash" size={24} color="#4CAF50" />
+            <Ionicons name="cash" size={24} color="#0066CC" />
             <Text style={styles.statValue}>{formatCurrency(contract.totalValue)}</Text>
             <Text style={styles.statLabel}>Giá trị hợp đồng</Text>
           </View>
           <View style={styles.statCard}>
-            <Ionicons name="calendar" size={24} color="#2196F3" />
+            <Ionicons name="calendar" size={24} color="#0066CC" />
             <Text style={styles.statValue}>
               {Math.ceil(
                 (new Date(contract.endDate).getTime() -
@@ -157,7 +157,7 @@ export default function ContractDetailScreen() {
             <View key={party.id} style={styles.partyCard}>
               <View style={styles.partyHeader}>
                 <View style={styles.partyRole}>
-                  <Ionicons name="person" size={16} color="#2196F3" />
+                  <Ionicons name="person" size={16} color="#0066CC" />
                   <Text style={styles.partyRoleText}>{party.role}</Text>
                 </View>
               </View>
@@ -184,7 +184,7 @@ export default function ContractDetailScreen() {
             </Text>
           </View>
           <TouchableOpacity style={styles.actionCard} onPress={handleSign}>
-            <Ionicons name="create" size={24} color="#2196F3" />
+            <Ionicons name="create" size={24} color="#0066CC" />
             <View style={styles.actionContent}>
               <Text style={styles.actionTitle}>Quản lý chữ ký</Text>
               <Text style={styles.actionSubtitle}>
@@ -212,13 +212,13 @@ export default function ContractDetailScreen() {
             </View>
             <View style={styles.milestoneStatItem}>
               <Text style={styles.milestoneStatLabel}>Đã thanh toán</Text>
-              <Text style={[styles.milestoneStatValue, { color: '#4CAF50' }]}>
+              <Text style={[styles.milestoneStatValue, { color: '#0066CC' }]}>
                 {formatCurrency(paidValue)}
               </Text>
             </View>
           </View>
           <TouchableOpacity style={styles.actionCard} onPress={handleViewMilestones}>
-            <Ionicons name="flag" size={24} color="#4CAF50" />
+            <Ionicons name="flag" size={24} color="#0066CC" />
             <View style={styles.actionContent}>
               <Text style={styles.actionTitle}>Xem chi tiết cột mốc</Text>
               <Text style={styles.actionSubtitle}>
@@ -243,7 +243,7 @@ export default function ContractDetailScreen() {
                   </Text>
                 </View>
                 <TouchableOpacity>
-                  <Ionicons name="download-outline" size={24} color="#2196F3" />
+                  <Ionicons name="download-outline" size={24} color="#0066CC" />
                 </TouchableOpacity>
               </View>
             ))}
@@ -254,7 +254,7 @@ export default function ContractDetailScreen() {
       {/* Footer Actions */}
       <View style={styles.footer}>
         <TouchableOpacity style={styles.secondaryButton} onPress={handleDownloadPDF}>
-          <Ionicons name="download" size={20} color="#2196F3" />
+          <Ionicons name="download" size={20} color="#0066CC" />
           <Text style={styles.secondaryButtonText}>Tải PDF</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.primaryButton} onPress={handleEdit}>
@@ -294,7 +294,7 @@ const styles = StyleSheet.create({
   contractNumber: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#2196F3',
+    color: '#0066CC',
   },
   statusBadge: {
     flexDirection: 'row',
@@ -411,7 +411,7 @@ const styles = StyleSheet.create({
   partyRoleText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#2196F3',
+    color: '#0066CC',
   },
   partyName: {
     fontSize: 15,
@@ -518,12 +518,12 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: '#f8f9fa',
     borderWidth: 1,
-    borderColor: '#2196F3',
+    borderColor: '#0066CC',
   },
   secondaryButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#2196F3',
+    color: '#0066CC',
   },
   primaryButton: {
     flex: 1,
@@ -533,7 +533,7 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingVertical: 14,
     borderRadius: 8,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
   },
   primaryButtonText: {
     fontSize: 16,

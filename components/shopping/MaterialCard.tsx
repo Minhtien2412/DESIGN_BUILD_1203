@@ -89,7 +89,7 @@ export function MaterialCard({
         {/* Rating */}
         {material.rating !== undefined && (
           <View style={styles.ratingContainer}>
-            <Ionicons name="star" size={14} color="#F59E0B" />
+            <Ionicons name="star" size={14} color="#0066CC" />
             <Text style={styles.ratingText}>{material.rating.toFixed(1)}</Text>
             {material.reviews !== undefined && (
               <Text style={styles.reviewsText}>({material.reviews})</Text>
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 8,
     left: 8,
-    backgroundColor: '#EF4444',
+    backgroundColor: '#000000',
     borderRadius: 6,
     paddingHorizontal: 8,
     paddingVertical: 4,
@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#EF4444',
+    color: '#000000',
   },
   unit: {
     fontSize: 12,

@@ -26,22 +26,22 @@ type WorkflowMapProps = {
 
 const STATUS_CONFIG = {
   completed: {
-    color: '#4CAF50',
+    color: '#0066CC',
     icon: 'checkmark-circle',
     bg: '#E8F5E9',
   },
   active: {
-    color: '#2196F3',
+    color: '#0066CC',
     icon: 'radio-button-on',
-    bg: '#E3F2FD',
+    bg: '#E8F4FF',
   },
   pending: {
-    color: '#9E9E9E',
+    color: '#999999',
     icon: 'radio-button-off-outline',
     bg: '#F5F5F5',
   },
   blocked: {
-    color: '#F44336',
+    color: '#000000',
     icon: 'close-circle',
     bg: '#FFEBEE',
   },
@@ -185,15 +185,15 @@ function HorizontalWorkflowMap({ phases }: { phases: WorkflowPhase[] }) {
       {/* Legend */}
       <View style={styles.legend}>
         <View style={styles.legendItem}>
-          <View style={[styles.legendDot, { backgroundColor: '#4CAF50' }]} />
+          <View style={[styles.legendDot, { backgroundColor: '#0066CC' }]} />
           <Text style={styles.legendText}>Hoàn thành</Text>
         </View>
         <View style={styles.legendItem}>
-          <View style={[styles.legendDot, { backgroundColor: '#2196F3' }]} />
+          <View style={[styles.legendDot, { backgroundColor: '#0066CC' }]} />
           <Text style={styles.legendText}>Đang thực hiện</Text>
         </View>
         <View style={styles.legendItem}>
-          <View style={[styles.legendDot, { backgroundColor: '#9E9E9E' }]} />
+          <View style={[styles.legendDot, { backgroundColor: '#999999' }]} />
           <Text style={styles.legendText}>Chưa bắt đầu</Text>
         </View>
       </View>
@@ -373,7 +373,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   stationNameActive: {
-    color: '#2196F3',
+    color: '#0066CC',
     fontWeight: '700',
   },
   progressContainer: {
@@ -429,13 +429,13 @@ const styles = StyleSheet.create({
   line: {
     width: 40,
     height: 4,
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#0066CC',
   },
   arrow: {
     width: 0,
     height: 0,
     borderLeftWidth: 10,
-    borderLeftColor: '#4CAF50',
+    borderLeftColor: '#0066CC',
     borderTopWidth: 6,
     borderTopColor: 'transparent',
     borderBottomWidth: 6,
@@ -494,7 +494,7 @@ const styles = StyleSheet.create({
     width: 3,
     flex: 1,
     minHeight: 80,
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#0066CC',
     marginTop: -4,
   },
   verticalContent: {
@@ -506,7 +506,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     borderLeftWidth: 3,
-    borderLeftColor: '#0A6847',
+    borderLeftColor: '#0066CC',
   },
   verticalHeader: {
     marginBottom: 12,
@@ -514,7 +514,7 @@ const styles = StyleSheet.create({
   verticalNumber: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#0A6847',
+    color: '#0066CC',
     textTransform: 'uppercase',
     marginBottom: 4,
   },

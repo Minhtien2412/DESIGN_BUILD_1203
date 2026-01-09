@@ -191,7 +191,7 @@ export default function PhotoAnalysisScreen() {
             {/* Error Message */}
             {error && !loading && (
               <View style={styles.errorContainer}>
-                <Ionicons name="alert-circle" size={20} color="#f44336" />
+                <Ionicons name="alert-circle" size={20} color="#000000" />
                 <Text style={styles.errorText}>{error}</Text>
               </View>
             )}
@@ -223,7 +223,7 @@ export default function PhotoAnalysisScreen() {
 function FeatureItem({ icon, text }: { icon: string; text: string }) {
   return (
     <View style={styles.featureItem}>
-      <Ionicons name={icon as any} size={20} color="#4caf50" />
+      <Ionicons name={icon as any} size={20} color="#0066CC" />
       <Text style={styles.featureText}>{text}</Text>
     </View>
   );
@@ -314,13 +314,13 @@ const styles = StyleSheet.create({
     gap: 8,
     padding: 12,
     margin: 16,
-    backgroundColor: '#ffebee',
+    backgroundColor: '#F5F5F5',
     borderRadius: 8,
   },
   errorText: {
     flex: 1,
     fontSize: 14,
-    color: '#f44336',
+    color: '#000000',
   },
   featuresList: {
     padding: 16,

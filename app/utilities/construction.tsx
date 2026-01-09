@@ -14,7 +14,7 @@ const CONSTRUCTION_ITEMS = [
     title: 'Bảng tiến độ thi công',
     subtitle: 'Quản lý công việc theo giai đoạn',
     icon: 'grid-outline',
-    color: '#10B981',
+    color: '#0066CC',
     route: '/construction/progress-board',
   },
   {
@@ -22,7 +22,7 @@ const CONSTRUCTION_ITEMS = [
     title: 'Tiến độ thanh toán',
     subtitle: 'Theo dõi milestone và hình ảnh',
     icon: 'checkmark-done-outline',
-    color: '#0A6847',
+    color: '#0066CC',
     route: '/construction/progress',
   },
   {
@@ -30,7 +30,7 @@ const CONSTRUCTION_ITEMS = [
     title: 'Theo dõi công trình',
     subtitle: 'Giám sát tiến trình xây dựng',
     icon: 'eye-outline',
-    color: '#ff9800',
+    color: '#0066CC',
     route: '/construction/tracking',
   },
   {
@@ -38,7 +38,7 @@ const CONSTRUCTION_ITEMS = [
     title: 'Bản đồ thi công',
     subtitle: 'Xem sơ đồ và vị trí công trình',
     icon: 'map-outline',
-    color: '#0A6847',
+    color: '#0066CC',
     route: '/construction/map',
   },
   {
@@ -54,7 +54,7 @@ const CONSTRUCTION_ITEMS = [
     title: 'Nhà thiết kế',
     subtitle: 'Kết nối với kiến trúc sư',
     icon: 'person-outline',
-    color: '#0A6847',
+    color: '#0066CC',
     route: '/construction/designer',
   },
 ];
@@ -102,7 +102,7 @@ export default function ConstructionScreen() {
 
         {/* Info Banner */}
         <View style={styles.infoBanner}>
-          <Ionicons name="information-circle-outline" size={20} color="#0A6847" />
+          <Ionicons name="information-circle-outline" size={20} color="#0066CC" />
           <Text style={styles.infoText}>
             Bảng tiến độ giúp bạn tổ chức công việc theo giai đoạn với giao diện Kanban board và Timeline
           </Text>
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
   infoBanner: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    backgroundColor: '#e3f2fd',
+    backgroundColor: '#E8F4FF',
     borderRadius: 12,
     padding: 16,
     marginHorizontal: 16,

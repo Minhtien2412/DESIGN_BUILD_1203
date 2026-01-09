@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Modern Auth Header - Compact auth component for home page header
  */
 
@@ -23,8 +23,8 @@ export function ModernAuthHeader() {
   if (loading) {
     return (
       <View style={styles.container}>
-        <MaterialCommunityIcons name="loading" size={20} color="#0A6847" />
-        <Text style={styles.loadingText}>Đang tải...</Text>
+        <MaterialCommunityIcons name="loading" size={20} color="#0066CC" />
+        <Text style={styles.loadingText}>�ang t?i...</Text>
       </View>
     );
   }
@@ -33,7 +33,7 @@ export function ModernAuthHeader() {
     return (
       <TouchableOpacity style={styles.container} onPress={handleAuthAction}>
         <View style={styles.avatarContainer}>
-          <MaterialCommunityIcons name="account-circle" size={24} color="#0A6847" />
+          <MaterialCommunityIcons name="account-circle" size={24} color="#0066CC" />
         </View>
         <View style={styles.userInfo}>
           <Text style={styles.userName} numberOfLines={1}>
@@ -51,7 +51,7 @@ export function ModernAuthHeader() {
   return (
     <TouchableOpacity style={styles.loginButton} onPress={handleAuthAction}>
       <MaterialCommunityIcons name="login" size={16} color="#ffffff" />
-      <Text style={styles.loginText}>Đăng nhập</Text>
+      <Text style={styles.loginText}>�ang nh?p</Text>
     </TouchableOpacity>
   );
 }
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 6,
-    backgroundColor: '#0A6847',
+    backgroundColor: '#0066CC',
     gap: 6,
   },
   loginText: {

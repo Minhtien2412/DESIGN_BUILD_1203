@@ -41,9 +41,9 @@ export default function CreateChangeRequestScreen() {
 
   const priorities = [
     { key: 'low', label: 'Thấp', color: '#94A3B8' },
-    { key: 'medium', label: 'Trung bình', color: '#F59E0B' },
-    { key: 'high', label: 'Cao', color: '#EF4444' },
-    { key: 'critical', label: 'Nghiêm trọng', color: '#DC2626' },
+    { key: 'medium', label: 'Trung bình', color: '#0080FF' },
+    { key: 'high', label: 'Cao', color: '#000000' },
+    { key: 'critical', label: 'Nghiêm trọng', color: '#000000' },
   ];
 
   const affectedAreaOptions = [

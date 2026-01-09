@@ -83,9 +83,9 @@ const ACTIVITY_ICONS = {
 
 const ACTIVITY_COLORS = {
   info: '#3B82F6',
-  warning: '#F59E0B',
-  success: '#10B981',
-  error: '#EF4444',
+  warning: '#0066CC',
+  success: '#0066CC',
+  error: '#000000',
 };
 
 export function AdminDashboard({
@@ -177,10 +177,10 @@ export function AdminDashboard({
           <Ionicons 
             name={growth >= 0 ? 'trending-up' : 'trending-down'} 
             size={12} 
-            color={growth >= 0 ? '#16A34A' : '#DC2626'} 
+            color={growth >= 0 ? '#16A34A' : '#000000'} 
           />
           <Text style={[styles.growthText, { 
-            color: growth >= 0 ? '#16A34A' : '#DC2626' 
+            color: growth >= 0 ? '#16A34A' : '#000000' 
           }]}>
             {Math.abs(growth)}%
           </Text>
@@ -213,17 +213,17 @@ export function AdminDashboard({
             {user.email}
           </Text>
           <Text style={[styles.userRole, { 
-            color: user.role === 'contractor' ? '#F59E0B' : '#6B7280' 
+            color: user.role === 'contractor' ? '#0066CC' : '#6B7280' 
           }]}>
             {user.role === 'contractor' ? 'Nhà thầu' : 'Khách hàng'}
           </Text>
         </View>
         <View style={styles.userStatus}>
           <View style={[styles.statusDot, { 
-            backgroundColor: user.isActive ? '#10B981' : '#EF4444' 
+            backgroundColor: user.isActive ? '#0066CC' : '#000000' 
           }]} />
           {user.role === 'contractor' && !user.isVerified && (
-            <View style={[styles.verificationBadge, { backgroundColor: '#F59E0B' }]}>
+            <View style={[styles.verificationBadge, { backgroundColor: '#0066CC' }]}>
               <Text style={styles.verificationText}>Chờ duyệt</Text>
             </View>
           )}
@@ -294,21 +294,21 @@ export function AdminDashboard({
           stats.totalContractors.toLocaleString(), 
           stats.monthlyGrowth.contractors, 
           'construct-outline',
-          '#F59E0B'
+          '#0066CC'
         )}
         {renderStatsCard(
           'Dự án', 
           stats.totalProjects.toLocaleString(), 
           stats.monthlyGrowth.projects, 
           'folder-outline',
-          '#10B981'
+          '#0066CC'
         )}
         {renderStatsCard(
           'Doanh thu', 
           `${stats.totalRevenue.toLocaleString()}đ`, 
           stats.monthlyGrowth.revenue, 
           'cash-outline',
-          '#8B5CF6'
+          '#666666'
         )}
       </View>
 
@@ -346,14 +346,14 @@ export function AdminDashboard({
             <Text style={styles.actionButtonText}>Xuất dữ liệu người dùng</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.actionButton, { backgroundColor: '#F59E0B' }]}
+            style={[styles.actionButton, { backgroundColor: '#0066CC' }]}
             onPress={() => onExportData('contractors')}
           >
             <Ionicons name="construct-outline" size={20} color="white" />
             <Text style={styles.actionButtonText}>Xuất dữ liệu nhà thầu</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.actionButton, { backgroundColor: '#10B981' }]}
+            style={[styles.actionButton, { backgroundColor: '#0066CC' }]}
             onPress={() => onExportData('activities')}
           >
             <Ionicons name="analytics-outline" size={20} color="white" />
@@ -489,7 +489,7 @@ export function AdminDashboard({
               <View style={styles.userDetailInfo}>
                 <Text style={[styles.userDetailLabel, { color: textColor }]}>Trạng thái:</Text>
                 <Text style={[styles.userDetailValue, { 
-                  color: selectedUser.isActive ? '#10B981' : '#EF4444' 
+                  color: selectedUser.isActive ? '#0066CC' : '#000000' 
                 }]}>
                   {selectedUser.isActive ? 'Hoạt động' : 'Không hoạt động'}
                 </Text>
@@ -530,7 +530,7 @@ export function AdminDashboard({
                   <View style={styles.userDetailInfo}>
                     <Text style={[styles.userDetailLabel, { color: textColor }]}>Xác minh:</Text>
                     <Text style={[styles.userDetailValue, { 
-                      color: selectedUser.isVerified ? '#10B981' : '#F59E0B' 
+                      color: selectedUser.isVerified ? '#0066CC' : '#0066CC' 
                     }]}>
                       {selectedUser.isVerified ? 'Đã xác minh' : 'Chờ xác minh'}
                     </Text>
@@ -558,7 +558,7 @@ export function AdminDashboard({
             <View style={styles.userActions}>
               <TouchableOpacity
                 style={[styles.userActionButton, { 
-                  backgroundColor: selectedUser.isActive ? '#EF4444' : '#10B981' 
+                  backgroundColor: selectedUser.isActive ? '#000000' : '#0066CC' 
                 }]}
                 onPress={() => handleUserAction(
                   selectedUser.isActive ? 'deactivate' : 'activate',
@@ -572,7 +572,7 @@ export function AdminDashboard({
 
               {selectedUser.role === 'contractor' && !selectedUser.isVerified && (
                 <TouchableOpacity
-                  style={[styles.userActionButton, { backgroundColor: '#10B981' }]}
+                  style={[styles.userActionButton, { backgroundColor: '#0066CC' }]}
                   onPress={() => handleUserAction('verify', selectedUser)}
                 >
                   <Text style={styles.userActionText}>Xác minh</Text>
@@ -580,7 +580,7 @@ export function AdminDashboard({
               )}
 
               <TouchableOpacity
-                style={[styles.userActionButton, { backgroundColor: '#EF4444' }]}
+                style={[styles.userActionButton, { backgroundColor: '#000000' }]}
                 onPress={() => handleUserAction('delete', selectedUser)}
               >
                 <Text style={styles.userActionText}>Xóa tài khoản</Text>

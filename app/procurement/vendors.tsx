@@ -73,12 +73,12 @@ export default function VendorsScreen() {
 
   const getStatusColor = (status: VendorStatus): string => {
     const colors: Record<VendorStatus, string> = {
-      ACTIVE: '#4CAF50',
-      INACTIVE: '#9E9E9E',
-      SUSPENDED: '#FF9800',
-      BLACKLISTED: '#F44336',
+      ACTIVE: '#0080FF',
+      INACTIVE: '#999999',
+      SUSPENDED: '#0066CC',
+      BLACKLISTED: '#000000',
     };
-    return colors[status] || '#9E9E9E';
+    return colors[status] || '#999999';
   };
 
   const getStatusLabel = (status: VendorStatus): string => {
@@ -123,7 +123,7 @@ export default function VendorsScreen() {
         showsHorizontalScrollIndicator={false}
         style={styles.statsContainer}
       >
-        <View style={[styles.statCard, { backgroundColor: '#E3F2FD' }]}>
+        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
           <Text style={styles.statValue}>{stats.total}</Text>
           <Text style={styles.statLabel}>Tổng NCC</Text>
         </View>
@@ -131,7 +131,7 @@ export default function VendorsScreen() {
           <Text style={styles.statValue}>{stats.active}</Text>
           <Text style={styles.statLabel}>Đang hoạt động</Text>
         </View>
-        <View style={[styles.statCard, { backgroundColor: '#FFF3E0' }]}>
+        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
           <Text style={styles.statValue}>{stats.highRated}</Text>
           <Text style={styles.statLabel}>Đánh giá cao</Text>
         </View>
@@ -265,7 +265,7 @@ export default function VendorsScreen() {
           style={[styles.filterChip, statusFilter === 'ACTIVE' && styles.filterChipActive]}
           onPress={() => setStatusFilter('ACTIVE' as VendorStatus)}
         >
-          <View style={[styles.statusDot, { backgroundColor: '#4CAF50' }]} />
+          <View style={[styles.statusDot, { backgroundColor: '#0080FF' }]} />
           <Text
             style={[
               styles.filterChipText,
@@ -282,7 +282,7 @@ export default function VendorsScreen() {
           ]}
           onPress={() => setStatusFilter('INACTIVE' as VendorStatus)}
         >
-          <View style={[styles.statusDot, { backgroundColor: '#9E9E9E' }]} />
+          <View style={[styles.statusDot, { backgroundColor: '#999999' }]} />
           <Text
             style={[
               styles.filterChipText,
@@ -299,7 +299,7 @@ export default function VendorsScreen() {
           ]}
           onPress={() => setStatusFilter('SUSPENDED' as VendorStatus)}
         >
-          <View style={[styles.statusDot, { backgroundColor: '#FF9800' }]} />
+          <View style={[styles.statusDot, { backgroundColor: '#0066CC' }]} />
           <Text
             style={[
               styles.filterChipText,
@@ -368,7 +368,7 @@ export default function VendorsScreen() {
 
               <View style={styles.vendorFooter}>
                 <View style={styles.ratingContainer}>
-                  <Ionicons name="star" size={16} color="#FFC107" />
+                  <Ionicons name="star" size={16} color="#0066CC" />
                   <Text style={styles.ratingText}>{vendor.rating.toFixed(1)}</Text>
                   <Text style={styles.ratingCount}>({vendor.totalOrders ?? 0} đơn)</Text>
                 </View>

@@ -108,12 +108,12 @@ export const PROJECT_STATUS_CONFIG: Record<ProjectStatus, {
   icon: string;
   order: number;
 }> = {
-  DRAFT: { label: 'Nháp', color: '#9E9E9E', bgColor: '#F5F5F5', icon: 'document-outline', order: 0 },
-  PLANNING: { label: 'Lên kế hoạch', color: '#2196F3', bgColor: '#E3F2FD', icon: 'clipboard-outline', order: 1 },
-  IN_PROGRESS: { label: 'Đang thi công', color: '#FF9800', bgColor: '#FFF3E0', icon: 'hammer-outline', order: 2 },
-  PENDING_REVIEW: { label: 'Chờ nghiệm thu', color: '#9C27B0', bgColor: '#F3E5F5', icon: 'eye-outline', order: 3 },
-  COMPLETED: { label: 'Hoàn thành', color: '#4CAF50', bgColor: '#E8F5E9', icon: 'checkmark-circle-outline', order: 4 },
-  ON_HOLD: { label: 'Tạm dừng', color: '#F44336', bgColor: '#FFEBEE', icon: 'pause-circle-outline', order: 5 },
+  DRAFT: { label: 'Nháp', color: '#999999', bgColor: '#F5F5F5', icon: 'document-outline', order: 0 },
+  PLANNING: { label: 'Lên kế hoạch', color: '#0066CC', bgColor: '#E8F4FF', icon: 'clipboard-outline', order: 1 },
+  IN_PROGRESS: { label: 'Đang thi công', color: '#0066CC', bgColor: '#E8F4FF', icon: 'hammer-outline', order: 2 },
+  PENDING_REVIEW: { label: 'Chờ nghiệm thu', color: '#999999', bgColor: '#F3E5F5', icon: 'eye-outline', order: 3 },
+  COMPLETED: { label: 'Hoàn thành', color: '#0066CC', bgColor: '#E8F5E9', icon: 'checkmark-circle-outline', order: 4 },
+  ON_HOLD: { label: 'Tạm dừng', color: '#000000', bgColor: '#FFEBEE', icon: 'pause-circle-outline', order: 5 },
   CANCELLED: { label: 'Đã hủy', color: '#757575', bgColor: '#EEEEEE', icon: 'close-circle-outline', order: 6 },
 };
 
@@ -136,14 +136,14 @@ export const TASK_STATUS_CONFIG: Record<TaskStatus, {
   icon: string;
   step: number;
 }> = {
-  NOT_STARTED: { label: 'Chưa bắt đầu', color: '#9E9E9E', bgColor: '#F5F5F5', icon: 'ellipse-outline', step: 0 },
-  IN_PROGRESS: { label: 'Đang thực hiện', color: '#2196F3', bgColor: '#E3F2FD', icon: 'construct-outline', step: 1 },
-  AWAITING_MATERIALS: { label: 'Chờ vật liệu', color: '#FF9800', bgColor: '#FFF3E0', icon: 'cube-outline', step: 1 },
-  PAUSED: { label: 'Tạm dừng', color: '#F44336', bgColor: '#FFEBEE', icon: 'pause-outline', step: 1 },
-  PENDING_CHECK: { label: 'Chờ kiểm tra', color: '#9C27B0', bgColor: '#F3E5F5', icon: 'search-outline', step: 2 },
-  COMPLETED: { label: 'Hoàn thành', color: '#4CAF50', bgColor: '#E8F5E9', icon: 'checkmark-outline', step: 3 },
+  NOT_STARTED: { label: 'Chưa bắt đầu', color: '#999999', bgColor: '#F5F5F5', icon: 'ellipse-outline', step: 0 },
+  IN_PROGRESS: { label: 'Đang thực hiện', color: '#0066CC', bgColor: '#E8F4FF', icon: 'construct-outline', step: 1 },
+  AWAITING_MATERIALS: { label: 'Chờ vật liệu', color: '#0066CC', bgColor: '#E8F4FF', icon: 'cube-outline', step: 1 },
+  PAUSED: { label: 'Tạm dừng', color: '#000000', bgColor: '#FFEBEE', icon: 'pause-outline', step: 1 },
+  PENDING_CHECK: { label: 'Chờ kiểm tra', color: '#999999', bgColor: '#F3E5F5', icon: 'search-outline', step: 2 },
+  COMPLETED: { label: 'Hoàn thành', color: '#0066CC', bgColor: '#E8F5E9', icon: 'checkmark-outline', step: 3 },
   APPROVED: { label: 'Đã nghiệm thu', color: '#00C853', bgColor: '#E8F5E9', icon: 'checkmark-circle', step: 4 },
-  REJECTED: { label: 'Bị từ chối', color: '#D32F2F', bgColor: '#FFCDD2', icon: 'close-circle-outline', step: 2 },
+  REJECTED: { label: 'Bị từ chối', color: '#D32F2F', bgColor: '#E8E8E8', icon: 'close-circle-outline', step: 2 },
 };
 
 // ==================== DATA MODELS ====================
@@ -443,7 +443,7 @@ export function generateTaskTimeline(task: ConstructionTask): TimelineStep[] {
       status: 'completed',
       date: task.createdAt,
       icon: 'create-outline',
-      color: '#2196F3',
+      color: '#0066CC',
     },
     {
       id: 'started',
@@ -453,7 +453,7 @@ export function generateTaskTimeline(task: ConstructionTask): TimelineStep[] {
               task.status === 'NOT_STARTED' ? 'pending' : 'current',
       date: task.actualStartDate,
       icon: 'hammer-outline',
-      color: '#FF9800',
+      color: '#0066CC',
     },
     {
       id: 'in_progress',
@@ -462,7 +462,7 @@ export function generateTaskTimeline(task: ConstructionTask): TimelineStep[] {
       status: task.status === 'IN_PROGRESS' ? 'current' : 
               ['PENDING_CHECK', 'COMPLETED', 'APPROVED'].includes(task.status) ? 'completed' : 'pending',
       icon: 'construct-outline',
-      color: '#FF9800',
+      color: '#0066CC',
     },
     {
       id: 'pending_check',
@@ -471,7 +471,7 @@ export function generateTaskTimeline(task: ConstructionTask): TimelineStep[] {
       status: task.status === 'PENDING_CHECK' ? 'current' :
               ['COMPLETED', 'APPROVED'].includes(task.status) ? 'completed' : 'pending',
       icon: 'search-outline',
-      color: '#9C27B0',
+      color: '#999999',
     },
     {
       id: 'completed',
@@ -481,7 +481,7 @@ export function generateTaskTimeline(task: ConstructionTask): TimelineStep[] {
               task.status === 'APPROVED' ? 'completed' : 'pending',
       date: task.actualEndDate,
       icon: 'checkmark-outline',
-      color: '#4CAF50',
+      color: '#0066CC',
     },
     {
       id: 'approved',

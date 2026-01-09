@@ -212,8 +212,8 @@ export function AttachmentPicker({
                 style={[styles.menuItem, { borderBottomColor: border }]}
                 onPress={pickImage}
               >
-                <View style={[styles.iconContainer, { backgroundColor: '#10B981' + '15' }]}>
-                  <Ionicons name="image" size={24} color="#10B981" />
+                <View style={[styles.iconContainer, { backgroundColor: '#0066CC' + '15' }]}>
+                  <Ionicons name="image" size={24} color="#0066CC" />
                 </View>
                 <View style={styles.menuItemContent}>
                   <Text style={[styles.menuItemTitle, { color: text }]}>
@@ -230,8 +230,8 @@ export function AttachmentPicker({
                 style={[styles.menuItem]}
                 onPress={pickDocument}
               >
-                <View style={[styles.iconContainer, { backgroundColor: '#F59E0B' + '15' }]}>
-                  <Ionicons name="document-text" size={24} color="#F59E0B" />
+                <View style={[styles.iconContainer, { backgroundColor: '#0066CC' + '15' }]}>
+                  <Ionicons name="document-text" size={24} color="#0066CC" />
                 </View>
                 <View style={styles.menuItemContent}>
                   <Text style={[styles.menuItemTitle, { color: text }]}>
@@ -330,7 +330,7 @@ export function AttachmentPreview({ attachments, onRemove }: AttachmentPreviewPr
             style={styles.removeButton}
             onPress={() => onRemove(index)}
           >
-            <Ionicons name="close-circle" size={20} color="#EF4444" />
+            <Ionicons name="close-circle" size={20} color="#000000" />
           </Pressable>
         </View>
       ))}

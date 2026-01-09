@@ -115,7 +115,7 @@ export default function CartScreen() {
                 onPress={() => removeFromCart(item.id)}
                 style={styles.removeButton}
               >
-                <Ionicons name="trash-outline" size={20} color="#EF4444" />
+                <Ionicons name="trash-outline" size={20} color="#000000" />
               </Pressable>
             </CardContent>
           </Card>

@@ -43,7 +43,7 @@ export default function PunchListScreen() {
   const getStatusColor = (status: PunchListStatus): { bg: string; text: string } => {
     const colors: Record<PunchListStatus, { bg: string; text: string }> = {
       DRAFT: { bg: '#F3F4F6', text: '#374151' },
-      SUBMITTED: { bg: '#DBEAFE', text: '#1E40AF' },
+      SUBMITTED: { bg: '#E8F4FF', text: '#1E40AF' },
       IN_PROGRESS: { bg: '#FEF3C7', text: '#92400E' },
       COMPLETED: { bg: '#D1FAE5', text: '#065F46' },
       CLOSED: { bg: '#E5E7EB', text: '#6B7280' },
@@ -72,7 +72,7 @@ export default function PunchListScreen() {
     return (
       <Container>
         <Section>
-          <ThemedText style={{ color: '#EF4444', textAlign: 'center' }}>
+          <ThemedText style={{ color: '#000000', textAlign: 'center' }}>
             Error: {error.message}
           </ThemedText>
         </Section>
@@ -101,21 +101,21 @@ export default function PunchListScreen() {
                 </ThemedText>
               </View>
               <View style={[styles.statCard, { backgroundColor: cardBackground, borderColor }]}>
-                <Ionicons name="list-outline" size={24} color="#F59E0B" />
+                <Ionicons name="list-outline" size={24} color="#0066CC" />
                 <ThemedText style={styles.statValue}>{summary.totalItems}</ThemedText>
                 <ThemedText style={[styles.statLabel, { color: secondaryText }]}>
                   Total Items
                 </ThemedText>
               </View>
               <View style={[styles.statCard, { backgroundColor: cardBackground, borderColor }]}>
-                <Ionicons name="checkmark-circle-outline" size={24} color="#10B981" />
+                <Ionicons name="checkmark-circle-outline" size={24} color="#0066CC" />
                 <ThemedText style={styles.statValue}>{summary.completionRate}%</ThemedText>
                 <ThemedText style={[styles.statLabel, { color: secondaryText }]}>
                   Completion Rate
                 </ThemedText>
               </View>
               <View style={[styles.statCard, { backgroundColor: cardBackground, borderColor }]}>
-                <Ionicons name="alert-circle-outline" size={24} color="#EF4444" />
+                <Ionicons name="alert-circle-outline" size={24} color="#000000" />
                 <ThemedText style={styles.statValue}>{summary.overdueItems}</ThemedText>
                 <ThemedText style={[styles.statLabel, { color: secondaryText }]}>
                   Overdue Items
@@ -195,7 +195,7 @@ export default function PunchListScreen() {
                             list.listType === 'FINAL'
                               ? '#FEE2E2'
                               : list.listType === 'SUBSTANTIAL_COMPLETION'
-                                ? '#DBEAFE'
+                                ? '#E8F4FF'
                                 : '#FEF3C7',
                         },
                       ]}
@@ -261,13 +261,13 @@ export default function PunchListScreen() {
                   </View>
                   <View style={styles.statItem}>
                     <ThemedText style={styles.statItemLabel}>In Progress:</ThemedText>
-                    <ThemedText style={[styles.statItemValue, { color: '#F59E0B' }]}>
+                    <ThemedText style={[styles.statItemValue, { color: '#0066CC' }]}>
                       {list.inProgressItems}
                     </ThemedText>
                   </View>
                   <View style={styles.statItem}>
                     <ThemedText style={styles.statItemLabel}>Completed:</ThemedText>
-                    <ThemedText style={[styles.statItemValue, { color: '#10B981' }]}>
+                    <ThemedText style={[styles.statItemValue, { color: '#0066CC' }]}>
                       {list.completedItems}
                     </ThemedText>
                   </View>
@@ -282,10 +282,10 @@ export default function PunchListScreen() {
                         width: `${list.completionRate}%`,
                         backgroundColor:
                           list.completionRate === 100
-                            ? '#10B981'
+                            ? '#0066CC'
                             : list.completionRate >= 50
                               ? '#3B82F6'
-                              : '#F59E0B',
+                              : '#0066CC',
                       },
                     ]}
                   />
@@ -304,16 +304,16 @@ export default function PunchListScreen() {
                   </View>
                   {list.overdueItems > 0 && (
                     <View style={styles.footerItem}>
-                      <Ionicons name="alert-circle" size={14} color="#EF4444" />
-                      <ThemedText style={[styles.footerText, { color: '#EF4444' }]}>
+                      <Ionicons name="alert-circle" size={14} color="#000000" />
+                      <ThemedText style={[styles.footerText, { color: '#000000' }]}>
                         {list.overdueItems} overdue
                       </ThemedText>
                     </View>
                   )}
                   {list.criticalItems > 0 && (
                     <View style={styles.footerItem}>
-                      <Ionicons name="warning" size={14} color="#F59E0B" />
-                      <ThemedText style={[styles.footerText, { color: '#F59E0B' }]}>
+                      <Ionicons name="warning" size={14} color="#0066CC" />
+                      <ThemedText style={[styles.footerText, { color: '#0066CC' }]}>
                         {list.criticalItems} critical
                       </ThemedText>
                     </View>

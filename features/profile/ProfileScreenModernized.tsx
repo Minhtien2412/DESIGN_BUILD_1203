@@ -1,30 +1,37 @@
 /**
  * Profile Screen - Modernized with Nordic Green Theme
  * Shopee/Grab style with stats cards, sections, settings
- * Updated: 13/12/2025
+ * Updated: 09/01/2026 - Added Avatar Upload
  */
 
 import { MODERN_COLORS, MODERN_RADIUS, MODERN_SHADOWS, MODERN_SPACING, MODERN_TYPOGRAPHY } from '@/constants/modern-theme';
 import { useAuth } from '@/features/auth';
 import { apiFetch } from '@/services/api';
+import avatarService, { AvatarUploadProgress } from '@/services/avatarService';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import {
-    Alert,
-    RefreshControl,
-    SafeAreaView,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  ActionSheetIOS,
+  ActivityIndicator,
+  Alert,
+  Image,
+  Platform,
+  RefreshControl,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
 
 export default function ProfileScreenModernized() {
-  const { user, signOut, isAuthenticated } = useAuth();
+  const { user, signOut, isAuthenticated, updateAvatar } = useAuth();
   const [refreshing, setRefreshing] = useState(false);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -75,6 +82,128 @@ export default function ProfileScreenModernized() {
 
   const handleEditAccount = () => {
     router.push('/profile/edit');
+  };
+
+  // ==================== AVATAR UPLOAD ====================
+  const handleAvatarUpload = () => {
+    if (Platform.OS === 'ios') {
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          options: ['Hủy', 'Chụp ảnh', 'Chọn từ thư viện', 'Xóa ảnh hiện tại'],
+          cancelButtonIndex: 0,
+          destructiveButtonIndex: 3,
+          title: 'Thay đổi ảnh đại diện',
+        },
+        async (buttonIndex) => {
+          if (buttonIndex === 1) {
+            await uploadFromCamera();
+          } else if (buttonIndex === 2) {
+            await uploadFromGallery();
+          } else if (buttonIndex === 3) {
+            await deleteCurrentAvatar();
+          }
+        }
+      );
+    } else {
+      Alert.alert(
+        'Thay đổi ảnh đại diện',
+        'Chọn phương thức',
+        [
+          { text: 'Hủy', style: 'cancel' },
+          { text: 'Chụp ảnh', onPress: uploadFromCamera },
+          { text: 'Chọn từ thư viện', onPress: uploadFromGallery },
+          { 
+            text: 'Xóa ảnh hiện tại', 
+            style: 'destructive', 
+            onPress: deleteCurrentAvatar 
+          },
+        ]
+      );
+    }
+  };
+
+  const uploadFromCamera = async () => {
+    try {
+      setAvatarUploading(true);
+      setUploadProgress(0);
+      
+      const result = await avatarService.pickAndUpload(
+        'camera',
+        { maxSizeMB: 2, compressQuality: 0.8 },
+        (progress: AvatarUploadProgress) => setUploadProgress(progress.percentage)
+      );
+      
+      if (result.success && result.url) {
+        // Update user context với avatar mới
+        await updateAvatar(result.url);
+        Alert.alert('Thành công', 'Đã cập nhật ảnh đại diện');
+      } else if (result.error) {
+        Alert.alert('Lỗi', result.error);
+      }
+    } catch (error: any) {
+      console.error('[Profile] Camera upload error:', error);
+      Alert.alert('Lỗi', error.message || 'Không thể chụp ảnh');
+    } finally {
+      setAvatarUploading(false);
+      setUploadProgress(0);
+    }
+  };
+
+  const uploadFromGallery = async () => {
+    try {
+      setAvatarUploading(true);
+      setUploadProgress(0);
+      
+      const result = await avatarService.pickAndUpload(
+        'gallery',
+        { maxSizeMB: 2, compressQuality: 0.8 },
+        (progress: AvatarUploadProgress) => setUploadProgress(progress.percentage)
+      );
+      
+      if (result.success && result.url) {
+        // Update user context với avatar mới
+        await updateAvatar(result.url);
+        Alert.alert('Thành công', 'Đã cập nhật ảnh đại diện');
+      } else if (result.error) {
+        Alert.alert('Lỗi', result.error);
+      }
+    } catch (error: any) {
+      console.error('[Profile] Gallery upload error:', error);
+      Alert.alert('Lỗi', error.message || 'Không thể chọn ảnh');
+    } finally {
+      setAvatarUploading(false);
+      setUploadProgress(0);
+    }
+  };
+
+  const deleteCurrentAvatar = async () => {
+    Alert.alert(
+      'Xóa ảnh đại diện',
+      'Bạn có chắc muốn xóa ảnh đại diện hiện tại?',
+      [
+        { text: 'Hủy', style: 'cancel' },
+        {
+          text: 'Xóa',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              setAvatarUploading(true);
+              const result = await avatarService.delete();
+              if (result.success) {
+                await updateAvatar('');
+                Alert.alert('Thành công', 'Đã xóa ảnh đại diện');
+              } else {
+                Alert.alert('Lỗi', result.error || 'Không thể xóa ảnh');
+              }
+            } catch (error: any) {
+              Alert.alert('Lỗi', error.message || 'Không thể xóa ảnh');
+            } finally {
+              setAvatarUploading(false);
+            }
+          },
+        },
+      ]
+    );
   };
 
   const handleDeleteAccount = () => {
@@ -278,15 +407,46 @@ export default function ProfileScreenModernized() {
           {/* Profile Card */}
           <View style={styles.profileCard}>
             <View style={styles.avatarContainer}>
-              <View style={styles.avatar}>
-                <Text style={styles.avatarText}>{name[0].toUpperCase()}</Text>
-              </View>
-              <TouchableOpacity style={styles.avatarEditButton}>
+              {/* Avatar with Image or Initial */}
+              {user?.avatar ? (
+                <Image 
+                  source={{ uri: user.avatar }} 
+                  style={styles.avatarImage}
+                  resizeMode="cover"
+                />
+              ) : (
+                <View style={styles.avatar}>
+                  <Text style={styles.avatarText}>{name[0].toUpperCase()}</Text>
+                </View>
+              )}
+              
+              {/* Upload Progress Overlay */}
+              {avatarUploading && (
+                <View style={styles.avatarOverlay}>
+                  <ActivityIndicator size="small" color="#fff" />
+                  {uploadProgress > 0 && (
+                    <Text style={styles.uploadProgressText}>{uploadProgress}%</Text>
+                  )}
+                </View>
+              )}
+              
+              {/* Edit Button */}
+              <TouchableOpacity 
+                style={styles.avatarEditButton}
+                onPress={handleAvatarUpload}
+                disabled={avatarUploading}
+              >
                 <Ionicons name="camera" size={16} color={MODERN_COLORS.surface} />
               </TouchableOpacity>
             </View>
             <Text style={styles.userName}>{name}</Text>
             <Text style={styles.userEmail}>{email}</Text>
+            
+            {/* User ID Display */}
+            <View style={styles.userIdBadge}>
+              <Ionicons name="finger-print-outline" size={12} color={MODERN_COLORS.textSecondary} />
+              <Text style={styles.userIdText}>ID: {user?.id?.slice(0, 8) || 'N/A'}</Text>
+            </View>
             
             {/* Phone Number */}
             {user?.phone && (
@@ -350,7 +510,7 @@ export default function ProfileScreenModernized() {
               onPress={() => router.push('/messages')}
               activeOpacity={0.8}
             >
-              <View style={[styles.quickActionIcon, { backgroundColor: '#8B5CF6' }]}>
+              <View style={[styles.quickActionIcon, { backgroundColor: '#666666' }]}>
                 <Ionicons name="people" size={24} color="#fff" />
               </View>
               <Text style={styles.quickActionLabel}>Danh bạ</Text>
@@ -396,6 +556,18 @@ export default function ProfileScreenModernized() {
               MODERN_COLORS.primary
             )}
             {renderMenuItem('folder-outline', 'File Manager', 'Quản lý file đã upload')}
+          </>
+        ))}
+
+        {renderSection('Developer Tools', (
+          <>
+            {renderMenuItem(
+              'cloud-done-outline', 
+              'Test CRM Sync', 
+              'Test Perfex CRM data integration',
+              () => router.push('/(tabs)/test-crm'),
+              MODERN_COLORS.success
+            )}
           </>
         ))}
 
@@ -532,6 +704,31 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     ...MODERN_SHADOWS.md,
   },
+  avatarImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: MODERN_COLORS.background,
+  },
+  avatarOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  uploadProgressText: {
+    fontSize: 10,
+    color: '#fff',
+    fontWeight: '600',
+    marginTop: 2,
+  },
   avatarText: {
     fontSize: MODERN_TYPOGRAPHY.fontSize.xxxl,
     fontWeight: MODERN_TYPOGRAPHY.fontWeight.bold,
@@ -560,6 +757,21 @@ const styles = StyleSheet.create({
     fontSize: MODERN_TYPOGRAPHY.fontSize.sm,
     color: MODERN_COLORS.textSecondary,
     marginBottom: MODERN_SPACING.sm,
+  },
+  userIdBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: MODERN_COLORS.background,
+    paddingHorizontal: MODERN_SPACING.sm,
+    paddingVertical: 4,
+    borderRadius: MODERN_RADIUS.sm,
+    marginBottom: MODERN_SPACING.xs,
+  },
+  userIdText: {
+    fontSize: 11,
+    color: MODERN_COLORS.textSecondary,
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
   },
   infoRow: {
     flexDirection: 'row',

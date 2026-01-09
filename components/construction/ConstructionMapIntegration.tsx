@@ -402,9 +402,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 10,
-    backgroundColor: '#DBEAFE',
+    backgroundColor: '#E8F4FF',
     borderTopWidth: 1,
-    borderTopColor: '#93C5FD',
+    borderTopColor: '#0080FF',
   },
   filterInfoText: {
     fontSize: 13,

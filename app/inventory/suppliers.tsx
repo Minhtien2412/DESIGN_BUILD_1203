@@ -66,7 +66,7 @@ export default function SuppliersScreen() {
               {/* Header */}
               <View style={styles.header}>
                 <View style={styles.iconContainer}>
-                  <Ionicons name="business" size={24} color="#2196F3" />
+                  <Ionicons name="business" size={24} color="#0066CC" />
                 </View>
                 <View style={styles.headerInfo}>
                   <Text style={styles.supplierName}>{supplier.name}</Text>
@@ -77,7 +77,7 @@ export default function SuppliersScreen() {
                           key={star}
                           name={star <= supplier.rating! ? 'star' : 'star-outline'}
                           size={14}
-                          color="#FFC107"
+                          color="#0066CC"
                         />
                       ))}
                       <Text style={styles.ratingText}>({supplier.rating})</Text>
@@ -135,7 +135,7 @@ export default function SuppliersScreen() {
               {/* Actions */}
               <View style={styles.actions}>
                 <TouchableOpacity style={styles.deleteButton} onPress={() => handleDelete(supplier.id, supplier.name)}>
-                  <Ionicons name="trash-outline" size={16} color="#F44336" />
+                  <Ionicons name="trash-outline" size={16} color="#000000" />
                   <Text style={styles.deleteButtonText}>Xóa</Text>
                 </TouchableOpacity>
               </View>
@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     paddingHorizontal: 20,
     paddingVertical: 10,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     borderRadius: 8,
   },
   emptyButtonText: {
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -271,13 +271,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderWidth: 1,
-    borderColor: '#F44336',
+    borderColor: '#000000',
     borderRadius: 6,
   },
   deleteButtonText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#F44336',
+    color: '#000000',
   },
   fab: {
     position: 'absolute',
@@ -286,7 +286,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 4,

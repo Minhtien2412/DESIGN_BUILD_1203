@@ -41,7 +41,7 @@ const MOCK_FILES: FileItem[] = [
     size: '12.5 MB',
     date: '18/10/2024',
     icon: 'file-pdf-box',
-    color: '#EF4444',
+    color: '#000000',
   },
   {
     id: '3',
@@ -50,7 +50,7 @@ const MOCK_FILES: FileItem[] = [
     size: '3.2 MB',
     date: '15/10/2024',
     icon: 'file-excel',
-    color: '#10B981',
+    color: '#0066CC',
   },
   {
     id: '4',
@@ -59,7 +59,7 @@ const MOCK_FILES: FileItem[] = [
     size: '85 MB',
     date: '12/10/2024',
     icon: 'folder',
-    color: '#F59E0B',
+    color: '#0066CC',
   },
   {
     id: '5',
@@ -77,7 +77,7 @@ const MOCK_FILES: FileItem[] = [
     size: '5.4 MB',
     date: '08/10/2024',
     icon: 'image',
-    color: '#8B5CF6',
+    color: '#666666',
   },
 ];
 
@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#EFF6FF',
+    backgroundColor: '#E8F4FF',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,

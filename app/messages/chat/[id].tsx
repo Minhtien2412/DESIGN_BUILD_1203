@@ -118,7 +118,7 @@ export default function ChatScreen() {
         {/* Input */}
         <View style={styles.inputContainer}>
           <TouchableOpacity style={styles.attachBtn}>
-            <Ionicons name="add-circle-outline" size={28} color="#FF6B35" />
+            <Ionicons name="add-circle-outline" size={28} color="#0066CC" />
           </TouchableOpacity>
           <TextInput
             style={styles.input}
@@ -149,7 +149,7 @@ export default function ChatScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#0066CC',
   },
   header: {
     flexDirection: 'row',
@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   messageBubbleMe: {
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#0066CC',
     borderBottomRightRadius: 4,
   },
   messageText: {
@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#0066CC',
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: 8,

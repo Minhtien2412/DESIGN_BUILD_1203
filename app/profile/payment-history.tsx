@@ -52,7 +52,7 @@ const PAYMENT_HISTORY: PaymentHistory[] = [
     amount: 890000,
     method: 'COD',
     methodIcon: 'cash',
-    methodColor: '#10B981',
+    methodColor: '#0066CC',
     status: 'pending',
     date: '2025-02-03 16:45',
     items: 1,
@@ -73,8 +73,8 @@ const PAYMENT_HISTORY: PaymentHistory[] = [
 const STATUS_CONFIG = {
   success: {
     label: 'Thành công',
-    color: '#10B981',
-    bg: '#10B98120',
+    color: '#0066CC',
+    bg: '#0066CC20',
     icon: 'checkmark-circle',
   },
   pending: {
@@ -85,8 +85,8 @@ const STATUS_CONFIG = {
   },
   failed: {
     label: 'Thất bại',
-    color: '#EF4444',
-    bg: '#EF444420',
+    color: '#000000',
+    bg: '#00000020',
     icon: 'close-circle',
   },
 };
@@ -264,7 +264,7 @@ export default function PaymentHistoryScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#0066CC',
   },
   header: {
     flexDirection: 'row',
@@ -299,7 +299,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f0f0f0',
   },
   filterTabActive: {
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#0066CC',
   },
   filterText: {
     fontSize: 14,
@@ -401,7 +401,7 @@ const styles = StyleSheet.create({
   totalAmount: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#FF6B35',
+    color: '#0066CC',
   },
   emptyState: {
     flex: 1,

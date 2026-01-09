@@ -44,7 +44,7 @@ export function CallHistoryList() {
     const isIncoming = call.calleeId === call.id; // Would need current user ID
     
     if (isMissed) {
-      return <Ionicons name="call-outline" size={20} color="#EF4444" />;
+      return <Ionicons name="call-outline" size={20} color="#000000" />;
     }
     
     if (call.type === 'video') {
@@ -86,7 +86,7 @@ export function CallHistoryList() {
           <Text
             style={[
               styles.callerName,
-              { color: isMissed ? '#EF4444' : textColor },
+              { color: isMissed ? '#000000' : textColor },
             ]}
             numberOfLines={1}
           >
@@ -112,7 +112,7 @@ export function CallHistoryList() {
               {formatDuration(item.duration)}
             </Text>
           ) : (
-            <Text style={[styles.duration, { color: '#EF4444' }]}>
+            <Text style={[styles.duration, { color: '#000000' }]}>
               {item.status === 'missed' ? 'Nhớ' : item.status === 'rejected' ? 'Từ chối' : ''}
             </Text>
           )}

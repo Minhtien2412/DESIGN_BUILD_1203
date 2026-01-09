@@ -16,13 +16,13 @@ import {
 } from 'react-native';
 
 const STATUS_OPTIONS = [
-  { value: AttendanceStatus.PRESENT, label: 'Có mặt', icon: 'checkmark-circle', color: '#4CAF50' },
-  { value: AttendanceStatus.ABSENT, label: 'Vắng', icon: 'close-circle', color: '#F44336' },
-  { value: AttendanceStatus.LATE, label: 'Trễ', icon: 'time', color: '#FF9800' },
-  { value: AttendanceStatus.HALF_DAY, label: 'Nửa ngày', icon: 'remove-circle', color: '#2196F3' },
-  { value: AttendanceStatus.ON_LEAVE, label: 'Nghỉ phép', icon: 'calendar', color: '#9C27B0' },
-  { value: AttendanceStatus.SICK_LEAVE, label: 'Nghỉ ốm', icon: 'medkit', color: '#FF5722' },
-  { value: AttendanceStatus.EXCUSED, label: 'Có phép', icon: 'document-text', color: '#0A6847' },
+  { value: AttendanceStatus.PRESENT, label: 'Có mặt', icon: 'checkmark-circle', color: '#0066CC' },
+  { value: AttendanceStatus.ABSENT, label: 'Vắng', icon: 'close-circle', color: '#000000' },
+  { value: AttendanceStatus.LATE, label: 'Trễ', icon: 'time', color: '#0066CC' },
+  { value: AttendanceStatus.HALF_DAY, label: 'Nửa ngày', icon: 'remove-circle', color: '#0066CC' },
+  { value: AttendanceStatus.ON_LEAVE, label: 'Nghỉ phép', icon: 'calendar', color: '#999999' },
+  { value: AttendanceStatus.SICK_LEAVE, label: 'Nghỉ ốm', icon: 'medkit', color: '#000000' },
+  { value: AttendanceStatus.EXCUSED, label: 'Có phép', icon: 'document-text', color: '#0066CC' },
 ];
 
 const SHIFT_OPTIONS = [
@@ -201,7 +201,7 @@ export default function CreateAttendanceScreen() {
                 <Ionicons
                   name={option.icon as any}
                   size={20}
-                  color={shiftType === option.value ? '#2196F3' : '#666'}
+                  color={shiftType === option.value ? '#0066CC' : '#666'}
                 />
                 <Text
                   style={[
@@ -328,7 +328,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   required: {
-    color: '#F44336',
+    color: '#000000',
   },
   dateButton: {
     flexDirection: 'row',
@@ -358,8 +358,8 @@ const styles = StyleSheet.create({
     minWidth: 120,
   },
   workerChipActive: {
-    backgroundColor: '#E3F2FD',
-    borderColor: '#2196F3',
+    backgroundColor: '#E8F4FF',
+    borderColor: '#0066CC',
   },
   workerChipText: {
     fontSize: 14,
@@ -367,7 +367,7 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   workerChipTextActive: {
-    color: '#2196F3',
+    color: '#0066CC',
   },
   workerChipSubtext: {
     fontSize: 11,
@@ -414,15 +414,15 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
   },
   shiftChipActive: {
-    backgroundColor: '#E3F2FD',
-    borderColor: '#2196F3',
+    backgroundColor: '#E8F4FF',
+    borderColor: '#0066CC',
   },
   shiftChipText: {
     fontSize: 13,
     color: '#666',
   },
   shiftChipTextActive: {
-    color: '#2196F3',
+    color: '#0066CC',
     fontWeight: '600',
   },
   field: {
@@ -486,7 +486,7 @@ const styles = StyleSheet.create({
     flex: 2,
     paddingVertical: 14,
     borderRadius: 8,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     alignItems: 'center',
   },
   saveButtonDisabled: {

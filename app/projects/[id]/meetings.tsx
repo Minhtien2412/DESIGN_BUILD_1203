@@ -45,10 +45,10 @@ interface MeetingNote {
 
 const MEETING_TYPES: Record<MeetingType, { label: string; icon: string; color: string }> = {
   DAILY_STANDUP: { label: 'Daily Standup', icon: 'calendar', color: '#3B82F6' },
-  WEEKLY_PROGRESS: { label: 'Họp tiến độ', icon: 'trending-up', color: '#10B981' },
-  TECHNICAL: { label: 'Họp kỹ thuật', icon: 'construct', color: '#F59E0B' },
-  SAFETY: { label: 'Họp an toàn', icon: 'shield-checkmark', color: '#EF4444' },
-  CLIENT: { label: 'Họp chủ đầu tư', icon: 'people', color: '#8B5CF6' },
+  WEEKLY_PROGRESS: { label: 'Họp tiến độ', icon: 'trending-up', color: '#0066CC' },
+  TECHNICAL: { label: 'Họp kỹ thuật', icon: 'construct', color: '#0066CC' },
+  SAFETY: { label: 'Họp an toàn', icon: 'shield-checkmark', color: '#000000' },
+  CLIENT: { label: 'Họp chủ đầu tư', icon: 'people', color: '#666666' },
   OTHER: { label: 'Khác', icon: 'document-text', color: '#6B7280' },
 };
 

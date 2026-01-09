@@ -305,15 +305,15 @@ export function TaskDetailExample({ taskId, onBack }: TaskDetailExampleProps) {
 
         <View style={styles.uploadActions}>
           <Pressable style={styles.uploadBtn} onPress={handleUploadFromGallery} disabled={uploading}>
-            <Ionicons name="images-outline" size={24} color="#EE4D2D" />
+            <Ionicons name="images-outline" size={24} color="#0066CC" />
             <Text style={styles.uploadBtnText}>Gallery</Text>
           </Pressable>
           <Pressable style={styles.uploadBtn} onPress={handleTakePhoto} disabled={uploading}>
-            <Ionicons name="camera-outline" size={24} color="#EE4D2D" />
+            <Ionicons name="camera-outline" size={24} color="#0066CC" />
             <Text style={styles.uploadBtnText}>Camera</Text>
           </Pressable>
           <Pressable style={styles.uploadBtn} onPress={handleUploadDocument} disabled={uploading}>
-            <Ionicons name="document-outline" size={24} color="#EE4D2D" />
+            <Ionicons name="document-outline" size={24} color="#0066CC" />
             <Text style={styles.uploadBtnText}>Document</Text>
           </Pressable>
         </View>
@@ -344,7 +344,7 @@ const styles = StyleSheet.create({
   loadingText: { marginTop: 12, fontSize: 14, color: '#666' },
   errorContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
   errorText: { fontSize: 16, color: '#666', marginBottom: 16 },
-  backButton: { paddingHorizontal: 24, paddingVertical: 12, backgroundColor: '#EE4D2D', borderRadius: 8 },
+  backButton: { paddingHorizontal: 24, paddingVertical: 12, backgroundColor: '#0066CC', borderRadius: 8 },
   backButtonText: { color: '#FFF', fontSize: 14, fontWeight: '600' },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16, backgroundColor: '#FFF' },
   backBtn: { padding: 8 },
@@ -355,14 +355,14 @@ const styles = StyleSheet.create({
   taskDescription: { fontSize: 14, color: '#666', lineHeight: 20 },
   statusRow: { flexDirection: 'row', gap: 8, marginTop: 16 },
   statusChip: { paddingHorizontal: 16, paddingVertical: 8, backgroundColor: '#F0F0F0', borderRadius: 16 },
-  statusActive: { backgroundColor: '#EE4D2D' },
+  statusActive: { backgroundColor: '#0066CC' },
   statusText: { fontSize: 12, fontWeight: '600', color: '#333' },
   sectionTitle: { fontSize: 16, fontWeight: '600', marginBottom: 12 },
   uploadProgress: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 },
   uploadText: { fontSize: 13, color: '#666' },
   uploadActions: { flexDirection: 'row', gap: 12 },
-  uploadBtn: { flex: 1, alignItems: 'center', padding: 16, backgroundColor: '#FFF5F0', borderRadius: 12, borderWidth: 1, borderColor: '#EE4D2D' },
-  uploadBtnText: { fontSize: 12, fontWeight: '600', color: '#EE4D2D', marginTop: 4 },
+  uploadBtn: { flex: 1, alignItems: 'center', padding: 16, backgroundColor: '#FFF5F0', borderRadius: 12, borderWidth: 1, borderColor: '#0066CC' },
+  uploadBtnText: { fontSize: 12, fontWeight: '600', color: '#0066CC', marginTop: 4 },
   attachmentItem: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#F0F0F0' },
   attachmentName: { flex: 1, fontSize: 14, color: '#333' },
   emptyText: { fontSize: 13, color: '#999', textAlign: 'center', paddingVertical: 20 },

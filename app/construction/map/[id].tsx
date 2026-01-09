@@ -121,7 +121,7 @@ export default function ConstructionMapDetailScreen() {
         <Ionicons
           name="map"
           size={18}
-          color={viewMode === 'map' ? '#2196F3' : '#666'}
+          color={viewMode === 'map' ? '#0066CC' : '#666'}
         />
         <Text
           style={[
@@ -143,7 +143,7 @@ export default function ConstructionMapDetailScreen() {
         <Ionicons
           name="checkbox-outline"
           size={18}
-          color={viewMode === 'tasks' ? '#2196F3' : '#666'}
+          color={viewMode === 'tasks' ? '#0066CC' : '#666'}
         />
         <Text
           style={[
@@ -165,7 +165,7 @@ export default function ConstructionMapDetailScreen() {
         <Ionicons
           name="layers-outline"
           size={18}
-          color={viewMode === 'stages' ? '#2196F3' : '#666'}
+          color={viewMode === 'stages' ? '#0066CC' : '#666'}
         />
         <Text
           style={[
@@ -187,7 +187,7 @@ export default function ConstructionMapDetailScreen() {
         <Ionicons
           name="grid-outline"
           size={18}
-          color={viewMode === 'both' ? '#2196F3' : '#666'}
+          color={viewMode === 'both' ? '#0066CC' : '#666'}
         />
         <Text
           style={[
@@ -230,7 +230,7 @@ export default function ConstructionMapDetailScreen() {
                   Lưu thay đổi tự động mỗi 3 giây
                 </Text>
               </View>
-              <Ionicons name="toggle" size={32} color="#2196F3" />
+              <Ionicons name="toggle" size={32} color="#0066CC" />
             </View>
 
             {/* WebSocket setting */}
@@ -243,7 +243,7 @@ export default function ConstructionMapDetailScreen() {
                   Đồng bộ thời gian thực với team
                 </Text>
               </View>
-              <Ionicons name="toggle" size={32} color="#2196F3" />
+              <Ionicons name="toggle" size={32} color="#0066CC" />
             </View>
 
             {/* Grid setting */}
@@ -277,15 +277,15 @@ export default function ConstructionMapDetailScreen() {
               <Text style={styles.settingSectionTitle}>Trạng thái kết nối</Text>
               <View style={styles.connectionStatus}>
                 <View style={styles.connectionItem}>
-                  <View style={[styles.statusDot, { backgroundColor: '#4CAF50' }]} />
+                  <View style={[styles.statusDot, { backgroundColor: '#0066CC' }]} />
                   <Text style={styles.connectionText}>API: Connected</Text>
                 </View>
                 <View style={styles.connectionItem}>
-                  <View style={[styles.statusDot, { backgroundColor: '#4CAF50' }]} />
+                  <View style={[styles.statusDot, { backgroundColor: '#0066CC' }]} />
                   <Text style={styles.connectionText}>WebSocket: Connected</Text>
                 </View>
                 <View style={styles.connectionItem}>
-                  <View style={[styles.statusDot, { backgroundColor: '#2196F3' }]} />
+                  <View style={[styles.statusDot, { backgroundColor: '#0066CC' }]} />
                   <Text style={styles.connectionText}>3 users online</Text>
                 </View>
               </View>
@@ -377,8 +377,8 @@ const styles = StyleSheet.create({
     borderColor: '#e0e0e0',
   },
   viewModeButtonActive: {
-    backgroundColor: '#E3F2FD',
-    borderColor: '#2196F3',
+    backgroundColor: '#E8F4FF',
+    borderColor: '#0066CC',
     borderWidth: 2,
   },
   viewModeText: {
@@ -387,7 +387,7 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   viewModeTextActive: {
-    color: '#2196F3',
+    color: '#0066CC',
     fontWeight: '600',
   },
   canvasWrapper: {

@@ -34,7 +34,7 @@ export default function CallTestScreen() {
               <Ionicons
                 name={connected ? 'checkmark-circle' : 'close-circle'}
                 size={24}
-                color={connected ? '#10B981' : '#EF4444'}
+                color={connected ? '#0066CC' : '#000000'}
               />
               <Text style={[styles.statusText, { color: textColor }]}>
                 WebSocket: {connected ? 'Đã kết nối' : 'Ngắt kết nối'}
@@ -125,7 +125,7 @@ export default function CallTestScreen() {
                   <Text style={[styles.label, { color: textColor + '80' }]}>
                     Cuộc gọi đến:
                   </Text>
-                  <Text style={[styles.value, { color: '#10B981' }]}>
+                  <Text style={[styles.value, { color: '#0066CC' }]}>
                     {incomingCall.caller?.name}
                   </Text>
                 </View>
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
     gap: 8,
     marginTop: 8,
     padding: 12,
-    backgroundColor: '#DBEAFE',
+    backgroundColor: '#E8F4FF',
     borderRadius: 8,
   },
   hintText: {

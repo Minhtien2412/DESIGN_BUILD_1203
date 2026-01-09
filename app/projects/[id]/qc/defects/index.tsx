@@ -19,8 +19,8 @@ import {
 } from 'react-native';
 
 const SEVERITY_COLORS = {
-  critical: '#ef4444',
-  major: '#f59e0b',
+  critical: '#000000',
+  major: '#0066CC',
   minor: '#3b82f6',
 };
 
@@ -159,7 +159,7 @@ export default function DefectsListScreen() {
               <Ionicons 
                 name="calendar-outline" 
                 size={16} 
-                color={isOverdue ? '#ef4444' : '#6b7280'} 
+                color={isOverdue ? '#000000' : '#6b7280'} 
               />
               <Text style={[styles.infoText, isOverdue && styles.overdueText]}>
                 Hạn: {new Date(defect.dueDate).toLocaleDateString('vi-VN')}
@@ -184,7 +184,7 @@ export default function DefectsListScreen() {
             style={styles.resolveButton}
             onPress={() => handleResolve(defect)}
           >
-            <Ionicons name="checkmark-circle" size={18} color="#10b981" />
+            <Ionicons name="checkmark-circle" size={18} color="#0066CC" />
             <Text style={styles.resolveButtonText}>Đánh dấu đã giải quyết</Text>
           </TouchableOpacity>
         )}
@@ -402,7 +402,7 @@ const styles = StyleSheet.create({
     color: '#6b7280',
   },
   overdueText: {
-    color: '#ef4444',
+    color: '#000000',
     fontWeight: '600',
   },
   resolutionBox: {
@@ -423,7 +423,7 @@ const styles = StyleSheet.create({
   },
   resolutionBy: {
     fontSize: 12,
-    color: '#059669',
+    color: '#0066CC',
     marginTop: 4,
   },
   resolveButton: {
@@ -434,12 +434,12 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#10b981',
+    borderColor: '#0066CC',
   },
   resolveButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#10b981',
+    color: '#0066CC',
   },
   emptyState: {
     alignItems: 'center',

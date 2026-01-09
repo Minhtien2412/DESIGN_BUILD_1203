@@ -582,7 +582,7 @@ export default function ServiceDetailScreen() {
           </View>
           <Text style={styles.serviceName}>{serviceData.name}</Text>
           <View style={styles.ratingRow}>
-            <Ionicons name="star" size={18} color="#FFD700" />
+            <Ionicons name="star" size={18} color="#FFFFFF" />
             <Text style={styles.ratingText}>
               {serviceData.rating.toFixed(1)}/5.0
             </Text>
@@ -638,7 +638,7 @@ export default function ServiceDetailScreen() {
                     <Ionicons
                       name="checkmark-circle"
                       size={18}
-                      color={selectedPackage === pkg.id ? '#FF6B00' : '#4CAF50'}
+                      color={selectedPackage === pkg.id ? '#FF6B00' : '#0066CC'}
                     />
                     <Text style={styles.featureRowText}>{feature}</Text>
                   </View>
@@ -670,7 +670,7 @@ export default function ServiceDetailScreen() {
                         key={i}
                         name={i < review.rating ? 'star' : 'star-outline'}
                         size={14}
-                        color="#FFD700"
+                        color="#FFFFFF"
                       />
                     ))}
                     <Text style={styles.reviewDate}> • {review.date}</Text>
@@ -741,7 +741,7 @@ const styles = StyleSheet.create({
   },
   categoryBadge: {
     alignSelf: 'flex-start',
-    backgroundColor: '#FFF3E0',
+    backgroundColor: '#E8F4FF',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
@@ -981,9 +981,9 @@ const styles = StyleSheet.create({
   },
   formHeader: {
     padding: 16,
-    backgroundColor: '#FFF3E0',
+    backgroundColor: '#E8F4FF',
     borderBottomWidth: 1,
-    borderBottomColor: '#FFE0B2',
+    borderBottomColor: '#E8F4FF',
   },
   formTitle: {
     fontSize: 20,

@@ -51,7 +51,7 @@ export default function LiveListScreen() {
         </View>
       ) : error ? (
         <View style={styles.center}>
-          <Ionicons name="alert-circle" size={48} color="#EF4444" />
+          <Ionicons name="alert-circle" size={48} color="#000000" />
           <Text style={{ color: textColor, marginTop: 8 }}>{error}</Text>
           <Pressable style={styles.retry} onPress={refresh}>
             <Text style={styles.retryText}>Retry</Text>
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#EF4444',
+    backgroundColor: '#000000',
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 999,
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     paddingHorizontal: 14,
     paddingVertical: 8,
-    backgroundColor: '#EF4444',
+    backgroundColor: '#000000',
     borderRadius: 10,
   },
   retryText: {
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     paddingHorizontal: 16,
     paddingVertical: 10,
-    backgroundColor: '#2563EB',
+    backgroundColor: '#0066CC',
     borderRadius: 10,
   },
   createButtonText: {

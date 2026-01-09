@@ -49,7 +49,7 @@ const MasonCard: React.FC<MasonCardProps> = ({ mason, onBooking, onPress }) => {
           <Text style={styles.masonName}>{mason.name}</Text>
           
           <View style={styles.ratingRow}>
-            <Ionicons name="star" size={14} color="#ffa41c" />
+            <Ionicons name="star" size={14} color="#0066CC" />
             <Text style={styles.ratingText}>{mason.rating}</Text>
             <Text style={styles.reviewsText}>({mason.reviewCount})</Text>
           </View>
@@ -76,7 +76,7 @@ const MasonCard: React.FC<MasonCardProps> = ({ mason, onBooking, onPress }) => {
       </View>
 
       <View style={styles.teamRow}>
-        <Ionicons name="people" size={16} color="#2196f3" />
+        <Ionicons name="people" size={16} color="#0066CC" />
         <Text style={styles.teamText}>Đội chuyên nghiệp</Text>
       </View>
 
@@ -111,7 +111,7 @@ const MasonCard: React.FC<MasonCardProps> = ({ mason, onBooking, onPress }) => {
             style={styles.callButton} 
             onPress={() => makePhoneCall(mason.phone)}
           >
-            <Ionicons name="call-outline" size={20} color="#EE4D2D" />
+            <Ionicons name="call-outline" size={20} color="#0066CC" />
             <Text style={styles.callButtonText}>Gọi điện</Text>
           </TouchableOpacity>
           
@@ -203,7 +203,7 @@ export default function ThoXayScreen() {
       <Stack.Screen
         options={{
           title: 'Thợ xây',
-          headerStyle: { backgroundColor: '#0A6847' },
+          headerStyle: { backgroundColor: '#0066CC' },
           headerTintColor: '#fff',
           headerTitleStyle: { fontWeight: '600' },
         }}
@@ -275,7 +275,7 @@ export default function ThoXayScreen() {
 
         {loading ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#0A6847" />
+            <ActivityIndicator size="large" color="#0066CC" />
             <Text style={styles.loadingText}>Đang tải danh sách...</Text>
           </View>
         ) : (
@@ -284,7 +284,7 @@ export default function ThoXayScreen() {
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.listContainer}
             refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={refresh} colors={['#0A6847']} />
+              <RefreshControl refreshing={refreshing} onRefresh={refresh} colors={['#0066CC']} />
             }
           >
             {filteredMasons.map((mason) => (
@@ -308,7 +308,7 @@ export default function ThoXayScreen() {
         )}
 
         <View style={styles.infoBanner}>
-          <Ionicons name="shield-checkmark" size={16} color="#4caf50" />
+          <Ionicons name="shield-checkmark" size={16} color="#0066CC" />
           <Text style={styles.infoBannerText}>Thợ có tay nghề • Cam kết chất lượng</Text>
         </View>
       </View>
@@ -335,7 +335,7 @@ export default function ThoXayScreen() {
                   <View style={styles.selectedMasonText}>
                     <Text style={styles.selectedMasonName}>{selectedMason.name}</Text>
                     <View style={styles.selectedRating}>
-                      <Ionicons name="star" size={14} color="#ffa41c" />
+                      <Ionicons name="star" size={14} color="#0066CC" />
                       <Text style={styles.selectedRatingText}>
                         {selectedMason.rating} ({selectedMason.reviewCount})
                       </Text>
@@ -455,7 +455,7 @@ const styles = StyleSheet.create({
   filterLabel: { fontSize: 13, fontWeight: '600', color: '#666', width: 95, paddingLeft: 16 },
   filterScroll: { flex: 1 },
   filterChip: { paddingHorizontal: 14, paddingVertical: 6, borderRadius: 16, backgroundColor: '#f5f5f5', marginHorizontal: 4 },
-  filterChipActive: { backgroundColor: '#0A6847' },
+  filterChipActive: { backgroundColor: '#0066CC' },
   filterChipText: { fontSize: 12, color: '#666', fontWeight: '500' },
   filterChipTextActive: { color: '#fff' },
   resultsBar: { backgroundColor: '#fff', paddingHorizontal: 16, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#f0f0f0' },
@@ -465,7 +465,7 @@ const styles = StyleSheet.create({
   content: { flex: 1 },
   listContainer: { padding: 16 },
   masonCard: { backgroundColor: '#fff', borderRadius: 12, padding: 16, marginBottom: 16, elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 4 },
-  featuredBadge: { position: 'absolute', top: 12, right: 12, flexDirection: 'row', alignItems: 'center', backgroundColor: '#0A6847', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 12, zIndex: 1, gap: 4 },
+  featuredBadge: { position: 'absolute', top: 12, right: 12, flexDirection: 'row', alignItems: 'center', backgroundColor: '#0066CC', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 12, zIndex: 1, gap: 4 },
   featuredText: { fontSize: 10, fontWeight: '600', color: '#fff' },
   cardHeader: { flexDirection: 'row', marginBottom: 12 },
   avatar: { width: 60, height: 60, borderRadius: 8, backgroundColor: '#f0f0f0' },
@@ -481,19 +481,19 @@ const styles = StyleSheet.create({
   specialtiesSection: { marginBottom: 12 },
   specialtiesLabel: { fontSize: 12, fontWeight: '600', color: '#666', marginBottom: 6 },
   specialtiesTags: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
-  specialtyTag: { backgroundColor: '#fff3e0', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
-  specialtyText: { fontSize: 11, fontWeight: '500', color: '#ff9800' },
+  specialtyTag: { backgroundColor: '#E8F4FF', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
+  specialtyText: { fontSize: 11, fontWeight: '500', color: '#0066CC' },
   teamRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12 },
   teamText: { fontSize: 12, color: '#666', flex: 1 },
   statsSection: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', paddingVertical: 12, marginBottom: 12, borderTopWidth: 1, borderBottomWidth: 1, borderColor: '#f0f0f0' },
   statItem: { alignItems: 'center' },
   statValue: { fontSize: 15, fontWeight: '700', color: '#333', marginBottom: 4 },
-  available: { color: '#4caf50' },
-  busy: { color: '#ff9800' },
+  available: { color: '#0066CC' },
+  busy: { color: '#0066CC' },
   statLabel: { fontSize: 11, color: '#999' },
   statDivider: { width: 1, height: 40, backgroundColor: '#f0f0f0' },
   priceRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  price: { fontSize: 18, fontWeight: '700', color: '#0A6847' },
+  price: { fontSize: 18, fontWeight: '700', color: '#0066CC' },
   priceUnit: { fontSize: 12, color: '#999' },
   priceSquare: { fontSize: 11, color: '#666', marginTop: 2 },
   actionButtons: { flexDirection: 'row', gap: 8 },
@@ -505,26 +505,26 @@ const styles = StyleSheet.create({
     paddingVertical: 8, 
     borderRadius: 8, 
     borderWidth: 1,
-    borderColor: '#EE4D2D',
+    borderColor: '#0066CC',
     gap: 4 
   },
-  callButtonText: { fontSize: 12, fontWeight: '600', color: '#EE4D2D' },
+  callButtonText: { fontSize: 12, fontWeight: '600', color: '#0066CC' },
   contactButton: { 
     flexDirection: 'row', 
     alignItems: 'center', 
-    backgroundColor: '#EE4D2D', 
+    backgroundColor: '#0066CC', 
     paddingHorizontal: 12, 
     paddingVertical: 8, 
     borderRadius: 8, 
     gap: 4 
   },
   contactButtonText: { fontSize: 12, fontWeight: '600', color: '#fff' },
-  bookButton: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#0A6847', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 8, gap: 6 },
+  bookButton: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#0066CC', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 8, gap: 6 },
   bookButtonText: { fontSize: 14, fontWeight: '600', color: '#fff' },
   emptyState: { alignItems: 'center', justifyContent: 'center', paddingVertical: 60 },
   emptyText: { fontSize: 15, color: '#999', marginTop: 16 },
   infoBanner: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#f1f8e9', paddingHorizontal: 16, paddingVertical: 10, gap: 8 },
-  infoBannerText: { fontSize: 12, color: '#4caf50', flex: 1 },
+  infoBannerText: { fontSize: 12, color: '#0066CC', flex: 1 },
   bookingModalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
   bookingModalContent: { backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '90%' },
   bookingModalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: '#f0f0f0' },
@@ -539,10 +539,10 @@ const styles = StyleSheet.create({
   form: { marginBottom: 16 },
   formGroup: { marginBottom: 16 },
   formLabel: { fontSize: 13, fontWeight: '600', color: '#333', marginBottom: 8 },
-  required: { color: '#0A6847' },
+  required: { color: '#0066CC' },
   formInput: { backgroundColor: '#f5f5f5', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 14, color: '#333', borderWidth: 1, borderColor: '#e0e0e0' },
   formTextArea: { height: 80, textAlignVertical: 'top' },
-  submitButton: { backgroundColor: '#0A6847', paddingVertical: 14, borderRadius: 8, alignItems: 'center', marginBottom: 12 },
+  submitButton: { backgroundColor: '#0066CC', paddingVertical: 14, borderRadius: 8, alignItems: 'center', marginBottom: 12 },
   submitButtonText: { fontSize: 15, fontWeight: '600', color: '#fff' },
   formNote: { fontSize: 12, color: '#999', textAlign: 'center', marginBottom: 20 },
 });

@@ -73,23 +73,23 @@ export function ToastNotification({
   const config = {
     success: {
       icon: 'checkmark-circle' as const,
-      color: '#10B981',
+      color: '#0066CC',
       bgColor: '#D1FAE5',
     },
     error: {
       icon: 'close-circle' as const,
-      color: '#EF4444',
+      color: '#000000',
       bgColor: '#FEE2E2',
     },
     warning: {
       icon: 'warning' as const,
-      color: '#F59E0B',
+      color: '#0066CC',
       bgColor: '#FEF3C7',
     },
     info: {
       icon: 'information-circle' as const,
       color: '#3B82F6',
-      bgColor: '#DBEAFE',
+      bgColor: '#E8F4FF',
     },
   };
 

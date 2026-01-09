@@ -75,9 +75,9 @@ export default function SecurityScreen() {
   const securityScore = calculateSecurityScore();
 
   const getScoreColor = (score: number) => {
-    if (score >= 80) return '#10B981';
-    if (score >= 50) return '#F59E0B';
-    return '#EF4444';
+    if (score >= 80) return '#0066CC';
+    if (score >= 50) return '#0066CC';
+    return '#000000';
   };
 
   const getScoreText = (score: number) => {
@@ -115,9 +115,9 @@ export default function SecurityScreen() {
 
   const getStrengthColor = (strength: PasswordStrength) => {
     switch (strength) {
-      case 'strong': return '#10B981';
-      case 'medium': return '#F59E0B';
-      case 'weak': return '#EF4444';
+      case 'strong': return '#0066CC';
+      case 'medium': return '#0066CC';
+      case 'weak': return '#000000';
     }
   };
 
@@ -461,14 +461,14 @@ export default function SecurityScreen() {
           {/* Security Settings */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Ionicons name="settings" size={24} color="#10B981" />
+              <Ionicons name="settings" size={24} color="#0066CC" />
               <Text style={styles.sectionTitle}>Cài đặt bảo mật</Text>
             </View>
             
             <View style={styles.card}>
               <View style={styles.settingItem}>
                 <View style={styles.settingLeft}>
-                  <View style={[styles.settingIconContainer, { backgroundColor: '#DBEAFE' }]}>
+                  <View style={[styles.settingIconContainer, { backgroundColor: '#E8F4FF' }]}>
                     <Ionicons name="finger-print" size={24} color="#3B82F6" />
                   </View>
                   <View style={styles.settingText}>
@@ -489,7 +489,7 @@ export default function SecurityScreen() {
               <View style={styles.settingItem}>
                 <View style={styles.settingLeft}>
                   <View style={[styles.settingIconContainer, { backgroundColor: '#FEF3C7' }]}>
-                    <Ionicons name="notifications" size={24} color="#F59E0B" />
+                    <Ionicons name="notifications" size={24} color="#0066CC" />
                   </View>
                   <View style={styles.settingText}>
                     <Text style={styles.settingTitle}>Thông báo đăng nhập</Text>
@@ -509,7 +509,7 @@ export default function SecurityScreen() {
               <View style={styles.settingItem}>
                 <View style={styles.settingLeft}>
                   <View style={[styles.settingIconContainer, { backgroundColor: '#D1FAE5' }]}>
-                    <Ionicons name="scan" size={24} color="#10B981" />
+                    <Ionicons name="scan" size={24} color="#0066CC" />
                   </View>
                   <View style={styles.settingText}>
                     <Text style={styles.settingTitle}>Sinh trắc học</Text>
@@ -529,7 +529,7 @@ export default function SecurityScreen() {
           {/* Active Sessions */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Ionicons name="phone-portrait" size={24} color="#F59E0B" />
+              <Ionicons name="phone-portrait" size={24} color="#0066CC" />
               <Text style={styles.sectionTitle}>Phiên đăng nhập ({sessions.length})</Text>
             </View>
             
@@ -539,7 +539,7 @@ export default function SecurityScreen() {
                   <View style={styles.sessionItem}>
                     <View style={[
                       styles.sessionIconContainer,
-                      { backgroundColor: session.current ? '#DBEAFE' : '#F3F4F6' }
+                      { backgroundColor: session.current ? '#E8F4FF' : '#F3F4F6' }
                     ]}>
                       <Ionicons 
                         name={session.device.includes('iPhone') ? 'phone-portrait' : 'desktop'} 
@@ -575,7 +575,7 @@ export default function SecurityScreen() {
                         onPress={() => handleEndSession(session.id)}
                         style={styles.sessionEndButton}
                       >
-                        <Ionicons name="close-circle" size={28} color="#EF4444" />
+                        <Ionicons name="close-circle" size={28} color="#000000" />
                       </TouchableOpacity>
                     )}
                   </View>
@@ -591,7 +591,7 @@ export default function SecurityScreen() {
                     onPress={handleEndAllSessions}
                     activeOpacity={0.8}
                   >
-                    <Ionicons name="log-out-outline" size={20} color="#EF4444" />
+                    <Ionicons name="log-out-outline" size={20} color="#000000" />
                     <Text style={styles.dangerButtonText}>Đăng xuất tất cả thiết bị khác</Text>
                   </TouchableOpacity>
                 </>
@@ -602,23 +602,23 @@ export default function SecurityScreen() {
           {/* Security Tips */}
           <View style={styles.tipsCard}>
             <View style={styles.tipsHeader}>
-              <Ionicons name="bulb" size={20} color="#F59E0B" />
+              <Ionicons name="bulb" size={20} color="#0066CC" />
               <Text style={styles.tipsTitle}>Mẹo bảo mật</Text>
             </View>
             <View style={styles.tipItem}>
-              <Ionicons name="checkmark-circle" size={16} color="#10B981" />
+              <Ionicons name="checkmark-circle" size={16} color="#0066CC" />
               <Text style={styles.tipText}>Sử dụng mật khẩu mạnh với ít nhất 8 ký tự</Text>
             </View>
             <View style={styles.tipItem}>
-              <Ionicons name="checkmark-circle" size={16} color="#10B981" />
+              <Ionicons name="checkmark-circle" size={16} color="#0066CC" />
               <Text style={styles.tipText}>Bật xác thực 2 bước để tăng cường bảo mật</Text>
             </View>
             <View style={styles.tipItem}>
-              <Ionicons name="checkmark-circle" size={16} color="#10B981" />
+              <Ionicons name="checkmark-circle" size={16} color="#0066CC" />
               <Text style={styles.tipText}>Không chia sẻ mật khẩu với bất kỳ ai</Text>
             </View>
             <View style={styles.tipItem}>
-              <Ionicons name="checkmark-circle" size={16} color="#10B981" />
+              <Ionicons name="checkmark-circle" size={16} color="#0066CC" />
               <Text style={styles.tipText}>Đổi mật khẩu định kỳ mỗi 3-6 tháng</Text>
             </View>
           </View>
@@ -742,7 +742,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   required: {
-    color: '#EF4444',
+    color: '#000000',
   },
   inputWrapper: {
     flexDirection: 'row',
@@ -755,7 +755,7 @@ const styles = StyleSheet.create({
     minHeight: 48,
   },
   inputError: {
-    borderColor: '#EF4444',
+    borderColor: '#000000',
     backgroundColor: '#FEF2F2',
   },
   input: {
@@ -766,7 +766,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 13,
-    color: '#EF4444',
+    color: '#000000',
     marginTop: 6,
   },
   strengthContainer: {
@@ -871,7 +871,7 @@ const styles = StyleSheet.create({
   currentBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#DBEAFE',
+    backgroundColor: '#E8F4FF',
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 12,
@@ -920,7 +920,7 @@ const styles = StyleSheet.create({
   dangerButtonText: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#EF4444',
+    color: '#000000',
   },
   tipsCard: {
     backgroundColor: '#FFFBEB',

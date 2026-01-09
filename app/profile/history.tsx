@@ -189,7 +189,7 @@ export default function ViewHistoryScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#0066CC',
   },
   header: {
     flexDirection: 'row',
@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   filterTextActive: {
-    color: '#FF6B35',
+    color: '#0066CC',
   },
   list: {
     paddingHorizontal: 16,
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 15,
     fontWeight: 'bold',
-    color: '#FF6B35',
+    color: '#0066CC',
   },
   time: {
     fontSize: 12,

@@ -29,7 +29,7 @@ const ACTIVITY_ICONS: Record<ActivityFeedEvent['type'], string> = {
 const ACTIVITY_COLORS: Record<ActivityFeedEvent['type'], string> = {
   project_created: '#3B82F6',
   payment_received: '#10B981',
-  milestone_completed: '#8B5CF6',
+  milestone_completed: '#666666',
   user_joined: '#F59E0B',
   comment_added: '#EF4444',
 };

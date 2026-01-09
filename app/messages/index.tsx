@@ -136,7 +136,7 @@ export default function MessagesScreen() {
     if (error) {
       return (
         <View style={styles.emptyContainer}>
-          <Ionicons name="alert-circle-outline" size={64} color="#ef4444" />
+          <Ionicons name="alert-circle-outline" size={64} color="#000000" />
           <Text style={styles.emptyTitle}>Lỗi tải dữ liệu</Text>
           <Text style={styles.emptySubtitle}>{error}</Text>
           <TouchableOpacity 
@@ -169,7 +169,7 @@ export default function MessagesScreen() {
             onPress={() => router.push('/messages/ai-assistant')}
             activeOpacity={0.7}
           >
-            <View style={[styles.suggestedAvatar, { backgroundColor: '#8B5CF6' }]}>
+            <View style={[styles.suggestedAvatar, { backgroundColor: '#666666' }]}>
               <Ionicons name="sparkles" size={28} color="#fff" />
             </View>
             <View style={styles.suggestedContent}>

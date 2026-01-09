@@ -239,7 +239,7 @@ export function ChatRoom({ conversationId, recipientName, recipientAvatar, onBac
         return primaryColor;
       case 'delivered':
       case 'sent':
-        return '#10B981';
+        return '#0066CC';
       default:
         return '#6B7280';
     }
@@ -402,7 +402,7 @@ export function ChatRoom({ conversationId, recipientName, recipientAvatar, onBac
           />
           <View>
             <Text style={[styles.headerName, { color: textColor }]}>{recipientName}</Text>
-            <Text style={[styles.headerStatus, { color: '#10B981' }]}>Đang hoạt động</Text>
+            <Text style={[styles.headerStatus, { color: '#0066CC' }]}>Đang hoạt động</Text>
           </View>
         </View>
 

@@ -1,10 +1,16 @@
+import { Loader } from '@/components/ui/loader';
 import { useThemeColor } from '@/hooks/use-theme-color';
+import VoucherService, {
+    MOCK_VOUCHERS as FALLBACK_VOUCHERS,
+    Voucher as VoucherType
+} from '@/services/voucherService';
 import { Ionicons } from '@expo/vector-icons';
 import { router, Stack } from 'expo-router';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
     Alert,
     Platform,
+    RefreshControl,
     ScrollView,
     StyleSheet,
     Text,
@@ -25,86 +31,44 @@ interface Voucher {
   isExpired: boolean;
 }
 
-const MOCK_VOUCHERS: Voucher[] = [
-  {
-    id: '1',
-    code: 'FREESHIP50K',
-    title: 'Miễn phí vận chuyển',
-    description: 'Giảm 50.000đ phí ship cho đơn từ 500.000đ',
-    discount: '50.000đ',
-    expiryDate: '31/12/2025',
-    minOrder: 500000,
-    type: 'shipping',
-    isUsed: false,
-    isExpired: false,
-  },
-  {
-    id: '2',
-    code: 'SALE20',
-    title: 'Giảm 20%',
-    description: 'Giảm 20% tối đa 200.000đ cho đơn từ 1.000.000đ',
-    discount: '20%',
-    expiryDate: '25/12/2025',
-    minOrder: 1000000,
-    type: 'discount',
-    isUsed: false,
-    isExpired: false,
-  },
-  {
-    id: '3',
-    code: 'CASHBACK100K',
-    title: 'Hoàn tiền 100K',
-    description: 'Hoàn 100.000đ vào ví cho đơn từ 2.000.000đ',
-    discount: '100.000đ',
-    expiryDate: '20/11/2025',
-    minOrder: 2000000,
-    type: 'cashback',
-    isUsed: false,
-    isExpired: false,
-  },
-  {
-    id: '4',
-    code: 'NEWUSER50',
-    title: 'Ưu đãi người mới',
-    description: 'Giảm 50% tối đa 100.000đ cho khách hàng mới',
-    discount: '50%',
-    expiryDate: '15/11/2025',
-    minOrder: 200000,
-    type: 'discount',
-    isUsed: true,
-    isExpired: false,
-  },
-  {
-    id: '5',
-    code: 'SUMMER2025',
-    title: 'Khuyến mãi hè',
-    description: 'Giảm 30% tối đa 300.000đ',
-    discount: '30%',
-    expiryDate: '10/11/2025',
-    minOrder: 1000000,
-    type: 'discount',
-    isUsed: false,
-    isExpired: true,
-  },
-];
+// Transform API voucher to local format
+function transformVoucher(apiVoucher: VoucherType): Voucher {
+  return {
+    id: apiVoucher.id,
+    code: apiVoucher.code,
+    title: apiVoucher.title,
+    description: apiVoucher.description || '',
+    discount: apiVoucher.type === 'percent' 
+      ? `${apiVoucher.discount}%` 
+      : new Intl.NumberFormat('vi-VN').format(apiVoucher.discount) + 'đ',
+    expiryDate: new Date(apiVoucher.expiresAt).toLocaleDateString('vi-VN'),
+    minOrder: apiVoucher.minOrder || 0,
+    type: apiVoucher.type === 'percent' ? 'discount' : 'shipping',
+    isUsed: apiVoucher.isUsed,
+    isExpired: apiVoucher.isExpired,
+  };
+}
+
+// Transform fallback data
+const MOCK_VOUCHERS: Voucher[] = FALLBACK_VOUCHERS.map(transformVoucher);
 
 const VOUCHER_TYPE_CONFIG = {
   discount: {
     label: 'Giảm giá',
     icon: 'pricetag' as const,
-    color: '#EF4444',
+    color: '#000000',
     bg: '#FEE2E2',
   },
   shipping: {
     label: 'Miễn ship',
     icon: 'car' as const,
     color: '#3B82F6',
-    bg: '#DBEAFE',
+    bg: '#E8F4FF',
   },
   cashback: {
     label: 'Hoàn tiền',
     icon: 'wallet' as const,
-    color: '#10B981',
+    color: '#0066CC',
     bg: '#D1FAE5',
   },
 };
@@ -118,14 +82,50 @@ export default function VouchersScreen() {
   const primary = useThemeColor({}, 'primary');
 
   const [selectedTab, setSelectedTab] = useState<'available' | 'used' | 'expired'>('available');
+  const [vouchers, setVouchers] = useState<Voucher[]>(MOCK_VOUCHERS);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [dataSource, setDataSource] = useState<'api' | 'mock'>('mock');
+
+  // Fetch vouchers from API
+  const fetchVouchers = useCallback(async (showLoading = true) => {
+    if (showLoading) setLoading(true);
+    try {
+      const result = await VoucherService.getMyVouchers();
+      if (result.ok && result.data?.vouchers) {
+        setVouchers(result.data.vouchers.map(transformVoucher));
+        setDataSource('api');
+      } else {
+        // Fallback to mock data
+        setVouchers(MOCK_VOUCHERS);
+        setDataSource('mock');
+      }
+    } catch (error) {
+      console.error('Error fetching vouchers:', error);
+      setVouchers(MOCK_VOUCHERS);
+      setDataSource('mock');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchVouchers();
+  }, [fetchVouchers]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchVouchers(false);
+  }, [fetchVouchers]);
 
   const tabs = [
-    { key: 'available' as const, label: 'Có thể dùng', count: MOCK_VOUCHERS.filter(v => !v.isUsed && !v.isExpired).length },
-    { key: 'used' as const, label: 'Đã dùng', count: MOCK_VOUCHERS.filter(v => v.isUsed).length },
-    { key: 'expired' as const, label: 'Hết hạn', count: MOCK_VOUCHERS.filter(v => v.isExpired).length },
+    { key: 'available' as const, label: 'Có thể dùng', count: vouchers.filter(v => !v.isUsed && !v.isExpired).length },
+    { key: 'used' as const, label: 'Đã dùng', count: vouchers.filter(v => v.isUsed).length },
+    { key: 'expired' as const, label: 'Hết hạn', count: vouchers.filter(v => v.isExpired).length },
   ];
 
-  const filteredVouchers = MOCK_VOUCHERS.filter(voucher => {
+  const filteredVouchers = vouchers.filter(voucher => {
     if (selectedTab === 'available') return !voucher.isUsed && !voucher.isExpired;
     if (selectedTab === 'used') return voucher.isUsed;
     if (selectedTab === 'expired') return voucher.isExpired;
@@ -170,6 +170,10 @@ export default function VouchersScreen() {
     Alert.alert('Đã sao chép', `Mã ${code} đã được sao chép`);
   };
 
+  if (loading) {
+    return <Loader text="Đang tải voucher..." />;
+  }
+
   return (
     <View style={[styles.container, { backgroundColor: bg }]}>
       <Stack.Screen
@@ -178,6 +182,14 @@ export default function VouchersScreen() {
           headerShown: true,
         }}
       />
+
+      {/* Data Source Indicator */}
+      {dataSource === 'mock' && (
+        <View style={[styles.mockBanner, { backgroundColor: '#FEF3C7' }]}>
+          <Ionicons name="information-circle" size={16} color="#92400E" />
+          <Text style={styles.mockBannerText}>📋 Dữ liệu mẫu - API đang cập nhật</Text>
+        </View>
+      )}
 
       {/* Tabs */}
       <View style={[styles.tabsContainer, { backgroundColor: surface, borderBottomColor: border }]}>
@@ -209,7 +221,12 @@ export default function VouchersScreen() {
       </View>
 
       {/* Vouchers List */}
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView 
+        contentContainerStyle={styles.content}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         {filteredVouchers.map(voucher => {
           const typeConfig = VOUCHER_TYPE_CONFIG[voucher.type];
           const isDisabled = voucher.isUsed || voucher.isExpired;
@@ -299,7 +316,7 @@ export default function VouchersScreen() {
                   )}
                   {voucher.isExpired && (
                     <View style={[styles.statusBadge, { backgroundColor: '#FEE2E2' }]}>
-                      <Text style={[styles.statusText, { color: '#EF4444' }]}>
+                      <Text style={[styles.statusText, { color: '#000000' }]}>
                         Hết hạn
                       </Text>
                     </View>
@@ -340,6 +357,18 @@ export default function VouchersScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  mockBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 8,
+    gap: 6,
+  },
+  mockBannerText: {
+    color: '#92400E',
+    fontSize: 12,
+    fontWeight: '500',
   },
   tabsContainer: {
     flexDirection: 'row',

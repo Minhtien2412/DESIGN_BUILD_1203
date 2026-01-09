@@ -7,8 +7,8 @@ export function HealthStatusCard() {
   const { status, checkNow, start, stop } = useHealthMonitor();
 
   const getStatusColor = () => {
-    if (status.isOnline) return '#4CAF50'; // Green
-    return status.errorCount > 3 ? '#F44336' : '#FF9800'; // Red or Orange
+    if (status.isOnline) return '#0066CC'; // Green
+    return status.errorCount > 3 ? '#000000' : '#0066CC'; // Red or Orange
   };
 
   const getStatusText = () => {

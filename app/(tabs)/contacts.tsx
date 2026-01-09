@@ -77,11 +77,11 @@ export default function ContactsScreen() {
           ]}>
             <View style={[
               styles.connectionDot,
-              { backgroundColor: connected ? '#10B981' : '#EF4444' },
+              { backgroundColor: connected ? '#0066CC' : '#000000' },
             ]} />
             <Text style={[
               styles.connectionText,
-              { color: connected ? '#10B981' : '#EF4444' },
+              { color: connected ? '#0066CC' : '#000000' },
             ]}>
               {connected ? 'Online' : 'Offline'}
             </Text>

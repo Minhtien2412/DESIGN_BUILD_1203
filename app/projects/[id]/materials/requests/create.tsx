@@ -119,7 +119,7 @@ export default function CreateRequestScreen() {
                 </Text>
               </View>
               <TouchableOpacity onPress={() => setSelectedMaterial(null)}>
-                <Ionicons name="close-circle" size={24} color="#ef4444" />
+                <Ionicons name="close-circle" size={24} color="#000000" />
               </TouchableOpacity>
             </View>
           )}
@@ -170,9 +170,9 @@ export default function CreateRequestScreen() {
           <Text style={styles.sectionTitle}>Mức độ khẩn cấp</Text>
           <View style={styles.urgencyButtons}>
             {[
-              { value: 'low', label: 'Thấp', color: '#10b981' },
-              { value: 'medium', label: 'Trung bình', color: '#f59e0b' },
-              { value: 'high', label: 'Cao', color: '#ef4444' },
+              { value: 'low', label: 'Thấp', color: '#0066CC' },
+              { value: 'medium', label: 'Trung bình', color: '#0066CC' },
+              { value: 'high', label: 'Cao', color: '#000000' },
             ].map(({ value, label, color }) => (
               <TouchableOpacity
                 key={value}
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#eff6ff',
+    backgroundColor: '#E8F4FF',
     borderWidth: 2,
     borderColor: '#3b82f6',
     borderRadius: 12,

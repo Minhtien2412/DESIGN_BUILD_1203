@@ -47,16 +47,16 @@ export default function ChangeManagementScreen() {
 
   const getStatusColor = (status: ChangeRequestStatus): string => {
     const colors: Record<ChangeRequestStatus, string> = {
-      DRAFT: '#9E9E9E',
-      SUBMITTED: '#0A6847',
-      UNDER_REVIEW: '#FF9800',
-      APPROVED: '#4CAF50',
+      DRAFT: '#999999',
+      SUBMITTED: '#0066CC',
+      UNDER_REVIEW: '#0066CC',
+      APPROVED: '#0066CC',
       REJECTED: '#1A1A1A',
-      ON_HOLD: '#0A6847',
-      IMPLEMENTED: '#10B981',
+      ON_HOLD: '#0066CC',
+      IMPLEMENTED: '#0066CC',
       CANCELLED: '#4A4A4A',
     };
-    return colors[status] || '#9E9E9E';
+    return colors[status] || '#999999';
   };
 
   const getStatusLabel = (status: ChangeRequestStatus): string => {
@@ -75,13 +75,13 @@ export default function ChangeManagementScreen() {
 
   const getPriorityColor = (priority: ChangePriority): string => {
     const colors: Record<ChangePriority, string> = {
-      LOW: '#4CAF50',
-      MEDIUM: '#FF9800',
+      LOW: '#0066CC',
+      MEDIUM: '#0066CC',
       HIGH: '#1A1A1A',
       URGENT: '#D32F2F',
       CRITICAL: '#B71C1C',
     };
-    return colors[priority] || '#9E9E9E';
+    return colors[priority] || '#999999';
   };
 
   const getPriorityLabel = (priority: ChangePriority): string => {
@@ -135,11 +135,11 @@ export default function ChangeManagementScreen() {
         showsHorizontalScrollIndicator={false}
         style={styles.statsContainer}
       >
-        <View style={[styles.statCard, { backgroundColor: '#E3F2FD' }]}>
+        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
           <Text style={styles.statValue}>{stats.total}</Text>
           <Text style={styles.statLabel}>Tổng yêu cầu</Text>
         </View>
-        <View style={[styles.statCard, { backgroundColor: '#FFF3E0' }]}>
+        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
           <Text style={styles.statValue}>{stats.pending}</Text>
           <Text style={styles.statLabel}>Chờ duyệt</Text>
         </View>
@@ -191,7 +191,7 @@ export default function ChangeManagementScreen() {
           ]}
           onPress={() => setStatusFilter('SUBMITTED' as ChangeRequestStatus)}
         >
-          <View style={[styles.statusDot, { backgroundColor: '#0A6847' }]} />
+          <View style={[styles.statusDot, { backgroundColor: '#0066CC' }]} />
           <Text
             style={[
               styles.filterChipText,
@@ -208,7 +208,7 @@ export default function ChangeManagementScreen() {
           ]}
           onPress={() => setStatusFilter('APPROVED' as ChangeRequestStatus)}
         >
-          <View style={[styles.statusDot, { backgroundColor: '#4CAF50' }]} />
+          <View style={[styles.statusDot, { backgroundColor: '#0066CC' }]} />
           <Text
             style={[
               styles.filterChipText,
@@ -225,7 +225,7 @@ export default function ChangeManagementScreen() {
           ]}
           onPress={() => setStatusFilter('IMPLEMENTED' as ChangeRequestStatus)}
         >
-          <View style={[styles.statusDot, { backgroundColor: '#10B981' }]} />
+          <View style={[styles.statusDot, { backgroundColor: '#0066CC' }]} />
           <Text
             style={[
               styles.filterChipText,

@@ -18,7 +18,7 @@ export default function LamCuaNewScreen() {
       <Stack.Screen
         options={{
           title: config?.title || 'Thợ làm cửa',
-          headerStyle: { backgroundColor: '#EE4D2D' },
+          headerStyle: { backgroundColor: '#0066CC' },
           headerTintColor: '#fff',
         }}
       />

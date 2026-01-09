@@ -144,13 +144,13 @@ const RolePermissionManager: React.FC<RolePermissionManagerProps> = ({
                 style={[styles.actionButton, styles.editButton]}
                 onPress={() => setEditingRole(role)}
               >
-                <Ionicons name="pencil" size={16} color="#2196F3" />
+                <Ionicons name="pencil" size={16} color="#0066CC" />
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.actionButton, styles.deleteButton]}
                 onPress={() => handleDeleteRole(role)}
               >
-                <Ionicons name="trash" size={16} color="#F44336" />
+                <Ionicons name="trash" size={16} color="#000000" />
               </TouchableOpacity>
             </>
           )}
@@ -176,7 +176,7 @@ const RolePermissionManager: React.FC<RolePermissionManagerProps> = ({
                     value={role.permissions.includes(permission)}
                     onValueChange={() => togglePermission(role, permission)}
                     disabled={!isAdmin}
-                    trackColor={{ false: '#E0E0E0', true: '#4CAF50' }}
+                    trackColor={{ false: '#E0E0E0', true: '#0066CC' }}
                     thumbColor={role.permissions.includes(permission) ? '#FFFFFF' : '#FFFFFF'}
                   />
                 </View>
@@ -269,7 +269,7 @@ const RolePermissionManager: React.FC<RolePermissionManagerProps> = ({
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           {loading ? (
             <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color="#4CAF50" />
+              <ActivityIndicator size="large" color="#0066CC" />
               <Text style={styles.loadingText}>Đang tải...</Text>
             </View>
           ) : (
@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
   addButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#0066CC',
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 8,
@@ -384,7 +384,7 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   editButton: {
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FF',
     borderRadius: 6,
   },
   deleteButton: {
@@ -408,7 +408,7 @@ const styles = StyleSheet.create({
   categoryTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#4CAF50',
+    color: '#0066CC',
     marginBottom: 12,
   },
   permissionItem: {
@@ -483,7 +483,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   createButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#0066CC',
     marginLeft: 8,
   },
   cancelButtonText: {

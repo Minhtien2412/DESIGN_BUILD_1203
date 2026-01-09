@@ -149,15 +149,15 @@ export default function ConstructionMapIndexScreen() {
   const getStatusColor = (status: Project['status']) => {
     switch (status) {
       case 'active':
-        return '#2196F3';
+        return '#0066CC';
       case 'completed':
-        return '#4CAF50';
+        return '#0066CC';
       case 'on-hold':
-        return '#FF9800';
+        return '#0066CC';
       case 'planning':
-        return '#9C27B0';
+        return '#999999';
       default:
-        return '#9E9E9E';
+        return '#999999';
     }
   };
 
@@ -254,9 +254,9 @@ export default function ConstructionMapIndexScreen() {
 
       {/* Open Button */}
       <View style={styles.cardFooter}>
-        <Ionicons name="map-outline" size={18} color="#2196F3" />
+        <Ionicons name="map-outline" size={18} color="#0066CC" />
         <Text style={styles.openText}>Xem bản đồ thi công</Text>
-        <Ionicons name="chevron-forward" size={18} color="#2196F3" />
+        <Ionicons name="chevron-forward" size={18} color="#0066CC" />
       </View>
     </TouchableOpacity>
   );
@@ -334,7 +334,7 @@ export default function ConstructionMapIndexScreen() {
     return (
       <Container>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#2196F3" />
+          <ActivityIndicator size="large" color="#0066CC" />
           <Text style={styles.loadingText}>Đang tải dự án...</Text>
         </View>
       </Container>
@@ -354,8 +354,8 @@ export default function ConstructionMapIndexScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={['#2196F3']}
-            tintColor="#2196F3"
+            colors={['#0066CC']}
+            tintColor="#0066CC"
           />
         }
       />
@@ -529,7 +529,7 @@ const styles = StyleSheet.create({
     marginLeft: 6,
     fontSize: 14,
     fontWeight: '500',
-    color: '#2196F3',
+    color: '#0066CC',
   },
   emptyContainer: {
     alignItems: 'center',

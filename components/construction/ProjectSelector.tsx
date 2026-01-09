@@ -87,13 +87,13 @@ export const ProjectSelector: React.FC<ProjectSelectorProps> = ({
   const getStatusColor = (status?: string): string => {
     switch (status) {
       case 'Planning':
-        return '#F59E0B';
+        return '#0066CC';
       case 'InProgress':
         return '#3B82F6';
       case 'OnHold':
-        return '#EF4444';
+        return '#000000';
       case 'Completed':
-        return '#10B981';
+        return '#0066CC';
       case 'Cancelled':
         return '#6B7280';
       default:
@@ -120,7 +120,7 @@ export const ProjectSelector: React.FC<ProjectSelectorProps> = ({
             </Text>
             {isSelected && (
               <View style={styles.selectedBadge}>
-                <Ionicons name="checkmark-circle" size={20} color="#10B981" />
+                <Ionicons name="checkmark-circle" size={20} color="#0066CC" />
               </View>
             )}
           </View>
@@ -153,7 +153,7 @@ export const ProjectSelector: React.FC<ProjectSelectorProps> = ({
             <Text style={styles.statText}>{stats.totalTasks} công việc</Text>
           </View>
           <View style={styles.statItem}>
-            <Ionicons name="checkmark-circle-outline" size={16} color="#10B981" />
+            <Ionicons name="checkmark-circle-outline" size={16} color="#0066CC" />
             <Text style={styles.statText}>{stats.completedTasks} hoàn thành</Text>
           </View>
         </View>
@@ -438,7 +438,7 @@ const styles = StyleSheet.create({
   },
   projectCardSelected: {
     borderWidth: 2,
-    borderColor: '#10B981',
+    borderColor: '#0066CC',
   },
   projectHeader: {
     flexDirection: 'row',
@@ -506,7 +506,7 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#10B981',
+    backgroundColor: '#0066CC',
     borderRadius: 3,
   },
   progressText: {

@@ -122,20 +122,20 @@ export default function ActivityLogScreen() {
 
   const getActionColor = (action: string) => {
     switch (action) {
-      case 'CREATE': return '#10B981';
+      case 'CREATE': return '#0066CC';
       case 'UPDATE': return '#3B82F6';
-      case 'DELETE': return '#EF4444';
-      case 'LOGIN': return '#8B5CF6';
-      case 'EXPORT': return '#F59E0B';
+      case 'DELETE': return '#000000';
+      case 'LOGIN': return '#666666';
+      case 'EXPORT': return '#0066CC';
       default: return '#94A3B8';
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'success': return '#10B981';
-      case 'failed': return '#EF4444';
-      case 'warning': return '#F59E0B';
+      case 'success': return '#0066CC';
+      case 'failed': return '#000000';
+      case 'warning': return '#0066CC';
       default: return '#94A3B8';
     }
   };
@@ -183,19 +183,19 @@ export default function ActivityLogScreen() {
         {/* Summary */}
         <View style={styles.summaryRow}>
           <View style={[styles.summaryCard, { backgroundColor: '#ECFDF5' }]}>
-            <Text style={[styles.summaryNumber, { color: '#10B981' }]}>
+            <Text style={[styles.summaryNumber, { color: '#0066CC' }]}>
               {activities.filter(a => a.status === 'success').length}
             </Text>
             <Text style={styles.summaryLabel}>Thành công</Text>
           </View>
           <View style={[styles.summaryCard, { backgroundColor: '#FEF3C7' }]}>
-            <Text style={[styles.summaryNumber, { color: '#F59E0B' }]}>
+            <Text style={[styles.summaryNumber, { color: '#0066CC' }]}>
               {activities.filter(a => a.status === 'warning').length}
             </Text>
             <Text style={styles.summaryLabel}>Cảnh báo</Text>
           </View>
           <View style={[styles.summaryCard, { backgroundColor: '#FEE2E2' }]}>
-            <Text style={[styles.summaryNumber, { color: '#EF4444' }]}>
+            <Text style={[styles.summaryNumber, { color: '#000000' }]}>
               {activities.filter(a => a.status === 'failed').length}
             </Text>
             <Text style={styles.summaryLabel}>Thất bại</Text>

@@ -65,7 +65,7 @@ export default function EquipmentListScreen() {
           title: 'Thiết bị & Máy móc',
           headerRight: () => (
             <TouchableOpacity onPress={() => setModalVisible(true)}>
-              <Ionicons name="add-circle" size={28} color="#2196F3" style={{ marginRight: 8 }} />
+              <Ionicons name="add-circle" size={28} color="#0066CC" style={{ marginRight: 8 }} />
             </TouchableOpacity>
           ),
         }}
@@ -79,17 +79,17 @@ export default function EquipmentListScreen() {
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statItem}>
-          <Text style={[styles.statValue, { color: '#4CAF50' }]}>{availableCount}</Text>
+          <Text style={[styles.statValue, { color: '#0066CC' }]}>{availableCount}</Text>
           <Text style={styles.statLabel}>Sẵn sàng</Text>
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statItem}>
-          <Text style={[styles.statValue, { color: '#2196F3' }]}>{inUseCount}</Text>
+          <Text style={[styles.statValue, { color: '#0066CC' }]}>{inUseCount}</Text>
           <Text style={styles.statLabel}>Đang dùng</Text>
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statItem}>
-          <Text style={[styles.statValue, { color: '#FF9800' }]}>{maintenanceCount}</Text>
+          <Text style={[styles.statValue, { color: '#0066CC' }]}>{maintenanceCount}</Text>
           <Text style={styles.statLabel}>Bảo trì</Text>
         </View>
       </View>
@@ -450,17 +450,17 @@ function AddEquipmentModal({ visible, projectId, onClose, onCreate }: AddEquipme
 function getStatusColor(status: EquipmentStatus): string {
   switch (status) {
     case EquipmentStatus.AVAILABLE:
-      return '#4CAF50';
+      return '#0066CC';
     case EquipmentStatus.IN_USE:
-      return '#2196F3';
+      return '#0066CC';
     case EquipmentStatus.MAINTENANCE:
-      return '#FF9800';
+      return '#0066CC';
     case EquipmentStatus.REPAIR:
-      return '#F44336';
+      return '#000000';
     case EquipmentStatus.RESERVED:
-      return '#9C27B0';
+      return '#999999';
     case EquipmentStatus.OUT_OF_SERVICE:
-      return '#9E9E9E';
+      return '#999999';
     case EquipmentStatus.RETIRED:
       return '#4A4A4A';
     default:
@@ -484,13 +484,13 @@ function getStatusLabel(status: EquipmentStatus): string {
 function getConditionColor(condition: EquipmentCondition): string {
   switch (condition) {
     case EquipmentCondition.EXCELLENT:
-      return '#4CAF50';
+      return '#0066CC';
     case EquipmentCondition.GOOD:
-      return '#10B981';
+      return '#0066CC';
     case EquipmentCondition.FAIR:
-      return '#FF9800';
+      return '#0066CC';
     case EquipmentCondition.POOR:
-      return '#F44336';
+      return '#000000';
     case EquipmentCondition.CRITICAL:
       return '#B71C1C';
     default:
@@ -512,11 +512,11 @@ function getConditionLabel(condition: EquipmentCondition): string {
 function getOwnershipColor(ownership: OwnershipType): string {
   switch (ownership) {
     case OwnershipType.OWNED:
-      return '#4CAF50';
+      return '#0066CC';
     case OwnershipType.RENTED:
-      return '#2196F3';
+      return '#0066CC';
     case OwnershipType.LEASED:
-      return '#FF9800';
+      return '#0066CC';
     default:
       return '#666';
   }
@@ -638,8 +638,8 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   filterChipActive: {
-    backgroundColor: '#2196F3',
-    borderColor: '#2196F3',
+    backgroundColor: '#0066CC',
+    borderColor: '#0066CC',
   },
   filterChipText: {
     fontSize: 13,
@@ -775,7 +775,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   addButton: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
@@ -844,8 +844,8 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   typeChipActive: {
-    backgroundColor: '#2196F3',
-    borderColor: '#2196F3',
+    backgroundColor: '#0066CC',
+    borderColor: '#0066CC',
   },
   typeChipText: {
     fontSize: 12,
@@ -902,7 +902,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 14,
     borderRadius: 8,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#0066CC',
     alignItems: 'center',
   },
   createButtonText: {

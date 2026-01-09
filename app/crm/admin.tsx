@@ -113,14 +113,14 @@ function AdminDashboardContent() {
               label="Dự án"
               value={dashboard?.totalProjects || projects.length}
               subValue={`${dashboard?.activeProjects || 0} đang thực hiện`}
-              color="#10B981"
+              color="#0066CC"
             />
             <StatCard
               icon="person"
               label="Nhân viên"
               value={dashboard?.totalStaff || staff.length}
               subValue={availableEndpoints.includes('staff') ? `${dashboard?.activeStaff || 0} hoạt động` : 'Chưa kết nối'}
-              color="#8B5CF6"
+              color="#666666"
               disabled={!availableEndpoints.includes('staff')}
             />
             <StatCard
@@ -128,7 +128,7 @@ function AdminDashboardContent() {
               label="Hóa đơn"
               value={dashboard?.totalInvoices || invoices.length}
               subValue={availableEndpoints.includes('invoices') ? `${dashboard?.paidInvoices || 0} đã thanh toán` : 'Chưa kết nối'}
-              color="#F59E0B"
+              color="#0066CC"
               disabled={!availableEndpoints.includes('invoices')}
             />
           </View>
@@ -148,7 +148,7 @@ function AdminDashboardContent() {
               <View style={styles.financialDivider} />
               <View style={styles.financialItem}>
                 <Text style={styles.financialLabel}>Doanh thu</Text>
-                <Text style={[styles.financialValue, { color: '#10B981' }]}>
+                <Text style={[styles.financialValue, { color: '#0066CC' }]}>
                   {formatVND(dashboard?.totalRevenue || 0)}
                 </Text>
               </View>
@@ -156,14 +156,14 @@ function AdminDashboardContent() {
             <View style={styles.financialRow}>
               <View style={styles.financialItem}>
                 <Text style={styles.financialLabel}>Chưa thu</Text>
-                <Text style={[styles.financialValue, { color: '#F59E0B' }]}>
+                <Text style={[styles.financialValue, { color: '#0066CC' }]}>
                   {formatVND(dashboard?.totalOutstanding || 0)}
                 </Text>
               </View>
               <View style={styles.financialDivider} />
               <View style={styles.financialItem}>
                 <Text style={styles.financialLabel}>Chi phí</Text>
-                <Text style={[styles.financialValue, { color: '#EF4444' }]}>
+                <Text style={[styles.financialValue, { color: '#000000' }]}>
                   {formatVND(dashboard?.totalExpenseAmount || 0)}
                 </Text>
               </View>
@@ -187,14 +187,14 @@ function AdminDashboardContent() {
               label="Dự án"
               count={projects.length}
               onPress={() => router.push('/crm/projects' as any)}
-              color="#10B981"
+              color="#0066CC"
             />
             <QuickActionButton
               icon="person-circle"
               label="Nhân viên"
               count={staff.length}
               onPress={() => router.push('/crm/staff' as any)}
-              color="#8B5CF6"
+              color="#666666"
               disabled={!availableEndpoints.includes('staff')}
             />
             <QuickActionButton
@@ -202,7 +202,7 @@ function AdminDashboardContent() {
               label="Hóa đơn"
               count={invoices.length}
               onPress={() => router.push('/crm/invoices' as any)}
-              color="#F59E0B"
+              color="#0066CC"
               disabled={!availableEndpoints.includes('invoices')}
             />
             <QuickActionButton
@@ -210,7 +210,7 @@ function AdminDashboardContent() {
               label="Leads"
               count={leads.length}
               onPress={() => router.push('/crm/leads' as any)}
-              color="#EC4899"
+              color="#666666"
               disabled={!availableEndpoints.includes('leads')}
             />
             <QuickActionButton
@@ -218,7 +218,7 @@ function AdminDashboardContent() {
               label="Công việc"
               count={tasks.length}
               onPress={() => router.push('/crm/tasks' as any)}
-              color="#6366F1"
+              color="#666666"
               disabled={!availableEndpoints.includes('tasks')}
             />
             <QuickActionButton
@@ -324,7 +324,7 @@ function SyncStatusBar({ syncState, availableEndpoints }: SyncStatusBarProps) {
           </>
         ) : (
           <>
-            <Ionicons name="checkmark-circle" size={16} color="#10B981" />
+            <Ionicons name="checkmark-circle" size={16} color="#0066CC" />
             <Text style={styles.syncText}>{lastSyncText}</Text>
           </>
         )}
@@ -454,7 +454,7 @@ function APIStatusItem({ name, available }: { name: string; available: boolean }
   return (
     <View style={styles.apiStatusItem}>
       <Text style={styles.apiStatusName}>{name}</Text>
-      <View style={[styles.apiStatusDot, { backgroundColor: available ? '#10B981' : '#EF4444' }]} />
+      <View style={[styles.apiStatusDot, { backgroundColor: available ? '#0066CC' : '#000000' }]} />
     </View>
   );
 }
@@ -497,7 +497,7 @@ const styles = StyleSheet.create({
   },
   headerSubtitle: {
     fontSize: 12,
-    color: '#93C5FD',
+    color: '#0080FF',
     marginTop: 2,
   },
   refreshButton: {
@@ -537,7 +537,7 @@ const styles = StyleSheet.create({
     margin: 16,
     marginBottom: 0,
     padding: 12,
-    backgroundColor: '#EF4444',
+    backgroundColor: '#000000',
     borderRadius: 8,
   },
   errorText: {
@@ -744,7 +744,7 @@ const styles = StyleSheet.create({
   itemValue: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#10B981',
+    color: '#0066CC',
   },
   customerAvatar: {
     width: 40,
@@ -808,7 +808,7 @@ const styles = StyleSheet.create({
     gap: 8,
     marginTop: 12,
     padding: 12,
-    backgroundColor: '#EFF6FF',
+    backgroundColor: '#E8F4FF',
     borderRadius: 8,
   },
   upgradeHintText: {

@@ -3,12 +3,15 @@
  * Quản lý địa chỉ nhận hàng với giao diện hiện đại
  */
 
+import { Loader } from '@/components/ui/loader';
 import { useThemeColor } from '@/hooks/use-theme-color';
+import { AddressService, MOCK_ADDRESSES as FALLBACK_ADDRESSES } from '@/services/addressService';
 import { Ionicons } from '@expo/vector-icons';
 import { Href, router, Stack } from 'expo-router';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
     Alert,
+    RefreshControl,
     ScrollView,
     StyleSheet,
     Text,
@@ -27,28 +30,7 @@ interface Address {
   isDefault: boolean;
 }
 
-const MOCK_ADDRESSES: Address[] = [
-  {
-    id: '1',
-    name: 'Nguyễn Văn A',
-    phone: '0901234567',
-    address: '123 Nguyễn Huệ',
-    ward: 'Phường Bến Nghé',
-    district: 'Quận 1',
-    city: 'TP. Hồ Chí Minh',
-    isDefault: true,
-  },
-  {
-    id: '2',
-    name: 'Nguyễn Văn A',
-    phone: '0901234567',
-    address: '456 Lê Lợi',
-    ward: 'Phường Bến Thành',
-    district: 'Quận 1',
-    city: 'TP. Hồ Chí Minh',
-    isDefault: false,
-  },
-];
+const MOCK_ADDRESSES: Address[] = FALLBACK_ADDRESSES;
 
 export default function AddressesScreen() {
   const bg = useThemeColor({}, 'background');
@@ -59,14 +41,56 @@ export default function AddressesScreen() {
   const primary = useThemeColor({}, 'primary');
 
   const [addresses, setAddresses] = useState<Address[]>(MOCK_ADDRESSES);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [dataSource, setDataSource] = useState<'api' | 'mock'>('mock');
 
-  const handleSetDefault = (id: string) => {
-    setAddresses(prev =>
-      prev.map(addr => ({
-        ...addr,
-        isDefault: addr.id === id,
-      }))
-    );
+  const fetchAddresses = useCallback(async (isRefresh = false) => {
+    if (isRefresh) setRefreshing(true);
+    else setLoading(true);
+    
+    try {
+      const data = await AddressService.getAddresses();
+      if (data && data.length > 0) {
+        setAddresses(data);
+        setDataSource('api');
+      } else {
+        setAddresses(MOCK_ADDRESSES);
+        setDataSource('mock');
+      }
+    } catch (error) {
+      console.error('Error fetching addresses:', error);
+      setAddresses(MOCK_ADDRESSES);
+      setDataSource('mock');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchAddresses();
+  }, [fetchAddresses]);
+
+  const onRefresh = useCallback(() => {
+    fetchAddresses(true);
+  }, [fetchAddresses]);
+
+  const handleSetDefault = async (id: string) => {
+    try {
+      if (dataSource === 'api') {
+        await AddressService.setDefaultAddress(id);
+      }
+      setAddresses(prev =>
+        prev.map(addr => ({
+          ...addr,
+          isDefault: addr.id === id,
+        }))
+      );
+    } catch (error) {
+      console.error('Error setting default address:', error);
+      Alert.alert('Lỗi', 'Không thể đặt địa chỉ mặc định');
+    }
   };
 
   const handleEdit = (id: string) => {
@@ -82,8 +106,16 @@ export default function AddressesScreen() {
         {
           text: 'Xóa',
           style: 'destructive',
-          onPress: () => {
-            setAddresses(prev => prev.filter(addr => addr.id !== id));
+          onPress: async () => {
+            try {
+              if (dataSource === 'api') {
+                await AddressService.deleteAddress(id);
+              }
+              setAddresses(prev => prev.filter(addr => addr.id !== id));
+            } catch (error) {
+              console.error('Error deleting address:', error);
+              Alert.alert('Lỗi', 'Không thể xóa địa chỉ');
+            }
           },
         },
       ]
@@ -94,6 +126,15 @@ export default function AddressesScreen() {
     router.push('/profile/addresses/new' as Href);
   };
 
+  if (loading) {
+    return (
+      <View style={[styles.container, { backgroundColor: bg }]}>
+        <Stack.Screen options={{ title: 'Địa chỉ nhận hàng', headerShown: true }} />
+        <Loader text="Đang tải địa chỉ..." />
+      </View>
+    );
+  }
+
   return (
     <View style={[styles.container, { backgroundColor: bg }]}>
       <Stack.Screen
@@ -103,7 +144,20 @@ export default function AddressesScreen() {
         }}
       />
 
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView 
+        contentContainerStyle={styles.content}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        {/* Data Source Indicator */}
+        {dataSource === 'mock' && (
+          <View style={styles.mockBanner}>
+            <Ionicons name="information-circle" size={16} color="#92400E" />
+            <Text style={styles.mockBannerText}>📋 Dữ liệu mẫu</Text>
+          </View>
+        )}
+
         {/* Addresses List */}
         {addresses.map(address => (
           <View
@@ -160,8 +214,8 @@ export default function AddressesScreen() {
                 style={[styles.actionButton, { borderColor: border }]}
                 onPress={() => handleDelete(address.id)}
               >
-                <Ionicons name="trash-outline" size={16} color="#EF4444" />
-                <Text style={[styles.actionButtonText, { color: '#EF4444' }]}>
+                <Ionicons name="trash-outline" size={16} color="#000000" />
+                <Text style={[styles.actionButtonText, { color: '#000000' }]}>
                   Xóa
                 </Text>
               </TouchableOpacity>
@@ -205,6 +259,16 @@ const styles = StyleSheet.create({
     padding: 16,
     paddingBottom: 100,
   },
+  mockBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FEF3C7',
+    padding: 8,
+    borderRadius: 8,
+    marginBottom: 12,
+    gap: 8,
+  },
+  mockBannerText: { fontSize: 12, color: '#92400E' },
   addressCard: {
     borderRadius: 12,
     borderWidth: 1,

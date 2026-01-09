@@ -164,7 +164,7 @@ export default function CreateBookingScreen() {
                   onPress={() => setSelectedEquipment(null)}
                   style={styles.removeButton}
                 >
-                  <Ionicons name="close-circle" size={24} color="#ef4444" />
+                  <Ionicons name="close-circle" size={24} color="#000000" />
                 </TouchableOpacity>
               </View>
             )}
@@ -345,7 +345,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 16,
-    backgroundColor: '#eff6ff',
+    backgroundColor: '#E8F4FF',
     borderRadius: 12,
     borderWidth: 1,
     borderColor: '#3b82f6',

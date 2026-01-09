@@ -304,7 +304,7 @@ export default function DepartmentsManagementScreen() {
                   )}
                   {hasPermission(user?.permissions, 'departments', 'delete') && (
                     <TouchableOpacity onPress={() => handleDelete(item)} style={styles.actionIcon}>
-                      <Ionicons name="trash-outline" size={20} color="#ef4444" />
+                      <Ionicons name="trash-outline" size={20} color="#000000" />
                     </TouchableOpacity>
                   )}
                 </View>
@@ -335,7 +335,7 @@ export default function DepartmentsManagementScreen() {
                     )}
                     {hasPermission(user?.permissions, 'departments', 'delete') && (
                       <TouchableOpacity onPress={() => handleDelete(subDept)} style={styles.actionIcon}>
-                        <Ionicons name="trash-outline" size={18} color="#ef4444" />
+                        <Ionicons name="trash-outline" size={18} color="#000000" />
                       </TouchableOpacity>
                     )}
                   </View>

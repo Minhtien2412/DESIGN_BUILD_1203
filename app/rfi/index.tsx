@@ -38,20 +38,20 @@ const STATUS_FILTERS: { value: RFIStatus | 'ALL'; label: string }[] = [
 const STATUS_COLORS: Record<RFIStatus, string> = {
   DRAFT: '#6B7280',
   SUBMITTED: '#3B82F6',
-  UNDER_REVIEW: '#F59E0B',
-  ANSWERED: '#10B981',
-  CLARIFICATION_REQUIRED: '#8B5CF6',
-  CLOSED: '#059669',
+  UNDER_REVIEW: '#0066CC',
+  ANSWERED: '#0066CC',
+  CLARIFICATION_REQUIRED: '#666666',
+  CLOSED: '#0066CC',
   CANCELLED: '#9CA3AF',
-  REOPENED: '#F97316',
+  REOPENED: '#0066CC',
 };
 
 const PRIORITY_COLORS: Record<RFIPriority, string> = {
-  LOW: '#10B981',
+  LOW: '#0066CC',
   MEDIUM: '#3B82F6',
-  HIGH: '#F59E0B',
-  URGENT: '#F97316',
-  CRITICAL: '#EF4444',
+  HIGH: '#0066CC',
+  URGENT: '#0066CC',
+  CRITICAL: '#000000',
 };
 
 export default function RFIsScreen() {
@@ -114,29 +114,29 @@ export default function RFIsScreen() {
     <View style={styles.container}>
       {/* Stats Cards */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.statsContainer}>
-        <View style={[styles.statCard, { backgroundColor: '#EFF6FF' }]}>
+        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
           <Text style={styles.statValue}>{rfis.length}</Text>
           <Text style={styles.statLabel}>Total</Text>
         </View>
 
-        <View style={[styles.statCard, { backgroundColor: '#DBEAFE' }]}>
+        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
           <Text style={[styles.statValue, { color: '#3B82F6' }]}>{submittedCount}</Text>
           <Text style={styles.statLabel}>Submitted</Text>
         </View>
 
         <View style={[styles.statCard, { backgroundColor: '#FEF3C7' }]}>
-          <Text style={[styles.statValue, { color: '#F59E0B' }]}>{underReviewCount}</Text>
+          <Text style={[styles.statValue, { color: '#0066CC' }]}>{underReviewCount}</Text>
           <Text style={styles.statLabel}>Under Review</Text>
         </View>
 
         <View style={[styles.statCard, { backgroundColor: '#D1FAE5' }]}>
-          <Text style={[styles.statValue, { color: '#10B981' }]}>{answeredCount}</Text>
+          <Text style={[styles.statValue, { color: '#0066CC' }]}>{answeredCount}</Text>
           <Text style={styles.statLabel}>Answered</Text>
         </View>
 
         {overdueCount > 0 && (
           <View style={[styles.statCard, { backgroundColor: '#FEE2E2' }]}>
-            <Text style={[styles.statValue, { color: '#EF4444' }]}>{overdueCount}</Text>
+            <Text style={[styles.statValue, { color: '#000000' }]}>{overdueCount}</Text>
             <Text style={styles.statLabel}>Overdue</Text>
           </View>
         )}
@@ -307,9 +307,9 @@ export default function RFIsScreen() {
                           style={{
                             color:
                               daysToRespond < 0
-                                ? '#EF4444'
+                                ? '#000000'
                                 : daysToRespond < 3
-                                ? '#F59E0B'
+                                ? '#0066CC'
                                 : '#6B7280',
                           }}
                         >
@@ -352,7 +352,7 @@ export default function RFIsScreen() {
                             ? '#FED7AA'
                             : rfi.impact.level === 'MODERATE'
                             ? '#FEF3C7'
-                            : '#DBEAFE',
+                            : '#E8F4FF',
                       },
                     ]}
                   >
@@ -361,12 +361,12 @@ export default function RFIsScreen() {
                       size={14}
                       color={
                         rfi.impact.level === 'CRITICAL'
-                          ? '#DC2626'
+                          ? '#000000'
                           : rfi.impact.level === 'SIGNIFICANT'
                           ? '#EA580C'
                           : rfi.impact.level === 'MODERATE'
                           ? '#D97706'
-                          : '#2563EB'
+                          : '#0066CC'
                       }
                     />
                     <Text
@@ -375,12 +375,12 @@ export default function RFIsScreen() {
                         {
                           color:
                             rfi.impact.level === 'CRITICAL'
-                              ? '#DC2626'
+                              ? '#000000'
                               : rfi.impact.level === 'SIGNIFICANT'
                               ? '#EA580C'
                               : rfi.impact.level === 'MODERATE'
                               ? '#D97706'
-                              : '#2563EB',
+                              : '#0066CC',
                         },
                       ]}
                     >
@@ -391,7 +391,7 @@ export default function RFIsScreen() {
                   <View style={styles.impactDetails}>
                     {rfi.impact.schedule.affectsSchedule && (
                       <View style={styles.impactItem}>
-                        <Ionicons name="calendar" size={12} color="#F59E0B" />
+                        <Ionicons name="calendar" size={12} color="#0066CC" />
                         <Text style={styles.impactItemText}>
                           Schedule: {rfi.impact.schedule.delayDays} days
                           {rfi.impact.schedule.criticalPath && ' (Critical)'}
@@ -400,7 +400,7 @@ export default function RFIsScreen() {
                     )}
                     {rfi.impact.cost.affectsCost && (
                       <View style={styles.impactItem}>
-                        <Ionicons name="cash" size={12} color="#10B981" />
+                        <Ionicons name="cash" size={12} color="#0066CC" />
                         <Text style={styles.impactItemText}>
                           Cost: {rfi.impact.cost.currency}{' '}
                           {rfi.impact.cost.estimatedAmount?.toLocaleString()}
@@ -409,7 +409,7 @@ export default function RFIsScreen() {
                     )}
                     {rfi.impact.safety.affectsSafety && (
                       <View style={styles.impactItem}>
-                        <Ionicons name="shield-checkmark" size={12} color="#EF4444" />
+                        <Ionicons name="shield-checkmark" size={12} color="#000000" />
                         <Text style={styles.impactItemText}>Safety Impact</Text>
                       </View>
                     )}
@@ -421,7 +421,7 @@ export default function RFIsScreen() {
               {rfi.response && (
                 <View style={styles.responsePreview}>
                   <View style={styles.responseHeader}>
-                    <Ionicons name="chatbox-ellipses" size={16} color="#10B981" />
+                    <Ionicons name="chatbox-ellipses" size={16} color="#0066CC" />
                     <Text style={styles.responseHeaderText}>Response Received</Text>
                   </View>
                   <Text style={styles.responseText} numberOfLines={2}>
@@ -437,7 +437,7 @@ export default function RFIsScreen() {
               {/* Overdue Warning */}
               {rfi.isOverdue && (
                 <View style={styles.overdueWarning}>
-                  <Ionicons name="warning" size={16} color="#DC2626" />
+                  <Ionicons name="warning" size={16} color="#000000" />
                   <Text style={styles.overdueWarningText}>
                     {rfi.daysOverdue} day(s) overdue - Immediate action required
                   </Text>
@@ -655,7 +655,7 @@ const styles = StyleSheet.create({
   categoryBadgeText: {
     fontSize: 10,
     fontWeight: '600',
-    color: '#7C3AED',
+    color: '#666666',
     textTransform: 'capitalize',
   },
   infoSection: {
@@ -710,7 +710,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 12,
     borderLeftWidth: 3,
-    borderLeftColor: '#10B981',
+    borderLeftColor: '#0066CC',
   },
   responseHeader: {
     flexDirection: 'row',
@@ -720,7 +720,7 @@ const styles = StyleSheet.create({
   responseHeaderText: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#059669',
+    color: '#0066CC',
     marginLeft: 6,
   },
   responseText: {
@@ -730,7 +730,7 @@ const styles = StyleSheet.create({
   },
   responseBy: {
     fontSize: 10,
-    color: '#059669',
+    color: '#0066CC',
     fontStyle: 'italic',
   },
   overdueWarning: {
@@ -743,7 +743,7 @@ const styles = StyleSheet.create({
   },
   overdueWarningText: {
     fontSize: 11,
-    color: '#DC2626',
+    color: '#000000',
     fontWeight: '600',
     marginLeft: 6,
     flex: 1,
@@ -765,7 +765,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#3B82F6',
   },
   actionButtonSuccess: {
-    backgroundColor: '#10B981',
+    backgroundColor: '#0066CC',
   },
   actionButtonText: {
     fontSize: 12,

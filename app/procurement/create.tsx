@@ -40,9 +40,9 @@ export default function CreateProcurementScreen() {
 
   const priorities = [
     { key: 'low', label: 'Thấp', color: '#94A3B8' },
-    { key: 'medium', label: 'Trung bình', color: '#F59E0B' },
-    { key: 'high', label: 'Cao', color: '#EF4444' },
-    { key: 'urgent', label: 'Khẩn cấp', color: '#DC2626' },
+    { key: 'medium', label: 'Trung bình', color: '#0080FF' },
+    { key: 'high', label: 'Cao', color: '#000000' },
+    { key: 'urgent', label: 'Khẩn cấp', color: '#000000' },
   ];
 
   const addItem = () => {
@@ -224,7 +224,7 @@ export default function CreateProcurementScreen() {
                   <View style={styles.itemHeader}>
                     <Text style={styles.itemNumber}>Mục #{index + 1}</Text>
                     <TouchableOpacity onPress={() => removeItem(index)}>
-                      <Ionicons name="trash-outline" size={20} color="#EF4444" />
+                      <Ionicons name="trash-outline" size={20} color="#000000" />
                     </TouchableOpacity>
                   </View>
                   

@@ -48,12 +48,12 @@ interface Risk {
 }
 
 const CATEGORY_CONFIG: Record<RiskCategory, { label: string; icon: string; color: string }> = {
-  SAFETY: { label: 'An toàn', icon: 'shield-checkmark', color: '#DC2626' },
-  SCHEDULE: { label: 'Tiến độ', icon: 'time', color: '#F59E0B' },
-  COST: { label: 'Chi phí', icon: 'cash', color: '#10B981' },
+  SAFETY: { label: 'An toàn', icon: 'shield-checkmark', color: '#000000' },
+  SCHEDULE: { label: 'Tiến độ', icon: 'time', color: '#0066CC' },
+  COST: { label: 'Chi phí', icon: 'cash', color: '#0066CC' },
   QUALITY: { label: 'Chất lượng', icon: 'star', color: '#3B82F6' },
-  LEGAL: { label: 'Pháp lý', icon: 'document-text', color: '#8B5CF6' },
-  ENVIRONMENTAL: { label: 'Môi trường', icon: 'leaf', color: '#059669' },
+  LEGAL: { label: 'Pháp lý', icon: 'document-text', color: '#666666' },
+  ENVIRONMENTAL: { label: 'Môi trường', icon: 'leaf', color: '#0066CC' },
 };
 
 const LIKELIHOOD_VALUES: Record<RiskLikelihood, number> = {
@@ -73,10 +73,10 @@ const IMPACT_VALUES: Record<RiskImpact, number> = {
 };
 
 const getRiskLevel = (score: number): { label: string; color: string } => {
-  if (score >= 15) return { label: 'Cực cao', color: '#DC2626' };
+  if (score >= 15) return { label: 'Cực cao', color: '#000000' };
   if (score >= 10) return { label: 'Cao', color: '#EA580C' };
-  if (score >= 6) return { label: 'Trung bình', color: '#F59E0B' };
-  if (score >= 3) return { label: 'Thấp', color: '#10B981' };
+  if (score >= 6) return { label: 'Trung bình', color: '#0066CC' };
+  if (score >= 3) return { label: 'Thấp', color: '#0066CC' };
   return { label: 'Rất thấp', color: '#6B7280' };
 };
 
@@ -243,17 +243,17 @@ export default function RiskManagementScreen() {
               <Text style={[styles.statValue, { color: text }]}>{riskStats.total}</Text>
               <Text style={[styles.statLabel, { color: textMuted }]}>Tổng số</Text>
             </View>
-            <View style={[styles.statCard, { backgroundColor: '#DC262610', borderColor: '#DC2626' }]}>
-              <Text style={[styles.statValue, { color: '#DC2626' }]}>{riskStats.critical}</Text>
-              <Text style={[styles.statLabel, { color: '#DC2626' }]}>Cực cao</Text>
+            <View style={[styles.statCard, { backgroundColor: '#00000010', borderColor: '#000000' }]}>
+              <Text style={[styles.statValue, { color: '#000000' }]}>{riskStats.critical}</Text>
+              <Text style={[styles.statLabel, { color: '#000000' }]}>Cực cao</Text>
             </View>
             <View style={[styles.statCard, { backgroundColor: '#EA580C10', borderColor: '#EA580C' }]}>
               <Text style={[styles.statValue, { color: '#EA580C' }]}>{riskStats.high}</Text>
               <Text style={[styles.statLabel, { color: '#EA580C' }]}>Cao</Text>
             </View>
-            <View style={[styles.statCard, { backgroundColor: '#F59E0B10', borderColor: '#F59E0B' }]}>
-              <Text style={[styles.statValue, { color: '#F59E0B' }]}>{riskStats.medium}</Text>
-              <Text style={[styles.statLabel, { color: '#F59E0B' }]}>Trung bình</Text>
+            <View style={[styles.statCard, { backgroundColor: '#0066CC10', borderColor: '#0066CC' }]}>
+              <Text style={[styles.statValue, { color: '#0066CC' }]}>{riskStats.medium}</Text>
+              <Text style={[styles.statLabel, { color: '#0066CC' }]}>Trung bình</Text>
             </View>
           </View>
         </View>

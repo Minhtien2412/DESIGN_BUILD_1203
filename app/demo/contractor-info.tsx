@@ -186,14 +186,14 @@ export default function ContractorDemoScreen() {
           <Section title="💡 Hướng dẫn sử dụng" style={styles.section}>
             <View style={styles.usageBox}>
               <View style={styles.usageItem}>
-                <Ionicons name="code-slash" size={20} color="#EE4D2D" />
+                <Ionicons name="code-slash" size={20} color="#0066CC" />
                 <Text style={styles.usageText}>
                   Import: {`import { ContractorInfoCard } from '@/components/ui'`}
                 </Text>
               </View>
               
               <View style={styles.usageItem}>
-                <Ionicons name="options" size={20} color="#0A6847" />
+                <Ionicons name="options" size={20} color="#0066CC" />
                 <Text style={styles.usageText}>
                   Props: userId, userData?, compact?, showContactBar?, variant?
                 </Text>

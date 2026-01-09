@@ -27,18 +27,18 @@ interface QuickActionSheetProps {
 
 // Primary communication actions
 const PRIMARY_ACTIONS = [
-  { id: 'call', label: 'Gọi điện', icon: 'call', color: '#22C55E', bgColor: '#DCFCE7' },
-  { id: 'messages', label: 'Nhắn tin', icon: 'chatbubbles', color: '#3B82F6', bgColor: '#DBEAFE' },
-  { id: 'live', label: 'Livestream', icon: 'videocam', color: '#EF4444', bgColor: '#FEE2E2' },
-  { id: 'contacts', label: 'Danh bạ', icon: 'people', color: '#8B5CF6', bgColor: '#EDE9FE' },
+  { id: 'call', label: 'Gọi điện', icon: 'call', color: '#0066CC', bgColor: '#DCFCE7' },
+  { id: 'messages', label: 'Nhắn tin', icon: 'chatbubbles', color: '#3B82F6', bgColor: '#E8F4FF' },
+  { id: 'live', label: 'Livestream', icon: 'videocam', color: '#000000', bgColor: '#FEE2E2' },
+  { id: 'contacts', label: 'Danh bạ', icon: 'people', color: '#666666', bgColor: '#EDE9FE' },
 ];
 
 // Secondary utility actions
 const SECONDARY_ACTIONS = [
-  { id: 'cost-estimator', label: 'Dự toán', icon: 'calculator', color: '#1976D2', bgColor: '#E3F2FD' },
+  { id: 'cost-estimator', label: 'Dự toán', icon: 'calculator', color: '#1976D2', bgColor: '#E8F4FF' },
   { id: 'store-locator', label: 'Cửa hàng', icon: 'location', color: '#43A047', bgColor: '#E8F5E9' },
-  { id: 'schedule', label: 'Lịch hẹn', icon: 'calendar', color: '#F57C00', bgColor: '#FFF3E0' },
-  { id: 'quote-request', label: 'Báo giá', icon: 'document-text', color: '#0A6847', bgColor: '#E8F5E9' },
+  { id: 'schedule', label: 'Lịch hẹn', icon: 'calendar', color: '#0066CC', bgColor: '#E8F4FF' },
+  { id: 'quote-request', label: 'Báo giá', icon: 'document-text', color: '#0066CC', bgColor: '#E8F5E9' },
 ];
 
 export function QuickActionSheet({ visible, onClose, onActionPress }: QuickActionSheetProps) {

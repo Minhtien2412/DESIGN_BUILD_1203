@@ -131,25 +131,25 @@ export const ConstructionMapSetup: React.FC<ConstructionMapSetupProps> = ({
 
             <View style={styles.featureList}>
               <View style={styles.featureItem}>
-                <Ionicons name="checkmark-circle" size={24} color="#10B981" />
+                <Ionicons name="checkmark-circle" size={24} color="#0066CC" />
                 <Text style={styles.featureText}>
                   Kéo thả công việc trực quan
                 </Text>
               </View>
               <View style={styles.featureItem}>
-                <Ionicons name="checkmark-circle" size={24} color="#10B981" />
+                <Ionicons name="checkmark-circle" size={24} color="#0066CC" />
                 <Text style={styles.featureText}>
                   Theo dõi tiến độ real-time
                 </Text>
               </View>
               <View style={styles.featureItem}>
-                <Ionicons name="checkmark-circle" size={24} color="#10B981" />
+                <Ionicons name="checkmark-circle" size={24} color="#0066CC" />
                 <Text style={styles.featureText}>
                   Cộng tác nhóm dễ dàng
                 </Text>
               </View>
               <View style={styles.featureItem}>
-                <Ionicons name="checkmark-circle" size={24} color="#10B981" />
+                <Ionicons name="checkmark-circle" size={24} color="#0066CC" />
                 <Text style={styles.featureText}>
                   Lọc và tìm kiếm thông minh
                 </Text>
@@ -318,7 +318,7 @@ export const ConstructionMapSetup: React.FC<ConstructionMapSetupProps> = ({
                     <TouchableOpacity
                       onPress={() => handleRemoveTeamMember(email)}
                     >
-                      <Ionicons name="close-circle" size={20} color="#EF4444" />
+                      <Ionicons name="close-circle" size={20} color="#000000" />
                     </TouchableOpacity>
                   </View>
                 ))}
@@ -331,7 +331,7 @@ export const ConstructionMapSetup: React.FC<ConstructionMapSetupProps> = ({
         return (
           <View style={styles.stepContent}>
             <View style={styles.successIcon}>
-              <Ionicons name="checkmark-circle" size={80} color="#10B981" />
+              <Ionicons name="checkmark-circle" size={80} color="#0066CC" />
             </View>
             <Text style={styles.successTitle}>Sẵn sàng!</Text>
             <Text style={styles.successDescription}>
@@ -575,7 +575,7 @@ const styles = StyleSheet.create({
   },
   gridSizeOptionActive: {
     borderColor: '#3B82F6',
-    backgroundColor: '#EFF6FF',
+    backgroundColor: '#E8F4FF',
   },
   gridSizeText: {
     fontSize: 16,
@@ -600,7 +600,7 @@ const styles = StyleSheet.create({
   },
   canvasSizeOptionActive: {
     borderColor: '#3B82F6',
-    backgroundColor: '#EFF6FF',
+    backgroundColor: '#E8F4FF',
   },
   canvasSizeLabel: {
     fontSize: 15,

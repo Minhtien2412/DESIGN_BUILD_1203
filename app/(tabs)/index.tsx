@@ -1,47 +1,79 @@
 /**
- * Home Screen v3 - European Minimal Design
- * Clean, Modern, Information-Dense Layout
- * @updated 2025-12-24
+ * Home Screen v4 - Complete Feature Hub
+ * Full-featured Home with All Module Access
+ * Based on Router Structure Analysis
+ * Now with REAL DATA from Perfex CRM & API
+ * @updated 2026-01-03
  */
 
 import { ProgressSection } from '@/components/home/progress-section';
 import { useAuth } from '@/context/AuthContext';
+import { useDashboardData } from '@/hooks/useDashboardData';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Href, router } from 'expo-router';
-import { memo, useCallback, useState } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import {
     Dimensions,
-    Platform,
     RefreshControl,
     ScrollView,
     StatusBar,
     StyleSheet,
     Text,
     TouchableOpacity,
-    View,
+    View
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
 
 // ============================================================================
-// DESIGN TOKENS - European Minimal Style
+// DESIGN TOKENS - Modern Shopee-inspired Style
 // ============================================================================
 const COLORS = {
-  bg: '#F8FAFC',
+  // Backgrounds
+  bg: '#F5F5F5',
   card: '#FFFFFF',
-  text: '#0F172A',
-  textSecondary: '#64748B',
-  textMuted: '#94A3B8',
-  accent: '#2563EB',
-  accentLight: '#EFF6FF',
-  success: '#10B981',
-  successLight: '#D1FAE5',
-  warning: '#F59E0B',
-  warningLight: '#FEF3C7',
-  border: '#E2E8F0',
-  divider: '#F1F5F9',
+  
+  // Primary Brand
+  primary: '#0066CC', // Shopee Orange
+  primaryDark: '#004499',
+  primaryLight: '#E8F4FF',
+  
+  // Accent Colors
+  accent: '#0066CC', // Blue
+  accentLight: '#E8F4FF',
+  
+  // Text
+  text: '#222222',
+  textSecondary: '#666666',
+  textMuted: '#999999',
+  textWhite: '#FFFFFF',
+  
+  // Status Colors
+  success: '#0066CC',
+  successLight: '#E8F4FF',
+  warning: '#0066CC',
+  warningLight: '#E8F4FF',
+  error: '#000000',
+  errorLight: '#F5F5F5',
+  info: '#0066CC',
+  infoLight: '#E8F4FF',
+  
+  // UI Elements
+  border: '#E8E8E8',
+  divider: '#F0F0F0',
+  shadow: 'rgba(0, 0, 0, 0.08)',
+  
+  // Module Colors
+  construction: '#0066CC',
+  project: '#0080FF',
+  shopping: '#999999',
+  ai: '#0066CC',
+  live: '#666666',
+  crm: '#0080FF',
+  documents: '#666666',
+  safety: '#000000',
 };
 
 const SPACING = {
@@ -51,191 +83,351 @@ const SPACING = {
   lg: 16,
   xl: 20,
   xxl: 24,
+  xxxl: 32,
 };
 
 // ============================================================================
-// MAIN SERVICES DATA - Compact & Essential
+// DATA - Based on Complete Router Structure
 // ============================================================================
-const MAIN_SERVICES = [
-  { id: 1, label: 'Thiết kế', icon: 'home-outline', route: '/services/house-design', color: '#6366F1' },
-  { id: 2, label: 'Thi công', icon: 'construct-outline', route: '/construction/progress', color: '#F59E0B' },
-  { id: 3, label: 'Dự án', icon: 'folder-outline', route: '/(tabs)/projects', color: '#10B981' },
-  { id: 4, label: 'Tiến độ', icon: 'analytics-outline', route: '/construction/tracking', color: '#3B82F6' },
-  { id: 5, label: 'Vật liệu', icon: 'cube-outline', route: '/materials/index', color: '#EC4899' },
-  { id: 6, label: 'Báo giá', icon: 'calculator-outline', route: '/utilities/quote-request', color: '#8B5CF6' },
+
+// Hero Banner Data
+const BANNERS = [
+  { id: 1, title: 'Ưu đãi 50%', subtitle: 'Thiết kế nội thất', color: '#0066CC', route: '/services/interior-design' },
+  { id: 2, title: 'Flash Sale', subtitle: 'Vật liệu xây dựng', color: '#666666', route: '/shopping/flash-sale' },
+  { id: 3, title: 'AI Assistant', subtitle: 'Dự toán thông minh', color: '#0066CC', route: '/ai/assistant' },
 ];
 
-// ============================================================================
-// QUICK TOOLS DATA - Most Used Features
-// ============================================================================
-const QUICK_TOOLS = [
-  { id: 1, label: 'Timeline', icon: 'git-network-outline', route: '/timeline/index' },
-  { id: 2, label: 'Ngân sách', icon: 'wallet-outline', route: '/budget/index' },
-  { id: 3, label: 'QC/QA', icon: 'checkmark-circle-outline', route: '/quality-assurance/index' },
-  { id: 4, label: 'An toàn', icon: 'shield-checkmark-outline', route: '/safety/index' },
-  { id: 5, label: 'Tài liệu', icon: 'document-outline', route: '/documents/folders' },
-  { id: 6, label: 'Báo cáo', icon: 'newspaper-outline', route: '/reports/index' },
-  { id: 7, label: 'Nhân công', icon: 'people-outline', route: '/labor/index' },
-  { id: 8, label: 'Sitemap', icon: 'map-outline', route: '/utilities/sitemap' },
+// Quick Access - Most Used Features (Badges will be dynamic)
+const QUICK_ACCESS_CONFIG = [
+  { id: 1, label: 'Dự án', icon: 'folder-outline', route: '/(tabs)/projects', color: '#0066CC', badgeKey: 'projects' },
+  { id: 2, label: 'Tiến độ', icon: 'analytics-outline', route: '/construction/progress', color: '#0066CC', badgeKey: null },
+  { id: 3, label: 'Tài liệu', icon: 'documents-outline', route: '/documents', color: '#3B82F6', badgeKey: 'documents' },
+  { id: 4, label: 'Hoá đơn', icon: 'receipt-outline', route: '/crm/invoices', color: '#10B981', badgeKey: 'invoices' },
+  { id: 5, label: 'Hợp đồng', icon: 'document-attach-outline', route: '/contracts', color: '#8B5CF6', badgeKey: 'contracts' },
+  { id: 6, label: 'Chat', icon: 'chatbubbles-outline', route: '/messages', color: '#0080FF', badgeKey: 'chat' },
+  { id: 7, label: 'CRM', icon: 'business-outline', route: '/crm', color: '#666666', badgeKey: 'crm' },
+  { id: 8, label: 'Xem thêm', icon: 'apps-outline', route: '/(tabs)/menu', color: '#666666', badgeKey: null },
 ];
 
-// ============================================================================
-// SERVICES GRID - Dịch vụ thi công
-// ============================================================================
-const CONSTRUCTION_SERVICES = [
-  { id: 1, label: 'Ép cọc', icon: '⚡', route: '/utilities/ep-coc' },
-  { id: 2, label: 'Đào đất', icon: '🚜', route: '/utilities/dao-dat' },
-  { id: 3, label: 'Bê tông', icon: '🏗️', route: '/utilities/be-tong' },
-  { id: 4, label: 'Vật liệu', icon: '📦', route: '/utilities/vat-lieu' },
-  { id: 5, label: 'Thợ xây', icon: '👷', route: '/utilities/tho-xay' },
-  { id: 6, label: 'Điện nước', icon: '💡', route: '/utilities/tho-dien-nuoc' },
-  { id: 7, label: 'Cốp pha', icon: '🔧', route: '/utilities/tho-coffa' },
-  { id: 8, label: 'Thiết kế', icon: '✏️', route: '/utilities/design-team' },
+// Core Modules - Primary Business Functions (Stats will be dynamic)
+const CORE_MODULES_CONFIG = [
+  { 
+    id: 1, 
+    title: 'Quản lý Dự án', 
+    subtitle: 'Timeline, Tasks, Phases',
+    icon: 'folder-open-outline',
+    color: '#0066CC',
+    route: '/(tabs)/projects',
+    statsKey: 'projects'
+  },
+  { 
+    id: 2, 
+    title: 'Thi công XD', 
+    subtitle: 'Progress, Tracking, Map',
+    icon: 'construct-outline',
+    color: '#0066CC',
+    route: '/construction/progress',
+    statsKey: 'construction'
+  },
+  { 
+    id: 3, 
+    title: 'Tài liệu & Văn bản', 
+    subtitle: 'Documents, Files, Archive',
+    icon: 'documents-outline',
+    color: '#3B82F6',
+    route: '/documents',
+    statsKey: 'documents'
+  },
+  { 
+    id: 4, 
+    title: 'Hoá đơn & Thanh toán', 
+    subtitle: 'Invoices, Payments',
+    icon: 'receipt-outline',
+    color: '#10B981',
+    route: '/crm/invoices',
+    statsKey: 'invoices'
+  },
+  { 
+    id: 5, 
+    title: 'Hợp đồng', 
+    subtitle: 'Contracts, Quotations',
+    icon: 'document-attach-outline',
+    color: '#8B5CF6',
+    route: '/contracts',
+    statsKey: 'contracts'
+  },
+  { 
+    id: 6, 
+    title: 'QC/QA', 
+    subtitle: 'Quality, Inspections',
+    icon: 'checkmark-done-outline',
+    color: '#0080FF',
+    route: '/quality-assurance',
+    statsKey: 'qc'
+  },
 ];
 
-// ============================================================================
-// UTILITY TOOLS - Tiện ích hoàn thiện
-// ============================================================================
+// Commerce Module - Shopping Features
+const COMMERCE_ITEMS = [
+  { id: 1, label: 'Vật liệu XD', emoji: '🧱', route: '/shopping/vat-lieu-xay', hot: true },
+  { id: 2, label: 'Gạch men', emoji: '🏠', route: '/shopping/gach-men', hot: false },
+  { id: 3, label: 'Sơn', emoji: '🎨', route: '/shopping/son', hot: true },
+  { id: 4, label: 'Điện', emoji: '💡', route: '/shopping/dien', hot: false },
+  { id: 5, label: 'Nước', emoji: '🚿', route: '/shopping/nuoc', hot: false },
+  { id: 6, label: 'Nội thất', emoji: '🛋️', route: '/shopping/noi-that', hot: true },
+  { id: 7, label: 'Thiết bị bếp', emoji: '🍳', route: '/shopping/thiet-bi-bep', hot: false },
+  { id: 8, label: 'PCCC', emoji: '🧯', route: '/shopping/pccc', hot: false },
+];
+
+// Services - Dịch vụ xây dựng
+const SERVICES = [
+  { id: 1, label: 'Thiết kế nhà', icon: 'home-outline', route: '/services/house-design', color: '#0066CC' },
+  { id: 2, label: 'Thiết kế nội thất', icon: 'bed-outline', route: '/services/interior-design', color: '#666666' },
+  { id: 3, label: 'Nhà thầu XD', icon: 'business-outline', route: '/services/construction-company', color: '#0080FF' },
+  { id: 4, label: 'Giám sát CL', icon: 'eye-outline', route: '/services/quality-supervision', color: '#0066CC' },
+  { id: 5, label: 'Phong thủy', icon: 'compass-outline', route: '/services/feng-shui', color: '#0066CC' },
+  { id: 6, label: 'Giấy phép XD', icon: 'document-outline', route: '/services/permit', color: '#000000' },
+  { id: 7, label: 'Bảo trì nhà', icon: 'build-outline', route: '/services/home-maintenance', color: '#FF6B00', hot: true },
+  { id: 8, label: 'Sửa điện nước', icon: 'flash-outline', route: '/services/home-maintenance', color: '#00B894' },
+];
+
+// AI Features
+const AI_FEATURES = [
+  { id: 1, label: 'AI Assistant', icon: 'sparkles', route: '/ai/assistant', desc: 'Trợ lý thông minh' },
+  { id: 2, label: 'Dự toán CP', icon: 'calculator', route: '/ai/cost-estimator', desc: 'Tính chi phí' },
+  { id: 3, label: 'Phân tích ảnh', icon: 'camera', route: '/ai/photo-analysis', desc: 'AI nhận diện' },
+  { id: 4, label: 'Báo cáo AI', icon: 'document-text', route: '/ai/generate-report', desc: 'Tự động tạo' },
+];
+
+// Communication Features
+const COMMUNICATION = [
+  { id: 1, label: 'Tin nhắn', icon: 'chatbubbles-outline', route: '/messages', badge: 5, color: '#0066CC' },
+  { id: 2, label: 'Video Call', icon: 'videocam-outline', route: '/call/active', badge: 0, color: '#0080FF' },
+  { id: 3, label: 'Live Stream', icon: 'radio-outline', route: '/(tabs)/live', badge: 2, color: '#666666' },
+  { id: 4, label: 'Social', icon: 'people-outline', route: '/social', badge: 0, color: '#0066CC' },
+];
+
+// Admin/Dashboard Quick Access
+const ADMIN_SHORTCUTS = [
+  { id: 1, label: 'Dashboard', icon: 'speedometer-outline', route: '/dashboard', role: 'all' },
+  { id: 2, label: 'Quản trị', icon: 'settings-outline', route: '/admin', role: 'admin' },
+  { id: 3, label: 'Nhân viên', icon: 'people-outline', route: '/admin/staff', role: 'admin' },
+  { id: 4, label: 'Phân quyền', icon: 'key-outline', route: '/admin/permissions', role: 'admin' },
+];
+
+// Utility Tools
 const UTILITY_TOOLS = [
-  { id: 1, label: 'Lát gạch', icon: 'grid-outline', route: '/finishing/lat-gach' },
-  { id: 2, label: 'Sơn', icon: 'color-fill-outline', route: '/finishing/son' },
-  { id: 3, label: 'Thạch cao', icon: 'square-outline', route: '/finishing/thach-cao' },
-  { id: 4, label: 'Cửa', icon: 'enter-outline', route: '/finishing/lam-cua' },
-  { id: 5, label: 'Camera', icon: 'videocam-outline', route: '/finishing/camera' },
-  { id: 6, label: 'Lan can', icon: 'reorder-four-outline', route: '/finishing/lan-can' },
-  { id: 7, label: 'Đá ốp', icon: 'diamond-outline', route: '/finishing/da' },
-  { id: 8, label: 'Thợ', icon: 'hammer-outline', route: '/finishing/tho-tong-hop' },
-];
-
-// ============================================================================
-// VIDEO & SHOPPING CATEGORIES
-// ============================================================================
-const VIDEO_ITEMS = [
-  { id: 1, title: 'Thi công móng nhà', views: '12K', duration: '8:45', route: '/videos/index' },
-  { id: 2, title: 'Đổ bê tông sàn', views: '8.5K', duration: '12:30', route: '/videos/index' },
-  { id: 3, title: 'Hoàn thiện nội thất', views: '15K', duration: '15:00', route: '/videos/index' },
-];
-
-const SHOPPING_CATS = [
-  { id: 1, label: 'Vật liệu', icon: '🧱', route: '/shopping/index?cat=construction' },
-  { id: 2, label: 'Thiết bị', icon: '⚡', route: '/shopping/index?cat=electrical' },
-  { id: 3, label: 'Nội thất', icon: '🛋️', route: '/shopping/index?cat=furniture' },
-  { id: 4, label: 'Sơn màu', icon: '🎨', route: '/shopping/index?cat=paint' },
+  { id: 1, label: 'Tài liệu', icon: 'folder-outline', route: '/documents' },
+  { id: 2, label: 'Hoá đơn', icon: 'receipt-outline', route: '/crm/invoices' },
+  { id: 3, label: 'An toàn LĐ', icon: 'shield-checkmark-outline', route: '/safety' },
+  { id: 4, label: 'Phương tiện', icon: 'car-outline', route: '/fleet' },
+  { id: 5, label: 'Kho bãi', icon: 'cube-outline', route: '/inventory' },
+  { id: 6, label: 'Thiết bị', icon: 'hardware-chip-outline', route: '/equipment' },
+  { id: 7, label: 'Nhân công', icon: 'body-outline', route: '/labor' },
+  { id: 8, label: 'Thời tiết', icon: 'partly-sunny-outline', route: '/weather' },
+  { id: 9, label: 'Bản đồ', icon: 'map-outline', route: '/construction/map-view' },
 ];
 
 // ============================================================================
 // MEMOIZED COMPONENTS
 // ============================================================================
 
-// Service Card - Main grid
-const ServiceCard = memo<{
-  item: typeof MAIN_SERVICES[0];
+// Banner Slider Item
+const BannerItem = memo<{ item: typeof BANNERS[0]; onPress: (route: string) => void }>(
+  ({ item, onPress }) => (
+    <TouchableOpacity
+      style={[styles.bannerItem, { backgroundColor: item.color }]}
+      onPress={() => onPress(item.route)}
+      activeOpacity={0.9}
+    >
+      <View>
+        <Text style={styles.bannerTitle}>{item.title}</Text>
+        <Text style={styles.bannerSubtitle}>{item.subtitle}</Text>
+      </View>
+      <Ionicons name="chevron-forward-circle" size={32} color="rgba(255,255,255,0.8)" />
+    </TouchableOpacity>
+  )
+);
+BannerItem.displayName = 'BannerItem';
+
+// Quick Access Item (Updated to accept badge prop)
+interface QuickAccessItemProps {
+  item: { id: number; label: string; icon: string; route: string; color: string; badgeKey: string | null };
+  badge: string | null;
   onPress: (route: string) => void;
-}>(({ item, onPress }) => (
-  <TouchableOpacity
-    style={styles.serviceCard}
-    onPress={() => onPress(item.route)}
-    activeOpacity={0.7}
-  >
-    <View style={[styles.serviceIconBox, { backgroundColor: item.color + '15' }]}>
-      <Ionicons name={item.icon as any} size={22} color={item.color} />
-    </View>
-    <Text style={styles.serviceLabel}>{item.label}</Text>
-  </TouchableOpacity>
-));
+}
+const QuickAccessItem = memo<QuickAccessItemProps>(
+  ({ item, badge, onPress }) => (
+    <TouchableOpacity 
+      style={styles.quickAccessItem} 
+      onPress={() => onPress(item.route)}
+      activeOpacity={0.7}
+    >
+      <View style={[styles.quickAccessIcon, { backgroundColor: item.color + '15' }]}>
+        <Ionicons name={item.icon as any} size={24} color={item.color} />
+        {badge && (
+          <View style={styles.quickAccessBadge}>
+            <Text style={styles.quickAccessBadgeText}>{badge}</Text>
+          </View>
+        )}
+      </View>
+      <Text style={styles.quickAccessLabel}>{item.label}</Text>
+    </TouchableOpacity>
+  )
+);
+QuickAccessItem.displayName = 'QuickAccessItem';
+
+// Core Module Card (Updated to accept stats prop)
+interface CoreModuleCardProps {
+  item: { id: number; title: string; subtitle: string; icon: string; color: string; route: string; statsKey: string };
+  stats: string;
+  onPress: (route: string) => void;
+}
+const CoreModuleCard = memo<CoreModuleCardProps>(
+  ({ item, stats, onPress }) => (
+    <TouchableOpacity
+      style={styles.coreModuleCard}
+      onPress={() => onPress(item.route)}
+      activeOpacity={0.8}
+    >
+      <View style={[styles.coreModuleIcon, { backgroundColor: item.color + '15' }]}>
+        <Ionicons name={item.icon as any} size={28} color={item.color} />
+      </View>
+      <View style={styles.coreModuleContent}>
+        <Text style={styles.coreModuleTitle}>{item.title}</Text>
+        <Text style={styles.coreModuleSubtitle}>{item.subtitle}</Text>
+      </View>
+      <View style={styles.coreModuleStats}>
+        <Text style={[styles.coreModuleStatsText, { color: item.color }]}>{stats}</Text>
+        <Ionicons name="chevron-forward" size={16} color={COLORS.textMuted} />
+      </View>
+    </TouchableOpacity>
+  )
+);
+CoreModuleCard.displayName = 'CoreModuleCard';
+
+// Commerce Category Item
+const CommerceItem = memo<{ item: typeof COMMERCE_ITEMS[0]; onPress: (route: string) => void }>(
+  ({ item, onPress }) => (
+    <TouchableOpacity
+      style={styles.commerceItem}
+      onPress={() => onPress(item.route)}
+      activeOpacity={0.7}
+    >
+      <View style={styles.commerceIconContainer}>
+        <Text style={styles.commerceEmoji}>{item.emoji}</Text>
+        {item.hot && (
+          <View style={styles.hotBadge}>
+            <Text style={styles.hotBadgeText}>HOT</Text>
+          </View>
+        )}
+      </View>
+      <Text style={styles.commerceLabel}>{item.label}</Text>
+    </TouchableOpacity>
+  )
+);
+CommerceItem.displayName = 'CommerceItem';
+
+// Service Card
+const ServiceCard = memo<{ item: typeof SERVICES[0]; onPress: (route: string) => void }>(
+  ({ item, onPress }) => (
+    <TouchableOpacity
+      style={styles.serviceCard}
+      onPress={() => onPress(item.route)}
+      activeOpacity={0.7}
+    >
+      <View style={[styles.serviceIcon, { backgroundColor: item.color + '15' }]}>
+        <Ionicons name={item.icon as any} size={22} color={item.color} />
+        {(item as any).hot && (
+          <View style={styles.serviceHotBadge}>
+            <Text style={styles.serviceHotBadgeText}>HOT</Text>
+          </View>
+        )}
+      </View>
+      <Text style={styles.serviceLabel}>{item.label}</Text>
+    </TouchableOpacity>
+  )
+);
 ServiceCard.displayName = 'ServiceCard';
 
-// Tool Item - Compact grid
-const ToolItem = memo<{
-  item: typeof QUICK_TOOLS[0];
-  onPress: (route: string) => void;
-}>(({ item, onPress }) => (
-  <TouchableOpacity
-    style={styles.toolItem}
-    onPress={() => onPress(item.route)}
-    activeOpacity={0.7}
-  >
-    <Ionicons name={item.icon as any} size={20} color={COLORS.accent} />
-    <Text style={styles.toolLabel}>{item.label}</Text>
-  </TouchableOpacity>
-));
-ToolItem.displayName = 'ToolItem';
-
-// Construction Service Card
-const ConstructionCard = memo<{
-  item: typeof CONSTRUCTION_SERVICES[0];
-  onPress: (route: string) => void;
-}>(({ item, onPress }) => (
-  <TouchableOpacity
-    style={styles.constructionCard}
-    onPress={() => onPress(item.route)}
-    activeOpacity={0.7}
-  >
-    <View style={styles.constructionIcon}>
-      <Text style={styles.constructionEmoji}>{item.icon}</Text>
-    </View>
-    <Text style={styles.constructionLabel}>{item.label}</Text>
-  </TouchableOpacity>
-));
-ConstructionCard.displayName = 'ConstructionCard';
-
-// Utility Tool Card
-const UtilityCard = memo<{
-  item: typeof UTILITY_TOOLS[0];
-  onPress: (route: string) => void;
-}>(({ item, onPress }) => (
-  <TouchableOpacity
-    style={styles.utilityCard}
-    onPress={() => onPress(item.route)}
-    activeOpacity={0.7}
-  >
-    <Ionicons name={item.icon as any} size={22} color={COLORS.text} />
-    <Text style={styles.utilityLabel}>{item.label}</Text>
-  </TouchableOpacity>
-));
-UtilityCard.displayName = 'UtilityCard';
-
-// Video Card
-const VideoCard = memo<{
-  item: typeof VIDEO_ITEMS[0];
-  onPress: (route: string) => void;
-}>(({ item, onPress }) => (
-  <TouchableOpacity
-    style={styles.videoCard}
-    onPress={() => onPress(item.route)}
-    activeOpacity={0.8}
-  >
-    <View style={styles.videoThumbnail}>
+// AI Feature Card
+const AIFeatureCard = memo<{ item: typeof AI_FEATURES[0]; onPress: (route: string) => void }>(
+  ({ item, onPress }) => (
+    <TouchableOpacity
+      style={styles.aiFeatureCard}
+      onPress={() => onPress(item.route)}
+      activeOpacity={0.8}
+    >
       <LinearGradient
-        colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.6)']}
-        style={styles.videoGradient}
-      />
-      <View style={styles.playButton}>
-        <Ionicons name="play" size={20} color="#fff" />
-      </View>
-      <Text style={styles.videoDuration}>{item.duration}</Text>
-    </View>
-    <Text style={styles.videoTitle} numberOfLines={2}>{item.title}</Text>
-    <Text style={styles.videoViews}>{item.views} lượt xem</Text>
-  </TouchableOpacity>
-));
-VideoCard.displayName = 'VideoCard';
+        colors={['#0066CC', '#004499']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.aiFeatureGradient}
+      >
+        <Ionicons name={item.icon as any} size={24} color="#fff" />
+      </LinearGradient>
+      <Text style={styles.aiFeatureLabel}>{item.label}</Text>
+      <Text style={styles.aiFeatureDesc}>{item.desc}</Text>
+    </TouchableOpacity>
+  )
+);
+AIFeatureCard.displayName = 'AIFeatureCard';
 
-// Shopping Category Card
-const ShoppingCard = memo<{
-  item: typeof SHOPPING_CATS[0];
-  onPress: (route: string) => void;
-}>(({ item, onPress }) => (
-  <TouchableOpacity
-    style={styles.shoppingCard}
-    onPress={() => onPress(item.route)}
-    activeOpacity={0.7}
-  >
-    <Text style={styles.shoppingEmoji}>{item.icon}</Text>
-    <Text style={styles.shoppingLabel}>{item.label}</Text>
-  </TouchableOpacity>
-));
-ShoppingCard.displayName = 'ShoppingCard';
+// Communication Item
+const CommunicationItem = memo<{ item: typeof COMMUNICATION[0]; onPress: (route: string) => void }>(
+  ({ item, onPress }) => (
+    <TouchableOpacity
+      style={styles.commItem}
+      onPress={() => onPress(item.route)}
+      activeOpacity={0.7}
+    >
+      <View style={[styles.commIcon, { backgroundColor: item.color + '15' }]}>
+        <Ionicons name={item.icon as any} size={24} color={item.color} />
+        {item.badge > 0 && (
+          <View style={styles.commBadge}>
+            <Text style={styles.commBadgeText}>{item.badge}</Text>
+          </View>
+        )}
+      </View>
+      <Text style={styles.commLabel}>{item.label}</Text>
+    </TouchableOpacity>
+  )
+);
+CommunicationItem.displayName = 'CommunicationItem';
+
+// Utility Tool Item
+const UtilityItem = memo<{ item: typeof UTILITY_TOOLS[0]; onPress: (route: string) => void }>(
+  ({ item, onPress }) => (
+    <TouchableOpacity
+      style={styles.utilityItem}
+      onPress={() => onPress(item.route)}
+      activeOpacity={0.7}
+    >
+      <Ionicons name={item.icon as any} size={22} color={COLORS.textSecondary} />
+      <Text style={styles.utilityLabel}>{item.label}</Text>
+    </TouchableOpacity>
+  )
+);
+UtilityItem.displayName = 'UtilityItem';
+
+// Data Source Indicator
+const DataSourceBadge = memo<{ source: 'api' | 'mock' | 'cache'; loading: boolean }>(
+  ({ source, loading }) => {
+    if (loading) return null;
+    const config = {
+      api: { label: '🟢 Live', color: '#0080FF' },
+      mock: { label: '🟡 Demo', color: '#0066CC' },
+      cache: { label: '💾 Cache', color: '#0066CC' },
+    };
+    const { label, color } = config[source];
+    return (
+      <View style={[styles.dataSourceBadge, { backgroundColor: color + '20', borderColor: color }]}>
+        <Text style={[styles.dataSourceText, { color }]}>{label}</Text>
+      </View>
+    );
+  }
+);
+DataSourceBadge.displayName = 'DataSourceBadge';
 
 // ============================================================================
 // MAIN COMPONENT
@@ -244,42 +436,89 @@ export default function HomeScreen() {
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
   const [refreshing, setRefreshing] = useState(false);
+  
+  // 🔥 USE REAL DATA FROM HOOK
+  const {
+    stats,
+    quickBadges,
+    coreStats,
+    loading: dataLoading,
+    dataSource,
+    refresh: refreshData,
+  } = useDashboardData();
+
+  // Memoize Quick Access with dynamic badges
+  const quickAccessItems = useMemo(() => {
+    return QUICK_ACCESS_CONFIG.map(item => ({
+      ...item,
+      badge: item.badgeKey ? (quickBadges as any)[item.badgeKey] : null,
+    }));
+  }, [quickBadges]);
+
+  // Memoize Core Modules with dynamic stats
+  const coreModules = useMemo(() => {
+    return CORE_MODULES_CONFIG.map(item => ({
+      ...item,
+      stats: (coreStats as any)[item.statsKey] || '0',
+    }));
+  }, [coreStats]);
 
   const handleRefresh = useCallback(async () => {
     setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 1000);
-  }, []);
+    await refreshData();
+    setRefreshing(false);
+  }, [refreshData]);
 
   const navigateTo = useCallback((route: string) => {
     router.push(route as Href);
   }, []);
 
+  const isAdmin = user?.role === 'admin' || user?.role === 'staff';
+
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <StatusBar barStyle="dark-content" backgroundColor={COLORS.bg} />
+      <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
 
-      {/* HEADER */}
-      <View style={styles.header}>
+      {/* ====== HEADER ====== */}
+      <LinearGradient
+        colors={[COLORS.primary, COLORS.primaryDark]}
+        style={styles.header}
+      >
         <View style={styles.headerTop}>
-          <View>
-            <Text style={styles.greeting}>
-              Xin chào{user?.name ? `, ${user.name}` : ''}
-            </Text>
-            <Text style={styles.headerSubtitle}>Hôm nay bạn cần gì?</Text>
-          </View>
+          <TouchableOpacity 
+            style={styles.logoContainer}
+            onPress={() => navigateTo('/(tabs)/profile')}
+          >
+            <View style={styles.avatar}>
+              <Ionicons name="person" size={20} color={COLORS.primary} />
+            </View>
+            <View>
+              <Text style={styles.greeting}>
+                Xin chào{user?.name ? `, ${user.name}` : ''}!
+              </Text>
+              <Text style={styles.headerSubtitle}>Quản lý xây dựng thông minh</Text>
+            </View>
+          </TouchableOpacity>
+          
           <View style={styles.headerActions}>
             <TouchableOpacity
               style={styles.headerBtn}
               onPress={() => navigateTo('/(tabs)/notifications')}
             >
-              <Ionicons name="notifications-outline" size={22} color={COLORS.text} />
+              <Ionicons name="notifications-outline" size={24} color="#fff" />
               <View style={styles.notiBadge} />
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.headerBtn}
               onPress={() => navigateTo('/cart')}
             >
-              <Ionicons name="cart-outline" size={22} color={COLORS.text} />
+              <Ionicons name="cart-outline" size={24} color="#fff" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.headerBtn}
+              onPress={() => navigateTo('/messages')}
+            >
+              <Ionicons name="chatbubble-outline" size={22} color="#fff" />
             </TouchableOpacity>
           </View>
         </View>
@@ -288,12 +527,15 @@ export default function HomeScreen() {
         <TouchableOpacity
           style={styles.searchBar}
           onPress={() => navigateTo('/search')}
-          activeOpacity={0.8}
+          activeOpacity={0.9}
         >
           <Ionicons name="search-outline" size={18} color={COLORS.textMuted} />
-          <Text style={styles.searchPlaceholder}>Tìm dịch vụ, vật liệu, công nhân...</Text>
+          <Text style={styles.searchPlaceholder}>Tìm dịch vụ, vật liệu, nhà thầu...</Text>
+          <View style={styles.searchCamera}>
+            <Ionicons name="camera-outline" size={18} color={COLORS.primary} />
+          </View>
         </TouchableOpacity>
-      </View>
+      </LinearGradient>
 
       <ScrollView
         style={styles.scrollView}
@@ -302,53 +544,51 @@ export default function HomeScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={handleRefresh}
-            tintColor={COLORS.accent}
+            tintColor={COLORS.primary}
+            colors={[COLORS.primary]}
           />
         }
       >
-        {/* AI ASSISTANT CARD */}
-        <TouchableOpacity
-          style={styles.aiCard}
-          onPress={() => navigateTo('/ai')}
-          activeOpacity={0.9}
+        {/* ====== BANNER SLIDER ====== */}
+        <ScrollView
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          style={styles.bannerContainer}
+          contentContainerStyle={styles.bannerContent}
         >
-          <LinearGradient
-            colors={['#2563EB', '#1D4ED8']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.aiGradient}
-          >
-            <View style={styles.aiContent}>
-              <View style={styles.aiLeft}>
-                <View style={styles.aiIconBox}>
-                  <Ionicons name="sparkles" size={20} color="#fff" />
-                </View>
-                <View>
-                  <Text style={styles.aiTitle}>AI Assistant</Text>
-                  <Text style={styles.aiSubtitle}>Trợ lý thông minh 24/7</Text>
-                </View>
-              </View>
-              <View style={styles.aiStats}>
-                <View style={styles.aiStatItem}>
-                  <Text style={styles.aiStatValue}>+15%</Text>
-                  <Text style={styles.aiStatLabel}>Tiến độ</Text>
-                </View>
-                <View style={styles.aiDivider} />
-                <View style={styles.aiStatItem}>
-                  <Text style={styles.aiStatValue}>7</Text>
-                  <Text style={styles.aiStatLabel}>Công việc</Text>
-                </View>
-              </View>
-            </View>
-          </LinearGradient>
-        </TouchableOpacity>
+          {BANNERS.map((banner) => (
+            <BannerItem key={banner.id} item={banner} onPress={navigateTo} />
+          ))}
+        </ScrollView>
 
-        {/* PROJECT PROGRESS SECTION */}
+        {/* ====== DATA SOURCE INDICATOR ====== */}
+        <View style={styles.dataSourceContainer}>
+          <DataSourceBadge source={dataSource} loading={dataLoading} />
+          {!dataLoading && (
+            <Text style={styles.statsOverview}>
+              📊 {stats.projects.total} dự án • {stats.customers.total} KH • {stats.tasks.pending} tasks
+            </Text>
+          )}
+        </View>
+
+        {/* ====== QUICK ACCESS ====== */}
+        <View style={styles.section}>
+          <View style={styles.quickAccessGrid}>
+            {quickAccessItems.map((item) => (
+              <QuickAccessItem key={item.id} item={item} badge={item.badge} onPress={navigateTo} />
+            ))}
+          </View>
+        </View>
+
+        {/* ====== PROJECT PROGRESS ====== */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <View>
-              <Text style={styles.sectionTitle}>Tiến độ dự án</Text>
-              <Text style={styles.sectionSubtitle}>Theo dõi tiến độ xây dựng</Text>
+              <Text style={styles.sectionTitle}>📊 Tiến độ dự án</Text>
+              <Text style={styles.sectionSubtitle}>
+                {dataSource === 'api' ? 'Dữ liệu realtime từ CRM' : 'Demo data'}
+              </Text>
             </View>
             <TouchableOpacity onPress={() => navigateTo('/construction/progress')}>
               <Text style={styles.seeAll}>Xem chi tiết</Text>
@@ -357,141 +597,201 @@ export default function HomeScreen() {
           <ProgressSection />
         </View>
 
-        {/* MAIN SERVICES */}
+        {/* ====== CORE MODULES ====== */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Dịch vụ chính</Text>
-            <TouchableOpacity onPress={() => navigateTo('/services/index')}>
-              <Text style={styles.seeAll}>Xem tất cả</Text>
+            <Text style={styles.sectionTitle}>🏗️ Quản lý Nghiệp vụ</Text>
+            <TouchableOpacity onPress={() => navigateTo('/dashboard')}>
+              <Text style={styles.seeAll}>Dashboard</Text>
             </TouchableOpacity>
           </View>
-          <View style={styles.servicesGrid}>
-            {MAIN_SERVICES.map((item) => (
-              <ServiceCard key={item.id} item={item} onPress={navigateTo} />
-            ))}
-          </View>
+          {coreModules.map((module) => (
+            <CoreModuleCard key={module.id} item={module} stats={module.stats} onPress={navigateTo} />
+          ))}
         </View>
 
-        {/* QUICK TOOLS */}
+        {/* ====== AI ASSISTANT ====== */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Công cụ quản lý</Text>
-            <TouchableOpacity onPress={() => navigateTo('/utilities/index')}>
-              <Text style={styles.seeAll}>Xem tất cả</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.toolsGrid}>
-            {QUICK_TOOLS.map((item) => (
-              <ToolItem key={item.id} item={item} onPress={navigateTo} />
-            ))}
-          </View>
-        </View>
-
-        {/* CONSTRUCTION SERVICES */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <View>
-              <Text style={styles.sectionTitle}>Dịch vụ thi công</Text>
-              <Text style={styles.sectionSubtitle}>Miễn phí tư vấn</Text>
-            </View>
-            <TouchableOpacity onPress={() => navigateTo('/construction/index')}>
-              <Text style={styles.seeAll}>Xem tất cả</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.constructionGrid}>
-            {CONSTRUCTION_SERVICES.map((item) => (
-              <ConstructionCard key={item.id} item={item} onPress={navigateTo} />
-            ))}
-          </View>
-        </View>
-
-        {/* UTILITY TOOLS - Hoàn thiện */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Hoàn thiện nội thất</Text>
-            <TouchableOpacity onPress={() => navigateTo('/finishing/index')}>
-              <Text style={styles.seeAll}>Xem tất cả</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.utilityGrid}>
-            {UTILITY_TOOLS.map((item) => (
-              <UtilityCard key={item.id} item={item} onPress={navigateTo} />
-            ))}
-          </View>
-        </View>
-
-        {/* VIDEO SECTION */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Video thi công</Text>
-            <TouchableOpacity onPress={() => navigateTo('/videos/index')}>
+            <Text style={styles.sectionTitle}>🤖 AI Features</Text>
+            <TouchableOpacity onPress={() => navigateTo('/ai')}>
               <Text style={styles.seeAll}>Xem tất cả</Text>
             </TouchableOpacity>
           </View>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.videoList}
+            contentContainerStyle={styles.aiList}
           >
-            {VIDEO_ITEMS.map((item) => (
-              <VideoCard key={item.id} item={item} onPress={navigateTo} />
+            {AI_FEATURES.map((item) => (
+              <AIFeatureCard key={item.id} item={item} onPress={navigateTo} />
             ))}
           </ScrollView>
         </View>
 
-        {/* SHOPPING CATEGORIES */}
+        {/* ====== SHOPPING / COMMERCE ====== */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Mua sắm thiết bị</Text>
-            <TouchableOpacity onPress={() => navigateTo('/shopping/index')}>
-              <Ionicons name="cart-outline" size={20} color={COLORS.accent} />
+            <View>
+              <Text style={styles.sectionTitle}>🛒 Mua sắm Vật liệu</Text>
+              <Text style={styles.sectionSubtitle}>Giá tốt nhất thị trường</Text>
+            </View>
+            <TouchableOpacity onPress={() => navigateTo('/shopping')}>
+              <Text style={styles.seeAll}>Xem tất cả</Text>
             </TouchableOpacity>
           </View>
-          <View style={styles.shoppingGrid}>
-            {SHOPPING_CATS.map((item) => (
-              <ShoppingCard key={item.id} item={item} onPress={navigateTo} />
+          
+          {/* Flash Sale Banner */}
+          <TouchableOpacity 
+            style={styles.flashSaleBanner}
+            onPress={() => navigateTo('/shopping/flash-sale')}
+            activeOpacity={0.9}
+          >
+            <LinearGradient
+              colors={['#0066CC', '#004499']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.flashSaleGradient}
+            >
+              <View style={styles.flashSaleContent}>
+                <Ionicons name="flash" size={24} color="#FFFFFF" />
+                <Text style={styles.flashSaleText}>FLASH SALE</Text>
+                <Text style={styles.flashSaleTime}>Kết thúc trong 02:45:30</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={24} color="#fff" />
+            </LinearGradient>
+          </TouchableOpacity>
+
+          {/* Categories Grid */}
+          <View style={styles.commerceGrid}>
+            {COMMERCE_ITEMS.map((item) => (
+              <CommerceItem key={item.id} item={item} onPress={navigateTo} />
             ))}
           </View>
         </View>
 
-        {/* MORE FEATURES */}
+        {/* ====== SERVICES ====== */}
         <View style={styles.section}>
-          <View style={styles.moreGrid}>
-            <TouchableOpacity
-              style={styles.moreCard}
-              onPress={() => navigateTo('/services/interior-design')}
-            >
-              <Ionicons name="bed-outline" size={24} color={COLORS.accent} />
-              <View style={styles.moreCardContent}>
-                <Text style={styles.moreCardTitle}>Thiết kế nội thất</Text>
-                <Text style={styles.moreCardDesc}>Thiết kế chuyên nghiệp</Text>
-              </View>
-              <Ionicons name="chevron-forward" size={18} color={COLORS.textMuted} />
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>💼 Dịch vụ Xây dựng</Text>
+            <TouchableOpacity onPress={() => navigateTo('/services')}>
+              <Text style={styles.seeAll}>Xem tất cả</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.moreCard}
-              onPress={() => navigateTo('/services/feng-shui')}
-            >
-              <Ionicons name="compass-outline" size={24} color={COLORS.warning} />
-              <View style={styles.moreCardContent}>
-                <Text style={styles.moreCardTitle}>Phong thủy</Text>
-                <Text style={styles.moreCardDesc}>Tư vấn chuyên sâu</Text>
-              </View>
-              <Ionicons name="chevron-forward" size={18} color={COLORS.textMuted} />
-            </TouchableOpacity>
+          </View>
+          <View style={styles.servicesGrid}>
+            {SERVICES.map((item) => (
+              <ServiceCard key={item.id} item={item} onPress={navigateTo} />
+            ))}
           </View>
         </View>
 
-        {/* ALL FEATURES BUTTON */}
+        {/* ====== COMMUNICATION ====== */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>💬 Giao tiếp & Kết nối</Text>
+          </View>
+          <View style={styles.commGrid}>
+            {COMMUNICATION.map((item) => (
+              <CommunicationItem key={item.id} item={item} onPress={navigateTo} />
+            ))}
+          </View>
+        </View>
+
+        {/* ====== UTILITY TOOLS ====== */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>🛠️ Công cụ & Tiện ích</Text>
+            <TouchableOpacity onPress={() => navigateTo('/(tabs)/menu')}>
+              <Text style={styles.seeAll}>Xem tất cả</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.utilityGrid}>
+            {UTILITY_TOOLS.map((item) => (
+              <UtilityItem key={item.id} item={item} onPress={navigateTo} />
+            ))}
+          </View>
+        </View>
+
+        {/* ====== ADMIN SECTION (If Admin) ====== */}
+        {isAdmin && (
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>🛡️ Quản trị hệ thống</Text>
+            </View>
+            <View style={styles.adminGrid}>
+              {ADMIN_SHORTCUTS.filter(s => s.role === 'all' || (isAdmin && s.role === 'admin')).map((item) => (
+                <TouchableOpacity
+                  key={item.id}
+                  style={styles.adminItem}
+                  onPress={() => navigateTo(item.route)}
+                  activeOpacity={0.7}
+                >
+                  <Ionicons name={item.icon as any} size={24} color={COLORS.accent} />
+                  <Text style={styles.adminLabel}>{item.label}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        )}
+
+        {/* ====== CRM SECTION ====== */}
+        <View style={styles.section}>
+          <TouchableOpacity
+            style={styles.crmBanner}
+            onPress={() => navigateTo('/crm')}
+            activeOpacity={0.9}
+          >
+            <LinearGradient
+              colors={['#0080FF', '#0066CC']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.crmGradient}
+            >
+              <View style={styles.crmContent}>
+                <Ionicons name="business-outline" size={32} color="#fff" />
+                <View style={styles.crmText}>
+                  <Text style={styles.crmTitle}>Perfex CRM</Text>
+                  <Text style={styles.crmSubtitle}>Quản lý khách hàng, dự án, hợp đồng</Text>
+                </View>
+              </View>
+              <Ionicons name="arrow-forward-circle" size={32} color="rgba(255,255,255,0.8)" />
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
+
+        {/* ====== ALL FEATURES BUTTON ====== */}
         <View style={styles.allFeaturesSection}>
           <TouchableOpacity
             style={styles.allFeaturesBtn}
-            onPress={() => navigateTo('/utilities/sitemap')}
+            onPress={() => navigateTo('/(tabs)/menu')}
           >
-            <Ionicons name="apps-outline" size={20} color={COLORS.accent} />
-            <Text style={styles.allFeaturesText}>Tất cả tiện ích (272 chức năng)</Text>
+            <Ionicons name="apps-outline" size={20} color={COLORS.primary} />
+            <Text style={styles.allFeaturesText}>Xem tất cả 272+ chức năng</Text>
             <Ionicons name="chevron-forward" size={18} color={COLORS.textMuted} />
           </TouchableOpacity>
+        </View>
+
+        {/* ====== DEV TOOLS (Only in __DEV__) ====== */}
+        {__DEV__ && (
+          <View style={styles.devToolsSection}>
+            <TouchableOpacity
+              style={styles.devButton}
+              onPress={() => navigateTo('/test-login-all-roles')}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="bug-outline" size={20} color="#0066CC" />
+              <Text style={styles.devButtonText}>🧪 Test Login All Roles</Text>
+              <View style={styles.devBadge}>
+                <Text style={styles.devBadgeText}>DEV</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {/* ====== FOOTER INFO ====== */}
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>Construction Management Platform</Text>
+          <Text style={styles.footerVersion}>Version 4.0 - Build 2026.01.03</Text>
         </View>
 
         <View style={{ height: 100 }} />
@@ -501,7 +801,7 @@ export default function HomeScreen() {
 }
 
 // ============================================================================
-// STYLES - European Minimal Design
+// STYLES
 // ============================================================================
 const styles = StyleSheet.create({
   container: {
@@ -511,38 +811,48 @@ const styles = StyleSheet.create({
 
   // Header
   header: {
-    backgroundColor: COLORS.card,
     paddingHorizontal: SPACING.lg,
     paddingBottom: SPACING.lg,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
   },
   headerTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: SPACING.md,
+    marginTop: SPACING.sm,
+  },
+  logoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.sm,
+  },
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   greeting: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: '700',
-    color: COLORS.text,
-    letterSpacing: -0.5,
+    color: '#fff',
   },
   headerSubtitle: {
-    fontSize: 13,
-    color: COLORS.textSecondary,
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.8)',
     marginTop: 2,
   },
   headerActions: {
     flexDirection: 'row',
-    gap: SPACING.xs,
+    gap: SPACING.sm,
   },
   headerBtn: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: COLORS.bg,
+    backgroundColor: 'rgba(255,255,255,0.2)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -553,17 +863,15 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#EF4444',
-    borderWidth: 2,
-    borderColor: COLORS.bg,
+    backgroundColor: '#FFFFFF',
   },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.bg,
-    borderRadius: 12,
+    backgroundColor: '#fff',
+    borderRadius: 8,
     paddingHorizontal: SPACING.md,
-    height: 44,
+    height: 40,
     gap: SPACING.sm,
   },
   searchPlaceholder: {
@@ -571,80 +879,66 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: COLORS.textMuted,
   },
+  searchCamera: {
+    padding: SPACING.xs,
+  },
 
   scrollView: {
     flex: 1,
   },
 
-  // AI Card
-  aiCard: {
-    marginHorizontal: SPACING.lg,
-    marginTop: SPACING.lg,
-    borderRadius: 16,
-    overflow: 'hidden',
-    ...Platform.select({
-      ios: {
-        shadowColor: '#2563EB',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 8,
-      },
-      android: { elevation: 4 },
-    }),
-  },
-  aiGradient: {
-    padding: SPACING.lg,
-  },
-  aiContent: {
+  // Data Source Badge
+  dataSourceContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.sm,
+    backgroundColor: COLORS.card,
+    marginTop: SPACING.sm,
   },
-  aiLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: SPACING.md,
-  },
-  aiIconBox: {
-    width: 44,
-    height: 44,
+  dataSourceBadge: {
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: SPACING.xs,
     borderRadius: 12,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    alignItems: 'center',
-    justifyContent: 'center',
+    borderWidth: 1,
   },
-  aiTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#fff',
+  dataSourceText: {
+    fontSize: 11,
+    fontWeight: '600',
   },
-  aiSubtitle: {
+  statsOverview: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.8)',
-    marginTop: 2,
+    color: COLORS.textSecondary,
   },
-  aiStats: {
+
+  // Banner
+  bannerContainer: {
+    marginTop: SPACING.sm,
+  },
+  bannerContent: {
+    paddingHorizontal: SPACING.lg,
+    gap: SPACING.sm,
+  },
+  bannerItem: {
+    width: width - SPACING.lg * 2,
+    height: 100,
+    borderRadius: 12,
+    padding: SPACING.lg,
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    gap: SPACING.md,
+    marginRight: SPACING.sm,
   },
-  aiStatItem: {
-    alignItems: 'center',
-  },
-  aiStatValue: {
-    fontSize: 16,
+  bannerTitle: {
+    fontSize: 20,
     fontWeight: '700',
     color: '#fff',
   },
-  aiStatLabel: {
-    fontSize: 10,
-    color: 'rgba(255,255,255,0.7)',
-    marginTop: 2,
-  },
-  aiDivider: {
-    width: 1,
-    height: 24,
-    backgroundColor: 'rgba(255,255,255,0.2)',
+  bannerSubtitle: {
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.9)',
+    marginTop: 4,
   },
 
   // Section
@@ -664,7 +958,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     color: COLORS.text,
-    letterSpacing: -0.3,
   },
   sectionSubtitle: {
     fontSize: 12,
@@ -673,11 +966,154 @@ const styles = StyleSheet.create({
   },
   seeAll: {
     fontSize: 13,
-    color: COLORS.accent,
+    color: COLORS.primary,
     fontWeight: '600',
   },
 
-  // Services Grid (3 columns)
+  // Quick Access
+  quickAccessGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  quickAccessItem: {
+    width: '25%',
+    alignItems: 'center',
+    paddingVertical: SPACING.sm,
+  },
+  quickAccessIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: SPACING.xs,
+  },
+  quickAccessBadge: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    backgroundColor: COLORS.error,
+    borderRadius: 10,
+    minWidth: 18,
+    height: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+  },
+  quickAccessBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  quickAccessLabel: {
+    fontSize: 11,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+  },
+
+  // Core Modules
+  coreModuleCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.bg,
+    borderRadius: 12,
+    padding: SPACING.md,
+    marginBottom: SPACING.sm,
+  },
+  coreModuleIcon: {
+    width: 52,
+    height: 52,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: SPACING.md,
+  },
+  coreModuleContent: {
+    flex: 1,
+  },
+  coreModuleTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: COLORS.text,
+  },
+  coreModuleSubtitle: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
+    marginTop: 2,
+  },
+  coreModuleStats: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.xs,
+  },
+  coreModuleStatsText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+
+  // Commerce
+  flashSaleBanner: {
+    marginBottom: SPACING.md,
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  flashSaleGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: SPACING.md,
+  },
+  flashSaleContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.sm,
+  },
+  flashSaleText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  flashSaleTime: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.9)',
+  },
+  commerceGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  commerceItem: {
+    width: '25%',
+    alignItems: 'center',
+    paddingVertical: SPACING.sm,
+  },
+  commerceIconContainer: {
+    position: 'relative',
+  },
+  commerceEmoji: {
+    fontSize: 32,
+  },
+  hotBadge: {
+    position: 'absolute',
+    top: -4,
+    right: -12,
+    backgroundColor: COLORS.error,
+    borderRadius: 4,
+    paddingHorizontal: 4,
+    paddingVertical: 1,
+  },
+  hotBadgeText: {
+    fontSize: 8,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  commerceLabel: {
+    fontSize: 11,
+    color: COLORS.textSecondary,
+    marginTop: SPACING.xs,
+    textAlign: 'center',
+  },
+
+  // Services
   servicesGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -689,7 +1125,7 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.md,
     alignItems: 'center',
   },
-  serviceIconBox: {
+  serviceIcon: {
     width: 52,
     height: 52,
     borderRadius: 14,
@@ -697,72 +1133,106 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: SPACING.xs,
   },
+  serviceHotBadge: {
+    position: 'absolute',
+    top: -4,
+    right: -8,
+    backgroundColor: '#FF6B00',
+    paddingHorizontal: 4,
+    paddingVertical: 1,
+    borderRadius: 6,
+  },
+  serviceHotBadgeText: {
+    fontSize: 7,
+    fontWeight: '700',
+    color: '#fff',
+  },
   serviceLabel: {
-    fontSize: 12,
+    fontSize: 11,
     color: COLORS.text,
     fontWeight: '500',
     textAlign: 'center',
   },
 
-  // Tools Grid (4 columns)
-  toolsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginTop: SPACING.sm,
+  // AI Features
+  aiList: {
+    gap: SPACING.sm,
   },
-  toolItem: {
-    width: '25%',
+  aiFeatureCard: {
+    width: 100,
     alignItems: 'center',
-    paddingVertical: SPACING.sm,
+    backgroundColor: COLORS.bg,
+    borderRadius: 12,
+    padding: SPACING.md,
   },
-  toolLabel: {
-    fontSize: 11,
-    color: COLORS.textSecondary,
-    marginTop: SPACING.xs,
-    textAlign: 'center',
-  },
-
-  // Construction Grid (4 columns)
-  constructionGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginHorizontal: -SPACING.xs,
-  },
-  constructionCard: {
-    width: '25%',
-    paddingHorizontal: SPACING.xs,
-    marginBottom: SPACING.md,
-    alignItems: 'center',
-  },
-  constructionIcon: {
+  aiFeatureGradient: {
     width: 48,
     height: 48,
     borderRadius: 12,
-    backgroundColor: COLORS.bg,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: SPACING.sm,
+  },
+  aiFeatureLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: COLORS.text,
+    textAlign: 'center',
+  },
+  aiFeatureDesc: {
+    fontSize: 10,
+    color: COLORS.textMuted,
+    textAlign: 'center',
+    marginTop: 2,
+  },
+
+  // Communication
+  commGrid: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  commItem: {
+    alignItems: 'center',
+  },
+  commIcon: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: SPACING.xs,
   },
-  constructionEmoji: {
-    fontSize: 22,
+  commBadge: {
+    position: 'absolute',
+    top: -2,
+    right: -2,
+    backgroundColor: COLORS.error,
+    borderRadius: 10,
+    minWidth: 18,
+    height: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 4,
   },
-  constructionLabel: {
-    fontSize: 11,
-    color: COLORS.text,
-    textAlign: 'center',
+  commBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  commLabel: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
   },
 
-  // Utility Grid (4 columns)
+  // Utility Tools
   utilityGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginHorizontal: -SPACING.xs,
   },
-  utilityCard: {
+  utilityItem: {
     width: '25%',
-    paddingHorizontal: SPACING.xs,
-    marginBottom: SPACING.md,
     alignItems: 'center',
+    paddingVertical: SPACING.sm,
   },
   utilityLabel: {
     fontSize: 11,
@@ -771,108 +1241,51 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
-  // Video List
-  videoList: {
-    paddingRight: SPACING.lg,
+  // Admin
+  adminGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    backgroundColor: COLORS.accentLight,
+    borderRadius: 12,
+    padding: SPACING.sm,
   },
-  videoCard: {
-    width: 160,
-    marginRight: SPACING.md,
+  adminItem: {
+    width: '25%',
+    alignItems: 'center',
+    paddingVertical: SPACING.sm,
   },
-  videoThumbnail: {
-    width: '100%',
-    height: 90,
-    borderRadius: 10,
-    backgroundColor: '#1F2937',
+  adminLabel: {
+    fontSize: 11,
+    color: COLORS.accent,
+    marginTop: SPACING.xs,
+    fontWeight: '500',
+  },
+
+  // CRM Banner
+  crmBanner: {
+    borderRadius: 12,
     overflow: 'hidden',
-    justifyContent: 'flex-end',
   },
-  videoGradient: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  playButton: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    marginTop: -16,
-    marginLeft: -16,
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  videoDuration: {
-    position: 'absolute',
-    bottom: 6,
-    right: 6,
-    fontSize: 10,
-    color: '#fff',
-    backgroundColor: 'rgba(0,0,0,0.6)',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  videoTitle: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: COLORS.text,
-    marginTop: SPACING.sm,
-    lineHeight: 18,
-  },
-  videoViews: {
-    fontSize: 11,
-    color: COLORS.textMuted,
-    marginTop: 2,
-  },
-
-  // Shopping Grid
-  shoppingGrid: {
+  crmGradient: {
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
+    padding: SPACING.lg,
   },
-  shoppingCard: {
-    flex: 1,
-    alignItems: 'center',
-    paddingVertical: SPACING.md,
-    marginHorizontal: SPACING.xs,
-    backgroundColor: COLORS.bg,
-    borderRadius: 12,
-  },
-  shoppingEmoji: {
-    fontSize: 28,
-    marginBottom: SPACING.xs,
-  },
-  shoppingLabel: {
-    fontSize: 11,
-    color: COLORS.textSecondary,
-    fontWeight: '500',
-  },
-
-  // More Grid
-  moreGrid: {
-    gap: SPACING.sm,
-  },
-  moreCard: {
+  crmContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.bg,
-    padding: SPACING.md,
-    borderRadius: 12,
     gap: SPACING.md,
   },
-  moreCardContent: {
-    flex: 1,
+  crmText: {},
+  crmTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#fff',
   },
-  moreCardTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.text,
-  },
-  moreCardDesc: {
+  crmSubtitle: {
     fontSize: 12,
-    color: COLORS.textSecondary,
+    color: 'rgba(255,255,255,0.9)',
     marginTop: 2,
   },
 
@@ -886,15 +1299,66 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: COLORS.card,
-    paddingVertical: SPACING.md,
     borderRadius: 12,
+    padding: SPACING.md,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.primary,
+    borderStyle: 'dashed',
     gap: SPACING.sm,
   },
   allFeaturesText: {
     fontSize: 14,
-    color: COLORS.text,
-    fontWeight: '500',
+    fontWeight: '600',
+    color: COLORS.primary,
+  },
+
+  // Footer
+  footer: {
+    alignItems: 'center',
+    paddingVertical: SPACING.xl,
+  },
+  footerText: {
+    fontSize: 12,
+    color: COLORS.textMuted,
+  },
+  footerVersion: {
+    fontSize: 10,
+    color: COLORS.textMuted,
+    marginTop: 4,
+  },
+
+  // Dev Tools
+  devToolsSection: {
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.md,
+  },
+  devButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFF9E6',
+    borderRadius: 12,
+    padding: SPACING.md,
+    borderWidth: 2,
+    borderColor: '#FFC107',
+    borderStyle: 'dashed',
+    gap: SPACING.sm,
+  },
+  devButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#0066CC',
+    flex: 1,
+  },
+  devBadge: {
+    backgroundColor: '#FFC107',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  devBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#000',
   },
 });

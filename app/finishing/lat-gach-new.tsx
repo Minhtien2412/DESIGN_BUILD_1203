@@ -18,7 +18,7 @@ export default function LatGachNewScreen() {
       <Stack.Screen
         options={{
           title: config?.title || 'Thợ lát gạch',
-          headerStyle: { backgroundColor: '#EE4D2D' },
+          headerStyle: { backgroundColor: '#0066CC' },
           headerTintColor: '#fff',
         }}
       />
