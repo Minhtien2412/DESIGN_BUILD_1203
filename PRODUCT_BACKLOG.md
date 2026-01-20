@@ -184,19 +184,19 @@
 **Tasks**:
 
 - [ ] T1: Implement visibility tracking (`onViewableItemsChanged`)
-- [ ] T2: Create VideoPlayerController singleton
-- [ ] T3: Single-active lock mechanism
-- [ ] T4: Auto-stop previous video on scroll
-- [ ] T5: Pause/resume state preservation
-- [ ] T6: Global mute/unmute control
-- [ ] T7: Persist mute setting (AsyncStorage)
-- [ ] T8: Unit tests for controller
+- [x] T2: Create VideoPlayerController singleton ✅ (2026-01-20 - services/VideoPlayerController.ts)
+- [x] T3: Single-active lock mechanism ✅ (built into controller)
+- [x] T4: Auto-stop previous video on scroll ✅ (play() auto-pauses others)
+- [x] T5: Pause/resume state preservation ✅ (playbackPositions map)
+- [x] T6: Global mute/unmute control ✅ (toggleMute, setMuted)
+- [x] T7: Persist mute setting (AsyncStorage) ✅
+- [x] T8: Unit tests for controller ✅ (14 tests passing)
 
 **Acceptance Criteria**:
 
-- [ ] AC1: Scroll nhanh không bị phát chồng tiếng
-- [ ] AC2: Quay lại video trước tiếp tục đúng timestamp
-- [ ] AC3: Mute setting persistent across sessions
+- [ ] AC1: Scroll nhanh không bị phát chồng tiếng (need T1 integration)
+- [x] AC2: Quay lại video trước tiếp tục đúng timestamp ✅
+- [x] AC3: Mute setting persistent across sessions ✅
 
 ---
 
