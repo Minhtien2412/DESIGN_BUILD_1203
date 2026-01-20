@@ -1,0 +1,73 @@
+# Gitleaks Configuration
+# https://github.com/gitleaks/gitleaks
+
+title = "App Design Build - Gitleaks Config"
+
+[extend]
+# Use default gitleaks rules as base
+useDefault = true
+
+# Allowlist - files/paths to ignore
+[allowlist]
+description = "Allowlisted files and paths"
+paths = [
+    '''node_modules''',
+    '''\.env\.example''',
+    '''\.env\.template''',
+    '''package-lock\.json''',
+    '''yarn\.lock''',
+    '''\.git''',
+    '''dist''',
+    '''build''',
+    '''coverage''',
+    '''android/build''',
+    '''ios/build''',
+    '''\.expo''',
+]
+
+# Allowlist specific regex patterns (for placeholders)
+regexes = [
+    '''<YOUR_.*>''',
+    '''YOUR_.*_KEY''',
+    '''YOUR_.*_SECRET''',
+    '''CHANGE_THIS.*''',
+    '''example\.com''',
+    '''localhost''',
+]
+
+# Custom rules for this project
+[[rules]]
+id = "expo-api-key"
+description = "Expo Public API Key"
+regex = '''EXPO_PUBLIC_API_KEY\s*=\s*['\"]?([a-zA-Z0-9\-_]{20,})['\"]?'''
+keywords = ["EXPO_PUBLIC_API_KEY"]
+
+[[rules]]
+id = "gemini-api-key"
+description = "Google Gemini API Key"
+regex = '''AIza[0-9A-Za-z\-_]{35}'''
+keywords = ["AIza", "GEMINI"]
+
+[[rules]]
+id = "openai-api-key"  
+description = "OpenAI API Key"
+regex = '''sk-[a-zA-Z0-9]{20,}'''
+keywords = ["sk-", "OPENAI"]
+
+[[rules]]
+id = "pinecone-api-key"
+description = "Pinecone API Key"
+regex = '''pcsk_[a-zA-Z0-9\-_]{20,}'''
+keywords = ["pcsk_", "PINECONE"]
+
+[[rules]]
+id = "firebase-api-key"
+description = "Firebase API Key"
+regex = '''AIza[0-9A-Za-z\-_]{35}'''
+keywords = ["FIREBASE"]
+
+[[rules]]
+id = "jwt-token"
+description = "JWT Token"
+regex = '''eyJ[a-zA-Z0-9\-_]+\.eyJ[a-zA-Z0-9\-_]+\.[a-zA-Z0-9\-_]+'''
+keywords = ["eyJ"]

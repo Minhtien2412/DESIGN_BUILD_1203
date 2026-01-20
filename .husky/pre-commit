@@ -1,0 +1,55 @@
+#!/bin/sh
+
+echo "🔍 Running pre-commit checks..."
+
+# 1. Check for secrets in staged files
+echo "🔐 Checking for exposed secrets..."
+
+# Simple pattern check for common API key formats
+SECRETS_FOUND=0
+
+# Check for exposed API keys patterns in staged files
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(ts|tsx|js|jsx|json|md|env)$')
+
+if [ -n "$STAGED_FILES" ]; then
+    # Check for common secret patterns
+    for file in $STAGED_FILES; do
+        if [ -f "$file" ]; then
+            # Check for Gemini/Firebase keys (AIza...)
+            if grep -E 'AIza[0-9A-Za-z\-_]{35}' "$file" | grep -v '<YOUR' | grep -v 'YOUR_' > /dev/null 2>&1; then
+                echo "❌ Potential Google API key found in: $file"
+                SECRETS_FOUND=1
+            fi
+            # Check for OpenAI keys (sk-...)
+            if grep -E 'sk-[a-zA-Z0-9]{20,}' "$file" | grep -v '<YOUR' | grep -v 'YOUR_' > /dev/null 2>&1; then
+                echo "❌ Potential OpenAI key found in: $file"
+                SECRETS_FOUND=1
+            fi
+            # Check for Pinecone keys (pcsk_...)
+            if grep -E 'pcsk_[a-zA-Z0-9\-_]{20,}' "$file" | grep -v '<YOUR' | grep -v 'YOUR_' > /dev/null 2>&1; then
+                echo "❌ Potential Pinecone key found in: $file"
+                SECRETS_FOUND=1
+            fi
+        fi
+    done
+fi
+
+if [ $SECRETS_FOUND -eq 1 ]; then
+    echo "⛔ Commit blocked: Secrets detected! Please remove them before committing."
+    exit 1
+fi
+
+echo "✅ No secrets detected"
+
+# 2. Run TypeScript check (if tsc available)
+# echo "📝 Running TypeScript check..."
+# npx tsc --noEmit --skipLibCheck 2>/dev/null || echo "⚠️ TypeScript check skipped"
+
+# 3. Run tests
+echo "🧪 Running tests..."
+npm test -- --no-coverage --passWithNoTests 2>/dev/null || {
+    echo "❌ Tests failed!"
+    exit 1
+}
+
+echo "✅ All pre-commit checks passed!"
