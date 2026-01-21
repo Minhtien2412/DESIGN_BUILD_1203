@@ -386,7 +386,7 @@ export default function FinishingChecklistScreen() {
       acc[item.category].push({ ...item, index });
       return acc;
     },
-    {} as Record<string, Array<typeof items[0] & { index: number }>>
+    {} as Record<string, (typeof items[0] & { index: number })[]>
   );
 
   const getStatusColor = (status: InspectionStatus) => {

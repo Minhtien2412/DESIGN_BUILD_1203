@@ -5,7 +5,7 @@
 
 import { Loader } from '@/components/ui/loader';
 import { useThemeColor } from '@/hooks/use-theme-color';
-import { AddressService, MOCK_ADDRESSES as FALLBACK_ADDRESSES } from '@/services/addressService';
+import AddressService, { MOCK_ADDRESSES as FALLBACK_ADDRESSES, type Address } from '@/services/addressService';
 import { Ionicons } from '@expo/vector-icons';
 import { Href, router, Stack } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
@@ -18,17 +18,6 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
-
-interface Address {
-  id: string;
-  name: string;
-  phone: string;
-  address: string;
-  ward: string;
-  district: string;
-  city: string;
-  isDefault: boolean;
-}
 
 const MOCK_ADDRESSES: Address[] = FALLBACK_ADDRESSES;
 
@@ -50,9 +39,9 @@ export default function AddressesScreen() {
     else setLoading(true);
     
     try {
-      const data = await AddressService.getAddresses();
-      if (data && data.length > 0) {
-        setAddresses(data);
+      const result = await AddressService.getAddresses();
+      if (result.ok && result.data && result.data.addresses && result.data.addresses.length > 0) {
+        setAddresses(result.data.addresses);
         setDataSource('api');
       } else {
         setAddresses(MOCK_ADDRESSES);
@@ -185,7 +174,7 @@ export default function AddressesScreen() {
             <View style={styles.addressDetails}>
               <Ionicons name="location-outline" size={16} color={textMuted} />
               <Text style={[styles.addressText, { color: text }]}>
-                {address.address}, {address.ward}, {address.district}, {address.city}
+                {address.address}, {address.district}, {address.city}
               </Text>
             </View>
 

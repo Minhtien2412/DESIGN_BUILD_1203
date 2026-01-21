@@ -59,6 +59,13 @@ export default function TabsLayout() {
         }} 
       />
       <Tabs.Screen 
+        name="news" 
+        options={{ 
+          href: null, // Hidden - accessible from home quick actions
+          title: 'Tin tức',
+        }} 
+      />
+      <Tabs.Screen 
         name="menu" 
         options={{ 
           // Ẩn tab "Tiện ích" theo yêu cầu, vẫn có thể mở từ nút nhanh
@@ -87,6 +94,27 @@ export default function TabsLayout() {
         options={{ 
           href: null,
           title: 'Test CRM',
+        }} 
+      />
+      <Tabs.Screen 
+        name="progress" 
+        options={{ 
+          href: null,
+          title: 'Tiến độ',
+        }} 
+      />
+      <Tabs.Screen 
+        name="ai-assistant" 
+        options={{ 
+          href: null,
+          title: 'AI Assistant',
+        }} 
+      />
+      <Tabs.Screen 
+        name="api-status" 
+        options={{ 
+          href: null,
+          title: 'API Status',
         }} 
       />
     </Tabs>

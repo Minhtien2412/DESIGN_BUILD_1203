@@ -27,9 +27,8 @@ import {
 } from 'react-native';
 
 import {
-    AttachmentPicker,
     AttachmentPreview,
-    type AttachmentFile,
+    type AttachmentFile
 } from '@/components/chat/AttachmentPicker';
 import { EmojiButton } from '@/components/chat/EmojiButton';
 import { MentionInput, type MentionUser } from '@/components/chat/MentionInput';
@@ -62,11 +61,11 @@ interface Message {
   };
   text: string;
   timestamp: string;
-  attachments?: Array<{
+  attachments?: {
     name: string;
     url: string;
     type: string;
-  }>;
+  }[];
   mentions?: string[];
   isRead: boolean;
 }
@@ -236,7 +235,7 @@ export default function TeamChatScreen() {
         const newFile: AttachmentFile = {
           uri: asset.uri,
           name: asset.fileName || `camera_${Date.now()}.${asset.type === 'video' ? 'mp4' : 'jpg'}`,
-          type: asset.type === 'video' ? 'video/mp4' : 'image/jpeg',
+          type: asset.type === 'video' ? 'video' : 'image',
           size: asset.fileSize || 0,
         };
         setAttachments(prev => [...prev, newFile]);
@@ -268,7 +267,7 @@ export default function TeamChatScreen() {
         const newFiles: AttachmentFile[] = result.assets.map(asset => ({
           uri: asset.uri,
           name: asset.fileName || `gallery_${Date.now()}.${asset.type === 'video' ? 'mp4' : 'jpg'}`,
-          type: asset.type === 'video' ? 'video/mp4' : 'image/jpeg',
+          type: asset.type === 'video' ? 'video' : 'image',
           size: asset.fileSize || 0,
         }));
         setAttachments(prev => [...prev, ...newFiles].slice(0, 5));
@@ -564,21 +563,15 @@ export default function TeamChatScreen() {
               <Text style={[styles.mediaOptionText, { color: text }]}>Thư viện</Text>
             </Pressable>
             
-            <AttachmentPicker
-              onSelect={(files) => {
-                setAttachments(prev => [...prev, ...files].slice(0, 5));
-                toggleMediaToolbar(false);
-              }}
-              maxFiles={5 - attachments.length}
-              renderTrigger={(onPress) => (
-                <Pressable style={styles.mediaOption} onPress={onPress}>
-                  <View style={[styles.mediaIconWrapper, { backgroundColor: '#F59E0B' }]}>
-                    <Ionicons name="document" size={24} color="#fff" />
-                  </View>
-                  <Text style={[styles.mediaOptionText, { color: text }]}>Tài liệu</Text>
-                </Pressable>
-              )}
-            />
+            <Pressable style={styles.mediaOption} onPress={() => {
+              // Manual file picker trigger
+              console.log('Document picker - to be implemented');
+            }}>
+              <View style={[styles.mediaIconWrapper, { backgroundColor: '#F59E0B' }]}>
+                <Ionicons name="document" size={24} color="#fff" />
+              </View>
+              <Text style={[styles.mediaOptionText, { color: text }]}>Tài liệu</Text>
+            </Pressable>
             
             <Pressable style={styles.mediaOption} onPress={() => {
               toggleMediaToolbar(false);

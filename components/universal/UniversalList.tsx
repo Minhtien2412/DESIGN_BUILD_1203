@@ -34,11 +34,11 @@ export interface ListConfig<T> {
   filterFunction?: FilterFunction<T>;
 
   // Sorting
-  sortOptions?: Array<{
+  sortOptions?: {
     label: string;
     value: string;
     sortFunction: SortFunction<T>;
-  }>;
+  }[];
 
   // Loading & refresh
   loading?: boolean;

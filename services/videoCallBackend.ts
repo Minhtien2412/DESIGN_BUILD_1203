@@ -8,14 +8,14 @@ import React from 'react';
 export interface VideoCallSession {
   id: string;
   roomId: string;
-  participants: Array<{
+  participants: {
     id: string;
     name: string;
     avatar?: string;
     role: 'host' | 'participant';
     joinedAt: string;
     status: 'online' | 'offline' | 'connecting';
-  }>;
+  }[];
   status: 'waiting' | 'active' | 'ended';
   createdAt: string;
   endedAt?: string;
@@ -36,11 +36,11 @@ export interface VideoCallNotification {
 export interface CallHistoryItem {
   id: string;
   roomId: string;
-  participants: Array<{
+  participants: {
     id: string;
     name: string;
     avatar?: string;
-  }>;
+  }[];
   type: 'incoming' | 'outgoing' | 'missed';
   isGroupCall: boolean;
   duration: number; // in seconds
@@ -51,7 +51,7 @@ export interface CallHistoryItem {
 export class VideoCallBackendService {
   private baseUrl: string;
   private authToken: string | null = null;
-  private static syntheticContactsCache: { at: number; data: Array<{ id: string; name: string; avatar?: string; status: 'online' | 'busy' | 'away' | 'offline'; lastSeen?: string; }> } | null = null;
+  private static syntheticContactsCache: { at: number; data: { id: string; name: string; avatar?: string; status: 'online' | 'busy' | 'away' | 'offline'; lastSeen?: string; }[] } | null = null;
   private static SYNTH_CONTACT_TTL = 60_000; // 60s reuse window
 
   constructor(baseUrl?: string) {
@@ -304,13 +304,13 @@ export class VideoCallBackendService {
   }
 
   // Get user contact list with presence info
-  async getContactsWithPresence(): Promise<Array<{
+  async getContactsWithPresence(): Promise<{
     id: string;
     name: string;
     avatar?: string;
     status: 'online' | 'busy' | 'away' | 'offline';
     lastSeen?: string;
-  }>> {
+  }[]> {
     // If feature flag disables remote contacts, synthesize immediately
     if ((global as any).AppConfig?.DISABLE_REMOTE_CONTACTS || require('@/config').AppConfig.DISABLE_REMOTE_CONTACTS) {
       const cached = VideoCallBackendService.syntheticContactsCache;
@@ -321,7 +321,7 @@ export class VideoCallBackendService {
       try {
         const users = await listAllUsers();
         const third = Math.max(1, Math.floor(users.length / 3));
-        const data: Array<{ id: string; name: string; avatar?: string; status: 'online' | 'busy' | 'away' | 'offline'; lastSeen: string; }> = users.slice(0, 18).map((u, idx) => ({
+        const data: { id: string; name: string; avatar?: string; status: 'online' | 'busy' | 'away' | 'offline'; lastSeen: string; }[] = users.slice(0, 18).map((u, idx) => ({
           id: u.id,
           name: u.name || u.phone || u.id,
           avatar: undefined,
@@ -345,7 +345,7 @@ export class VideoCallBackendService {
       try {
         const users = await listAllUsers();
         const third = Math.max(1, Math.floor(users.length / 3));
-        const data: Array<{ id: string; name: string; avatar?: string; status: 'online' | 'busy' | 'away' | 'offline'; lastSeen: string; }> = users.slice(0, 18).map((u, idx) => ({
+        const data: { id: string; name: string; avatar?: string; status: 'online' | 'busy' | 'away' | 'offline'; lastSeen: string; }[] = users.slice(0, 18).map((u, idx) => ({
           id: u.id,
           name: u.name || u.phone || u.id,
           avatar: undefined,
@@ -381,7 +381,7 @@ export class VideoCallBackendService {
           if (cached && (now - cached.at) < VideoCallBackendService.SYNTH_CONTACT_TTL) return cached.data;
           const users = await listAllUsers();
           const third = Math.max(1, Math.floor(users.length / 3));
-          const data: Array<{ id: string; name: string; avatar?: string; status: 'online' | 'busy' | 'away' | 'offline'; lastSeen: string; }> = users.slice(0, 18).map((u, idx) => ({
+          const data: { id: string; name: string; avatar?: string; status: 'online' | 'busy' | 'away' | 'offline'; lastSeen: string; }[] = users.slice(0, 18).map((u, idx) => ({
             id: u.id,
             name: u.name || u.phone || u.id,
             avatar: undefined,
@@ -399,12 +399,12 @@ export class VideoCallBackendService {
   }
 
   // Search users for adding to call
-  async searchUsers(query: string): Promise<Array<{
+  async searchUsers(query: string): Promise<{
     id: string;
     name: string;
     avatar?: string;
     email?: string;
-  }>> {
+  }[]> {
     try {
       const response = await apiFetch(`/users/search?q=${encodeURIComponent(query)}`, {
         headers: {

@@ -13,7 +13,7 @@ import { apiFetch } from './api';
 // Conditionally import to avoid Expo Go runtime issues
 let Notifications: typeof import('expo-notifications') | null = null;
 try {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
+   
   Notifications = require('expo-notifications');
 } catch (e) {
   console.log('[push] expo-notifications not available:', e);

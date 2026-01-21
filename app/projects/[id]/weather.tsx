@@ -37,26 +37,26 @@ interface WeatherData {
     description: string;
     icon: string;
   };
-  hourly: Array<{
+  hourly: {
     time: string;
     temp: number;
     icon: string;
-  }>;
-  daily: Array<{
+  }[];
+  daily: {
     date: string;
     tempMax: number;
     tempMin: number;
     icon: string;
     condition: string;
     rainChance: number;
-  }>;
-  alerts?: Array<{
+  }[];
+  alerts?: {
     event: string;
     severity: 'extreme' | 'severe' | 'moderate' | 'minor';
     description: string;
     start: string;
     end: string;
-  }>;
+  }[];
 }
 
 const WEATHER_ICONS: Record<string, string> = {

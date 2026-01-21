@@ -503,6 +503,20 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#f0f0f0',
   },
+  mockBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FEF3C7',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 12,
+    gap: 8,
+  },
+  mockBannerText: {
+    fontSize: 13,
+    color: '#92400E',
+    fontWeight: '500',
+  },
   reviewsTitle: {
     fontSize: 15,
     fontWeight: '600',

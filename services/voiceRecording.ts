@@ -10,7 +10,7 @@
 import * as FileSystem from 'expo-file-system';
 
 // Conditional import to suppress deprecation warning in dev
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 let Audio: any = null;
 try {
   const expoAv = require('expo-av');
@@ -33,7 +33,7 @@ export interface VoiceRecording {
 
 class VoiceRecorder {
   // Using any type since Audio is dynamically imported
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   private recording: any = null;
   private isRecording = false;
   private startTime: number = 0;

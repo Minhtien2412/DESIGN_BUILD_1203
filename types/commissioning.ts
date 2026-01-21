@@ -105,12 +105,12 @@ export interface CommissioningTest {
     role: string;
     company: string;
   };
-  witnessedBy?: Array<{
+  witnessedBy?: {
     id: string;
     name: string;
     role: string;
     company: string;
-  }>;
+  }[];
   
   // Test execution
   testSteps: TestStep[];
@@ -132,11 +132,11 @@ export interface CommissioningTest {
   photos: CommissioningPhoto[];
   attachments: CommissioningAttachment[];
   dataLogs?: string[]; // URLs to data log files
-  instrumentsUsed?: Array<{
+  instrumentsUsed?: {
     name: string;
     serialNumber: string;
     calibrationDate: string;
-  }>;
+  }[];
   
   // Environmental conditions
   environmentalConditions?: {
@@ -323,12 +323,12 @@ export interface CommissioningSystem {
   // Documentation
   drawings?: string[];
   manuals?: string[];
-  warranties?: Array<{
+  warranties?: {
     type: string;
     startDate: string;
     endDate: string;
     provider: string;
-  }>;
+  }[];
   
   // Training
   trainingRequired: boolean;
@@ -382,12 +382,12 @@ export interface CommissioningPlan {
     role: string;
     company: string;
   };
-  teamMembers: Array<{
+  teamMembers: {
     id: string;
     name: string;
     role: string;
     company: string;
-  }>;
+  }[];
   
   // Progress
   overallProgress: number; // Percentage
@@ -437,14 +437,14 @@ export interface CommissioningReport {
   
   // Systems covered
   systemIds: string[];
-  systemSummaries: Array<{
+  systemSummaries: {
     systemId: string;
     systemName: string;
     status: CommissioningStatus;
     testsCompleted: number;
     testsPassed: number;
     deficiencies: number;
-  }>;
+  }[];
   
   // Executive summary
   executiveSummary: string;
@@ -544,17 +544,17 @@ export interface CommissioningSummary {
   averageDaysDelayed: number;
   
   // Top categories
-  topSystemCategories: Array<{
+  topSystemCategories: {
     category: SystemCategory;
     count: number;
     completionRate: number;
-  }>;
+  }[];
   
-  topDeficiencyCategories: Array<{
+  topDeficiencyCategories: {
     category: SystemCategory;
     count: number;
     resolutionRate: number;
-  }>;
+  }[];
 }
 
 export interface CommissioningAnalytics {
@@ -563,42 +563,42 @@ export interface CommissioningAnalytics {
   summary: CommissioningSummary;
   
   // Test completion trend
-  testCompletionTrend: Array<{
+  testCompletionTrend: {
     month: string;
     testsCompleted: number;
     testsPassed: number;
     testsFailed: number;
     passRate: number;
-  }>;
+  }[];
   
   // System progress trend
-  systemProgressTrend: Array<{
+  systemProgressTrend: {
     month: string;
     systemsStarted: number;
     systemsCompleted: number;
     averageProgress: number;
-  }>;
+  }[];
   
   // Deficiency trend
-  deficiencyTrend: Array<{
+  deficiencyTrend: {
     month: string;
     identified: number;
     resolved: number;
     outstanding: number;
-  }>;
+  }[];
   
   // Category performance
-  categoryPerformance: Array<{
+  categoryPerformance: {
     category: SystemCategory;
     totalTests: number;
     passRate: number;
     averageRetests: number;
     deficiencies: number;
     completionRate: number;
-  }>;
+  }[];
   
   // Contractor performance
-  contractorPerformance: Array<{
+  contractorPerformance: {
     contractorId: string;
     contractorName: string;
     systemsResponsible: number;
@@ -606,7 +606,7 @@ export interface CommissioningAnalytics {
     passRate: number;
     deficiencies: number;
     onTimeCompletion: number;
-  }>;
+  }[];
 }
 
 export interface CommissioningExportOptions {

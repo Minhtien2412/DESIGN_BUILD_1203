@@ -33,13 +33,13 @@ interface ProjectProgress {
     blocked_tasks: number;
     completion_rate: number;
   };
-  milestones: Array<{
+  milestones: {
     id: number;
     name: string;
     status: string;
     completion_percentage: number;
     due_date: string;
-  }>;
+  }[];
 }
 
 interface Props {

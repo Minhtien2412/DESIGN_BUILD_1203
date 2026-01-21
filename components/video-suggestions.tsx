@@ -10,13 +10,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
-    Dimensions,
-    FlatList,
-    Platform,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Dimensions,
+  FlatList,
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -228,9 +228,9 @@ export const VideoSuggestions: React.FC<VideoSuggestionsProps> = ({
               url={item.url}
               thumbnail={item.thumbnail}
               title={item.title}
-              autoPlay={false}
+              autoPlay={true}
               muted={true}
-              loop={false}
+              loop={true}
               compact={true}
               style={styles.videoPlayer}
             />

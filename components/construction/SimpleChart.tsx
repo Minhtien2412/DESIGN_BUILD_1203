@@ -8,11 +8,11 @@ import { StyleSheet, Text, View, ViewStyle } from 'react-native';
 
 // ============ BAR CHART ============
 interface BarChartProps {
-  data: Array<{
+  data: {
     label: string;
     value: number;
     color?: string;
-  }>;
+  }[];
   maxValue?: number;
   height?: number;
   showValues?: boolean;
@@ -63,10 +63,10 @@ export function BarChart({
 
 // ============ LINE CHART ============
 interface LineChartProps {
-  data: Array<{
+  data: {
     label: string;
     value: number;
-  }>;
+  }[];
   height?: number;
   lineColor?: string;
   gradientColors?: [string, string];
@@ -142,11 +142,11 @@ export function LineChart({
 
 // ============ DONUT CHART ============
 interface DonutChartProps {
-  data: Array<{
+  data: {
     label: string;
     value: number;
     color: string;
-  }>;
+  }[];
   size?: number;
   thickness?: number;
   centerText?: string;

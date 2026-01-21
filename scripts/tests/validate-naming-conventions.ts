@@ -83,8 +83,8 @@ interface ValidationResult {
   route: string;
   routeKey: string;
   passed: boolean;
-  errors: Array<{ rule: string; message: string }>;
-  warnings: Array<{ rule: string; message: string }>;
+  errors: { rule: string; message: string }[];
+  warnings: { rule: string; message: string }[];
 }
 
 interface ValidationSummary {

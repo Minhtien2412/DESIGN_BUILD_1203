@@ -249,13 +249,13 @@ const styles = StyleSheet.create({
 
 // Avatar Group Component
 interface AvatarGroupProps {
-  avatars: Array<{
+  avatars: {
     source?: ImageSourcePropType;
     name?: string;
     id: string | number;
     avatar?: string | null;
     userId?: string | number;
-  }>;
+  }[];
   max?: number;
   size?: AvatarSizeType;
   shape?: AvatarShape;

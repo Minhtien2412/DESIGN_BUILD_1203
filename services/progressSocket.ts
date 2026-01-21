@@ -17,7 +17,7 @@ export interface TaskProgress {
   name: string;
   status: 'TODO' | 'IN_PROGRESS' | 'COMPLETED';
   progress: number; // 0-100
-  assignees: Array<{ id: number; fullName: string; avatar?: string }>;
+  assignees: { id: number; fullName: string; avatar?: string }[];
   startDate: string | null;
   dueDate: string | null;
   completedDate: string | null;
@@ -52,11 +52,11 @@ export interface ProjectProgress {
     percentTimeElapsed: number;
     isOverdue: boolean;
   };
-  milestones: Array<{
+  milestones: {
     name: string;
     progress: number;
     completed: boolean;
-  }>;
+  }[];
   team: {
     members: number;
     activeMembers: number;

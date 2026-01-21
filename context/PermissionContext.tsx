@@ -6,7 +6,7 @@
  */
 
 import { getItem, setItem } from '@/utils/storage';
-import * as BackgroundFetch from 'expo-background-fetch';
+import * as BackgroundTask from 'expo-background-task';
 import * as Camera from 'expo-camera';
 import * as Location from 'expo-location';
 import * as Notifications from 'expo-notifications';
@@ -29,15 +29,15 @@ Notifications.setNotificationHandler({
   }),
 });
 
-// Register background tasks
+// Register background tasks using expo-background-task (replaces deprecated expo-background-fetch)
 TaskManager.defineTask(BACKGROUND_NOTIFICATION_TASK, async () => {
   try {
     // This will run in background to receive notifications
     console.log('[Background] Notification task running');
-    return BackgroundFetch.BackgroundFetchResult.NewData;
+    return BackgroundTask.BackgroundTaskResult.Success;
   } catch (error) {
     console.error('[Background] Notification task error:', error);
-    return BackgroundFetch.BackgroundFetchResult.Failed;
+    return BackgroundTask.BackgroundTaskResult.Failed;
   }
 });
 
@@ -45,10 +45,10 @@ TaskManager.defineTask(BACKGROUND_CALL_TASK, async () => {
   try {
     // This will run in background to receive calls
     console.log('[Background] Call task running');
-    return BackgroundFetch.BackgroundFetchResult.NewData;
+    return BackgroundTask.BackgroundTaskResult.Success;
   } catch (error) {
     console.error('[Background] Call task error:', error);
-    return BackgroundFetch.BackgroundFetchResult.Failed;
+    return BackgroundTask.BackgroundTaskResult.Failed;
   }
 });
 
@@ -208,18 +208,14 @@ export const PermissionProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       const { status } = await Notifications.getPermissionsAsync();
       
       if (status === 'granted') {
-        // Register background fetch for notifications
-        await BackgroundFetch.registerTaskAsync(BACKGROUND_NOTIFICATION_TASK, {
+        // Register background task for notifications using expo-background-task
+        await BackgroundTask.registerTaskAsync(BACKGROUND_NOTIFICATION_TASK, {
           minimumInterval: 60 * 15, // 15 minutes
-          stopOnTerminate: false,
-          startOnBoot: true,
         });
         
-        // Register background fetch for calls
-        await BackgroundFetch.registerTaskAsync(BACKGROUND_CALL_TASK, {
+        // Register background task for calls
+        await BackgroundTask.registerTaskAsync(BACKGROUND_CALL_TASK, {
           minimumInterval: 60 * 5, // 5 minutes
-          stopOnTerminate: false,
-          startOnBoot: true,
         });
         
         console.log('[Permissions] Background tasks registered successfully');

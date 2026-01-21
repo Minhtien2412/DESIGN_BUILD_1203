@@ -373,21 +373,21 @@ export interface PunchListTemplate {
   name: string;
   description?: string;
   category: PunchItemCategory;
-  defaultItems: Array<{
+  defaultItems: {
     title: string;
     description: string;
     category: PunchItemCategory;
     type: PunchItemType;
     priority: PunchItemPriority;
-  }>;
-  customFields?: Array<{
+  }[];
+  customFields?: {
     id: string;
     name: string;
     type: 'TEXT' | 'NUMBER' | 'DATE' | 'SELECT' | 'MULTISELECT' | 'BOOLEAN';
     options?: string[];
     required: boolean;
     defaultValue?: any;
-  }>;
+  }[];
   createdBy: string;
   createdAt: string;
 }
@@ -434,18 +434,18 @@ export interface PunchListSummary {
   costVariance: number;
   
   // Top issues
-  topCategories: Array<{
+  topCategories: {
     category: PunchItemCategory;
     count: number;
     percentage: number;
-  }>;
+  }[];
   
-  topResponsibleParties: Array<{
+  topResponsibleParties: {
     party: ResponsibleParty;
     company: string;
     count: number;
     completionRate: number;
-  }>;
+  }[];
 }
 
 export interface PunchListAnalytics {
@@ -454,32 +454,32 @@ export interface PunchListAnalytics {
   summary: PunchListSummary;
   
   // Trend analysis
-  itemCreationTrend: Array<{
+  itemCreationTrend: {
     month: string;
     created: number;
     completed: number;
     closed: number;
-  }>;
+  }[];
   
   // Completion trend
-  completionTrend: Array<{
+  completionTrend: {
     month: string;
     completionRate: number;
     averageDaysToComplete: number;
-  }>;
+  }[];
   
   // Category analysis
-  categoryAnalysis: Array<{
+  categoryAnalysis: {
     category: PunchItemCategory;
     totalItems: number;
     completed: number;
     completionRate: number;
     averageDaysToComplete: number;
     costImpact: number;
-  }>;
+  }[];
   
   // Contractor performance
-  contractorPerformance: Array<{
+  contractorPerformance: {
     contractorId: string;
     contractorName: string;
     company: string;
@@ -489,15 +489,15 @@ export interface PunchListAnalytics {
     averageDaysToComplete: number;
     rejectedItems: number;
     rejectionRate: number;
-  }>;
+  }[];
   
   // Priority distribution
-  priorityDistribution: Array<{
+  priorityDistribution: {
     priority: PunchItemPriority;
     count: number;
     percentage: number;
     averageDaysToComplete: number;
-  }>;
+  }[];
   
   // Cost analysis
   costAnalysis: {
@@ -508,11 +508,11 @@ export interface PunchListAnalytics {
   };
   
   // Aging analysis
-  agingAnalysis: Array<{
+  agingAnalysis: {
     ageRange: string; // '0-7 days', '8-14 days', '15-30 days', '30+ days'
     count: number;
     percentage: number;
-  }>;
+  }[];
 }
 
 export interface PunchListExportOptions {

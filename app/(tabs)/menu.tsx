@@ -7,14 +7,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { Href, router } from 'expo-router';
 import { memo, useCallback, useMemo, useState } from 'react';
 import {
-    Dimensions,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Dimensions,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -169,25 +169,59 @@ const MODULE_CATEGORIES: ModuleCategory[] = [
       { id: 'sv2', label: 'Thiết kế nội thất', icon: 'bed-outline', route: '/services/interior-design' },
       { id: 'sv3', label: 'Nhà thầu XD', icon: 'business-outline', route: '/services/construction-company' },
       { id: 'sv4', label: 'Giám sát CL', icon: 'eye-outline', route: '/services/quality-supervision' },
-      { id: 'sv5', label: 'Tư vấn Phong thủy', icon: 'compass-outline', route: '/services/feng-shui' },
+      { id: 'sv5', label: 'Phong thủy AI', icon: 'compass-outline', route: '/tools/feng-shui-ai', hot: true },
       { id: 'sv6', label: 'Giấy phép XD', icon: 'document-outline', route: '/services/permit' },
       { id: 'sv7', label: 'Tất cả dịch vụ', icon: 'apps-outline', route: '/services' },
+    ],
+  },
+
+  // ====== AI CONSULTATION ======
+  {
+    id: 'ai-consultation',
+    title: '🤖 Tư vấn AI',
+    icon: 'sparkles-outline',
+    color: '#7C3AED',
+    items: [
+      { id: 'aic1', label: 'Thiết kế nhà AI', icon: 'home-outline', route: '/services/house-design-ai', hot: true },
+      { id: 'aic2', label: 'Nội thất AI', icon: 'bed-outline', route: '/services/interior-design-ai', hot: true },
+      { id: 'aic3', label: 'Giấy phép AI', icon: 'document-outline', route: '/services/permit-ai', hot: true },
+      { id: 'aic4', label: 'Dự toán AI', icon: 'calculator-outline', route: '/services/cost-estimate-ai', hot: true },
+      { id: 'aic5', label: 'Phong thủy AI', icon: 'compass-outline', route: '/tools/feng-shui-ai', hot: true },
+      { id: 'aic6', label: 'AI Assistant', icon: 'chatbubble-ellipses-outline', route: '/ai/assistant' },
     ],
   },
 
   // ====== AI & TOOLS ======
   {
     id: 'ai',
-    title: '🤖 AI & Công cụ',
-    icon: 'sparkles-outline',
+    title: '🛠️ Công cụ AI',
+    icon: 'construct-outline',
     color: '#0066CC',
     items: [
       { id: 'ai1', label: 'AI Assistant', icon: 'chatbubble-ellipses-outline', route: '/ai/assistant', hot: true },
       { id: 'ai2', label: 'Dự toán AI', icon: 'calculator-outline', route: '/ai/cost-estimator' },
       { id: 'ai3', label: 'Phân tích ảnh', icon: 'camera-outline', route: '/ai/photo-analysis' },
       { id: 'ai4', label: 'Báo cáo AI', icon: 'document-text-outline', route: '/ai/generate-report' },
-      { id: 'ai5', label: 'Đề xuất AI', icon: 'bulb-outline', route: '/ai/suggestions' },
+      { id: 'ai5', label: 'Phong thủy AI', icon: 'compass-outline', route: '/tools/feng-shui-ai' },
       { id: 'ai6', label: 'All AI Tools', icon: 'apps-outline', route: '/ai' },
+    ],
+  },
+
+  // ====== AI ARCHITECT ======
+  {
+    id: 'ai-architect',
+    title: '🏛️ AI Kiến Trúc Sư',
+    icon: 'business-outline',
+    color: '#8e44ad',
+    items: [
+      { id: 'arch1', label: 'Tổng quan', icon: 'grid-outline', route: '/ai-architect', hot: true },
+      { id: 'arch2', label: 'Sơ đồ Hệ thống', icon: 'git-network-outline', route: '/ai-architect/architecture', new: true },
+      { id: 'arch3', label: 'Sinh Code PHP', icon: 'code-slash-outline', route: '/ai-architect/implementation' },
+      { id: 'arch4', label: 'Phong cách KT', icon: 'color-palette-outline', route: '/ai-architect/visualizer' },
+      { id: 'arch5', label: 'Tư vấn AI', icon: 'chatbubble-ellipses-outline', route: '/ai-architect/consultant', hot: true },
+      { id: 'arch6', label: 'AI Design', icon: 'sparkles-outline', route: '/ai-architect/design', new: true },
+      { id: 'arch7', label: 'Templates', icon: 'layers-outline', route: '/ai-architect/templates' },
+      { id: 'arch8', label: 'Export', icon: 'download-outline', route: '/ai-architect/export' },
     ],
   },
 
@@ -390,6 +424,21 @@ const MODULE_CATEGORIES: ModuleCategory[] = [
     ],
   },
 
+  // ====== MEDIA & CONTENT ======
+  {
+    id: 'media',
+    title: '🎬 Media & Nội dung',
+    icon: 'images-outline',
+    color: '#f97316',
+    items: [
+      { id: 'md1', label: 'Pexels Gallery', icon: 'images-outline', route: '/pexels-gallery', hot: true },
+      { id: 'md2', label: 'Video Demo', icon: 'videocam-outline', route: '/demo-videos', new: true },
+      { id: 'md3', label: 'Tin tức', icon: 'newspaper-outline', route: '/(tabs)/news' },
+      { id: 'md4', label: 'Xã hội', icon: 'people-outline', route: '/(tabs)/social' },
+      { id: 'md5', label: 'Live Stream', icon: 'radio-outline', route: '/(tabs)/live' },
+    ],
+  },
+
   // ====== TESTING & DEV ======
   {
     id: 'testing',
@@ -401,6 +450,8 @@ const MODULE_CATEGORIES: ModuleCategory[] = [
       { id: 'ts2', label: 'Test Auth', icon: 'key-outline', route: '/test-perfex-auth' },
       { id: 'ts3', label: 'Test Simple', icon: 'code-outline', route: '/test-simple' },
       { id: 'ts4', label: 'Progress Backup', icon: 'cloud-upload-outline', route: '/construction-progress-backup' },
+      { id: 'ts5', label: 'API Status', icon: 'pulse-outline', route: '/(tabs)/api-status' },
+      { id: 'ts6', label: 'Quyền truy cập', icon: 'key-outline', route: '/permissions' },
     ],
   },
 ];

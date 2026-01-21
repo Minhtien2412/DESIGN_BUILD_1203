@@ -25,11 +25,11 @@ interface IncomingCall {
     avatar?: string;
   };
   isGroupCall: boolean;
-  participants?: Array<{
+  participants?: {
     id: string;
     name: string;
     avatar?: string;
-  }>;
+  }[];
 }
 
 interface IncomingCallOverlayProps {

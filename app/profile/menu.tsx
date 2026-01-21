@@ -100,6 +100,20 @@ export default function ProfileMenuScreen() {
       color: '#6B7280',
     },
     {
+      icon: 'pulse-outline',
+      title: 'API Status',
+      description: 'Kiểm tra trạng thái các API',
+      route: '/(tabs)/api-status',
+      color: '#10B981',
+    },
+    {
+      icon: 'sparkles-outline',
+      title: 'AI Assistant',
+      description: 'Hỗ trợ chỉnh sửa app với AI',
+      route: '/(tabs)/ai-assistant',
+      color: '#8B5CF6',
+    },
+    {
       icon: 'shield-outline',
       title: 'Quyền truy cập',
       description: 'Camera, vị trí, thông báo',

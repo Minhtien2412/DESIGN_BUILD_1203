@@ -26,6 +26,17 @@ model User {
   // Calls received by this user
   callsReceived  Call[] @relation("Callee")
 
+  // Social features
+  posts            Post[]           @relation("PostAuthor")
+  postReactions    PostReaction[]   @relation("PostReactions")
+  postComments     PostComment[]    @relation("PostComments")
+  commentReactions CommentReaction[] @relation("CommentReactions")
+  postSaves        PostSave[]       @relation("PostSaves")
+  saveCollections  SaveCollection[] @relation("SaveCollections")
+  postViews        PostView[]       @relation("PostViews")
+  stories          Story[]          @relation("StoryAuthor")
+  storyViews       StoryView[]      @relation("StoryViews")
+
   @@map("users")
 }
 
@@ -67,4 +78,277 @@ enum CallStatus {
   ENDED     // Call ended by either party
   MISSED    // Callee didn't answer
   DECLINED  // Callee declined
+}
+
+// ==================== SOCIAL FEATURES ====================
+
+model Post {
+  id String @id @default(uuid())
+  
+  // Author
+  authorId String @map("author_id")
+  author   User   @relation("PostAuthor", fields: [authorId], references: [id])
+  
+  // Content
+  content String @db.Text
+  
+  // Media (images, videos)
+  mediaUrls   String[] @map("media_urls")
+  thumbnailUrl String? @map("thumbnail_url")
+  
+  // Post type
+  type PostType @default(TEXT)
+  
+  // Privacy setting
+  privacy PostPrivacy @default(PUBLIC)
+  
+  // Sharing
+  originalPostId String?  @map("original_post_id")
+  originalPost   Post?    @relation("SharedPosts", fields: [originalPostId], references: [id])
+  shares         Post[]   @relation("SharedPosts")
+  shareContent   String?  @map("share_content")
+  
+  // Location
+  locationName String? @map("location_name")
+  locationLat  Float?  @map("location_lat")
+  locationLng  Float?  @map("location_lng")
+  
+  // Tags
+  tags String[]
+  
+  // Mentioned users
+  mentionedUserIds String[] @map("mentioned_user_ids")
+  
+  // Counts (denormalized)
+  reactionsCount Int @default(0) @map("reactions_count")
+  commentsCount  Int @default(0) @map("comments_count")
+  sharesCount    Int @default(0) @map("shares_count")
+  viewsCount     Int @default(0) @map("views_count")
+  
+  // Status
+  isDeleted  Boolean @default(false) @map("is_deleted")
+  isEdited   Boolean @default(false) @map("is_edited")
+  isPinned   Boolean @default(false) @map("is_pinned")
+  editedAt   DateTime? @map("edited_at")
+  
+  // Relations
+  reactions PostReaction[]
+  comments  PostComment[]
+  saves     PostSave[]
+  views     PostView[]
+  
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  
+  @@index([authorId])
+  @@index([privacy])
+  @@index([createdAt])
+  @@index([originalPostId])
+  @@map("posts")
+}
+
+enum PostType {
+  TEXT
+  IMAGE
+  VIDEO
+  LINK
+  POLL
+  EVENT
+}
+
+enum PostPrivacy {
+  PUBLIC
+  FRIENDS
+  PRIVATE
+}
+
+model PostReaction {
+  id String @id @default(uuid())
+  
+  postId String @map("post_id")
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  
+  userId String @map("user_id")
+  user   User   @relation("PostReactions", fields: [userId], references: [id])
+  
+  type ReactionType @default(LIKE)
+  
+  createdAt DateTime @default(now()) @map("created_at")
+  
+  @@unique([postId, userId])
+  @@index([postId])
+  @@index([userId])
+  @@map("post_reactions")
+}
+
+enum ReactionType {
+  LIKE
+  LOVE
+  HAHA
+  WOW
+  SAD
+  ANGRY
+}
+
+model PostComment {
+  id String @id @default(uuid())
+  
+  postId String @map("post_id")
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  
+  authorId String @map("author_id")
+  author   User   @relation("PostComments", fields: [authorId], references: [id])
+  
+  content String @db.Text
+  
+  mediaUrl     String? @map("media_url")
+  mediaType    String? @map("media_type")
+  
+  parentId     String?       @map("parent_id")
+  parent       PostComment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies      PostComment[] @relation("CommentReplies")
+  
+  reactionsCount Int @default(0) @map("reactions_count")
+  repliesCount   Int @default(0) @map("replies_count")
+  
+  isDeleted  Boolean @default(false) @map("is_deleted")
+  isEdited   Boolean @default(false) @map("is_edited")
+  editedAt   DateTime? @map("edited_at")
+  
+  reactions CommentReaction[]
+  
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  
+  @@index([postId])
+  @@index([authorId])
+  @@index([parentId])
+  @@index([createdAt])
+  @@map("post_comments")
+}
+
+model CommentReaction {
+  id String @id @default(uuid())
+  
+  commentId String      @map("comment_id")
+  comment   PostComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  
+  userId String @map("user_id")
+  user   User   @relation("CommentReactions", fields: [userId], references: [id])
+  
+  type ReactionType @default(LIKE)
+  
+  createdAt DateTime @default(now()) @map("created_at")
+  
+  @@unique([commentId, userId])
+  @@index([commentId])
+  @@index([userId])
+  @@map("comment_reactions")
+}
+
+model PostSave {
+  id String @id @default(uuid())
+  
+  postId String @map("post_id")
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  
+  userId String @map("user_id")
+  user   User   @relation("PostSaves", fields: [userId], references: [id])
+  
+  collectionId String?        @map("collection_id")
+  collection   SaveCollection? @relation(fields: [collectionId], references: [id])
+  
+  createdAt DateTime @default(now()) @map("created_at")
+  
+  @@unique([postId, userId])
+  @@index([postId])
+  @@index([userId])
+  @@index([collectionId])
+  @@map("post_saves")
+}
+
+model SaveCollection {
+  id String @id @default(uuid())
+  
+  userId String @map("user_id")
+  user   User   @relation("SaveCollections", fields: [userId], references: [id])
+  
+  name    String
+  isDefault Boolean @default(false) @map("is_default")
+  
+  saves PostSave[]
+  
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  
+  @@index([userId])
+  @@map("save_collections")
+}
+
+model PostView {
+  id String @id @default(uuid())
+  
+  postId String @map("post_id")
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  
+  userId   String? @map("user_id")
+  user     User?   @relation("PostViews", fields: [userId], references: [id])
+  
+  ipAddress  String? @map("ip_address")
+  userAgent  String? @map("user_agent")
+  viewDuration Int?  @map("view_duration")
+  
+  viewedAt DateTime @default(now()) @map("viewed_at")
+  
+  @@index([postId])
+  @@index([userId])
+  @@index([viewedAt])
+  @@map("post_views")
+}
+
+model Story {
+  id String @id @default(uuid())
+  
+  authorId String @map("author_id")
+  author   User   @relation("StoryAuthor", fields: [authorId], references: [id])
+  
+  mediaUrl  String  @map("media_url")
+  mediaType StoryMediaType @map("media_type")
+  
+  duration Int?
+  caption String?
+  textOverlay Json? @map("text_overlay")
+  
+  viewsCount Int @default(0) @map("views_count")
+  
+  views StoryView[]
+  
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  
+  @@index([authorId])
+  @@index([expiresAt])
+  @@map("stories")
+}
+
+model StoryView {
+  id String @id @default(uuid())
+  
+  storyId String @map("story_id")
+  story   Story  @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  
+  userId String @map("user_id")
+  user   User   @relation("StoryViews", fields: [userId], references: [id])
+  
+  viewedAt DateTime @default(now()) @map("viewed_at")
+  
+  @@unique([storyId, userId])
+  @@index([storyId])
+  @@index([userId])
+  @@map("story_views")
+}
+
+enum StoryMediaType {
+  IMAGE
+  VIDEO
 }

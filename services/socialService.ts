@@ -168,7 +168,7 @@ export async function reactToPost(
 export async function getPostReactions(
   postId: string,
   type?: ReactionType
-): Promise<{ reactions: Array<{ user: SocialUser; type: ReactionType }> }> {
+): Promise<{ reactions: { user: SocialUser; type: ReactionType }[] }> {
   try {
     const params = type ? `?type=${type}` : '';
     const response = await apiFetch(`${API_BASE}/posts/${postId}/reactions${params}`);

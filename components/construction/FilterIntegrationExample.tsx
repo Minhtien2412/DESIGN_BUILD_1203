@@ -36,7 +36,7 @@ export const ConstructionMapWithFilters: React.FC<{ projectId: string }> = ({
 }) => {
   const { tasks, stages } = useConstructionMap({ projectId });
   // Assignees placeholder - hook doesn't return assignees currently
-  const assignees: Array<{ userId: string; userName: string }> = [];
+  const assignees: { userId: string; userName: string }[] = [];
   const [showFilterPanel, setShowFilterPanel] = useState(false);
   const [currentFilters, setCurrentFilters] = useState<FilterCriteria>(defaultFilters);
   const [presets, setPresets] = useState<FilterPreset[]>([]);

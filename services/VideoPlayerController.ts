@@ -1,20 +1,20 @@
 /**
  * VideoPlayerController - Singleton để quản lý playback của videos
- * 
+ *
  * Đảm bảo:
  * - Chỉ 1 video phát tại 1 thời điểm
  * - Lưu trữ timestamp khi pause
  * - Global mute/unmute control
  * - Persist mute setting
- * 
+ *
  * @see PRODUCT_BACKLOG.md VIDEO-001
  */
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { VideoPlayer } from 'expo-video';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { VideoPlayer } from "expo-video";
 
-const MUTE_SETTING_KEY = '@video_player_muted';
-const PLAYBACK_POSITIONS_KEY = '@video_playback_positions';
+const MUTE_SETTING_KEY = "@video_player_muted";
+const PLAYBACK_POSITIONS_KEY = "@video_playback_positions";
 
 export interface PlaybackPosition {
   videoId: string;
@@ -40,7 +40,7 @@ type StateChangeCallback = (state: VideoPlayerState) => void;
 
 class VideoPlayerControllerClass {
   private static instance: VideoPlayerControllerClass;
-  
+
   private activeVideoId: string | null = null;
   private isMuted: boolean = false;
   private volume: number = 1.0;
@@ -71,7 +71,7 @@ class VideoPlayerControllerClass {
       // Load mute setting
       const muteSetting = await AsyncStorage.getItem(MUTE_SETTING_KEY);
       if (muteSetting !== null) {
-        this.isMuted = muteSetting === 'true';
+        this.isMuted = muteSetting === "true";
       }
 
       // Load playback positions
@@ -80,7 +80,7 @@ class VideoPlayerControllerClass {
         const parsed = JSON.parse(positions) as PlaybackPosition[];
         // Only restore positions from last 24 hours
         const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000;
-        parsed.forEach(pos => {
+        parsed.forEach((pos) => {
           if (pos.lastUpdated > oneDayAgo) {
             this.playbackPositions.set(pos.videoId, pos);
           }
@@ -88,12 +88,12 @@ class VideoPlayerControllerClass {
       }
 
       this.isInitialized = true;
-      console.log('[VideoPlayerController] Initialized', {
+      console.log("[VideoPlayerController] Initialized", {
         isMuted: this.isMuted,
-        savedPositions: this.playbackPositions.size
+        savedPositions: this.playbackPositions.size,
       });
     } catch (error) {
-      console.error('[VideoPlayerController] Init error:', error);
+      console.error("[VideoPlayerController] Init error:", error);
       this.isInitialized = true;
     }
   }
@@ -102,7 +102,7 @@ class VideoPlayerControllerClass {
    * Register a video player instance
    */
   registerPlayer(
-    videoId: string, 
+    videoId: string,
     player: VideoPlayer,
     callbacks?: { onPause?: () => void; onResume?: () => void }
   ): void {
@@ -117,7 +117,7 @@ class VideoPlayerControllerClass {
     player.muted = this.isMuted;
     player.volume = this.volume;
 
-    console.log('[VideoPlayerController] Registered player:', videoId);
+    console.log("[VideoPlayerController] Registered player:", videoId);
   }
 
   /**
@@ -129,12 +129,12 @@ class VideoPlayerControllerClass {
       // Save position before unregistering
       this.savePlaybackPosition(videoId, instance.player.currentTime);
       this.players.delete(videoId);
-      
+
       if (this.activeVideoId === videoId) {
         this.activeVideoId = null;
       }
-      
-      console.log('[VideoPlayerController] Unregistered player:', videoId);
+
+      console.log("[VideoPlayerController] Unregistered player:", videoId);
     }
   }
 
@@ -158,9 +158,9 @@ class VideoPlayerControllerClass {
       instance.player.play();
       this.activeVideoId = videoId;
       instance.onResume?.();
-      
+
       this.notifyStateChange();
-      console.log('[VideoPlayerController] Playing:', videoId);
+      console.log("[VideoPlayerController] Playing:", videoId);
     }
   }
 
@@ -193,7 +193,7 @@ class VideoPlayerControllerClass {
       this.savePlaybackPosition(videoId, instance.player.currentTime);
       instance.player.pause();
       instance.onPause?.();
-      console.log('[VideoPlayerController] Paused:', videoId);
+      console.log("[VideoPlayerController] Paused:", videoId);
     }
   }
 
@@ -202,9 +202,9 @@ class VideoPlayerControllerClass {
    */
   async toggleMute(): Promise<boolean> {
     this.isMuted = !this.isMuted;
-    
+
     // Apply to all registered players
-    this.players.forEach(instance => {
+    this.players.forEach((instance) => {
       instance.player.muted = this.isMuted;
     });
 
@@ -212,11 +212,14 @@ class VideoPlayerControllerClass {
     try {
       await AsyncStorage.setItem(MUTE_SETTING_KEY, String(this.isMuted));
     } catch (error) {
-      console.error('[VideoPlayerController] Failed to save mute setting:', error);
+      console.error(
+        "[VideoPlayerController] Failed to save mute setting:",
+        error
+      );
     }
 
     this.notifyStateChange();
-    console.log('[VideoPlayerController] Mute toggled:', this.isMuted);
+    console.log("[VideoPlayerController] Mute toggled:", this.isMuted);
     return this.isMuted;
   }
 
@@ -225,15 +228,18 @@ class VideoPlayerControllerClass {
    */
   async setMuted(muted: boolean): Promise<void> {
     this.isMuted = muted;
-    
-    this.players.forEach(instance => {
+
+    this.players.forEach((instance) => {
       instance.player.muted = muted;
     });
 
     try {
       await AsyncStorage.setItem(MUTE_SETTING_KEY, String(muted));
     } catch (error) {
-      console.error('[VideoPlayerController] Failed to save mute setting:', error);
+      console.error(
+        "[VideoPlayerController] Failed to save mute setting:",
+        error
+      );
     }
 
     this.notifyStateChange();
@@ -244,8 +250,8 @@ class VideoPlayerControllerClass {
    */
   setVolume(volume: number): void {
     this.volume = Math.max(0, Math.min(1, volume));
-    
-    this.players.forEach(instance => {
+
+    this.players.forEach((instance) => {
       instance.player.volume = this.volume;
     });
 
@@ -263,21 +269,27 @@ class VideoPlayerControllerClass {
   /**
    * Save playback position
    */
-  private async savePlaybackPosition(videoId: string, position: number): Promise<void> {
+  private async savePlaybackPosition(
+    videoId: string,
+    position: number
+  ): Promise<void> {
     if (!videoId || position <= 0) return;
 
     this.playbackPositions.set(videoId, {
       videoId,
       position,
-      lastUpdated: Date.now()
+      lastUpdated: Date.now(),
     });
 
     // Persist to storage (debounced in real implementation)
     try {
       const positions = Array.from(this.playbackPositions.values());
-      await AsyncStorage.setItem(PLAYBACK_POSITIONS_KEY, JSON.stringify(positions));
+      await AsyncStorage.setItem(
+        PLAYBACK_POSITIONS_KEY,
+        JSON.stringify(positions)
+      );
     } catch (error) {
-      console.error('[VideoPlayerController] Failed to save positions:', error);
+      console.error("[VideoPlayerController] Failed to save positions:", error);
     }
   }
 
@@ -286,12 +298,15 @@ class VideoPlayerControllerClass {
    */
   async clearPlaybackPosition(videoId: string): Promise<void> {
     this.playbackPositions.delete(videoId);
-    
+
     try {
       const positions = Array.from(this.playbackPositions.values());
-      await AsyncStorage.setItem(PLAYBACK_POSITIONS_KEY, JSON.stringify(positions));
+      await AsyncStorage.setItem(
+        PLAYBACK_POSITIONS_KEY,
+        JSON.stringify(positions)
+      );
     } catch (error) {
-      console.error('[VideoPlayerController] Failed to clear position:', error);
+      console.error("[VideoPlayerController] Failed to clear position:", error);
     }
   }
 
@@ -314,7 +329,7 @@ class VideoPlayerControllerClass {
     this.stateListeners.add(callback);
     // Immediately call with current state
     callback(this.getState());
-    
+
     return () => {
       this.stateListeners.delete(callback);
     };
@@ -322,7 +337,7 @@ class VideoPlayerControllerClass {
 
   private notifyStateChange(): void {
     const state = this.getState();
-    this.stateListeners.forEach(callback => callback(state));
+    this.stateListeners.forEach((callback) => callback(state));
   }
 
   /**

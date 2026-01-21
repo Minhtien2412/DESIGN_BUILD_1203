@@ -46,7 +46,7 @@ export default function AdminDashboardScreen() {
       if (isRefresh) setRefreshing(true);
       else setLoading(true);
 
-      const data = await dashboardApi.getDashboard('admin');
+      const data = await dashboardApi.getAdminDashboard();
       setStats(data);
     } catch (error) {
       console.error('Failed to load dashboard:', error);
@@ -130,11 +130,13 @@ export default function AdminDashboardScreen() {
             </Text>
             <ProgressChart
               type="circular"
-              labels={['Completed', 'Pending']}
-              data={[
-                stats.completedTasks,
-                stats.totalTasks - stats.completedTasks,
-              ]}
+              data={{
+                labels: ['Completed', 'Pending'],
+                data: [
+                  stats.completedTasks,
+                  stats.totalTasks - stats.completedTasks,
+                ],
+              }}
             />
           </View>
         )}

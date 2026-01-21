@@ -217,9 +217,9 @@ export function trackRecentView(itemId: string, itemName: string, itemType: stri
 export async function getAnalyticsSummary(): Promise<{
   totalEvents: number;
   eventsByType: Record<string, number>;
-  topScreens: Array<{ screen: string; count: number }>;
-  topCategories: Array<{ category: string; count: number }>;
-  searchQueries: Array<{ query: string; count: number }>;
+  topScreens: { screen: string; count: number }[];
+  topCategories: { category: string; count: number }[];
+  searchQueries: { query: string; count: number }[];
 }> {
   const events = await getStoredEvents();
   

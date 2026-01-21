@@ -15,20 +15,20 @@ export interface StaffMember {
     roleid: number;
     name: string;
   };
-  departments?: Array<{
+  departments?: {
     departmentid: number;
     name: string;
-  }>;
+  }[];
   active: number;
   last_login?: string;
   created_at: string;
 }
 
 export interface StaffDetail extends StaffMember {
-  permissions: Array<{
+  permissions: {
     feature: string;
     capabilities: string[];
-  }>;
+  }[];
   statistics?: {
     total_projects: number;
     active_tasks: number;
@@ -79,10 +79,10 @@ export interface Activity {
 export interface PermissionFeature {
   name: string;
   label: string;
-  capabilities: Array<{
+  capabilities: {
     name: string;
     label: string;
-  }>;
+  }[];
 }
 
 interface StaffFilters {

@@ -30,31 +30,31 @@ interface MeetingNoteDetail {
     name: string;
     role?: string;
   };
-  attendees: Array<{
+  attendees: {
     id: string;
     name: string;
     role: string;
     isPresent: boolean;
-  }>;
+  }[];
   agenda: string[];
-  decisions: Array<{
+  decisions: {
     id: string;
     description: string;
     decidedBy: string;
-  }>;
-  actionItems: Array<{
+  }[];
+  actionItems: {
     id: string;
     task: string;
     assignee: string;
     deadline: string;
     status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
-  }>;
+  }[];
   notes: string;
-  attachments: Array<{
+  attachments: {
     name: string;
     url: string;
     type: string;
-  }>;
+  }[];
 }
 
 export default function MeetingNoteDetailScreen() {

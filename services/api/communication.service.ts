@@ -187,7 +187,7 @@ export interface CreateAnnouncementData {
   isPinned?: boolean;
   targetAudience?: 'ALL' | 'TEAM' | 'CLIENTS' | 'CONTRACTORS';
   expiresAt?: string;
-  attachments?: Array<{ name: string; url: string; type: string; size: number }> | File[];
+  attachments?: { name: string; url: string; type: string; size: number }[] | File[];
 }
 
 export interface CreateMeetingNoteData {

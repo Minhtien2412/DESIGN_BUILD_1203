@@ -1,1271 +1,1027 @@
 /**
- * Social Feed Screen - Facebook/Instagram Style
- * Features: Stories, Feed posts, Reels, Likes, Comments, Share
- * @author AI Assistant
- * @date 03/01/2026
+ * Facebook-Style Community Feed Screen
+ * ======================================
+ *
+ * Infinite scroll feed combining content from multiple sources
+ * with Facebook-like UI/UX for seamless browsing experience.
+ *
+ * Features:
+ * - Infinite scroll with FlatList
+ * - Stories carousel at top
+ * - Create post section
+ * - Pull-to-refresh
+ * - Multi-source content aggregation
+ * - Smooth animations
+ *
+ * @author ThietKeResort Team
+ * @created 2025-01-20
  */
 
-import Avatar from '@/components/ui/avatar';
-import { useAuth } from '@/context/AuthContext';
-import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
-import { router } from 'expo-router';
-import { useCallback, useRef, useState } from 'react';
+import { Ionicons } from "@expo/vector-icons";
+import { Image } from "expo-image";
+import { useRouter } from "expo-router";
+import { useCallback, useMemo, useRef, useState } from "react";
 import {
-    Animated,
+    ActivityIndicator,
     Dimensions,
     FlatList,
-    Image,
     Modal,
+    NativeScrollEvent,
+    NativeSyntheticEvent,
+    Platform,
     RefreshControl,
-    ScrollView,
     StatusBar,
     StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
     View,
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+} from "react-native";
+import Animated, {
+    FadeInDown,
+    interpolate,
+    SharedValue,
+    SlideInRight,
+    useAnimatedStyle,
+    useSharedValue
+} from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+import {
+    CreatePostCard,
+    FacebookFeedCard,
+    StoryCard,
+} from "../../components/community/FacebookFeedCard";
+import { useAuth } from "../../context/AuthContext";
+import { useCommunityFeed } from "../../hooks/useCommunityFeed";
+import {
+    CommunityFeedItem,
+    FeedItemType,
+} from "../../services/communityFeedService";
 
-// ==================== MOCK DATA ====================
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
-// Stories data
-const STORIES = [
-  { id: 0, name: 'Bạn', avatar: null, hasStory: false, isUser: true },
-  { id: 1, name: 'Kiến trúc A&A', avatar: 'https://i.pravatar.cc/150?u=company1', hasStory: true, viewed: false },
-  { id: 2, name: 'Nội thất Luxury', avatar: 'https://i.pravatar.cc/150?u=company2', hasStory: true, viewed: false },
-  { id: 3, name: 'Thợ Minh Khang', avatar: 'https://i.pravatar.cc/150?u=worker1', hasStory: true, viewed: true },
-  { id: 4, name: 'Decor Studio', avatar: 'https://i.pravatar.cc/150?u=company3', hasStory: true, viewed: false },
-  { id: 5, name: 'Phong Thủy VN', avatar: 'https://i.pravatar.cc/150?u=company4', hasStory: true, viewed: true },
-  { id: 6, name: 'Công ty XD ABC', avatar: 'https://i.pravatar.cc/150?u=company5', hasStory: true, viewed: false },
-  { id: 7, name: 'HomeDesign', avatar: 'https://i.pravatar.cc/150?u=company6', hasStory: true, viewed: true },
-];
-
-// Sample posts data
-const POSTS = [
-  {
-    id: 1,
-    user: {
-      id: 101,
-      name: 'Công ty Thiết kế A&A',
-      avatar: 'https://i.pravatar.cc/150?u=company1',
-      verified: true,
-      role: 'Công ty thiết kế',
-    },
-    content: '🏠 Hoàn thành dự án biệt thự hiện đại tại Quận 2!\n\nDiện tích: 350m²\nPhong cách: Minimalist Modern\nThời gian thi công: 8 tháng\n\n👉 Liên hệ ngay để được tư vấn miễn phí!',
-    images: [
-      'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800',
-      'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800',
-      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800',
-    ],
-    likes: 1234,
-    comments: 89,
-    shares: 45,
-    time: '2 giờ trước',
-    liked: false,
-    saved: false,
-  },
-  {
-    id: 2,
-    user: {
-      id: 102,
-      name: 'Thợ xây Minh Khang',
-      avatar: 'https://i.pravatar.cc/150?u=worker1',
-      verified: false,
-      role: 'Thợ xây dựng • 15 năm KN',
-    },
-    content: '💪 Hôm nay đổ móng cho công trình mới!\n\nAi cần thợ xây dựng chuyên nghiệp liên hệ nhé:\n📞 0909.xxx.xxx\n\n#thoxay #xaydung #construction',
-    images: [
-      'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800',
-    ],
-    video: null,
-    likes: 567,
-    comments: 34,
-    shares: 12,
-    time: '4 giờ trước',
-    liked: true,
-    saved: false,
-  },
-  {
-    id: 3,
-    user: {
-      id: 103,
-      name: 'Nội thất Luxury Home',
-      avatar: 'https://i.pravatar.cc/150?u=company2',
-      verified: true,
-      role: 'Thiết kế nội thất cao cấp',
-    },
-    content: '✨ MẪU NỘI THẤT PHÒNG KHÁCH 2026 ✨\n\nXu hướng màu Earth Tone kết hợp gỗ tự nhiên\n\n🔥 Ưu đãi 20% cho 10 khách hàng đầu tiên trong tháng!',
-    images: [
-      'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800',
-      'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=800',
-    ],
-    likes: 2341,
-    comments: 156,
-    shares: 89,
-    time: '6 giờ trước',
-    liked: false,
-    saved: true,
-  },
-  {
-    id: 4,
-    user: {
-      id: 104,
-      name: 'Phong Thủy Việt Nam',
-      avatar: 'https://i.pravatar.cc/150?u=company4',
-      verified: true,
-      role: 'Chuyên gia phong thủy',
-    },
-    content: '🔮 PHONG THỦY NHÀ Ở NĂM 2026 🔮\n\nNhững điều cần tránh khi bố trí phòng khách:\n\n1️⃣ Không đặt gương đối diện cửa chính\n2️⃣ Tránh để cây khô héo trong nhà\n3️⃣ Không bày đồ vật sắc nhọn\n\n💬 Comment hỏi thêm, mình sẽ tư vấn!',
-    images: [],
-    likes: 890,
-    comments: 234,
-    shares: 123,
-    time: '8 giờ trước',
-    liked: false,
-    saved: false,
-  },
-  {
-    id: 5,
-    user: {
-      id: 105,
-      name: 'Vật liệu xây dựng Hưng Phát',
-      avatar: 'https://i.pravatar.cc/150?u=company7',
-      verified: true,
-      role: 'Cung cấp vật liệu xây dựng',
-    },
-    content: '🧱 KHUYẾN MÃI CUỐI NĂM 🧱\n\n✅ Gạch ốp lát: Giảm 30%\n✅ Sơn nước: Mua 3 tặng 1\n✅ Xi măng: Giảm 15%\n\n📦 Giao hàng miễn phí trong TP.HCM\n📞 Hotline: 1900.xxxx',
-    images: [
-      'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800',
-    ],
-    likes: 456,
-    comments: 67,
-    shares: 34,
-    time: '1 ngày trước',
-    liked: false,
-    saved: false,
-  },
-];
-
-// Reels data
-const REELS = [
-  {
-    id: 1,
-    user: { name: 'Công ty A&A', avatar: 'https://i.pravatar.cc/150?u=company1' },
-    thumbnail: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400',
-    views: '12.3K',
-    title: 'Biệt thự hiện đại',
-  },
-  {
-    id: 2,
-    user: { name: 'Thợ xây Minh', avatar: 'https://i.pravatar.cc/150?u=worker1' },
-    thumbnail: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=400',
-    views: '8.5K',
-    title: 'Kỹ thuật đổ móng',
-  },
-  {
-    id: 3,
-    user: { name: 'Nội thất Luxury', avatar: 'https://i.pravatar.cc/150?u=company2' },
-    thumbnail: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400',
-    views: '25.1K',
-    title: 'Phòng khách 2026',
-  },
-  {
-    id: 4,
-    user: { name: 'HomeDesign', avatar: 'https://i.pravatar.cc/150?u=company6' },
-    thumbnail: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400',
-    views: '6.7K',
-    title: 'Nhà phố 3 tầng',
-  },
-];
-
-// ==================== COMPONENTS ====================
-
-// Story Item Component
-const StoryItem = ({ item, onPress }: { item: typeof STORIES[0]; onPress: () => void }) => {
-  const { user } = useAuth();
-  
-  return (
-    <TouchableOpacity style={styles.storyItem} onPress={onPress}>
-      <View style={styles.storyAvatarContainer}>
-        {item.isUser ? (
-          <View style={styles.addStoryButton}>
-            <Avatar name={user?.name || 'U'} size={60} />
-            <View style={styles.addStoryIcon}>
-              <Ionicons name="add" size={14} color="#fff" />
-            </View>
-          </View>
-        ) : (
-          <LinearGradient
-            colors={item.viewed ? ['#8e8e8e', '#8e8e8e'] : ['#f09433', '#e6683c', '#dc2743', '#cc2366', '#bc1888']}
-            style={styles.storyRing}
-          >
-            <View style={styles.storyAvatarWrapper}>
-              <Image source={{ uri: item.avatar || '' }} style={styles.storyAvatar} />
-            </View>
-          </LinearGradient>
-        )}
-      </View>
-      <Text style={styles.storyName} numberOfLines={1}>
-        {item.name}
-      </Text>
-    </TouchableOpacity>
-  );
+// ============================================
+// Theme Constants
+// ============================================
+const COLORS = {
+  background: "#F0F2F5",
+  surface: "#FFFFFF",
+  primary: "#1877F2",
+  text: "#1C1E21",
+  textSecondary: "#65676B",
+  textTertiary: "#8A8D91",
+  border: "#E4E6EB",
+  divider: "#CED0D4",
 };
 
-// Post Card Component
-const PostCard = ({ 
-  post, 
-  onLike, 
-  onComment, 
-  onShare, 
-  onSave,
-  onUserPress,
-}: { 
-  post: typeof POSTS[0];
-  onLike: () => void;
-  onComment: () => void;
-  onShare: () => void;
-  onSave: () => void;
-  onUserPress: () => void;
-}) => {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [showFullContent, setShowFullContent] = useState(false);
-  
-  const isLongContent = post.content.length > 200;
-  const displayContent = showFullContent || !isLongContent 
-    ? post.content 
-    : post.content.slice(0, 200) + '...';
-  
-  return (
-    <View style={styles.postCard}>
-      {/* Post Header */}
-      <TouchableOpacity style={styles.postHeader} onPress={onUserPress}>
-        <Image source={{ uri: post.user.avatar }} style={styles.postAvatar} />
-        <View style={styles.postUserInfo}>
-          <View style={styles.postUserNameRow}>
-            <Text style={styles.postUserName}>{post.user.name}</Text>
-            {post.user.verified && (
-              <Ionicons name="checkmark-circle" size={14} color="#0095f6" style={{ marginLeft: 4 }} />
-            )}
-          </View>
-          <Text style={styles.postUserRole}>{post.user.role}</Text>
-        </View>
-        <TouchableOpacity style={styles.postMoreButton}>
-          <Ionicons name="ellipsis-horizontal" size={20} color="#333" />
-        </TouchableOpacity>
-      </TouchableOpacity>
-
-      {/* Post Content */}
-      <View style={styles.postContent}>
-        <Text style={styles.postText}>{displayContent}</Text>
-        {isLongContent && !showFullContent && (
-          <TouchableOpacity onPress={() => setShowFullContent(true)}>
-            <Text style={styles.seeMoreText}>Xem thêm</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-
-      {/* Post Images */}
-      {post.images.length > 0 && (
-        <View style={styles.postImagesContainer}>
-          {post.images.length === 1 ? (
-            <Image source={{ uri: post.images[0] }} style={styles.postSingleImage} />
-          ) : (
-            <>
-              <ScrollView
-                horizontal
-                pagingEnabled
-                showsHorizontalScrollIndicator={false}
-                onMomentumScrollEnd={(e) => {
-                  const index = Math.round(e.nativeEvent.contentOffset.x / SCREEN_WIDTH);
-                  setCurrentImageIndex(index);
-                }}
-              >
-                {post.images.map((img, idx) => (
-                  <Image key={idx} source={{ uri: img }} style={styles.postMultiImage} />
-                ))}
-              </ScrollView>
-              <View style={styles.imagePagination}>
-                {post.images.map((_, idx) => (
-                  <View
-                    key={idx}
-                    style={[styles.paginationDot, idx === currentImageIndex && styles.paginationDotActive]}
-                  />
-                ))}
-              </View>
-            </>
-          )}
-        </View>
-      )}
-
-      {/* Post Stats */}
-      <View style={styles.postStats}>
-        <View style={styles.postLikesCount}>
-          <View style={styles.likeIconsRow}>
-            <View style={[styles.reactionIcon, { backgroundColor: '#0866ff' }]}>
-              <Ionicons name="thumbs-up" size={10} color="#fff" />
-            </View>
-            <View style={[styles.reactionIcon, { backgroundColor: '#f33e58', marginLeft: -4 }]}>
-              <Ionicons name="heart" size={10} color="#fff" />
-            </View>
-          </View>
-          <Text style={styles.statsText}>{post.likes.toLocaleString()}</Text>
-        </View>
-        <Text style={styles.statsText}>
-          {post.comments} bình luận • {post.shares} chia sẻ
-        </Text>
-      </View>
-
-      {/* Post Actions */}
-      <View style={styles.postActions}>
-        <TouchableOpacity style={styles.actionButton} onPress={onLike}>
-          <Ionicons 
-            name={post.liked ? "thumbs-up" : "thumbs-up-outline"} 
-            size={20} 
-            color={post.liked ? '#0866ff' : '#65676b'} 
-          />
-          <Text style={[styles.actionText, post.liked && { color: '#0866ff' }]}>Thích</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={styles.actionButton} onPress={onComment}>
-          <Ionicons name="chatbubble-outline" size={20} color="#65676b" />
-          <Text style={styles.actionText}>Bình luận</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={styles.actionButton} onPress={onShare}>
-          <Ionicons name="share-outline" size={20} color="#65676b" />
-          <Text style={styles.actionText}>Chia sẻ</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={styles.actionButton} onPress={onSave}>
-          <Ionicons 
-            name={post.saved ? "bookmark" : "bookmark-outline"} 
-            size={20} 
-            color={post.saved ? '#0066CC' : '#65676b'} 
-          />
-        </TouchableOpacity>
-      </View>
-
-      {/* Post Time */}
-      <Text style={styles.postTime}>{post.time}</Text>
-    </View>
-  );
+const SPACING = {
+  xs: 4,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 20,
 };
 
-// Reel Item Component
-const ReelItem = ({ item, onPress }: { item: typeof REELS[0]; onPress: () => void }) => (
-  <TouchableOpacity style={styles.reelItem} onPress={onPress}>
-    <Image source={{ uri: item.thumbnail }} style={styles.reelThumbnail} />
-    <LinearGradient
-      colors={['transparent', 'rgba(0,0,0,0.7)']}
-      style={styles.reelOverlay}
-    >
-      <View style={styles.reelInfo}>
-        <View style={styles.reelViews}>
-          <Ionicons name="play" size={12} color="#fff" />
-          <Text style={styles.reelViewsText}>{item.views}</Text>
-        </View>
-        <Text style={styles.reelTitle} numberOfLines={2}>{item.title}</Text>
-      </View>
-    </LinearGradient>
-    <View style={styles.reelPlayIcon}>
-      <Ionicons name="play" size={24} color="#fff" />
-    </View>
-  </TouchableOpacity>
-);
+// ============================================
+// Filter Tabs
+// ============================================
+interface FilterTab {
+  id: FeedItemType | "all";
+  label: string;
+  icon: keyof typeof Ionicons.glyphMap;
+}
 
-// ==================== MAIN COMPONENT ====================
+const FILTER_TABS: FilterTab[] = [
+  { id: "all", label: "Tất cả", icon: "apps" },
+  { id: "development_plan", label: "Kế hoạch", icon: "flag" },
+  { id: "announcement", label: "Thông báo", icon: "megaphone" },
+  { id: "news", label: "Tin tức", icon: "newspaper" },
+  { id: "video", label: "Video", icon: "videocam" },
+  { id: "photo", label: "Ảnh", icon: "images" },
+];
 
-export default function SocialScreen() {
+// ============================================
+// Header Component
+// ============================================
+interface HeaderProps {
+  scrollY: SharedValue<number>;
+  onSearchPress: () => void;
+  onMessagesPress: () => void;
+}
+
+function Header({ scrollY, onSearchPress, onMessagesPress }: HeaderProps) {
   const insets = useSafeAreaInsets();
-  const { user } = useAuth();
-  const [refreshing, setRefreshing] = useState(false);
-  const [posts, setPosts] = useState(POSTS);
-  const [activeTab, setActiveTab] = useState<'feed' | 'reels'>('feed');
-  const [showCommentModal, setShowCommentModal] = useState(false);
-  const [selectedPost, setSelectedPost] = useState<typeof POSTS[0] | null>(null);
-  const [commentText, setCommentText] = useState('');
-  
-  const scrollY = useRef(new Animated.Value(0)).current;
-  
-  const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 1500);
-  }, []);
-  
-  const handleLike = (postId: number) => {
-    setPosts(prev => prev.map(p => 
-      p.id === postId 
-        ? { ...p, liked: !p.liked, likes: p.liked ? p.likes - 1 : p.likes + 1 } 
-        : p
-    ));
-  };
-  
-  const handleComment = (post: typeof POSTS[0]) => {
-    setSelectedPost(post);
-    setShowCommentModal(true);
-  };
-  
-  const handleShare = (postId: number) => {
-    // TODO: Implement share functionality
-    console.log('Share post:', postId);
-  };
-  
-  const handleSave = (postId: number) => {
-    setPosts(prev => prev.map(p => 
-      p.id === postId ? { ...p, saved: !p.saved } : p
-    ));
-  };
-  
-  const handleStoryPress = (story: typeof STORIES[0]) => {
-    if (story.isUser) {
-      // Open create post screen
-      router.push('/social/create-post');
-    } else {
-      // View story - navigate to story viewer
-      router.push(`/social/story-viewer?userId=user_${story.id}&index=${story.id}` as any);
-    }
-  };
-  
-  const handleUserPress = (userId: number, userName: string) => {
-    // Navigate to chat with this user
-    router.push(`/messages/chat/conv_social_${userId}` as `/messages/chat/${string}`);
-  };
-  
-  const handleReelPress = (reelId: number) => {
-    // Navigate to reels viewer
-    router.push(`/social/reels-viewer?id=reel_${reelId}` as any);
-  };
 
-  const handleCreatePost = () => {
-    // Navigate to create post screen
-    router.push('/social/create-post');
-  };
-
-  const handleVideoDiscovery = () => {
-    // Navigate to video discovery screen
-    router.push('/social/video-discovery');
-  };
-
-  // Header opacity based on scroll
-  const headerOpacity = scrollY.interpolate({
-    inputRange: [0, 100],
-    outputRange: [1, 0.9],
-    extrapolate: 'clamp',
+  const headerAnimatedStyle = useAnimatedStyle(() => {
+    const opacity = interpolate(scrollY.value, [0, 50], [0, 1], "clamp");
+    return {
+      backgroundColor: `rgba(255, 255, 255, ${opacity})`,
+      borderBottomColor: `rgba(206, 208, 212, ${opacity})`,
+    };
   });
 
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-      
-      {/* Header */}
-      <Animated.View style={[styles.header, { paddingTop: insets.top, opacity: headerOpacity }]}>
+    <Animated.View
+      style={[styles.header, { paddingTop: insets.top }, headerAnimatedStyle]}
+    >
+      <View style={styles.headerContent}>
         <Text style={styles.headerTitle}>Cộng đồng</Text>
         <View style={styles.headerActions}>
-          <TouchableOpacity style={styles.headerButton} onPress={handleCreatePost}>
-            <Ionicons name="add-circle-outline" size={26} color="#333" />
+          <TouchableOpacity style={styles.headerBtn} onPress={onSearchPress}>
+            <Ionicons name="search" size={22} color={COLORS.text} />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.headerButton} onPress={handleVideoDiscovery}>
-            <Ionicons name="search-outline" size={24} color="#333" />
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.headerButton}
-            onPress={() => router.push('/messages/unified')}
-          >
-            <Ionicons name="chatbubble-ellipses-outline" size={24} color="#333" />
-            <View style={styles.messageBadge}>
-              <Text style={styles.badgeText}>3</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-      </Animated.View>
-
-      {/* Tab Switcher */}
-      <View style={styles.tabSwitcher}>
-        <TouchableOpacity 
-          style={[styles.tabButton, activeTab === 'feed' && styles.tabButtonActive]}
-          onPress={() => setActiveTab('feed')}
-        >
-          <Ionicons 
-            name="newspaper-outline" 
-            size={20} 
-            color={activeTab === 'feed' ? '#0066CC' : '#65676b'} 
-          />
-          <Text style={[styles.tabText, activeTab === 'feed' && styles.tabTextActive]}>
-            Bảng tin
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={[styles.tabButton, activeTab === 'reels' && styles.tabButtonActive]}
-          onPress={() => setActiveTab('reels')}
-        >
-          <Ionicons 
-            name="film-outline" 
-            size={20} 
-            color={activeTab === 'reels' ? '#0066CC' : '#65676b'} 
-          />
-          <Text style={[styles.tabText, activeTab === 'reels' && styles.tabTextActive]}>
-            Reels
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      {activeTab === 'feed' ? (
-        <Animated.ScrollView
-          style={styles.content}
-          showsVerticalScrollIndicator={false}
-          onScroll={Animated.event(
-            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-            { useNativeDriver: true }
-          )}
-          scrollEventThrottle={16}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#0066CC']} />
-          }
-        >
-          {/* Stories Section */}
-          <View style={styles.storiesSection}>
-            <ScrollView 
-              horizontal 
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.storiesContainer}
-            >
-              {STORIES.map(story => (
-                <StoryItem 
-                  key={story.id} 
-                  item={story} 
-                  onPress={() => handleStoryPress(story)} 
-                />
-              ))}
-            </ScrollView>
-          </View>
-
-          {/* Create Post Card */}
-          <View style={styles.createPostCard}>
-            <Avatar name={user?.name || 'U'} size={40} />
-            <TouchableOpacity 
-              style={styles.createPostInput}
-              onPress={handleCreatePost}
-            >
-              <Text style={styles.createPostPlaceholder}>Bạn đang nghĩ gì?</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.createPostButton} onPress={handleCreatePost}>
-              <Ionicons name="images-outline" size={22} color="#45bd62" />
-            </TouchableOpacity>
-          </View>
-
-          {/* Video Discovery Banner */}
-          <TouchableOpacity style={styles.discoveryBanner} onPress={handleVideoDiscovery}>
-            <LinearGradient
-              colors={['#0066CC', '#004499']}
-              style={styles.discoveryBannerGradient}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-            >
-              <View style={styles.discoveryBannerContent}>
-                <Ionicons name="play-circle" size={32} color="#fff" />
-                <View style={styles.discoveryBannerText}>
-                  <Text style={styles.discoveryBannerTitle}>Video xây dựng miễn phí</Text>
-                  <Text style={styles.discoveryBannerSubtitle}>Hàng ngàn video từ chuyên gia</Text>
-                </View>
-              </View>
-              <Ionicons name="chevron-forward" size={24} color="#fff" />
-            </LinearGradient>
-          </TouchableOpacity>
-
-          {/* Reels Preview */}
-          <View style={styles.reelsPreviewSection}>
-            <View style={styles.sectionHeader}>
-              <View style={styles.sectionTitleRow}>
-                <Ionicons name="film" size={20} color="#0066CC" />
-                <Text style={styles.sectionTitle}>Reels</Text>
-              </View>
-              <TouchableOpacity onPress={handleVideoDiscovery}>
-                <Text style={styles.seeAllText}>Khám phá</Text>
-              </TouchableOpacity>
-            </View>
-            <ScrollView 
-              horizontal 
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.reelsContainer}
-            >
-              {REELS.map(reel => (
-                <ReelItem 
-                  key={reel.id} 
-                  item={reel} 
-                  onPress={() => handleReelPress(reel.id)} 
-                />
-              ))}
-            </ScrollView>
-          </View>
-
-          {/* Posts Feed */}
-          {posts.map(post => (
-            <PostCard
-              key={post.id}
-              post={post}
-              onLike={() => handleLike(post.id)}
-              onComment={() => handleComment(post)}
-              onShare={() => handleShare(post.id)}
-              onSave={() => handleSave(post.id)}
-              onUserPress={() => handleUserPress(post.user.id, post.user.name)}
+          <TouchableOpacity style={styles.headerBtn} onPress={onMessagesPress}>
+            <Ionicons
+              name="chatbubble-ellipses"
+              size={22}
+              color={COLORS.text}
             />
-          ))}
-
-          <View style={{ height: 100 }} />
-        </Animated.ScrollView>
-      ) : (
-        // Reels Tab
-        <FlatList
-          data={REELS}
-          numColumns={2}
-          keyExtractor={(item) => item.id.toString()}
-          contentContainerStyle={styles.reelsGrid}
-          renderItem={({ item }) => (
-            <TouchableOpacity 
-              style={styles.reelGridItem} 
-              onPress={() => handleReelPress(item.id)}
-            >
-              <Image source={{ uri: item.thumbnail }} style={styles.reelGridThumbnail} />
-              <LinearGradient
-                colors={['transparent', 'rgba(0,0,0,0.8)']}
-                style={styles.reelGridOverlay}
-              >
-                <View style={styles.reelGridInfo}>
-                  <View style={styles.reelViews}>
-                    <Ionicons name="play" size={14} color="#fff" />
-                    <Text style={styles.reelViewsText}>{item.views}</Text>
-                  </View>
-                </View>
-              </LinearGradient>
-              <View style={styles.reelGridPlayIcon}>
-                <Ionicons name="play-circle" size={40} color="rgba(255,255,255,0.9)" />
-              </View>
-            </TouchableOpacity>
-          )}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#0066CC']} />
-          }
-        />
-      )}
-
-      {/* Comment Modal */}
-      <Modal
-        visible={showCommentModal}
-        animationType="slide"
-        transparent
-        onRequestClose={() => setShowCommentModal(false)}
-      >
-        <View style={styles.commentModalOverlay}>
-          <View style={styles.commentModalContent}>
-            <View style={styles.commentModalHeader}>
-              <Text style={styles.commentModalTitle}>Bình luận</Text>
-              <TouchableOpacity onPress={() => setShowCommentModal(false)}>
-                <Ionicons name="close" size={24} color="#333" />
-              </TouchableOpacity>
-            </View>
-            
-            <ScrollView style={styles.commentsList}>
-              {/* Sample comments */}
-              {[
-                { id: 1, user: 'Nguyễn Văn A', content: 'Thiết kế đẹp quá! 👍', time: '1 giờ' },
-                { id: 2, user: 'Trần Thị B', content: 'Cho em hỏi giá bao nhiêu ạ?', time: '2 giờ' },
-                { id: 3, user: 'Lê Văn C', content: 'Rất chuyên nghiệp!', time: '3 giờ' },
-              ].map(comment => (
-                <View key={comment.id} style={styles.commentItem}>
-                  <Avatar name={comment.user} size={36} />
-                  <View style={styles.commentContent}>
-                    <View style={styles.commentBubble}>
-                      <Text style={styles.commentUser}>{comment.user}</Text>
-                      <Text style={styles.commentText}>{comment.content}</Text>
-                    </View>
-                    <View style={styles.commentActions}>
-                      <Text style={styles.commentTime}>{comment.time}</Text>
-                      <TouchableOpacity>
-                        <Text style={styles.commentAction}>Thích</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity>
-                        <Text style={styles.commentAction}>Trả lời</Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                </View>
-              ))}
-            </ScrollView>
-            
-            <View style={styles.commentInputContainer}>
-              <Avatar name={user?.name || 'U'} size={32} />
-              <TextInput
-                style={styles.commentInput}
-                placeholder="Viết bình luận..."
-                placeholderTextColor="#999"
-                value={commentText}
-                onChangeText={setCommentText}
-              />
-              <TouchableOpacity 
-                style={styles.sendButton}
-                disabled={!commentText.trim()}
-              >
-                <Ionicons 
-                  name="send" 
-                  size={20} 
-                  color={commentText.trim() ? '#0866ff' : '#ccc'} 
-                />
-              </TouchableOpacity>
-            </View>
-          </View>
+          </TouchableOpacity>
         </View>
-      </Modal>
+      </View>
+    </Animated.View>
+  );
+}
+
+// ============================================
+// Stories Section
+// ============================================
+interface StoriesSectionProps {
+  items: CommunityFeedItem[];
+  onStoryPress: (item: CommunityFeedItem) => void;
+  onCreateStory: () => void;
+}
+
+function StoriesSection({
+  items,
+  onStoryPress,
+  onCreateStory,
+}: StoriesSectionProps) {
+  const { user } = useAuth();
+
+  // Get items with images for stories
+  const storyItems = useMemo(() => {
+    return items.filter((item) => item.imageUrl).slice(0, 10);
+  }, [items]);
+
+  if (storyItems.length === 0) return null;
+
+  return (
+    <Animated.View
+      entering={FadeInDown.duration(400)}
+      style={styles.storiesContainer}
+    >
+      <FlatList
+        data={storyItems}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.storiesList}
+        keyExtractor={(item) => `story-${item.id}`}
+        ListHeaderComponent={
+          <TouchableOpacity
+            style={styles.createStoryCard}
+            onPress={onCreateStory}
+          >
+            <View style={styles.createStoryImageContainer}>
+              {user?.avatar ? (
+                <Image
+                  source={{ uri: user.avatar }}
+                  style={styles.createStoryUserImage}
+                />
+              ) : (
+                <View style={styles.createStoryPlaceholder}>
+                  <Ionicons
+                    name="person"
+                    size={32}
+                    color={COLORS.textSecondary}
+                  />
+                </View>
+              )}
+              <View style={styles.createStoryPlusBtn}>
+                <Ionicons name="add" size={18} color="white" />
+              </View>
+            </View>
+            <Text style={styles.createStoryText}>Tạo tin</Text>
+          </TouchableOpacity>
+        }
+        renderItem={({ item, index }) => (
+          <Animated.View
+            entering={SlideInRight.delay(index * 50).duration(300)}
+          >
+            <StoryCard item={item} onPress={() => onStoryPress(item)} />
+          </Animated.View>
+        )}
+      />
+    </Animated.View>
+  );
+}
+
+// ============================================
+// Filter Chips
+// ============================================
+interface FilterChipsProps {
+  activeFilter: FeedItemType | "all";
+  onFilterChange: (filter: FeedItemType | "all") => void;
+  counts: Record<string, number>;
+}
+
+function FilterChips({
+  activeFilter,
+  onFilterChange,
+  counts,
+}: FilterChipsProps) {
+  return (
+    <View style={styles.filterChipsContainer}>
+      <FlatList
+        data={FILTER_TABS}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.filterChipsList}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => {
+          const isActive = activeFilter === item.id;
+          const count = counts[item.id] || 0;
+
+          return (
+            <TouchableOpacity
+              style={[styles.filterChip, isActive && styles.filterChipActive]}
+              onPress={() => onFilterChange(item.id)}
+            >
+              <Ionicons
+                name={item.icon}
+                size={16}
+                color={isActive ? "white" : COLORS.text}
+              />
+              <Text
+                style={[
+                  styles.filterChipText,
+                  isActive && styles.filterChipTextActive,
+                ]}
+              >
+                {item.label}
+              </Text>
+              {count > 0 && item.id !== "all" && (
+                <View
+                  style={[
+                    styles.filterChipBadge,
+                    isActive && styles.filterChipBadgeActive,
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.filterChipBadgeText,
+                      isActive && styles.filterChipBadgeTextActive,
+                    ]}
+                  >
+                    {count > 99 ? "99+" : count}
+                  </Text>
+                </View>
+              )}
+            </TouchableOpacity>
+          );
+        }}
+      />
     </View>
   );
 }
 
-// ==================== STYLES ====================
+// ============================================
+// Search Modal
+// ============================================
+interface SearchModalProps {
+  visible: boolean;
+  onClose: () => void;
+  onSearch: (query: string) => void;
+}
 
+function SearchModal({ visible, onClose, onSearch }: SearchModalProps) {
+  const [searchText, setSearchText] = useState("");
+  const insets = useSafeAreaInsets();
+
+  const handleSearch = () => {
+    if (searchText.trim()) {
+      onSearch(searchText.trim());
+      onClose();
+    }
+  };
+
+  const handleClear = () => setSearchText("");
+
+  return (
+    <Modal
+      visible={visible}
+      animationType="slide"
+      transparent
+      onRequestClose={onClose}
+    >
+      <View style={[styles.searchModalContainer, { paddingTop: insets.top }]}>
+        <View style={styles.searchModalHeader}>
+          <TouchableOpacity onPress={onClose} style={styles.searchBackBtn}>
+            <Ionicons name="arrow-back" size={24} color={COLORS.text} />
+          </TouchableOpacity>
+
+          <View style={styles.searchInputContainer}>
+            <Ionicons name="search" size={20} color={COLORS.textSecondary} />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Tìm kiếm trong cộng đồng..."
+              placeholderTextColor={COLORS.textTertiary}
+              value={searchText}
+              onChangeText={setSearchText}
+              onSubmitEditing={handleSearch}
+              autoFocus
+              returnKeyType="search"
+            />
+            {searchText.length > 0 && (
+              <TouchableOpacity onPress={handleClear}>
+                <Ionicons
+                  name="close-circle"
+                  size={20}
+                  color={COLORS.textSecondary}
+                />
+              </TouchableOpacity>
+            )}
+          </View>
+        </View>
+
+        {/* Search Suggestions */}
+        <View style={styles.searchSuggestions}>
+          <Text style={styles.searchSuggestionsTitle}>Tìm kiếm gần đây</Text>
+          {["Tin tức xây dựng", "Kế hoạch phát triển", "Thông báo mới"].map(
+            (suggestion, i) => (
+              <TouchableOpacity
+                key={i}
+                style={styles.searchSuggestionItem}
+                onPress={() => {
+                  setSearchText(suggestion);
+                  onSearch(suggestion);
+                  onClose();
+                }}
+              >
+                <Ionicons
+                  name="time-outline"
+                  size={20}
+                  color={COLORS.textSecondary}
+                />
+                <Text style={styles.searchSuggestionText}>{suggestion}</Text>
+              </TouchableOpacity>
+            )
+          )}
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
+// ============================================
+// Loading / Empty / Error States
+// ============================================
+function LoadingFooter() {
+  return (
+    <View style={styles.loadingFooter}>
+      <ActivityIndicator size="small" color={COLORS.primary} />
+      <Text style={styles.loadingFooterText}>Đang tải thêm...</Text>
+    </View>
+  );
+}
+
+function EmptyState({ filter }: { filter: string }) {
+  const message =
+    filter === "all"
+      ? "Chưa có nội dung nào trong cộng đồng"
+      : `Chưa có ${FILTER_TABS.find((t) => t.id === filter)?.label.toLowerCase() || "nội dung"} nào`;
+
+  return (
+    <View style={styles.emptyState}>
+      <Ionicons
+        name="newspaper-outline"
+        size={64}
+        color={COLORS.textTertiary}
+      />
+      <Text style={styles.emptyStateTitle}>Không có nội dung</Text>
+      <Text style={styles.emptyStateText}>{message}</Text>
+    </View>
+  );
+}
+
+function ErrorState({
+  message,
+  onRetry,
+}: {
+  message: string;
+  onRetry: () => void;
+}) {
+  return (
+    <View style={styles.errorState}>
+      <Ionicons name="alert-circle-outline" size={64} color="#EF4444" />
+      <Text style={styles.errorStateTitle}>Có lỗi xảy ra</Text>
+      <Text style={styles.errorStateText}>{message}</Text>
+      <TouchableOpacity style={styles.retryButton} onPress={onRetry}>
+        <Ionicons name="refresh" size={18} color="white" />
+        <Text style={styles.retryButtonText}>Thử lại</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+// ============================================
+// Main Screen Component
+// ============================================
+export default function SocialScreen() {
+  const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const { user } = useAuth();
+
+  // State
+  const [activeFilter, setActiveFilter] = useState<FeedItemType | "all">("all");
+  const [searchModalVisible, setSearchModalVisible] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Animation
+  const scrollY = useSharedValue(0);
+  const flatListRef = useRef<FlatList>(null);
+
+  // Use community feed hook
+  const {
+    items,
+    isLoading,
+    isRefreshing,
+    isLoadingMore,
+    error,
+    hasMore,
+    sources,
+    refresh,
+    loadMore,
+    search,
+  } = useCommunityFeed({
+    pageSize: 30,
+    autoRefresh: false,
+  });
+
+  // Filter items based on active filter and search
+  const filteredItems = useMemo(() => {
+    let result = items;
+
+    // Apply type filter
+    if (activeFilter !== "all") {
+      result = result.filter((item) => item.type === activeFilter);
+    }
+
+    // Apply search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter(
+        (item) =>
+          item.title.toLowerCase().includes(query) ||
+          item.description?.toLowerCase().includes(query)
+      );
+    }
+
+    return result;
+  }, [items, activeFilter, searchQuery]);
+
+  // Count items by type
+  const typeCounts = useMemo(() => {
+    const counts: Record<string, number> = { all: items.length };
+    items.forEach((item) => {
+      counts[item.type] = (counts[item.type] || 0) + 1;
+    });
+    return counts;
+  }, [items]);
+
+  // Handlers
+  const handleScroll = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      scrollY.value = event.nativeEvent.contentOffset.y;
+    },
+    []
+  );
+
+  const handleRefresh = useCallback(() => {
+    setSearchQuery("");
+    refresh();
+  }, [refresh]);
+
+  const handleLoadMore = useCallback(() => {
+    if (!isLoadingMore && hasMore) {
+      loadMore();
+    }
+  }, [isLoadingMore, hasMore, loadMore]);
+
+  const handleFilterChange = useCallback((filter: FeedItemType | "all") => {
+    setActiveFilter(filter);
+    // Scroll to top when filter changes
+    flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
+  }, []);
+
+  const handleSearch = useCallback(
+    (query: string) => {
+      setSearchQuery(query);
+      search(query);
+    },
+    [search]
+  );
+
+  const handleStoryPress = useCallback(
+    (item: CommunityFeedItem) => {
+      // Navigate based on item type
+      switch (item.type) {
+        case "video":
+          router.push("/demo-videos");
+          break;
+        case "photo":
+          router.push("/pexels-gallery");
+          break;
+        case "news":
+          if ((item as any).url) {
+            router.push(
+              `/webview?url=${encodeURIComponent((item as any).url)}` as any
+            );
+          }
+          break;
+        default:
+          break;
+      }
+    },
+    [router]
+  );
+
+  const handleCreatePost = useCallback(() => {
+    router.push("/community/create-post" as any);
+  }, [router]);
+
+  const handleCreateStory = useCallback(() => {
+    // Navigate to create story screen
+    console.log("Create story");
+  }, []);
+
+  // Render Header Component (stories + create post + filters)
+  const renderListHeader = useCallback(() => {
+    return (
+      <View>
+        {/* Stories */}
+        <StoriesSection
+          items={items}
+          onStoryPress={handleStoryPress}
+          onCreateStory={handleCreateStory}
+        />
+
+        {/* Create Post */}
+        <CreatePostCard userAvatar={user?.avatar} onPress={handleCreatePost} />
+
+        {/* Filter Chips */}
+        <FilterChips
+          activeFilter={activeFilter}
+          onFilterChange={handleFilterChange}
+          counts={typeCounts}
+        />
+
+        {/* Source Stats (mini) */}
+        <View style={styles.sourceStatsBar}>
+          <View style={styles.sourceStatItem}>
+            <View
+              style={[styles.sourceStatDot, { backgroundColor: "#10B981" }]}
+            />
+            <Text style={styles.sourceStatLabel}>
+              Backend: {sources.backend}
+            </Text>
+          </View>
+          <View style={styles.sourceStatItem}>
+            <View
+              style={[styles.sourceStatDot, { backgroundColor: "#3B82F6" }]}
+            />
+            <Text style={styles.sourceStatLabel}>GNews: {sources.gnews}</Text>
+          </View>
+          <View style={styles.sourceStatItem}>
+            <View
+              style={[styles.sourceStatDot, { backgroundColor: "#8B5CF6" }]}
+            />
+            <Text style={styles.sourceStatLabel}>Pexels: {sources.pexels}</Text>
+          </View>
+        </View>
+      </View>
+    );
+  }, [
+    items,
+    activeFilter,
+    typeCounts,
+    sources,
+    user,
+    handleStoryPress,
+    handleCreateStory,
+    handleCreatePost,
+    handleFilterChange,
+  ]);
+
+  // Render Item
+  const renderItem = useCallback(({ item }: { item: CommunityFeedItem }) => {
+    return <FacebookFeedCard item={item} />;
+  }, []);
+
+  // Render Footer
+  const renderListFooter = useCallback(() => {
+    if (isLoadingMore) {
+      return <LoadingFooter />;
+    }
+    if (!hasMore && filteredItems.length > 0) {
+      return (
+        <View style={styles.endOfFeed}>
+          <Text style={styles.endOfFeedText}>Bạn đã xem hết nội dung 🎉</Text>
+        </View>
+      );
+    }
+    return null;
+  }, [isLoadingMore, hasMore, filteredItems.length]);
+
+  // Key extractor
+  const keyExtractor = useCallback(
+    (item: CommunityFeedItem) => `feed-${item.id}-${item.type}`,
+    []
+  );
+
+  return (
+    <View style={[styles.container, { paddingTop: insets.top }]}>
+      <StatusBar barStyle="dark-content" backgroundColor={COLORS.surface} />
+
+      {/* Header */}
+      <Header
+        scrollY={scrollY}
+        onSearchPress={() => setSearchModalVisible(true)}
+        onMessagesPress={() => router.push("/messages" as any)}
+      />
+
+      {/* Main Content */}
+      {isLoading && !isRefreshing ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={COLORS.primary} />
+          <Text style={styles.loadingText}>Đang tải nội dung...</Text>
+        </View>
+      ) : error ? (
+        <ErrorState message={error} onRetry={handleRefresh} />
+      ) : (
+        <FlatList
+          ref={flatListRef}
+          data={filteredItems}
+          renderItem={renderItem}
+          keyExtractor={keyExtractor}
+          ListHeaderComponent={renderListHeader}
+          ListFooterComponent={renderListFooter}
+          ListEmptyComponent={<EmptyState filter={activeFilter} />}
+          onScroll={handleScroll}
+          scrollEventThrottle={16}
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.3}
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefreshing}
+              onRefresh={handleRefresh}
+              colors={[COLORS.primary]}
+              tintColor={COLORS.primary}
+            />
+          }
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.feedList}
+          removeClippedSubviews={Platform.OS === "android"}
+          maxToRenderPerBatch={10}
+          windowSize={10}
+          initialNumToRender={5}
+        />
+      )}
+
+      {/* Search Modal */}
+      <SearchModal
+        visible={searchModalVisible}
+        onClose={() => setSearchModalVisible(false)}
+        onSearch={handleSearch}
+      />
+    </View>
+  );
+}
+
+// ============================================
+// Styles
+// ============================================
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f0f2f5',
+    backgroundColor: COLORS.background,
   },
-  
+
   // Header
   header: {
-    backgroundColor: '#fff',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingBottom: 8,
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 100,
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e5e5',
+    borderBottomColor: "transparent",
+  },
+  headerContent: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.sm,
+    backgroundColor: COLORS.surface,
   },
   headerTitle: {
     fontSize: 24,
-    fontWeight: '700',
-    color: '#0066CC',
+    fontWeight: "bold",
+    color: COLORS.primary,
   },
   headerActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+    flexDirection: "row",
+    gap: SPACING.xs,
   },
-  headerButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#f0f2f5',
-    justifyContent: 'center',
-    alignItems: 'center',
+  headerBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: COLORS.background,
+    justifyContent: "center",
+    alignItems: "center",
   },
-  messageBadge: {
-    position: 'absolute',
-    top: -2,
-    right: -2,
-    backgroundColor: '#0066CC',
-    borderRadius: 10,
-    minWidth: 16,
-    height: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 4,
+
+  // Feed List
+  feedList: {
+    paddingTop: 56, // Header height
   },
-  badgeText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: '#fff',
-  },
-  
-  // Tab Switcher
-  tabSwitcher: {
-    flexDirection: 'row',
-    backgroundColor: '#fff',
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e5e5e5',
-  },
-  tabButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 12,
-    gap: 6,
-    borderBottomWidth: 2,
-    borderBottomColor: 'transparent',
-  },
-  tabButtonActive: {
-    borderBottomColor: '#0066CC',
-  },
-  tabText: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#65676b',
-  },
-  tabTextActive: {
-    color: '#0066CC',
-  },
-  
-  // Content
-  content: {
-    flex: 1,
-  },
-  
+
   // Stories
-  storiesSection: {
-    backgroundColor: '#fff',
-    paddingVertical: 12,
-    marginBottom: 8,
-  },
   storiesContainer: {
-    paddingHorizontal: 12,
-    gap: 12,
+    backgroundColor: COLORS.surface,
+    paddingVertical: SPACING.md,
+    marginBottom: SPACING.sm,
   },
-  storyItem: {
-    alignItems: 'center',
-    width: 72,
+  storiesList: {
+    paddingHorizontal: SPACING.md,
   },
-  storyAvatarContainer: {
-    marginBottom: 4,
-  },
-  storyRing: {
-    width: 68,
-    height: 68,
-    borderRadius: 34,
-    padding: 3,
-  },
-  storyAvatarWrapper: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 31,
-    borderWidth: 3,
-    borderColor: '#fff',
-    overflow: 'hidden',
-  },
-  storyAvatar: {
-    width: '100%',
-    height: '100%',
-  },
-  addStoryButton: {
-    position: 'relative',
-  },
-  addStoryIcon: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    backgroundColor: '#0866ff',
-    borderRadius: 12,
-    width: 22,
-    height: 22,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#fff',
-  },
-  storyName: {
-    fontSize: 11,
-    color: '#333',
-    textAlign: 'center',
-    width: 72,
-  },
-  
-  // Create Post
-  createPostCard: {
-    backgroundColor: '#fff',
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 12,
-    marginBottom: 8,
-    gap: 12,
-  },
-  createPostInput: {
-    flex: 1,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#f0f2f5',
-    justifyContent: 'center',
-    paddingHorizontal: 16,
-  },
-  createPostPlaceholder: {
-    color: '#65676b',
-    fontSize: 14,
-  },
-  createPostButton: {
-    padding: 4,
-  },
-  
-  // Discovery Banner
-  discoveryBanner: {
-    marginHorizontal: 12,
-    marginBottom: 8,
-    borderRadius: 12,
-    overflow: 'hidden',
-  },
-  discoveryBannerGradient: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-  },
-  discoveryBannerContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  discoveryBannerText: {},
-  discoveryBannerTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#fff',
-  },
-  discoveryBannerSubtitle: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.9)',
-    marginTop: 2,
-  },
-  
-  // Reels Preview
-  reelsPreviewSection: {
-    backgroundColor: '#fff',
-    paddingVertical: 12,
-    marginBottom: 8,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    marginBottom: 12,
-  },
-  sectionTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#333',
-  },
-  seeAllText: {
-    fontSize: 14,
-    color: '#0866ff',
-  },
-  reelsContainer: {
-    paddingHorizontal: 12,
-    gap: 8,
-  },
-  reelItem: {
+  createStoryCard: {
     width: 110,
     height: 180,
+    marginRight: SPACING.sm,
     borderRadius: 12,
-    overflow: 'hidden',
-    backgroundColor: '#f0f0f0',
+    overflow: "hidden",
+    backgroundColor: COLORS.background,
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
-  reelThumbnail: {
-    width: '100%',
-    height: '100%',
-  },
-  reelOverlay: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 80,
-    justifyContent: 'flex-end',
-    padding: 8,
-  },
-  reelInfo: {
-    gap: 4,
-  },
-  reelViews: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  reelViewsText: {
-    fontSize: 12,
-    color: '#fff',
-    fontWeight: '600',
-  },
-  reelTitle: {
-    fontSize: 12,
-    color: '#fff',
-    fontWeight: '500',
-  },
-  reelPlayIcon: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: [{ translateX: -12 }, { translateY: -12 }],
-    opacity: 0.8,
-  },
-  
-  // Post Card
-  postCard: {
-    backgroundColor: '#fff',
-    marginBottom: 8,
-  },
-  postHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 12,
-  },
-  postAvatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-  },
-  postUserInfo: {
+  createStoryImageContainer: {
     flex: 1,
-    marginLeft: 12,
+    justifyContent: "center",
+    alignItems: "center",
+    position: "relative",
   },
-  postUserNameRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  createStoryUserImage: {
+    width: 80,
+    height: 120,
+    borderRadius: 8,
   },
-  postUserName: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#333',
+  createStoryPlaceholder: {
+    width: 80,
+    height: 120,
+    borderRadius: 8,
+    backgroundColor: COLORS.border,
+    justifyContent: "center",
+    alignItems: "center",
   },
-  postUserRole: {
+  createStoryPlusBtn: {
+    position: "absolute",
+    bottom: -14,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: COLORS.primary,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 3,
+    borderColor: COLORS.surface,
+  },
+  createStoryText: {
+    textAlign: "center",
     fontSize: 12,
-    color: '#65676b',
-    marginTop: 2,
+    fontWeight: "500",
+    color: COLORS.text,
+    paddingVertical: SPACING.sm,
   },
-  postMoreButton: {
-    padding: 8,
+
+  // Filter Chips
+  filterChipsContainer: {
+    backgroundColor: COLORS.surface,
+    paddingVertical: SPACING.sm,
+    marginBottom: SPACING.sm,
   },
-  postContent: {
-    paddingHorizontal: 12,
-    paddingBottom: 12,
+  filterChipsList: {
+    paddingHorizontal: SPACING.md,
+    gap: SPACING.sm,
   },
-  postText: {
-    fontSize: 14,
-    color: '#333',
-    lineHeight: 20,
-  },
-  seeMoreText: {
-    color: '#65676b',
-    fontSize: 14,
-    marginTop: 4,
-  },
-  postImagesContainer: {
-    position: 'relative',
-  },
-  postSingleImage: {
-    width: SCREEN_WIDTH,
-    height: SCREEN_WIDTH * 0.75,
-    backgroundColor: '#f0f0f0',
-  },
-  postMultiImage: {
-    width: SCREEN_WIDTH,
-    height: SCREEN_WIDTH * 0.75,
-    backgroundColor: '#f0f0f0',
-  },
-  imagePagination: {
-    position: 'absolute',
-    bottom: 12,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    justifyContent: 'center',
+  filterChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
+    borderRadius: 20,
+    backgroundColor: COLORS.background,
     gap: 6,
+    marginRight: SPACING.sm,
   },
-  paginationDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: 'rgba(255,255,255,0.5)',
+  filterChipActive: {
+    backgroundColor: COLORS.primary,
   },
-  paginationDotActive: {
-    backgroundColor: '#fff',
+  filterChipText: {
+    fontSize: 13,
+    fontWeight: "500",
+    color: COLORS.text,
+  },
+  filterChipTextActive: {
+    color: "white",
+  },
+  filterChipBadge: {
+    minWidth: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: COLORS.border,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 6,
+  },
+  filterChipBadgeActive: {
+    backgroundColor: "rgba(255,255,255,0.3)",
+  },
+  filterChipBadgeText: {
+    fontSize: 11,
+    fontWeight: "600",
+    color: COLORS.text,
+  },
+  filterChipBadgeTextActive: {
+    color: "white",
+  },
+
+  // Source Stats Bar
+  sourceStatsBar: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: SPACING.lg,
+    paddingVertical: SPACING.sm,
+    backgroundColor: COLORS.surface,
+    marginBottom: SPACING.sm,
+  },
+  sourceStatItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  sourceStatDot: {
     width: 8,
     height: 8,
     borderRadius: 4,
   },
-  postStats: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e5e5e5',
-  },
-  postLikesCount: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  likeIconsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  reactionIcon: {
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1.5,
-    borderColor: '#fff',
-  },
-  statsText: {
-    fontSize: 13,
-    color: '#65676b',
-  },
-  postActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-  },
-  actionButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 8,
-    gap: 6,
-  },
-  actionText: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: '#65676b',
-  },
-  postTime: {
+  sourceStatLabel: {
     fontSize: 11,
-    color: '#999',
-    paddingHorizontal: 12,
-    paddingBottom: 8,
+    color: COLORS.textSecondary,
   },
-  
-  // Reels Grid
-  reelsGrid: {
-    padding: 2,
-  },
-  reelGridItem: {
+
+  // Search Modal
+  searchModalContainer: {
     flex: 1,
-    margin: 2,
-    aspectRatio: 9 / 16,
-    borderRadius: 8,
-    overflow: 'hidden',
-    backgroundColor: '#f0f0f0',
+    backgroundColor: COLORS.surface,
   },
-  reelGridThumbnail: {
-    width: '100%',
-    height: '100%',
-  },
-  reelGridOverlay: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 60,
-    justifyContent: 'flex-end',
-    padding: 8,
-  },
-  reelGridInfo: {},
-  reelGridPlayIcon: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: [{ translateX: -20 }, { translateY: -20 }],
-  },
-  
-  // Comment Modal
-  commentModalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'flex-end',
-  },
-  commentModalContent: {
-    backgroundColor: '#fff',
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-    maxHeight: SCREEN_HEIGHT * 0.7,
-  },
-  commentModalHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+  searchModalHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e5e5',
+    borderBottomColor: COLORS.border,
   },
-  commentModalTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#333',
+  searchBackBtn: {
+    padding: SPACING.sm,
+    marginRight: SPACING.sm,
   },
-  commentsList: {
-    padding: 12,
-    maxHeight: SCREEN_HEIGHT * 0.45,
-  },
-  commentItem: {
-    flexDirection: 'row',
-    marginBottom: 16,
-    gap: 8,
-  },
-  commentContent: {
+  searchInputContainer: {
     flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: COLORS.background,
+    borderRadius: 20,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
+    gap: SPACING.sm,
   },
-  commentBubble: {
-    backgroundColor: '#f0f2f5',
-    borderRadius: 16,
-    padding: 10,
+  searchInput: {
+    flex: 1,
+    fontSize: 15,
+    color: COLORS.text,
   },
-  commentUser: {
+  searchSuggestions: {
+    padding: SPACING.lg,
+  },
+  searchSuggestionsTitle: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: COLORS.textSecondary,
+    marginBottom: SPACING.md,
+  },
+  searchSuggestionItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: SPACING.md,
+    gap: SPACING.md,
+  },
+  searchSuggestionText: {
+    fontSize: 15,
+    color: COLORS.text,
+  },
+
+  // Loading States
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    marginTop: SPACING.md,
+    fontSize: 14,
+    color: COLORS.textSecondary,
+  },
+  loadingFooter: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: SPACING.xl,
+    gap: SPACING.sm,
+  },
+  loadingFooterText: {
     fontSize: 13,
-    fontWeight: '600',
-    color: '#333',
+    color: COLORS.textSecondary,
   },
-  commentText: {
-    fontSize: 14,
-    color: '#333',
-    marginTop: 2,
-  },
-  commentActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 4,
-    paddingLeft: 8,
-    gap: 16,
-  },
-  commentTime: {
-    fontSize: 12,
-    color: '#999',
-  },
-  commentAction: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#65676b',
-  },
-  commentInputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#e5e5e5',
-    gap: 10,
-  },
-  commentInput: {
+
+  // Empty State
+  emptyState: {
     flex: 1,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#f0f2f5',
-    paddingHorizontal: 16,
-    fontSize: 14,
-    color: '#333',
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 100,
+    paddingHorizontal: SPACING.xl,
   },
-  sendButton: {
-    padding: 4,
+  emptyStateTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: COLORS.text,
+    marginTop: SPACING.lg,
+  },
+  emptyStateText: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    textAlign: "center",
+    marginTop: SPACING.sm,
+  },
+
+  // Error State
+  errorState: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: SPACING.xl,
+  },
+  errorStateTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: COLORS.text,
+    marginTop: SPACING.lg,
+  },
+  errorStateText: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    textAlign: "center",
+    marginTop: SPACING.sm,
+  },
+  retryButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: COLORS.primary,
+    paddingHorizontal: SPACING.xl,
+    paddingVertical: SPACING.md,
+    borderRadius: 8,
+    marginTop: SPACING.lg,
+    gap: SPACING.sm,
+  },
+  retryButtonText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "white",
+  },
+
+  // End of Feed
+  endOfFeed: {
+    paddingVertical: SPACING.xl,
+    alignItems: "center",
+  },
+  endOfFeedText: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
   },
 });

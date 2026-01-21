@@ -1,8 +1,9 @@
+import { TappableImage } from '@/components/ui/full-media-viewer';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Ionicons } from '@expo/vector-icons';
 import { Stack, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const favoriteItems = [
   {
@@ -81,7 +82,7 @@ export default function FavoritesScreen() {
 
   const renderItem = ({ item }: { item: typeof favoriteItems[0] }) => (
     <TouchableOpacity style={[styles.itemCard, { backgroundColor: cardBg }]}>
-      <Image source={{ uri: item.image }} style={styles.itemImage} />
+      <TappableImage source={{ uri: item.image }} style={styles.itemImage} title={item.name} />
       <TouchableOpacity style={styles.heartBtn}>
         <Ionicons name="heart" size={20} color="#FF6B35" />
       </TouchableOpacity>

@@ -54,7 +54,7 @@ export interface RefreshTokenRequest {
 
 // ==================== USER TYPES ====================
 
-export type UserRole = 'ADMIN' | 'ENGINEER' | 'CLIENT' | 'CONTRACTOR';
+export type UserRole = "ADMIN" | "ENGINEER" | "CLIENT" | "CONTRACTOR";
 
 export interface User {
   id: number;
@@ -87,7 +87,12 @@ export interface UserFilters {
 
 // ==================== PROJECT TYPES ====================
 
-export type ProjectStatus = 'PLANNING' | 'IN_PROGRESS' | 'ON_HOLD' | 'COMPLETED' | 'CANCELLED';
+export type ProjectStatus =
+  | "PLANNING"
+  | "IN_PROGRESS"
+  | "ON_HOLD"
+  | "COMPLETED"
+  | "CANCELLED";
 
 export interface Project {
   id: number;
@@ -167,7 +172,7 @@ export interface PaymentSchedule {
   projectName: string;
   amount: number;
   dueDate: string;
-  status: 'paid' | 'pending' | 'overdue';
+  status: "paid" | "pending" | "overdue";
   description?: string;
 }
 
@@ -193,7 +198,7 @@ export interface ProjectUpdate {
   description: string;
   message?: string;
   timestamp?: string;
-  type: 'milestone' | 'payment' | 'status' | 'general';
+  type: "milestone" | "payment" | "status" | "general";
   createdAt: string;
   icon?: string;
 }
@@ -224,16 +229,22 @@ export interface Activity {
 }
 
 export interface SystemHealth {
-  status: 'healthy' | 'degraded' | 'down';
+  status: "healthy" | "degraded" | "down" | "warning" | "critical";
   uptime: number;
   cpu: number;
   memory: number;
+  disk: number;
 }
 
 // ==================== TASK TYPES ====================
 
-export type TaskStatus = 'TODO' | 'IN_PROGRESS' | 'IN_REVIEW' | 'COMPLETED' | 'CANCELLED';
-export type TaskPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
+export type TaskStatus =
+  | "TODO"
+  | "IN_PROGRESS"
+  | "IN_REVIEW"
+  | "COMPLETED"
+  | "CANCELLED";
+export type TaskPriority = "LOW" | "MEDIUM" | "HIGH" | "URGENT";
 
 export interface Task {
   id: number;
@@ -276,7 +287,11 @@ export interface TaskFilters {
 
 // ==================== TIMELINE TYPES ====================
 
-export type PhaseStatus = 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED' | 'DELAYED';
+export type PhaseStatus =
+  | "NOT_STARTED"
+  | "IN_PROGRESS"
+  | "COMPLETED"
+  | "DELAYED";
 
 export interface ProjectTimeline {
   projectId: number;
@@ -347,17 +362,22 @@ export interface CreatePhaseTaskData {
 
 export interface ReorderPhasesData {
   projectId: number;
-  phaseOrders: Array<{
+  phaseOrders: {
     phaseId: number;
     order: number;
-  }>;
+  }[];
 }
 
 // ==================== QC TYPES ====================
 
-export type QCStatus = 'PENDING' | 'IN_PROGRESS' | 'PASSED' | 'FAILED' | 'REQUIRES_REWORK';
-export type BugSeverity = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
-export type BugStatus = 'OPEN' | 'IN_PROGRESS' | 'RESOLVED' | 'CLOSED';
+export type QCStatus =
+  | "PENDING"
+  | "IN_PROGRESS"
+  | "PASSED"
+  | "FAILED"
+  | "REQUIRES_REWORK";
+export type BugSeverity = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+export type BugStatus = "OPEN" | "IN_PROGRESS" | "RESOLVED" | "CLOSED";
 
 export interface QCCategory {
   id: number;
@@ -479,11 +499,11 @@ export interface QCReport {
   totalBugs: number;
   openBugs: number;
   resolvedBugs: number;
-  bugsByPhase: Array<{
+  bugsByPhase: {
     phaseId: number;
     phaseName: string;
     bugCount: number;
-  }>;
+  }[];
   bugsBySeverity: {
     low: number;
     medium: number;
@@ -499,6 +519,7 @@ export interface UploadResponse {
   filename: string;
   size: number;
   mimeType: string;
+  thumbnailUrl?: string; // For video files
 }
 
 export interface MultiUploadResponse {
@@ -515,21 +536,21 @@ export interface PresignedUrlResponse {
 // ==================== PRODUCT TYPES ====================
 
 export enum ProductCategory {
-  ELECTRONICS = 'ELECTRONICS',
-  FASHION = 'FASHION',
-  HOME = 'HOME',
-  BEAUTY = 'BEAUTY',
-  SPORTS = 'SPORTS',
-  BOOKS = 'BOOKS',
-  TOYS = 'TOYS',
-  FOOD = 'FOOD',
-  OTHER = 'OTHER',
+  ELECTRONICS = "ELECTRONICS",
+  FASHION = "FASHION",
+  HOME = "HOME",
+  BEAUTY = "BEAUTY",
+  SPORTS = "SPORTS",
+  BOOKS = "BOOKS",
+  TOYS = "TOYS",
+  FOOD = "FOOD",
+  OTHER = "OTHER",
 }
 
 export enum ProductStatus {
-  PENDING = 'PENDING',
-  APPROVED = 'APPROVED',
-  REJECTED = 'REJECTED',
+  PENDING = "PENDING",
+  APPROVED = "APPROVED",
+  REJECTED = "REJECTED",
 }
 
 export interface Product {
@@ -591,6 +612,6 @@ export interface UpdateProductDto {
 }
 
 export interface UpdateProductStatusDto {
-  status: 'APPROVED' | 'REJECTED';
+  status: "APPROVED" | "REJECTED";
   rejectionReason?: string;
 }

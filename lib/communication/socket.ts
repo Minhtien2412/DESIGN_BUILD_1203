@@ -57,7 +57,7 @@ export class SocketManager {
   private reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
   private heartbeatInterval: ReturnType<typeof setInterval> | null = null;
   private eventListeners: Map<string, Set<EventCallback>> = new Map();
-  private messageQueue: Array<{ event: string; data: unknown }> = [];
+  private messageQueue: { event: string; data: unknown }[] = [];
   private userId: string | null = null;
 
   constructor(config: Partial<SocketConfig> = {}) {

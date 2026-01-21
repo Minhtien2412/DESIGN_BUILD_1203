@@ -66,7 +66,7 @@ interface FilterPanelProps {
   currentFilters: FilterCriteria;
   onApplyFilters: (criteria: FilterCriteria) => void;
   onClose: () => void;
-  assigneeOptions?: Array<{ id: string; name: string }>;
+  assigneeOptions?: { id: string; name: string }[];
   presets?: FilterPreset[];
   onSavePreset?: (name: string, criteria: FilterCriteria) => void;
   onDeletePreset?: (presetId: string) => void;

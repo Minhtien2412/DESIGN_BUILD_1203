@@ -59,10 +59,11 @@ export const LazyAnalyticsDashboard = withLazyLoading(
 
 /**
  * Lazy loaded media components (video players, image galleries)
+ * TODO: Create ImageGallery component or remove this export
  */
-export const LazyImageGallery = withLazyLoading(
-  () => import('@/components/media/ImageGallery').then((m) => ({ default: m.ImageGallery }))
-);
+// export const LazyImageGallery = withLazyLoading(
+//   () => import('@/components/media/ImageGallery').then((m) => ({ default: m.ImageGallery }))
+// );
 
 /**
  * Preload components for better UX
@@ -80,7 +81,7 @@ export function preloadComponent(
  * Batch preload multiple components
  */
 export function preloadComponents(
-  importFuncs: Array<() => Promise<any>>
+  importFuncs: (() => Promise<any>)[]
 ): void {
   importFuncs.forEach((importFunc) => {
     preloadComponent(importFunc);

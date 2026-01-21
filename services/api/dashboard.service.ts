@@ -29,6 +29,7 @@ const MOCK_ADMIN_DASHBOARD: AdminDashboard = {
     cpu: 45,
     memory: 62,
     disk: 38,
+    uptime: 99.9,
     status: 'healthy',
   },
 };

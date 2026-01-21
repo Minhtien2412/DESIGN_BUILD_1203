@@ -23,10 +23,16 @@ import AddressService, {
     Address,
     MOCK_ADDRESSES as FALLBACK_ADDRESSES
 } from '@/services/addressService';
+import {
+    createPayment,
+    PaymentOrder,
+    PaymentProvider,
+} from '@/services/paymentService';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import {
+    Alert,
     Image,
     RefreshControl,
     ScrollView,
@@ -57,16 +63,28 @@ const PAYMENT_METHODS: PaymentMethod[] = [
     description: 'Thanh toán bằng tiền mặt khi nhận hàng',
   },
   {
+    id: 'vnpay',
+    name: 'VNPay',
+    icon: 'card-outline',
+    description: 'Thanh toán qua cổng VNPay',
+  },
+  {
     id: 'momo',
     name: 'Ví MoMo',
     icon: 'wallet-outline',
     description: 'Thanh toán qua ví điện tử MoMo',
   },
   {
+    id: 'zalopay',
+    name: 'ZaloPay',
+    icon: 'wallet-outline',
+    description: 'Thanh toán qua ZaloPay',
+  },
+  {
     id: 'card',
     name: 'Thẻ tín dụng/Ghi nợ',
     icon: 'card-outline',
-    description: 'Visa, Mastercard, JCB',
+    description: 'Visa, Mastercard, JCB (Stripe)',
   },
   {
     id: 'banking',
@@ -124,15 +142,92 @@ export default function CheckoutScreen() {
 
   const formatPrice = (price: number) => price.toLocaleString('vi-VN');
 
-  const handlePlaceOrder = () => {
-    setCurrentStep('success');
-    // Clear cart after 2 seconds
-    setTimeout(() => {
-      clearCart();
+  const handlePlaceOrder = async () => {
+    // Map local payment method to API method
+    const paymentMethodMap: Record<string, PaymentProvider> = {
+      'vnpay': 'vnpay',
+      'momo': 'momo',
+      'zalopay': 'zalopay',
+      'card': 'stripe',
+      'banking': 'bank_transfer',
+    };
+
+    const apiMethod = paymentMethodMap[selectedPayment.id];
+    
+    // COD - direct success
+    if (selectedPayment.id === 'cod') {
+      setCurrentStep('success');
       setTimeout(() => {
-        router.replace('/(tabs)');
-      }, 1500);
-    }, 2000);
+        clearCart();
+        setTimeout(() => {
+          router.replace('/(tabs)');
+        }, 1500);
+      }, 2000);
+      return;
+    }
+
+    // Online payment - use payment service
+    if (apiMethod) {
+      try {
+        setLoading(true);
+        const orderId = `ORD-${Date.now()}`;
+        
+        const paymentOrder: PaymentOrder = {
+          id: orderId,
+          amount: totalPrice,
+          currency: 'VND',
+          description: `Thanh toán đơn hàng ${orderId}`,
+          customerName: selectedAddress.name,
+          customerPhone: selectedAddress.phone,
+          customerEmail: 'customer@example.com',
+        };
+
+        const result = await createPayment(apiMethod, paymentOrder);
+
+        if (result.success) {
+          if (result.status === 'processing') {
+            // Payment redirected to provider - already handled by createPayment
+            clearCart();
+            setCurrentStep('success');
+            setTimeout(() => {
+              router.replace('/(tabs)');
+            }, 3000);
+          } else if (result.status === 'pending' && apiMethod === 'bank_transfer') {
+            // Show bank transfer info
+            Alert.alert(
+              'Thông tin chuyển khoản',
+              `Số tài khoản: 1234567890\nNgân hàng: Vietcombank\nNội dung: ${orderId}\nSố tiền: ${formatPrice(totalPrice)}đ`,
+              [
+                {
+                  text: 'Đã chuyển khoản',
+                  onPress: () => {
+                    clearCart();
+                    setCurrentStep('success');
+                    setTimeout(() => router.replace('/(tabs)'), 3000);
+                  },
+                },
+              ]
+            );
+          }
+        } else {
+          Alert.alert('Lỗi', result.message || 'Không thể tạo thanh toán. Vui lòng thử lại.');
+        }
+      } catch (error) {
+        console.error('Payment error:', error);
+        Alert.alert('Lỗi', 'Đã xảy ra lỗi khi xử lý thanh toán');
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      // Fallback for unmapped methods
+      setCurrentStep('success');
+      setTimeout(() => {
+        clearCart();
+        setTimeout(() => {
+          router.replace('/(tabs)');
+        }, 1500);
+      }, 2000);
+    }
   };
 
   const renderProgressBar = () => {
@@ -619,6 +714,20 @@ const styles = StyleSheet.create({
     borderStyle: 'dashed',
     marginBottom: MODERN_SPACING.lg,
     gap: MODERN_SPACING.sm,
+  },
+  mockBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FEF3C7',
+    padding: MODERN_SPACING.sm,
+    borderRadius: MODERN_RADIUS.md,
+    marginBottom: MODERN_SPACING.md,
+    gap: MODERN_SPACING.xs,
+  },
+  mockBannerText: {
+    fontSize: MODERN_TYPOGRAPHY.fontSize.sm,
+    color: '#92400E',
+    fontWeight: MODERN_TYPOGRAPHY.fontWeight.medium,
   },
   addAddressText: {
     fontSize: MODERN_TYPOGRAPHY.fontSize.md,

@@ -28,7 +28,7 @@ export interface AnalyticsData {
   totalEvents: number;
   uniqueUsers: number;
   averageSessionDuration: number;
-  topFeatures: Array<{ feature: string; usageCount: number }>;
+  topFeatures: { feature: string; usageCount: number }[];
   userRetention: {
     daily: number;
     weekly: number;
@@ -186,7 +186,7 @@ export async function getAnalyticsSummary(
  */
 export async function getUserFlow(
   userId?: string
-): Promise<Array<{ step: string; count: number }>> {
+): Promise<{ step: string; count: number }[]> {
   try {
     const url = userId 
       ? `/analytics/user-flow?userId=${userId}`
@@ -205,7 +205,7 @@ export async function getUserFlow(
  */
 export async function getTopFeatures(
   limit: number = 10
-): Promise<Array<{ feature: string; count: number }>> {
+): Promise<{ feature: string; count: number }[]> {
   try {
     const response = await apiFetch(`/analytics/top-features?limit=${limit}`);
     return response.data;
@@ -222,7 +222,7 @@ export async function getErrorStats(
   dateRange?: { from: string; to: string }
 ): Promise<{
   totalErrors: number;
-  errorsByType: Array<{ type: string; count: number }>;
+  errorsByType: { type: string; count: number }[];
   errorRate: number;
 }> {
   try {

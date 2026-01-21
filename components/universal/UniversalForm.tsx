@@ -33,7 +33,7 @@ export interface FormField {
   placeholder?: string;
   required?: boolean;
   validation?: (value: any) => string | undefined;
-  options?: Array<{ label: string; value: any }>; // For select fields
+  options?: { label: string; value: any }[]; // For select fields
   multiline?: boolean;
   numberOfLines?: number;
   keyboardType?: "default" | "numeric" | "email-address" | "phone-pad";

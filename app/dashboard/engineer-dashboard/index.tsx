@@ -3,12 +3,12 @@
  * Dashboard for engineers with project-focused metrics
  */
 
-import { StatCard } from '@/components/dashboard/StatCard';
-import { useThemeColor } from '@/hooks/use-theme-color';
-import { dashboardApi } from '@/services/dashboardApi';
-import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { StatCard } from "@/components/dashboard/StatCard";
+import { useThemeColor } from "@/hooks/use-theme-color";
+import { dashboardApi } from "@/services/dashboardApi";
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import { useEffect, useState } from "react";
 import {
     ActivityIndicator,
     Pressable,
@@ -17,17 +17,18 @@ import {
     StyleSheet,
     Text,
     View,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function EngineerDashboardScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [stats, setStats] = useState<any>(null);
 
-  const backgroundColor = useThemeColor({}, 'background');
-  const textColor = useThemeColor({}, 'text');
-  const primaryColor = '#0080FF';
+  const backgroundColor = useThemeColor({}, "background");
+  const textColor = useThemeColor({}, "text");
+  const cardColor = useThemeColor({}, "card");
+  const primaryColor = "#0080FF";
 
   useEffect(() => {
     loadDashboard();
@@ -38,10 +39,10 @@ export default function EngineerDashboardScreen() {
       if (isRefresh) setRefreshing(true);
       else setLoading(true);
 
-      const data = await dashboardApi.getDashboard('engineer');
+      const data = await dashboardApi.getEngineerDashboard();
       setStats(data);
     } catch (error) {
-      console.error('Failed to load dashboard:', error);
+      console.error("Failed to load dashboard:", error);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -52,7 +53,7 @@ export default function EngineerDashboardScreen() {
     return (
       <SafeAreaView
         style={[styles.container, { backgroundColor }]}
-        edges={['top']}
+        edges={["top"]}
       >
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={primaryColor} />
@@ -67,7 +68,7 @@ export default function EngineerDashboardScreen() {
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor }]}
-      edges={['top']}
+      edges={["top"]}
     >
       {/* Header */}
       <View style={styles.header}>
@@ -107,7 +108,7 @@ export default function EngineerDashboardScreen() {
             value={stats?.pendingTasks || 0}
             subtitle="Pending"
             icon="checkbox-outline"
-            trend={{ value: 5, direction: 'down' }}
+            trend={{ value: 5, direction: "down" }}
             color="#007AFF"
           />
           <StatCard
@@ -122,7 +123,7 @@ export default function EngineerDashboardScreen() {
             value={`${Math.round(((stats?.completedTasks || 0) / (stats?.totalTasks || 1)) * 100)}%`}
             subtitle="Overall"
             icon="trending-up-outline"
-            trend={{ value: 12, direction: 'up' }}
+            trend={{ value: 12, direction: "up" }}
             color="#34C759"
           />
         </View>
@@ -134,8 +135,10 @@ export default function EngineerDashboardScreen() {
           </Text>
           <View style={styles.actionsGrid}>
             <Pressable
-              style={[styles.actionCard, { backgroundColor: '#007AFF20' }]}
-              onPress={() => router.push('/quality-assurance/inspections/create')}
+              style={[styles.actionCard, { backgroundColor: "#007AFF20" }]}
+              onPress={() =>
+                router.push("/quality-assurance/inspections/create")
+              }
             >
               <Ionicons name="clipboard-outline" size={32} color="#007AFF" />
               <Text style={[styles.actionLabel, { color: textColor }]}>
@@ -144,18 +147,22 @@ export default function EngineerDashboardScreen() {
             </Pressable>
 
             <Pressable
-              style={[styles.actionCard, { backgroundColor: '#FF950020' }]}
-              onPress={() => router.push('/daily-report')}
+              style={[styles.actionCard, { backgroundColor: "#FF950020" }]}
+              onPress={() => router.push("/daily-report")}
             >
-              <Ionicons name="document-text-outline" size={32} color="#FF9500" />
+              <Ionicons
+                name="document-text-outline"
+                size={32}
+                color="#FF9500"
+              />
               <Text style={[styles.actionLabel, { color: textColor }]}>
                 Daily Report
               </Text>
             </Pressable>
 
             <Pressable
-              style={[styles.actionCard, { backgroundColor: '#34C75920' }]}
-              onPress={() => router.push('/materials')}
+              style={[styles.actionCard, { backgroundColor: "#34C75920" }]}
+              onPress={() => router.push("/materials")}
             >
               <Ionicons name="cube-outline" size={32} color="#34C759" />
               <Text style={[styles.actionLabel, { color: textColor }]}>
@@ -164,10 +171,14 @@ export default function EngineerDashboardScreen() {
             </Pressable>
 
             <Pressable
-              style={[styles.actionCard, { backgroundColor: '#FF3B3020' }]}
-              onPress={() => router.push('/safety')}
+              style={[styles.actionCard, { backgroundColor: "#FF3B3020" }]}
+              onPress={() => router.push("/safety")}
             >
-              <Ionicons name="shield-checkmark-outline" size={32} color="#FF3B30" />
+              <Ionicons
+                name="shield-checkmark-outline"
+                size={32}
+                color="#FF3B30"
+              />
               <Text style={[styles.actionLabel, { color: textColor }]}>
                 Safety Check
               </Text>
@@ -182,36 +193,38 @@ export default function EngineerDashboardScreen() {
               Recent Activities
             </Text>
             <View style={styles.activitiesList}>
-              {stats.recentActivities.slice(0, 5).map((activity: any, index: number) => (
-                <View
-                  key={index}
-                  style={[
-                    styles.activityItem,
-                    { backgroundColor: useThemeColor({}, 'card') },
-                  ]}
-                >
+              {stats.recentActivities
+                .slice(0, 5)
+                .map((activity: any, index: number) => (
                   <View
+                    key={index}
                     style={[
-                      styles.activityIcon,
-                      { backgroundColor: `${primaryColor}20` },
+                      styles.activityItem,
+                      { backgroundColor: cardColor },
                     ]}
                   >
-                    <Ionicons
-                      name="checkmark-circle"
-                      size={16}
-                      color={primaryColor}
-                    />
+                    <View
+                      style={[
+                        styles.activityIcon,
+                        { backgroundColor: `${primaryColor}20` },
+                      ]}
+                    >
+                      <Ionicons
+                        name="checkmark-circle"
+                        size={16}
+                        color={primaryColor}
+                      />
+                    </View>
+                    <View style={styles.activityContent}>
+                      <Text style={[styles.activityText, { color: textColor }]}>
+                        {activity.description}
+                      </Text>
+                      <Text style={[styles.activityTime, { color: "#999" }]}>
+                        {new Date(activity.timestamp).toLocaleTimeString()}
+                      </Text>
+                    </View>
                   </View>
-                  <View style={styles.activityContent}>
-                    <Text style={[styles.activityText, { color: textColor }]}>
-                      {activity.description}
-                    </Text>
-                    <Text style={[styles.activityTime, { color: '#999' }]}>
-                      {new Date(activity.timestamp).toLocaleTimeString()}
-                    </Text>
-                  </View>
-                </View>
-              ))}
+                ))}
             </View>
           </View>
         )}
@@ -226,32 +239,32 @@ const styles = StyleSheet.create({
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     gap: 16,
   },
   loadingText: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingVertical: 16,
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     letterSpacing: -0.3,
   },
   content: {
     padding: 20,
   },
   statsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 12,
     marginBottom: 24,
   },
@@ -260,33 +273,33 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 16,
     letterSpacing: -0.3,
   },
   actionsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 12,
   },
   actionCard: {
-    width: '48%',
+    width: "48%",
     aspectRatio: 1,
     borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     gap: 12,
   },
   actionLabel: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   activitiesList: {
     gap: 8,
   },
   activityItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 12,
     padding: 12,
     borderRadius: 12,
@@ -295,19 +308,19 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   activityContent: {
     flex: 1,
   },
   activityText: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
     marginBottom: 2,
   },
   activityTime: {
     fontSize: 12,
-    fontWeight: '500',
+    fontWeight: "500",
   },
 });

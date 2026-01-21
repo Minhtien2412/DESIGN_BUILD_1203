@@ -1,3 +1,4 @@
+import { TappableImage } from '@/components/ui/full-media-viewer';
 import { useAuth } from '@/context/AuthContext';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Ionicons } from '@expo/vector-icons';
@@ -32,7 +33,7 @@ export interface ChatMessage {
   replyTo?: string;
 }
 
-interface ChatRoomProps {
+export interface ChatRoomProps {
   conversationId: string;
   recipientName: string;
   recipientAvatar?: string;
@@ -279,13 +280,13 @@ export function ChatRoom({ conversationId, recipientName, recipientAvatar, onBac
             </Text>
           )}
 
-          {item.type === 'image' && (
-            <TouchableOpacity onPress={() => {
-              // Open image in full screen
-              Alert.alert('Xem ảnh', 'Chức năng xem ảnh đầy đủ sẽ được thêm sau');
-            }}>
-              <Image source={{ uri: item.fileUrl }} style={styles.imageMessage} />
-            </TouchableOpacity>
+          {item.type === 'image' && item.fileUrl && (
+            <TappableImage 
+              source={{ uri: item.fileUrl }} 
+              style={styles.imageMessage}
+              title={`Ảnh từ ${item.senderName}`}
+              description={new Date(item.timestamp).toLocaleString('vi-VN')}
+            />
           )}
 
           {item.type === 'file' && (

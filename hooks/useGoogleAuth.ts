@@ -48,10 +48,9 @@ export function useGoogleAuth(): UseGoogleAuthReturn {
 
   // Build redirect URI - use Expo proxy for mobile (required for Expo Go)
   const redirectUri = AuthSession.makeRedirectUri({
-    // For Expo Go, useProxy creates: https://auth.expo.io/@username/slug
-    useProxy: Platform.OS !== 'web',
     // For standalone/dev builds, use custom scheme
     scheme: 'appdesignbuild',
+    // Note: useProxy removed - handled automatically by Expo
   });
 
   console.log('[Google OAuth] Config:', {
@@ -86,9 +85,7 @@ export function useGoogleAuth(): UseGoogleAuthReturn {
       });
 
       // Prompt user to authenticate
-      const result = await authRequest.promptAsync(discovery, {
-        useProxy: Platform.OS !== 'web',
-      });
+      const result = await authRequest.promptAsync(discovery);
 
       console.log('[Google OAuth] Result type:', result.type);
 

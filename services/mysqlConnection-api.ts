@@ -36,12 +36,12 @@ export interface DatabaseTestResult {
   success: boolean;
   message: string;
   results?: {
-    tests: Array<{
+    tests: {
       test: string;
       status: 'PASSED' | 'FAILED';
       result?: string;
       error?: string;
-    }>;
+    }[];
     summary: {
       total: number;
       passed: number;

@@ -20,7 +20,7 @@ Notifications.setNotificationHandler({
 });
 
 interface PushNotificationData {
-  type: 'message' | 'call' | 'notification';
+  type: 'message' | 'call' | 'notification' | 'order' | 'task' | 'project' | 'meeting' | 'system';
   conversationId?: number;
   messageId?: number;
   senderId?: number;
@@ -152,14 +152,21 @@ class PushNotificationService {
       }
     );
 
-    // Listener for when user taps on notification
+    // Listener for when user taps on notification - use notification navigator
     this.responseListener = Notifications.addNotificationResponseReceivedListener(
-      (response) => {
+      async (response) => {
         console.log('[PushNotification] User tapped notification:', response);
-        const data = response.notification.request.content.data as PushNotificationData;
         
-        // Navigate based on type
-        this.handleNotificationTap(data);
+        // Use notification navigator service for deep linking
+        try {
+          const { handleNotificationTap } = await import('./notificationNavigator');
+          const result = handleNotificationTap(response);
+          console.log('[PushNotification] Navigation result:', result);
+        } catch (error) {
+          console.warn('[PushNotification] Navigator fallback:', error);
+          const data = response.notification.request.content.data as PushNotificationData;
+          this.handleNotificationTap(data);
+        }
       }
     );
   }
@@ -174,12 +181,23 @@ class PushNotificationService {
   }
 
   /**
-   * Handle notification tap (deep linking)
+   * Handle notification tap (deep linking) - Fallback method
    */
-  private handleNotificationTap(data: PushNotificationData) {
-    // Use expo-router to navigate
-    // router.push(`/messages/${data.conversationId}`);
-    console.log('[PushNotification] Navigate to:', data);
+  private async handleNotificationTap(data: PushNotificationData) {
+    try {
+      const { router } = await import('expo-router');
+      
+      // Navigate based on type
+      if (data.type === 'message' && data.conversationId) {
+        router.push(`/chat/${data.conversationId}` as any);
+      } else if (data.type === 'order' && data.conversationId) {
+        router.push(`/order/${data.conversationId}` as any);
+      } else {
+        router.push('/notifications');
+      }
+    } catch (error) {
+      console.error('[PushNotification] Navigation failed:', error);
+    }
   }
 
   /**

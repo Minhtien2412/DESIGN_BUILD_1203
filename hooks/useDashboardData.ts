@@ -325,13 +325,29 @@ export function useDashboardData(): UseDashboardDataReturn {
               });
             });
           
-          setNotifications(notifs.length > 0 ? notifs : getMockNotifications());
+          // Empty notifications if no data from API
+          setNotifications(notifs);
         }
       } else {
-        // Fallback to mock data
-        console.log('[useDashboardData] ⚠️ No CRM data, using mock fallback');
-        setDataSource('mock');
-        loadMockData();
+        // No CRM data - show empty state instead of mock
+        console.log('[useDashboardData] ⚠️ No CRM data available');
+        setDataSource('api');
+        setProjects([]);
+        setTasks([]);
+        setStats({
+          projects: { total: 0, active: 0, completed: 0 },
+          customers: { total: 0, active: 0 },
+          tasks: { total: 0, pending: 0, overdue: 0 },
+          invoices: { total: 0, unpaid: 0, revenue: 0 },
+        });
+        setQuickBadges({ projects: null, chat: null, orders: null, crm: null });
+        setCoreStats({
+          projects: '0 dự án',
+          construction: '0 công trình',
+          contracts: '0 hợp đồng',
+          qc: '0 kiểm tra',
+        });
+        setNotifications([]);
       }
 
       if (isMounted.current) {
@@ -340,9 +356,11 @@ export function useDashboardData(): UseDashboardDataReturn {
     } catch (err: any) {
       console.error('[useDashboardData] ❌ Error:', err);
       if (isMounted.current) {
-        setError(err.message || 'Không thể tải dữ liệu');
-        setDataSource('mock');
-        loadMockData();
+        setError(err.message || 'Không thể tải dữ liệu từ CRM');
+        setDataSource('api');
+        // Show empty state on error instead of mock
+        setProjects([]);
+        setTasks([]);
       }
     } finally {
       if (isMounted.current) {
@@ -351,31 +369,24 @@ export function useDashboardData(): UseDashboardDataReturn {
     }
   }, []);
 
-  // Load mock data as fallback
-  const loadMockData = useCallback(() => {
-    setProjects([
-      { id: '1', name: 'Villa Đà Lạt', progress: 75, status: 'in-progress', statusLabel: 'Đang thực hiện', client: 'Nguyễn Văn A', deadline: '2026-02-15', daysLeft: 43 },
-      { id: '2', name: 'Resort Phú Quốc', progress: 45, status: 'in-progress', statusLabel: 'Đang thực hiện', client: 'Trần Văn B', deadline: '2026-03-20', daysLeft: 76 },
-      { id: '3', name: 'Nhà phố Quận 7', progress: 90, status: 'in-progress', statusLabel: 'Đang thực hiện', client: 'Lê Văn C', deadline: '2026-01-20', daysLeft: 17 },
-    ]);
-    setTasks([
-      { id: '1', name: 'Kiểm tra móng Villa', priority: 'urgent', priorityLabel: 'Khẩn cấp', status: 'Đang làm', statusLabel: 'Đang làm', dueDate: '2026-01-05', isOverdue: false, projectName: 'Villa Đà Lạt' },
-      { id: '2', name: 'Nghiệm thu điện tầng 2', priority: 'high', priorityLabel: 'Cao', status: 'Chưa bắt đầu', statusLabel: 'Chưa bắt đầu', dueDate: '2026-01-03', isOverdue: true, projectName: 'Nhà phố Q7' },
-    ]);
+  // Load empty data - removed mock data
+  const loadEmptyData = useCallback(() => {
+    setProjects([]);
+    setTasks([]);
     setStats({
-      projects: { total: 12, active: 5, completed: 6 },
-      customers: { total: 48, active: 45 },
-      tasks: { total: 156, pending: 23, overdue: 10 },
-      invoices: { total: 89, unpaid: 15, revenue: 1250000000 },
+      projects: { total: 0, active: 0, completed: 0 },
+      customers: { total: 0, active: 0 },
+      tasks: { total: 0, pending: 0, overdue: 0 },
+      invoices: { total: 0, unpaid: 0, revenue: 0 },
     });
-    setQuickBadges({ projects: '3', chat: '5', orders: '2', crm: null });
+    setQuickBadges({ projects: null, chat: null, orders: null, crm: null });
     setCoreStats({
-      projects: '12 dự án',
-      construction: '5 công trình',
-      contracts: '8 hợp đồng',
-      qc: '24 kiểm tra',
+      projects: '0 dự án',
+      construction: '0 công trình',
+      contracts: '0 hợp đồng',
+      qc: '0 kiểm tra',
     });
-    setNotifications(getMockNotifications());
+    setNotifications([]);
   }, []);
 
   // Effect - delay fetch to avoid blocking initial render
@@ -416,14 +427,6 @@ function formatCurrency(amount: number): string {
     currency: 'VND',
     maximumFractionDigits: 0,
   }).format(amount);
-}
-
-function getMockNotifications(): DashboardNotification[] {
-  return [
-    { id: '1', type: 'task', title: 'Task mới được giao', message: 'Kiểm tra chất lượng bê tông', time: '5 phút trước', read: false, icon: 'checkmark-circle', color: '#0066CC' },
-    { id: '2', type: 'project', title: 'Cập nhật tiến độ', message: 'Villa Đà Lạt đạt 75%', time: '1 giờ trước', read: false, icon: 'trending-up', color: '#0066CC' },
-    { id: '3', type: 'message', title: 'Tin nhắn mới', message: 'Từ Nguyễn Văn A', time: '2 giờ trước', read: true, icon: 'chatbubble', color: '#999999' },
-  ];
 }
 
 export default useDashboardData;

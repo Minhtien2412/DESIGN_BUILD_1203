@@ -1,0 +1,67 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Construction Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Container cho timeline */
+        .timeline-container {
+            position: relative;
+        }
+
+        /* Nút thắt (Node) indicator */
+        .timeline-node {
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Đường kẻ nối giữa các node */
+        .timeline-connector {
+            position: absolute;
+            left: 19px; /* Căn giữa node 40px (20px - 1px width) */
+            top: 40px;  /* Bắt đầu từ dưới cùng của node hiện tại */
+            bottom: -8px; /* Kéo dài xuống node tiếp theo */
+            width: 2px;
+            background-color: #E5E7EB; /* Màu xám mặc định */
+            z-index: 0;
+        }
+
+        /* Màu xanh cho line khi công việc đã xong hoặc đang làm */
+        .timeline-connector.active {
+            background-color: #10B981;
+        }
+
+        /* Hiệu ứng mượt cho card */
+        .task-card {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .task-card:active {
+            transform: scale(0.98);
+            background-color: #F9FAFB;
+        }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body class="bg-gray-50 text-gray-900">
+    <div id="root"></div>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>

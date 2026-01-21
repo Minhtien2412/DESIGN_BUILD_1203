@@ -1,12 +1,38 @@
-﻿// ============================================================================
+// ============================================================================
 // CRITICAL POLYFILLS - MUST LOAD FIRST
 // ============================================================================
+
+// DISABLE FONTFACEOBSERVER - Must be FIRST to prevent timeout errors
+if (typeof window !== 'undefined') {
+  window.FontFaceObserver = function(family, options) {
+    return {
+      load: function(text, timeout) {
+        return Promise.resolve({ family });
+      },
+      check: function() {
+        return true;
+      }
+    };
+  };
+  Object.defineProperty(window, 'FontFaceObserver', {
+    value: window.FontFaceObserver,
+    writable: false,
+    configurable: false
+  });
+}
 
 // Random values polyfill for crypto operations
 import 'react-native-get-random-values';
 
 // URL polyfill for URL parsing
 import 'react-native-url-polyfill/auto';
+
+// ============================================================================
+// EXPO ROUTER ENTRY POINT
+// ============================================================================
+
+// Import Expo Router entry - this must come AFTER all polyfills
+import 'expo-router/entry';
 
 // ============================================================================
 // GLOBAL RUNTIME POLYFILLS - FIX "require is not defined"
@@ -67,11 +93,4 @@ if (typeof global !== 'undefined') {
     global.process = { env: {} };
   }
 }
-
-// ============================================================================
-// EXPO ROUTER ENTRY POINT
-// ============================================================================
-
-// Import Expo Router entry - this must come AFTER all polyfills
-import 'expo-router/entry';
 

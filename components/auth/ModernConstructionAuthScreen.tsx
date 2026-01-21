@@ -187,7 +187,7 @@ export default function ModernConstructionAuthScreen() {
     };
 
     // Filtered roles for MySQL system
-    const mysqlRoles: Array<{role: MySQLRole, display: string}> = [
+    const mysqlRoles: {role: MySQLRole, display: string}[] = [
         { role: 'client', display: 'Kh�ch h�ng' },
         { role: 'contractor', display: 'Nh� th?u' },
         { role: 'designer', display: 'Ki?n tr�c su' },

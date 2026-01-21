@@ -427,7 +427,7 @@ export default function Auth3DFlipScreen() {
         onPress={async () => {
           // Validate staff secret key if STAFF role selected
           if (registerForm.formData.role === 'STAFF' && staffSecretKey !== 'Nhaxinh@123') {
-            registerForm.updateField('general', 'Bạn không có quyền đăng ký tài khoản Nhân viên. Vui lòng nhập đúng mã bảo mật.');
+            registerForm.setErrors({ general: 'Bạn không có quyền đăng ký tài khoản Nhân viên. Vui lòng nhập đúng mã bảo mật.' });
             return;
           }
           

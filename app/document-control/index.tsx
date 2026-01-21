@@ -96,7 +96,7 @@ export default function DocumentControlListScreen() {
     { label: 'Issued', value: summary?.documentsByStatus.ISSUED || 0, icon: 'send' as const },
   ];
 
-  const statusFilters: Array<DocumentStatus | 'ALL'> = [
+  const statusFilters: (DocumentStatus | 'ALL')[] = [
     'ALL',
     'DRAFT' as DocumentStatus,
     'IN_REVIEW' as DocumentStatus,

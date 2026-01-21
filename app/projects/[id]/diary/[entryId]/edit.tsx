@@ -25,7 +25,7 @@ import {
 
 type WeatherCondition = 'sunny' | 'cloudy' | 'rainy' | 'windy';
 
-const WEATHER_OPTIONS: Array<{ value: WeatherCondition; icon: keyof typeof Ionicons.glyphMap; label: string }> = [
+const WEATHER_OPTIONS: { value: WeatherCondition; icon: keyof typeof Ionicons.glyphMap; label: string }[] = [
   { value: 'sunny', icon: 'sunny', label: 'Nắng' },
   { value: 'cloudy', icon: 'cloudy', label: 'Mây' },
   { value: 'rainy', icon: 'rainy', label: 'Mưa' },

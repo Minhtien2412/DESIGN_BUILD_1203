@@ -24,23 +24,23 @@ export interface ProjectAnalytics {
     totalBudget: number;
     spent: number;
     remaining: number;
-    byCategory: Array<{
+    byCategory: {
       category: string;
       allocated: number;
       spent: number;
       percentage: number;
-    }>;
+    }[];
   };
   timeline: {
     plannedDuration: number;
     actualDuration: number;
     daysRemaining: number;
-    milestones: Array<{
+    milestones: {
       name: string;
       plannedDate: string;
       actualDate?: string;
       status: 'completed' | 'in-progress' | 'pending' | 'delayed';
-    }>;
+    }[];
   };
   resources: {
     equipment: number;
@@ -93,21 +93,21 @@ export interface DashboardMetrics {
   averageProgress: number;
   onTimeProjects: number;
   delayedProjects: number;
-  recentActivity: Array<{
+  recentActivity: {
     type: string;
     message: string;
     timestamp: string;
     projectId: string;
     projectName: string;
-  }>;
-  upcomingTasks: Array<{
+  }[];
+  upcomingTasks: {
     id: string;
     title: string;
     dueDate: string;
     priority: 'low' | 'medium' | 'high' | 'critical';
     projectId: string;
     projectName: string;
-  }>;
+  }[];
 }
 
 export interface PerformanceMetrics {
@@ -246,17 +246,17 @@ class AnalyticsService {
     period?: { startDate: string; endDate: string }
   ): Promise<{
     total: number;
-    categories: Array<{
+    categories: {
       name: string;
       amount: number;
       percentage: number;
       trend: number;
-    }>;
-    overtime: Array<{
+    }[];
+    overtime: {
       date: string;
       amount: number;
       cumulative: number;
-    }>;
+    }[];
   }> {
     try {
       const params = new URLSearchParams(period as any);
@@ -276,27 +276,27 @@ class AnalyticsService {
     projectId?: string,
     period?: { startDate: string; endDate: string }
   ): Promise<{
-    equipment: Array<{
+    equipment: {
       id: string;
       name: string;
       utilizationRate: number;
       hoursUsed: number;
       hoursAvailable: number;
-    }>;
-    workforce: Array<{
+    }[];
+    workforce: {
       id: string;
       name: string;
       role: string;
       hoursWorked: number;
       efficiency: number;
-    }>;
-    materials: Array<{
+    }[];
+    materials: {
       id: string;
       name: string;
       quantityUsed: number;
       quantityPlanned: number;
       wastePercentage: number;
-    }>;
+    }[];
   }> {
     try {
       const params = new URLSearchParams({
@@ -317,11 +317,11 @@ class AnalyticsService {
     projectIds: string[],
     metrics: string[]
   ): Promise<{
-    projects: Array<{
+    projects: {
       projectId: string;
       projectName: string;
       metrics: Record<string, number>;
-    }>;
+    }[];
   }> {
     try {
       const response = await apiFetch('/analytics/compare', {

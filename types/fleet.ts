@@ -517,30 +517,30 @@ export interface FleetSummary {
 
 export interface FleetAnalytics {
   // Maintenance Trends
-  maintenanceTrends: Array<{
+  maintenanceTrends: {
     month: string;
     preventive: number;
     corrective: number;
     cost: number;
-  }>;
+  }[];
   
   // Fuel Trends
-  fuelTrends: Array<{
+  fuelTrends: {
     month: string;
     consumption: number; // liters
     cost: number;
     efficiency: number; // km/liter
-  }>;
+  }[];
   
   // Vehicle Performance
-  vehiclePerformance: Array<{
+  vehiclePerformance: {
     vehicleId: string;
     vehicleNumber: string;
     utilization: number; // percentage
     fuelEfficiency: number;
     maintenanceCost: number;
     downtime: number; // hours
-  }>;
+  }[];
   
   // Cost Breakdown
   costBreakdown: {
@@ -552,11 +552,11 @@ export interface FleetAnalytics {
   };
   
   // Top Issues
-  topIssues: Array<{
+  topIssues: {
     issue: string;
     occurrences: number;
     totalCost: number;
-  }>;
+  }[];
 }
 
 // ============================================================================

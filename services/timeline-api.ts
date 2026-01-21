@@ -100,7 +100,7 @@ export interface UpdatePhaseTaskDto {
 }
 
 export interface ReorderPhasesDto {
-  phaseOrders: Array<{ id: number; order: number }>;
+  phaseOrders: { id: number; order: number }[];
 }
 
 // ==================== API FUNCTIONS ====================

@@ -352,14 +352,14 @@ interface UIState {
   // State
   theme: 'light' | 'dark';
   sidebarCollapsed: boolean;
-  notifications: Array<{
+  notifications: {
     id: string;
     type: 'success' | 'error' | 'warning' | 'info';
     title: string;
     message: string;
     timestamp: number;
     read: boolean;
-  }>;
+  }[];
   loading: {
     global: boolean;
     projects: boolean;

@@ -38,7 +38,7 @@ const COLORS = {
 // Filter tabs
 type ContactFilter = 'all' | 'staff' | 'customer' | 'support';
 
-const FILTER_TABS: Array<{ key: ContactFilter; label: string; icon: string }> = [
+const FILTER_TABS: { key: ContactFilter; label: string; icon: string }[] = [
   { key: 'all', label: 'Tất cả', icon: 'people' },
   { key: 'staff', label: 'Nhân viên', icon: 'briefcase' },
   { key: 'customer', label: 'Khách hàng', icon: 'person' },

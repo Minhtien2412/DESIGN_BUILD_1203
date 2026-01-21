@@ -57,17 +57,16 @@ function TikTokFeedContent() {
   const feed = getCurrentFeed();
   const currentVideo = getCurrentVideo();
 
-  // Track viewable items
-  const onViewableItemsChanged = useCallback(
+  // Track viewable items - use useRef to avoid "Changing onViewableItemsChanged on the fly" error
+  const onViewableItemsChanged = useRef(
     ({ viewableItems }: { viewableItems: ViewToken[] }) => {
       if (viewableItems.length > 0) {
         const index = viewableItems[0].index ?? 0;
         setViewableIndex(index);
         setCurrentIndex(index);
       }
-    },
-    [setCurrentIndex]
-  );
+    }
+  ).current;
 
   const viewabilityConfig = useRef({
     itemVisiblePercentThreshold: 50,

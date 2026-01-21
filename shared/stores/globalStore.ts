@@ -41,14 +41,14 @@ interface GlobalState {
     payments: boolean;
   };
   error: string | null;
-  notifications: Array<{
+  notifications: {
     id: string;
     type: 'success' | 'error' | 'warning' | 'info';
     title: string;
     message: string;
     timestamp: number;
     read: boolean;
-  }>;
+  }[];
 }
 
 type GlobalAction = 

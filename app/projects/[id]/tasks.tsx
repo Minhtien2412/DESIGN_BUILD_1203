@@ -1,4 +1,4 @@
-﻿import TasksKanbanBoard from '@/features/tasks/TasksKanbanBoard';
+import TasksKanbanBoard from '@/features/tasks/TasksKanbanBoard';
 import { useLocalSearchParams } from 'expo-router';
 
 export default function ProjectTasksScreen() {

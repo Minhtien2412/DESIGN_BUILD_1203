@@ -213,7 +213,7 @@ export default function AddTaskForm({
             <View style={styles.field}>
               <Text style={[styles.label, { color: text }]}>Độ ưu tiên</Text>
               <View style={styles.priorityGrid}>
-                {(Object.keys(PRIORITY_CONFIG) as Array<keyof typeof PRIORITY_CONFIG>).map((priority) => {
+                {(Object.keys(PRIORITY_CONFIG) as (keyof typeof PRIORITY_CONFIG)[]).map((priority) => {
                   const config = PRIORITY_CONFIG[priority];
                   return (
                     <Pressable
@@ -251,7 +251,7 @@ export default function AddTaskForm({
             <View style={styles.field}>
               <Text style={[styles.label, { color: text }]}>Trạng thái</Text>
               <View style={styles.statusGrid}>
-                {(Object.keys(STATUS_CONFIG) as Array<keyof typeof STATUS_CONFIG>).map((status) => {
+                {(Object.keys(STATUS_CONFIG) as (keyof typeof STATUS_CONFIG)[]).map((status) => {
                   const config = STATUS_CONFIG[status];
                   return (
                     <Pressable

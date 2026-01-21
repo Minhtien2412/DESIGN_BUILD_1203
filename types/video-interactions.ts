@@ -46,6 +46,8 @@ export interface VideoStats {
   likes: number;
   comments: number;
   shares: number;
+  saves?: number;
+  downloads?: number;
   completionRate: number; // Percentage of viewers who watched to end
   averageWatchTime: number; // Average seconds watched
   updatedAt: string;
@@ -103,7 +105,7 @@ export interface GetCommentsResponse {
 export interface TrackViewRequest {
   videoId: string;
   userId?: string;
-  deviceId: string;
+  deviceId?: string; // Made optional - server can track without it
   duration: number;
   completed: boolean;
 }

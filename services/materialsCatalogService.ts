@@ -318,7 +318,7 @@ export async function addToOrder(
  * Request quotation for materials
  */
 export async function requestQuote(
-  materials: Array<{ id: string | number; quantity: number }>,
+  materials: { id: string | number; quantity: number }[],
   projectDetails?: { name?: string; address?: string; notes?: string }
 ): Promise<{ success: boolean; message?: string; quoteId?: string }> {
   try {

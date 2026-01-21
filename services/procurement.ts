@@ -197,15 +197,15 @@ export const rejectQuotation = async (id: string, reason: string): Promise<Quota
 };
 
 export const compareQuotations = async (requestId: string): Promise<{
-  items: Array<{
+  items: {
     itemName: string;
-    vendors: Array<{
+    vendors: {
       vendorName: string;
       unitPrice: number;
       total: number;
       deliveryTime: number;
-    }>;
-  }>;
+    }[];
+  }[];
   lowestTotal: {
     vendorName: string;
     total: number;
@@ -395,17 +395,17 @@ export const getProcurementAnalytics = async (
   totalValue: number;
   pendingOrders: number;
   completedOrders: number;
-  topVendors: Array<{
+  topVendors: {
     vendorId: string;
     vendorName: string;
     orderCount: number;
     totalValue: number;
-  }>;
-  categoryBreakdown: Array<{
+  }[];
+  categoryBreakdown: {
     category: string;
     count: number;
     value: number;
-  }>;
+  }[];
   avgDeliveryTime: number;
   onTimeDeliveryRate: number;
 }> => {
@@ -427,11 +427,11 @@ export const getVendorAnalytics = async (vendorId: string): Promise<{
   qualityRating: number;
   responsiveness: number;
   recentOrders: PurchaseOrder[];
-  monthlyTrend: Array<{
+  monthlyTrend: {
     month: string;
     orderCount: number;
     totalValue: number;
-  }>;
+  }[];
 }> => {
   return apiFetch(`${BASE_URL}/vendors/${vendorId}/analytics`);
 };
@@ -442,21 +442,21 @@ export const getSpendAnalysis = async (
   toDate?: string
 ): Promise<{
   totalSpend: number;
-  byCategory: Array<{
+  byCategory: {
     category: string;
     amount: number;
     percentage: number;
-  }>;
-  byVendor: Array<{
+  }[];
+  byVendor: {
     vendorId: string;
     vendorName: string;
     amount: number;
     percentage: number;
-  }>;
-  byMonth: Array<{
+  }[];
+  byMonth: {
     month: string;
     amount: number;
-  }>;
+  }[];
   topPurchases: PurchaseOrder[];
 }> => {
   const queryParams = new URLSearchParams();

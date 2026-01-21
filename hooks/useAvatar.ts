@@ -8,6 +8,9 @@ import { uploadAvatar } from '@/services/api/profileApi';
 import { resolveAvatar } from '@/utils/avatar';
 import { useMemo, useState } from 'react';
 
+// Keep existing useAvatar hook for read-only usage
+import { type AvatarSource } from '@/utils/avatar';
+
 export interface UseAvatarReturn {
   avatarUrl: string;
   upload: (uri: string) => Promise<string>;
@@ -70,9 +73,6 @@ export function useAvatarUpload(): UseAvatarReturn {
     error,
   };
 }
-
-// Keep existing useAvatar hook for read-only usage
-import { type AvatarSource } from '@/utils/avatar';
 
 /**
  * Options for avatar resolution

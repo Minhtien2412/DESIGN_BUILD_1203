@@ -15,11 +15,11 @@ interface SidebarNavProps {
   missedCallsCount?: number;
 }
 
-const NAV_ITEMS: Array<{
+const NAV_ITEMS: {
   id: NavItem;
   icon: keyof typeof Ionicons.glyphMap;
   label: string;
-}> = [
+}[] = [
   { id: 'chat', icon: 'chatbubbles', label: 'Chat' },
   { id: 'calls', icon: 'call', label: 'Cuộc gọi' },
   { id: 'contacts', icon: 'people', label: 'Danh bạ' },

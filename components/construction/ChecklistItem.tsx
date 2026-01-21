@@ -57,7 +57,7 @@ export default function ChecklistItem({
   const config = STATUS_CONFIG[status];
   const Content = onPress ? TouchableOpacity : View;
 
-  const statuses: Array<'passed' | 'failed' | 'na' | 'pending'> = ['passed', 'failed', 'na', 'pending'];
+  const statuses: ('passed' | 'failed' | 'na' | 'pending')[] = ['passed', 'failed', 'na', 'pending'];
 
   return (
     <View style={[styles.container, style]}>

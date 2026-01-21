@@ -289,7 +289,7 @@ class UserBehaviorTracker {
     tabSwitches: number;
     totalScrollDistance: number;
     interactions: number;
-    topActions: Array<{ action: string; count: number }>;
+    topActions: { action: string; count: number }[];
   } {
     if (!this.currentSession) {
       return {

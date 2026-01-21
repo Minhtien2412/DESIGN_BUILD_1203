@@ -237,21 +237,21 @@ export const getProjectChangeImpact = async (projectId: string): Promise<{
   originalDuration: number;
   currentDuration: number;
   scheduleVariance: number;
-  changesByCategory: Array<{
+  changesByCategory: {
     category: string;
     count: number;
     costImpact: number;
     scheduleImpact: number;
-  }>;
-  changesByStatus: Array<{
+  }[];
+  changesByStatus: {
     status: string;
     count: number;
-  }>;
-  timeline: Array<{
+  }[];
+  timeline: {
     month: string;
     changes: number;
     cost: number;
-  }>;
+  }[];
 }> => {
   return apiFetch(`${BASE_URL}/projects/${projectId}/impact`);
 };
@@ -270,7 +270,7 @@ export const exportChangeRegister = async (
 export const compareChangeAlternatives = async (
   requestId: string
 ): Promise<{
-  alternatives: Array<{
+  alternatives: {
     id: string;
     title: string;
     costEstimate: number;
@@ -279,7 +279,7 @@ export const compareChangeAlternatives = async (
     ranking: number;
     pros: string[];
     cons: string[];
-  }>;
+  }[];
   recommendation: {
     alternativeId: string;
     reason: string;
@@ -294,10 +294,10 @@ export const getForecast = async (projectId: string): Promise<{
   forecastedDelay: number;
   confidence: number;
   basedOn: string;
-  factors: Array<{
+  factors: {
     factor: string;
     impact: string;
-  }>;
+  }[];
 }> => {
   return apiFetch(`${BASE_URL}/projects/${projectId}/forecast`);
 };

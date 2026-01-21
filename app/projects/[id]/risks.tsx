@@ -38,13 +38,13 @@ interface Risk {
   status: RiskStatus;
   owner: { id: string; name: string };
   identifiedDate: string;
-  mitigations?: Array<{
+  mitigations?: {
     id: string;
     action: string;
     responsible: string;
     deadline: string;
     status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
-  }>;
+  }[];
 }
 
 const CATEGORY_CONFIG: Record<RiskCategory, { label: string; icon: string; color: string }> = {

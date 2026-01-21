@@ -37,11 +37,11 @@ export interface CostEstimation {
     overhead: number;
   };
   confidence: number;
-  alternatives?: Array<{
+  alternatives?: {
     description: string;
     cost: number;
     savings: number;
-  }>;
+  }[];
 }
 
 export interface MaterialSuggestion {
@@ -52,11 +52,11 @@ export interface MaterialSuggestion {
   unit: string;
   estimatedCost: number;
   supplier?: string;
-  alternatives?: Array<{
+  alternatives?: {
     name: string;
     cost: number;
     quality: 'standard' | 'premium' | 'budget';
-  }>;
+  }[];
   confidence: number;
 }
 
@@ -64,14 +64,14 @@ export interface ProjectRiskAnalysis {
   projectId: string;
   overallRisk: 'low' | 'medium' | 'high' | 'critical';
   riskScore: number;
-  risks: Array<{
+  risks: {
     category: string;
     description: string;
     severity: 'low' | 'medium' | 'high' | 'critical';
     probability: number;
     impact: string;
     mitigation: string;
-  }>;
+  }[];
   recommendations: string[];
 }
 
@@ -80,12 +80,12 @@ export interface TimelineOptimization {
   currentDuration: number;
   optimizedDuration: number;
   savings: number;
-  suggestions: Array<{
+  suggestions: {
     task: string;
     currentDuration: number;
     optimizedDuration: number;
     method: string;
-  }>;
+  }[];
 }
 
 class AIService {
@@ -261,11 +261,11 @@ class AIService {
   async predictCompletion(projectId: string): Promise<{
     predictedDate: string;
     confidence: number;
-    factors: Array<{
+    factors: {
       name: string;
       impact: string;
       weight: number;
-    }>;
+    }[];
   }> {
     try {
       const response = await apiFetch(`/ai/predict-completion/${projectId}`);
@@ -278,13 +278,13 @@ class AIService {
   /**
    * Detect anomalies in project data
    */
-  async detectAnomalies(projectId: string): Promise<Array<{
+  async detectAnomalies(projectId: string): Promise<{
     type: string;
     description: string;
     severity: 'low' | 'medium' | 'high';
     detectedAt: string;
     recommendation: string;
-  }>> {
+  }[]> {
     try {
       const response = await apiFetch(`/ai/detect-anomalies/${projectId}`);
       return response.anomalies || [];

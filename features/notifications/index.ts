@@ -1,4 +1,9 @@
 // Domain barrel: notifications
+// Hooks - moved to separate imports to avoid cycles
+// export * from './hooks/useNotificationSync';
+// export * from './hooks/usePushNotifications';
+import type { Notification as _Notification } from '@/context/NotificationContext';
+
 export { NotificationProvider, useNotifications } from '@/context/NotificationContext';
 export type { Notification } from '@/context/NotificationContext';
 
@@ -11,11 +16,6 @@ export * from './storage/analyticsStore';
 
 // Rich templates & i18n
 export * from './i18n';
-
-// Hooks - moved to separate imports to avoid cycles
-// export * from './hooks/useNotificationSync';
-// export * from './hooks/usePushNotifications';
-import type { Notification as _Notification } from '@/context/NotificationContext';
 export function notifyFromChat(add: (n: Omit<_Notification, 'id' | 'createdAt' | 'read'>) => void, params: { fromUserId: string; preview?: string; title?: string }) {
 	const { fromUserId, preview, title } = params;
 	add({

@@ -25,7 +25,7 @@ export interface Message {
   isRead: boolean;
   readAt?: string | null;
   status?: 'sending' | 'sent' | 'delivered' | 'failed';
-  reactions?: Array<{ emoji: string; userId: number; userName: string }>;
+  reactions?: { emoji: string; userId: number; userName: string }[];
 }
 
 export interface Conversation {

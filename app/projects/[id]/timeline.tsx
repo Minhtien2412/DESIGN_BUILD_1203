@@ -130,8 +130,8 @@ function convertTasksToTimeline(tasks: PerfexTask[]): TimelinePhase[] {
       id: task.id,
       name: task.name,
       status,
-      startDate: formatDate(task.startdate),
-      endDate: formatDate(task.duedate),
+      startDate: formatDate(task.startdate || ''),
+      endDate: formatDate(task.duedate || ''),
       progress,
       tasks: task.description ? task.description.split('\n').filter(Boolean) : ['Công việc đang thực hiện'],
       icon,
@@ -253,8 +253,13 @@ export default function ProjectTimelineScreen() {
   
   // Load tasks from CRM
   const loadTimeline = useCallback(async () => {
+    if (!projectId) {
+      console.warn('⚠️ No projectId provided');
+      return;
+    }
+    
     try {
-      const response = await PerfexTasksService.getByProject(projectId);
+      const response = await PerfexTasksService.getAll({ rel_type: 'project', rel_id: projectId }) as any;
       
       if (response.success && response.data) {
         const phases = convertTasksToTimeline(response.data);

@@ -1,8 +1,9 @@
+import { TappableImage } from '@/components/ui/full-media-viewer';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Ionicons } from '@expo/vector-icons';
 import { Stack, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Dimensions, FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
@@ -76,7 +77,7 @@ export default function EventsScreen() {
   const renderEvent = ({ item }: { item: typeof events[0] }) => (
     <TouchableOpacity style={[styles.eventCard, { backgroundColor: cardBg }]}>
       <View style={styles.imageContainer}>
-        <Image source={{ uri: item.image }} style={styles.eventImage} />
+        <TappableImage source={{ uri: item.image }} style={styles.eventImage} title={item.title} description={item.location} />
         <View style={[styles.categoryBadge, { backgroundColor: '#FF6B35' }]}>
           <Text style={styles.categoryBadgeText}>{item.category}</Text>
         </View>

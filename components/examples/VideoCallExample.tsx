@@ -37,7 +37,7 @@ export default function VideoCallExampleScreen() {
 
     // Navigate with camera/mic initially off
     router.push({
-      pathname: `/meet/${meetingId}/room`,
+      pathname: `/meet/${meetingId}/room` as any,
       params: {
         participantName,
         // Service will handle these via query params

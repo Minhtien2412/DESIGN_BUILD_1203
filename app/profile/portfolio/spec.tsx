@@ -79,7 +79,7 @@ export default function SpecScreen() {
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
-    fetchSpecs(true);
+    fetchSpecs();
   }, [fetchSpecs]);
 
   const tabs = [

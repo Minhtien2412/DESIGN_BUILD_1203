@@ -535,13 +535,13 @@ export function usePerfexSync() {
     results: null,
   });
 
-  const syncUsers = useCallback(async (users: Array<{
+  const syncUsers = useCallback(async (users: {
     id: string;
     email: string;
     name: string;
     phone?: string;
     address?: string;
-  }>) => {
+  }[]) => {
     setState(prev => ({ ...prev, syncing: true }));
     try {
       const results = await PerfexCRM.Sync.syncAllUsers(users);
@@ -557,7 +557,7 @@ export function usePerfexSync() {
     }
   }, []);
 
-  const syncProjects = useCallback(async (projects: Array<{
+  const syncProjects = useCallback(async (projects: {
     id: string;
     name: string;
     description?: string;
@@ -566,7 +566,7 @@ export function usePerfexSync() {
     endDate?: string;
     progress: number;
     status: string;
-  }>) => {
+  }[]) => {
     setState(prev => ({ ...prev, syncing: true }));
     try {
       const results = await PerfexCRM.Sync.syncAllProjects(projects);

@@ -13,12 +13,12 @@ import {
     View,
 } from 'react-native';
 
-const ACCESS_LEVEL_OPTIONS: Array<{
+const ACCESS_LEVEL_OPTIONS: {
   value: AccessLevel;
   label: string;
   icon: keyof typeof Ionicons.glyphMap;
   description: string;
-}> = [
+}[] = [
   {
     value: AccessLevel.PRIVATE,
     label: 'Riêng tư',

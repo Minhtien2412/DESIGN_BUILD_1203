@@ -321,7 +321,7 @@ export async function runAllTests() {
   const results = {
     passed: 0,
     failed: 0,
-    tests: [] as Array<{ name: string; status: 'pass' | 'fail'; error?: string }>,
+    tests: [] as { name: string; status: 'pass' | 'fail'; error?: string }[],
   };
   
   const tests = [

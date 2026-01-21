@@ -82,7 +82,7 @@ export default function AsBuiltDrawingsListScreen() {
     { label: 'Open Redlines', value: summary?.totalRedlines || 0, icon: 'create' as const },
   ];
 
-  const statusFilters: Array<DrawingStatus | 'ALL'> = [
+  const statusFilters: (DrawingStatus | 'ALL')[] = [
     'ALL',
     'DRAFT' as DrawingStatus,
     'IN_REVIEW' as DrawingStatus,

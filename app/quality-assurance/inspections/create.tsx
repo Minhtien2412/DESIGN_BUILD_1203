@@ -65,7 +65,6 @@ export default function CreateInspectionScreen() {
         title: title.trim(),
         description: description.trim(),
         type,
-        location: location.trim(),
         scheduledDate: new Date(scheduledDate).toISOString(),
         status: 'scheduled',
       });

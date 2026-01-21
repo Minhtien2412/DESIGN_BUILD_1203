@@ -63,7 +63,7 @@ export function VideoPlayer({
 
   // Animation refs
   const controlsOpacity = useRef(new Animated.Value(0)).current;
-  const hideControlsTimer = useRef<NodeJS.Timeout | null>(null);
+  const hideControlsTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Determine video source (URL or local asset)
   const videoSource = asset || url || '';
@@ -104,7 +104,7 @@ export function VideoPlayer({
     }
     hideControlsTimer.current = setTimeout(() => {
       hideControls();
-    }, 3000);
+    }, 3000) as any;
   }, []);
 
   const showControlsWithTimer = useCallback(() => {

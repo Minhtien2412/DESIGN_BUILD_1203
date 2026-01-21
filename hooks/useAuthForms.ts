@@ -210,6 +210,7 @@ export const useRegisterForm = () => {
     locationLoading,
     setShowPassword,
     setShowConfirmPassword,
+    setErrors,
     updateField,
     getLocation,
     handleSubmit,

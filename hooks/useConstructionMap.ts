@@ -57,11 +57,11 @@ export interface UseConstructionMapReturn {
   selectedStageId: string | null;
   
   // Collaboration
-  activeUsers: Array<{
+  activeUsers: {
     userId: string;
     userName: string;
     color?: string;
-  }>;
+  }[];
   
   // Actions - Canvas Controls
   zoomIn: () => void;
@@ -130,11 +130,11 @@ export function useConstructionMap({
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [selectedStageId, setSelectedStageId] = useState<string | null>(null);
   
-  const [activeUsers, setActiveUsers] = useState<Array<{
+  const [activeUsers, setActiveUsers] = useState<{
     userId: string;
     userName: string;
     color?: string;
-  }>>([]);
+  }[]>([]);
   
   const [isConnected, setIsConnected] = useState(false);
   const [isWebSocketConnected, setIsWebSocketConnected] = useState(false);

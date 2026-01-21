@@ -3,7 +3,7 @@
  * Memory management, lazy loading, and optimization helpers
  */
 
-import { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { InteractionManager, Platform } from 'react-native';
 
 /**
@@ -70,7 +70,9 @@ class ImageCache {
   set(key: string, value: string): void {
     if (this.cache.size >= this.maxSize) {
       const firstKey = this.cache.keys().next().value;
-      this.cache.delete(firstKey);
+      if (firstKey !== undefined) {
+        this.cache.delete(firstKey);
+      }
     }
     this.cache.set(key, value);
   }
@@ -211,7 +213,7 @@ export function useBatchedUpdates() {
     timeoutRef.current = setTimeout(() => {
       pendingUpdates.current.forEach((fn) => fn());
       pendingUpdates.current = [];
-    }, 16); // One frame
+    }, 16) as any; // One frame
   }, []);
 
   useEffect(() => {
@@ -242,8 +244,3 @@ export function getOptimizedImageUri(
   const separator = uri.includes('?') ? '&' : '?';
   return `${uri}${separator}w=${width}&q=${quality}`;
 }
-
-/**
- * React import for hooks
- */
-import React from 'react';

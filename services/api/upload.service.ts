@@ -45,11 +45,11 @@ export const uploadService = {
    * Upload multiple files
    * POST /upload/multiple
    */
-  multiple: async (files: Array<{
+  multiple: async (files: {
     uri: string;
     name?: string;
     type?: string;
-  }>): Promise<MultiUploadResponse> => {
+  }[]): Promise<MultiUploadResponse> => {
     console.log('[UploadService] 📤 Uploading', files.length, 'files');
     
     const formData = new FormData();

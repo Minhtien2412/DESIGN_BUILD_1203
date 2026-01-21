@@ -24,15 +24,15 @@ export default function StoriesViewerScreen() {
       setLoading(true);
       setError(null);
       
-      const groups = await StoriesService.getStoryGroups();
+      const groups = await StoriesService.getStories();
       
       // Convert to StoryGroup format if needed
-      const formattedGroups: StoryGroup[] = groups.map(g => ({
+      const formattedGroups: StoryGroup[] = groups.map((g: any) => ({
         userId: g.userId,
         userName: g.userName,
         userAvatar: g.userAvatar,
         hasUnviewed: g.hasUnviewed,
-        stories: g.stories.map(s => ({
+        stories: g.stories.map((s: any) => ({
           id: s.id,
           userId: g.userId,
           userName: g.userName,

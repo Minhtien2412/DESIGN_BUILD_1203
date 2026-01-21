@@ -450,7 +450,7 @@ class PhotoTimelineService extends BaseApiService {
    * Bulk upload photos
    */
   async bulkUpload(
-    files: Array<{ file: File | Blob; data: Omit<CreatePhotoData, 'file'> }>
+    files: { file: File | Blob; data: Omit<CreatePhotoData, 'file'> }[]
   ): Promise<ApiResponse<ProgressPhoto[]>> {
     const formData = new FormData();
     
@@ -537,7 +537,7 @@ class PhotoTimelineService extends BaseApiService {
     byCategory: Record<PhotoCategory, number>;
     byPhase: Record<PhotoPhase, number>;
     byMonth: Record<string, number>;
-    topLocations: Array<{ location: string; count: number }>;
+    topLocations: { location: string; count: number }[];
   }>> {
     return this.get<ApiResponse<any>>('/progress-photos/statistics', { projectId }, {
       cache: true,

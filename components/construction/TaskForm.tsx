@@ -30,7 +30,7 @@ export interface TaskFormProps {
   stageId?: string;
   onSubmit: (data: TaskFormData) => Promise<void>;
   onCancel: () => void;
-  assigneeOptions?: Array<{ id: string; name: string }>;
+  assigneeOptions?: { id: string; name: string }[];
 }
 
 export interface TaskFormData {
@@ -121,7 +121,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
   const [showAssigneePicker, setShowAssigneePicker] = useState(false);
 
   // Status options
-  const statusOptions: Array<{ value: Task['status']; label: string; color: string }> = [
+  const statusOptions: { value: Task['status']; label: string; color: string }[] = [
     { value: 'pending', label: 'Chờ xử lý', color: '#9CA3AF' },
     { value: 'in-progress', label: 'Đang thực hiện', color: '#3B82F6' },
     { value: 'completed', label: 'Hoàn thành', color: '#0066CC' },
@@ -129,7 +129,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
   ];
 
   // Priority options
-  const priorityOptions: Array<{ value: Task['priority']; label: string; color: string }> = [
+  const priorityOptions: { value: Task['priority']; label: string; color: string }[] = [
     { value: 'low', label: 'Thấp', color: '#0066CC' },
     { value: 'medium', label: 'Trung bình', color: '#0066CC' },
     { value: 'high', label: 'Cao', color: '#000000' },

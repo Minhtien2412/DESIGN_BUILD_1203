@@ -1,149 +1,36 @@
 # GitHub Copilot Instructions (Project-Specific Guidance)
 
-This repository is an Expo Router (SDK 54) + React 19 + TypeScript mobile application targeting a Shopee‑style shopping / services experience. These instructions help AI assistants produce consistent, type‑safe, idiomatic contributions.
+## Architecture
+- Expo Router (SDK 54) + React Native 19 TypeScript app blending Shopee-style commerce with construction/CRM tooling; screens sit under [app](app) (tabs in [app/(tabs)](app/(tabs)), admin/AI flows in dedicated folders) as outlined in [README.md](README.md).
+- Route with string literals (e.g. `/product/${id}`) and keep hidden menus under `(tabs)` with `tabBarButton: () => null` to avoid polluting the main nav.
+- The root stack in [app/_layout.tsx](app/_layout.tsx) wraps Sentry, analytics (`useScreenTracking`, `initAnalyticsSession`), offline/banner/toast layers, and the media viewer before mounting the Expo `Stack`; never short-circuit these wrappers.
 
----
-## Core Architectural Principles
-1. **Routing:** Uses `expo-router` with typed routes. Dynamic product detail route: `app/product/[id].tsx`. Hidden auxiliary pages (e.g. `menu4..menu9`) live under `app/(tabs)/` but are NOT in the bottom tab bar (they use `tabBarButton: () => null`).
-2. **Providers Order:** Root layout (`app/_layout.tsx`) mounts `AuthProvider` → `CartProvider` → `Stack`. Keep this order (auth state may influence cart clearing on sign out later).
-3. **State Management:** Lightweight React Context only (Auth & Cart). Avoid introducing Redux/MobX unless explicitly requested.
-4. **Design System:** Reuse UI atoms/molecules in `components/ui/` (e.g. `button`, `input`, `container`, `section`, `menu-card`, `product-card`, `info-box`, `loader`). Prefer extending these over creating ad-hoc styles.
-5. **Styling & Theming:** Follow theme utilities and `useThemeColor` hook (see `hooks/` and `constants/theme.ts`). Do not hardcode colors when a semantic token exists.
-6. **Images/Assets:** Always require the **base** scale asset (e.g. `require('../assets/images/react-logo.png')`). Metro auto-resolves `@2x/@3x` variants. Never require `@2x` or `@3x` explicitly.
-7. **Error Handling:** Centralized via `services/api.ts` (`apiFetch`). Use its exported helper instead of raw `fetch` for any network call.
-8. **Async Storage:** Use `SecureStore` through `utils/storage.ts` for sensitive items (tokens) and cart persistence. Do not access platform storage APIs directly.
+## Providers & State
+- Provider order in [app/_layout.tsx](app/_layout.tsx) is strict: Auth → PerfexAuth → Cart → Favorites → ViewHistory → Meeting → Call → CommunicationHub → WebSocket → Progress socket → Utilities → ProjectData → VideoInteractions → Notification → PushNotification → Notifications → UnifiedBadge. Insert new providers near their closest dependency.
+- [context/AuthContext.tsx](context/AuthContext.tsx) handles login/signup, token persistence, Perfex sync, and permission helpers; always go through `authApi` plus `saveTokens` so `apiFetch` can refresh tokens automatically.
+- [context/cart-context.tsx](context/cart-context.tsx) stores full `Product` objects, persists via AsyncStorage, and drives the cart badge service—use `addToCart`, `updateQuantity`, and `clearCart` instead of mutating arrays.
+- Feature screens rely on numerous domain contexts (calls, meetings, notifications, sockets); consume the existing hooks rather than creating duplicate local state.
 
----
-## Routing & Navigation Conventions
-- Use string literal paths when possible: `router.push('/cart')`.
-- For dynamic product links, generate with a helper: `/product/${id}` (ensure `id` exists in `PRODUCTS`).
-- Remove all `as any` casts when creating links. If type friction occurs, create a small helper:
-  ```ts
-  export const productRoute = (id: string) => `/product/${id}` as const;
-  ```
-- Hidden routes must not accidentally surface as tabs—confirm `options={{ tabBarButton: () => null }}` in layout.
-- Keep bottom tab count to four visible entries: Home (`index`), Projects (shop), Notifications, Profile.
+## Data & APIs
+- `apiFetch` in [services/api.ts](services/api.ts) injects the `X-API-Key`, bearer token, 20s timeout, retry/backoff, and refresh-token orchestration; prefer `get/post/put/patch/del` helpers instead of raw `fetch`.
+- Configuration comes from [config/env.ts](config/env.ts); Android localhost is auto-mapped to `10.0.2.2`, and websocket namespaces (`/chat`, `/call`, `/progress`) live there too.
+- Tokens must flow through [services/token.service.ts](services/token.service.ts) (`saveTokens`, `clearTokens`, `calculateExpiryTimestamp`) and sensitive storage should reuse [utils/storage.ts](utils/storage.ts) to stay SecureStore-compatible.
+- Cart persistence and badge updates are centralized in [context/cart-context.tsx](context/cart-context.tsx) via AsyncStorage + `cartBadge`; avoid duplicating persistence logic.
+- Offline catalog data plus search helpers reside in [data/products.ts](data/products.ts); keep `id`, `price`, localized descriptions, and tags in sync when adding mock entries.
 
----
-## Context Contracts
-### AuthContext
-- Exposes: `user`, `signIn(email, pass)`, `signUp(email, pass)`, `signOut()`, `loading`.
-- Tokens stored securely. Future changes (refresh, profile) must remain backward compatible unless a migration is documented.
+## UI & Theming
+- Follow the minimalist palette in [constants/theme.ts](constants/theme.ts) and request colors through `useThemeColor`; compose existing atoms inside [components/ui](components/ui) such as [components/ui/button.tsx](components/ui/button.tsx) for consistent spacing and states.
+- Layout screens with shared primitives (`Container`, `Section`, cards) rather than bespoke styles so tablet/phone spacing stays uniform.
+- Global overlays (`FullMediaViewerProvider`, `OfflineIndicator`, `NotificationToast`, `IncomingCallModal`) already exist—toggle them via their hooks/services instead of recreating UI.
+- Always require the base-scale asset (`require('../img.png')`); Metro handles `@2x/@3x` variants automatically.
 
-### CartContext
-- Items keyed by product id; shape: `{ id, name, price, qty, image }`.
-- Methods: `add(product, qty?)`, `remove(id)`, `increment(id)`, `decrement(id)`, `clear()`. Derived: `totalQty`, `totalPrice`.
-- Always persist after every mutation; keep operations synchronous wrapping async persistence fire-and-forget (unless adding error recovery logic deliberately).
+## Workflows
+- Standard loop: `npm install`, `npm start` (Expo dev), `npm test`, `npm run lint`, and `npx tsc --noEmit` for strict TS (see [START_HERE.md](START_HERE.md)).
+- Capture diagnostic output into the text files described in START_HERE (`typescript-errors.txt`, `eslint-errors.txt`, etc.) when triaging quality issues.
+- Architecture, API, deployment, and testing guides live under [docs](docs); review the relevant guide before changing backend-aligned modules.
 
----
-## Data & Mock Layer
-- `data/products.ts` houses `PRODUCTS`. Add new products by appending with unique `id` (string). Keep deterministic pricing (integer VND). Include descriptions where helpful.
-- When real API integration begins, retain `PRODUCTS` for offline / skeleton unless explicitly removed.
-
----
-## API Layer Usage
-Use `apiFetch(path, options?)` only. It currently:
-- Applies a timeout (AbortController).
-- Attempts JSON parse; falls back to text.
-- Normalizes error shape via `ApiError` with: `status`, `statusText`, `url`, `detail`, `body`.
-Guidelines:
-- Wrap calls in try/catch.
-- Surface user-facing errors with friendly message + optional retry.
-- Avoid duplicating timeout logic elsewhere.
-
-Example:
-```ts
-try {
-  const data = await apiFetch('/products');
-} catch (e) {
-  if (e instanceof ApiError) {
-    // handle structured error
-  }
-}
-```
-
----
-## UI Component Guidelines
-- Prefer composing inside `Container` and `Section` for spacing consistency.
-- Use `fullWidth` prop on `Container` only for edge-to-edge grids.
-- `Button`: supply `loading` when performing async actions; disable while loading.
-- `Input`: maintain controlled pattern (`value`, `onChangeText`). Add minimal validation inline or via small utility—avoid large form libs unless required.
-- `Loader`: show for short fetch states; for longer operations consider skeleton UIs.
-
----
-## Performance & Quality
-- Keep bundle lean: no large third-party libs without justification.
-- Avoid unnecessary re-renders: memoize heavy list items if performance issues appear (not premature optimization).
-- Use FlatList or FlashList (if added) for large product sets; current small static array is fine.
-
----
-## Type Safety Rules
-- Zero tolerance for `as any` (remove remaining ones). If a type gap exists, define an interface or helper function.
-- For navigation string literal unions, prefer helper factories over casting.
-- Extend `Product` type rather than augmenting ad-hoc object shapes in cart logic.
-
----
-## Adding New Features (Examples)
-### Checkout Flow (Future)
-1. Introduce `Order` type and `orders` storage (separate context or extend CartContext minimally).
-2. Move cart → order, clear cart, persist order history.
-3. Provide optimistic UI then reconcile with API.
-
-### Category Filtering
-1. Add `category` to `Product` type.
-2. Create derived list with filter chips component.
-3. Persist last category filter in storage for UX continuity.
-
----
-## Testing & Validation (Lightweight)
-- Run: `npm start` (alias for `expo start`).
-- Quick smoke: open Android / Web; navigate product list → product detail → add to cart → view cart.
-- Before commits adding navigation: ensure no red screen from unresolved asset or route.
-
----
-## Common Pitfalls & Resolutions
-| Issue | Cause | Fix |
-|-------|-------|-----|
-| Asset resolution error for `@2x` | Directly requiring scaled image | Require base `react-logo.png` only |
-| Route type error | Using object form without matching types | Switch to string literal `/product/<id>` |
-| Stale cart after sign out | (Future) Not clearing cart | Clear on signOut once business rule confirmed |
-| Network hang | Missing timeout | Already handled by `apiFetch`; use it |
-
----
-## Code Style
-- Follow existing formatting; rely on ESLint config (`eslint.config.js`).
-- Prefer named exports; default exports only for screens/components that benefit from expo-router conventions.
-- Keep functions small (< ~50 LOC) or refactor.
-
----
-## Contribution Checklist
-Before submitting a feature PR:
-- [ ] No `as any` or newly introduced eslint-disable comments.
-- [ ] All navigation uses helper or literal strings.
-- [ ] Assets required via base scale name.
-- [ ] Context contracts unchanged or migration documented.
-- [ ] API calls use `apiFetch`.
-- [ ] New UI reuses design system components.
-- [ ] TypeScript passes with `strict`.
-
----
-## Quick Reference
-- Product dynamic route: `/product/[id]` (push with template string).
-- Cart route: `/cart`.
-- Providers: `app/_layout.tsx`.
-- Mock data: `data/products.ts`.
-- API wrapper: `services/api.ts`.
-
----
-## AI Assistant Guidance
-When asked to add a feature:
-1. Identify existing UI component to extend.
-2. Ensure route fits naming & folder conventions.
-3. Avoid adding new global state unless necessary.
-4. Keep types explicit; add or refine types instead of casting.
-5. Update this instruction file if a new architectural pattern is introduced.
-
-If uncertain, prefer creating a small, composable helper over broad refactors.
-
----
-*End of instructions.*
+## Pitfalls & Tips
+- Requests fail without `ENV.API_KEY`; ensure `.env` / `app.config.ts` exports `EXPO_PUBLIC_API_KEY` so Fastify accepts even auth calls.
+- Guest mode is allowed: `AuthNavigator` in [app/_layout.tsx](app/_layout.tsx) only redirects authenticated users into `(tabs)`; guard protected actions per-screen with `useAuth()` instead of forcing global redirects.
+- Cart totals drive the unified badge via `cartBadge`; bypassing the context causes stale counts.
+- Prefer typed helpers over `as any`; when navigation strings feel clumsy, add a small factory (e.g., `productRoute(id)`) rather than casting.

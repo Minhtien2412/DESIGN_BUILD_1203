@@ -372,27 +372,27 @@ export interface InspectionAnalytics {
     totalNCRs: number;
     openNCRs: number;
   };
-  byType: Array<{
+  byType: {
     type: InspectionType | TestType;
     count: number;
     passRate: number;
-  }>;
-  bySeverity: Array<{
+  }[];
+  bySeverity: {
     severity: InspectionSeverity;
     count: number;
     percentage: number;
-  }>;
-  trends: Array<{
+  }[];
+  trends: {
     month: string;
     inspections: number;
     passRate: number;
     findings: number;
-  }>;
-  topIssues: Array<{
+  }[];
+  topIssues: {
     category: string;
     count: number;
     avgResolutionDays: number;
-  }>;
+  }[];
   complianceRate: number;
 }
 
@@ -424,12 +424,12 @@ export interface SubmitInspectionResultParams {
   id: string;
   actualStartDate: string;
   actualEndDate: string;
-  checklistResults: Array<{
+  checklistResults: {
     itemId: string;
     result: 'PASS' | 'FAIL' | 'N/A';
     remarks?: string;
     measuredValue?: string;
-  }>;
+  }[];
   findings?: Omit<InspectionFinding, 'id' | 'findingNumber' | 'status' | 'createdAt'>[];
   recommendations?: string;
   nextSteps?: string;
@@ -452,12 +452,12 @@ export interface CreateTestParams {
 export interface SubmitTestResultParams {
   id: string;
   testDate: string;
-  parameterResults: Array<{
+  parameterResults: {
     parameterId: string;
     measuredValue: string;
     result: 'PASS' | 'FAIL';
     remarks?: string;
-  }>;
+  }[];
   summary?: string;
   recommendations?: string;
   certificateNumber?: string;

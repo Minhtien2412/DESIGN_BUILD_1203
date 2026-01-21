@@ -301,3 +301,11 @@ export async function refreshDashboard(
       throw new Error(`Invalid role: ${role}`);
   }
 }
+
+// Export as object for backwards compatibility
+export const dashboardApi = {
+  getAdminDashboard,
+  getEngineerDashboard,
+  getClientDashboard,
+  refreshDashboard,
+};

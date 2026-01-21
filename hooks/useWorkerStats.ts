@@ -3,15 +3,29 @@
  * Fetches and manages worker statistics for home screen utilities
  */
 
-import { WorkerStatsService } from '@/services/worker-stats';
-import type { WorkerStatsResponse } from '@/types/worker-stats';
-import { WorkerType } from '@/types/worker-stats';
-import { useEffect, useState } from 'react';
+import { WorkerStatsService } from "@/services/worker-stats";
+import type {
+    WorkerStatsResponse
+} from "@/types/worker-stats";
+import { WorkerType } from "@/types/worker-stats";
+import { useCallback, useEffect, useState } from "react";
+
+// Available locations for filtering
+export const LOCATIONS = [
+  "Tất cả",
+  "Sài Gòn",
+  "Hà Nội",
+  "Đà Nẵng",
+  "Cần Thơ",
+] as const;
+export type LocationType = (typeof LOCATIONS)[number];
 
 export function useWorkerStats(autoRefresh = false, intervalMs = 300000) {
   const [stats, setStats] = useState<WorkerStatsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const [selectedLocation, setSelectedLocation] =
+    useState<LocationType>("Sài Gòn");
 
   const fetchStats = async () => {
     try {
@@ -37,11 +51,57 @@ export function useWorkerStats(autoRefresh = false, intervalMs = 300000) {
     }
   }, [autoRefresh, intervalMs]);
 
+  /**
+   * Get worker count for a specific worker type at selected location
+   */
+  const getWorkerCount = useCallback(
+    (workerType: WorkerType): { location: string; count: number } => {
+      if (!stats) {
+        return {
+          location:
+            selectedLocation === "Tất cả" ? "Toàn quốc" : selectedLocation,
+          count: 0,
+        };
+      }
+
+      const workerStat = stats.stats.find((s) => s.workerType === workerType);
+      if (!workerStat) {
+        return {
+          location:
+            selectedLocation === "Tất cả" ? "Toàn quốc" : selectedLocation,
+          count: 0,
+        };
+      }
+
+      if (selectedLocation === "Tất cả") {
+        // Sum all locations
+        const totalCount = workerStat.locations.reduce(
+          (sum, loc) => sum + loc.count,
+          0
+        );
+        return { location: "Toàn quốc", count: totalCount };
+      }
+
+      // Find specific location
+      const locationStat = workerStat.locations.find(
+        (l) => l.location === selectedLocation
+      );
+      return {
+        location: selectedLocation,
+        count: locationStat?.count || 0,
+      };
+    },
+    [stats, selectedLocation]
+  );
+
   return {
     stats,
     loading,
     error,
     refresh: fetchStats,
+    selectedLocation,
+    setSelectedLocation,
+    getWorkerCount,
   };
 }
 
@@ -49,12 +109,15 @@ export function useWorkerStats(autoRefresh = false, intervalMs = 300000) {
  * Get stats for a specific worker type
  */
 export function useWorkerTypeStats(workerType: WorkerType) {
-  const { stats, loading, error, refresh } = useWorkerStats();
+  const { stats, loading, error, refresh, selectedLocation, getWorkerCount } =
+    useWorkerStats();
 
-  const typeStats = stats?.stats.find(s => s.workerType === workerType);
+  const typeStats = stats?.stats.find((s) => s.workerType === workerType);
+  const locationStats = getWorkerCount(workerType);
 
   return {
     typeStats,
+    locationStats,
     loading,
     error,
     refresh,
@@ -65,17 +128,21 @@ export function useWorkerTypeStats(workerType: WorkerType) {
  * Map worker type enum to utility item IDs
  */
 export const WORKER_TYPE_MAP: Record<number, WorkerType> = {
-  // Construction utilities (IDs 1-8)
+  // Construction utilities (IDs 1-16)
   1: WorkerType.EP_COC,
   2: WorkerType.DAO_DAT,
   3: WorkerType.VAT_LIEU,
   4: WorkerType.NHAN_CONG,
   5: WorkerType.THO_XAY,
-  6: WorkerType.THO_COFFA,
-  7: WorkerType.THO_DIEN_NUOC,
-  8: WorkerType.BE_TONG,
-  
-  // Finishing utilities (IDs 1-8, but offset in context)
+  6: WorkerType.THO_COFFA, // Thợ sắt
+  7: WorkerType.THO_COFFA, // Thợ coffa
+  8: WorkerType.VAT_LIEU, // Thợ cơ khí (use material)
+  9: WorkerType.THO_XAY, // Thợ tô tường (use mason)
+  10: WorkerType.THO_DIEN_NUOC,
+  11: WorkerType.BE_TONG,
+  12: WorkerType.THO_COFFA, // Cốp pha
+
+  // Finishing utilities (IDs 101-116)
   101: WorkerType.THO_LAT_GACH,
   102: WorkerType.THO_THACH_CAO,
   103: WorkerType.THO_SON,
@@ -84,4 +151,11 @@ export const WORKER_TYPE_MAP: Record<number, WorkerType> = {
   106: WorkerType.THO_LAN_CAN,
   107: WorkerType.THO_CONG,
   108: WorkerType.THO_CAMERA,
+  109: WorkerType.THO_DA, // Thợ ốp đá
+  110: WorkerType.THO_DIEN_NUOC, // Thợ điện
+  111: WorkerType.THO_LAM_CUA, // Thợ nội thất
+  112: WorkerType.THO_XAY, // Tổng hợp
+  113: WorkerType.THO_LAM_CUA, // Thợ mộc
+  114: WorkerType.THO_LAN_CAN, // Thợ nhôm kính
+  115: WorkerType.THO_CAMERA, // Thợ vệ sinh (use camera as placeholder)
 };

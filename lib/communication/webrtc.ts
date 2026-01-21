@@ -94,7 +94,7 @@ export class WebRTCManager {
         // This is a placeholder - actual implementation needs react-native-webrtc
         console.log('[WebRTC] Native platform detected, using native WebRTC');
         try {
-          // react-native-webrtc will be provided
+          // @ts-expect-error - react-native-webrtc will be provided when installed
           const RNWebRTC = await import('react-native-webrtc');
           const { mediaDevices } = RNWebRTC;
           this.localStream = await mediaDevices.getUserMedia({

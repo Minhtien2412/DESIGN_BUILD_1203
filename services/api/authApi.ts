@@ -4,19 +4,27 @@
  * Enhanced with OTP and Social Login support
  */
 
-import ENV from '../../config/env';
-import { apiFetch } from '../api';
+import ENV from "../../config/env";
+import { apiFetch } from "../api";
 
 const BASE_URL = `${ENV.API_BASE_URL}/auth`;
 
 // Debug log
-console.log('[authApi] BASE_URL:', BASE_URL);
-console.log('[authApi] ENV.API_BASE_URL:', ENV.API_BASE_URL);
+console.log("[authApi] BASE_URL:", BASE_URL);
+console.log("[authApi] ENV.API_BASE_URL:", ENV.API_BASE_URL);
 
 // ==================== TYPES ====================
 
 // Backend Role enum
-export type UserRole = 'CLIENT' | 'ENGINEER' | 'CONTRACTOR' | 'ARCHITECT' | 'DESIGNER' | 'SUPPLIER' | 'STAFF' | 'ADMIN';
+export type UserRole =
+  | "CLIENT"
+  | "ENGINEER"
+  | "CONTRACTOR"
+  | "ARCHITECT"
+  | "DESIGNER"
+  | "SUPPLIER"
+  | "STAFF"
+  | "ADMIN";
 
 export interface User {
   id: number;
@@ -72,16 +80,16 @@ export interface RefreshTokenResponse {
  */
 export async function login(dto: LoginDto): Promise<AuthResponse> {
   try {
-    console.log('[authApi] Attempting login with:', { email: dto.email });
-    return await apiFetch<AuthResponse>('/auth/login', {
-      method: 'POST',
+    console.log("[authApi] Attempting login with:", { email: dto.email });
+    return await apiFetch<AuthResponse>("/auth/login", {
+      method: "POST",
       data: dto,
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     });
   } catch (error) {
-    console.error('[authApi] login error:', error);
+    console.error("[authApi] login error:", error);
     throw error;
   }
 }
@@ -93,16 +101,19 @@ export async function login(dto: LoginDto): Promise<AuthResponse> {
  */
 export async function register(dto: RegisterDto): Promise<AuthResponse> {
   try {
-    console.log('[authApi] Attempting registration with:', { email: dto.email, role: dto.role });
-    return await apiFetch<AuthResponse>('/auth/register', {
-      method: 'POST',
+    console.log("[authApi] Attempting registration with:", {
+      email: dto.email,
+      role: dto.role,
+    });
+    return await apiFetch<AuthResponse>("/auth/register", {
+      method: "POST",
       data: dto,
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     });
   } catch (error) {
-    console.error('[authApi] register error:', error);
+    console.error("[authApi] register error:", error);
     throw error;
   }
 }
@@ -112,18 +123,20 @@ export async function register(dto: RegisterDto): Promise<AuthResponse> {
  * Endpoint: POST /auth/refresh
  * Returns new access token
  */
-export async function refreshAccessToken(refreshToken: string): Promise<RefreshTokenResponse> {
+export async function refreshAccessToken(
+  refreshToken: string
+): Promise<RefreshTokenResponse> {
   try {
-    console.log('[authApi] Attempting token refresh');
-    return await apiFetch<RefreshTokenResponse>('/auth/refresh', {
-      method: 'POST',
+    console.log("[authApi] Attempting token refresh");
+    return await apiFetch<RefreshTokenResponse>("/auth/refresh", {
+      method: "POST",
       data: { refreshToken },
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     });
   } catch (error) {
-    console.error('[authApi] refreshAccessToken error:', error);
+    console.error("[authApi] refreshAccessToken error:", error);
     throw error;
   }
 }
@@ -135,14 +148,14 @@ export async function refreshAccessToken(refreshToken: string): Promise<RefreshT
  */
 export async function getProfile(accessToken: string): Promise<User> {
   try {
-    return await apiFetch<User>('/auth/me', {
-      method: 'GET',
+    return await apiFetch<User>("/auth/me", {
+      method: "GET",
       headers: {
-        'Authorization': `Bearer ${accessToken}`
-      }
+        Authorization: `Bearer ${accessToken}`,
+      },
     });
   } catch (error) {
-    console.error('[authApi] getProfile error:', error);
+    console.error("[authApi] getProfile error:", error);
     throw error;
   }
 }
@@ -153,11 +166,11 @@ export async function getProfile(accessToken: string): Promise<User> {
  */
 export async function getCurrentUser(): Promise<User> {
   try {
-    return await apiFetch<User>('/auth/me', {
-      method: 'GET',
+    return await apiFetch<User>("/auth/me", {
+      method: "GET",
     });
   } catch (error) {
-    console.error('[authApi] getCurrentUser error:', error);
+    console.error("[authApi] getCurrentUser error:", error);
     throw error;
   }
 }
@@ -165,9 +178,9 @@ export async function getCurrentUser(): Promise<User> {
 // ==================== OTP TYPES ====================
 
 export interface SendOtpDto {
-  type: 'phone' | 'email';
+  type: "phone" | "email";
   value: string;
-  purpose: 'register' | 'reset-password' | 'verify-phone' | 'verify-email';
+  purpose: "register" | "reset-password" | "verify-phone" | "verify-email";
 }
 
 export interface SendOtpResponse {
@@ -178,10 +191,10 @@ export interface SendOtpResponse {
 }
 
 export interface VerifyOtpDto {
-  type: 'phone' | 'email';
+  type: "phone" | "email";
   value: string;
   code: string;
-  purpose: 'register' | 'reset-password' | 'verify-phone' | 'verify-email';
+  purpose: "register" | "reset-password" | "verify-phone" | "verify-email";
 }
 
 export interface VerifyOtpResponse {
@@ -198,16 +211,16 @@ export interface VerifyOtpResponse {
  */
 export async function sendOtp(dto: SendOtpDto): Promise<SendOtpResponse> {
   try {
-    console.log('[authApi] Sending OTP to:', dto.value);
-    return await apiFetch<SendOtpResponse>('/auth/send-otp', {
-      method: 'POST',
+    console.log("[authApi] Sending OTP to:", dto.value);
+    return await apiFetch<SendOtpResponse>("/auth/send-otp", {
+      method: "POST",
       data: dto,
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     });
   } catch (error) {
-    console.error('[authApi] sendOtp error:', error);
+    console.error("[authApi] sendOtp error:", error);
     throw error;
   }
 }
@@ -218,16 +231,16 @@ export async function sendOtp(dto: SendOtpDto): Promise<SendOtpResponse> {
  */
 export async function verifyOtp(dto: VerifyOtpDto): Promise<VerifyOtpResponse> {
   try {
-    console.log('[authApi] Verifying OTP for:', dto.value);
-    return await apiFetch<VerifyOtpResponse>('/auth/verify-otp', {
-      method: 'POST',
+    console.log("[authApi] Verifying OTP for:", dto.value);
+    return await apiFetch<VerifyOtpResponse>("/auth/verify-otp", {
+      method: "POST",
       data: dto,
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     });
   } catch (error) {
-    console.error('[authApi] verifyOtp error:', error);
+    console.error("[authApi] verifyOtp error:", error);
     throw error;
   }
 }
@@ -235,7 +248,7 @@ export async function verifyOtp(dto: VerifyOtpDto): Promise<VerifyOtpResponse> {
 // ==================== SOCIAL LOGIN TYPES ====================
 
 export interface SocialLoginDto {
-  provider: 'google' | 'facebook' | 'apple';
+  provider: "google" | "facebook" | "apple";
   token: string; // OAuth token from provider
   userData?: {
     email?: string;
@@ -250,16 +263,16 @@ export interface SocialLoginDto {
  */
 export async function socialLogin(dto: SocialLoginDto): Promise<AuthResponse> {
   try {
-    console.log('[authApi] Social login via:', dto.provider);
-    return await apiFetch<AuthResponse>('/auth/social-login', {
-      method: 'POST',
+    console.log("[authApi] Social login via:", dto.provider);
+    return await apiFetch<AuthResponse>("/auth/social-login", {
+      method: "POST",
       data: dto,
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     });
   } catch (error) {
-    console.error('[authApi] socialLogin error:', error);
+    console.error("[authApi] socialLogin error:", error);
     throw error;
   }
 }
@@ -279,18 +292,20 @@ export interface ResetPasswordDto {
  * Request password reset
  * Endpoint: POST /auth/forgot-password
  */
-export async function forgotPassword(dto: ForgotPasswordDto): Promise<{ success: boolean; message: string }> {
+export async function forgotPassword(
+  dto: ForgotPasswordDto
+): Promise<{ success: boolean; message: string }> {
   try {
-    console.log('[authApi] Requesting password reset for:', dto.email);
-    return await apiFetch('/auth/forgot-password', {
-      method: 'POST',
+    console.log("[authApi] Requesting password reset for:", dto.email);
+    return await apiFetch("/auth/forgot-password", {
+      method: "POST",
       data: dto,
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     });
   } catch (error) {
-    console.error('[authApi] forgotPassword error:', error);
+    console.error("[authApi] forgotPassword error:", error);
     throw error;
   }
 }
@@ -299,18 +314,20 @@ export async function forgotPassword(dto: ForgotPasswordDto): Promise<{ success:
  * Reset password with token
  * Endpoint: POST /auth/reset-password
  */
-export async function resetPassword(dto: ResetPasswordDto): Promise<{ success: boolean; message: string }> {
+export async function resetPassword(
+  dto: ResetPasswordDto
+): Promise<{ success: boolean; message: string }> {
   try {
-    console.log('[authApi] Resetting password with token');
-    return await apiFetch('/auth/reset-password', {
-      method: 'POST',
+    console.log("[authApi] Resetting password with token");
+    return await apiFetch("/auth/reset-password", {
+      method: "POST",
       data: dto,
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     });
   } catch (error) {
-    console.error('[authApi] resetPassword error:', error);
+    console.error("[authApi] resetPassword error:", error);
     throw error;
   }
 }
@@ -331,6 +348,13 @@ export const authApi = {
   // Password Reset
   forgotPassword,
   resetPassword,
+  // Generic POST helper for custom endpoints
+  post: async (endpoint: string, data: any) => {
+    return await apiFetch(`${BASE_URL}${endpoint}`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  },
 };
 
 export default authApi;

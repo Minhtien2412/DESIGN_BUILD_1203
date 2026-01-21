@@ -203,11 +203,11 @@ const styles = StyleSheet.create({
 
 // Chip Group Component
 interface ChipGroupProps {
-  chips: Array<{
+  chips: {
     key: string;
     label: string;
     icon?: keyof typeof Ionicons.glyphMap;
-  }>;
+  }[];
   selected?: string[];
   onChange?: (selected: string[]) => void;
   variant?: ChipVariant;

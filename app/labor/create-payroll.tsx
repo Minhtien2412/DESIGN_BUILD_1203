@@ -15,11 +15,11 @@ import {
     View,
 } from 'react-native';
 
-const PAYMENT_METHOD_OPTIONS: Array<{
+const PAYMENT_METHOD_OPTIONS: {
   value: PaymentMethod;
   label: string;
   icon: keyof typeof Ionicons.glyphMap;
-}> = [
+}[] = [
   { value: PaymentMethod.CASH, label: 'Tiền mặt', icon: 'cash' },
   { value: PaymentMethod.BANK_TRANSFER, label: 'Chuyển khoản', icon: 'card' },
   { value: PaymentMethod.CHECK, label: 'Séc', icon: 'document-text' },

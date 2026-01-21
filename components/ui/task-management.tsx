@@ -26,8 +26,8 @@ export interface Task {
   status: 'todo' | 'in-progress' | 'completed' | 'blocked';
   priority: 'low' | 'medium' | 'high' | 'urgent';
   dueDate?: string;
-  assignees?: Array<{ id: string; name: string; avatar?: string }>;
-  subtasks?: Array<{ id: string; title: string; completed: boolean }>;
+  assignees?: { id: string; name: string; avatar?: string }[];
+  subtasks?: { id: string; title: string; completed: boolean }[];
   tags?: string[];
 }
 

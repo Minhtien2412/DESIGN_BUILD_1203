@@ -110,7 +110,7 @@ export const updateTaskProgress = async (
 };
 
 export const bulkUpdateTasks = async (
-  updates: Array<{ taskId: string; data: UpdateTaskRequest }>
+  updates: { taskId: string; data: UpdateTaskRequest }[]
 ): Promise<TimelineTask[]> => {
   return apiFetch(`${BASE_URL}/tasks/bulk-update`, {
     method: 'POST',
@@ -264,12 +264,12 @@ export const autoSchedule = async (
 ): Promise<{
   phases: TimelinePhase[];
   tasks: TimelineTask[];
-  adjustments: Array<{
+  adjustments: {
     taskId: string;
     oldStartDate: Date;
     newStartDate: Date;
     reason: string;
-  }>;
+  }[];
 }> => {
   return apiFetch(`${BASE_URL}/auto-schedule/${projectId}`, {
     method: 'POST',

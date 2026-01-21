@@ -1,7 +1,7 @@
 /**
  * Timeline - Edit Phase
  */
-import { MOCK_PHASE, PhaseService } from '@/services/phaseService';
+import PhaseService, { MOCK_PHASE } from '@/services/phaseService';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
@@ -47,13 +47,13 @@ export default function EditPhaseScreen() {
     }
 
     try {
-      const data = await PhaseService.getPhaseById(phaseId);
-      if (data) {
+      const result = await PhaseService.getPhaseById(phaseId);
+      if (result.data) {
         setFormData({
-          name: data.name,
-          description: data.description || '',
-          startDate: data.startDate,
-          endDate: data.endDate,
+          name: result.data.name,
+          description: result.data.description || '',
+          startDate: result.data.startDate,
+          endDate: result.data.endDate,
         });
         setDataSource('api');
       } else {

@@ -224,7 +224,7 @@ export function subscribeToProjectProgress(
     const projectData = data.progress as {
       name?: string;
       overallProgress?: number;
-      milestones?: Array<{ name: string; progress: number; completed: boolean }>;
+      milestones?: { name: string; progress: number; completed: boolean }[];
     };
     
     // Convert backend milestones to Milestone interface

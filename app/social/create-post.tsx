@@ -1,15 +1,21 @@
 /**
- * Create Post Screen - Full-featured Post Creation
- * Features: Camera/gallery, text, tags, location, mentions
+ * Create Post Screen - Minimalist Monochrome Design
+ * Features: Photo/video upload, text input, tags, audience selection
+ * Theme: Monochrome (#1a1a1a, #9ca3af, #fafafa)
+ * 
  * @author AI Assistant
- * @date 03/01/2026
+ * @date 16/01/2026
  */
 
-import Avatar from '@/components/ui/avatar';
+import {
+    COMMUNITY_COLORS as COLORS,
+    COMMUNITY_RADIUS as RADIUS,
+    COMMUNITY_SPACING as SPACING,
+    COMMUNITY_TYPOGRAPHY as TYPOGRAPHY
+} from '@/constants/community-theme';
 import { useAuth } from '@/context/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import {
@@ -30,30 +36,121 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
-// Post types
+// ==================== DATA ====================
+
 const POST_TYPES = [
   { id: 'post', name: 'Bài viết', icon: 'create-outline' },
   { id: 'photo', name: 'Ảnh/Video', icon: 'images-outline' },
   { id: 'reel', name: 'Reels', icon: 'film-outline' },
-  { id: 'story', name: 'Story', icon: 'add-circle-outline' },
-  { id: 'live', name: 'Live', icon: 'radio-outline' },
 ];
 
-// Suggested tags
 const SUGGESTED_TAGS = [
   'xâydựng', 'kiếntrúc', 'nộithất', 'nhàđẹp', 'thiếtkế',
-  'biệtthự', 'nhàphố', 'cănnhộ', 'phongthủy', 'vậtliệu',
-  'thicông', 'sửachữa', 'DIY', 'sanvườn', 'trangtrí',
+  'biệtthự', 'nhàphố', 'cănnhộ', 'vậtliệu', 'DIY',
 ];
 
-// Audience options
 const AUDIENCE_OPTIONS = [
-  { id: 'public', name: 'Công khai', icon: 'globe-outline', desc: 'Mọi người có thể xem' },
-  { id: 'friends', name: 'Bạn bè', icon: 'people-outline', desc: 'Chỉ bạn bè xem được' },
-  { id: 'private', name: 'Chỉ mình tôi', icon: 'lock-closed-outline', desc: 'Chỉ mình bạn xem được' },
+  { id: 'public', name: 'Công khai', icon: 'globe-outline', desc: 'Mọi người' },
+  { id: 'friends', name: 'Bạn bè', icon: 'people-outline', desc: 'Chỉ bạn bè' },
+  { id: 'private', name: 'Chỉ mình tôi', icon: 'lock-closed-outline', desc: 'Riêng tư' },
 ];
+
+// ==================== COMPONENTS ====================
+
+// Post Type Selector
+const PostTypeSelector = ({ selected, onSelect }: { 
+  selected: string; 
+  onSelect: (id: string) => void 
+}) => (
+  <View style={styles.postTypesRow}>
+    {POST_TYPES.map(type => (
+      <TouchableOpacity
+        key={type.id}
+        style={[styles.postTypeBtn, selected === type.id && styles.postTypeBtnActive]}
+        onPress={() => onSelect(type.id)}
+      >
+        <Ionicons 
+          name={type.icon as any} 
+          size={20} 
+          color={selected === type.id ? COLORS.textInverse : COLORS.textSecondary} 
+        />
+        <Text style={[styles.postTypeText, selected === type.id && styles.postTypeTextActive]}>
+          {type.name}
+        </Text>
+      </TouchableOpacity>
+    ))}
+  </View>
+);
+
+// Media Grid
+const MediaGrid = ({ images, onRemove }: { 
+  images: string[]; 
+  onRemove: (index: number) => void 
+}) => {
+  if (images.length === 0) return null;
+  
+  return (
+    <ScrollView 
+      horizontal 
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={styles.mediaGrid}
+    >
+      {images.map((uri, index) => (
+        <View key={index} style={styles.mediaItem}>
+          <Image source={{ uri }} style={styles.mediaImage} />
+          <TouchableOpacity 
+            style={styles.mediaRemoveBtn}
+            onPress={() => onRemove(index)}
+          >
+            <Ionicons name="close" size={16} color={COLORS.textInverse} />
+          </TouchableOpacity>
+        </View>
+      ))}
+    </ScrollView>
+  );
+};
+
+// Tag Chip
+const TagChip = ({ tag, selected, onPress }: { 
+  tag: string; 
+  selected: boolean; 
+  onPress: () => void 
+}) => (
+  <TouchableOpacity 
+    style={[styles.tagChip, selected && styles.tagChipActive]}
+    onPress={onPress}
+  >
+    <Text style={[styles.tagText, selected && styles.tagTextActive]}>#{tag}</Text>
+  </TouchableOpacity>
+);
+
+// Audience Selector
+const AudienceSelector = ({ selected, onSelect }: { 
+  selected: string; 
+  onSelect: (id: string) => void 
+}) => (
+  <View style={styles.audienceRow}>
+    {AUDIENCE_OPTIONS.map(opt => (
+      <TouchableOpacity
+        key={opt.id}
+        style={[styles.audienceBtn, selected === opt.id && styles.audienceBtnActive]}
+        onPress={() => onSelect(opt.id)}
+      >
+        <Ionicons 
+          name={opt.icon as any} 
+          size={18} 
+          color={selected === opt.id ? COLORS.textInverse : COLORS.textSecondary} 
+        />
+        <Text style={[styles.audienceText, selected === opt.id && styles.audienceTextActive]}>
+          {opt.name}
+        </Text>
+      </TouchableOpacity>
+    ))}
+  </View>
+);
 
 // ==================== MAIN COMPONENT ====================
+
 export default function CreatePostScreen() {
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
@@ -62,18 +159,14 @@ export default function CreatePostScreen() {
   const [content, setContent] = useState('');
   const [images, setImages] = useState<string[]>([]);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [customTag, setCustomTag] = useState('');
-  const [location, setLocation] = useState('');
   const [audience, setAudience] = useState('public');
-  const [showAudienceModal, setShowAudienceModal] = useState(false);
   const [isPosting, setIsPosting] = useState(false);
   
-  // Pick images from gallery
+  // Pick images
   const pickImages = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    
     if (status !== 'granted') {
-      Alert.alert('Quyền truy cập', 'Cần quyền truy cập thư viện ảnh để chọn ảnh.');
+      Alert.alert('Quyền truy cập', 'Cần quyền truy cập thư viện ảnh.');
       return;
     }
     
@@ -89,48 +182,30 @@ export default function CreatePostScreen() {
     }
   };
   
-  // Take photo with camera
+  // Take photo
   const takePhoto = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    
     if (status !== 'granted') {
-      Alert.alert('Quyền truy cập', 'Cần quyền truy cập camera để chụp ảnh.');
+      Alert.alert('Quyền truy cập', 'Cần quyền truy cập camera.');
       return;
     }
     
-    const result = await ImagePicker.launchCameraAsync({
-      quality: 0.8,
-    });
-    
+    const result = await ImagePicker.launchCameraAsync({ quality: 0.8 });
     if (!result.canceled && result.assets) {
       setImages([...images, result.assets[0].uri]);
     }
-  };
-  
-  // Remove image
-  const removeImage = (index: number) => {
-    setImages(images.filter((_, i) => i !== index));
   };
   
   // Toggle tag
   const toggleTag = (tag: string) => {
     if (selectedTags.includes(tag)) {
       setSelectedTags(selectedTags.filter(t => t !== tag));
-    } else if (selectedTags.length < 10) {
+    } else if (selectedTags.length < 5) {
       setSelectedTags([...selectedTags, tag]);
     }
   };
   
-  // Add custom tag
-  const addCustomTag = () => {
-    const tag = customTag.trim().replace(/\s+/g, '').toLowerCase();
-    if (tag && !selectedTags.includes(tag) && selectedTags.length < 10) {
-      setSelectedTags([...selectedTags, tag]);
-      setCustomTag('');
-    }
-  };
-  
-  // Post content
+  // Submit post
   const handlePost = async () => {
     if (!content.trim() && images.length === 0) {
       Alert.alert('Thông báo', 'Vui lòng nhập nội dung hoặc thêm ảnh.');
@@ -147,275 +222,105 @@ export default function CreatePostScreen() {
       ]);
     }, 1500);
   };
-  
-  const selectedAudience = AUDIENCE_OPTIONS.find(a => a.id === audience);
-  
+
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+    <View style={[styles.container, { paddingTop: insets.top }]}>
+      <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
       
       {/* Header */}
-      <View style={[styles.header, { paddingTop: insets.top }]}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Ionicons name="close" size={28} color="#333" />
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+          <Ionicons name="close" size={24} color={COLORS.primary} />
         </TouchableOpacity>
-        
         <Text style={styles.headerTitle}>Tạo bài viết</Text>
-        
         <TouchableOpacity 
-          style={[styles.postButton, (!content.trim() && images.length === 0) && styles.postButtonDisabled]}
+          style={[styles.postBtn, (!content.trim() && images.length === 0) && styles.postBtnDisabled]}
           onPress={handlePost}
           disabled={isPosting || (!content.trim() && images.length === 0)}
         >
-          {isPosting ? (
-            <Text style={styles.postButtonText}>Đang đăng...</Text>
-          ) : (
-            <Text style={styles.postButtonText}>Đăng</Text>
-          )}
+          <Text style={[styles.postBtnText, (!content.trim() && images.length === 0) && styles.postBtnTextDisabled]}>
+            {isPosting ? 'Đang đăng...' : 'Đăng'}
+          </Text>
         </TouchableOpacity>
       </View>
       
       <KeyboardAvoidingView 
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.content}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <ScrollView showsVerticalScrollIndicator={false}>
-          {/* User info & audience */}
-          <View style={styles.userSection}>
-            <Avatar name={user?.name || 'U'} size={48} />
-            <View style={styles.userInfo}>
+          {/* Post Types */}
+          <PostTypeSelector selected={postType} onSelect={setPostType} />
+          
+          {/* User Info */}
+          <View style={styles.userRow}>
+            <View style={styles.userAvatar}>
+              <Text style={styles.userAvatarText}>{user?.name?.[0] || 'U'}</Text>
+            </View>
+            <View>
               <Text style={styles.userName}>{user?.name || 'Người dùng'}</Text>
-              <TouchableOpacity 
-                style={styles.audienceButton}
-                onPress={() => setShowAudienceModal(!showAudienceModal)}
-              >
-                <Ionicons name={selectedAudience?.icon as any} size={14} color="#666" />
-                <Text style={styles.audienceText}>{selectedAudience?.name}</Text>
-                <Ionicons name="chevron-down" size={14} color="#666" />
+              <TouchableOpacity style={styles.audienceSmall}>
+                <Ionicons 
+                  name={AUDIENCE_OPTIONS.find(o => o.id === audience)?.icon as any || 'globe-outline'} 
+                  size={12} 
+                  color={COLORS.textSecondary} 
+                />
+                <Text style={styles.audienceSmallText}>
+                  {AUDIENCE_OPTIONS.find(o => o.id === audience)?.name || 'Công khai'}
+                </Text>
+                <Ionicons name="chevron-down" size={12} color={COLORS.textSecondary} />
               </TouchableOpacity>
             </View>
           </View>
           
-          {/* Audience selector */}
-          {showAudienceModal && (
-            <View style={styles.audienceModal}>
-              {AUDIENCE_OPTIONS.map(option => (
-                <TouchableOpacity
-                  key={option.id}
-                  style={[styles.audienceOption, audience === option.id && styles.audienceOptionActive]}
-                  onPress={() => {
-                    setAudience(option.id);
-                    setShowAudienceModal(false);
-                  }}
-                >
-                  <Ionicons 
-                    name={option.icon as any} 
-                    size={20} 
-                    color={audience === option.id ? '#0066CC' : '#666'} 
-                  />
-                  <View style={styles.audienceOptionInfo}>
-                    <Text style={[styles.audienceOptionName, audience === option.id && styles.audienceOptionNameActive]}>
-                      {option.name}
-                    </Text>
-                    <Text style={styles.audienceOptionDesc}>{option.desc}</Text>
-                  </View>
-                  {audience === option.id && (
-                    <Ionicons name="checkmark" size={20} color="#0066CC" />
-                  )}
-                </TouchableOpacity>
-              ))}
-            </View>
-          )}
-          
-          {/* Post type tabs */}
-          <ScrollView 
-            horizontal 
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.postTypesContainer}
-          >
-            {POST_TYPES.map(type => (
-              <TouchableOpacity
-                key={type.id}
-                style={[styles.postTypeTab, postType === type.id && styles.postTypeTabActive]}
-                onPress={() => setPostType(type.id)}
-              >
-                <Ionicons 
-                  name={type.icon as any} 
-                  size={20} 
-                  color={postType === type.id ? '#0066CC' : '#666'} 
-                />
-                <Text style={[styles.postTypeText, postType === type.id && styles.postTypeTextActive]}>
-                  {type.name}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-          
-          {/* Content input */}
+          {/* Text Input */}
           <TextInput
-            style={styles.contentInput}
-            placeholder="Bạn đang nghĩ gì? Chia sẻ về dự án xây dựng, nội thất, thiết kế..."
-            placeholderTextColor="#999"
+            style={styles.textInput}
+            placeholder="Bạn đang nghĩ gì về xây dựng, kiến trúc...?"
+            placeholderTextColor={COLORS.textTertiary}
             value={content}
             onChangeText={setContent}
             multiline
-            textAlignVertical="top"
+            maxLength={2000}
           />
           
-          {/* Images preview */}
-          {images.length > 0 && (
-            <View style={styles.imagesSection}>
-              <ScrollView 
-                horizontal 
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.imagesContainer}
-              >
-                {images.map((uri, index) => (
-                  <View key={index} style={styles.imagePreview}>
-                    <Image source={{ uri }} style={styles.previewImage} />
-                    <TouchableOpacity 
-                      style={styles.removeImageButton}
-                      onPress={() => removeImage(index)}
-                    >
-                      <Ionicons name="close-circle" size={24} color="#fff" />
-                    </TouchableOpacity>
-                  </View>
-                ))}
-                
-                {/* Add more images button */}
-                <TouchableOpacity style={styles.addImageButton} onPress={pickImages}>
-                  <Ionicons name="add" size={32} color="#666" />
-                  <Text style={styles.addImageText}>Thêm ảnh</Text>
-                </TouchableOpacity>
-              </ScrollView>
-            </View>
-          )}
+          {/* Media Grid */}
+          <MediaGrid images={images} onRemove={(i) => setImages(images.filter((_, idx) => idx !== i))} />
           
-          {/* Media buttons */}
-          <View style={styles.mediaSection}>
-            <Text style={styles.sectionTitle}>Thêm vào bài viết</Text>
-            <View style={styles.mediaButtons}>
-              <TouchableOpacity style={styles.mediaButton} onPress={pickImages}>
-                <Ionicons name="images" size={24} color="#45bd62" />
-                <Text style={styles.mediaButtonText}>Ảnh/Video</Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity style={styles.mediaButton} onPress={takePhoto}>
-                <Ionicons name="camera" size={24} color="#f02849" />
-                <Text style={styles.mediaButtonText}>Chụp ảnh</Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity style={styles.mediaButton}>
-                <Ionicons name="location" size={24} color="#f7b928" />
-                <Text style={styles.mediaButtonText}>Vị trí</Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity style={styles.mediaButton}>
-                <Ionicons name="pricetag" size={24} color="#1877f2" />
-                <Text style={styles.mediaButtonText}>Gắn thẻ</Text>
-              </TouchableOpacity>
-            </View>
+          {/* Media Actions */}
+          <View style={styles.mediaActions}>
+            <TouchableOpacity style={styles.mediaActionBtn} onPress={pickImages}>
+              <Ionicons name="images-outline" size={22} color={COLORS.primary} />
+              <Text style={styles.mediaActionText}>Thư viện</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.mediaActionBtn} onPress={takePhoto}>
+              <Ionicons name="camera-outline" size={22} color={COLORS.primary} />
+              <Text style={styles.mediaActionText}>Camera</Text>
+            </TouchableOpacity>
           </View>
           
-          {/* Location */}
-          <View style={styles.locationSection}>
-            <Text style={styles.sectionTitle}>Vị trí</Text>
-            <View style={styles.locationInputContainer}>
-              <Ionicons name="location-outline" size={20} color="#666" />
-              <TextInput
-                style={styles.locationInput}
-                placeholder="Thêm vị trí"
-                placeholderTextColor="#999"
-                value={location}
-                onChangeText={setLocation}
-              />
-            </View>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.locationSuggestions}>
-              {['TP. Hồ Chí Minh', 'Hà Nội', 'Đà Nẵng', 'Nha Trang', 'Cần Thơ'].map(loc => (
-                <TouchableOpacity 
-                  key={loc} 
-                  style={styles.locationChip}
-                  onPress={() => setLocation(loc)}
-                >
-                  <Text style={styles.locationChipText}>{loc}</Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          </View>
-          
-          {/* Tags */}
-          <View style={styles.tagsSection}>
-            <Text style={styles.sectionTitle}>
-              Hashtag ({selectedTags.length}/10)
-            </Text>
-            
-            {/* Selected tags */}
-            {selectedTags.length > 0 && (
-              <View style={styles.selectedTagsContainer}>
-                {selectedTags.map(tag => (
-                  <TouchableOpacity
-                    key={tag}
-                    style={styles.selectedTag}
-                    onPress={() => toggleTag(tag)}
-                  >
-                    <Text style={styles.selectedTagText}>#{tag}</Text>
-                    <Ionicons name="close" size={14} color="#0066CC" />
-                  </TouchableOpacity>
-                ))}
-              </View>
-            )}
-            
-            {/* Custom tag input */}
-            <View style={styles.customTagContainer}>
-              <TextInput
-                style={styles.customTagInput}
-                placeholder="Thêm hashtag..."
-                placeholderTextColor="#999"
-                value={customTag}
-                onChangeText={setCustomTag}
-                onSubmitEditing={addCustomTag}
-              />
-              {customTag.trim() && (
-                <TouchableOpacity style={styles.addTagButton} onPress={addCustomTag}>
-                  <Text style={styles.addTagButtonText}>Thêm</Text>
-                </TouchableOpacity>
-              )}
-            </View>
-            
-            {/* Suggested tags */}
-            <Text style={styles.suggestedTitle}>Gợi ý</Text>
-            <View style={styles.suggestedTagsContainer}>
-              {SUGGESTED_TAGS.filter(t => !selectedTags.includes(t)).map(tag => (
-                <TouchableOpacity
+          {/* Tags Section */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Gắn thẻ (tối đa 5)</Text>
+            <View style={styles.tagsContainer}>
+              {SUGGESTED_TAGS.map(tag => (
+                <TagChip
                   key={tag}
-                  style={styles.suggestedTag}
+                  tag={tag}
+                  selected={selectedTags.includes(tag)}
                   onPress={() => toggleTag(tag)}
-                >
-                  <Text style={styles.suggestedTagText}>#{tag}</Text>
-                </TouchableOpacity>
+                />
               ))}
             </View>
           </View>
           
-          {/* Tips */}
-          <View style={styles.tipsSection}>
-            <LinearGradient
-              colors={['#f0f9ff', '#e0f2fe']}
-              style={styles.tipsGradient}
-            >
-              <Ionicons name="bulb-outline" size={24} color="#0369a1" />
-              <View style={styles.tipsContent}>
-                <Text style={styles.tipsTitle}>Mẹo tạo bài viết hay</Text>
-                <Text style={styles.tipsText}>
-                  • Thêm ảnh/video chất lượng cao{'\n'}
-                  • Sử dụng hashtag phổ biến{'\n'}
-                  • Chia sẻ kinh nghiệm thực tế{'\n'}
-                  • Tag vị trí để tăng reach
-                </Text>
-              </View>
-            </LinearGradient>
+          {/* Audience Section */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Ai có thể xem?</Text>
+            <AudienceSelector selected={audience} onSelect={setAudience} />
           </View>
           
+          {/* Bottom Padding */}
           <View style={{ height: 100 }} />
         </ScrollView>
       </KeyboardAvoidingView>
@@ -424,10 +329,11 @@ export default function CreatePostScreen() {
 }
 
 // ==================== STYLES ====================
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.background,
   },
   
   // Header
@@ -435,29 +341,39 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingBottom: 12,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.md,
+    backgroundColor: COLORS.surface,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: COLORS.border,
+  },
+  backBtn: {
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#333',
+    fontSize: TYPOGRAPHY.fontSize.lg,
+    fontWeight: TYPOGRAPHY.fontWeight.semibold,
+    color: COLORS.text,
   },
-  postButton: {
-    backgroundColor: '#0066CC',
-    paddingHorizontal: 20,
-    paddingVertical: 8,
-    borderRadius: 20,
+  postBtn: {
+    backgroundColor: COLORS.primary,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.sm,
+    borderRadius: RADIUS.full,
   },
-  postButtonDisabled: {
-    backgroundColor: '#ccc',
+  postBtnDisabled: {
+    backgroundColor: COLORS.surfaceElevated,
   },
-  postButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#fff',
+  postBtnText: {
+    fontSize: TYPOGRAPHY.fontSize.md,
+    fontWeight: TYPOGRAPHY.fontWeight.semibold,
+    color: COLORS.textInverse,
+  },
+  postBtnTextDisabled: {
+    color: COLORS.textTertiary,
   },
   
   // Content
@@ -465,310 +381,196 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   
-  // User section
-  userSection: {
+  // Post Types
+  postTypesRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    gap: 12,
-  },
-  userInfo: {},
-  userName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-  },
-  audienceButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f0f0f0',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-    marginTop: 4,
-    gap: 4,
-  },
-  audienceText: {
-    fontSize: 12,
-    color: '#666',
-  },
-  
-  // Audience modal
-  audienceModal: {
-    marginHorizontal: 16,
-    backgroundColor: '#f8f8f8',
-    borderRadius: 12,
-    marginBottom: 12,
-  },
-  audienceOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 12,
-    gap: 12,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.md,
+    gap: SPACING.sm,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: COLORS.border,
   },
-  audienceOptionActive: {
-    backgroundColor: '#fff5f5',
-  },
-  audienceOptionInfo: {
-    flex: 1,
-  },
-  audienceOptionName: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#333',
-  },
-  audienceOptionNameActive: {
-    color: '#0066CC',
-  },
-  audienceOptionDesc: {
-    fontSize: 12,
-    color: '#999',
-    marginTop: 2,
-  },
-  
-  // Post types
-  postTypesContainer: {
-    paddingHorizontal: 12,
-    gap: 8,
-    paddingBottom: 12,
-  },
-  postTypeTab: {
+  postTypeBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: '#f5f5f5',
-    gap: 6,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
+    borderRadius: RADIUS.full,
+    backgroundColor: COLORS.surfaceElevated,
+    gap: SPACING.xs,
   },
-  postTypeTabActive: {
-    backgroundColor: '#fff5f5',
-    borderWidth: 1,
-    borderColor: '#0066CC',
+  postTypeBtnActive: {
+    backgroundColor: COLORS.primary,
   },
   postTypeText: {
-    fontSize: 13,
-    color: '#666',
-    fontWeight: '500',
+    fontSize: TYPOGRAPHY.fontSize.sm,
+    color: COLORS.textSecondary,
+    fontWeight: TYPOGRAPHY.fontWeight.medium,
   },
   postTypeTextActive: {
-    color: '#0066CC',
+    color: COLORS.textInverse,
   },
   
-  // Content input
-  contentInput: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 16,
-    color: '#333',
+  // User Row
+  userRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: SPACING.lg,
+    gap: SPACING.md,
+  },
+  userAvatar: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: COLORS.surfaceElevated,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  userAvatarText: {
+    fontSize: TYPOGRAPHY.fontSize.lg,
+    fontWeight: TYPOGRAPHY.fontWeight.semibold,
+    color: COLORS.text,
+  },
+  userName: {
+    fontSize: TYPOGRAPHY.fontSize.md,
+    fontWeight: TYPOGRAPHY.fontWeight.semibold,
+    color: COLORS.text,
+  },
+  audienceSmall: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginTop: 2,
+  },
+  audienceSmallText: {
+    fontSize: TYPOGRAPHY.fontSize.xs,
+    color: COLORS.textSecondary,
+  },
+  
+  // Text Input
+  textInput: {
+    fontSize: TYPOGRAPHY.fontSize.lg,
+    color: COLORS.text,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.md,
     minHeight: 120,
-    lineHeight: 24,
+    textAlignVertical: 'top',
   },
   
-  // Images
-  imagesSection: {
-    paddingVertical: 12,
+  // Media Grid
+  mediaGrid: {
+    paddingHorizontal: SPACING.lg,
+    gap: SPACING.sm,
+    paddingBottom: SPACING.md,
   },
-  imagesContainer: {
-    paddingHorizontal: 12,
-    gap: 8,
-  },
-  imagePreview: {
-    width: 120,
-    height: 120,
-    borderRadius: 8,
+  mediaItem: {
+    width: 100,
+    height: 100,
+    borderRadius: RADIUS.md,
     overflow: 'hidden',
+    marginRight: SPACING.sm,
   },
-  previewImage: {
+  mediaImage: {
     width: '100%',
     height: '100%',
   },
-  removeImageButton: {
+  mediaRemoveBtn: {
     position: 'absolute',
-    top: 4,
-    right: 4,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    top: SPACING.xs,
+    right: SPACING.xs,
+    width: 24,
+    height: 24,
     borderRadius: 12,
-  },
-  addImageButton: {
-    width: 120,
-    height: 120,
-    borderRadius: 8,
-    borderWidth: 2,
-    borderColor: '#ddd',
-    borderStyle: 'dashed',
-    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.6)',
     alignItems: 'center',
-  },
-  addImageText: {
-    fontSize: 12,
-    color: '#666',
-    marginTop: 4,
+    justifyContent: 'center',
   },
   
-  // Media section
-  mediaSection: {
-    padding: 16,
+  // Media Actions
+  mediaActions: {
+    flexDirection: 'row',
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.md,
+    gap: SPACING.md,
     borderTopWidth: 1,
-    borderTopColor: '#eee',
+    borderTopColor: COLORS.border,
+  },
+  mediaActionBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.xs,
+    paddingVertical: SPACING.sm,
+    paddingHorizontal: SPACING.md,
+    backgroundColor: COLORS.surfaceElevated,
+    borderRadius: RADIUS.md,
+  },
+  mediaActionText: {
+    fontSize: TYPOGRAPHY.fontSize.sm,
+    color: COLORS.text,
+    fontWeight: TYPOGRAPHY.fontWeight.medium,
+  },
+  
+  // Section
+  section: {
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.md,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.border,
   },
   sectionTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 12,
-  },
-  mediaButtons: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  mediaButton: {
-    flex: 1,
-    alignItems: 'center',
-    paddingVertical: 12,
-    backgroundColor: '#f8f8f8',
-    borderRadius: 8,
-    gap: 4,
-  },
-  mediaButtonText: {
-    fontSize: 11,
-    color: '#666',
-  },
-  
-  // Location
-  locationSection: {
-    padding: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#eee',
-  },
-  locationInputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f5f5f5',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    gap: 8,
-  },
-  locationInput: {
-    flex: 1,
-    paddingVertical: 12,
-    fontSize: 14,
-    color: '#333',
-  },
-  locationSuggestions: {
-    marginTop: 8,
-  },
-  locationChip: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    backgroundColor: '#e8f4f8',
-    borderRadius: 16,
-    marginRight: 8,
-  },
-  locationChipText: {
-    fontSize: 12,
-    color: '#0891b2',
+    fontSize: TYPOGRAPHY.fontSize.md,
+    fontWeight: TYPOGRAPHY.fontWeight.semibold,
+    color: COLORS.text,
+    marginBottom: SPACING.md,
   },
   
   // Tags
-  tagsSection: {
-    padding: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#eee',
-  },
-  selectedTagsContainer: {
+  tagsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
-    marginBottom: 12,
+    gap: SPACING.sm,
   },
-  selectedTag: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff5f5',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#0066CC',
-    gap: 4,
+  tagChip: {
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
+    backgroundColor: COLORS.surfaceElevated,
+    borderRadius: RADIUS.full,
   },
-  selectedTagText: {
-    fontSize: 13,
-    color: '#0066CC',
+  tagChipActive: {
+    backgroundColor: COLORS.primary,
   },
-  customTagContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f5f5f5',
-    borderRadius: 8,
-    paddingLeft: 12,
-    marginBottom: 12,
+  tagText: {
+    fontSize: TYPOGRAPHY.fontSize.sm,
+    color: COLORS.textSecondary,
   },
-  customTagInput: {
-    flex: 1,
-    paddingVertical: 10,
-    fontSize: 14,
-    color: '#333',
-  },
-  addTagButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    backgroundColor: '#0066CC',
-    borderTopRightRadius: 8,
-    borderBottomRightRadius: 8,
-  },
-  addTagButtonText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#fff',
-  },
-  suggestedTitle: {
-    fontSize: 12,
-    color: '#999',
-    marginBottom: 8,
-  },
-  suggestedTagsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  suggestedTag: {
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 16,
-  },
-  suggestedTagText: {
-    fontSize: 12,
-    color: '#666',
+  tagTextActive: {
+    color: COLORS.textInverse,
   },
   
-  // Tips
-  tipsSection: {
-    margin: 16,
-    borderRadius: 12,
-    overflow: 'hidden',
-  },
-  tipsGradient: {
+  // Audience
+  audienceRow: {
     flexDirection: 'row',
-    padding: 16,
-    gap: 12,
+    gap: SPACING.sm,
   },
-  tipsContent: {
+  audienceBtn: {
     flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: SPACING.xs,
+    paddingVertical: SPACING.md,
+    backgroundColor: COLORS.surfaceElevated,
+    borderRadius: RADIUS.md,
   },
-  tipsTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#0369a1',
-    marginBottom: 8,
+  audienceBtnActive: {
+    backgroundColor: COLORS.primary,
   },
-  tipsText: {
-    fontSize: 12,
-    color: '#0369a1',
-    lineHeight: 20,
+  audienceText: {
+    fontSize: TYPOGRAPHY.fontSize.sm,
+    color: COLORS.textSecondary,
+    fontWeight: TYPOGRAPHY.fontWeight.medium,
+  },
+  audienceTextActive: {
+    color: COLORS.textInverse,
   },
 });

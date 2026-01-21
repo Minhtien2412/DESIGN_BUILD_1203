@@ -39,7 +39,7 @@ export const clearTokens = () => {
 
 // Refresh lock to prevent multiple refresh requests
 let isRefreshing = false;
-let refreshSubscribers: Array<(token: string) => void> = [];
+let refreshSubscribers: ((token: string) => void)[] = [];
 
 const subscribeTokenRefresh = (cb: (token: string) => void) => {
   refreshSubscribers.push(cb);

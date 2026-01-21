@@ -1,7 +1,7 @@
 import { SafeScrollView } from "@/components/ui/safe-area";
 import { Colors } from "@/constants/theme";
-import { SERVICES } from "@/data/home-sections";
-import { Ionicons } from "@expo/vector-icons";
+import { AI_SERVICES, SERVICES } from "@/data/home-sections";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Href, router } from "expo-router";
 import { useRef } from "react";
 import { Animated, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -16,6 +16,26 @@ export default function ServicesHubScreen() {
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Dịch vụ</Text>
         <View style={{ width: 40 }} />
+      </View>
+
+      {/* AI Services Banner */}
+      <View style={styles.aiSection}>
+        <View style={styles.aiSectionHeader}>
+          <MaterialCommunityIcons name="robot-happy" size={24} color="#7C3AED" />
+          <Text style={styles.aiSectionTitle}>🤖 Tư vấn AI</Text>
+          <View style={styles.newBadge}>
+            <Text style={styles.newBadgeText}>MỚI</Text>
+          </View>
+        </View>
+        <Text style={styles.aiSectionSubtitle}>
+          Trợ lý AI thông minh tư vấn mọi vấn đề về xây dựng
+        </Text>
+        
+        <View style={styles.aiServicesRow}>
+          {AI_SERVICES.map((service) => (
+            <AIServiceCard key={service.id} item={service} />
+          ))}
+        </View>
       </View>
 
       {/* Marketplace Banner */}
@@ -33,6 +53,11 @@ export default function ServicesHubScreen() {
         <Ionicons name="chevron-forward" size={24} color={Colors.light.primary} />
       </TouchableOpacity>
 
+      {/* Section Title */}
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitle}>📋 Tất cả dịch vụ</Text>
+      </View>
+
       {/* Services Grid */}
       <View style={styles.grid}>
         {SERVICES.map((service) => (
@@ -40,6 +65,48 @@ export default function ServicesHubScreen() {
         ))}
       </View>
     </SafeScrollView>
+  );
+}
+
+// AI Service Card Component
+function AIServiceCard({ item }: { item: typeof AI_SERVICES[0] }) {
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+
+  const handlePressIn = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 0.95,
+      useNativeDriver: true,
+      speed: 50,
+      bounciness: 8
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 50,
+      bounciness: 8
+    }).start();
+  };
+
+  return (
+    <TouchableOpacity
+      activeOpacity={1}
+      onPress={() => router.push(item.route as Href)}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+    >
+      <Animated.View style={[styles.aiServiceCard, { transform: [{ scale: scaleAnim }] }]}>
+        <View style={[styles.aiIconContainer, { backgroundColor: item.color + '20' }]}>
+          <Text style={styles.aiServiceIcon}>{item.icon}</Text>
+        </View>
+        <Text style={styles.aiServiceName} numberOfLines={2}>{item.name}</Text>
+        {item.isNew && (
+          <View style={[styles.hotDot, { backgroundColor: item.color }]} />
+        )}
+      </Animated.View>
+    </TouchableOpacity>
   );
 }
 
@@ -109,6 +176,85 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: Colors.light.text,
   },
+  
+  // AI Section
+  aiSection: {
+    backgroundColor: '#7C3AED10',
+    marginHorizontal: 16,
+    marginTop: 16,
+    padding: 16,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#7C3AED30',
+  },
+  aiSectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 4,
+  },
+  aiSectionTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#7C3AED',
+  },
+  newBadge: {
+    backgroundColor: '#DC2626',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 10,
+  },
+  newBadgeText: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: '700',
+  },
+  aiSectionSubtitle: {
+    fontSize: 13,
+    color: '#666',
+    marginBottom: 12,
+  },
+  aiServicesRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  aiServiceCard: {
+    width: '18.5%',
+    alignItems: 'center',
+    padding: 8,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    position: 'relative',
+  },
+  aiIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 4,
+  },
+  aiServiceIcon: {
+    fontSize: 20,
+  },
+  aiServiceName: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: Colors.light.text,
+    textAlign: 'center',
+    lineHeight: 13,
+  },
+  hotDot: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  
+  // Marketplace Banner
   marketplaceBanner: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -141,6 +287,20 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#666',
   },
+  
+  // Section Header
+  sectionHeader: {
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 4,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: Colors.light.text,
+  },
+  
+  // Services Grid
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',

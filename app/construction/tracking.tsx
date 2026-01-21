@@ -74,7 +74,7 @@ export default function WorkerTrackingScreen() {
       { status: 'completed', delay: 15000 },
     ];
 
-    const timeouts: NodeJS.Timeout[] = [];
+    const timeouts: ReturnType<typeof setTimeout>[] = [];
 
     statusSequence.forEach(({ status: newStatus, delay }) => {
       const timeout = setTimeout(() => {

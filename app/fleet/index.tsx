@@ -1,345 +1,678 @@
 /**
- * Fleet Management List Screen
+ * Fleet Management Screen - Modern Minimalist Design
+ * Features: Live status tracking, animated cards, statistics dashboard, dark mode
  */
 
-import { ThemedText } from '@/components/themed-text';
-import { Container } from '@/components/ui/container';
-import { Section } from '@/components/ui/section';
-import { useThemeColor } from '@/hooks/use-theme-color';
-import { useFleetSummary, useVehicles } from '@/hooks/useFleet';
-import type { VehicleStatus, VehicleType } from '@/types/fleet';
-import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
-import { useState } from 'react';
-import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { useThemeColor } from "@/hooks/use-theme-color";
+import { useFleetSummary, useVehicles } from "@/hooks/useFleet";
+import type { VehicleStatus, VehicleType } from "@/types/fleet";
+import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
+import { LinearGradient } from "expo-linear-gradient";
+import { router } from "expo-router";
+import { useEffect, useRef, useState } from "react";
+import {
+    Animated,
+    Dimensions,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+    useColorScheme,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-const VEHICLE_TYPE_ICONS: Record<VehicleType, keyof typeof Ionicons.glyphMap> = {
-  CAR: 'car-outline',
-  TRUCK: 'bus-outline',
-  VAN: 'car-sport-outline',
-  PICKUP: 'car-outline',
-  CRANE: 'construct-outline',
-  EXCAVATOR: 'hammer-outline',
-  BULLDOZER: 'construct-outline',
-  LOADER: 'business-outline',
-  FORKLIFT: 'construct-outline',
-  DUMP_TRUCK: 'bus-outline',
-  CONCRETE_MIXER: 'business-outline',
-  TRAILER: 'bus-outline',
-  MOTORCYCLE: 'bicycle-outline',
-  OTHER: 'ellipse-outline',
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
+
+const VEHICLE_TYPE_ICONS: Record<VehicleType, keyof typeof Ionicons.glyphMap> =
+  {
+    CAR: "car",
+    TRUCK: "bus",
+    VAN: "car-sport",
+    PICKUP: "car",
+    CRANE: "construct",
+    EXCAVATOR: "hammer",
+    BULLDOZER: "construct",
+    LOADER: "business",
+    FORKLIFT: "construct",
+    DUMP_TRUCK: "bus",
+    CONCRETE_MIXER: "business",
+    TRAILER: "bus",
+    MOTORCYCLE: "bicycle",
+    OTHER: "ellipse",
+  };
+
+type TabType = "vehicles" | "maintenance" | "fuel" | "trips";
+
+const TABS: {
+  id: TabType;
+  label: string;
+  icon: keyof typeof Ionicons.glyphMap;
+}[] = [
+  { id: "vehicles", label: "Phương tiện", icon: "car" },
+  { id: "maintenance", label: "Bảo trì", icon: "build" },
+  { id: "fuel", label: "Nhiên liệu", icon: "flame" },
+  { id: "trips", label: "Chuyến đi", icon: "navigate" },
+];
+
+const STATUS_COLORS: Record<VehicleStatus, string> = {
+  ACTIVE: "#10b981",
+  INACTIVE: "#6b7280",
+  IN_MAINTENANCE: "#f59e0b",
+  IN_REPAIR: "#ef4444",
+  RESERVED: "#3b82f6",
+  OUT_OF_SERVICE: "#ef4444",
+  RETIRED: "#9ca3af",
+};
+
+// Stat Card Component
+const StatCard = ({
+  title,
+  value,
+  color,
+  icon,
+  index,
+}: {
+  title: string;
+  value: string | number;
+  color: string;
+  icon: keyof typeof Ionicons.glyphMap;
+  index: number;
+}) => {
+  const scaleAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      delay: index * 100,
+      useNativeDriver: true,
+      tension: 50,
+      friction: 8,
+    }).start();
+  }, []);
+
+  return (
+    <Animated.View
+      style={[
+        styles.statCard,
+        { backgroundColor: color + "15" },
+        {
+          opacity: scaleAnim,
+          transform: [{ scale: scaleAnim }],
+        },
+      ]}
+    >
+      <View style={[styles.statIconWrap, { backgroundColor: color + "20" }]}>
+        <Ionicons name={icon} size={20} color={color} />
+      </View>
+      <Text style={[styles.statValue, { color }]}>{value}</Text>
+      <Text style={styles.statLabel}>{title}</Text>
+    </Animated.View>
+  );
+};
+
+// Vehicle Card Component
+const VehicleCard = ({
+  vehicle,
+  index,
+  textColor,
+  surfaceColor,
+  borderColor,
+  onPress,
+}: {
+  vehicle: any;
+  index: number;
+  textColor: string;
+  surfaceColor: string;
+  borderColor: string;
+  onPress: () => void;
+}) => {
+  const scaleAnim = useRef(new Animated.Value(0)).current;
+  const statusColor =
+    STATUS_COLORS[vehicle.status as VehicleStatus] || "#6b7280";
+
+  useEffect(() => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      delay: index * 80,
+      useNativeDriver: true,
+      tension: 50,
+      friction: 8,
+    }).start();
+  }, []);
+
+  return (
+    <Animated.View
+      style={[
+        styles.vehicleCardWrapper,
+        {
+          opacity: scaleAnim,
+          transform: [
+            { scale: scaleAnim },
+            {
+              translateY: scaleAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [30, 0],
+              }),
+            },
+          ],
+        },
+      ]}
+    >
+      <TouchableOpacity
+        style={[
+          styles.vehicleCard,
+          { backgroundColor: surfaceColor, borderColor },
+        ]}
+        onPress={onPress}
+        activeOpacity={0.7}
+      >
+        {/* Live indicator for active vehicles */}
+        {vehicle.status === "ACTIVE" && (
+          <View style={styles.liveIndicator}>
+            <View style={styles.liveDot} />
+            <Text style={styles.liveText}>LIVE</Text>
+          </View>
+        )}
+
+        <View style={styles.vehicleHeader}>
+          <View style={styles.vehicleIconWrap}>
+            <LinearGradient
+              colors={[statusColor + "20", statusColor + "10"]}
+              style={styles.vehicleIconGradient}
+            >
+              <Ionicons
+                name={VEHICLE_TYPE_ICONS[vehicle.type as VehicleType]}
+                size={28}
+                color={statusColor}
+              />
+            </LinearGradient>
+          </View>
+
+          <View style={styles.vehicleInfo}>
+            <Text style={[styles.vehicleNumber, { color: textColor }]}>
+              {vehicle.vehicleNumber}
+            </Text>
+            <Text style={[styles.vehicleMake, { color: textColor + "60" }]}>
+              {vehicle.make} {vehicle.model}
+            </Text>
+          </View>
+
+          <View
+            style={[
+              styles.statusBadge,
+              { backgroundColor: statusColor + "15" },
+            ]}
+          >
+            <View
+              style={[styles.statusDot, { backgroundColor: statusColor }]}
+            />
+            <Text style={[styles.statusText, { color: statusColor }]}>
+              {vehicle.status.replace("_", " ")}
+            </Text>
+          </View>
+        </View>
+
+        <View style={[styles.vehicleStats, { borderColor }]}>
+          <View style={styles.vehicleStat}>
+            <Ionicons
+              name="speedometer-outline"
+              size={16}
+              color={textColor + "60"}
+            />
+            <Text style={[styles.vehicleStatValue, { color: textColor }]}>
+              {vehicle.currentOdometer?.toLocaleString() || 0}
+            </Text>
+            <Text
+              style={[styles.vehicleStatLabel, { color: textColor + "50" }]}
+            >
+              km
+            </Text>
+          </View>
+
+          <View style={styles.vehicleStatDivider} />
+
+          <View style={styles.vehicleStat}>
+            <Ionicons name="flame-outline" size={16} color={textColor + "60"} />
+            <Text style={[styles.vehicleStatValue, { color: textColor }]}>
+              {vehicle.fuelType}
+            </Text>
+          </View>
+
+          {vehicle.assignedDriverName && (
+            <>
+              <View style={styles.vehicleStatDivider} />
+              <View style={styles.vehicleStat}>
+                <Ionicons
+                  name="person-outline"
+                  size={16}
+                  color={textColor + "60"}
+                />
+                <Text
+                  style={[styles.vehicleStatValue, { color: textColor }]}
+                  numberOfLines={1}
+                >
+                  {vehicle.assignedDriverName}
+                </Text>
+              </View>
+            </>
+          )}
+        </View>
+
+        {vehicle.nextMaintenanceDate && (
+          <View
+            style={[styles.maintenanceAlert, { backgroundColor: "#f59e0b10" }]}
+          >
+            <Ionicons name="build-outline" size={14} color="#f59e0b" />
+            <Text style={styles.maintenanceText}>
+              Bảo trì:{" "}
+              {new Date(vehicle.nextMaintenanceDate).toLocaleDateString(
+                "vi-VN"
+              )}
+            </Text>
+          </View>
+        )}
+      </TouchableOpacity>
+    </Animated.View>
+  );
 };
 
 export default function FleetScreen() {
-  const backgroundColor = useThemeColor({}, 'background');
-  const surfaceColor = useThemeColor({}, 'surface');
-  const textColor = useThemeColor({}, 'text');
-  const textMutedColor = useThemeColor({}, 'textMuted');
-  const borderColor = useThemeColor({}, 'border');
-  const tintColor = useThemeColor({}, 'tint');
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
 
-  const [selectedTab, setSelectedTab] = useState<'vehicles' | 'maintenance' | 'fuel' | 'trips'>('vehicles');
-  const [statusFilter, setStatusFilter] = useState<VehicleStatus | 'ALL'>('ALL');
+  const backgroundColor = useThemeColor({}, "background");
+  const textColor = useThemeColor({}, "text");
+  const surfaceColor = useThemeColor({}, "surface");
+  const borderColor = useThemeColor({}, "border");
+
+  const [selectedTab, setSelectedTab] = useState<TabType>("vehicles");
+  const [statusFilter, setStatusFilter] = useState<VehicleStatus | "ALL">(
+    "ALL"
+  );
 
   const { summary } = useFleetSummary();
   const { vehicles, loading } = useVehicles();
 
-  const getStatusColor = (status: VehicleStatus) => {
-    switch (status) {
-      case 'ACTIVE': return '#0066CC';
-      case 'INACTIVE': return '#6b7280';
-      case 'IN_MAINTENANCE': return '#0066CC';
-      case 'IN_REPAIR': return '#000000';
-      case 'RESERVED': return '#3b82f6';
-      case 'OUT_OF_SERVICE': return '#000000';
-      case 'RETIRED': return '#9ca3af';
-      default: return textMutedColor;
-    }
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 400,
+      useNativeDriver: true,
+    }).start();
+  }, []);
+
+  const filteredVehicles = vehicles.filter(
+    (v) => statusFilter === "ALL" || v.status === statusFilter
+  );
+
+  const handleTabPress = (tab: TabType) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setSelectedTab(tab);
   };
 
-  const filteredVehicles = vehicles.filter(v =>
-    statusFilter === 'ALL' || v.status === statusFilter
+  const handleFilterPress = (status: VehicleStatus | "ALL") => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setStatusFilter(status);
+  };
+
+  const handleVehiclePress = (vehicleId: string) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    router.push(`/fleet/${vehicleId}`);
+  };
+
+  const renderVehicleItem = ({ item, index }: { item: any; index: number }) => (
+    <VehicleCard
+      vehicle={item}
+      index={index}
+      textColor={textColor}
+      surfaceColor={surfaceColor}
+      borderColor={borderColor}
+      onPress={() => handleVehiclePress(item.id)}
+    />
+  );
+
+  const renderEmptyState = (
+    icon: keyof typeof Ionicons.glyphMap,
+    message: string
+  ) => (
+    <View
+      style={[
+        styles.emptyState,
+        { backgroundColor: surfaceColor, borderColor },
+      ]}
+    >
+      <View
+        style={[
+          styles.emptyIconWrap,
+          { backgroundColor: isDark ? "#374151" : "#f3f4f6" },
+        ]}
+      >
+        <Ionicons
+          name={icon}
+          size={40}
+          color={isDark ? "#6b7280" : "#9ca3af"}
+        />
+      </View>
+      <Text style={[styles.emptyText, { color: textColor }]}>{message}</Text>
+    </View>
   );
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor }]}>
-      <Container>
-        {/* Header Stats */}
-        <Section>
-          <ThemedText type="title" style={styles.title}>Fleet Management</ThemedText>
-          
-          <View style={styles.statsGrid}>
-            <View style={[styles.statCard, { backgroundColor: surfaceColor, borderColor }]}>
-              <ThemedText type="default" style={styles.statLabel}>Total Vehicles</ThemedText>
-              <ThemedText type="title" style={styles.statValue}>
-                {summary?.totalVehicles || 0}
-              </ThemedText>
-            </View>
-            <View style={[styles.statCard, { backgroundColor: surfaceColor, borderColor }]}>
-              <ThemedText type="default" style={styles.statLabel}>Active</ThemedText>
-              <ThemedText type="title" style={[styles.statValue, { color: '#0066CC' }]}>
-                {summary?.activeVehicles || 0}
-              </ThemedText>
-            </View>
-            <View style={[styles.statCard, { backgroundColor: surfaceColor, borderColor }]}>
-              <ThemedText type="default" style={styles.statLabel}>In Maintenance</ThemedText>
-              <ThemedText type="title" style={[styles.statValue, { color: '#0066CC' }]}>
-                {summary?.inMaintenanceVehicles || 0}
-              </ThemedText>
-            </View>
-            <View style={[styles.statCard, { backgroundColor: surfaceColor, borderColor }]}>
-              <ThemedText type="default" style={styles.statLabel}>Utilization</ThemedText>
-              <ThemedText type="title" style={[styles.statValue, { color: tintColor }]}>
-                {summary?.utilizationRate?.toFixed(0) || 0}%
-              </ThemedText>
-            </View>
-          </View>
-        </Section>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor }]}
+      edges={["top"]}
+    >
+      {/* Header */}
+      <Animated.View style={[styles.header, { opacity: fadeAnim }]}>
+        <TouchableOpacity
+          style={[styles.backButton, { backgroundColor: surfaceColor }]}
+          onPress={() => router.back()}
+        >
+          <Ionicons name="arrow-back" size={22} color={textColor} />
+        </TouchableOpacity>
+
+        <View style={styles.headerTextWrap}>
+          <Text style={[styles.title, { color: textColor }]}>
+            Quản lý đội xe
+          </Text>
+          <Text style={[styles.subtitle, { color: textColor + "60" }]}>
+            {vehicles.length} phương tiện
+          </Text>
+        </View>
+
+        <TouchableOpacity
+          style={[styles.addButton, { backgroundColor: "#6366f1" }]}
+          onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
+        >
+          <Ionicons name="add" size={22} color="#fff" />
+        </TouchableOpacity>
+      </Animated.View>
+
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        {/* Stats Grid */}
+        <View style={styles.statsGrid}>
+          <StatCard
+            title="Tổng xe"
+            value={summary?.totalVehicles || 0}
+            color="#6366f1"
+            icon="car"
+            index={0}
+          />
+          <StatCard
+            title="Hoạt động"
+            value={summary?.activeVehicles || 0}
+            color="#10b981"
+            icon="checkmark-circle"
+            index={1}
+          />
+          <StatCard
+            title="Bảo trì"
+            value={summary?.inMaintenanceVehicles || 0}
+            color="#f59e0b"
+            icon="build"
+            index={2}
+          />
+          <StatCard
+            title="Hiệu suất"
+            value={`${summary?.utilizationRate?.toFixed(0) || 0}%`}
+            color="#3b82f6"
+            icon="trending-up"
+            index={3}
+          />
+        </View>
 
         {/* Tab Selector */}
-        <Section>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tabScrollView}>
-            <View style={styles.tabContainer}>
+        <View style={styles.tabContainer}>
+          {TABS.map((tab) => {
+            const isActive = selectedTab === tab.id;
+            return (
               <TouchableOpacity
+                key={tab.id}
                 style={[
                   styles.tab,
-                  { borderColor, backgroundColor: selectedTab === 'vehicles' ? tintColor : surfaceColor }
+                  {
+                    backgroundColor: isActive
+                      ? isDark
+                        ? "#6366f1"
+                        : "#1a1a1a"
+                      : "transparent",
+                  },
                 ]}
-                onPress={() => setSelectedTab('vehicles')}
+                onPress={() => handleTabPress(tab.id)}
+                activeOpacity={0.7}
               >
-                <ThemedText
-                  type="default"
-                  style={[styles.tabText, { color: selectedTab === 'vehicles' ? '#fff' : textColor }]}
+                <Ionicons
+                  name={tab.icon as any}
+                  size={18}
+                  color={isActive ? "#fff" : textColor + "60"}
+                />
+                <Text
+                  style={[
+                    styles.tabText,
+                    { color: isActive ? "#fff" : textColor + "80" },
+                  ]}
                 >
-                  Vehicles
-                </ThemedText>
+                  {tab.label}
+                </Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.tab,
-                  { borderColor, backgroundColor: selectedTab === 'maintenance' ? tintColor : surfaceColor }
-                ]}
-                onPress={() => setSelectedTab('maintenance')}
-              >
-                <ThemedText
-                  type="default"
-                  style={[styles.tabText, { color: selectedTab === 'maintenance' ? '#fff' : textColor }]}
-                >
-                  Maintenance
-                </ThemedText>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.tab,
-                  { borderColor, backgroundColor: selectedTab === 'fuel' ? tintColor : surfaceColor }
-                ]}
-                onPress={() => setSelectedTab('fuel')}
-              >
-                <ThemedText
-                  type="default"
-                  style={[styles.tabText, { color: selectedTab === 'fuel' ? '#fff' : textColor }]}
-                >
-                  Fuel
-                </ThemedText>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.tab,
-                  { borderColor, backgroundColor: selectedTab === 'trips' ? tintColor : surfaceColor }
-                ]}
-                onPress={() => setSelectedTab('trips')}
-              >
-                <ThemedText
-                  type="default"
-                  style={[styles.tabText, { color: selectedTab === 'trips' ? '#fff' : textColor }]}
-                >
-                  Trips
-                </ThemedText>
-              </TouchableOpacity>
-            </View>
-          </ScrollView>
-        </Section>
+            );
+          })}
+        </View>
 
         {/* Vehicles Tab */}
-        {selectedTab === 'vehicles' && (
+        {selectedTab === "vehicles" && (
           <>
             {/* Status Filters */}
-            <Section>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterContainer}>
-                {(['ALL', 'ACTIVE', 'IN_MAINTENANCE', 'RESERVED', 'INACTIVE'] as const).map(status => (
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.filterScroll}
+            >
+              {(
+                [
+                  "ALL",
+                  "ACTIVE",
+                  "IN_MAINTENANCE",
+                  "RESERVED",
+                  "INACTIVE",
+                ] as const
+              ).map((status) => {
+                const isActive = statusFilter === status;
+                const count =
+                  status === "ALL"
+                    ? vehicles.length
+                    : vehicles.filter((v) => v.status === status).length;
+
+                return (
                   <TouchableOpacity
                     key={status}
                     style={[
                       styles.filterChip,
-                      { 
-                        backgroundColor: statusFilter === status ? tintColor : surfaceColor,
-                        borderColor 
-                      }
+                      {
+                        backgroundColor: isActive
+                          ? isDark
+                            ? "#6366f1"
+                            : "#1a1a1a"
+                          : surfaceColor,
+                        borderColor: isActive ? "transparent" : borderColor,
+                      },
                     ]}
-                    onPress={() => setStatusFilter(status as VehicleStatus | 'ALL')}
+                    onPress={() =>
+                      handleFilterPress(status as VehicleStatus | "ALL")
+                    }
+                    activeOpacity={0.7}
                   >
-                    <ThemedText
-                      type="default"
+                    <Text
                       style={[
                         styles.filterText,
-                        { color: statusFilter === status ? '#fff' : textColor }
+                        { color: isActive ? "#fff" : textColor },
                       ]}
                     >
-                      {status}
-                    </ThemedText>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-            </Section>
-
-            {/* Vehicles List */}
-            <Section>
-              {loading ? (
-                <ThemedText type="default" style={{ color: textMutedColor }}>Loading vehicles...</ThemedText>
-              ) : filteredVehicles.length === 0 ? (
-                <View style={[styles.emptyState, { backgroundColor: surfaceColor, borderColor }]}>
-                  <Ionicons name="car-outline" size={48} color={textMutedColor} />
-                  <ThemedText type="default" style={{ color: textMutedColor, marginTop: 12 }}>
-                    No vehicles found
-                  </ThemedText>
-                </View>
-              ) : (
-                filteredVehicles.map(vehicle => (
-                  <TouchableOpacity
-                    key={vehicle.id}
-                    style={[styles.card, { backgroundColor: surfaceColor, borderColor }]}
-                    onPress={() => router.push(`/fleet/${vehicle.id}`)}
-                  >
-                    <View style={styles.cardHeader}>
-                      <View style={styles.cardHeaderLeft}>
-                        <Ionicons
-                          name={VEHICLE_TYPE_ICONS[vehicle.type]}
-                          size={24}
-                          color={tintColor}
-                        />
-                        <View style={{ marginLeft: 12 }}>
-                          <ThemedText type="title">{vehicle.vehicleNumber}</ThemedText>
-                          <ThemedText type="default" style={{ color: textMutedColor }}>
-                            {vehicle.make} {vehicle.model}
-                          </ThemedText>
-                        </View>
-                      </View>
-                      <View style={[styles.statusBadge, { backgroundColor: getStatusColor(vehicle.status) }]}>
-                        <ThemedText type="default" style={styles.badgeText}>
-                          {vehicle.status}
-                        </ThemedText>
-                      </View>
-                    </View>
-
-                    <View style={styles.infoGrid}>
-                      <View style={styles.infoItem}>
-                        <Ionicons name="speedometer-outline" size={16} color={textMutedColor} />
-                        <ThemedText type="default" style={{ color: textMutedColor, marginLeft: 6 }}>
-                          {vehicle.currentOdometer.toLocaleString()} km
-                        </ThemedText>
-                      </View>
-                      <View style={styles.infoItem}>
-                        <Ionicons name="flame-outline" size={16} color={textMutedColor} />
-                        <ThemedText type="default" style={{ color: textMutedColor, marginLeft: 6 }}>
-                          {vehicle.fuelType}
-                        </ThemedText>
-                      </View>
-                      {vehicle.assignedDriverName && (
-                        <View style={styles.infoItem}>
-                          <Ionicons name="person-outline" size={16} color={textMutedColor} />
-                          <ThemedText type="default" style={{ color: textMutedColor, marginLeft: 6 }}>
-                            {vehicle.assignedDriverName}
-                          </ThemedText>
-                        </View>
-                      )}
-                    </View>
-
-                    {vehicle.nextMaintenanceDate && (
-                      <View style={[styles.maintenanceAlert, { backgroundColor, borderColor, marginTop: 12 }]}>
-                        <Ionicons name="build-outline" size={14} color={tintColor} />
-                        <ThemedText type="default" style={{ color: textMutedColor, marginLeft: 6 }}>
-                          Next maintenance: {new Date(vehicle.nextMaintenanceDate).toLocaleDateString()}
-                        </ThemedText>
+                      {status === "ALL" ? "Tất cả" : status.replace("_", " ")}
+                    </Text>
+                    {count > 0 && (
+                      <View
+                        style={[
+                          styles.filterBadge,
+                          {
+                            backgroundColor: isActive
+                              ? "rgba(255,255,255,0.2)"
+                              : borderColor,
+                          },
+                        ]}
+                      >
+                        <Text
+                          style={[
+                            styles.filterBadgeText,
+                            { color: isActive ? "#fff" : textColor + "80" },
+                          ]}
+                        >
+                          {count}
+                        </Text>
                       </View>
                     )}
                   </TouchableOpacity>
-                ))
-              )}
-            </Section>
+                );
+              })}
+            </ScrollView>
+
+            {/* Vehicles List */}
+            {loading ? (
+              <View style={styles.loadingContainer}>
+                <Text style={[styles.loadingText, { color: textColor + "60" }]}>
+                  Đang tải...
+                </Text>
+              </View>
+            ) : filteredVehicles.length === 0 ? (
+              renderEmptyState("car-outline", "Không tìm thấy phương tiện")
+            ) : (
+              <View style={styles.vehiclesList}>
+                {filteredVehicles.map((vehicle, index) => (
+                  <VehicleCard
+                    key={vehicle.id}
+                    vehicle={vehicle}
+                    index={index}
+                    textColor={textColor}
+                    surfaceColor={surfaceColor}
+                    borderColor={borderColor}
+                    onPress={() => handleVehiclePress(vehicle.id)}
+                  />
+                ))}
+              </View>
+            )}
           </>
         )}
 
         {/* Maintenance Tab */}
-        {selectedTab === 'maintenance' && (
-          <Section>
-            <View style={[styles.emptyState, { backgroundColor: surfaceColor, borderColor }]}>
-              <Ionicons name="build-outline" size={48} color={textMutedColor} />
-              <ThemedText type="default" style={{ color: textMutedColor, marginTop: 12 }}>
-                Maintenance records coming soon
-              </ThemedText>
-            </View>
-          </Section>
-        )}
+        {selectedTab === "maintenance" &&
+          renderEmptyState("build-outline", "Bảo trì sắp ra mắt")}
 
         {/* Fuel Tab */}
-        {selectedTab === 'fuel' && (
-          <Section>
-            <View style={[styles.summaryCard, { backgroundColor: surfaceColor, borderColor, marginBottom: 16 }]}>
+        {selectedTab === "fuel" && (
+          <>
+            {/* Fuel Summary */}
+            <View
+              style={[
+                styles.summaryCard,
+                { backgroundColor: surfaceColor, borderColor },
+              ]}
+            >
               <View style={styles.summaryRow}>
-                <ThemedText type="default" style={{ color: textMutedColor }}>This Month</ThemedText>
-                <ThemedText type="title">
-                  {summary?.fuelConsumptionThisMonth?.toLocaleString() || 0} L
-                </ThemedText>
-              </View>
-              <View style={styles.summaryRow}>
-                <ThemedText type="default" style={{ color: textMutedColor }}>Cost</ThemedText>
-                <ThemedText type="title" style={{ color: tintColor }}>
-                  {summary?.fuelCostThisMonth?.toLocaleString() || 0} {summary?.currency}
-                </ThemedText>
-              </View>
-              <View style={styles.summaryRow}>
-                <ThemedText type="default" style={{ color: textMutedColor }}>Avg Efficiency</ThemedText>
-                <ThemedText type="title">
-                  {summary?.averageFuelEfficiency?.toFixed(2) || 0} km/L
-                </ThemedText>
+                <View style={styles.summaryItem}>
+                  <Ionicons name="flame" size={20} color="#f59e0b" />
+                  <Text style={[styles.summaryValue, { color: textColor }]}>
+                    {summary?.fuelConsumptionThisMonth?.toLocaleString() || 0} L
+                  </Text>
+                  <Text
+                    style={[styles.summaryLabel, { color: textColor + "60" }]}
+                  >
+                    Tiêu thụ tháng
+                  </Text>
+                </View>
+                <View style={styles.summaryDivider} />
+                <View style={styles.summaryItem}>
+                  <Ionicons name="wallet" size={20} color="#10b981" />
+                  <Text style={[styles.summaryValue, { color: textColor }]}>
+                    {((summary?.fuelCostThisMonth || 0) / 1000000).toFixed(1)}M
+                  </Text>
+                  <Text
+                    style={[styles.summaryLabel, { color: textColor + "60" }]}
+                  >
+                    Chi phí
+                  </Text>
+                </View>
+                <View style={styles.summaryDivider} />
+                <View style={styles.summaryItem}>
+                  <Ionicons name="speedometer" size={20} color="#3b82f6" />
+                  <Text style={[styles.summaryValue, { color: textColor }]}>
+                    {summary?.averageFuelEfficiency?.toFixed(1) || 0}
+                  </Text>
+                  <Text
+                    style={[styles.summaryLabel, { color: textColor + "60" }]}
+                  >
+                    km/L
+                  </Text>
+                </View>
               </View>
             </View>
-
-            <View style={[styles.emptyState, { backgroundColor: surfaceColor, borderColor }]}>
-              <Ionicons name="flame-outline" size={48} color={textMutedColor} />
-              <ThemedText type="default" style={{ color: textMutedColor, marginTop: 12 }}>
-                Fuel entries coming soon
-              </ThemedText>
-            </View>
-          </Section>
+            {renderEmptyState("flame-outline", "Nhật ký nhiên liệu sắp ra mắt")}
+          </>
         )}
 
         {/* Trips Tab */}
-        {selectedTab === 'trips' && (
-          <Section>
-            <View style={[styles.summaryCard, { backgroundColor: surfaceColor, borderColor, marginBottom: 16 }]}>
+        {selectedTab === "trips" && (
+          <>
+            {/* Trips Summary */}
+            <View
+              style={[
+                styles.summaryCard,
+                { backgroundColor: surfaceColor, borderColor },
+              ]}
+            >
               <View style={styles.summaryRow}>
-                <ThemedText type="default" style={{ color: textMutedColor }}>Trips This Month</ThemedText>
-                <ThemedText type="title">{summary?.tripsThisMonth || 0}</ThemedText>
-              </View>
-              <View style={styles.summaryRow}>
-                <ThemedText type="default" style={{ color: textMutedColor }}>Total Distance</ThemedText>
-                <ThemedText type="title">
-                  {summary?.distanceThisMonth?.toLocaleString() || 0} km
-                </ThemedText>
+                <View style={styles.summaryItem}>
+                  <Ionicons name="navigate" size={20} color="#6366f1" />
+                  <Text style={[styles.summaryValue, { color: textColor }]}>
+                    {summary?.tripsThisMonth || 0}
+                  </Text>
+                  <Text
+                    style={[styles.summaryLabel, { color: textColor + "60" }]}
+                  >
+                    Chuyến đi
+                  </Text>
+                </View>
+                <View style={styles.summaryDivider} />
+                <View style={styles.summaryItem}>
+                  <Ionicons name="map" size={20} color="#10b981" />
+                  <Text style={[styles.summaryValue, { color: textColor }]}>
+                    {summary?.distanceThisMonth?.toLocaleString() || 0}
+                  </Text>
+                  <Text
+                    style={[styles.summaryLabel, { color: textColor + "60" }]}
+                  >
+                    km
+                  </Text>
+                </View>
               </View>
             </View>
-
-            <View style={[styles.emptyState, { backgroundColor: surfaceColor, borderColor }]}>
-              <Ionicons name="navigate-outline" size={48} color={textMutedColor} />
-              <ThemedText type="default" style={{ color: textMutedColor, marginTop: 12 }}>
-                Trip records coming soon
-              </ThemedText>
-            </View>
-          </Section>
+            {renderEmptyState(
+              "navigate-outline",
+              "Lịch sử chuyến đi sắp ra mắt"
+            )}
+          </>
         )}
-      </Container>
-    </ScrollView>
+
+        <View style={styles.bottomPadding} />
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
@@ -347,120 +680,300 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    gap: 16,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  headerTextWrap: {
+    flex: 1,
+  },
   title: {
-    marginBottom: 16,
+    fontSize: 22,
+    fontWeight: "700",
+  },
+  subtitle: {
+    fontSize: 13,
+    marginTop: 2,
+  },
+  addButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingHorizontal: 20,
   },
   statsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+    marginBottom: 20,
   },
   statCard: {
-    flex: 1,
-    minWidth: '47%',
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
+    width: (SCREEN_WIDTH - 50) / 2,
+    paddingVertical: 14,
+    paddingHorizontal: 12,
+    borderRadius: 14,
+    alignItems: "center",
   },
-  statLabel: {
-    marginBottom: 4,
+  statIconWrap: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 8,
   },
   statValue: {
-    marginTop: 4,
+    fontSize: 22,
+    fontWeight: "700",
   },
-  tabScrollView: {
-    marginHorizontal: -16,
-    paddingHorizontal: 16,
+  statLabel: {
+    fontSize: 12,
+    color: "#6b7280",
+    marginTop: 2,
   },
   tabContainer: {
-    flexDirection: 'row',
-    gap: 12,
+    flexDirection: "row",
+    gap: 8,
+    marginBottom: 16,
   },
   tab: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    borderWidth: 1,
-    alignItems: 'center',
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    gap: 6,
   },
   tabText: {
-    fontWeight: '600',
-    fontSize: 14,
+    fontSize: 12,
+    fontWeight: "600",
   },
-  filterContainer: {
-    marginHorizontal: -16,
-    paddingHorizontal: 16,
+  filterScroll: {
+    paddingBottom: 12,
+    gap: 8,
   },
   filterChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 14,
     paddingVertical: 8,
-    paddingHorizontal: 16,
     borderRadius: 20,
     borderWidth: 1,
+    gap: 6,
     marginRight: 8,
   },
   filterText: {
-    fontWeight: '500',
+    fontSize: 12,
+    fontWeight: "500",
   },
-  card: {
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-    marginBottom: 12,
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 12,
-  },
-  cardHeaderLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+  filterBadge: {
+    minWidth: 20,
+    height: 20,
     borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 6,
   },
-  badgeText: {
-    color: '#fff',
-    fontSize: 10,
-    fontWeight: '600',
+  filterBadgeText: {
+    fontSize: 11,
+    fontWeight: "600",
   },
-  infoGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+  vehiclesList: {
     gap: 12,
   },
-  infoItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  vehicleCardWrapper: {},
+  vehicleCard: {
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: 16,
+    overflow: "hidden",
+  },
+  liveIndicator: {
+    position: "absolute",
+    top: 12,
+    right: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    backgroundColor: "#10b98115",
+  },
+  liveDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: "#10b981",
+  },
+  liveText: {
+    fontSize: 10,
+    fontWeight: "700",
+    color: "#10b981",
+  },
+  vehicleHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  vehicleIconWrap: {
+    width: 52,
+    height: 52,
+    borderRadius: 14,
+    overflow: "hidden",
+  },
+  vehicleIconGradient: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  vehicleInfo: {
+    flex: 1,
+  },
+  vehicleNumber: {
+    fontSize: 17,
+    fontWeight: "700",
+  },
+  vehicleMake: {
+    fontSize: 13,
+    marginTop: 2,
+  },
+  statusBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 8,
+    gap: 5,
+  },
+  statusDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+  },
+  statusText: {
+    fontSize: 10,
+    fontWeight: "600",
+    textTransform: "uppercase",
+  },
+  vehicleStats: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 14,
+    paddingTop: 14,
+    borderTopWidth: 1,
+    gap: 12,
+  },
+  vehicleStat: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    flex: 1,
+  },
+  vehicleStatValue: {
+    fontSize: 13,
+    fontWeight: "600",
+  },
+  vehicleStatLabel: {
+    fontSize: 12,
+  },
+  vehicleStatDivider: {
+    width: 1,
+    height: 20,
+    backgroundColor: "#e5e7eb",
   },
   maintenanceAlert: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 8,
-    borderRadius: 6,
-    borderWidth: 1,
-  },
-  summaryCard: {
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-  },
-  summaryRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 12,
     paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0,0,0,0.05)',
+    paddingHorizontal: 10,
+    borderRadius: 8,
+    gap: 6,
+  },
+  maintenanceText: {
+    fontSize: 12,
+    fontWeight: "500",
+    color: "#f59e0b",
+  },
+  loadingContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 40,
+  },
+  loadingText: {
+    fontSize: 14,
   },
   emptyState: {
+    alignItems: "center",
+    justifyContent: "center",
     padding: 40,
-    borderRadius: 12,
+    borderRadius: 16,
     borderWidth: 1,
-    alignItems: 'center',
+    marginTop: 12,
+  },
+  emptyIconWrap: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 16,
+  },
+  emptyText: {
+    fontSize: 15,
+    fontWeight: "500",
+  },
+  summaryCard: {
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: 16,
+    marginTop: 4,
+    marginBottom: 12,
+  },
+  summaryRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-around",
+  },
+  summaryItem: {
+    alignItems: "center",
+    gap: 6,
+    flex: 1,
+  },
+  summaryValue: {
+    fontSize: 20,
+    fontWeight: "700",
+  },
+  summaryLabel: {
+    fontSize: 11,
+    textAlign: "center",
+  },
+  summaryDivider: {
+    width: 1,
+    height: 50,
+    backgroundColor: "#e5e7eb",
+  },
+  bottomPadding: {
+    height: 100,
   },
 });

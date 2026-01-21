@@ -82,7 +82,7 @@ export const useTokenRefresh = (
     checkAndRefreshToken();
 
     // Check every 5 minutes
-    intervalRef.current = setInterval(checkAndRefreshToken, 5 * 60 * 1000);
+    intervalRef.current = setInterval(checkAndRefreshToken, 5 * 60 * 1000) as any;
 
     return () => {
       if (intervalRef.current) {

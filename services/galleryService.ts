@@ -70,10 +70,10 @@ export async function getProjectPhotosFromPerfex(
   try {
     // Get project details which may include files/attachments
     const result = await PerfexProjectsService.getById(projectId);
-    if (result.data) {
+    if ((result as any).ok && (result as any).data) {
       // Transform Perfex project attachments to gallery format
       // Note: This depends on Perfex CRM project structure
-      const project = result.data;
+      const project = (result as any).data;
       const photos: GalleryPhoto[] = [];
       
       // If project has files array (common in Perfex)
@@ -140,69 +140,8 @@ export async function bulkDeletePhotos(
   return postJson(ENDPOINTS.bulkDelete, { photoIds });
 }
 
-// Mock data fallback
-export const MOCK_PHOTOS: GalleryPhoto[] = [
-  {
-    id: 'photo1',
-    url: 'https://placehold.co/800x600/0066CC/white?text=Khung+Sắt',
-    thumbnail: 'https://placehold.co/200x150/0066CC/white?text=Khung+Sắt',
-    caption: 'Hoàn thành khung sắt tầng 1',
-    uploadedAt: '2025-01-10T08:30:00Z',
-    uploadedBy: 'Kỹ sư Minh',
-    phase: 'Móng & khung',
-    tags: ['khung-sat', 'tang-1'],
-  },
-  {
-    id: 'photo2',
-    url: 'https://placehold.co/800x600/28a745/white?text=Đổ+Bê+Tông',
-    thumbnail: 'https://placehold.co/200x150/28a745/white?text=Đổ+Bê+Tông',
-    caption: 'Đổ bê tông sàn tầng 2',
-    uploadedAt: '2025-01-08T14:20:00Z',
-    uploadedBy: 'Đội trưởng Hùng',
-    phase: 'Bê tông',
-    tags: ['be-tong', 'san', 'tang-2'],
-  },
-  {
-    id: 'photo3',
-    url: 'https://placehold.co/800x600/ffc107/black?text=Hệ+Thống+Điện',
-    thumbnail: 'https://placehold.co/200x150/ffc107/black?text=Hệ+Thống+Điện',
-    caption: 'Lắp đặt hệ thống điện',
-    uploadedAt: '2025-01-05T10:00:00Z',
-    uploadedBy: 'Thợ điện Tuấn',
-    phase: 'M&E',
-    tags: ['dien', 'he-thong'],
-  },
-  {
-    id: 'photo4',
-    url: 'https://placehold.co/800x600/dc3545/white?text=Ốp+Tường',
-    thumbnail: 'https://placehold.co/200x150/dc3545/white?text=Ốp+Tường',
-    caption: 'Ốp gạch tường phòng khách',
-    uploadedAt: '2025-01-02T16:45:00Z',
-    uploadedBy: 'Thợ xây Bình',
-    phase: 'Hoàn thiện',
-    tags: ['op-tuong', 'gach', 'phong-khach'],
-  },
-  {
-    id: 'photo5',
-    url: 'https://placehold.co/800x600/6f42c1/white?text=Sơn+Ngoại+Thất',
-    thumbnail: 'https://placehold.co/200x150/6f42c1/white?text=Sơn+Ngoại+Thất',
-    caption: 'Sơn ngoại thất hoàn thiện',
-    uploadedAt: '2024-12-28T11:30:00Z',
-    uploadedBy: 'Thợ sơn Đức',
-    phase: 'Hoàn thiện',
-    tags: ['son', 'ngoai-that'],
-  },
-  {
-    id: 'photo6',
-    url: 'https://placehold.co/800x600/17a2b8/white?text=Toàn+Cảnh',
-    thumbnail: 'https://placehold.co/200x150/17a2b8/white?text=Toàn+Cảnh',
-    caption: 'Tổng quan công trình sau 3 tháng',
-    uploadedAt: '2024-12-25T09:00:00Z',
-    uploadedBy: 'Giám sát Tùng',
-    phase: 'Tổng quan',
-    tags: ['tong-quan', 'progress'],
-  },
-];
+// Empty photos array - data comes from API/CRM only
+export const MOCK_PHOTOS: GalleryPhoto[] = [];
 
 export default {
   getProjectPhotos,
@@ -212,3 +151,4 @@ export default {
   bulkDeletePhotos,
   MOCK_PHOTOS,
 };
+

@@ -17,6 +17,9 @@ import { BorderRadiusSemantic, IconSize, Spacing } from '../../constants/spacing
 import { TextVariants } from '../../constants/typography';
 import { useThemeColor } from '../../hooks/use-theme-color';
 
+// Context for managing alerts globally
+import { createContext, useCallback, useContext, useState, type ReactNode } from 'react';
+
 export type AlertType = 'success' | 'error' | 'warning' | 'info';
 
 export interface AlertProps {
@@ -208,9 +211,6 @@ const styles = StyleSheet.create({
     padding: Spacing[1],
   },
 });
-
-// Context for managing alerts globally
-import { createContext, useCallback, useContext, useState, type ReactNode } from 'react';
 
 interface AlertContextType {
   showAlert: (config: Omit<AlertProps, 'visible'>) => void;

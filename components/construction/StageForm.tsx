@@ -137,7 +137,7 @@ export const StageForm: React.FC<StageFormProps> = ({
   const [showColorPicker, setShowColorPicker] = useState(false);
 
   // Status options
-  const statusOptions: Array<{ value: Stage['status']; label: string; color: string }> = [
+  const statusOptions: { value: Stage['status']; label: string; color: string }[] = [
     { value: 'pending', label: 'Chờ xử lý', color: '#9CA3AF' },
     { value: 'active', label: 'Đang thực hiện', color: '#3B82F6' },
     { value: 'completed', label: 'Hoàn thành', color: '#0066CC' },

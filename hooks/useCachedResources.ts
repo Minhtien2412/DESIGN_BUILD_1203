@@ -1,21 +1,21 @@
 import { useEffect, useState } from 'react';
-import { Platform } from 'react-native';
 
 /**
  * Hook to handle resource loading (fonts, assets)
  * Skip fontfaceobserver on web to prevent 6000ms timeout error
  */
 export function useCachedResources() {
-  // Hooks must be called unconditionally
-  const [isLoadingComplete, setLoadingComplete] = useState(Platform.OS === 'web');
+  // On web, immediately return true to skip all async loading
+  // This prevents fontfaceobserver timeout issues
+  const [isLoadingComplete, setLoadingComplete] = useState(true);
 
   useEffect(() => {
-    // On web, skip all async loading to prevent fontfaceobserver timeout
-    // Web browsers handle fonts via CSS
-    if (Platform.OS === 'web') {
-      return;
-    }
-
+    // Skip all resource loading - not needed for this app
+    // Fonts are loaded via CSS in index.html
+    // Native platforms use system fonts
+    return;
+    
+    /* Commented out - kept for reference if needed in future
     async function loadResourcesAndDataAsync() {
       try {
         // Native platforms can load fonts if needed
@@ -30,7 +30,10 @@ export function useCachedResources() {
       }
     }
 
-    loadResourcesAndDataAsync();
+    if (Platform.OS !== 'web') {
+      loadResourcesAndDataAsync();
+    }
+    */
   }, []);
 
   return isLoadingComplete;

@@ -15,12 +15,12 @@ import {
     View,
 } from 'react-native';
 
-const LEAVE_TYPE_OPTIONS: Array<{
+const LEAVE_TYPE_OPTIONS: {
   value: LeaveType;
   label: string;
   icon: keyof typeof Ionicons.glyphMap;
   color: string;
-}> = [
+}[] = [
   { value: LeaveType.ANNUAL, label: 'Phép năm', icon: 'calendar', color: '#0066CC' },
   { value: LeaveType.SICK, label: 'Nghỉ ốm', icon: 'medkit', color: '#000000' },
   { value: LeaveType.PERSONAL, label: 'Cá nhân', icon: 'person', color: '#0066CC' },

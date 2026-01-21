@@ -34,12 +34,12 @@ interface Decision {
   rationale: string;
   alternatives?: string[];
   decisionMaker: { id: string; name: string; role: string };
-  stakeholders: Array<{ id: string; name: string; role: string }>;
+  stakeholders: { id: string; name: string; role: string }[];
   dateProposed: string;
   dateDecided?: string;
   dateImplemented?: string;
-  relatedRisks?: Array<{ id: string; title: string }>;
-  relatedDocuments?: Array<{ name: string; url: string }>;
+  relatedRisks?: { id: string; title: string }[];
+  relatedDocuments?: { name: string; url: string }[];
   estimatedCost?: number;
   estimatedTime?: number; // days
 }
@@ -321,7 +321,7 @@ export default function DecisionLogScreen() {
       {/* Category Filter */}
       <FlatList
         horizontal
-        data={['ALL', ...Object.keys(CATEGORY_CONFIG)] as Array<DecisionCategory | 'ALL'>}
+        data={['ALL', ...Object.keys(CATEGORY_CONFIG)] as (DecisionCategory | 'ALL')[]}
         renderItem={({ item }) => {
           const isAll = item === 'ALL';
           const config = isAll ? null : CATEGORY_CONFIG[item];

@@ -1,3 +1,4 @@
+import { Loader } from '@/components/ui/loader';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import ReviewService, {
     Review as ApiReview,

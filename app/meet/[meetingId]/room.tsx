@@ -29,7 +29,7 @@ const { width, height } = Dimensions.get('window');
 
 export default function VideoCallRoomScreen() {
   const params = useLocalSearchParams<{ meetingId: string; participantName?: string }>();
-  const [room, setRoom] = useState<Room | null>(null);
+  const [room, setRoom] = useState<typeof Room | null>(null);
   const [participants, setParticipants] = useState<CallParticipant[]>([]);
   const [isCameraOn, setIsCameraOn] = useState(true);
   const [isMicOn, setIsMicOn] = useState(true);
@@ -114,7 +114,7 @@ export default function VideoCallRoomScreen() {
     statsInterval.current = setInterval(() => {
       const stats = videoCallService.getCallStats();
       setCallStats(stats);
-    }, 1000);
+    }, 1000) as any;
   };
 
   /**
@@ -286,7 +286,7 @@ export default function VideoCallRoomScreen() {
   if (isConnecting) {
     return (
       <Container>
-        <Loader size={40} />
+        <Loader size="large" />
         <Text style={[styles.loadingText, { color: textColor }]}>Connecting to call...</Text>
       </Container>
     );

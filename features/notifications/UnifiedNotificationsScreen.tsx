@@ -17,7 +17,9 @@
  */
 
 import { MODERN_COLORS, MODERN_RADIUS, MODERN_SHADOWS, MODERN_SPACING, MODERN_TYPOGRAPHY } from '@/constants/modern-theme';
+import { useUnifiedBadge } from '@/context/UnifiedBadgeContext';
 import { useUnifiedNotifications } from '@/hooks/useNotifications';
+import { handleNotificationItemPress } from '@/services/notificationNavigator';
 import { UnifiedNotification } from '@/services/notificationSyncService';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
@@ -63,6 +65,9 @@ export default function UnifiedNotificationsScreen() {
     syncIntervalMs: 5 * 60 * 1000, // 5 phút
   });
   
+  // Unified Badge Context - sync notification badges
+  const { syncWithNotifications } = useUnifiedBadge();
+  
   const [refreshing, setRefreshing] = useState(false);
   const [selectedTab, setSelectedTab] = useState<TabType>('all');
   const router = useRouter();
@@ -89,27 +94,29 @@ export default function UnifiedNotificationsScreen() {
   const handleMarkAllRead = async () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     await markAllAsRead();
+    // Reset notification badge immediately (Zalo-style)
+    syncWithNotifications(0);
   };
 
   const handleNotificationPress = async (item: UnifiedNotification) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    
+    // Mark as read first
     await markAsRead(item.id);
     
-    // Navigate based on notification type and related data
-    const relatedType = item.relatedType?.toLowerCase();
-    const relatedId = item.relatedId;
+    // Update badge count immediately (Zalo-style)
+    const newUnreadCount = unreadCount - (item.isRead ? 0 : 1);
+    syncWithNotifications(Math.max(0, newUnreadCount));
     
-    if (relatedType === 'task' && relatedId) {
-      router.push(`/tasks/${relatedId}` as any);
-    } else if (relatedType === 'project' && relatedId) {
-      router.push(`/projects/${relatedId}` as any);
-    } else if (relatedType === 'ticket' && relatedId) {
-      router.push(`/tickets/${relatedId}` as any);
-    } else if (relatedType === 'chat' && relatedId) {
-      router.push({ pathname: '/chat/[chatId]', params: { chatId: String(relatedId) } } as any);
-    } else if (relatedType === 'payment' && relatedId) {
-      router.push(`/payments/${relatedId}` as any);
-    }
+    // Use notification navigator service for deep linking
+    const result = handleNotificationItemPress({
+      id: item.id,
+      type: item.type,
+      relatedType: item.relatedType,
+      relatedId: item.relatedId,
+    });
+    
+    console.log('[UnifiedNotifications] Navigation result:', result);
   };
 
   const handleNotificationLongPress = (item: UnifiedNotification) => {

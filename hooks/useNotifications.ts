@@ -328,7 +328,7 @@ export function useUnifiedNotifications(options?: {
   const [lastSyncTime, setLastSyncTime] = useState<string | null>(null);
   const [error, setError] = useState<Error | null>(null);
   const { isOffline } = useNetworkStatus();
-  const syncIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const syncIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   
   // Sync interval (default 5 minutes)
   const SYNC_INTERVAL = options?.syncIntervalMs || 5 * 60 * 1000;

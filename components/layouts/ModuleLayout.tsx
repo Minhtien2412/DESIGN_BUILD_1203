@@ -25,14 +25,14 @@ export interface ModuleLayoutProps {
   scrollable?: boolean;
 
   // Footer actions
-  footerActions?: Array<{
+  footerActions?: {
     label: string;
     onPress: () => void;
     variant?: "primary" | "secondary" | "danger";
     icon?: string;
     loading?: boolean;
     disabled?: boolean;
-  }>;
+  }[];
 
   // Layout options
   backgroundColor?: string;

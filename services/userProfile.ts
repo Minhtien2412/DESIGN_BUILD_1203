@@ -13,7 +13,7 @@ export type NormalizedUserProfile = {
 
 type RawResponse = any;
 
-function firstString(...vals: Array<unknown>): string | undefined {
+function firstString(...vals: unknown[]): string | undefined {
   for (const v of vals) {
     if (typeof v === 'string' && v.trim()) return v;
   }

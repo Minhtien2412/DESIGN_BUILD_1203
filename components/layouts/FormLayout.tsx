@@ -25,21 +25,21 @@ export interface FormLayoutProps {
   children: ReactNode;
 
   // Progress indicator (for multi-step forms)
-  steps?: Array<{
+  steps?: {
     label: string;
     completed: boolean;
-  }>;
+  }[];
   currentStep?: number;
 
   // Form actions (typically at bottom)
-  actions?: Array<{
+  actions?: {
     label: string;
     onPress: () => void;
     variant?: "primary" | "secondary" | "danger";
     icon?: string;
     loading?: boolean;
     disabled?: boolean;
-  }>;
+  }[];
 
   // Layout options
   scrollable?: boolean;

@@ -3,15 +3,15 @@
  * Centralized token handling for Frontend apps
  */
 
-import * as SecureStore from 'expo-secure-store';
-import { Platform } from 'react-native';
+import * as SecureStore from "expo-secure-store";
+import { Platform } from "react-native";
 
 // Storage keys
 const STORAGE_KEYS = {
-  ACCESS_TOKEN: 'auth_access_token',
-  REFRESH_TOKEN: 'auth_refresh_token',
-  USER_ID: 'auth_user_id',
-  TOKEN_EXPIRY: 'auth_token_expiry',
+  ACCESS_TOKEN: "auth_access_token",
+  REFRESH_TOKEN: "auth_refresh_token",
+  USER_ID: "auth_user_id",
+  TOKEN_EXPIRY: "auth_token_expiry",
 } as const;
 
 /**
@@ -28,22 +28,31 @@ export interface TokenData {
  */
 export const saveTokens = async (tokens: TokenData): Promise<void> => {
   try {
-    if (Platform.OS === 'web') {
+    if (Platform.OS === "web") {
       // Web: use sessionStorage (more secure than localStorage)
       sessionStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, tokens.accessToken);
       sessionStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, tokens.refreshToken);
-      sessionStorage.setItem(STORAGE_KEYS.TOKEN_EXPIRY, tokens.expiresAt.toString());
+      sessionStorage.setItem(
+        STORAGE_KEYS.TOKEN_EXPIRY,
+        tokens.expiresAt.toString()
+      );
     } else {
       // Mobile: use SecureStore (iOS Keychain / Android Keystore)
       await Promise.all([
         SecureStore.setItemAsync(STORAGE_KEYS.ACCESS_TOKEN, tokens.accessToken),
-        SecureStore.setItemAsync(STORAGE_KEYS.REFRESH_TOKEN, tokens.refreshToken),
-        SecureStore.setItemAsync(STORAGE_KEYS.TOKEN_EXPIRY, tokens.expiresAt.toString()),
+        SecureStore.setItemAsync(
+          STORAGE_KEYS.REFRESH_TOKEN,
+          tokens.refreshToken
+        ),
+        SecureStore.setItemAsync(
+          STORAGE_KEYS.TOKEN_EXPIRY,
+          tokens.expiresAt.toString()
+        ),
       ]);
     }
-    console.log('[TokenService] ✅ Tokens saved securely');
+    console.log("[TokenService] ✅ Tokens saved securely");
   } catch (error) {
-    console.error('[TokenService] ❌ Failed to save tokens:', error);
+    console.error("[TokenService] ❌ Failed to save tokens:", error);
     throw error;
   }
 };
@@ -53,13 +62,13 @@ export const saveTokens = async (tokens: TokenData): Promise<void> => {
  */
 export const getAccessToken = async (): Promise<string | null> => {
   try {
-    if (Platform.OS === 'web') {
+    if (Platform.OS === "web") {
       return sessionStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     } else {
       return await SecureStore.getItemAsync(STORAGE_KEYS.ACCESS_TOKEN);
     }
   } catch (error) {
-    console.error('[TokenService] ❌ Failed to get access token:', error);
+    console.error("[TokenService] ❌ Failed to get access token:", error);
     return null;
   }
 };
@@ -69,13 +78,13 @@ export const getAccessToken = async (): Promise<string | null> => {
  */
 export const getRefreshToken = async (): Promise<string | null> => {
   try {
-    if (Platform.OS === 'web') {
+    if (Platform.OS === "web") {
       return sessionStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
     } else {
       return await SecureStore.getItemAsync(STORAGE_KEYS.REFRESH_TOKEN);
     }
   } catch (error) {
-    console.error('[TokenService] ❌ Failed to get refresh token:', error);
+    console.error("[TokenService] ❌ Failed to get refresh token:", error);
     return null;
   }
 };
@@ -86,7 +95,7 @@ export const getRefreshToken = async (): Promise<string | null> => {
 export const isTokenExpired = async (): Promise<boolean> => {
   try {
     let expiryStr: string | null;
-    if (Platform.OS === 'web') {
+    if (Platform.OS === "web") {
       expiryStr = sessionStorage.getItem(STORAGE_KEYS.TOKEN_EXPIRY);
     } else {
       expiryStr = await SecureStore.getItemAsync(STORAGE_KEYS.TOKEN_EXPIRY);
@@ -98,17 +107,17 @@ export const isTokenExpired = async (): Promise<boolean> => {
 
     const expiresAt = parseInt(expiryStr, 10);
     const now = Date.now();
-    
+
     // Add 60s buffer to refresh before actual expiry
     const isExpired = now >= expiresAt - 60000;
-    
+
     if (isExpired) {
-      console.log('[TokenService] ⚠️ Token expired or expiring soon');
+      console.log("[TokenService] ⚠️ Token expired or expiring soon");
     }
-    
+
     return isExpired;
   } catch (error) {
-    console.error('[TokenService] ❌ Failed to check token expiry:', error);
+    console.error("[TokenService] ❌ Failed to check token expiry:", error);
     return true; // Treat as expired on error
   }
 };
@@ -118,7 +127,7 @@ export const isTokenExpired = async (): Promise<boolean> => {
  */
 export const clearTokens = async (): Promise<void> => {
   try {
-    if (Platform.OS === 'web') {
+    if (Platform.OS === "web") {
       sessionStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
       sessionStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
       sessionStorage.removeItem(STORAGE_KEYS.TOKEN_EXPIRY);
@@ -131,9 +140,9 @@ export const clearTokens = async (): Promise<void> => {
         SecureStore.deleteItemAsync(STORAGE_KEYS.USER_ID),
       ]);
     }
-    console.log('[TokenService] 🗑️ Tokens cleared');
+    console.log("[TokenService] 🗑️ Tokens cleared");
   } catch (error) {
-    console.error('[TokenService] ❌ Failed to clear tokens:', error);
+    console.error("[TokenService] ❌ Failed to clear tokens:", error);
   }
 };
 
@@ -144,7 +153,7 @@ export const clearTokens = async (): Promise<void> => {
 export const calculateExpiryTimestamp = (expiresIn: string): number => {
   const now = Date.now();
   const match = expiresIn.match(/^(\d+)([dhms])$/);
-  
+
   if (!match) {
     // Default to 7 days if format invalid
     return now + 7 * 24 * 60 * 60 * 1000;
@@ -155,9 +164,9 @@ export const calculateExpiryTimestamp = (expiresIn: string): number => {
 
   const multipliers = {
     d: 24 * 60 * 60 * 1000, // days
-    h: 60 * 60 * 1000,      // hours
-    m: 60 * 1000,           // minutes
-    s: 1000,                // seconds
+    h: 60 * 60 * 1000, // hours
+    m: 60 * 1000, // minutes
+    s: 1000, // seconds
   };
 
   return now + value * multipliers[unit as keyof typeof multipliers];
@@ -169,18 +178,18 @@ export const calculateExpiryTimestamp = (expiresIn: string): number => {
  */
 export const parseJwtExpiry = (token: string): number | null => {
   try {
-    const parts = token.split('.');
+    const parts = token.split(".");
     if (parts.length !== 3) {
       return null;
     }
 
     // Decode base64 payload
     const payload = JSON.parse(atob(parts[1]));
-    
+
     // JWT exp is in seconds, convert to milliseconds
     return payload.exp ? payload.exp * 1000 : null;
   } catch (error) {
-    console.error('[TokenService] ❌ Failed to parse JWT:', error);
+    console.error("[TokenService] ❌ Failed to parse JWT:", error);
     return null;
   }
 };
@@ -190,13 +199,13 @@ export const parseJwtExpiry = (token: string): number | null => {
  */
 export const saveUserId = async (userId: string): Promise<void> => {
   try {
-    if (Platform.OS === 'web') {
+    if (Platform.OS === "web") {
       sessionStorage.setItem(STORAGE_KEYS.USER_ID, userId);
     } else {
       await SecureStore.setItemAsync(STORAGE_KEYS.USER_ID, userId);
     }
   } catch (error) {
-    console.error('[TokenService] ❌ Failed to save user ID:', error);
+    console.error("[TokenService] ❌ Failed to save user ID:", error);
   }
 };
 
@@ -205,13 +214,13 @@ export const saveUserId = async (userId: string): Promise<void> => {
  */
 export const getUserId = async (): Promise<string | null> => {
   try {
-    if (Platform.OS === 'web') {
+    if (Platform.OS === "web") {
       return sessionStorage.getItem(STORAGE_KEYS.USER_ID);
     } else {
       return await SecureStore.getItemAsync(STORAGE_KEYS.USER_ID);
     }
   } catch (error) {
-    console.error('[TokenService] ❌ Failed to get user ID:', error);
+    console.error("[TokenService] ❌ Failed to get user ID:", error);
     return null;
   }
 };
@@ -227,7 +236,7 @@ export const getAllTokens = async (): Promise<{
   const [accessToken, refreshToken, expiryStr] = await Promise.all([
     getAccessToken(),
     getRefreshToken(),
-    Platform.OS === 'web' 
+    Platform.OS === "web"
       ? sessionStorage.getItem(STORAGE_KEYS.TOKEN_EXPIRY)
       : SecureStore.getItemAsync(STORAGE_KEYS.TOKEN_EXPIRY),
   ]);
@@ -237,4 +246,32 @@ export const getAllTokens = async (): Promise<{
     refreshToken,
     expiresAt: expiryStr ? parseInt(expiryStr, 10) : null,
   };
+};
+
+/**
+ * Get tokens for biometric authentication
+ * Returns both access and refresh tokens if available
+ */
+export const getTokens = async (): Promise<{
+  accessToken: string;
+  refreshToken: string;
+} | null> => {
+  try {
+    const [accessToken, refreshToken] = await Promise.all([
+      getAccessToken(),
+      getRefreshToken(),
+    ]);
+
+    if (!accessToken || !refreshToken) {
+      return null;
+    }
+
+    return {
+      accessToken,
+      refreshToken,
+    };
+  } catch (error) {
+    console.error("[TokenService] ❌ Failed to get tokens:", error);
+    return null;
+  }
 };

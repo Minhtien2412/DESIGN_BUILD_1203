@@ -531,7 +531,7 @@ class PerfexFullSyncManager extends EventEmitter {
     availableEndpoints: [],
   };
 
-  private autoSyncTimer: NodeJS.Timeout | null = null;
+  private autoSyncTimer: ReturnType<typeof setInterval> | null = null;
   private isInitialized = false;
   private endpointStatus: Map<string, EndpointStatus> = new Map();
 

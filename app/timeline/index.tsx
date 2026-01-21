@@ -122,7 +122,7 @@ export default function TimelineScreen() {
 
   // Handle phases reordered
   const handlePhaseReordered = useCallback(
-    (data: { phases: Array<{ id: number; order: number }> }) => {
+    (data: { phases: { id: number; order: number }[] }) => {
       setTimeline((prev) => {
         if (!prev) return prev;
         const orderMap = new Map(data.phases.map((p) => [p.id, p.order]));

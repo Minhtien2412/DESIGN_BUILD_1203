@@ -331,7 +331,7 @@ export async function passwordLogin(account: string, password: string): Promise<
 // Demo: ensure a few support staff exist with stable ids/phones
 export async function ensureDemoStaff(): Promise<UserRecord[]> {
   const users = await readUsers();
-  const want: Array<{ id: string; phone: string; name: string; role: Role }> = [
+  const want: { id: string; phone: string; name: string; role: Role }[] = [
     { id: 'u_staff_phuong', phone: '091510001', name: 'Phương - Thợ sơn', role: 'sale-admin' },
     { id: 'u_staff_hieu',   phone: '091510002', name: 'Kỹ sư Hiếu',        role: 'sale-admin' },
     { id: 'u_staff_hung',   phone: '091510003', name: 'Võ Văn Hùng',       role: 'sale-admin' },

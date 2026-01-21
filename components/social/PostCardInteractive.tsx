@@ -80,7 +80,7 @@ export function PostCardInteractive({
   const reactionScale = useRef(new Animated.Value(0)).current;
   const imageScale = useRef(new Animated.Value(1)).current;
   const lastTap = useRef<number | null>(null);
-  const longPressTimer = useRef<NodeJS.Timeout | null>(null);
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Double tap to like
   const handleDoubleTap = useCallback(() => {

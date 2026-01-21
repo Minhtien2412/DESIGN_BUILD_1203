@@ -106,8 +106,8 @@ function mapInvoiceToPhase(invoice: PerfexInvoice, index: number, total: number)
     amount,
     conditions: invoice.adminnote || '',
     checklist: [],
-    approver: invoice.sale_agent_name || undefined,
-    approvalDate: invoice.datepaid ? formatDate(invoice.datepaid) : undefined,
+    approver: (invoice as any).sale_agent_name || (invoice as any).sale_agent || undefined,
+    approvalDate: (invoice as any).datepaid ? formatDate((invoice as any).datepaid) : undefined,
     paymentStatus: mapInvoiceStatus(invoice.status),
   };
 }
@@ -141,11 +141,11 @@ export default function PaymentProgressScreen() {
   // Load invoices from CRM
   const loadPayments = useCallback(async () => {
     try {
-      const response = await PerfexInvoicesService.getByProject(projectId);
+      const response = await PerfexInvoicesService.getAll({ project_id: parseInt(projectId) }) as any;
       
       if (response.success && response.data && response.data.length > 0) {
-        const totalValue = response.data.reduce((sum, inv) => sum + parseFloat(inv.total || '0'), 0);
-        const mappedPhases = response.data.map((inv, idx) => 
+        const totalValue = response.data.reduce((sum: number, inv: any) => sum + parseFloat(inv.total || '0'), 0);
+        const mappedPhases = response.data.map((inv: any, idx: number) => 
           mapInvoiceToPhase(inv, idx, totalValue)
         );
         setPhases(mappedPhases);

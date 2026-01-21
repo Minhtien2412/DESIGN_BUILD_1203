@@ -172,20 +172,20 @@ export default function InspectionsListScreen() {
             </Text>
           </View>
 
-          {inspection.inspector && (
+          {(inspection as any).inspector && (
             <View style={styles.metaRow}>
               <Ionicons name="person-outline" size={14} color="#999" />
               <Text style={[styles.metaText, { color: '#999' }]}>
-                {inspection.inspector.name}
+                {(inspection as any).inspector.name}
               </Text>
             </View>
           )}
 
-          {inspection.defectCount !== undefined && inspection.defectCount > 0 && (
+          {(inspection as any).defectCount !== undefined && (inspection as any).defectCount > 0 && (
             <View style={styles.metaRow}>
               <Ionicons name="alert-circle-outline" size={14} color="#FF9500" />
               <Text style={[styles.metaText, { color: '#FF9500' }]}>
-                {inspection.defectCount} defects
+                {(inspection as any).defectCount} defects
               </Text>
             </View>
           )}

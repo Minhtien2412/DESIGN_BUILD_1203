@@ -157,7 +157,7 @@ export const updateAttendeeStatus = async (
 
 export const markAttendance = async (
   minutesId: string,
-  attendances: Array<{ participantId: string; status: string; arrivalTime?: string }>
+  attendances: { participantId: string; status: string; arrivalTime?: string }[]
 ): Promise<MeetingMinutes> => {
   return apiFetch<MeetingMinutes>(`/meeting-minutes/${minutesId}/attendance`, {
     method: 'POST',

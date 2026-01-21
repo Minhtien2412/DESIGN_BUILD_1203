@@ -1,0 +1,9 @@
+3248a9aa108b64c30a259543b2d0f3aa
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getTestId = getTestId;
+function getTestId(elementName) {
+  return `toast${elementName}`;
+}
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJuYW1lcyI6WyJnZXRUZXN0SWQiLCJlbGVtZW50TmFtZSJdLCJzb3VyY2VzIjpbInRlc3QtaWQuanMiXSwic291cmNlc0NvbnRlbnQiOlsiZXhwb3J0IGZ1bmN0aW9uIGdldFRlc3RJZChlbGVtZW50TmFtZSkge1xuICAgIHJldHVybiBgdG9hc3Qke2VsZW1lbnROYW1lfWA7XG59XG4iXSwibWFwcGluZ3MiOiI7Ozs7QUFBTyxTQUFTQSxTQUFTQSxDQUFDQyxXQUFXLEVBQUU7RUFDbkMsT0FBTyxRQUFRQSxXQUFXLEVBQUU7QUFDaEMiLCJpZ25vcmVMaXN0IjpbXX0=

@@ -26,7 +26,7 @@ export interface TimelineWebSocketEvents {
   onPhaseUpdated?: (phase: Phase) => void;
   onPhaseDeleted?: (phaseId: number) => void;
   onPhaseProgressUpdated?: (data: { phaseId: number; progress: number }) => void;
-  onPhaseReordered?: (data: { phases: Array<{ id: number; order: number }> }) => void;
+  onPhaseReordered?: (data: { phases: { id: number; order: number }[] }) => void;
   onTaskCreated?: (task: PhaseTask) => void;
   onTaskUpdated?: (task: PhaseTask) => void;
   onTaskDeleted?: (taskId: number) => void;
@@ -111,7 +111,7 @@ export function useTimelineWebSocket(
 
     // Phase Reordered
     if (events.onPhaseReordered) {
-      const handler = (data: { phases: Array<{ id: number; order: number }> }) => {
+      const handler = (data: { phases: { id: number; order: number }[] }) => {
         console.log('[Timeline WS] Phases reordered:', data);
         events.onPhaseReordered?.(data);
       };

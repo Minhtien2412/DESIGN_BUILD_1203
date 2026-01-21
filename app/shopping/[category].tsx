@@ -107,7 +107,7 @@ export default function ShoppingCategoryScreen() {
     try {
       const response = await getProducts({
         category: categoryInfo.apiCategory || category,
-        sortBy: sortBy === 'price-asc' || sortBy === 'price-desc' ? 'price' : sortBy === 'rating' ? 'rating' : 'soldCount',
+        sortBy: (sortBy === 'price-asc' || sortBy === 'price-desc' ? 'price' : sortBy === 'rating' ? 'rating' : 'newest') as 'price' | 'rating' | 'newest' | 'popular',
         sortOrder: sortBy === 'price-desc' ? 'desc' : sortBy === 'price-asc' ? 'asc' : 'desc',
         limit: 50,
       });

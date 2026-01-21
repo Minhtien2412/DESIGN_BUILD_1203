@@ -27,47 +27,47 @@ interface DecisionDetail {
   status: string;
   context: string;
   rationale: string;
-  alternatives?: Array<{
+  alternatives?: {
     option: string;
     pros: string[];
     cons: string[];
     reason: string;
-  }>;
+  }[];
   decisionMaker: {
     id: string;
     name: string;
     role: string;
   };
-  stakeholders: Array<{
+  stakeholders: {
     id: string;
     name: string;
     role: string;
     influence: 'HIGH' | 'MEDIUM' | 'LOW';
-  }>;
+  }[];
   dateProposed: string;
   dateDecided?: string;
   dateImplemented?: string;
-  relatedRisks?: Array<{
+  relatedRisks?: {
     id: string;
     title: string;
     severity: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
     mitigation?: string;
-  }>;
-  relatedDocuments?: Array<{
+  }[];
+  relatedDocuments?: {
     name: string;
     url: string;
     type: string;
-  }>;
+  }[];
   estimatedCost?: number;
   estimatedTime?: number;
   actualCost?: number;
   actualTime?: number;
-  statusHistory: Array<{
+  statusHistory: {
     status: string;
     date: string;
     changedBy: string;
     comments?: string;
-  }>;
+  }[];
 }
 
 export default function DecisionDetailScreen() {

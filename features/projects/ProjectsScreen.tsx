@@ -75,7 +75,7 @@ const ProjectCard = ({
   onPress: () => void;
   onMenuPress: () => void;
   budgetData?: { totalBudget: number; totalSpent: number } | undefined;
-  projectTasks?: Array<{ status: string } | any>;
+  projectTasks?: ({ status: string } | any)[];
 }) => {
   const scheme = useColorScheme();
   const colors = Colors[scheme ?? 'light'];

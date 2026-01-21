@@ -1,0 +1,11 @@
+a41e37dbb04c9467b6a150387e160283
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.additiveInverseArray = additiveInverseArray;
+function additiveInverseArray(arr) {
+  return arr.map(function (i) {
+    return -i;
+  });
+}
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJuYW1lcyI6WyJhZGRpdGl2ZUludmVyc2VBcnJheSIsImFyciIsIm1hcCIsImkiXSwic291cmNlcyI6WyJhcnJheS5qcyJdLCJzb3VyY2VzQ29udGVudCI6WyJmdW5jdGlvbiBhZGRpdGl2ZUludmVyc2VBcnJheShhcnIpIHtcbiAgICByZXR1cm4gYXJyLm1hcCgoaSkgPT4gLWkpO1xufVxuZXhwb3J0IHsgYWRkaXRpdmVJbnZlcnNlQXJyYXkgfTtcbiJdLCJtYXBwaW5ncyI6Ijs7OztBQUFBLFNBQVNBLG9CQUFvQkEsQ0FBQ0MsR0FBRyxFQUFFO0VBQy9CLE9BQU9BLEdBQUcsQ0FBQ0MsR0FBRyxDQUFDLFVBQUNDLENBQUM7SUFBQSxPQUFLLENBQUNBLENBQUM7RUFBQSxFQUFDO0FBQzdCIiwiaWdub3JlTGlzdCI6W119

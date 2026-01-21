@@ -48,7 +48,7 @@ export default function LiveVideo({ item, isActive, controlsVisible, onUserInter
   const [isPausedByUser, setIsPausedByUser] = useState(false);
   const [volume, setVolume] = useState(1.0);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [bursts, setBursts] = useState<Array<{ id: string; x: number }>>([]);
+  const [bursts, setBursts] = useState<{ id: string; x: number }[]>([]);
   const [showControls, setShowControls] = useState(false);
   const [showRate2x, setShowRate2x] = useState(false);
   const [fitMode, setFitMode] = useState<'contain' | 'cover'>('contain');

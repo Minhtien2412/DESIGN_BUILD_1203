@@ -1,85 +1,313 @@
-import { Container } from '@/components/ui/container';
-import { Colors } from '@/constants/theme';
-import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
-import { useState } from 'react';
+/**
+ * Budget Reports Screen - Modern Minimalist Design
+ * Features: Animated cards, glassmorphism stats, dark mode, haptic feedback
+ */
+
+import { useThemeColor } from "@/hooks/use-theme-color";
+import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
+import { LinearGradient } from "expo-linear-gradient";
+import { router } from "expo-router";
+import { useEffect, useRef, useState } from "react";
 import {
-    ActivityIndicator,
+    Animated,
+    Dimensions,
     ScrollView,
     StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
     View,
-} from 'react-native';
+    useColorScheme,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 interface Report {
   id: number;
   name: string;
-  type: 'daily' | 'weekly' | 'monthly' | 'quarterly';
+  type: "daily" | "weekly" | "monthly" | "quarterly";
   projectName: string;
   period: string;
   totalExpense: number;
   totalIncome: number;
   balance: number;
-  status: 'draft' | 'completed';
+  status: "draft" | "completed";
   createdAt: string;
 }
 
+// Report Card Component with animations
+const ReportCard = ({
+  report,
+  index,
+  textColor,
+  surfaceColor,
+  borderColor,
+  isDark,
+  onPress,
+  formatCurrency,
+}: {
+  report: Report;
+  index: number;
+  textColor: string;
+  surfaceColor: string;
+  borderColor: string;
+  isDark: boolean;
+  onPress: () => void;
+  formatCurrency: (amount: number) => string;
+}) => {
+  const scaleAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      delay: index * 80,
+      useNativeDriver: true,
+      tension: 50,
+      friction: 8,
+    }).start();
+  }, []);
+
+  const getTypeConfig = (type: string) => {
+    const configs: Record<
+      string,
+      { color: string; icon: keyof typeof Ionicons.glyphMap; label: string }
+    > = {
+      daily: { color: "#3b82f6", icon: "today", label: "Hàng ngày" },
+      weekly: { color: "#8b5cf6", icon: "calendar", label: "Hàng tuần" },
+      monthly: {
+        color: "#10b981",
+        icon: "calendar-outline",
+        label: "Hàng tháng",
+      },
+      quarterly: { color: "#f59e0b", icon: "stats-chart", label: "Hàng quý" },
+    };
+    return configs[type] || configs.monthly;
+  };
+
+  const typeConfig = getTypeConfig(report.type);
+
+  return (
+    <Animated.View
+      style={[
+        styles.reportCardWrapper,
+        {
+          opacity: scaleAnim,
+          transform: [
+            { scale: scaleAnim },
+            {
+              translateY: scaleAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [30, 0],
+              }),
+            },
+          ],
+        },
+      ]}
+    >
+      <TouchableOpacity
+        style={[
+          styles.reportCard,
+          { backgroundColor: surfaceColor, borderColor },
+        ]}
+        onPress={onPress}
+        activeOpacity={0.7}
+      >
+        {/* Header with type and status */}
+        <View style={styles.cardHeader}>
+          <View
+            style={[
+              styles.typeBadge,
+              { backgroundColor: typeConfig.color + "15" },
+            ]}
+          >
+            <Ionicons
+              name={typeConfig.icon}
+              size={12}
+              color={typeConfig.color}
+            />
+            <Text style={[styles.typeText, { color: typeConfig.color }]}>
+              {typeConfig.label}
+            </Text>
+          </View>
+          <View
+            style={[
+              styles.statusBadge,
+              {
+                backgroundColor:
+                  report.status === "completed"
+                    ? isDark
+                      ? "#10b98120"
+                      : "#ecfdf5"
+                    : isDark
+                      ? "#f59e0b20"
+                      : "#fef3c7",
+              },
+            ]}
+          >
+            <View
+              style={[
+                styles.statusDot,
+                {
+                  backgroundColor:
+                    report.status === "completed" ? "#10b981" : "#f59e0b",
+                },
+              ]}
+            />
+            <Text
+              style={[
+                styles.statusText,
+                {
+                  color: report.status === "completed" ? "#10b981" : "#f59e0b",
+                },
+              ]}
+            >
+              {report.status === "completed" ? "Hoàn thành" : "Nháp"}
+            </Text>
+          </View>
+        </View>
+
+        {/* Report Name */}
+        <Text style={[styles.reportName, { color: textColor }]}>
+          {report.name}
+        </Text>
+        <Text style={[styles.projectName, { color: textColor + "60" }]}>
+          {report.projectName}
+        </Text>
+
+        {/* Stats Row */}
+        <View style={[styles.statsRow, { borderColor }]}>
+          <View style={styles.statItem}>
+            <Ionicons name="arrow-down-circle" size={16} color="#ef4444" />
+            <Text style={[styles.statLabel, { color: textColor + "60" }]}>
+              Chi
+            </Text>
+            <Text style={[styles.statValue, { color: "#ef4444" }]}>
+              {formatCurrency(report.totalExpense)}
+            </Text>
+          </View>
+          <View style={styles.statDivider} />
+          <View style={styles.statItem}>
+            <Ionicons name="arrow-up-circle" size={16} color="#10b981" />
+            <Text style={[styles.statLabel, { color: textColor + "60" }]}>
+              Thu
+            </Text>
+            <Text style={[styles.statValue, { color: "#10b981" }]}>
+              {formatCurrency(report.totalIncome)}
+            </Text>
+          </View>
+          <View style={styles.statDivider} />
+          <View style={styles.statItem}>
+            <Ionicons
+              name="wallet"
+              size={16}
+              color={report.balance >= 0 ? "#3b82f6" : "#ef4444"}
+            />
+            <Text style={[styles.statLabel, { color: textColor + "60" }]}>
+              Số dư
+            </Text>
+            <Text
+              style={[
+                styles.statValue,
+                { color: report.balance >= 0 ? "#3b82f6" : "#ef4444" },
+              ]}
+            >
+              {formatCurrency(report.balance)}
+            </Text>
+          </View>
+        </View>
+
+        {/* Footer */}
+        <View style={styles.cardFooter}>
+          <View style={styles.footerInfo}>
+            <Ionicons
+              name="calendar-outline"
+              size={13}
+              color={textColor + "50"}
+            />
+            <Text style={[styles.footerText, { color: textColor + "50" }]}>
+              {report.period}
+            </Text>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color={textColor + "40"} />
+        </View>
+      </TouchableOpacity>
+    </Animated.View>
+  );
+};
+
 export default function BudgetReportsScreen() {
-  const [loading, setLoading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterType, setFilterType] = useState<string>('all');
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
+
+  const backgroundColor = useThemeColor({}, "background");
+  const textColor = useThemeColor({}, "text");
+  const surfaceColor = useThemeColor({}, "surface");
+  const borderColor = useThemeColor({}, "border");
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterType, setFilterType] = useState<string>("all");
+
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 400,
+      useNativeDriver: true,
+    }).start();
+  }, []);
 
   // Mock data
   const reports: Report[] = [
     {
       id: 1,
-      name: 'Báo cáo chi phí tháng 1/2025',
-      type: 'monthly',
-      projectName: 'Tòa nhà Sunrise Tower',
-      period: '01/2025',
+      name: "Báo cáo chi phí tháng 1/2025",
+      type: "monthly",
+      projectName: "Tòa nhà Sunrise Tower",
+      period: "01/2025",
       totalExpense: 1500000000,
       totalIncome: 2000000000,
       balance: 500000000,
-      status: 'completed',
-      createdAt: '2025-02-01',
+      status: "completed",
+      createdAt: "2025-02-01",
     },
     {
       id: 2,
-      name: 'Báo cáo chi phí tuần 3/2025',
-      type: 'weekly',
-      projectName: 'Biệt thự Phú Mỹ Hưng',
-      period: 'Tuần 3 - T1/2025',
+      name: "Báo cáo chi phí tuần 3/2025",
+      type: "weekly",
+      projectName: "Biệt thự Phú Mỹ Hưng",
+      period: "Tuần 3 - T1/2025",
       totalExpense: 350000000,
       totalIncome: 400000000,
       balance: 50000000,
-      status: 'completed',
-      createdAt: '2025-01-21',
+      status: "completed",
+      createdAt: "2025-01-21",
     },
     {
       id: 3,
-      name: 'Báo cáo ngày 20/01/2025',
-      type: 'daily',
-      projectName: 'Chung cư The Manor',
-      period: '20/01/2025',
+      name: "Báo cáo ngày 20/01/2025",
+      type: "daily",
+      projectName: "Chung cư The Manor",
+      period: "20/01/2025",
       totalExpense: 85000000,
       totalIncome: 0,
       balance: -85000000,
-      status: 'draft',
-      createdAt: '2025-01-20',
+      status: "draft",
+      createdAt: "2025-01-20",
     },
     {
       id: 4,
-      name: 'Báo cáo Q4/2024',
-      type: 'quarterly',
-      projectName: 'Tất cả dự án',
-      period: 'Q4/2024',
+      name: "Báo cáo Q4/2024",
+      type: "quarterly",
+      projectName: "Tất cả dự án",
+      period: "Q4/2024",
       totalExpense: 8500000000,
       totalIncome: 10000000000,
       balance: 1500000000,
-      status: 'completed',
-      createdAt: '2025-01-05',
+      status: "completed",
+      createdAt: "2025-01-05",
     },
   ];
 
@@ -90,379 +318,566 @@ export default function BudgetReportsScreen() {
     if (absAmount >= 1000000000) {
       formatted = `${(absAmount / 1000000000).toFixed(1)} tỷ`;
     } else if (absAmount >= 1000000) {
-      formatted = `${(absAmount / 1000000).toFixed(0)} triệu`;
+      formatted = `${(absAmount / 1000000).toFixed(0)}M`;
     } else {
-      formatted = absAmount.toLocaleString('vi-VN') + ' ₫';
+      formatted = absAmount.toLocaleString("vi-VN");
     }
     return isNegative ? `-${formatted}` : formatted;
   };
 
-  const getTypeColor = (type: string) => {
-    switch (type) {
-      case 'daily': return '#3B82F6';
-      case 'weekly': return '#0066CC';
-      case 'monthly': return '#0066CC';
-      case 'quarterly': return '#666666';
-      default: return '#94A3B8';
-    }
-  };
-
-  const getTypeText = (type: string) => {
-    switch (type) {
-      case 'daily': return 'Hàng ngày';
-      case 'weekly': return 'Hàng tuần';
-      case 'monthly': return 'Hàng tháng';
-      case 'quarterly': return 'Hàng quý';
-      default: return type;
-    }
-  };
-
-  const filteredReports = reports.filter(report => {
-    const matchSearch = report.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                       report.projectName.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchType = filterType === 'all' || report.type === filterType;
+  const filteredReports = reports.filter((report) => {
+    const matchSearch =
+      report.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      report.projectName.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchType = filterType === "all" || report.type === filterType;
     return matchSearch && matchType;
   });
 
   const typeFilters = [
-    { key: 'all', label: 'Tất cả' },
-    { key: 'daily', label: 'Ngày' },
-    { key: 'weekly', label: 'Tuần' },
-    { key: 'monthly', label: 'Tháng' },
-    { key: 'quarterly', label: 'Quý' },
+    { key: "all", label: "Tất cả", icon: "apps" as const },
+    { key: "daily", label: "Ngày", icon: "today" as const },
+    { key: "weekly", label: "Tuần", icon: "calendar" as const },
+    { key: "monthly", label: "Tháng", icon: "calendar-outline" as const },
+    { key: "quarterly", label: "Quý", icon: "stats-chart" as const },
   ];
 
+  const totalExpense = reports.reduce((sum, r) => sum + r.totalExpense, 0);
+  const totalIncome = reports.reduce((sum, r) => sum + r.totalIncome, 0);
+  const netBalance = totalIncome - totalExpense;
+
+  const handleFilterPress = (key: string) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setFilterType(key);
+  };
+
+  const handleReportPress = (report: Report) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    // Navigate to report detail
+  };
+
   return (
-    <Container fullWidth>
-      <View style={styles.container}>
-        {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-            <Ionicons name="arrow-back" size={24} color="#333" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Báo cáo tài chính</Text>
-          <TouchableOpacity style={styles.addButton}>
-            <Ionicons name="add" size={24} color={Colors.light.primary} />
-          </TouchableOpacity>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor }]}
+      edges={["top"]}
+    >
+      {/* Header */}
+      <Animated.View style={[styles.header, { opacity: fadeAnim }]}>
+        <TouchableOpacity
+          style={[styles.backButton, { backgroundColor: surfaceColor }]}
+          onPress={() => router.back()}
+        >
+          <Ionicons name="arrow-back" size={22} color={textColor} />
+        </TouchableOpacity>
+
+        <View style={styles.headerTextWrap}>
+          <Text style={[styles.title, { color: textColor }]}>
+            Báo cáo tài chính
+          </Text>
+          <Text style={[styles.subtitle, { color: textColor + "60" }]}>
+            {reports.length} báo cáo
+          </Text>
         </View>
 
-        {/* Summary */}
+        <TouchableOpacity
+          style={[styles.addButton, { backgroundColor: "#6366f1" }]}
+          onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
+        >
+          <Ionicons name="add" size={22} color="#fff" />
+        </TouchableOpacity>
+      </Animated.View>
+
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        {/* Summary Cards */}
         <View style={styles.summaryContainer}>
-          <View style={styles.summaryCard}>
-            <Ionicons name="arrow-down-circle" size={24} color="#000000" />
-            <View style={styles.summaryContent}>
-              <Text style={styles.summaryLabel}>Tổng chi</Text>
-              <Text style={[styles.summaryValue, { color: '#000000' }]}>
-                {formatCurrency(reports.reduce((sum, r) => sum + r.totalExpense, 0))}
+          <LinearGradient
+            colors={
+              isDark ? ["#ef444420", "#ef444410"] : ["#fef2f2", "#fff5f5"]
+            }
+            style={styles.summaryCard}
+          >
+            <View style={styles.summaryIconWrap}>
+              <Ionicons name="arrow-down-circle" size={22} color="#ef4444" />
+            </View>
+            <Text style={styles.summaryLabel}>Tổng chi</Text>
+            <Text style={[styles.summaryValue, { color: "#ef4444" }]}>
+              {formatCurrency(totalExpense)}
+            </Text>
+          </LinearGradient>
+
+          <LinearGradient
+            colors={
+              isDark ? ["#10b98120", "#10b98110"] : ["#ecfdf5", "#f0fdf4"]
+            }
+            style={styles.summaryCard}
+          >
+            <View style={styles.summaryIconWrap}>
+              <Ionicons name="arrow-up-circle" size={22} color="#10b981" />
+            </View>
+            <Text style={styles.summaryLabel}>Tổng thu</Text>
+            <Text style={[styles.summaryValue, { color: "#10b981" }]}>
+              {formatCurrency(totalIncome)}
+            </Text>
+          </LinearGradient>
+
+          <LinearGradient
+            colors={
+              netBalance >= 0
+                ? isDark
+                  ? ["#3b82f620", "#3b82f610"]
+                  : ["#eff6ff", "#f0f9ff"]
+                : isDark
+                  ? ["#ef444420", "#ef444410"]
+                  : ["#fef2f2", "#fff5f5"]
+            }
+            style={styles.summaryCardFull}
+          >
+            <View style={styles.summaryIconWrap}>
+              <Ionicons
+                name="wallet"
+                size={22}
+                color={netBalance >= 0 ? "#3b82f6" : "#ef4444"}
+              />
+            </View>
+            <View style={styles.summaryTextWrap}>
+              <Text style={styles.summaryLabel}>Cân đối ròng</Text>
+              <Text
+                style={[
+                  styles.summaryValueLarge,
+                  { color: netBalance >= 0 ? "#3b82f6" : "#ef4444" },
+                ]}
+              >
+                {formatCurrency(netBalance)}
               </Text>
             </View>
-          </View>
-          <View style={styles.summaryCard}>
-            <Ionicons name="arrow-up-circle" size={24} color="#0066CC" />
-            <View style={styles.summaryContent}>
-              <Text style={styles.summaryLabel}>Tổng thu</Text>
-              <Text style={[styles.summaryValue, { color: '#0066CC' }]}>
-                {formatCurrency(reports.reduce((sum, r) => sum + r.totalIncome, 0))}
+            <View
+              style={[
+                styles.trendBadge,
+                {
+                  backgroundColor: netBalance >= 0 ? "#10b98115" : "#ef444415",
+                },
+              ]}
+            >
+              <Ionicons
+                name={netBalance >= 0 ? "trending-up" : "trending-down"}
+                size={14}
+                color={netBalance >= 0 ? "#10b981" : "#ef4444"}
+              />
+              <Text
+                style={{
+                  fontSize: 11,
+                  fontWeight: "600",
+                  color: netBalance >= 0 ? "#10b981" : "#ef4444",
+                }}
+              >
+                {netBalance >= 0 ? "+" : ""}
+                {((netBalance / (totalIncome || 1)) * 100).toFixed(0)}%
               </Text>
             </View>
-          </View>
+          </LinearGradient>
         </View>
 
         {/* Search */}
-        <View style={styles.searchContainer}>
-          <Ionicons name="search" size={20} color="#94A3B8" style={styles.searchIcon} />
+        <View
+          style={[
+            styles.searchContainer,
+            { backgroundColor: surfaceColor, borderColor },
+          ]}
+        >
+          <Ionicons name="search" size={20} color={textColor + "50"} />
           <TextInput
-            style={styles.searchInput}
+            style={[styles.searchInput, { color: textColor }]}
             placeholder="Tìm kiếm báo cáo..."
+            placeholderTextColor={textColor + "40"}
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
+          {searchQuery.length > 0 && (
+            <TouchableOpacity onPress={() => setSearchQuery("")}>
+              <Ionicons
+                name="close-circle"
+                size={20}
+                color={textColor + "40"}
+              />
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* Filter Tabs */}
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          style={styles.filterContainer}
-          contentContainerStyle={styles.filterContent}
+          contentContainerStyle={styles.filterScroll}
         >
-          {typeFilters.map((filter) => (
-            <TouchableOpacity
-              key={filter.key}
-              style={[
-                styles.filterTab,
-                filterType === filter.key && styles.filterTabActive,
-              ]}
-              onPress={() => setFilterType(filter.key)}
-            >
-              <Text
+          {typeFilters.map((filter) => {
+            const isActive = filterType === filter.key;
+            const count =
+              filter.key === "all"
+                ? reports.length
+                : reports.filter((r) => r.type === filter.key).length;
+
+            return (
+              <TouchableOpacity
+                key={filter.key}
                 style={[
-                  styles.filterText,
-                  filterType === filter.key && styles.filterTextActive,
+                  styles.filterChip,
+                  {
+                    backgroundColor: isActive
+                      ? isDark
+                        ? "#6366f1"
+                        : "#1a1a1a"
+                      : surfaceColor,
+                    borderColor: isActive ? "transparent" : borderColor,
+                  },
                 ]}
+                onPress={() => handleFilterPress(filter.key)}
+                activeOpacity={0.7}
               >
-                {filter.label}
-              </Text>
-            </TouchableOpacity>
-          ))}
+                <Ionicons
+                  name={filter.icon}
+                  size={14}
+                  color={isActive ? "#fff" : textColor + "80"}
+                />
+                <Text
+                  style={[
+                    styles.filterText,
+                    { color: isActive ? "#fff" : textColor },
+                  ]}
+                >
+                  {filter.label}
+                </Text>
+                {count > 0 && (
+                  <View
+                    style={[
+                      styles.filterBadge,
+                      {
+                        backgroundColor: isActive
+                          ? "rgba(255,255,255,0.2)"
+                          : borderColor,
+                      },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.filterBadgeText,
+                        { color: isActive ? "#fff" : textColor + "80" },
+                      ]}
+                    >
+                      {count}
+                    </Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+            );
+          })}
         </ScrollView>
 
         {/* Reports List */}
-        <ScrollView style={styles.listContainer} showsVerticalScrollIndicator={false}>
-          {loading ? (
-            <ActivityIndicator size="large" color={Colors.light.primary} style={styles.loader} />
-          ) : (
-            filteredReports.map((report) => (
-              <TouchableOpacity
-                key={report.id}
-                style={styles.reportCard}
-                onPress={() => {}}
+        <View style={styles.listContainer}>
+          {filteredReports.length === 0 ? (
+            <View
+              style={[
+                styles.emptyState,
+                { backgroundColor: surfaceColor, borderColor },
+              ]}
+            >
+              <View
+                style={[
+                  styles.emptyIconWrap,
+                  { backgroundColor: isDark ? "#374151" : "#f3f4f6" },
+                ]}
               >
-                <View style={styles.cardHeader}>
-                  <View style={[styles.typeBadge, { backgroundColor: `${getTypeColor(report.type)}15` }]}>
-                    <Text style={[styles.typeText, { color: getTypeColor(report.type) }]}>
-                      {getTypeText(report.type)}
-                    </Text>
-                  </View>
-                  <View style={[styles.statusBadge, { backgroundColor: report.status === 'completed' ? '#ECFDF5' : '#FEF3C7' }]}>
-                    <Text style={[styles.statusText, { color: report.status === 'completed' ? '#0066CC' : '#0066CC' }]}>
-                      {report.status === 'completed' ? 'Hoàn thành' : 'Nháp'}
-                    </Text>
-                  </View>
-                </View>
-
-                <Text style={styles.reportName}>{report.name}</Text>
-                <Text style={styles.projectName}>{report.projectName}</Text>
-
-                <View style={styles.statsRow}>
-                  <View style={styles.statItem}>
-                    <Text style={styles.statLabel}>Chi</Text>
-                    <Text style={[styles.statValue, { color: '#000000' }]}>
-                      {formatCurrency(report.totalExpense)}
-                    </Text>
-                  </View>
-                  <View style={styles.statItem}>
-                    <Text style={styles.statLabel}>Thu</Text>
-                    <Text style={[styles.statValue, { color: '#0066CC' }]}>
-                      {formatCurrency(report.totalIncome)}
-                    </Text>
-                  </View>
-                  <View style={styles.statItem}>
-                    <Text style={styles.statLabel}>Số dư</Text>
-                    <Text style={[styles.statValue, { color: report.balance >= 0 ? '#0066CC' : '#000000' }]}>
-                      {formatCurrency(report.balance)}
-                    </Text>
-                  </View>
-                </View>
-
-                <View style={styles.cardFooter}>
-                  <View style={styles.footerInfo}>
-                    <Ionicons name="calendar-outline" size={14} color="#94A3B8" />
-                    <Text style={styles.footerText}>{report.period}</Text>
-                  </View>
-                  <View style={styles.footerInfo}>
-                    <Ionicons name="time-outline" size={14} color="#94A3B8" />
-                    <Text style={styles.footerText}>
-                      {new Date(report.createdAt).toLocaleDateString('vi-VN')}
-                    </Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
+                <Ionicons
+                  name="document-outline"
+                  size={40}
+                  color={isDark ? "#6b7280" : "#9ca3af"}
+                />
+              </View>
+              <Text style={[styles.emptyText, { color: textColor }]}>
+                Không tìm thấy báo cáo
+              </Text>
+            </View>
+          ) : (
+            filteredReports.map((report, index) => (
+              <ReportCard
+                key={report.id}
+                report={report}
+                index={index}
+                textColor={textColor}
+                surfaceColor={surfaceColor}
+                borderColor={borderColor}
+                isDark={isDark}
+                onPress={() => handleReportPress(report)}
+                formatCurrency={formatCurrency}
+              />
             ))
           )}
+        </View>
 
-          <View style={{ height: 100 }} />
-        </ScrollView>
-      </View>
-    </Container>
+        <View style={styles.bottomPadding} />
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 16,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e5e5e5',
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    gap: 16,
   },
   backButton: {
-    padding: 8,
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
   },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
+  headerTextWrap: {
+    flex: 1,
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: "700",
+  },
+  subtitle: {
+    fontSize: 13,
+    marginTop: 2,
   },
   addButton: {
-    padding: 8,
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingHorizontal: 20,
   },
   summaryContainer: {
-    flexDirection: 'row',
-    padding: 16,
-    gap: 12,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+    marginBottom: 20,
   },
   summaryCard: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    padding: 12,
-    borderRadius: 12,
-    gap: 10,
+    width: (SCREEN_WIDTH - 50) / 2,
+    paddingVertical: 14,
+    paddingHorizontal: 12,
+    borderRadius: 14,
+    alignItems: "center",
   },
-  summaryContent: {
+  summaryCardFull: {
+    width: SCREEN_WIDTH - 40,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    borderRadius: 14,
+    gap: 12,
+  },
+  summaryIconWrap: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: "rgba(255,255,255,0.5)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  summaryTextWrap: {
     flex: 1,
   },
   summaryLabel: {
     fontSize: 12,
-    color: '#666',
+    color: "#6b7280",
+    marginTop: 6,
   },
   summaryValue: {
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: 18,
+    fontWeight: "700",
     marginTop: 2,
   },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    marginHorizontal: 16,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    borderWidth: 1,
-    borderColor: '#e5e5e5',
+  summaryValueLarge: {
+    fontSize: 22,
+    fontWeight: "700",
+    marginTop: 2,
   },
-  searchIcon: {
-    marginRight: 8,
+  trendBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 20,
+    gap: 4,
+  },
+  searchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderWidth: 1,
+    gap: 10,
+    marginBottom: 16,
   },
   searchInput: {
     flex: 1,
-    paddingVertical: 12,
     fontSize: 15,
-    color: '#333',
+    paddingVertical: 4,
   },
-  filterContainer: {
-    marginTop: 12,
-    maxHeight: 44,
-  },
-  filterContent: {
-    paddingHorizontal: 16,
+  filterScroll: {
+    paddingBottom: 16,
     gap: 8,
   },
-  filterTab: {
-    paddingHorizontal: 16,
+  filterChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#e5e5e5',
+    gap: 6,
     marginRight: 8,
   },
-  filterTabActive: {
-    backgroundColor: Colors.light.primary,
-    borderColor: Colors.light.primary,
-  },
   filterText: {
-    fontSize: 13,
-    color: '#666',
-    fontWeight: '500',
+    fontSize: 12,
+    fontWeight: "500",
   },
-  filterTextActive: {
-    color: '#fff',
+  filterBadge: {
+    minWidth: 20,
+    height: 20,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 6,
+  },
+  filterBadgeText: {
+    fontSize: 11,
+    fontWeight: "600",
   },
   listContainer: {
-    flex: 1,
-    paddingHorizontal: 16,
-    marginTop: 16,
+    gap: 12,
   },
-  loader: {
-    marginTop: 40,
-  },
+  reportCardWrapper: {},
   reportCard: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
+    borderRadius: 16,
+    borderWidth: 1,
     padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    overflow: "hidden",
   },
   cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 12,
   },
   typeBadge: {
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
+    paddingVertical: 5,
+    borderRadius: 8,
+    gap: 5,
   },
   typeText: {
     fontSize: 11,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   statusBadge: {
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
+    paddingVertical: 5,
+    borderRadius: 8,
+    gap: 5,
+  },
+  statusDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
   },
   statusText: {
     fontSize: 11,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   reportName: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
     marginBottom: 4,
   },
   projectName: {
     fontSize: 13,
-    color: '#666',
     marginBottom: 12,
   },
   statsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-around",
+    paddingVertical: 14,
     borderTopWidth: 1,
-    borderBottomWidth: 1,
-    borderColor: '#f0f0f0',
     marginBottom: 12,
   },
   statItem: {
-    alignItems: 'center',
+    alignItems: "center",
+    gap: 4,
+    flex: 1,
   },
   statLabel: {
     fontSize: 11,
-    color: '#94A3B8',
-    marginBottom: 4,
   },
   statValue: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
+  },
+  statDivider: {
+    width: 1,
+    height: 30,
+    backgroundColor: "#e5e7eb",
   },
   cardFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   footerInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
   },
   footerText: {
     fontSize: 12,
-    color: '#94A3B8',
+  },
+  emptyState: {
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 40,
+    borderRadius: 16,
+    borderWidth: 1,
+  },
+  emptyIconWrap: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 16,
+  },
+  emptyText: {
+    fontSize: 15,
+    fontWeight: "500",
+  },
+  bottomPadding: {
+    height: 100,
   },
 });

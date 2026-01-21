@@ -264,7 +264,7 @@ export default function UserProfileScreen() {
               {/* Online Status Indicator */}
               <View style={[
                 styles.onlineIndicator,
-                { backgroundColor: user.isOnline ? COLORS.online : COLORS.offline }
+                { backgroundColor: user.online ? COLORS.online : COLORS.offline }
               ]} />
               {/* Verified Badge */}
               {user.verified && (
@@ -277,15 +277,15 @@ export default function UserProfileScreen() {
             {/* Name & Status */}
             <Text style={styles.userName}>{user.name}</Text>
             <Text style={styles.userStatus}>
-              {user.isOnline ? 'Đang hoạt động' : formatLastSeen(user.lastSeen)}
+              {user.online ? 'Đang hoạt động' : formatLastSeen(user.lastSeen)}
             </Text>
 
             {/* Quick Stats */}
-            {user.mutualFriends !== undefined && user.mutualFriends > 0 && (
+            {(user as any).stats?.mutualFriends !== undefined && (user as any).stats.mutualFriends > 0 && (
               <View style={styles.mutualFriendsRow}>
                 <Ionicons name="people" size={14} color={COLORS.white} />
                 <Text style={styles.mutualFriendsText}>
-                  {user.mutualFriends} bạn chung
+                  {(user as any).stats?.mutualFriends} bạn chung
                 </Text>
               </View>
             )}
@@ -347,7 +347,7 @@ export default function UserProfileScreen() {
           </View>
 
           {/* Add Friend / Message Row */}
-          {!user.isFriend && (
+          {!(user as any).isFriend && (
             <TouchableOpacity 
               style={styles.addFriendBtn}
               onPress={handleAddFriend}
@@ -445,13 +445,13 @@ export default function UserProfileScreen() {
         </View>
 
         {/* Stats Section - For Construction App */}
-        {(user.projects || user.rating) && (
+        {((user as any).projects || user.rating) && (
           <View style={styles.statsSection}>
             <Text style={styles.sectionTitle}>Thống kê</Text>
             <View style={styles.statsRow}>
-              {user.projects && (
+              {(user as any).projects && (
                 <View style={styles.statItem}>
-                  <Text style={styles.statValue}>{user.projects}</Text>
+                  <Text style={styles.statValue}>{(user as any).projects}</Text>
                   <Text style={styles.statLabel}>Dự án</Text>
                 </View>
               )}
@@ -464,9 +464,9 @@ export default function UserProfileScreen() {
                   <Text style={styles.statLabel}>Đánh giá</Text>
                 </View>
               )}
-              {user.mutualFriends !== undefined && (
+              {(user as any).mutualFriends !== undefined && (
                 <View style={styles.statItem}>
-                  <Text style={styles.statValue}>{user.mutualFriends}</Text>
+                  <Text style={styles.statValue}>{(user as any).mutualFriends}</Text>
                   <Text style={styles.statLabel}>Bạn chung</Text>
                 </View>
               )}

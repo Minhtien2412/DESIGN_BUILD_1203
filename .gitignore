@@ -64,3 +64,5 @@ mock-*.js
 # misc
 uploads/
 dist-test/
+
+.env.local

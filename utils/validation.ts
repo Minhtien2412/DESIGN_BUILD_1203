@@ -109,3 +109,75 @@ export function debounceValidation(
     }, delay);
   };
 }
+
+/**
+ * Password strength checker
+ * Returns level 0-4 with corresponding text and color
+ */
+export interface PasswordStrength {
+  level: 0 | 1 | 2 | 3 | 4;
+  text: string;
+  color: string;
+  percentage: number;
+}
+
+export function getPasswordStrength(password: string): PasswordStrength {
+  if (!password) {
+    return { level: 0, text: '', color: '#E5E7EB', percentage: 0 };
+  }
+
+  let score = 0;
+  
+  // Length checks
+  if (password.length >= 6) score++;
+  if (password.length >= 8) score++;
+  if (password.length >= 12) score++;
+  
+  // Character variety
+  if (/[a-z]/.test(password) && /[A-Z]/.test(password)) score++;
+  if (/\d/.test(password)) score++;
+  if (/[^a-zA-Z0-9]/.test(password)) score++;
+  
+  // Common patterns (penalty)
+  if (/^[0-9]+$/.test(password)) score = Math.max(0, score - 1); // All numbers
+  if (/^[a-zA-Z]+$/.test(password)) score = Math.max(0, score - 1); // All letters
+  if (/(.)\1{2,}/.test(password)) score = Math.max(0, score - 1); // Repeated chars
+
+  if (score <= 1) return { level: 1, text: 'Rất yếu', color: '#DC2626', percentage: 25 };
+  if (score <= 2) return { level: 2, text: 'Yếu', color: '#F97316', percentage: 50 };
+  if (score <= 3) return { level: 3, text: 'Trung bình', color: '#EAB308', percentage: 75 };
+  if (score <= 4) return { level: 4, text: 'Mạnh', color: '#22C55E', percentage: 100 };
+  return { level: 4, text: 'Rất mạnh', color: '#16A34A', percentage: 100 };
+}
+
+/**
+ * Validate confirm password matches
+ */
+export function validateConfirmPassword(password: string, confirmPassword: string): ValidationResult {
+  if (!confirmPassword) {
+    return { isValid: false, error: 'Vui lòng xác nhận mật khẩu' };
+  }
+  
+  if (password !== confirmPassword) {
+    return { isValid: false, error: 'Mật khẩu xác nhận không khớp' };
+  }
+  
+  return { isValid: true };
+}
+
+/**
+ * Validate OTP code (6 digits)
+ */
+export function validateOtp(otp: string): ValidationResult {
+  const trimmed = otp.trim();
+  
+  if (!trimmed) {
+    return { isValid: false, error: 'Vui lòng nhập mã OTP' };
+  }
+  
+  if (!/^\d{6}$/.test(trimmed)) {
+    return { isValid: false, error: 'Mã OTP phải là 6 chữ số' };
+  }
+  
+  return { isValid: true };
+}

@@ -72,7 +72,7 @@ export async function getProjectPhases(
 
   // Fallback to Perfex Tasks grouped as phases
   try {
-    const tasksResult = await PerfexTasksService.getByProject(projectId);
+    const tasksResult = await PerfexTasksService.getAll({ rel_type: 'project', rel_id: projectId });
     if (tasksResult.data && Array.isArray(tasksResult.data)) {
       const phases = groupTasksIntoPhases(tasksResult.data);
       return { ok: true, data: { phases, total: phases.length } };
@@ -178,50 +178,21 @@ function mapTaskStatus(status?: number | string): 'pending' | 'in_progress' | 'c
   return 'pending';
 }
 
-// Mock data fallback
-export const MOCK_PHASE: Phase = {
-  id: '1',
-  name: 'Giai đoạn 1: Thiết kế',
-  description: 'Hoàn thành toàn bộ hồ sơ thiết kế',
-  startDate: '2024-01-01',
-  endDate: '2024-02-15',
-  progress: 65,
-  status: 'in_progress',
-  tasks: [
-    { id: '1', title: 'Thiết kế kiến trúc', progress: 100, status: 'completed' },
-    { id: '2', title: 'Thiết kế kết cấu', progress: 80, status: 'in_progress' },
-    { id: '3', title: 'Thiết kế MEP', progress: 50, status: 'in_progress' },
-    { id: '4', title: 'Dự toán chi phí', progress: 20, status: 'pending' },
-  ],
+// Fallback empty phase - used when API returns no data
+export const EMPTY_PHASE: Phase = {
+  id: '',
+  name: 'Chưa có giai đoạn',
+  description: 'Chưa có dữ liệu từ hệ thống',
+  startDate: new Date().toISOString().split('T')[0],
+  endDate: new Date().toISOString().split('T')[0],
+  progress: 0,
+  status: 'pending',
+  tasks: [],
 };
 
-export const MOCK_PHASES: Phase[] = [
-  MOCK_PHASE,
-  {
-    id: '2',
-    name: 'Giai đoạn 2: Thi công phần thô',
-    description: 'Thi công móng, khung, mái',
-    startDate: '2024-02-16',
-    endDate: '2024-05-15',
-    progress: 30,
-    status: 'in_progress',
-    tasks: [
-      { id: '5', title: 'Đào móng', progress: 100, status: 'completed' },
-      { id: '6', title: 'Đổ bê tông móng', progress: 50, status: 'in_progress' },
-      { id: '7', title: 'Xây tường', progress: 0, status: 'pending' },
-    ],
-  },
-  {
-    id: '3',
-    name: 'Giai đoạn 3: Hoàn thiện',
-    description: 'Sơn, lát gạch, lắp đặt thiết bị',
-    startDate: '2024-05-16',
-    endDate: '2024-07-15',
-    progress: 0,
-    status: 'pending',
-    tasks: [],
-  },
-];
+// Backward compatibility - deprecated, use EMPTY_PHASE
+export const MOCK_PHASE = EMPTY_PHASE;
+export const MOCK_PHASES: Phase[] = [];
 
 export default {
   getProjectPhases,
@@ -229,6 +200,7 @@ export default {
   createPhase,
   updatePhase,
   deletePhase,
+  EMPTY_PHASE,
   MOCK_PHASE,
   MOCK_PHASES,
 };

@@ -62,11 +62,11 @@ export interface UnifiedMessage {
   isRead: boolean;
   readBy?: number[];
   // Reactions
-  reactions?: Array<{
+  reactions?: {
     emoji: string;
     userId: number;
     userName: string;
-  }>;
+  }[];
   // Timestamps
   createdAt: string;
   updatedAt: string;

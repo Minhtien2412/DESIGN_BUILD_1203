@@ -52,7 +52,7 @@ export default function Design3DScreen() {
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    fetchDesigns(true);
+    fetchDesigns();
   }, [fetchDesigns]);
 
   const filteredDesigns = selectedFilter

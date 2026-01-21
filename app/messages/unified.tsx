@@ -53,7 +53,7 @@ const COLORS = {
 
 type FilterTab = 'all' | 'unread' | 'groups';
 
-const FILTER_TABS: Array<{ key: FilterTab; label: string }> = [
+const FILTER_TABS: { key: FilterTab; label: string }[] = [
   { key: 'all', label: 'Tất cả' },
   { key: 'unread', label: 'Chưa đọc' },
   { key: 'groups', label: 'Nhóm' },

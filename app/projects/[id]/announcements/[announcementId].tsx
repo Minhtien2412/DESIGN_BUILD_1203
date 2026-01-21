@@ -34,8 +34,8 @@ interface Announcement {
   publishedByName?: string;
   createdAt: string;
   expiresAt?: string;
-  readBy?: Array<{ userId: number; readAt: string; userName?: string }>;
-  attachments?: Array<{ name: string; url: string; type: string; size: number }>;
+  readBy?: { userId: number; readAt: string; userName?: string }[];
+  attachments?: { name: string; url: string; type: string; size: number }[];
   isPinned?: boolean;
 }
 

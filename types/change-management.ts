@@ -329,24 +329,24 @@ export interface ChangeAnalytics {
     implemented: number;
     approvalRate: number;
   };
-  byCategory: Array<{
+  byCategory: {
     category: ChangeCategory;
     count: number;
     totalCost: number;
     avgCost: number;
-  }>;
-  byOrigin: Array<{
+  }[];
+  byOrigin: {
     origin: ChangeOrigin;
     count: number;
     percentage: number;
-  }>;
+  }[];
   costImpact: {
     totalCost: number;
     avgCostPerChange: number;
-    costByCategory: Array<{
+    costByCategory: {
       category: ChangeCategory;
       cost: number;
-    }>;
+    }[];
   };
   scheduleImpact: {
     totalDelayDays: number;
@@ -354,12 +354,12 @@ export interface ChangeAnalytics {
     criticalPathChanges: number;
   };
   topChanges: ChangeRequest[];
-  trends: Array<{
+  trends: {
     month: string;
     requestCount: number;
     approvedCount: number;
     totalCost: number;
-  }>;
+  }[];
 }
 
 // API request/response types

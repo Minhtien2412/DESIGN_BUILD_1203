@@ -1,11 +1,11 @@
-import { buildApiUrl } from '@/config';
-import { VideoItem, VIDEOS } from '@/data/videos';
-import * as ExpoConstants from 'expo-constants';
-import { api } from './api';
-import { serverFetch } from './enhancedServerClient';
+import { buildApiUrl } from "@/config";
+import { VideoCategory, VideoItem, VIDEOS } from "@/data/videos";
+import * as ExpoConstants from "expo-constants";
+import { api } from "./api";
+import { serverFetch } from "./enhancedServerClient";
 
 // Detect if running in Expo Go
-const isExpoGo = ExpoConstants.default?.appOwnership === 'expo';
+const isExpoGo = ExpoConstants.default?.appOwnership === "expo";
 
 export interface VideoMetadata {
   id: string;
@@ -39,7 +39,7 @@ export interface VideoFile {
   mimeType: string;
   resolution: string;
   bitrate: number;
-  quality: 'low' | 'medium' | 'high' | 'ultra';
+  quality: "low" | "medium" | "high" | "ultra";
   createdAt: Date;
 }
 
@@ -79,21 +79,21 @@ class VideoService {
     // Initialize with existing videos from data/videos.ts
     const existingVideos: VideoItem[] = VIDEOS;
 
-    existingVideos.forEach(video => {
+    existingVideos.forEach((video) => {
       const metadata: VideoMetadata = {
         id: video.id,
         title: video.title,
-        description: '',
-        category: video.category || 'general',
+        description: "",
+        category: video.category || "general",
         tags: video.hashtags || [],
-        authorId: video.authorSlug || 'unknown',
-        authorName: video.author || 'Unknown',
+        authorId: video.authorSlug || "unknown",
+        authorName: video.author || "Unknown",
         createdAt: new Date(),
         updatedAt: new Date(),
         viewCount: 0,
         likeCount: video.likes || 0,
         commentCount: video.comments || 0,
-        isLive: video.type === 'live',
+        isLive: video.type === "live",
         isPublic: true,
       };
 
@@ -104,13 +104,14 @@ class VideoService {
       const videoFile: VideoFile = {
         id: `${video.id}_file`,
         videoId: video.id,
-        filePath: typeof video.url === 'string' ? video.url : `local://${video.id}`,
+        filePath:
+          typeof video.url === "string" ? video.url : `local://${video.id}`,
         fileName: video.title,
         fileSize: 0,
-        mimeType: 'video/mp4',
-        resolution: '1080p',
+        mimeType: "video/mp4",
+        resolution: "1080p",
         bitrate: 2000,
-        quality: 'high',
+        quality: "high",
         createdAt: new Date(),
       };
 
@@ -137,7 +138,7 @@ class VideoService {
     limit: number = 20
   ): { videos: VideoMetadata[]; total: number; hasMore: boolean } {
     const categoryVideos = Array.from(this.videos.values())
-      .filter(video => video.category === category && video.isPublic)
+      .filter((video) => video.category === category && video.isPublic)
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
     const startIndex = (page - 1) * limit;
@@ -154,15 +155,19 @@ class VideoService {
   // Get videos in sequence (for ordered playback)
   getVideosInSequence(startId?: string, count: number = 10): VideoMetadata[] {
     if (!startId) {
-      return this.videoSequence.slice(0, count).map(id => this.videos.get(id)!).filter(Boolean);
+      return this.videoSequence
+        .slice(0, count)
+        .map((id) => this.videos.get(id)!)
+        .filter(Boolean);
     }
 
     const startIndex = this.videoSequence.indexOf(startId);
     if (startIndex === -1) return [];
 
     const endIndex = Math.min(startIndex + count, this.videoSequence.length);
-    return this.videoSequence.slice(startIndex, endIndex)
-      .map(id => this.videos.get(id)!)
+    return this.videoSequence
+      .slice(startIndex, endIndex)
+      .map((id) => this.videos.get(id)!)
       .filter(Boolean);
   }
 
@@ -172,7 +177,9 @@ class VideoService {
   }
 
   // Create new video
-  async createVideo(metadata: Omit<VideoMetadata, 'id' | 'createdAt' | 'updatedAt'>): Promise<VideoMetadata> {
+  async createVideo(
+    metadata: Omit<VideoMetadata, "id" | "createdAt" | "updatedAt">
+  ): Promise<VideoMetadata> {
     const id = this.generateVideoId();
     const video: VideoMetadata = {
       ...metadata,
@@ -191,7 +198,10 @@ class VideoService {
   }
 
   // Update video metadata
-  async updateVideo(id: string, updates: Partial<VideoMetadata>): Promise<VideoMetadata | null> {
+  async updateVideo(
+    id: string,
+    updates: Partial<VideoMetadata>
+  ): Promise<VideoMetadata | null> {
     const video = this.videos.get(id);
     if (!video) return null;
 
@@ -247,7 +257,12 @@ class VideoService {
   }
 
   // Live Stream Management
-  createLiveStream(metadata: Omit<LiveStream, 'id' | 'createdAt' | 'updatedAt' | 'isLive' | 'viewerCount'>): LiveStream {
+  createLiveStream(
+    metadata: Omit<
+      LiveStream,
+      "id" | "createdAt" | "updatedAt" | "isLive" | "viewerCount"
+    >
+  ): LiveStream {
     const id = this.generateVideoId();
     const stream: LiveStream = {
       ...metadata,
@@ -285,9 +300,11 @@ class VideoService {
   getLiveStreams(activeOnly: boolean = false): LiveStream[] {
     const streams = Array.from(this.liveStreams.values());
     if (activeOnly) {
-      return streams.filter(stream => stream.isLive);
+      return streams.filter((stream) => stream.isLive);
     }
-    return streams.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    return streams.sort(
+      (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
+    );
   }
 
   updateViewerCount(streamId: string, count: number): void {
@@ -301,9 +318,12 @@ class VideoService {
   // Search videos
   searchVideos(query: string, category?: string): VideoMetadata[] {
     const videos = Array.from(this.videos.values());
-    return videos.filter(video => {
-      const matchesQuery = video.title.toLowerCase().includes(query.toLowerCase()) ||
-                          video.tags.some(tag => tag.toLowerCase().includes(query.toLowerCase()));
+    return videos.filter((video) => {
+      const matchesQuery =
+        video.title.toLowerCase().includes(query.toLowerCase()) ||
+        video.tags.some((tag) =>
+          tag.toLowerCase().includes(query.toLowerCase())
+        );
       const matchesCategory = !category || video.category === category;
       return matchesQuery && matchesCategory && video.isPublic;
     });
@@ -312,7 +332,7 @@ class VideoService {
   // Get trending videos
   getTrendingVideos(limit: number = 10): VideoMetadata[] {
     return Array.from(this.videos.values())
-      .filter(video => video.isPublic)
+      .filter((video) => video.isPublic)
       .sort((a, b) => b.viewCount - a.viewCount)
       .slice(0, limit);
   }
@@ -320,30 +340,32 @@ class VideoService {
   // Database operations
   async saveVideoToDatabase(video: VideoMetadata): Promise<void> {
     try {
-      await serverFetch('/videos', {
-        method: 'POST',
+      await serverFetch("/videos", {
+        method: "POST",
         body: JSON.stringify(video),
       });
     } catch (error) {
-      console.error('Failed to save video to database:', error);
+      console.error("Failed to save video to database:", error);
       // Fallback to local storage
       this.videos.set(video.id, video);
     }
   }
 
   async loadVideosFromDatabase(): Promise<void> {
-    console.log('[VideoService] Starting video load process...');
-    
+    console.log("[VideoService] Starting video load process...");
+
     // Always initialize local videos first as fallback
     if (this.videos.size === 0) {
       this.initializeDefaultVideos();
-      console.log('[VideoService] Initialized with local defaults');
+      console.log("[VideoService] Initialized with local defaults");
     }
 
     // DISABLED: Remote video API (backend doesn't have /videos endpoint, only /video for calls)
     // Using local video data only - see data/videos.ts
-    console.log('[VideoService] Using local video data (remote API disabled)');
-    console.log(`[VideoService] Video loading complete. Total videos: ${this.videos.size}`);
+    console.log("[VideoService] Using local video data (remote API disabled)");
+    console.log(
+      `[VideoService] Video loading complete. Total videos: ${this.videos.size}`
+    );
     return;
 
     /* DISABLED - Uncomment if backend implements /videos endpoint
@@ -421,14 +443,17 @@ class VideoService {
     */
   }
 
-  async updateVideoInDatabase(id: string, updates: Partial<VideoMetadata>): Promise<void> {
+  async updateVideoInDatabase(
+    id: string,
+    updates: Partial<VideoMetadata>
+  ): Promise<void> {
     try {
       await serverFetch(`/videos/${id}`, {
-        method: 'PATCH',
+        method: "PATCH",
         body: JSON.stringify(updates),
       });
     } catch (error) {
-      console.error('Failed to update video in database:', error);
+      console.error("Failed to update video in database:", error);
       // Fallback to local update
       const video = this.videos.get(id);
       if (video) {
@@ -441,10 +466,10 @@ class VideoService {
   async deleteVideoFromDatabase(id: string): Promise<void> {
     try {
       await serverFetch(`/videos/${id}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
     } catch (error) {
-      console.error('Failed to delete video from database:', error);
+      console.error("Failed to delete video from database:", error);
       // Fallback to local delete
       this.videos.delete(id);
       const index = this.videoSequence.indexOf(id);
@@ -455,7 +480,10 @@ class VideoService {
   }
 
   // Generate video URL
-  getVideoUrl(videoId: string, quality: 'low' | 'medium' | 'high' | 'ultra' = 'high'): string {
+  getVideoUrl(
+    videoId: string,
+    quality: "low" | "medium" | "high" | "ultra" = "high"
+  ): string {
     return buildApiUrl(`/videos/${videoId}/stream?quality=${quality}`);
   }
 
@@ -468,16 +496,21 @@ class VideoService {
    * Reorder videos (front-end only) and optionally sync ordering to backend.
    * Backend can accept PATCH /videos/order with { sequence: string[] } for persistence (not implemented here).
    */
-  async reorderVideos(newSequence: string[], syncRemote: boolean = false): Promise<void> {
+  async reorderVideos(
+    newSequence: string[],
+    syncRemote: boolean = false
+  ): Promise<void> {
     // Validate IDs
-    const allValid = newSequence.every(id => this.videos.has(id));
-    if (!allValid) throw new Error('Invalid video ID in sequence');
+    const allValid = newSequence.every((id) => this.videos.has(id));
+    if (!allValid) throw new Error("Invalid video ID in sequence");
     this.videoSequence = [...newSequence];
     if (syncRemote) {
       try {
-        await api.patch(buildApiUrl('/videos/order'), { sequence: this.videoSequence });
+        await api.patch(buildApiUrl("/videos/order"), {
+          sequence: this.videoSequence,
+        });
       } catch (e) {
-        console.warn('[VideoService] Failed to sync order, keeping local only');
+        console.warn("[VideoService] Failed to sync order, keeping local only");
       }
     }
   }
@@ -485,28 +518,44 @@ class VideoService {
   /** Lightweight AJAX-style fetch for partial pagination (front-end consumption). */
   async fetchPage(page: number, limit: number = 20): Promise<VideoMetadata[]> {
     try {
-      const res = await api.get(buildApiUrl('/videos'), { params: { page, limit } });
-      const list = Array.isArray(res.data?.data) ? res.data.data : Array.isArray(res.data) ? res.data : res.data?.data?.videos || [];
-      return list.map((video: any) => this.videos.get(video.id) || {
-        id: video.id,
-        title: video.title,
-        description: video.description || '',
-        category: video.category || 'general',
-        tags: video.tags || [],
-        authorId: video.authorId || video.author_id || 'unknown',
-        authorName: video.authorName || video.author_name || 'Unknown',
-        createdAt: new Date(video.createdAt || video.created_at || Date.now()),
-        updatedAt: new Date(video.updatedAt || video.updated_at || Date.now()),
-        viewCount: video.viewCount || 0,
-        likeCount: video.likeCount || 0,
-        commentCount: video.commentCount || 0,
-        isLive: video.isLive || false,
-        isPublic: video.isPublic !== false,
+      const res = await api.get(buildApiUrl("/videos"), {
+        params: { page, limit },
       });
+      const list = Array.isArray(res.data?.data)
+        ? res.data.data
+        : Array.isArray(res.data)
+          ? res.data
+          : res.data?.data?.videos || [];
+      return list.map(
+        (video: any) =>
+          this.videos.get(video.id) || {
+            id: video.id,
+            title: video.title,
+            description: video.description || "",
+            category: video.category || "general",
+            tags: video.tags || [],
+            authorId: video.authorId || video.author_id || "unknown",
+            authorName: video.authorName || video.author_name || "Unknown",
+            createdAt: new Date(
+              video.createdAt || video.created_at || Date.now()
+            ),
+            updatedAt: new Date(
+              video.updatedAt || video.updated_at || Date.now()
+            ),
+            viewCount: video.viewCount || 0,
+            likeCount: video.likeCount || 0,
+            commentCount: video.commentCount || 0,
+            isLive: video.isLive || false,
+            isPublic: video.isPublic !== false,
+          }
+      );
     } catch (e) {
-      console.warn('[VideoService] fetchPage failed, returning local slice');
+      console.warn("[VideoService] fetchPage failed, returning local slice");
       const start = (page - 1) * limit;
-      return this.videoSequence.slice(start, start + limit).map(id => this.videos.get(id)!).filter(Boolean);
+      return this.videoSequence
+        .slice(start, start + limit)
+        .map((id) => this.videos.get(id)!)
+        .filter(Boolean);
     }
   }
 
@@ -519,16 +568,18 @@ class VideoService {
       author: video.authorName,
       likes: video.likeCount,
       comments: video.commentCount,
-      category: video.category,
+      category: video.category as VideoCategory | undefined,
       hashtags: video.tags,
-      type: video.isLive ? 'live' : 'vod',
+      type: video.isLive ? "live" : "vod",
       authorSlug: video.authorId,
     };
   }
 
   // Get all videos as VideoItem array
   getAllVideosAsVideoItems(): VideoItem[] {
-    return Array.from(this.videos.values()).map(video => this.videoMetadataToVideoItem(video));
+    return Array.from(this.videos.values()).map((video) =>
+      this.videoMetadataToVideoItem(video)
+    );
   }
 
   // Get video by ID as VideoItem

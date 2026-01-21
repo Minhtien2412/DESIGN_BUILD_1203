@@ -107,7 +107,7 @@ export const setAuthToken = setToken;
 
 // --- Token refresh machinery (no circular deps) ---
 let isRefreshing = false;
-let refreshWaiters: Array<(token: string | null) => void> = [];
+let refreshWaiters: ((token: string | null) => void)[] = [];
 
 // Optional persistence hook set by other modules (e.g., secure storage)
 let persistTokenCallback: ((token: string | null) => void | Promise<void>) | null = null;
@@ -330,7 +330,7 @@ export async function apiFetch<T = any>(path: string, options: ApiFetchOptions =
   } catch (err: any) {
     clearTimeout(timeoutId);
     if (err instanceof ApiError) throw err;
-    if (err && err.name === 'AbortError') throw new ApiError('K?t n?i quá ch?m', { code: 'TIMEOUT' });
+    if (err && err.name === 'AbortError') throw new ApiError('K?t n?i quï¿½ ch?m', { code: 'TIMEOUT' });
     throw new ApiError('L?i k?t n?i', { code: 'NETWORK_ERROR' });
   }
 }
@@ -587,13 +587,13 @@ export async function searchProducts(
  * Get product categories
  * @returns List of categories
  */
-export async function getCategories(): Promise<Array<{ id: string; name: string; icon?: string; color?: string }>> {
+export async function getCategories(): Promise<{ id: string; name: string; icon?: string; color?: string }[]> {
   try {
     const response = await apiFetch('/products/categories', {
       method: 'GET',
     });
     
-    return response as Array<{ id: string; name: string; icon?: string; color?: string }>;
+    return response as { id: string; name: string; icon?: string; color?: string }[];
   } catch (error) {
     console.error('[API] Error fetching categories:', error);
     throw error;

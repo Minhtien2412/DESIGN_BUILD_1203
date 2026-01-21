@@ -191,7 +191,7 @@ export async function captureAndUploadConstructionPhoto(
  * Upload multiple files (batch)
  */
 export async function uploadMultipleFiles(
-  files: Array<{ uri: string; name: string; type: string }>,
+  files: { uri: string; name: string; type: string }[],
   uploadType: UploadType,
   onProgress?: (fileIndex: number, progress: UploadProgress) => void
 ): Promise<UploadResult[]> {

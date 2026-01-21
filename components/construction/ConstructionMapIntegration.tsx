@@ -82,7 +82,7 @@ export const ConstructionMapIntegration: React.FC<ConstructionMapIntegrationProp
   } = useConstructionMap({ projectId: currentProjectId || '' });
 
   // Assignees placeholder - hook doesn't return assignees currently
-  const assignees: Array<{ userId: string; userName: string }> = [];
+  const assignees: { userId: string; userName: string }[] = [];
 
   // Apply filters
   const { filteredTasks, isFiltering } = useFilterTasks(tasks, currentFilters);

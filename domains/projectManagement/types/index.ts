@@ -36,11 +36,11 @@ export interface PaymentAnalytics {
   riskAssessment: {
     overallRisk: 'low' | 'medium' | 'high';
     riskScore: number;
-    risks: Array<{
+    risks: {
       type: string;
       severity: string;
       message: string;
-    }>;
+    }[];
   };
 }
 

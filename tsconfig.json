@@ -33,12 +33,15 @@
     "dev-backups",
     "expo-skeleton",
     "my-new-expo-app",
+    // exclude perfex-crm-ai-architect separate project
+    "perfex-crm-ai-architect/**",
   // exclude server/backend code from app typecheck
   "server/**",
   "backend-implementation/**",
   "backend-nestjs/**",
   "backend-archive/**",
   "backend-files/**",
+  "backend/admin-web/**",
   "BE-baotienweb.cloud/**",
   "docs/backend-code/**",
   "*.controller.*.ts",

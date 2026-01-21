@@ -8,6 +8,7 @@
  * @route /(tabs)/projects
  */
 
+import { TappableImage } from '@/components/ui/full-media-viewer';
 import { MODERN_COLORS, MODERN_RADIUS, MODERN_SHADOWS, MODERN_SPACING } from '@/constants/modern-theme';
 import { useAuth } from '@/context/AuthContext';
 import { useProjectsHub } from '@/hooks/useProjectsHub';
@@ -19,7 +20,6 @@ import { useCallback, useState } from 'react';
 import {
     ActivityIndicator,
     Dimensions,
-    Image,
     RefreshControl,
     ScrollView,
     StyleSheet,
@@ -83,11 +83,20 @@ const QUICK_ACTIONS: QuickAction[] = [
   {
     id: 'progress',
     title: 'Tiến độ thi công',
-    subtitle: 'Xem chi tiết tiến độ',
+    subtitle: 'Báo cáo tiến độ dự án',
     icon: 'analytics',
-    color: '#9C27B0',
-    route: '/construction-progress',
+    color: '#10B981',
+    route: '/(tabs)/progress',
     roles: ['ADMIN', 'MANAGER', 'ENGINEER', 'CONTRACTOR', 'CLIENT'],
+  },
+  {
+    id: 'ai-assistant',
+    title: '🤖 AI Assistant',
+    subtitle: 'Hỗ trợ chỉnh sửa app',
+    icon: 'sparkles',
+    color: '#8B5CF6',
+    route: '/(tabs)/ai-assistant',
+    roles: ['ADMIN', 'MANAGER', 'ENGINEER', 'CONTRACTOR', 'CLIENT', 'WORKER'],
   },
   {
     id: 'create',
@@ -275,7 +284,12 @@ export default function ProjectsHubScreen() {
           >
             <View style={styles.projectImagePlaceholder}>
               {project.image ? (
-                <Image source={{ uri: project.image }} style={styles.projectImage} />
+                <TappableImage 
+                  source={{ uri: project.image }} 
+                  style={styles.projectImage}
+                  title={project.name}
+                  description={`Khách hàng: ${project.customerName}`}
+                />
               ) : (
                 <Ionicons name="business" size={40} color="#ccc" />
               )}

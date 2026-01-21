@@ -85,16 +85,24 @@ export function PushNotificationProvider({ children }: { children: ReactNode }) 
       setNotifications(prev => [newNotification, ...prev]);
     });
 
-    // Listen for notification taps
-    const responseListener = Notifications.addNotificationResponseReceivedListener((response: any) => {
+    // Listen for notification taps - use notification navigator for deep linking
+    const responseListener = Notifications.addNotificationResponseReceivedListener(async (response: any) => {
       const notificationId = response.notification.request.identifier;
       markAsRead(notificationId);
       
-      // Handle notification action based on type
-      const data = response.notification.request.content.data;
-      if (data?.screen) {
-        // Navigate to screen (you can integrate with router here)
-        console.log('Navigate to:', data.screen);
+      // Use notification navigator service for deep linking
+      try {
+        const { handleNotificationTap } = await import('@/services/notificationNavigator');
+        const result = handleNotificationTap(response);
+        console.log('[PushNotification] Navigation result:', result);
+      } catch (error) {
+        console.warn('[PushNotification] Navigator not available:', error);
+        // Fallback: navigate to screen from data
+        const data = response.notification.request.content.data;
+        if (data?.screen) {
+          const { router } = await import('expo-router');
+          router.push(data.screen as any);
+        }
       }
     });
 

@@ -23,7 +23,7 @@ class HealthMonitor {
   private retryMs = 2000; // Start with 2 seconds
   private maxRetryMs = 60000; // Max 1 minute
   private timeoutId: ReturnType<typeof setTimeout> | null = null;
-  private listeners: Array<(status: HealthStatus) => void> = [];
+  private listeners: ((status: HealthStatus) => void)[] = [];
   private isRunning = false;
 
   // Subscribe to health status changes

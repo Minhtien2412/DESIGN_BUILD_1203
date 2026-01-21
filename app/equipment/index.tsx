@@ -3,8 +3,8 @@
  * View and manage construction equipment and machinery
  */
 
-import { Loader } from '@/components/ui/loader';
-import { useEquipment } from '@/hooks/useEquipment';
+import { Loader } from "@/components/ui/loader";
+import { useEquipment } from "@/hooks/useEquipment";
 import {
     EquipmentCondition,
     EquipmentStatus,
@@ -12,12 +12,14 @@ import {
     OwnershipType,
     type CreateEquipmentParams,
     type Equipment,
-} from '@/types/equipment';
-import { Ionicons } from '@expo/vector-icons';
-import { Href, router, Stack, useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
+} from "@/types/equipment";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { Href, router, Stack, useLocalSearchParams } from "expo-router";
+import { useRef, useState } from "react";
 import {
     Alert,
+    Animated,
     FlatList,
     Modal,
     RefreshControl,
@@ -27,19 +29,231 @@ import {
     TextInput,
     TouchableOpacity,
     View,
-} from 'react-native';
+} from "react-native";
+
+// Filter status configuration với màu sắc và icon
+const FILTER_STATUS_CONFIG = [
+  {
+    id: "all" as const,
+    label: "Tất cả",
+    icon: "apps" as const,
+    color: "#6366F1",
+    gradient: ["#6366F1", "#8B5CF6"] as const,
+  },
+  {
+    id: EquipmentStatus.AVAILABLE,
+    label: "Sẵn sàng",
+    icon: "checkmark-circle" as const,
+    color: "#10B981",
+    gradient: ["#10B981", "#34D399"] as const,
+  },
+  {
+    id: EquipmentStatus.IN_USE,
+    label: "Đang sử dụng",
+    icon: "construct" as const,
+    color: "#3B82F6",
+    gradient: ["#3B82F6", "#60A5FA"] as const,
+  },
+  {
+    id: EquipmentStatus.MAINTENANCE,
+    label: "Bảo trì",
+    icon: "settings" as const,
+    color: "#F59E0B",
+    gradient: ["#F59E0B", "#FBBF24"] as const,
+  },
+  {
+    id: EquipmentStatus.REPAIR,
+    label: "Sửa chữa",
+    icon: "build" as const,
+    color: "#EF4444",
+    gradient: ["#EF4444", "#F87171"] as const,
+  },
+];
+
+// Animated Filter Chip Component
+interface FilterChipProps {
+  config: (typeof FILTER_STATUS_CONFIG)[number];
+  isActive: boolean;
+  onPress: () => void;
+  count?: number;
+}
+
+function FilterChip({ config, isActive, onPress, count }: FilterChipProps) {
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+
+  const handlePressIn = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 0.95,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      friction: 3,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  return (
+    <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+      <TouchableOpacity
+        onPress={onPress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        activeOpacity={0.9}
+      >
+        {isActive ? (
+          <LinearGradient
+            colors={config.gradient}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={filterStyles.chipActive}
+          >
+            <Ionicons name={config.icon} size={16} color="#FFF" />
+            <Text style={filterStyles.chipTextActive}>{config.label}</Text>
+            {count !== undefined && count > 0 && (
+              <View style={filterStyles.countBadge}>
+                <Text style={filterStyles.countText}>{count}</Text>
+              </View>
+            )}
+          </LinearGradient>
+        ) : (
+          <View
+            style={[filterStyles.chip, { borderColor: config.color + "40" }]}
+          >
+            <Ionicons name={config.icon} size={16} color={config.color} />
+            <Text style={[filterStyles.chipText, { color: config.color }]}>
+              {config.label}
+            </Text>
+            {count !== undefined && count > 0 && (
+              <View
+                style={[
+                  filterStyles.countBadgeInactive,
+                  { backgroundColor: config.color + "20" },
+                ]}
+              >
+                <Text
+                  style={[
+                    filterStyles.countTextInactive,
+                    { color: config.color },
+                  ]}
+                >
+                  {count}
+                </Text>
+              </View>
+            )}
+          </View>
+        )}
+      </TouchableOpacity>
+    </Animated.View>
+  );
+}
+
+const filterStyles = StyleSheet.create({
+  container: {
+    backgroundColor: "#FAFAFA",
+    paddingTop: 12,
+    paddingBottom: 16,
+    borderBottomWidth: 0,
+  },
+  scrollContent: {
+    paddingHorizontal: 16,
+    gap: 10,
+  },
+  chip: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 24,
+    borderWidth: 1.5,
+    backgroundColor: "#FFFFFF",
+    gap: 6,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  chipActive: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 24,
+    gap: 6,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  chipText: {
+    fontSize: 13,
+    fontWeight: "600",
+  },
+  chipTextActive: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#FFFFFF",
+  },
+  countBadge: {
+    backgroundColor: "rgba(255,255,255,0.3)",
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 12,
+    marginLeft: 2,
+  },
+  countText: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: "#FFFFFF",
+  },
+  countBadgeInactive: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 12,
+    marginLeft: 2,
+  },
+  countTextInactive: {
+    fontSize: 11,
+    fontWeight: "700",
+  },
+});
 
 export default function EquipmentListScreen() {
-  const { projectId } = useLocalSearchParams<{ projectId: string }>();
-  const [statusFilter, setStatusFilter] = useState<EquipmentStatus | 'all'>('all');
-  const [searchQuery, setSearchQuery] = useState('');
+  const { projectId, category } = useLocalSearchParams<{
+    projectId?: string;
+    category?: string;
+  }>();
+  const [statusFilter, setStatusFilter] = useState<EquipmentStatus | "all">(
+    "all"
+  );
+  const [searchQuery, setSearchQuery] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
+  // Map category to equipment type filter
+  const categoryToType: Record<string, EquipmentType | undefined> = {
+    kitchen: EquipmentType.CRANE, // TODO: Add proper kitchen type
+    bathroom: EquipmentType.PUMP, // TODO: Add proper bathroom type
+    electrical: EquipmentType.GENERATOR,
+    plumbing: EquipmentType.PUMP,
+    "fire-safety": EquipmentType.SAFETY,
+    hvac: EquipmentType.GENERATOR, // TODO: Add proper HVAC type
+    "water-heater": EquipmentType.PUMP, // TODO: Add proper water heater type
+    machinery: EquipmentType.HEAVY_MACHINERY,
+  };
+
+  const equipmentTypeFilter = category ? categoryToType[category] : undefined;
+
   const { equipment, loading, error, create, refetch } = useEquipment({
-    projectId: projectId || '',
-    status: statusFilter === 'all' ? undefined : statusFilter,
+    projectId: projectId || "",
+    status: statusFilter === "all" ? undefined : statusFilter,
     search: searchQuery || undefined,
+    type: equipmentTypeFilter,
   });
 
   const handleRefresh = async () => {
@@ -52,44 +266,84 @@ export default function EquipmentListScreen() {
     return <Loader />;
   }
 
-  const availableCount = equipment.filter((e) => e.status === EquipmentStatus.AVAILABLE).length;
-  const inUseCount = equipment.filter((e) => e.status === EquipmentStatus.IN_USE).length;
-  const maintenanceCount = equipment.filter(
-    (e) => e.status === EquipmentStatus.MAINTENANCE || e.status === EquipmentStatus.REPAIR
+  const availableCount = equipment.filter(
+    (e) => e.status === EquipmentStatus.AVAILABLE
   ).length;
+  const inUseCount = equipment.filter(
+    (e) => e.status === EquipmentStatus.IN_USE
+  ).length;
+  const maintenanceCount = equipment.filter(
+    (e) => e.status === EquipmentStatus.MAINTENANCE
+  ).length;
+  const repairCount = equipment.filter(
+    (e) => e.status === EquipmentStatus.REPAIR
+  ).length;
+
+  // Count mapping for each filter
+  const getFilterCount = (filterId: string) => {
+    switch (filterId) {
+      case "all":
+        return equipment.length;
+      case EquipmentStatus.AVAILABLE:
+        return availableCount;
+      case EquipmentStatus.IN_USE:
+        return inUseCount;
+      case EquipmentStatus.MAINTENANCE:
+        return maintenanceCount;
+      case EquipmentStatus.REPAIR:
+        return repairCount;
+      default:
+        return 0;
+    }
+  };
 
   return (
     <>
       <Stack.Screen
         options={{
-          title: 'Thiết bị & Máy móc',
+          title: "Thiết bị & Máy móc",
           headerRight: () => (
             <TouchableOpacity onPress={() => setModalVisible(true)}>
-              <Ionicons name="add-circle" size={28} color="#0066CC" style={{ marginRight: 8 }} />
+              <Ionicons
+                name="add-circle"
+                size={28}
+                color="#0066CC"
+                style={{ marginRight: 8 }}
+              />
             </TouchableOpacity>
           ),
         }}
       />
 
-      {/* Stats Header */}
+      {/* Stats Header - Modern Design */}
       <View style={styles.statsHeader}>
         <View style={styles.statItem}>
+          <Ionicons name="cube" size={20} color="#6366F1" />
           <Text style={styles.statValue}>{equipment.length}</Text>
           <Text style={styles.statLabel}>Tổng số</Text>
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statItem}>
-          <Text style={[styles.statValue, { color: '#0066CC' }]}>{availableCount}</Text>
+          <Ionicons name="checkmark-circle" size={20} color="#10B981" />
+          <Text style={[styles.statValue, { color: "#10B981" }]}>
+            {availableCount}
+          </Text>
           <Text style={styles.statLabel}>Sẵn sàng</Text>
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statItem}>
-          <Text style={[styles.statValue, { color: '#0066CC' }]}>{inUseCount}</Text>
+          <Ionicons name="construct" size={20} color="#3B82F6" />
+          <Text style={[styles.statValue, { color: "#3B82F6" }]}>
+            {inUseCount}
+          </Text>
           <Text style={styles.statLabel}>Đang dùng</Text>
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statItem}>
-          <Text style={[styles.statValue, { color: '#0066CC' }]}>{maintenanceCount}</Text>
+          <Ionicons name="settings" size={20} color="#F59E0B" />
+          <Text style={[styles.statValue, { color: "#F59E0B" }]}>
+            {maintenanceCount + repairCount}
+          </Text>
           <Text style={styles.statLabel}>Bảo trì</Text>
         </View>
       </View>
@@ -104,99 +358,49 @@ export default function EquipmentListScreen() {
           onChangeText={setSearchQuery}
         />
         {searchQuery.length > 0 && (
-          <TouchableOpacity onPress={() => setSearchQuery('')}>
+          <TouchableOpacity onPress={() => setSearchQuery("")}>
             <Ionicons name="close-circle" size={20} color="#666" />
           </TouchableOpacity>
         )}
       </View>
 
-      {/* Filter Tabs */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterTabs}>
-        <TouchableOpacity
-          style={[styles.filterChip, statusFilter === 'all' && styles.filterChipActive]}
-          onPress={() => setStatusFilter('all')}
+      {/* Filter Tabs - Modern Design */}
+      <View style={filterStyles.container}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={filterStyles.scrollContent}
         >
-          <Text style={[styles.filterChipText, statusFilter === 'all' && styles.filterChipTextActive]}>
-            Tất cả
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.filterChip,
-            statusFilter === EquipmentStatus.AVAILABLE && styles.filterChipActive,
-          ]}
-          onPress={() => setStatusFilter(EquipmentStatus.AVAILABLE)}
-        >
-          <Text
-            style={[
-              styles.filterChipText,
-              statusFilter === EquipmentStatus.AVAILABLE && styles.filterChipTextActive,
-            ]}
-          >
-            Sẵn sàng
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.filterChip,
-            statusFilter === EquipmentStatus.IN_USE && styles.filterChipActive,
-          ]}
-          onPress={() => setStatusFilter(EquipmentStatus.IN_USE)}
-        >
-          <Text
-            style={[
-              styles.filterChipText,
-              statusFilter === EquipmentStatus.IN_USE && styles.filterChipTextActive,
-            ]}
-          >
-            Đang sử dụng
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.filterChip,
-            statusFilter === EquipmentStatus.MAINTENANCE && styles.filterChipActive,
-          ]}
-          onPress={() => setStatusFilter(EquipmentStatus.MAINTENANCE)}
-        >
-          <Text
-            style={[
-              styles.filterChipText,
-              statusFilter === EquipmentStatus.MAINTENANCE && styles.filterChipTextActive,
-            ]}
-          >
-            Bảo trì
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.filterChip,
-            statusFilter === EquipmentStatus.REPAIR && styles.filterChipActive,
-          ]}
-          onPress={() => setStatusFilter(EquipmentStatus.REPAIR)}
-        >
-          <Text
-            style={[
-              styles.filterChipText,
-              statusFilter === EquipmentStatus.REPAIR && styles.filterChipTextActive,
-            ]}
-          >
-            Sửa chữa
-          </Text>
-        </TouchableOpacity>
-      </ScrollView>
+          {FILTER_STATUS_CONFIG.map((config) => (
+            <FilterChip
+              key={config.id}
+              config={config}
+              isActive={statusFilter === config.id}
+              onPress={() =>
+                setStatusFilter(config.id as EquipmentStatus | "all")
+              }
+              count={getFilterCount(config.id as string)}
+            />
+          ))}
+        </ScrollView>
+      </View>
 
       <FlatList
         data={equipment}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => <EquipmentCard equipment={item} />}
         contentContainerStyle={styles.listContent}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Ionicons name="construct" size={64} color="#ccc" />
             <Text style={styles.emptyText}>Chưa có thiết bị nào</Text>
-            <TouchableOpacity style={styles.addButton} onPress={() => setModalVisible(true)}>
+            <TouchableOpacity
+              style={styles.addButton}
+              onPress={() => setModalVisible(true)}
+            >
               <Text style={styles.addButtonText}>Thêm thiết bị</Text>
             </TouchableOpacity>
           </View>
@@ -206,15 +410,15 @@ export default function EquipmentListScreen() {
       {/* Add Equipment Modal */}
       <AddEquipmentModal
         visible={modalVisible}
-        projectId={projectId || ''}
+        projectId={projectId || ""}
         onClose={() => setModalVisible(false)}
         onCreate={async (params) => {
           try {
             await create(params);
             setModalVisible(false);
-            Alert.alert('Thành công', 'Đã thêm thiết bị');
+            Alert.alert("Thành công", "Đã thêm thiết bị");
           } catch (err) {
-            Alert.alert('Lỗi', 'Không thể thêm thiết bị');
+            Alert.alert("Lỗi", "Không thể thêm thiết bị");
           }
         }}
       />
@@ -237,18 +441,28 @@ function EquipmentCard({ equipment }: EquipmentCardProps) {
       onPress={() => router.push(`/equipment/${equipment.id}` as Href)}
     >
       <View style={styles.cardHeader}>
-        <View style={[styles.typeIcon, { backgroundColor: `${statusColor}15` }]}>
+        <View
+          style={[styles.typeIcon, { backgroundColor: `${statusColor}15` }]}
+        >
           <Ionicons name={typeIcon} size={32} color={statusColor} />
         </View>
         <View style={{ flex: 1 }}>
           <View style={styles.titleRow}>
-            <Text style={styles.equipmentNumber}>{equipment.equipmentNumber}</Text>
-            <View style={[styles.statusBadge, { backgroundColor: statusColor }]}>
-              <Text style={styles.statusText}>{getStatusLabel(equipment.status)}</Text>
+            <Text style={styles.equipmentNumber}>
+              {equipment.equipmentNumber}
+            </Text>
+            <View
+              style={[styles.statusBadge, { backgroundColor: statusColor }]}
+            >
+              <Text style={styles.statusText}>
+                {getStatusLabel(equipment.status)}
+              </Text>
             </View>
           </View>
           <Text style={styles.equipmentName}>{equipment.name}</Text>
-          <Text style={styles.equipmentType}>{getEquipmentTypeLabel(equipment.type)}</Text>
+          <Text style={styles.equipmentType}>
+            {getEquipmentTypeLabel(equipment.type)}
+          </Text>
         </View>
       </View>
 
@@ -257,11 +471,15 @@ function EquipmentCard({ equipment }: EquipmentCardProps) {
           <View style={styles.infoRow}>
             <Ionicons name="business" size={14} color="#666" />
             <Text style={styles.infoText}>{equipment.manufacturer}</Text>
-            {equipment.model && <Text style={styles.infoText}> • {equipment.model}</Text>}
+            {equipment.model && (
+              <Text style={styles.infoText}> • {equipment.model}</Text>
+            )}
           </View>
         )}
         <View style={styles.infoRow}>
-          <View style={[styles.conditionDot, { backgroundColor: conditionColor }]} />
+          <View
+            style={[styles.conditionDot, { backgroundColor: conditionColor }]}
+          />
           <Text style={styles.infoLabel}>Tình trạng:</Text>
           <Text style={[styles.infoValue, { color: conditionColor }]}>
             {getConditionLabel(equipment.condition)}
@@ -276,15 +494,31 @@ function EquipmentCard({ equipment }: EquipmentCardProps) {
         {equipment.assignedToName && (
           <View style={styles.infoRow}>
             <Ionicons name="person" size={14} color="#666" />
-            <Text style={styles.infoText}>Được cấp cho: {equipment.assignedToName}</Text>
+            <Text style={styles.infoText}>
+              Được cấp cho: {equipment.assignedToName}
+            </Text>
           </View>
         )}
       </View>
 
       <View style={styles.cardFooter}>
-        <View style={[styles.ownershipBadge, { borderColor: getOwnershipColor(equipment.ownershipType) }]}>
-          <Ionicons name={getOwnershipIcon(equipment.ownershipType)} size={12} color={getOwnershipColor(equipment.ownershipType)} />
-          <Text style={[styles.ownershipText, { color: getOwnershipColor(equipment.ownershipType) }]}>
+        <View
+          style={[
+            styles.ownershipBadge,
+            { borderColor: getOwnershipColor(equipment.ownershipType) },
+          ]}
+        >
+          <Ionicons
+            name={getOwnershipIcon(equipment.ownershipType)}
+            size={12}
+            color={getOwnershipColor(equipment.ownershipType)}
+          />
+          <Text
+            style={[
+              styles.ownershipText,
+              { color: getOwnershipColor(equipment.ownershipType) },
+            ]}
+          >
             {getOwnershipLabel(equipment.ownershipType)}
           </Text>
         </View>
@@ -306,19 +540,26 @@ interface AddEquipmentModalProps {
   onCreate: (params: CreateEquipmentParams) => Promise<void>;
 }
 
-function AddEquipmentModal({ visible, projectId, onClose, onCreate }: AddEquipmentModalProps) {
+function AddEquipmentModal({
+  visible,
+  projectId,
+  onClose,
+  onCreate,
+}: AddEquipmentModalProps) {
   const [type, setType] = useState<EquipmentType>(EquipmentType.EXCAVATOR);
-  const [name, setName] = useState('');
-  const [manufacturer, setManufacturer] = useState('');
-  const [model, setModel] = useState('');
-  const [serialNumber, setSerialNumber] = useState('');
-  const [ownershipType, setOwnershipType] = useState<OwnershipType>(OwnershipType.OWNED);
-  const [currentLocation, setCurrentLocation] = useState('');
+  const [name, setName] = useState("");
+  const [manufacturer, setManufacturer] = useState("");
+  const [model, setModel] = useState("");
+  const [serialNumber, setSerialNumber] = useState("");
+  const [ownershipType, setOwnershipType] = useState<OwnershipType>(
+    OwnershipType.OWNED
+  );
+  const [currentLocation, setCurrentLocation] = useState("");
   const [creating, setCreating] = useState(false);
 
   const handleCreate = async () => {
     if (!name.trim()) {
-      Alert.alert('Lỗi', 'Vui lòng nhập tên thiết bị');
+      Alert.alert("Lỗi", "Vui lòng nhập tên thiết bị");
       return;
     }
 
@@ -338,19 +579,24 @@ function AddEquipmentModal({ visible, projectId, onClose, onCreate }: AddEquipme
       });
       // Reset form
       setType(EquipmentType.EXCAVATOR);
-      setName('');
-      setManufacturer('');
-      setModel('');
-      setSerialNumber('');
+      setName("");
+      setManufacturer("");
+      setModel("");
+      setSerialNumber("");
       setOwnershipType(OwnershipType.OWNED);
-      setCurrentLocation('');
+      setCurrentLocation("");
     } finally {
       setCreating(false);
     }
   };
 
   return (
-    <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      animationType="slide"
+      transparent
+      onRequestClose={onClose}
+    >
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
           <View style={styles.modalHeader}>
@@ -362,19 +608,37 @@ function AddEquipmentModal({ visible, projectId, onClose, onCreate }: AddEquipme
 
           <ScrollView style={styles.modalBody}>
             <Text style={styles.inputLabel}>Loại thiết bị *</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.typeChips}>
-              {Object.values(EquipmentType).slice(0, 12).map((t) => (
-                <TouchableOpacity
-                  key={t}
-                  style={[styles.typeChip, type === t && styles.typeChipActive]}
-                  onPress={() => setType(t)}
-                >
-                  <Ionicons name={getEquipmentIcon(t)} size={18} color={type === t ? '#FFF' : '#666'} />
-                  <Text style={[styles.typeChipText, type === t && styles.typeChipTextActive]}>
-                    {getEquipmentTypeLabel(t)}
-                  </Text>
-                </TouchableOpacity>
-              ))}
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={styles.typeChips}
+            >
+              {Object.values(EquipmentType)
+                .slice(0, 12)
+                .map((t) => (
+                  <TouchableOpacity
+                    key={t}
+                    style={[
+                      styles.typeChip,
+                      type === t && styles.typeChipActive,
+                    ]}
+                    onPress={() => setType(t)}
+                  >
+                    <Ionicons
+                      name={getEquipmentIcon(t)}
+                      size={18}
+                      color={type === t ? "#FFF" : "#666"}
+                    />
+                    <Text
+                      style={[
+                        styles.typeChipText,
+                        type === t && styles.typeChipTextActive,
+                      ]}
+                    >
+                      {getEquipmentTypeLabel(t)}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
             </ScrollView>
 
             <Text style={styles.inputLabel}>Tên thiết bị *</Text>
@@ -386,13 +650,25 @@ function AddEquipmentModal({ visible, projectId, onClose, onCreate }: AddEquipme
             />
 
             <Text style={styles.inputLabel}>Nhà sản xuất</Text>
-            <TextInput style={styles.input} value={manufacturer} onChangeText={setManufacturer} />
+            <TextInput
+              style={styles.input}
+              value={manufacturer}
+              onChangeText={setManufacturer}
+            />
 
             <Text style={styles.inputLabel}>Model</Text>
-            <TextInput style={styles.input} value={model} onChangeText={setModel} />
+            <TextInput
+              style={styles.input}
+              value={model}
+              onChangeText={setModel}
+            />
 
             <Text style={styles.inputLabel}>Số serial</Text>
-            <TextInput style={styles.input} value={serialNumber} onChangeText={setSerialNumber} />
+            <TextInput
+              style={styles.input}
+              value={serialNumber}
+              onChangeText={setSerialNumber}
+            />
 
             <Text style={styles.inputLabel}>Hình thức sở hữu</Text>
             <View style={styles.ownershipChips}>
@@ -406,7 +682,11 @@ function AddEquipmentModal({ visible, projectId, onClose, onCreate }: AddEquipme
                   ]}
                   onPress={() => setOwnershipType(o)}
                 >
-                  <Ionicons name={getOwnershipIcon(o)} size={16} color={ownershipType === o ? getOwnershipColor(o) : '#666'} />
+                  <Ionicons
+                    name={getOwnershipIcon(o)}
+                    size={16}
+                    color={ownershipType === o ? getOwnershipColor(o) : "#666"}
+                  />
                   <Text
                     style={[
                       styles.ownershipChipText,
@@ -437,7 +717,9 @@ function AddEquipmentModal({ visible, projectId, onClose, onCreate }: AddEquipme
               onPress={handleCreate}
               disabled={creating}
             >
-              <Text style={styles.createButtonText}>{creating ? 'Đang thêm...' : 'Thêm'}</Text>
+              <Text style={styles.createButtonText}>
+                {creating ? "Đang thêm..." : "Thêm"}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -450,33 +732,33 @@ function AddEquipmentModal({ visible, projectId, onClose, onCreate }: AddEquipme
 function getStatusColor(status: EquipmentStatus): string {
   switch (status) {
     case EquipmentStatus.AVAILABLE:
-      return '#0066CC';
+      return "#0066CC";
     case EquipmentStatus.IN_USE:
-      return '#0066CC';
+      return "#0066CC";
     case EquipmentStatus.MAINTENANCE:
-      return '#0066CC';
+      return "#0066CC";
     case EquipmentStatus.REPAIR:
-      return '#000000';
+      return "#000000";
     case EquipmentStatus.RESERVED:
-      return '#999999';
+      return "#999999";
     case EquipmentStatus.OUT_OF_SERVICE:
-      return '#999999';
+      return "#999999";
     case EquipmentStatus.RETIRED:
-      return '#4A4A4A';
+      return "#4A4A4A";
     default:
-      return '#666';
+      return "#666";
   }
 }
 
 function getStatusLabel(status: EquipmentStatus): string {
   const labels: Record<EquipmentStatus, string> = {
-    [EquipmentStatus.AVAILABLE]: 'SẴN SÀNG',
-    [EquipmentStatus.IN_USE]: 'ĐANG DÙNG',
-    [EquipmentStatus.MAINTENANCE]: 'BẢO TRÌ',
-    [EquipmentStatus.REPAIR]: 'SỬA CHỮA',
-    [EquipmentStatus.RESERVED]: 'ĐÃ ĐẶT',
-    [EquipmentStatus.OUT_OF_SERVICE]: 'NGỪNG HOẠT ĐỘNG',
-    [EquipmentStatus.RETIRED]: 'ĐÃ LOẠI',
+    [EquipmentStatus.AVAILABLE]: "SẴN SÀNG",
+    [EquipmentStatus.IN_USE]: "ĐANG DÙNG",
+    [EquipmentStatus.MAINTENANCE]: "BẢO TRÌ",
+    [EquipmentStatus.REPAIR]: "SỬA CHỮA",
+    [EquipmentStatus.RESERVED]: "ĐÃ ĐẶT",
+    [EquipmentStatus.OUT_OF_SERVICE]: "NGỪNG HOẠT ĐỘNG",
+    [EquipmentStatus.RETIRED]: "ĐÃ LOẠI",
   };
   return labels[status] || status;
 }
@@ -484,27 +766,27 @@ function getStatusLabel(status: EquipmentStatus): string {
 function getConditionColor(condition: EquipmentCondition): string {
   switch (condition) {
     case EquipmentCondition.EXCELLENT:
-      return '#0066CC';
+      return "#0066CC";
     case EquipmentCondition.GOOD:
-      return '#0066CC';
+      return "#0066CC";
     case EquipmentCondition.FAIR:
-      return '#0066CC';
+      return "#0066CC";
     case EquipmentCondition.POOR:
-      return '#000000';
+      return "#000000";
     case EquipmentCondition.CRITICAL:
-      return '#B71C1C';
+      return "#B71C1C";
     default:
-      return '#666';
+      return "#666";
   }
 }
 
 function getConditionLabel(condition: EquipmentCondition): string {
   const labels: Record<EquipmentCondition, string> = {
-    [EquipmentCondition.EXCELLENT]: 'Xuất sắc',
-    [EquipmentCondition.GOOD]: 'Tốt',
-    [EquipmentCondition.FAIR]: 'Khá',
-    [EquipmentCondition.POOR]: 'Kém',
-    [EquipmentCondition.CRITICAL]: 'Nghiêm trọng',
+    [EquipmentCondition.EXCELLENT]: "Xuất sắc",
+    [EquipmentCondition.GOOD]: "Tốt",
+    [EquipmentCondition.FAIR]: "Khá",
+    [EquipmentCondition.POOR]: "Kém",
+    [EquipmentCondition.CRITICAL]: "Nghiêm trọng",
   };
   return labels[condition] || condition;
 }
@@ -512,21 +794,21 @@ function getConditionLabel(condition: EquipmentCondition): string {
 function getOwnershipColor(ownership: OwnershipType): string {
   switch (ownership) {
     case OwnershipType.OWNED:
-      return '#0066CC';
+      return "#0066CC";
     case OwnershipType.RENTED:
-      return '#0066CC';
+      return "#0066CC";
     case OwnershipType.LEASED:
-      return '#0066CC';
+      return "#0066CC";
     default:
-      return '#666';
+      return "#666";
   }
 }
 
 function getOwnershipLabel(ownership: OwnershipType): string {
   const labels: Record<OwnershipType, string> = {
-    [OwnershipType.OWNED]: 'Sở hữu',
-    [OwnershipType.RENTED]: 'Thuê',
-    [OwnershipType.LEASED]: 'Cho thuê',
+    [OwnershipType.OWNED]: "Sở hữu",
+    [OwnershipType.RENTED]: "Thuê",
+    [OwnershipType.LEASED]: "Cho thuê",
   };
   return labels[ownership] || ownership;
 }
@@ -534,138 +816,153 @@ function getOwnershipLabel(ownership: OwnershipType): string {
 function getOwnershipIcon(ownership: OwnershipType): any {
   switch (ownership) {
     case OwnershipType.OWNED:
-      return 'checkmark-circle';
+      return "checkmark-circle";
     case OwnershipType.RENTED:
-      return 'time';
+      return "time";
     case OwnershipType.LEASED:
-      return 'swap-horizontal';
+      return "swap-horizontal";
     default:
-      return 'help-circle';
+      return "help-circle";
   }
 }
 
 function getEquipmentIcon(type: EquipmentType): any {
   const icons: Partial<Record<EquipmentType, string>> = {
-    [EquipmentType.EXCAVATOR]: 'construct',
-    [EquipmentType.BULLDOZER]: 'construct',
-    [EquipmentType.CRANE]: 'git-network',
-    [EquipmentType.FORKLIFT]: 'cube',
-    [EquipmentType.CONCRETE_MIXER]: 'sync',
-    [EquipmentType.CONCRETE_PUMP]: 'water',
-    [EquipmentType.LOADER]: 'cube-outline',
-    [EquipmentType.DUMP_TRUCK]: 'car',
-    [EquipmentType.GENERATOR]: 'flash',
-    [EquipmentType.COMPRESSOR]: 'speedometer',
-    [EquipmentType.WELDING_MACHINE]: 'bonfire',
-    [EquipmentType.POWER_TOOLS]: 'hammer',
+    [EquipmentType.EXCAVATOR]: "construct",
+    [EquipmentType.BULLDOZER]: "construct",
+    [EquipmentType.CRANE]: "git-network",
+    [EquipmentType.FORKLIFT]: "cube",
+    [EquipmentType.CONCRETE_MIXER]: "sync",
+    [EquipmentType.CONCRETE_PUMP]: "water",
+    [EquipmentType.LOADER]: "cube-outline",
+    [EquipmentType.DUMP_TRUCK]: "car",
+    [EquipmentType.GENERATOR]: "flash",
+    [EquipmentType.COMPRESSOR]: "speedometer",
+    [EquipmentType.WELDING_MACHINE]: "bonfire",
+    [EquipmentType.POWER_TOOLS]: "hammer",
   };
-  return icons[type] || 'build';
+  return icons[type] || "build";
 }
 
 function getEquipmentTypeLabel(type: EquipmentType): string {
   const labels: Partial<Record<EquipmentType, string>> = {
-    [EquipmentType.EXCAVATOR]: 'Máy xúc',
-    [EquipmentType.BULLDOZER]: 'Máy ủi',
-    [EquipmentType.CRANE]: 'Cần cẩu',
-    [EquipmentType.FORKLIFT]: 'Xe nâng',
-    [EquipmentType.CONCRETE_MIXER]: 'Máy trộn bê tông',
-    [EquipmentType.CONCRETE_PUMP]: 'Bơm bê tông',
-    [EquipmentType.LOADER]: 'Máy xúc lật',
-    [EquipmentType.BACKHOE]: 'Máy đào hố',
-    [EquipmentType.DUMP_TRUCK]: 'Xe ben',
-    [EquipmentType.GRADER]: 'Máy san',
-    [EquipmentType.ROLLER]: 'Máy lu',
-    [EquipmentType.GENERATOR]: 'Máy phát điện',
+    [EquipmentType.EXCAVATOR]: "Máy xúc",
+    [EquipmentType.BULLDOZER]: "Máy ủi",
+    [EquipmentType.CRANE]: "Cần cẩu",
+    [EquipmentType.FORKLIFT]: "Xe nâng",
+    [EquipmentType.CONCRETE_MIXER]: "Máy trộn bê tông",
+    [EquipmentType.CONCRETE_PUMP]: "Bơm bê tông",
+    [EquipmentType.LOADER]: "Máy xúc lật",
+    [EquipmentType.BACKHOE]: "Máy đào hố",
+    [EquipmentType.DUMP_TRUCK]: "Xe ben",
+    [EquipmentType.GRADER]: "Máy san",
+    [EquipmentType.ROLLER]: "Máy lu",
+    [EquipmentType.GENERATOR]: "Máy phát điện",
   };
   return labels[type] || type;
 }
 
 const styles = StyleSheet.create({
   statsHeader: {
-    flexDirection: 'row',
-    backgroundColor: '#FFF',
+    flexDirection: "row",
+    backgroundColor: "#FFF",
     paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
+    paddingHorizontal: 8,
+    borderBottomWidth: 0,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
   },
   statItem: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
+    gap: 4,
   },
   statValue: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
+    fontSize: 22,
+    fontWeight: "700",
+    color: "#1F2937",
   },
   statLabel: {
-    fontSize: 12,
-    color: '#666',
-    marginTop: 4,
+    fontSize: 11,
+    color: "#6B7280",
+    marginTop: 2,
+    fontWeight: "500",
   },
   statDivider: {
     width: 1,
-    backgroundColor: '#E0E0E0',
+    backgroundColor: "#E5E7EB",
+    marginVertical: 8,
   },
   searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFF',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFF",
+    marginHorizontal: 16,
+    marginVertical: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
     gap: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.03,
+    shadowRadius: 2,
+    elevation: 1,
   },
   searchInput: {
     flex: 1,
     fontSize: 14,
-    color: '#333',
+    color: "#1F2937",
   },
+  // Legacy filter styles - kept for compatibility
   filterTabs: {
-    backgroundColor: '#FFF',
+    backgroundColor: "#FAFAFA",
     paddingHorizontal: 16,
     paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
   },
   filterChip: {
     paddingHorizontal: 16,
     paddingVertical: 8,
-    borderRadius: 16,
+    borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#ddd',
-    backgroundColor: '#FFF',
+    borderColor: "#E5E7EB",
+    backgroundColor: "#FFF",
     marginRight: 8,
   },
   filterChipActive: {
-    backgroundColor: '#0066CC',
-    borderColor: '#0066CC',
+    backgroundColor: "#6366F1",
+    borderColor: "#6366F1",
   },
   filterChipText: {
     fontSize: 13,
-    color: '#666',
-    fontWeight: '500',
+    color: "#6B7280",
+    fontWeight: "500",
   },
   filterChipTextActive: {
-    color: '#FFF',
-    fontWeight: 'bold',
+    color: "#FFF",
+    fontWeight: "bold",
   },
   listContent: {
     padding: 16,
   },
   equipmentCard: {
-    backgroundColor: '#FFF',
+    backgroundColor: "#FFF",
     padding: 16,
     borderRadius: 12,
     marginBottom: 16,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
   },
   cardHeader: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 12,
     marginBottom: 12,
   },
@@ -673,19 +970,19 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   titleRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
     marginBottom: 4,
   },
   equipmentNumber: {
     fontSize: 12,
-    color: '#666',
-    fontWeight: '600',
+    color: "#666",
+    fontWeight: "600",
   },
   statusBadge: {
     paddingHorizontal: 10,
@@ -694,39 +991,39 @@ const styles = StyleSheet.create({
   },
   statusText: {
     fontSize: 10,
-    color: '#FFF',
-    fontWeight: 'bold',
+    color: "#FFF",
+    fontWeight: "bold",
   },
   equipmentName: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
     marginBottom: 2,
   },
   equipmentType: {
     fontSize: 13,
-    color: '#666',
+    color: "#666",
   },
   cardInfo: {
     gap: 6,
     marginBottom: 12,
   },
   infoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6,
   },
   infoText: {
     fontSize: 12,
-    color: '#666',
+    color: "#666",
   },
   infoLabel: {
     fontSize: 12,
-    color: '#666',
+    color: "#666",
   },
   infoValue: {
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   conditionDot: {
     width: 8,
@@ -734,16 +1031,16 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   cardFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#E0E0E0',
+    borderTopColor: "#E0E0E0",
   },
   ownershipBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 4,
     paddingHorizontal: 10,
     paddingVertical: 4,
@@ -752,165 +1049,165 @@ const styles = StyleSheet.create({
   },
   ownershipText: {
     fontSize: 11,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   hoursInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 4,
   },
   hoursText: {
     fontSize: 11,
-    color: '#666',
+    color: "#666",
   },
   emptyContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     paddingVertical: 60,
   },
   emptyText: {
     fontSize: 16,
-    color: '#666',
+    color: "#666",
     marginTop: 16,
     marginBottom: 20,
   },
   addButton: {
-    backgroundColor: '#0066CC',
+    backgroundColor: "#0066CC",
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
   },
   addButtonText: {
-    color: '#FFF',
+    color: "#FFF",
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'flex-end',
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "flex-end",
   },
   modalContent: {
-    backgroundColor: '#FFF',
+    backgroundColor: "#FFF",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    maxHeight: '90%',
+    maxHeight: "90%",
   },
   modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
+    borderBottomColor: "#E0E0E0",
   },
   modalTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
   },
   modalBody: {
     padding: 20,
   },
   inputLabel: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
     marginBottom: 8,
     marginTop: 12,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 10,
     fontSize: 14,
-    color: '#333',
+    color: "#333",
   },
   typeChips: {
     marginBottom: 8,
   },
   typeChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#ddd',
-    backgroundColor: '#FFF',
+    borderColor: "#ddd",
+    backgroundColor: "#FFF",
     gap: 6,
     marginRight: 8,
   },
   typeChipActive: {
-    backgroundColor: '#0066CC',
-    borderColor: '#0066CC',
+    backgroundColor: "#0066CC",
+    borderColor: "#0066CC",
   },
   typeChipText: {
     fontSize: 12,
-    color: '#666',
+    color: "#666",
   },
   typeChipTextActive: {
-    color: '#FFF',
-    fontWeight: 'bold',
+    color: "#FFF",
+    fontWeight: "bold",
   },
   ownershipChips: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 8,
   },
   ownershipChip: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     paddingVertical: 10,
     borderRadius: 8,
     borderWidth: 2,
-    backgroundColor: '#FFF',
+    backgroundColor: "#FFF",
     gap: 6,
   },
   ownershipChipActive: {
-    backgroundColor: '#F5F5F5',
+    backgroundColor: "#F5F5F5",
   },
   ownershipChipText: {
     fontSize: 12,
-    color: '#666',
-    fontWeight: '600',
+    color: "#666",
+    fontWeight: "600",
   },
   modalFooter: {
-    flexDirection: 'row',
+    flexDirection: "row",
     padding: 20,
     gap: 12,
     borderTopWidth: 1,
-    borderTopColor: '#E0E0E0',
+    borderTopColor: "#E0E0E0",
   },
   cancelButton: {
     flex: 1,
     paddingVertical: 14,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#ddd',
-    alignItems: 'center',
+    borderColor: "#ddd",
+    alignItems: "center",
   },
   cancelButtonText: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#666',
+    fontWeight: "bold",
+    color: "#666",
   },
   createButton: {
     flex: 1,
     paddingVertical: 14,
     borderRadius: 8,
-    backgroundColor: '#0066CC',
-    alignItems: 'center',
+    backgroundColor: "#0066CC",
+    alignItems: "center",
   },
   createButtonText: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#FFF',
+    fontWeight: "bold",
+    color: "#FFF",
   },
   buttonDisabled: {
-    backgroundColor: '#ccc',
+    backgroundColor: "#ccc",
   },
 });

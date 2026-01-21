@@ -282,17 +282,17 @@ export const getInspectionAnalytics = async (
 
 export const getComplianceReport = async (projectId: string): Promise<{
   overallCompliance: number;
-  byCategory: Array<{
+  byCategory: {
     category: string;
     compliance: number;
     passed: number;
     total: number;
-  }>;
-  byStandard: Array<{
+  }[];
+  byStandard: {
     standard: string;
     compliance: number;
     violations: number;
-  }>;
+  }[];
   criticalFindings: number;
   majorFindings: number;
   minorFindings: number;
@@ -306,11 +306,11 @@ export const getInspectionSchedule = async (
   projectId: string,
   fromDate?: string,
   toDate?: string
-): Promise<Array<{
+): Promise<{
   date: string;
   inspections: Inspection[];
   tests: Test[];
-}>> => {
+}[]> => {
   const queryParams = new URLSearchParams();
   if (fromDate) queryParams.append('fromDate', fromDate);
   if (toDate) queryParams.append('toDate', toDate);

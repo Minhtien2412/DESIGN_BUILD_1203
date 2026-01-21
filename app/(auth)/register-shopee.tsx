@@ -456,9 +456,30 @@ export default function RegisterShopeeScreen() {
     } catch (error: any) {
       console.error('[Register] Error:', error);
       triggerShake();
-      setErrors({ 
-        general: error.message || 'Đăng ký thất bại. Vui lòng thử lại.' 
-      });
+      
+      // Chi tiết lỗi dựa trên mã lỗi
+      let errorMessage = 'Đăng ký thất bại. Vui lòng thử lại.';
+      
+      if (error.message) {
+        const msg = error.message.toLowerCase();
+        if (msg.includes('email') && (msg.includes('exist') || msg.includes('taken') || msg.includes('already'))) {
+          errorMessage = 'Email này đã được sử dụng. Vui lòng dùng email khác hoặc đăng nhập.';
+        } else if (msg.includes('phone') && (msg.includes('exist') || msg.includes('taken'))) {
+          errorMessage = 'Số điện thoại này đã được sử dụng. Vui lòng dùng số khác hoặc đăng nhập.';
+        } else if (msg.includes('network') || msg.includes('fetch') || msg.includes('connection')) {
+          errorMessage = 'Lỗi kết nối mạng. Vui lòng kiểm tra internet và thử lại.';
+        } else if (msg.includes('password')) {
+          errorMessage = 'Mật khẩu không đạt yêu cầu. Vui lòng chọn mật khẩu mạnh hơn.';
+        } else if (msg.includes('invalid')) {
+          errorMessage = 'Thông tin không hợp lệ. Vui lòng kiểm tra lại.';
+        } else if (msg.includes('timeout')) {
+          errorMessage = 'Máy chủ không phản hồi. Vui lòng thử lại sau.';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      setErrors({ general: errorMessage });
     } finally {
       setLoading(false);
     }

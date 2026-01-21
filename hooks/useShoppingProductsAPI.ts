@@ -136,10 +136,10 @@ function applyFilters(products: Product[], filters: ProductFilters): Product[] {
 // ==================== HOOK ====================
 
 export function useShoppingProducts(initialFilters?: ProductFilters): UseShoppingProductsReturn {
-  const [allProducts, setAllProducts] = useState<Product[]>(PRODUCTS);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [dataSource, setDataSource] = useState<'api' | 'mock'>('mock');
+  const [dataSource, setDataSource] = useState<'api' | 'mock'>('api');
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
   const [filters, setFiltersState] = useState<ProductFilters>(initialFilters || {});
@@ -175,16 +175,17 @@ export function useShoppingProducts(initialFilters?: ProductFilters): UseShoppin
         setDataSource('api');
         console.log('[useShoppingProducts] Loaded from API:', response.products.length);
       } else {
-        // Use mock data
-        setAllProducts(PRODUCTS);
-        setDataSource('mock');
+        // Empty state - no data from API
+        setAllProducts([]);
+        setDataSource('api');
         setHasMore(false);
       }
     } catch (err) {
       console.error('[useShoppingProducts] Error:', err);
       setError(err instanceof Error ? err.message : 'Failed to load products');
-      setAllProducts(PRODUCTS);
-      setDataSource('mock');
+      // Empty state on error - no fallback to mock data
+      setAllProducts([]);
+      setDataSource('api');
     } finally {
       setLoading(false);
     }

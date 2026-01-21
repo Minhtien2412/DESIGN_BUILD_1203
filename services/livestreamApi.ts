@@ -68,15 +68,15 @@ export interface StreamAnalytics {
   peakViewers: number;
   averageWatchTime: number;
   totalWatchTime: number;
-  viewersByTime: Array<{
+  viewersByTime: {
     timestamp: string;
     viewers: number;
-  }>;
-  topViewers: Array<{
+  }[];
+  topViewers: {
     userId: string;
     userName: string;
     watchTime: number;
-  }>;
+  }[];
 }
 
 class LivestreamService {

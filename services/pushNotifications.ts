@@ -9,7 +9,7 @@ import { apiClient } from './enhancedApi';
 // Conditionally import expo-notifications to avoid Expo Go errors (SDK 53+)
 let Notifications: typeof import('expo-notifications') | null = null;
 try {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
+   
   Notifications = require('expo-notifications');
 } catch (error) {
   console.log('[pushNotifications] expo-notifications not available:', error);

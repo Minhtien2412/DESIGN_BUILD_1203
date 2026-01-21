@@ -61,21 +61,21 @@ export interface PaymentStats {
   completedPayments: number;
   failedPayments: number;
   refundedAmount: number;
-  monthlyRevenue: Array<{
+  monthlyRevenue: {
     month: string;
     revenue: number;
     expenses: number;
-  }>;
-  paymentsByMethod: Array<{
+  }[];
+  paymentsByMethod: {
     method: string;
     count: number;
     amount: number;
-  }>;
-  paymentsByStatus: Array<{
+  }[];
+  paymentsByStatus: {
     status: string;
     count: number;
     amount: number;
-  }>;
+  }[];
 }
 
 // ============================================================================

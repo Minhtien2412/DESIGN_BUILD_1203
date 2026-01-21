@@ -46,7 +46,7 @@ export type CategoryPost = {
   textAlign?: 'left' | 'center' | 'right';
   fontScale?: number; // 1 = base, 1.2 = larger
   // Multi-media support
-  media?: Array<{ type: 'image' | 'video'; uri: string }>;
+  media?: { type: 'image' | 'video'; uri: string }[];
   layout?: 'auto' | 'two-col' | 'mosaic-3' | 'grid-4' | 'grid-5';
   // Comments
   comments?: PostComment[];

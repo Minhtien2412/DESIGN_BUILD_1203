@@ -331,7 +331,7 @@ export default function FoundationChecklistScreen() {
     }
     acc[item.category].push({ ...item, index });
     return acc;
-  }, {} as Record<string, Array<typeof FOUNDATION_ITEMS[0] & { index: number }>>);
+  }, {} as Record<string, (typeof FOUNDATION_ITEMS[0] & { index: number })[]>);
 
   return (
     <Container>

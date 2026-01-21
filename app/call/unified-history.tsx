@@ -44,7 +44,7 @@ const COLORS = {
 
 type FilterTab = 'all' | 'missed' | 'outgoing' | 'incoming';
 
-const FILTER_TABS: Array<{ key: FilterTab; label: string; icon: string }> = [
+const FILTER_TABS: { key: FilterTab; label: string; icon: string }[] = [
   { key: 'all', label: 'Tất cả', icon: 'call' },
   { key: 'missed', label: 'Gọi nhỡ', icon: 'call-outline' },
   { key: 'outgoing', label: 'Gọi đi', icon: 'arrow-up' },

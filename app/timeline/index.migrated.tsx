@@ -99,7 +99,7 @@ export default function TimelineScreen() {
   );
 
   const handlePhaseReordered = useCallback(
-    (data: { phases: Array<{ id: number; order: number }> }) => {
+    (data: { phases: { id: number; order: number }[] }) => {
       setTimeline((prev: ProjectTimeline | null) => {
         if (!prev) return prev;
         const orderMap = new Map(data.phases.map((p) => [p.id, p.order]));

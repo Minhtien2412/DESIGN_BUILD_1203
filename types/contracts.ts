@@ -112,7 +112,7 @@ export interface ContractTemplate {
   terms: ContractTerm[];
   defaultPaymentTerms: PaymentTerms;
   defaultDuration: number; // in days
-  requiredParties: Array<'CLIENT' | 'CONTRACTOR' | 'SUBCONTRACTOR' | 'SUPPLIER' | 'CONSULTANT'>;
+  requiredParties: ('CLIENT' | 'CONTRACTOR' | 'SUBCONTRACTOR' | 'SUPPLIER' | 'CONSULTANT')[];
   isPublic: boolean;
   createdBy: string;
   createdAt: Date;

@@ -12,7 +12,7 @@ import { apiFetch } from './api';
 const API_BASE = ((): string => {
   try {
     // attempt to read export dynamically if present at runtime
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+     
     const mod = require('./api');
     return mod.API_BASE || process.env.EXPO_PUBLIC_API_BASE || 'https://api.thietkeresort.com.vn';
   } catch {

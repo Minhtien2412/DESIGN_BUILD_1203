@@ -28,25 +28,25 @@ export interface DetailLayoutProps {
   };
 
   // Meta info (displayed below title)
-  metaInfo?: Array<{
+  metaInfo?: {
     icon: string;
     label: string;
     value: string;
-  }>;
+  }[];
 
   // Content sections
-  sections: Array<{
+  sections: {
     title?: string;
     content: ReactNode;
-  }>;
+  }[];
 
   // Actions
-  actions?: Array<{
+  actions?: {
     label: string;
     icon: string;
     onPress: () => void;
     variant?: "primary" | "secondary" | "outline";
-  }>;
+  }[];
 
   // Navigation
   showBackButton?: boolean;

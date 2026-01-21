@@ -62,7 +62,29 @@ export default function ResetPasswordScreen() {
         );
       }
     } catch (error: any) {
-      Alert.alert('Lỗi', error.message || 'Không thể đặt lại mật khẩu. Token có thể đã hết hạn.');
+      // Xử lý lỗi đặt lại mật khẩu chi tiết
+      let errorMessage = 'Không thể đặt lại mật khẩu. Token có thể đã hết hạn.';
+      
+      if (error?.message) {
+        const msg = error.message.toLowerCase();
+        if (msg.includes('expired') || msg.includes('hết hạn')) {
+          errorMessage = 'Link đặt lại mật khẩu đã hết hạn. Vui lòng yêu cầu link mới.';
+        } else if (msg.includes('invalid') || msg.includes('không hợp lệ')) {
+          errorMessage = 'Link đặt lại mật khẩu không hợp lệ. Vui lòng sử dụng link từ email mới nhất.';
+        } else if (msg.includes('weak') || msg.includes('yếu')) {
+          errorMessage = 'Mật khẩu quá yếu. Vui lòng chọn mật khẩu mạnh hơn (ít nhất 8 ký tự với chữ hoa, chữ thường và số).';
+        } else if (msg.includes('network') || msg.includes('timeout')) {
+          errorMessage = 'Lỗi kết nối mạng. Vui lòng kiểm tra internet và thử lại.';
+        } else if (msg.includes('already used') || msg.includes('đã sử dụng')) {
+          errorMessage = 'Link này đã được sử dụng. Vui lòng yêu cầu link mới nếu cần đặt lại mật khẩu.';
+        } else if (msg.includes('same') || msg.includes('giống')) {
+          errorMessage = 'Mật khẩu mới phải khác mật khẩu cũ.';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      Alert.alert('Lỗi', errorMessage);
     } finally {
       setLoading(false);
     }

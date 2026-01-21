@@ -3,7 +3,7 @@ import { Platform } from 'react-native';
 // Lazy require to avoid type resolution issues before dependency is installed
 function getLocalAuth() {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+     
     const mod = require('expo-local-authentication');
     return mod as any;
   } catch {

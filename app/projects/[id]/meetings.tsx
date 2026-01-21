@@ -29,17 +29,17 @@ interface MeetingNote {
   duration: number; // minutes
   location: string;
   organizer: { id: string; name: string };
-  attendees: Array<{ id: string; name: string; attended: boolean }>;
+  attendees: { id: string; name: string; attended: boolean }[];
   agenda: string[];
-  decisions: Array<{ id: string; decision: string; owner: string }>;
-  actionItems: Array<{
+  decisions: { id: string; decision: string; owner: string }[];
+  actionItems: {
     id: string;
     task: string;
     assignee: string;
     deadline: string;
     status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
-  }>;
-  attachments?: Array<{ name: string; url: string }>;
+  }[];
+  attachments?: { name: string; url: string }[];
   notes?: string;
 }
 
@@ -280,7 +280,7 @@ export default function MeetingNotesScreen() {
       {/* Type Filter */}
       <FlatList
         horizontal
-        data={['ALL', ...Object.keys(MEETING_TYPES)] as Array<MeetingType | 'ALL'>}
+        data={['ALL', ...Object.keys(MEETING_TYPES)] as (MeetingType | 'ALL')[]}
         renderItem={({ item }) => {
           const isAll = item === 'ALL';
           const config = isAll ? null : MEETING_TYPES[item];

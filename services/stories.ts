@@ -97,11 +97,11 @@ export interface StoryAnalytics {
   totalViews: number;
   uniqueViewers: number;
   averageViewDuration: number;
-  viewsByStory: Array<{
+  viewsByStory: {
     storyId: string;
     views: number;
     createdAt: string;
-  }>;
+  }[];
 }
 
 export async function getStoryAnalytics(

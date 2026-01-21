@@ -28,17 +28,17 @@ export interface ProjectTemplate {
   icon: keyof typeof Ionicons.glyphMap;
   color: string;
   category: 'residential' | 'commercial' | 'infrastructure' | 'custom';
-  defaultStages: Array<{
+  defaultStages: {
     name: string;
     order: number;
     duration: number; // days
-  }>;
-  defaultTasks: Array<{
+  }[];
+  defaultTasks: {
     name: string;
     stageIndex: number;
     duration: number;
     priority: 'Low' | 'Medium' | 'High';
-  }>;
+  }[];
   estimatedDuration: number; // days
   complexity: 'simple' | 'medium' | 'complex';
 }

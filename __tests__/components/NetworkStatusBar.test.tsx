@@ -3,12 +3,19 @@
  */
 
 // Mock vector icons
-jest.mock('@expo/vector-icons', () => ({
+import {
+    NetworkStatusBar,
+    OfflineIndicator,
+} from "@/components/NetworkStatusBar";
+import { useOfflineSync } from "@/hooks/useOfflineSync";
+import { render, screen } from "@testing-library/react-native";
+
+jest.mock("@expo/vector-icons", () => ({
   Ionicons: () => null,
 }));
 
 // Mock the hook
-jest.mock('@/hooks/useOfflineSync', () => ({
+jest.mock("@/hooks/useOfflineSync", () => ({
   useOfflineSync: jest.fn(() => ({
     isOnline: true,
     isSyncing: false,
@@ -17,23 +24,20 @@ jest.mock('@/hooks/useOfflineSync', () => ({
   })),
 }));
 
-import { NetworkStatusBar, OfflineIndicator } from '@/components/NetworkStatusBar';
-import { useOfflineSync } from '@/hooks/useOfflineSync';
-import { render, screen } from '@testing-library/react-native';
-
-describe('NetworkStatusBar', () => {
+describe("NetworkStatusBar", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('should not render when online with no pending items', () => {
-    const { root } = render(<NetworkStatusBar />);
-    
-    // Component should be invisible when online and no pending
-    expect(root.children.length).toBe(0);
+  it("should not render when online with no pending items", () => {
+    const { toJSON } = render(<NetworkStatusBar />);
+
+    // Component should render nothing or empty when online and no pending
+    // toJSON() returns null when nothing is rendered
+    expect(toJSON()).toBeNull();
   });
 
-  it('should render when offline', () => {
+  it("should render when offline", () => {
     (useOfflineSync as jest.Mock).mockReturnValue({
       isOnline: false,
       isSyncing: false,
@@ -42,11 +46,11 @@ describe('NetworkStatusBar', () => {
     });
 
     render(<NetworkStatusBar />);
-    
-    expect(screen.getByText('Không có kết nối mạng')).toBeTruthy();
+
+    expect(screen.getByText("Không có kết nối mạng")).toBeTruthy();
   });
 
-  it('should render when syncing', () => {
+  it("should render when syncing", () => {
     (useOfflineSync as jest.Mock).mockReturnValue({
       isOnline: true,
       isSyncing: true,
@@ -55,11 +59,11 @@ describe('NetworkStatusBar', () => {
     });
 
     render(<NetworkStatusBar />);
-    
+
     expect(screen.getByText(/Đang đồng bộ/)).toBeTruthy();
   });
 
-  it('should show pending count when showWhenOnline is true', () => {
+  it("should show pending count when showWhenOnline is true", () => {
     (useOfflineSync as jest.Mock).mockReturnValue({
       isOnline: true,
       isSyncing: false,
@@ -68,17 +72,17 @@ describe('NetworkStatusBar', () => {
     });
 
     render(<NetworkStatusBar showWhenOnline />);
-    
+
     expect(screen.getByText(/5 mục đang chờ đồng bộ/)).toBeTruthy();
   });
 });
 
-describe('OfflineIndicator', () => {
+describe("OfflineIndicator", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('should not render when online with no pending items', () => {
+  it("should not render when online with no pending items", () => {
     (useOfflineSync as jest.Mock).mockReturnValue({
       isOnline: true,
       isSyncing: false,
@@ -86,12 +90,12 @@ describe('OfflineIndicator', () => {
       failedCount: 0,
     });
 
-    const { root } = render(<OfflineIndicator />);
-    
-    expect(root.children.length).toBe(0);
+    const { toJSON } = render(<OfflineIndicator />);
+
+    expect(toJSON()).toBeNull();
   });
 
-  it('should render when offline', () => {
+  it("should render when offline", () => {
     (useOfflineSync as jest.Mock).mockReturnValue({
       isOnline: false,
       isSyncing: false,
@@ -100,11 +104,11 @@ describe('OfflineIndicator', () => {
     });
 
     const { root } = render(<OfflineIndicator />);
-    
+
     expect(root.children.length).toBeGreaterThan(0);
   });
 
-  it('should show pending count badge', () => {
+  it("should show pending count badge", () => {
     (useOfflineSync as jest.Mock).mockReturnValue({
       isOnline: true,
       isSyncing: false,
@@ -113,7 +117,7 @@ describe('OfflineIndicator', () => {
     });
 
     render(<OfflineIndicator />);
-    
-    expect(screen.getByText('3')).toBeTruthy();
+
+    expect(screen.getByText("3")).toBeTruthy();
   });
 });

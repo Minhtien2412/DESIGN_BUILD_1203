@@ -1,0 +1,1 @@
+{"version":3,"names":["additiveInverseArray","arr","map","i"],"sources":["array.js"],"sourcesContent":["function additiveInverseArray(arr) {\n    return arr.map((i) => -i);\n}\nexport { additiveInverseArray };\n"],"mappings":";;;;AAAA,SAASA,oBAAoBA,CAACC,GAAG,EAAE;EAC/B,OAAOA,GAAG,CAACC,GAAG,CAAC,UAACC,CAAC;IAAA,OAAK,CAACA,CAAC;EAAA,EAAC;AAC7B","ignoreList":[]}

@@ -386,11 +386,11 @@ export interface StorageStats {
   byCategory: Record<DocumentCategory, number>;
   
   // Largest files
-  largestFiles: Array<{
+  largestFiles: {
     id: string;
     name: string;
     size: number;
-  }>;
+  }[];
 }
 
 export interface DocumentSearchFilters {

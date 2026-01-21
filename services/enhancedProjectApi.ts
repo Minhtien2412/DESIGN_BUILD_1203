@@ -159,7 +159,7 @@ class EnhancedProjectApiService {
   }
 
   // Get project contacts using the contacts endpoint
-  async getProjectContacts(): Promise<Array<{ id: string; name: string; email: string; phone?: string; role: string }>> {
+  async getProjectContacts(): Promise<{ id: string; name: string; email: string; phone?: string; role: string }[]> {
     try {
       const response = await apiFetch<ApiResponse>('/contacts');
       
@@ -182,14 +182,14 @@ class EnhancedProjectApiService {
   }
 
   // Get project bookings using the bookings endpoint
-  async getProjectBookings(projectId: string): Promise<Array<{ 
+  async getProjectBookings(projectId: string): Promise<{ 
     id: string; 
     title: string; 
     date: string; 
     time: string; 
     status: string; 
     description?: string 
-  }>> {
+  }[]> {
     try {
       const response = await apiFetch<ApiResponse>(`/bookings?projectId=${projectId}`);
       

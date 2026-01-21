@@ -90,17 +90,16 @@ export default function ShortVideosScreen() {
     fetchVideos();
   }, [fetchVideos]);
 
-  const onViewableItemsChanged = useCallback(
+  const onViewableItemsChanged = useRef(
     ({ viewableItems }: { viewableItems: ViewToken[] }) => {
       if (viewableItems.length > 0) {
         const index = viewableItems[0].index;
-        if (index !== null && index !== currentIndex) {
+        if (index !== null) {
           setCurrentIndex(index);
         }
       }
-    },
-    [currentIndex]
-  );
+    }
+  ).current;
 
   const viewabilityConfig = {
     itemVisiblePercentThreshold: 80,

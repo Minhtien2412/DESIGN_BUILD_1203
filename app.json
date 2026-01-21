@@ -103,6 +103,14 @@
         {
           "locationAlwaysAndWhenInUsePermission": "Ứng dụng dùng vị trí của bạn để gắn địa điểm vào bài đăng."
         }
+      ],
+      [
+        "@sentry/react-native/expo",
+        {
+          "url": "https://sentry.io/",
+          "project": "react-native",
+          "organization": "design-build"
+        }
       ]
     ],
     "experiments": {

@@ -1,541 +1,1566 @@
 /**
- * Home Screen v4 - Complete Feature Hub
- * Full-featured Home with All Module Access
- * Based on Router Structure Analysis
- * Now with REAL DATA from Perfex CRM & API
- * @updated 2026-01-03
+ * Home Screen - Enhanced with Horizontal Scrollable Sections
+ * Each section displays 2 rows x 4 columns, scrollable left/right
+ * Includes external content from Pexels/GNews APIs when DB data is empty
+ * @updated 2026-01-15
  */
 
-import { ProgressSection } from '@/components/home/progress-section';
-import { useAuth } from '@/context/AuthContext';
-import { useDashboardData } from '@/hooks/useDashboardData';
-import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Href, router } from 'expo-router';
-import { memo, useCallback, useMemo, useState } from 'react';
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { Href, router } from "expo-router";
+import { memo, useCallback, useMemo, useState } from "react";
 import {
     Dimensions,
+    FlatList,
+    Image,
     RefreshControl,
     ScrollView,
     StatusBar,
     StyleSheet,
     Text,
     TouchableOpacity,
-    View
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+    View,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const { width } = Dimensions.get('window');
+// External content hooks and components
+import {
+    ExternalNewsSection,
+    ExternalVideoSection,
+} from "@/components/ExternalContentSection";
+import { useExternalNews, useExternalVideos } from "@/hooks/useExternalContent";
+import { useWorkerStats, WORKER_TYPE_MAP } from "@/hooks/useWorkerStats";
+
+const { width } = Dimensions.get("window");
+const ITEM_WIDTH = (width - 16) / 4; // 4 items per row - tighter padding
 
 // ============================================================================
-// DESIGN TOKENS - Modern Shopee-inspired Style
+// COLORS & SPACING
 // ============================================================================
 const COLORS = {
-  // Backgrounds
-  bg: '#F5F5F5',
-  card: '#FFFFFF',
-  
-  // Primary Brand
-  primary: '#0066CC', // Shopee Orange
-  primaryDark: '#004499',
-  primaryLight: '#E8F4FF',
-  
-  // Accent Colors
-  accent: '#0066CC', // Blue
-  accentLight: '#E8F4FF',
-  
-  // Text
-  text: '#222222',
-  textSecondary: '#666666',
-  textMuted: '#999999',
-  textWhite: '#FFFFFF',
-  
-  // Status Colors
-  success: '#0066CC',
-  successLight: '#E8F4FF',
-  warning: '#0066CC',
-  warningLight: '#E8F4FF',
-  error: '#000000',
-  errorLight: '#F5F5F5',
-  info: '#0066CC',
-  infoLight: '#E8F4FF',
-  
-  // UI Elements
-  border: '#E8E8E8',
-  divider: '#F0F0F0',
-  shadow: 'rgba(0, 0, 0, 0.08)',
-  
-  // Module Colors
-  construction: '#0066CC',
-  project: '#0080FF',
-  shopping: '#999999',
-  ai: '#0066CC',
-  live: '#666666',
-  crm: '#0080FF',
-  documents: '#666666',
-  safety: '#000000',
+  bg: "#F8F9FA",
+  white: "#FFFFFF",
+  primary: "#7CB342",
+  text: "#212121",
+  textLight: "#757575",
+  border: "#E0E0E0",
+  liveBadge: "#E53935",
+  chipBg: "#F5F5F5",
+  chipActiveBg: "#7CB342",
+  chipActiveText: "#FFFFFF",
 };
 
 const SPACING = {
-  xs: 4,
-  sm: 8,
-  md: 12,
-  lg: 16,
-  xl: 20,
-  xxl: 24,
-  xxxl: 32,
+  xs: 2,
+  sm: 4,
+  md: 8,
+  lg: 8,
+  xl: 12,
 };
 
+const FALLBACK_ICON = require("@/assets/images/icon.png");
+
+const ICONS = {
+  services: {
+    houseDesign: require("@/assets/images/icon-dich-vu/thiet-ke-nha.webp"),
+    interiorDesign: require("@/assets/images/icon-dich-vu/thiet-ke-noi-that.webp"),
+    lookup: require("@/assets/images/icon-dich-vu/tra-cuu-xay-dung.webp"),
+    permit: require("@/assets/images/icon-dich-vu/xin-phep.webp"),
+    template: require("@/assets/images/icon-dich-vu/ho-so-mau.webp"),
+    loBan: require("@/assets/images/icon-dich-vu/lo-ban.webp"),
+    palette: require("@/assets/images/icon-dich-vu/bang-mau.webp"),
+    consulting: require("@/assets/images/icon-dich-vu/tu-van-chat-luong.webp"),
+    contractor: require("@/assets/images/icon-dich-vu/cong-ty-xay-dung.webp"),
+    interiorCompany: require("@/assets/images/icon-dich-vu/cong-ty-noi-that.webp"),
+    supervisor: require("@/assets/images/icon-dich-vu/giam-sat-chat-luong.webp"),
+    estimation: require("@/assets/images/tien-ich-thiet-ke/du-toan.webp"),
+    materials: require("@/assets/images/tien-ich-xay-dung/vat-lieu.webp"),
+    aiTools: require("@/assets/images/tien-ich-thiet-ke/kien-tru-su-noi-that.webp"),
+    workerFinder: require("@/assets/images/tien-ich-xay-dung/nhan-cong.webp"),
+    more: FALLBACK_ICON,
+  },
+  designUtilities: {
+    architect: require("@/assets/images/tien-ich-thiet-ke/kien-truc-su.webp"),
+    interiorArchitect: require("@/assets/images/tien-ich-thiet-ke/kien-tru-su-noi-that.webp"),
+    supervisor: require("@/assets/images/tien-ich-thiet-ke/ky-su-giam-sat.webp"),
+    structureEngineer: require("@/assets/images/tien-ich-thiet-ke/ky-su-ket-cau.webp"),
+    electricalEngineer: require("@/assets/images/tien-ich-thiet-ke/ky-su-dien.webp"),
+    plumbingEngineer: require("@/assets/images/tien-ich-thiet-ke/ky-su-nuoc.webp"),
+    estimation: require("@/assets/images/tien-ich-thiet-ke/du-toan.webp"),
+  },
+  shopping: {
+    kitchen: require("@/assets/images/tien-ich-mua-sam-trang-thiet-bi/thiet-bi-bep.webp"),
+    bathroom: require("@/assets/images/tien-ich-mua-sam-trang-thiet-bi/thiet-bi-ve-sinh.webp"),
+    electric: require("@/assets/images/tien-ich-mua-sam-trang-thiet-bi/dien.webp"),
+    water: require("@/assets/images/tien-ich-mua-sam-trang-thiet-bi/nuoc.webp"),
+    pccc: require("@/assets/images/tien-ich-mua-sam-trang-thiet-bi/pccc.webp"),
+    dining: require("@/assets/images/tien-ich-mua-sam-trang-thiet-bi/ban-an.webp"),
+    study: require("@/assets/images/tien-ich-mua-sam-trang-thiet-bi/ban-hoc.webp"),
+    sofa: require("@/assets/images/tien-ich-mua-sam-trang-thiet-bi/sofa.webp"),
+  },
+  library: {
+    office: require("@/assets/images/thu-vien/van-phong.webp"),
+    townhouse: require("@/assets/images/thu-vien/nha-pho.webp"),
+    villa: require("@/assets/images/thu-vien/biet-thu.webp"),
+    classicVilla: require("@/assets/images/thu-vien/biet-thu-co-dien.webp"),
+    hotel: require("@/assets/images/thu-vien/khach-san.webp"),
+    factory: require("@/assets/images/thu-vien/nha-xuong.webp"),
+    servicedApartment: require("@/assets/images/thu-vien/can-ho-dich-vu.webp"),
+  },
+  construction: {
+    pile: require("@/assets/images/tien-ich-xay-dung/ep-coc.webp"),
+    digging: require("@/assets/images/tien-ich-xay-dung/dao-dat.webp"),
+    material: require("@/assets/images/tien-ich-xay-dung/vat-lieu.webp"),
+    workforce: require("@/assets/images/tien-ich-xay-dung/nhan-cong.webp"),
+    mason: require("@/assets/images/tien-ich-xay-dung/tho-xay.webp"),
+    coffa: require("@/assets/images/tien-ich-xay-dung/tho-coffa.webp"),
+    plaster: require("@/assets/images/tien-ich-xay-dung/tho-to-tuong.webp"),
+    mep: require("@/assets/images/tien-ich-xay-dung/tho-dien-nuoc.webp"),
+    concrete: require("@/assets/images/tien-ich-xay-dung/be-tong.webp"),
+  },
+  finishing: {
+    tile: require("@/assets/images/tien-ich-hoan-thien/tho-lat-gach.webp"),
+    gypsum: require("@/assets/images/tien-ich-hoan-thien/tho-thachcao-.webp"),
+    paint: require("@/assets/images/tien-ich-hoan-thien/tho-son.webp"),
+    stone: require("@/assets/images/tien-ich-hoan-thien/tho-da.webp"),
+    door: require("@/assets/images/tien-ich-hoan-thien/tho-lam-cua.webp"),
+    railing: require("@/assets/images/tien-ich-hoan-thien/tho-lan-can.webp"),
+    gate: require("@/assets/images/tien-ich-hoan-thien/tho-cong.webp"),
+    camera: require("@/assets/images/tien-ich-hoan-thien/tho-camera.webp"),
+  },
+} as const;
+
 // ============================================================================
-// DATA - Based on Complete Router Structure
+// DATA - DỊCH VỤ (Main Services - 16 items for scrolling)
 // ============================================================================
-
-// Hero Banner Data
-const BANNERS = [
-  { id: 1, title: 'Ưu đãi 50%', subtitle: 'Thiết kế nội thất', color: '#0066CC', route: '/services/interior-design' },
-  { id: 2, title: 'Flash Sale', subtitle: 'Vật liệu xây dựng', color: '#666666', route: '/shopping/flash-sale' },
-  { id: 3, title: 'AI Assistant', subtitle: 'Dự toán thông minh', color: '#0066CC', route: '/ai/assistant' },
-];
-
-// Quick Access - Most Used Features (Badges will be dynamic)
-const QUICK_ACCESS_CONFIG = [
-  { id: 1, label: 'Dự án', icon: 'folder-outline', route: '/(tabs)/projects', color: '#0066CC', badgeKey: 'projects' },
-  { id: 2, label: 'Tiến độ', icon: 'analytics-outline', route: '/construction/progress', color: '#0066CC', badgeKey: null },
-  { id: 3, label: 'Tài liệu', icon: 'documents-outline', route: '/documents', color: '#3B82F6', badgeKey: 'documents' },
-  { id: 4, label: 'Hoá đơn', icon: 'receipt-outline', route: '/crm/invoices', color: '#10B981', badgeKey: 'invoices' },
-  { id: 5, label: 'Hợp đồng', icon: 'document-attach-outline', route: '/contracts', color: '#8B5CF6', badgeKey: 'contracts' },
-  { id: 6, label: 'Chat', icon: 'chatbubbles-outline', route: '/messages', color: '#0080FF', badgeKey: 'chat' },
-  { id: 7, label: 'CRM', icon: 'business-outline', route: '/crm', color: '#666666', badgeKey: 'crm' },
-  { id: 8, label: 'Xem thêm', icon: 'apps-outline', route: '/(tabs)/menu', color: '#666666', badgeKey: null },
-];
-
-// Core Modules - Primary Business Functions (Stats will be dynamic)
-const CORE_MODULES_CONFIG = [
-  { 
-    id: 1, 
-    title: 'Quản lý Dự án', 
-    subtitle: 'Timeline, Tasks, Phases',
-    icon: 'folder-open-outline',
-    color: '#0066CC',
-    route: '/(tabs)/projects',
-    statsKey: 'projects'
-  },
-  { 
-    id: 2, 
-    title: 'Thi công XD', 
-    subtitle: 'Progress, Tracking, Map',
-    icon: 'construct-outline',
-    color: '#0066CC',
-    route: '/construction/progress',
-    statsKey: 'construction'
-  },
-  { 
-    id: 3, 
-    title: 'Tài liệu & Văn bản', 
-    subtitle: 'Documents, Files, Archive',
-    icon: 'documents-outline',
-    color: '#3B82F6',
-    route: '/documents',
-    statsKey: 'documents'
-  },
-  { 
-    id: 4, 
-    title: 'Hoá đơn & Thanh toán', 
-    subtitle: 'Invoices, Payments',
-    icon: 'receipt-outline',
-    color: '#10B981',
-    route: '/crm/invoices',
-    statsKey: 'invoices'
-  },
-  { 
-    id: 5, 
-    title: 'Hợp đồng', 
-    subtitle: 'Contracts, Quotations',
-    icon: 'document-attach-outline',
-    color: '#8B5CF6',
-    route: '/contracts',
-    statsKey: 'contracts'
-  },
-  { 
-    id: 6, 
-    title: 'QC/QA', 
-    subtitle: 'Quality, Inspections',
-    icon: 'checkmark-done-outline',
-    color: '#0080FF',
-    route: '/quality-assurance',
-    statsKey: 'qc'
-  },
-];
-
-// Commerce Module - Shopping Features
-const COMMERCE_ITEMS = [
-  { id: 1, label: 'Vật liệu XD', emoji: '🧱', route: '/shopping/vat-lieu-xay', hot: true },
-  { id: 2, label: 'Gạch men', emoji: '🏠', route: '/shopping/gach-men', hot: false },
-  { id: 3, label: 'Sơn', emoji: '🎨', route: '/shopping/son', hot: true },
-  { id: 4, label: 'Điện', emoji: '💡', route: '/shopping/dien', hot: false },
-  { id: 5, label: 'Nước', emoji: '🚿', route: '/shopping/nuoc', hot: false },
-  { id: 6, label: 'Nội thất', emoji: '🛋️', route: '/shopping/noi-that', hot: true },
-  { id: 7, label: 'Thiết bị bếp', emoji: '🍳', route: '/shopping/thiet-bi-bep', hot: false },
-  { id: 8, label: 'PCCC', emoji: '🧯', route: '/shopping/pccc', hot: false },
-];
-
-// Services - Dịch vụ xây dựng
+// Icons đơn giản, style châu Âu - minimal & clean
 const SERVICES = [
-  { id: 1, label: 'Thiết kế nhà', icon: 'home-outline', route: '/services/house-design', color: '#0066CC' },
-  { id: 2, label: 'Thiết kế nội thất', icon: 'bed-outline', route: '/services/interior-design', color: '#666666' },
-  { id: 3, label: 'Nhà thầu XD', icon: 'business-outline', route: '/services/construction-company', color: '#0080FF' },
-  { id: 4, label: 'Giám sát CL', icon: 'eye-outline', route: '/services/quality-supervision', color: '#0066CC' },
-  { id: 5, label: 'Phong thủy', icon: 'compass-outline', route: '/services/feng-shui', color: '#0066CC' },
-  { id: 6, label: 'Giấy phép XD', icon: 'document-outline', route: '/services/permit', color: '#000000' },
-  { id: 7, label: 'Bảo trì nhà', icon: 'build-outline', route: '/services/home-maintenance', color: '#FF6B00', hot: true },
-  { id: 8, label: 'Sửa điện nước', icon: 'flash-outline', route: '/services/home-maintenance', color: '#00B894' },
+  {
+    id: 1,
+    label: "Thiết kế nhà",
+    icon: ICONS.services.houseDesign,
+    route: "/services/house-design",
+  },
+  {
+    id: 2,
+    label: "Thiết kế nội thất",
+    icon: ICONS.services.interiorDesign,
+    route: "/services/interior-design",
+  },
+  {
+    id: 3,
+    label: "Tra cứu xây dựng",
+    icon: ICONS.services.lookup,
+    route: "/construction",
+  },
+  {
+    id: 4,
+    label: "Xin phép",
+    icon: ICONS.services.permit,
+    route: "/services/permit",
+  },
+  {
+    id: 5,
+    label: "Hồ sơ mẫu",
+    icon: ICONS.services.template,
+    route: "/documents",
+  },
+  {
+    id: 6,
+    label: "Lô ban",
+    icon: ICONS.services.loBan,
+    route: "/tools/lo-ban-ruler",
+  },
+  {
+    id: 7,
+    label: "Bảng màu",
+    icon: ICONS.services.palette,
+    route: "/tools/color-picker",
+  },
+  {
+    id: 8,
+    label: "Tư vấn CL",
+    icon: ICONS.services.consulting,
+    route: "/quality-assurance",
+  },
+  // Row 2
+  {
+    id: 9,
+    label: "Công ty XD",
+    icon: ICONS.services.contractor,
+    route: "/contractor",
+  },
+  {
+    id: 10,
+    label: "Công ty NT",
+    icon: ICONS.services.interiorCompany,
+    route: "/services/interior-design",
+  },
+  {
+    id: 11,
+    label: "Giám sát CL",
+    icon: ICONS.services.supervisor,
+    route: "/services/quality-supervision",
+  },
+  {
+    id: 12,
+    label: "Dự toán",
+    icon: ICONS.services.estimation,
+    route: "/calculators",
+  },
+  {
+    id: 13,
+    label: "Vật liệu",
+    icon: ICONS.services.materials,
+    route: "/materials",
+  },
+  {
+    id: 14,
+    label: "AI Thiết kế",
+    icon: ICONS.services.aiTools,
+    route: "/ai-design",
+  },
+  {
+    id: 15,
+    label: "Tìm thợ",
+    icon: ICONS.services.workerFinder,
+    route: "/workers",
+  },
+  {
+    id: 16,
+    label: "Xem thêm",
+    icon: ICONS.services.more,
+    route: "/(tabs)/menu",
+  },
 ];
 
-// AI Features
-const AI_FEATURES = [
-  { id: 1, label: 'AI Assistant', icon: 'sparkles', route: '/ai/assistant', desc: 'Trợ lý thông minh' },
-  { id: 2, label: 'Dự toán CP', icon: 'calculator', route: '/ai/cost-estimator', desc: 'Tính chi phí' },
-  { id: 3, label: 'Phân tích ảnh', icon: 'camera', route: '/ai/photo-analysis', desc: 'AI nhận diện' },
-  { id: 4, label: 'Báo cáo AI', icon: 'document-text', route: '/ai/generate-report', desc: 'Tự động tạo' },
+// DESIGN LIVE
+const DESIGN_LIVE = [
+  {
+    id: 1,
+    image: "https://picsum.photos/150/150?random=1",
+    badge: true,
+    route: "/live",
+  },
+  {
+    id: 2,
+    image: "https://picsum.photos/150/150?random=2",
+    badge: true,
+    route: "/live",
+  },
+  {
+    id: 3,
+    image: "https://picsum.photos/150/150?random=3",
+    badge: true,
+    route: "/live",
+  },
+  {
+    id: 4,
+    image: "https://picsum.photos/150/150?random=4",
+    badge: true,
+    route: "/live",
+  },
+  {
+    id: 5,
+    image: "https://picsum.photos/150/150?random=5",
+    badge: true,
+    route: "/live",
+  },
+  {
+    id: 6,
+    image: "https://picsum.photos/150/150?random=6",
+    badge: true,
+    route: "/live",
+  },
 ];
 
-// Communication Features
-const COMMUNICATION = [
-  { id: 1, label: 'Tin nhắn', icon: 'chatbubbles-outline', route: '/messages', badge: 5, color: '#0066CC' },
-  { id: 2, label: 'Video Call', icon: 'videocam-outline', route: '/call/active', badge: 0, color: '#0080FF' },
-  { id: 3, label: 'Live Stream', icon: 'radio-outline', route: '/(tabs)/live', badge: 2, color: '#666666' },
-  { id: 4, label: 'Social', icon: 'people-outline', route: '/social', badge: 0, color: '#0066CC' },
+// TIỆN ÍCH THIẾT KẾ (16 items)
+// Design services - minimal icons
+const DESIGN_SERVICES = [
+  {
+    id: 1,
+    label: "Kiến trúc sư",
+    price: "300.000đ/m2",
+    location: "Sài Gòn",
+    count: "100",
+    icon: ICONS.designUtilities.architect,
+    route: "/services/house-design",
+  },
+  {
+    id: 2,
+    label: "Kỹ sư",
+    price: "200.000đ/m2",
+    location: "Sài Gòn",
+    count: "100",
+    icon: ICONS.designUtilities.supervisor,
+    route: "/services/construction-company",
+  },
+  {
+    id: 3,
+    label: "Kết cấu",
+    price: "150.000đ/m2",
+    location: "Sài Gòn",
+    count: "100",
+    icon: ICONS.designUtilities.structureEngineer,
+    route: "/services/construction-lookup",
+  },
+  {
+    id: 4,
+    label: "Điện",
+    price: "200.000đ/m2",
+    location: "Sài Gòn",
+    count: "100",
+    icon: ICONS.designUtilities.electricalEngineer,
+    route: "/finishing/dien-nuoc",
+  },
+  {
+    id: 5,
+    label: "Nước",
+    price: "250.000đ/m2",
+    location: "Sài Gòn",
+    count: "100",
+    icon: ICONS.designUtilities.plumbingEngineer,
+    route: "/finishing/dien-nuoc",
+  },
+  {
+    id: 6,
+    label: "Dự toán",
+    price: "150.000đ/m2",
+    location: "Sài Gòn",
+    count: "100",
+    icon: ICONS.designUtilities.estimation,
+    route: "/calculators",
+  },
+  {
+    id: 7,
+    label: "Nội thất",
+    price: "70.000đ/m2",
+    location: "Sài Gòn",
+    count: "100",
+    icon: ICONS.designUtilities.interiorArchitect,
+    route: "/services/interior-design",
+  },
+  {
+    id: 8,
+    label: "Công Cụ AI",
+    price: "70.000đ/m2",
+    location: "Sài Gòn",
+    count: "100",
+    icon: ICONS.services.aiTools,
+    route: "/ai-design",
+  },
+  // Row 2
+  {
+    id: 9,
+    label: "Phong thủy",
+    price: "100.000đ/m2",
+    location: "Hà Nội",
+    count: "80",
+    icon: ICONS.services.loBan,
+    route: "/tools/feng-shui-ai",
+  },
+  {
+    id: 10,
+    label: "Xin phép XD",
+    price: "50.000đ/m2",
+    location: "Đà Nẵng",
+    count: "60",
+    icon: ICONS.services.permit,
+    route: "/services/permit",
+  },
+  {
+    id: 11,
+    label: "Khảo sát",
+    price: "80.000đ/m2",
+    location: "Sài Gòn",
+    count: "45",
+    icon: ICONS.services.lookup,
+    route: "/construction",
+  },
+  {
+    id: 12,
+    label: "Thiết kế 3D",
+    price: "120.000đ/m2",
+    location: "Sài Gòn",
+    count: "55",
+    icon: ICONS.services.houseDesign,
+    route: "/ai-design",
+  },
+  {
+    id: 13,
+    label: "Bản vẽ",
+    price: "90.000đ/m2",
+    location: "Hà Nội",
+    count: "70",
+    icon: ICONS.services.template,
+    route: "/documents",
+  },
+  {
+    id: 14,
+    label: "Thi công",
+    price: "180.000đ/m2",
+    location: "Sài Gòn",
+    count: "120",
+    icon: ICONS.services.contractor,
+    route: "/contractor",
+  },
+  {
+    id: 15,
+    label: "Giám sát",
+    price: "50.000đ/m2",
+    location: "Sài Gòn",
+    count: "90",
+    icon: ICONS.services.supervisor,
+    route: "/services/quality-supervision",
+  },
+  {
+    id: 16,
+    label: "Nghiệm thu",
+    price: "40.000đ/m2",
+    location: "Sài Gòn",
+    count: "75",
+    icon: ICONS.services.consulting,
+    route: "/quality-assurance",
+  },
 ];
 
-// Admin/Dashboard Quick Access
-const ADMIN_SHORTCUTS = [
-  { id: 1, label: 'Dashboard', icon: 'speedometer-outline', route: '/dashboard', role: 'all' },
-  { id: 2, label: 'Quản trị', icon: 'settings-outline', route: '/admin', role: 'admin' },
-  { id: 3, label: 'Nhân viên', icon: 'people-outline', route: '/admin/staff', role: 'admin' },
-  { id: 4, label: 'Phân quyền', icon: 'key-outline', route: '/admin/permissions', role: 'admin' },
+// TIỆN ÍCH MUA SẮM TRANG THIẾT BỊ - minimal icons
+const EQUIPMENT_ITEMS = [
+  {
+    id: 1,
+    label: "Thiết bị bếp",
+    icon: ICONS.shopping.kitchen,
+    route: "/equipment?category=kitchen",
+  },
+  {
+    id: 2,
+    label: "Thiết bị vệ sinh",
+    icon: ICONS.shopping.bathroom,
+    route: "/equipment?category=bathroom",
+  },
+  {
+    id: 3,
+    label: "Điện",
+    icon: ICONS.shopping.electric,
+    route: "/equipment?category=electrical",
+  },
+  {
+    id: 4,
+    label: "Nước",
+    icon: ICONS.shopping.water,
+    route: "/equipment?category=plumbing",
+  },
+  {
+    id: 5,
+    label: "PCCC",
+    icon: ICONS.shopping.pccc,
+    route: "/equipment?category=fire-safety",
+  },
+  {
+    id: 6,
+    label: "Bàn ăn",
+    icon: ICONS.shopping.dining,
+    route: "/shop?category=furniture&type=dining",
+  },
+  {
+    id: 7,
+    label: "Bàn học",
+    icon: ICONS.shopping.study,
+    route: "/shop?category=furniture&type=desk",
+  },
+  {
+    id: 8,
+    label: "Sofa",
+    icon: ICONS.shopping.sofa,
+    route: "/shop?category=furniture&type=sofa",
+  },
+  // Row 2
+  {
+    id: 9,
+    label: "Tủ quần áo",
+    icon: ICONS.shopping.study,
+    route: "/shop?category=furniture&type=wardrobe",
+  },
+  {
+    id: 10,
+    label: "Giường ngủ",
+    icon: ICONS.shopping.sofa,
+    route: "/shop?category=furniture&type=bed",
+  },
+  {
+    id: 11,
+    label: "Đèn trang trí",
+    icon: ICONS.shopping.electric,
+    route: "/shop?category=lighting",
+  },
+  {
+    id: 12,
+    label: "Rèm cửa",
+    icon: ICONS.shopping.water,
+    route: "/shop?category=curtain",
+  },
+  {
+    id: 13,
+    label: "Máy lạnh",
+    icon: ICONS.shopping.electric,
+    route: "/equipment?category=hvac",
+  },
+  {
+    id: 14,
+    label: "Máy nước nóng",
+    icon: ICONS.shopping.water,
+    route: "/equipment?category=water-heater",
+  },
+  {
+    id: 15,
+    label: "Bồn tắm",
+    icon: ICONS.shopping.bathroom,
+    route: "/equipment?category=bathroom",
+  },
+  { id: 16, label: "Xem thêm", icon: ICONS.services.more, route: "/shop" },
 ];
 
-// Utility Tools
-const UTILITY_TOOLS = [
-  { id: 1, label: 'Tài liệu', icon: 'folder-outline', route: '/documents' },
-  { id: 2, label: 'Hoá đơn', icon: 'receipt-outline', route: '/crm/invoices' },
-  { id: 3, label: 'An toàn LĐ', icon: 'shield-checkmark-outline', route: '/safety' },
-  { id: 4, label: 'Phương tiện', icon: 'car-outline', route: '/fleet' },
-  { id: 5, label: 'Kho bãi', icon: 'cube-outline', route: '/inventory' },
-  { id: 6, label: 'Thiết bị', icon: 'hardware-chip-outline', route: '/equipment' },
-  { id: 7, label: 'Nhân công', icon: 'body-outline', route: '/labor' },
-  { id: 8, label: 'Thời tiết', icon: 'partly-sunny-outline', route: '/weather' },
-  { id: 9, label: 'Bản đồ', icon: 'map-outline', route: '/construction/map-view' },
+// THƯ VIỆN - minimal geometric icons
+const LIBRARY_ITEMS = [
+  {
+    id: 1,
+    label: "Văn phòng",
+    icon: ICONS.library.office,
+    route: "/categories/office",
+  },
+  {
+    id: 2,
+    label: "Nhà phố",
+    icon: ICONS.library.townhouse,
+    route: "/categories/townhouse",
+  },
+  {
+    id: 3,
+    label: "Biệt thự",
+    icon: ICONS.library.villa,
+    route: "/categories/villa",
+  },
+  {
+    id: 4,
+    label: "Biệt thự cổ điển",
+    icon: ICONS.library.classicVilla,
+    route: "/categories/classic-villa",
+  },
+  {
+    id: 5,
+    label: "Khách sạn",
+    icon: ICONS.library.hotel,
+    route: "/categories/hotel",
+  },
+  {
+    id: 6,
+    label: "Nhà xưởng",
+    icon: ICONS.library.factory,
+    route: "/categories/factory",
+  },
+  {
+    id: 7,
+    label: "Căn hộ DV",
+    icon: ICONS.library.servicedApartment,
+    route: "/categories/apartment",
+  },
+  {
+    id: 8,
+    label: "Nhà hàng",
+    icon: ICONS.library.hotel,
+    route: "/categories/restaurant",
+  },
+  // Row 2
+  {
+    id: 9,
+    label: "Cafe",
+    icon: ICONS.library.townhouse,
+    route: "/categories/cafe",
+  },
+  {
+    id: 10,
+    label: "Spa",
+    icon: ICONS.library.servicedApartment,
+    route: "/categories/spa",
+  },
+  {
+    id: 11,
+    label: "Gym",
+    icon: ICONS.library.factory,
+    route: "/categories/gym",
+  },
+  {
+    id: 12,
+    label: "Trường học",
+    icon: ICONS.library.office,
+    route: "/categories/school",
+  },
+  {
+    id: 13,
+    label: "Bệnh viện",
+    icon: ICONS.library.hotel,
+    route: "/categories/hospital",
+  },
+  {
+    id: 14,
+    label: "Showroom",
+    icon: ICONS.library.office,
+    route: "/categories/showroom",
+  },
+  { id: 15, label: "Kho", icon: ICONS.library.factory, route: "/warehouse" },
+  {
+    id: 16,
+    label: "Xem thêm",
+    icon: ICONS.services.more,
+    route: "/categories",
+  },
+];
+
+// TIỆN ÍCH XÂY DỰNG - simplified icons
+const CONSTRUCTION_WORKERS = [
+  {
+    id: 1,
+    label: "Ép cọc",
+    price: "Hà Nội - 100",
+    icon: ICONS.construction.pile,
+    route: "/workers?specialty=ep-coc",
+  },
+  {
+    id: 2,
+    label: "Đào đất",
+    price: "Sài Gòn - 50",
+    icon: ICONS.construction.digging,
+    route: "/workers?specialty=dao-dat",
+  },
+  {
+    id: 3,
+    label: "Vật liệu",
+    price: "Sài Gòn - 50",
+    icon: ICONS.construction.material,
+    route: "/materials",
+  },
+  {
+    id: 4,
+    label: "Nhân công XD",
+    price: "Sài Gòn - 50",
+    icon: ICONS.construction.workforce,
+    route: "/workers?specialty=nhan-cong",
+  },
+  {
+    id: 5,
+    label: "Thợ xây",
+    price: "Hà Nội - 78",
+    icon: ICONS.construction.mason,
+    route: "/workers?specialty=tho-xay",
+  },
+  {
+    id: 6,
+    label: "Thợ sắt",
+    price: "Sài Gòn - 97",
+    icon: ICONS.construction.coffa,
+    route: "/workers?specialty=tho-sat",
+  },
+  {
+    id: 7,
+    label: "Thợ coffa",
+    price: "Sài Gòn - 97",
+    icon: ICONS.construction.coffa,
+    route: "/workers?specialty=tho-coffa",
+  },
+  {
+    id: 8,
+    label: "Thợ cơ khí",
+    price: "Sài Gòn - 97",
+    icon: ICONS.construction.material,
+    route: "/workers?specialty=co-khi",
+  },
+  // Row 2
+  {
+    id: 9,
+    label: "Thợ tô tường",
+    price: "Hà Nội - 100",
+    icon: ICONS.construction.plaster,
+    route: "/workers?specialty=to-tuong",
+  },
+  {
+    id: 10,
+    label: "Thợ điện nước",
+    price: "Sài Gòn - 50",
+    icon: ICONS.construction.mep,
+    route: "/finishing/dien-nuoc",
+  },
+  {
+    id: 11,
+    label: "Bê tông",
+    price: "Sài Gòn - 50",
+    icon: ICONS.construction.concrete,
+    route: "/materials?category=be-tong",
+  },
+  {
+    id: 12,
+    label: "Cốp pha",
+    price: "Đà Nẵng - 35",
+    icon: ICONS.construction.coffa,
+    route: "/workers?specialty=cop-pha",
+  },
+  {
+    id: 13,
+    label: "Máy móc",
+    price: "Sài Gòn - 80",
+    icon: ICONS.construction.material,
+    route: "/equipment?category=machinery",
+  },
+  {
+    id: 14,
+    label: "Vận tải",
+    price: "Sài Gòn - 60",
+    icon: ICONS.construction.workforce,
+    route: "/fleet",
+  },
+  {
+    id: 15,
+    label: "Giám sát",
+    price: "Hà Nội - 45",
+    icon: ICONS.services.supervisor,
+    route: "/services/quality-supervision",
+  },
+  { id: 16, label: "Xem thêm", icon: ICONS.services.more, route: "/workers" },
+];
+
+// VIDEO CONSTRUCTIONS (12 items)
+const VIDEO_ITEMS = [
+  {
+    id: 1,
+    label: "Thợ ép cọc",
+    image: "https://picsum.photos/100/100?random=5",
+    live: true,
+    route: "/videos",
+  },
+  {
+    id: 2,
+    label: "Nhân công XD",
+    image: "https://picsum.photos/100/100?random=6",
+    live: true,
+    route: "/videos",
+  },
+  {
+    id: 3,
+    label: "Thợ đắp chỉ",
+    image: "https://picsum.photos/100/100?random=7",
+    live: true,
+    route: "/videos",
+  },
+  {
+    id: 4,
+    label: "Thợ tô tường",
+    image: "https://picsum.photos/100/100?random=8",
+    live: true,
+    route: "/videos",
+  },
+  {
+    id: 5,
+    label: "Lát gạch",
+    image: "https://picsum.photos/100/100?random=9",
+    live: false,
+    route: "/videos",
+  },
+  {
+    id: 6,
+    label: "Sơn nhà",
+    image: "https://picsum.photos/100/100?random=10",
+    live: true,
+    route: "/videos",
+  },
+  {
+    id: 7,
+    label: "Làm cửa",
+    image: "https://picsum.photos/100/100?random=11",
+    live: false,
+    route: "/videos",
+  },
+  {
+    id: 8,
+    label: "Lắp điện",
+    image: "https://picsum.photos/100/100?random=12",
+    live: true,
+    route: "/videos",
+  },
+];
+
+// TIỆN ÍCH HOÀN THIỆN - clean outline icons
+const FINISHING_WORKERS = [
+  {
+    id: 1,
+    label: "Thợ lát gạch",
+    price: "Hà Nội - 100",
+    icon: ICONS.finishing.tile,
+    route: "/finishing/lat-gach",
+  },
+  {
+    id: 2,
+    label: "Thợ thạch cao",
+    price: "Sài Gòn - 100",
+    icon: ICONS.finishing.gypsum,
+    route: "/finishing/thach-cao",
+  },
+  {
+    id: 3,
+    label: "Thợ sơn",
+    price: "Sài Gòn - 70",
+    icon: ICONS.finishing.paint,
+    route: "/finishing/son",
+  },
+  {
+    id: 4,
+    label: "Thợ đá",
+    price: "Sài Gòn - 70",
+    icon: ICONS.finishing.stone,
+    route: "/finishing/da",
+  },
+  {
+    id: 5,
+    label: "Thợ làm cửa",
+    price: "Hà Nội - 100",
+    icon: ICONS.finishing.door,
+    route: "/finishing/lam-cua",
+  },
+  {
+    id: 6,
+    label: "Thợ lan can",
+    price: "Sài Gòn - 70",
+    icon: ICONS.finishing.railing,
+    route: "/finishing/lan-can",
+  },
+  {
+    id: 7,
+    label: "Thợ cổng",
+    price: "Đà Nẵng - 35",
+    icon: ICONS.finishing.gate,
+    route: "/finishing",
+  },
+  {
+    id: 8,
+    label: "Thợ camera",
+    price: "Sài Gòn - 70",
+    icon: ICONS.finishing.camera,
+    route: "/finishing/camera",
+  },
+  // Row 2
+  {
+    id: 9,
+    label: "Thợ ốp đá",
+    price: "Sài Gòn - 65",
+    icon: ICONS.finishing.stone,
+    route: "/finishing/op-da",
+  },
+  {
+    id: 10,
+    label: "Thợ điện",
+    price: "Hà Nội - 85",
+    icon: ICONS.construction.mep,
+    route: "/finishing/dien-nuoc",
+  },
+  {
+    id: 11,
+    label: "Thợ nội thất",
+    price: "Sài Gòn - 90",
+    icon: ICONS.services.interiorDesign,
+    route: "/finishing/noi-that",
+  },
+  {
+    id: 12,
+    label: "Tổng hợp",
+    price: "Đà Nẵng - 50",
+    icon: ICONS.finishing.gate,
+    route: "/finishing/tho-tong-hop",
+  },
+  {
+    id: 13,
+    label: "Thợ mộc",
+    price: "Sài Gòn - 75",
+    icon: ICONS.finishing.door,
+    route: "/finishing",
+  },
+  {
+    id: 14,
+    label: "Thợ nhôm kính",
+    price: "Hà Nội - 60",
+    icon: ICONS.finishing.railing,
+    route: "/finishing",
+  },
+  {
+    id: 15,
+    label: "Thợ vệ sinh",
+    price: "Sài Gòn - 40",
+    icon: ICONS.shopping.bathroom,
+    route: "/finishing",
+  },
+  { id: 16, label: "Xem thêm", icon: ICONS.services.more, route: "/finishing" },
+];
+
+// DANH MỤC (Categories with images - 8 items)
+const CATEGORY_ITEMS = [
+  {
+    id: 1,
+    label: "Lát gạch",
+    image: "https://picsum.photos/80/80?random=11",
+    route: "/finishing/lat-gach",
+  },
+  {
+    id: 2,
+    label: "Nội quy công trình",
+    image: "https://picsum.photos/80/80?random=12",
+    route: "/documents",
+  },
+  {
+    id: 3,
+    label: "Bảo quản thiết bị",
+    image: "https://picsum.photos/80/80?random=13",
+    route: "/equipment/maintenance",
+  },
+  {
+    id: 4,
+    label: "Ốp đá",
+    image: "https://picsum.photos/80/80?random=14",
+    route: "/finishing/op-da",
+  },
+  {
+    id: 5,
+    label: "Sơn tường",
+    image: "https://picsum.photos/80/80?random=15",
+    route: "/finishing/son",
+  },
+  {
+    id: 6,
+    label: "Thạch cao",
+    image: "https://picsum.photos/80/80?random=16",
+    route: "/finishing/thach-cao",
+  },
+  {
+    id: 7,
+    label: "Làm cửa",
+    image: "https://picsum.photos/80/80?random=17",
+    route: "/finishing/lam-cua",
+  },
+  {
+    id: 8,
+    label: "Camera",
+    image: "https://picsum.photos/80/80?random=18",
+    route: "/finishing/camera",
+  },
 ];
 
 // ============================================================================
-// MEMOIZED COMPONENTS
+// FILTER DATA
 // ============================================================================
 
-// Banner Slider Item
-const BannerItem = memo<{ item: typeof BANNERS[0]; onPress: (route: string) => void }>(
-  ({ item, onPress }) => (
-    <TouchableOpacity
-      style={[styles.bannerItem, { backgroundColor: item.color }]}
-      onPress={() => onPress(item.route)}
-      activeOpacity={0.9}
-    >
-      <View>
-        <Text style={styles.bannerTitle}>{item.title}</Text>
-        <Text style={styles.bannerSubtitle}>{item.subtitle}</Text>
-      </View>
-      <Ionicons name="chevron-forward-circle" size={32} color="rgba(255,255,255,0.8)" />
-    </TouchableOpacity>
-  )
-);
-BannerItem.displayName = 'BannerItem';
+// Bộ lọc cho Dịch vụ
+const SERVICE_FILTERS = [
+  { id: "all", label: "Tất cả" },
+  { id: "design", label: "Thiết kế" },
+  { id: "construction", label: "Xây dựng" },
+  { id: "interior", label: "Nội thất" },
+  { id: "consulting", label: "Tư vấn" },
+  { id: "tools", label: "Công cụ" },
+];
 
-// Quick Access Item (Updated to accept badge prop)
-interface QuickAccessItemProps {
-  item: { id: number; label: string; icon: string; route: string; color: string; badgeKey: string | null };
-  badge: string | null;
-  onPress: (route: string) => void;
-}
-const QuickAccessItem = memo<QuickAccessItemProps>(
-  ({ item, badge, onPress }) => (
-    <TouchableOpacity 
-      style={styles.quickAccessItem} 
-      onPress={() => onPress(item.route)}
-      activeOpacity={0.7}
-    >
-      <View style={[styles.quickAccessIcon, { backgroundColor: item.color + '15' }]}>
-        <Ionicons name={item.icon as any} size={24} color={item.color} />
-        {badge && (
-          <View style={styles.quickAccessBadge}>
-            <Text style={styles.quickAccessBadgeText}>{badge}</Text>
-          </View>
-        )}
-      </View>
-      <Text style={styles.quickAccessLabel}>{item.label}</Text>
-    </TouchableOpacity>
-  )
-);
-QuickAccessItem.displayName = 'QuickAccessItem';
-
-// Core Module Card (Updated to accept stats prop)
-interface CoreModuleCardProps {
-  item: { id: number; title: string; subtitle: string; icon: string; color: string; route: string; statsKey: string };
-  stats: string;
-  onPress: (route: string) => void;
-}
-const CoreModuleCard = memo<CoreModuleCardProps>(
-  ({ item, stats, onPress }) => (
-    <TouchableOpacity
-      style={styles.coreModuleCard}
-      onPress={() => onPress(item.route)}
-      activeOpacity={0.8}
-    >
-      <View style={[styles.coreModuleIcon, { backgroundColor: item.color + '15' }]}>
-        <Ionicons name={item.icon as any} size={28} color={item.color} />
-      </View>
-      <View style={styles.coreModuleContent}>
-        <Text style={styles.coreModuleTitle}>{item.title}</Text>
-        <Text style={styles.coreModuleSubtitle}>{item.subtitle}</Text>
-      </View>
-      <View style={styles.coreModuleStats}>
-        <Text style={[styles.coreModuleStatsText, { color: item.color }]}>{stats}</Text>
-        <Ionicons name="chevron-forward" size={16} color={COLORS.textMuted} />
-      </View>
-    </TouchableOpacity>
-  )
-);
-CoreModuleCard.displayName = 'CoreModuleCard';
-
-// Commerce Category Item
-const CommerceItem = memo<{ item: typeof COMMERCE_ITEMS[0]; onPress: (route: string) => void }>(
-  ({ item, onPress }) => (
-    <TouchableOpacity
-      style={styles.commerceItem}
-      onPress={() => onPress(item.route)}
-      activeOpacity={0.7}
-    >
-      <View style={styles.commerceIconContainer}>
-        <Text style={styles.commerceEmoji}>{item.emoji}</Text>
-        {item.hot && (
-          <View style={styles.hotBadge}>
-            <Text style={styles.hotBadgeText}>HOT</Text>
-          </View>
-        )}
-      </View>
-      <Text style={styles.commerceLabel}>{item.label}</Text>
-    </TouchableOpacity>
-  )
-);
-CommerceItem.displayName = 'CommerceItem';
-
-// Service Card
-const ServiceCard = memo<{ item: typeof SERVICES[0]; onPress: (route: string) => void }>(
-  ({ item, onPress }) => (
-    <TouchableOpacity
-      style={styles.serviceCard}
-      onPress={() => onPress(item.route)}
-      activeOpacity={0.7}
-    >
-      <View style={[styles.serviceIcon, { backgroundColor: item.color + '15' }]}>
-        <Ionicons name={item.icon as any} size={22} color={item.color} />
-        {(item as any).hot && (
-          <View style={styles.serviceHotBadge}>
-            <Text style={styles.serviceHotBadgeText}>HOT</Text>
-          </View>
-        )}
-      </View>
-      <Text style={styles.serviceLabel}>{item.label}</Text>
-    </TouchableOpacity>
-  )
-);
-ServiceCard.displayName = 'ServiceCard';
-
-// AI Feature Card
-const AIFeatureCard = memo<{ item: typeof AI_FEATURES[0]; onPress: (route: string) => void }>(
-  ({ item, onPress }) => (
-    <TouchableOpacity
-      style={styles.aiFeatureCard}
-      onPress={() => onPress(item.route)}
-      activeOpacity={0.8}
-    >
-      <LinearGradient
-        colors={['#0066CC', '#004499']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.aiFeatureGradient}
-      >
-        <Ionicons name={item.icon as any} size={24} color="#fff" />
-      </LinearGradient>
-      <Text style={styles.aiFeatureLabel}>{item.label}</Text>
-      <Text style={styles.aiFeatureDesc}>{item.desc}</Text>
-    </TouchableOpacity>
-  )
-);
-AIFeatureCard.displayName = 'AIFeatureCard';
-
-// Communication Item
-const CommunicationItem = memo<{ item: typeof COMMUNICATION[0]; onPress: (route: string) => void }>(
-  ({ item, onPress }) => (
-    <TouchableOpacity
-      style={styles.commItem}
-      onPress={() => onPress(item.route)}
-      activeOpacity={0.7}
-    >
-      <View style={[styles.commIcon, { backgroundColor: item.color + '15' }]}>
-        <Ionicons name={item.icon as any} size={24} color={item.color} />
-        {item.badge > 0 && (
-          <View style={styles.commBadge}>
-            <Text style={styles.commBadgeText}>{item.badge}</Text>
-          </View>
-        )}
-      </View>
-      <Text style={styles.commLabel}>{item.label}</Text>
-    </TouchableOpacity>
-  )
-);
-CommunicationItem.displayName = 'CommunicationItem';
-
-// Utility Tool Item
-const UtilityItem = memo<{ item: typeof UTILITY_TOOLS[0]; onPress: (route: string) => void }>(
-  ({ item, onPress }) => (
-    <TouchableOpacity
-      style={styles.utilityItem}
-      onPress={() => onPress(item.route)}
-      activeOpacity={0.7}
-    >
-      <Ionicons name={item.icon as any} size={22} color={COLORS.textSecondary} />
-      <Text style={styles.utilityLabel}>{item.label}</Text>
-    </TouchableOpacity>
-  )
-);
-UtilityItem.displayName = 'UtilityItem';
-
-// Data Source Indicator
-const DataSourceBadge = memo<{ source: 'api' | 'mock' | 'cache'; loading: boolean }>(
-  ({ source, loading }) => {
-    if (loading) return null;
-    const config = {
-      api: { label: '🟢 Live', color: '#0080FF' },
-      mock: { label: '🟡 Demo', color: '#0066CC' },
-      cache: { label: '💾 Cache', color: '#0066CC' },
-    };
-    const { label, color } = config[source];
-    return (
-      <View style={[styles.dataSourceBadge, { backgroundColor: color + '20', borderColor: color }]}>
-        <Text style={[styles.dataSourceText, { color }]}>{label}</Text>
-      </View>
-    );
+// ============================================================================
+// HELPER: Group items into pages (2 rows x 4 cols = 8 items per page)
+// ============================================================================
+function groupItemsIntoPages<T>(items: T[], itemsPerPage: number = 8): T[][] {
+  const pages: T[][] = [];
+  for (let i = 0; i < items.length; i += itemsPerPage) {
+    pages.push(items.slice(i, i + itemsPerPage));
   }
-);
-DataSourceBadge.displayName = 'DataSourceBadge';
+  return pages;
+}
 
 // ============================================================================
-// MAIN COMPONENT
+// COMPONENTS
 // ============================================================================
+
+// Header
+const Header = memo(() => (
+  <View style={styles.header}>
+    <TouchableOpacity onPress={() => router.push("/(tabs)/menu" as Href)}>
+      <Ionicons name="menu-outline" size={28} color={COLORS.text} />
+    </TouchableOpacity>
+    <Text style={styles.logoText}>APP Design Build</Text>
+    <TouchableOpacity onPress={() => router.push("/notifications" as Href)}>
+      <Ionicons name="notifications-outline" size={26} color={COLORS.text} />
+    </TouchableOpacity>
+  </View>
+));
+
+// Search Bar
+const SearchBar = memo(() => (
+  <TouchableOpacity
+    style={styles.searchBar}
+    onPress={() => router.push("/search" as Href)}
+    activeOpacity={0.7}
+  >
+    <Ionicons name="search-outline" size={20} color={COLORS.textLight} />
+    <Text style={styles.searchPlaceholder}>
+      Tìm Kiếm dịch vụ, thợ, vật liệu...
+    </Text>
+  </TouchableOpacity>
+));
+
+// Service Grid Item
+const ServiceItem = memo<{ item: (typeof SERVICES)[0] }>(({ item }) => (
+  <TouchableOpacity
+    style={styles.serviceItem}
+    onPress={() => router.push(item.route as Href)}
+    activeOpacity={0.7}
+  >
+    <View style={styles.serviceIconContainer}>
+      <Image source={item.icon} style={styles.iconImage} resizeMode="contain" />
+    </View>
+    <Text style={styles.serviceLabel} numberOfLines={2}>
+      {item.label}
+    </Text>
+  </TouchableOpacity>
+));
+
+// Service Section with horizontal scroll (2 rows x 4 cols)
+const ServiceSection = memo<{
+  title: string;
+  data: typeof SERVICES;
+  seeMoreRoute: string;
+}>(({ title, data, seeMoreRoute }) => {
+  const pages = useMemo(() => groupItemsIntoPages(data, 8), [data]);
+
+  return (
+    <View style={styles.section}>
+      {title ? (
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>{title}</Text>
+          <TouchableOpacity onPress={() => router.push(seeMoreRoute as Href)}>
+            <Text style={styles.seeMoreText}>XEM THÊM</Text>
+          </TouchableOpacity>
+        </View>
+      ) : null}
+      <FlatList
+        data={pages}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        keyExtractor={(_, index) => `page-${index}`}
+        renderItem={({ item: pageItems }) => (
+          <View style={styles.gridPage}>
+            {pageItems.map((service) => (
+              <ServiceItem key={service.id} item={service} />
+            ))}
+          </View>
+        )}
+      />
+    </View>
+  );
+});
+
+// Design Live Item with badge
+const DesignLiveItem = memo<{ item: (typeof DESIGN_LIVE)[0] }>(({ item }) => (
+  <TouchableOpacity
+    style={styles.designLiveItem}
+    onPress={() => router.push(item.route as Href)}
+    activeOpacity={0.7}
+  >
+    <Image source={{ uri: item.image }} style={styles.designLiveImage} />
+    {item.badge && (
+      <View style={styles.liveBadge}>
+        <View style={styles.liveDot} />
+        <Text style={styles.liveBadgeText}>Live</Text>
+      </View>
+    )}
+  </TouchableOpacity>
+));
+
+// Green Banner
+const GreenBanner = memo(() => (
+  <TouchableOpacity
+    style={styles.greenBanner}
+    onPress={() => router.push("/construction" as Href)}
+    activeOpacity={0.9}
+  >
+    <LinearGradient
+      colors={["#66BB6A", "#43A047"]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={styles.greenBannerGradient}
+    >
+      <View style={styles.greenBannerContent}>
+        <View>
+          <Text style={styles.greenBannerTitle}>TIỆN ÍCH</Text>
+          <Text style={styles.greenBannerSubtitle}>XÂY DỰNG</Text>
+          <Text style={styles.greenBannerDescription}>
+            Hỗ trợ cho công ty xây dựng hoặc nhà thầu
+          </Text>
+          <Text style={styles.greenBannerNote}>
+            Tài khoản khách hàng (Tác vụ lập phiếu công việc / Thẻ thanh toán)
+          </Text>
+        </View>
+        <View style={styles.greenBannerButton}>
+          <Text style={styles.greenBannerButtonText}>KHÁM PHÁ NGAY</Text>
+          <Ionicons name="arrow-forward" size={16} color={COLORS.white} />
+        </View>
+      </View>
+      <View style={styles.greenBannerImageContainer}>
+        <Ionicons name="construct" size={80} color="rgba(255,255,255,0.3)" />
+      </View>
+    </LinearGradient>
+  </TouchableOpacity>
+));
+
+// Design Service Card
+const DesignServiceItem = memo<{ item: (typeof DESIGN_SERVICES)[0] }>(
+  ({ item }) => (
+    <TouchableOpacity
+      style={styles.designServiceItem}
+      onPress={() => router.push(item.route as Href)}
+      activeOpacity={0.7}
+    >
+      <View style={styles.designServiceIcon}>
+        <Image
+          source={item.icon}
+          style={styles.iconImage}
+          resizeMode="contain"
+        />
+      </View>
+      <Text style={styles.designServiceLabel} numberOfLines={1}>
+        {item.label}
+      </Text>
+      <Text style={styles.designServicePrice} numberOfLines={1}>
+        {item.price}
+      </Text>
+    </TouchableOpacity>
+  )
+);
+
+// Design Service Section with horizontal scroll
+const DesignServiceSection = memo<{
+  title: string;
+  data: typeof DESIGN_SERVICES;
+  seeMoreRoute: string;
+}>(({ title, data, seeMoreRoute }) => {
+  const pages = useMemo(() => groupItemsIntoPages(data, 8), [data]);
+
+  return (
+    <View style={styles.section}>
+      {title ? (
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>{title}</Text>
+          <TouchableOpacity onPress={() => router.push(seeMoreRoute as Href)}>
+            <Text style={styles.seeMoreText}>XEM THÊM</Text>
+          </TouchableOpacity>
+        </View>
+      ) : null}
+      <FlatList
+        data={pages}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        keyExtractor={(_, index) => `design-page-${index}`}
+        renderItem={({ item: pageItems }) => (
+          <View style={styles.gridPage}>
+            {pageItems.map((item) => (
+              <DesignServiceItem key={item.id} item={item} />
+            ))}
+          </View>
+        )}
+      />
+    </View>
+  );
+});
+
+// Equipment Item
+const EquipmentItemComponent = memo<{ item: (typeof EQUIPMENT_ITEMS)[0] }>(
+  ({ item }) => (
+    <TouchableOpacity
+      style={styles.equipmentItem}
+      onPress={() => router.push(item.route as Href)}
+      activeOpacity={0.7}
+    >
+      <View style={styles.equipmentIcon}>
+        <Image
+          source={item.icon}
+          style={styles.iconImage}
+          resizeMode="contain"
+        />
+      </View>
+      <Text style={styles.equipmentLabel} numberOfLines={2}>
+        {item.label}
+      </Text>
+    </TouchableOpacity>
+  )
+);
+
+// Equipment Section
+const EquipmentSection = memo<{
+  title: string;
+  data: typeof EQUIPMENT_ITEMS;
+  seeMoreRoute: string;
+}>(({ title, data, seeMoreRoute }) => {
+  const pages = useMemo(() => groupItemsIntoPages(data, 8), [data]);
+
+  return (
+    <View style={styles.section}>
+      {title ? (
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>{title}</Text>
+          <TouchableOpacity onPress={() => router.push(seeMoreRoute as Href)}>
+            <Text style={styles.seeMoreText}>XEM THÊM</Text>
+          </TouchableOpacity>
+        </View>
+      ) : null}
+      <FlatList
+        data={pages}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        keyExtractor={(_, index) => `equipment-page-${index}`}
+        renderItem={({ item: pageItems }) => (
+          <View style={styles.gridPage}>
+            {pageItems.map((item) => (
+              <EquipmentItemComponent key={item.id} item={item} />
+            ))}
+          </View>
+        )}
+      />
+    </View>
+  );
+});
+
+// Library Item
+const LibraryItemComponent = memo<{ item: (typeof LIBRARY_ITEMS)[0] }>(
+  ({ item }) => (
+    <TouchableOpacity
+      style={styles.libraryItem}
+      onPress={() => router.push(item.route as Href)}
+      activeOpacity={0.7}
+    >
+      <View style={styles.libraryIcon}>
+        <Image
+          source={item.icon}
+          style={styles.iconImage}
+          resizeMode="contain"
+        />
+      </View>
+      <Text style={styles.libraryLabel} numberOfLines={2}>
+        {item.label}
+      </Text>
+    </TouchableOpacity>
+  )
+);
+
+// Library Section
+const LibrarySection = memo<{
+  title: string;
+  data: typeof LIBRARY_ITEMS;
+  seeMoreRoute: string;
+}>(({ title, data, seeMoreRoute }) => {
+  const pages = useMemo(() => groupItemsIntoPages(data, 8), [data]);
+
+  return (
+    <View style={styles.section}>
+      {title ? (
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>{title}</Text>
+          <TouchableOpacity onPress={() => router.push(seeMoreRoute as Href)}>
+            <Text style={styles.seeMoreText}>XEM THÊM</Text>
+          </TouchableOpacity>
+        </View>
+      ) : null}
+      <FlatList
+        data={pages}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        keyExtractor={(_, index) => `library-page-${index}`}
+        renderItem={({ item: pageItems }) => (
+          <View style={styles.gridPage}>
+            {pageItems.map((item) => (
+              <LibraryItemComponent key={item.id} item={item} />
+            ))}
+          </View>
+        )}
+      />
+    </View>
+  );
+});
+
+// Construction Worker Item
+const ConstructionWorkerItem = memo<{ item: (typeof CONSTRUCTION_WORKERS)[0] }>(
+  ({ item }) => (
+    <TouchableOpacity
+      style={styles.workerItem}
+      onPress={() => router.push(item.route as Href)}
+      activeOpacity={0.7}
+    >
+      <View style={styles.workerIcon}>
+        <Image
+          source={item.icon}
+          style={styles.iconImage}
+          resizeMode="contain"
+        />
+      </View>
+      <Text style={styles.workerLabel} numberOfLines={1}>
+        {item.label}
+      </Text>
+      {item.price && (
+        <Text style={styles.workerPrice} numberOfLines={1}>
+          {item.price}
+        </Text>
+      )}
+    </TouchableOpacity>
+  )
+);
+
+// Construction Worker Section
+const ConstructionWorkerSection = memo<{
+  title: string;
+  data: typeof CONSTRUCTION_WORKERS;
+  seeMoreRoute: string;
+}>(({ title, data, seeMoreRoute }) => {
+  const pages = useMemo(() => groupItemsIntoPages(data, 8), [data]);
+
+  return (
+    <View style={styles.section}>
+      {title ? (
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>{title}</Text>
+          <TouchableOpacity onPress={() => router.push(seeMoreRoute as Href)}>
+            <Text style={styles.seeMoreText}>XEM THÊM</Text>
+          </TouchableOpacity>
+        </View>
+      ) : null}
+      <FlatList
+        data={pages}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        keyExtractor={(_, index) => `worker-page-${index}`}
+        renderItem={({ item: pageItems }) => (
+          <View style={styles.gridPage}>
+            {pageItems.map((item) => (
+              <ConstructionWorkerItem key={item.id} item={item} />
+            ))}
+          </View>
+        )}
+      />
+    </View>
+  );
+});
+
+// Video Item
+const VideoItemComponent = memo<{ item: (typeof VIDEO_ITEMS)[0] }>(
+  ({ item }) => (
+    <TouchableOpacity
+      style={styles.videoItem}
+      onPress={() => router.push(item.route as Href)}
+      activeOpacity={0.7}
+    >
+      <View style={styles.videoImageContainer}>
+        <Image source={{ uri: item.image }} style={styles.videoImage} />
+        {item.live && (
+          <View style={styles.videoLiveBadge}>
+            <View style={styles.videoLiveDot} />
+            <Text style={styles.videoLiveBadgeText}>Live</Text>
+          </View>
+        )}
+        <View style={styles.videoPlayIcon}>
+          <Ionicons name="play" size={16} color={COLORS.white} />
+        </View>
+      </View>
+      <Text style={styles.videoLabel} numberOfLines={1}>
+        {item.label}
+      </Text>
+    </TouchableOpacity>
+  )
+);
+
+// Video Section
+const VideoSection = memo<{
+  title: string;
+  data: typeof VIDEO_ITEMS;
+  seeMoreRoute: string;
+}>(({ title, data, seeMoreRoute }) => (
+  <View style={styles.section}>
+    <View style={styles.sectionHeader}>
+      <Text style={styles.sectionTitle}>{title}</Text>
+      <TouchableOpacity onPress={() => router.push(seeMoreRoute as Href)}>
+        <Text style={styles.seeMoreText}>XEM THÊM</Text>
+      </TouchableOpacity>
+    </View>
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={styles.videoContainer}
+    >
+      {data.map((item) => (
+        <VideoItemComponent key={item.id} item={item} />
+      ))}
+    </ScrollView>
+  </View>
+));
+
+// Finishing Worker Item
+const FinishingWorkerItem = memo<{ item: (typeof FINISHING_WORKERS)[0] }>(
+  ({ item }) => (
+    <TouchableOpacity
+      style={styles.finishingItem}
+      onPress={() => router.push(item.route as Href)}
+      activeOpacity={0.7}
+    >
+      <View style={styles.finishingIcon}>
+        <Image
+          source={item.icon}
+          style={styles.iconImage}
+          resizeMode="contain"
+        />
+      </View>
+      <Text style={styles.finishingLabel} numberOfLines={1}>
+        {item.label}
+      </Text>
+      {item.price && (
+        <Text style={styles.finishingPrice} numberOfLines={1}>
+          {item.price}
+        </Text>
+      )}
+    </TouchableOpacity>
+  )
+);
+
+// Finishing Worker Section
+const FinishingWorkerSection = memo<{
+  title: string;
+  data: typeof FINISHING_WORKERS;
+  seeMoreRoute: string;
+}>(({ title, data, seeMoreRoute }) => {
+  const pages = useMemo(() => groupItemsIntoPages(data, 8), [data]);
+
+  return (
+    <View style={styles.section}>
+      {title ? (
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>{title}</Text>
+          <TouchableOpacity onPress={() => router.push(seeMoreRoute as Href)}>
+            <Text style={styles.seeMoreText}>XEM THÊM</Text>
+          </TouchableOpacity>
+        </View>
+      ) : null}
+      <FlatList
+        data={pages}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        keyExtractor={(_, index) => `finishing-page-${index}`}
+        renderItem={({ item: pageItems }) => (
+          <View style={styles.gridPage}>
+            {pageItems.map((item) => (
+              <FinishingWorkerItem key={item.id} item={item} />
+            ))}
+          </View>
+        )}
+      />
+    </View>
+  );
+});
+
+// Category Card
+const CategoryCard = memo<{ item: (typeof CATEGORY_ITEMS)[0] }>(({ item }) => (
+  <TouchableOpacity
+    style={styles.categoryCard}
+    onPress={() => router.push(item.route as Href)}
+    activeOpacity={0.7}
+  >
+    <Image source={{ uri: item.image }} style={styles.categoryImage} />
+    <Text style={styles.categoryLabel}>{item.label}</Text>
+  </TouchableOpacity>
+));
+
+// ============================================================================
+// MAIN SCREEN
+// ============================================================================
+
 export default function HomeScreen() {
-  const { user } = useAuth();
   const insets = useSafeAreaInsets();
   const [refreshing, setRefreshing] = useState(false);
-  
-  // 🔥 USE REAL DATA FROM HOOK
+
+  // Worker stats from API
   const {
-    stats,
-    quickBadges,
-    coreStats,
-    loading: dataLoading,
-    dataSource,
-    refresh: refreshData,
-  } = useDashboardData();
+    stats: workerStats,
+    loading: statsLoading,
+    refresh: refreshStats,
+    selectedLocation,
+    getWorkerCount,
+  } = useWorkerStats();
 
-  // Memoize Quick Access with dynamic badges
-  const quickAccessItems = useMemo(() => {
-    return QUICK_ACCESS_CONFIG.map(item => ({
-      ...item,
-      badge: item.badgeKey ? (quickBadges as any)[item.badgeKey] : null,
-    }));
-  }, [quickBadges]);
+  // Get dynamic construction workers data with API stats
+  const dynamicConstructionWorkers = useMemo(() => {
+    return CONSTRUCTION_WORKERS.map((worker) => {
+      const workerType = WORKER_TYPE_MAP[worker.id];
+      if (!workerType || worker.id === 16) return worker; // Skip "Xem thêm"
 
-  // Memoize Core Modules with dynamic stats
-  const coreModules = useMemo(() => {
-    return CORE_MODULES_CONFIG.map(item => ({
-      ...item,
-      stats: (coreStats as any)[item.statsKey] || '0',
-    }));
-  }, [coreStats]);
+      const { location, count } = getWorkerCount(workerType);
+      return {
+        ...worker,
+        price: `${location} - ${count}`,
+      };
+    });
+  }, [getWorkerCount, workerStats, selectedLocation]);
 
-  const handleRefresh = useCallback(async () => {
+  // Get dynamic finishing workers data with API stats
+  const dynamicFinishingWorkers = useMemo(() => {
+    return FINISHING_WORKERS.map((worker) => {
+      const workerType = WORKER_TYPE_MAP[worker.id + 100]; // Offset for finishing
+      if (!workerType || worker.id === 16) return worker; // Skip "Xem thêm"
+
+      const { location, count } = getWorkerCount(workerType);
+      return {
+        ...worker,
+        price: `${location} - ${count}`,
+      };
+    });
+  }, [getWorkerCount, workerStats, selectedLocation]);
+
+  // External content from Pexels/GNews APIs
+  const {
+    videos: externalVideos,
+    isLoading: videosLoading,
+    refetch: refetchVideos,
+  } = useExternalVideos({
+    category: "general",
+    perPage: 8,
+    enabled: true,
+  });
+  const {
+    articles: externalNews,
+    isLoading: newsLoading,
+    refetch: refetchNews,
+  } = useExternalNews({
+    category: "general",
+    max: 8, // Load sẵn 8 tin
+    enabled: true,
+  });
+
+  // Tính tổng số content mới
+  const totalNewContent = externalVideos.length + externalNews.length;
+
+  const onRefresh = useCallback(() => {
     setRefreshing(true);
-    await refreshData();
-    setRefreshing(false);
-  }, [refreshData]);
-
-  const navigateTo = useCallback((route: string) => {
-    router.push(route as Href);
-  }, []);
-
-  const isAdmin = user?.role === 'admin' || user?.role === 'staff';
+    // Also refresh external content and worker stats
+    Promise.all([refetchVideos(), refetchNews(), refreshStats()]).finally(
+      () => {
+        setTimeout(() => setRefreshing(false), 1500);
+      }
+    );
+  }, [refetchVideos, refetchNews, refreshStats]);
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
+      <StatusBar barStyle="dark-content" backgroundColor={COLORS.white} />
 
-      {/* ====== HEADER ====== */}
-      <LinearGradient
-        colors={[COLORS.primary, COLORS.primaryDark]}
-        style={styles.header}
-      >
-        <View style={styles.headerTop}>
-          <TouchableOpacity 
-            style={styles.logoContainer}
-            onPress={() => navigateTo('/(tabs)/profile')}
-          >
-            <View style={styles.avatar}>
-              <Ionicons name="person" size={20} color={COLORS.primary} />
-            </View>
-            <View>
-              <Text style={styles.greeting}>
-                Xin chào{user?.name ? `, ${user.name}` : ''}!
-              </Text>
-              <Text style={styles.headerSubtitle}>Quản lý xây dựng thông minh</Text>
-            </View>
-          </TouchableOpacity>
-          
-          <View style={styles.headerActions}>
-            <TouchableOpacity
-              style={styles.headerBtn}
-              onPress={() => navigateTo('/(tabs)/notifications')}
-            >
-              <Ionicons name="notifications-outline" size={24} color="#fff" />
-              <View style={styles.notiBadge} />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.headerBtn}
-              onPress={() => navigateTo('/cart')}
-            >
-              <Ionicons name="cart-outline" size={24} color="#fff" />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.headerBtn}
-              onPress={() => navigateTo('/messages')}
-            >
-              <Ionicons name="chatbubble-outline" size={22} color="#fff" />
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* Search Bar */}
-        <TouchableOpacity
-          style={styles.searchBar}
-          onPress={() => navigateTo('/search')}
-          activeOpacity={0.9}
-        >
-          <Ionicons name="search-outline" size={18} color={COLORS.textMuted} />
-          <Text style={styles.searchPlaceholder}>Tìm dịch vụ, vật liệu, nhà thầu...</Text>
-          <View style={styles.searchCamera}>
-            <Ionicons name="camera-outline" size={18} color={COLORS.primary} />
-          </View>
-        </TouchableOpacity>
-      </LinearGradient>
+      <Header />
 
       <ScrollView
         style={styles.scrollView}
@@ -543,257 +1568,143 @@ export default function HomeScreen() {
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
-            onRefresh={handleRefresh}
-            tintColor={COLORS.primary}
+            onRefresh={onRefresh}
             colors={[COLORS.primary]}
           />
         }
       >
-        {/* ====== BANNER SLIDER ====== */}
-        <ScrollView
-          horizontal
-          pagingEnabled
-          showsHorizontalScrollIndicator={false}
-          style={styles.bannerContainer}
-          contentContainerStyle={styles.bannerContent}
-        >
-          {BANNERS.map((banner) => (
-            <BannerItem key={banner.id} item={banner} onPress={navigateTo} />
-          ))}
-        </ScrollView>
-
-        {/* ====== DATA SOURCE INDICATOR ====== */}
-        <View style={styles.dataSourceContainer}>
-          <DataSourceBadge source={dataSource} loading={dataLoading} />
-          {!dataLoading && (
-            <Text style={styles.statsOverview}>
-              📊 {stats.projects.total} dự án • {stats.customers.total} KH • {stats.tasks.pending} tasks
-            </Text>
-          )}
+        {/* Search Bar */}
+        <View style={styles.searchSection}>
+          <SearchBar />
         </View>
 
-        {/* ====== QUICK ACCESS ====== */}
+        {/* DỊCH VỤ - 2 rows x 4 cols, scrollable */}
         <View style={styles.section}>
-          <View style={styles.quickAccessGrid}>
-            {quickAccessItems.map((item) => (
-              <QuickAccessItem key={item.id} item={item} badge={item.badge} onPress={navigateTo} />
-            ))}
-          </View>
+          <ServiceSection
+            title=""
+            data={SERVICES}
+            seeMoreRoute="/(tabs)/menu"
+          />
         </View>
 
-        {/* ====== PROJECT PROGRESS ====== */}
+        {/* DESIGN LIVE */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <View>
-              <Text style={styles.sectionTitle}>📊 Tiến độ dự án</Text>
-              <Text style={styles.sectionSubtitle}>
-                {dataSource === 'api' ? 'Dữ liệu realtime từ CRM' : 'Demo data'}
-              </Text>
-            </View>
-            <TouchableOpacity onPress={() => navigateTo('/construction/progress')}>
-              <Text style={styles.seeAll}>Xem chi tiết</Text>
-            </TouchableOpacity>
-          </View>
-          <ProgressSection />
-        </View>
-
-        {/* ====== CORE MODULES ====== */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>🏗️ Quản lý Nghiệp vụ</Text>
-            <TouchableOpacity onPress={() => navigateTo('/dashboard')}>
-              <Text style={styles.seeAll}>Dashboard</Text>
-            </TouchableOpacity>
-          </View>
-          {coreModules.map((module) => (
-            <CoreModuleCard key={module.id} item={module} stats={module.stats} onPress={navigateTo} />
-          ))}
-        </View>
-
-        {/* ====== AI ASSISTANT ====== */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>🤖 AI Features</Text>
-            <TouchableOpacity onPress={() => navigateTo('/ai')}>
-              <Text style={styles.seeAll}>Xem tất cả</Text>
+            <Text style={styles.sectionTitle}>DESIGN LIVE</Text>
+            <TouchableOpacity onPress={() => router.push("/live" as Href)}>
+              <Text style={styles.seeMoreText}>XEM THÊM</Text>
             </TouchableOpacity>
           </View>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.aiList}
+            contentContainerStyle={styles.designLiveContainer}
           >
-            {AI_FEATURES.map((item) => (
-              <AIFeatureCard key={item.id} item={item} onPress={navigateTo} />
+            {DESIGN_LIVE.map((item) => (
+              <DesignLiveItem key={item.id} item={item} />
             ))}
           </ScrollView>
         </View>
 
-        {/* ====== SHOPPING / COMMERCE ====== */}
+        {/* Green Banner */}
+        <View style={styles.bannerSection}>
+          <GreenBanner />
+        </View>
+
+        {/* TIỆN ÍCH THIẾT KẾ */}
+        <DesignServiceSection
+          title="TIỆN ÍCH THIẾT KẾ"
+          data={DESIGN_SERVICES}
+          seeMoreRoute="/services"
+        />
+
+        {/* TIỆN ÍCH MUA SẮM TRANG THIẾT BỊ */}
+        <EquipmentSection
+          title="TIỆN ÍCH MUA SẮM"
+          data={EQUIPMENT_ITEMS}
+          seeMoreRoute="/shop"
+        />
+
+        {/* THƯ VIỆN */}
+        <LibrarySection
+          title="THƯ VIỆN THIẾT KẾ"
+          data={LIBRARY_ITEMS}
+          seeMoreRoute="/categories"
+        />
+
+        {/* TIỆN ÍCH XÂY DỰNG */}
+        <ConstructionWorkerSection
+          title="TIỆN ÍCH XÂY DỰNG"
+          data={dynamicConstructionWorkers}
+          seeMoreRoute="/workers"
+        />
+
+        {/* VIDEO CONSTRUCTIONS */}
+        <VideoSection
+          title="VIDEO XÂY DỰNG"
+          data={VIDEO_ITEMS}
+          seeMoreRoute="/videos"
+        />
+
+        {/* TIỆN ÍCH HOÀN THIỆN */}
+        <FinishingWorkerSection
+          title="TIỆN ÍCH HOÀN THIỆN"
+          data={dynamicFinishingWorkers}
+          seeMoreRoute="/finishing"
+        />
+
+        {/* Categories */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <View>
-              <Text style={styles.sectionTitle}>🛒 Mua sắm Vật liệu</Text>
-              <Text style={styles.sectionSubtitle}>Giá tốt nhất thị trường</Text>
-            </View>
-            <TouchableOpacity onPress={() => navigateTo('/shopping')}>
-              <Text style={styles.seeAll}>Xem tất cả</Text>
-            </TouchableOpacity>
-          </View>
-          
-          {/* Flash Sale Banner */}
-          <TouchableOpacity 
-            style={styles.flashSaleBanner}
-            onPress={() => navigateTo('/shopping/flash-sale')}
-            activeOpacity={0.9}
-          >
-            <LinearGradient
-              colors={['#0066CC', '#004499']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.flashSaleGradient}
-            >
-              <View style={styles.flashSaleContent}>
-                <Ionicons name="flash" size={24} color="#FFFFFF" />
-                <Text style={styles.flashSaleText}>FLASH SALE</Text>
-                <Text style={styles.flashSaleTime}>Kết thúc trong 02:45:30</Text>
-              </View>
-              <Ionicons name="chevron-forward" size={24} color="#fff" />
-            </LinearGradient>
-          </TouchableOpacity>
-
-          {/* Categories Grid */}
-          <View style={styles.commerceGrid}>
-            {COMMERCE_ITEMS.map((item) => (
-              <CommerceItem key={item.id} item={item} onPress={navigateTo} />
-            ))}
-          </View>
-        </View>
-
-        {/* ====== SERVICES ====== */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>💼 Dịch vụ Xây dựng</Text>
-            <TouchableOpacity onPress={() => navigateTo('/services')}>
-              <Text style={styles.seeAll}>Xem tất cả</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.servicesGrid}>
-            {SERVICES.map((item) => (
-              <ServiceCard key={item.id} item={item} onPress={navigateTo} />
-            ))}
-          </View>
-        </View>
-
-        {/* ====== COMMUNICATION ====== */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>💬 Giao tiếp & Kết nối</Text>
-          </View>
-          <View style={styles.commGrid}>
-            {COMMUNICATION.map((item) => (
-              <CommunicationItem key={item.id} item={item} onPress={navigateTo} />
-            ))}
-          </View>
-        </View>
-
-        {/* ====== UTILITY TOOLS ====== */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>🛠️ Công cụ & Tiện ích</Text>
-            <TouchableOpacity onPress={() => navigateTo('/(tabs)/menu')}>
-              <Text style={styles.seeAll}>Xem tất cả</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.utilityGrid}>
-            {UTILITY_TOOLS.map((item) => (
-              <UtilityItem key={item.id} item={item} onPress={navigateTo} />
-            ))}
-          </View>
-        </View>
-
-        {/* ====== ADMIN SECTION (If Admin) ====== */}
-        {isAdmin && (
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>🛡️ Quản trị hệ thống</Text>
-            </View>
-            <View style={styles.adminGrid}>
-              {ADMIN_SHORTCUTS.filter(s => s.role === 'all' || (isAdmin && s.role === 'admin')).map((item) => (
-                <TouchableOpacity
-                  key={item.id}
-                  style={styles.adminItem}
-                  onPress={() => navigateTo(item.route)}
-                  activeOpacity={0.7}
-                >
-                  <Ionicons name={item.icon as any} size={24} color={COLORS.accent} />
-                  <Text style={styles.adminLabel}>{item.label}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-        )}
-
-        {/* ====== CRM SECTION ====== */}
-        <View style={styles.section}>
-          <TouchableOpacity
-            style={styles.crmBanner}
-            onPress={() => navigateTo('/crm')}
-            activeOpacity={0.9}
-          >
-            <LinearGradient
-              colors={['#0080FF', '#0066CC']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.crmGradient}
-            >
-              <View style={styles.crmContent}>
-                <Ionicons name="business-outline" size={32} color="#fff" />
-                <View style={styles.crmText}>
-                  <Text style={styles.crmTitle}>Perfex CRM</Text>
-                  <Text style={styles.crmSubtitle}>Quản lý khách hàng, dự án, hợp đồng</Text>
-                </View>
-              </View>
-              <Ionicons name="arrow-forward-circle" size={32} color="rgba(255,255,255,0.8)" />
-            </LinearGradient>
-          </TouchableOpacity>
-        </View>
-
-        {/* ====== ALL FEATURES BUTTON ====== */}
-        <View style={styles.allFeaturesSection}>
-          <TouchableOpacity
-            style={styles.allFeaturesBtn}
-            onPress={() => navigateTo('/(tabs)/menu')}
-          >
-            <Ionicons name="apps-outline" size={20} color={COLORS.primary} />
-            <Text style={styles.allFeaturesText}>Xem tất cả 272+ chức năng</Text>
-            <Ionicons name="chevron-forward" size={18} color={COLORS.textMuted} />
-          </TouchableOpacity>
-        </View>
-
-        {/* ====== DEV TOOLS (Only in __DEV__) ====== */}
-        {__DEV__ && (
-          <View style={styles.devToolsSection}>
+            <Text style={styles.sectionTitle}>DANH MỤC NỔI BẬT</Text>
             <TouchableOpacity
-              style={styles.devButton}
-              onPress={() => navigateTo('/test-login-all-roles')}
-              activeOpacity={0.7}
+              onPress={() => router.push("/categories" as Href)}
             >
-              <Ionicons name="bug-outline" size={20} color="#0066CC" />
-              <Text style={styles.devButtonText}>🧪 Test Login All Roles</Text>
-              <View style={styles.devBadge}>
-                <Text style={styles.devBadgeText}>DEV</Text>
-              </View>
+              <Text style={styles.seeMoreText}>XEM THÊM</Text>
             </TouchableOpacity>
+          </View>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.categoriesContainer}
+          >
+            {CATEGORY_ITEMS.map((item) => (
+              <CategoryCard key={item.id} item={item} />
+            ))}
+          </ScrollView>
+        </View>
+
+        {/* ============================================== */}
+        {/* EXTERNAL CONTENT - From Pexels & GNews APIs */}
+        {/* ============================================== */}
+
+        {/* External Videos from Pexels */}
+        {externalVideos.length > 0 && (
+          <View style={styles.section}>
+            <ExternalVideoSection
+              videos={externalVideos}
+              title="🎬 Video xây dựng tham khảo"
+              subtitle="Video miễn phí từ Pexels"
+              isLoading={videosLoading}
+              onSeeAll={() => router.push("/social/video-discovery" as Href)}
+            />
           </View>
         )}
 
-        {/* ====== FOOTER INFO ====== */}
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>Construction Management Platform</Text>
-          <Text style={styles.footerVersion}>Version 4.0 - Build 2026.01.03</Text>
-        </View>
+        {/* External News from GNews */}
+        {externalNews.length > 0 && (
+          <View style={styles.section}>
+            <ExternalNewsSection
+              articles={externalNews}
+              title="📰 Tin tức xây dựng"
+              subtitle="Tin từ GNews API"
+              isLoading={newsLoading}
+              onSeeAll={() => router.push("/news" as Href)}
+            />
+          </View>
+        )}
 
+        {/* Bottom Padding */}
         <View style={{ height: 100 }} />
       </ScrollView>
     </View>
@@ -803,562 +1714,435 @@ export default function HomeScreen() {
 // ============================================================================
 // STYLES
 // ============================================================================
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.bg,
   },
-
-  // Header
-  header: {
-    paddingHorizontal: SPACING.lg,
-    paddingBottom: SPACING.lg,
-  },
-  headerTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: SPACING.md,
-    marginTop: SPACING.sm,
-  },
-  logoContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: SPACING.sm,
-  },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  greeting: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#fff',
-  },
-  headerSubtitle: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.8)',
-    marginTop: 2,
-  },
-  headerActions: {
-    flexDirection: 'row',
-    gap: SPACING.sm,
-  },
-  headerBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  notiBadge: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#FFFFFF',
-  },
-  searchBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    paddingHorizontal: SPACING.md,
-    height: 40,
-    gap: SPACING.sm,
-  },
-  searchPlaceholder: {
-    flex: 1,
-    fontSize: 14,
-    color: COLORS.textMuted,
-  },
-  searchCamera: {
-    padding: SPACING.xs,
-  },
-
   scrollView: {
     flex: 1,
   },
 
-  // Data Source Badge
-  dataSourceContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+  // Header
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.sm,
-    backgroundColor: COLORS.card,
-    marginTop: SPACING.sm,
+    paddingVertical: SPACING.md,
+    backgroundColor: COLORS.white,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
   },
-  dataSourceBadge: {
-    paddingHorizontal: SPACING.sm,
-    paddingVertical: SPACING.xs,
-    borderRadius: 12,
-    borderWidth: 1,
-  },
-  dataSourceText: {
-    fontSize: 11,
-    fontWeight: '600',
-  },
-  statsOverview: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
+  logoText: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: COLORS.primary,
+    letterSpacing: 1,
   },
 
-  // Banner
-  bannerContainer: {
-    marginTop: SPACING.sm,
-  },
-  bannerContent: {
+  // Search
+  searchSection: {
     paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.md,
+    backgroundColor: COLORS.white,
+  },
+  searchBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F0F0F0",
+    borderRadius: 24,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.sm + 2,
     gap: SPACING.sm,
   },
-  bannerItem: {
-    width: width - SPACING.lg * 2,
-    height: 100,
-    borderRadius: 12,
-    padding: SPACING.lg,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginRight: SPACING.sm,
-  },
-  bannerTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#fff',
-  },
-  bannerSubtitle: {
+  searchPlaceholder: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.9)',
-    marginTop: 4,
+    color: COLORS.textLight,
+    flex: 1,
   },
 
   // Section
   section: {
-    backgroundColor: COLORS.card,
-    marginTop: SPACING.sm,
-    paddingVertical: SPACING.lg,
+    marginTop: SPACING.lg,
+    paddingHorizontal: SPACING.lg,
+  },
+  bannerSection: {
+    marginTop: SPACING.lg,
     paddingHorizontal: SPACING.lg,
   },
   sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: SPACING.md,
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: 14,
+    fontWeight: "700",
     color: COLORS.text,
+    letterSpacing: 0.5,
   },
-  sectionSubtitle: {
+  seeMoreText: {
     fontSize: 12,
-    color: COLORS.textSecondary,
-    marginTop: 2,
-  },
-  seeAll: {
-    fontSize: 13,
     color: COLORS.primary,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 
-  // Quick Access
-  quickAccessGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  quickAccessItem: {
-    width: '25%',
-    alignItems: 'center',
-    paddingVertical: SPACING.sm,
-  },
-  quickAccessIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: SPACING.xs,
-  },
-  quickAccessBadge: {
-    position: 'absolute',
-    top: -4,
-    right: -4,
-    backgroundColor: COLORS.error,
-    borderRadius: 10,
-    minWidth: 18,
-    height: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 4,
-  },
-  quickAccessBadgeText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: '#fff',
-  },
-  quickAccessLabel: {
-    fontSize: 11,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
+  // Grid Page (2 rows x 4 cols)
+  gridPage: {
+    width: width - SPACING.lg * 2,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
   },
 
-  // Core Modules
-  coreModuleCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.bg,
-    borderRadius: 12,
-    padding: SPACING.md,
+  // Service Item
+  serviceItem: {
+    width: ITEM_WIDTH,
+    alignItems: "center",
     marginBottom: SPACING.sm,
   },
-  coreModuleIcon: {
-    width: 52,
-    height: 52,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: SPACING.md,
-  },
-  coreModuleContent: {
-    flex: 1,
-  },
-  coreModuleTitle: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: COLORS.text,
-  },
-  coreModuleSubtitle: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
-    marginTop: 2,
-  },
-  coreModuleStats: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: SPACING.xs,
-  },
-  coreModuleStatsText: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-
-  // Commerce
-  flashSaleBanner: {
-    marginBottom: SPACING.md,
+  serviceIconContainer: {
+    width: 68,
+    height: 68,
     borderRadius: 8,
-    overflow: 'hidden',
+    backgroundColor: COLORS.white,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 2,
+    overflow: "hidden",
   },
-  flashSaleGradient: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: SPACING.md,
-  },
-  flashSaleContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: SPACING.sm,
-  },
-  flashSaleText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#fff',
-  },
-  flashSaleTime: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.9)',
-  },
-  commerceGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  commerceItem: {
-    width: '25%',
-    alignItems: 'center',
-    paddingVertical: SPACING.sm,
-  },
-  commerceIconContainer: {
-    position: 'relative',
-  },
-  commerceEmoji: {
-    fontSize: 32,
-  },
-  hotBadge: {
-    position: 'absolute',
-    top: -4,
-    right: -12,
-    backgroundColor: COLORS.error,
-    borderRadius: 4,
-    paddingHorizontal: 4,
-    paddingVertical: 1,
-  },
-  hotBadgeText: {
-    fontSize: 8,
-    fontWeight: '700',
-    color: '#fff',
-  },
-  commerceLabel: {
-    fontSize: 11,
-    color: COLORS.textSecondary,
-    marginTop: SPACING.xs,
-    textAlign: 'center',
-  },
-
-  // Services
-  servicesGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginHorizontal: -SPACING.xs,
-  },
-  serviceCard: {
-    width: '33.33%',
-    paddingHorizontal: SPACING.xs,
-    marginBottom: SPACING.md,
-    alignItems: 'center',
-  },
-  serviceIcon: {
-    width: 52,
-    height: 52,
-    borderRadius: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: SPACING.xs,
-  },
-  serviceHotBadge: {
-    position: 'absolute',
-    top: -4,
-    right: -8,
-    backgroundColor: '#FF6B00',
-    paddingHorizontal: 4,
-    paddingVertical: 1,
-    borderRadius: 6,
-  },
-  serviceHotBadgeText: {
-    fontSize: 7,
-    fontWeight: '700',
-    color: '#fff',
+  iconImage: {
+    width: 68,
+    height: 68,
+    borderRadius: 8,
   },
   serviceLabel: {
-    fontSize: 11,
-    color: COLORS.text,
-    fontWeight: '500',
-    textAlign: 'center',
-  },
-
-  // AI Features
-  aiList: {
-    gap: SPACING.sm,
-  },
-  aiFeatureCard: {
-    width: 100,
-    alignItems: 'center',
-    backgroundColor: COLORS.bg,
-    borderRadius: 12,
-    padding: SPACING.md,
-  },
-  aiFeatureGradient: {
-    width: 48,
-    height: 48,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: SPACING.sm,
-  },
-  aiFeatureLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: COLORS.text,
-    textAlign: 'center',
-  },
-  aiFeatureDesc: {
     fontSize: 10,
-    color: COLORS.textMuted,
-    textAlign: 'center',
-    marginTop: 2,
+    color: COLORS.text,
+    textAlign: "center",
+    lineHeight: 13,
+    maxWidth: 70,
   },
 
-  // Communication
-  commGrid: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+  // Design Live
+  designLiveContainer: {
+    paddingRight: SPACING.lg,
   },
-  commItem: {
-    alignItems: 'center',
+  designLiveItem: {
+    marginRight: SPACING.md,
+    position: "relative",
   },
-  commIcon: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: SPACING.xs,
+  designLiveImage: {
+    width: 90,
+    height: 90,
+    borderRadius: 8,
+    backgroundColor: COLORS.border,
   },
-  commBadge: {
-    position: 'absolute',
-    top: -2,
-    right: -2,
-    backgroundColor: COLORS.error,
-    borderRadius: 10,
-    minWidth: 18,
-    height: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 4,
+  liveBadge: {
+    position: "absolute",
+    top: SPACING.xs,
+    left: SPACING.xs,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: COLORS.liveBadge,
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+    borderRadius: 4,
+    gap: 3,
   },
-  commBadgeText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: '#fff',
+  liveDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: COLORS.white,
   },
-  commLabel: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
-  },
-
-  // Utility Tools
-  utilityGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  utilityItem: {
-    width: '25%',
-    alignItems: 'center',
-    paddingVertical: SPACING.sm,
-  },
-  utilityLabel: {
-    fontSize: 11,
-    color: COLORS.textSecondary,
-    marginTop: SPACING.xs,
-    textAlign: 'center',
+  liveBadgeText: {
+    fontSize: 9,
+    fontWeight: "700",
+    color: COLORS.white,
   },
 
-  // Admin
-  adminGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    backgroundColor: COLORS.accentLight,
-    borderRadius: 12,
-    padding: SPACING.sm,
+  // Green Banner
+  greenBanner: {
+    height: 160,
+    borderRadius: 8,
+    overflow: "hidden",
   },
-  adminItem: {
-    width: '25%',
-    alignItems: 'center',
-    paddingVertical: SPACING.sm,
-  },
-  adminLabel: {
-    fontSize: 11,
-    color: COLORS.accent,
-    marginTop: SPACING.xs,
-    fontWeight: '500',
-  },
-
-  // CRM Banner
-  crmBanner: {
-    borderRadius: 12,
-    overflow: 'hidden',
-  },
-  crmGradient: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+  greenBannerGradient: {
+    flex: 1,
+    flexDirection: "row",
     padding: SPACING.lg,
   },
-  crmContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: SPACING.md,
+  greenBannerContent: {
+    flex: 1,
+    justifyContent: "space-between",
   },
-  crmText: {},
-  crmTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#fff',
+  greenBannerTitle: {
+    fontSize: 22,
+    fontWeight: "800",
+    color: COLORS.white,
   },
-  crmSubtitle: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.9)',
+  greenBannerSubtitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: COLORS.white,
+    marginTop: 2,
+  },
+  greenBannerDescription: {
+    fontSize: 10,
+    color: "rgba(255,255,255,0.9)",
+    marginTop: SPACING.xs,
+  },
+  greenBannerNote: {
+    fontSize: 8,
+    color: "rgba(255,255,255,0.8)",
+    marginTop: SPACING.xs,
+  },
+  greenBannerButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(255,255,255,0.25)",
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
+    borderRadius: 20,
+    alignSelf: "flex-start",
+    gap: SPACING.xs,
+  },
+  greenBannerButtonText: {
+    fontSize: 11,
+    fontWeight: "600",
+    color: COLORS.white,
+  },
+  greenBannerImageContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  // Design Service Item
+  designServiceItem: {
+    width: ITEM_WIDTH,
+    alignItems: "center",
+    marginBottom: SPACING.sm,
+  },
+  designServiceIcon: {
+    width: 66,
+    height: 66,
+    borderRadius: 8,
+    backgroundColor: COLORS.white,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 2,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  designServiceLabel: {
+    fontSize: 10,
+    fontWeight: "600",
+    color: COLORS.text,
+    textAlign: "center",
+    maxWidth: 70,
+  },
+  designServicePrice: {
+    fontSize: 8,
+    color: COLORS.primary,
+    textAlign: "center",
     marginTop: 2,
   },
 
-  // All Features
-  allFeaturesSection: {
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.lg,
+  // Equipment Item
+  equipmentItem: {
+    width: ITEM_WIDTH,
+    alignItems: "center",
+    marginBottom: SPACING.sm,
   },
-  allFeaturesBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: COLORS.card,
-    borderRadius: 12,
-    padding: SPACING.md,
+  equipmentIcon: {
+    width: 66,
+    height: 66,
+    borderRadius: 8,
+    backgroundColor: COLORS.white,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 2,
     borderWidth: 1,
-    borderColor: COLORS.primary,
-    borderStyle: 'dashed',
-    gap: SPACING.sm,
+    borderColor: COLORS.border,
   },
-  allFeaturesText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.primary,
-  },
-
-  // Footer
-  footer: {
-    alignItems: 'center',
-    paddingVertical: SPACING.xl,
-  },
-  footerText: {
-    fontSize: 12,
-    color: COLORS.textMuted,
-  },
-  footerVersion: {
+  equipmentLabel: {
     fontSize: 10,
-    color: COLORS.textMuted,
-    marginTop: 4,
+    color: COLORS.text,
+    textAlign: "center",
+    maxWidth: 70,
   },
 
-  // Dev Tools
-  devToolsSection: {
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.md,
+  // Library Item
+  libraryItem: {
+    width: ITEM_WIDTH,
+    alignItems: "center",
+    marginBottom: SPACING.sm,
   },
-  devButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#FFF9E6',
-    borderRadius: 12,
-    padding: SPACING.md,
-    borderWidth: 2,
-    borderColor: '#FFC107',
-    borderStyle: 'dashed',
-    gap: SPACING.sm,
+  libraryIcon: {
+    width: 66,
+    height: 66,
+    borderRadius: 8,
+    backgroundColor: COLORS.white,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 2,
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
-  devButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#0066CC',
-    flex: 1,
+  libraryLabel: {
+    fontSize: 10,
+    color: COLORS.text,
+    textAlign: "center",
+    maxWidth: 70,
   },
-  devBadge: {
-    backgroundColor: '#FFC107',
-    paddingHorizontal: 8,
+
+  // Worker Item
+  workerItem: {
+    width: ITEM_WIDTH,
+    alignItems: "center",
+    marginBottom: SPACING.sm,
+  },
+  workerIcon: {
+    width: 66,
+    height: 66,
+    borderRadius: 8,
+    backgroundColor: COLORS.white,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 2,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  workerLabel: {
+    fontSize: 10,
+    fontWeight: "600",
+    color: COLORS.text,
+    textAlign: "center",
+    maxWidth: 70,
+  },
+  workerPrice: {
+    fontSize: 8,
+    color: COLORS.textLight,
+    textAlign: "center",
+    marginTop: 2,
+  },
+
+  // Video
+  videoContainer: {
+    paddingRight: SPACING.lg,
+  },
+  videoItem: {
+    width: 100,
+    marginRight: SPACING.md,
+  },
+  videoImageContainer: {
+    position: "relative",
+  },
+  videoImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 8,
+    backgroundColor: COLORS.border,
+  },
+  videoLiveBadge: {
+    position: "absolute",
+    top: SPACING.xs,
+    left: SPACING.xs,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: COLORS.liveBadge,
+    paddingHorizontal: 5,
     paddingVertical: 2,
-    borderRadius: 4,
+    borderRadius: 3,
+    gap: 2,
   },
-  devBadgeText: {
+  videoLiveDot: {
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
+    backgroundColor: COLORS.white,
+  },
+  videoLiveBadgeText: {
+    fontSize: 8,
+    fontWeight: "600",
+    color: COLORS.white,
+  },
+  videoPlayIcon: {
+    position: "absolute",
+    top: 38,
+    left: 38,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  videoLabel: {
     fontSize: 10,
-    fontWeight: '700',
-    color: '#000',
+    color: COLORS.text,
+    marginTop: SPACING.xs,
+    textAlign: "center",
+  },
+
+  // Finishing Item
+  finishingItem: {
+    width: ITEM_WIDTH,
+    alignItems: "center",
+    marginBottom: SPACING.sm,
+  },
+  finishingIcon: {
+    width: 66,
+    height: 66,
+    borderRadius: 8,
+    backgroundColor: COLORS.white,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 2,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  finishingLabel: {
+    fontSize: 10,
+    fontWeight: "600",
+    color: COLORS.text,
+    textAlign: "center",
+    maxWidth: 70,
+  },
+  finishingPrice: {
+    fontSize: 8,
+    color: COLORS.textLight,
+    textAlign: "center",
+    marginTop: 2,
+  },
+
+  // Categories
+  categoriesContainer: {
+    paddingRight: SPACING.lg,
+  },
+  categoryCard: {
+    width: 120,
+    marginRight: SPACING.md,
+    backgroundColor: COLORS.white,
+    borderRadius: 8,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  categoryImage: {
+    width: "100%",
+    height: 80,
+    backgroundColor: COLORS.border,
+  },
+  categoryLabel: {
+    fontSize: 11,
+    fontWeight: "600",
+    color: COLORS.text,
+    padding: SPACING.sm,
+    textAlign: "center",
   },
 });

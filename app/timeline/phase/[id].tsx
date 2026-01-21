@@ -2,7 +2,7 @@
  * Timeline - Phase Detail
  */
 import { Loader } from '@/components/ui/loader';
-import { MOCK_PHASE, Phase, PhaseService } from '@/services/phaseService';
+import PhaseService, { MOCK_PHASE, type Phase, type PhaseTask } from '@/services/phaseService';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
@@ -33,9 +33,9 @@ export default function PhaseDetailScreen() {
     else setLoading(true);
     
     try {
-      const data = await PhaseService.getPhaseById(id);
-      if (data) {
-        setPhase(data);
+      const result = await PhaseService.getPhaseById(id);
+      if (result.data) {
+        setPhase(result.data);
         setDataSource('api');
       } else {
         setPhase(FALLBACK_PHASE);
@@ -77,7 +77,7 @@ export default function PhaseDetailScreen() {
     }
   };
 
-  const renderTask = ({ item, index }: { item: typeof MOCK_PHASE.tasks[0]; index: number }) => (
+  const renderTask = ({ item, index }: { item: PhaseTask; index: number }) => (
     <TouchableOpacity 
       style={styles.taskCard}
       onPress={() => router.push(`/timeline/task/${item.id}` as any)}
@@ -159,15 +159,15 @@ export default function PhaseDetailScreen() {
         {/* Stats */}
         <View style={styles.statsRow}>
           <View style={styles.statCard}>
-            <Text style={styles.statValue}>{phase.tasks.filter(t => t.status === 'completed').length}</Text>
+            <Text style={styles.statValue}>{phase.tasks?.filter(t => t.status === 'completed').length || 0}</Text>
             <Text style={styles.statLabel}>Hoàn thành</Text>
           </View>
           <View style={styles.statCard}>
-            <Text style={[styles.statValue, { color: '#0066CC' }]}>{phase.tasks.filter(t => t.status === 'in_progress').length}</Text>
+            <Text style={[styles.statValue, { color: '#0066CC' }]}>{phase.tasks?.filter(t => t.status === 'in_progress').length || 0}</Text>
             <Text style={styles.statLabel}>Đang làm</Text>
           </View>
           <View style={styles.statCard}>
-            <Text style={[styles.statValue, { color: '#6b7280' }]}>{phase.tasks.filter(t => t.status === 'pending').length}</Text>
+            <Text style={[styles.statValue, { color: '#6b7280' }]}>{phase.tasks?.filter(t => t.status === 'pending').length || 0}</Text>
             <Text style={styles.statLabel}>Chờ xử lý</Text>
           </View>
         </View>
@@ -175,13 +175,13 @@ export default function PhaseDetailScreen() {
         {/* Tasks */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Công việc ({phase.tasks.length})</Text>
+            <Text style={styles.sectionTitle}>Công việc ({phase.tasks?.length || 0})</Text>
             <TouchableOpacity>
               <Ionicons name="add-circle" size={24} color="#0066CC" />
             </TouchableOpacity>
           </View>
           
-          {phase.tasks.map((task, index) => (
+          {phase.tasks?.map((task, index) => (
             <View key={task.id}>
               {renderTask({ item: task, index })}
             </View>

@@ -7,6 +7,11 @@
  * backgroundColor: MODERN_COLORS.primary
  */
 
+/**
+ * Modern Dimensions
+ */
+import { Dimensions } from 'react-native';
+
 export const MODERN_COLORS = {
   // Primary - Professional Blue (Sophisticated)
   primary: '#0066CC',
@@ -192,11 +197,6 @@ export const createGradient = (colors: readonly string[]) => ({
   start: { x: 0, y: 0 },
   end: { x: 1, y: 1 },
 });
-
-/**
- * Modern Dimensions
- */
-import { Dimensions } from 'react-native';
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 export const MODERN_DIMENSIONS = {

@@ -66,7 +66,7 @@ export class ApiError extends Error {
 let accessToken: string | null = null;
 let refreshToken: string | null = null;
 let isRefreshing = false;
-let refreshSubscribers: Array<(token: string | null) => void> = [];
+let refreshSubscribers: ((token: string | null) => void)[] = [];
 
 export const setAuthTokens = async (access: string, refresh: string) => {
   accessToken = access;

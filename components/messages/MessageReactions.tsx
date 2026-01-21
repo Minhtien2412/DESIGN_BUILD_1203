@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
  * Converts raw reaction data into grouped format
  */
 export function aggregateReactions(
-  reactionsData: Array<{ emoji: string; userId: number }>,
+  reactionsData: { emoji: string; userId: number }[],
   currentUserId: number
 ): Reaction[] {
   const grouped = new Map<string, Reaction>();

@@ -1,4 +1,7 @@
 // Multi-language support for notifications
+// Language preferences storage
+import { getItem, setItem } from '@/utils/storage';
+
 export type SupportedLanguage = 'vi' | 'en' | 'zh' | 'ja' | 'ko';
 
 export interface TranslationEntry {
@@ -419,9 +422,6 @@ export function getLocalizedTemplate(
   return templates[lang] || templates.vi || templates.en;
 }
 
-// Language preferences storage
-import { getItem, setItem } from '@/utils/storage';
-
 const LANGUAGE_KEY = 'app_language';
 
 export async function getStoredLanguage(): Promise<SupportedLanguage> {
@@ -442,12 +442,12 @@ export async function setStoredLanguage(language: SupportedLanguage): Promise<vo
 }
 
 // Language selector component data
-export const SUPPORTED_LANGUAGES: Array<{
+export const SUPPORTED_LANGUAGES: {
   code: SupportedLanguage;
   name: string;
   nativeName: string;
   flag: string;
-}> = [
+}[] = [
   {
     code: 'vi',
     name: 'Vietnamese',

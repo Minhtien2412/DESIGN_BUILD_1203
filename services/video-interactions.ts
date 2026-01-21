@@ -1,6 +1,8 @@
 /**
  * Video Interactions API Service
  * Handles video likes, comments, views, and shares
+ * 
+ * Updated: 16/01/2026 - Now uses /api/v1/interactions endpoints
  */
 
 import type {
@@ -18,7 +20,8 @@ import type {
 } from '@/types/video-interactions';
 import { apiFetch } from './api';
 
-const API_BASE = '/api/videos';
+// Updated API base path
+const API_BASE = '/api/v1/interactions';
 
 /**
  * Like or unlike a video
@@ -29,13 +32,15 @@ export async function toggleVideoLike(
   try {
     const response = await apiFetch(`${API_BASE}/${request.videoId}/like`, {
       method: 'POST',
-      body: JSON.stringify({ userId: request.userId }),
     });
 
-    return response as LikeVideoResponse;
+    return {
+      success: response.success,
+      isLiked: response.liked,
+      likesCount: response.likesCount,
+    };
   } catch (error: any) {
-    console.warn('[VideoAPI] Like endpoint not available (backend not deployed yet):', error.message);
-    // Fallback response - graceful degradation
+    console.warn('[VideoAPI] Like endpoint error:', error.message);
     return {
       success: false,
       isLiked: false,
@@ -54,18 +59,18 @@ export async function addVideoComment(
     const response = await apiFetch(`${API_BASE}/${request.videoId}/comments`, {
       method: 'POST',
       body: JSON.stringify({
-        userId: request.userId,
-        userName: request.userName,
-        userAvatar: request.userAvatar,
         content: request.content,
         parentId: request.parentId,
       }),
     });
 
-    return response as CommentVideoResponse;
+    return {
+      success: response.success,
+      comment: response.comment,
+      commentsCount: response.comment ? 1 : 0,
+    };
   } catch (error: any) {
-    console.warn('[VideoAPI] Comment endpoint not available (backend not deployed yet):', error.message);
-    // Don't throw - return error response instead
+    console.warn('[VideoAPI] Comment endpoint error:', error.message);
     return {
       success: false,
       comment: null as any,
@@ -81,20 +86,25 @@ export async function getVideoComments(
   request: GetCommentsRequest
 ): Promise<GetCommentsResponse> {
   try {
+    const page = Math.floor((request.offset || 0) / (request.limit || 20)) + 1;
     const params = new URLSearchParams({
+      page: page.toString(),
       limit: (request.limit || 20).toString(),
-      offset: (request.offset || 0).toString(),
-      sortBy: request.sortBy || 'latest',
+      sortBy: request.sortBy === 'popular' ? 'popular' : 'newest',
     });
 
     const response = await apiFetch(
       `${API_BASE}/${request.videoId}/comments?${params}`
     );
 
-    return response as GetCommentsResponse;
+    return {
+      success: response.success,
+      comments: response.comments || [],
+      total: response.total || 0,
+      hasMore: response.hasMore || false,
+    };
   } catch (error: any) {
-    console.warn('[VideoAPI] Comments endpoint not available (backend not deployed yet):', error.message);
-    // Return empty list on error - don't throw, just gracefully degrade
+    console.warn('[VideoAPI] Comments endpoint error:', error.message);
     return {
       success: true,
       comments: [],
@@ -111,19 +121,20 @@ export async function trackVideoView(
   request: TrackViewRequest
 ): Promise<TrackViewResponse> {
   try {
-    const response = await apiFetch(`${API_BASE}/${request.videoId}/views`, {
+    const response = await apiFetch(`${API_BASE}/${request.videoId}/view`, {
       method: 'POST',
       body: JSON.stringify({
-        userId: request.userId,
-        deviceId: request.deviceId,
-        duration: request.duration,
+        watchDuration: request.duration,
         completed: request.completed,
       }),
     });
 
-    return response as TrackViewResponse;
+    return {
+      success: response.success,
+      viewsCount: response.viewsCount || 0,
+    };
   } catch (error: any) {
-    console.warn('[VideoAPI] View tracking not available (backend not deployed yet):', error.message);
+    console.warn('[VideoAPI] View tracking error:', error.message);
     return {
       success: false,
       viewsCount: 0,
@@ -138,17 +149,19 @@ export async function shareVideo(
   request: ShareVideoRequest
 ): Promise<ShareVideoResponse> {
   try {
-    const response = await apiFetch(`${API_BASE}/${request.videoId}/shares`, {
+    const response = await apiFetch(`${API_BASE}/${request.videoId}/share`, {
       method: 'POST',
       body: JSON.stringify({
-        userId: request.userId,
         platform: request.platform,
       }),
     });
 
-    return response as ShareVideoResponse;
+    return {
+      success: response.success,
+      sharesCount: response.sharesCount || 0,
+    };
   } catch (error: any) {
-    console.warn('[VideoAPI] Share tracking not available (backend not deployed yet):', error.message);
+    console.warn('[VideoAPI] Share tracking error:', error.message);
     return {
       success: false,
       sharesCount: 0,
@@ -162,15 +175,29 @@ export async function shareVideo(
 export async function getVideoStats(videoId: string): Promise<VideoStats | null> {
   try {
     const response = await apiFetch(`${API_BASE}/${videoId}/stats`);
-    return response as VideoStats;
+    if (response.success && response.stats) {
+      return {
+        videoId,
+        views: response.stats.views || 0,
+        likes: response.stats.likes || 0,
+        comments: response.stats.comments || 0,
+        shares: response.stats.shares || 0,
+        saves: response.stats.saves || 0,
+        downloads: response.stats.downloads || 0,
+        completionRate: 0,
+        averageWatchTime: 0,
+        updatedAt: new Date().toISOString(),
+      };
+    }
+    return null;
   } catch (error: any) {
-    console.warn('[VideoAPI] Stats endpoint not available (backend not deployed yet):', error.message);
+    console.warn('[VideoAPI] Stats endpoint error:', error.message);
     return null;
   }
 }
 
 /**
- * Delete a comment (only by author or admin)
+ * Delete a comment (only by author)
  */
 export async function deleteVideoComment(
   videoId: string,
@@ -178,15 +205,14 @@ export async function deleteVideoComment(
   userId: string
 ): Promise<{ success: boolean }> {
   try {
-    const response = await apiFetch(
-      `${API_BASE}/${videoId}/comments/${commentId}`,
+    await apiFetch(
+      `${API_BASE}/comments/${commentId}`,
       {
         method: 'DELETE',
-        body: JSON.stringify({ userId }),
       }
     );
 
-    return response as { success: boolean };
+    return { success: true };
   } catch (error) {
     console.error('[VideoAPI] Error deleting comment:', error);
     return { success: false };
@@ -200,19 +226,129 @@ export async function likeComment(
   videoId: string,
   commentId: string,
   userId: string
-): Promise<{ success: boolean; likes: number }> {
+): Promise<{ success: boolean; likes: number; liked: boolean }> {
   try {
     const response = await apiFetch(
-      `${API_BASE}/${videoId}/comments/${commentId}/like`,
+      `${API_BASE}/comments/${commentId}/like`,
       {
         method: 'POST',
-        body: JSON.stringify({ userId }),
       }
     );
 
-    return response as { success: boolean; likes: number };
+    return {
+      success: response.success,
+      likes: response.likesCount || 0,
+      liked: response.liked || false,
+    };
   } catch (error) {
     console.error('[VideoAPI] Error liking comment:', error);
-    return { success: false, likes: 0 };
+    return { success: false, likes: 0, liked: false };
   }
+}
+
+/**
+ * Toggle save/bookmark video
+ */
+export async function toggleVideoSave(
+  videoId: string
+): Promise<{ success: boolean; saved: boolean; savesCount: number }> {
+  try {
+    const response = await apiFetch(`${API_BASE}/${videoId}/save`, {
+      method: 'POST',
+    });
+
+    return {
+      success: response.success,
+      saved: response.saved || false,
+      savesCount: response.savesCount || 0,
+    };
+  } catch (error: any) {
+    console.warn('[VideoAPI] Save endpoint error:', error.message);
+    return {
+      success: false,
+      saved: false,
+      savesCount: 0,
+    };
+  }
+}
+
+/**
+ * Record video download
+ */
+export async function recordVideoDownload(
+  videoId: string
+): Promise<{ success: boolean; downloadsCount: number }> {
+  try {
+    const response = await apiFetch(`${API_BASE}/${videoId}/download`, {
+      method: 'POST',
+    });
+
+    return {
+      success: response.success,
+      downloadsCount: response.downloadsCount || 0,
+    };
+  } catch (error: any) {
+    console.warn('[VideoAPI] Download tracking error:', error.message);
+    return {
+      success: false,
+      downloadsCount: 0,
+    };
+  }
+}
+
+/**
+ * Get user interaction status for video
+ */
+export async function getUserVideoStatus(
+  videoId: string
+): Promise<{ liked: boolean; saved: boolean; shared: boolean; viewed: boolean } | null> {
+  try {
+    const response = await apiFetch(`${API_BASE}/${videoId}/status`);
+    if (response.success) {
+      return response.status;
+    }
+    return null;
+  } catch (error: any) {
+    console.warn('[VideoAPI] Status endpoint error:', error.message);
+    return null;
+  }
+}
+
+/**
+ * Get batch stats for multiple videos
+ */
+export async function getBatchVideoStats(
+  videoIds: string[]
+): Promise<Record<string, VideoStats>> {
+  try {
+    const numericIds = videoIds.map(id => parseInt(id, 10)).filter(id => !isNaN(id));
+    const response = await apiFetch(`${API_BASE}/batch-stats`, {
+      method: 'POST',
+      body: JSON.stringify({ videoIds: numericIds }),
+    });
+
+    if (response.success && response.stats) {
+      return response.stats;
+    }
+    return {};
+  } catch (error: any) {
+    console.warn('[VideoAPI] Batch stats error:', error.message);
+    return {};
+  }
+}
+
+/**
+ * Format count for display (1.2K, 1.5M, etc.)
+ */
+export function formatCount(count: number): string {
+  if (count >= 1_000_000_000) {
+    return (count / 1_000_000_000).toFixed(1).replace(/\.0$/, '') + 'B';
+  }
+  if (count >= 1_000_000) {
+    return (count / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'M';
+  }
+  if (count >= 1_000) {
+    return (count / 1_000).toFixed(1).replace(/\.0$/, '') + 'K';
+  }
+  return count.toString();
 }

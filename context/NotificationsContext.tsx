@@ -10,9 +10,9 @@
 //     markNotificationAsRead,
 //     setBadgeCount,
 // } from '@/services/pushNotifications';
+import { handleNotificationTap as navigateFromNotification } from '@/services/notificationNavigator';
 import { socketManager } from '@/services/websocket/socketManager';
 import * as Notifications from 'expo-notifications';
-import { router } from 'expo-router';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
 // ============================================================================
@@ -34,6 +34,7 @@ interface NotificationsContextType {
   unreadCount: number;
   loading: boolean;
   isConnected: boolean;
+  addNotification: (notification: Omit<AppNotification, 'id'>) => void;
   refreshNotifications: () => Promise<void>;
   markAsRead: (id: string) => Promise<void>;
   markAllAsRead: () => Promise<void>;
@@ -134,17 +135,17 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
   // Notification Handlers
   // ========================================================================
 
-  const handleNewNotification = useCallback((notification: AppNotification) => {
+  const handleNewNotification = useCallback(async (notification: AppNotification) => {
     console.log('[NotificationsContext] 🔔 New notification:', notification.title);
     
     setNotifications((prev) => [notification, ...prev]);
     
     // Update badge count
     const newUnreadCount = unreadCount + 1;
-    setBadgeCount(newUnreadCount);
+    await Notifications.setBadgeCountAsync(newUnreadCount);
   }, [unreadCount]);
 
-  const handleNotificationRead = useCallback((data: { notificationId: string }) => {
+  const handleNotificationRead = useCallback(async (data: { notificationId: string }) => {
     console.log('[NotificationsContext] ✓ Notification marked as read:', data.notificationId);
     
     setNotifications((prev) =>
@@ -153,7 +154,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
 
     // Update badge count
     const newUnreadCount = Math.max(0, unreadCount - 1);
-    setBadgeCount(newUnreadCount);
+    await Notifications.setBadgeCountAsync(newUnreadCount);
   }, [unreadCount]);
 
   // ========================================================================
@@ -199,23 +200,22 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
       markAsRead(data.id);
     }
 
-    // Navigate based on notification type
-    if (data.type === 'task' && data.taskId) {
-      router.push(`/(tabs)` as any); // TODO: Add proper route
-    } else if (data.type === 'message' && data.roomId) {
-      router.push(`/messages/${data.roomId}` as any);
-    } else if (data.type === 'project' && data.projectId) {
-      router.push(`/(tabs)` as any); // TODO: Add proper route
-    } else if (data.type === 'meeting' && data.meetingId) {
-      router.push(`/meet/${data.meetingId}/room`);
-    } else {
-      router.push('/notifications');
-    }
+    // Use notification navigator service for deep linking
+    const result = navigateFromNotification(response);
+    console.log('[NotificationsContext] Navigation result:', result);
   };
 
   // ========================================================================
   // API Methods
   // ========================================================================
+
+  const addNotification = useCallback((notification: Omit<AppNotification, 'id'>) => {
+    const newNotification: AppNotification = {
+      ...notification,
+      id: Date.now().toString() + Math.random().toString(36).substring(7),
+    };
+    setNotifications((prev) => [newNotification, ...prev]);
+  }, []);
 
   const refreshNotifications = async () => {
     try {
@@ -268,7 +268,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
 
       if (response.ok) {
         setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-        setBadgeCount(0);
+        await Notifications.setBadgeCountAsync(0);
       }
     } catch (error) {
       console.error('[NotificationsContext] Failed to mark all as read:', error);
@@ -297,7 +297,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
 
       if (response.ok) {
         setNotifications([]);
-        setBadgeCount(0);
+        await Notifications.setBadgeCountAsync(0);
       }
     } catch (error) {
       console.error('[NotificationsContext] Failed to clear all:', error);
@@ -313,6 +313,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
     unreadCount,
     loading,
     isConnected,
+    addNotification,
     refreshNotifications,
     markAsRead,
     markAllAsRead,

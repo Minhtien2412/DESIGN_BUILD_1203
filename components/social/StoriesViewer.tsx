@@ -66,8 +66,8 @@ export function StoriesViewer({
   const translateY = useRef(new Animated.Value(0)).current;
   const opacity = useRef(new Animated.Value(1)).current;
   
-  const progressTimer = useRef<NodeJS.Timeout | null>(null);
-  const longPressTimer = useRef<NodeJS.Timeout | null>(null);
+  const progressTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const currentStory = stories[currentIndex];
   const storyDuration = (currentStory?.duration || 5) * 1000; // Convert to ms
 

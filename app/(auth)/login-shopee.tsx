@@ -18,19 +18,19 @@ import * as LocalAuthentication from 'expo-local-authentication';
 import { useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import {
-  ActivityIndicator,
-  Alert,
-  Animated,
-  Dimensions,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Vibration,
-  View
+    ActivityIndicator,
+    Alert,
+    Animated,
+    Dimensions,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    Vibration,
+    View
 } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
@@ -202,8 +202,30 @@ export default function LoginShopeeScreen() {
   // Detect phone or email
   useEffect(() => {
     const value = formData.emailOrPhone;
-    setIsPhone(/^\d+$/.test(value.replace(/[^0-9]/g, '')));
+    const numericValue = value.replace(/[^0-9]/g, '');
+    setIsPhone(numericValue.length > 0 && /^\d+$/.test(numericValue));
   }, [formData.emailOrPhone]);
+  
+  // Realtime validation helper
+  const getInputStatus = (field: 'emailOrPhone' | 'password'): 'default' | 'valid' | 'invalid' => {
+    if (!formData[field]) return 'default';
+    
+    if (field === 'emailOrPhone') {
+      if (isPhone) {
+        const phone = formData.emailOrPhone.replace(/[^0-9]/g, '');
+        return phone.length >= 10 ? 'valid' : 'invalid';
+      } else {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(formData.emailOrPhone) ? 'valid' : 'invalid';
+      }
+    }
+    
+    if (field === 'password') {
+      return formData.password.length >= 6 ? 'valid' : 'invalid';
+    }
+    
+    return 'default';
+  };
 
   // Form validation
   const validateForm = (): boolean => {
@@ -282,9 +304,28 @@ export default function LoginShopeeScreen() {
     } catch (error: any) {
       console.error('[Login] Error:', error);
       triggerShake();
-      setErrors({
-        general: error.message || 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.',
-      });
+      
+      // Chi tiết lỗi dựa trên mã lỗi
+      let errorMessage = 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.';
+      
+      if (error.message) {
+        const msg = error.message.toLowerCase();
+        if (msg.includes('invalid') || msg.includes('credentials') || msg.includes('password')) {
+          errorMessage = 'Email hoặc mật khẩu không đúng. Vui lòng thử lại.';
+        } else if (msg.includes('not found') || msg.includes('user')) {
+          errorMessage = 'Tài khoản không tồn tại. Vui lòng kiểm tra email hoặc đăng ký mới.';
+        } else if (msg.includes('network') || msg.includes('fetch') || msg.includes('connection')) {
+          errorMessage = 'Lỗi kết nối mạng. Vui lòng kiểm tra internet và thử lại.';
+        } else if (msg.includes('disabled') || msg.includes('blocked') || msg.includes('inactive')) {
+          errorMessage = 'Tài khoản đã bị vô hiệu hóa. Vui lòng liên hệ hỗ trợ.';
+        } else if (msg.includes('timeout')) {
+          errorMessage = 'Máy chủ không phản hồi. Vui lòng thử lại sau.';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      setErrors({ general: errorMessage });
     } finally {
       setLoading(false);
     }

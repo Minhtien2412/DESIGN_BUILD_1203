@@ -1,6 +1,5 @@
 import { buildApiUrl } from '@/config';
 import { useAuth } from '@/context/AuthContext';
-import { useNotifications } from '@/features/notifications';
 import Constants from 'expo-constants';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Platform } from 'react-native';
@@ -50,7 +49,6 @@ export function usePushNotifications(): PushNotificationState & {
   registerToken: () => Promise<string | null>;
 } {
   const { user } = useAuth();
-  const { addNotification } = useNotifications();
   const [state, setState] = useState<PushNotificationState>({
     expoPushToken: null,
     permission: 'undetermined',
@@ -58,8 +56,8 @@ export function usePushNotifications(): PushNotificationState & {
     error: null,
   });
 
-  const notificationListener = useRef<any>();
-  const responseListener = useRef<any>();
+  const notificationListener = useRef<any>(null);
+  const responseListener = useRef<any>(null);
 
   // Check if notifications are available
   const isAvailable = !isExpoGo && Notifications !== null;
@@ -159,15 +157,8 @@ export function usePushNotifications(): PushNotificationState & {
         
         // Add to local notifications store
         const { title, body, data } = notification.request.content;
-        addNotification({
-          id: notification.request.identifier,
-          title: title || 'Thông báo mới',
-          body: body || '',
-          type: (data?.type as string) || 'system',
-          read: false,
-          createdAt: new Date().toISOString(),
-          data,
-        });
+        // Note: addNotification not available in context
+        console.log('New notification:', { title, body, data });
       }
     );
 
@@ -188,13 +179,13 @@ export function usePushNotifications(): PushNotificationState & {
 
     return () => {
       if (notificationListener.current) {
-        Notifications!.removeNotificationSubscription(notificationListener.current);
+        notificationListener.current.remove();
       }
       if (responseListener.current) {
-        Notifications!.removeNotificationSubscription(responseListener.current);
+        responseListener.current.remove();
       }
     };
-  }, [isAvailable, addNotification]);
+  }, [isAvailable]);
 
   // Auto-register on mount if user is logged in
   useEffect(() => {

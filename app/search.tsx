@@ -1,3 +1,3 @@
-import SearchResultsScreen from '@/features/search/SearchResultsScreen';
+import AISearchScreen from '@/features/search/AISearchScreen';
 
-export default SearchResultsScreen;
+export default AISearchScreen;

@@ -138,6 +138,8 @@ export interface PerfexTask {
   invoice_id?: number;
   hourly_rate?: string;
   milestone?: number;
+  milestone_id?: number;
+  progress?: number;
   kanban_order?: number;
   milestone_order?: number;
   visible_to_client: number;
@@ -982,13 +984,13 @@ export const PerfexSyncService = {
   /**
    * Sync tất cả users từ app sang Perfex
    */
-  syncAllUsers: async (users: Array<{
+  syncAllUsers: async (users: {
     id: string;
     email: string;
     name: string;
     phone?: string;
     address?: string;
-  }>) => {
+  }[]) => {
     const results = {
       success: 0,
       failed: 0,
@@ -1011,7 +1013,7 @@ export const PerfexSyncService = {
   /**
    * Sync tất cả projects từ app sang Perfex
    */
-  syncAllProjects: async (projects: Array<{
+  syncAllProjects: async (projects: {
     id: string;
     name: string;
     description?: string;
@@ -1020,7 +1022,7 @@ export const PerfexSyncService = {
     endDate?: string;
     progress: number;
     status: string;
-  }>) => {
+  }[]) => {
     const results = {
       success: 0,
       failed: 0,

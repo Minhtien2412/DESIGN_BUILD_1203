@@ -3,22 +3,22 @@
  * Uses useChat hook + chatAPIService for real backend data
  */
 
-import { MessageBubbleEnhanced, TypingIndicator } from '@/components/chat';
-import { Loader } from '@/components/ui/loader';
-import { useAuth } from '@/context/AuthContext';
-import { useChat } from '@/hooks/use-chat';
-import { useThemeColor } from '@/hooks/use-theme-color';
-import type { Attachment, ChatMessage } from '@/services/ChatService';
-import { Ionicons } from '@expo/vector-icons';
-import * as Haptics from 'expo-haptics';
-import * as ImagePicker from 'expo-image-picker';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { MessageBubbleEnhanced, TypingIndicator } from "@/components/chat";
+import { TappableImage } from "@/components/ui/full-media-viewer";
+import { Loader } from "@/components/ui/loader";
+import { useAuth } from "@/context/AuthContext";
+import { useChat } from "@/hooks/use-chat";
+import { useThemeColor } from "@/hooks/use-theme-color";
+import type { Attachment, ChatMessage } from "@/services/ChatService";
+import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
+import * as ImagePicker from "expo-image-picker";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
     ActivityIndicator,
     Alert,
     FlatList,
-    Image,
     Keyboard,
     KeyboardAvoidingView,
     Platform,
@@ -27,27 +27,30 @@ import {
     Text,
     TextInput,
     View,
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // ==================== TYPES ====================
 
 // ==================== COMPONENT ====================
 
 export default function EnhancedChatScreen() {
-  const { chatId, chatName } = useLocalSearchParams<{ chatId: string; chatName?: string }>();
+  const { chatId, chatName } = useLocalSearchParams<{
+    chatId: string;
+    chatName?: string;
+  }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
   const flatListRef = useRef<FlatList>(null);
 
   // Theme colors
-  const primary = useThemeColor({}, 'primary');
-  const background = useThemeColor({}, 'background');
-  const surface = useThemeColor({}, 'surface');
-  const text = useThemeColor({}, 'text');
-  const textMuted = useThemeColor({}, 'textMuted');
-  const border = useThemeColor({}, 'border');
+  const primary = useThemeColor({}, "primary");
+  const background = useThemeColor({}, "background");
+  const surface = useThemeColor({}, "surface");
+  const text = useThemeColor({}, "text");
+  const textMuted = useThemeColor({}, "textMuted");
+  const border = useThemeColor({}, "border");
 
   // Chat hook with real API data
   const {
@@ -65,14 +68,14 @@ export default function EnhancedChatScreen() {
   } = useChat({ chatId, autoConnect: true });
 
   // Local state
-  const [inputText, setInputText] = useState('');
+  const [inputText, setInputText] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [replyingTo, setReplyingTo] = useState<ChatMessage | null>(null);
   const [showActions, setShowActions] = useState(false);
 
   // Current user ID
-  const currentUserId = user?.id?.toString() || '';
+  const currentUserId = user?.id?.toString() || "";
 
   // ==================== EFFECTS ====================
 
@@ -80,9 +83,9 @@ export default function EnhancedChatScreen() {
   useEffect(() => {
     if (messages.length > 0) {
       const unreadIds = messages
-        .filter(m => m.senderId !== currentUserId && m.status !== 'read')
-        .map(m => m.id);
-      
+        .filter((m) => m.senderId !== currentUserId && m.status !== "read")
+        .map((m) => m.id);
+
       if (unreadIds.length > 0) {
         markAsRead(unreadIds);
       }
@@ -114,16 +117,16 @@ export default function EnhancedChatScreen() {
       });
 
       if (success) {
-        setInputText('');
+        setInputText("");
         setAttachments([]);
         setReplyingTo(null);
         Keyboard.dismiss();
       } else {
-        Alert.alert('Lỗi', 'Không thể gửi tin nhắn. Vui lòng thử lại.');
+        Alert.alert("Lỗi", "Không thể gửi tin nhắn. Vui lòng thử lại.");
       }
     } catch (err) {
-      console.error('[Chat] Send error:', err);
-      Alert.alert('Lỗi', 'Đã xảy ra lỗi khi gửi tin nhắn.');
+      console.error("[Chat] Send error:", err);
+      Alert.alert("Lỗi", "Đã xảy ra lỗi khi gửi tin nhắn.");
     } finally {
       setIsSending(false);
     }
@@ -136,9 +139,9 @@ export default function EnhancedChatScreen() {
 
   const handleReaction = async (messageId: string, emoji: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    const message = messages.find(m => m.id === messageId);
+    const message = messages.find((m) => m.id === messageId);
     const hasReacted = message?.reactions?.some(
-      r => r.userId === currentUserId && r.emoji === emoji
+      (r) => r.userId === currentUserId && r.emoji === emoji
     );
 
     if (hasReacted) {
@@ -156,7 +159,10 @@ export default function EnhancedChatScreen() {
   const handleForward = (message: ChatMessage) => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     // TODO: Implement forward functionality
-    Alert.alert('Chuyển tiếp', `Chuyển tiếp tin nhắn: "${message.content.substring(0, 50)}..."`);
+    Alert.alert(
+      "Chuyển tiếp",
+      `Chuyển tiếp tin nhắn: "${message.content.substring(0, 50)}..."`
+    );
   };
 
   const handleImagePick = async () => {
@@ -168,17 +174,17 @@ export default function EnhancedChatScreen() {
       });
 
       if (!result.canceled) {
-        const newAttachments: Attachment[] = result.assets.map(asset => ({
-          type: asset.type === 'video' ? 'video' : 'image',
+        const newAttachments: Attachment[] = result.assets.map((asset) => ({
+          type: asset.type === "video" ? "video" : "image",
           url: asset.uri,
           name: asset.fileName || `file_${Date.now()}`,
           size: asset.fileSize,
         }));
-        setAttachments(prev => [...prev, ...newAttachments]);
+        setAttachments((prev) => [...prev, ...newAttachments]);
       }
     } catch (err) {
-      console.error('[Chat] Image pick error:', err);
-      Alert.alert('Lỗi', 'Không thể chọn ảnh');
+      console.error("[Chat] Image pick error:", err);
+      Alert.alert("Lỗi", "Không thể chọn ảnh");
     }
   };
 
@@ -190,61 +196,79 @@ export default function EnhancedChatScreen() {
 
   // ==================== RENDER HELPERS ====================
 
-  const renderMessage = useCallback(({ item, index }: { item: ChatMessage; index: number }) => {
-    const isOwn = item.senderId === currentUserId;
-    const showAvatar = !isOwn && (
-      index === 0 || messages[index - 1]?.senderId !== item.senderId
-    );
+  const renderMessage = useCallback(
+    ({ item, index }: { item: ChatMessage; index: number }) => {
+      const isOwn = item.senderId === currentUserId;
+      const showAvatar =
+        !isOwn &&
+        (index === 0 || messages[index - 1]?.senderId !== item.senderId);
 
-    // Convert ChatMessage to MessageBubbleEnhanced props
-    return (
-      <MessageBubbleEnhanced
-        id={item.id}
-        text={item.content}
-        mine={isOwn}
-        timestamp={item.timestamp}
-        status={item.status}
-        senderName={item.senderName}
-        senderAvatar={item.senderAvatar}
-        attachments={item.attachments?.map(att => ({
-          id: att.url || String(Math.random()),
-          type: att.type as 'image' | 'video' | 'file' | 'audio' | 'location',
-          url: att.url || '',
-          name: att.name,
-          size: att.size,
-        }))}
-        replyTo={item.replyTo ? {
-          id: item.replyTo.id,
-          text: item.replyTo.content,
-          senderName: item.replyTo.senderName,
-        } : undefined}
-        reactions={item.reactions?.map(r => ({
-          emoji: r.emoji,
-          count: 1,
-          users: [r.userId],
-          reacted: r.userId === currentUserId,
-        }))}
-        showSender={showAvatar}
-        onReact={(msgId: string, emoji: string) => handleReaction(msgId, emoji)}
-        onReply={(msgId: string) => {
-          const msg = messages.find(m => m.id === msgId);
-          if (msg) handleReply(msg);
-        }}
-        onForward={(msgId: string) => {
-          const msg = messages.find(m => m.id === msgId);
-          if (msg) handleForward(msg);
-        }}
-        onLongPress={() => {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-        }}
-      />
-    );
-  }, [currentUserId, messages, handleReaction]);
+      // Convert ChatMessage to MessageBubbleEnhanced props
+      return (
+        <MessageBubbleEnhanced
+          id={item.id}
+          text={item.content}
+          mine={isOwn}
+          timestamp={item.timestamp}
+          status={item.status}
+          senderName={item.senderName}
+          senderAvatar={item.senderAvatar}
+          senderId={item.senderId}
+          attachments={item.attachments?.map((att) => ({
+            id: att.url || String(Math.random()),
+            type: att.type as "image" | "video" | "file" | "audio" | "location",
+            url: att.url || "",
+            name: att.name,
+            size: att.size,
+          }))}
+          replyTo={
+            item.replyTo
+              ? {
+                  id: item.replyTo.id,
+                  text: item.replyTo.content,
+                  senderName: item.replyTo.senderName,
+                }
+              : undefined
+          }
+          reactions={item.reactions?.map((r) => ({
+            emoji: r.emoji,
+            count: 1,
+            users: [r.userId],
+            reacted: r.userId === currentUserId,
+          }))}
+          showSender={showAvatar}
+          onReact={(msgId: string, emoji: string) =>
+            handleReaction(msgId, emoji)
+          }
+          onReply={(msgId: string) => {
+            const msg = messages.find((m) => m.id === msgId);
+            if (msg) handleReply(msg);
+          }}
+          onForward={(msgId: string) => {
+            const msg = messages.find((m) => m.id === msgId);
+            if (msg) handleForward(msg);
+          }}
+          onLongPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+          }}
+          onSenderPress={(senderId: string) => {
+            router.push(`/profile/${senderId}`);
+          }}
+        />
+      );
+    },
+    [currentUserId, messages, handleReaction]
+  );
 
   const renderHeader = () => (
-    <View style={[styles.header, { backgroundColor: primary, paddingTop: insets.top }]}>
-      <Pressable 
-        style={styles.backButton} 
+    <View
+      style={[
+        styles.header,
+        { backgroundColor: primary, paddingTop: insets.top },
+      ]}
+    >
+      <Pressable
+        style={styles.backButton}
         onPress={() => router.back()}
         hitSlop={12}
       >
@@ -253,20 +277,25 @@ export default function EnhancedChatScreen() {
 
       <View style={styles.headerInfo}>
         <Text style={styles.headerTitle} numberOfLines={1}>
-          {chatName || 'Chat'}
+          {chatName || "Chat"}
         </Text>
         <View style={styles.headerStatus}>
-          <View style={[
-            styles.statusDot, 
-            { backgroundColor: isConnected ? '#4CAF50' : '#ff9800' }
-          ]} />
+          <View
+            style={[
+              styles.statusDot,
+              { backgroundColor: isConnected ? "#4CAF50" : "#ff9800" },
+            ]}
+          />
           <Text style={styles.headerSubtitle}>
-            {isConnected ? 'Đang kết nối' : 'Đang kết nối lại...'}
+            {isConnected ? "Đang kết nối" : "Đang kết nối lại..."}
           </Text>
         </View>
       </View>
 
-      <Pressable style={styles.headerAction} onPress={() => setShowActions(true)}>
+      <Pressable
+        style={styles.headerAction}
+        onPress={() => setShowActions(true)}
+      >
         <Ionicons name="ellipsis-vertical" size={24} color="#fff" />
       </Pressable>
     </View>
@@ -276,12 +305,20 @@ export default function EnhancedChatScreen() {
     if (!replyingTo) return null;
 
     return (
-      <View style={[styles.replyPreview, { backgroundColor: surface, borderColor: border }]}>
+      <View
+        style={[
+          styles.replyPreview,
+          { backgroundColor: surface, borderColor: border },
+        ]}
+      >
         <View style={styles.replyContent}>
           <Text style={[styles.replyName, { color: primary }]}>
             {replyingTo.senderName}
           </Text>
-          <Text style={[styles.replyText, { color: textMuted }]} numberOfLines={1}>
+          <Text
+            style={[styles.replyText, { color: textMuted }]}
+            numberOfLines={1}
+          >
             {replyingTo.content}
           </Text>
         </View>
@@ -299,18 +336,26 @@ export default function EnhancedChatScreen() {
       <View style={[styles.attachmentPreview, { backgroundColor: surface }]}>
         {attachments.map((att, index) => (
           <View key={index} style={styles.attachmentItem}>
-            {att.type === 'image' && (
-              <Image source={{ uri: att.url }} style={styles.attachmentThumb} />
+            {att.type === "image" && att.url && (
+              <TappableImage
+                source={{ uri: att.url }}
+                style={styles.attachmentThumb}
+                title={`Ảnh đính kèm ${index + 1}`}
+                allowDelete
+                onDelete={() =>
+                  setAttachments((prev) => prev.filter((_, i) => i !== index))
+                }
+              />
             )}
-            {att.type === 'video' && (
+            {att.type === "video" && (
               <View style={[styles.attachmentThumb, styles.videoThumb]}>
                 <Ionicons name="videocam" size={20} color="#fff" />
               </View>
             )}
-            <Pressable 
+            <Pressable
               style={styles.removeAttachment}
               onPress={() => {
-                setAttachments(prev => prev.filter((_, i) => i !== index));
+                setAttachments((prev) => prev.filter((_, i) => i !== index));
               }}
             >
               <Ionicons name="close-circle" size={20} color="#ff4444" />
@@ -327,15 +372,20 @@ export default function EnhancedChatScreen() {
 
     return (
       <View style={styles.typingContainer}>
-        <TypingIndicator 
-          users={typingArray.map(t => t.userName || 'Someone')} 
+        <TypingIndicator
+          users={typingArray.map((t) => t.userName || "Someone")}
         />
       </View>
     );
   };
 
   const renderInputBar = () => (
-    <View style={[styles.inputContainer, { backgroundColor: background, borderColor: border }]}>
+    <View
+      style={[
+        styles.inputContainer,
+        { backgroundColor: background, borderColor: border },
+      ]}
+    >
       {renderReplyPreview()}
       {renderAttachmentPreview()}
 
@@ -344,7 +394,12 @@ export default function EnhancedChatScreen() {
           <Ionicons name="image-outline" size={24} color={primary} />
         </Pressable>
 
-        <View style={[styles.inputWrapper, { backgroundColor: surface, borderColor: border }]}>
+        <View
+          style={[
+            styles.inputWrapper,
+            { backgroundColor: surface, borderColor: border },
+          ]}
+        >
           <TextInput
             style={[styles.input, { color: text }]}
             placeholder="Nhập tin nhắn..."
@@ -356,10 +411,12 @@ export default function EnhancedChatScreen() {
           />
         </View>
 
-        <Pressable 
+        <Pressable
           style={[styles.sendButton, { backgroundColor: primary }]}
           onPress={handleSend}
-          disabled={isSending || (!inputText.trim() && attachments.length === 0)}
+          disabled={
+            isSending || (!inputText.trim() && attachments.length === 0)
+          }
         >
           {isSending ? (
             <ActivityIndicator color="#fff" size="small" />
@@ -375,7 +432,16 @@ export default function EnhancedChatScreen() {
 
   if (!chatId) {
     return (
-      <View style={[styles.container, { backgroundColor: background, justifyContent: 'center', alignItems: 'center' }]}>
+      <View
+        style={[
+          styles.container,
+          {
+            backgroundColor: background,
+            justifyContent: "center",
+            alignItems: "center",
+          },
+        ]}
+      >
         <Text style={{ color: text }}>Không tìm thấy chat</Text>
       </View>
     );
@@ -384,7 +450,7 @@ export default function EnhancedChatScreen() {
   return (
     <KeyboardAvoidingView
       style={[styles.container, { backgroundColor: background }]}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
       keyboardVerticalOffset={0}
     >
       {renderHeader()}
@@ -415,9 +481,13 @@ export default function EnhancedChatScreen() {
           ListFooterComponent={renderTypingIndicator}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
-              <Ionicons name="chatbubbles-outline" size={64} color={textMuted} />
+              <Ionicons
+                name="chatbubbles-outline"
+                size={64}
+                color={textMuted}
+              />
               <Text style={[styles.emptyText, { color: textMuted }]}>
-                Chưa có tin nhắn nào.{'\n'}Hãy bắt đầu cuộc trò chuyện!
+                Chưa có tin nhắn nào.{"\n"}Hãy bắt đầu cuộc trò chuyện!
               </Text>
             </View>
           }
@@ -425,20 +495,20 @@ export default function EnhancedChatScreen() {
       )}
 
       {error && (
-        <View style={[styles.errorBanner, { backgroundColor: '#ffebee' }]}>
+        <View style={[styles.errorBanner, { backgroundColor: "#ffebee" }]}>
           <Text style={styles.errorText}>{error}</Text>
-          <Pressable onPress={() => {
-            // Retry loading messages
-            loadMoreMessages();
-          }}>
+          <Pressable
+            onPress={() => {
+              // Retry loading messages
+              loadMoreMessages();
+            }}
+          >
             <Text style={[styles.errorRetry, { color: primary }]}>Thử lại</Text>
           </Pressable>
         </View>
       )}
 
-      <View style={{ paddingBottom: insets.bottom }}>
-        {renderInputBar()}
-      </View>
+      <View style={{ paddingBottom: insets.bottom }}>{renderInputBar()}</View>
     </KeyboardAvoidingView>
   );
 }
@@ -450,8 +520,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 8,
     paddingBottom: 12,
   },
@@ -464,12 +534,12 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#fff',
+    fontWeight: "600",
+    color: "#fff",
   },
   headerStatus: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginTop: 2,
   },
   statusDot: {
@@ -480,15 +550,15 @@ const styles = StyleSheet.create({
   },
   headerSubtitle: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.8)',
+    color: "rgba(255,255,255,0.8)",
   },
   headerAction: {
     padding: 8,
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   loadingText: {
     marginTop: 12,
@@ -503,14 +573,14 @@ const styles = StyleSheet.create({
   },
   emptyContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     paddingVertical: 60,
   },
   emptyText: {
     marginTop: 16,
     fontSize: 14,
-    textAlign: 'center',
+    textAlign: "center",
     lineHeight: 22,
   },
   typingContainer: {
@@ -521,15 +591,15 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
   },
   inputRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
+    flexDirection: "row",
+    alignItems: "flex-end",
     padding: 8,
     gap: 8,
   },
   inputAction: {
     padding: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   inputWrapper: {
     flex: 1,
@@ -547,12 +617,12 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   replyPreview: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderBottomWidth: 1,
@@ -560,24 +630,24 @@ const styles = StyleSheet.create({
   replyContent: {
     flex: 1,
     borderLeftWidth: 3,
-    borderLeftColor: '#2196F3',
+    borderLeftColor: "#2196F3",
     paddingLeft: 8,
   },
   replyName: {
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   replyText: {
     fontSize: 13,
     marginTop: 2,
   },
   attachmentPreview: {
-    flexDirection: 'row',
+    flexDirection: "row",
     padding: 8,
     gap: 8,
   },
   attachmentItem: {
-    position: 'relative',
+    position: "relative",
   },
   attachmentThumb: {
     width: 60,
@@ -585,29 +655,29 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   videoThumb: {
-    backgroundColor: '#333',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#333",
+    justifyContent: "center",
+    alignItems: "center",
   },
   removeAttachment: {
-    position: 'absolute',
+    position: "absolute",
     top: -6,
     right: -6,
   },
   errorBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 16,
     paddingVertical: 8,
   },
   errorText: {
     flex: 1,
     fontSize: 13,
-    color: '#c62828',
+    color: "#c62828",
   },
   errorRetry: {
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });

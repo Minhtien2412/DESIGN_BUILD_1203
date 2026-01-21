@@ -1,176 +1,284 @@
 /**
  * Live Streams Screen - TikTok/Facebook Live Style
  * Vertical swipe, real-time comments, gifts, reactions
+ * Auto-loads from Pexels API when no real live streams
+ *
+ * @updated 16/01/2026 - Fixed UI, integrated Pexels videos as live fallback
  */
 
-import { Container } from '@/components/ui/container';
-import { Loader } from '@/components/ui/loader';
-import { useThemeColor } from '@/hooks/use-theme-color';
-import { getCurrentLiveStreams, LiveStream } from '@/services/liveStream';
-import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
-import { router } from 'expo-router';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useThemeColor } from "@/hooks/use-theme-color";
+import { useExternalVideos } from "@/hooks/useExternalContent";
+import { getCurrentLiveStreams, LiveStream } from "@/services/liveStream";
+import { Ionicons } from "@expo/vector-icons";
+import { ResizeMode, Video } from "expo-av";
+import { LinearGradient } from "expo-linear-gradient";
+import { router } from "expo-router";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
+    ActivityIndicator,
     Animated,
     Dimensions,
     FlatList,
     Image,
-    Platform,
     RefreshControl,
     ScrollView,
+    StatusBar,
     StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
     View,
-} from 'react-native';
+    ViewToken,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
-
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 // Mock comments for demo
 const MOCK_COMMENTS = [
-  { id: 1, user: 'Nguyễn Văn A', avatar: 'https://i.pravatar.cc/50?img=1', text: 'Công trình đẹp quá! 👍', time: Date.now() - 5000 },
-  { id: 2, user: 'Trần Thị B', avatar: 'https://i.pravatar.cc/50?img=2', text: 'Anh ơi phần móng làm thế nào vậy?', time: Date.now() - 15000 },
-  { id: 3, user: 'Lê Văn C', avatar: 'https://i.pravatar.cc/50?img=3', text: 'Chào anh! 👋', time: Date.now() - 25000 },
-  { id: 4, user: 'Phạm Thị D', avatar: 'https://i.pravatar.cc/50?img=4', text: 'Đội thợ chuyên nghiệp quá', time: Date.now() - 35000 },
-  { id: 5, user: 'Hoàng Văn E', avatar: 'https://i.pravatar.cc/50?img=5', text: 'Xin giá xây nhà nhé anh', time: Date.now() - 45000 },
+  {
+    id: 1,
+    user: "Nguyễn Văn A",
+    avatar: "https://i.pravatar.cc/50?img=1",
+    text: "Công trình đẹp quá! 👍",
+    time: Date.now() - 5000,
+  },
+  {
+    id: 2,
+    user: "Trần Thị B",
+    avatar: "https://i.pravatar.cc/50?img=2",
+    text: "Anh ơi phần móng làm thế nào vậy?",
+    time: Date.now() - 15000,
+  },
+  {
+    id: 3,
+    user: "Lê Văn C",
+    avatar: "https://i.pravatar.cc/50?img=3",
+    text: "Chào anh! 👋",
+    time: Date.now() - 25000,
+  },
+  {
+    id: 4,
+    user: "Phạm Thị D",
+    avatar: "https://i.pravatar.cc/50?img=4",
+    text: "Đội thợ chuyên nghiệp quá",
+    time: Date.now() - 35000,
+  },
+  {
+    id: 5,
+    user: "Hoàng Văn E",
+    avatar: "https://i.pravatar.cc/50?img=5",
+    text: "Xin giá xây nhà nhé anh",
+    time: Date.now() - 45000,
+  },
 ];
 
 const GIFTS = [
-  { id: 1, name: 'Hoa', icon: '🌸', value: 1 },
-  { id: 2, name: 'Tim', icon: '❤️', value: 5 },
-  { id: 3, name: 'Vương miện', icon: '👑', value: 10 },
-  { id: 4, name: 'Pháo hoa', icon: '🎉', value: 20 },
-  { id: 5, name: 'Rocket', icon: '🚀', value: 50 },
+  { id: 1, name: "Hoa", icon: "🌸", value: 1 },
+  { id: 2, name: "Tim", icon: "❤️", value: 5 },
+  { id: 3, name: "Vương miện", icon: "👑", value: 10 },
+  { id: 4, name: "Pháo hoa", icon: "🎉", value: 20 },
+  { id: 5, name: "Rocket", icon: "🚀", value: 50 },
 ];
 
+// Import ExternalVideo type
+
+// Convert external video to LiveStream format
+interface CombinedStream extends LiveStream {
+  isExternal?: boolean;
+}
+
 export default function LiveStreamsScreen() {
-  const [streams, setStreams] = useState<LiveStream[]>([]);
+  const insets = useSafeAreaInsets();
+  const [streams, setStreams] = useState<CombinedStream[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [selectedStream, setSelectedStream] = useState<LiveStream | null>(null);
-  const [showFullScreen, setShowFullScreen] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [comments, setComments] = useState(MOCK_COMMENTS);
-  const [newComment, setNewComment] = useState('');
+  const [newComment, setNewComment] = useState("");
   const [showGifts, setShowGifts] = useState(false);
-  const [reactions, setReactions] = useState<Array<{ id: number; emoji: string; x: number }>>([]);
+  const [reactions, setReactions] = useState<
+    { id: number; emoji: string; y: number }[]
+  >([]);
+  const [isPaused, setIsPaused] = useState(false);
 
-  const heartScale = useRef(new Animated.Value(0)).current;
+  const videoRef = useRef<Video>(null);
+  const flatListRef = useRef<FlatList>(null);
   const giftPanelHeight = useRef(new Animated.Value(0)).current;
 
-  const backgroundColor = useThemeColor({}, 'background');
-  const textColor = useThemeColor({}, 'text');
-  const subtextColor = useThemeColor({}, 'textMuted');
-  const borderColor = useThemeColor({}, 'border');
+  const backgroundColor = useThemeColor({}, "background");
 
-  // Load live streams
+  // External videos from Pexels API - fallback khi không có live thực
+  const {
+    videos: externalVideos,
+    isLoading: videosLoading,
+    refetch: refetchVideos,
+    loadMore: loadMoreVideos,
+    hasMore: hasMoreVideos,
+  } = useExternalVideos({
+    category: "general",
+    perPage: 10,
+    enabled: true,
+  });
+
+  // Load live streams và merge với external videos
   const loadStreams = useCallback(async () => {
     try {
-      const liveStreams = await getCurrentLiveStreams(20);
-      setStreams(liveStreams);
+      // 1. Lấy live streams thực từ API
+      const realLiveStreams = await getCurrentLiveStreams(20);
+
+      // 2. Convert external videos thành format LiveStream
+      const externalAsLive: CombinedStream[] = externalVideos.map(
+        (video, idx) => ({
+          id: `external-${video.id}`,
+          title: video.title || `Video xây dựng #${idx + 1}`,
+          description: video.description || "Video từ Pexels",
+          streamUrl: "",
+          playbackUrl: video.videoUrl || "",
+          streamKey: "",
+          status: "live" as const,
+          viewerCount: video.views || Math.floor(Math.random() * 5000) + 100,
+          startedAt: video.createdAt || new Date().toISOString(),
+          hostId: `pexels-${video.id}`,
+          hostName: video.author?.name || "Pexels Video",
+          hostAvatar:
+            video.author?.avatar || `https://i.pravatar.cc/100?u=${video.id}`,
+          thumbnailUrl:
+            video.thumbnail || `https://picsum.photos/400/600?random=${idx}`,
+          isRecording: false,
+          settings: {
+            quality: "auto" as const,
+            enableChat: true,
+            enableReactions: true,
+            isPrivate: false,
+          },
+          createdAt: video.createdAt || new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          isExternal: true,
+        })
+      );
+
+      // 3. Merge: Real live streams trước, rồi đến external videos
+      const combined = [...realLiveStreams, ...externalAsLive];
+      setStreams(combined);
     } catch (error) {
-      console.error('Failed to load live streams:', error);
+      console.error("Failed to load live streams:", error);
+      // Fallback: Chỉ dùng external videos
+      const externalAsLive: CombinedStream[] = externalVideos.map(
+        (video, idx) => ({
+          id: `external-${video.id}`,
+          title: video.title || `Video xây dựng #${idx + 1}`,
+          description: video.description || "Video từ Pexels",
+          streamUrl: "",
+          playbackUrl: video.videoUrl || "",
+          streamKey: "",
+          status: "live" as const,
+          viewerCount: video.views || Math.floor(Math.random() * 5000) + 100,
+          startedAt: video.createdAt || new Date().toISOString(),
+          hostId: `pexels-${video.id}`,
+          hostName: video.author?.name || "Pexels Video",
+          hostAvatar:
+            video.author?.avatar || `https://i.pravatar.cc/100?u=${video.id}`,
+          thumbnailUrl:
+            video.thumbnail || `https://picsum.photos/400/600?random=${idx}`,
+          isRecording: false,
+          settings: {
+            quality: "auto" as const,
+            enableChat: true,
+            enableReactions: true,
+            isPrivate: false,
+          },
+          createdAt: video.createdAt || new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          isExternal: true,
+        })
+      );
+      setStreams(externalAsLive);
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  }, []);
+  }, [externalVideos]);
 
   useEffect(() => {
-    loadStreams();
-    const interval = setInterval(loadStreams, 30000);
-    return () => clearInterval(interval);
-  }, [loadStreams]);
+    if (!videosLoading && externalVideos.length > 0) {
+      loadStreams();
+    }
+  }, [externalVideos, videosLoading]);
 
+  // Auto add comments for demo
   useEffect(() => {
-    // Auto add comments for demo
-    if (showFullScreen && selectedStream) {
+    if (streams.length > 0) {
       const interval = setInterval(() => {
         const randomComments = [
-          'Công trình tiến độ nhanh quá! 🏗️',
-          'Anh ơi tư vấn giá cho em với',
-          'Đội thợ làm việc chuyên nghiệp',
-          'Phần này làm mất bao lâu vậy anh?',
-          'Xin số điện thoại nhé anh',
-          'Dự án đẹp quá! 👍',
-          'Live hàng ngày nhé anh',
+          "Công trình tiến độ nhanh quá! 🏗️",
+          "Anh ơi tư vấn giá cho em với",
+          "Đội thợ làm việc chuyên nghiệp",
+          "Phần này làm mất bao lâu vậy anh?",
+          "Xin số điện thoại nhé anh",
+          "Dự án đẹp quá! 👍",
+          "Live hàng ngày nhé anh",
+          "Chất lượng video tốt quá 📹",
+          "Follow rồi nha ❤️",
         ];
         const newCmt = {
           id: Date.now(),
-          user: `User ${Math.floor(Math.random() * 1000)}`,
+          user: `User_${Math.floor(Math.random() * 1000)}`,
           avatar: `https://i.pravatar.cc/50?img=${Math.floor(Math.random() * 70)}`,
-          text: randomComments[Math.floor(Math.random() * randomComments.length)],
+          text: randomComments[
+            Math.floor(Math.random() * randomComments.length)
+          ],
           time: Date.now(),
         };
-        setComments(prev => [...prev, newCmt].slice(-20));
-      }, 8000);
+        setComments((prev) => [...prev, newCmt].slice(-15));
+      }, 5000);
       return () => clearInterval(interval);
     }
-  }, [showFullScreen, selectedStream]);
+  }, [streams.length]);
 
   const onRefresh = () => {
     setRefreshing(true);
+    refetchVideos();
     loadStreams();
-  };
-
-  const handleStreamPress = (stream: LiveStream) => {
-    setSelectedStream(stream);
-    setShowFullScreen(true);
   };
 
   const handleSendComment = () => {
     if (newComment.trim()) {
       const comment = {
         id: Date.now(),
-        user: 'Bạn',
-        avatar: 'https://i.pravatar.cc/50?img=99',
+        user: "Bạn",
+        avatar: "https://i.pravatar.cc/50?img=99",
         text: newComment,
         time: Date.now(),
       };
-      setComments(prev => [...prev, comment]);
-      setNewComment('');
+      setComments((prev) => [...prev, comment].slice(-15));
+      setNewComment("");
     }
   };
 
   const handleLike = () => {
-    // Heart animation
-    Animated.sequence([
-      Animated.timing(heartScale, {
-        toValue: 1,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-      Animated.timing(heartScale, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-    ]).start();
-
     // Add floating reaction
     const reaction = {
       id: Date.now(),
-      emoji: '❤️',
-      x: Math.random() * SCREEN_WIDTH * 0.3,
+      emoji: "❤️",
+      y: Math.random() * 100,
     };
-    setReactions(prev => [...prev, reaction]);
+    setReactions((prev) => [...prev, reaction]);
     setTimeout(() => {
-      setReactions(prev => prev.filter(r => r.id !== reaction.id));
-    }, 3000);
+      setReactions((prev) => prev.filter((r) => r.id !== reaction.id));
+    }, 2000);
   };
 
-  const handleGift = (gift: any) => {
+  const handleGift = (gift: (typeof GIFTS)[0]) => {
     const reaction = {
       id: Date.now(),
       emoji: gift.icon,
-      x: Math.random() * SCREEN_WIDTH * 0.3,
+      y: Math.random() * 100,
     };
-    setReactions(prev => [...prev, reaction]);
+    setReactions((prev) => [...prev, reaction]);
     setTimeout(() => {
-      setReactions(prev => prev.filter(r => r.id !== reaction.id));
-    }, 3000);
+      setReactions((prev) => prev.filter((r) => r.id !== reaction.id));
+    }, 2000);
     setShowGifts(false);
   };
 
@@ -183,55 +291,178 @@ export default function LiveStreamsScreen() {
     }).start();
   };
 
-  const renderFullScreenLive = () => {
-    if (!selectedStream) return null;
+  const onViewableItemsChanged = useRef(
+    ({ viewableItems }: { viewableItems: ViewToken[] }) => {
+      if (viewableItems.length > 0 && viewableItems[0].index !== null) {
+        setCurrentIndex(viewableItems[0].index);
+      }
+    }
+  ).current;
+
+  const viewabilityConfig = useRef({
+    itemVisiblePercentThreshold: 80, // Video phải hiển thị 80% mới autoplay
+  }).current;
+
+  // Reset pause state khi chuyển video
+  useEffect(() => {
+    setIsPaused(false);
+  }, [currentIndex]);
+
+  // Load more khi gần cuối
+  const handleEndReached = () => {
+    if (hasMoreVideos && !videosLoading) {
+      loadMoreVideos();
+    }
+  };
+
+  // Video Item Component - extracted to fix hooks rules
+  const VideoItemComponent = ({
+    item,
+    index,
+    isCurrentActive,
+  }: {
+    item: CombinedStream;
+    index: number;
+    isCurrentActive: boolean;
+  }) => {
+    const [videoLoading, setVideoLoading] = useState(true);
 
     return (
-      <View style={styles.fullScreenContainer}>
-        {/* Video Background */}
+      <View style={styles.videoContainer}>
+        {/* Thumbnail as background while loading */}
         <Image
-          source={{ uri: selectedStream.thumbnailUrl || 'https://via.placeholder.com/400x800' }}
-          style={styles.fullScreenVideo}
-          blurRadius={5}
+          source={{ uri: item.thumbnailUrl || "https://picsum.photos/400/800" }}
+          style={[styles.video, styles.thumbnailBg]}
+          blurRadius={2}
         />
-        
+
+        {/* Video Player */}
+        {item.playbackUrl ? (
+          <Video
+            source={{ uri: item.playbackUrl }}
+            style={styles.video}
+            resizeMode={ResizeMode.COVER}
+            shouldPlay={isCurrentActive && !isPaused}
+            isLooping
+            isMuted={false}
+            useNativeControls={false}
+            onLoadStart={() => setVideoLoading(true)}
+            onLoad={() => setVideoLoading(false)}
+            onError={(e) => console.log("Video error:", e)}
+            posterSource={{ uri: item.thumbnailUrl }}
+            usePoster={videoLoading}
+            posterStyle={styles.video}
+          />
+        ) : (
+          <Image
+            source={{
+              uri: item.thumbnailUrl || "https://picsum.photos/400/800",
+            }}
+            style={styles.video}
+          />
+        )}
+
+        {/* Loading indicator */}
+        {videoLoading && isCurrentActive && item.playbackUrl && (
+          <View style={styles.videoLoadingOverlay}>
+            <ActivityIndicator size="large" color="#fff" />
+          </View>
+        )}
+
         {/* Gradient Overlays */}
         <LinearGradient
-          colors={['rgba(0,0,0,0.7)', 'transparent']}
+          colors={["rgba(0,0,0,0.6)", "transparent"]}
           style={styles.topGradient}
         />
         <LinearGradient
-          colors={['transparent', 'rgba(0,0,0,0.8)']}
+          colors={["transparent", "rgba(0,0,0,0.8)"]}
           style={styles.bottomGradient}
         />
 
+        {/* Touch to Pause/Play */}
+        <TouchableOpacity
+          style={styles.touchOverlay}
+          activeOpacity={1}
+          onPress={() => setIsPaused(!isPaused)}
+        >
+          {isPaused && isCurrentActive && (
+            <View style={styles.pauseIcon}>
+              <Ionicons name="play" size={60} color="rgba(255,255,255,0.8)" />
+            </View>
+          )}
+        </TouchableOpacity>
+
         {/* Top Bar */}
-        <View style={styles.topBar}>
+        <View style={[styles.topBar, { paddingTop: insets.top + 10 }]}>
           <TouchableOpacity
-            style={styles.closeButton}
-            onPress={() => setShowFullScreen(false)}
+            style={styles.backButton}
+            onPress={() => router.back()}
           >
-            <Ionicons name="close" size={28} color="#fff" />
+            <Ionicons name="arrow-back" size={28} color="#fff" />
           </TouchableOpacity>
 
-          <View style={styles.hostInfoBar}>
-            <Image source={{ uri: selectedStream.hostAvatar }} style={styles.hostAvatarLive} />
-            <View style={styles.hostTextLive}>
-              <Text style={styles.hostNameLive}>{selectedStream.hostName}</Text>
-              <View style={styles.liveBadgeLive}>
-                <View style={styles.liveDotPulse} />
-                <Text style={styles.liveTextLive}>LIVE</Text>
-              </View>
+          <View style={styles.topCenter}>
+            <View style={styles.liveBadge}>
+              <View style={styles.liveDot} />
+              <Text style={styles.liveText}>
+                {item.isExternal ? "VIDEO" : "LIVE"}
+              </Text>
             </View>
-            <TouchableOpacity style={styles.followButton}>
-              <Text style={styles.followButtonText}>+ Theo dõi</Text>
-            </TouchableOpacity>
+            <View style={styles.viewerBadge}>
+              <Ionicons name="eye" size={14} color="#fff" />
+              <Text style={styles.viewerText}>
+                {formatViewerCount(item.viewerCount)}
+              </Text>
+            </View>
           </View>
 
-          <View style={styles.viewerBadgeLive}>
-            <Ionicons name="eye" size={16} color="#fff" />
-            <Text style={styles.viewerTextLive}>{formatViewerCount(selectedStream.viewerCount)}</Text>
+          <TouchableOpacity style={styles.menuButton}>
+            <Ionicons name="ellipsis-horizontal" size={24} color="#fff" />
+          </TouchableOpacity>
+        </View>
+
+        {/* Host Info */}
+        <View style={styles.hostInfo}>
+          <Image source={{ uri: item.hostAvatar }} style={styles.hostAvatar} />
+          <View style={styles.hostDetails}>
+            <Text style={styles.hostName}>{item.hostName}</Text>
+            <Text style={styles.streamTitle} numberOfLines={2}>
+              {item.title}
+            </Text>
           </View>
+          <TouchableOpacity style={styles.followButton}>
+            <Ionicons name="add" size={18} color="#fff" />
+            <Text style={styles.followText}>Follow</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Right Actions */}
+        <View style={styles.rightActions}>
+          <TouchableOpacity style={styles.actionBtn} onPress={handleLike}>
+            <Ionicons name="heart" size={32} color="#fff" />
+            <Text style={styles.actionCount}>
+              {formatViewerCount(Math.floor(item.viewerCount * 0.3))}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.actionBtn}>
+            <Ionicons name="chatbubble-ellipses" size={28} color="#fff" />
+            <Text style={styles.actionCount}>{comments.length}</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.actionBtn} onPress={toggleGifts}>
+            <Text style={styles.giftEmoji}>🎁</Text>
+            <Text style={styles.actionCount}>Quà</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.actionBtn}>
+            <Ionicons name="share-social" size={28} color="#fff" />
+            <Text style={styles.actionCount}>Chia sẻ</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.actionBtn}>
+            <Ionicons name="bookmark-outline" size={28} color="#fff" />
+          </TouchableOpacity>
         </View>
 
         {/* Comments Section */}
@@ -239,11 +470,13 @@ export default function LiveStreamsScreen() {
           <ScrollView
             style={styles.commentsScroll}
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 10 }}
           >
             {comments.map((comment) => (
               <View key={comment.id} style={styles.commentBubble}>
-                <Image source={{ uri: comment.avatar }} style={styles.commentAvatar} />
+                <Image
+                  source={{ uri: comment.avatar }}
+                  style={styles.commentAvatar}
+                />
                 <View style={styles.commentContent}>
                   <Text style={styles.commentUser}>{comment.user}</Text>
                   <Text style={styles.commentText}>{comment.text}</Text>
@@ -258,48 +491,33 @@ export default function LiveStreamsScreen() {
           {reactions.map((reaction) => (
             <Animated.Text
               key={reaction.id}
-              style={[
-                styles.floatingReaction,
-                {
-                  left: reaction.x,
-                  transform: [{
-                    translateY: heartScale.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [0, -SCREEN_HEIGHT * 0.6],
-                    }),
-                  }],
-                  opacity: heartScale.interpolate({
-                    inputRange: [0, 0.5, 1],
-                    outputRange: [1, 1, 0],
-                  }),
-                },
-              ]}
+              style={[styles.floatingReaction, { bottom: 150 + reaction.y }]}
             >
               {reaction.emoji}
             </Animated.Text>
           ))}
         </View>
 
-        {/* Right Actions */}
-        <View style={styles.rightActions}>
-          <TouchableOpacity style={styles.actionButton} onPress={handleLike}>
-            <Ionicons name="heart" size={32} color="#000000" />
-            <Text style={styles.actionText}>2.5K</Text>
+        {/* Bottom Input */}
+        <View
+          style={[styles.bottomInput, { paddingBottom: insets.bottom + 10 }]}
+        >
+          <TextInput
+            style={styles.commentInput}
+            placeholder="Bình luận..."
+            placeholderTextColor="rgba(255,255,255,0.6)"
+            value={newComment}
+            onChangeText={setNewComment}
+            onSubmitEditing={handleSendComment}
+          />
+          <TouchableOpacity
+            style={styles.sendButton}
+            onPress={handleSendComment}
+          >
+            <Ionicons name="send" size={20} color="#fff" />
           </TouchableOpacity>
-
-          <TouchableOpacity style={styles.actionButton}>
-            <Ionicons name="chatbubble" size={28} color="#fff" />
-            <Text style={styles.actionText}>{comments.length}</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.actionButton} onPress={toggleGifts}>
-            <Text style={styles.giftIcon}>🎁</Text>
-            <Text style={styles.actionText}>Quà</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.actionButton}>
-            <Ionicons name="share-social" size={28} color="#fff" />
-            <Text style={styles.actionText}>Chia sẻ</Text>
+          <TouchableOpacity style={styles.emojiButton}>
+            <Text style={styles.emoji}>😀</Text>
           </TouchableOpacity>
         </View>
 
@@ -311,157 +529,108 @@ export default function LiveStreamsScreen() {
               <Ionicons name="close" size={24} color="#333" />
             </TouchableOpacity>
           </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.giftList}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             {GIFTS.map((gift) => (
               <TouchableOpacity
                 key={gift.id}
                 style={styles.giftItem}
                 onPress={() => handleGift(gift)}
               >
-                <Text style={styles.giftEmoji}>{gift.icon}</Text>
+                <Text style={styles.giftIcon}>{gift.icon}</Text>
                 <Text style={styles.giftName}>{gift.name}</Text>
                 <Text style={styles.giftValue}>{gift.value} 💎</Text>
               </TouchableOpacity>
             ))}
           </ScrollView>
         </Animated.View>
-
-        {/* Bottom Input */}
-        <View style={styles.bottomInput}>
-          <TextInput
-            style={styles.commentInput}
-            placeholder="Bình luận..."
-            placeholderTextColor="#999"
-            value={newComment}
-            onChangeText={setNewComment}
-            onSubmitEditing={handleSendComment}
-          />
-          <TouchableOpacity style={styles.sendButton} onPress={handleSendComment}>
-            <Ionicons name="send" size={20} color="#fff" />
-          </TouchableOpacity>
-        </View>
       </View>
     );
   };
 
-  const renderStreamCard = ({ item }: { item: LiveStream }) => (
-    <TouchableOpacity
-      style={styles.streamCard}
-      onPress={() => handleStreamPress(item)}
-      activeOpacity={0.9}
-    >
-      {/* Thumbnail */}
-      <View style={styles.thumbnailContainer}>
-        <Image
-          source={{ uri: item.thumbnailUrl || 'https://via.placeholder.com/400x225' }}
-          style={styles.thumbnail}
-        />
-        
-        {/* Gradient Overlay */}
-        <LinearGradient
-          colors={['transparent', 'rgba(0,0,0,0.7)']}
-          style={styles.cardGradient}
-        />
-
-        {/* LIVE Badge */}
-        <View style={styles.liveBadge}>
-          <View style={styles.liveDotAnimated} />
-          <Text style={styles.liveText}>LIVE</Text>
-        </View>
-
-        {/* Viewer Count */}
-        <View style={styles.viewerBadge}>
-          <Ionicons name="eye" size={14} color="#fff" />
-          <Text style={styles.viewerText}>{formatViewerCount(item.viewerCount)}</Text>
-        </View>
-
-        {/* Stream Info Overlay */}
-        <View style={styles.cardOverlay}>
-          <View style={styles.hostInfoCard}>
-            <Image
-              source={{ uri: item.hostAvatar || 'https://via.placeholder.com/40' }}
-              style={styles.hostAvatarCard}
-            />
-            <View style={styles.hostDetailsCard}>
-              <Text style={styles.hostNameCard}>{item.hostName}</Text>
-              <Text style={styles.streamTitleCard} numberOfLines={1}>
-                {item.title}
-              </Text>
-            </View>
-          </View>
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
-
-  const renderHeader = () => (
-    <View style={styles.header}>
-      <View>
-        <Text style={[styles.headerTitle, { color: textColor }]}>Live Now 🔴</Text>
-        <Text style={[styles.headerSubtitle, { color: subtextColor }]}>
-          {streams.length} người đang phát trực tiếp
-        </Text>
-      </View>
-      
-      <TouchableOpacity
-        style={styles.createButton}
-        onPress={() => router.push('/live/create')}
-      >
-        <Ionicons name="videocam" size={20} color="#fff" />
-        <Text style={styles.createButtonText}>Go Live</Text>
-      </TouchableOpacity>
-    </View>
-  );
-
-  const renderEmpty = () => (
-    <View style={styles.emptyContainer}>
-      <View style={styles.emptyIcon}>
-        <Ionicons name="videocam-off-outline" size={64} color="#999" />
-      </View>
-      <Text style={[styles.emptyText, { color: textColor }]}>Chưa có live stream nào</Text>
-      <Text style={[styles.emptySubtext, { color: subtextColor }]}>
-        Hãy là người đầu tiên chia sẻ công trình của bạn!
-      </Text>
-      <TouchableOpacity
-        style={styles.emptyButton}
-        onPress={() => router.push('/live/create')}
-      >
-        <Ionicons name="videocam" size={20} color="#fff" />
-        <Text style={styles.emptyButtonText}>Bắt đầu Live Stream</Text>
-      </TouchableOpacity>
-    </View>
-  );
-
-  if (loading) {
+  // Loading State
+  if (loading || videosLoading) {
     return (
-      <Container scroll={false}>
-        <Loader />
-      </Container>
+      <View style={styles.loadingContainer}>
+        <StatusBar barStyle="light-content" />
+        <ActivityIndicator size="large" color="#FF2D55" />
+        <Text style={styles.loadingText}>Đang tải video...</Text>
+      </View>
+    );
+  }
+
+  // Empty State - không có video nào
+  if (streams.length === 0) {
+    return (
+      <View style={[styles.emptyContainer, { backgroundColor }]}>
+        <StatusBar barStyle="dark-content" />
+        <View style={styles.emptyContent}>
+          <Ionicons name="videocam-off-outline" size={80} color="#ccc" />
+          <Text style={styles.emptyTitle}>Chưa có Live Stream</Text>
+          <Text style={styles.emptySubtitle}>
+            Hãy là người đầu tiên phát trực tiếp!
+          </Text>
+          <TouchableOpacity
+            style={styles.goLiveButton}
+            onPress={() => router.push("/live/create")}
+          >
+            <Ionicons name="videocam" size={24} color="#fff" />
+            <Text style={styles.goLiveText}>Bắt đầu Live</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     );
   }
 
   return (
-    <>
-      {/* Use scroll={false} to avoid nesting FlatList inside ScrollView */}
-      <Container fullWidth scroll={false} style={{ backgroundColor, flex: 1 }}>
-        <FlatList
-          data={streams}
-          renderItem={renderStreamCard}
-          keyExtractor={(item) => item.id}
-          ListHeaderComponent={renderHeader}
-          ListEmptyComponent={renderEmpty}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-          contentContainerStyle={styles.listContent}
-          numColumns={2}
-          columnWrapperStyle={styles.columnWrapper}
-        />
-      </Container>
+    <View style={styles.container}>
+      <StatusBar
+        barStyle="light-content"
+        translucent
+        backgroundColor="transparent"
+      />
 
-      {/* Full Screen Live Modal */}
-      {showFullScreen && renderFullScreenLive()}
-    </>
+      <FlatList
+        ref={flatListRef}
+        data={streams}
+        renderItem={({ item, index }) => (
+          <VideoItemComponent
+            item={item}
+            index={index}
+            isCurrentActive={index === currentIndex}
+          />
+        )}
+        keyExtractor={(item) => item.id}
+        pagingEnabled
+        horizontal={false}
+        showsVerticalScrollIndicator={false}
+        snapToInterval={SCREEN_HEIGHT}
+        snapToAlignment="start"
+        decelerationRate="fast"
+        onViewableItemsChanged={onViewableItemsChanged}
+        viewabilityConfig={viewabilityConfig}
+        onEndReached={handleEndReached}
+        onEndReachedThreshold={0.5}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#fff"
+          />
+        }
+        getItemLayout={(_, index) => ({
+          length: SCREEN_HEIGHT,
+          offset: SCREEN_HEIGHT * index,
+          index,
+        })}
+      />
+
+      {/* Page Indicator */}
+      <View style={[styles.pageIndicator, { top: insets.top + 60 }]}>
+        <Text style={styles.pageText}>
+          {currentIndex + 1}/{streams.length}
+        </Text>
+      </View>
+    </View>
   );
 }
 
@@ -475,408 +644,367 @@ function formatViewerCount(count: number): string {
 }
 
 const styles = StyleSheet.create({
-  listContent: {
-    padding: 16,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
-    width: '100%',
-  },
-  headerTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-  },
-  headerSubtitle: {
-    fontSize: 14,
-    marginTop: 4,
-  },
-  createButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#000000',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 20,
-    gap: 6,
-  },
-  createButtonText: {
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: 14,
-  },
-  columnWrapper: {
-    gap: 12,
-  },
-  streamCard: {
+  container: {
     flex: 1,
-    marginBottom: 16,
-    borderRadius: 12,
-    overflow: 'hidden',
+    backgroundColor: "#000",
   },
-  thumbnailContainer: {
-    width: '100%',
-    aspectRatio: 16 / 9,
-    position: 'relative',
+  loadingContainer: {
+    flex: 1,
+    backgroundColor: "#000",
+    alignItems: "center",
+    justifyContent: "center",
   },
-  thumbnail: {
-    width: '100%',
-    height: '100%',
-    backgroundColor: '#000',
+  loadingText: {
+    color: "#fff",
+    fontSize: 16,
+    marginTop: 16,
   },
-  cardGradient: {
-    position: 'absolute',
+  videoContainer: {
+    width: SCREEN_WIDTH,
+    height: SCREEN_HEIGHT,
+    backgroundColor: "#000",
+  },
+  video: {
+    width: "100%",
+    height: "100%",
+    position: "absolute",
+  },
+  thumbnailBg: {
+    zIndex: -1,
+  },
+  videoLoadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.3)",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 5,
+  },
+  touchOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 1,
+  },
+  pauseIcon: {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    marginLeft: -30,
+    marginTop: -30,
+  },
+  topGradient: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 150,
+    zIndex: 2,
+  },
+  bottomGradient: {
+    position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
-    height: 80,
+    height: 350,
+    zIndex: 2,
   },
-  cardOverlay: {
-    position: 'absolute',
-    bottom: 8,
-    left: 8,
-    right: 8,
+  topBar: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    zIndex: 10,
   },
-  hostInfoCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  backButton: {
+    padding: 8,
   },
-  hostAvatarCard: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    borderWidth: 2,
-    borderColor: '#fff',
-  },
-  hostDetailsCard: {
-    flex: 1,
-  },
-  hostNameCard: {
-    color: '#fff',
-    fontSize: 13,
-    fontWeight: '600',
-    marginBottom: 2,
-  },
-  streamTitleCard: {
-    color: '#fff',
-    fontSize: 11,
-    opacity: 0.9,
+  topCenter: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
   },
   liveBadge: {
-    position: 'absolute',
-    top: 8,
-    left: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#000000',
-    paddingHorizontal: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FF2D55",
+    paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 4,
-    gap: 4,
+    gap: 6,
   },
-  liveDotAnimated: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#fff',
+  liveDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: "#fff",
   },
   liveText: {
-    color: '#fff',
-    fontSize: 11,
-    fontWeight: '700',
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "700",
   },
   viewerBadge: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.6)',
-    paddingHorizontal: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+    paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
     gap: 4,
   },
   viewerText: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: '600',
+    color: "#fff",
+    fontSize: 13,
+    fontWeight: "600",
   },
-  emptyContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 60,
+  menuButton: {
+    padding: 8,
   },
-  emptyIcon: {
-    marginBottom: 16,
-  },
-  emptyText: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 8,
-  },
-  emptySubtext: {
-    fontSize: 14,
-    marginBottom: 24,
-  },
-  emptyButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    backgroundColor: '#000000',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 24,
-  },
-  emptyButtonText: {
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: 14,
-  },
-
-  // Full Screen Live Styles (TikTok Live)
-  fullScreenContainer: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: '#000',
-    zIndex: 9999,
-  },
-  fullScreenVideo: {
-    width: SCREEN_WIDTH,
-    height: SCREEN_HEIGHT,
-  },
-  topGradient: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 150,
-  },
-  bottomGradient: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 250,
-  },
-  topBar: {
-    position: 'absolute',
-    top: Platform.OS === 'ios' ? 50 : 20,
-    left: 0,
-    right: 0,
-    paddingHorizontal: 16,
+  hostInfo: {
+    position: "absolute",
+    bottom: 180,
+    left: 16,
+    right: 80,
+    flexDirection: "row",
+    alignItems: "center",
     zIndex: 10,
   },
-  closeButton: {
-    alignSelf: 'flex-start',
-    padding: 8,
-    marginBottom: 12,
-  },
-  hostInfoBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  hostAvatarLive: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+  hostAvatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     borderWidth: 2,
-    borderColor: '#000000',
+    borderColor: "#FF2D55",
   },
-  hostTextLive: {
+  hostDetails: {
     flex: 1,
+    marginLeft: 12,
   },
-  hostNameLive: {
-    color: '#fff',
-    fontSize: 15,
-    fontWeight: '600',
-    marginBottom: 2,
+  hostName: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "700",
+    marginBottom: 4,
   },
-  liveBadgeLive: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  liveDotPulse: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#000000',
-  },
-  liveTextLive: {
-    color: '#000000',
-    fontSize: 11,
-    fontWeight: 'bold',
+  streamTitle: {
+    color: "rgba(255,255,255,0.9)",
+    fontSize: 13,
+    lineHeight: 18,
   },
   followButton: {
-    backgroundColor: '#000000',
-    paddingHorizontal: 16,
-    paddingVertical: 6,
-    borderRadius: 16,
-  },
-  followButtonText: {
-    color: '#fff',
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  viewerBadgeLive: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FF2D55",
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
-    alignSelf: 'flex-start',
-    marginTop: 8,
+    gap: 4,
   },
-  viewerTextLive: {
-    color: '#fff',
+  followText: {
+    color: "#fff",
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: "600",
+  },
+  rightActions: {
+    position: "absolute",
+    right: 12,
+    bottom: 200,
+    alignItems: "center",
+    gap: 20,
+    zIndex: 10,
+  },
+  actionBtn: {
+    alignItems: "center",
+  },
+  actionCount: {
+    color: "#fff",
+    fontSize: 12,
+    marginTop: 4,
+    fontWeight: "500",
+  },
+  giftEmoji: {
+    fontSize: 28,
   },
   commentsSection: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 120,
-    left: 16,
+    left: 12,
     right: 80,
-    maxHeight: 300,
+    maxHeight: 200,
+    zIndex: 10,
   },
   commentsScroll: {
     flex: 1,
   },
   commentBubble: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    alignItems: "flex-start",
     marginBottom: 8,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    backgroundColor: "rgba(0,0,0,0.3)",
     padding: 8,
-    borderRadius: 16,
-    maxWidth: '90%',
+    borderRadius: 12,
   },
   commentAvatar: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
     marginRight: 8,
   },
   commentContent: {
     flex: 1,
   },
   commentUser: {
-    color: '#FCD34D',
+    color: "#FFD700",
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 2,
   },
   commentText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 13,
+    lineHeight: 18,
   },
   reactionsContainer: {
-    position: 'absolute',
-    bottom: 200,
-    right: 16,
-    width: 50,
+    position: "absolute",
+    right: 60,
+    bottom: 250,
+    zIndex: 15,
   },
   floatingReaction: {
-    position: 'absolute',
-    fontSize: 32,
+    position: "absolute",
+    fontSize: 36,
     right: 0,
-  },
-  rightActions: {
-    position: 'absolute',
-    right: 16,
-    bottom: 200,
-    gap: 24,
-  },
-  actionButton: {
-    alignItems: 'center',
-  },
-  actionText: {
-    color: '#fff',
-    fontSize: 11,
-    marginTop: 4,
-    fontWeight: '600',
-  },
-  giftIcon: {
-    fontSize: 28,
-  },
-  giftPanel: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: '#fff',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    padding: 16,
-    overflow: 'hidden',
-  },
-  giftHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  giftTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-  },
-  giftList: {
-    flexDirection: 'row',
-  },
-  giftItem: {
-    alignItems: 'center',
-    marginRight: 20,
-    padding: 12,
-    borderRadius: 12,
-    backgroundColor: '#f5f5f5',
-    minWidth: 80,
-  },
-  giftEmoji: {
-    fontSize: 32,
-    marginBottom: 4,
-  },
-  giftName: {
-    fontSize: 12,
-    color: '#333',
-    marginBottom: 2,
-  },
-  giftValue: {
-    fontSize: 11,
-    color: '#666',
-    fontWeight: '600',
   },
   bottomInput: {
-    position: 'absolute',
-    bottom: Platform.OS === 'ios' ? 40 : 20,
-    left: 16,
-    right: 16,
-    flexDirection: 'row',
+    position: "absolute",
+    bottom: 0,
+    left: 12,
+    right: 12,
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
+    zIndex: 10,
   },
   commentInput: {
     flex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: "rgba(255,255,255,0.15)",
     borderRadius: 24,
     paddingHorizontal: 16,
-    paddingVertical: 10,
-    color: '#fff',
+    paddingVertical: 12,
+    color: "#fff",
     fontSize: 14,
   },
   sendButton: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#000000',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#FF2D55",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  emojiButton: {
+    width: 44,
+    height: 44,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  emoji: {
+    fontSize: 28,
+  },
+  giftPanel: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 16,
+    zIndex: 20,
+  },
+  giftHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  giftTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#333",
+  },
+  giftItem: {
+    alignItems: "center",
+    marginRight: 16,
+    padding: 12,
+    borderRadius: 12,
+    backgroundColor: "#f5f5f5",
+    minWidth: 80,
+  },
+  giftIcon: {
+    fontSize: 36,
+    marginBottom: 6,
+  },
+  giftName: {
+    fontSize: 12,
+    color: "#333",
+    marginBottom: 2,
+  },
+  giftValue: {
+    fontSize: 11,
+    color: "#666",
+    fontWeight: "600",
+  },
+  pageIndicator: {
+    position: "absolute",
+    right: 16,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 10,
+    zIndex: 20,
+  },
+  pageText: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "600",
+  },
+  emptyContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  emptyContent: {
+    alignItems: "center",
+    padding: 32,
+  },
+  emptyTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#333",
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  emptySubtitle: {
+    fontSize: 14,
+    color: "#666",
+    marginBottom: 24,
+    textAlign: "center",
+  },
+  goLiveButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FF2D55",
+    paddingHorizontal: 24,
+    paddingVertical: 14,
+    borderRadius: 24,
+    gap: 8,
+  },
+  goLiveText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "700",
   },
 });
-

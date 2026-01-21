@@ -448,11 +448,11 @@ class DataSyncService {
   async syncInvoiceToPerfex(invoice: {
     projectId?: string;
     customerId: string;
-    items: Array<{
+    items: {
       description: string;
       qty: number;
       rate: number;
-    }>;
+    }[];
     dueDate?: string;
   }): Promise<{ success: boolean; perfexInvoiceId?: string }> {
     const result = await perfexFetch<any>('/invoices', {

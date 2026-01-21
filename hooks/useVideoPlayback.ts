@@ -1,18 +1,18 @@
 /**
  * useVideoPlayback - Hook to integrate with VideoPlayerController
- * 
+ *
  * Usage:
  * ```tsx
  * const { isPlaying, isMuted, play, pause, toggleMute } = useVideoPlayback(videoId);
  * ```
  */
 
-import { useCallback, useEffect, useState } from 'react';
-import { VideoPlayer } from 'expo-video';
-import { 
-  VideoPlayerController, 
-  VideoPlayerState 
-} from '@/services/VideoPlayerController';
+import {
+    VideoPlayerController,
+    VideoPlayerState,
+} from "@/services/VideoPlayerController";
+import { VideoPlayer } from "expo-video";
+import { useCallback, useEffect, useState } from "react";
 
 interface UseVideoPlaybackOptions {
   autoRegister?: boolean;
@@ -38,8 +38,8 @@ export function useVideoPlayback(
   options: UseVideoPlaybackOptions = {}
 ): UseVideoPlaybackReturn {
   const { autoRegister = true, onPause, onResume } = options;
-  
-  const [state, setState] = useState<VideoPlayerState>(() => 
+
+  const [state, setState] = useState<VideoPlayerState>(() =>
     VideoPlayerController.getState()
   );
 
@@ -50,9 +50,15 @@ export function useVideoPlayback(
   }, []);
 
   // Register player with controller
-  const registerPlayer = useCallback((player: VideoPlayer) => {
-    VideoPlayerController.registerPlayer(videoId, player, { onPause, onResume });
-  }, [videoId, onPause, onResume]);
+  const registerPlayer = useCallback(
+    (player: VideoPlayer) => {
+      VideoPlayerController.registerPlayer(videoId, player, {
+        onPause,
+        onResume,
+      });
+    },
+    [videoId, onPause, onResume]
+  );
 
   // Unregister player on unmount
   const unregisterPlayer = useCallback(() => {
@@ -108,7 +114,7 @@ export function useGlobalMute(): {
   toggleMute: () => Promise<boolean>;
   setMuted: (muted: boolean) => Promise<void>;
 } {
-  const [isMuted, setIsMuted] = useState(() => 
+  const [isMuted, setIsMuted] = useState(() =>
     VideoPlayerController.getMuted()
   );
 
@@ -134,7 +140,7 @@ export function useGlobalMute(): {
  * useActiveVideo - Get the currently active video
  */
 export function useActiveVideo(): string | null {
-  const [activeVideoId, setActiveVideoId] = useState<string | null>(() => 
+  const [activeVideoId, setActiveVideoId] = useState<string | null>(() =>
     VideoPlayerController.getActiveVideoId()
   );
 

@@ -492,7 +492,7 @@ class DocumentManagementService extends BaseApiService {
   /**
    * Bulk upload documents
    */
-  async bulkUpload(files: Array<{ file: File | Blob; data: Omit<CreateDocumentData, 'file'> }>): Promise<ApiResponse<Document[]>> {
+  async bulkUpload(files: { file: File | Blob; data: Omit<CreateDocumentData, 'file'> }[]): Promise<ApiResponse<Document[]>> {
     const formData = new FormData();
     
     files.forEach((item, index) => {

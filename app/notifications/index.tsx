@@ -170,7 +170,7 @@ export default function NotificationsScreen() {
   if (loading && notifications.length === 0) {
     return (
       <Container>
-        <Loader size={40} />
+        <Loader size="large" />
       </Container>
     );
   }
