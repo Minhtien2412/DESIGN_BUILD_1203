@@ -38,7 +38,7 @@ interface UseVideoVisibilityOptions {
   debounceMs?: number;
 }
 
-interface ViewableItem {
+interface _ViewableItem {
   videoId: string;
   isViewable: boolean;
 }
@@ -59,7 +59,7 @@ export function useViewabilityConfig(threshold: number = 50) {
  * Hook to handle viewable items changed callback
  */
 export function useViewableItemsChanged(
-  options: UseVideoVisibilityOptions = {}
+  options: UseVideoVisibilityOptions = {},
 ) {
   const {
     autoPlayOnVisible = true,
@@ -80,7 +80,7 @@ export function useViewableItemsChanged(
       debounceTimer.current = setTimeout(() => {
         // Find the first viewable video item
         const viewableVideo = viewableItems.find(
-          (item) => item.isViewable && item.item?.id
+          (item) => item.isViewable && item.item?.id,
         );
 
         const currentViewableId = viewableVideo?.item?.id || null;
@@ -103,7 +103,7 @@ export function useViewableItemsChanged(
         lastViewableId.current = currentViewableId;
       }, debounceMs);
     },
-    [autoPlayOnVisible, autoPauseOnInvisible, debounceMs]
+    [autoPlayOnVisible, autoPauseOnInvisible, debounceMs],
   );
 
   // Cleanup on unmount
@@ -123,7 +123,7 @@ export function useViewableItemsChanged(
  */
 export function useVideoInViewport(
   videoId: string,
-  options: UseVideoVisibilityOptions = {}
+  options: UseVideoVisibilityOptions = {},
 ) {
   const { autoPlayOnVisible = true, autoPauseOnInvisible = true } = options;
 
@@ -163,7 +163,7 @@ export function useVideoInViewport(
  */
 export function useVideoFeed<T extends { id: string }>(
   videos: T[],
-  options: UseVideoVisibilityOptions = {}
+  options: UseVideoVisibilityOptions = {},
 ) {
   const viewabilityConfig = useViewabilityConfig(options.viewabilityThreshold);
   const onViewableItemsChanged = useViewableItemsChanged(options);

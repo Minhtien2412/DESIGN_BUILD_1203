@@ -16,17 +16,10 @@ jest.mock("@react-native-async-storage/async-storage", () => ({
   clear: jest.fn(),
 }));
 
-jest.mock("expo-file-system", () => ({
-  getInfoAsync: jest.fn(),
-  documentDirectory: "/mock/documents/",
-  cacheDirectory: "/mock/cache/",
-  downloadAsync: jest.fn(),
-  deleteAsync: jest.fn(),
-  makeDirectoryAsync: jest.fn(),
-  createDownloadResumable: jest.fn(() => ({
-    downloadAsync: jest.fn(),
-  })),
-}));
+// FileSystemCompat is mocked via moduleNameMapper in jest.config.js
+import * as FileSystem from "@/utils/FileSystemCompat";
+import * as MediaLibrary from "expo-media-library";
+import * as Sharing from "expo-sharing";
 
 jest.mock("expo-sharing", () => ({
   isAvailableAsync: jest.fn(),
@@ -37,10 +30,6 @@ jest.mock("expo-media-library", () => ({
   requestPermissionsAsync: jest.fn(),
   saveToLibraryAsync: jest.fn(),
 }));
-
-import * as FileSystem from "expo-file-system";
-import * as MediaLibrary from "expo-media-library";
-import * as Sharing from "expo-sharing";
 
 import {
     addToPlaylist,
@@ -97,7 +86,7 @@ import {
     // Types
     VideoSource,
     // Service
-    VideoViewerService
+    VideoViewerService,
 } from "../../services/VideoViewerService";
 
 describe("VideoViewerService", () => {
@@ -205,7 +194,7 @@ describe("VideoViewerService", () => {
     test("extracts filename from URI", () => {
       expect(getFilenameFromUri("/path/to/video.mp4")).toBe("video.mp4");
       expect(
-        getFilenameFromUri("https://example.com/video.mp4?size=large")
+        getFilenameFromUri("https://example.com/video.mp4?size=large"),
       ).toBe("video.mp4");
     });
   });
@@ -296,7 +285,7 @@ describe("VideoViewerService", () => {
       test("merges stored settings with defaults", async () => {
         const stored = { defaultPlaybackSpeed: 1.5 };
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify(stored)
+          JSON.stringify(stored),
         );
 
         const settings = await loadVideoSettings();
@@ -318,7 +307,7 @@ describe("VideoViewerService", () => {
 
         expect(AsyncStorage.setItem).toHaveBeenCalledWith(
           "@video_viewer_settings",
-          expect.stringContaining('"defaultPlaybackSpeed":1.5')
+          expect.stringContaining('"defaultPlaybackSpeed":1.5'),
         );
       });
     });
@@ -327,7 +316,7 @@ describe("VideoViewerService", () => {
       test("removes settings from storage", async () => {
         await resetVideoSettings();
         expect(AsyncStorage.removeItem).toHaveBeenCalledWith(
-          "@video_viewer_settings"
+          "@video_viewer_settings",
         );
       });
     });
@@ -353,7 +342,7 @@ describe("VideoViewerService", () => {
 
       test("returns stored positions", async () => {
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify({ "video-1": mockPosition })
+          JSON.stringify({ "video-1": mockPosition }),
         );
 
         const positions = await loadPlaybackPositions();
@@ -364,7 +353,7 @@ describe("VideoViewerService", () => {
     describe("getPlaybackPosition", () => {
       test("returns position for video", async () => {
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify({ "video-1": mockPosition })
+          JSON.stringify({ "video-1": mockPosition }),
         );
 
         const position = await getPlaybackPosition("video-1");
@@ -390,14 +379,14 @@ describe("VideoViewerService", () => {
     describe("clearPlaybackPosition", () => {
       test("removes position", async () => {
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify({ "video-1": mockPosition })
+          JSON.stringify({ "video-1": mockPosition }),
         );
 
         await clearPlaybackPosition("video-1");
 
         expect(AsyncStorage.setItem).toHaveBeenCalledWith(
           "@video_playback_positions",
-          "{}"
+          "{}",
         );
       });
     });
@@ -406,7 +395,7 @@ describe("VideoViewerService", () => {
       test("removes all positions", async () => {
         await clearAllPlaybackPositions();
         expect(AsyncStorage.removeItem).toHaveBeenCalledWith(
-          "@video_playback_positions"
+          "@video_playback_positions",
         );
       });
     });
@@ -431,7 +420,7 @@ describe("VideoViewerService", () => {
 
       test("returns stored playlist", async () => {
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify([{ ...mockVideo, position: 0 }])
+          JSON.stringify([{ ...mockVideo, position: 0 }]),
         );
 
         const playlist = await loadPlaylist();
@@ -451,7 +440,7 @@ describe("VideoViewerService", () => {
 
       test("does not add duplicate", async () => {
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify([{ ...mockVideo, position: 0 }])
+          JSON.stringify([{ ...mockVideo, position: 0 }]),
         );
 
         const playlist = await addToPlaylist(mockVideo);
@@ -463,7 +452,7 @@ describe("VideoViewerService", () => {
     describe("removeFromPlaylist", () => {
       test("removes video from playlist", async () => {
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify([{ ...mockVideo, position: 0 }])
+          JSON.stringify([{ ...mockVideo, position: 0 }]),
         );
 
         const playlist = await removeFromPlaylist("video-1");
@@ -478,7 +467,7 @@ describe("VideoViewerService", () => {
           { id: "v3", uri: "uri3", position: 2 },
         ];
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify(mockPlaylist)
+          JSON.stringify(mockPlaylist),
         );
 
         const playlist = await removeFromPlaylist("v2");
@@ -497,7 +486,7 @@ describe("VideoViewerService", () => {
           { id: "v3", uri: "uri3", position: 2 },
         ];
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify(mockPlaylist)
+          JSON.stringify(mockPlaylist),
         );
 
         const playlist = await reorderPlaylist(0, 2);
@@ -583,7 +572,7 @@ describe("VideoViewerService", () => {
 
       test("returns stored offline videos", async () => {
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify([mockOfflineVideo])
+          JSON.stringify([mockOfflineVideo]),
         );
 
         const videos = await loadOfflineVideos();
@@ -602,7 +591,7 @@ describe("VideoViewerService", () => {
 
       test("does not duplicate existing video", async () => {
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify([mockOfflineVideo])
+          JSON.stringify([mockOfflineVideo]),
         );
 
         await saveOfflineVideo(mockOfflineVideo);
@@ -615,7 +604,7 @@ describe("VideoViewerService", () => {
     describe("deleteOfflineVideo", () => {
       test("deletes offline video and file", async () => {
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify([mockOfflineVideo])
+          JSON.stringify([mockOfflineVideo]),
         );
         (FileSystem.getInfoAsync as jest.Mock).mockResolvedValue({
           exists: true,
@@ -627,7 +616,7 @@ describe("VideoViewerService", () => {
         expect(FileSystem.deleteAsync).toHaveBeenCalled();
         expect(AsyncStorage.setItem).toHaveBeenCalledWith(
           "@offline_videos",
-          "[]"
+          "[]",
         );
       });
     });
@@ -635,7 +624,7 @@ describe("VideoViewerService", () => {
     describe("isVideoOffline", () => {
       test("returns true if video is offline", async () => {
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify([mockOfflineVideo])
+          JSON.stringify([mockOfflineVideo]),
         );
 
         const result = await isVideoOffline("video-1");
@@ -653,7 +642,7 @@ describe("VideoViewerService", () => {
     describe("getOfflineVideo", () => {
       test("returns offline video", async () => {
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify([mockOfflineVideo])
+          JSON.stringify([mockOfflineVideo]),
         );
 
         const video = await getOfflineVideo("video-1");
@@ -671,7 +660,7 @@ describe("VideoViewerService", () => {
     describe("clearOfflineVideos", () => {
       test("clears all offline videos and files", async () => {
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify([mockOfflineVideo])
+          JSON.stringify([mockOfflineVideo]),
         );
         (FileSystem.getInfoAsync as jest.Mock).mockResolvedValue({
           exists: true,
@@ -710,7 +699,7 @@ describe("VideoViewerService", () => {
         });
 
         await expect(getVideoInfo("/path/to/missing.mp4")).rejects.toThrow(
-          "Video file not found"
+          "Video file not found",
         );
       });
     });

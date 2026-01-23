@@ -352,3 +352,160 @@ enum StoryMediaType {
   IMAGE
   VIDEO
 }
+
+// ==================== FILE MANAGEMENT ====================
+
+model File {
+  id          String   @id @default(uuid())
+  
+  // Owner
+  ownerId     String   @map("owner_id")
+  
+  // File info
+  filename    String
+  originalName String  @map("original_name")
+  mimeType    String   @map("mime_type")
+  size        Int      // bytes
+  path        String   // storage path
+  url         String?  // public URL if applicable
+  
+  // Folder structure
+  folderId    String?  @map("folder_id")
+  folder      Folder?  @relation(fields: [folderId], references: [id])
+  
+  // Metadata
+  metadata    Json?    // custom metadata
+  tags        String[]
+  
+  // Current version
+  currentVersion Int   @default(1) @map("current_version")
+  
+  // Soft delete (trash)
+  isDeleted   Boolean  @default(false) @map("is_deleted")
+  deletedAt   DateTime? @map("deleted_at")
+  deletedBy   String?  @map("deleted_by")
+  
+  // Auto-delete from trash after 30 days
+  permanentDeleteAt DateTime? @map("permanent_delete_at")
+  
+  // Audit
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  // Relations
+  versions    FileVersion[]
+  auditLogs   FileAuditLog[]
+  
+  @@index([ownerId])
+  @@index([folderId])
+  @@index([isDeleted])
+  @@index([deletedAt])
+  @@index([permanentDeleteAt])
+  @@map("files")
+}
+
+model FileVersion {
+  id          String   @id @default(uuid())
+  
+  fileId      String   @map("file_id")
+  file        File     @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  
+  version     Int      // version number
+  
+  // Version file info
+  filename    String
+  mimeType    String   @map("mime_type")
+  size        Int
+  path        String   // storage path for this version
+  url         String?
+  
+  // Change info
+  changeNote  String?  @map("change_note")
+  changedBy   String   @map("changed_by")
+  
+  // Hash for deduplication
+  checksum    String?  // SHA256 hash
+  
+  createdAt   DateTime @default(now()) @map("created_at")
+  
+  @@unique([fileId, version])
+  @@index([fileId])
+  @@index([createdAt])
+  @@map("file_versions")
+}
+
+model Folder {
+  id          String   @id @default(uuid())
+  
+  ownerId     String   @map("owner_id")
+  
+  name        String
+  
+  // Parent folder for nested structure
+  parentId    String?  @map("parent_id")
+  parent      Folder?  @relation("FolderHierarchy", fields: [parentId], references: [id])
+  children    Folder[] @relation("FolderHierarchy")
+  
+  // Soft delete
+  isDeleted   Boolean  @default(false) @map("is_deleted")
+  deletedAt   DateTime? @map("deleted_at")
+  permanentDeleteAt DateTime? @map("permanent_delete_at")
+  
+  // Audit
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  // Relations
+  files       File[]
+  
+  @@index([ownerId])
+  @@index([parentId])
+  @@index([isDeleted])
+  @@map("folders")
+}
+
+model FileAuditLog {
+  id          String   @id @default(uuid())
+  
+  fileId      String   @map("file_id")
+  file        File     @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  
+  action      FileAction
+  
+  // Who performed the action
+  userId      String   @map("user_id")
+  userEmail   String?  @map("user_email")
+  
+  // Details
+  details     Json?    // Additional context
+  ipAddress   String?  @map("ip_address")
+  userAgent   String?  @map("user_agent")
+  
+  // Version info if applicable
+  versionFrom Int?     @map("version_from")
+  versionTo   Int?     @map("version_to")
+  
+  createdAt   DateTime @default(now()) @map("created_at")
+  
+  @@index([fileId])
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("file_audit_logs")
+}
+
+enum FileAction {
+  CREATED
+  VIEWED
+  DOWNLOADED
+  UPDATED
+  VERSION_CREATED
+  RESTORED_VERSION
+  MOVED
+  RENAMED
+  SOFT_DELETED
+  RESTORED
+  PERMANENTLY_DELETED
+  SHARED
+  UNSHARED
+}

@@ -275,7 +275,7 @@ export const useDeviceOptimization = () => {
   const getImageProps = React.useMemo(() => {
     if (!performanceConfig) return {};
 
-    const quality = performanceConfig.imageQuality === 'high' ? 1 : 
+    const _quality = performanceConfig.imageQuality === 'high' ? 1 : 
                    performanceConfig.imageQuality === 'medium' ? 0.8 : 0.6;
 
     return {

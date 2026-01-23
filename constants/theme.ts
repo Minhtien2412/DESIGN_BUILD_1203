@@ -55,6 +55,12 @@ export const Colors = {
     goldDark: "#004C99",
     marble: "#F5F5F5",
     charcoal: "#000000",
+
+    // Basic colors
+    white: "#FFFFFF",
+    black: "#000000",
+    textSecondary: "#666666",
+    secondaryText: "#666666",
   },
   dark: {
     // Primary colors (dark mode)
@@ -104,6 +110,12 @@ export const Colors = {
     goldDark: "#0080FF",
     marble: "#1A1A1A",
     charcoal: "#0A0A0A",
+
+    // Basic colors
+    white: "#FFFFFF",
+    black: "#000000",
+    textSecondary: "#999999",
+    secondaryText: "#999999",
   },
 };
 
@@ -185,4 +197,74 @@ export const BORDER_RADIUS = {
 };
 
 // Backward compatibility alias
-export const COLORS = Colors.light;
+export const COLORS = {
+  ...Colors.light,
+  errorLight: "#FFE6E6", // Light red background for errors
+  successLight: "#E6FFE6", // Light green background for success
+  warningLight: "#FFF5E6", // Light orange background for warnings
+  infoLight: "#E6F2FF", // Light blue background for info
+  primaryLight: "#E6F2FF", // Light primary background
+  textTertiary: "#999999", // Tertiary text color
+};
+
+// Typography constants for consistent text styling
+export const TYPOGRAPHY = {
+  fontFamily: {
+    regular: Platform.select({
+      ios: "System",
+      android: "Roboto",
+      default: "System",
+    }),
+    medium: Platform.select({
+      ios: "System",
+      android: "Roboto-Medium",
+      default: "System",
+    }),
+    bold: Platform.select({
+      ios: "System",
+      android: "Roboto-Bold",
+      default: "System",
+    }),
+    light: Platform.select({
+      ios: "System",
+      android: "Roboto-Light",
+      default: "System",
+    }),
+  },
+  fontSize: FONT_SIZE,
+  sizes: FONT_SIZE, // Alias for backward compatibility
+  lineHeight: {
+    xs: 14,
+    sm: 18,
+    md: 22,
+    lg: 26,
+    xl: 30,
+    xxl: 36,
+  },
+  letterSpacing: {
+    tight: -0.5,
+    normal: 0,
+    wide: 0.5,
+    wider: 1,
+  },
+};
+
+// Extended colors with errorLight for backward compatibility
+export const ExtendedColors = {
+  ...Colors.light,
+  errorLight: "#FFE6E6", // Light red background for errors
+  successLight: "#E6FFE6", // Light green background for success
+  warningLight: "#FFF5E6", // Light orange background for warnings
+  infoLight: "#E6F2FF", // Light blue background for info
+  primaryLight: "#E6F2FF", // Light primary background
+  textTertiary: "#999999", // Tertiary text color
+};
+
+// Theme object for backward compatibility
+export const theme = {
+  colors: ExtendedColors,
+  spacing: SPACING,
+  borderRadius: BORDER_RADIUS,
+  typography: TYPOGRAPHY,
+  fonts: Fonts,
+};

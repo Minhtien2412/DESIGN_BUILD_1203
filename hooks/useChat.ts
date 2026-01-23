@@ -57,11 +57,11 @@ export interface ChatMessage {
   status: "sending" | "sent" | "delivered" | "read" | "failed";
   createdAt: Date;
   editedAt?: Date;
-  reactions?: Array<{
+  reactions?: {
     emoji: string;
     userId: number;
     userName?: string;
-  }>;
+  }[];
 }
 
 export interface UseChatOptions {

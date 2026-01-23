@@ -1,12 +1,12 @@
 /**
  * useServicesBooking Hook
- * 
+ *
  * Custom hook for services and booking management:
  * - Browse services
  * - Create bookings
  * - View booking history
  * - Cancel bookings
- * 
+ *
  * Backend: https://baotienweb.cloud/api/v1/services
  * Created: Dec 22, 2025
  */
@@ -27,10 +27,10 @@ import {
     type ServiceBooking,
     type ServiceCategory,
     type ServiceDetails,
-    type ServiceFilters
-} from '@/services/servicesApi';
-import { useCallback, useEffect, useState } from 'react';
-import { Alert } from 'react-native';
+    type ServiceFilters,
+} from "@/services/servicesApi";
+import { useCallback, useEffect, useState } from "react";
+import { Alert } from "react-native";
 
 interface UseServicesReturn {
   // Services state
@@ -38,14 +38,14 @@ interface UseServicesReturn {
   categories: ServiceCategory[];
   currentService: ServiceDetails | null;
   loadingServices: boolean;
-  
+
   // Bookings state
   bookings: ServiceBooking[];
   loadingBookings: boolean;
-  
+
   // Common
   error: string | null;
-  
+
   // Actions
   loadServices: (filters?: ServiceFilters) => Promise<void>;
   loadCategories: () => Promise<void>;
@@ -53,7 +53,7 @@ interface UseServicesReturn {
   loadBookings: (status?: BookingStatus) => Promise<void>;
   createServiceBooking: (data: CreateBookingData) => Promise<boolean>;
   cancelServiceBooking: (bookingId: number) => Promise<boolean>;
-  
+
   // Helpers
   formatServicePrice: (price: number) => string;
   getStatusText: (status: BookingStatus) => string;
@@ -71,19 +71,22 @@ export function useServicesBooking(): UseServicesReturn {
   // Services state
   const [services, setServices] = useState<Service[]>([]);
   const [categories, setCategories] = useState<ServiceCategory[]>([]);
-  const [currentService, setCurrentService] = useState<ServiceDetails | null>(null);
+  const [currentService, setCurrentService] = useState<ServiceDetails | null>(
+    null,
+  );
   const [loadingServices, setLoadingServices] = useState(false);
-  const [servicesPagination, setServicesPagination] = useState<UseServicesPagination>({
-    total: 0,
-    page: 1,
-    totalPages: 0,
-    hasMore: false,
-  });
-  
+  const [_servicesPagination, _setServicesPagination] =
+    useState<UseServicesPagination>({
+      total: 0,
+      page: 1,
+      totalPages: 0,
+      hasMore: false,
+    });
+
   // Bookings state
   const [bookings, setBookings] = useState<ServiceBooking[]>([]);
   const [loadingBookings, setLoadingBookings] = useState(false);
-  
+
   // Common state
   const [error, setError] = useState<string | null>(null);
 
@@ -93,18 +96,18 @@ export function useServicesBooking(): UseServicesReturn {
   const loadServices = useCallback(async (filters?: ServiceFilters) => {
     setLoadingServices(true);
     setError(null);
-    
+
     try {
       const response = await getServices(filters);
-      
+
       if (response.success) {
         // If loading next page, append to existing
         if (filters?.page && filters.page > 1) {
-          setServices(prev => [...prev, ...response.data]);
+          setServices((prev) => [...prev, ...response.data]);
         } else {
           setServices(response.data);
         }
-        
+
         setServicesPagination({
           total: response.meta.total,
           page: response.meta.page,
@@ -113,8 +116,8 @@ export function useServicesBooking(): UseServicesReturn {
         });
       }
     } catch (e: any) {
-      setError(e.message || 'Không thể tải danh sách dịch vụ');
-      console.error('[useServicesBooking] Error loading services:', e);
+      setError(e.message || "Không thể tải danh sách dịch vụ");
+      console.error("[useServicesBooking] Error loading services:", e);
     } finally {
       setLoadingServices(false);
     }
@@ -130,7 +133,7 @@ export function useServicesBooking(): UseServicesReturn {
         setCategories(response.data);
       }
     } catch (e: any) {
-      console.error('[useServicesBooking] Error loading categories:', e);
+      console.error("[useServicesBooking] Error loading categories:", e);
     }
   }, []);
 
@@ -140,15 +143,15 @@ export function useServicesBooking(): UseServicesReturn {
   const loadServiceDetails = useCallback(async (id: number) => {
     setLoadingServices(true);
     setError(null);
-    
+
     try {
       const response = await getServiceDetails(id);
       if (response.success) {
         setCurrentService(response.data);
       }
     } catch (e: any) {
-      setError(e.message || 'Không thể tải chi tiết dịch vụ');
-      console.error('[useServicesBooking] Error loading service details:', e);
+      setError(e.message || "Không thể tải chi tiết dịch vụ");
+      console.error("[useServicesBooking] Error loading service details:", e);
     } finally {
       setLoadingServices(false);
     }
@@ -160,15 +163,15 @@ export function useServicesBooking(): UseServicesReturn {
   const loadBookings = useCallback(async (status?: BookingStatus) => {
     setLoadingBookings(true);
     setError(null);
-    
+
     try {
       const response = await getUserBookings({ status, limit: 50 });
       if (response.success) {
         setBookings(response.data);
       }
     } catch (e: any) {
-      setError(e.message || 'Không thể tải lịch sử đặt dịch vụ');
-      console.error('[useServicesBooking] Error loading bookings:', e);
+      setError(e.message || "Không thể tải lịch sử đặt dịch vụ");
+      console.error("[useServicesBooking] Error loading bookings:", e);
     } finally {
       setLoadingBookings(false);
     }
@@ -177,81 +180,89 @@ export function useServicesBooking(): UseServicesReturn {
   /**
    * Create a new service booking
    */
-  const createServiceBooking = useCallback(async (data: CreateBookingData): Promise<boolean> => {
-    setLoadingBookings(true);
-    setError(null);
-    
-    try {
-      const response = await createBooking(data);
-      
-      if (response.success) {
-        // Add new booking to list
-        setBookings(prev => [response.data, ...prev]);
-        
-        Alert.alert(
-          'Đặt dịch vụ thành công',
-          `Đơn đặt #${response.data.id} đã được tạo.\nTổng giá: ${formatPrice(response.data.totalPrice || 0)}`,
-          [{ text: 'OK' }]
-        );
-        return true;
-      } else {
-        Alert.alert('Lỗi', response.message || 'Đặt dịch vụ thất bại');
+  const createServiceBooking = useCallback(
+    async (data: CreateBookingData): Promise<boolean> => {
+      setLoadingBookings(true);
+      setError(null);
+
+      try {
+        const response = await createBooking(data);
+
+        if (response.success) {
+          // Add new booking to list
+          setBookings((prev) => [response.data, ...prev]);
+
+          Alert.alert(
+            "Đặt dịch vụ thành công",
+            `Đơn đặt #${response.data.id} đã được tạo.\nTổng giá: ${formatPrice(response.data.totalPrice || 0)}`,
+            [{ text: "OK" }],
+          );
+          return true;
+        } else {
+          Alert.alert("Lỗi", response.message || "Đặt dịch vụ thất bại");
+          return false;
+        }
+      } catch (e: any) {
+        setError(e.message);
+        Alert.alert("Lỗi", e.message || "Đặt dịch vụ thất bại");
         return false;
+      } finally {
+        setLoadingBookings(false);
       }
-    } catch (e: any) {
-      setError(e.message);
-      Alert.alert('Lỗi', e.message || 'Đặt dịch vụ thất bại');
-      return false;
-    } finally {
-      setLoadingBookings(false);
-    }
-  }, []);
+    },
+    [],
+  );
 
   /**
    * Cancel a booking
    */
-  const cancelServiceBooking = useCallback(async (bookingId: number): Promise<boolean> => {
-    return new Promise((resolve) => {
-      Alert.alert(
-        'Xác nhận hủy',
-        'Bạn có chắc muốn hủy đơn đặt dịch vụ này?',
-        [
-          { text: 'Không', style: 'cancel', onPress: () => resolve(false) },
-          {
-            text: 'Hủy đơn',
-            style: 'destructive',
-            onPress: async () => {
-              setLoadingBookings(true);
-              
-              try {
-                const response = await cancelBooking(bookingId);
-                
-                if (response.success) {
-                  // Update booking in list
-                  setBookings(prev =>
-                    prev.map(b =>
-                      b.id === bookingId ? { ...b, status: 'CANCELLED' as BookingStatus } : b
-                    )
-                  );
-                  
-                  Alert.alert('Thành công', 'Đã hủy đơn đặt dịch vụ');
-                  resolve(true);
-                } else {
-                  Alert.alert('Lỗi', response.message || 'Không thể hủy đơn');
+  const cancelServiceBooking = useCallback(
+    async (bookingId: number): Promise<boolean> => {
+      return new Promise((resolve) => {
+        Alert.alert(
+          "Xác nhận hủy",
+          "Bạn có chắc muốn hủy đơn đặt dịch vụ này?",
+          [
+            { text: "Không", style: "cancel", onPress: () => resolve(false) },
+            {
+              text: "Hủy đơn",
+              style: "destructive",
+              onPress: async () => {
+                setLoadingBookings(true);
+
+                try {
+                  const response = await cancelBooking(bookingId);
+
+                  if (response.success) {
+                    // Update booking in list
+                    setBookings((prev) =>
+                      prev.map((b) =>
+                        b.id === bookingId
+                          ? { ...b, status: "CANCELLED" as BookingStatus }
+                          : b,
+                      ),
+                    );
+
+                    Alert.alert("Thành công", "Đã hủy đơn đặt dịch vụ");
+                    resolve(true);
+                  } else {
+                    Alert.alert("Lỗi", response.message || "Không thể hủy đơn");
+                    resolve(false);
+                  }
+                } catch (e: any) {
+                  Alert.alert("Lỗi", e.message || "Không thể hủy đơn");
                   resolve(false);
+                } finally {
+                  setLoadingBookings(false);
                 }
-              } catch (e: any) {
-                Alert.alert('Lỗi', e.message || 'Không thể hủy đơn');
-                resolve(false);
-              } finally {
-                setLoadingBookings(false);
-              }
+              },
             },
-          },
-        ]
-      );
-    });
-  }, []);
+          ],
+        );
+      });
+    },
+    [],
+  );
 
   return {
     // Services state
@@ -259,14 +270,14 @@ export function useServicesBooking(): UseServicesReturn {
     categories,
     currentService,
     loadingServices,
-    
+
     // Bookings state
     bookings,
     loadingBookings,
-    
+
     // Common
     error,
-    
+
     // Actions
     loadServices,
     loadCategories,
@@ -274,7 +285,7 @@ export function useServicesBooking(): UseServicesReturn {
     loadBookings,
     createServiceBooking,
     cancelServiceBooking,
-    
+
     // Helpers
     formatServicePrice: formatPrice,
     getStatusText: getBookingStatusText,
@@ -293,14 +304,14 @@ export function useServiceDetail(serviceId: number) {
   const loadService = useCallback(async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const response = await getServiceDetails(serviceId);
       if (response.success) {
         setService(response.data);
       }
     } catch (e: any) {
-      setError(e.message || 'Không thể tải chi tiết dịch vụ');
+      setError(e.message || "Không thể tải chi tiết dịch vụ");
     } finally {
       setLoading(false);
     }

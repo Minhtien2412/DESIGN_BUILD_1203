@@ -1,12 +1,12 @@
 /**
  * useCall Hook
  * Manages call state, history, and actions with real-time updates
- * 
+ *
  * @author AI Assistant
  * @date 23/12/2025
  */
 
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from "@/context/AuthContext";
 import {
     Call,
     CallHistoryItem,
@@ -14,8 +14,8 @@ import {
     CallType,
     getCallDisplayInfo,
     MOCK_CALL_HISTORY,
-} from '@/services/api/call.service';
-import { useCallback, useEffect, useRef, useState } from 'react';
+} from "@/services/api/call.service";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 // ==================== TYPES ====================
 
@@ -101,62 +101,71 @@ export function useCall(options: UseCallOptions = {}): UseCallReturn {
   const [currentPage, setCurrentPage] = useState(1);
 
   // Refs
-  const durationIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const durationIntervalRef = useRef<ReturnType<typeof setInterval> | null>(
+    null,
+  );
 
   // Current user ID
-  const currentUserId = typeof user?.id === 'string' ? parseInt(user.id, 10) : (user?.id ?? 0);
+  const currentUserId =
+    typeof user?.id === "string" ? parseInt(user.id, 10) : (user?.id ?? 0);
 
   // ==================== LOAD HISTORY ====================
 
-  const loadHistory = useCallback(async (page: number = 1, isRefresh: boolean = false) => {
-    if (!user?.id) return;
-
-    try {
-      if (isRefresh) {
-        setRefreshing(true);
-      } else if (page === 1) {
-        setLoading(true);
-      }
-      setError(null);
-
-      // Try API first, fallback to mock data
-      let calls: Call[] = [];
-      let hasMore = false;
+  const loadHistory = useCallback(
+    async (page: number = 1, isRefresh: boolean = false) => {
+      if (!user?.id) return;
 
       try {
-        const response = await callService.getCallHistory({
-          page,
-          limit: historyLimit,
-        });
-        calls = response.calls;
-        hasMore = response.hasMore;
-      } catch {
-        // Fallback to mock data in development
-        console.warn('[useCall] API failed, using mock data');
-        calls = MOCK_CALL_HISTORY;
-        hasMore = false;
+        if (isRefresh) {
+          setRefreshing(true);
+        } else if (page === 1) {
+          setLoading(true);
+        }
+        setError(null);
+
+        // Try API first, fallback to mock data
+        let calls: Call[] = [];
+        let hasMore = false;
+
+        try {
+          const response = await callService.getCallHistory({
+            page,
+            limit: historyLimit,
+          });
+          calls = response.calls;
+          hasMore = response.hasMore;
+        } catch {
+          // Fallback to mock data in development
+          console.warn("[useCall] API failed, using mock data");
+          calls = MOCK_CALL_HISTORY;
+          hasMore = false;
+        }
+
+        // Transform to CallHistoryItem
+        const historyItems = calls.map((call) =>
+          getCallDisplayInfo(call, currentUserId),
+        );
+
+        if (page === 1) {
+          setCallHistory(historyItems);
+        } else {
+          setCallHistory((prev) => [...prev, ...historyItems]);
+        }
+
+        setHasMoreHistory(hasMore);
+        setCurrentPage(page);
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : "Không thể tải lịch sử cuộc gọi";
+        setError(message);
+        console.error("[useCall] Load history error:", err);
+      } finally {
+        setLoading(false);
+        setRefreshing(false);
       }
-
-      // Transform to CallHistoryItem
-      const historyItems = calls.map(call => getCallDisplayInfo(call, currentUserId));
-
-      if (page === 1) {
-        setCallHistory(historyItems);
-      } else {
-        setCallHistory(prev => [...prev, ...historyItems]);
-      }
-
-      setHasMoreHistory(hasMore);
-      setCurrentPage(page);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Không thể tải lịch sử cuộc gọi';
-      setError(message);
-      console.error('[useCall] Load history error:', err);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, [user?.id, currentUserId, historyLimit]);
+    },
+    [user?.id, currentUserId, historyLimit],
+  );
 
   const refreshHistory = useCallback(async () => {
     await loadHistory(1, true);
@@ -182,38 +191,42 @@ export function useCall(options: UseCallOptions = {}): UseCallReturn {
 
   // ==================== CALL ACTIONS ====================
 
-  const startCall = useCallback(async (userId: number, type: CallType = 'video') => {
-    if (!user?.id) {
-      setError('Vui lòng đăng nhập để thực hiện cuộc gọi');
-      return;
-    }
+  const startCall = useCallback(
+    async (userId: number, type: CallType = "video") => {
+      if (!user?.id) {
+        setError("Vui lòng đăng nhập để thực hiện cuộc gọi");
+        return;
+      }
 
-    try {
-      setLoading(true);
-      setError(null);
+      try {
+        setLoading(true);
+        setError(null);
 
-      const response = await callService.startCall(userId, type);
+        const response = await callService.startCall(userId, type);
 
-      setActiveCall({
-        call: response.call,
-        roomId: response.roomId,
-        token: response.token,
-        isConnected: false,
-        isMuted: false,
-        isVideoEnabled: type === 'video',
-        duration: 0,
-      });
+        setActiveCall({
+          call: response.call,
+          roomId: response.roomId,
+          token: response.token,
+          isConnected: false,
+          isMuted: false,
+          isVideoEnabled: type === "video",
+          duration: 0,
+        });
 
-      // Start duration timer
-      startDurationTimer();
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Không thể bắt đầu cuộc gọi';
-      setError(message);
-      console.error('[useCall] Start call error:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, [user?.id]);
+        // Start duration timer
+        startDurationTimer();
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : "Không thể bắt đầu cuộc gọi";
+        setError(message);
+        console.error("[useCall] Start call error:", err);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [user?.id],
+  );
 
   const acceptCall = useCallback(async (callId: number) => {
     try {
@@ -228,16 +241,17 @@ export function useCall(options: UseCallOptions = {}): UseCallReturn {
         token: response.token,
         isConnected: true,
         isMuted: false,
-        isVideoEnabled: response.call.type === 'video',
+        isVideoEnabled: response.call.type === "video",
         duration: 0,
       });
 
       setIncomingCall(null);
       startDurationTimer();
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Không thể chấp nhận cuộc gọi';
+      const message =
+        err instanceof Error ? err.message : "Không thể chấp nhận cuộc gọi";
       setError(message);
-      console.error('[useCall] Accept call error:', err);
+      console.error("[useCall] Accept call error:", err);
     } finally {
       setLoading(false);
     }
@@ -249,9 +263,10 @@ export function useCall(options: UseCallOptions = {}): UseCallReturn {
       await callService.rejectCall(callId);
       setIncomingCall(null);
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Không thể từ chối cuộc gọi';
+      const message =
+        err instanceof Error ? err.message : "Không thể từ chối cuộc gọi";
       setError(message);
-      console.error('[useCall] Reject call error:', err);
+      console.error("[useCall] Reject call error:", err);
     } finally {
       setLoading(false);
     }
@@ -271,13 +286,14 @@ export function useCall(options: UseCallOptions = {}): UseCallReturn {
       }
 
       setActiveCall(null);
-      
+
       // Refresh history to include this call
       await refreshHistory();
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Không thể kết thúc cuộc gọi';
+      const message =
+        err instanceof Error ? err.message : "Không thể kết thúc cuộc gọi";
       setError(message);
-      console.error('[useCall] End call error:', err);
+      console.error("[useCall] End call error:", err);
     } finally {
       setLoading(false);
     }
@@ -286,14 +302,14 @@ export function useCall(options: UseCallOptions = {}): UseCallReturn {
   // ==================== IN-CALL CONTROLS ====================
 
   const toggleMute = useCallback(() => {
-    setActiveCall(prev => {
+    setActiveCall((prev) => {
       if (!prev) return null;
       return { ...prev, isMuted: !prev.isMuted };
     });
   }, []);
 
   const toggleVideo = useCallback(() => {
-    setActiveCall(prev => {
+    setActiveCall((prev) => {
       if (!prev) return null;
       return { ...prev, isVideoEnabled: !prev.isVideoEnabled };
     });
@@ -304,26 +320,26 @@ export function useCall(options: UseCallOptions = {}): UseCallReturn {
   const markMissedAsRead = useCallback(async (callId: number) => {
     try {
       await callService.markMissedCallAsRead(callId);
-      setMissedCallsCount(prev => Math.max(0, prev - 1));
-      
+      setMissedCallsCount((prev) => Math.max(0, prev - 1));
+
       // Update history item
-      setCallHistory(prev =>
-        prev.map(item =>
-          item.id === callId ? { ...item, status: 'ended' as const } : item
-        )
+      setCallHistory((prev) =>
+        prev.map((item) =>
+          item.id === callId ? { ...item, status: "ended" as const } : item,
+        ),
       );
     } catch (err) {
-      console.error('[useCall] Mark missed as read error:', err);
+      console.error("[useCall] Mark missed as read error:", err);
     }
   }, []);
 
   const clearMissedCalls = useCallback(async () => {
-    const missedCalls = callHistory.filter(c => c.status === 'missed');
-    
+    const missedCalls = callHistory.filter((c) => c.status === "missed");
+
     await Promise.all(
-      missedCalls.map(call => callService.markMissedCallAsRead(call.id))
+      missedCalls.map((call) => callService.markMissedCallAsRead(call.id)),
     );
-    
+
     setMissedCallsCount(0);
   }, [callHistory]);
 
@@ -331,9 +347,9 @@ export function useCall(options: UseCallOptions = {}): UseCallReturn {
 
   const startDurationTimer = useCallback(() => {
     stopDurationTimer();
-    
+
     durationIntervalRef.current = setInterval(() => {
-      setActiveCall(prev => {
+      setActiveCall((prev) => {
         if (!prev) return null;
         return { ...prev, duration: prev.duration + 1 };
       });
@@ -349,19 +365,25 @@ export function useCall(options: UseCallOptions = {}): UseCallReturn {
 
   // ==================== HELPER FUNCTIONS ====================
 
-  const getCallInfo = useCallback((call: Call): CallHistoryItem => {
-    return getCallDisplayInfo(call, currentUserId);
-  }, [currentUserId]);
+  const getCallInfo = useCallback(
+    (call: Call): CallHistoryItem => {
+      return getCallDisplayInfo(call, currentUserId);
+    },
+    [currentUserId],
+  );
 
   // ==================== HANDLE INCOMING CALL (WebSocket) ====================
 
-  const handleIncomingCall = useCallback((call: IncomingCall) => {
-    setIncomingCall(call);
-    
-    if (onIncomingCall) {
-      onIncomingCall(call);
-    }
-  }, [onIncomingCall]);
+  const _handleIncomingCall = useCallback(
+    (call: IncomingCall) => {
+      setIncomingCall(call);
+
+      if (onIncomingCall) {
+        onIncomingCall(call);
+      }
+    },
+    [onIncomingCall],
+  );
 
   // ==================== EFFECTS ====================
 

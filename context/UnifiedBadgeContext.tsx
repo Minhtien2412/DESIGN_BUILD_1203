@@ -471,7 +471,7 @@ export function UnifiedBadgeProvider({ children }: { children: ReactNode }) {
     if (user?.id) {
       refreshAllBadges();
     }
-  }, [user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [user?.id]);  
 
   // Auto refresh interval (mỗi 2 phút)
   useEffect(() => {
@@ -486,7 +486,7 @@ export function UnifiedBadgeProvider({ children }: { children: ReactNode }) {
         clearInterval(refreshIntervalRef.current);
       }
     };
-  }, [user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [user?.id]);  
 
   // Cleanup on unmount
   useEffect(() => {

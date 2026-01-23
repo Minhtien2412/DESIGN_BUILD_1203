@@ -77,7 +77,7 @@ function MiniMapTile({ task, size, bounds, initial, onCommit, onPress }: TilePro
   useEffect(() => {
     x.value = initial.x;
     y.value = initial.y;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [initial.x, initial.y]);
 
   const status = STATUS_CONFIG[task.status] || {

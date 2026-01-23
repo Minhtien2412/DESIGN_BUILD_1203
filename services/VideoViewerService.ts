@@ -7,8 +7,8 @@
  * Story: VIEW-003 - Video Viewer (from File Manager)
  */
 
+import * as FileSystem from "@/utils/FileSystemCompat";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as FileSystem from "expo-file-system";
 import * as MediaLibrary from "expo-media-library";
 import * as Sharing from "expo-sharing";
 import { useCallback, useEffect, useState } from "react";
@@ -232,7 +232,7 @@ export function isSupportedFormat(mimeType: string): boolean {
 export function shouldResumePlayback(
   position: number,
   duration: number,
-  threshold: number
+  threshold: number,
 ): boolean {
   if (duration === 0) return false;
   const progress = (position / duration) * 100;
@@ -249,7 +249,7 @@ export function clampPlaybackRate(rate: number): number {
 
 export function getNextPlaybackSpeed(currentSpeed: number): PlaybackSpeed {
   const currentIndex = PLAYBACK_SPEEDS.findIndex(
-    (s) => s.value === currentSpeed
+    (s) => s.value === currentSpeed,
   );
   const nextIndex = (currentIndex + 1) % PLAYBACK_SPEEDS.length;
   return PLAYBACK_SPEEDS[nextIndex];
@@ -257,7 +257,7 @@ export function getNextPlaybackSpeed(currentSpeed: number): PlaybackSpeed {
 
 export function getPreviousPlaybackSpeed(currentSpeed: number): PlaybackSpeed {
   const currentIndex = PLAYBACK_SPEEDS.findIndex(
-    (s) => s.value === currentSpeed
+    (s) => s.value === currentSpeed,
   );
   const prevIndex =
     currentIndex <= 0 ? PLAYBACK_SPEEDS.length - 1 : currentIndex - 1;
@@ -282,7 +282,7 @@ export async function loadVideoSettings(): Promise<VideoViewerSettings> {
 }
 
 export async function saveVideoSettings(
-  settings: Partial<VideoViewerSettings>
+  settings: Partial<VideoViewerSettings>,
 ): Promise<void> {
   try {
     const current = await loadVideoSettings();
@@ -315,7 +315,7 @@ export async function loadPlaybackPositions(): Promise<
 }
 
 export async function getPlaybackPosition(
-  videoId: string
+  videoId: string,
 ): Promise<PlaybackPosition | null> {
   const positions = await loadPlaybackPositions();
   return positions[videoId] || null;
@@ -324,7 +324,7 @@ export async function getPlaybackPosition(
 export async function savePlaybackPosition(
   videoId: string,
   position: number,
-  duration: number
+  duration: number,
 ): Promise<void> {
   try {
     const positions = await loadPlaybackPositions();
@@ -336,7 +336,7 @@ export async function savePlaybackPosition(
     };
     await AsyncStorage.setItem(
       STORAGE_KEYS.PLAYBACK_POSITIONS,
-      JSON.stringify(positions)
+      JSON.stringify(positions),
     );
   } catch (error) {
     console.error("Error saving playback position:", error);
@@ -349,7 +349,7 @@ export async function clearPlaybackPosition(videoId: string): Promise<void> {
     delete positions[videoId];
     await AsyncStorage.setItem(
       STORAGE_KEYS.PLAYBACK_POSITIONS,
-      JSON.stringify(positions)
+      JSON.stringify(positions),
     );
   } catch (error) {
     console.error("Error clearing playback position:", error);
@@ -384,7 +384,7 @@ export async function savePlaylist(playlist: PlaylistItem[]): Promise<void> {
 }
 
 export async function addToPlaylist(
-  video: VideoSource
+  video: VideoSource,
 ): Promise<PlaylistItem[]> {
   const playlist = await loadPlaylist();
 
@@ -405,7 +405,7 @@ export async function addToPlaylist(
 }
 
 export async function removeFromPlaylist(
-  videoId: string
+  videoId: string,
 ): Promise<PlaylistItem[]> {
   let playlist = await loadPlaylist();
   playlist = playlist.filter((item) => item.id !== videoId);
@@ -422,7 +422,7 @@ export async function removeFromPlaylist(
 
 export async function reorderPlaylist(
   fromIndex: number,
-  toIndex: number
+  toIndex: number,
 ): Promise<PlaylistItem[]> {
   const playlist = await loadPlaylist();
 
@@ -455,7 +455,7 @@ export async function clearPlaylist(): Promise<void> {
 export function getNextInPlaylist(
   playlist: PlaylistItem[],
   currentId: string,
-  loop: boolean = false
+  loop: boolean = false,
 ): PlaylistItem | null {
   const currentIndex = playlist.findIndex((item) => item.id === currentId);
   if (currentIndex === -1) return null;
@@ -471,7 +471,7 @@ export function getNextInPlaylist(
 export function getPreviousInPlaylist(
   playlist: PlaylistItem[],
   currentId: string,
-  loop: boolean = false
+  loop: boolean = false,
 ): PlaylistItem | null {
   const currentIndex = playlist.findIndex((item) => item.id === currentId);
   if (currentIndex === -1) return null;
@@ -511,7 +511,7 @@ export async function saveOfflineVideo(video: OfflineVideo): Promise<void> {
     offline.push(video);
     await AsyncStorage.setItem(
       STORAGE_KEYS.OFFLINE_VIDEOS,
-      JSON.stringify(offline)
+      JSON.stringify(offline),
     );
   } catch (error) {
     console.error("Error saving offline video:", error);
@@ -535,7 +535,7 @@ export async function deleteOfflineVideo(videoId: string): Promise<void> {
       offline = offline.filter((v) => v.id !== videoId);
       await AsyncStorage.setItem(
         STORAGE_KEYS.OFFLINE_VIDEOS,
-        JSON.stringify(offline)
+        JSON.stringify(offline),
       );
     }
   } catch (error) {
@@ -550,7 +550,7 @@ export async function isVideoOffline(videoId: string): Promise<boolean> {
 }
 
 export async function getOfflineVideo(
-  videoId: string
+  videoId: string,
 ): Promise<OfflineVideo | null> {
   const offline = await loadOfflineVideos();
   return offline.find((v) => v.id === videoId) || null;
@@ -599,7 +599,7 @@ export async function getVideoInfo(uri: string): Promise<VideoMetadata> {
       filename,
       size: fileInfo.size || 0,
       mimeType: Object.keys(VIDEO_EXTENSIONS).find(
-        (key) => VIDEO_EXTENSIONS[key] === extension
+        (key) => VIDEO_EXTENSIONS[key] === extension,
       ),
       modificationTime: fileInfo.modificationTime,
     };
@@ -652,7 +652,7 @@ export async function saveVideoToGallery(uri: string): Promise<boolean> {
 
 export async function downloadVideoForOffline(
   video: VideoSource,
-  onProgress?: (progress: number) => void
+  onProgress?: (progress: number) => void,
 ): Promise<OfflineVideo | null> {
   try {
     if (!isRemoteUri(video.uri)) {
@@ -680,7 +680,7 @@ export async function downloadVideoForOffline(
           downloadProgress.totalBytesWritten /
           downloadProgress.totalBytesExpectedToWrite;
         onProgress?.(progress * 100);
-      }
+      },
     );
 
     const result = await downloadResumable.downloadAsync();
@@ -732,7 +732,7 @@ export async function deleteVideo(uri: string): Promise<boolean> {
 
 export function useVideoSettings() {
   const [settings, setSettings] = useState<VideoViewerSettings>(
-    DEFAULT_VIDEO_SETTINGS
+    DEFAULT_VIDEO_SETTINGS,
   );
   const [loading, setLoading] = useState(true);
 
@@ -748,7 +748,7 @@ export function useVideoSettings() {
       await saveVideoSettings(updates);
       setSettings((prev) => ({ ...prev, ...updates }));
     },
-    []
+    [],
   );
 
   const resetSettings = useCallback(async () => {
@@ -771,7 +771,7 @@ export function usePlaybackPosition(videoId: string) {
       await savePlaybackPosition(videoId, pos, duration);
       setPosition({ videoId, position: pos, duration, timestamp: Date.now() });
     },
-    [videoId]
+    [videoId],
   );
 
   const clearPosition = useCallback(async () => {
@@ -817,14 +817,14 @@ export function usePlaylist() {
     (currentId: string, loop: boolean = false) => {
       return getNextInPlaylist(playlist, currentId, loop);
     },
-    [playlist]
+    [playlist],
   );
 
   const getPrevious = useCallback(
     (currentId: string, loop: boolean = false) => {
       return getPreviousInPlaylist(playlist, currentId, loop);
     },
-    [playlist]
+    [playlist],
   );
 
   return {
@@ -858,7 +858,7 @@ export function useOfflineVideos() {
       }
       return offline;
     },
-    []
+    [],
   );
 
   const deleteVideo = useCallback(async (videoId: string) => {
@@ -875,7 +875,7 @@ export function useOfflineVideos() {
     (videoId: string) => {
       return videos.some((v) => v.id === videoId);
     },
-    [videos]
+    [videos],
   );
 
   return { videos, download, deleteVideo, clearAll, isOffline, loading };
@@ -924,7 +924,7 @@ class VideoViewerServiceClass {
   async savePosition(
     videoId: string,
     position: number,
-    duration: number
+    duration: number,
   ): Promise<void> {
     await savePlaybackPosition(videoId, position, duration);
   }
@@ -949,7 +949,7 @@ class VideoViewerServiceClass {
 
   async downloadForOffline(
     video: VideoSource,
-    onProgress?: (progress: number) => void
+    onProgress?: (progress: number) => void,
   ): Promise<OfflineVideo | null> {
     return downloadVideoForOffline(video, onProgress);
   }

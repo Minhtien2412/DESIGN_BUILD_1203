@@ -7,8 +7,8 @@
  * Story: VIEW-001 - PDF Viewer
  */
 
+import * as FileSystem from "@/utils/FileSystemCompat";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as FileSystem from "expo-file-system";
 import * as Sharing from "expo-sharing";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -57,12 +57,12 @@ export interface Bookmark {
 export interface SearchResult {
   pageNumber: number;
   text: string;
-  rects: Array<{
+  rects: {
     x: number;
     y: number;
     width: number;
     height: number;
-  }>;
+  }[];
 }
 
 /**
@@ -122,7 +122,7 @@ export interface Annotation {
   pageNumber: number;
   type: "highlight" | "underline" | "note" | "strikethrough";
   color: string;
-  rects?: Array<{ x: number; y: number; width: number; height: number }>;
+  rects?: { x: number; y: number; width: number; height: number }[];
   text?: string;
   note?: string;
   createdAt: number;
@@ -217,7 +217,7 @@ function generateId(): string {
  */
 export function calculateProgress(
   currentPage: number,
-  totalPages: number
+  totalPages: number,
 ): number {
   if (totalPages <= 0) return 0;
   return Math.round((currentPage / totalPages) * 100);
@@ -247,7 +247,7 @@ export function formatPageRange(current: number, total: number): string {
 export function calculateFitWidth(
   pageWidth: number,
   containerWidth: number,
-  padding: number = 20
+  padding: number = 20,
 ): number {
   return (containerWidth - padding * 2) / pageWidth;
 }
@@ -258,7 +258,7 @@ export function calculateFitWidth(
 export function calculateFitHeight(
   pageHeight: number,
   containerHeight: number,
-  padding: number = 20
+  padding: number = 20,
 ): number {
   return (containerHeight - padding * 2) / pageHeight;
 }
@@ -271,7 +271,7 @@ export function calculateFitPage(
   pageHeight: number,
   containerWidth: number,
   containerHeight: number,
-  padding: number = 20
+  padding: number = 20,
 ): number {
   const fitWidth = calculateFitWidth(pageWidth, containerWidth, padding);
   const fitHeight = calculateFitHeight(pageHeight, containerHeight, padding);
@@ -291,7 +291,7 @@ export function clampZoom(zoom: number): number {
  */
 export function estimateReadingTime(
   totalPages: number,
-  pagesRead: number = 0
+  pagesRead: number = 0,
 ): number {
   const remainingPages = totalPages - pagesRead;
   return Math.ceil(remainingPages * 2);
@@ -332,7 +332,7 @@ export async function loadPDFSettings(): Promise<PDFViewerSettings> {
  * Save PDF viewer settings
  */
 export async function savePDFSettings(
-  settings: Partial<PDFViewerSettings>
+  settings: Partial<PDFViewerSettings>,
 ): Promise<void> {
   try {
     const current = await loadPDFSettings();
@@ -374,7 +374,7 @@ export async function loadBookmarks(): Promise<Bookmark[]> {
  * Get bookmarks for a document
  */
 export async function getDocumentBookmarks(
-  documentId: string
+  documentId: string,
 ): Promise<Bookmark[]> {
   const bookmarks = await loadBookmarks();
   return bookmarks
@@ -389,13 +389,13 @@ export async function addBookmark(
   documentId: string,
   pageNumber: number,
   label?: string,
-  color?: string
+  color?: string,
 ): Promise<Bookmark> {
   const bookmarks = await loadBookmarks();
 
   // Check if bookmark exists
   const existing = bookmarks.find(
-    (b) => b.documentId === documentId && b.pageNumber === pageNumber
+    (b) => b.documentId === documentId && b.pageNumber === pageNumber,
   );
   if (existing) {
     return existing;
@@ -430,11 +430,11 @@ export async function removeBookmark(id: string): Promise<void> {
  */
 export async function removeBookmarkByPage(
   documentId: string,
-  pageNumber: number
+  pageNumber: number,
 ): Promise<void> {
   const bookmarks = await loadBookmarks();
   const filtered = bookmarks.filter(
-    (b) => !(b.documentId === documentId && b.pageNumber === pageNumber)
+    (b) => !(b.documentId === documentId && b.pageNumber === pageNumber),
   );
   await AsyncStorage.setItem(STORAGE_KEYS.BOOKMARKS, JSON.stringify(filtered));
 }
@@ -444,7 +444,7 @@ export async function removeBookmarkByPage(
  */
 export async function updateBookmark(
   id: string,
-  updates: Partial<Bookmark>
+  updates: Partial<Bookmark>,
 ): Promise<void> {
   const bookmarks = await loadBookmarks();
   const index = bookmarks.findIndex((b) => b.id === id);
@@ -452,7 +452,7 @@ export async function updateBookmark(
     bookmarks[index] = { ...bookmarks[index], ...updates };
     await AsyncStorage.setItem(
       STORAGE_KEYS.BOOKMARKS,
-      JSON.stringify(bookmarks)
+      JSON.stringify(bookmarks),
     );
   }
 }
@@ -462,11 +462,11 @@ export async function updateBookmark(
  */
 export async function isPageBookmarked(
   documentId: string,
-  pageNumber: number
+  pageNumber: number,
 ): Promise<boolean> {
   const bookmarks = await loadBookmarks();
   return bookmarks.some(
-    (b) => b.documentId === documentId && b.pageNumber === pageNumber
+    (b) => b.documentId === documentId && b.pageNumber === pageNumber,
   );
 }
 
@@ -476,7 +476,7 @@ export async function isPageBookmarked(
 export async function toggleBookmark(
   documentId: string,
   pageNumber: number,
-  label?: string
+  label?: string,
 ): Promise<{ isBookmarked: boolean; bookmark?: Bookmark }> {
   const isMarked = await isPageBookmarked(documentId, pageNumber);
 
@@ -514,7 +514,7 @@ export async function loadAllProgress(): Promise<
  * Get reading progress for a document
  */
 export async function getReadingProgress(
-  documentId: string
+  documentId: string,
 ): Promise<ReadingProgress | null> {
   const progress = await loadAllProgress();
   return progress[documentId] || null;
@@ -526,7 +526,7 @@ export async function getReadingProgress(
 export async function saveReadingProgress(
   documentId: string,
   currentPage: number,
-  totalPages: number
+  totalPages: number,
 ): Promise<ReadingProgress> {
   const allProgress = await loadAllProgress();
 
@@ -541,7 +541,7 @@ export async function saveReadingProgress(
   allProgress[documentId] = progress;
   await AsyncStorage.setItem(
     STORAGE_KEYS.PROGRESS,
-    JSON.stringify(allProgress)
+    JSON.stringify(allProgress),
   );
 
   return progress;
@@ -555,7 +555,7 @@ export async function clearReadingProgress(documentId: string): Promise<void> {
   delete allProgress[documentId];
   await AsyncStorage.setItem(
     STORAGE_KEYS.PROGRESS,
-    JSON.stringify(allProgress)
+    JSON.stringify(allProgress),
   );
 }
 
@@ -642,7 +642,7 @@ export async function loadAnnotations(): Promise<Annotation[]> {
  * Get annotations for a document
  */
 export async function getDocumentAnnotations(
-  documentId: string
+  documentId: string,
 ): Promise<Annotation[]> {
   const annotations = await loadAnnotations();
   return annotations.filter((a) => a.documentId === documentId);
@@ -653,11 +653,11 @@ export async function getDocumentAnnotations(
  */
 export async function getPageAnnotations(
   documentId: string,
-  pageNumber: number
+  pageNumber: number,
 ): Promise<Annotation[]> {
   const annotations = await loadAnnotations();
   return annotations.filter(
-    (a) => a.documentId === documentId && a.pageNumber === pageNumber
+    (a) => a.documentId === documentId && a.pageNumber === pageNumber,
   );
 }
 
@@ -665,7 +665,7 @@ export async function getPageAnnotations(
  * Add annotation
  */
 export async function addAnnotation(
-  annotation: Omit<Annotation, "id" | "createdAt" | "updatedAt">
+  annotation: Omit<Annotation, "id" | "createdAt" | "updatedAt">,
 ): Promise<Annotation> {
   const annotations = await loadAnnotations();
 
@@ -679,7 +679,7 @@ export async function addAnnotation(
   annotations.push(newAnnotation);
   await AsyncStorage.setItem(
     STORAGE_KEYS.ANNOTATIONS,
-    JSON.stringify(annotations)
+    JSON.stringify(annotations),
   );
 
   return newAnnotation;
@@ -690,7 +690,7 @@ export async function addAnnotation(
  */
 export async function updateAnnotation(
   id: string,
-  updates: Partial<Annotation>
+  updates: Partial<Annotation>,
 ): Promise<void> {
   const annotations = await loadAnnotations();
   const index = annotations.findIndex((a) => a.id === id);
@@ -703,7 +703,7 @@ export async function updateAnnotation(
     };
     await AsyncStorage.setItem(
       STORAGE_KEYS.ANNOTATIONS,
-      JSON.stringify(annotations)
+      JSON.stringify(annotations),
     );
   }
 }
@@ -716,7 +716,7 @@ export async function removeAnnotation(id: string): Promise<void> {
   const filtered = annotations.filter((a) => a.id !== id);
   await AsyncStorage.setItem(
     STORAGE_KEYS.ANNOTATIONS,
-    JSON.stringify(filtered)
+    JSON.stringify(filtered),
   );
 }
 
@@ -777,7 +777,7 @@ export async function sharePDF(uri: string): Promise<boolean> {
  */
 export async function copyPDFToStorage(
   sourceUri: string,
-  filename: string
+  filename: string,
 ): Promise<string> {
   try {
     const destDir = `${FileSystem.documentDirectory}pdfs/`;
@@ -866,7 +866,7 @@ export function prevSearchResult(state: SearchState): SearchState {
  * Get current search result
  */
 export function getCurrentSearchResult(
-  state: SearchState
+  state: SearchState,
 ): SearchResult | null {
   if (state.currentIndex < 0 || state.currentIndex >= state.results.length) {
     return null;
@@ -898,7 +898,7 @@ export function usePDFSettings() {
       setSettings(newSettings);
       await savePDFSettings(updates);
     },
-    [settings]
+    [settings],
   );
 
   const reset = useCallback(async () => {
@@ -934,11 +934,11 @@ export function useBookmarks(documentId: string) {
     async (pageNumber: number, label?: string) => {
       const bookmark = await addBookmark(documentId, pageNumber, label);
       setBookmarks((prev) =>
-        [...prev, bookmark].sort((a, b) => a.pageNumber - b.pageNumber)
+        [...prev, bookmark].sort((a, b) => a.pageNumber - b.pageNumber),
       );
       return bookmark;
     },
-    [documentId]
+    [documentId],
   );
 
   const remove = useCallback(async (id: string) => {
@@ -952,22 +952,22 @@ export function useBookmarks(documentId: string) {
       if (result.isBookmarked && result.bookmark) {
         setBookmarks((prev) =>
           [...prev, result.bookmark!].sort(
-            (a, b) => a.pageNumber - b.pageNumber
-          )
+            (a, b) => a.pageNumber - b.pageNumber,
+          ),
         );
       } else {
         setBookmarks((prev) => prev.filter((b) => b.pageNumber !== pageNumber));
       }
       return result.isBookmarked;
     },
-    [documentId]
+    [documentId],
   );
 
   const isBookmarked = useCallback(
     (pageNumber: number) => {
       return bookmarks.some((b) => b.pageNumber === pageNumber);
     },
-    [bookmarks]
+    [bookmarks],
   );
 
   return { bookmarks, loading, refresh, add, remove, toggle, isBookmarked };
@@ -988,12 +988,12 @@ export function useReadingProgress(documentId: string, totalPages: number) {
       const newProgress = await saveReadingProgress(
         documentId,
         currentPage,
-        totalPages
+        totalPages,
       );
       setProgress(newProgress);
       return newProgress;
     },
-    [documentId, totalPages]
+    [documentId, totalPages],
   );
 
   const clear = useCallback(async () => {
@@ -1022,7 +1022,7 @@ export function usePDFViewer(uri: string, totalPages: number) {
   } = useBookmarks(documentId);
   const { progress, updateProgress } = useReadingProgress(
     documentId,
-    totalPages
+    totalPages,
   );
 
   // Load saved position
@@ -1040,7 +1040,7 @@ export function usePDFViewer(uri: string, totalPages: number) {
       setCurrentPage(validPage);
       updateProgress(validPage);
     },
-    [totalPages, updateProgress]
+    [totalPages, updateProgress],
   );
 
   // Next page
@@ -1061,7 +1061,7 @@ export function usePDFViewer(uri: string, totalPages: number) {
   const goToFirst = useCallback(() => goToPage(1), [goToPage]);
   const goToLast = useCallback(
     () => goToPage(totalPages),
-    [goToPage, totalPages]
+    [goToPage, totalPages],
   );
 
   // Zoom controls
@@ -1207,7 +1207,7 @@ class PDFViewerServiceClass {
   async saveProgress(
     documentId: string,
     currentPage: number,
-    totalPages: number
+    totalPages: number,
   ) {
     return saveReadingProgress(documentId, currentPage, totalPages);
   }
@@ -1227,7 +1227,7 @@ class PDFViewerServiceClass {
   }
 
   async addAnnotation(
-    annotation: Omit<Annotation, "id" | "createdAt" | "updatedAt">
+    annotation: Omit<Annotation, "id" | "createdAt" | "updatedAt">,
   ) {
     return addAnnotation(annotation);
   }

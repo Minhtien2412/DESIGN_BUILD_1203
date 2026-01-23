@@ -3,16 +3,25 @@
  * Features: Full-screen view, zoom, edit, delete, share, download
  * @author AI Assistant
  * @date 13/01/2026
+ * @updated 22/01/2026 - Added video playback support
  */
 
-import { Ionicons } from '@expo/vector-icons';
-import { File as ExpoFile, Paths } from 'expo-file-system';
-import { Image, ImageContentFit } from 'expo-image';
-import * as ImageManipulator from 'expo-image-manipulator';
-import * as ImagePicker from 'expo-image-picker';
-import * as MediaLibrary from 'expo-media-library';
-import * as Sharing from 'expo-sharing';
-import React, { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
+import { Ionicons } from "@expo/vector-icons";
+import { ResizeMode, Video } from "expo-av";
+import { File as ExpoFile, Paths } from "expo-file-system";
+import { Image, ImageContentFit } from "expo-image";
+import * as ImageManipulator from "expo-image-manipulator";
+import * as ImagePicker from "expo-image-picker";
+import * as MediaLibrary from "expo-media-library";
+import * as Sharing from "expo-sharing";
+import React, {
+    createContext,
+    useCallback,
+    useContext,
+    useMemo,
+    useRef,
+    useState,
+} from "react";
 import {
     ActivityIndicator,
     Alert,
@@ -31,16 +40,16 @@ import {
     Text,
     TouchableOpacity,
     View,
-} from 'react-native';
+} from "react-native";
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 // ==================== TYPES ====================
 
 export interface MediaFile {
   id: string;
   uri: string;
-  type: 'image' | 'video';
+  type: "image" | "video";
   width?: number;
   height?: number;
   thumbnail?: string;
@@ -69,7 +78,11 @@ export interface FullMediaViewerOptions {
 }
 
 interface ViewerContextType {
-  open: (files: MediaFile[], initialIndex?: number, options?: FullMediaViewerOptions) => void;
+  open: (
+    files: MediaFile[],
+    initialIndex?: number,
+    options?: FullMediaViewerOptions,
+  ) => void;
   close: () => void;
   isOpen: boolean;
 }
@@ -80,31 +93,45 @@ const FullMediaViewerContext = createContext<ViewerContextType | null>(null);
 
 export function useFullMediaViewer() {
   const ctx = useContext(FullMediaViewerContext);
-  if (!ctx) throw new Error('useFullMediaViewer must be used within FullMediaViewerProvider');
+  if (!ctx)
+    throw new Error(
+      "useFullMediaViewer must be used within FullMediaViewerProvider",
+    );
   return ctx;
 }
 
 // ==================== PROVIDER ====================
 
-export function FullMediaViewerProvider({ children }: { children: React.ReactNode }) {
+export function FullMediaViewerProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [files, setFiles] = useState<MediaFile[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const [options, setOptions] = useState<FullMediaViewerOptions>({});
 
-  const open = useCallback((newFiles: MediaFile[], initialIndex = 0, opts: FullMediaViewerOptions = {}) => {
-    setFiles(newFiles);
-    setCurrentIndex(initialIndex);
-    setOptions({
-      allowDelete: true,
-      allowEdit: true,
-      allowShare: true,
-      allowDownload: true,
-      showInfo: true,
-      ...opts,
-    });
-    setIsVisible(true);
-  }, []);
+  const open = useCallback(
+    (
+      newFiles: MediaFile[],
+      initialIndex = 0,
+      opts: FullMediaViewerOptions = {},
+    ) => {
+      setFiles(newFiles);
+      setCurrentIndex(initialIndex);
+      setOptions({
+        allowDelete: true,
+        allowEdit: true,
+        allowShare: true,
+        allowDownload: true,
+        showInfo: true,
+        ...opts,
+      });
+      setIsVisible(true);
+    },
+    [],
+  );
 
   const close = useCallback(() => {
     setIsVisible(false);
@@ -114,30 +141,41 @@ export function FullMediaViewerProvider({ children }: { children: React.ReactNod
     }, 300);
   }, []);
 
-  const value = useMemo(() => ({ open, close, isOpen: isVisible }), [open, close, isVisible]);
+  const value = useMemo(
+    () => ({ open, close, isOpen: isVisible }),
+    [open, close, isVisible],
+  );
 
   const handleIndexChange = useCallback((index: number) => {
     setCurrentIndex(index);
   }, []);
 
-  const handleDelete = useCallback((id: string) => {
-    const newFiles = files.filter(f => f.id !== id);
-    options.onDelete?.(id);
-    
-    if (newFiles.length === 0) {
-      close();
-    } else {
-      setFiles(newFiles);
-      if (currentIndex >= newFiles.length) {
-        setCurrentIndex(newFiles.length - 1);
-      }
-    }
-  }, [files, currentIndex, options, close]);
+  const handleDelete = useCallback(
+    (id: string) => {
+      const newFiles = files.filter((f) => f.id !== id);
+      options.onDelete?.(id);
 
-  const handleEdit = useCallback((id: string, newUri: string) => {
-    setFiles(prev => prev.map(f => f.id === id ? { ...f, uri: newUri } : f));
-    options.onEdit?.(id, newUri);
-  }, [options]);
+      if (newFiles.length === 0) {
+        close();
+      } else {
+        setFiles(newFiles);
+        if (currentIndex >= newFiles.length) {
+          setCurrentIndex(newFiles.length - 1);
+        }
+      }
+    },
+    [files, currentIndex, options, close],
+  );
+
+  const handleEdit = useCallback(
+    (id: string, newUri: string) => {
+      setFiles((prev) =>
+        prev.map((f) => (f.id === id ? { ...f, uri: newUri } : f)),
+      );
+      options.onEdit?.(id, newUri);
+    },
+    [options],
+  );
 
   return (
     <FullMediaViewerContext.Provider value={value}>
@@ -206,33 +244,34 @@ function FullMediaViewerContent({
   }, [showControls, controlsOpacity]);
 
   // Handle scroll
-  const handleScroll = useCallback((event: any) => {
-    const index = Math.round(event.nativeEvent.contentOffset.x / SCREEN_WIDTH);
-    if (index !== currentIndex && index >= 0 && index < files.length) {
-      onIndexChange(index);
-    }
-  }, [currentIndex, files.length, onIndexChange]);
+  const handleScroll = useCallback(
+    (event: any) => {
+      const index = Math.round(
+        event.nativeEvent.contentOffset.x / SCREEN_WIDTH,
+      );
+      if (index !== currentIndex && index >= 0 && index < files.length) {
+        onIndexChange(index);
+      }
+    },
+    [currentIndex, files.length, onIndexChange],
+  );
 
   // Delete confirmation
   const handleDelete = useCallback(() => {
-    Alert.alert(
-      'Xóa ảnh/video',
-      'Bạn có chắc muốn xóa?',
-      [
-        { text: 'Hủy', style: 'cancel' },
-        {
-          text: 'Xóa',
-          style: 'destructive',
-          onPress: () => onDelete(currentFile.id),
-        },
-      ]
-    );
+    Alert.alert("Xóa ảnh/video", "Bạn có chắc muốn xóa?", [
+      { text: "Hủy", style: "cancel" },
+      {
+        text: "Xóa",
+        style: "destructive",
+        onPress: () => onDelete(currentFile.id),
+      },
+    ]);
   }, [currentFile, onDelete]);
 
   // Share
   const handleShare = useCallback(async () => {
     try {
-      if (Platform.OS === 'web') {
+      if (Platform.OS === "web") {
         await Share.share({ url: currentFile.uri });
       } else {
         const canShare = await Sharing.isAvailableAsync();
@@ -243,8 +282,8 @@ function FullMediaViewerContent({
         }
       }
     } catch (error) {
-      console.error('Share error:', error);
-      Alert.alert('Lỗi', 'Không thể chia sẻ');
+      console.error("Share error:", error);
+      Alert.alert("Lỗi", "Không thể chia sẻ");
     }
   }, [currentFile]);
 
@@ -252,18 +291,18 @@ function FullMediaViewerContent({
   const handleDownload = useCallback(async () => {
     try {
       setIsLoading(true);
-      
+
       // Request permission
       const { status } = await MediaLibrary.requestPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Quyền truy cập', 'Cần quyền truy cập thư viện để lưu');
+      if (status !== "granted") {
+        Alert.alert("Quyền truy cập", "Cần quyền truy cập thư viện để lưu");
         return;
       }
 
       // Download if remote URL
       let localUri = currentFile.uri;
-      if (currentFile.uri.startsWith('http')) {
-        const filename = `media_${Date.now()}.${currentFile.type === 'video' ? 'mp4' : 'jpg'}`;
+      if (currentFile.uri.startsWith("http")) {
+        const filename = `media_${Date.now()}.${currentFile.type === "video" ? "mp4" : "jpg"}`;
         // Use new expo-file-system API
         const destFile = new ExpoFile(Paths.cache, filename);
         const response = await fetch(currentFile.uri);
@@ -275,10 +314,10 @@ function FullMediaViewerContent({
 
       // Save to gallery
       await MediaLibrary.saveToLibraryAsync(localUri);
-      Alert.alert('Thành công', 'Đã lưu vào thư viện ảnh');
+      Alert.alert("Thành công", "Đã lưu vào thư viện ảnh");
     } catch (error) {
-      console.error('Download error:', error);
-      Alert.alert('Lỗi', 'Không thể tải về');
+      console.error("Download error:", error);
+      Alert.alert("Lỗi", "Không thể tải về");
     } finally {
       setIsLoading(false);
     }
@@ -286,25 +325,29 @@ function FullMediaViewerContent({
 
   // Edit image
   const handleEdit = useCallback(async () => {
-    if (currentFile.type !== 'image') {
-      Alert.alert('Thông báo', 'Chỉ hỗ trợ chỉnh sửa ảnh');
+    if (currentFile.type !== "image") {
+      Alert.alert("Thông báo", "Chỉ hỗ trợ chỉnh sửa ảnh");
       return;
     }
     setIsEditing(true);
   }, [currentFile]);
 
   // Render each media item
-  const renderItem = useCallback(({ item }: { item: MediaFile }) => (
-    <MediaItemView
-      file={item}
-      onTap={toggleControls}
-    />
-  ), [toggleControls]);
+  const renderItem = useCallback(
+    ({ item }: { item: MediaFile }) => (
+      <MediaItemView file={item} onTap={toggleControls} />
+    ),
+    [toggleControls],
+  );
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
-      
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor="transparent"
+        translucent
+      />
+
       {/* Media Gallery */}
       <FlatList
         ref={flatListRef}
@@ -325,20 +368,26 @@ function FullMediaViewerContent({
       />
 
       {/* Controls Overlay */}
-      <Animated.View style={[styles.controlsOverlay, { opacity: controlsOpacity }]} pointerEvents={showControls ? 'auto' : 'none'}>
+      <Animated.View
+        style={[styles.controlsOverlay, { opacity: controlsOpacity }]}
+        pointerEvents={showControls ? "auto" : "none"}
+      >
         {/* Header */}
         <SafeAreaView style={styles.header}>
           <TouchableOpacity style={styles.headerButton} onPress={onClose}>
             <Ionicons name="close" size={28} color="#fff" />
           </TouchableOpacity>
-          
+
           <Text style={styles.headerTitle}>
             {options.headerTitle || `${currentIndex + 1} / ${files.length}`}
           </Text>
-          
+
           <View style={styles.headerRight}>
             {options.allowDownload && (
-              <TouchableOpacity style={styles.headerButton} onPress={handleDownload}>
+              <TouchableOpacity
+                style={styles.headerButton}
+                onPress={handleDownload}
+              >
                 <Ionicons name="download-outline" size={24} color="#fff" />
               </TouchableOpacity>
             )}
@@ -350,9 +399,13 @@ function FullMediaViewerContent({
           {/* Info */}
           {options.showInfo && currentFile.title && (
             <View style={styles.infoBar}>
-              <Text style={styles.infoTitle} numberOfLines={1}>{currentFile.title}</Text>
+              <Text style={styles.infoTitle} numberOfLines={1}>
+                {currentFile.title}
+              </Text>
               {currentFile.description && (
-                <Text style={styles.infoDesc} numberOfLines={2}>{currentFile.description}</Text>
+                <Text style={styles.infoDesc} numberOfLines={2}>
+                  {currentFile.description}
+                </Text>
               )}
             </View>
           )}
@@ -360,23 +413,34 @@ function FullMediaViewerContent({
           {/* Action buttons */}
           <View style={styles.actionBar}>
             {options.allowShare && (
-              <TouchableOpacity style={styles.actionButton} onPress={handleShare}>
+              <TouchableOpacity
+                style={styles.actionButton}
+                onPress={handleShare}
+              >
                 <Ionicons name="share-outline" size={26} color="#fff" />
                 <Text style={styles.actionText}>Chia sẻ</Text>
               </TouchableOpacity>
             )}
-            
-            {options.allowEdit && currentFile.type === 'image' && (
-              <TouchableOpacity style={styles.actionButton} onPress={handleEdit}>
+
+            {options.allowEdit && currentFile.type === "image" && (
+              <TouchableOpacity
+                style={styles.actionButton}
+                onPress={handleEdit}
+              >
                 <Ionicons name="create-outline" size={26} color="#fff" />
                 <Text style={styles.actionText}>Sửa</Text>
               </TouchableOpacity>
             )}
-            
+
             {options.allowDelete && (
-              <TouchableOpacity style={styles.actionButton} onPress={handleDelete}>
+              <TouchableOpacity
+                style={styles.actionButton}
+                onPress={handleDelete}
+              >
                 <Ionicons name="trash-outline" size={26} color="#ff4444" />
-                <Text style={[styles.actionText, { color: '#ff4444' }]}>Xóa</Text>
+                <Text style={[styles.actionText, { color: "#ff4444" }]}>
+                  Xóa
+                </Text>
               </TouchableOpacity>
             )}
           </View>
@@ -471,7 +535,7 @@ function MediaItemView({ file, onTap }: MediaItemViewProps) {
           lastTranslateY.current = 0;
         }
       },
-    })
+    }),
   ).current;
 
   // Double tap to zoom
@@ -501,33 +565,274 @@ function MediaItemView({ file, onTap }: MediaItemViewProps) {
         style={[
           styles.mediaItem,
           {
-            transform: [
-              { scale },
-              { translateX },
-              { translateY },
-            ],
+            transform: [{ scale }, { translateX }, { translateY }],
           },
         ]}
         {...panResponder.panHandlers}
       >
         <Pressable onPress={handleTap} style={styles.mediaItemPressable}>
-          {file.type === 'image' ? (
+          {file.type === "image" ? (
             <Image
               source={{ uri: file.uri }}
               style={styles.mediaImage}
               contentFit="contain"
             />
           ) : (
-            <View style={styles.videoPlaceholder}>
-              <Ionicons name="play-circle" size={80} color="#fff" />
-              <Text style={styles.videoText}>Video</Text>
-            </View>
+            <VideoPlayer file={file} onTap={onTap} />
           )}
         </Pressable>
       </Animated.View>
     </View>
   );
 }
+
+// ==================== VIDEO PLAYER COMPONENT ====================
+
+interface VideoPlayerProps {
+  file: MediaFile;
+  onTap: () => void;
+}
+
+function VideoPlayer({ file, onTap }: VideoPlayerProps) {
+  const videoRef = useRef<Video>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [progress, setProgress] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [showControls, setShowControls] = useState(true);
+
+  const togglePlayPause = useCallback(async () => {
+    if (videoRef.current) {
+      if (isPlaying) {
+        await videoRef.current.pauseAsync();
+      } else {
+        await videoRef.current.playAsync();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  }, [isPlaying]);
+
+  const handleLoad = useCallback((status: any) => {
+    setIsLoading(false);
+    if (status.durationMillis) {
+      setDuration(status.durationMillis);
+    }
+  }, []);
+
+  const handlePlaybackStatusUpdate = useCallback((status: any) => {
+    if (status.isLoaded) {
+      setIsPlaying(status.isPlaying);
+      if (status.positionMillis && status.durationMillis) {
+        setProgress(status.positionMillis / status.durationMillis);
+      }
+    }
+  }, []);
+
+  const formatTime = (millis: number) => {
+    const totalSeconds = Math.floor(millis / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  };
+
+  const handleTap = useCallback(() => {
+    setShowControls((prev) => !prev);
+    onTap();
+  }, [onTap]);
+
+  const handleSeek = useCallback(
+    async (value: number) => {
+      if (videoRef.current && duration > 0) {
+        await videoRef.current.setPositionAsync(value * duration);
+      }
+    },
+    [duration],
+  );
+
+  return (
+    <View style={videoStyles.container}>
+      <Video
+        ref={videoRef}
+        source={{ uri: file.uri }}
+        style={videoStyles.video}
+        resizeMode={ResizeMode.CONTAIN}
+        shouldPlay={false}
+        isLooping={false}
+        onLoad={handleLoad}
+        onPlaybackStatusUpdate={handlePlaybackStatusUpdate}
+        useNativeControls={false}
+      />
+
+      {/* Loading indicator */}
+      {isLoading && (
+        <View style={videoStyles.loadingContainer}>
+          <ActivityIndicator size="large" color="#fff" />
+          <Text style={videoStyles.loadingText}>Đang tải video...</Text>
+        </View>
+      )}
+
+      {/* Custom Controls Overlay */}
+      <Pressable style={videoStyles.controlsOverlay} onPress={handleTap}>
+        {showControls && (
+          <View style={videoStyles.controlsContainer}>
+            {/* Play/Pause Button */}
+            <TouchableOpacity
+              style={videoStyles.playButton}
+              onPress={togglePlayPause}
+              activeOpacity={0.8}
+            >
+              <Ionicons
+                name={isPlaying ? "pause" : "play"}
+                size={50}
+                color="#fff"
+              />
+            </TouchableOpacity>
+
+            {/* Progress Bar */}
+            <View style={videoStyles.progressContainer}>
+              <Text style={videoStyles.timeText}>
+                {formatTime(progress * duration)}
+              </Text>
+              <View style={videoStyles.progressBar}>
+                <TouchableOpacity
+                  style={videoStyles.progressTrack}
+                  onPress={(e) => {
+                    const { locationX } = e.nativeEvent;
+                    const width = SCREEN_WIDTH - 120;
+                    handleSeek(locationX / width);
+                  }}
+                >
+                  <View
+                    style={[
+                      videoStyles.progressFill,
+                      { width: `${progress * 100}%` },
+                    ]}
+                  />
+                </TouchableOpacity>
+              </View>
+              <Text style={videoStyles.timeText}>{formatTime(duration)}</Text>
+            </View>
+          </View>
+        )}
+      </Pressable>
+
+      {/* Thumbnail for non-playing state */}
+      {!isPlaying && file.thumbnail && (
+        <Pressable
+          style={videoStyles.thumbnailOverlay}
+          onPress={togglePlayPause}
+        >
+          <Image
+            source={{ uri: file.thumbnail }}
+            style={videoStyles.thumbnail}
+            contentFit="cover"
+          />
+          <View style={videoStyles.playIconOverlay}>
+            <View style={videoStyles.playIconCircle}>
+              <Ionicons name="play" size={40} color="#fff" />
+            </View>
+          </View>
+        </Pressable>
+      )}
+    </View>
+  );
+}
+
+const videoStyles = StyleSheet.create({
+  container: {
+    width: SCREEN_WIDTH,
+    height: SCREEN_HEIGHT,
+    backgroundColor: "#000",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  video: {
+    width: SCREEN_WIDTH,
+    height: SCREEN_HEIGHT * 0.7,
+  },
+  loadingContainer: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  loadingText: {
+    color: "#fff",
+    marginTop: 12,
+    fontSize: 14,
+  },
+  controlsOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  controlsContainer: {
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  playButton: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  progressContainer: {
+    position: "absolute",
+    bottom: 100,
+    left: 20,
+    right: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  progressBar: {
+    flex: 1,
+    height: 40,
+    justifyContent: "center",
+  },
+  progressTrack: {
+    height: 4,
+    backgroundColor: "rgba(255,255,255,0.3)",
+    borderRadius: 2,
+  },
+  progressFill: {
+    height: "100%",
+    backgroundColor: "#1877F2",
+    borderRadius: 2,
+  },
+  timeText: {
+    color: "#fff",
+    fontSize: 12,
+    minWidth: 45,
+  },
+  thumbnailOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  thumbnail: {
+    width: SCREEN_WIDTH,
+    height: SCREEN_HEIGHT * 0.7,
+  },
+  playIconOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.3)",
+  },
+  playIconCircle: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingLeft: 6, // Offset play icon to center visually
+  },
+});
 
 // ==================== IMAGE EDITOR MODAL ====================
 
@@ -550,13 +855,13 @@ function ImageEditorModal({ file, onSave, onCancel }: ImageEditorModalProps) {
       const result = await ImageManipulator.manipulateAsync(
         file.uri,
         [{ rotate: newRotation }],
-        { compress: 0.9, format: ImageManipulator.SaveFormat.JPEG }
+        { compress: 0.9, format: ImageManipulator.SaveFormat.JPEG },
       );
       setEditedUri(result.uri);
       setRotation(newRotation);
     } catch (error) {
-      console.error('Rotate error:', error);
-      Alert.alert('Lỗi', 'Không thể xoay ảnh');
+      console.error("Rotate error:", error);
+      Alert.alert("Lỗi", "Không thể xoay ảnh");
     } finally {
       setIsProcessing(false);
     }
@@ -569,12 +874,12 @@ function ImageEditorModal({ file, onSave, onCancel }: ImageEditorModalProps) {
       const result = await ImageManipulator.manipulateAsync(
         editedUri,
         [{ flip: ImageManipulator.FlipType.Horizontal }],
-        { compress: 0.9, format: ImageManipulator.SaveFormat.JPEG }
+        { compress: 0.9, format: ImageManipulator.SaveFormat.JPEG },
       );
       setEditedUri(result.uri);
     } catch (error) {
-      console.error('Flip error:', error);
-      Alert.alert('Lỗi', 'Không thể lật ảnh');
+      console.error("Flip error:", error);
+      Alert.alert("Lỗi", "Không thể lật ảnh");
     } finally {
       setIsProcessing(false);
     }
@@ -593,7 +898,7 @@ function ImageEditorModal({ file, onSave, onCancel }: ImageEditorModalProps) {
         setEditedUri(result.assets[0].uri);
       }
     } catch (error) {
-      console.error('Crop error:', error);
+      console.error("Crop error:", error);
     }
   }, []);
 
@@ -603,9 +908,9 @@ function ImageEditorModal({ file, onSave, onCancel }: ImageEditorModalProps) {
       setIsProcessing(true);
       // Note: ImageManipulator doesn't support grayscale directly
       // This is a placeholder - would need custom shader or library
-      Alert.alert('Thông báo', 'Tính năng đang phát triển');
+      Alert.alert("Thông báo", "Tính năng đang phát triển");
     } catch (error) {
-      console.error('Filter error:', error);
+      console.error("Filter error:", error);
     } finally {
       setIsProcessing(false);
     }
@@ -615,21 +920,25 @@ function ImageEditorModal({ file, onSave, onCancel }: ImageEditorModalProps) {
     <Modal visible animationType="slide" statusBarTranslucent>
       <View style={styles.editorContainer}>
         <StatusBar barStyle="light-content" />
-        
+
         {/* Header */}
         <SafeAreaView style={styles.editorHeader}>
           <TouchableOpacity onPress={onCancel} style={styles.editorHeaderBtn}>
             <Text style={styles.editorCancelText}>Hủy</Text>
           </TouchableOpacity>
-          
+
           <Text style={styles.editorTitle}>Chỉnh sửa ảnh</Text>
-          
-          <TouchableOpacity 
-            onPress={() => onSave(editedUri)} 
+
+          <TouchableOpacity
+            onPress={() => onSave(editedUri)}
             style={styles.editorHeaderBtn}
             disabled={isProcessing}
           >
-            <Text style={[styles.editorSaveText, isProcessing && { opacity: 0.5 }]}>Lưu</Text>
+            <Text
+              style={[styles.editorSaveText, isProcessing && { opacity: 0.5 }]}
+            >
+              Lưu
+            </Text>
           </TouchableOpacity>
         </SafeAreaView>
 
@@ -653,17 +962,17 @@ function ImageEditorModal({ file, onSave, onCancel }: ImageEditorModalProps) {
             <Ionicons name="refresh" size={28} color="#fff" />
             <Text style={styles.editorToolText}>Xoay</Text>
           </TouchableOpacity>
-          
+
           <TouchableOpacity style={styles.editorTool} onPress={handleFlip}>
             <Ionicons name="swap-horizontal" size={28} color="#fff" />
             <Text style={styles.editorToolText}>Lật</Text>
           </TouchableOpacity>
-          
+
           <TouchableOpacity style={styles.editorTool} onPress={handleCrop}>
             <Ionicons name="crop" size={28} color="#fff" />
             <Text style={styles.editorToolText}>Cắt</Text>
           </TouchableOpacity>
-          
+
           <TouchableOpacity style={styles.editorTool} onPress={handleGrayscale}>
             <Ionicons name="color-filter" size={28} color="#fff" />
             <Text style={styles.editorToolText}>Bộ lọc</Text>
@@ -679,104 +988,104 @@ function ImageEditorModal({ file, onSave, onCancel }: ImageEditorModalProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: "#000",
   },
   controlsOverlay: {
     ...StyleSheet.absoluteFillObject,
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 16,
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+    backgroundColor: "rgba(0,0,0,0.4)",
   },
   headerButton: {
     width: 44,
     height: 44,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   headerTitle: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   headerRight: {
-    flexDirection: 'row',
+    flexDirection: "row",
   },
   footer: {
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    backgroundColor: "rgba(0,0,0,0.4)",
     paddingBottom: 20,
   },
   infoBar: {
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.1)',
+    borderBottomColor: "rgba(255,255,255,0.1)",
   },
   infoTitle: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   infoDesc: {
-    color: 'rgba(255,255,255,0.7)',
+    color: "rgba(255,255,255,0.7)",
     fontSize: 14,
     marginTop: 4,
   },
   actionBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexDirection: "row",
+    justifyContent: "space-around",
     paddingVertical: 16,
     paddingHorizontal: 32,
   },
   actionButton: {
-    alignItems: 'center',
+    alignItems: "center",
     minWidth: 60,
   },
   actionText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 12,
     marginTop: 4,
   },
   pagination: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 140,
     left: 0,
     right: 0,
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
     gap: 8,
   },
   paginationDot: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: 'rgba(255,255,255,0.4)',
+    backgroundColor: "rgba(255,255,255,0.4)",
   },
   paginationDotActive: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     width: 24,
   },
   loadingOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.7)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(0,0,0,0.7)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   loadingText: {
-    color: '#fff',
+    color: "#fff",
     marginTop: 12,
     fontSize: 14,
   },
   mediaItemContainer: {
     width: SCREEN_WIDTH,
     height: SCREEN_HEIGHT,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   mediaItem: {
     width: SCREEN_WIDTH,
@@ -784,82 +1093,83 @@ const styles = StyleSheet.create({
   },
   mediaItemPressable: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   mediaImage: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
   videoPlaceholder: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   videoText: {
-    color: '#fff',
+    color: "#fff",
     marginTop: 8,
     fontSize: 16,
   },
   // Editor styles
   editorContainer: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: "#000",
   },
   editorHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#1a1a1a',
-    paddingTop: Platform.OS === 'android' ? (StatusBar.currentHeight || 0) + 12 : 12,
+    backgroundColor: "#1a1a1a",
+    paddingTop:
+      Platform.OS === "android" ? (StatusBar.currentHeight || 0) + 12 : 12,
   },
   editorHeaderBtn: {
     paddingHorizontal: 8,
     paddingVertical: 4,
   },
   editorCancelText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
   },
   editorTitle: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 17,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   editorSaveText: {
-    color: '#0066CC',
+    color: "#0066CC",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   editorPreview: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   editorImage: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
   editorProcessing: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   editorTools: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexDirection: "row",
+    justifyContent: "space-around",
     paddingVertical: 20,
     paddingHorizontal: 16,
-    backgroundColor: '#1a1a1a',
+    backgroundColor: "#1a1a1a",
   },
   editorTool: {
-    alignItems: 'center',
+    alignItems: "center",
     minWidth: 60,
   },
   editorToolText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 12,
     marginTop: 6,
   },
@@ -894,40 +1204,46 @@ export function TappableImage({
   allowDelete = false,
   onDelete,
   onEdit,
-  resizeMode = 'cover',
+  resizeMode = "cover",
   ...props
 }: TappableImageProps) {
   const viewer = useFullMediaViewer();
-  
+
   const handlePress = useCallback(() => {
-    const uri = typeof source === 'number' 
-      ? RNImage.resolveAssetSource(source).uri 
-      : source.uri;
-    
+    const uri =
+      typeof source === "number"
+        ? RNImage.resolveAssetSource(source).uri
+        : source.uri;
+
     const mediaFile: MediaFile = {
       id: id || `img_${Date.now()}`,
       uri,
-      type: 'image',
+      type: "image",
       title,
       description,
     };
-    
+
     viewer.open([mediaFile], 0, {
       allowEdit,
       allowDelete,
       onDelete,
       onEdit,
     });
-  }, [source, id, title, description, allowEdit, allowDelete, onDelete, onEdit, viewer]);
+  }, [
+    source,
+    id,
+    title,
+    description,
+    allowEdit,
+    allowDelete,
+    onDelete,
+    onEdit,
+    viewer,
+  ]);
 
   return (
     <TouchableOpacity onPress={handlePress} activeOpacity={0.9}>
-      <Image
-        source={source}
-        style={style}
-        contentFit={resizeMode}
-        {...props}
-      />
+      <Image source={source} style={style} contentFit={resizeMode} {...props} />
     </TouchableOpacity>
   );
 }
@@ -936,12 +1252,12 @@ export function TappableImage({
  * Tappable Image Gallery - Hiển thị nhiều ảnh với swipe
  */
 export interface TappableGalleryProps {
-  images: Array<{
+  images: {
     id?: string;
     uri: string;
     title?: string;
     description?: string;
-  }>;
+  }[];
   initialIndex?: number;
   style?: any;
   imageStyle?: any;
@@ -966,24 +1282,27 @@ export function TappableGallery({
   onEdit,
 }: TappableGalleryProps) {
   const viewer = useFullMediaViewer();
-  const { width: screenWidth } = Dimensions.get('window');
-  
-  const handleImagePress = useCallback((index: number) => {
-    const mediaFiles: MediaFile[] = images.map((img, i) => ({
-      id: img.id || `gallery_${i}`,
-      uri: img.uri,
-      type: 'image' as const,
-      title: img.title,
-      description: img.description,
-    }));
-    
-    viewer.open(mediaFiles, index, {
-      allowEdit,
-      allowDelete,
-      onDelete,
-      onEdit,
-    });
-  }, [images, allowEdit, allowDelete, onDelete, onEdit, viewer]);
+  const { width: screenWidth } = Dimensions.get("window");
+
+  const handleImagePress = useCallback(
+    (index: number) => {
+      const mediaFiles: MediaFile[] = images.map((img, i) => ({
+        id: img.id || `gallery_${i}`,
+        uri: img.uri,
+        type: "image" as const,
+        title: img.title,
+        description: img.description,
+      }));
+
+      viewer.open(mediaFiles, index, {
+        allowEdit,
+        allowDelete,
+        onDelete,
+        onEdit,
+      });
+    },
+    [images, allowEdit, allowDelete, onDelete, onEdit, viewer],
+  );
 
   if (horizontal) {
     return (
@@ -1012,7 +1331,7 @@ export function TappableGallery({
   }
 
   return (
-    <View style={[{ flexDirection: 'row', flexWrap: 'wrap' }, style]}>
+    <View style={[{ flexDirection: "row", flexWrap: "wrap" }, style]}>
       {images.map((img, index) => (
         <TouchableOpacity
           key={img.id || index}

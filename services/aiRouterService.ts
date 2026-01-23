@@ -676,14 +676,14 @@ Trả về JSON:
   /**
    * Quick action helpers
    */
-  getQuickActions(): Array<{
+  getQuickActions(): {
     id: string;
     title: string;
     subtitle: string;
     icon: string;
     route: string;
     color: string;
-  }> {
+  }[] {
     return [
       {
         id: "chat",

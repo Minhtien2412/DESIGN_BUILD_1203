@@ -87,7 +87,7 @@ export interface UseConversationsReturn {
   createDirectConversation: (userId: number) => Promise<Conversation>;
   createGroupConversation: (
     name: string,
-    participantIds: number[]
+    participantIds: number[],
   ) => Promise<Conversation>;
   getConversation: (id: string) => Promise<Conversation>;
   markAsRead: (conversationId: string) => Promise<void>;
@@ -103,7 +103,7 @@ export interface UseConversationsReturn {
 // ============================================
 
 export function useConversations(
-  options: UseConversationsOptions = {}
+  options: UseConversationsOptions = {},
 ): UseConversationsReturn {
   const { autoLoad = true, pageSize = 20, unreadOnly = false } = options;
 
@@ -184,12 +184,12 @@ export function useConversations(
         setIsLoading(false);
       }
     },
-    [pageSize, unreadOnly, cursor, isLoading]
+    [pageSize, unreadOnly, cursor, isLoading],
   );
 
   const loadMore = useCallback(
     () => loadConversations(true),
-    [loadConversations]
+    [loadConversations],
   );
   const refresh = useCallback(() => {
     setCursor(undefined);
@@ -240,7 +240,7 @@ export function useConversations(
       });
     };
 
-    const handleReadReceipt = (payload: ReadReceipt) => {
+    const handleReadReceipt = (_payload: ReadReceipt) => {
       // Update unread count when someone reads (for typing indicators etc)
     };
 
@@ -255,7 +255,7 @@ export function useConversations(
             };
           }
           return c;
-        })
+        }),
       );
     };
 
@@ -312,7 +312,7 @@ export function useConversations(
 
       return conversation;
     },
-    []
+    [],
   );
 
   const createGroupConversation = useCallback(
@@ -339,7 +339,7 @@ export function useConversations(
 
       return conversation;
     },
-    []
+    [],
   );
 
   const getConversation = useCallback(
@@ -362,7 +362,7 @@ export function useConversations(
         otherUser: response.otherUser,
       };
     },
-    []
+    [],
   );
 
   const markAsRead = useCallback(async (conversationId: string) => {
@@ -374,7 +374,7 @@ export function useConversations(
           return { ...c, unreadCount: 0 };
         }
         return c;
-      })
+      }),
     );
   }, []);
 
@@ -388,10 +388,10 @@ export function useConversations(
             return { ...c, muted };
           }
           return c;
-        })
+        }),
       );
     },
-    []
+    [],
   );
 
   const pinConversation = useCallback(
@@ -416,7 +416,7 @@ export function useConversations(
         });
       });
     },
-    []
+    [],
   );
 
   const leaveConversation = useCallback(async (conversationId: string) => {
@@ -431,7 +431,7 @@ export function useConversations(
         `/conversations/${conversationId}/participants`,
         {
           userIds,
-        }
+        },
       );
 
       setConversations((prev) =>
@@ -440,10 +440,10 @@ export function useConversations(
             return { ...c, participants: response.participants };
           }
           return c;
-        })
+        }),
       );
     },
-    []
+    [],
   );
 
   const removeParticipant = useCallback(
@@ -459,10 +459,10 @@ export function useConversations(
             };
           }
           return c;
-        })
+        }),
       );
     },
-    []
+    [],
   );
 
   // ============================================
@@ -471,7 +471,7 @@ export function useConversations(
 
   const totalUnread = conversations.reduce(
     (sum, c) => sum + (c.unreadCount || 0),
-    0
+    0,
   );
 
   return {

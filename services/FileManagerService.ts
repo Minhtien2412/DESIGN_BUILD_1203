@@ -10,10 +10,16 @@
  * - Offline caching
  */
 
+import * as FileSystem from "@/utils/FileSystemCompat";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as FileSystem from "expo-file-system";
 import * as Sharing from "expo-sharing";
 import { del, get, post } from "./api";
+
+// ============================================================================
+// REACT HOOKS
+// ============================================================================
+
+import { useCallback, useEffect, useState } from "react";
 
 // ============================================================================
 // TYPES
@@ -152,7 +158,7 @@ export function getFileType(contentType: string): FileTypeFilter {
     if (type === "all" || type === "other") continue;
     if (
       mimeTypes.some(
-        (m) => contentType.startsWith(m.split("/")[0]) || contentType === m
+        (m) => contentType.startsWith(m.split("/")[0]) || contentType === m,
       )
     ) {
       return type as FileTypeFilter;
@@ -276,7 +282,7 @@ class FileCacheManager {
       if (keys.length > 20) {
         // Remove oldest entries
         const sorted = keys.sort(
-          (a, b) => entries[a].timestamp - entries[b].timestamp
+          (a, b) => entries[a].timestamp - entries[b].timestamp,
         );
         for (let i = 0; i < 10; i++) {
           delete entries[sorted[i]];
@@ -342,7 +348,7 @@ class FileManagerServiceClass {
     if (params.includeDeleted) query.set("includeDeleted", "true");
 
     const response = await get<FileListResponse>(
-      `/api/v1/files?${query.toString()}`
+      `/api/v1/files?${query.toString()}`,
     );
 
     // Cache the response
@@ -413,7 +419,7 @@ class FileManagerServiceClass {
   async detachFile(
     fileId: string,
     targetType: string,
-    targetId: string
+    targetId: string,
   ): Promise<void> {
     await post("/api/v1/files/detach", { fileId, targetType, targetId });
   }
@@ -423,7 +429,7 @@ class FileManagerServiceClass {
    */
   async downloadFile(
     file: FileItem,
-    onProgress?: (progress: DownloadProgress) => void
+    onProgress?: (progress: DownloadProgress) => void,
   ): Promise<string> {
     // Ensure download directory exists
     const dirInfo = await FileSystem.getInfoAsync(DOWNLOAD_DIR);
@@ -464,11 +470,11 @@ class FileManagerServiceClass {
           progress.progress = Math.round(
             (downloadProgress.totalBytesWritten /
               downloadProgress.totalBytesExpectedToWrite) *
-              100
+              100,
           );
           onProgress?.(progress);
           this.notifyListeners(file.id, progress);
-        }
+        },
       );
 
       this.downloadTasks.set(file.id, { task: downloadResumable, progress });
@@ -612,7 +618,7 @@ class FileManagerServiceClass {
    */
   subscribeToDownload(
     fileId: string,
-    callback: (progress: DownloadProgress) => void
+    callback: (progress: DownloadProgress) => void,
   ): () => void {
     const listeners = this.listeners.get(fileId) || new Set();
     listeners.add(callback);
@@ -649,12 +655,6 @@ class FileManagerServiceClass {
 // ============================================================================
 
 export const FileManagerService = new FileManagerServiceClass();
-
-// ============================================================================
-// REACT HOOKS
-// ============================================================================
-
-import { useCallback, useEffect, useState } from "react";
 
 /**
  * Hook for file listing with filters
@@ -697,7 +697,7 @@ export function useFileList(initialParams: FileListParams = {}) {
         setIsLoadingMore(false);
       }
     },
-    [params]
+    [params],
   );
 
   const loadMore = useCallback(() => {
@@ -779,7 +779,7 @@ export function useFileSearch(debounceMs = 300) {
  */
 export function useFileDownload() {
   const [downloads, setDownloads] = useState<Map<string, DownloadProgress>>(
-    new Map()
+    new Map(),
   );
 
   const download = useCallback(async (file: FileItem) => {
@@ -805,7 +805,7 @@ export function useFileDownload() {
             next.set(file.id, progress);
             return next;
           });
-        }
+        },
       );
       return localPath;
     } catch (e) {
@@ -826,7 +826,7 @@ export function useFileDownload() {
     (fileId: string) => {
       return downloads.get(fileId) || null;
     },
-    [downloads]
+    [downloads],
   );
 
   return {
@@ -848,7 +848,7 @@ export function useFileAttachment() {
     async (
       fileId: string,
       targetType: "message" | "project" | "task" | "comment",
-      targetId: string
+      targetId: string,
     ) => {
       setIsAttaching(true);
       setError(null);
@@ -863,7 +863,7 @@ export function useFileAttachment() {
         setIsAttaching(false);
       }
     },
-    []
+    [],
   );
 
   const detach = useCallback(
@@ -881,7 +881,7 @@ export function useFileAttachment() {
         setIsAttaching(false);
       }
     },
-    []
+    [],
   );
 
   return {

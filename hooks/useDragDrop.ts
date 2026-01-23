@@ -4,8 +4,8 @@
  * Features: Touch/mouse support, snap-to-grid, real-time sync, visual feedback
  */
 
-import { useState, useCallback, useRef } from 'react';
-import { PanResponder, Animated } from 'react-native';
+import { useCallback, useRef, useState } from "react";
+import { Animated, PanResponder } from "react-native";
 
 // ============================================
 // Types
@@ -49,7 +49,7 @@ const snapToGrid = (value: number, gridSize: number): number => {
 /**
  * Clamp value between min and max
  */
-const clamp = (value: number, min: number, max: number): number => {
+const _clamp = (value: number, min: number, max: number): number => {
   return Math.min(Math.max(value, min), max);
 };
 
@@ -78,17 +78,20 @@ export const useDragDrop = (config: DragDropConfig = {}): UseDragDropReturn => {
   const initialPosition = useRef({ x: 0, y: 0 });
 
   // Start drag operation
-  const startDrag = useCallback((itemId: string, initialX: number, initialY: number) => {
-    if (disabled) return;
+  const startDrag = useCallback(
+    (itemId: string, initialX: number, initialY: number) => {
+      if (disabled) return;
 
-    setDraggedItemId(itemId);
-    initialPosition.current = { x: initialX, y: initialY };
-    position.setValue({ x: initialX, y: initialY });
+      setDraggedItemId(itemId);
+      initialPosition.current = { x: initialX, y: initialY };
+      position.setValue({ x: initialX, y: initialY });
 
-    if (onDragStart) {
-      onDragStart(itemId);
-    }
-  }, [disabled, onDragStart, position]);
+      if (onDragStart) {
+        onDragStart(itemId);
+      }
+    },
+    [disabled, onDragStart, position],
+  );
 
   // Reset position to initial
   const resetPosition = useCallback(() => {
@@ -184,7 +187,7 @@ export const useDragDrop = (config: DragDropConfig = {}): UseDragDropReturn => {
         // Drag was cancelled, reset to initial position
         resetPosition();
       },
-    })
+    }),
   ).current;
 
   return {

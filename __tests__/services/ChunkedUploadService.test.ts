@@ -4,7 +4,8 @@
  */
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as FileSystem from "expo-file-system";
+// FileSystemCompat is mocked via moduleNameMapper in jest.config.js
+import * as FileSystem from "@/utils/FileSystemCompat";
 
 import {
     calculateChunkSize,
@@ -20,14 +21,6 @@ jest.mock("@react-native-async-storage/async-storage", () => ({
   getItem: jest.fn(),
   setItem: jest.fn(),
   removeItem: jest.fn(),
-}));
-
-jest.mock("expo-file-system", () => ({
-  getInfoAsync: jest.fn(),
-  readAsStringAsync: jest.fn(),
-  EncodingType: {
-    Base64: "base64",
-  },
 }));
 
 jest.mock("../../services/api", () => ({
@@ -119,7 +112,7 @@ describe("ChunkedUploadService", () => {
 
     it("should read chunk data", async () => {
       (FileSystem.readAsStringAsync as jest.Mock).mockResolvedValue(
-        "base64data"
+        "base64data",
       );
 
       const splitter = new ChunkSplitter("file:///test.mp4", 100, 10);
@@ -132,7 +125,7 @@ describe("ChunkedUploadService", () => {
           encoding: "base64",
           position: 0,
           length: 10,
-        }
+        },
       );
     });
 
@@ -173,7 +166,7 @@ describe("ChunkedUploadService", () => {
         expect.objectContaining({
           filename: "test.mp4",
           contentType: "video/mp4",
-        })
+        }),
       );
     });
 
@@ -197,7 +190,7 @@ describe("ChunkedUploadService", () => {
         "/api/v1/upload/multipart/initiate",
         expect.objectContaining({
           metadata: { projectId: "proj-123" },
-        })
+        }),
       );
     });
   });
@@ -235,7 +228,7 @@ describe("ChunkedUploadService", () => {
             { partNumber: 1, etag: '"etag1"' },
             { partNumber: 2, etag: '"etag2"' },
           ]),
-        })
+        }),
       );
     });
   });
@@ -252,7 +245,7 @@ describe("ChunkedUploadService", () => {
 
       expect(post).toHaveBeenCalledWith(
         "/api/v1/upload/multipart/mp-upload-123/abort",
-        {}
+        {},
       );
     });
   });
@@ -280,7 +273,7 @@ describe("ChunkedUploadService", () => {
         },
       };
       (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-        JSON.stringify(mockStates)
+        JSON.stringify(mockStates),
       );
 
       const pending = await ChunkedUploadService.getPendingUploads();
@@ -329,7 +322,7 @@ describe("ChunkedUploadService", () => {
       const callback = jest.fn();
       const unsubscribe = ChunkedUploadService.subscribe(
         "upload-123",
-        callback
+        callback,
       );
 
       expect(typeof unsubscribe).toBe("function");
@@ -363,7 +356,7 @@ describe("ChunkedUploadService", () => {
 
       expect(post).toHaveBeenCalledWith(
         "/api/v1/upload/multipart/upload-to-cancel/abort",
-        {}
+        {},
       );
     });
   });

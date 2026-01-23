@@ -18,6 +18,7 @@
  */
 
 import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useCallback, useMemo, useRef, useState } from "react";
@@ -36,6 +37,7 @@ import {
     TextInput,
     TouchableOpacity,
     View,
+    ViewToken,
 } from "react-native";
 import Animated, {
     FadeInDown,
@@ -43,7 +45,7 @@ import Animated, {
     SharedValue,
     SlideInRight,
     useAnimatedStyle,
-    useSharedValue
+    useSharedValue,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -52,6 +54,10 @@ import {
     FacebookFeedCard,
     StoryCard,
 } from "../../components/community/FacebookFeedCard";
+import {
+    MediaFile,
+    useFullMediaViewer,
+} from "../../components/ui/full-media-viewer";
 import { useAuth } from "../../context/AuthContext";
 import { useCommunityFeed } from "../../hooks/useCommunityFeed";
 import {
@@ -366,7 +372,7 @@ function SearchModal({ visible, onClose, onSearch }: SearchModalProps) {
                 />
                 <Text style={styles.searchSuggestionText}>{suggestion}</Text>
               </TouchableOpacity>
-            )
+            ),
           )}
         </View>
       </View>
@@ -432,11 +438,13 @@ export default function SocialScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
+  const mediaViewer = useFullMediaViewer();
 
   // State
   const [activeFilter, setActiveFilter] = useState<FeedItemType | "all">("all");
   const [searchModalVisible, setSearchModalVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [visibleItems, setVisibleItems] = useState<Set<string>>(new Set());
 
   // Animation
   const scrollY = useSharedValue(0);
@@ -474,7 +482,7 @@ export default function SocialScreen() {
       result = result.filter(
         (item) =>
           item.title.toLowerCase().includes(query) ||
-          item.description?.toLowerCase().includes(query)
+          item.description?.toLowerCase().includes(query),
       );
     }
 
@@ -495,7 +503,7 @@ export default function SocialScreen() {
     (event: NativeSyntheticEvent<NativeScrollEvent>) => {
       scrollY.value = event.nativeEvent.contentOffset.y;
     },
-    []
+    [],
   );
 
   const handleRefresh = useCallback(() => {
@@ -520,23 +528,48 @@ export default function SocialScreen() {
       setSearchQuery(query);
       search(query);
     },
-    [search]
+    [search],
   );
 
   const handleStoryPress = useCallback(
     (item: CommunityFeedItem) => {
-      // Navigate based on item type
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+      // For video/photo, open MediaViewer directly (Facebook style)
+      if (item.type === "video" || item.type === "photo") {
+        const videoItem = item.type === "video" ? (item as any) : null;
+        const mediaUrl =
+          videoItem?.videoUrl || videoItem?.thumbnailUrl || item.imageUrl;
+
+        if (mediaUrl) {
+          const mediaFile: MediaFile = {
+            id: item.id,
+            uri: mediaUrl,
+            type: item.type === "video" ? "video" : "image",
+            title: item.title,
+            description: item.description,
+            thumbnail: item.imageUrl || videoItem?.thumbnailUrl,
+            createdAt: item.createdAt,
+          };
+
+          mediaViewer.open([mediaFile], 0, {
+            allowDelete: false,
+            allowEdit: false,
+            allowShare: true,
+            allowDownload: true,
+            showInfo: true,
+            headerTitle: item.title,
+          });
+          return;
+        }
+      }
+
+      // Navigate for other types
       switch (item.type) {
-        case "video":
-          router.push("/demo-videos");
-          break;
-        case "photo":
-          router.push("/pexels-gallery");
-          break;
         case "news":
           if ((item as any).url) {
             router.push(
-              `/webview?url=${encodeURIComponent((item as any).url)}` as any
+              `/webview?url=${encodeURIComponent((item as any).url)}` as any,
             );
           }
           break;
@@ -544,7 +577,7 @@ export default function SocialScreen() {
           break;
       }
     },
-    [router]
+    [router, mediaViewer],
   );
 
   const handleCreatePost = useCallback(() => {
@@ -555,6 +588,25 @@ export default function SocialScreen() {
     // Navigate to create story screen
     console.log("Create story");
   }, []);
+
+  // Viewability config for video auto-play
+  const viewabilityConfig = useRef({
+    itemVisiblePercentThreshold: 50, // Item is "visible" when 50% is shown
+    minimumViewTime: 250, // Minimum time visible before triggering
+  }).current;
+
+  // Handle viewable items changed for video auto-play
+  const onViewableItemsChanged = useRef(
+    ({ viewableItems }: { viewableItems: ViewToken[] }) => {
+      const newVisibleSet = new Set<string>();
+      viewableItems.forEach((viewToken) => {
+        if (viewToken.isViewable && viewToken.item) {
+          newVisibleSet.add(viewToken.item.id);
+        }
+      });
+      setVisibleItems(newVisibleSet);
+    },
+  ).current;
 
   // Render Header Component (stories + create post + filters)
   const renderListHeader = useCallback(() => {
@@ -614,10 +666,32 @@ export default function SocialScreen() {
     handleFilterChange,
   ]);
 
-  // Render Item
-  const renderItem = useCallback(({ item }: { item: CommunityFeedItem }) => {
-    return <FacebookFeedCard item={item} />;
-  }, []);
+  // Get all video items for vertical video feed navigation
+  const allVideoItems = useMemo(() => {
+    return filteredItems.filter((item) => item.type === "video");
+  }, [filteredItems]);
+
+  // Render Item with visibility tracking for video auto-play
+  const renderItem = useCallback(
+    ({ item, index }: { item: CommunityFeedItem; index: number }) => {
+      const isVisible = visibleItems.has(item.id);
+      // Find video index if this is a video item
+      const videoIndex =
+        item.type === "video"
+          ? allVideoItems.findIndex((v) => v.id === item.id)
+          : 0;
+      return (
+        <FacebookFeedCard
+          item={item}
+          isVisible={isVisible}
+          index={index}
+          allVideos={allVideoItems}
+          videoIndex={videoIndex}
+        />
+      );
+    },
+    [visibleItems, allVideoItems],
+  );
 
   // Render Footer
   const renderListFooter = useCallback(() => {
@@ -637,7 +711,7 @@ export default function SocialScreen() {
   // Key extractor
   const keyExtractor = useCallback(
     (item: CommunityFeedItem) => `feed-${item.id}-${item.type}`,
-    []
+    [],
   );
 
   return (
@@ -686,6 +760,9 @@ export default function SocialScreen() {
           maxToRenderPerBatch={10}
           windowSize={10}
           initialNumToRender={5}
+          // Video auto-play viewability tracking
+          viewabilityConfig={viewabilityConfig}
+          onViewableItemsChanged={onViewableItemsChanged}
         />
       )}
 

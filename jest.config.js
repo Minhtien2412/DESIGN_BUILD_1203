@@ -20,7 +20,11 @@ module.exports = {
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/$1",
-    "^react-native$": "react-native",
+    // Mock Platform directly in mapper
+    "^react-native/Libraries/Utilities/Platform$":
+      "<rootDir>/mocks/Platform.js",
+    // Mock FileSystemCompat to avoid native module issues
+    "^@/utils/FileSystemCompat$": "<rootDir>/mocks/FileSystemCompat.js",
   },
   collectCoverageFrom: [
     "services/**/*.{ts,tsx}",

@@ -10,10 +10,16 @@
  * - Rate limiting
  */
 
+import * as FileSystem from "@/utils/FileSystemCompat";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Crypto from "expo-crypto";
-import * as FileSystem from "expo-file-system";
 import { post } from "./api";
+
+// ============================================================================
+// REACT HOOKS
+// ============================================================================
+
+import { useCallback, useState } from "react";
 
 // ============================================================================
 // TYPES
@@ -131,7 +137,7 @@ const RATE_LIMIT_MAX_UPLOADS = 10; // Max 10 uploads per minute
 export function validateFile(
   filename: string,
   contentType: string,
-  fileSize: number
+  fileSize: number,
 ): FileValidationResult {
   const errors: string[] = [];
 
@@ -207,7 +213,7 @@ function formatBytes(bytes: number): string {
  */
 export async function calculateChecksum(
   fileUri: string,
-  algorithm: "md5" | "sha256" = "sha256"
+  algorithm: "md5" | "sha256" = "sha256",
 ): Promise<string> {
   try {
     // Read file as base64
@@ -251,7 +257,7 @@ async function checkRateLimit(): Promise<{
 
     // Filter timestamps within window
     data.timestamps = data.timestamps.filter(
-      (ts) => now - ts < RATE_LIMIT_WINDOW
+      (ts) => now - ts < RATE_LIMIT_WINDOW,
     );
 
     if (data.timestamps.length >= RATE_LIMIT_MAX_UPLOADS) {
@@ -291,7 +297,7 @@ class PresignedUploadServiceClass {
     const validation = validateFile(
       request.filename,
       request.contentType,
-      request.fileSize
+      request.fileSize,
     );
     if (!validation.valid) {
       throw new Error(validation.errors.join("\n"));
@@ -301,7 +307,7 @@ class PresignedUploadServiceClass {
     const rateLimit = await checkRateLimit();
     if (!rateLimit.allowed) {
       throw new Error(
-        `Quá nhiều upload. Vui lòng thử lại sau ${Math.ceil((rateLimit.retryAfter || 0) / 1000)} giây.`
+        `Quá nhiều upload. Vui lòng thử lại sau ${Math.ceil((rateLimit.retryAfter || 0) / 1000)} giây.`,
       );
     }
 
@@ -324,7 +330,7 @@ class PresignedUploadServiceClass {
   async uploadFile(
     fileUri: string,
     presignResponse: PresignResponse,
-    onProgress?: (progress: UploadProgress) => void
+    onProgress?: (progress: UploadProgress) => void,
   ): Promise<string> {
     const { uploadId, uploadUrl, headers } = presignResponse;
 
@@ -363,12 +369,12 @@ class PresignedUploadServiceClass {
           progress.progress = Math.round(
             (uploadProgress.totalBytesSent /
               uploadProgress.totalBytesExpectedToSend) *
-              100
+              100,
           );
 
           this.notifyListeners(uploadId, progress);
           onProgress?.(progress);
-        }
+        },
       );
 
       // Store abort function
@@ -418,11 +424,11 @@ class PresignedUploadServiceClass {
    * Complete upload - verify and save metadata
    */
   async completeUpload(
-    request: CompleteUploadRequest
+    request: CompleteUploadRequest,
   ): Promise<CompleteUploadResponse> {
     const response = await post<CompleteUploadResponse>(
       "/api/v1/upload/complete",
-      request
+      request,
     );
 
     // Update progress
@@ -450,7 +456,7 @@ class PresignedUploadServiceClass {
       context?: UploadContext;
       metadata?: Record<string, unknown>;
       onProgress?: (progress: UploadProgress) => void;
-    }
+    },
   ): Promise<CompleteUploadResponse> {
     const { contentType, context, metadata, onProgress } = options;
 
@@ -513,7 +519,7 @@ class PresignedUploadServiceClass {
    */
   subscribe(
     uploadId: string,
-    callback: (progress: UploadProgress) => void
+    callback: (progress: UploadProgress) => void,
   ): () => void {
     const listeners = this.listeners.get(uploadId) || new Set();
     listeners.add(callback);
@@ -580,12 +586,6 @@ class PresignedUploadServiceClass {
 
 export const PresignedUploadService = new PresignedUploadServiceClass();
 
-// ============================================================================
-// REACT HOOKS
-// ============================================================================
-
-import { useCallback, useState } from "react";
-
 /**
  * Hook for presigned upload
  */
@@ -602,7 +602,7 @@ export function usePresignedUpload() {
         contentType: string;
         context?: UploadContext;
         metadata?: Record<string, unknown>;
-      }
+      },
     ) => {
       setIsUploading(true);
       setError(null);
@@ -622,7 +622,7 @@ export function usePresignedUpload() {
         setIsUploading(false);
       }
     },
-    []
+    [],
   );
 
   const cancel = useCallback(() => {

@@ -4,9 +4,7 @@
  */
 
 import { WorkerStatsService } from "@/services/worker-stats";
-import type {
-    WorkerStatsResponse
-} from "@/types/worker-stats";
+import type { WorkerStatsResponse } from "@/types/worker-stats";
 import { WorkerType } from "@/types/worker-stats";
 import { useCallback, useEffect, useState } from "react";
 
@@ -77,21 +75,21 @@ export function useWorkerStats(autoRefresh = false, intervalMs = 300000) {
         // Sum all locations
         const totalCount = workerStat.locations.reduce(
           (sum, loc) => sum + loc.count,
-          0
+          0,
         );
         return { location: "Toàn quốc", count: totalCount };
       }
 
       // Find specific location
       const locationStat = workerStat.locations.find(
-        (l) => l.location === selectedLocation
+        (l) => l.location === selectedLocation,
       );
       return {
         location: selectedLocation,
         count: locationStat?.count || 0,
       };
     },
-    [stats, selectedLocation]
+    [stats, selectedLocation],
   );
 
   return {
@@ -109,8 +107,14 @@ export function useWorkerStats(autoRefresh = false, intervalMs = 300000) {
  * Get stats for a specific worker type
  */
 export function useWorkerTypeStats(workerType: WorkerType) {
-  const { stats, loading, error, refresh, selectedLocation, getWorkerCount } =
-    useWorkerStats();
+  const {
+    stats,
+    loading,
+    error,
+    refresh,
+    selectedLocation: _selectedLocation,
+    getWorkerCount,
+  } = useWorkerStats();
 
   const typeStats = stats?.stats.find((s) => s.workerType === workerType);
   const locationStats = getWorkerCount(workerType);

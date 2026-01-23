@@ -22,21 +22,21 @@ const getGeminiApiKey = () => {
 
 // Helper to call Gemini REST API
 interface GeminiApiResponse {
-  candidates?: Array<{
+  candidates?: {
     content?: {
-      parts?: Array<{ text?: string }>;
+      parts?: { text?: string }[];
     };
     groundingMetadata?: {
       webSearchQueries?: string[];
       searchEntryPoint?: { renderedContent?: string };
-      groundingSupports?: Array<{
+      groundingSupports?: {
         segment?: { text?: string };
         groundingChunkIndices?: number[];
         confidenceScores?: number[];
         web?: { uri?: string; title?: string };
-      }>;
+      }[];
     };
-  }>;
+  }[];
   error?: { message?: string };
 }
 
@@ -46,7 +46,7 @@ async function callGeminiApi(
   options?: { temperature?: number; maxOutputTokens?: number }
 ): Promise<{
   text: string;
-  groundingLinks?: Array<{ title: string; uri: string }>;
+  groundingLinks?: { title: string; uri: string }[];
 }> {
   const apiKey = getGeminiApiKey();
   const url = `${GEMINI_API_URL}/${model}:generateContent?key=${apiKey}`;

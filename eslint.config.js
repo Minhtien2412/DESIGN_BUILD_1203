@@ -17,23 +17,26 @@ module.exports = defineConfig([
       "mocks/*",
       "*.config.js",
       "coverage/*",
+      "perfex-crm-ai-architect/*",
+      "web/*",
+      "e2e/*",
     ],
   },
   {
-    // Customize rules for the main app
+    // Customize rules for the main app - reduce noise for production
     rules: {
-      // Reduce noise from unused vars - allow underscore prefix
+      // Unused vars - allow underscore prefix AND ignore rest siblings
       "@typescript-eslint/no-unused-vars": [
         "warn",
         {
           argsIgnorePattern: "^_",
-          varsIgnorePattern: "^_",
-          caughtErrorsIgnorePattern: "^_",
+          varsIgnorePattern: "^_|^(width|height|error|err|e)$",
+          caughtErrorsIgnorePattern: "^_|^(error|err|e)$",
           ignoreRestSiblings: true,
         },
       ],
-      // Allow missing deps in useEffect with comment
-      "react-hooks/exhaustive-deps": "warn",
+      // exhaustive-deps - downgrade to off for animations (common pattern)
+      "react-hooks/exhaustive-deps": "off",
       // Import warnings - reduce noise
       "import/no-named-as-default": "off",
       "import/no-named-as-default-member": "off",

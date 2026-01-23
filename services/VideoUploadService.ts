@@ -10,10 +10,16 @@
  * - Caption/hashtag management
  */
 
+import * as FileSystem from "@/utils/FileSystemCompat";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
 import { post } from "./api";
+
+// ============================================================================
+// REACT HOOKS
+// ============================================================================
+
+import { useCallback, useEffect, useState } from "react";
 
 // ============================================================================
 // TYPES
@@ -277,7 +283,7 @@ class UploadTaskManager {
   getPendingTasks(): UploadTask[] {
     return Array.from(this.tasks.values()).filter(
       (t) =>
-        t.progress.status === "preparing" || t.progress.status === "uploading"
+        t.progress.status === "preparing" || t.progress.status === "uploading",
     );
   }
 
@@ -289,7 +295,7 @@ class UploadTaskManager {
 
   subscribe(
     uploadId: string,
-    callback: (progress: UploadProgress) => void
+    callback: (progress: UploadProgress) => void,
   ): () => void {
     const listeners = this.listeners.get(uploadId) || new Set();
     listeners.add(callback);
@@ -394,7 +400,7 @@ class VideoUploadServiceClass {
 
   private async processUpload(
     uploadId: string,
-    config: UploadConfig
+    config: UploadConfig,
   ): Promise<void> {
     try {
       // Step 1: Get presigned URL
@@ -434,7 +440,7 @@ class VideoUploadServiceClass {
   }
 
   private async getPresignedUrl(
-    config: UploadConfig
+    config: UploadConfig,
   ): Promise<PresignedUploadResponse> {
     const response = await post<PresignedUploadResponse>(
       "/api/v1/upload/presign",
@@ -442,7 +448,7 @@ class VideoUploadServiceClass {
         contentType: config.video.mimeType,
         fileSize: config.video.fileSize,
         filename: config.video.filename,
-      }
+      },
     );
 
     return response;
@@ -451,7 +457,7 @@ class VideoUploadServiceClass {
   private async uploadToPresignedUrl(
     uploadId: string,
     fileUri: string,
-    presigned: PresignedUploadResponse
+    presigned: PresignedUploadResponse,
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       let aborted = false;
@@ -472,14 +478,15 @@ class VideoUploadServiceClass {
 
           const percent = Math.round(
             10 +
-              (progress.totalBytesSent / progress.totalBytesExpectedToSend) * 75
+              (progress.totalBytesSent / progress.totalBytesExpectedToSend) *
+                75,
           );
 
           this.taskManager.updateProgress(uploadId, {
             progress: percent,
             bytesUploaded: progress.totalBytesSent,
           });
-        }
+        },
       );
 
       // Store abort function
@@ -510,7 +517,7 @@ class VideoUploadServiceClass {
 
   private async completeUpload(
     serverUploadId: string,
-    config: UploadConfig
+    config: UploadConfig,
   ): Promise<{ videoUrl: string; thumbnailUrl: string }> {
     const response = await post<{ videoUrl: string; thumbnailUrl: string }>(
       "/api/v1/upload/complete",
@@ -529,7 +536,7 @@ class VideoUploadServiceClass {
           width: config.video.width,
           height: config.video.height,
         },
-      }
+      },
     );
 
     return response;
@@ -580,7 +587,7 @@ class VideoUploadServiceClass {
    */
   subscribe(
     uploadId: string,
-    callback: (progress: UploadProgress) => void
+    callback: (progress: UploadProgress) => void,
   ): () => void {
     return this.taskManager.subscribe(uploadId, callback);
   }
@@ -612,12 +619,6 @@ class VideoUploadServiceClass {
 // ============================================================================
 
 export const VideoUploadService = new VideoUploadServiceClass();
-
-// ============================================================================
-// REACT HOOKS
-// ============================================================================
-
-import { useCallback, useEffect, useState } from "react";
 
 /**
  * Hook for video upload with progress tracking

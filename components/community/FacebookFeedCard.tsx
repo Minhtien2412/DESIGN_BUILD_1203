@@ -4,13 +4,15 @@
  *
  * Modern social media card design inspired by Facebook/Instagram
  * with engagement actions, comments preview, and media support.
+ * Auto-play video when visible in viewport.
  *
  * @author ThietKeResort Team
  * @created 2025-01-20
+ * @updated 2026-01-22 - Added inline video auto-play
  */
 
 import { Ionicons } from "@expo/vector-icons";
-import * as Haptics from 'expo-haptics';
+import * as Haptics from "expo-haptics";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { memo, useCallback, useState } from "react";
@@ -29,8 +31,14 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { CommunityFeedItem } from "../../services/communityFeedService";
+import { MediaFile, useFullMediaViewer } from "../ui/full-media-viewer";
+import { useCommentsSheet } from "./CommentsSheet";
+import { FeedVideoPlayer } from "./FeedVideoPlayer";
+import { useMoreOptions } from "./MoreOptionsMenu";
+import { useShareSheet } from "./ShareSheet";
+import { useVerticalVideoFeed, VideoItem } from "./VerticalVideoFeed";
 
-const { width: SCREEN_WIDTH } = Dimensions.get("window");
+const { width: _SCREEN_WIDTH } = Dimensions.get("window");
 
 // ============================================
 // Theme Constants
@@ -142,21 +150,31 @@ interface AuthorHeaderProps {
   importance?: string;
   /** Callback when avatar is pressed to navigate to profile */
   onAvatarPress?: () => void;
+  /** Callback when more button (3 dots) is pressed */
+  onMorePress?: () => void;
 }
 
 const AuthorHeader = memo(
-  ({ author, source, type, createdAt, importance, onAvatarPress }: AuthorHeaderProps) => {
+  ({
+    author,
+    source,
+    type,
+    createdAt,
+    importance,
+    onAvatarPress,
+    onMorePress,
+  }: AuthorHeaderProps) => {
     const displayName = author?.name || getSourceName(source);
     const typeColor = getTypeColor(type);
     const router = useRouter();
-    
+
     // Handle avatar press to navigate to user profile
     const handleAvatarPress = useCallback(() => {
       if (onAvatarPress) {
         onAvatarPress();
         return;
       }
-      
+
       // Navigate to profile if author has id
       if (author?.id) {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -166,7 +184,7 @@ const AuthorHeader = memo(
 
     return (
       <View style={styles.authorHeader}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.authorAvatarContainer}
           onPress={handleAvatarPress}
           disabled={!author?.id && !onAvatarPress}
@@ -201,12 +219,18 @@ const AuthorHeader = memo(
 
         <View style={styles.authorInfo}>
           <View style={styles.authorNameRow}>
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={handleAvatarPress}
               disabled={!author?.id && !onAvatarPress}
               activeOpacity={0.7}
             >
-              <Text style={[styles.authorName, author?.id && styles.authorNameClickable]} numberOfLines={1}>
+              <Text
+                style={[
+                  styles.authorName,
+                  author?.id && styles.authorNameClickable,
+                ]}
+                numberOfLines={1}
+              >
                 {displayName}
               </Text>
             </TouchableOpacity>
@@ -241,7 +265,7 @@ const AuthorHeader = memo(
           </View>
         </View>
 
-        <TouchableOpacity style={styles.moreButton}>
+        <TouchableOpacity style={styles.moreButton} onPress={onMorePress}>
           <Ionicons
             name="ellipsis-horizontal"
             size={20}
@@ -250,7 +274,7 @@ const AuthorHeader = memo(
         </TouchableOpacity>
       </View>
     );
-  }
+  },
 );
 
 function getSourceName(source: string): string {
@@ -299,6 +323,14 @@ interface ContentSectionProps {
   views?: number;
   progress?: number;
   status?: string;
+  /** Unique ID for video player */
+  itemId?: string;
+  /** Whether this item is visible in viewport (for auto-play) */
+  isVisible?: boolean;
+  /** Index in list (for preloading) */
+  index?: number;
+  /** Callback when media (image/video) is pressed */
+  onMediaPress?: () => void;
 }
 
 const ContentSection = memo(
@@ -312,9 +344,11 @@ const ContentSection = memo(
     views,
     progress,
     status,
+    itemId,
+    isVisible = false,
+    index = 0,
+    onMediaPress,
   }: ContentSectionProps) => {
-    const router = useRouter();
-
     return (
       <View style={styles.contentSection}>
         {/* Text Content */}
@@ -364,9 +398,32 @@ const ContentSection = memo(
           )}
         </View>
 
-        {/* Media Content */}
-        {imageUrl && (
-          <View style={styles.mediaContainer}>
+        {/* Video Content - Auto-play inline */}
+        {type === "video" && videoUrl && itemId && (
+          <View style={styles.videoContainer}>
+            <FeedVideoPlayer
+              videoId={itemId}
+              videoUrl={videoUrl}
+              thumbnailUrl={imageUrl}
+              title={title}
+              duration={duration}
+              views={views}
+              isVisible={isVisible}
+              onPress={onMediaPress}
+              index={index}
+              autoPlay={true}
+              startMuted={true}
+            />
+          </View>
+        )}
+
+        {/* Image/Photo Content - Clickable for direct viewing */}
+        {type !== "video" && imageUrl && (
+          <TouchableOpacity
+            style={styles.mediaContainer}
+            onPress={onMediaPress}
+            activeOpacity={0.9}
+          >
             <Image
               source={{ uri: imageUrl }}
               style={styles.mediaImage}
@@ -374,42 +431,17 @@ const ContentSection = memo(
               transition={200}
             />
 
-            {/* Video overlay */}
-            {type === "video" && (
-              <View style={styles.videoOverlay}>
-                <View style={styles.playButton}>
-                  <Ionicons name="play" size={32} color="white" />
-                </View>
-                {duration && (
-                  <View style={styles.durationBadge}>
-                    <Text style={styles.durationText}>
-                      {Math.floor(duration / 60)}:
-                      {(duration % 60).toString().padStart(2, "0")}
-                    </Text>
-                  </View>
-                )}
-                {views && (
-                  <View style={styles.viewsBadge}>
-                    <Ionicons name="eye" size={12} color="white" />
-                    <Text style={styles.viewsText}>
-                      {formatNumber(views)} lượt xem
-                    </Text>
-                  </View>
-                )}
-              </View>
-            )}
-
             {/* Photo overlay */}
             {type === "photo" && (
               <View style={styles.photoOverlay}>
                 <Ionicons name="expand" size={20} color="white" />
               </View>
             )}
-          </View>
+          </TouchableOpacity>
         )}
       </View>
     );
-  }
+  },
 );
 
 function getStatusColor(status: string): string {
@@ -479,7 +511,7 @@ const EngagementStats = memo(
         </View>
       </View>
     );
-  }
+  },
 );
 
 // ============================================
@@ -487,6 +519,7 @@ const EngagementStats = memo(
 // ============================================
 interface ActionButtonsProps {
   liked: boolean;
+  saved?: boolean;
   onLike: () => void;
   onComment: () => void;
   onShare: () => void;
@@ -494,8 +527,16 @@ interface ActionButtonsProps {
 }
 
 const ActionButtons = memo(
-  ({ liked, onLike, onComment, onShare, onSave }: ActionButtonsProps) => {
+  ({
+    liked,
+    saved,
+    onLike,
+    onComment,
+    onShare,
+    onSave,
+  }: ActionButtonsProps) => {
     const likeScale = useSharedValue(1);
+    const saveScale = useSharedValue(1);
 
     const handleLike = () => {
       likeScale.value = withSpring(1.3, { damping: 10 }, () => {
@@ -504,8 +545,19 @@ const ActionButtons = memo(
       onLike();
     };
 
+    const handleSave = () => {
+      saveScale.value = withSpring(1.3, { damping: 10 }, () => {
+        saveScale.value = withSpring(1);
+      });
+      onSave?.();
+    };
+
     const likeAnimatedStyle = useAnimatedStyle(() => ({
       transform: [{ scale: likeScale.value }],
+    }));
+
+    const saveAnimatedStyle = useAnimatedStyle(() => ({
+      transform: [{ scale: saveScale.value }],
     }));
 
     return (
@@ -542,18 +594,24 @@ const ActionButtons = memo(
         </TouchableOpacity>
 
         {onSave && (
-          <TouchableOpacity style={styles.actionButton} onPress={onSave}>
-            <Ionicons
-              name="bookmark-outline"
-              size={22}
-              color={COLORS.textSecondary}
-            />
-            <Text style={styles.actionText}>Lưu</Text>
+          <TouchableOpacity style={styles.actionButton} onPress={handleSave}>
+            <Animated.View style={saveAnimatedStyle}>
+              <Ionicons
+                name={saved ? "bookmark" : "bookmark-outline"}
+                size={22}
+                color={saved ? COLORS.primary : COLORS.textSecondary}
+              />
+            </Animated.View>
+            <Text
+              style={[styles.actionText, saved && { color: COLORS.primary }]}
+            >
+              {saved ? "Đã lưu" : "Lưu"}
+            </Text>
           </TouchableOpacity>
         )}
       </View>
     );
-  }
+  },
 );
 
 // ============================================
@@ -561,34 +619,216 @@ const ActionButtons = memo(
 // ============================================
 interface FacebookFeedCardProps {
   item: CommunityFeedItem;
+  /** Whether this card is currently visible in viewport (for video auto-play) */
+  isVisible?: boolean;
+  /** Index in the list (for video preloading) */
+  index?: number;
+  /** All videos in the feed (for vertical video feed navigation) */
+  allVideos?: CommunityFeedItem[];
+  /** Index of this video in allVideos array */
+  videoIndex?: number;
   onPress?: () => void;
 }
 
 export const FacebookFeedCard = memo(
-  ({ item, onPress }: FacebookFeedCardProps) => {
+  ({
+    item,
+    isVisible = false,
+    index = 0,
+    allVideos,
+    videoIndex = 0,
+    onPress,
+  }: FacebookFeedCardProps) => {
     const router = useRouter();
+    const mediaViewer = useFullMediaViewer();
+    const verticalVideoFeed = useVerticalVideoFeed();
+    const commentsSheet = useCommentsSheet();
+    const shareSheet = useShareSheet();
+    const moreOptions = useMoreOptions();
     const [liked, setLiked] = useState(false);
+    const [saved, setSaved] = useState(false);
     const [likesCount, setLikesCount] = useState(
-      item.metadata?.likes || Math.floor(Math.random() * 100)
+      item.metadata?.likes || Math.floor(Math.random() * 100),
     );
-    const commentsCount =
-      item.metadata?.comments || Math.floor(Math.random() * 20);
+    const [localCommentsCount, setLocalCommentsCount] = useState(
+      item.metadata?.comments || Math.floor(Math.random() * 20),
+    );
     const sharesCount = item.metadata?.shares || Math.floor(Math.random() * 10);
 
     const handleLike = () => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       setLiked(!liked);
       setLikesCount((prev: number) => (liked ? prev - 1 : prev + 1));
     };
 
     const handleComment = () => {
-      // Navigate to comments or show comment modal
-      console.log("Open comments for:", item.id);
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+      // Open comments sheet
+      commentsSheet.open({
+        contentId: item.id,
+        contentType:
+          item.type === "video"
+            ? "video"
+            : item.type === "photo"
+              ? "post"
+              : item.type === "news"
+                ? "news"
+                : "post",
+        title: item.title || "Bình luận",
+        showRating: item.type === "news" || item.type === "development_plan", // Show rating for news/plans
+        placeholder: "Viết bình luận...",
+        onCommentPost: (comment: {
+          content: string;
+          parentId: string | null;
+          rating?: number;
+        }) => {
+          console.log("New comment:", comment);
+          setLocalCommentsCount((prev: number) => prev + 1);
+        },
+        onCommentLike: (commentId: string) => {
+          console.log("Liked comment:", commentId);
+        },
+      });
     };
 
-    const handleShare = () => {
-      // Show share options
-      console.log("Share:", item.id);
-    };
+    const handleShare = useCallback(() => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+      // Open share sheet with item info
+      shareSheet.open({
+        item: {
+          id: item.id,
+          type:
+            item.type === "video"
+              ? "video"
+              : item.type === "photo"
+                ? "image"
+                : "post",
+          title: item.title,
+          description: item.description,
+          imageUrl: item.imageUrl,
+        },
+        onShare: (platform) => {
+          console.log(`Shared via ${platform}:`, item.id);
+        },
+        onCopyLink: () => {
+          console.log("Link copied:", item.id);
+        },
+      });
+    }, [item, shareSheet]);
+
+    const handleSave = useCallback(() => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      setSaved(!saved);
+      // TODO: Persist save state to backend/storage
+      console.log(saved ? "Unsaved:" : "Saved:", item.id);
+    }, [saved, item.id]);
+
+    const handleMoreOptions = useCallback(() => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+      // Open more options menu
+      moreOptions.open({
+        item: {
+          id: item.id,
+          type:
+            item.type === "video"
+              ? "video"
+              : item.type === "news"
+                ? "news"
+                : "post",
+          authorId: item.author?.id,
+          authorName: item.author?.name,
+          isSaved: saved,
+        },
+        onSave: (newSaved) => {
+          setSaved(newSaved);
+        },
+        onHide: () => {
+          console.log("Hidden:", item.id);
+          // TODO: Update feed to hide this item
+        },
+        onReport: () => {
+          console.log("Reported:", item.id);
+        },
+        onCopyLink: () => {
+          console.log("Link copied from menu:", item.id);
+        },
+      });
+    }, [item, saved, moreOptions]);
+
+    // Handle video press - open vertical video feed (Facebook/TikTok style)
+    const handleVideoPress = useCallback(() => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+      // Convert all video items to VideoItem format
+      const videoItems: VideoItem[] = (allVideos || [item])
+        .filter((v) => v.type === "video")
+        .map((v) => {
+          const videoData = v as any;
+          return {
+            id: v.id,
+            videoUrl: videoData.videoUrl || "",
+            thumbnailUrl: videoData.thumbnailUrl || v.imageUrl,
+            title: v.title,
+            description: v.description,
+            author: v.author,
+            duration: videoData.duration,
+            views: videoData.views,
+            likes: v.metadata?.likes,
+            comments: v.metadata?.comments,
+            shares: v.metadata?.shares,
+            createdAt: v.createdAt,
+          };
+        });
+
+      // Find the index of current video
+      const currentVideoIndex = videoItems.findIndex((v) => v.id === item.id);
+
+      // Open vertical video feed
+      verticalVideoFeed.open(
+        videoItems,
+        currentVideoIndex >= 0 ? currentVideoIndex : 0,
+      );
+    }, [item, allVideos, verticalVideoFeed]);
+
+    // Handle media press - open directly in full-screen viewer like Facebook
+    const handleMediaPress = useCallback(() => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+      // For videos, use vertical video feed
+      if (item.type === "video") {
+        handleVideoPress();
+        return;
+      }
+
+      // For images, use media viewer
+      const mediaUrl = item.imageUrl;
+
+      if (!mediaUrl) return;
+
+      // Create media file for viewer
+      const mediaFile: MediaFile = {
+        id: item.id,
+        uri: mediaUrl,
+        type: "image",
+        title: item.title,
+        description: item.description,
+        thumbnail: item.imageUrl,
+        createdAt: item.createdAt,
+      };
+
+      // Open media viewer directly - Facebook style
+      mediaViewer.open([mediaFile], 0, {
+        allowDelete: false,
+        allowEdit: false,
+        allowShare: true,
+        allowDownload: true,
+        showInfo: true,
+        headerTitle: item.title,
+      });
+    }, [item, mediaViewer, handleVideoPress]);
 
     const handlePress = () => {
       if (onPress) {
@@ -596,21 +836,21 @@ export const FacebookFeedCard = memo(
         return;
       }
 
-      // Default navigation based on type
+      // For video/photo, open media viewer directly (Facebook style)
+      if (item.type === "video" || item.type === "photo") {
+        handleMediaPress();
+        return;
+      }
+
+      // Default navigation for other types
       switch (item.type) {
         case "news":
           const newsItem = item as any;
           if (newsItem.url) {
             router.push(
-              `/webview?url=${encodeURIComponent(newsItem.url)}` as any
+              `/webview?url=${encodeURIComponent(newsItem.url)}` as any,
             );
           }
-          break;
-        case "video":
-          router.push(`/demo-videos`);
-          break;
-        case "photo":
-          router.push(`/pexels-gallery`);
           break;
         case "announcement":
           router.push(`/crm-notifications`);
@@ -642,7 +882,7 @@ export const FacebookFeedCard = memo(
       >
         <TouchableOpacity activeOpacity={0.95} onPress={handlePress}>
           <View style={styles.card}>
-            {/* Author Header - Avatar/Name clickable to profile */}
+            {/* Author Header - Avatar/Name clickable to profile, 3-dots for more options */}
             <AuthorHeader
               author={item.author}
               source={item.source}
@@ -650,9 +890,10 @@ export const FacebookFeedCard = memo(
               createdAt={item.createdAt}
               importance={announcementItem?.importance}
               onAvatarPress={item.author?.id ? handleAuthorPress : undefined}
+              onMorePress={handleMoreOptions}
             />
 
-            {/* Content */}
+            {/* Content - Media is clickable for direct viewing */}
             <ContentSection
               title={item.title}
               description={item.description}
@@ -663,12 +904,20 @@ export const FacebookFeedCard = memo(
               views={videoItem?.views}
               progress={devPlanItem?.progress}
               status={devPlanItem?.status}
+              itemId={item.id}
+              isVisible={isVisible}
+              index={index}
+              onMediaPress={
+                item.type === "video" || item.type === "photo"
+                  ? handleMediaPress
+                  : undefined
+              }
             />
 
             {/* Engagement Stats */}
             <EngagementStats
               likes={likesCount}
-              comments={commentsCount}
+              comments={localCommentsCount}
               shares={sharesCount}
             />
 
@@ -678,15 +927,17 @@ export const FacebookFeedCard = memo(
             {/* Action Buttons */}
             <ActionButtons
               liked={liked}
+              saved={saved}
               onLike={handleLike}
               onComment={handleComment}
               onShare={handleShare}
+              onSave={handleSave}
             />
           </View>
         </TouchableOpacity>
       </Animated.View>
     );
-  }
+  },
 );
 
 // ============================================
@@ -751,7 +1002,7 @@ export const CreatePostCard = memo(
         </View>
       </TouchableOpacity>
     );
-  }
+  },
 );
 
 // ============================================
@@ -911,6 +1162,13 @@ const styles = StyleSheet.create({
   },
 
   // Media
+  videoContainer: {
+    position: "relative",
+    width: "100%",
+    aspectRatio: 16 / 9,
+    backgroundColor: "#000",
+    overflow: "hidden",
+  },
   mediaContainer: {
     position: "relative",
     width: "100%",

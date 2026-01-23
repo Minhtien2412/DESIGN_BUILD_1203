@@ -195,11 +195,11 @@ class PineconeService {
    * Upsert vectors
    */
   async upsert(
-    vectors: Array<{
+    vectors: {
       id: string;
       values: number[];
       metadata?: Record<string, unknown>;
-    }>
+    }[]
   ): Promise<boolean> {
     try {
       const response = await fetch(`${this.host}/vectors/upsert`, {

@@ -16,7 +16,7 @@ import callSocketService, {
     CallEndedEvent,
     CallType,
     CallUser,
-    IncomingCallEvent
+    IncomingCallEvent,
 } from "@/services/communication/callSocket.service";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -115,7 +115,7 @@ export function useVoiceCall({
   // Refs
   const cleanupRef = useRef<(() => void)[]>([]);
   const callDurationInterval = useRef<ReturnType<typeof setInterval> | null>(
-    null
+    null,
   );
   const pendingCallIdRef = useRef<string | null>(null);
 
@@ -188,7 +188,7 @@ export function useVoiceCall({
 
     callDurationInterval.current = setInterval(() => {
       setCurrentCall((prev) =>
-        prev ? { ...prev, duration: prev.duration + 1 } : null
+        prev ? { ...prev, duration: prev.duration + 1 } : null,
       );
     }, 1000);
   }, []);
@@ -225,7 +225,7 @@ export function useVoiceCall({
         throw err;
       }
     },
-    [connected, callState]
+    [connected, callState],
   );
 
   const answerCall = useCallback(() => {
@@ -310,7 +310,7 @@ export function useVoiceCall({
         });
 
         onIncomingCall?.(data);
-      }
+      },
     );
     cleanupRef.current.push(removeIncoming);
 
@@ -329,7 +329,7 @@ export function useVoiceCall({
 
         setCallState("connected");
         setCurrentCall((prev) =>
-          prev ? { ...prev, startedAt: new Date() } : null
+          prev ? { ...prev, startedAt: new Date() } : null,
         );
 
         // Save LiveKit credentials if provided
@@ -344,7 +344,7 @@ export function useVoiceCall({
         }
 
         startDurationTimer();
-      }
+      },
     );
     cleanupRef.current.push(removeAnswered);
 
@@ -358,12 +358,12 @@ export function useVoiceCall({
 
         // Reset after delay
         setTimeout(resetCallState, 2000);
-      }
+      },
     );
     cleanupRef.current.push(removeEnded);
 
     // Handle busy signal
-    const removeBusy = callSocketService.onCallBusy(({ callId }) => {
+    const removeBusy = callSocketService.onCallBusy((_data) => {
       console.log("[useVoiceCall] User busy");
 
       setCallState("ended");

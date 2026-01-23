@@ -838,19 +838,19 @@ export async function performDefaultAction(
 /**
  * Get available actions for a scan result
  */
-export function getAvailableActions(result: ScanResult): Array<{
+export function getAvailableActions(result: ScanResult): {
   id: string;
   label: string;
   icon: string;
   action: () => Promise<boolean>;
-}> {
+}[] {
   const category = detectCategory(result.data);
-  const actions: Array<{
+  const actions: {
     id: string;
     label: string;
     icon: string;
     action: () => Promise<boolean>;
-  }> = [];
+  }[] = [];
 
   // Category-specific actions
   switch (category) {

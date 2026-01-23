@@ -10,10 +10,16 @@
  * - Retry with exponential backoff
  */
 
+import * as FileSystem from "@/utils/FileSystemCompat";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as FileSystem from "expo-file-system";
 import { post } from "./api";
 import { calculateChecksum } from "./PresignedUploadService";
+
+// ============================================================================
+// REACT HOOKS
+// ============================================================================
+
+import { useCallback, useEffect, useState } from "react";
 
 // ============================================================================
 // TYPES
@@ -137,7 +143,7 @@ const DEFAULT_CONFIG: ChunkedUploadConfig = {
  */
 export function calculateChunkSize(
   fileSize: number,
-  config?: Partial<ChunkedUploadConfig>
+  config?: Partial<ChunkedUploadConfig>,
 ): number {
   const targetChunks = 100; // Aim for ~100 chunks max
   const calculated = Math.ceil(fileSize / targetChunks);
@@ -153,7 +159,7 @@ export function calculateChunkSize(
  */
 export function calculateTotalChunks(
   fileSize: number,
-  chunkSize: number
+  chunkSize: number,
 ): number {
   return Math.ceil(fileSize / chunkSize);
 }
@@ -164,7 +170,7 @@ export function calculateTotalChunks(
 export function getChunkRange(
   partNumber: number,
   chunkSize: number,
-  fileSize: number
+  fileSize: number,
 ): { start: number; end: number; size: number } {
   const start = (partNumber - 1) * chunkSize;
   const end = Math.min(start + chunkSize, fileSize);
@@ -200,7 +206,7 @@ export class ChunkSplitter {
     const { start, size } = getChunkRange(
       partNumber,
       this.chunkSize,
-      this.fileSize
+      this.fileSize,
     );
 
     const data = await FileSystem.readAsStringAsync(this.fileUri, {
@@ -264,7 +270,7 @@ class UploadQueue {
    */
   async start(
     onChunkReady: (chunk: QueuedChunk) => Promise<CompletedPart | null>,
-    onComplete: () => void
+    onComplete: () => void,
   ) {
     this.onChunkReady = onChunkReady;
     this.onComplete = onComplete;
@@ -390,11 +396,11 @@ class ChunkedUploadServiceClass {
    * Initiate multipart upload
    */
   async initiateUpload(
-    request: MultipartInitRequest
+    request: MultipartInitRequest,
   ): Promise<MultipartInitResponse> {
     const response = await post<MultipartInitResponse>(
       "/api/v1/upload/multipart/initiate",
-      request
+      request,
     );
     return response;
   }
@@ -405,12 +411,12 @@ class ChunkedUploadServiceClass {
   async uploadChunk(
     splitter: ChunkSplitter,
     uploadId: string,
-    partNumber: number
+    partNumber: number,
   ): Promise<CompletedPart> {
     // Get presigned URL for this part
     const presignResponse = await post<ChunkUploadRequest>(
       `/api/v1/upload/multipart/${uploadId}/presign`,
-      { partNumber }
+      { partNumber },
     );
 
     // Read chunk data
@@ -439,11 +445,11 @@ class ChunkedUploadServiceClass {
    * Complete multipart upload
    */
   async completeUpload(
-    request: MultipartCompleteRequest
+    request: MultipartCompleteRequest,
   ): Promise<MultipartCompleteResponse> {
     const response = await post<MultipartCompleteResponse>(
       "/api/v1/upload/multipart/complete",
-      request
+      request,
     );
     return response;
   }
@@ -466,7 +472,7 @@ class ChunkedUploadServiceClass {
       contentType: string;
       metadata?: Record<string, unknown>;
       onProgress?: (progress: ChunkedUploadProgress) => void;
-    }
+    },
   ): Promise<MultipartCompleteResponse> {
     const { contentType, metadata, onProgress } = options;
 
@@ -538,7 +544,7 @@ class ChunkedUploadServiceClass {
             const part = await this.uploadChunk(
               splitter,
               uploadId,
-              chunk.partNumber
+              chunk.partNumber,
             );
 
             // Update progress
@@ -546,10 +552,10 @@ class ChunkedUploadServiceClass {
             progress.completedChunks++;
             progress.uploadedBytes = Math.min(
               progress.uploadedBytes + chunkSize,
-              fileSize
+              fileSize,
             );
             progress.progress = Math.round(
-              (progress.completedChunks / totalChunks) * 100
+              (progress.completedChunks / totalChunks) * 100,
             );
             progress.updatedAt = Date.now();
 
@@ -567,7 +573,7 @@ class ChunkedUploadServiceClass {
             // Try retry
             const retried = queue.retry(
               chunk.partNumber,
-              this.config.maxRetries
+              this.config.maxRetries,
             );
             if (!retried) {
               progress.failedChunks.push(chunk.partNumber);
@@ -617,7 +623,7 @@ class ChunkedUploadServiceClass {
             onProgress?.(progress);
             reject(error);
           }
-        }
+        },
       );
     });
   }
@@ -627,7 +633,7 @@ class ChunkedUploadServiceClass {
    */
   async resumeUpload(
     uploadId: string,
-    onProgress?: (progress: ChunkedUploadProgress) => void
+    onProgress?: (progress: ChunkedUploadProgress) => void,
   ): Promise<MultipartCompleteResponse> {
     // Load persistent state
     const state = await this.loadPersistentState(uploadId);
@@ -645,7 +651,7 @@ class ChunkedUploadServiceClass {
     const splitter = new ChunkSplitter(
       state.fileUri,
       state.totalBytes,
-      state.chunkSize
+      state.chunkSize,
     );
 
     // Calculate already uploaded bytes
@@ -662,7 +668,7 @@ class ChunkedUploadServiceClass {
       completedChunks: state.completedParts.length,
       failedChunks: [],
       progress: Math.round(
-        (state.completedParts.length / state.totalChunks) * 100
+        (state.completedParts.length / state.totalChunks) * 100,
       ),
       status: "uploading",
       startedAt: state.startedAt,
@@ -683,17 +689,17 @@ class ChunkedUploadServiceClass {
             const part = await this.uploadChunk(
               splitter,
               uploadId,
-              chunk.partNumber
+              chunk.partNumber,
             );
 
             progress.completedParts.push(part);
             progress.completedChunks++;
             progress.uploadedBytes = Math.min(
               progress.uploadedBytes + state.chunkSize,
-              state.totalBytes
+              state.totalBytes,
             );
             progress.progress = Math.round(
-              (progress.completedChunks / state.totalChunks) * 100
+              (progress.completedChunks / state.totalChunks) * 100,
             );
             progress.updatedAt = Date.now();
 
@@ -709,7 +715,7 @@ class ChunkedUploadServiceClass {
           } catch {
             const retried = queue.retry(
               chunk.partNumber,
-              this.config.maxRetries
+              this.config.maxRetries,
             );
             if (!retried) {
               progress.failedChunks.push(chunk.partNumber);
@@ -756,7 +762,7 @@ class ChunkedUploadServiceClass {
             onProgress?.(progress);
             reject(error);
           }
-        }
+        },
       );
     });
   }
@@ -813,7 +819,7 @@ class ChunkedUploadServiceClass {
    */
   subscribe(
     uploadId: string,
-    callback: (progress: ChunkedUploadProgress) => void
+    callback: (progress: ChunkedUploadProgress) => void,
   ): () => void {
     const listeners = this.listeners.get(uploadId) || new Set();
     listeners.add(callback);
@@ -864,7 +870,7 @@ class ChunkedUploadServiceClass {
 
   private async updatePersistentState(
     uploadId: string,
-    updates: Partial<PersistentUploadState>
+    updates: Partial<PersistentUploadState>,
   ): Promise<void> {
     try {
       const saved = await AsyncStorage.getItem(UPLOAD_STATE_KEY);
@@ -882,7 +888,7 @@ class ChunkedUploadServiceClass {
   }
 
   private async loadPersistentState(
-    uploadId: string
+    uploadId: string,
   ): Promise<PersistentUploadState | null> {
     try {
       const saved = await AsyncStorage.getItem(UPLOAD_STATE_KEY);
@@ -914,7 +920,7 @@ class ChunkedUploadServiceClass {
 
   private notifyListeners(
     uploadId: string,
-    progress: ChunkedUploadProgress
+    progress: ChunkedUploadProgress,
   ): void {
     const listeners = this.listeners.get(uploadId);
     if (listeners) {
@@ -928,12 +934,6 @@ class ChunkedUploadServiceClass {
 // ============================================================================
 
 export const ChunkedUploadService = new ChunkedUploadServiceClass();
-
-// ============================================================================
-// REACT HOOKS
-// ============================================================================
-
-import { useCallback, useEffect, useState } from "react";
 
 /**
  * Hook for chunked upload with resume
@@ -950,7 +950,7 @@ export function useChunkedUpload() {
         filename?: string;
         contentType: string;
         metadata?: Record<string, unknown>;
-      }
+      },
     ) => {
       setIsUploading(true);
       setError(null);
@@ -970,7 +970,7 @@ export function useChunkedUpload() {
         setIsUploading(false);
       }
     },
-    []
+    [],
   );
 
   const resume = useCallback(async (uploadId: string) => {
@@ -980,7 +980,7 @@ export function useChunkedUpload() {
     try {
       const result = await ChunkedUploadService.resumeUpload(
         uploadId,
-        setProgress
+        setProgress,
       );
       return result;
     } catch (e) {

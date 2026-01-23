@@ -6,7 +6,8 @@
  */
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as FileSystem from "expo-file-system";
+// FileSystemCompat is mocked via moduleNameMapper in jest.config.js
+import * as FileSystem from "@/utils/FileSystemCompat";
 import * as ImageManipulator from "expo-image-manipulator";
 import * as Sharing from "expo-sharing";
 
@@ -23,14 +24,6 @@ jest.mock("expo-image-manipulator", () => ({
     JPEG: "jpeg",
     PNG: "png",
   },
-}));
-
-jest.mock("expo-file-system", () => ({
-  documentDirectory: "file:///documents/",
-  makeDirectoryAsync: jest.fn(),
-  copyAsync: jest.fn(),
-  deleteAsync: jest.fn(),
-  getInfoAsync: jest.fn(),
 }));
 
 jest.mock("expo-sharing", () => ({
@@ -81,7 +74,7 @@ import {
     reorderPages,
     saveScanSession,
     shareDocument,
-    validateCorners
+    validateCorners,
 } from "../../services/DocumentScanService";
 
 describe("DocumentScanService", () => {
@@ -209,7 +202,7 @@ describe("DocumentScanService", () => {
 
       const result = await applyPerspectiveCorrection(
         "file:///original.jpg",
-        corners
+        corners,
       );
 
       expect(ImageManipulator.manipulateAsync).toHaveBeenCalled();
@@ -244,12 +237,12 @@ describe("DocumentScanService", () => {
 
     it("should return original on error", async () => {
       (ImageManipulator.manipulateAsync as jest.Mock).mockRejectedValueOnce(
-        new Error("Processing failed")
+        new Error("Processing failed"),
       );
 
       const result = await applyEnhancements(
         "file:///input.jpg",
-        DEFAULT_ENHANCEMENTS
+        DEFAULT_ENHANCEMENTS,
       );
 
       expect(result).toBe("file:///input.jpg");
@@ -263,7 +256,7 @@ describe("DocumentScanService", () => {
       expect(ImageManipulator.manipulateAsync).toHaveBeenCalledWith(
         "file:///input.jpg",
         [{ resize: { width: 200 } }],
-        expect.any(Object)
+        expect.any(Object),
       );
       expect(result).toBe("file:///processed.jpg");
     });
@@ -311,7 +304,7 @@ describe("DocumentScanService", () => {
       ];
 
       (AsyncStorage.getItem as jest.Mock).mockResolvedValueOnce(
-        JSON.stringify(mockSessions)
+        JSON.stringify(mockSessions),
       );
 
       const sessions = await getAllSessions();
@@ -376,7 +369,7 @@ describe("DocumentScanService", () => {
       ];
 
       (AsyncStorage.getItem as jest.Mock).mockResolvedValueOnce(
-        JSON.stringify(existingSessions)
+        JSON.stringify(existingSessions),
       );
 
       const updatedSession: ScanSession = {
@@ -413,7 +406,7 @@ describe("DocumentScanService", () => {
       };
 
       (AsyncStorage.getItem as jest.Mock).mockResolvedValueOnce(
-        JSON.stringify([mockSession])
+        JSON.stringify([mockSession]),
       );
 
       await deleteScanSession("session-to-delete");
@@ -439,13 +432,13 @@ describe("DocumentScanService", () => {
       };
 
       (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-        JSON.stringify([mockSession])
+        JSON.stringify([mockSession]),
       );
 
       const page = await addPageToSession(
         "session-1",
         "file:///captured.jpg",
-        true
+        true,
       );
 
       expect(page.pageNumber).toBe(1);
@@ -455,7 +448,7 @@ describe("DocumentScanService", () => {
 
     it("should throw if session not found", async () => {
       await expect(
-        addPageToSession("non-existent", "file:///captured.jpg")
+        addPageToSession("non-existent", "file:///captured.jpg"),
       ).rejects.toThrow("Session not found");
     });
   });
@@ -476,7 +469,7 @@ describe("DocumentScanService", () => {
       };
 
       (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-        JSON.stringify([mockSession])
+        JSON.stringify([mockSession]),
       );
 
       await reorderPages("session-1", ["page-3", "page-1", "page-2"]);
@@ -512,7 +505,7 @@ describe("DocumentScanService", () => {
       };
 
       (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-        JSON.stringify([mockSession])
+        JSON.stringify([mockSession]),
       );
 
       const result = await exportAsPDF("session-1");
@@ -533,7 +526,7 @@ describe("DocumentScanService", () => {
       };
 
       (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-        JSON.stringify([emptySession])
+        JSON.stringify([emptySession]),
       );
 
       const result = await exportAsPDF("session-1");
@@ -566,7 +559,7 @@ describe("DocumentScanService", () => {
       };
 
       (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-        JSON.stringify([mockSession])
+        JSON.stringify([mockSession]),
       );
 
       const result = await exportAsImages("session-1", "high");
@@ -679,10 +672,10 @@ describe("DocumentScanService", () => {
 
     it("should have increasing quality", () => {
       expect(SCAN_QUALITY_PRESETS.draft.jpegQuality).toBeLessThan(
-        SCAN_QUALITY_PRESETS.standard.jpegQuality
+        SCAN_QUALITY_PRESETS.standard.jpegQuality,
       );
       expect(SCAN_QUALITY_PRESETS.standard.jpegQuality).toBeLessThan(
-        SCAN_QUALITY_PRESETS.high.jpegQuality
+        SCAN_QUALITY_PRESETS.high.jpegQuality,
       );
     });
   });

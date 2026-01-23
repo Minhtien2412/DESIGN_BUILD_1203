@@ -99,14 +99,14 @@ export function useImageViewer() {
    * Mở gallery nhiều ảnh/video
    */
   const openGallery = useCallback((
-    items: Array<{
+    items: {
       id?: string;
       uri: string;
       type?: 'image' | 'video';
       title?: string;
       description?: string;
       thumbnail?: string;
-    }>,
+    }[],
     initialIndex = 0,
     options?: ImageViewerOptions
   ) => {

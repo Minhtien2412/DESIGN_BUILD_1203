@@ -16,21 +16,14 @@ jest.mock("@react-native-async-storage/async-storage", () => ({
   clear: jest.fn(),
 }));
 
-jest.mock("expo-file-system", () => ({
-  getInfoAsync: jest.fn(),
-  documentDirectory: "/mock/documents/",
-  makeDirectoryAsync: jest.fn(),
-  copyAsync: jest.fn(),
-  deleteAsync: jest.fn(),
-}));
+// FileSystemCompat is mocked via moduleNameMapper in jest.config.js
+import * as FileSystem from "@/utils/FileSystemCompat";
+import * as Sharing from "expo-sharing";
 
 jest.mock("expo-sharing", () => ({
   isAvailableAsync: jest.fn(),
   shareAsync: jest.fn(),
 }));
-
-import * as FileSystem from "expo-file-system";
-import * as Sharing from "expo-sharing";
 
 import {
     addAnnotation,
@@ -95,7 +88,7 @@ import {
     toggleBookmark,
     updateAnnotation,
     updateBookmark,
-    ZOOM_CONSTRAINTS
+    ZOOM_CONSTRAINTS,
 } from "../../services/PDFViewerService";
 
 describe("PDFViewerService", () => {
@@ -265,7 +258,7 @@ describe("PDFViewerService", () => {
       test("merges stored settings with defaults", async () => {
         const stored = { nightMode: true, defaultZoom: 1.5 };
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify(stored)
+          JSON.stringify(stored),
         );
 
         const settings = await loadPDFSettings();
@@ -288,20 +281,20 @@ describe("PDFViewerService", () => {
 
         expect(AsyncStorage.setItem).toHaveBeenCalledWith(
           "@pdf_viewer_settings",
-          expect.stringContaining('"nightMode":true')
+          expect.stringContaining('"nightMode":true'),
         );
       });
 
       test("merges with existing settings", async () => {
         const existing = { nightMode: true };
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify(existing)
+          JSON.stringify(existing),
         );
 
         await savePDFSettings({ defaultZoom: 2.0 });
 
         const savedData = JSON.parse(
-          (AsyncStorage.setItem as jest.Mock).mock.calls[0][1]
+          (AsyncStorage.setItem as jest.Mock).mock.calls[0][1],
         );
         expect(savedData.nightMode).toBe(true);
         expect(savedData.defaultZoom).toBe(2.0);
@@ -312,7 +305,7 @@ describe("PDFViewerService", () => {
       test("removes settings from storage", async () => {
         await resetPDFSettings();
         expect(AsyncStorage.removeItem).toHaveBeenCalledWith(
-          "@pdf_viewer_settings"
+          "@pdf_viewer_settings",
         );
       });
     });
@@ -354,7 +347,7 @@ describe("PDFViewerService", () => {
 
       test("returns stored bookmarks", async () => {
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify(mockBookmarks)
+          JSON.stringify(mockBookmarks),
         );
 
         const bookmarks = await loadBookmarks();
@@ -365,7 +358,7 @@ describe("PDFViewerService", () => {
     describe("getDocumentBookmarks", () => {
       test("filters bookmarks by documentId", async () => {
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify(mockBookmarks)
+          JSON.stringify(mockBookmarks),
         );
 
         const bookmarks = await getDocumentBookmarks("doc-1");
@@ -375,7 +368,7 @@ describe("PDFViewerService", () => {
 
       test("sorts bookmarks by page number", async () => {
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify(mockBookmarks)
+          JSON.stringify(mockBookmarks),
         );
 
         const bookmarks = await getDocumentBookmarks("doc-1");
@@ -399,7 +392,7 @@ describe("PDFViewerService", () => {
 
       test("returns existing bookmark if already exists", async () => {
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify(mockBookmarks)
+          JSON.stringify(mockBookmarks),
         );
 
         const bookmark = await addBookmark("doc-1", 5);
@@ -420,16 +413,16 @@ describe("PDFViewerService", () => {
     describe("removeBookmark", () => {
       test("removes bookmark by id", async () => {
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify(mockBookmarks)
+          JSON.stringify(mockBookmarks),
         );
 
         await removeBookmark("bm-1");
 
         const savedData = JSON.parse(
-          (AsyncStorage.setItem as jest.Mock).mock.calls[0][1]
+          (AsyncStorage.setItem as jest.Mock).mock.calls[0][1],
         );
         expect(
-          savedData.find((b: Bookmark) => b.id === "bm-1")
+          savedData.find((b: Bookmark) => b.id === "bm-1"),
         ).toBeUndefined();
         expect(savedData).toHaveLength(2);
       });
@@ -438,18 +431,18 @@ describe("PDFViewerService", () => {
     describe("removeBookmarkByPage", () => {
       test("removes bookmark by document and page", async () => {
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify(mockBookmarks)
+          JSON.stringify(mockBookmarks),
         );
 
         await removeBookmarkByPage("doc-1", 5);
 
         const savedData = JSON.parse(
-          (AsyncStorage.setItem as jest.Mock).mock.calls[0][1]
+          (AsyncStorage.setItem as jest.Mock).mock.calls[0][1],
         );
         expect(
           savedData.find(
-            (b: Bookmark) => b.documentId === "doc-1" && b.pageNumber === 5
-          )
+            (b: Bookmark) => b.documentId === "doc-1" && b.pageNumber === 5,
+          ),
         ).toBeUndefined();
       });
     });
@@ -457,7 +450,7 @@ describe("PDFViewerService", () => {
     describe("updateBookmark", () => {
       test("updates bookmark properties", async () => {
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify(mockBookmarks)
+          JSON.stringify(mockBookmarks),
         );
 
         await updateBookmark("bm-1", {
@@ -466,7 +459,7 @@ describe("PDFViewerService", () => {
         });
 
         const savedData = JSON.parse(
-          (AsyncStorage.setItem as jest.Mock).mock.calls[0][1]
+          (AsyncStorage.setItem as jest.Mock).mock.calls[0][1],
         );
         const updated = savedData.find((b: Bookmark) => b.id === "bm-1");
         expect(updated.label).toBe("Updated Label");
@@ -477,7 +470,7 @@ describe("PDFViewerService", () => {
     describe("isPageBookmarked", () => {
       test("returns true if page is bookmarked", async () => {
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify(mockBookmarks)
+          JSON.stringify(mockBookmarks),
         );
 
         const result = await isPageBookmarked("doc-1", 5);
@@ -486,7 +479,7 @@ describe("PDFViewerService", () => {
 
       test("returns false if page is not bookmarked", async () => {
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify(mockBookmarks)
+          JSON.stringify(mockBookmarks),
         );
 
         const result = await isPageBookmarked("doc-1", 20);
@@ -507,7 +500,7 @@ describe("PDFViewerService", () => {
 
       test("removes bookmark if exists", async () => {
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify(mockBookmarks)
+          JSON.stringify(mockBookmarks),
         );
 
         const result = await toggleBookmark("doc-1", 5);
@@ -541,7 +534,7 @@ describe("PDFViewerService", () => {
 
       test("returns stored progress", async () => {
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify(mockProgress)
+          JSON.stringify(mockProgress),
         );
 
         const progress = await loadAllProgress();
@@ -552,7 +545,7 @@ describe("PDFViewerService", () => {
     describe("getReadingProgress", () => {
       test("returns progress for document", async () => {
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify(mockProgress)
+          JSON.stringify(mockProgress),
         );
 
         const progress = await getReadingProgress("doc-1");
@@ -562,7 +555,7 @@ describe("PDFViewerService", () => {
 
       test("returns null if no progress", async () => {
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify(mockProgress)
+          JSON.stringify(mockProgress),
         );
 
         const progress = await getReadingProgress("doc-2");
@@ -583,13 +576,13 @@ describe("PDFViewerService", () => {
 
       test("updates existing progress", async () => {
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify(mockProgress)
+          JSON.stringify(mockProgress),
         );
 
         await saveReadingProgress("doc-1", 75, 100);
 
         const savedData = JSON.parse(
-          (AsyncStorage.setItem as jest.Mock).mock.calls[0][1]
+          (AsyncStorage.setItem as jest.Mock).mock.calls[0][1],
         );
         expect(savedData["doc-1"].currentPage).toBe(75);
         expect(savedData["doc-1"].percentage).toBe(75);
@@ -599,13 +592,13 @@ describe("PDFViewerService", () => {
     describe("clearReadingProgress", () => {
       test("clears progress for document", async () => {
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify(mockProgress)
+          JSON.stringify(mockProgress),
         );
 
         await clearReadingProgress("doc-1");
 
         const savedData = JSON.parse(
-          (AsyncStorage.setItem as jest.Mock).mock.calls[0][1]
+          (AsyncStorage.setItem as jest.Mock).mock.calls[0][1],
         );
         expect(savedData["doc-1"]).toBeUndefined();
       });
@@ -636,7 +629,7 @@ describe("PDFViewerService", () => {
 
       test("returns stored recent documents", async () => {
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify([mockDocument])
+          JSON.stringify([mockDocument]),
         );
 
         const docs = await loadRecentDocuments();
@@ -653,7 +646,7 @@ describe("PDFViewerService", () => {
 
         expect(AsyncStorage.setItem).toHaveBeenCalled();
         const savedData = JSON.parse(
-          (AsyncStorage.setItem as jest.Mock).mock.calls[0][1]
+          (AsyncStorage.setItem as jest.Mock).mock.calls[0][1],
         );
         expect(savedData).toHaveLength(1);
         expect(savedData[0].id).toBe("doc-1");
@@ -665,13 +658,13 @@ describe("PDFViewerService", () => {
           mockDocument,
         ];
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify(existingDocs)
+          JSON.stringify(existingDocs),
         );
 
         await addToRecent(mockDocument);
 
         const savedData = JSON.parse(
-          (AsyncStorage.setItem as jest.Mock).mock.calls[0][1]
+          (AsyncStorage.setItem as jest.Mock).mock.calls[0][1],
         );
         expect(savedData[0].id).toBe("doc-1");
       });
@@ -682,13 +675,13 @@ describe("PDFViewerService", () => {
           id: `doc-${i}`,
         }));
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify(manyDocs)
+          JSON.stringify(manyDocs),
         );
 
         await addToRecent({ ...mockDocument, id: "doc-new" });
 
         const savedData = JSON.parse(
-          (AsyncStorage.setItem as jest.Mock).mock.calls[0][1]
+          (AsyncStorage.setItem as jest.Mock).mock.calls[0][1],
         );
         expect(savedData).toHaveLength(20);
         expect(savedData[0].id).toBe("doc-new");
@@ -698,13 +691,13 @@ describe("PDFViewerService", () => {
     describe("removeFromRecent", () => {
       test("removes document from recent", async () => {
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify([mockDocument])
+          JSON.stringify([mockDocument]),
         );
 
         await removeFromRecent("doc-1");
 
         const savedData = JSON.parse(
-          (AsyncStorage.setItem as jest.Mock).mock.calls[0][1]
+          (AsyncStorage.setItem as jest.Mock).mock.calls[0][1],
         );
         expect(savedData).toHaveLength(0);
       });
@@ -714,7 +707,7 @@ describe("PDFViewerService", () => {
       test("clears all recent documents", async () => {
         await clearRecentDocuments();
         expect(AsyncStorage.removeItem).toHaveBeenCalledWith(
-          "@pdf_recent_documents"
+          "@pdf_recent_documents",
         );
       });
     });
@@ -756,7 +749,7 @@ describe("PDFViewerService", () => {
 
       test("returns stored annotations", async () => {
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify(mockAnnotations)
+          JSON.stringify(mockAnnotations),
         );
 
         const annotations = await loadAnnotations();
@@ -767,7 +760,7 @@ describe("PDFViewerService", () => {
     describe("getDocumentAnnotations", () => {
       test("filters annotations by documentId", async () => {
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify(mockAnnotations)
+          JSON.stringify(mockAnnotations),
         );
 
         const annotations = await getDocumentAnnotations("doc-1");
@@ -776,7 +769,7 @@ describe("PDFViewerService", () => {
 
       test("returns empty array for unknown document", async () => {
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify(mockAnnotations)
+          JSON.stringify(mockAnnotations),
         );
 
         const annotations = await getDocumentAnnotations("unknown");
@@ -787,7 +780,7 @@ describe("PDFViewerService", () => {
     describe("getPageAnnotations", () => {
       test("filters annotations by page", async () => {
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify(mockAnnotations)
+          JSON.stringify(mockAnnotations),
         );
 
         const annotations = await getPageAnnotations("doc-1", 5);
@@ -817,13 +810,13 @@ describe("PDFViewerService", () => {
     describe("updateAnnotation", () => {
       test("updates annotation", async () => {
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify(mockAnnotations)
+          JSON.stringify(mockAnnotations),
         );
 
         await updateAnnotation("ann-1", { color: "#FF0000", note: "Updated" });
 
         const savedData = JSON.parse(
-          (AsyncStorage.setItem as jest.Mock).mock.calls[0][1]
+          (AsyncStorage.setItem as jest.Mock).mock.calls[0][1],
         );
         const updated = savedData.find((a: Annotation) => a.id === "ann-1");
         expect(updated.color).toBe("#FF0000");
@@ -834,16 +827,16 @@ describe("PDFViewerService", () => {
     describe("removeAnnotation", () => {
       test("removes annotation", async () => {
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify(mockAnnotations)
+          JSON.stringify(mockAnnotations),
         );
 
         await removeAnnotation("ann-1");
 
         const savedData = JSON.parse(
-          (AsyncStorage.setItem as jest.Mock).mock.calls[0][1]
+          (AsyncStorage.setItem as jest.Mock).mock.calls[0][1],
         );
         expect(
-          savedData.find((a: Annotation) => a.id === "ann-1")
+          savedData.find((a: Annotation) => a.id === "ann-1"),
         ).toBeUndefined();
       });
     });
@@ -874,7 +867,7 @@ describe("PDFViewerService", () => {
         });
 
         await expect(getPDFInfo("/path/to/missing.pdf")).rejects.toThrow(
-          "File not found"
+          "File not found",
         );
       });
     });
@@ -911,7 +904,7 @@ describe("PDFViewerService", () => {
 
         const destUri = await copyPDFToStorage("/source/doc.pdf", "doc.pdf");
 
-        expect(destUri).toBe("/mock/documents/pdfs/doc.pdf");
+        expect(destUri).toBe("file:///documents/pdfs/doc.pdf");
         expect(FileSystem.copyAsync).toHaveBeenCalled();
       });
 
@@ -920,15 +913,15 @@ describe("PDFViewerService", () => {
           exists: false,
         });
         (FileSystem.makeDirectoryAsync as jest.Mock).mockResolvedValue(
-          undefined
+          undefined,
         );
         (FileSystem.copyAsync as jest.Mock).mockResolvedValue(undefined);
 
         await copyPDFToStorage("/source/doc.pdf", "doc.pdf");
 
         expect(FileSystem.makeDirectoryAsync).toHaveBeenCalledWith(
-          "/mock/documents/pdfs/",
-          { intermediates: true }
+          "file:///documents/pdfs/",
+          { intermediates: true },
         );
       });
     });

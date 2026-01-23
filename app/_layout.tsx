@@ -1,4 +1,8 @@
 import { IncomingCallModal } from "@/components/call";
+import { CommentsSheetProvider } from "@/components/community/CommentsSheet";
+import { MoreOptionsProvider } from "@/components/community/MoreOptionsMenu";
+import { ShareSheetProvider } from "@/components/community/ShareSheet";
+import { VerticalVideoFeedProvider } from "@/components/community/VerticalVideoFeed";
 import { FormErrorBoundary } from "@/components/FormErrorBoundary";
 import { NotificationToast } from "@/components/notifications/NotificationToast";
 import { FullMediaViewerProvider } from "@/components/ui/full-media-viewer";
@@ -106,88 +110,96 @@ export default Sentry.wrap(function RootLayout() {
   return (
     <FormErrorBoundary>
       <FullMediaViewerProvider>
-        <PermissionProvider>
-          <AuthProvider>
-            <PerfexAuthProvider>
-              <CartProvider>
-                <FavoritesProvider>
-                  <ViewHistoryProvider>
-                    <MeetingProvider>
-                      <CallProvider>
-                        <CommunicationHubProvider>
-                          <WebSocketProvider>
-                            <ProgressWebSocketProvider>
-                              <UtilitiesProvider>
-                                <ProjectDataProvider>
-                                  <VideoInteractionsProvider>
-                                    <ProfileProvider>
-                                      <NotificationProvider>
-                                        <PushNotificationProvider>
-                                          <NotificationsProvider>
-                                            <UnifiedBadgeProvider>
-                                              <OfflineIndicator />
-                                              <IncomingCallModal />
-                                              <NotificationToast />
-                                              <AuthNavigator />
-                                              <Stack
-                                                screenOptions={{
-                                                  headerShown: false,
-                                                }}
-                                                initialRouteName="(tabs)"
-                                              >
-                                                <Stack.Screen
-                                                  name="(tabs)"
-                                                  options={{
-                                                    headerShown: false,
-                                                  }}
-                                                />
-                                                <Stack.Screen
-                                                  name="(auth)"
-                                                  options={{
-                                                    headerShown: false,
-                                                  }}
-                                                />
-                                                <Stack.Screen
-                                                  name="crm"
-                                                  options={{
-                                                    headerShown: false,
-                                                  }}
-                                                />
-                                                <Stack.Screen
-                                                  name="communication/index"
-                                                  options={{
-                                                    headerShown: false,
-                                                  }}
-                                                />
-                                                <Stack.Screen
-                                                  name="call/active"
-                                                  options={{
-                                                    headerShown: false,
-                                                    presentation:
-                                                      "fullScreenModal",
-                                                  }}
-                                                />
-                                              </Stack>
-                                              <Toast />
-                                            </UnifiedBadgeProvider>
-                                          </NotificationsProvider>
-                                        </PushNotificationProvider>
-                                      </NotificationProvider>
-                                    </ProfileProvider>
-                                  </VideoInteractionsProvider>
-                                </ProjectDataProvider>
-                              </UtilitiesProvider>
-                            </ProgressWebSocketProvider>
-                          </WebSocketProvider>
-                        </CommunicationHubProvider>
-                      </CallProvider>
-                    </MeetingProvider>
-                  </ViewHistoryProvider>
-                </FavoritesProvider>
-              </CartProvider>
-            </PerfexAuthProvider>
-          </AuthProvider>
-        </PermissionProvider>
+        <VerticalVideoFeedProvider>
+          <CommentsSheetProvider>
+            <ShareSheetProvider>
+              <MoreOptionsProvider>
+                <PermissionProvider>
+                  <AuthProvider>
+                    <PerfexAuthProvider>
+                      <CartProvider>
+                        <FavoritesProvider>
+                          <ViewHistoryProvider>
+                            <MeetingProvider>
+                              <CallProvider>
+                                <CommunicationHubProvider>
+                                  <WebSocketProvider>
+                                    <ProgressWebSocketProvider>
+                                      <UtilitiesProvider>
+                                        <ProjectDataProvider>
+                                          <VideoInteractionsProvider>
+                                            <ProfileProvider>
+                                              <NotificationProvider>
+                                                <PushNotificationProvider>
+                                                  <NotificationsProvider>
+                                                    <UnifiedBadgeProvider>
+                                                      <OfflineIndicator />
+                                                      <IncomingCallModal />
+                                                      <NotificationToast />
+                                                      <AuthNavigator />
+                                                      <Stack
+                                                        screenOptions={{
+                                                          headerShown: false,
+                                                        }}
+                                                        initialRouteName="(tabs)"
+                                                      >
+                                                        <Stack.Screen
+                                                          name="(tabs)"
+                                                          options={{
+                                                            headerShown: false,
+                                                          }}
+                                                        />
+                                                        <Stack.Screen
+                                                          name="(auth)"
+                                                          options={{
+                                                            headerShown: false,
+                                                          }}
+                                                        />
+                                                        <Stack.Screen
+                                                          name="crm"
+                                                          options={{
+                                                            headerShown: false,
+                                                          }}
+                                                        />
+                                                        <Stack.Screen
+                                                          name="communication/index"
+                                                          options={{
+                                                            headerShown: false,
+                                                          }}
+                                                        />
+                                                        <Stack.Screen
+                                                          name="call/active"
+                                                          options={{
+                                                            headerShown: false,
+                                                            presentation:
+                                                              "fullScreenModal",
+                                                          }}
+                                                        />
+                                                      </Stack>
+                                                      <Toast />
+                                                    </UnifiedBadgeProvider>
+                                                  </NotificationsProvider>
+                                                </PushNotificationProvider>
+                                              </NotificationProvider>
+                                            </ProfileProvider>
+                                          </VideoInteractionsProvider>
+                                        </ProjectDataProvider>
+                                      </UtilitiesProvider>
+                                    </ProgressWebSocketProvider>
+                                  </WebSocketProvider>
+                                </CommunicationHubProvider>
+                              </CallProvider>
+                            </MeetingProvider>
+                          </ViewHistoryProvider>
+                        </FavoritesProvider>
+                      </CartProvider>
+                    </PerfexAuthProvider>
+                  </AuthProvider>
+                </PermissionProvider>
+              </MoreOptionsProvider>
+            </ShareSheetProvider>
+          </CommentsSheetProvider>
+        </VerticalVideoFeedProvider>
       </FullMediaViewerProvider>
     </FormErrorBoundary>
   );

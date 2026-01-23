@@ -4,7 +4,8 @@
  */
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as FileSystem from "expo-file-system";
+// FileSystemCompat is mocked via moduleNameMapper in jest.config.js
+import * as FileSystem from "@/utils/FileSystemCompat";
 import * as Sharing from "expo-sharing";
 
 import {
@@ -22,15 +23,6 @@ jest.mock("@react-native-async-storage/async-storage", () => ({
   getItem: jest.fn(),
   setItem: jest.fn(),
   removeItem: jest.fn(),
-}));
-
-jest.mock("expo-file-system", () => ({
-  documentDirectory: "file:///documents/",
-  getInfoAsync: jest.fn(),
-  makeDirectoryAsync: jest.fn(),
-  readDirectoryAsync: jest.fn(),
-  deleteAsync: jest.fn(),
-  createDownloadResumable: jest.fn(),
 }));
 
 jest.mock("expo-sharing", () => ({
@@ -75,8 +67,8 @@ describe("FileManagerService", () => {
       expect(getFileType("application/msword")).toBe("document");
       expect(
         getFileType(
-          "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-        )
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        ),
       ).toBe("document");
     });
 
@@ -172,7 +164,7 @@ describe("FileManagerService", () => {
 
       expect(result.files).toHaveLength(1);
       expect(get).toHaveBeenCalledWith(
-        expect.stringContaining("/api/v1/files")
+        expect.stringContaining("/api/v1/files"),
       );
     });
 
@@ -188,7 +180,7 @@ describe("FileManagerService", () => {
       await FileManagerService.listFiles({ type: "image" });
 
       expect(get).toHaveBeenCalledWith(
-        expect.stringContaining("contentTypes=")
+        expect.stringContaining("contentTypes="),
       );
     });
 
@@ -219,7 +211,7 @@ describe("FileManagerService", () => {
 
       expect(get).toHaveBeenCalledWith(expect.stringContaining("sortBy=name"));
       expect(get).toHaveBeenCalledWith(
-        expect.stringContaining("sortOrder=asc")
+        expect.stringContaining("sortOrder=asc"),
       );
     });
   });
@@ -329,7 +321,7 @@ describe("FileManagerService", () => {
         "/api/v1/files/attach",
         expect.objectContaining({
           targetType: "project",
-        })
+        }),
       );
     });
   });
@@ -355,7 +347,7 @@ describe("FileManagerService", () => {
 
       // Mock getLocalPath to return a path
       (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-        "file:///documents/downloads/photo.jpg"
+        "file:///documents/downloads/photo.jpg",
       );
 
       await FileManagerService.shareFile(mockFile as any);
@@ -375,7 +367,7 @@ describe("FileManagerService", () => {
       };
 
       await expect(
-        FileManagerService.shareFile(mockFile as any)
+        FileManagerService.shareFile(mockFile as any),
       ).rejects.toThrow("Chia sẻ không khả dụng");
     });
   });
@@ -387,7 +379,7 @@ describe("FileManagerService", () => {
   describe("isDownloaded", () => {
     it("should return true if file exists locally", async () => {
       (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-        "file:///local/photo.jpg"
+        "file:///local/photo.jpg",
       );
       (FileSystem.getInfoAsync as jest.Mock).mockResolvedValue({
         exists: true,
@@ -429,7 +421,7 @@ describe("FileManagerService", () => {
       await FileManagerService.invalidateCache();
 
       expect(AsyncStorage.removeItem).toHaveBeenCalledWith(
-        "@file_manager_cache"
+        "@file_manager_cache",
       );
     });
   });

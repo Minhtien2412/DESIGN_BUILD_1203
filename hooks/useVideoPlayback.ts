@@ -35,12 +35,12 @@ interface UseVideoPlaybackReturn {
 
 export function useVideoPlayback(
   videoId: string,
-  options: UseVideoPlaybackOptions = {}
+  options: UseVideoPlaybackOptions = {},
 ): UseVideoPlaybackReturn {
-  const { autoRegister = true, onPause, onResume } = options;
+  const { autoRegister: _autoRegister = true, onPause, onResume } = options;
 
   const [state, setState] = useState<VideoPlayerState>(() =>
-    VideoPlayerController.getState()
+    VideoPlayerController.getState(),
   );
 
   // Subscribe to controller state changes
@@ -57,7 +57,7 @@ export function useVideoPlayback(
         onResume,
       });
     },
-    [videoId, onPause, onResume]
+    [videoId, onPause, onResume],
   );
 
   // Unregister player on unmount
@@ -115,7 +115,7 @@ export function useGlobalMute(): {
   setMuted: (muted: boolean) => Promise<void>;
 } {
   const [isMuted, setIsMuted] = useState(() =>
-    VideoPlayerController.getMuted()
+    VideoPlayerController.getMuted(),
   );
 
   useEffect(() => {
@@ -141,7 +141,7 @@ export function useGlobalMute(): {
  */
 export function useActiveVideo(): string | null {
   const [activeVideoId, setActiveVideoId] = useState<string | null>(() =>
-    VideoPlayerController.getActiveVideoId()
+    VideoPlayerController.getActiveVideoId(),
   );
 
   useEffect(() => {

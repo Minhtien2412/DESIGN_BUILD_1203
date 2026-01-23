@@ -371,14 +371,14 @@ export interface SearchMessagesParams {
 }
 
 export interface SearchMessagesResponse {
-  messages: Array<{
+  messages: {
     id: string;
     conversationId: string;
     content: string;
     senderId: number;
     sender?: { name: string };
     createdAt: string;
-  }>;
+  }[];
   total: number;
 }
 

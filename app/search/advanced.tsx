@@ -39,12 +39,12 @@ const POPULAR_SEARCHES = [
   { text: "thợ xây", icon: "person", color: "#14b8a6" },
 ];
 
-const CATEGORIES: Array<{
+const CATEGORIES: {
   name: string;
   icon: string;
   color: string;
   gradient: [string, string];
-}> = [
+}[] = [
   {
     name: "Vật liệu xây",
     icon: "cube-outline",

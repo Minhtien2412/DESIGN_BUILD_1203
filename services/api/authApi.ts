@@ -121,7 +121,8 @@ export async function register(dto: RegisterDto): Promise<AuthResponse> {
 /**
  * Refresh access token using refresh token
  * Endpoint: POST /auth/refresh
- * Returns new access token
+ * NOTE: Backend uses JwtRefreshAuthGuard which expects refreshToken in Bearer header
+ * Returns new access token and refresh token
  */
 export async function refreshAccessToken(
   refreshToken: string
@@ -130,9 +131,9 @@ export async function refreshAccessToken(
     console.log("[authApi] Attempting token refresh");
     return await apiFetch<RefreshTokenResponse>("/auth/refresh", {
       method: "POST",
-      data: { refreshToken },
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${refreshToken}`,
       },
     });
   } catch (error) {

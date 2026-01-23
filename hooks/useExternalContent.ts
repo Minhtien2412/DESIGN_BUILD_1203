@@ -83,7 +83,7 @@ export function useExternalVideos(options: UseExternalVideosOptions = {}): UseEx
 
   useEffect(() => {
     fetchVideos(page, false);
-  }, [category, enabled]); // eslint-disable-line
+  }, [category, enabled]);  
 
   return { videos, isLoading, error, refetch, loadMore, hasMore };
 }
@@ -140,7 +140,7 @@ export function useExternalNews(options: UseExternalNewsOptions = {}): UseExtern
 
   useEffect(() => {
     fetchNews();
-  }, [category, topic, enabled]); // eslint-disable-line
+  }, [category, topic, enabled]);  
 
   return { articles, isLoading, error, refetch };
 }
@@ -209,7 +209,7 @@ export function useExternalPhotos(options: UseExternalPhotosOptions = {}): UseEx
 
   useEffect(() => {
     fetchPhotos(page, false);
-  }, [category, enabled]); // eslint-disable-line
+  }, [category, enabled]);  
 
   return { photos, isLoading, error, refetch, loadMore, hasMore };
 }
@@ -264,7 +264,7 @@ export function useCombinedFeed(options: UseCombinedFeedOptions = {}): UseCombin
 
   useEffect(() => {
     fetchFeed();
-  }, [enabled]); // eslint-disable-line
+  }, [enabled]);  
 
   return { feed, isLoading, error, refetch };
 }

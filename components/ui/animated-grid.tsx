@@ -29,7 +29,7 @@ const GridCell = React.memo(function GridCell({ item, index, columns }: GridCell
       -1,
       true
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   return (

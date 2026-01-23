@@ -1,16 +1,20 @@
 /**
  * useRealTimeCommunication Hook - Modern Real-time Communication
- * 
+ *
  * Integrates new communication modules (WebRTC, Socket, Media)
  * with React state management for calls, chat, and streaming
- * 
+ *
  * @module hooks/useRealTimeCommunication
  */
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from "react";
 // Import directly from specific files to avoid module resolution issues
-import { AudioManager, getAudioManager } from '../lib/communication/media';
-import { getSocketManager, SocketManager, SocketStatus } from '../lib/communication/socket';
+import { AudioManager, getAudioManager } from "../lib/communication/media";
+import {
+    getSocketManager,
+    SocketManager,
+    SocketStatus,
+} from "../lib/communication/socket";
 import type {
     Call,
     CallStatus,
@@ -18,8 +22,8 @@ import type {
     CommunicationUser,
     Conversation,
     Message,
-} from '../lib/communication/types';
-import { getWebRTCManager, WebRTCManager } from '../lib/communication/webrtc';
+} from "../lib/communication/types";
+import { getWebRTCManager, WebRTCManager } from "../lib/communication/webrtc";
 
 // ==================== TYPES ====================
 
@@ -65,7 +69,7 @@ interface ConnectionState {
 const INITIAL_CALL_STATE: CallState = {
   activeCall: null,
   incomingCall: null,
-  callStatus: 'idle',
+  callStatus: "idle",
   localStream: null,
   remoteStream: null,
   remoteParticipantId: null,
@@ -85,17 +89,19 @@ const INITIAL_CHAT_STATE: ChatState = {
 };
 
 const INITIAL_CONNECTION_STATE: ConnectionState = {
-  socketStatus: 'disconnected',
+  socketStatus: "disconnected",
   isWebRTCReady: false,
   isConnected: false,
 };
 
 // ==================== MAIN HOOK ====================
 
-export function useRealTimeCommunication(options: UseRealTimeCommunicationOptions = {}) {
-  const { 
-    autoConnectSocket = false, 
-    userId, 
+export function useRealTimeCommunication(
+  options: UseRealTimeCommunicationOptions = {},
+) {
+  const {
+    autoConnectSocket = false,
+    userId,
     token,
     onIncomingCall,
     onCallEnded,
@@ -109,7 +115,9 @@ export function useRealTimeCommunication(options: UseRealTimeCommunicationOption
   const callTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // State
-  const [connectionState, setConnectionState] = useState<ConnectionState>(INITIAL_CONNECTION_STATE);
+  const [connectionState, setConnectionState] = useState<ConnectionState>(
+    INITIAL_CONNECTION_STATE,
+  );
   const [callState, setCallState] = useState<CallState>(INITIAL_CALL_STATE);
   const [chatState, setChatState] = useState<ChatState>(INITIAL_CHAT_STATE);
 
@@ -125,111 +133,156 @@ export function useRealTimeCommunication(options: UseRealTimeCommunicationOption
     const webrtc = webrtcRef.current;
 
     // Socket status listener
-    const unsubscribeStatus = socket.on<SocketStatus>('status', (status: SocketStatus) => {
-      setConnectionState(prev => ({
-        ...prev,
-        socketStatus: status,
-        isConnected: status === 'connected',
-      }));
-    });
+    const unsubscribeStatus = socket.on<SocketStatus>(
+      "status",
+      (status: SocketStatus) => {
+        setConnectionState((prev) => ({
+          ...prev,
+          socketStatus: status,
+          isConnected: status === "connected",
+        }));
+      },
+    );
 
     // WebRTC event listeners
     const handleRemoteStream = (data: unknown) => {
       const { stream } = data as { participantId: string; stream: MediaStream };
-      setCallState(prev => ({ ...prev, remoteStream: stream }));
+      setCallState((prev) => ({ ...prev, remoteStream: stream }));
     };
-    webrtc.on('remoteStream', handleRemoteStream);
+    webrtc.on("remoteStream", handleRemoteStream);
 
     const handleConnectionState = (data: unknown) => {
-      const { state } = data as { participantId: string; state: RTCPeerConnectionState };
-      if (state === 'connected') {
-        setCallState(prev => ({ ...prev, callStatus: 'connected' }));
-      } else if (state === 'disconnected' || state === 'failed') {
+      const { state } = data as {
+        participantId: string;
+        state: RTCPeerConnectionState;
+      };
+      if (state === "connected") {
+        setCallState((prev) => ({ ...prev, callStatus: "connected" }));
+      } else if (state === "disconnected" || state === "failed") {
         handleCallEnded();
       }
     };
-    webrtc.on('connectionStateChange', handleConnectionState);
+    webrtc.on("connectionStateChange", handleConnectionState);
 
     // Socket call listeners
-    const unsubscribeIncomingCall = socket.on<Call & { sdp?: RTCSessionDescriptionInit; callerId?: string }>(
-      'call:incoming', 
+    const unsubscribeIncomingCall = socket.on<
+      Call & { sdp?: RTCSessionDescriptionInit; callerId?: string }
+    >(
+      "call:incoming",
       (call: Call & { sdp?: RTCSessionDescriptionInit; callerId?: string }) => {
         // Store the remote offer and caller info for later use
         const callWithOffer = {
           ...call,
           remoteOffer: call.sdp,
         };
-        const callerId = call.callerId || call.initiator?.id || call.participants?.[0]?.id;
-        setCallState(prev => ({ 
-          ...prev, 
+        const callerId =
+          call.callerId || call.initiator?.id || call.participants?.[0]?.id;
+        setCallState((prev) => ({
+          ...prev,
           incomingCall: callWithOffer,
           remoteParticipantId: callerId || null,
         }));
         onIncomingCall?.(call);
-      }
+      },
     );
 
-    const unsubscribeCallAccepted = socket.on<{ callId: string; sdp: RTCSessionDescriptionInit; userId?: string }>(
-      'call:accepted',
-      async ({ callId, sdp, userId: remoteUserId }: { callId: string; sdp: RTCSessionDescriptionInit; userId?: string }) => {
+    const unsubscribeCallAccepted = socket.on<{
+      callId: string;
+      sdp: RTCSessionDescriptionInit;
+      userId?: string;
+    }>(
+      "call:accepted",
+      async ({
+        sdp,
+        userId: remoteUserId,
+      }: {
+        callId: string;
+        sdp: RTCSessionDescriptionInit;
+        userId?: string;
+      }) => {
         // Use the remoteParticipantId from state or from the event
         const participantId = remoteUserId || callState.remoteParticipantId;
         if (participantId) {
           await webrtc.setRemoteAnswer(participantId, sdp);
         }
-        setCallState(prev => ({
+        setCallState((prev) => ({
           ...prev,
-          callStatus: 'connected',
-          activeCall: prev.activeCall ? { ...prev.activeCall, status: 'connected' } : null,
+          callStatus: "connected",
+          activeCall: prev.activeCall
+            ? { ...prev.activeCall, status: "connected" }
+            : null,
         }));
         startCallTimer();
-      }
+      },
     );
 
-    const unsubscribeCallRejected = socket.on<{ callId: string; reason?: string }>(
-      'call:rejected',
-      ({ callId, reason }: { callId: string; reason?: string }) => {
-        handleCallEnded();
-      }
-    );
+    const unsubscribeCallRejected = socket.on<{
+      callId: string;
+      reason?: string;
+    }>("call:rejected", (_data: { callId: string; reason?: string }) => {
+      handleCallEnded();
+    });
 
     const unsubscribeCallEnded = socket.on<{ callId: string }>(
-      'call:ended',
+      "call:ended",
       () => {
         handleCallEnded();
-      }
+      },
     );
 
-    const unsubscribeIceCandidate = socket.on<{ candidate: RTCIceCandidateInit; userId?: string }>(
-      'call:ice-candidate',
-      async ({ candidate, userId: remoteUserId }: { candidate: RTCIceCandidateInit; userId?: string }) => {
+    const unsubscribeIceCandidate = socket.on<{
+      candidate: RTCIceCandidateInit;
+      userId?: string;
+    }>(
+      "call:ice-candidate",
+      async ({
+        candidate,
+        userId: remoteUserId,
+      }: {
+        candidate: RTCIceCandidateInit;
+        userId?: string;
+      }) => {
         // Use the remoteParticipantId from state or from the event
         const participantId = remoteUserId || callState.remoteParticipantId;
         if (participantId) {
           await webrtc.addIceCandidate(participantId, candidate);
         }
-      }
+      },
     );
 
     // Chat listeners
-    const unsubscribeNewMessage = socket.on<Message>('message:new', (message: Message) => {
-      setChatState(prev => ({
-        ...prev,
-        messages: [...prev.messages, message],
-      }));
-      onNewMessage?.(message);
-    });
+    const unsubscribeNewMessage = socket.on<Message>(
+      "message:new",
+      (message: Message) => {
+        setChatState((prev) => ({
+          ...prev,
+          messages: [...prev.messages, message],
+        }));
+        onNewMessage?.(message);
+      },
+    );
 
-    const unsubscribeTyping = socket.on<{ conversationId: string; userId: string; isTyping: boolean }>(
-      'typing:update',
-      ({ conversationId, userId, isTyping }: { conversationId: string; userId: string; isTyping: boolean }) => {
-        setChatState(prev => ({
+    const unsubscribeTyping = socket.on<{
+      conversationId: string;
+      userId: string;
+      isTyping: boolean;
+    }>(
+      "typing:update",
+      ({
+        userId,
+        isTyping,
+      }: {
+        conversationId: string;
+        userId: string;
+        isTyping: boolean;
+      }) => {
+        setChatState((prev) => ({
           ...prev,
           typingUsers: isTyping
-            ? [...prev.typingUsers.filter(id => id !== userId), userId]
-            : prev.typingUsers.filter(id => id !== userId),
+            ? [...prev.typingUsers.filter((id) => id !== userId), userId]
+            : prev.typingUsers.filter((id) => id !== userId),
         }));
-      }
+      },
     );
 
     // Auto-connect if configured
@@ -239,8 +292,8 @@ export function useRealTimeCommunication(options: UseRealTimeCommunicationOption
 
     return () => {
       unsubscribeStatus();
-      webrtc.off('remoteStream', handleRemoteStream);
-      webrtc.off('connectionStateChange', handleConnectionState);
+      webrtc.off("remoteStream", handleRemoteStream);
+      webrtc.off("connectionStateChange", handleConnectionState);
       unsubscribeIncomingCall();
       unsubscribeCallAccepted();
       unsubscribeCallRejected();
@@ -250,14 +303,24 @@ export function useRealTimeCommunication(options: UseRealTimeCommunicationOption
       unsubscribeTyping();
       stopCallTimer();
     };
-  }, [autoConnectSocket, userId, token, onIncomingCall, onCallEnded, onNewMessage]);
+  }, [
+    autoConnectSocket,
+    userId,
+    token,
+    onIncomingCall,
+    onCallEnded,
+    onNewMessage,
+  ]);
 
   // ==================== CALL TIMER ====================
 
   const startCallTimer = useCallback(() => {
     stopCallTimer();
     callTimerRef.current = setInterval(() => {
-      setCallState(prev => ({ ...prev, callDuration: prev.callDuration + 1 }));
+      setCallState((prev) => ({
+        ...prev,
+        callDuration: prev.callDuration + 1,
+      }));
     }, 1000);
   }, []);
 
@@ -270,7 +333,7 @@ export function useRealTimeCommunication(options: UseRealTimeCommunicationOption
 
   const handleCallEnded = useCallback(() => {
     const { activeCall } = callState;
-    
+
     webrtcRef.current?.closeAllConnections();
     stopCallTimer();
 
@@ -283,9 +346,12 @@ export function useRealTimeCommunication(options: UseRealTimeCommunicationOption
 
   // ==================== SOCKET METHODS ====================
 
-  const connectSocket = useCallback((auth?: { userId: string; token: string }) => {
-    socketRef.current?.connect(auth);
-  }, []);
+  const connectSocket = useCallback(
+    (auth?: { userId: string; token: string }) => {
+      socketRef.current?.connect(auth);
+    },
+    [],
+  );
 
   const disconnectSocket = useCallback(() => {
     socketRef.current?.disconnect();
@@ -293,70 +359,70 @@ export function useRealTimeCommunication(options: UseRealTimeCommunicationOption
 
   // ==================== CALL METHODS ====================
 
-  const initiateCall = useCallback(async (
-    targetUser: CommunicationUser,
-    type: CallType,
-  ): Promise<boolean> => {
-    try {
-      const webrtc = webrtcRef.current;
-      const socket = socketRef.current;
-      
-      if (!webrtc || !socket?.isConnected()) {
-        console.error('[Call] Not connected');
+  const initiateCall = useCallback(
+    async (targetUser: CommunicationUser, type: CallType): Promise<boolean> => {
+      try {
+        const webrtc = webrtcRef.current;
+        const socket = socketRef.current;
+
+        if (!webrtc || !socket?.isConnected()) {
+          console.error("[Call] Not connected");
+          return false;
+        }
+
+        // Start local stream
+        const stream = await webrtc.initializeMedia(type);
+        if (!stream) {
+          console.error("[Call] Failed to get local stream");
+          return false;
+        }
+
+        // Create peer connection and offer for target user
+        webrtc.createPeerConnection(targetUser.id);
+        const offer = await webrtc.createOffer(targetUser.id);
+
+        // Create call object
+        const call: Call = {
+          id: `call_${Date.now()}`,
+          type,
+          status: "calling",
+          startTime: new Date().toISOString(),
+          participants: [
+            { id: userId || "", name: "Me", role: "caller" },
+            { ...targetUser, role: "callee" },
+          ],
+          initiator: { id: userId || "", name: "Me" },
+          isGroup: false,
+        };
+
+        // Update state
+        setCallState((prev) => ({
+          ...prev,
+          activeCall: call,
+          callStatus: "calling",
+          localStream: stream,
+          remoteParticipantId: targetUser.id,
+          isVideoEnabled: type === "video",
+          callDuration: 0,
+        }));
+
+        // Send call signal with SDP offer
+        socket.sendCallSignal("call", {
+          callId: call.id,
+          callerId: userId,
+          calleeId: targetUser.id,
+          type,
+          sdp: offer,
+        });
+
+        return true;
+      } catch (error) {
+        console.error("[Call] Failed to initiate:", error);
         return false;
       }
-
-      // Start local stream
-      const stream = await webrtc.initializeMedia(type);
-      if (!stream) {
-        console.error('[Call] Failed to get local stream');
-        return false;
-      }
-
-      // Create peer connection and offer for target user
-      webrtc.createPeerConnection(targetUser.id);
-      const offer = await webrtc.createOffer(targetUser.id);
-
-      // Create call object
-      const call: Call = {
-        id: `call_${Date.now()}`,
-        type,
-        status: 'calling',
-        startTime: new Date().toISOString(),
-        participants: [
-          { id: userId || '', name: 'Me', role: 'caller' },
-          { ...targetUser, role: 'callee' },
-        ],
-        initiator: { id: userId || '', name: 'Me' },
-        isGroup: false,
-      };
-
-      // Update state
-      setCallState(prev => ({
-        ...prev,
-        activeCall: call,
-        callStatus: 'calling',
-        localStream: stream,
-        remoteParticipantId: targetUser.id,
-        isVideoEnabled: type === 'video',
-        callDuration: 0,
-      }));
-
-      // Send call signal with SDP offer
-      socket.sendCallSignal('call', {
-        callId: call.id,
-        callerId: userId,
-        calleeId: targetUser.id,
-        type,
-        sdp: offer,
-      });
-
-      return true;
-    } catch (error) {
-      console.error('[Call] Failed to initiate:', error);
-      return false;
-    }
-  }, [userId]);
+    },
+    [userId],
+  );
 
   const acceptIncomingCall = useCallback(async (): Promise<boolean> => {
     try {
@@ -369,7 +435,10 @@ export function useRealTimeCommunication(options: UseRealTimeCommunicationOption
       }
 
       // Get the caller's ID from incoming call
-      const callerId = incomingCall.initiator?.id || incomingCall.participants?.[0]?.id || 'unknown';
+      const callerId =
+        incomingCall.initiator?.id ||
+        incomingCall.participants?.[0]?.id ||
+        "unknown";
 
       // Start local stream
       const stream = await webrtc.initializeMedia(incomingCall.type);
@@ -379,30 +448,32 @@ export function useRealTimeCommunication(options: UseRealTimeCommunicationOption
 
       // Create peer connection for the caller
       webrtc.createPeerConnection(callerId);
-      
+
       // Create answer with the remote offer (stored from incoming call signal)
-      const remoteOffer = (incomingCall as Call & { remoteOffer?: RTCSessionDescriptionInit }).remoteOffer;
+      const remoteOffer = (
+        incomingCall as Call & { remoteOffer?: RTCSessionDescriptionInit }
+      ).remoteOffer;
       if (!remoteOffer) {
-        console.error('[Call] No remote offer available');
+        console.error("[Call] No remote offer available");
         webrtc.closeAllConnections();
         return false;
       }
-      
+
       const answer = await webrtc.createAnswer(callerId, remoteOffer);
 
       // Update state
-      setCallState(prev => ({
+      setCallState((prev) => ({
         ...prev,
-        activeCall: { ...incomingCall, status: 'connected' },
+        activeCall: { ...incomingCall, status: "connected" },
         incomingCall: null,
-        callStatus: 'connected',
+        callStatus: "connected",
         localStream: stream,
-        isVideoEnabled: incomingCall.type === 'video',
+        isVideoEnabled: incomingCall.type === "video",
         callDuration: 0,
       }));
 
       // Send accept signal with SDP answer
-      socket.sendCallSignal('accept', {
+      socket.sendCallSignal("accept", {
         callId: incomingCall.id,
         userId,
         sdp: answer,
@@ -411,24 +482,27 @@ export function useRealTimeCommunication(options: UseRealTimeCommunicationOption
       startCallTimer();
       return true;
     } catch (error) {
-      console.error('[Call] Failed to accept:', error);
+      console.error("[Call] Failed to accept:", error);
       return false;
     }
   }, [callState.incomingCall, userId, startCallTimer]);
 
-  const rejectIncomingCall = useCallback((reason?: string) => {
-    const socket = socketRef.current;
-    const { incomingCall } = callState;
+  const rejectIncomingCall = useCallback(
+    (reason?: string) => {
+      const socket = socketRef.current;
+      const { incomingCall } = callState;
 
-    if (socket?.isConnected() && incomingCall) {
-      socket.rejectCall(incomingCall.id, reason);
-    }
+      if (socket?.isConnected() && incomingCall) {
+        socket.rejectCall(incomingCall.id, reason);
+      }
 
-    setCallState(prev => ({
-      ...prev,
-      incomingCall: null,
-    }));
-  }, [callState.incomingCall]);
+      setCallState((prev) => ({
+        ...prev,
+        incomingCall: null,
+      }));
+    },
+    [callState.incomingCall],
+  );
 
   const endCall = useCallback(() => {
     const webrtc = webrtcRef.current;
@@ -456,7 +530,7 @@ export function useRealTimeCommunication(options: UseRealTimeCommunicationOption
     const webrtc = webrtcRef.current;
     if (webrtc) {
       const newMutedState = webrtc.toggleAudio();
-      setCallState(prev => ({ ...prev, isMuted: !newMutedState }));
+      setCallState((prev) => ({ ...prev, isMuted: !newMutedState }));
     }
   }, []);
 
@@ -464,7 +538,7 @@ export function useRealTimeCommunication(options: UseRealTimeCommunicationOption
     const webrtc = webrtcRef.current;
     if (webrtc) {
       const newVideoState = webrtc.toggleVideo();
-      setCallState(prev => ({ ...prev, isVideoEnabled: newVideoState }));
+      setCallState((prev) => ({ ...prev, isVideoEnabled: newVideoState }));
     }
   }, []);
 
@@ -473,28 +547,34 @@ export function useRealTimeCommunication(options: UseRealTimeCommunicationOption
   }, []);
 
   const toggleSpeaker = useCallback(() => {
-    setCallState(prev => ({ ...prev, isSpeakerOn: !prev.isSpeakerOn }));
+    setCallState((prev) => ({ ...prev, isSpeakerOn: !prev.isSpeakerOn }));
     // Note: Actual speaker toggle requires native module (expo-av or similar)
   }, []);
 
   // ==================== CHAT METHODS ====================
 
-  const sendMessage = useCallback((conversationId: string, content: string, type: string = 'text') => {
-    socketRef.current?.sendMessage(conversationId, content, type);
-  }, []);
+  const sendMessage = useCallback(
+    (conversationId: string, content: string, type: string = "text") => {
+      socketRef.current?.sendMessage(conversationId, content, type);
+    },
+    [],
+  );
 
-  const markAsRead = useCallback((conversationId: string, messageId: string) => {
-    socketRef.current?.markAsRead(conversationId, messageId);
-  }, []);
+  const markAsRead = useCallback(
+    (conversationId: string, messageId: string) => {
+      socketRef.current?.markAsRead(conversationId, messageId);
+    },
+    [],
+  );
 
   const startTyping = useCallback((conversationId: string) => {
     socketRef.current?.startTyping(conversationId);
-    setChatState(prev => ({ ...prev, isTyping: true }));
+    setChatState((prev) => ({ ...prev, isTyping: true }));
   }, []);
 
   const stopTyping = useCallback((conversationId: string) => {
     socketRef.current?.stopTyping(conversationId);
-    setChatState(prev => ({ ...prev, isTyping: false }));
+    setChatState((prev) => ({ ...prev, isTyping: false }));
   }, []);
 
   const joinRoom = useCallback((roomId: string) => {
@@ -505,18 +585,24 @@ export function useRealTimeCommunication(options: UseRealTimeCommunicationOption
     socketRef.current?.leaveRoom(roomId);
   }, []);
 
-  const setActiveConversation = useCallback((conversation: Conversation | null) => {
-    setChatState(prev => ({ ...prev, activeConversation: conversation }));
-  }, []);
+  const setActiveConversation = useCallback(
+    (conversation: Conversation | null) => {
+      setChatState((prev) => ({ ...prev, activeConversation: conversation }));
+    },
+    [],
+  );
 
   // ==================== AUDIO RECORDING ====================
 
-  const startRecording = useCallback(async (options?: {
-    onProgress?: (duration: number) => void;
-    maxDuration?: number;
-  }) => {
-    return audioRef.current?.startRecording(options);
-  }, []);
+  const startRecording = useCallback(
+    async (options?: {
+      onProgress?: (duration: number) => void;
+      maxDuration?: number;
+    }) => {
+      return audioRef.current?.startRecording(options);
+    },
+    [],
+  );
 
   const stopRecording = useCallback(async () => {
     return audioRef.current?.stopRecording();
@@ -535,7 +621,7 @@ export function useRealTimeCommunication(options: UseRealTimeCommunicationOption
   const formatCallDuration = useCallback((seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   }, []);
 
   // ==================== RETURN ====================

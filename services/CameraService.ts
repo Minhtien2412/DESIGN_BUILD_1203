@@ -14,6 +14,7 @@
  */
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Audio } from "expo-av";
 import * as ImagePicker from "expo-image-picker";
 import * as Linking from "expo-linking";
 import * as MediaLibrary from "expo-media-library";
@@ -107,7 +108,7 @@ const MIN_VIDEO_DURATION = 3; // 3 seconds
 export async function checkCameraPermissions(): Promise<CameraPermissionState> {
   const [camera, microphone, mediaLibrary] = await Promise.all([
     ImagePicker.getCameraPermissionsAsync(),
-    ImagePicker.getMicrophonePermissionsAsync(),
+    Audio.getPermissionsAsync(),
     MediaLibrary.getPermissionsAsync(),
   ]);
 
@@ -130,7 +131,7 @@ export async function requestCameraPermission(): Promise<boolean> {
  * Request microphone permission (for video)
  */
 export async function requestMicrophonePermission(): Promise<boolean> {
-  const { status } = await ImagePicker.requestMicrophonePermissionsAsync();
+  const { status } = await Audio.requestPermissionsAsync();
   return status === "granted";
 }
 
@@ -146,11 +147,11 @@ export async function requestMediaLibraryPermission(): Promise<boolean> {
  * Request all required permissions
  */
 export async function requestAllPermissions(
-  includeMediaLibrary = false
+  includeMediaLibrary = false,
 ): Promise<CameraPermissionState> {
   const [camera, microphone, mediaLibrary] = await Promise.all([
     ImagePicker.requestCameraPermissionsAsync(),
-    ImagePicker.requestMicrophonePermissionsAsync(),
+    Audio.requestPermissionsAsync(),
     includeMediaLibrary
       ? MediaLibrary.requestPermissionsAsync()
       : Promise.resolve({ status: "undetermined" as const }),
@@ -178,7 +179,7 @@ export async function openSettings(): Promise<void> {
  * Show permission denied alert with settings redirect option
  */
 export function showPermissionDeniedAlert(
-  permissionType: "camera" | "microphone" | "gallery"
+  permissionType: "camera" | "microphone" | "gallery",
 ): void {
   const messages = {
     camera: {
@@ -227,7 +228,7 @@ export async function loadCameraSettings(): Promise<CameraSettings> {
  * Save camera settings
  */
 export async function saveCameraSettings(
-  settings: Partial<CameraSettings>
+  settings: Partial<CameraSettings>,
 ): Promise<void> {
   try {
     const current = await loadCameraSettings();
@@ -263,7 +264,7 @@ export async function capturePhotoWithPicker(
     allowsEditing: boolean;
     aspect: [number, number];
     exif: boolean;
-  }> = {}
+  }> = {},
 ): Promise<CapturedMedia | null> {
   // Check permission
   const { status } = await ImagePicker.getCameraPermissionsAsync();
@@ -306,7 +307,7 @@ export async function captureVideoWithPicker(
   options: Partial<{
     quality: ImagePicker.UIImagePickerControllerQualityType;
     durationLimit: number;
-  }> = {}
+  }> = {},
 ): Promise<CapturedMedia | null> {
   // Check camera permission
   const cameraStatus = await ImagePicker.getCameraPermissionsAsync();
@@ -319,9 +320,9 @@ export async function captureVideoWithPicker(
   }
 
   // Check microphone permission
-  const micStatus = await ImagePicker.getMicrophonePermissionsAsync();
+  const micStatus = await Audio.getPermissionsAsync();
   if (micStatus.status !== "granted") {
-    const result = await ImagePicker.requestMicrophonePermissionsAsync();
+    const result = await Audio.requestPermissionsAsync();
     if (result.status !== "granted") {
       showPermissionDeniedAlert("microphone");
       return null;
@@ -345,7 +346,7 @@ export async function captureVideoWithPicker(
     type: "video",
     width: asset.width,
     height: asset.height,
-    duration: asset.duration,
+    duration: asset.duration ?? undefined,
     fileSize: asset.fileSize,
     timestamp: Date.now(),
   };
@@ -383,7 +384,7 @@ export async function saveToGallery(uri: string): Promise<boolean> {
 export function calculateZoomFromPinch(
   scale: number,
   currentZoom: number,
-  sensitivity = 0.005
+  sensitivity = 0.005,
 ): number {
   const delta = (scale - 1) * sensitivity;
   return Math.max(0, Math.min(1, currentZoom + delta));
@@ -395,7 +396,7 @@ export function calculateZoomFromPinch(
 export function formatZoomDisplay(
   zoom: number,
   minZoom = 1,
-  maxZoom = 10
+  maxZoom = 10,
 ): string {
   const actualZoom = minZoom + zoom * (maxZoom - minZoom);
   return `${actualZoom.toFixed(1)}x`;
@@ -515,7 +516,7 @@ export function useCameraSettings() {
         return next;
       });
     },
-    []
+    [],
   );
 
   const reset = useCallback(async () => {
@@ -526,19 +527,20 @@ export function useCameraSettings() {
   // Individual setters for convenience
   const setMode = useCallback(
     (mode: CameraMode) => updateSettings({ mode }),
-    [updateSettings]
+    [updateSettings],
   );
 
   const setFacing = useCallback(
     (facing: CameraFacing) => updateSettings({ facing }),
-    [updateSettings]
+    [updateSettings],
   );
 
   const toggleFacing = useCallback(() => {
     setSettings((prev) => {
-      const next = {
+      const newFacing: CameraFacing = prev.facing === "back" ? "front" : "back";
+      const next: CameraSettings = {
         ...prev,
-        facing: prev.facing === "back" ? "front" : "back",
+        facing: newFacing,
       };
       saveCameraSettings(next);
       return next;
@@ -547,7 +549,7 @@ export function useCameraSettings() {
 
   const setFlash = useCallback(
     (flash: FlashState) => updateSettings({ flash }),
-    [updateSettings]
+    [updateSettings],
   );
 
   const cycleFlash = useCallback(() => {
@@ -560,18 +562,18 @@ export function useCameraSettings() {
 
   const setZoom = useCallback(
     (zoom: number) => updateSettings({ zoom: Math.max(0, Math.min(1, zoom)) }),
-    [updateSettings]
+    [updateSettings],
   );
 
   const setQuality = useCallback(
     (quality: number) =>
       updateSettings({ quality: Math.max(0, Math.min(1, quality)) }),
-    [updateSettings]
+    [updateSettings],
   );
 
   const setRatio = useCallback(
     (ratio: string) => updateSettings({ ratio }),
-    [updateSettings]
+    [updateSettings],
   );
 
   return {
@@ -595,7 +597,7 @@ export function useCameraSettings() {
  */
 export function useCameraCapture() {
   const [capturedMedia, setCapturedMedia] = useState<CapturedMedia | null>(
-    null
+    null,
   );
   const [isCapturing, setIsCapturing] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
@@ -624,7 +626,7 @@ export function useCameraCapture() {
         setIsCapturing(false);
       }
     },
-    []
+    [],
   );
 
   const startVideoRecording = useCallback(
@@ -652,7 +654,7 @@ export function useCameraCapture() {
         }
       }
     },
-    []
+    [],
   );
 
   const clearCapture = useCallback(() => {
@@ -720,13 +722,13 @@ class CameraServiceClass {
   }
 
   async requestPermissions(
-    includeMediaLibrary = false
+    includeMediaLibrary = false,
   ): Promise<CameraPermissionState> {
     return requestAllPermissions(includeMediaLibrary);
   }
 
   async capturePhoto(
-    options?: Parameters<typeof capturePhotoWithPicker>[0]
+    options?: Parameters<typeof capturePhotoWithPicker>[0],
   ): Promise<CapturedMedia | null> {
     return capturePhotoWithPicker({
       quality: this.settings.quality,
@@ -735,7 +737,7 @@ class CameraServiceClass {
   }
 
   async captureVideo(
-    options?: Parameters<typeof captureVideoWithPicker>[0]
+    options?: Parameters<typeof captureVideoWithPicker>[0],
   ): Promise<CapturedMedia | null> {
     return captureVideoWithPicker({
       durationLimit: this.settings.maxDuration,

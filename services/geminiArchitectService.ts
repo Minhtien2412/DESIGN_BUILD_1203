@@ -218,7 +218,7 @@ export const QUICK_ACTIONS = [
 
 // Service class - Using REST API for React Native compatibility
 class GeminiArchitectService {
-  private conversationHistory: Array<{ role: string; parts: Array<{ text: string }> }> = [];
+  private conversationHistory: { role: string; parts: { text: string }[] }[] = [];
 
   constructor() {
     // No SDK initialization needed - using REST API
@@ -233,8 +233,8 @@ class GeminiArchitectService {
     }
 
     const requestBody: {
-      contents: Array<{ role: string; parts: Array<{ text: string }> }>;
-      systemInstruction?: { parts: Array<{ text: string }> };
+      contents: { role: string; parts: { text: string }[] }[];
+      systemInstruction?: { parts: { text: string }[] };
     } = {
       contents: [
         ...this.conversationHistory,

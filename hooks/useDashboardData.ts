@@ -1,10 +1,10 @@
 /**
  * useDashboardData Hook
  * =====================
- * 
+ *
  * Custom hook để fetch real data từ Perfex CRM và Main API cho Dashboard
  * Kết hợp dữ liệu từ nhiều nguồn với caching và error handling
- * 
+ *
  * @author ThietKeResort Team
  * @created 2026-01-03
  */
@@ -16,8 +16,8 @@ import {
     PerfexTasksService,
     type PerfexProject,
     type PerfexTask,
-} from '@/services/perfexCRM';
-import { useCallback, useEffect, useRef, useState } from 'react';
+} from "@/services/perfexCRM";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 // ==================== TYPES ====================
 
@@ -25,7 +25,7 @@ export interface DashboardProject {
   id: string;
   name: string;
   progress: number;
-  status: 'not-started' | 'in-progress' | 'on-hold' | 'cancelled' | 'finished';
+  status: "not-started" | "in-progress" | "on-hold" | "cancelled" | "finished";
   statusLabel: string;
   client: string;
   deadline?: string;
@@ -35,7 +35,7 @@ export interface DashboardProject {
 export interface DashboardTask {
   id: string;
   name: string;
-  priority: 'low' | 'medium' | 'high' | 'urgent';
+  priority: "low" | "medium" | "high" | "urgent";
   priorityLabel: string;
   status: string;
   statusLabel: string;
@@ -78,27 +78,33 @@ export interface CoreModuleStats {
 
 // ==================== HELPERS ====================
 
-const PROJECT_STATUS_MAP: Record<number, { key: DashboardProject['status']; label: string }> = {
-  1: { key: 'not-started', label: 'Chưa bắt đầu' },
-  2: { key: 'in-progress', label: 'Đang thực hiện' },
-  3: { key: 'on-hold', label: 'Tạm dừng' },
-  4: { key: 'cancelled', label: 'Đã hủy' },
-  5: { key: 'finished', label: 'Hoàn thành' },
+const PROJECT_STATUS_MAP: Record<
+  number,
+  { key: DashboardProject["status"]; label: string }
+> = {
+  1: { key: "not-started", label: "Chưa bắt đầu" },
+  2: { key: "in-progress", label: "Đang thực hiện" },
+  3: { key: "on-hold", label: "Tạm dừng" },
+  4: { key: "cancelled", label: "Đã hủy" },
+  5: { key: "finished", label: "Hoàn thành" },
 };
 
-const TASK_PRIORITY_MAP: Record<number, { key: DashboardTask['priority']; label: string }> = {
-  1: { key: 'low', label: 'Thấp' },
-  2: { key: 'medium', label: 'Trung bình' },
-  3: { key: 'high', label: 'Cao' },
-  4: { key: 'urgent', label: 'Khẩn cấp' },
+const TASK_PRIORITY_MAP: Record<
+  number,
+  { key: DashboardTask["priority"]; label: string }
+> = {
+  1: { key: "low", label: "Thấp" },
+  2: { key: "medium", label: "Trung bình" },
+  3: { key: "high", label: "Cao" },
+  4: { key: "urgent", label: "Khẩn cấp" },
 };
 
 const TASK_STATUS_MAP: Record<number, string> = {
-  1: 'Chưa bắt đầu',
-  2: 'Đang làm',
-  3: 'Testing',
-  4: 'Chờ phản hồi',
-  5: 'Hoàn thành',
+  1: "Chưa bắt đầu",
+  2: "Đang làm",
+  3: "Testing",
+  4: "Chờ phản hồi",
+  5: "Hoàn thành",
 };
 
 function getDaysLeft(deadline?: string): number | undefined {
@@ -118,15 +124,15 @@ function formatTimeAgo(dateString: string): string {
   const date = new Date(dateString);
   const now = new Date();
   const diff = now.getTime() - date.getTime();
-  
+
   const minutes = Math.floor(diff / 60000);
   const hours = Math.floor(diff / 3600000);
   const days = Math.floor(diff / 86400000);
-  
+
   if (minutes < 60) return `${minutes} phút trước`;
   if (hours < 24) return `${hours} giờ trước`;
   if (days < 7) return `${days} ngày trước`;
-  return date.toLocaleDateString('vi-VN');
+  return date.toLocaleDateString("vi-VN");
 }
 
 // ==================== MAIN HOOK ====================
@@ -139,13 +145,13 @@ interface UseDashboardDataReturn {
   quickBadges: QuickAccessBadges;
   coreStats: CoreModuleStats;
   notifications: DashboardNotification[];
-  
+
   // States
   loading: boolean;
   error: string | null;
   lastUpdated: Date | null;
-  dataSource: 'api' | 'mock' | 'cache';
-  
+  dataSource: "api" | "mock" | "cache";
+
   // Actions
   refresh: () => Promise<void>;
 }
@@ -167,33 +173,37 @@ export function useDashboardData(): UseDashboardDataReturn {
     crm: null,
   });
   const [coreStats, setCoreStats] = useState<CoreModuleStats>({
-    projects: '0 dự án',
-    construction: '0 công trình',
-    contracts: '0 hợp đồng',
-    qc: '0 kiểm tra',
+    projects: "0 dự án",
+    construction: "0 công trình",
+    contracts: "0 hợp đồng",
+    qc: "0 kiểm tra",
   });
-  const [notifications, setNotifications] = useState<DashboardNotification[]>([]);
-  
+  const [notifications, setNotifications] = useState<DashboardNotification[]>(
+    [],
+  );
+
   const [loading, setLoading] = useState(false); // Don't block initial render
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-  const [dataSource, setDataSource] = useState<'api' | 'mock' | 'cache'>('mock');
-  
+  const [dataSource, setDataSource] = useState<"api" | "mock" | "cache">(
+    "mock",
+  );
+
   const isMounted = useRef(true);
 
   // Fetch all data with timeout protection
   const fetchData = useCallback(async () => {
     if (!isMounted.current) return;
-    
+
     setLoading(true);
     setError(null);
-    
-    console.log('[useDashboardData] 🔄 Fetching real data from CRM & API...');
-    
+
+    console.log("[useDashboardData] 🔄 Fetching real data from CRM & API...");
+
     try {
       // Add timeout to prevent blocking
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Request timeout')), 5000)
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Request timeout")), 5000),
       );
 
       // Fetch từ Perfex CRM song song with timeout
@@ -204,17 +214,32 @@ export function useDashboardData(): UseDashboardDataReturn {
         PerfexInvoicesService.getAll({ limit: 100 }),
       ]);
 
-      const results = await Promise.race([fetchPromise, timeoutPromise]) as PromiseSettledResult<any>[];
-      
+      const results = (await Promise.race([
+        fetchPromise,
+        timeoutPromise,
+      ])) as PromiseSettledResult<any>[];
+
       const [projectsRes, customersRes, tasksRes, invoicesRes] = results;
 
       // Extract data safely
-      const crmProjects = projectsRes.status === 'fulfilled' ? (projectsRes.value as any).data || [] : [];
-      const crmCustomers = customersRes.status === 'fulfilled' ? (customersRes.value as any).data || [] : [];
-      const crmTasks = tasksRes.status === 'fulfilled' ? (tasksRes.value as any).data || [] : [];
-      const crmInvoices = invoicesRes.status === 'fulfilled' ? (invoicesRes.value as any).data || [] : [];
+      const crmProjects =
+        projectsRes.status === "fulfilled"
+          ? (projectsRes.value as any).data || []
+          : [];
+      const crmCustomers =
+        customersRes.status === "fulfilled"
+          ? (customersRes.value as any).data || []
+          : [];
+      const crmTasks =
+        tasksRes.status === "fulfilled"
+          ? (tasksRes.value as any).data || []
+          : [];
+      const crmInvoices =
+        invoicesRes.status === "fulfilled"
+          ? (invoicesRes.value as any).data || []
+          : [];
 
-      console.log('[useDashboardData] ✅ CRM Data received:', {
+      console.log("[useDashboardData] ✅ CRM Data received:", {
         projects: crmProjects.length,
         customers: crmCustomers.length,
         tasks: crmTasks.length,
@@ -223,10 +248,10 @@ export function useDashboardData(): UseDashboardDataReturn {
 
       // Check if we got real data
       const hasRealData = crmProjects.length > 0 || crmCustomers.length > 0;
-      
+
       if (hasRealData) {
-        setDataSource('api');
-        
+        setDataSource("api");
+
         // Transform projects
         const transformedProjects: DashboardProject[] = crmProjects
           .filter((p: PerfexProject) => p.status === 2) // Active only
@@ -235,49 +260,82 @@ export function useDashboardData(): UseDashboardDataReturn {
             id: p.id,
             name: p.name,
             progress: p.progress || 0,
-            status: PROJECT_STATUS_MAP[p.status]?.key || 'in-progress',
-            statusLabel: PROJECT_STATUS_MAP[p.status]?.label || 'Đang thực hiện',
-            client: p.clientid || 'N/A',
+            status: PROJECT_STATUS_MAP[p.status]?.key || "in-progress",
+            statusLabel:
+              PROJECT_STATUS_MAP[p.status]?.label || "Đang thực hiện",
+            client: p.clientid || "N/A",
             deadline: p.deadline,
             daysLeft: getDaysLeft(p.deadline),
           }));
-        
+
         // Transform tasks
         const transformedTasks: DashboardTask[] = crmTasks
-          .filter((t: PerfexTask) => t.status !== 5 && (t.priority >= 3 || isOverdue(t.duedate)))
+          .filter(
+            (t: PerfexTask) =>
+              t.status !== 5 && (t.priority >= 3 || isOverdue(t.duedate)),
+          )
           .slice(0, 10)
           .map((t: PerfexTask) => ({
             id: t.id,
             name: t.name,
-            priority: TASK_PRIORITY_MAP[t.priority]?.key || 'medium',
-            priorityLabel: TASK_PRIORITY_MAP[t.priority]?.label || 'Trung bình',
-            status: TASK_STATUS_MAP[t.status] || 'Chưa bắt đầu',
-            statusLabel: TASK_STATUS_MAP[t.status] || 'Chưa bắt đầu',
+            priority: TASK_PRIORITY_MAP[t.priority]?.key || "medium",
+            priorityLabel: TASK_PRIORITY_MAP[t.priority]?.label || "Trung bình",
+            status: TASK_STATUS_MAP[t.status] || "Chưa bắt đầu",
+            statusLabel: TASK_STATUS_MAP[t.status] || "Chưa bắt đầu",
             dueDate: t.duedate,
             isOverdue: isOverdue(t.duedate),
-            projectName: t.rel_type === 'project' ? `Project #${t.rel_id}` : undefined,
+            projectName:
+              t.rel_type === "project" ? `Project #${t.rel_id}` : undefined,
           }));
 
         // Calculate stats
-        const activeProjects = crmProjects.filter((p: PerfexProject) => p.status === 2).length;
-        const completedProjects = crmProjects.filter((p: PerfexProject) => p.status === 5).length;
-        const pendingTasks = crmTasks.filter((t: PerfexTask) => t.status === 1 || t.status === 2).length;
-        const overdueTasks = crmTasks.filter((t: PerfexTask) => isOverdue(t.duedate) && t.status !== 5).length;
-        const unpaidInvoices = crmInvoices.filter((i: any) => i.status === 1 || i.status === 4).length;
-        const totalRevenue = crmInvoices.reduce((sum: number, i: any) => sum + parseFloat(i.total || '0'), 0);
+        const activeProjects = crmProjects.filter(
+          (p: PerfexProject) => p.status === 2,
+        ).length;
+        const completedProjects = crmProjects.filter(
+          (p: PerfexProject) => p.status === 5,
+        ).length;
+        const pendingTasks = crmTasks.filter(
+          (t: PerfexTask) => t.status === 1 || t.status === 2,
+        ).length;
+        const overdueTasks = crmTasks.filter(
+          (t: PerfexTask) => isOverdue(t.duedate) && t.status !== 5,
+        ).length;
+        const unpaidInvoices = crmInvoices.filter(
+          (i: any) => i.status === 1 || i.status === 4,
+        ).length;
+        const totalRevenue = crmInvoices.reduce(
+          (sum: number, i: any) => sum + parseFloat(i.total || "0"),
+          0,
+        );
 
         if (isMounted.current) {
           setProjects(transformedProjects);
           setTasks(transformedTasks);
           setStats({
-            projects: { total: crmProjects.length, active: activeProjects, completed: completedProjects },
-            customers: { total: crmCustomers.length, active: crmCustomers.filter((c: any) => c.active === 1).length },
-            tasks: { total: crmTasks.length, pending: pendingTasks, overdue: overdueTasks },
-            invoices: { total: crmInvoices.length, unpaid: unpaidInvoices, revenue: totalRevenue },
+            projects: {
+              total: crmProjects.length,
+              active: activeProjects,
+              completed: completedProjects,
+            },
+            customers: {
+              total: crmCustomers.length,
+              active: crmCustomers.filter((c: any) => c.active === 1).length,
+            },
+            tasks: {
+              total: crmTasks.length,
+              pending: pendingTasks,
+              overdue: overdueTasks,
+            },
+            invoices: {
+              total: crmInvoices.length,
+              unpaid: unpaidInvoices,
+              revenue: totalRevenue,
+            },
           });
           setQuickBadges({
             projects: activeProjects > 0 ? String(activeProjects) : null,
-            chat: '5', // Will be replaced when messages API is connected
+            chat: "5", // Will be replaced when messages API is connected
             orders: unpaidInvoices > 0 ? String(unpaidInvoices) : null,
             crm: null,
           });
@@ -287,10 +345,10 @@ export function useDashboardData(): UseDashboardDataReturn {
             contracts: `${crmInvoices.length} hợp đồng`,
             qc: `${pendingTasks} pending`,
           });
-          
+
           // Generate notifications from real data
           const notifs: DashboardNotification[] = [];
-          
+
           // Overdue tasks
           crmTasks
             .filter((t: PerfexTask) => isOverdue(t.duedate) && t.status !== 5)
@@ -298,16 +356,16 @@ export function useDashboardData(): UseDashboardDataReturn {
             .forEach((t: PerfexTask) => {
               notifs.push({
                 id: `task-${t.id}`,
-                type: 'task',
-                title: 'Task quá hạn',
+                type: "task",
+                title: "Task quá hạn",
                 message: t.name,
                 time: formatTimeAgo(t.dateadded),
                 read: false,
-                icon: 'alert-circle',
-                color: '#000000',
+                icon: "alert-circle",
+                color: "#000000",
               });
             });
-          
+
           // Unpaid invoices
           crmInvoices
             .filter((i: any) => i.status === 1 || i.status === 4)
@@ -315,23 +373,23 @@ export function useDashboardData(): UseDashboardDataReturn {
             .forEach((i: any) => {
               notifs.push({
                 id: `invoice-${i.id}`,
-                type: 'invoice',
-                title: i.status === 4 ? 'Hóa đơn quá hạn' : 'Chờ thanh toán',
+                type: "invoice",
+                title: i.status === 4 ? "Hóa đơn quá hạn" : "Chờ thanh toán",
                 message: `#${i.number} - ${formatCurrency(parseFloat(i.total))}`,
                 time: formatTimeAgo(i.datecreated),
                 read: false,
-                icon: 'receipt',
-                color: i.status === 4 ? '#000000' : '#0066CC',
+                icon: "receipt",
+                color: i.status === 4 ? "#000000" : "#0066CC",
               });
             });
-          
+
           // Empty notifications if no data from API
           setNotifications(notifs);
         }
       } else {
         // No CRM data - show empty state instead of mock
-        console.log('[useDashboardData] ⚠️ No CRM data available');
-        setDataSource('api');
+        console.log("[useDashboardData] ⚠️ No CRM data available");
+        setDataSource("api");
         setProjects([]);
         setTasks([]);
         setStats({
@@ -342,10 +400,10 @@ export function useDashboardData(): UseDashboardDataReturn {
         });
         setQuickBadges({ projects: null, chat: null, orders: null, crm: null });
         setCoreStats({
-          projects: '0 dự án',
-          construction: '0 công trình',
-          contracts: '0 hợp đồng',
-          qc: '0 kiểm tra',
+          projects: "0 dự án",
+          construction: "0 công trình",
+          contracts: "0 hợp đồng",
+          qc: "0 kiểm tra",
         });
         setNotifications([]);
       }
@@ -354,10 +412,10 @@ export function useDashboardData(): UseDashboardDataReturn {
         setLastUpdated(new Date());
       }
     } catch (err: any) {
-      console.error('[useDashboardData] ❌ Error:', err);
+      console.error("[useDashboardData] ❌ Error:", err);
       if (isMounted.current) {
-        setError(err.message || 'Không thể tải dữ liệu từ CRM');
-        setDataSource('api');
+        setError(err.message || "Không thể tải dữ liệu từ CRM");
+        setDataSource("api");
         // Show empty state on error instead of mock
         setProjects([]);
         setTasks([]);
@@ -370,7 +428,7 @@ export function useDashboardData(): UseDashboardDataReturn {
   }, []);
 
   // Load empty data - removed mock data
-  const loadEmptyData = useCallback(() => {
+  const _loadEmptyData = useCallback(() => {
     setProjects([]);
     setTasks([]);
     setStats({
@@ -381,10 +439,10 @@ export function useDashboardData(): UseDashboardDataReturn {
     });
     setQuickBadges({ projects: null, chat: null, orders: null, crm: null });
     setCoreStats({
-      projects: '0 dự án',
-      construction: '0 công trình',
-      contracts: '0 hợp đồng',
-      qc: '0 kiểm tra',
+      projects: "0 dự án",
+      construction: "0 công trình",
+      contracts: "0 hợp đồng",
+      qc: "0 kiểm tra",
     });
     setNotifications([]);
   }, []);
@@ -392,12 +450,12 @@ export function useDashboardData(): UseDashboardDataReturn {
   // Effect - delay fetch to avoid blocking initial render
   useEffect(() => {
     isMounted.current = true;
-    
+
     // Delay fetch to allow UI to render first (non-blocking)
     const timer = setTimeout(() => {
       fetchData();
     }, 200);
-    
+
     return () => {
       isMounted.current = false;
       clearTimeout(timer);
@@ -422,9 +480,9 @@ export function useDashboardData(): UseDashboardDataReturn {
 // ==================== HELPERS ====================
 
 function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND',
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
     maximumFractionDigits: 0,
   }).format(amount);
 }

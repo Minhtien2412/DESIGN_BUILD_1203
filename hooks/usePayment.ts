@@ -1,6 +1,12 @@
-import { paymentClient, type Payment, type PaymentConfirmInput, type PaymentCreateInput, type PaymentListQuery, type PaymentListResponse } from '@/services/tk-api';
-import { AuthStore } from '@/services/authStore';
-import React, { useCallback, useState } from 'react';
+import { AuthStore } from "@/services/authStore";
+import {
+    paymentClient,
+    type Payment,
+    type PaymentConfirmInput,
+    type PaymentCreateInput,
+    type PaymentListQuery,
+} from "@/services/tk-api";
+import React, { useCallback, useState } from "react";
 
 interface UsePaymentCreateResult {
   createPayment: (input: PaymentCreateInput) => Promise<void>;
@@ -26,7 +32,7 @@ export function usePaymentCreate(): UsePaymentCreateResult {
       const result = await paymentClient.createPayment(input, accessToken);
       setPayment(result.payment);
     } catch (err: any) {
-      setError(err?.message || 'Failed to create payment');
+      setError(err?.message || "Failed to create payment");
     } finally {
       setLoading(false);
     }
@@ -68,32 +74,46 @@ export function usePayment(id: string): UsePaymentResult {
       const result = await paymentClient.getPayment(id, accessToken);
       setPayment(result.payment);
     } catch (err: any) {
-      setError(err?.message || 'Failed to fetch payment');
+      setError(err?.message || "Failed to fetch payment");
     } finally {
       setLoading(false);
     }
   }, [id]);
 
-  const confirmPayment = useCallback(async (input: PaymentConfirmInput = { status: 'paid' }) => {
-    if (!id) return;
-    setConfirming(true);
-    setError(null);
-    try {
-      const accessToken = await AuthStore.getAccessToken();
-      const result = await paymentClient.confirmPayment(id, input, accessToken);
-      setPayment(result.payment);
-    } catch (err: any) {
-      setError(err?.message || 'Failed to confirm payment');
-    } finally {
-      setConfirming(false);
-    }
-  }, [id]);
+  const confirmPayment = useCallback(
+    async (input: PaymentConfirmInput = { status: "paid" }) => {
+      if (!id) return;
+      setConfirming(true);
+      setError(null);
+      try {
+        const accessToken = await AuthStore.getAccessToken();
+        const result = await paymentClient.confirmPayment(
+          id,
+          input,
+          accessToken,
+        );
+        setPayment(result.payment);
+      } catch (err: any) {
+        setError(err?.message || "Failed to confirm payment");
+      } finally {
+        setConfirming(false);
+      }
+    },
+    [id],
+  );
 
   React.useEffect(() => {
     fetchPayment();
   }, [fetchPayment]);
 
-  return { payment, loading, error, refetch: fetchPayment, confirmPayment, confirming };
+  return {
+    payment,
+    loading,
+    error,
+    refetch: fetchPayment,
+    confirmPayment,
+    confirming,
+  };
 }
 
 interface UsePaymentListResult {
@@ -109,7 +129,9 @@ interface UsePaymentListResult {
 /**
  * Hook for listing payments with pagination and auth token
  */
-export function usePaymentList(query: PaymentListQuery = {}): UsePaymentListResult {
+export function usePaymentList(
+  query: PaymentListQuery = {},
+): UsePaymentListResult {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -117,31 +139,34 @@ export function usePaymentList(query: PaymentListQuery = {}): UsePaymentListResu
   const [hasMore, setHasMore] = useState(true);
   const [total, setTotal] = useState(0);
 
-  const fetchPayments = useCallback(async (page: number = 1, append: boolean = false) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const accessToken = await AuthStore.getAccessToken();
-      const result = await paymentClient.listPayments(
-        { ...query, page, page_size: query.page_size || 20 },
-        accessToken
-      );
-      
-      if (append) {
-        setPayments(prev => [...prev, ...result.payments]);
-      } else {
-        setPayments(result.payments);
+  const fetchPayments = useCallback(
+    async (page: number = 1, append: boolean = false) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const accessToken = await AuthStore.getAccessToken();
+        const result = await paymentClient.listPayments(
+          { ...query, page, page_size: query.page_size || 20 },
+          accessToken,
+        );
+
+        if (append) {
+          setPayments((prev) => [...prev, ...result.payments]);
+        } else {
+          setPayments(result.payments);
+        }
+
+        setTotal(result.total);
+        setHasMore(page < result.total_pages);
+        setCurrentPage(page);
+      } catch (err: any) {
+        setError(err?.message || "Failed to fetch payments");
+      } finally {
+        setLoading(false);
       }
-      
-      setTotal(result.total);
-      setHasMore(page < result.total_pages);
-      setCurrentPage(page);
-    } catch (err: any) {
-      setError(err?.message || 'Failed to fetch payments');
-    } finally {
-      setLoading(false);
-    }
-  }, [query]);
+    },
+    [query],
+  );
 
   const loadMore = useCallback(async () => {
     if (!hasMore || loading) return;
@@ -187,7 +212,7 @@ export function useHealthCheck(): UseHealthCheckResult {
       setLastChecked(new Date());
     } catch (err: any) {
       setIsHealthy(false);
-      setError(err?.message || 'Health check failed');
+      setError(err?.message || "Health check failed");
     } finally {
       setLoading(false);
     }
@@ -216,7 +241,7 @@ export function useVideos(limit: number = 20): UseVideosResult {
       const result = await paymentClient.getVideos(limit);
       setVideos(result?.videos || []);
     } catch (err: any) {
-      setError(err?.message || 'Failed to fetch videos');
+      setError(err?.message || "Failed to fetch videos");
     } finally {
       setLoading(false);
     }

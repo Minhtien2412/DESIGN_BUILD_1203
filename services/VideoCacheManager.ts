@@ -10,8 +10,14 @@
  * - Periodic cleanup
  */
 
+import * as FileSystem from "@/utils/FileSystemCompat";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as FileSystem from "expo-file-system";
+
+// ============================================================================
+// HOOKS
+// ============================================================================
+
+import { useCallback, useEffect, useState } from "react";
 
 // ============================================================================
 // TYPES
@@ -209,7 +215,7 @@ class VideoCacheManagerClass {
   async cacheVideo(
     videoId: string,
     url: string,
-    quality: "high" | "medium" | "low" = "medium"
+    quality: "high" | "medium" | "low" = "medium",
   ): Promise<string | null> {
     await this.ensureInitialized();
 
@@ -326,11 +332,11 @@ class VideoCacheManagerClass {
    * Prefetch videos in advance
    */
   async prefetchVideos(
-    videos: Array<{
+    videos: {
       videoId: string;
       url: string;
       quality?: "high" | "medium" | "low";
-    }>
+    }[],
   ): Promise<void> {
     await this.ensureInitialized();
 
@@ -432,7 +438,7 @@ class VideoCacheManagerClass {
 
     // Sort entries by last access (oldest first)
     const entries = Object.values(this.index.entries).sort(
-      (a, b) => a.lastAccess - b.lastAccess
+      (a, b) => a.lastAccess - b.lastAccess,
     );
 
     let freedBytes = 0;
@@ -582,7 +588,7 @@ class VideoCacheManagerClass {
         JSON.stringify({
           hitCount: this.stats.hitCount,
           missCount: this.stats.missCount,
-        })
+        }),
       );
 
       if (this.telemetryCallback) {
@@ -682,18 +688,12 @@ class VideoCacheManagerClass {
 
 export const VideoCacheManager = new VideoCacheManagerClass();
 
-// ============================================================================
-// HOOKS
-// ============================================================================
-
-import { useCallback, useEffect, useState } from "react";
-
 /**
  * Hook to get cached video URL
  */
 export function useCachedVideo(
   videoId: string | undefined,
-  originalUrl: string
+  originalUrl: string,
 ) {
   const [url, setUrl] = useState<string>(originalUrl);
   const [isLoading, setIsLoading] = useState(false);

@@ -3,17 +3,24 @@
  * Backend: https://baotienweb.cloud/api/v1/notifications
  */
 
-import { getItem } from '@/utils/storage';
-import ENV from '../../config/env';
-import { apiFetch } from '../api';
+import { getItem } from "@/utils/storage";
+import ENV from "../../config/env";
+import { apiFetch } from "../api";
 
-const BASE_URL = `${ENV.API_BASE_URL}/notifications`;
+const _BASE_URL = `${ENV.API_BASE_URL}/notifications`;
 
 // ==================== TYPES ====================
 
 export interface Notification {
   id: number;
-  type: 'INFO' | 'SUCCESS' | 'WARNING' | 'ERROR' | 'TASK' | 'MESSAGE' | 'PAYMENT';
+  type:
+    | "INFO"
+    | "SUCCESS"
+    | "WARNING"
+    | "ERROR"
+    | "TASK"
+    | "MESSAGE"
+    | "PAYMENT";
   title: string;
   message: string;
   isRead: boolean;
@@ -39,11 +46,11 @@ export interface MarkAsReadDto {
 
 // ==================== AUTH HELPER ====================
 
-async function getAuthHeaders(): Promise<HeadersInit> {
-  const token = await getItem('accessToken');
+async function _getAuthHeaders(): Promise<HeadersInit> {
+  const token = await getItem("accessToken");
   return {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
   };
 }
 
@@ -53,10 +60,13 @@ async function getAuthHeaders(): Promise<HeadersInit> {
  * Get all notifications for current user
  * Endpoint: GET /notifications
  */
-export async function getNotifications(page = 1, limit = 20): Promise<NotificationListResponse> {
+export async function getNotifications(
+  page = 1,
+  limit = 20,
+): Promise<NotificationListResponse> {
   const params = new URLSearchParams();
-  params.append('page', page.toString());
-  params.append('limit', limit.toString());
+  params.append("page", page.toString());
+  params.append("limit", limit.toString());
   return await apiFetch<NotificationListResponse>(`/notifications?${params}`);
 }
 
@@ -65,7 +75,7 @@ export async function getNotifications(page = 1, limit = 20): Promise<Notificati
  * Endpoint: GET /notifications/unread-count
  */
 export async function getUnreadCount(): Promise<{ count: number }> {
-  return await apiFetch<{ count: number }>('/notifications/unread-count');
+  return await apiFetch<{ count: number }>("/notifications/unread-count");
 }
 
 /**
@@ -74,7 +84,7 @@ export async function getUnreadCount(): Promise<{ count: number }> {
  */
 export async function markAsRead(id: number): Promise<void> {
   await apiFetch<void>(`/notifications/${id}/read`, {
-    method: 'PATCH'
+    method: "PATCH",
   });
 }
 
@@ -83,9 +93,9 @@ export async function markAsRead(id: number): Promise<void> {
  * Endpoint: POST /notifications/mark-read
  */
 export async function markMultipleAsRead(dto: MarkAsReadDto): Promise<void> {
-  await apiFetch<void>('/notifications/mark-read', {
-    method: 'POST',
-    body: JSON.stringify(dto)
+  await apiFetch<void>("/notifications/mark-read", {
+    method: "POST",
+    body: JSON.stringify(dto),
   });
 }
 
@@ -94,8 +104,8 @@ export async function markMultipleAsRead(dto: MarkAsReadDto): Promise<void> {
  * Endpoint: POST /notifications/mark-all-read
  */
 export async function markAllAsRead(): Promise<void> {
-  await apiFetch<void>('/notifications/mark-all-read', {
-    method: 'POST'
+  await apiFetch<void>("/notifications/mark-all-read", {
+    method: "POST",
   });
 }
 
@@ -105,7 +115,7 @@ export async function markAllAsRead(): Promise<void> {
  */
 export async function deleteNotification(id: number): Promise<void> {
   await apiFetch<void>(`/notifications/${id}`, {
-    method: 'DELETE'
+    method: "DELETE",
   });
 }
 
@@ -117,7 +127,7 @@ export const notificationsApi = {
   markAsRead,
   markMultipleAsRead,
   markAllAsRead,
-  deleteNotification
+  deleteNotification,
 };
 
 export default notificationsApi;

@@ -9,7 +9,7 @@ import React from 'react';
  * Prevents re-renders when live stream list updates
  */
 export const MemoizedLiveStreamCard = React.memo(
-  ({ stream, onPress }: any) => {
+  ({ stream: _stream, onPress: _onPress }: any) => {
     // Component implementation will be imported from actual component file
     return null;
   },
@@ -29,7 +29,7 @@ MemoizedLiveStreamCard.displayName = 'MemoizedLiveStreamCard';
  * Prevents unnecessary re-renders in activity list
  */
 export const MemoizedActivityItem = React.memo(
-  ({ activity }: any) => {
+  ({ activity: _activity }: any) => {
     return null;
   },
   (prevProps, nextProps) => {
@@ -47,7 +47,7 @@ MemoizedActivityItem.displayName = 'MemoizedActivityItem';
  * Used in product grids and lists
  */
 export const MemoizedProductCard = React.memo(
-  ({ product, onPress }: any) => {
+  ({ product: _product, onPress: _onPress }: any) => {
     return null;
   },
   (prevProps, nextProps) => {
@@ -67,7 +67,7 @@ MemoizedProductCard.displayName = 'MemoizedProductCard';
  * Used in stories horizontal scroll
  */
 export const MemoizedStoryItem = React.memo(
-  ({ story, hasUnviewed, onPress }: any) => {
+  ({ story: _story, hasUnviewed: _hasUnviewed, onPress: _onPress }: any) => {
     return null;
   },
   (prevProps, nextProps) => {

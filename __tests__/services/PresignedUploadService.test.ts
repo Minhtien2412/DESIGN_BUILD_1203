@@ -5,7 +5,8 @@
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Crypto from "expo-crypto";
-import * as FileSystem from "expo-file-system";
+// FileSystemCompat is mocked via moduleNameMapper in jest.config.js
+import * as FileSystem from "@/utils/FileSystemCompat";
 
 import {
     calculateChecksum,
@@ -14,24 +15,29 @@ import {
 } from "../../services/PresignedUploadService";
 import { post } from "../../services/api";
 
+// Mock FileSystemCompat module with all needed functions
+jest.mock("@/utils/FileSystemCompat", () => ({
+  documentDirectory: "file:///documents/",
+  cacheDirectory: "file:///cache/",
+  EncodingType: { UTF8: "utf8", Base64: "base64" },
+  FileSystemUploadType: { BINARY_CONTENT: 0, MULTIPART: 1 },
+  getInfoAsync: jest.fn(() => Promise.resolve({ exists: true, size: 1024 })),
+  readAsStringAsync: jest.fn(() => Promise.resolve("base64data")),
+  writeAsStringAsync: jest.fn(() => Promise.resolve()),
+  deleteAsync: jest.fn(() => Promise.resolve()),
+  copyAsync: jest.fn(() => Promise.resolve()),
+  makeDirectoryAsync: jest.fn(() => Promise.resolve()),
+  createUploadTask: jest.fn(() => ({
+    uploadAsync: jest.fn(() => Promise.resolve({ status: 200, body: "{}" })),
+    cancelAsync: jest.fn(() => Promise.resolve()),
+  })),
+}));
+
 // Mock dependencies
 jest.mock("@react-native-async-storage/async-storage", () => ({
   getItem: jest.fn(),
   setItem: jest.fn(),
   removeItem: jest.fn(),
-}));
-
-jest.mock("expo-file-system", () => ({
-  getInfoAsync: jest.fn(),
-  readAsStringAsync: jest.fn(),
-  createUploadTask: jest.fn(),
-  FileSystemUploadType: {
-    BINARY_CONTENT: 0,
-    MULTIPART: 1,
-  },
-  EncodingType: {
-    Base64: "base64",
-  },
 }));
 
 jest.mock("expo-crypto", () => ({
@@ -77,7 +83,7 @@ describe("PresignedUploadService", () => {
       const result = validateFile(
         "document.pdf",
         "application/pdf",
-        10 * 1024 * 1024
+        10 * 1024 * 1024,
       );
       expect(result.valid).toBe(true);
       expect(result.errors).toHaveLength(0);
@@ -87,7 +93,7 @@ describe("PresignedUploadService", () => {
       const result = validateFile("file.txt", "text/plain", 1024);
       expect(result.valid).toBe(false);
       expect(result.errors).toContain(
-        "Loại file không được hỗ trợ: text/plain"
+        "Loại file không được hỗ trợ: text/plain",
       );
     });
 
@@ -95,7 +101,7 @@ describe("PresignedUploadService", () => {
       const result = validateFile(
         "big-image.jpg",
         "image/jpeg",
-        25 * 1024 * 1024
+        25 * 1024 * 1024,
       );
       expect(result.valid).toBe(false);
       expect(result.errors.some((e) => e.includes("File quá lớn"))).toBe(true);
@@ -105,7 +111,7 @@ describe("PresignedUploadService", () => {
       const result = validateFile(
         "big-video.mp4",
         "video/mp4",
-        600 * 1024 * 1024
+        600 * 1024 * 1024,
       );
       expect(result.valid).toBe(false);
       expect(result.errors.some((e) => e.includes("File quá lớn"))).toBe(true);
@@ -121,7 +127,7 @@ describe("PresignedUploadService", () => {
       const result = validateFile(
         "script.exe",
         "application/octet-stream",
-        1024
+        1024,
       );
       expect(result.valid).toBe(false);
       expect(result.errors).toContain("Loại file không được phép.");
@@ -131,7 +137,7 @@ describe("PresignedUploadService", () => {
       const result = validateFile(
         "script.bat",
         "application/octet-stream",
-        1024
+        1024,
       );
       expect(result.valid).toBe(false);
     });
@@ -151,7 +157,7 @@ describe("PresignedUploadService", () => {
   describe("calculateChecksum", () => {
     it("should calculate SHA256 checksum", async () => {
       (FileSystem.readAsStringAsync as jest.Mock).mockResolvedValue(
-        "base64content"
+        "base64content",
       );
       (Crypto.digestStringAsync as jest.Mock).mockResolvedValue("abc123hash");
 
@@ -162,18 +168,18 @@ describe("PresignedUploadService", () => {
         "file:///test.jpg",
         {
           encoding: "base64",
-        }
+        },
       );
       expect(Crypto.digestStringAsync).toHaveBeenCalledWith(
         "SHA-256",
         "base64content",
-        expect.any(Object)
+        expect.any(Object),
       );
     });
 
     it("should calculate MD5 checksum", async () => {
       (FileSystem.readAsStringAsync as jest.Mock).mockResolvedValue(
-        "base64content"
+        "base64content",
       );
       (Crypto.digestStringAsync as jest.Mock).mockResolvedValue("md5hash");
 
@@ -183,17 +189,17 @@ describe("PresignedUploadService", () => {
       expect(Crypto.digestStringAsync).toHaveBeenCalledWith(
         "MD5",
         "base64content",
-        expect.any(Object)
+        expect.any(Object),
       );
     });
 
     it("should throw on read error", async () => {
       (FileSystem.readAsStringAsync as jest.Mock).mockRejectedValue(
-        new Error("Read failed")
+        new Error("Read failed"),
       );
 
       await expect(calculateChecksum("file:///test.jpg")).rejects.toThrow(
-        "Không thể tính checksum file"
+        "Không thể tính checksum file",
       );
     });
   });
@@ -225,7 +231,7 @@ describe("PresignedUploadService", () => {
           filename: "photo.jpg",
           contentType: "image/jpeg",
           fileSize: 1024 * 1024,
-        })
+        }),
       );
     });
 
@@ -235,7 +241,7 @@ describe("PresignedUploadService", () => {
           filename: "script.exe",
           contentType: "application/octet-stream",
           fileSize: 1024,
-        })
+        }),
       ).rejects.toThrow();
     });
 
@@ -258,7 +264,7 @@ describe("PresignedUploadService", () => {
         "/api/v1/upload/presign",
         expect.objectContaining({
           context: { type: "project", id: "proj-123" },
-        })
+        }),
       );
     });
 
@@ -283,7 +289,7 @@ describe("PresignedUploadService", () => {
         expect.objectContaining({
           checksum: "sha256hash",
           checksumAlgorithm: "sha256",
-        })
+        }),
       );
     });
   });
@@ -295,7 +301,7 @@ describe("PresignedUploadService", () => {
   describe("rate limiting", () => {
     it("should allow upload within rate limit", async () => {
       (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-        JSON.stringify({ timestamps: [Date.now() - 10000] })
+        JSON.stringify({ timestamps: [Date.now() - 10000] }),
       );
       (post as jest.Mock).mockResolvedValue({
         uploadId: "upload-123",
@@ -319,7 +325,7 @@ describe("PresignedUploadService", () => {
         .fill(0)
         .map((_, i) => Date.now() - i * 1000);
       (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-        JSON.stringify({ timestamps })
+        JSON.stringify({ timestamps }),
       );
 
       await expect(
@@ -327,7 +333,7 @@ describe("PresignedUploadService", () => {
           filename: "photo.jpg",
           contentType: "image/jpeg",
           fileSize: 1024 * 1024,
-        })
+        }),
       ).rejects.toThrow(/Quá nhiều upload/);
     });
 
@@ -337,7 +343,7 @@ describe("PresignedUploadService", () => {
         .fill(0)
         .map(() => Date.now() - 65000);
       (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-        JSON.stringify({ timestamps })
+        JSON.stringify({ timestamps }),
       );
       (post as jest.Mock).mockResolvedValue({
         uploadId: "upload-123",
@@ -391,14 +397,14 @@ describe("PresignedUploadService", () => {
             uploadAsync: mockUploadAsync,
             cancelAsync: mockCancelAsync,
           };
-        }
+        },
       );
 
       const onProgress = jest.fn();
       const uploadPromise = PresignedUploadService.uploadFile(
         "file:///test.jpg",
         mockPresignResponse,
-        onProgress
+        onProgress,
       );
 
       // Simulate progress
@@ -423,7 +429,7 @@ describe("PresignedUploadService", () => {
           httpMethod: "PUT",
           headers: { "Content-Type": "image/jpeg" },
         }),
-        expect.any(Function)
+        expect.any(Function),
       );
     });
 
@@ -440,8 +446,8 @@ describe("PresignedUploadService", () => {
       await expect(
         PresignedUploadService.uploadFile(
           "file:///test.jpg",
-          mockPresignResponse
-        )
+          mockPresignResponse,
+        ),
       ).rejects.toThrow("Upload failed: 500");
     });
   });
@@ -474,7 +480,7 @@ describe("PresignedUploadService", () => {
         expect.objectContaining({
           uploadId: "upload-123",
           checksum: "sha256hash",
-        })
+        }),
       );
       expect(AsyncStorage.setItem).toHaveBeenCalled();
     });
@@ -500,7 +506,7 @@ describe("PresignedUploadService", () => {
         "/api/v1/upload/complete",
         expect.objectContaining({
           metadata: { projectId: "proj-123", tags: ["construction"] },
-        })
+        }),
       );
     });
   });
@@ -522,7 +528,7 @@ describe("PresignedUploadService", () => {
         },
       ];
       (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-        JSON.stringify(mockHistory)
+        JSON.stringify(mockHistory),
       );
 
       const result = await PresignedUploadService.getHistory();
@@ -542,7 +548,7 @@ describe("PresignedUploadService", () => {
       await PresignedUploadService.clearHistory();
 
       expect(AsyncStorage.removeItem).toHaveBeenCalledWith(
-        "@presigned_upload_history"
+        "@presigned_upload_history",
       );
     });
   });
@@ -579,7 +585,7 @@ describe("PresignedUploadService", () => {
 
       const uploadTask = PresignedUploadService.uploadFile(
         "file:///test.jpg",
-        mockPresignResponse
+        mockPresignResponse,
       );
 
       // Wait a tick for the upload to start

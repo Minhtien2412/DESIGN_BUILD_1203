@@ -85,12 +85,12 @@ interface AuthContextType extends AuthState {
   signIn: (
     email: string,
     password: string,
-    isBiometricLogin?: boolean
+    isBiometricLogin?: boolean,
   ) => Promise<SignInResult | undefined>;
   // Biometric Authentication - restore session from stored tokens
   restoreSessionFromBiometric: (
     accessToken: string,
-    refreshToken: string
+    refreshToken: string,
   ) => Promise<boolean>;
   signUp: (
     email: string,
@@ -98,39 +98,39 @@ interface AuthContextType extends AuthState {
     name?: string,
     role?: string,
     phone?: string,
-    location?: { latitude: number; longitude: number; address?: string }
+    location?: { latitude: number; longitude: number; address?: string },
   ) => Promise<void>;
   // OTP Authentication
   sendOTP: (
     phone: string,
-    channel?: "sms" | "voice" | "viber"
+    channel?: "sms" | "voice" | "viber",
   ) => Promise<SendOTPResult>;
   verifyOTP: (
     phone: string,
     otp: string,
-    sessionId?: string
+    sessionId?: string,
   ) => Promise<VerifyOTPResult>;
   checkTrustedDevice: (
-    phone: string
+    phone: string,
   ) => Promise<{ trusted: boolean; daysRemaining?: number }>;
   autoLoginWithTrustedDevice: (phone: string) => Promise<VerifyOTPResult>;
   signInWithPhone: (
     phone: string,
     name?: string,
-    email?: string
+    email?: string,
   ) => Promise<void>;
   registerWithPhone: (
     phone: string,
     name: string,
     email?: string,
-    password?: string
+    password?: string,
   ) => Promise<void>;
   // Social Login
   signInWithGoogle: () => Promise<void>;
   signInWithGoogleCode: (code: string) => Promise<void>; // OAuth 2.0 Authorization Code Flow
   signInWithGoogleToken: (
     credential: string,
-    clientId?: string
+    clientId?: string,
   ) => Promise<void>; // ID Token verification
   signInWithGoogleAccessToken: (accessToken: string) => Promise<void>; // Implicit Flow
   signInWithFacebook: () => Promise<void>;
@@ -148,6 +148,13 @@ interface AuthContextType extends AuthState {
   hasRole: (role: string | string[]) => boolean;
   hasMarketplacePermission: (permission: string) => boolean; // New: Check marketplace role permissions
   switchRole: (newUserType: UserType) => Promise<void>; // New: Switch marketplace role
+  // Aliases for backward compatibility
+  login: (
+    email: string,
+    password: string,
+    isBiometricLogin?: boolean,
+  ) => Promise<SignInResult | undefined>; // Alias for signIn
+  sessionId?: string; // Current session ID for device management
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -231,7 +238,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signIn = async (
     email: string,
     password: string,
-    isBiometricLogin: boolean = false
+    isBiometricLogin: boolean = false,
   ) => {
     try {
       setState((prev) => ({ ...prev, loading: true }));
@@ -277,13 +284,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           });
           console.log(
             "[AuthContext] Perfex sync result:",
-            syncResult.linkedAccounts ? "linked" : "not linked"
+            syncResult.linkedAccounts ? "linked" : "not linked",
           );
         } catch (syncError) {
           // Silent fail - sync không quan trọng với luồng đăng nhập
           console.warn(
             "[AuthContext] Perfex sync skipped:",
-            syncError instanceof Error ? syncError.message : "unknown error"
+            syncError instanceof Error ? syncError.message : "unknown error",
           );
         }
       }, 100);
@@ -307,7 +314,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
    */
   const restoreSessionFromBiometric = async (
     accessToken: string,
-    refreshToken: string
+    refreshToken: string,
   ): Promise<boolean> => {
     try {
       setState((prev) => ({ ...prev, loading: true }));
@@ -353,7 +360,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     name?: string,
     role?: string,
     phone?: string,
-    location?: { latitude: number; longitude: number; address?: string }
+    location?: { latitude: number; longitude: number; address?: string },
   ) => {
     try {
       setState((prev) => ({ ...prev, loading: true }));
@@ -396,7 +403,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const { sendWelcomeMessages } =
           await import("@/services/welcome-message");
         sendWelcomeMessages(user.id).catch((err) =>
-          console.warn("Failed to send welcome messages:", err)
+          console.warn("Failed to send welcome messages:", err),
         );
       } catch (err) {
         console.warn("Welcome message service not available:", err);
@@ -435,12 +442,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           await trustedDeviceService.removeTrustedDevice(currentPhone);
           console.log(
             "[AuthContext] Cleared trusted device for:",
-            currentPhone
+            currentPhone,
           );
         } catch (trustError) {
           console.warn(
             "[AuthContext] Could not clear trusted device:",
-            trustError
+            trustError,
           );
         }
       }
@@ -513,7 +520,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // These are stub implementations that throw errors
   const signInWithGoogle = async () => {
     throw new Error(
-      'Vui lòng sử dụng nút "Đăng nhập với Google" trên màn hình đăng nhập.'
+      'Vui lòng sử dụng nút "Đăng nhập với Google" trên màn hình đăng nhập.',
     );
   };
 
@@ -547,7 +554,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signInWithGoogleToken = async (
     credential: string,
-    clientId?: string
+    clientId?: string,
   ) => {
     try {
       setState((prev) => ({ ...prev, loading: true }));
@@ -611,7 +618,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signInWithFacebook = async () => {
     throw new Error(
-      "Facebook Sign-In chưa được implement. Vui lòng sử dụng email/password."
+      "Facebook Sign-In chưa được implement. Vui lòng sử dụng email/password.",
     );
   };
 
@@ -633,7 +640,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     const featurePermission = state.user.permissions.find(
-      (p) => p.feature === feature
+      (p) => p.feature === feature,
     );
     if (!featurePermission) return false;
 
@@ -645,7 +652,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const roles = Array.isArray(role) ? role : [role];
     return roles.some(
-      (r) => state.user!.role?.toLowerCase() === r.toLowerCase()
+      (r) => state.user!.role?.toLowerCase() === r.toLowerCase(),
     );
   };
 
@@ -754,7 +761,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
    * @returns { trusted: false } nếu cần OTP
    */
   const checkTrustedDevice = async (
-    phone: string
+    phone: string,
   ): Promise<{
     trusted: boolean;
     daysRemaining?: number;
@@ -797,7 +804,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
    * 2. Còn trong thời hạn 30 ngày
    */
   const autoLoginWithTrustedDevice = async (
-    phone: string
+    phone: string,
   ): Promise<VerifyOTPResult> => {
     try {
       console.log("[AuthContext] Attempting auto-login for phone:", phone);
@@ -894,7 +901,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
    */
   const sendOTP = async (
     phone: string,
-    channel: "sms" | "voice" | "viber" = "sms"
+    channel: "sms" | "voice" | "viber" = "sms",
   ): Promise<SendOTPResult> => {
     try {
       console.log("[AuthContext] Sending OTP to:", phone);
@@ -938,7 +945,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const verifyOTP = async (
     phone: string,
     otp: string,
-    sessionId?: string
+    sessionId?: string,
   ): Promise<VerifyOTPResult> => {
     try {
       console.log("[AuthContext] Verifying OTP for:", phone);
@@ -978,7 +985,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             {
               accessToken: response.accessToken,
               refreshToken: response.refreshToken,
-            }
+            },
           );
           console.log("[AuthContext] Device trusted for 30 days");
         } catch (trustError) {
@@ -1046,7 +1053,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signInWithPhone = async (
     phone: string,
     name?: string,
-    email?: string
+    email?: string,
   ): Promise<void> => {
     setState((prev) => ({ ...prev, loading: true }));
 
@@ -1073,7 +1080,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     phone: string,
     name: string,
     email?: string,
-    password?: string
+    password?: string,
   ): Promise<void> => {
     try {
       setState((prev) => ({ ...prev, loading: true }));
@@ -1171,6 +1178,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         hasRole,
         hasMarketplacePermission,
         switchRole,
+        // Aliases for backward compatibility
+        login: signIn,
+        sessionId: undefined, // TODO: Add session management
       }}
     >
       {children}

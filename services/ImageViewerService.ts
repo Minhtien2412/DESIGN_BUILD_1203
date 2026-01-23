@@ -7,8 +7,8 @@
  * Story: VIEW-002 - Image Viewer
  */
 
+import * as FileSystem from "@/utils/FileSystemCompat";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as FileSystem from "expo-file-system";
 import * as MediaLibrary from "expo-media-library";
 import * as Sharing from "expo-sharing";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -247,7 +247,7 @@ export function calculateFitDimensions(
   imageHeight: number,
   containerWidth: number,
   containerHeight: number,
-  mode: "contain" | "cover" = "contain"
+  mode: "contain" | "cover" = "contain",
 ): ImageDimensions {
   const imageRatio = calculateAspectRatio(imageWidth, imageHeight);
   const containerRatio = calculateAspectRatio(containerWidth, containerHeight);
@@ -283,7 +283,7 @@ export function calculateFitDimensions(
 export function clampZoom(
   zoom: number,
   min: number = IMAGE_ZOOM_CONSTRAINTS.MIN,
-  max: number = IMAGE_ZOOM_CONSTRAINTS.MAX
+  max: number = IMAGE_ZOOM_CONSTRAINTS.MAX,
 ): number {
   return Math.max(min, Math.min(max, zoom));
 }
@@ -295,7 +295,7 @@ export function calculatePinchZoom(
   baseScale: number,
   pinchScale: number,
   min: number,
-  max: number
+  max: number,
 ): number {
   const newScale = baseScale * pinchScale;
   return clampZoom(newScale, min, max);
@@ -309,7 +309,7 @@ export function calculatePanBoundaries(
   imageHeight: number,
   containerWidth: number,
   containerHeight: number,
-  scale: number
+  scale: number,
 ): { minX: number; maxX: number; minY: number; maxY: number } {
   const scaledWidth = imageWidth * scale;
   const scaledHeight = imageHeight * scale;
@@ -331,7 +331,7 @@ export function calculatePanBoundaries(
 export function clampTranslation(
   translateX: number,
   translateY: number,
-  boundaries: { minX: number; maxX: number; minY: number; maxY: number }
+  boundaries: { minX: number; maxX: number; minY: number; maxY: number },
 ): { x: number; y: number } {
   return {
     x: Math.max(boundaries.minX, Math.min(boundaries.maxX, translateX)),
@@ -351,7 +351,7 @@ export function getRotationTransform(angle: RotationAngle): string {
  */
 export function getNextRotation(
   current: RotationAngle,
-  clockwise: boolean = true
+  clockwise: boolean = true,
 ): RotationAngle {
   const rotations: RotationAngle[] = [0, 90, 180, 270];
   const currentIndex = rotations.indexOf(current);
@@ -447,7 +447,7 @@ export async function loadImageSettings(): Promise<ImageViewerSettings> {
  * Save image viewer settings
  */
 export async function saveImageSettings(
-  settings: Partial<ImageViewerSettings>
+  settings: Partial<ImageViewerSettings>,
 ): Promise<void> {
   try {
     const current = await loadImageSettings();
@@ -494,7 +494,7 @@ export async function addToFavorites(imageId: string): Promise<void> {
     favorites.push(imageId);
     await AsyncStorage.setItem(
       STORAGE_KEYS.FAVORITES,
-      JSON.stringify(favorites)
+      JSON.stringify(favorites),
     );
   }
 }
@@ -588,7 +588,7 @@ export async function clearRecentImages(): Promise<void> {
  * Get image info
  */
 export async function getImageInfo(
-  uri: string
+  uri: string,
 ): Promise<Partial<ImageMetadata>> {
   try {
     const info = await FileSystem.getInfoAsync(uri);
@@ -748,7 +748,7 @@ export async function preloadImage(uri: string): Promise<boolean> {
 export async function preloadAdjacentImages(
   images: GalleryImage[],
   currentIndex: number,
-  count: number = 2
+  count: number = 2,
 ): Promise<void> {
   const indicesToPreload: number[] = [];
 
@@ -762,7 +762,7 @@ export async function preloadAdjacentImages(
   }
 
   await Promise.all(
-    indicesToPreload.map((index) => preloadImage(images[index].uri))
+    indicesToPreload.map((index) => preloadImage(images[index].uri)),
   );
 }
 
@@ -775,7 +775,7 @@ export async function preloadAdjacentImages(
  */
 export function useImageSettings() {
   const [settings, setSettings] = useState<ImageViewerSettings>(
-    DEFAULT_IMAGE_SETTINGS
+    DEFAULT_IMAGE_SETTINGS,
   );
   const [loading, setLoading] = useState(true);
 
@@ -791,7 +791,7 @@ export function useImageSettings() {
       setSettings(newSettings);
       await saveImageSettings(updates);
     },
-    [settings]
+    [settings],
   );
 
   const reset = useCallback(async () => {
@@ -835,11 +835,11 @@ export function useImageZoom(settings: ImageViewerSettings) {
         baseScale.current,
         pinchScale,
         settings.minZoom,
-        settings.maxZoom
+        settings.maxZoom,
       );
       setScale(newScale);
     },
-    [settings.minZoom, settings.maxZoom]
+    [settings.minZoom, settings.maxZoom],
   );
 
   const handlePinchEnd = useCallback(() => {
@@ -855,7 +855,7 @@ export function useImageZoom(settings: ImageViewerSettings) {
     (
       dx: number,
       dy: number,
-      boundaries?: ReturnType<typeof calculatePanBoundaries>
+      boundaries?: ReturnType<typeof calculatePanBoundaries>,
     ) => {
       let newX = lastTranslateX.current + dx;
       let newY = lastTranslateY.current + dy;
@@ -869,7 +869,7 @@ export function useImageZoom(settings: ImageViewerSettings) {
       setTranslateX(newX);
       setTranslateY(newY);
     },
-    []
+    [],
   );
 
   const handleDoubleTap = useCallback(
@@ -892,7 +892,7 @@ export function useImageZoom(settings: ImageViewerSettings) {
         setTranslateY(offsetY);
       }
     },
-    [scale, settings.enableDoubleTapZoom, settings.doubleTapZoom, reset]
+    [scale, settings.enableDoubleTapZoom, settings.doubleTapZoom, reset],
   );
 
   const rotate = useCallback((clockwise: boolean = true) => {
@@ -901,13 +901,13 @@ export function useImageZoom(settings: ImageViewerSettings) {
 
   const zoomIn = useCallback(() => {
     setScale((prev) =>
-      clampZoom(prev + 0.5, settings.minZoom, settings.maxZoom)
+      clampZoom(prev + 0.5, settings.minZoom, settings.maxZoom),
     );
   }, [settings.minZoom, settings.maxZoom]);
 
   const zoomOut = useCallback(() => {
     setScale((prev) =>
-      clampZoom(prev - 0.5, settings.minZoom, settings.maxZoom)
+      clampZoom(prev - 0.5, settings.minZoom, settings.maxZoom),
     );
   }, [settings.minZoom, settings.maxZoom]);
 
@@ -951,7 +951,7 @@ export function useGallery(images: GalleryImage[], initialIndex: number = 0) {
         setTimeout(() => setIsTransitioning(false), 300);
       }
     },
-    [images.length, currentIndex]
+    [images.length, currentIndex],
   );
 
   const next = useCallback(() => {
@@ -969,7 +969,7 @@ export function useGallery(images: GalleryImage[], initialIndex: number = 0) {
   const goToFirst = useCallback(() => goTo(0), [goTo]);
   const goToLast = useCallback(
     () => goTo(images.length - 1),
-    [goTo, images.length]
+    [goTo, images.length],
   );
 
   // Preload adjacent images
@@ -997,7 +997,7 @@ export function useGallery(images: GalleryImage[], initialIndex: number = 0) {
  */
 export function useImageViewer(
   images: GalleryImage[],
-  initialIndex: number = 0
+  initialIndex: number = 0,
 ) {
   const { settings, updateSettings } = useImageSettings();
   const gallery = useGallery(images, initialIndex);
@@ -1005,12 +1005,12 @@ export function useImageViewer(
 
   const [showInfo, setShowInfo] = useState(false);
   const [showControls, setShowControls] = useState(true);
-  const [isFavorite, setIsFavorite] = useState(false);
+  const [isFavoriteState, setIsFavoriteState] = useState(false);
 
   // Check favorite status
   useEffect(() => {
     if (gallery.currentImage) {
-      isFavorite(gallery.currentImage.id).then(setIsFavorite);
+      isFavorite(gallery.currentImage.id).then(setIsFavoriteState);
     }
   }, [gallery.currentImage?.id]);
 
@@ -1030,7 +1030,7 @@ export function useImageViewer(
   const handleToggleFavorite = useCallback(async () => {
     if (gallery.currentImage) {
       const newState = await toggleFavorite(gallery.currentImage.id);
-      setIsFavorite(newState);
+      setIsFavoriteState(newState);
       return newState;
     }
     return false;
@@ -1077,7 +1077,7 @@ export function useImageViewer(
     // UI state
     showInfo,
     showControls,
-    isFavorite,
+    isFavorite: isFavoriteState,
 
     // Actions
     toggleInfo,

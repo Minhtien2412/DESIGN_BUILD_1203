@@ -1,19 +1,24 @@
 /**
  * API Integration Hooks
  * ======================
- * 
+ *
  * React hooks để sử dụng API integration dễ dàng trong components
  * - Auto loading states
  * - Error handling
  * - Data caching
  * - Refetch logic
- * 
+ *
  * @author ThietKeResort Team
  * @created 2025-12-31
  */
 
-import { ApiIntegration, ApiResponse, MainApiIntegration, PerfexApiIntegration } from '@/services/apiIntegration';
-import { useCallback, useEffect, useState } from 'react';
+import {
+    ApiIntegration,
+    ApiResponse,
+    MainApiIntegration,
+    PerfexApiIntegration,
+} from "@/services/apiIntegration";
+import { useCallback, useEffect, useState } from "react";
 
 // ==================== TYPES ====================
 
@@ -21,7 +26,7 @@ export interface UseApiState<T> {
   data: T | null;
   loading: boolean;
   error: Error | null;
-  source: 'api' | 'mock' | 'cache' | null;
+  source: "api" | "mock" | "cache" | null;
   timestamp: number | null;
 }
 
@@ -40,14 +45,14 @@ export interface UseApiOptions {
  */
 export function useApi<T>(
   fetcher: () => Promise<ApiResponse<T>>,
-  options: UseApiOptions = {}
+  options: UseApiOptions = {},
 ): UseApiState<T> & {
   refetch: () => Promise<void>;
   clearData: () => void;
 } {
   const {
     enabled = true,
-    cache = true,
+    cache: _cache = true,
     refetchInterval,
     onSuccess,
     onError,
@@ -62,11 +67,11 @@ export function useApi<T>(
   });
 
   const fetchData = useCallback(async () => {
-    setState(prev => ({ ...prev, loading: true, error: null }));
+    setState((prev) => ({ ...prev, loading: true, error: null }));
 
     try {
       const response = await fetcher();
-      
+
       setState({
         data: response.data,
         loading: false,
@@ -79,8 +84,11 @@ export function useApi<T>(
         onSuccess(response.data);
       }
     } catch (error: any) {
-      const err = error instanceof Error ? error : new Error(error.message || 'Unknown error');
-      
+      const err =
+        error instanceof Error
+          ? error
+          : new Error(error.message || "Unknown error");
+
       setState({
         data: null,
         loading: false,
@@ -137,30 +145,27 @@ export function useApi<T>(
  * Get construction projects
  */
 export function useProjects(options?: UseApiOptions) {
-  return useApi(
-    () => MainApiIntegration.getProjects(),
-    options
-  );
+  return useApi(() => MainApiIntegration.getProjects(), options);
 }
 
 /**
  * Get project details
  */
 export function useProject(projectId: string, options?: UseApiOptions) {
-  return useApi(
-    () => MainApiIntegration.getProject(projectId),
-    { enabled: !!projectId, ...options }
-  );
+  return useApi(() => MainApiIntegration.getProject(projectId), {
+    enabled: !!projectId,
+    ...options,
+  });
 }
 
 /**
  * Get project tasks
  */
 export function useProjectTasks(projectId: string, options?: UseApiOptions) {
-  return useApi(
-    () => MainApiIntegration.getProjectTasks(projectId),
-    { enabled: !!projectId, ...options }
-  );
+  return useApi(() => MainApiIntegration.getProjectTasks(projectId), {
+    enabled: !!projectId,
+    ...options,
+  });
 }
 
 // ==================== PERFEX CRM HOOKS ====================
@@ -169,30 +174,24 @@ export function useProjectTasks(projectId: string, options?: UseApiOptions) {
  * Get Perfex customers
  */
 export function usePerfexCustomers(options?: UseApiOptions) {
-  return useApi(
-    () => PerfexApiIntegration.getCustomers(),
-    options
-  );
+  return useApi(() => PerfexApiIntegration.getCustomers(), options);
 }
 
 /**
  * Get Perfex projects
  */
 export function usePerfexProjects(options?: UseApiOptions) {
-  return useApi(
-    () => PerfexApiIntegration.getProjects(),
-    options
-  );
+  return useApi(() => PerfexApiIntegration.getProjects(), options);
 }
 
 /**
  * Get Perfex project details
  */
 export function usePerfexProject(projectId: string, options?: UseApiOptions) {
-  return useApi(
-    () => PerfexApiIntegration.getProject(projectId),
-    { enabled: !!projectId, ...options }
-  );
+  return useApi(() => PerfexApiIntegration.getProject(projectId), {
+    enabled: !!projectId,
+    ...options,
+  });
 }
 
 // ==================== MUTATION HOOKS ====================
@@ -213,7 +212,7 @@ export interface UseMutationOptions<T, V> {
  */
 export function useMutation<T, V = any>(
   mutationFn: (variables: V) => Promise<ApiResponse<T>>,
-  options: UseMutationOptions<T, V> = {}
+  options: UseMutationOptions<T, V> = {},
 ): UseMutationState & {
   mutate: (variables: V) => Promise<T | null>;
   reset: () => void;
@@ -232,7 +231,7 @@ export function useMutation<T, V = any>(
 
       try {
         const response = await mutationFn(variables);
-        
+
         setState({ loading: false, error: null, success: true });
 
         if (onSuccess) {
@@ -241,8 +240,11 @@ export function useMutation<T, V = any>(
 
         return response.data;
       } catch (error: any) {
-        const err = error instanceof Error ? error : new Error(error.message || 'Unknown error');
-        
+        const err =
+          error instanceof Error
+            ? error
+            : new Error(error.message || "Unknown error");
+
         setState({ loading: false, error: err, success: false });
 
         if (onError) {
@@ -252,7 +254,7 @@ export function useMutation<T, V = any>(
         return null;
       }
     },
-    [mutationFn, onSuccess, onError]
+    [mutationFn, onSuccess, onError],
   );
 
   const reset = useCallback(() => {
@@ -272,27 +274,32 @@ export function useMutation<T, V = any>(
 export function useCreateProject(options?: UseMutationOptions<any, any>) {
   return useMutation(
     (data: any) => MainApiIntegration.createProject(data),
-    options
+    options,
   );
 }
 
 /**
  * Update project mutation
  */
-export function useUpdateProject(options?: UseMutationOptions<any, { id: string; data: any }>) {
+export function useUpdateProject(
+  options?: UseMutationOptions<any, { id: string; data: any }>,
+) {
   return useMutation(
-    ({ id, data }: { id: string; data: any }) => MainApiIntegration.updateProject(id, data),
-    options
+    ({ id, data }: { id: string; data: any }) =>
+      MainApiIntegration.updateProject(id, data),
+    options,
   );
 }
 
 /**
  * Delete project mutation
  */
-export function useDeleteProject(options?: UseMutationOptions<{ success: boolean }, string>) {
+export function useDeleteProject(
+  options?: UseMutationOptions<{ success: boolean }, string>,
+) {
   return useMutation(
     (id: string) => MainApiIntegration.deleteProject(id),
-    options
+    options,
   );
 }
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
 /**
  * Hook to handle resource loading (fonts, assets)
@@ -7,14 +7,14 @@ import { useEffect, useState } from 'react';
 export function useCachedResources() {
   // On web, immediately return true to skip all async loading
   // This prevents fontfaceobserver timeout issues
-  const [isLoadingComplete, setLoadingComplete] = useState(true);
+  const [isLoadingComplete, _setLoadingComplete] = useState(true);
 
   useEffect(() => {
     // Skip all resource loading - not needed for this app
     // Fonts are loaded via CSS in index.html
     // Native platforms use system fonts
     return;
-    
+
     /* Commented out - kept for reference if needed in future
     async function loadResourcesAndDataAsync() {
       try {

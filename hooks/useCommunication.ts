@@ -23,7 +23,7 @@ import {
     updateMeeting,
     updateMessage,
     votePoll,
-} from '@/services/communication';
+} from "@/services/communication";
 import {
     Channel,
     ChannelSettings,
@@ -41,8 +41,8 @@ import {
     UpdateChannelParams,
     UpdateMeetingParams,
     UpdateMessageParams,
-} from '@/types/communication';
-import { useEffect, useState } from 'react';
+} from "@/types/communication";
+import { useEffect, useState } from "react";
 
 // Hook: Manage messages in a channel
 export function useMessages(initialParams: GetMessagesParams) {
@@ -57,16 +57,16 @@ export function useMessages(initialParams: GetMessagesParams) {
       if (!append) setLoading(true);
       setError(null);
       const data = await getMessages(params);
-      
+
       if (append) {
         setMessages((prev) => [...prev, ...data]);
       } else {
         setMessages(data);
       }
-      
+
       setHasMore(data.length === (params.limit || 50));
     } catch (err: any) {
-      setError(err.message || 'Failed to fetch messages');
+      setError(err.message || "Failed to fetch messages");
     } finally {
       setLoading(false);
     }
@@ -76,14 +76,14 @@ export function useMessages(initialParams: GetMessagesParams) {
     fetchMessages();
   }, [params]);
 
-  const send = async (sendParams: Omit<SendMessageParams, 'channelId'>) => {
+  const send = async (sendParams: Omit<SendMessageParams, "channelId">) => {
     const optimisticMessage: Message = {
       id: `temp-${Date.now()}`,
       channelId: params.channelId,
       type: sendParams.type,
       content: sendParams.content,
-      senderId: 'current-user', // Should come from auth context
-      senderName: 'You',
+      senderId: "current-user", // Should come from auth context
+      senderName: "You",
       status: MessageStatus.SENDING,
       edited: false,
       deleted: false,
@@ -97,14 +97,14 @@ export function useMessages(initialParams: GetMessagesParams) {
         ...sendParams,
         channelId: params.channelId,
       });
-      
+
       setMessages((prev) =>
-        prev.map((m) => (m.id === optimisticMessage.id ? newMessage : m))
+        prev.map((m) => (m.id === optimisticMessage.id ? newMessage : m)),
       );
-      
+
       return newMessage;
     } catch (err: any) {
-      setError(err.message || 'Failed to send message');
+      setError(err.message || "Failed to send message");
       setMessages((prev) => prev.filter((m) => m.id !== optimisticMessage.id));
       throw err;
     }
@@ -113,16 +113,18 @@ export function useMessages(initialParams: GetMessagesParams) {
   const update = async (updateParams: UpdateMessageParams) => {
     const { attachments: _ignoredAttachments, ...rest } = updateParams;
     const optimisticMessages: Message[] = messages.map((m) =>
-      m.id === updateParams.id ? { ...m, ...rest, edited: true } : m
+      m.id === updateParams.id ? { ...m, ...rest, edited: true } : m,
     );
     setMessages(optimisticMessages);
 
     try {
       const updatedMessage = await updateMessage(updateParams);
-      setMessages((prev) => prev.map((m) => (m.id === updatedMessage.id ? updatedMessage : m)));
+      setMessages((prev) =>
+        prev.map((m) => (m.id === updatedMessage.id ? updatedMessage : m)),
+      );
       return updatedMessage;
     } catch (err: any) {
-      setError(err.message || 'Failed to update message');
+      setError(err.message || "Failed to update message");
       fetchMessages();
       throw err;
     }
@@ -135,7 +137,7 @@ export function useMessages(initialParams: GetMessagesParams) {
     try {
       await deleteMessage(id);
     } catch (err: any) {
-      setError(err.message || 'Failed to delete message');
+      setError(err.message || "Failed to delete message");
       fetchMessages();
       throw err;
     }
@@ -144,17 +146,22 @@ export function useMessages(initialParams: GetMessagesParams) {
   const react = async (messageId: string, reaction: string) => {
     try {
       const updatedMessage = await addReaction(messageId, reaction);
-      setMessages((prev) => prev.map((m) => (m.id === updatedMessage.id ? updatedMessage : m)));
+      setMessages((prev) =>
+        prev.map((m) => (m.id === updatedMessage.id ? updatedMessage : m)),
+      );
       return updatedMessage;
     } catch (err: any) {
-      setError(err.message || 'Failed to add reaction');
+      setError(err.message || "Failed to add reaction");
       throw err;
     }
   };
 
   const loadMore = () => {
     if (hasMore && messages.length > 0) {
-      setParams((prev) => ({ ...prev, before: messages[messages.length - 1].id }));
+      setParams((prev) => ({
+        ...prev,
+        before: messages[messages.length - 1].id,
+      }));
       fetchMessages(true);
     }
   };
@@ -163,7 +170,7 @@ export function useMessages(initialParams: GetMessagesParams) {
     try {
       await markAsRead(params.channelId);
     } catch (err: any) {
-      console.error('Failed to mark as read:', err);
+      console.error("Failed to mark as read:", err);
     }
   };
 
@@ -196,7 +203,7 @@ export function useChannels(initialParams: GetChannelsParams) {
       const data = await getChannels(params);
       setChannels(data);
     } catch (err: any) {
-      setError(err.message || 'Failed to fetch channels');
+      setError(err.message || "Failed to fetch channels");
     } finally {
       setLoading(false);
     }
@@ -212,7 +219,7 @@ export function useChannels(initialParams: GetChannelsParams) {
       setChannels((prev) => [newChannel, ...prev]);
       return newChannel;
     } catch (err: any) {
-      setError(err.message || 'Failed to create channel');
+      setError(err.message || "Failed to create channel");
       throw err;
     }
   };
@@ -224,19 +231,21 @@ export function useChannels(initialParams: GetChannelsParams) {
             ...c,
             ...updateParams,
             settings: updateParams.settings
-              ? { ...c.settings, ...updateParams.settings } as ChannelSettings
+              ? ({ ...c.settings, ...updateParams.settings } as ChannelSettings)
               : c.settings,
           }
-        : c
+        : c,
     );
     setChannels(optimisticChannels);
 
     try {
       const updatedChannel = await updateChannel(updateParams);
-      setChannels((prev) => prev.map((c) => (c.id === updatedChannel.id ? updatedChannel : c)));
+      setChannels((prev) =>
+        prev.map((c) => (c.id === updatedChannel.id ? updatedChannel : c)),
+      );
       return updatedChannel;
     } catch (err: any) {
-      setError(err.message || 'Failed to update channel');
+      setError(err.message || "Failed to update channel");
       fetchChannels();
       throw err;
     }
@@ -249,7 +258,7 @@ export function useChannels(initialParams: GetChannelsParams) {
     try {
       await deleteChannel(id);
     } catch (err: any) {
-      setError(err.message || 'Failed to delete channel');
+      setError(err.message || "Failed to delete channel");
       fetchChannels();
       throw err;
     }
@@ -288,7 +297,7 @@ export function useChannel(id: string | null) {
         const data = await getChannel(id);
         setChannel(data);
       } catch (err: any) {
-        setError(err.message || 'Failed to fetch channel');
+        setError(err.message || "Failed to fetch channel");
       } finally {
         setLoading(false);
       }
@@ -314,7 +323,7 @@ export function useMeetings(initialParams: GetMeetingsParams) {
       const data = await getMeetings(params);
       setMeetings(data);
     } catch (err: any) {
-      setError(err.message || 'Failed to fetch meetings');
+      setError(err.message || "Failed to fetch meetings");
     } finally {
       setLoading(false);
     }
@@ -330,23 +339,25 @@ export function useMeetings(initialParams: GetMeetingsParams) {
       setMeetings((prev) => [newMeeting, ...prev]);
       return newMeeting;
     } catch (err: any) {
-      setError(err.message || 'Failed to create meeting');
+      setError(err.message || "Failed to create meeting");
       throw err;
     }
   };
 
   const update = async (updateParams: UpdateMeetingParams) => {
     const optimisticMeetings = meetings.map((m) =>
-      m.id === updateParams.id ? { ...m, ...updateParams } : m
+      m.id === updateParams.id ? { ...m, ...updateParams } : m,
     );
     setMeetings(optimisticMeetings);
 
     try {
       const updatedMeeting = await updateMeeting(updateParams);
-      setMeetings((prev) => prev.map((m) => (m.id === updatedMeeting.id ? updatedMeeting : m)));
+      setMeetings((prev) =>
+        prev.map((m) => (m.id === updatedMeeting.id ? updatedMeeting : m)),
+      );
       return updatedMeeting;
     } catch (err: any) {
-      setError(err.message || 'Failed to update meeting');
+      setError(err.message || "Failed to update meeting");
       fetchMeetings();
       throw err;
     }
@@ -359,19 +370,24 @@ export function useMeetings(initialParams: GetMeetingsParams) {
     try {
       await deleteMeeting(id);
     } catch (err: any) {
-      setError(err.message || 'Failed to delete meeting');
+      setError(err.message || "Failed to delete meeting");
       fetchMeetings();
       throw err;
     }
   };
 
-  const respond = async (id: string, rsvp: 'ACCEPTED' | 'DECLINED' | 'TENTATIVE') => {
+  const respond = async (
+    id: string,
+    rsvp: "ACCEPTED" | "DECLINED" | "TENTATIVE",
+  ) => {
     try {
       const updatedMeeting = await respondToMeeting(id, rsvp);
-      setMeetings((prev) => prev.map((m) => (m.id === updatedMeeting.id ? updatedMeeting : m)));
+      setMeetings((prev) =>
+        prev.map((m) => (m.id === updatedMeeting.id ? updatedMeeting : m)),
+      );
       return updatedMeeting;
     } catch (err: any) {
-      setError(err.message || 'Failed to respond to meeting');
+      setError(err.message || "Failed to respond to meeting");
       throw err;
     }
   };
@@ -410,7 +426,7 @@ export function useMeeting(id: string | null) {
         const data = await getMeeting(id);
         setMeeting(data);
       } catch (err: any) {
-        setError(err.message || 'Failed to fetch meeting');
+        setError(err.message || "Failed to fetch meeting");
       } finally {
         setLoading(false);
       }
@@ -423,19 +439,22 @@ export function useMeeting(id: string | null) {
 }
 
 // Hook: Polls
-export function usePoll(messageId: string | null) {
+export function usePoll(_messageId: string | null) {
   const [poll, setPoll] = useState<Poll | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const create = async (createParams: Omit<CreatePollParams, 'channelId'>, channelId: string) => {
+  const create = async (
+    createParams: Omit<CreatePollParams, "channelId">,
+    channelId: string,
+  ) => {
     try {
       setLoading(true);
       const newPoll = await createPoll({ ...createParams, channelId });
       setPoll(newPoll);
       return newPoll;
     } catch (err: any) {
-      setError(err.message || 'Failed to create poll');
+      setError(err.message || "Failed to create poll");
       throw err;
     } finally {
       setLoading(false);
@@ -448,7 +467,7 @@ export function usePoll(messageId: string | null) {
       setPoll(updatedPoll);
       return updatedPoll;
     } catch (err: any) {
-      setError(err.message || 'Failed to vote');
+      setError(err.message || "Failed to vote");
       throw err;
     }
   };

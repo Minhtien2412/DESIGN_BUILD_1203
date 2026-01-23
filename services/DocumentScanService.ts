@@ -8,14 +8,17 @@
  * Dependencies: expo-camera, expo-image-manipulator, expo-file-system
  */
 
+import * as FileSystem from "@/utils/FileSystemCompat";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as FileSystem from "expo-file-system";
 import * as ImageManipulator from "expo-image-manipulator";
 import * as Sharing from "expo-sharing";
-import {
-    checkCameraPermissions,
-    requestAllPermissions
-} from "./CameraService";
+import { checkCameraPermissions, requestAllPermissions } from "./CameraService";
+
+// ============================================================================
+// React Hooks
+// ============================================================================
+
+import { useCallback, useEffect, useState } from "react";
 
 // ============================================================================
 // Types
@@ -204,7 +207,7 @@ export const PAGE_SIZES: Record<string, { width: number; height: number }> = {
  */
 export function detectDocumentEdges(
   imageData: { width: number; height: number },
-  _debugMode: boolean = false
+  _debugMode: boolean = false,
 ): EdgeDetectionResult {
   const { width, height } = imageData;
 
@@ -243,7 +246,7 @@ export function validateCorners(corners: DocumentCorners): boolean {
       !isNaN(p.x) &&
       !isNaN(p.y) &&
       p.x >= 0 &&
-      p.y >= 0
+      p.y >= 0,
   );
 
   if (!allValid) return false;
@@ -266,11 +269,11 @@ export function calculateAspectRatio(corners: DocumentCorners): number {
   const { topLeft, topRight, bottomLeft } = corners;
 
   const topWidth = Math.sqrt(
-    Math.pow(topRight.x - topLeft.x, 2) + Math.pow(topRight.y - topLeft.y, 2)
+    Math.pow(topRight.x - topLeft.x, 2) + Math.pow(topRight.y - topLeft.y, 2),
   );
   const leftHeight = Math.sqrt(
     Math.pow(bottomLeft.x - topLeft.x, 2) +
-      Math.pow(bottomLeft.y - topLeft.y, 2)
+      Math.pow(bottomLeft.y - topLeft.y, 2),
   );
 
   return topWidth / leftHeight;
@@ -281,7 +284,7 @@ export function calculateAspectRatio(corners: DocumentCorners): number {
  */
 export function isA4AspectRatio(
   aspectRatio: number,
-  tolerance: number = 0.1
+  tolerance: number = 0.1,
 ): boolean {
   const a4Ratio = 210 / 297; // ~0.707
   return Math.abs(aspectRatio - a4Ratio) < tolerance;
@@ -300,7 +303,7 @@ export async function applyPerspectiveCorrection(
   imageUri: string,
   corners: DocumentCorners,
   targetWidth: number = 2480, // A4 at 300 DPI
-  targetHeight: number = 3508
+  targetHeight: number = 3508,
 ): Promise<string> {
   try {
     // Calculate bounding box from corners
@@ -331,7 +334,7 @@ export async function applyPerspectiveCorrection(
           },
         },
       ],
-      { compress: 0.9, format: ImageManipulator.SaveFormat.JPEG }
+      { compress: 0.9, format: ImageManipulator.SaveFormat.JPEG },
     );
 
     return result.uri;
@@ -346,7 +349,7 @@ export async function applyPerspectiveCorrection(
  */
 export async function autoCropDocument(
   imageUri: string,
-  padding: number = 10
+  padding: number = 10,
 ): Promise<{ uri: string; corners: DocumentCorners }> {
   try {
     // Get image dimensions
@@ -386,7 +389,7 @@ export async function autoCropDocument(
     // Apply perspective correction
     const processedUri = await applyPerspectiveCorrection(
       imageUri,
-      paddedCorners
+      paddedCorners,
     );
 
     return { uri: processedUri, corners: paddedCorners };
@@ -410,7 +413,7 @@ export async function autoCropDocument(
  */
 export async function applyEnhancements(
   imageUri: string,
-  enhancements: ImageEnhancements
+  enhancements: ImageEnhancements,
 ): Promise<string> {
   try {
     const actions: ImageManipulator.Action[] = [];
@@ -453,13 +456,13 @@ export async function applyEnhancements(
  */
 export async function generateThumbnail(
   imageUri: string,
-  maxSize: number = 200
+  maxSize: number = 200,
 ): Promise<string> {
   try {
     const result = await ImageManipulator.manipulateAsync(
       imageUri,
       [{ resize: { width: maxSize } }],
-      { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG }
+      { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG },
     );
     return result.uri;
   } catch (error) {
@@ -603,7 +606,7 @@ export async function deleteScanSession(sessionId: string): Promise<void> {
 export async function addPageToSession(
   sessionId: string,
   imageUri: string,
-  autoProcess: boolean = true
+  autoProcess: boolean = true,
 ): Promise<ScannedPage> {
   const sessions = await getAllSessions();
   const session = sessions.find((s) => s.id === sessionId);
@@ -651,7 +654,7 @@ export async function addPageToSession(
 export async function updatePage(
   sessionId: string,
   pageId: string,
-  updates: Partial<ScannedPage>
+  updates: Partial<ScannedPage>,
 ): Promise<ScannedPage> {
   const sessions = await getAllSessions();
   const session = sessions.find((s) => s.id === sessionId);
@@ -676,7 +679,7 @@ export async function updatePage(
  */
 export async function removePage(
   sessionId: string,
-  pageId: string
+  pageId: string,
 ): Promise<void> {
   const sessions = await getAllSessions();
   const session = sessions.find((s) => s.id === sessionId);
@@ -712,7 +715,7 @@ export async function removePage(
  */
 export async function reorderPages(
   sessionId: string,
-  pageIds: string[]
+  pageIds: string[],
 ): Promise<void> {
   const sessions = await getAllSessions();
   const session = sessions.find((s) => s.id === sessionId);
@@ -746,7 +749,7 @@ export async function reorderPages(
  */
 export async function exportAsPDF(
   sessionId: string,
-  options: Partial<PDFExportOptions> = {}
+  options: Partial<PDFExportOptions> = {},
 ): Promise<ExportResult> {
   const mergedOptions = { ...DEFAULT_PDF_OPTIONS, ...options };
   const sessions = await getAllSessions();
@@ -811,7 +814,7 @@ export async function exportAsPDF(
  */
 export async function exportAsImages(
   sessionId: string,
-  quality: "low" | "medium" | "high" = "high"
+  quality: "low" | "medium" | "high" = "high",
 ): Promise<ExportResult> {
   const sessions = await getAllSessions();
   const session = sessions.find((s) => s.id === sessionId);
@@ -841,7 +844,7 @@ export async function exportAsImages(
       const result = await ImageManipulator.manipulateAsync(
         page.processedUri,
         [],
-        { compress, format: ImageManipulator.SaveFormat.JPEG }
+        { compress, format: ImageManipulator.SaveFormat.JPEG },
       );
 
       await FileSystem.copyAsync({ from: result.uri, to: destPath });
@@ -951,19 +954,13 @@ export function formatSessionDate(timestamp: number): string {
   });
 }
 
-// ============================================================================
-// React Hooks
-// ============================================================================
-
-import { useCallback, useEffect, useState } from "react";
-
 /**
  * Hook for managing scan sessions
  */
 export function useScanSessions() {
   const [sessions, setSessions] = useState<ScanSession[]>([]);
   const [currentSession, setCurrentSessionState] = useState<ScanSession | null>(
-    null
+    null,
   );
   const [loading, setLoading] = useState(true);
 
@@ -991,7 +988,7 @@ export function useScanSessions() {
       await loadSessions();
       return session;
     },
-    [loadSessions]
+    [loadSessions],
   );
 
   const remove = useCallback(
@@ -999,7 +996,7 @@ export function useScanSessions() {
       await deleteScanSession(sessionId);
       await loadSessions();
     },
-    [loadSessions]
+    [loadSessions],
   );
 
   const setCurrent = useCallback(
@@ -1008,7 +1005,7 @@ export function useScanSessions() {
       const session = sessions.find((s) => s.id === sessionId) || null;
       setCurrentSessionState(session);
     },
-    [sessions]
+    [sessions],
   );
 
   return {
@@ -1067,10 +1064,10 @@ export function useDocumentScanner(sessionId: string | null) {
         setProcessing(false);
       }
     },
-    [sessionId, loadSession]
+    [sessionId, loadSession],
   );
 
-  const removePage = useCallback(
+  const removePageFromSession = useCallback(
     async (pageId: string) => {
       if (!sessionId) return;
 
@@ -1081,7 +1078,7 @@ export function useDocumentScanner(sessionId: string | null) {
         setError((err as Error).message);
       }
     },
-    [sessionId, loadSession]
+    [sessionId, loadSession],
   );
 
   const reorder = useCallback(
@@ -1095,7 +1092,7 @@ export function useDocumentScanner(sessionId: string | null) {
         setError((err as Error).message);
       }
     },
-    [sessionId, loadSession]
+    [sessionId, loadSession],
   );
 
   const exportPDF = useCallback(
@@ -1113,7 +1110,7 @@ export function useDocumentScanner(sessionId: string | null) {
         setProcessing(false);
       }
     },
-    [sessionId, loadSession]
+    [sessionId, loadSession],
   );
 
   const exportImages = useCallback(
@@ -1131,7 +1128,7 @@ export function useDocumentScanner(sessionId: string | null) {
         setProcessing(false);
       }
     },
-    [sessionId, loadSession]
+    [sessionId, loadSession],
   );
 
   return {
@@ -1190,7 +1187,7 @@ class DocumentScanServiceClass {
   async addPage(
     sessionId: string,
     imageUri: string,
-    autoProcess: boolean = true
+    autoProcess: boolean = true,
   ) {
     return addPageToSession(sessionId, imageUri, autoProcess);
   }
@@ -1201,7 +1198,7 @@ class DocumentScanServiceClass {
 
   async exportImages(
     sessionId: string,
-    quality: "low" | "medium" | "high" = "high"
+    quality: "low" | "medium" | "high" = "high",
   ) {
     return exportAsImages(sessionId, quality);
   }

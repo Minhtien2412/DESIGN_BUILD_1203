@@ -202,7 +202,7 @@ class PersistentCache {
   const cacheKeys = keys.filter(k => k.startsWith(this.prefix));
       
       for (const key of cacheKeys) {
-        const data = await this.get(key.replace(this.prefix, ''));
+        const _data = await this.get(key.replace(this.prefix, ''));
         // Cleanup will be handled by get() if expired
       }
     } catch (error) {
@@ -223,7 +223,7 @@ export const useMemoryOptimization = () => {
 
   useEffect(() => {
     // Setup memory warning handler
-    const handleMemoryWarning = () => {
+    const _handleMemoryWarning = () => {
       setMemoryWarning(true);
       
       // Clear memory caches

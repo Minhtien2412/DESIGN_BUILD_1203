@@ -16,17 +16,8 @@ jest.mock("@react-native-async-storage/async-storage", () => ({
   clear: jest.fn(),
 }));
 
-jest.mock("expo-file-system", () => ({
-  getInfoAsync: jest.fn(),
-  documentDirectory: "/mock/documents/",
-  cacheDirectory: "/mock/cache/",
-  downloadAsync: jest.fn(),
-  deleteAsync: jest.fn(),
-  readAsStringAsync: jest.fn(),
-  EncodingType: {
-    Base64: "base64",
-  },
-}));
+// Import the mock from mocks folder (via moduleNameMapper)
+import * as FileSystem from "@/utils/FileSystemCompat";
 
 jest.mock("expo-sharing", () => ({
   isAvailableAsync: jest.fn(),
@@ -44,7 +35,6 @@ jest.mock("react-native", () => ({
   },
 }));
 
-import * as FileSystem from "expo-file-system";
 import * as MediaLibrary from "expo-media-library";
 import * as Sharing from "expo-sharing";
 
@@ -331,10 +321,10 @@ describe("ImageViewerService", () => {
     test("extracts filename from URI", () => {
       expect(getFilenameFromUri("/path/to/image.jpg")).toBe("image.jpg");
       expect(getFilenameFromUri("https://example.com/photos/image.png")).toBe(
-        "image.png"
+        "image.png",
       );
       expect(
-        getFilenameFromUri("https://example.com/image.jpg?size=large")
+        getFilenameFromUri("https://example.com/image.jpg?size=large"),
       ).toBe("image.jpg");
     });
 
@@ -384,7 +374,7 @@ describe("ImageViewerService", () => {
       test("merges stored settings with defaults", async () => {
         const stored = { minZoom: 0.5, maxZoom: 8 };
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify(stored)
+          JSON.stringify(stored),
         );
 
         const settings = await loadImageSettings();
@@ -407,7 +397,7 @@ describe("ImageViewerService", () => {
 
         expect(AsyncStorage.setItem).toHaveBeenCalledWith(
           "@image_viewer_settings",
-          expect.stringContaining('"minZoom":0.5')
+          expect.stringContaining('"minZoom":0.5'),
         );
       });
     });
@@ -416,7 +406,7 @@ describe("ImageViewerService", () => {
       test("removes settings from storage", async () => {
         await resetImageSettings();
         expect(AsyncStorage.removeItem).toHaveBeenCalledWith(
-          "@image_viewer_settings"
+          "@image_viewer_settings",
         );
       });
     });
@@ -435,7 +425,7 @@ describe("ImageViewerService", () => {
 
       test("returns stored favorites", async () => {
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify(["img-1", "img-2"])
+          JSON.stringify(["img-1", "img-2"]),
         );
 
         const favorites = await loadFavorites();
@@ -451,13 +441,13 @@ describe("ImageViewerService", () => {
 
         expect(AsyncStorage.setItem).toHaveBeenCalledWith(
           "@image_viewer_favorites",
-          JSON.stringify(["img-1"])
+          JSON.stringify(["img-1"]),
         );
       });
 
       test("does not add duplicate", async () => {
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify(["img-1"])
+          JSON.stringify(["img-1"]),
         );
 
         await addToFavorites("img-1");
@@ -470,14 +460,14 @@ describe("ImageViewerService", () => {
     describe("removeFromFavorites", () => {
       test("removes image from favorites", async () => {
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify(["img-1", "img-2"])
+          JSON.stringify(["img-1", "img-2"]),
         );
 
         await removeFromFavorites("img-1");
 
         expect(AsyncStorage.setItem).toHaveBeenCalledWith(
           "@image_viewer_favorites",
-          JSON.stringify(["img-2"])
+          JSON.stringify(["img-2"]),
         );
       });
     });
@@ -493,7 +483,7 @@ describe("ImageViewerService", () => {
 
       test("removes from favorites if already favorite", async () => {
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify(["img-1"])
+          JSON.stringify(["img-1"]),
         );
 
         const result = await toggleFavorite("img-1");
@@ -505,7 +495,7 @@ describe("ImageViewerService", () => {
     describe("isFavorite", () => {
       test("returns true if favorite", async () => {
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify(["img-1"])
+          JSON.stringify(["img-1"]),
         );
 
         const result = await isFavorite("img-1");
@@ -514,7 +504,7 @@ describe("ImageViewerService", () => {
 
       test("returns false if not favorite", async () => {
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify(["img-2"])
+          JSON.stringify(["img-2"]),
         );
 
         const result = await isFavorite("img-1");
@@ -542,7 +532,7 @@ describe("ImageViewerService", () => {
 
       test("returns stored recent images", async () => {
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify([mockImage])
+          JSON.stringify([mockImage]),
         );
 
         const recent = await loadRecentImages();
@@ -559,7 +549,7 @@ describe("ImageViewerService", () => {
 
         expect(AsyncStorage.setItem).toHaveBeenCalled();
         const savedData = JSON.parse(
-          (AsyncStorage.setItem as jest.Mock).mock.calls[0][1]
+          (AsyncStorage.setItem as jest.Mock).mock.calls[0][1],
         );
         expect(savedData[0].id).toBe("img-1");
       });
@@ -567,13 +557,13 @@ describe("ImageViewerService", () => {
       test("moves existing image to top", async () => {
         const existing = [{ id: "img-2", uri: "file:///img2.jpg" }, mockImage];
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify(existing)
+          JSON.stringify(existing),
         );
 
         await addToRecent(mockImage);
 
         const savedData = JSON.parse(
-          (AsyncStorage.setItem as jest.Mock).mock.calls[0][1]
+          (AsyncStorage.setItem as jest.Mock).mock.calls[0][1],
         );
         expect(savedData[0].id).toBe("img-1");
       });
@@ -584,13 +574,13 @@ describe("ImageViewerService", () => {
           uri: `file:///img${i}.jpg`,
         }));
         (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-          JSON.stringify(manyImages)
+          JSON.stringify(manyImages),
         );
 
         await addToRecent({ id: "img-new", uri: "file:///new.jpg" });
 
         const savedData = JSON.parse(
-          (AsyncStorage.setItem as jest.Mock).mock.calls[0][1]
+          (AsyncStorage.setItem as jest.Mock).mock.calls[0][1],
         );
         expect(savedData).toHaveLength(50);
         expect(savedData[0].id).toBe("img-new");
@@ -601,7 +591,7 @@ describe("ImageViewerService", () => {
       test("clears recent images", async () => {
         await clearRecentImages();
         expect(AsyncStorage.removeItem).toHaveBeenCalledWith(
-          "@image_viewer_recent"
+          "@image_viewer_recent",
         );
       });
     });
@@ -632,7 +622,7 @@ describe("ImageViewerService", () => {
         });
 
         await expect(getImageInfo("/path/to/missing.jpg")).rejects.toThrow(
-          "File not found"
+          "File not found",
         );
       });
     });
@@ -670,7 +660,7 @@ describe("ImageViewerService", () => {
 
         expect(result).toBe(true);
         expect(MediaLibrary.saveToLibraryAsync).toHaveBeenCalledWith(
-          "file:///image.jpg"
+          "file:///image.jpg",
         );
       });
 
@@ -684,7 +674,7 @@ describe("ImageViewerService", () => {
         (MediaLibrary.saveToLibraryAsync as jest.Mock).mockResolvedValue({});
 
         const result = await saveImageToGallery(
-          "https://example.com/image.jpg"
+          "https://example.com/image.jpg",
         );
 
         expect(result).toBe(true);
@@ -705,7 +695,7 @@ describe("ImageViewerService", () => {
     describe("getImageBase64", () => {
       test("returns base64 for local file", async () => {
         (FileSystem.readAsStringAsync as jest.Mock).mockResolvedValue(
-          "base64data"
+          "base64data",
         );
 
         const result = await getImageBase64("file:///image.jpg");
@@ -718,7 +708,7 @@ describe("ImageViewerService", () => {
           uri: "/local/image.jpg",
         });
         (FileSystem.readAsStringAsync as jest.Mock).mockResolvedValue(
-          "base64data"
+          "base64data",
         );
 
         const result = await getImageBase64("https://example.com/image.jpg");
@@ -729,7 +719,7 @@ describe("ImageViewerService", () => {
 
       test("returns null on error", async () => {
         (FileSystem.readAsStringAsync as jest.Mock).mockRejectedValue(
-          new Error("Read failed")
+          new Error("Read failed"),
         );
 
         const result = await getImageBase64("file:///image.jpg");
@@ -749,7 +739,7 @@ describe("ImageViewerService", () => {
 
         expect(result).toBe(true);
         expect(FileSystem.deleteAsync).toHaveBeenCalledWith(
-          "file:///image.jpg"
+          "file:///image.jpg",
         );
       });
 

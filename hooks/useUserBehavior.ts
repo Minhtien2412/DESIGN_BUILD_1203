@@ -3,8 +3,8 @@
  * Tích hợp tracking vào components một cách dễ dàng
  */
 
-import { useCallback, useEffect, useRef } from 'react';
-import { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
+import { useCallback, useEffect, useRef } from "react";
+import { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 
 // TODO: Implement user-behavior-tracker module
 // import {
@@ -25,30 +25,30 @@ import { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 
 // Temporary stub types
 type UserAction = any;
-const trackScreenView = (...args: any[]) => {};
-const trackScroll = (...args: any[]) => {};
-const trackTabSwitch = (...args: any[]) => {};
-const trackSearch = (...args: any[]) => {};
-const trackFilter = (...args: any[]) => {};
-const trackSort = (...args: any[]) => {};
-const trackItemView = (...args: any[]) => {};
-const trackItemClick = (...args: any[]) => {};
-const trackPullRefresh = (...args: any[]) => {};
-const trackLoadMore = (...args: any[]) => {};
-const trackSwipe = (...args: any[]) => {};
-const userBehaviorTracker = { 
+const trackScreenView = (..._args: any[]) => {};
+const trackScroll = (..._args: any[]) => {};
+const trackTabSwitch = (..._args: any[]) => {};
+const trackSearch = (..._args: any[]) => {};
+const trackFilter = (..._args: any[]) => {};
+const trackSort = (..._args: any[]) => {};
+const trackItemView = (..._args: any[]) => {};
+const trackItemClick = (..._args: any[]) => {};
+const trackPullRefresh = (..._args: any[]) => {};
+const trackLoadMore = (..._args: any[]) => {};
+const trackSwipe = (..._args: any[]) => {};
+const userBehaviorTracker = {
   endSession: () => {},
-  track: (...args: any[]) => {},
+  track: (..._args: any[]) => {},
   getSessionAnalytics: () => ({}),
   getUserPatterns: () => ({}),
   exportSessionData: () => ({}),
   clearSession: () => {},
 };
 const UserActionEnum = {
-  SCREEN_VIEW: 'SCREEN_VIEW',
-  INPUT_FOCUS: 'INPUT_FOCUS',
-  INPUT_BLUR: 'INPUT_BLUR',
-  FORM_SUBMIT: 'FORM_SUBMIT',
+  SCREEN_VIEW: "SCREEN_VIEW",
+  INPUT_FOCUS: "INPUT_FOCUS",
+  INPUT_BLUR: "INPUT_BLUR",
+  FORM_SUBMIT: "FORM_SUBMIT",
 } as const;
 
 export interface UseUserBehaviorOptions {
@@ -62,8 +62,13 @@ export interface UseUserBehaviorOptions {
  * Main hook for user behavior tracking
  */
 export function useUserBehavior(options: UseUserBehaviorOptions) {
-  const { screenName, enableScrollTracking = true, enableTabTracking = true, enableAutoScreenView = true } = options;
-  
+  const {
+    screenName,
+    enableScrollTracking = true,
+    enableTabTracking = true,
+    enableAutoScreenView = true,
+  } = options;
+
   const scrollPositionRef = useRef(0);
   const contentHeightRef = useRef(0);
   const viewportHeightRef = useRef(0);
@@ -91,11 +96,12 @@ export function useUserBehavior(options: UseUserBehaviorOptions) {
       const now = Date.now();
       // Throttle scroll events to max 1 per 500ms
       if (now - lastScrollTimeRef.current < 500) return;
-      
+
       lastScrollTimeRef.current = now;
 
-      const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
-      
+      const { contentOffset, contentSize, layoutMeasurement } =
+        event.nativeEvent;
+
       scrollPositionRef.current = contentOffset.y;
       contentHeightRef.current = contentSize.height;
       viewportHeightRef.current = layoutMeasurement.height;
@@ -104,21 +110,21 @@ export function useUserBehavior(options: UseUserBehaviorOptions) {
         contentOffset.y,
         screenName,
         contentSize.height,
-        layoutMeasurement.height
+        layoutMeasurement.height,
       );
     },
-    [screenName, enableScrollTracking]
+    [screenName, enableScrollTracking],
   );
 
   /**
    * Handle tab switch
    */
   const handleTabSwitch = useCallback(
-    (fromTab: string, toTab: string, method: 'tap' | 'swipe' = 'tap') => {
+    (fromTab: string, toTab: string, method: "tap" | "swipe" = "tap") => {
       if (!enableTabTracking) return;
       trackTabSwitch(fromTab, toTab, screenName, method);
     },
-    [screenName, enableTabTracking]
+    [screenName, enableTabTracking],
   );
 
   /**
@@ -128,7 +134,7 @@ export function useUserBehavior(options: UseUserBehaviorOptions) {
     (query: string, resultsCount?: number) => {
       trackSearch(query, screenName, resultsCount);
     },
-    [screenName]
+    [screenName],
   );
 
   /**
@@ -138,17 +144,17 @@ export function useUserBehavior(options: UseUserBehaviorOptions) {
     (filterType: string, filterValue: any, resultsCount?: number) => {
       trackFilter(filterType, filterValue, screenName, resultsCount);
     },
-    [screenName]
+    [screenName],
   );
 
   /**
    * Handle sort
    */
   const handleSort = useCallback(
-    (sortBy: string, order: 'asc' | 'desc' = 'asc') => {
+    (sortBy: string, order: "asc" | "desc" = "asc") => {
       trackSort(sortBy, screenName, order);
     },
-    [screenName]
+    [screenName],
   );
 
   /**
@@ -158,7 +164,7 @@ export function useUserBehavior(options: UseUserBehaviorOptions) {
     (itemId: string, itemType: string, position?: number) => {
       trackItemView(itemId, itemType, screenName, position);
     },
-    [screenName]
+    [screenName],
   );
 
   /**
@@ -168,7 +174,7 @@ export function useUserBehavior(options: UseUserBehaviorOptions) {
     (itemId: string, itemType: string, position?: number) => {
       trackItemClick(itemId, itemType, screenName, position);
     },
-    [screenName]
+    [screenName],
   );
 
   /**
@@ -185,7 +191,7 @@ export function useUserBehavior(options: UseUserBehaviorOptions) {
     (page: number, itemsLoaded: number) => {
       trackLoadMore(screenName, page, itemsLoaded);
     },
-    [screenName]
+    [screenName],
   );
 
   /**
@@ -195,7 +201,7 @@ export function useUserBehavior(options: UseUserBehaviorOptions) {
     (action: UserAction, metadata?: any) => {
       userBehaviorTracker.track(action, screenName, metadata);
     },
-    [screenName]
+    [screenName],
   );
 
   return {
@@ -210,7 +216,7 @@ export function useUserBehavior(options: UseUserBehaviorOptions) {
     handlePullRefresh,
     handleLoadMore,
     trackCustomAction,
-    
+
     // Scroll state
     scrollPosition: scrollPositionRef.current,
     contentHeight: contentHeightRef.current,
@@ -223,7 +229,7 @@ export function useUserBehavior(options: UseUserBehaviorOptions) {
  */
 export function useItemVisibilityTracking(
   screenName: string,
-  itemType: string
+  itemType: string,
 ) {
   const viewedItemsRef = useRef<Set<string>>(new Set());
 
@@ -234,7 +240,7 @@ export function useItemVisibilityTracking(
         trackItemView(itemId, itemType, screenName, position);
       }
     },
-    [screenName, itemType]
+    [screenName, itemType],
   );
 
   const resetViewedItems = useCallback(() => {
@@ -289,7 +295,7 @@ export function useFormTracking(screenName: string, formName: string) {
   const trackFieldFocus = useCallback(
     (fieldName: string) => {
       formStartTimeRef.current = formStartTimeRef.current || Date.now();
-      fieldInteractionsRef.current[fieldName] = 
+      fieldInteractionsRef.current[fieldName] =
         (fieldInteractionsRef.current[fieldName] || 0) + 1;
 
       userBehaviorTracker.track(UserActionEnum.INPUT_FOCUS, screenName, {
@@ -298,7 +304,7 @@ export function useFormTracking(screenName: string, formName: string) {
         interactionCount: fieldInteractionsRef.current[fieldName],
       });
     },
-    [screenName, formName]
+    [screenName, formName],
   );
 
   const trackFieldBlur = useCallback(
@@ -307,16 +313,16 @@ export function useFormTracking(screenName: string, formName: string) {
         formName,
         fieldName,
         hasValue: !!value,
-        valueLength: typeof value === 'string' ? value.length : undefined,
+        valueLength: typeof value === "string" ? value.length : undefined,
       });
     },
-    [screenName, formName]
+    [screenName, formName],
   );
 
   const trackFormSubmit = useCallback(
     (isSuccess: boolean, errorFields?: string[]) => {
-      const timeToSubmit = formStartTimeRef.current 
-        ? Date.now() - formStartTimeRef.current 
+      const timeToSubmit = formStartTimeRef.current
+        ? Date.now() - formStartTimeRef.current
         : 0;
 
       userBehaviorTracker.track(UserActionEnum.FORM_SUBMIT, screenName, {
@@ -331,7 +337,7 @@ export function useFormTracking(screenName: string, formName: string) {
       formStartTimeRef.current = 0;
       fieldInteractionsRef.current = {};
     },
-    [screenName, formName]
+    [screenName, formName],
   );
 
   return {
@@ -346,10 +352,10 @@ export function useFormTracking(screenName: string, formName: string) {
  */
 export function useGestureTracking(screenName: string) {
   const trackSwipeGesture = useCallback(
-    (direction: 'left' | 'right' | 'up' | 'down', velocity?: number) => {
+    (direction: "left" | "right" | "up" | "down", velocity?: number) => {
       trackSwipe(direction, screenName, velocity);
     },
-    [screenName]
+    [screenName],
   );
 
   return {

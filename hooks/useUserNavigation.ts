@@ -45,28 +45,28 @@ export interface UserNavigationReturn {
   /** Navigate to user profile */
   navigateToProfile: (
     userId: string | number,
-    options?: NavigationOptions
+    options?: NavigationOptions,
   ) => void;
   /** Navigate to social profile (alternative route) */
   navigateToSocialProfile: (
     userId: string | number,
-    options?: NavigationOptions
+    options?: NavigationOptions,
   ) => void;
   /** Navigate to chat/message with user */
   navigateToChat: (
     userId: string | number,
-    options?: NavigationOptions
+    options?: NavigationOptions,
   ) => void;
   /** Navigate to call user */
   navigateToCall: (
     userId: string | number,
     type?: "voice" | "video",
-    options?: NavigationOptions
+    options?: NavigationOptions,
   ) => void;
   /** Navigate to user's portfolio */
   navigateToPortfolio: (
     userId: string | number,
-    options?: NavigationOptions
+    options?: NavigationOptions,
   ) => void;
   /** Check if navigating to own profile */
   isOwnProfile: (userId: string | number) => boolean;
@@ -101,7 +101,7 @@ export function useUserNavigation(): UserNavigationReturn {
 
       router.push(route as any);
     },
-    [router]
+    [router],
   );
 
   /**
@@ -117,7 +117,7 @@ export function useUserNavigation(): UserNavigationReturn {
 
       router.push(`/social/profile/${userId}` as any);
     },
-    [router]
+    [router],
   );
 
   /**
@@ -133,7 +133,7 @@ export function useUserNavigation(): UserNavigationReturn {
 
       router.push(`/messages/chat/${userId}` as any);
     },
-    [router]
+    [router],
   );
 
   /**
@@ -143,7 +143,7 @@ export function useUserNavigation(): UserNavigationReturn {
     (
       userId: string | number,
       type: "voice" | "video" = "voice",
-      options: NavigationOptions = {}
+      options: NavigationOptions = {},
     ) => {
       const { haptic = true } = options;
 
@@ -153,7 +153,7 @@ export function useUserNavigation(): UserNavigationReturn {
 
       router.push(`/call/${userId}?type=${type}` as any);
     },
-    [router]
+    [router],
   );
 
   /**
@@ -169,13 +169,13 @@ export function useUserNavigation(): UserNavigationReturn {
 
       router.push(`/portfolio/${userId}` as any);
     },
-    [router]
+    [router],
   );
 
   /**
    * Check if userId is current user
    */
-  const isOwnProfile = useCallback((userId: string | number): boolean => {
+  const isOwnProfile = useCallback((_userId: string | number): boolean => {
     // This would need to be connected to auth context
     // For now, return false - implement with useAuth()
     return false;

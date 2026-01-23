@@ -141,7 +141,7 @@ export function usePosts(options: UsePostsOptions = {}): UsePostsResult {
     return () => {
       isMounted.current = false;
     };
-  }, [enabled, type, userId]); // eslint-disable-line
+  }, [enabled, type, userId]);  
 
   // Load more
   const loadMore = useCallback(async () => {
@@ -335,7 +335,7 @@ export function useComments(options: UseCommentsOptions): UseCommentsResult {
     return () => {
       isMounted.current = false;
     };
-  }, [postId, enabled]); // eslint-disable-line
+  }, [postId, enabled]);  
 
   const loadMore = useCallback(async () => {
     if (!hasMore || isLoadingRef.current) return;
@@ -548,7 +548,7 @@ export function useNotifications(
     return () => {
       isMounted.current = false;
     };
-  }, [enabled]); // eslint-disable-line
+  }, [enabled]);  
 
   const loadMore = useCallback(async () => {
     if (!hasMore || isLoadingRef.current) return;
@@ -621,7 +621,7 @@ export function useInfiniteScroll(options: UseInfiniteScrollOptions) {
   }).current;
 
   const onViewableItemsChanged = useCallback(
-    ({ viewableItems }: { viewableItems: Array<{ index?: number }> }) => {
+    ({ viewableItems }: { viewableItems: { index?: number }[] }) => {
       if (!hasMore || isLoading) return;
 
       // Check nếu user đã scroll gần cuối

@@ -17,7 +17,7 @@ export async function setItem(key: string, value: string): Promise<void> {
   // Warn about large values that might not be stored successfully
   if (value.length > 2048) {
     console.warn(
-      `[Storage] Value for key '${key}' is ${value.length} bytes (>2048). May not be stored successfully in SecureStore.`
+      `[Storage] Value for key '${key}' is ${value.length} bytes (>2048). May not be stored successfully in SecureStore.`,
     );
   }
 
@@ -88,6 +88,9 @@ export async function setToken(token: string) {
 export async function getToken() {
   return getItem(TOKEN_KEY);
 }
+
+// Alias for backward compatibility
+export const getAuthToken = getToken;
 
 export async function clearToken() {
   await deleteItem(TOKEN_KEY);

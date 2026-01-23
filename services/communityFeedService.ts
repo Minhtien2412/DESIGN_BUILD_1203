@@ -64,12 +64,12 @@ export interface AnnouncementFeedItem extends BaseFeedItem {
   projectId?: number;
   importance: "low" | "medium" | "high" | "critical";
   isRead?: boolean;
-  attachments?: Array<{
+  attachments?: {
     id: number;
     fileName: string;
     fileUrl: string;
     fileType: string;
-  }>;
+  }[];
 }
 
 export interface DevelopmentPlanFeedItem extends BaseFeedItem {
@@ -78,11 +78,11 @@ export interface DevelopmentPlanFeedItem extends BaseFeedItem {
   status?: "planned" | "in_progress" | "completed" | "delayed";
   progress?: number;
   targetDate?: string;
-  milestones?: Array<{
+  milestones?: {
     name: string;
     status: string;
     date?: string;
-  }>;
+  }[];
 }
 
 export interface NewsFeedItem extends BaseFeedItem {

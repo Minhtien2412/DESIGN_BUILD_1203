@@ -3,9 +3,22 @@
  * Mock native modules and configure testing environment
  */
 
+// Mock react-native Platform first (before any other imports)
+jest.mock("react-native/Libraries/Utilities/Platform", () => ({
+  OS: "ios",
+  Version: 17,
+  select: jest.fn((obj) => obj.ios ?? obj.default),
+  isPad: false,
+  isTVOS: false,
+  isTV: false,
+  constants: {
+    reactNativeVersion: { major: 0, minor: 73, patch: 0 },
+  },
+}));
+
 // Mock AsyncStorage
 jest.mock("@react-native-async-storage/async-storage", () =>
-  require("@react-native-async-storage/async-storage/jest/async-storage-mock")
+  require("@react-native-async-storage/async-storage/jest/async-storage-mock"),
 );
 
 // Mock expo-secure-store
@@ -69,10 +82,10 @@ jest.mock("expo-device", () => ({
 jest.mock("expo-notifications", () => ({
   getPermissionsAsync: jest.fn(() => Promise.resolve({ status: "granted" })),
   requestPermissionsAsync: jest.fn(() =>
-    Promise.resolve({ status: "granted" })
+    Promise.resolve({ status: "granted" }),
   ),
   getExpoPushTokenAsync: jest.fn(() =>
-    Promise.resolve({ data: "test-push-token" })
+    Promise.resolve({ data: "test-push-token" }),
   ),
   setNotificationHandler: jest.fn(),
   addNotificationReceivedListener: jest.fn(() => ({ remove: jest.fn() })),
@@ -125,16 +138,77 @@ jest.mock("expo-clipboard", () => ({
 jest.mock("expo-file-system", () => ({
   documentDirectory: "file:///documents/",
   cacheDirectory: "file:///cache/",
-  downloadAsync: jest.fn(),
-  getInfoAsync: jest.fn(() => Promise.resolve({ exists: false, size: 0 })),
-  readAsStringAsync: jest.fn(() => Promise.resolve("")),
-  writeAsStringAsync: jest.fn(),
-  deleteAsync: jest.fn(),
-  makeDirectoryAsync: jest.fn(),
+  downloadAsync: jest.fn(() =>
+    Promise.resolve({ uri: "file:///cache/downloaded.file", status: 200 }),
+  ),
+  getInfoAsync: jest.fn(() =>
+    Promise.resolve({ exists: true, size: 1024, isDirectory: false }),
+  ),
+  readAsStringAsync: jest.fn(() => Promise.resolve("base64data")),
+  writeAsStringAsync: jest.fn(() => Promise.resolve()),
+  deleteAsync: jest.fn(() => Promise.resolve()),
+  makeDirectoryAsync: jest.fn(() => Promise.resolve()),
   readDirectoryAsync: jest.fn(() => Promise.resolve([])),
-  copyAsync: jest.fn(),
-  moveAsync: jest.fn(),
+  copyAsync: jest.fn(() => Promise.resolve()),
+  moveAsync: jest.fn(() => Promise.resolve()),
   EncodingType: { UTF8: "utf8", Base64: "base64" },
+  FileSystemUploadType: { BINARY_CONTENT: 0, MULTIPART: 1 },
+  createUploadTask: jest.fn(() => ({
+    uploadAsync: jest.fn(() => Promise.resolve({ status: 200, body: "{}" })),
+    cancelAsync: jest.fn(() => Promise.resolve()),
+  })),
+  Directory: jest.fn().mockImplementation(() => ({
+    create: jest.fn(() => Promise.resolve()),
+    exists: jest.fn(() => true),
+    delete: jest.fn(() => Promise.resolve()),
+  })),
+  File: jest.fn().mockImplementation(() => ({
+    text: jest.fn(() => Promise.resolve("mock content")),
+    arrayBuffer: jest.fn(() => Promise.resolve(new ArrayBuffer(0))),
+    write: jest.fn(() => Promise.resolve()),
+    exists: jest.fn(() => true),
+    delete: jest.fn(() => Promise.resolve()),
+  })),
+  Paths: {
+    document: { uri: "file:///documents/" },
+    cache: { uri: "file:///cache/" },
+    bundle: { uri: "file:///bundle/" },
+    availableDiskSpace: 1000000000,
+    totalDiskSpace: 5000000000,
+  },
+}));
+
+// Mock FileSystemCompat utility (wraps expo-file-system)
+jest.mock("./utils/FileSystemCompat", () => ({
+  documentDirectory: "file:///documents/",
+  cacheDirectory: "file:///cache/",
+  bundleDirectory: "file:///bundle/",
+  EncodingType: { UTF8: "utf8", Base64: "base64" },
+  getFreeDiskStorageAsync: jest.fn(() => Promise.resolve(1000000000)),
+  getTotalDiskCapacityAsync: jest.fn(() => Promise.resolve(5000000000)),
+  readAsStringAsync: jest.fn(() => Promise.resolve("base64data")),
+  writeAsStringAsync: jest.fn(() => Promise.resolve()),
+  getInfoAsync: jest.fn(() =>
+    Promise.resolve({ exists: true, size: 1024, isDirectory: false }),
+  ),
+  deleteAsync: jest.fn(() => Promise.resolve()),
+  copyAsync: jest.fn(() => Promise.resolve()),
+  moveAsync: jest.fn(() => Promise.resolve()),
+  makeDirectoryAsync: jest.fn(() => Promise.resolve()),
+  readDirectoryAsync: jest.fn(() => Promise.resolve([])),
+  downloadAsync: jest.fn(() =>
+    Promise.resolve({ uri: "file:///test.pdf", status: 200 }),
+  ),
+  createDownloadResumable: jest.fn(() => ({
+    downloadAsync: jest.fn(() => Promise.resolve({ uri: "file:///test.pdf" })),
+    pauseAsync: jest.fn(() => Promise.resolve()),
+    resumeAsync: jest.fn(() => Promise.resolve()),
+    savable: jest.fn(() => ({})),
+  })),
+  uploadAsync: jest.fn(() => Promise.resolve({ status: 200, body: "{}" })),
+  createDirectoryAsync: jest.fn(() => Promise.resolve()),
+  isFileAsync: jest.fn(() => Promise.resolve(true)),
+  FileUploadType: { BINARY_CONTENT: 0, MULTIPART: 1 },
 }));
 
 // Mock @react-native-community/netinfo
@@ -145,7 +219,7 @@ jest.mock("@react-native-community/netinfo", () => ({
       isConnected: true,
       isInternetReachable: true,
       type: "wifi",
-    })
+    }),
   ),
   useNetInfo: () => ({
     isConnected: true,
@@ -162,11 +236,17 @@ jest.mock("expo-av", () => ({
         Promise.resolve({
           sound: { playAsync: jest.fn(), unloadAsync: jest.fn() },
           status: { isLoaded: true },
-        })
+        }),
       ),
     },
-    setAudioModeAsync: jest.fn(),
+    setAudioModeAsync: jest.fn(() => Promise.resolve()),
     Recording: jest.fn(),
+    getPermissionsAsync: jest.fn(() =>
+      Promise.resolve({ status: "granted", granted: true }),
+    ),
+    requestPermissionsAsync: jest.fn(() =>
+      Promise.resolve({ status: "granted", granted: true }),
+    ),
   },
   Video: "Video",
 }));

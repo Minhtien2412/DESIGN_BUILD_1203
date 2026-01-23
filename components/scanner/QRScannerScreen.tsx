@@ -689,8 +689,7 @@ export function QRScannerScreen({
         barcodeScannerSettings={{
           barcodeTypes: settings.allowedBarcodeTypes.map((t) =>
             t === "qr" ? "qr" : t.replace("_", "-")
-          ) as Array<
-            | "qr"
+          ) as (| "qr"
             | "aztec"
             | "ean13"
             | "ean8"
@@ -702,8 +701,7 @@ export function QRScannerScreen({
             | "itf14"
             | "codabar"
             | "code128"
-            | "upc_a"
-          >,
+            | "upc_a")[],
         }}
         onBarcodeScanned={isScanning ? handleBarCodeScanned : undefined}
       />

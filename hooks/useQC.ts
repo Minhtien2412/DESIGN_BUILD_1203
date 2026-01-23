@@ -1,4 +1,4 @@
-import * as qcService from '@/services/qc-qa';
+import * as qcService from "@/services/qc-qa";
 import type {
     AddDefectCommentRequest,
     Checklist,
@@ -17,9 +17,9 @@ import type {
     UpdateChecklistItemRequest,
     UpdateChecklistRequest,
     UpdateDefectRequest,
-    UpdateInspectionRequest
-} from '@/types/qc-qa';
-import { useCallback, useState } from 'react';
+    UpdateInspectionRequest,
+} from "@/types/qc-qa";
+import { useCallback, useState } from "react";
 
 // ============ Checklists Hook ============
 
@@ -61,7 +61,7 @@ export function useChecklists() {
         checklists: [],
         total: 0,
         loading: false,
-        error: err instanceof Error ? err.message : 'Failed to load checklists',
+        error: err instanceof Error ? err.message : "Failed to load checklists",
       }));
     }
   }, []);
@@ -78,12 +78,12 @@ export function useChecklists() {
           ...prev,
           loading: false,
           error:
-            err instanceof Error ? err.message : 'Failed to load checklist',
+            err instanceof Error ? err.message : "Failed to load checklist",
         }));
         return null;
       }
     },
-    []
+    [],
   );
 
   const createChecklist = useCallback(
@@ -103,18 +103,18 @@ export function useChecklists() {
           ...prev,
           loading: false,
           error:
-            err instanceof Error ? err.message : 'Failed to create checklist',
+            err instanceof Error ? err.message : "Failed to create checklist",
         }));
         return null;
       }
     },
-    []
+    [],
   );
 
   const updateChecklist = useCallback(
     async (
       id: string,
-      data: UpdateChecklistRequest
+      data: UpdateChecklistRequest,
     ): Promise<Checklist | null> => {
       setState((prev) => ({ ...prev, loading: true, error: null }));
       try {
@@ -122,7 +122,7 @@ export function useChecklists() {
         setState((prev) => ({
           ...prev,
           checklists: prev.checklists.map((c) =>
-            c.id === id ? response.checklist : c
+            c.id === id ? response.checklist : c,
           ),
           loading: false,
         }));
@@ -132,31 +132,31 @@ export function useChecklists() {
           ...prev,
           loading: false,
           error:
-            err instanceof Error ? err.message : 'Failed to update checklist',
+            err instanceof Error ? err.message : "Failed to update checklist",
         }));
         return null;
       }
     },
-    []
+    [],
   );
 
   const updateChecklistItem = useCallback(
     async (
       checklistId: string,
       itemId: string,
-      data: UpdateChecklistItemRequest
+      data: UpdateChecklistItemRequest,
     ): Promise<Checklist | null> => {
       setState((prev) => ({ ...prev, loading: true, error: null }));
       try {
         const response = await qcService.updateChecklistItem(
           checklistId,
           itemId,
-          data
+          data,
         );
         setState((prev) => ({
           ...prev,
           checklists: prev.checklists.map((c) =>
-            c.id === checklistId ? response.checklist : c
+            c.id === checklistId ? response.checklist : c,
           ),
           loading: false,
         }));
@@ -168,12 +168,12 @@ export function useChecklists() {
           error:
             err instanceof Error
               ? err.message
-              : 'Failed to update checklist item',
+              : "Failed to update checklist item",
         }));
         return null;
       }
     },
-    []
+    [],
   );
 
   const deleteChecklist = useCallback(async (id: string): Promise<boolean> => {
@@ -192,7 +192,7 @@ export function useChecklists() {
         ...prev,
         loading: false,
         error:
-          err instanceof Error ? err.message : 'Failed to delete checklist',
+          err instanceof Error ? err.message : "Failed to delete checklist",
       }));
       return false;
     }
@@ -206,7 +206,7 @@ export function useChecklists() {
         setState((prev) => ({
           ...prev,
           checklists: prev.checklists.map((c) =>
-            c.id === id ? response.checklist : c
+            c.id === id ? response.checklist : c,
           ),
           loading: false,
         }));
@@ -215,12 +215,12 @@ export function useChecklists() {
         setState((prev) => ({
           ...prev,
           loading: false,
-          error: err instanceof Error ? err.message : 'Failed to submit',
+          error: err instanceof Error ? err.message : "Failed to submit",
         }));
         return null;
       }
     },
-    []
+    [],
   );
 
   const approveChecklist = useCallback(
@@ -231,7 +231,7 @@ export function useChecklists() {
         setState((prev) => ({
           ...prev,
           checklists: prev.checklists.map((c) =>
-            c.id === id ? response.checklist : c
+            c.id === id ? response.checklist : c,
           ),
           loading: false,
         }));
@@ -240,12 +240,12 @@ export function useChecklists() {
         setState((prev) => ({
           ...prev,
           loading: false,
-          error: err instanceof Error ? err.message : 'Failed to approve',
+          error: err instanceof Error ? err.message : "Failed to approve",
         }));
         return null;
       }
     },
-    []
+    [],
   );
 
   return {
@@ -299,7 +299,7 @@ export function useInspections() {
         ...prev,
         loading: false,
         error:
-          err instanceof Error ? err.message : 'Failed to load inspections',
+          err instanceof Error ? err.message : "Failed to load inspections",
       }));
     }
   }, []);
@@ -316,12 +316,12 @@ export function useInspections() {
           ...prev,
           loading: false,
           error:
-            err instanceof Error ? err.message : 'Failed to load inspection',
+            err instanceof Error ? err.message : "Failed to load inspection",
         }));
         return null;
       }
     },
-    []
+    [],
   );
 
   const createInspection = useCallback(
@@ -341,18 +341,18 @@ export function useInspections() {
           ...prev,
           loading: false,
           error:
-            err instanceof Error ? err.message : 'Failed to create inspection',
+            err instanceof Error ? err.message : "Failed to create inspection",
         }));
         return null;
       }
     },
-    []
+    [],
   );
 
   const updateInspection = useCallback(
     async (
       id: string,
-      data: UpdateInspectionRequest
+      data: UpdateInspectionRequest,
     ): Promise<Inspection | null> => {
       setState((prev) => ({ ...prev, loading: true, error: null }));
       try {
@@ -360,7 +360,7 @@ export function useInspections() {
         setState((prev) => ({
           ...prev,
           inspections: prev.inspections.map((i) =>
-            i.id === id ? response.inspection : i
+            i.id === id ? response.inspection : i,
           ),
           loading: false,
         }));
@@ -370,38 +370,35 @@ export function useInspections() {
           ...prev,
           loading: false,
           error:
-            err instanceof Error ? err.message : 'Failed to update inspection',
+            err instanceof Error ? err.message : "Failed to update inspection",
         }));
         return null;
       }
     },
-    []
+    [],
   );
 
-  const deleteInspection = useCallback(
-    async (id: string): Promise<boolean> => {
-      setState((prev) => ({ ...prev, loading: true, error: null }));
-      try {
-        await qcService.deleteInspection(id);
-        setState((prev) => ({
-          ...prev,
-          inspections: prev.inspections.filter((i) => i.id !== id),
-          total: prev.total - 1,
-          loading: false,
-        }));
-        return true;
-      } catch (err) {
-        setState((prev) => ({
-          ...prev,
-          loading: false,
-          error:
-            err instanceof Error ? err.message : 'Failed to delete inspection',
-        }));
-        return false;
-      }
-    },
-    []
-  );
+  const deleteInspection = useCallback(async (id: string): Promise<boolean> => {
+    setState((prev) => ({ ...prev, loading: true, error: null }));
+    try {
+      await qcService.deleteInspection(id);
+      setState((prev) => ({
+        ...prev,
+        inspections: prev.inspections.filter((i) => i.id !== id),
+        total: prev.total - 1,
+        loading: false,
+      }));
+      return true;
+    } catch (err) {
+      setState((prev) => ({
+        ...prev,
+        loading: false,
+        error:
+          err instanceof Error ? err.message : "Failed to delete inspection",
+      }));
+      return false;
+    }
+  }, []);
 
   const completeInspection = useCallback(
     async (id: string): Promise<Inspection | null> => {
@@ -411,7 +408,7 @@ export function useInspections() {
         setState((prev) => ({
           ...prev,
           inspections: prev.inspections.map((i) =>
-            i.id === id ? response.inspection : i
+            i.id === id ? response.inspection : i,
           ),
           loading: false,
         }));
@@ -420,12 +417,12 @@ export function useInspections() {
         setState((prev) => ({
           ...prev,
           loading: false,
-          error: err instanceof Error ? err.message : 'Failed to complete',
+          error: err instanceof Error ? err.message : "Failed to complete",
         }));
         return null;
       }
     },
-    []
+    [],
   );
 
   return {
@@ -476,7 +473,7 @@ export function useDefects() {
       setState((prev) => ({
         ...prev,
         loading: false,
-        error: err instanceof Error ? err.message : 'Failed to load defects',
+        error: err instanceof Error ? err.message : "Failed to load defects",
       }));
     }
   }, []);
@@ -492,12 +489,12 @@ export function useDefects() {
         setState((prev) => ({
           ...prev,
           loading: false,
-          error: err instanceof Error ? err.message : 'Failed to load defect',
+          error: err instanceof Error ? err.message : "Failed to load defect",
         }));
         return null;
       }
     },
-    []
+    [],
   );
 
   const createDefect = useCallback(
@@ -516,13 +513,12 @@ export function useDefects() {
         setState((prev) => ({
           ...prev,
           loading: false,
-          error:
-            err instanceof Error ? err.message : 'Failed to create defect',
+          error: err instanceof Error ? err.message : "Failed to create defect",
         }));
         return null;
       }
     },
-    []
+    [],
   );
 
   const updateDefect = useCallback(
@@ -532,9 +528,7 @@ export function useDefects() {
         const response = await qcService.updateDefect(id, data);
         setState((prev) => ({
           ...prev,
-          defects: prev.defects.map((d) =>
-            d.id === id ? response.defect : d
-          ),
+          defects: prev.defects.map((d) => (d.id === id ? response.defect : d)),
           loading: false,
         }));
         return response.defect;
@@ -542,13 +536,12 @@ export function useDefects() {
         setState((prev) => ({
           ...prev,
           loading: false,
-          error:
-            err instanceof Error ? err.message : 'Failed to update defect',
+          error: err instanceof Error ? err.message : "Failed to update defect",
         }));
         return null;
       }
     },
-    []
+    [],
   );
 
   const deleteDefect = useCallback(async (id: string): Promise<boolean> => {
@@ -566,7 +559,7 @@ export function useDefects() {
       setState((prev) => ({
         ...prev,
         loading: false,
-        error: err instanceof Error ? err.message : 'Failed to delete defect',
+        error: err instanceof Error ? err.message : "Failed to delete defect",
       }));
       return false;
     }
@@ -575,7 +568,7 @@ export function useDefects() {
   const addComment = useCallback(
     async (
       defectId: string,
-      data: AddDefectCommentRequest
+      data: AddDefectCommentRequest,
     ): Promise<Defect | null> => {
       setState((prev) => ({ ...prev, loading: true, error: null }));
       try {
@@ -583,7 +576,7 @@ export function useDefects() {
         setState((prev) => ({
           ...prev,
           defects: prev.defects.map((d) =>
-            d.id === defectId ? response.defect : d
+            d.id === defectId ? response.defect : d,
           ),
           loading: false,
         }));
@@ -592,12 +585,12 @@ export function useDefects() {
         setState((prev) => ({
           ...prev,
           loading: false,
-          error: err instanceof Error ? err.message : 'Failed to add comment',
+          error: err instanceof Error ? err.message : "Failed to add comment",
         }));
         return null;
       }
     },
-    []
+    [],
   );
 
   const resolveDefect = useCallback(
@@ -607,9 +600,7 @@ export function useDefects() {
         const response = await qcService.resolveDefect(id, resolution);
         setState((prev) => ({
           ...prev,
-          defects: prev.defects.map((d) =>
-            d.id === id ? response.defect : d
-          ),
+          defects: prev.defects.map((d) => (d.id === id ? response.defect : d)),
           loading: false,
         }));
         return response.defect;
@@ -617,57 +608,59 @@ export function useDefects() {
         setState((prev) => ({
           ...prev,
           loading: false,
-          error: err instanceof Error ? err.message : 'Failed to resolve',
+          error: err instanceof Error ? err.message : "Failed to resolve",
         }));
         return null;
       }
     },
-    []
+    [],
   );
 
-  const verifyDefect = useCallback(async (id: string): Promise<Defect | null> => {
-    setState((prev) => ({ ...prev, loading: true, error: null }));
-    try {
-      const response = await qcService.verifyDefect(id);
-      setState((prev) => ({
-        ...prev,
-        defects: prev.defects.map((d) =>
-          d.id === id ? response.defect : d
-        ),
-        loading: false,
-      }));
-      return response.defect;
-    } catch (err) {
-      setState((prev) => ({
-        ...prev,
-        loading: false,
-        error: err instanceof Error ? err.message : 'Failed to verify',
-      }));
-      return null;
-    }
-  }, []);
+  const verifyDefect = useCallback(
+    async (id: string): Promise<Defect | null> => {
+      setState((prev) => ({ ...prev, loading: true, error: null }));
+      try {
+        const response = await qcService.verifyDefect(id);
+        setState((prev) => ({
+          ...prev,
+          defects: prev.defects.map((d) => (d.id === id ? response.defect : d)),
+          loading: false,
+        }));
+        return response.defect;
+      } catch (err) {
+        setState((prev) => ({
+          ...prev,
+          loading: false,
+          error: err instanceof Error ? err.message : "Failed to verify",
+        }));
+        return null;
+      }
+    },
+    [],
+  );
 
-  const closeDefect = useCallback(async (id: string): Promise<Defect | null> => {
-    setState((prev) => ({ ...prev, loading: true, error: null }));
-    try {
-      const response = await qcService.closeDefect(id);
-      setState((prev) => ({
-        ...prev,
-        defects: prev.defects.map((d) =>
-          d.id === id ? response.defect : d
-        ),
-        loading: false,
-      }));
-      return response.defect;
-    } catch (err) {
-      setState((prev) => ({
-        ...prev,
-        loading: false,
-        error: err instanceof Error ? err.message : 'Failed to close',
-      }));
-      return null;
-    }
-  }, []);
+  const closeDefect = useCallback(
+    async (id: string): Promise<Defect | null> => {
+      setState((prev) => ({ ...prev, loading: true, error: null }));
+      try {
+        const response = await qcService.closeDefect(id);
+        setState((prev) => ({
+          ...prev,
+          defects: prev.defects.map((d) => (d.id === id ? response.defect : d)),
+          loading: false,
+        }));
+        return response.defect;
+      } catch (err) {
+        setState((prev) => ({
+          ...prev,
+          loading: false,
+          error: err instanceof Error ? err.message : "Failed to close",
+        }));
+        return null;
+      }
+    },
+    [],
+  );
 
   return {
     ...state,
@@ -711,7 +704,7 @@ export function useQualityMetrics() {
       setState((prev) => ({
         ...prev,
         loading: false,
-        error: err instanceof Error ? err.message : 'Failed to load metrics',
+        error: err instanceof Error ? err.message : "Failed to load metrics",
       }));
     }
   }, []);
@@ -739,7 +732,7 @@ export function useComplianceReports() {
 
   const generateReport = useCallback(
     async (
-      data: GenerateComplianceReportRequest
+      data: GenerateComplianceReportRequest,
     ): Promise<ComplianceReport | null> => {
       setState((prev) => ({ ...prev, loading: true, error: null }));
       try {
@@ -755,12 +748,12 @@ export function useComplianceReports() {
           ...prev,
           loading: false,
           error:
-            err instanceof Error ? err.message : 'Failed to generate report',
+            err instanceof Error ? err.message : "Failed to generate report",
         }));
         return null;
       }
     },
-    []
+    [],
   );
 
   const loadReportById = useCallback(
@@ -778,31 +771,34 @@ export function useComplianceReports() {
         setState((prev) => ({
           ...prev,
           loading: false,
-          error: err instanceof Error ? err.message : 'Failed to load report',
+          error: err instanceof Error ? err.message : "Failed to load report",
         }));
         return null;
       }
     },
-    []
+    [],
   );
 
-  const downloadPDF = useCallback(async (reportId: string): Promise<boolean> => {
-    setState((prev) => ({ ...prev, loading: true, error: null }));
-    try {
-      const blob = await qcService.downloadComplianceReportPDF(reportId);
-      // Handle blob download
-      // This would typically open the PDF or download it
-      setState((prev) => ({ ...prev, loading: false }));
-      return true;
-    } catch (err) {
-      setState((prev) => ({
-        ...prev,
-        loading: false,
-        error: err instanceof Error ? err.message : 'Failed to download PDF',
-      }));
-      return false;
-    }
-  }, []);
+  const downloadPDF = useCallback(
+    async (reportId: string): Promise<boolean> => {
+      setState((prev) => ({ ...prev, loading: true, error: null }));
+      try {
+        const _blob = await qcService.downloadComplianceReportPDF(reportId);
+        // Handle blob download
+        // This would typically open the PDF or download it
+        setState((prev) => ({ ...prev, loading: false }));
+        return true;
+      } catch (err) {
+        setState((prev) => ({
+          ...prev,
+          loading: false,
+          error: err instanceof Error ? err.message : "Failed to download PDF",
+        }));
+        return false;
+      }
+    },
+    [],
+  );
 
   return {
     ...state,

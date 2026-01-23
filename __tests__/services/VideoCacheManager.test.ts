@@ -16,7 +16,7 @@ import {
 const mockAsyncStorage: Record<string, string> = {};
 jest.mock("@react-native-async-storage/async-storage", () => ({
   getItem: jest.fn((key: string) =>
-    Promise.resolve(mockAsyncStorage[key] || null)
+    Promise.resolve(mockAsyncStorage[key] || null),
   ),
   setItem: jest.fn((key: string, value: string) => {
     mockAsyncStorage[key] = value;
@@ -33,7 +33,7 @@ const mockFileSystem = {
   files: {} as Record<string, { exists: boolean; size: number }>,
 };
 
-jest.mock("expo-file-system", () => ({
+jest.mock("@/utils/FileSystemCompat", () => ({
   cacheDirectory: "file:///cache/",
   getInfoAsync: jest.fn((path: string, _options?: { size: boolean }) => {
     const file = mockFileSystem.files[path];
@@ -63,10 +63,10 @@ describe("VideoCacheManager", () => {
   beforeEach(() => {
     // Clear mocks
     Object.keys(mockAsyncStorage).forEach(
-      (key) => delete mockAsyncStorage[key]
+      (key) => delete mockAsyncStorage[key],
     );
     Object.keys(mockFileSystem.files).forEach(
-      (key) => delete mockFileSystem.files[key]
+      (key) => delete mockFileSystem.files[key],
     );
     jest.clearAllMocks();
 
@@ -176,7 +176,7 @@ describe("VideoCacheManager", () => {
 
       await VideoCacheManager.cacheVideo(
         "video-1",
-        "http://example.com/video1.mp4"
+        "http://example.com/video1.mp4",
       );
 
       const result = await VideoCacheManager.getCachedVideo("video-1");
@@ -192,7 +192,7 @@ describe("VideoCacheManager", () => {
       mockFileSystem.files[localPath] = { exists: true, size: 1024 * 1024 };
       await VideoCacheManager.cacheVideo(
         "video-1",
-        "http://example.com/video1.mp4"
+        "http://example.com/video1.mp4",
       );
 
       // Get it multiple times
@@ -221,7 +221,7 @@ describe("VideoCacheManager", () => {
       const result = await VideoCacheManager.cacheVideo(
         "video-test",
         "http://example.com/test.mp4",
-        "medium"
+        "medium",
       );
 
       expect(result).not.toBeNull();
@@ -233,13 +233,13 @@ describe("VideoCacheManager", () => {
 
       await VideoCacheManager.cacheVideo(
         "video-1",
-        "http://example.com/v1.mp4"
+        "http://example.com/v1.mp4",
       );
       const stats1 = VideoCacheManager.getStats();
 
       await VideoCacheManager.cacheVideo(
         "video-1",
-        "http://example.com/v1.mp4"
+        "http://example.com/v1.mp4",
       );
       const stats2 = VideoCacheManager.getStats();
 
@@ -251,11 +251,11 @@ describe("VideoCacheManager", () => {
 
       await VideoCacheManager.cacheVideo(
         "video-1",
-        "http://example.com/v1.mp4"
+        "http://example.com/v1.mp4",
       );
       await VideoCacheManager.cacheVideo(
         "video-2",
-        "http://example.com/v2.mp4"
+        "http://example.com/v2.mp4",
       );
 
       const stats = VideoCacheManager.getStats();
@@ -270,7 +270,7 @@ describe("VideoCacheManager", () => {
 
       await VideoCacheManager.cacheVideo(
         "video-1",
-        "http://example.com/v1.mp4"
+        "http://example.com/v1.mp4",
       );
       expect(VideoCacheManager.isCached("video-1")).toBe(true);
 
@@ -283,7 +283,7 @@ describe("VideoCacheManager", () => {
 
       await VideoCacheManager.cacheVideo(
         "video-1",
-        "http://example.com/v1.mp4"
+        "http://example.com/v1.mp4",
       );
       const sizeBefore = VideoCacheManager.getStats().totalSize;
 
@@ -300,11 +300,11 @@ describe("VideoCacheManager", () => {
 
       await VideoCacheManager.cacheVideo(
         "video-1",
-        "http://example.com/v1.mp4"
+        "http://example.com/v1.mp4",
       );
       await VideoCacheManager.cacheVideo(
         "video-2",
-        "http://example.com/v2.mp4"
+        "http://example.com/v2.mp4",
       );
 
       await VideoCacheManager.clearCache();
@@ -439,10 +439,10 @@ describe("VideoCacheManager", () => {
       (VideoCacheManager as any).index = null;
       (VideoCacheManager as any).stats = { hitCount: 0, missCount: 0 };
       Object.keys(mockAsyncStorage).forEach(
-        (key) => delete mockAsyncStorage[key]
+        (key) => delete mockAsyncStorage[key],
       );
       Object.keys(mockFileSystem.files).forEach(
-        (key) => delete mockFileSystem.files[key]
+        (key) => delete mockFileSystem.files[key],
       );
 
       await VideoCacheManager.initialize();

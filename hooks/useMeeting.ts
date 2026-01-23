@@ -61,7 +61,7 @@ interface UseMeetingReturn {
   // Actions
   createMeeting: (
     name: string,
-    settings?: Partial<MeetingSettings>
+    settings?: Partial<MeetingSettings>,
   ) => Promise<void>;
   joinMeeting: (roomId: string, password?: string) => Promise<void>;
   leaveMeeting: () => void;
@@ -198,20 +198,18 @@ export function useMeeting({
         setParticipants(room.participants);
         setLivekitCredentials(livekit);
         setMeetingState("connected");
-      }
+      },
     );
     cleanupRef.current.push(unsubJoined);
 
     // Meeting ended
-    const unsubEnded = meetingSocketService.onMeetingEnded(
-      ({ roomId, reason }) => {
-        console.log("[useMeeting] Meeting ended:", reason);
-        setMeetingState("ended");
-        setCurrentRoom(null);
-        setParticipants([]);
-        onMeetingEnded?.(reason);
-      }
-    );
+    const unsubEnded = meetingSocketService.onMeetingEnded(({ reason }) => {
+      console.log("[useMeeting] Meeting ended:", reason);
+      setMeetingState("ended");
+      setCurrentRoom(null);
+      setParticipants([]);
+      onMeetingEnded?.(reason);
+    });
     cleanupRef.current.push(unsubEnded);
 
     // Participant joined
@@ -220,7 +218,7 @@ export function useMeeting({
         console.log("[useMeeting] Participant joined:", participant.name);
         setParticipants((prev) => [...prev, participant]);
         onParticipantJoined?.(participant);
-      }
+      },
     );
     cleanupRef.current.push(unsubParticipantJoined);
 
@@ -231,7 +229,7 @@ export function useMeeting({
         setParticipants((prev) => prev.filter((p) => p.id !== userId));
         setRaisedHands((prev) => prev.filter((id) => id !== userId));
         onParticipantLeft?.(userId);
-      }
+      },
     );
     cleanupRef.current.push(unsubParticipantLeft);
 
@@ -241,11 +239,11 @@ export function useMeeting({
         if (participant.id) {
           setParticipants((prev) =>
             prev.map((p) =>
-              p.id === participant.id ? { ...p, ...participant } : p
-            )
+              p.id === participant.id ? { ...p, ...participant } : p,
+            ),
           );
         }
-      }
+      },
     );
     cleanupRef.current.push(unsubParticipantUpdated);
 
@@ -266,14 +264,14 @@ export function useMeeting({
     const unsubRecordingStarted = meetingSocketService.onRecordingStarted(
       () => {
         setIsRecording(true);
-      }
+      },
     );
     cleanupRef.current.push(unsubRecordingStarted);
 
     const unsubRecordingStopped = meetingSocketService.onRecordingStopped(
       () => {
         setIsRecording(false);
-      }
+      },
     );
     cleanupRef.current.push(unsubRecordingStopped);
 
@@ -323,7 +321,7 @@ export function useMeeting({
 
       meetingSocketService.createMeeting(name, settings);
     },
-    [connected, connect]
+    [connected, connect],
   );
 
   const joinMeeting = useCallback(
@@ -337,7 +335,7 @@ export function useMeeting({
 
       meetingSocketService.joinMeeting(roomId, password);
     },
-    [connected, connect]
+    [connected, connect],
   );
 
   const leaveMeeting = useCallback(() => {
@@ -426,7 +424,7 @@ export function useMeeting({
       if (!currentRoom || !content.trim()) return;
       meetingSocketService.sendChatMessage(currentRoom.id, content.trim());
     },
-    [currentRoom]
+    [currentRoom],
   );
 
   const raiseHand = useCallback(() => {
@@ -444,7 +442,7 @@ export function useMeeting({
       if (!currentRoom) return;
       meetingSocketService.sendReaction(currentRoom.id, reaction);
     },
-    [currentRoom]
+    [currentRoom],
   );
 
   // =========================================================================
@@ -456,7 +454,7 @@ export function useMeeting({
       if (!currentRoom) return;
       meetingSocketService.kickParticipant(currentRoom.id, userId);
     },
-    [currentRoom]
+    [currentRoom],
   );
 
   const muteParticipant = useCallback(
@@ -464,7 +462,7 @@ export function useMeeting({
       if (!currentRoom) return;
       meetingSocketService.muteParticipant(currentRoom.id, userId);
     },
-    [currentRoom]
+    [currentRoom],
   );
 
   const promoteParticipant = useCallback(
@@ -472,7 +470,7 @@ export function useMeeting({
       if (!currentRoom) return;
       meetingSocketService.promoteParticipant(currentRoom.id, userId, role);
     },
-    [currentRoom]
+    [currentRoom],
   );
 
   // =========================================================================

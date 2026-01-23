@@ -15,6 +15,12 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { get, post } from "./api";
 
 // ============================================================================
+// REACT HOOKS
+// ============================================================================
+
+import { useCallback, useEffect, useState } from "react";
+
+// ============================================================================
 // TYPES
 // ============================================================================
 
@@ -670,12 +676,6 @@ class VideoInteractionsServiceClass {
 // ============================================================================
 
 export const VideoInteractionsService = new VideoInteractionsServiceClass();
-
-// ============================================================================
-// REACT HOOKS
-// ============================================================================
-
-import { useCallback, useEffect, useState } from "react";
 
 /**
  * Hook for video interactions with optimistic updates

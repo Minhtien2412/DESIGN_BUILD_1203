@@ -57,7 +57,7 @@ export const getMediaDevices = () => {
       return mediaDevices.getUserMedia(constraints);
     },
     
-    getDisplayMedia: (constraints: any) => {
+    getDisplayMedia: (_constraints: any) => {
       // Screen sharing in React Native requires additional setup
       // This is a placeholder - implement based on your platform needs
       throw new Error('Screen sharing not implemented yet');
