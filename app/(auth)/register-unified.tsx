@@ -36,7 +36,7 @@ import {
     View,
 } from "react-native";
 
-const { width } = Dimensions.get("window");
+const { width: _width } = Dimensions.get("window");
 
 // ==================== THEME ====================
 
@@ -371,7 +371,7 @@ export default function UnifiedRegisterScreen() {
         formData.name,
         formData.role,
         formData.phone || undefined,
-        formData.location || undefined
+        formData.location || undefined,
       );
       // Navigation handled by isAuthenticated effect
     } catch (error: any) {
@@ -442,7 +442,7 @@ export default function UnifiedRegisterScreen() {
             formData.phone,
             formData.name,
             formData.email || undefined,
-            formData.password || undefined
+            formData.password || undefined,
           );
         }
         // Navigation handled by isAuthenticated effect

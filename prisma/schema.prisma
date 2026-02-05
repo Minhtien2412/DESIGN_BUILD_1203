@@ -509,3 +509,39 @@ enum FileAction {
   SHARED
   UNSHARED
 }
+
+// ============================================
+// CSKH AI - Customer Support Chat
+// ============================================
+
+model CSKHConversation {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  status    String   @default("active") // active, closed
+  
+  messages  CSKHMessage[]
+  
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  
+  @@index([userId])
+  @@index([status])
+  @@map("cskh_conversations")
+}
+
+model CSKHMessage {
+  id             String   @id @default(uuid())
+  conversationId String   @map("conversation_id")
+  userId         String   @map("user_id")
+  role           String   // user, assistant, system
+  content        String
+  
+  conversation   CSKHConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  
+  createdAt      DateTime @default(now()) @map("created_at")
+  
+  @@index([conversationId])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("cskh_messages")
+}

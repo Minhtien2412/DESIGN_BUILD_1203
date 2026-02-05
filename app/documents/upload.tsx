@@ -5,6 +5,8 @@
 
 import { useAuth } from '@/context/AuthContext';
 import { DocumentCategory } from '@/types/document';
+import { uploadDocument as uploadDocumentApi } from '@/services/document';
+import { FileCache, OfflineDocuments } from '@/services/offlineStorage';
 import { Ionicons } from '@expo/vector-icons';
 import * as DocumentPicker from 'expo-document-picker';
 import * as ImagePicker from 'expo-image-picker';
@@ -171,49 +173,97 @@ export default function DocumentUploadScreen() {
 
   const handleUpload = async () => {
     if (selectedFiles.length === 0) {
-      Alert.alert('Chưa chọn file', 'Vui lòng chọn ít nhất một file để tải lên');
+      Alert.alert('No files selected', 'Please choose at least one file to upload.');
       return;
     }
 
     if (!title.trim()) {
-      Alert.alert('Thiếu tiêu đề', 'Vui lòng nhập tiêu đề cho tài liệu');
+      Alert.alert('Missing title', 'Please enter a title for the document.');
+      return;
+    }
+
+    const normalizedProjectId = Array.isArray(projectId) ? projectId[0] : projectId;
+    const normalizedFolderId = Array.isArray(folderId) ? folderId[0] : folderId;
+    if (!normalizedProjectId) {
+      Alert.alert('Missing project', 'Project is required for upload.');
       return;
     }
 
     setUploading(true);
     setUploadProgress(0);
 
+    const trimmedTitle = title.trim();
+    const trimmedDescription = description.trim();
+    const parsedTags = tags
+      .split(',')
+      .map(tag => tag.trim())
+      .filter(Boolean);
+
+    let successCount = 0;
+    let offlineCount = 0;
+
     try {
-      // Simulate upload progress
-      for (let i = 0; i <= 100; i += 10) {
-        await new Promise(resolve => setTimeout(resolve, 200));
-        setUploadProgress(i);
+      for (let index = 0; index < selectedFiles.length; index++) {
+        const file = selectedFiles[index];
+        const docName = selectedFiles.length > 1 ? `${trimmedTitle} - ${file.name}` : trimmedTitle;
+
+        try {
+          await uploadDocumentApi({
+            projectId: normalizedProjectId,
+            name: docName,
+            description: trimmedDescription || undefined,
+            category,
+            tags: parsedTags.length ? parsedTags : undefined,
+            folderId: normalizedFolderId,
+            file: {
+              uri: file.uri,
+              name: file.name,
+              type: file.type || 'application/octet-stream',
+            } as any,
+          });
+          successCount += 1;
+        } catch (uploadError) {
+          const offlineDoc = await OfflineDocuments.add({
+            name: docName,
+            type: file.type?.split('/')[1] || 'other',
+            size: file.size || 0,
+            localUri: file.uri,
+            fileName: file.name,
+            mimeType: file.type || 'application/octet-stream',
+            projectId: normalizedProjectId,
+            category,
+            description: trimmedDescription || undefined,
+            tags: parsedTags.length ? parsedTags : undefined,
+            folderId: normalizedFolderId,
+          });
+
+          await FileCache.addPendingUpload({
+            type: 'document',
+            localUri: file.uri,
+            targetEndpoint: '/documents/upload',
+            fileName: file.name,
+            mimeType: file.type || 'application/octet-stream',
+            offlineDocId: offlineDoc.id,
+            projectId: normalizedProjectId,
+          });
+          offlineCount += 1;
+        } finally {
+          const progress = Math.round(((index + 1) / selectedFiles.length) * 100);
+          setUploadProgress(progress);
+        }
       }
 
-      // TODO: Implement actual upload to backend
-      // const formData = new FormData();
-      // selectedFiles.forEach((file, index) => {
-      //   formData.append(`files[${index}]`, {
-      //     uri: file.uri,
-      //     name: file.name,
-      //     type: file.type,
-      //   } as any);
-      // });
-      // formData.append('title', title);
-      // formData.append('description', description);
-      // formData.append('category', category);
-      // formData.append('tags', tags);
-      // if (projectId) formData.append('projectId', projectId);
-      // if (folderId) formData.append('folderId', folderId);
+      const total = selectedFiles.length;
+      const message = offlineCount > 0
+        ? `Uploaded ${successCount}/${total}. ${offlineCount} saved offline for sync.`
+        : `Uploaded ${total} file(s).`;
 
-      Alert.alert(
-        'Thành công',
-        `Đã tải lên ${selectedFiles.length} file`,
-        [{ text: 'OK', onPress: () => router.back() }]
-      );
+      Alert.alert('Upload complete', message, [
+        { text: 'OK', onPress: () => router.back() },
+      ]);
     } catch (error) {
       console.error('Upload error:', error);
-      Alert.alert('Lỗi', 'Không thể tải lên tài liệu. Vui lòng thử lại.');
+      Alert.alert('Upload failed', 'Unable to upload documents. Please try again.');
     } finally {
       setUploading(false);
       setUploadProgress(0);

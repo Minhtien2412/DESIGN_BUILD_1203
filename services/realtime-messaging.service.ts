@@ -132,9 +132,14 @@ class RealtimeMessagingService extends EventEmitter {
       return;
     }
 
-    const wsUrl = ENV.API_BASE_URL.replace("/api", "").replace("http", "ws");
+    // Use WS_BASE_URL from config, fallback to API_BASE_URL conversion
+    const wsUrl =
+      ENV.WS_BASE_URL ||
+      ENV.API_BASE_URL.replace("/api/v1", "").replace("http", "ws");
+    // Namespace must match BE: @WebSocketGateway({ namespace: '/chat' })
+    const namespace = ENV.WS_CHAT_NS || "/chat";
 
-    this.socket = io(`${wsUrl}/messaging`, {
+    this.socket = io(`${wsUrl}${namespace}`, {
       transports: ["websocket", "polling"],
       auth: { token },
       reconnection: true,
@@ -274,7 +279,7 @@ class RealtimeMessagingService extends EventEmitter {
   private async resendPendingMessages() {
     for (const [clientMessageId, payload] of this.pendingMessages) {
       console.log(
-        `[RealtimeMessaging] Resending pending message: ${clientMessageId}`
+        `[RealtimeMessaging] Resending pending message: ${clientMessageId}`,
       );
       await this.sendMessage(payload);
     }
@@ -355,7 +360,7 @@ class RealtimeMessagingService extends EventEmitter {
         { conversationWatermarks: watermarks },
         (response: any) => {
           resolve(response?.syncData || []);
-        }
+        },
       );
 
       setTimeout(() => resolve([]), 10000);
@@ -382,7 +387,7 @@ export function generateClientMessageId(): string {
  */
 export function formatMessagePreview(
   type: MessageType,
-  content?: string
+  content?: string,
 ): string {
   if (type === "TEXT" && content) {
     return content.length > 100 ? content.substring(0, 100) + "..." : content;

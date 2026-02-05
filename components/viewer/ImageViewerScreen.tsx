@@ -29,7 +29,7 @@ import {
     formatDimensions,
     GalleryImage,
     IMAGE_ZOOM_CONSTRAINTS,
-    useImageViewer
+    useImageViewer,
 } from "../../services/ImageViewerService";
 
 // ============================================================================
@@ -101,8 +101,10 @@ const Header: React.FC<HeaderProps> = ({
 
   return (
     <Animated.View
-      style={[styles.header, { opacity }]}
-      pointerEvents={visible ? "auto" : "none"}
+      style={[
+        styles.header,
+        { opacity, pointerEvents: visible ? "auto" : "none" },
+      ]}
     >
       <TouchableOpacity style={styles.headerButton} onPress={onClose}>
         <Ionicons name="close" size={28} color={COLORS.white} />
@@ -169,8 +171,10 @@ const Footer: React.FC<FooterProps> = ({
 
   return (
     <Animated.View
-      style={[styles.footer, { opacity }]}
-      pointerEvents={visible ? "auto" : "none"}
+      style={[
+        styles.footer,
+        { opacity, pointerEvents: visible ? "auto" : "none" },
+      ]}
     >
       <TouchableOpacity style={styles.footerButton} onPress={onShare}>
         <Ionicons name="share-outline" size={26} color={COLORS.white} />
@@ -465,7 +469,7 @@ const ZoomableImage: React.FC<ZoomableImageProps> = ({
           }, DOUBLE_TAP_DELAY);
         }
       },
-    })
+    }),
   ).current;
 
   return (
@@ -627,7 +631,7 @@ export const ImageViewerScreen: React.FC<ImageViewerScreenProps> = ({
           },
         },
       ],
-      { cancelable: true }
+      { cancelable: true },
     );
   }, [viewer, images.length, handleClose]);
 

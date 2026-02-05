@@ -16,11 +16,8 @@ import * as FileSystem from "@/utils/FileSystemCompat";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import NetInfo, { NetInfoState } from "@react-native-community/netinfo";
 import { EventEmitter } from "events";
-import {
-    FileItem,
-    formatFileSize,
-    getFileType
-} from "./FileManagerService";
+import { Platform } from "react-native";
+import { FileItem, formatFileSize, getFileType } from "./FileManagerService";
 
 // ============================================================================
 // REACT HOOKS
@@ -201,6 +198,12 @@ class OfflineFileServiceClass extends EventEmitter {
   }
 
   private setupNetworkListener(): void {
+    // Skip on web - NetInfo doesn't work reliably on web
+    if (Platform.OS === "web") {
+      this.networkState = { isConnected: true } as NetInfoState;
+      return;
+    }
+
     NetInfo.addEventListener((state) => {
       const wasOnline = this.networkState?.isConnected;
       this.networkState = state;

@@ -9,12 +9,7 @@ import { Colors } from '@/constants/theme';
 import { useProjectBudget, useProjectData, useProjectTasks } from '@/context/project-data-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useProjectDetail } from '@/hooks/useProjects';
-import {
-    MOCK_DOCUMENTS,
-    MOCK_TEAM,
-    MOCK_WORKFLOW,
-    ProjectDetailService
-} from '@/services/projectDetailService';
+import { ProjectDetailService } from '@/services/projectDetailService';
 import { Ionicons } from '@expo/vector-icons';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
@@ -56,10 +51,10 @@ export default function ProjectDetailScreen() {
   const [showExpenseForm, setShowExpenseForm] = useState(false);
   const [showTaskForm, setShowTaskForm] = useState(false);
   
-  // State for API data - initialize with mock data immediately
-  const [workflowPhases, setWorkflowPhases] = useState<WorkflowPhase[]>(MOCK_WORKFLOW);
-  const [teamMembers, setTeamMembers] = useState<TeamMember[]>(MOCK_TEAM);
-  const [documents, setDocuments] = useState<ProjectDocument[]>(MOCK_DOCUMENTS);
+  // State for API data - start empty until real data arrives
+  const [workflowPhases, setWorkflowPhases] = useState<WorkflowPhase[]>([]);
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const [documents, setDocuments] = useState<ProjectDocument[]>([]);
   const [loadingDetails, setLoadingDetails] = useState(false); // Don't block on loading
 
   const { project, loading, error, refresh } = useProjectDetail(id ? parseInt(id) : null);
@@ -72,6 +67,7 @@ export default function ProjectDetailScreen() {
     if (!id) return;
     
     try {
+      setLoadingDetails(true);
       // Add timeout to prevent hanging
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 5000);
@@ -88,8 +84,8 @@ export default function ProjectDetailScreen() {
       setTeamMembers(teamRes.members);
       setDocuments(docsRes.documents);
     } catch (error) {
-      console.warn('Failed to fetch project details, using mock data:', error);
-      // Keep existing mock data
+      console.warn('Failed to fetch project details:', error);
+      // Keep existing data (may be empty)
     } finally {
       setLoadingDetails(false);
     }

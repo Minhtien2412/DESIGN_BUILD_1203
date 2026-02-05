@@ -1,34 +1,55 @@
 /**
  * useSocket Hook
- * React hook for Socket.IO integration
- * Based on FRONTEND-INTEGRATION-GUIDE.md
+ * React hook for unified Socket.IO integration
+ * @updated 2026-01-26
  */
 
-import socketManager, { ChatMessage, Notification, ProjectUpdate, TypingIndicator } from '@/services/socket';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { Platform } from 'react-native';
-import io from 'socket.io-client';
-
-// Extract Socket type from io return type
-type Socket = ReturnType<typeof io>;
+import { useAuth } from "@/context/AuthContext";
+import socketManager, {
+    CallEvent,
+    Message,
+    Notification,
+    SocketConfig,
+} from "@/services/socketManager";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Platform } from "react-native";
 
 // ============================================================================
 // Types
 // ============================================================================
 
+type SocketStatus =
+  | "disconnected"
+  | "connecting"
+  | "connected"
+  | "reconnecting"
+  | "error";
+
 export interface UseSocketReturn {
-  socket: Socket | null;
   connected: boolean;
-  connect: () => Promise<void>;
+  status: SocketStatus;
+  connect: () => void;
   disconnect: () => void;
 }
 
+export interface TypingIndicator {
+  chatId: string;
+  userId: string;
+  userName: string;
+  isTyping: boolean;
+}
+
 export interface UseChatReturn extends UseSocketReturn {
-  messages: ChatMessage[];
-  sendMessage: (content: string, type?: 'text' | 'image' | 'file') => void;
+  messages: Message[];
+  sendMessage: (
+    content: string,
+    type?: Message["type"],
+  ) => Promise<{ ok: boolean }>;
   typingUsers: TypingIndicator[];
   startTyping: () => void;
   stopTyping: () => void;
+  joinRoom: (roomId: string) => void;
+  leaveRoom: (roomId: string) => void;
 }
 
 // ============================================================================
@@ -39,49 +60,79 @@ export interface UseChatReturn extends UseSocketReturn {
  * Base hook for socket connection
  */
 export function useSocket(): UseSocketReturn {
-  const [socket, setSocket] = useState<Socket | null>(null);
+  const { user, accessToken } = useAuth();
   const [connected, setConnected] = useState(false);
+  const [status, setStatus] = useState<SocketStatus>("disconnected");
 
-  const connect = useCallback(async () => {
-    // Disable socket on web platform
-    if (Platform.OS === 'web') {
-      console.log('[useSocket] Socket disabled on web platform');
+  const connect = useCallback(() => {
+    // Skip socket on web in development (can enable in production)
+    if (Platform.OS === "web" && __DEV__) {
+      console.log("[useSocket] Socket disabled on web in development");
       return;
     }
 
-    try {
-      const socketInstance = await socketManager.connect();
-      setSocket(socketInstance);
-      setConnected(socketManager.isConnected());
-    } catch (error) {
-      console.error('[useSocket] Connection failed:', error);
+    if (!accessToken) {
+      console.warn("[useSocket] No access token available");
+      return;
     }
-  }, []);
+
+    const config: SocketConfig = {
+      token: accessToken,
+      userId: user?.id,
+      onConnect: () => {
+        setConnected(true);
+        setStatus("connected");
+      },
+      onDisconnect: () => {
+        setConnected(false);
+        setStatus("disconnected");
+      },
+      onReconnect: () => {
+        setConnected(true);
+        setStatus("connected");
+      },
+      onError: (error) => {
+        console.error("[useSocket] Error:", error);
+        setStatus("error");
+      },
+    };
+
+    socketManager.connect(config);
+  }, [accessToken, user?.id]);
 
   const disconnect = useCallback(() => {
     socketManager.disconnect();
-    setSocket(null);
     setConnected(false);
+    setStatus("disconnected");
   }, []);
 
+  // Listen to status changes
   useEffect(() => {
-    // Skip socket connection on web
-    if (Platform.OS === 'web') {
-      return;
+    const handleStatusChange = (newStatus: SocketStatus) => {
+      setStatus(newStatus);
+      setConnected(newStatus === "connected");
+    };
+
+    socketManager.on("statusChange", handleStatusChange);
+    return () => {
+      socketManager.off("statusChange", handleStatusChange);
+    };
+  }, []);
+
+  // Auto-connect when token is available
+  useEffect(() => {
+    if (accessToken && !socketManager.isConnected()) {
+      connect();
     }
 
-    // Auto-connect on mount
-    connect();
-
-    // Cleanup on unmount
     return () => {
-      disconnect();
+      // Don't disconnect on unmount - keep connection alive
     };
-  }, [connect, disconnect]);
+  }, [accessToken, connect]);
 
   return {
-    socket,
     connected,
+    status,
     connect,
     disconnect,
   };
@@ -92,96 +143,90 @@ export function useSocket(): UseSocketReturn {
 // ============================================================================
 
 /**
- * Hook for chat functionality in a project
+ * Hook for chat functionality
  */
-export function useChat(projectId: string): UseChatReturn {
-  const { socket, connected, connect, disconnect } = useSocket();
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+export function useChat(chatId: string): UseChatReturn {
+  const { connected, status, connect, disconnect } = useSocket();
+  const [messages, setMessages] = useState<Message[]>([]);
   const [typingUsers, setTypingUsers] = useState<TypingIndicator[]>([]);
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Join chat room when connected
   useEffect(() => {
-    if (!connected || !projectId) return;
+    if (!connected || !chatId) return;
 
-    socketManager.joinChat(projectId);
+    socketManager.joinRoom(chatId);
 
     return () => {
-      socketManager.leaveChat(projectId);
+      socketManager.leaveRoom(chatId);
     };
-  }, [connected, projectId]);
+  }, [connected, chatId]);
 
   // Listen for new messages
   useEffect(() => {
-    if (!connected) return;
-
-    const handleNewMessage = (message: ChatMessage) => {
-      if (message.projectId === projectId) {
-        setMessages(prev => [...prev, message]);
+    const handleNewMessage = (message: Message) => {
+      if (message.chatId === chatId) {
+        setMessages((prev) => [...prev, message]);
       }
     };
 
-    socketManager.onNewMessage(handleNewMessage);
+    socketManager.on("message", handleNewMessage);
 
     return () => {
-      socketManager.offNewMessage(handleNewMessage);
+      socketManager.off("message", handleNewMessage);
     };
-  }, [connected, projectId]);
+  }, [chatId]);
 
   // Listen for typing indicators
   useEffect(() => {
-    if (!connected) return;
-
     const handleTyping = (data: TypingIndicator) => {
-      if (data.projectId === projectId) {
-        setTypingUsers(prev => {
-          // Check if user is already typing
-          const exists = prev.some(u => u.userId === data.userId);
-          if (exists) return prev;
-          
-          // Add user to typing list
-          return [...prev, data];
+      if (data.chatId === chatId) {
+        setTypingUsers((prev) => {
+          if (data.isTyping) {
+            // Add user to typing list
+            const exists = prev.some((u) => u.userId === data.userId);
+            if (exists) return prev;
+            return [...prev, data];
+          } else {
+            // Remove user from typing list
+            return prev.filter((u) => u.userId !== data.userId);
+          }
         });
-
-        // Remove user from typing list after 3 seconds
-        setTimeout(() => {
-          setTypingUsers(prev => prev.filter(u => u.userId !== data.userId));
-        }, 3000);
       }
     };
 
-    socketManager.onTyping(handleTyping);
+    socketManager.on("typing", handleTyping);
 
     return () => {
-      socketManager.offTyping(handleTyping);
+      socketManager.off("typing", handleTyping);
     };
-  }, [connected, projectId]);
+  }, [chatId]);
 
   const sendMessage = useCallback(
-    (content: string, type: 'text' | 'image' | 'file' = 'text') => {
+    async (content: string, type: Message["type"] = "text") => {
       if (!connected) {
-        console.warn('[useChat] Cannot send message: not connected');
-        return;
+        console.warn("[useChat] Cannot send message: not connected");
+        return { ok: false };
       }
 
-      socketManager.sendMessage(projectId, content, type);
+      return socketManager.sendMessage(chatId, { type, body: content });
     },
-    [connected, projectId]
+    [connected, chatId],
   );
 
   const startTyping = useCallback(() => {
     if (!connected) return;
 
-    socketManager.startTyping(projectId);
+    socketManager.sendTyping(chatId, true);
 
     // Auto-stop typing after 5 seconds
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
     }
     typingTimeoutRef.current = setTimeout(() => {
-      socketManager.stopTyping(projectId);
+      socketManager.sendTyping(chatId, false);
     }, 5000);
-  }, [connected, projectId]);
+  }, [connected, chatId]);
 
   const stopTyping = useCallback(() => {
     if (!connected) return;
@@ -191,12 +236,20 @@ export function useChat(projectId: string): UseChatReturn {
       typingTimeoutRef.current = null;
     }
 
-    socketManager.stopTyping(projectId);
-  }, [connected, projectId]);
+    socketManager.sendTyping(chatId, false);
+  }, [connected, chatId]);
+
+  const joinRoom = useCallback((roomId: string) => {
+    socketManager.joinRoom(roomId);
+  }, []);
+
+  const leaveRoom = useCallback((roomId: string) => {
+    socketManager.leaveRoom(roomId);
+  }, []);
 
   return {
-    socket,
     connected,
+    status,
     connect,
     disconnect,
     messages,
@@ -204,6 +257,8 @@ export function useChat(projectId: string): UseChatReturn {
     typingUsers,
     startTyping,
     stopTyping,
+    joinRoom,
+    leaveRoom,
   };
 }
 
@@ -220,30 +275,27 @@ export interface UseNotificationsReturn extends UseSocketReturn {
  * Hook for real-time notifications
  */
 export function useNotifications(): UseNotificationsReturn {
-  const { socket, connected, connect, disconnect } = useSocket();
+  const { connected, status, connect, disconnect } = useSocket();
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
   // Listen for new notifications
   useEffect(() => {
-    // Skip on web or if not connected
-    if (Platform.OS === 'web' || !connected) return;
-
     const handleNotification = (notification: Notification) => {
-      setNotifications(prev => [notification, ...prev]);
+      setNotifications((prev) => [notification, ...prev]);
     };
 
-    socketManager.onNotification(handleNotification);
+    socketManager.on("notification", handleNotification);
 
     return () => {
-      socketManager.offNotification(handleNotification);
+      socketManager.off("notification", handleNotification);
     };
-  }, [connected]);
+  }, []);
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
   return {
-    socket,
     connected,
+    status,
     connect,
     disconnect,
     notifications,
@@ -252,54 +304,93 @@ export function useNotifications(): UseNotificationsReturn {
 }
 
 // ============================================================================
-// useProjectUpdates - Project updates hook
+// useCall - Call functionality hook
 // ============================================================================
 
-export interface UseProjectUpdatesReturn extends UseSocketReturn {
-  updates: ProjectUpdate[];
+export interface UseCallReturn extends UseSocketReturn {
+  incomingCall: CallEvent | null;
+  initiateCall: (
+    receiverId: string,
+    type: "audio" | "video",
+  ) => Promise<{ ok: boolean; callId?: string; roomName?: string }>;
+  acceptCall: (callId: string) => void;
+  rejectCall: (callId: string) => void;
+  endCall: (callId: string) => void;
 }
 
 /**
- * Hook for real-time project updates
+ * Hook for call functionality
  */
-export function useProjectUpdates(projectId: string): UseProjectUpdatesReturn {
-  const { socket, connected, connect, disconnect } = useSocket();
-  const [updates, setUpdates] = useState<ProjectUpdate[]>([]);
+export function useCall(): UseCallReturn {
+  const { connected, status, connect, disconnect } = useSocket();
+  const [incomingCall, setIncomingCall] = useState<CallEvent | null>(null);
 
-  // Subscribe to project updates
+  // Listen for call events
   useEffect(() => {
-    if (!connected || !projectId) return;
+    const handleIncomingCall = (data: CallEvent) => {
+      setIncomingCall(data);
+    };
 
-    socketManager.subscribeToProject(projectId);
+    const handleCallEnded = () => {
+      setIncomingCall(null);
+    };
+
+    const handleCallAccepted = () => {
+      setIncomingCall(null);
+    };
+
+    const handleCallRejected = () => {
+      setIncomingCall(null);
+    };
+
+    socketManager.on("callIncoming", handleIncomingCall);
+    socketManager.on("callEnded", handleCallEnded);
+    socketManager.on("callAccepted", handleCallAccepted);
+    socketManager.on("callRejected", handleCallRejected);
 
     return () => {
-      socketManager.unsubscribeFromProject(projectId);
+      socketManager.off("callIncoming", handleIncomingCall);
+      socketManager.off("callEnded", handleCallEnded);
+      socketManager.off("callAccepted", handleCallAccepted);
+      socketManager.off("callRejected", handleCallRejected);
     };
-  }, [connected, projectId]);
+  }, []);
 
-  // Listen for project updates
-  useEffect(() => {
-    if (!connected) return;
-
-    const handleUpdate = (update: ProjectUpdate) => {
-      if (update.projectId === projectId) {
-        setUpdates(prev => [update, ...prev]);
+  const initiateCall = useCallback(
+    async (receiverId: string, type: "audio" | "video") => {
+      if (!connected) {
+        return { ok: false };
       }
-    };
+      return socketManager.initiateCall(receiverId, type);
+    },
+    [connected],
+  );
 
-    socketManager.onProjectUpdate(handleUpdate);
+  const acceptCall = useCallback((callId: string) => {
+    socketManager.acceptCall(callId);
+    setIncomingCall(null);
+  }, []);
 
-    return () => {
-      socketManager.offProjectUpdate(handleUpdate);
-    };
-  }, [connected, projectId]);
+  const rejectCall = useCallback((callId: string) => {
+    socketManager.rejectCall(callId);
+    setIncomingCall(null);
+  }, []);
+
+  const endCall = useCallback((callId: string) => {
+    socketManager.endCall(callId);
+    setIncomingCall(null);
+  }, []);
 
   return {
-    socket,
     connected,
+    status,
     connect,
     disconnect,
-    updates,
+    incomingCall,
+    initiateCall,
+    acceptCall,
+    rejectCall,
+    endCall,
   };
 }
 
@@ -307,4 +398,5 @@ export function useProjectUpdates(projectId: string): UseProjectUpdatesReturn {
 // Export
 // ============================================================================
 
+export type { CallEvent, Message, Notification };
 export default useSocket;

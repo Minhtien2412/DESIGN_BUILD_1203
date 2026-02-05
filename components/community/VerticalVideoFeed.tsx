@@ -4,28 +4,26 @@
  *
  * Full-screen vertical video feed with swipe up/down navigation.
  * Features:
- * - Full-screen video playback
+ * - Full-screen video playback with advanced gestures
  * - Swipe up to next video, swipe down to previous
+ * - Double tap to seek ±10s
+ * - Long press for 2x speed
+ * - Pinch to zoom
  * - Auto-play current video, pause others
  * - Video info overlay (title, description, author)
  * - Like, comment, share actions
- * - Close button to return
  *
  * @author ThietKeResort Team
  * @created 2026-01-22
+ * @updated 2026-01-24 - Added advanced gesture controls
  */
 
-import { Ionicons } from "@expo/vector-icons";
-import { AVPlaybackStatus, ResizeMode, Video } from "expo-av";
 import * as Haptics from "expo-haptics";
-import { Image } from "expo-image";
-import { LinearGradient } from "expo-linear-gradient";
 import React, {
     createContext,
     memo,
     useCallback,
     useContext,
-    useEffect,
     useMemo,
     useRef,
     useState,
@@ -35,26 +33,17 @@ import {
     FlatList,
     Modal,
     Platform,
-    Pressable,
     StatusBar,
     StyleSheet,
     Text,
-    TouchableOpacity,
     View,
     ViewToken,
 } from "react-native";
-import Animated, {
-    FadeIn,
-    FadeOut,
-    useAnimatedStyle,
-    useSharedValue,
-    withTiming,
-} from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-// Import CommentsSheet hook - will be used in VideoItemCard
-// Note: This is imported here to avoid circular dependencies
+// Import CommentsSheet hook and AdvancedVideoPlayer
+import { AdvancedVideoPlayer, VideoData } from "./AdvancedVideoPlayer";
 import { CommentsSheetProvider, useCommentsSheet } from "./CommentsSheet";
+import { ShareSheetProvider, useShareSheet } from "./ShareSheet";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
@@ -92,18 +81,27 @@ interface VerticalVideoFeedContextType {
 const VerticalVideoFeedContext =
   createContext<VerticalVideoFeedContextType | null>(null);
 
-export function useVerticalVideoFeed() {
+// Noop fallback when provider is not available
+const noopVerticalVideoFeed: VerticalVideoFeedContextType = {
+  open: () => console.warn("[VerticalVideoFeed] Provider not available"),
+  close: () => {},
+  isOpen: false,
+};
+
+export function useVerticalVideoFeed(): VerticalVideoFeedContextType {
   const ctx = useContext(VerticalVideoFeedContext);
+  // Return noop fallback instead of throwing to prevent crashes during hydration
   if (!ctx) {
-    throw new Error(
-      "useVerticalVideoFeed must be used within VerticalVideoFeedProvider",
-    );
+    if (__DEV__) {
+      console.warn("[VerticalVideoFeed] useVerticalVideoFeed called outside of VerticalVideoFeedProvider");
+    }
+    return noopVerticalVideoFeed;
   }
   return ctx;
 }
 
 // ============================================
-// Single Video Item Component
+// Single Video Item Component (uses AdvancedVideoPlayer)
 // ============================================
 interface VideoItemCardProps {
   item: VideoItem;
@@ -113,100 +111,30 @@ interface VideoItemCardProps {
 
 const VideoItemCard = memo(
   ({ item, isVisible, onClose }: VideoItemCardProps) => {
-    const videoRef = useRef<Video>(null);
     const commentsSheet = useCommentsSheet();
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [isMuted, setIsMuted] = useState(false);
-    const [showControls, setShowControls] = useState(true);
-    const [progress, setProgress] = useState(0);
-    const [duration, setDuration] = useState(0);
-    const [isLiked, setIsLiked] = useState(false);
-    const [commentsCount, setCommentsCount] = useState(item.comments || 0);
-    const controlsTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-    const progressWidth = useSharedValue(0);
-    const insets = useSafeAreaInsets();
+    const shareSheet = useShareSheet();
 
-    // Auto-play when visible
-    useEffect(() => {
-      if (isVisible) {
-        videoRef.current?.playAsync();
-      } else {
-        videoRef.current?.pauseAsync();
-        videoRef.current?.setPositionAsync(0);
-      }
-    }, [isVisible]);
-
-    // Auto-hide controls
-    useEffect(() => {
-      if (isPlaying && showControls) {
-        controlsTimer.current = setTimeout(() => {
-          setShowControls(false);
-        }, 3000);
-      }
-      return () => {
-        if (controlsTimer.current) {
-          clearTimeout(controlsTimer.current);
-        }
-      };
-    }, [isPlaying, showControls]);
-
-    const handlePlaybackStatusUpdate = useCallback(
-      (status: AVPlaybackStatus) => {
-        if (!status.isLoaded) return;
-
-        setIsPlaying(status.isPlaying);
-
-        if (status.durationMillis) {
-          setDuration(status.durationMillis / 1000);
-        }
-
-        if (status.durationMillis && status.positionMillis) {
-          const newProgress = status.positionMillis / status.durationMillis;
-          setProgress(newProgress);
-          progressWidth.value = withTiming(newProgress * 100, {
-            duration: 100,
-          });
-        }
-
-        // Loop video
-        if (status.didJustFinish) {
-          videoRef.current?.setPositionAsync(0);
-          videoRef.current?.playAsync();
-        }
-      },
-      [progressWidth],
+    // Convert VideoItem to VideoData format
+    const videoData: VideoData = useMemo(
+      () => ({
+        id: item.id,
+        videoUrl: item.videoUrl,
+        thumbnailUrl: item.thumbnailUrl,
+        title: item.title,
+        description: item.description,
+        author: item.author,
+        duration: item.duration,
+        views: item.views,
+        likes: item.likes,
+        comments: item.comments,
+        shares: item.shares,
+      }),
+      [item],
     );
-
-    const handleTap = useCallback(() => {
-      setShowControls(true);
-      if (controlsTimer.current) {
-        clearTimeout(controlsTimer.current);
-      }
-
-      if (isPlaying) {
-        videoRef.current?.pauseAsync();
-      } else {
-        videoRef.current?.playAsync();
-      }
-    }, [isPlaying]);
-
-    const handleMuteToggle = useCallback(() => {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      setIsMuted(!isMuted);
-      videoRef.current?.setIsMutedAsync(!isMuted);
-    }, [isMuted]);
-
-    const handleLike = useCallback(() => {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-      setIsLiked(!isLiked);
-    }, [isLiked]);
 
     const handleComment = useCallback(() => {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      // Pause video when opening comments
-      videoRef.current?.pauseAsync();
 
-      // Open comments sheet
       commentsSheet.open({
         contentId: item.id,
         contentType: "video",
@@ -219,7 +147,6 @@ const VideoItemCard = memo(
           rating?: number;
         }) => {
           console.log("New comment:", comment);
-          setCommentsCount((prev) => prev + 1);
         },
         onCommentLike: (commentId: string) => {
           console.log("Liked comment:", commentId);
@@ -229,180 +156,42 @@ const VideoItemCard = memo(
 
     const handleShare = useCallback(() => {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      // TODO: Share video
+
+      shareSheet.open({
+        item: {
+          id: item.id,
+          type: "video",
+          title: item.title || "Video",
+          description: item.description || "",
+          url: item.videoUrl,
+          imageUrl: item.thumbnailUrl,
+        },
+        onShare: (platform) => {
+          console.log(`Shared video via ${platform}:`, item.id);
+        },
+        onCopyLink: () => {
+          console.log("Link copied for video:", item.id);
+        },
+      });
+    }, [item, shareSheet]);
+
+    const handleLike = useCallback(() => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      // Handle like action
     }, []);
-
-    const formatNumber = (num?: number): string => {
-      if (!num) return "0";
-      if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
-      if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
-      return num.toString();
-    };
-
-    const formatDuration = (seconds: number): string => {
-      const mins = Math.floor(seconds / 60);
-      const secs = Math.floor(seconds % 60);
-      return `${mins}:${secs.toString().padStart(2, "0")}`;
-    };
-
-    const progressStyle = useAnimatedStyle(() => ({
-      width: `${progressWidth.value}%`,
-    }));
 
     return (
       <View style={[styles.videoItemContainer, { height: SCREEN_HEIGHT }]}>
-        {/* Video */}
-        <Video
-          ref={videoRef}
-          source={{ uri: item.videoUrl }}
-          style={styles.fullScreenVideo}
-          resizeMode={ResizeMode.CONTAIN}
-          shouldPlay={false}
-          isLooping
-          isMuted={isMuted}
-          onPlaybackStatusUpdate={handlePlaybackStatusUpdate}
-          posterSource={
-            item.thumbnailUrl ? { uri: item.thumbnailUrl } : undefined
-          }
-          usePoster={!!item.thumbnailUrl}
-          posterStyle={styles.videoPoster}
+        <AdvancedVideoPlayer
+          video={videoData}
+          isVisible={isVisible}
+          autoPlay={true}
+          onClose={onClose}
+          onLike={handleLike}
+          onComment={handleComment}
+          onShare={handleShare}
+          showOverlay={true}
         />
-
-        {/* Tap Area */}
-        <Pressable style={styles.tapArea} onPress={handleTap}>
-          {/* Play/Pause Indicator */}
-          {!isPlaying && showControls && (
-            <Animated.View
-              style={styles.playIndicator}
-              entering={FadeIn.duration(150)}
-              exiting={FadeOut.duration(150)}
-            >
-              <View style={styles.playButton}>
-                <Ionicons name="play" size={50} color="white" />
-              </View>
-            </Animated.View>
-          )}
-        </Pressable>
-
-        {/* Top Gradient & Header */}
-        <LinearGradient
-          colors={["rgba(0,0,0,0.6)", "transparent"]}
-          style={[styles.topGradient, { paddingTop: insets.top }]}
-          pointerEvents="box-none"
-        >
-          <View style={styles.header}>
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={onClose}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            >
-              <Ionicons name="close" size={28} color="white" />
-            </TouchableOpacity>
-
-            <Text style={styles.headerTitle} numberOfLines={1}>
-              {item.title || "Video"}
-            </Text>
-
-            <TouchableOpacity
-              style={styles.muteButton}
-              onPress={handleMuteToggle}
-            >
-              <Ionicons
-                name={isMuted ? "volume-mute" : "volume-high"}
-                size={24}
-                color="white"
-              />
-            </TouchableOpacity>
-          </View>
-        </LinearGradient>
-
-        {/* Bottom Gradient & Info */}
-        <LinearGradient
-          colors={["transparent", "rgba(0,0,0,0.7)"]}
-          style={[styles.bottomGradient, { paddingBottom: insets.bottom + 20 }]}
-          pointerEvents="box-none"
-        >
-          {/* Video Info */}
-          <View style={styles.videoInfo}>
-            {/* Author */}
-            {item.author && (
-              <View style={styles.authorRow}>
-                {item.author.avatar ? (
-                  <Image
-                    source={{ uri: item.author.avatar }}
-                    style={styles.authorAvatar}
-                    contentFit="cover"
-                  />
-                ) : (
-                  <View style={styles.authorAvatarPlaceholder}>
-                    <Ionicons name="person" size={16} color="white" />
-                  </View>
-                )}
-                <Text style={styles.authorName}>{item.author.name}</Text>
-                <TouchableOpacity style={styles.followButton}>
-                  <Text style={styles.followButtonText}>Theo dõi</Text>
-                </TouchableOpacity>
-              </View>
-            )}
-
-            {/* Description */}
-            {item.description && (
-              <Text style={styles.description} numberOfLines={2}>
-                {item.description}
-              </Text>
-            )}
-
-            {/* Stats */}
-            <View style={styles.statsRow}>
-              <View style={styles.statItem}>
-                <Ionicons name="eye" size={14} color="rgba(255,255,255,0.8)" />
-                <Text style={styles.statText}>{formatNumber(item.views)}</Text>
-              </View>
-              {duration > 0 && (
-                <View style={styles.statItem}>
-                  <Ionicons
-                    name="time"
-                    size={14}
-                    color="rgba(255,255,255,0.8)"
-                  />
-                  <Text style={styles.statText}>
-                    {formatDuration(duration)}
-                  </Text>
-                </View>
-              )}
-            </View>
-          </View>
-
-          {/* Progress Bar */}
-          <View style={styles.progressBar}>
-            <Animated.View style={[styles.progressFill, progressStyle]} />
-          </View>
-        </LinearGradient>
-
-        {/* Right Side Actions */}
-        <View style={[styles.actionsColumn, { bottom: insets.bottom + 100 }]}>
-          {/* Like */}
-          <TouchableOpacity style={styles.actionButton} onPress={handleLike}>
-            <Ionicons
-              name={isLiked ? "heart" : "heart-outline"}
-              size={32}
-              color={isLiked ? "#FF2D55" : "white"}
-            />
-            <Text style={styles.actionText}>{formatNumber(item.likes)}</Text>
-          </TouchableOpacity>
-
-          {/* Comment */}
-          <TouchableOpacity style={styles.actionButton} onPress={handleComment}>
-            <Ionicons name="chatbubble-outline" size={30} color="white" />
-            <Text style={styles.actionText}>{formatNumber(commentsCount)}</Text>
-          </TouchableOpacity>
-
-          {/* Share */}
-          <TouchableOpacity style={styles.actionButton} onPress={handleShare}>
-            <Ionicons name="share-social-outline" size={30} color="white" />
-            <Text style={styles.actionText}>{formatNumber(item.shares)}</Text>
-          </TouchableOpacity>
-        </View>
       </View>
     );
   },
@@ -501,51 +290,53 @@ export function VerticalVideoFeedProvider({
         statusBarTranslucent
         onRequestClose={close}
       >
-        <CommentsSheetProvider>
-          <StatusBar
-            barStyle="light-content"
-            backgroundColor="transparent"
-            translucent
-          />
-          <View style={styles.modalContainer}>
-            <FlatList
-              ref={flatListRef}
-              data={videos}
-              renderItem={renderItem}
-              keyExtractor={keyExtractor}
-              pagingEnabled
-              showsVerticalScrollIndicator={false}
-              snapToInterval={SCREEN_HEIGHT}
-              snapToAlignment="start"
-              decelerationRate="fast"
-              getItemLayout={getItemLayout}
-              viewabilityConfig={viewabilityConfig}
-              onViewableItemsChanged={onViewableItemsChanged}
-              initialScrollIndex={currentIndex}
-              onScrollToIndexFailed={(info) => {
-                setTimeout(() => {
-                  flatListRef.current?.scrollToIndex({
-                    index: info.index,
-                    animated: false,
-                  });
-                }, 100);
-              }}
-              removeClippedSubviews={Platform.OS === "android"}
-              maxToRenderPerBatch={3}
-              windowSize={5}
-              initialNumToRender={1}
+        <ShareSheetProvider>
+          <CommentsSheetProvider>
+            <StatusBar
+              barStyle="light-content"
+              backgroundColor="transparent"
+              translucent
             />
+            <View style={styles.modalContainer}>
+              <FlatList
+                ref={flatListRef}
+                data={videos}
+                renderItem={renderItem}
+                keyExtractor={keyExtractor}
+                pagingEnabled
+                showsVerticalScrollIndicator={false}
+                snapToInterval={SCREEN_HEIGHT}
+                snapToAlignment="start"
+                decelerationRate="fast"
+                getItemLayout={getItemLayout}
+                viewabilityConfig={viewabilityConfig}
+                onViewableItemsChanged={onViewableItemsChanged}
+                initialScrollIndex={currentIndex}
+                onScrollToIndexFailed={(info) => {
+                  setTimeout(() => {
+                    flatListRef.current?.scrollToIndex({
+                      index: info.index,
+                      animated: false,
+                    });
+                  }, 100);
+                }}
+                removeClippedSubviews={Platform.OS === "android"}
+                maxToRenderPerBatch={3}
+                windowSize={5}
+                initialNumToRender={1}
+              />
 
-            {/* Page Indicator */}
-            {videos.length > 1 && (
-              <View style={styles.pageIndicator}>
-                <Text style={styles.pageText}>
-                  {currentIndex + 1} / {videos.length}
-                </Text>
-              </View>
-            )}
-          </View>
-        </CommentsSheetProvider>
+              {/* Page Indicator */}
+              {videos.length > 1 && (
+                <View style={styles.pageIndicator}>
+                  <Text style={styles.pageText}>
+                    {currentIndex + 1} / {videos.length}
+                  </Text>
+                </View>
+              )}
+            </View>
+          </CommentsSheetProvider>
+        </ShareSheetProvider>
       </Modal>
     </VerticalVideoFeedContext.Provider>
   );
@@ -562,165 +353,6 @@ const styles = StyleSheet.create({
   videoItemContainer: {
     width: SCREEN_WIDTH,
     backgroundColor: "#000",
-  },
-  fullScreenVideo: {
-    width: "100%",
-    height: "100%",
-  },
-  videoPoster: {
-    width: "100%",
-    height: "100%",
-    resizeMode: "contain",
-  },
-  tapArea: {
-    ...StyleSheet.absoluteFillObject,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  playIndicator: {
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  playButton: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-    paddingLeft: 6,
-  },
-  topGradient: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 120,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingTop: 8,
-  },
-  closeButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "rgba(0,0,0,0.3)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  headerTitle: {
-    flex: 1,
-    fontSize: 16,
-    fontWeight: "600",
-    color: "white",
-    marginHorizontal: 12,
-  },
-  muteButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "rgba(0,0,0,0.3)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  bottomGradient: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    paddingHorizontal: 16,
-    paddingTop: 40,
-  },
-  videoInfo: {
-    marginBottom: 12,
-    paddingRight: 70, // Space for action buttons
-  },
-  authorRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 8,
-  },
-  authorAvatar: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    borderWidth: 2,
-    borderColor: "white",
-  },
-  authorAvatarPlaceholder: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: "rgba(255,255,255,0.2)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  authorName: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "white",
-    marginLeft: 10,
-  },
-  followButton: {
-    marginLeft: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 4,
-    borderWidth: 1,
-    borderColor: "white",
-  },
-  followButtonText: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: "white",
-  },
-  description: {
-    fontSize: 14,
-    color: "rgba(255,255,255,0.9)",
-    lineHeight: 20,
-    marginBottom: 8,
-  },
-  statsRow: {
-    flexDirection: "row",
-    gap: 16,
-  },
-  statItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-  },
-  statText: {
-    fontSize: 13,
-    color: "rgba(255,255,255,0.8)",
-  },
-  progressBar: {
-    height: 3,
-    backgroundColor: "rgba(255,255,255,0.3)",
-    borderRadius: 1.5,
-    overflow: "hidden",
-  },
-  progressFill: {
-    height: "100%",
-    backgroundColor: "white",
-    borderRadius: 1.5,
-  },
-  actionsColumn: {
-    position: "absolute",
-    right: 12,
-    alignItems: "center",
-    gap: 20,
-  },
-  actionButton: {
-    alignItems: "center",
-    gap: 4,
-  },
-  actionText: {
-    fontSize: 12,
-    color: "white",
-    fontWeight: "500",
   },
   pageIndicator: {
     position: "absolute",

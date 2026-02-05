@@ -1,17 +1,21 @@
 /**
  * TikTok Video Card Component
  * Fullscreen video card with user info and action buttons
- * 
+ *
+ * Uses VideoPlayerController to ensure only 1 video plays at a time
+ *
  * @author AI Assistant
  * @date 23/12/2025
+ * @updated 29/01/2026 - Integrated VideoPlayerController for single video playback
  */
 
-import { useTikTok } from '@/context/TikTokContext';
-import { TikTokVideo } from '@/types/tiktok';
-import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
-import { useVideoPlayer, VideoView } from 'expo-video';
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { useTikTok } from "@/context/TikTokContext";
+import { useVideoPlayback } from "@/hooks/useVideoPlayback";
+import { TikTokVideo } from "@/types/tiktok";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { useVideoPlayer, VideoView } from "expo-video";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import {
     Dimensions,
     Image,
@@ -19,12 +23,12 @@ import {
     StyleSheet,
     Text,
     TouchableOpacity,
-    View
-} from 'react-native';
-import { DoubleTapHeart } from './DoubleTapHeart';
-import { TikTokActionBar } from './TikTokActionBar';
+    View,
+} from "react-native";
+import { DoubleTapHeart } from "./DoubleTapHeart";
+import { TikTokActionBar } from "./TikTokActionBar";
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 interface TikTokVideoCardProps {
   video: TikTokVideo;
@@ -58,20 +62,31 @@ export const TikTokVideoCard = memo(function TikTokVideoCard({
   const [heartPosition, setHeartPosition] = useState({ x: 0, y: 0 });
   const lastTap = useRef<number>(0);
 
+  // Use centralized video playback controller
+  const { registerPlayer, play, pause } = useVideoPlayback(video.id);
+
   // Video player
   const player = useVideoPlayer(video.videoUrl, (p) => {
     p.loop = true;
     p.muted = state.isMuted;
   });
 
-  // Control playback based on active state
+  // Register player with controller
+  useEffect(() => {
+    if (player) {
+      registerPlayer(player);
+    }
+  }, [player, registerPlayer]);
+
+  // Control playback based on active state - uses VideoPlayerController
   useEffect(() => {
     if (isActive) {
-      player.play();
+      // Play through controller - ensures only 1 video plays
+      play();
     } else {
-      player.pause();
+      pause();
     }
-  }, [isActive, player]);
+  }, [isActive, play, pause]);
 
   // Sync mute state
   useEffect(() => {
@@ -79,25 +94,28 @@ export const TikTokVideoCard = memo(function TikTokVideoCard({
   }, [state.isMuted, player]);
 
   // Double tap to like
-  const handleDoubleTap = useCallback((event: any) => {
-    const now = Date.now();
-    const DOUBLE_TAP_DELAY = 300;
+  const handleDoubleTap = useCallback(
+    (event: any) => {
+      const now = Date.now();
+      const DOUBLE_TAP_DELAY = 300;
 
-    if (now - lastTap.current < DOUBLE_TAP_DELAY) {
-      // Double tap detected
-      const { locationX, locationY } = event.nativeEvent;
-      setHeartPosition({ x: locationX, y: locationY });
-      setShowHeart(true);
+      if (now - lastTap.current < DOUBLE_TAP_DELAY) {
+        // Double tap detected
+        const { locationX, locationY } = event.nativeEvent;
+        setHeartPosition({ x: locationX, y: locationY });
+        setShowHeart(true);
 
-      if (!isVideoLiked(video.id)) {
-        likeVideo(video.id);
+        if (!isVideoLiked(video.id)) {
+          likeVideo(video.id);
+        }
+
+        setTimeout(() => setShowHeart(false), 1000);
       }
 
-      setTimeout(() => setShowHeart(false), 1000);
-    }
-
-    lastTap.current = now;
-  }, [video.id, isVideoLiked, likeVideo]);
+      lastTap.current = now;
+    },
+    [video.id, isVideoLiked, likeVideo],
+  );
 
   // Single tap to toggle play/pause
   const handleSingleTap = useCallback(() => {
@@ -115,10 +133,7 @@ export const TikTokVideoCard = memo(function TikTokVideoCard({
   return (
     <View style={styles.container}>
       {/* Video */}
-      <Pressable 
-        style={styles.videoContainer} 
-        onPress={handleDoubleTap}
-      >
+      <Pressable style={styles.videoContainer} onPress={handleDoubleTap}>
         <VideoView
           style={styles.video}
           player={player}
@@ -134,27 +149,24 @@ export const TikTokVideoCard = memo(function TikTokVideoCard({
 
       {/* Bottom gradient */}
       <LinearGradient
-        colors={['transparent', 'rgba(0,0,0,0.3)', 'rgba(0,0,0,0.7)']}
-        style={[styles.bottomGradient, { pointerEvents: 'none' }]}
+        colors={["transparent", "rgba(0,0,0,0.3)", "rgba(0,0,0,0.7)"]}
+        style={[styles.bottomGradient, { pointerEvents: "none" }]}
       />
 
       {/* Video Info */}
       <View style={styles.videoInfo}>
         {/* Author */}
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.authorRow}
           onPress={() => onUserPress?.(video.author.id)}
         >
-          <Image 
-            source={{ uri: video.author.avatar }} 
-            style={styles.avatar}
-          />
+          <Image source={{ uri: video.author.avatar }} style={styles.avatar} />
           <Text style={styles.username}>@{video.author.username}</Text>
           {video.author.verified && (
             <Ionicons name="checkmark-circle" size={14} color="#20D5EC" />
           )}
           {!following && (
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.followButton}
               onPress={() => followUser(video.author.id)}
             >
@@ -171,10 +183,7 @@ export const TikTokVideoCard = memo(function TikTokVideoCard({
         {/* Hashtags */}
         <View style={styles.hashtagsRow}>
           {video.hashtags.slice(0, 3).map((tag, index) => (
-            <TouchableOpacity 
-              key={index}
-              onPress={() => onHashtagPress?.(tag)}
-            >
+            <TouchableOpacity key={index} onPress={() => onHashtagPress?.(tag)}>
               <Text style={styles.hashtag}>#{tag}</Text>
             </TouchableOpacity>
           ))}
@@ -182,7 +191,7 @@ export const TikTokVideoCard = memo(function TikTokVideoCard({
 
         {/* Music */}
         {video.music && (
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.musicRow}
             onPress={() => video.music && onMusicPress?.(video.music.id)}
           >
@@ -191,8 +200,8 @@ export const TikTokVideoCard = memo(function TikTokVideoCard({
               {video.music.name} - {video.music.artist}
             </Text>
             <View style={styles.musicDisc}>
-              <Image 
-                source={{ uri: video.music.coverUrl || video.author.avatar }} 
+              <Image
+                source={{ uri: video.music.coverUrl || video.author.avatar }}
                 style={styles.musicDiscImage}
               />
             </View>
@@ -213,14 +222,11 @@ export const TikTokVideoCard = memo(function TikTokVideoCard({
       />
 
       {/* Mute indicator */}
-      <TouchableOpacity 
-        style={styles.muteButton}
-        onPress={toggleMute}
-      >
-        <Ionicons 
-          name={state.isMuted ? 'volume-mute' : 'volume-high'} 
-          size={20} 
-          color="white" 
+      <TouchableOpacity style={styles.muteButton} onPress={toggleMute}>
+        <Ionicons
+          name={state.isMuted ? "volume-mute" : "volume-high"}
+          size={20}
+          color="white"
         />
       </TouchableOpacity>
     </View>
@@ -231,31 +237,31 @@ const styles = StyleSheet.create({
   container: {
     width: SCREEN_WIDTH,
     height: SCREEN_HEIGHT,
-    backgroundColor: '#000',
+    backgroundColor: "#000",
   },
   videoContainer: {
     ...StyleSheet.absoluteFillObject,
   },
   video: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
   bottomGradient: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
     height: 300,
   },
   videoInfo: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 100,
     left: 16,
     right: 100,
   },
   authorRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 12,
   },
   avatar: {
@@ -263,50 +269,50 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
     borderWidth: 2,
-    borderColor: 'white',
+    borderColor: "white",
     marginRight: 10,
   },
   username: {
-    color: 'white',
+    color: "white",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginRight: 4,
   },
   followButton: {
-    backgroundColor: '#FE2C55',
+    backgroundColor: "#FE2C55",
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 4,
     marginLeft: 10,
   },
   followText: {
-    color: 'white',
+    color: "white",
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   caption: {
-    color: 'white',
+    color: "white",
     fontSize: 14,
     lineHeight: 20,
     marginBottom: 8,
   },
   hashtagsRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     marginBottom: 8,
   },
   hashtag: {
-    color: 'white',
+    color: "white",
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
     marginRight: 8,
   },
   musicRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   musicText: {
-    color: 'white',
+    color: "white",
     fontSize: 13,
     marginLeft: 6,
     flex: 1,
@@ -315,24 +321,24 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#333',
+    backgroundColor: "#333",
     marginLeft: 10,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   musicDiscImage: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
   muteButton: {
-    position: 'absolute',
+    position: "absolute",
     top: 60,
     right: 16,
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 

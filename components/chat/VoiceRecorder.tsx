@@ -7,13 +7,19 @@
  * - Playback preview before sending
  * - Duration limit (default 2 min)
  *
+ * Uses audioWrapper for compatibility with future expo-audio migration
+ *
  * @author ThietKeResort Team
  * @created 2026-01-22
+ * @updated 2026-01-26 - Migrated to audioWrapper
  */
 
 import { useThemeColor } from "@/hooks/use-theme-color";
+import {
+    AudioPlayer,
+    AudioRecorder as AudioRecorderUtil,
+} from "@/utils/audioWrapper";
 import { Ionicons } from "@expo/vector-icons";
-import { Audio } from "expo-av";
 import * as Haptics from "expo-haptics";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -63,58 +69,41 @@ export function VoiceRecorder({
   const [waveform, setWaveform] = useState<number[]>([]);
 
   // Refs
-  const recordingRef = useRef<Audio.Recording | null>(null);
-  const soundRef = useRef<Audio.Sound | null>(null);
-  const durationIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const waveformIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const recorderRef = useRef<AudioRecorderUtil | null>(null);
+  const playerRef = useRef<AudioPlayer | null>(null);
+  const recordingUriRef = useRef<string | null>(null);
+  const durationIntervalRef = useRef<ReturnType<typeof setInterval> | null>(
+    null,
+  );
+  const waveformIntervalRef = useRef<ReturnType<typeof setInterval> | null>(
+    null,
+  );
   const pulseAnim = useRef(new Animated.Value(1)).current;
-
-  // ============================================
-  // Permissions
-  // ============================================
-
-  const requestPermissions = async (): Promise<boolean> => {
-    try {
-      const { status } = await Audio.requestPermissionsAsync();
-      if (status !== "granted") {
-        Alert.alert(
-          "Cần quyền truy cập",
-          "Vui lòng cấp quyền microphone để ghi âm",
-          [{ text: "OK" }],
-        );
-        return false;
-      }
-
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
-        playsInSilentModeIOS: true,
-      });
-
-      return true;
-    } catch (error) {
-      console.error("Error requesting permissions:", error);
-      return false;
-    }
-  };
 
   // ============================================
   // Recording Logic
   // ============================================
 
   const startRecording = useCallback(async () => {
-    if (!(await requestPermissions())) return;
-
     try {
-      // Clean up any existing recording
-      if (recordingRef.current) {
-        await recordingRef.current.stopAndUnloadAsync();
+      // Create new recorder
+      recorderRef.current = new AudioRecorderUtil({
+        maxDuration,
+        onRecordingStatusUpdate: (status) => {
+          setDuration(Math.floor(status.durationMillis / 1000));
+        },
+      });
+
+      const started = await recorderRef.current.start();
+      if (!started) {
+        Alert.alert(
+          "Cần quyền truy cập",
+          "Vui lòng cấp quyền microphone để ghi âm",
+          [{ text: "OK" }],
+        );
+        return;
       }
 
-      // Start new recording
-      const { recording } = await Audio.Recording.createAsync(
-        Audio.RecordingOptionsPresets.HIGH_QUALITY,
-      );
-      recordingRef.current = recording;
       setState("recording");
       setDuration(0);
       setWaveform([]);
@@ -124,17 +113,6 @@ export function VoiceRecorder({
 
       // Start pulse animation
       startPulseAnimation();
-
-      // Update duration
-      durationIntervalRef.current = setInterval(() => {
-        setDuration((d) => {
-          if (d >= maxDuration) {
-            stopRecording();
-            return d;
-          }
-          return d + 1;
-        });
-      }, 1000);
 
       // Update waveform (mock - real implementation needs metering)
       waveformIntervalRef.current = setInterval(() => {
@@ -150,16 +128,16 @@ export function VoiceRecorder({
   }, [maxDuration]);
 
   const stopRecording = useCallback(async () => {
-    if (!recordingRef.current) return;
+    if (!recorderRef.current) return;
 
     try {
       clearIntervals();
       stopPulseAnimation();
 
-      await recordingRef.current.stopAndUnloadAsync();
-      const uri = recordingRef.current.getURI();
+      const uri = await recorderRef.current.stop();
 
       if (uri) {
+        recordingUriRef.current = uri;
         setState("recorded");
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       } else {
@@ -177,16 +155,17 @@ export function VoiceRecorder({
       clearIntervals();
       stopPulseAnimation();
 
-      if (recordingRef.current) {
-        await recordingRef.current.stopAndUnloadAsync();
-        recordingRef.current = null;
+      if (recorderRef.current) {
+        await recorderRef.current.cancel();
+        recorderRef.current = null;
       }
 
-      if (soundRef.current) {
-        await soundRef.current.unloadAsync();
-        soundRef.current = null;
+      if (playerRef.current) {
+        await playerRef.current.unload();
+        playerRef.current = null;
       }
 
+      recordingUriRef.current = null;
       setState("idle");
       setDuration(0);
       setWaveform([]);
@@ -198,9 +177,7 @@ export function VoiceRecorder({
   }, [onClose]);
 
   const sendRecording = useCallback(async () => {
-    if (!recordingRef.current) return;
-
-    const uri = recordingRef.current.getURI();
+    const uri = recordingUriRef.current;
     if (!uri) {
       Alert.alert("Lỗi", "Không tìm thấy bản ghi âm");
       return;
@@ -213,7 +190,8 @@ export function VoiceRecorder({
     });
 
     // Reset state
-    recordingRef.current = null;
+    recorderRef.current = null;
+    recordingUriRef.current = null;
     setState("idle");
     setDuration(0);
     setWaveform([]);
@@ -227,31 +205,30 @@ export function VoiceRecorder({
   const [playbackPosition, setPlaybackPosition] = useState(0);
 
   const playPreview = useCallback(async () => {
-    if (!recordingRef.current) return;
-    const uri = recordingRef.current.getURI();
+    const uri = recordingUriRef.current;
     if (!uri) return;
 
     try {
-      if (soundRef.current) {
-        const status = await soundRef.current.getStatusAsync();
-        if (status.isLoaded) {
+      if (playerRef.current) {
+        const status = await playerRef.current.getStatus();
+        if (status?.isLoaded) {
           if (status.isPlaying) {
-            await soundRef.current.pauseAsync();
+            await playerRef.current.pause();
             setIsPlaying(false);
             return;
           } else {
-            await soundRef.current.playAsync();
+            await playerRef.current.play();
             setIsPlaying(true);
             return;
           }
         }
       }
 
-      // Create new sound
-      const { sound } = await Audio.Sound.createAsync(
-        { uri },
-        { shouldPlay: true },
-        (status) => {
+      // Create new player
+      playerRef.current = new AudioPlayer({
+        uri,
+        shouldPlay: true,
+        onPlaybackStatusUpdate: (status) => {
           if (status.isLoaded) {
             setPlaybackPosition(status.positionMillis / 1000);
             if (status.didJustFinish) {
@@ -260,8 +237,9 @@ export function VoiceRecorder({
             }
           }
         },
-      );
-      soundRef.current = sound;
+      });
+      await playerRef.current.load();
+      await playerRef.current.play();
       setIsPlaying(true);
     } catch (error) {
       console.error("Error playing preview:", error);
@@ -319,11 +297,11 @@ export function VoiceRecorder({
   useEffect(() => {
     return () => {
       clearIntervals();
-      if (recordingRef.current) {
-        recordingRef.current.stopAndUnloadAsync().catch(() => {});
+      if (recorderRef.current) {
+        recorderRef.current.cancel().catch(() => {});
       }
-      if (soundRef.current) {
-        soundRef.current.unloadAsync().catch(() => {});
+      if (playerRef.current) {
+        playerRef.current.unload().catch(() => {});
       }
     };
   }, []);

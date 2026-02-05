@@ -1,10 +1,11 @@
 /**
  * ThietKe Resort API Authentication Client
- * Base URL: https://api.thietkeresort.com.vn
+ * Base URL: Configured via ENV.API_BASE_URL
  * Auth: Bearer Token (JWT) on Authorization header
  */
 
-import { apiFetch } from './api';
+import ENV from "@/config/env";
+import { apiFetch } from "./api";
 
 // Types matching the API specification
 export interface RegisterRequest {
@@ -50,8 +51,15 @@ export interface UserProfile {
 }
 
 export interface ApiErrorResponse {
-  error: 'NO_TOKEN' | 'INVALID_TOKEN' | 'INVALID_INPUT' | 'EMAIL_PASSWORD_REQUIRED' | 
-         'NO_FIELDS' | 'NOT_FOUND' | 'EMAIL_EXISTS' | string;
+  error:
+    | "NO_TOKEN"
+    | "INVALID_TOKEN"
+    | "INVALID_INPUT"
+    | "EMAIL_PASSWORD_REQUIRED"
+    | "NO_FIELDS"
+    | "NOT_FOUND"
+    | "EMAIL_EXISTS"
+    | string;
 }
 
 /**
@@ -60,7 +68,7 @@ export interface ApiErrorResponse {
 export class ThietKeAuthClient {
   private baseUrl: string;
 
-  constructor(baseUrl = 'https://api.thietkeresort.com.vn') {
+  constructor(baseUrl = ENV.API_BASE_URL) {
     this.baseUrl = baseUrl;
   }
 
@@ -70,8 +78,8 @@ export class ThietKeAuthClient {
    */
   async register(data: RegisterRequest): Promise<AuthResponse> {
     try {
-      const response = await apiFetch<AuthResponse>('/auth/register', {
-        method: 'POST',
+      const response = await apiFetch<AuthResponse>("/auth/register", {
+        method: "POST",
         body: JSON.stringify(data),
       });
       return response;
@@ -86,8 +94,8 @@ export class ThietKeAuthClient {
    */
   async login(data: LoginRequest): Promise<AuthResponse> {
     try {
-      const response = await apiFetch<AuthResponse>('/auth/login', {
-        method: 'POST',
+      const response = await apiFetch<AuthResponse>("/auth/login", {
+        method: "POST",
         body: JSON.stringify(data),
       });
       return response;
@@ -102,8 +110,8 @@ export class ThietKeAuthClient {
    */
   async refresh(refreshToken: string): Promise<RefreshResponse> {
     try {
-      const response = await apiFetch<RefreshResponse>('/auth/refresh', {
-        method: 'POST',
+      const response = await apiFetch<RefreshResponse>("/auth/refresh", {
+        method: "POST",
         body: JSON.stringify({ refresh_token: refreshToken }),
       });
       return response;
@@ -118,8 +126,8 @@ export class ThietKeAuthClient {
    */
   async getProfile(accessToken: string): Promise<{ user: UserProfile }> {
     try {
-      const response = await apiFetch<{ user: UserProfile }>('/me', {
-        method: 'GET',
+      const response = await apiFetch<{ user: UserProfile }>("/me", {
+        method: "GET",
         token: accessToken,
       });
       return response;
@@ -133,44 +141,44 @@ export class ThietKeAuthClient {
    */
   private handleAuthError(error: any): Error {
     if (error?.status === 401) {
-      if (error?.body?.error === 'NO_TOKEN') {
-        return new Error('Token bị thiếu. Vui lòng đăng nhập lại.');
+      if (error?.body?.error === "NO_TOKEN") {
+        return new Error("Token bị thiếu. Vui lòng đăng nhập lại.");
       }
-      if (error?.body?.error === 'INVALID_TOKEN') {
-        return new Error('Token không hợp lệ. Vui lòng đăng nhập lại.');
+      if (error?.body?.error === "INVALID_TOKEN") {
+        return new Error("Token không hợp lệ. Vui lòng đăng nhập lại.");
       }
-      return new Error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+      return new Error("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
     }
 
     if (error?.status === 400) {
-      if (error?.body?.error === 'INVALID_INPUT') {
-        return new Error('Dữ liệu đầu vào không hợp lệ.');
+      if (error?.body?.error === "INVALID_INPUT") {
+        return new Error("Dữ liệu đầu vào không hợp lệ.");
       }
-      if (error?.body?.error === 'EMAIL_PASSWORD_REQUIRED') {
-        return new Error('Email và mật khẩu là bắt buộc.');
+      if (error?.body?.error === "EMAIL_PASSWORD_REQUIRED") {
+        return new Error("Email và mật khẩu là bắt buộc.");
       }
-      if (error?.body?.error === 'NO_FIELDS') {
-        return new Error('Thiếu thông tin bắt buộc.');
+      if (error?.body?.error === "NO_FIELDS") {
+        return new Error("Thiếu thông tin bắt buộc.");
       }
-      return new Error('Dữ liệu không hợp lệ.');
+      return new Error("Dữ liệu không hợp lệ.");
     }
 
     if (error?.status === 404) {
-      return new Error('Không tìm thấy tài khoản.');
+      return new Error("Không tìm thấy tài khoản.");
     }
 
     if (error?.status === 409) {
-      if (error?.body?.error === 'EMAIL_EXISTS') {
-        return new Error('Email đã được sử dụng. Vui lòng chọn email khác.');
+      if (error?.body?.error === "EMAIL_EXISTS") {
+        return new Error("Email đã được sử dụng. Vui lòng chọn email khác.");
       }
-      return new Error('Dữ liệu đã tồn tại.');
+      return new Error("Dữ liệu đã tồn tại.");
     }
 
     if (error?.status >= 500) {
-      return new Error('Lỗi máy chủ. Vui lòng thử lại sau.');
+      return new Error("Lỗi máy chủ. Vui lòng thử lại sau.");
     }
 
-    return new Error(error?.message || 'Đã xảy ra lỗi không xác định.');
+    return new Error(error?.message || "Đã xảy ra lỗi không xác định.");
   }
 }
 
@@ -181,4 +189,5 @@ export const thietKeAuth = new ThietKeAuthClient();
 export const register = (data: RegisterRequest) => thietKeAuth.register(data);
 export const login = (data: LoginRequest) => thietKeAuth.login(data);
 export const refreshToken = (token: string) => thietKeAuth.refresh(token);
-export const getMe = (accessToken: string) => thietKeAuth.getProfile(accessToken);
+export const getMe = (accessToken: string) =>
+  thietKeAuth.getProfile(accessToken);

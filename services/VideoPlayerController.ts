@@ -11,10 +11,13 @@
  */
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { VideoPlayer } from "expo-video";
+import { Platform } from "react-native";
+import type { VideoPlayer } from "expo-video";
 
 const MUTE_SETTING_KEY = "@video_player_muted";
 const PLAYBACK_POSITIONS_KEY = "@video_playback_positions";
+const CAN_USE_STORAGE =
+  Platform.OS !== "web" || typeof window !== "undefined";
 
 export interface PlaybackPosition {
   videoId: string;
@@ -66,6 +69,10 @@ class VideoPlayerControllerClass {
    */
   private async initialize(): Promise<void> {
     if (this.isInitialized) return;
+    if (!CAN_USE_STORAGE) {
+      this.isInitialized = true;
+      return;
+    }
 
     try {
       // Load mute setting
@@ -208,14 +215,15 @@ class VideoPlayerControllerClass {
       instance.player.muted = this.isMuted;
     });
 
-    // Persist setting
-    try {
-      await AsyncStorage.setItem(MUTE_SETTING_KEY, String(this.isMuted));
-    } catch (error) {
-      console.error(
-        "[VideoPlayerController] Failed to save mute setting:",
-        error
-      );
+    if (CAN_USE_STORAGE) {
+      try {
+        await AsyncStorage.setItem(MUTE_SETTING_KEY, String(this.isMuted));
+      } catch (error) {
+        console.error(
+          "[VideoPlayerController] Failed to save mute setting:",
+          error
+        );
+      }
     }
 
     this.notifyStateChange();
@@ -233,13 +241,15 @@ class VideoPlayerControllerClass {
       instance.player.muted = muted;
     });
 
-    try {
-      await AsyncStorage.setItem(MUTE_SETTING_KEY, String(muted));
-    } catch (error) {
-      console.error(
-        "[VideoPlayerController] Failed to save mute setting:",
-        error
-      );
+    if (CAN_USE_STORAGE) {
+      try {
+        await AsyncStorage.setItem(MUTE_SETTING_KEY, String(muted));
+      } catch (error) {
+        console.error(
+          "[VideoPlayerController] Failed to save mute setting:",
+          error
+        );
+      }
     }
 
     this.notifyStateChange();
@@ -282,14 +292,19 @@ class VideoPlayerControllerClass {
     });
 
     // Persist to storage (debounced in real implementation)
-    try {
-      const positions = Array.from(this.playbackPositions.values());
-      await AsyncStorage.setItem(
-        PLAYBACK_POSITIONS_KEY,
-        JSON.stringify(positions)
-      );
-    } catch (error) {
-      console.error("[VideoPlayerController] Failed to save positions:", error);
+    if (CAN_USE_STORAGE) {
+      try {
+        const positions = Array.from(this.playbackPositions.values());
+        await AsyncStorage.setItem(
+          PLAYBACK_POSITIONS_KEY,
+          JSON.stringify(positions)
+        );
+      } catch (error) {
+        console.error(
+          "[VideoPlayerController] Failed to save positions:",
+          error
+        );
+      }
     }
   }
 
@@ -299,14 +314,19 @@ class VideoPlayerControllerClass {
   async clearPlaybackPosition(videoId: string): Promise<void> {
     this.playbackPositions.delete(videoId);
 
-    try {
-      const positions = Array.from(this.playbackPositions.values());
-      await AsyncStorage.setItem(
-        PLAYBACK_POSITIONS_KEY,
-        JSON.stringify(positions)
-      );
-    } catch (error) {
-      console.error("[VideoPlayerController] Failed to clear position:", error);
+    if (CAN_USE_STORAGE) {
+      try {
+        const positions = Array.from(this.playbackPositions.values());
+        await AsyncStorage.setItem(
+          PLAYBACK_POSITIONS_KEY,
+          JSON.stringify(positions)
+        );
+      } catch (error) {
+        console.error(
+          "[VideoPlayerController] Failed to clear position:",
+          error
+        );
+      }
     }
   }
 

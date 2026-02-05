@@ -3,7 +3,13 @@
  * Handle user addresses for checkout/delivery
  */
 
-import { BackendResult, deleteReq, getJson, patchJson, postJson } from './backendClient';
+import {
+    BackendResult,
+    deleteReq,
+    getJson,
+    patchJson,
+    postJson,
+} from "./backendClient";
 
 // Types
 export interface Address {
@@ -17,7 +23,7 @@ export interface Address {
   postalCode?: string;
   country?: string;
   isDefault: boolean;
-  type?: 'home' | 'office' | 'other';
+  type?: "home" | "office" | "other";
   lat?: number;
   lng?: number;
   createdAt?: string;
@@ -38,22 +44,24 @@ export interface CreateAddressInput {
   province?: string;
   postalCode?: string;
   isDefault?: boolean;
-  type?: 'home' | 'office' | 'other';
+  type?: "home" | "office" | "other";
 }
 
-// API Endpoints
+// API Endpoints - Using versioned API
 const ENDPOINTS = {
-  list: '/api/users/addresses',
-  create: '/api/users/addresses',
-  update: (id: string) => `/api/users/addresses/${id}`,
-  delete: (id: string) => `/api/users/addresses/${id}`,
-  setDefault: (id: string) => `/api/users/addresses/${id}/default`,
+  list: "/api/v1/users/addresses",
+  create: "/api/v1/users/addresses",
+  update: (id: string) => `/api/v1/users/addresses/${id}`,
+  delete: (id: string) => `/api/v1/users/addresses/${id}`,
+  setDefault: (id: string) => `/api/v1/users/addresses/${id}/default`,
 };
 
 /**
  * Get all addresses for the current user
  */
-export async function getAddresses(): Promise<BackendResult<AddressListResponse>> {
+export async function getAddresses(): Promise<
+  BackendResult<AddressListResponse>
+> {
   return getJson<AddressListResponse>(ENDPOINTS.list, { retry: 2 });
 }
 
@@ -61,7 +69,7 @@ export async function getAddresses(): Promise<BackendResult<AddressListResponse>
  * Create a new address
  */
 export async function createAddress(
-  input: CreateAddressInput
+  input: CreateAddressInput,
 ): Promise<BackendResult<Address>> {
   return postJson<Address>(ENDPOINTS.create, input);
 }
@@ -71,7 +79,7 @@ export async function createAddress(
  */
 export async function updateAddress(
   id: string,
-  input: Partial<CreateAddressInput>
+  input: Partial<CreateAddressInput>,
 ): Promise<BackendResult<Address>> {
   return patchJson<Address>(ENDPOINTS.update(id), input);
 }
@@ -80,7 +88,7 @@ export async function updateAddress(
  * Delete an address
  */
 export async function deleteAddress(
-  id: string
+  id: string,
 ): Promise<BackendResult<{ success: boolean }>> {
   return deleteReq(ENDPOINTS.delete(id));
 }
@@ -89,7 +97,7 @@ export async function deleteAddress(
  * Set an address as default
  */
 export async function setDefaultAddress(
-  id: string
+  id: string,
 ): Promise<BackendResult<Address>> {
   return postJson<Address>(ENDPOINTS.setDefault(id), {});
 }
@@ -97,24 +105,24 @@ export async function setDefaultAddress(
 // Mock data fallback
 export const MOCK_ADDRESSES: Address[] = [
   {
-    id: '1',
-    name: 'Văn phòng',
-    phone: '0912345678',
-    address: '123 Nguyễn Huệ',
-    district: 'Quận 1',
-    city: 'TP. Hồ Chí Minh',
+    id: "1",
+    name: "Văn phòng",
+    phone: "0912345678",
+    address: "123 Nguyễn Huệ",
+    district: "Quận 1",
+    city: "TP. Hồ Chí Minh",
     isDefault: true,
-    type: 'office',
+    type: "office",
   },
   {
-    id: '2',
-    name: 'Nhà riêng',
-    phone: '0987654321',
-    address: '456 Lê Lợi',
-    district: 'Quận 3',
-    city: 'TP. Hồ Chí Minh',
+    id: "2",
+    name: "Nhà riêng",
+    phone: "0987654321",
+    address: "456 Lê Lợi",
+    district: "Quận 3",
+    city: "TP. Hồ Chí Minh",
     isDefault: false,
-    type: 'home',
+    type: "home",
   },
 ];
 

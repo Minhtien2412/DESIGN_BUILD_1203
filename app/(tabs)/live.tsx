@@ -9,8 +9,10 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useExternalVideos } from "@/hooks/useExternalContent";
 import { getCurrentLiveStreams, LiveStream } from "@/services/liveStream";
+// Video playback with expo-video
 import { Ionicons } from "@expo/vector-icons";
-import { ResizeMode, Video } from "expo-av";
+import { useEvent } from "expo";
+import { VideoView, useVideoPlayer } from "expo-video";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -102,7 +104,6 @@ export default function LiveStreamsScreen() {
   >([]);
   const [isPaused, setIsPaused] = useState(false);
 
-  const videoRef = useRef<Video>(null);
   const flatListRef = useRef<FlatList>(null);
   const giftPanelHeight = useRef(new Animated.Value(0)).current;
 
@@ -155,7 +156,7 @@ export default function LiveStreamsScreen() {
           createdAt: video.createdAt || new Date().toISOString(),
           updatedAt: new Date().toISOString(),
           isExternal: true,
-        })
+        }),
       );
 
       // 3. Merge: Real live streams trước, rồi đến external videos
@@ -191,7 +192,7 @@ export default function LiveStreamsScreen() {
           createdAt: video.createdAt || new Date().toISOString(),
           updatedAt: new Date().toISOString(),
           isExternal: true,
-        })
+        }),
       );
       setStreams(externalAsLive);
     } finally {
@@ -296,7 +297,7 @@ export default function LiveStreamsScreen() {
       if (viewableItems.length > 0 && viewableItems[0].index !== null) {
         setCurrentIndex(viewableItems[0].index);
       }
-    }
+    },
   ).current;
 
   const viewabilityConfig = useRef({
@@ -326,6 +327,28 @@ export default function LiveStreamsScreen() {
     isCurrentActive: boolean;
   }) => {
     const [videoLoading, setVideoLoading] = useState(true);
+    const player = useVideoPlayer(item.playbackUrl || null, (player) => {
+      player.loop = true;
+      player.muted = false;
+    });
+    const status = useEvent(player, "statusChange", { status: player.status });
+
+    useEffect(() => {
+      if (!item.playbackUrl) return;
+      setVideoLoading(status.status !== "readyToPlay");
+      if (status.status === "error") {
+        console.log("Video error:", status.error?.message || "Unknown error");
+      }
+    }, [item.playbackUrl, status]);
+
+    useEffect(() => {
+      if (!item.playbackUrl) return;
+      if (isCurrentActive && !isPaused) {
+        player.play();
+      } else {
+        player.pause();
+      }
+    }, [isCurrentActive, isPaused, item.playbackUrl, player]);
 
     return (
       <View style={styles.videoContainer}>
@@ -338,20 +361,12 @@ export default function LiveStreamsScreen() {
 
         {/* Video Player */}
         {item.playbackUrl ? (
-          <Video
-            source={{ uri: item.playbackUrl }}
+          <VideoView
+            player={player}
             style={styles.video}
-            resizeMode={ResizeMode.COVER}
-            shouldPlay={isCurrentActive && !isPaused}
-            isLooping
-            isMuted={false}
-            useNativeControls={false}
-            onLoadStart={() => setVideoLoading(true)}
-            onLoad={() => setVideoLoading(false)}
-            onError={(e) => console.log("Video error:", e)}
-            posterSource={{ uri: item.thumbnailUrl }}
-            usePoster={videoLoading}
-            posterStyle={styles.video}
+            contentFit="cover"
+            nativeControls={false}
+            onFirstFrameRender={() => setVideoLoading(false)}
           />
         ) : (
           <Image

@@ -1,4 +1,4 @@
-import * as laborService from '@/services/labor';
+import * as laborService from "@/services/labor";
 import type {
     AssignShiftRequest,
     Attendance,
@@ -19,8 +19,8 @@ import type {
     Worker,
     WorkerPerformance,
     WorkerSummary,
-} from '@/types/labor';
-import { useCallback, useEffect, useState } from 'react';
+} from "@/types/labor";
+import { useCallback, useEffect, useState } from "react";
 
 // ==================== Workers ====================
 
@@ -79,12 +79,56 @@ export function useWorker(workerId: string) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
+  const fetchWorker = useCallback(async () => {
+    if (!workerId) return;
+    try {
+      setLoading(true);
+      const data = await laborService.getWorker(workerId);
+      setWorker(data);
+      setError(null);
+    } catch (err) {
+      setError(err as Error);
+    } finally {
+      setLoading(false);
+    }
+  }, [workerId]);
+
   useEffect(() => {
-    const fetchWorker = async () => {
+    fetchWorker();
+  }, [fetchWorker]);
+
+  return { worker, loading, error, refetch: fetchWorker };
+}
+
+// Alias for worker detail screen
+export function useWorkerDetail(workerId: string) {
+  return useWorker(workerId);
+}
+
+// Worker attendance history hook
+export function useWorkerAttendanceHistory(
+  workerId: string,
+  days: number = 30,
+) {
+  const [history, setHistory] = useState<Attendance[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    const fetchHistory = async () => {
+      if (!workerId) return;
       try {
         setLoading(true);
-        const data = await laborService.getWorker(workerId);
-        setWorker(data);
+        const endDate = new Date().toISOString().split("T")[0];
+        const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000)
+          .toISOString()
+          .split("T")[0];
+        const data = await laborService.getWorkerAttendances(
+          workerId,
+          startDate,
+          endDate,
+        );
+        setHistory(data);
         setError(null);
       } catch (err) {
         setError(err as Error);
@@ -93,10 +137,10 @@ export function useWorker(workerId: string) {
       }
     };
 
-    fetchWorker();
-  }, [workerId]);
+    fetchHistory();
+  }, [workerId, days]);
 
-  return { worker, loading, error };
+  return { history, loading, error };
 }
 
 // ==================== Attendance ====================
@@ -131,10 +175,12 @@ export function useAttendances(projectId?: string, date?: string) {
 
   const updateAttendance = async (
     attendanceId: string,
-    data: UpdateAttendanceRequest
+    data: UpdateAttendanceRequest,
   ) => {
     const updated = await laborService.updateAttendance(attendanceId, data);
-    setAttendances((prev) => prev.map((a) => (a.id === attendanceId ? updated : a)));
+    setAttendances((prev) =>
+      prev.map((a) => (a.id === attendanceId ? updated : a)),
+    );
     return updated;
   };
 
@@ -164,7 +210,7 @@ export function useAttendances(projectId?: string, date?: string) {
 export function useWorkerAttendances(
   workerId: string,
   startDate?: string,
-  endDate?: string
+  endDate?: string,
 ) {
   const [attendances, setAttendances] = useState<Attendance[]>([]);
   const [loading, setLoading] = useState(true);
@@ -177,7 +223,7 @@ export function useWorkerAttendances(
         const data = await laborService.getWorkerAttendances(
           workerId,
           startDate,
-          endDate
+          endDate,
         );
         setAttendances(data);
         setError(null);
@@ -226,7 +272,7 @@ export function useShifts(projectId?: string) {
 
   const updateShift = async (
     shiftId: string,
-    data: Partial<CreateShiftRequest>
+    data: Partial<CreateShiftRequest>,
   ) => {
     const updated = await laborService.updateShift(shiftId, data);
     setShifts((prev) => prev.map((s) => (s.id === shiftId ? updated : s)));
@@ -254,29 +300,51 @@ export function useShifts(projectId?: string) {
   };
 }
 
-export function useShiftAssignments(shiftId?: string, date?: string) {
+export function useShiftAssignments(
+  projectId?: string,
+  shiftId?: string,
+  date?: string,
+) {
   const [assignments, setAssignments] = useState<ShiftAssignment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  useEffect(() => {
-    const fetchAssignments = async () => {
-      try {
-        setLoading(true);
-        const data = await laborService.getShiftAssignments(shiftId, date);
-        setAssignments(data);
-        setError(null);
-      } catch (err) {
-        setError(err as Error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAssignments();
+  const fetchAssignments = useCallback(async () => {
+    try {
+      setLoading(true);
+      const data = await laborService.getShiftAssignments(shiftId, date);
+      setAssignments(data);
+      setError(null);
+    } catch (err) {
+      setError(err as Error);
+    } finally {
+      setLoading(false);
+    }
   }, [shiftId, date]);
 
-  return { assignments, loading, error };
+  useEffect(() => {
+    fetchAssignments();
+  }, [fetchAssignments]);
+
+  const createAssignment = async (data: AssignShiftRequest) => {
+    const newAssignment = await laborService.assignShift(data);
+    setAssignments((prev) => [newAssignment, ...prev]);
+    return newAssignment;
+  };
+
+  const deleteAssignment = async (assignmentId: string) => {
+    await laborService.deleteShiftAssignment(assignmentId);
+    setAssignments((prev) => prev.filter((a) => a.id !== assignmentId));
+  };
+
+  return {
+    assignments,
+    loading,
+    error,
+    refetch: fetchAssignments,
+    createAssignment,
+    deleteAssignment,
+  };
 }
 
 // ==================== Leave Requests ====================
@@ -309,25 +377,28 @@ export function useLeaveRequests(projectId?: string, status?: string) {
     return newRequest;
   };
 
-  const approveLeaveRequest = async (leaveRequestId: string, approvedBy: string) => {
+  const approveLeaveRequest = async (
+    leaveRequestId: string,
+    approvedBy: string,
+  ) => {
     const updated = await laborService.approveLeaveRequest(leaveRequestId, {
       approvedBy,
     });
     setLeaveRequests((prev) =>
-      prev.map((lr) => (lr.id === leaveRequestId ? updated : lr))
+      prev.map((lr) => (lr.id === leaveRequestId ? updated : lr)),
     );
     return updated;
   };
 
   const rejectLeaveRequest = async (
     leaveRequestId: string,
-    rejectionReason: string
+    rejectionReason: string,
   ) => {
     const updated = await laborService.rejectLeaveRequest(leaveRequestId, {
       rejectionReason,
     });
     setLeaveRequests((prev) =>
-      prev.map((lr) => (lr.id === leaveRequestId ? updated : lr))
+      prev.map((lr) => (lr.id === leaveRequestId ? updated : lr)),
     );
     return updated;
   };
@@ -335,7 +406,7 @@ export function useLeaveRequests(projectId?: string, status?: string) {
   const cancelLeaveRequest = async (leaveRequestId: string) => {
     const updated = await laborService.cancelLeaveRequest(leaveRequestId);
     setLeaveRequests((prev) =>
-      prev.map((lr) => (lr.id === leaveRequestId ? updated : lr))
+      prev.map((lr) => (lr.id === leaveRequestId ? updated : lr)),
     );
     return updated;
   };
@@ -384,7 +455,7 @@ export function usePayrolls(projectId?: string, status?: string) {
 
   const updatePayroll = async (
     payrollId: string,
-    data: Partial<CreatePayrollRequest>
+    data: Partial<CreatePayrollRequest>,
   ) => {
     const updated = await laborService.updatePayroll(payrollId, data);
     setPayrolls((prev) => prev.map((p) => (p.id === payrollId ? updated : p)));
@@ -405,7 +476,7 @@ export function usePayrolls(projectId?: string, status?: string) {
   const processPayment = async (
     payrollId: string,
     paymentDate: string,
-    paymentReference?: string
+    paymentReference?: string,
   ) => {
     const updated = await laborService.processPayment(payrollId, {
       paymentDate,
@@ -483,7 +554,7 @@ export function useAttendanceSummary(date: string, projectId?: string) {
 export function usePayrollSummary(
   periodStart: string,
   periodEnd: string,
-  projectId?: string
+  projectId?: string,
 ) {
   const [summary, setSummary] = useState<PayrollSummary | null>(null);
   const [loading, setLoading] = useState(true);
@@ -496,7 +567,7 @@ export function usePayrollSummary(
         const data = await laborService.getPayrollSummary(
           periodStart,
           periodEnd,
-          projectId
+          projectId,
         );
         setSummary(data);
         setError(null);
@@ -516,9 +587,11 @@ export function usePayrollSummary(
 export function useWorkerPerformance(
   workerId: string,
   periodStart: string,
-  periodEnd: string
+  periodEnd: string,
 ) {
-  const [performance, setPerformance] = useState<WorkerPerformance | null>(null);
+  const [performance, setPerformance] = useState<WorkerPerformance | null>(
+    null,
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -529,7 +602,7 @@ export function useWorkerPerformance(
         const data = await laborService.getWorkerPerformance(
           workerId,
           periodStart,
-          periodEnd
+          periodEnd,
         );
         setPerformance(data);
         setError(null);

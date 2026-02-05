@@ -1,6 +1,14 @@
-import { Ionicons } from '@expo/vector-icons';
-import { useVideoPlayer, VideoView } from 'expo-video';
-import { useCallback, useEffect, useRef, useState } from 'react';
+/**
+ * VideoPlayer - Full-featured video player component
+ *
+ * Uses VideoPlayerController to ensure only 1 video plays at a time globally
+ *
+ * @updated 29/01/2026 - Integrated VideoPlayerController
+ */
+import { useVideoPlayback } from "@/hooks/useVideoPlayback";
+import { Ionicons } from "@expo/vector-icons";
+import { useVideoPlayer, VideoView } from "expo-video";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
     ActivityIndicator,
     Animated,
@@ -10,24 +18,25 @@ import {
     StyleSheet,
     Text,
     TouchableOpacity,
-    View
-} from 'react-native';
+    View,
+} from "react-native";
 
 // Safe import for Slider
 let Slider: any;
 try {
-  Slider = require('@react-native-community/slider').default;
+  Slider = require("@react-native-community/slider").default;
 } catch (e) {
-  console.warn('[VideoPlayer] Slider not available, using fallback');
+  console.warn("[VideoPlayer] Slider not available, using fallback");
 }
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 interface VideoPlayerProps {
   url?: string; // URL from API
   asset?: any; // Local asset from require()
   thumbnail?: string;
   title?: string;
+  videoId?: string; // Unique ID for controller tracking
   autoPlay?: boolean;
   muted?: boolean;
   loop?: boolean;
@@ -36,6 +45,7 @@ interface VideoPlayerProps {
   compact?: boolean; // For home screen compact view
   showSeekBar?: boolean; // Show seek/progress bar
   enableGestures?: boolean; // Enable swipe gestures for volume/brightness
+  isActive?: boolean; // Whether this video should play
 }
 
 export function VideoPlayer({
@@ -43,6 +53,7 @@ export function VideoPlayer({
   asset,
   thumbnail,
   title,
+  videoId,
   autoPlay = true, // Auto-play by default
   muted = false, // Unmuted by default
   loop = true,
@@ -51,6 +62,7 @@ export function VideoPlayer({
   compact = false,
   showSeekBar = true,
   enableGestures = true,
+  isActive = true, // Default to active for backward compatibility
 }: VideoPlayerProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
@@ -65,8 +77,19 @@ export function VideoPlayer({
   const controlsOpacity = useRef(new Animated.Value(0)).current;
   const hideControlsTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Generate unique ID for controller
+  const id = useMemo(
+    () =>
+      videoId ||
+      `video-player-${url?.slice(-20) || asset?.toString().slice(-20) || Date.now()}`,
+    [videoId, url, asset],
+  );
+
+  // Use centralized video playback controller - ensures only 1 video plays at a time
+  const { registerPlayer, play, pause } = useVideoPlayback(id);
+
   // Determine video source (URL or local asset)
-  const videoSource = asset || url || '';
+  const videoSource = asset || url || "";
 
   // Use new expo-video API
   const player = useVideoPlayer(videoSource, (player) => {
@@ -74,10 +97,24 @@ export function VideoPlayer({
     player.muted = muted;
     player.volume = volume;
     player.playbackRate = playbackSpeed;
-    if (autoPlay) {
-      player.play();
-    }
+    // Don't auto-play directly - let controller manage it
   });
+
+  // Register player with controller
+  useEffect(() => {
+    if (player) {
+      registerPlayer(player);
+    }
+  }, [player, registerPlayer]);
+
+  // Control playback through controller - ensures only 1 video plays at a time
+  useEffect(() => {
+    if (isActive && autoPlay) {
+      play();
+    } else if (!isActive) {
+      pause();
+    }
+  }, [isActive, autoPlay, play, pause]);
 
   // Update current time and duration
   useEffect(() => {
@@ -152,13 +189,16 @@ export function VideoPlayer({
     setCurrentTime(value);
   }, []);
 
-  const handleSeekComplete = useCallback((value: number) => {
-    if (player) {
-      player.currentTime = value;
-      setIsSeeking(false);
-      showControlsWithTimer();
-    }
-  }, [player, showControlsWithTimer]);
+  const handleSeekComplete = useCallback(
+    (value: number) => {
+      if (player) {
+        player.currentTime = value;
+        setIsSeeking(false);
+        showControlsWithTimer();
+      }
+    },
+    [player, showControlsWithTimer],
+  );
 
   // Skip forward/backward
   const skipForward = useCallback(() => {
@@ -196,13 +236,19 @@ export function VideoPlayer({
     PanResponder.create({
       onStartShouldSetPanResponder: () => enableGestures,
       onMoveShouldSetPanResponder: (_, gestureState) => {
-        return enableGestures && (Math.abs(gestureState.dx) > 10 || Math.abs(gestureState.dy) > 10);
+        return (
+          enableGestures &&
+          (Math.abs(gestureState.dx) > 10 || Math.abs(gestureState.dy) > 10)
+        );
       },
       onPanResponderMove: (_, gestureState) => {
         // Swipe left/right to seek
         if (Math.abs(gestureState.dx) > Math.abs(gestureState.dy)) {
           const seekDelta = (gestureState.dx / SCREEN_WIDTH) * duration;
-          const newTime = Math.max(0, Math.min(currentTime + seekDelta, duration));
+          const newTime = Math.max(
+            0,
+            Math.min(currentTime + seekDelta, duration),
+          );
           setCurrentTime(newTime);
         }
         // Swipe up/down on left side to adjust volume
@@ -219,20 +265,24 @@ export function VideoPlayer({
           setIsSeeking(false);
         }
       },
-    })
+    }),
   ).current;
 
   const formatDuration = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
   if (hasError) {
     return (
       <View style={[styles.container, style]}>
         {thumbnail && (
-          <Image source={{ uri: thumbnail }} style={styles.thumbnail} resizeMode="cover" />
+          <Image
+            source={{ uri: thumbnail }}
+            style={styles.thumbnail}
+            resizeMode="cover"
+          />
         )}
         <View style={styles.errorOverlay}>
           <Ionicons name="alert-circle-outline" size={32} color="#fff" />
@@ -243,8 +293,8 @@ export function VideoPlayer({
   }
 
   return (
-    <TouchableOpacity 
-      style={[styles.container, style]} 
+    <TouchableOpacity
+      style={[styles.container, style]}
       activeOpacity={0.9}
       onPress={handleVideoPress}
       {...(enableGestures ? panResponder.panHandlers : {})}
@@ -265,10 +315,12 @@ export function VideoPlayer({
 
       {/* Controls Overlay with Animation */}
       {!compact && showControls && !isLoading && (
-        <Animated.View style={[styles.controlsOverlay, { opacity: controlsOpacity }]}>
+        <Animated.View
+          style={[styles.controlsOverlay, { opacity: controlsOpacity }]}
+        >
           {/* Top Bar */}
           <View style={styles.topBar}>
-            <Text style={styles.videoTitle}>{title || 'Video'}</Text>
+            <Text style={styles.videoTitle}>{title || "Video"}</Text>
             <TouchableOpacity onPress={cyclePlaybackSpeed}>
               <Text style={styles.speedText}>{playbackSpeed}x</Text>
             </TouchableOpacity>
@@ -291,7 +343,7 @@ export function VideoPlayer({
               activeOpacity={0.8}
             >
               <Ionicons
-                name={player.playing ? 'pause' : 'play'}
+                name={player.playing ? "pause" : "play"}
                 size={36}
                 color="#fff"
               />
@@ -311,7 +363,9 @@ export function VideoPlayer({
           {showSeekBar && (
             <View style={styles.bottomBar}>
               <View style={styles.progressRow}>
-                <Text style={styles.timeText}>{formatDuration(currentTime)}</Text>
+                <Text style={styles.timeText}>
+                  {formatDuration(currentTime)}
+                </Text>
                 {Slider ? (
                   <Slider
                     style={styles.slider}
@@ -326,31 +380,39 @@ export function VideoPlayer({
                   />
                 ) : (
                   <View style={styles.slider}>
-                    <View style={[styles.progressBar, { backgroundColor: 'rgba(255,255,255,0.3)' }]}>
-                      <View 
+                    <View
+                      style={[
+                        styles.progressBar,
+                        { backgroundColor: "rgba(255,255,255,0.3)" },
+                      ]}
+                    >
+                      <View
                         style={[
-                          styles.progressFill, 
-                          { 
+                          styles.progressFill,
+                          {
                             width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%`,
-                            backgroundColor: '#0066CC' 
-                          }
-                        ]} 
+                            backgroundColor: "#0066CC",
+                          },
+                        ]}
                       />
                     </View>
                   </View>
                 )}
                 <Text style={styles.timeText}>{formatDuration(duration)}</Text>
               </View>
-              
+
               <View style={styles.bottomControls}>
-                <TouchableOpacity onPress={toggleMute} style={styles.controlButton}>
+                <TouchableOpacity
+                  onPress={toggleMute}
+                  style={styles.controlButton}
+                >
                   <Ionicons
-                    name={player.muted ? 'volume-mute' : 'volume-high'}
+                    name={player.muted ? "volume-mute" : "volume-high"}
                     size={20}
                     color="#fff"
                   />
                 </TouchableOpacity>
-                
+
                 {enableGestures && (
                   <Text style={styles.gestureHint}>
                     Vuốt để tua | Vuốt trái để điều chỉnh âm lượng
@@ -382,12 +444,9 @@ export function VideoPlayer({
 
       {/* Simple Mute Button (compact mode) */}
       {compact && (
-        <TouchableOpacity
-          style={styles.muteButton}
-          onPress={toggleMute}
-        >
+        <TouchableOpacity style={styles.muteButton} onPress={toggleMute}>
           <Ionicons
-            name={player.muted ? 'volume-mute' : 'volume-high'}
+            name={player.muted ? "volume-mute" : "volume-high"}
             size={20}
             color="#fff"
           />
@@ -410,106 +469,106 @@ export function VideoPlayer({
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%',
+    width: "100%",
     aspectRatio: 16 / 9,
-    backgroundColor: '#000',
+    backgroundColor: "#000",
     borderRadius: 12,
-    overflow: 'hidden',
-    position: 'relative',
+    overflow: "hidden",
+    position: "relative",
   },
   video: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
   poster: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
   thumbnail: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
   loadingOverlay: {
     ...StyleSheet.absoluteFillObject,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
   errorOverlay: {
     ...StyleSheet.absoluteFillObject,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.7)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.7)",
   },
   errorText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 12,
     marginTop: 8,
   },
   controlsOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    justifyContent: 'space-between',
+    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "space-between",
     paddingVertical: 16,
     paddingHorizontal: 20,
   },
   topBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   videoTitle: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
     flex: 1,
   },
   speedText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 13,
-    fontWeight: '600',
-    backgroundColor: 'rgba(0,102,204,0.8)',
+    fontWeight: "600",
+    backgroundColor: "rgba(0,102,204,0.8)",
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   centerControls: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     gap: 40,
   },
   playButton: {
     width: 70,
     height: 70,
     borderRadius: 35,
-    backgroundColor: 'rgba(0,102,204,0.9)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
+    backgroundColor: "rgba(0,102,204,0.9)",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.4,
     shadowRadius: 6,
     elevation: 8,
   },
   skipButton: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     padding: 10,
   },
   skipText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 10,
     marginTop: 2,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   bottomBar: {
     gap: 8,
   },
   progressRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 10,
   },
   slider: {
@@ -517,86 +576,86 @@ const styles = StyleSheet.create({
     height: 40,
   },
   timeText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 12,
-    fontWeight: '500',
+    fontWeight: "500",
     minWidth: 40,
   },
   bottomControls: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   controlButton: {
     padding: 8,
   },
   gestureHint: {
-    color: 'rgba(255,255,255,0.7)',
+    color: "rgba(255,255,255,0.7)",
     fontSize: 10,
-    fontStyle: 'italic',
+    fontStyle: "italic",
   },
   progressContainer: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 16,
     left: 16,
     right: 16,
   },
   progressBar: {
     height: 4,
-    backgroundColor: 'rgba(255,255,255,0.3)',
+    backgroundColor: "rgba(255,255,255,0.3)",
     borderRadius: 2,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   progressFill: {
-    height: '100%',
-    backgroundColor: '#0066CC',
+    height: "100%",
+    backgroundColor: "#0066CC",
   },
   titleOverlay: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: 'rgba(0,0,0,0.7)',
+    backgroundColor: "rgba(0,0,0,0.7)",
     padding: 8,
   },
   titleText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 11,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   compactPlayIcon: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
+    position: "absolute",
+    top: "50%",
+    left: "50%",
     transform: [{ translateX: -20 }, { translateY: -20 }],
   },
   playIconBackground: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(0,102,204,0.9)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(0,102,204,0.9)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   muteButton: {
-    position: 'absolute',
+    position: "absolute",
     top: 12,
     right: 12,
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: 'rgba(0,0,0,0.6)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(0,0,0,0.6)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   volumeIndicator: {
-    position: 'absolute',
+    position: "absolute",
     left: 20,
-    top: '50%',
+    top: "50%",
     transform: [{ translateY: -25 }],
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.8)',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.8)",
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 20,
@@ -605,18 +664,18 @@ const styles = StyleSheet.create({
   volumeBar: {
     width: 60,
     height: 4,
-    backgroundColor: 'rgba(255,255,255,0.3)',
+    backgroundColor: "rgba(255,255,255,0.3)",
     borderRadius: 2,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   volumeFill: {
-    height: '100%',
-    backgroundColor: '#0066CC',
+    height: "100%",
+    backgroundColor: "#0066CC",
   },
   volumeText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 11,
-    fontWeight: '600',
+    fontWeight: "600",
     minWidth: 35,
   },
 });

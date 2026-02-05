@@ -1,22 +1,34 @@
-import { Colors } from '@/constants/theme';
-import { Ionicons } from '@expo/vector-icons';
-import { useState } from 'react';
-import {
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    View,
-} from 'react-native';
-import { Container } from '../ui/container';
-import { Loader } from '../ui/loader';
-import { Section } from '../ui/section';
+import { Colors } from "@/constants/theme";
+import { Ionicons } from "@expo/vector-icons";
+import { useState } from "react";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Container } from "../ui/container";
+import { Loader } from "../ui/loader";
+import { Section } from "../ui/section";
 
 const MODERN_COLORS = Colors.light;
 const MODERN_SHADOWS = {
-  sm: { shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 2, elevation: 1 },
-  md: { shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2 },
-  lg: { shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.15, shadowRadius: 8, elevation: 4 },
+  sm: {
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  md: {
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  lg: {
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 4,
+  },
 };
 
 export interface SafetyDashboardTemplateProps {
@@ -35,11 +47,11 @@ interface IncidentStats {
 
 interface Incident {
   id: string;
-  type: 'critical' | 'major' | 'minor';
+  type: "critical" | "major" | "minor";
   description: string;
   location: string;
   reportedAt: string;
-  status: 'open' | 'investigating' | 'resolved';
+  status: "open" | "investigating" | "resolved";
 }
 
 export default function SafetyDashboardTemplate({
@@ -59,45 +71,45 @@ export default function SafetyDashboardTemplate({
 
   const [recentIncidents] = useState<Incident[]>([
     {
-      id: '1',
-      type: 'major',
-      description: 'Công nhân không đội mũ bảo hộ',
-      location: 'Tầng 3 - Khu vực A',
-      reportedAt: '2025-12-18 09:30',
-      status: 'investigating',
+      id: "1",
+      type: "major",
+      description: "Công nhân không đội mũ bảo hộ",
+      location: "Tầng 3 - Khu vực A",
+      reportedAt: "2025-12-18 09:30",
+      status: "investigating",
     },
     {
-      id: '2',
-      type: 'minor',
-      description: 'Thiếu rào chắn khu vực nguy hiểm',
-      location: 'Tầng 2 - Khu vực B',
-      reportedAt: '2025-12-17 14:15',
-      status: 'resolved',
+      id: "2",
+      type: "minor",
+      description: "Thiếu rào chắn khu vực nguy hiểm",
+      location: "Tầng 2 - Khu vực B",
+      reportedAt: "2025-12-17 14:15",
+      status: "resolved",
     },
   ]);
 
   const getScoreColor = (score: number) => {
-    if (score >= 80) return '#0066CC';
-    if (score >= 60) return '#0066CC';
-    return '#000000';
+    if (score >= 80) return "#0066CC";
+    if (score >= 60) return "#0066CC";
+    return "#000000";
   };
 
-  const getIncidentColor = (type: Incident['type']) => {
+  const getIncidentColor = (type: Incident["type"]) => {
     switch (type) {
-      case 'critical':
-        return '#000000';
-      case 'major':
-        return '#0066CC';
-      case 'minor':
-        return '#3B82F6';
+      case "critical":
+        return "#000000";
+      case "major":
+        return "#0066CC";
+      case "minor":
+        return "#3B82F6";
     }
   };
 
-  const getStatusBadge = (status: Incident['status']) => {
+  const getStatusBadge = (status: Incident["status"]) => {
     const config = {
-      open: { label: 'Mới', color: '#000000' },
-      investigating: { label: 'Đang xử lý', color: '#0066CC' },
-      resolved: { label: 'Đã giải quyết', color: '#0066CC' },
+      open: { label: "Mới", color: "#000000" },
+      investigating: { label: "Đang xử lý", color: "#0066CC" },
+      resolved: { label: "Đã giải quyết", color: "#0066CC" },
     };
     return config[status];
   };
@@ -114,15 +126,22 @@ export default function SafetyDashboardTemplate({
           <View style={styles.scoreCard}>
             <Text style={styles.scoreLabel}>Điểm An Toàn</Text>
             <View style={styles.scoreCircle}>
-              <Text style={[styles.scoreValue, { color: getScoreColor(safetyScore) }]}>
+              <Text
+                style={[
+                  styles.scoreValue,
+                  { color: getScoreColor(safetyScore) },
+                ]}
+              >
                 {safetyScore}
               </Text>
               <Text style={styles.scoreMax}>/100</Text>
             </View>
             <Text style={styles.scoreDescription}>
-              {safetyScore >= 80 && 'Xuất sắc - Duy trì công tác an toàn tốt'}
-              {safetyScore >= 60 && safetyScore < 80 && 'Tốt - Cần cải thiện một số điểm'}
-              {safetyScore < 60 && 'Cảnh báo - Cần tăng cường ngay'}
+              {safetyScore >= 80
+                ? "Xuất sắc - Duy trì công tác an toàn tốt"
+                : safetyScore >= 60
+                  ? "Tốt - Cần cải thiện một số điểm"
+                  : "Cảnh báo - Cần tăng cường ngay"}
             </Text>
           </View>
         </Section>
@@ -130,24 +149,24 @@ export default function SafetyDashboardTemplate({
         {/* Incident Statistics */}
         <Section title="Thống kê sự cố">
           <View style={styles.statsGrid}>
-            <View style={[styles.statCard, { borderLeftColor: '#6B7280' }]}>
+            <View style={[styles.statCard, { borderLeftColor: "#6B7280" }]}>
               <Text style={styles.statValue}>{stats.total}</Text>
               <Text style={styles.statLabel}>Tổng số</Text>
             </View>
-            <View style={[styles.statCard, { borderLeftColor: '#000000' }]}>
-              <Text style={[styles.statValue, { color: '#000000' }]}>
+            <View style={[styles.statCard, { borderLeftColor: "#000000" }]}>
+              <Text style={[styles.statValue, { color: "#000000" }]}>
                 {stats.critical}
               </Text>
               <Text style={styles.statLabel}>Nghiêm trọng</Text>
             </View>
-            <View style={[styles.statCard, { borderLeftColor: '#0066CC' }]}>
-              <Text style={[styles.statValue, { color: '#0066CC' }]}>
+            <View style={[styles.statCard, { borderLeftColor: "#0066CC" }]}>
+              <Text style={[styles.statValue, { color: "#0066CC" }]}>
                 {stats.major}
               </Text>
               <Text style={styles.statLabel}>Quan trọng</Text>
             </View>
-            <View style={[styles.statCard, { borderLeftColor: '#3B82F6' }]}>
-              <Text style={[styles.statValue, { color: '#3B82F6' }]}>
+            <View style={[styles.statCard, { borderLeftColor: "#3B82F6" }]}>
+              <Text style={[styles.statValue, { color: "#3B82F6" }]}>
                 {stats.minor}
               </Text>
               <Text style={styles.statLabel}>Nhỏ</Text>
@@ -195,7 +214,10 @@ export default function SafetyDashboardTemplate({
                     <View
                       style={[
                         styles.statusBadge,
-                        { backgroundColor: getStatusBadge(incident.status).color + '20' },
+                        {
+                          backgroundColor:
+                            getStatusBadge(incident.status).color + "20",
+                        },
                       ]}
                     >
                       <Text
@@ -273,15 +295,12 @@ function ChecklistItem({ text, checked }: { text: string; checked: boolean }) {
   return (
     <View style={styles.checklistItem}>
       <Ionicons
-        name={checked ? 'checkmark-circle' : 'ellipse-outline'}
+        name={checked ? "checkmark-circle" : "ellipse-outline"}
         size={20}
-        color={checked ? '#0066CC' : MODERN_COLORS.border}
+        color={checked ? "#0066CC" : MODERN_COLORS.border}
       />
       <Text
-        style={[
-          styles.checklistText,
-          checked && styles.checklistTextChecked,
-        ]}
+        style={[styles.checklistText, checked && styles.checklistTextChecked]}
       >
         {text}
       </Text>
@@ -296,9 +315,9 @@ const styles = StyleSheet.create({
   },
   scoreCard: {
     padding: 24,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 12,
-    alignItems: 'center',
+    alignItems: "center",
     ...MODERN_SHADOWS.md,
   },
   scoreLabel: {
@@ -312,13 +331,13 @@ const styles = StyleSheet.create({
     borderRadius: 60,
     borderWidth: 8,
     borderColor: MODERN_COLORS.accentSoft,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: 16,
   },
   scoreValue: {
     fontSize: 42,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   scoreMax: {
     fontSize: 16,
@@ -327,26 +346,26 @@ const styles = StyleSheet.create({
   scoreDescription: {
     fontSize: 14,
     color: MODERN_COLORS.textMuted,
-    textAlign: 'center',
+    textAlign: "center",
   },
   statsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 12,
     marginBottom: 16,
   },
   statCard: {
     flex: 1,
-    minWidth: '45%',
+    minWidth: "45%",
     padding: 16,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 8,
     borderLeftWidth: 4,
     ...MODERN_SHADOWS.sm,
   },
   statValue: {
     fontSize: 28,
-    fontWeight: '700',
+    fontWeight: "700",
     color: MODERN_COLORS.text,
     marginBottom: 4,
   },
@@ -356,14 +375,14 @@ const styles = StyleSheet.create({
   },
   resolutionCard: {
     padding: 16,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 12,
     ...MODERN_SHADOWS.sm,
   },
   resolutionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 12,
   },
   resolutionLabel: {
@@ -372,26 +391,26 @@ const styles = StyleSheet.create({
   },
   resolutionValue: {
     fontSize: 20,
-    fontWeight: '700',
+    fontWeight: "700",
     color: MODERN_COLORS.primary,
   },
   progressBar: {
     height: 8,
     backgroundColor: MODERN_COLORS.border,
     borderRadius: 4,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   progressFill: {
-    height: '100%',
-    backgroundColor: '#0066CC',
+    height: "100%",
+    backgroundColor: "#0066CC",
     borderRadius: 4,
   },
   incidentCard: {
-    flexDirection: 'row',
-    backgroundColor: '#fff',
+    flexDirection: "row",
+    backgroundColor: "#fff",
     borderRadius: 12,
     marginBottom: 12,
-    overflow: 'hidden',
+    overflow: "hidden",
     ...MODERN_SHADOWS.sm,
   },
   incidentIndicator: {
@@ -402,15 +421,15 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   incidentHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
     marginBottom: 8,
   },
   incidentDescription: {
     flex: 1,
     fontSize: 15,
-    fontWeight: '600',
+    fontWeight: "600",
     color: MODERN_COLORS.text,
   },
   statusBadge: {
@@ -421,11 +440,11 @@ const styles = StyleSheet.create({
   },
   statusText: {
     fontSize: 11,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   incidentMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6,
     marginTop: 4,
   },
@@ -435,13 +454,13 @@ const styles = StyleSheet.create({
   },
   checklistCard: {
     padding: 16,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 12,
     ...MODERN_SHADOWS.sm,
   },
   checklistItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 12,
     paddingVertical: 12,
     borderBottomWidth: 1,
@@ -454,18 +473,18 @@ const styles = StyleSheet.create({
   },
   checklistTextChecked: {
     color: MODERN_COLORS.textMuted,
-    textDecorationLine: 'line-through',
+    textDecorationLine: "line-through",
   },
   contactCard: {
     padding: 16,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 12,
     gap: 16,
     ...MODERN_SHADOWS.sm,
   },
   contactRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 12,
   },
   contactInfo: {
@@ -477,7 +496,7 @@ const styles = StyleSheet.create({
   },
   contactNumber: {
     fontSize: 18,
-    fontWeight: '700',
+    fontWeight: "700",
     color: MODERN_COLORS.text,
   },
 });

@@ -25,16 +25,18 @@ import type {
     UpdateMeetingParams,
     UpdateMessageParams,
     VotePollParams,
-} from '@/types/communication';
-import { apiFetch } from './api';
+} from "@/types/communication";
+import { apiFetch } from "./api";
 
 // Messages
-export async function getMessages(params: GetMessagesParams): Promise<Message[]> {
+export async function getMessages(
+  params: GetMessagesParams,
+): Promise<Message[]> {
   const queryParams = new URLSearchParams();
-  queryParams.append('channelId', params.channelId);
-  if (params.limit) queryParams.append('limit', params.limit.toString());
-  if (params.before) queryParams.append('before', params.before);
-  if (params.after) queryParams.append('after', params.after);
+  queryParams.append("channelId", params.channelId);
+  if (params.limit) queryParams.append("limit", params.limit.toString());
+  if (params.before) queryParams.append("before", params.before);
+  if (params.after) queryParams.append("after", params.after);
 
   return apiFetch(`/messages?${queryParams.toString()}`);
 }
@@ -45,229 +47,271 @@ export async function getMessage(id: string): Promise<Message> {
 
 export async function sendMessage(params: SendMessageParams): Promise<Message> {
   const formData = new FormData();
-  formData.append('channelId', params.channelId);
-  formData.append('type', params.type);
-  formData.append('content', params.content);
-  
+  formData.append("channelId", params.channelId);
+  formData.append("type", params.type);
+  formData.append("content", params.content);
+
   if (params.attachments) {
     params.attachments.forEach((file) => {
-      formData.append('attachments', file);
+      formData.append("attachments", file);
     });
   }
-  
+
   if (params.mentions) {
-    formData.append('mentions', JSON.stringify(params.mentions));
-  }
-  
-  if (params.replyTo) {
-    formData.append('replyTo', params.replyTo);
-  }
-  
-  if (params.metadata) {
-    formData.append('metadata', JSON.stringify(params.metadata));
+    formData.append("mentions", JSON.stringify(params.mentions));
   }
 
-  return apiFetch('/messages', {
-    method: 'POST',
+  if (params.replyTo) {
+    formData.append("replyTo", params.replyTo);
+  }
+
+  if (params.metadata) {
+    formData.append("metadata", JSON.stringify(params.metadata));
+  }
+
+  return apiFetch("/messages", {
+    method: "POST",
     body: formData,
   });
 }
 
-export async function updateMessage(params: UpdateMessageParams): Promise<Message> {
+export async function updateMessage(
+  params: UpdateMessageParams,
+): Promise<Message> {
   const { id, ...data } = params;
   return apiFetch(`/messages/${id}`, {
-    method: 'PUT',
+    method: "PUT",
     body: JSON.stringify(data),
   });
 }
 
 export async function deleteMessage(id: string): Promise<void> {
   return apiFetch(`/messages/${id}`, {
-    method: 'DELETE',
+    method: "DELETE",
   });
 }
 
-export async function addReaction(messageId: string, reaction: string): Promise<Message> {
+export async function addReaction(
+  messageId: string,
+  reaction: string,
+): Promise<Message> {
   return apiFetch(`/messages/${messageId}/reactions`, {
-    method: 'POST',
+    method: "POST",
     body: JSON.stringify({ reaction }),
   });
 }
 
-export async function removeReaction(messageId: string, reaction: string): Promise<Message> {
+export async function removeReaction(
+  messageId: string,
+  reaction: string,
+): Promise<Message> {
   return apiFetch(`/messages/${messageId}/reactions/${reaction}`, {
-    method: 'DELETE',
+    method: "DELETE",
   });
 }
 
 export async function markAsRead(channelId: string): Promise<void> {
-  return apiFetch(`/channels/${channelId}/read`, {
-    method: 'POST',
+  return apiFetch(`/chat/rooms/${channelId}/read`, {
+    method: "POST",
   });
 }
 
-export async function searchMessages(params: SearchMessagesParams): Promise<Message[]> {
+export async function searchMessages(
+  params: SearchMessagesParams,
+): Promise<Message[]> {
   const queryParams = new URLSearchParams();
-  queryParams.append('query', params.query);
-  if (params.channelId) queryParams.append('channelId', params.channelId);
-  if (params.fromDate) queryParams.append('fromDate', params.fromDate);
-  if (params.toDate) queryParams.append('toDate', params.toDate);
-  if (params.senderId) queryParams.append('senderId', params.senderId);
+  queryParams.append("query", params.query);
+  if (params.channelId) queryParams.append("channelId", params.channelId);
+  if (params.fromDate) queryParams.append("fromDate", params.fromDate);
+  if (params.toDate) queryParams.append("toDate", params.toDate);
+  if (params.senderId) queryParams.append("senderId", params.senderId);
   if (params.hasAttachments !== undefined) {
-    queryParams.append('hasAttachments', params.hasAttachments.toString());
+    queryParams.append("hasAttachments", params.hasAttachments.toString());
   }
 
   return apiFetch(`/messages/search?${queryParams.toString()}`);
 }
 
 // Channels
-export async function getChannels(params: GetChannelsParams): Promise<Channel[]> {
+export async function getChannels(
+  params: GetChannelsParams,
+): Promise<Channel[]> {
   const queryParams = new URLSearchParams();
-  if (params.type) queryParams.append('type', params.type);
-  if (params.projectId) queryParams.append('projectId', params.projectId);
+  if (params.type) queryParams.append("type", params.type);
+  // Only append projectId if it's defined and not empty
+  if (
+    params.projectId !== undefined &&
+    params.projectId !== null &&
+    params.projectId !== ""
+  ) {
+    queryParams.append("projectId", params.projectId);
+  }
   if (params.includeArchived !== undefined) {
-    queryParams.append('includeArchived', params.includeArchived.toString());
+    queryParams.append("includeArchived", params.includeArchived.toString());
   }
 
-  return apiFetch(`/channels?${queryParams.toString()}`);
+  const queryString = queryParams.toString();
+  // Use /chat/rooms endpoint (backend uses this instead of /channels)
+  const url = queryString ? `/chat/rooms?${queryString}` : "/chat/rooms";
+  return apiFetch(url);
 }
 
 export async function getChannel(id: string): Promise<Channel> {
-  return apiFetch(`/channels/${id}`);
+  return apiFetch(`/chat/rooms/${id}`);
 }
 
-export async function createChannel(params: CreateChannelParams): Promise<Channel> {
-  return apiFetch('/channels', {
-    method: 'POST',
+export async function createChannel(
+  params: CreateChannelParams,
+): Promise<Channel> {
+  return apiFetch("/chat/rooms", {
+    method: "POST",
     body: JSON.stringify(params),
   });
 }
 
-export async function updateChannel(params: UpdateChannelParams): Promise<Channel> {
+export async function updateChannel(
+  params: UpdateChannelParams,
+): Promise<Channel> {
   const { id, ...data } = params;
-  return apiFetch(`/channels/${id}`, {
-    method: 'PUT',
+  return apiFetch(`/chat/rooms/${id}`, {
+    method: "PUT",
     body: JSON.stringify(data),
   });
 }
 
 export async function deleteChannel(id: string): Promise<void> {
-  return apiFetch(`/channels/${id}`, {
-    method: 'DELETE',
+  return apiFetch(`/chat/rooms/${id}`, {
+    method: "DELETE",
   });
 }
 
-export async function addChannelMembers(params: AddChannelMembersParams): Promise<Channel> {
+export async function addChannelMembers(
+  params: AddChannelMembersParams,
+): Promise<Channel> {
   const { channelId, ...data } = params;
-  return apiFetch(`/channels/${channelId}/members`, {
-    method: 'POST',
+  return apiFetch(`/chat/rooms/${channelId}/members`, {
+    method: "POST",
     body: JSON.stringify(data),
   });
 }
 
-export async function removeChannelMember(channelId: string, userId: string): Promise<Channel> {
-  return apiFetch(`/channels/${channelId}/members/${userId}`, {
-    method: 'DELETE',
+export async function removeChannelMember(
+  channelId: string,
+  userId: string,
+): Promise<Channel> {
+  return apiFetch(`/chat/rooms/${channelId}/members/${userId}`, {
+    method: "DELETE",
   });
 }
 
 export async function leaveChannel(channelId: string): Promise<void> {
-  return apiFetch(`/channels/${channelId}/leave`, {
-    method: 'POST',
+  return apiFetch(`/chat/rooms/${channelId}/leave`, {
+    method: "POST",
   });
 }
 
-export async function muteChannel(channelId: string, muteUntil?: string): Promise<Channel> {
-  return apiFetch(`/channels/${channelId}/mute`, {
-    method: 'POST',
+export async function muteChannel(
+  channelId: string,
+  muteUntil?: string,
+): Promise<Channel> {
+  return apiFetch(`/chat/rooms/${channelId}/mute`, {
+    method: "POST",
     body: JSON.stringify({ muteUntil }),
   });
 }
 
 export async function unmuteChannel(channelId: string): Promise<Channel> {
-  return apiFetch(`/channels/${channelId}/unmute`, {
-    method: 'POST',
+  return apiFetch(`/chat/rooms/${channelId}/unmute`, {
+    method: "POST",
   });
 }
 
 export async function pinChannel(channelId: string): Promise<Channel> {
-  return apiFetch(`/channels/${channelId}/pin`, {
-    method: 'POST',
+  return apiFetch(`/chat/rooms/${channelId}/pin`, {
+    method: "POST",
   });
 }
 
 export async function unpinChannel(channelId: string): Promise<Channel> {
-  return apiFetch(`/channels/${channelId}/unpin`, {
-    method: 'POST',
+  return apiFetch(`/chat/rooms/${channelId}/unpin`, {
+    method: "POST",
   });
 }
 
 export async function archiveChannel(channelId: string): Promise<Channel> {
-  return apiFetch(`/channels/${channelId}/archive`, {
-    method: 'POST',
+  return apiFetch(`/chat/rooms/${channelId}/archive`, {
+    method: "POST",
   });
 }
 
 // Calls
 export async function startCall(params: StartCallParams): Promise<Call> {
-  return apiFetch('/calls', {
-    method: 'POST',
+  return apiFetch("/calls", {
+    method: "POST",
     body: JSON.stringify(params),
   });
 }
 
 export async function joinCall(callId: string): Promise<Call> {
   return apiFetch(`/calls/${callId}/join`, {
-    method: 'POST',
+    method: "POST",
   });
 }
 
 export async function leaveCall(callId: string): Promise<void> {
   return apiFetch(`/calls/${callId}/leave`, {
-    method: 'POST',
+    method: "POST",
   });
 }
 
 export async function endCall(callId: string): Promise<Call> {
   return apiFetch(`/calls/${callId}/end`, {
-    method: 'POST',
+    method: "POST",
   });
 }
 
-export async function toggleMute(callId: string, isMuted: boolean): Promise<Call> {
+export async function toggleMute(
+  callId: string,
+  isMuted: boolean,
+): Promise<Call> {
   return apiFetch(`/calls/${callId}/mute`, {
-    method: 'POST',
+    method: "POST",
     body: JSON.stringify({ isMuted }),
   });
 }
 
-export async function toggleVideo(callId: string, isVideoEnabled: boolean): Promise<Call> {
+export async function toggleVideo(
+  callId: string,
+  isVideoEnabled: boolean,
+): Promise<Call> {
   return apiFetch(`/calls/${callId}/video`, {
-    method: 'POST',
+    method: "POST",
     body: JSON.stringify({ isVideoEnabled }),
   });
 }
 
 export async function startScreenShare(callId: string): Promise<Call> {
   return apiFetch(`/calls/${callId}/screen-share/start`, {
-    method: 'POST',
+    method: "POST",
   });
 }
 
 export async function stopScreenShare(callId: string): Promise<Call> {
   return apiFetch(`/calls/${callId}/screen-share/stop`, {
-    method: 'POST',
+    method: "POST",
   });
 }
 
 // Meetings
-export async function getMeetings(params: GetMeetingsParams): Promise<Meeting[]> {
+export async function getMeetings(
+  params: GetMeetingsParams,
+): Promise<Meeting[]> {
   const queryParams = new URLSearchParams();
-  if (params.projectId) queryParams.append('projectId', params.projectId);
-  if (params.status) queryParams.append('status', params.status);
-  if (params.fromDate) queryParams.append('fromDate', params.fromDate);
-  if (params.toDate) queryParams.append('toDate', params.toDate);
-  if (params.userId) queryParams.append('userId', params.userId);
+  if (params.projectId) queryParams.append("projectId", params.projectId);
+  if (params.status) queryParams.append("status", params.status);
+  if (params.fromDate) queryParams.append("fromDate", params.fromDate);
+  if (params.toDate) queryParams.append("toDate", params.toDate);
+  if (params.userId) queryParams.append("userId", params.userId);
 
   return apiFetch(`/meetings?${queryParams.toString()}`);
 }
@@ -276,50 +320,57 @@ export async function getMeeting(id: string): Promise<Meeting> {
   return apiFetch(`/meetings/${id}`);
 }
 
-export async function createMeeting(params: CreateMeetingParams): Promise<Meeting> {
-  return apiFetch('/meetings', {
-    method: 'POST',
+export async function createMeeting(
+  params: CreateMeetingParams,
+): Promise<Meeting> {
+  return apiFetch("/meetings", {
+    method: "POST",
     body: JSON.stringify(params),
   });
 }
 
-export async function updateMeeting(params: UpdateMeetingParams): Promise<Meeting> {
+export async function updateMeeting(
+  params: UpdateMeetingParams,
+): Promise<Meeting> {
   const { id, ...data } = params;
   return apiFetch(`/meetings/${id}`, {
-    method: 'PUT',
+    method: "PUT",
     body: JSON.stringify(data),
   });
 }
 
 export async function deleteMeeting(id: string): Promise<void> {
   return apiFetch(`/meetings/${id}`, {
-    method: 'DELETE',
+    method: "DELETE",
   });
 }
 
-export async function respondToMeeting(id: string, rsvp: 'ACCEPTED' | 'DECLINED' | 'TENTATIVE'): Promise<Meeting> {
+export async function respondToMeeting(
+  id: string,
+  rsvp: "ACCEPTED" | "DECLINED" | "TENTATIVE",
+): Promise<Meeting> {
   return apiFetch(`/meetings/${id}/rsvp`, {
-    method: 'POST',
+    method: "POST",
     body: JSON.stringify({ rsvp }),
   });
 }
 
 export async function startMeeting(id: string): Promise<Meeting> {
   return apiFetch(`/meetings/${id}/start`, {
-    method: 'POST',
+    method: "POST",
   });
 }
 
 export async function endMeeting(id: string): Promise<Meeting> {
   return apiFetch(`/meetings/${id}/end`, {
-    method: 'POST',
+    method: "POST",
   });
 }
 
 // Polls
 export async function createPoll(params: CreatePollParams): Promise<Poll> {
-  return apiFetch('/polls', {
-    method: 'POST',
+  return apiFetch("/polls", {
+    method: "POST",
     body: JSON.stringify(params),
   });
 }
@@ -327,14 +378,14 @@ export async function createPoll(params: CreatePollParams): Promise<Poll> {
 export async function votePoll(params: VotePollParams): Promise<Poll> {
   const { pollId, ...data } = params;
   return apiFetch(`/polls/${pollId}/vote`, {
-    method: 'POST',
+    method: "POST",
     body: JSON.stringify(data),
   });
 }
 
 export async function closePoll(pollId: string): Promise<Poll> {
   return apiFetch(`/polls/${pollId}/close`, {
-    method: 'POST',
+    method: "POST",
   });
 }
 
@@ -343,40 +394,48 @@ export async function getOnlineStatus(userId: string): Promise<OnlineStatus> {
   return apiFetch(`/users/${userId}/status`);
 }
 
-export async function updateOnlineStatus(status: 'ONLINE' | 'AWAY' | 'BUSY' | 'OFFLINE', customStatus?: any): Promise<OnlineStatus> {
-  return apiFetch('/users/me/status', {
-    method: 'PUT',
+export async function updateOnlineStatus(
+  status: "ONLINE" | "AWAY" | "BUSY" | "OFFLINE",
+  customStatus?: any,
+): Promise<OnlineStatus> {
+  return apiFetch("/users/me/status", {
+    method: "PUT",
     body: JSON.stringify({ status, customStatus }),
   });
 }
 
 // Typing indicators
 export async function sendTypingIndicator(channelId: string): Promise<void> {
-  return apiFetch(`/channels/${channelId}/typing`, {
-    method: 'POST',
+  return apiFetch(`/chat/rooms/${channelId}/typing`, {
+    method: "POST",
   });
 }
 
 // Notification preferences
 export async function getNotificationPreferences(): Promise<NotificationPreferences> {
-  return apiFetch('/users/me/notification-preferences');
+  return apiFetch("/users/me/notification-preferences");
 }
 
-export async function updateNotificationPreferences(preferences: Partial<NotificationPreferences>): Promise<NotificationPreferences> {
-  return apiFetch('/users/me/notification-preferences', {
-    method: 'PUT',
+export async function updateNotificationPreferences(
+  preferences: Partial<NotificationPreferences>,
+): Promise<NotificationPreferences> {
+  return apiFetch("/users/me/notification-preferences", {
+    method: "PUT",
     body: JSON.stringify(preferences),
   });
 }
 
 // File uploads
-export async function uploadFile(file: File, channelId: string): Promise<{ url: string; filename: string }> {
+export async function uploadFile(
+  file: File,
+  channelId: string,
+): Promise<{ url: string; filename: string }> {
   const formData = new FormData();
-  formData.append('file', file);
-  formData.append('channelId', channelId);
+  formData.append("file", file);
+  formData.append("channelId", channelId);
 
-  return apiFetch('/files/upload', {
-    method: 'POST',
+  return apiFetch("/files/upload", {
+    method: "POST",
     body: formData,
   });
 }

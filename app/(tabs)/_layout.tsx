@@ -1,121 +1,137 @@
-import { CustomTabBar } from '@/components/navigation/custom-tab-bar';
-import { Colors } from '@/constants/theme';
-import { Tabs } from 'expo-router';
-import { useColorScheme } from 'react-native';
+import { CustomTabBar } from "@/components/navigation/custom-tab-bar";
+import { Tabs } from "expo-router";
 
 export default function TabsLayout() {
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? 'light'];
-
   return (
-    <Tabs 
+    <Tabs
       tabBar={(props) => <CustomTabBar {...props} />}
-      screenOptions={{ 
+      screenOptions={{
         headerShown: false,
       }}
     >
-      <Tabs.Screen 
-        name="index" 
-        options={{ 
-          title: 'Trang chủ',
-        }} 
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: "Trang chủ",
+        }}
       />
-      <Tabs.Screen 
-        name="social" 
-        options={{ 
-          title: 'Cộng đồng',
-        }} 
+      <Tabs.Screen
+        name="social"
+        options={{
+          title: "Cộng đồng",
+        }}
       />
-      <Tabs.Screen 
-        name="home-construction" 
-        options={{ 
+      <Tabs.Screen
+        name="home-construction"
+        options={{
           href: null, // Hidden - moved to social
-          title: 'Home XD',
-        }} 
+          title: "Home XD",
+        }}
       />
-      <Tabs.Screen 
-        name="projects" 
-        options={{ 
-          title: 'Dự án',
-        }} 
+      <Tabs.Screen
+        name="projects"
+        options={{
+          title: "Dự án",
+        }}
       />
-      <Tabs.Screen 
-        name="live" 
-        options={{ 
-          title: 'Live',
-        }} 
+      <Tabs.Screen
+        name="live"
+        options={{
+          title: "Trực tiếp",
+        }}
       />
-      <Tabs.Screen 
-        name="notifications" 
-        options={{ 
+      <Tabs.Screen
+        name="notifications"
+        options={{
           href: null, // Hidden - notifications chỉ hiển thị ở header
-          title: 'Thông báo',
-        }} 
+          title: "Thông báo",
+        }}
       />
-      <Tabs.Screen 
-        name="profile" 
-        options={{ 
-          title: 'Cá nhân',
-        }} 
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: "Cá nhân",
+        }}
       />
-      <Tabs.Screen 
-        name="news" 
-        options={{ 
+      <Tabs.Screen
+        name="news"
+        options={{
           href: null, // Hidden - accessible from home quick actions
-          title: 'Tin tức',
-        }} 
+          title: "Tin tức",
+        }}
       />
-      <Tabs.Screen 
-        name="menu" 
-        options={{ 
+      <Tabs.Screen
+        name="menu"
+        options={{
           // Ẩn tab "Tiện ích" theo yêu cầu, vẫn có thể mở từ nút nhanh
           href: null,
-          title: 'Tiện ích',
-        }} 
+          title: "Tiện ích",
+        }}
       />
-      
+
       {/* Hidden utility tabs */}
-      <Tabs.Screen 
-        name="call-test" 
-        options={{ 
+      <Tabs.Screen
+        name="call-test"
+        options={{
           href: null,
-          title: 'Call Test',
-        }} 
+          title: "Thử nghiệm cuộc gọi",
+        }}
       />
-      <Tabs.Screen 
-        name="contacts" 
-        options={{ 
+      <Tabs.Screen
+        name="contacts"
+        options={{
           href: null,
-          title: 'Liên hệ',
-        }} 
+          title: "Liên hệ",
+        }}
       />
-      <Tabs.Screen 
-        name="test-crm" 
-        options={{ 
+      <Tabs.Screen
+        name="test-crm"
+        options={{
           href: null,
-          title: 'Test CRM',
-        }} 
+          title: "Quản lý khách hàng",
+        }}
       />
-      <Tabs.Screen 
-        name="progress" 
-        options={{ 
+      <Tabs.Screen
+        name="progress"
+        options={{
           href: null,
-          title: 'Tiến độ',
-        }} 
+          title: "Tiến độ",
+        }}
       />
-      <Tabs.Screen 
-        name="ai-assistant" 
-        options={{ 
+      <Tabs.Screen
+        name="ai-assistant"
+        options={{
           href: null,
-          title: 'AI Assistant',
-        }} 
+          title: "Trợ lý AI",
+        }}
       />
-      <Tabs.Screen 
-        name="api-status" 
-        options={{ 
+      <Tabs.Screen
+        name="api-status"
+        options={{
           href: null,
-          title: 'API Status',
-        }} 
+          title: "Trạng thái hệ thống",
+        }}
+      />
+      <Tabs.Screen
+        name="messages"
+        options={{
+          href: null,
+          title: "Tin nhắn",
+        }}
+      />
+      <Tabs.Screen
+        name="communication"
+        options={{
+          href: null, // Hidden - accessible from quick actions
+          title: "Liên lạc",
+        }}
+      />
+      <Tabs.Screen
+        name="design-library"
+        options={{
+          href: null, // Hidden - accessible from menu/quick actions
+          title: "Thư viện thiết kế",
+        }}
       />
     </Tabs>
   );

@@ -2,14 +2,18 @@
  * Reels Video Player
  * Fullscreen vertical video player giống Facebook Reels / Instagram Reels / TikTok
  * With like, comment, share, and view tracking
+ *
+ * Uses VideoPlayerController to ensure only 1 video plays at a time globally
+ * @updated 29/01/2026 - Integrated VideoPlayerController
  */
 
-import { useAuth } from '@/context/AuthContext';
-import { useVideoInteractions } from '@/context/VideoInteractionsContext';
-import { HapticFeedback } from '@/utils/haptics';
-import { Ionicons } from '@expo/vector-icons';
-import { useVideoPlayer, VideoView } from 'expo-video';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useAuth } from "@/context/AuthContext";
+import { useVideoInteractions } from "@/context/VideoInteractionsContext";
+import { useVideoPlayback } from "@/hooks/useVideoPlayback";
+import { HapticFeedback } from "@/utils/haptics";
+import { Ionicons } from "@expo/vector-icons";
+import { useVideoPlayer, VideoView } from "expo-video";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
     ActivityIndicator,
     Alert,
@@ -23,11 +27,11 @@ import {
     Text,
     TouchableOpacity,
     View,
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { CommentsModal } from './ui/CommentsModal';
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { CommentsModal } from "./ui/CommentsModal";
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 interface ReelsPlayerProps {
   visible: boolean;
@@ -44,7 +48,7 @@ export const ReelsPlayer: React.FC<ReelsPlayerProps> = ({
   visible,
   videoUrl,
   videoAsset,
-  videoId = 'unknown',
+  videoId = "unknown",
   title,
   views: initialViews,
   likes: initialLikes,
@@ -79,14 +83,24 @@ export const ReelsPlayer: React.FC<ReelsPlayerProps> = ({
   const sharesCount = getVideoShares(videoId);
 
   // Determine video source (URL or local asset)
-  const videoSource = videoAsset || videoUrl || '';
+  const videoSource = videoAsset || videoUrl || "";
+
+  // Use centralized video playback controller
+  const { registerPlayer, play, pause } = useVideoPlayback(`reels-${videoId}`);
 
   // Use the new expo-video API
   const player = useVideoPlayer(videoSource, (player) => {
     player.loop = true;
     player.muted = isMuted;
-    player.play();
+    // Don't auto-play directly - let controller manage it
   });
+
+  // Register player with controller
+  useEffect(() => {
+    if (player) {
+      registerPlayer(player);
+    }
+  }, [player, registerPlayer]);
 
   // Track view when video starts playing
   useEffect(() => {
@@ -99,9 +113,11 @@ export const ReelsPlayer: React.FC<ReelsPlayerProps> = ({
   useEffect(() => {
     return () => {
       if (watchStartTime.current > 0) {
-        const duration = Math.floor((Date.now() - watchStartTime.current) / 1000);
+        const duration = Math.floor(
+          (Date.now() - watchStartTime.current) / 1000,
+        );
         totalWatchTime.current += duration;
-        
+
         // Track if watched for at least 3 seconds
         if (totalWatchTime.current >= 3) {
           const completed = totalWatchTime.current >= 30; // Consider completed if watched 30+ seconds
@@ -113,22 +129,26 @@ export const ReelsPlayer: React.FC<ReelsPlayerProps> = ({
 
   useEffect(() => {
     if (!visible) {
-      player.pause();
+      // Pause through controller
+      pause();
       // Save watch time before pausing
       if (watchStartTime.current > 0) {
-        const duration = Math.floor((Date.now() - watchStartTime.current) / 1000);
+        const duration = Math.floor(
+          (Date.now() - watchStartTime.current) / 1000,
+        );
         totalWatchTime.current += duration;
         watchStartTime.current = 0;
       }
     } else {
       setIsLoading(true);
-      player.play();
+      // Play through controller - ensures only 1 video plays at a time
+      play();
       watchStartTime.current = Date.now();
       // Simulate loading complete after a short delay
       const timer = setTimeout(() => setIsLoading(false), 500);
       return () => clearTimeout(timer);
     }
-  }, [visible, player]);
+  }, [visible, play, pause]);
 
   useEffect(() => {
     player.muted = isMuted;
@@ -140,7 +160,9 @@ export const ReelsPlayer: React.FC<ReelsPlayerProps> = ({
       player.pause();
       // Save watch time
       if (watchStartTime.current > 0) {
-        const duration = Math.floor((Date.now() - watchStartTime.current) / 1000);
+        const duration = Math.floor(
+          (Date.now() - watchStartTime.current) / 1000,
+        );
         totalWatchTime.current += duration;
         watchStartTime.current = 0;
       }
@@ -162,7 +184,7 @@ export const ReelsPlayer: React.FC<ReelsPlayerProps> = ({
 
   const handleLike = async () => {
     if (!user) {
-      Alert.alert('Đăng nhập', 'Bạn cần đăng nhập để thích video');
+      Alert.alert("Đăng nhập", "Bạn cần đăng nhập để thích video");
       return;
     }
 
@@ -172,7 +194,7 @@ export const ReelsPlayer: React.FC<ReelsPlayerProps> = ({
 
   const handleComment = () => {
     if (!user) {
-      Alert.alert('Đăng nhập', 'Bạn cần đăng nhập để bình luận');
+      Alert.alert("Đăng nhập", "Bạn cần đăng nhập để bình luận");
       return;
     }
 
@@ -182,7 +204,7 @@ export const ReelsPlayer: React.FC<ReelsPlayerProps> = ({
 
   const handleShare = async () => {
     HapticFeedback.light();
-    
+
     try {
       const shareUrl = videoUrl || `app://video/${videoId}`;
       const result = await Share.share({
@@ -192,18 +214,18 @@ export const ReelsPlayer: React.FC<ReelsPlayerProps> = ({
 
       if (result.action === Share.sharedAction) {
         // Track share
-        const platform = result.activityType || 'other';
+        const platform = result.activityType || "other";
         await trackShare(videoId, platform as any);
         HapticFeedback.success();
       }
     } catch (error) {
-      console.error('[ReelsPlayer] Error sharing:', error);
+      console.error("[ReelsPlayer] Error sharing:", error);
       HapticFeedback.error();
     }
   };
 
   const formatNumber = (num?: number): string => {
-    if (!num) return '0';
+    if (!num) return "0";
     if (num >= 1000000) {
       return `${(num / 1000000).toFixed(1)}M`;
     } else if (num >= 1000) {
@@ -256,7 +278,11 @@ export const ReelsPlayer: React.FC<ReelsPlayerProps> = ({
               {/* Play/Pause Indicator */}
               {!player.playing && !isLoading && (
                 <View style={styles.playPauseIndicator}>
-                  <Ionicons name="play" size={80} color="rgba(255,255,255,0.8)" />
+                  <Ionicons
+                    name="play"
+                    size={80}
+                    color="rgba(255,255,255,0.8)"
+                  />
                 </View>
               )}
             </>
@@ -271,7 +297,9 @@ export const ReelsPlayer: React.FC<ReelsPlayerProps> = ({
         </View>
 
         {/* Bottom Info */}
-        <View style={[styles.bottomInfo, { paddingBottom: insets.bottom + 16 }]}>
+        <View
+          style={[styles.bottomInfo, { paddingBottom: insets.bottom + 16 }]}
+        >
           {/* Video Info */}
           <View style={styles.infoSection}>
             {title && (
@@ -283,20 +311,38 @@ export const ReelsPlayer: React.FC<ReelsPlayerProps> = ({
               <View style={styles.statsRow}>
                 {viewsCount > 0 && (
                   <View style={styles.statItem}>
-                    <Ionicons name="eye-outline" size={16} color="rgba(255,255,255,0.8)" />
-                    <Text style={styles.statText}>{formatNumber(viewsCount)} lượt xem</Text>
+                    <Ionicons
+                      name="eye-outline"
+                      size={16}
+                      color="rgba(255,255,255,0.8)"
+                    />
+                    <Text style={styles.statText}>
+                      {formatNumber(viewsCount)} lượt xem
+                    </Text>
                   </View>
                 )}
                 {likesCount > 0 && (
                   <View style={styles.statItem}>
-                    <Ionicons name="heart" size={16} color={isLiked ? '#ff4444' : 'rgba(255,255,255,0.8)'} />
-                    <Text style={styles.statText}>{formatNumber(likesCount)}</Text>
+                    <Ionicons
+                      name="heart"
+                      size={16}
+                      color={isLiked ? "#ff4444" : "rgba(255,255,255,0.8)"}
+                    />
+                    <Text style={styles.statText}>
+                      {formatNumber(likesCount)}
+                    </Text>
                   </View>
                 )}
                 {commentsCount > 0 && (
                   <View style={styles.statItem}>
-                    <Ionicons name="chatbubble-outline" size={16} color="rgba(255,255,255,0.8)" />
-                    <Text style={styles.statText}>{formatNumber(commentsCount)}</Text>
+                    <Ionicons
+                      name="chatbubble-outline"
+                      size={16}
+                      color="rgba(255,255,255,0.8)"
+                    />
+                    <Text style={styles.statText}>
+                      {formatNumber(commentsCount)}
+                    </Text>
                   </View>
                 )}
               </View>
@@ -307,25 +353,33 @@ export const ReelsPlayer: React.FC<ReelsPlayerProps> = ({
           <View style={styles.actionButtons}>
             {/* Like */}
             <TouchableOpacity style={styles.actionButton} onPress={handleLike}>
-              <View style={[styles.actionIconContainer, isLiked && styles.actionIconLiked]}>
+              <View
+                style={[
+                  styles.actionIconContainer,
+                  isLiked && styles.actionIconLiked,
+                ]}
+              >
                 <Ionicons
-                  name={isLiked ? 'heart' : 'heart-outline'}
+                  name={isLiked ? "heart" : "heart-outline"}
                   size={24}
-                  color={isLiked ? '#ff4444' : '#fff'}
+                  color={isLiked ? "#ff4444" : "#fff"}
                 />
               </View>
               <Text style={styles.actionLabel}>
-                {likesCount > 0 ? formatNumber(likesCount) : 'Thích'}
+                {likesCount > 0 ? formatNumber(likesCount) : "Thích"}
               </Text>
             </TouchableOpacity>
 
             {/* Comment */}
-            <TouchableOpacity style={styles.actionButton} onPress={handleComment}>
+            <TouchableOpacity
+              style={styles.actionButton}
+              onPress={handleComment}
+            >
               <View style={styles.actionIconContainer}>
                 <Ionicons name="chatbubble-outline" size={24} color="#fff" />
               </View>
               <Text style={styles.actionLabel}>
-                {commentsCount > 0 ? formatNumber(commentsCount) : 'Bình luận'}
+                {commentsCount > 0 ? formatNumber(commentsCount) : "Bình luận"}
               </Text>
             </TouchableOpacity>
 
@@ -335,21 +389,24 @@ export const ReelsPlayer: React.FC<ReelsPlayerProps> = ({
                 <Ionicons name="share-social-outline" size={24} color="#fff" />
               </View>
               <Text style={styles.actionLabel}>
-                {sharesCount > 0 ? formatNumber(sharesCount) : 'Chia sẻ'}
+                {sharesCount > 0 ? formatNumber(sharesCount) : "Chia sẻ"}
               </Text>
             </TouchableOpacity>
 
             {/* Mute/Unmute */}
-            <TouchableOpacity style={styles.actionButton} onPress={handleMuteToggle}>
+            <TouchableOpacity
+              style={styles.actionButton}
+              onPress={handleMuteToggle}
+            >
               <View style={styles.actionIconContainer}>
                 <Ionicons
-                  name={isMuted ? 'volume-mute' : 'volume-high'}
+                  name={isMuted ? "volume-mute" : "volume-high"}
                   size={24}
                   color="#fff"
                 />
               </View>
               <Text style={styles.actionLabel}>
-                {isMuted ? 'Bật âm' : 'Tắt âm'}
+                {isMuted ? "Bật âm" : "Tắt âm"}
               </Text>
             </TouchableOpacity>
           </View>
@@ -370,12 +427,12 @@ export const ReelsPlayer: React.FC<ReelsPlayerProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: "#000",
   },
   videoContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   video: {
     width: SCREEN_WIDTH,
@@ -383,47 +440,47 @@ const styles = StyleSheet.create({
   },
   loadingContainer: {
     ...StyleSheet.absoluteFillObject,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
   playPauseIndicator: {
     ...StyleSheet.absoluteFillObject,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.3)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.3)",
   },
   errorContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
   },
   errorText: {
     fontSize: 16,
-    color: '#fff',
+    color: "#fff",
     marginTop: 16,
     marginBottom: 24,
   },
   retryButton: {
-    backgroundColor: '#0891B2',
+    backgroundColor: "#0891B2",
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
   },
   retryText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   topBar: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 0,
     right: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: 16,
     paddingVertical: 12,
   },
@@ -431,68 +488,68 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   bottomInfo: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
     paddingHorizontal: 16,
     paddingTop: 24,
-    backgroundColor: 'linear-gradient(transparent, rgba(0,0,0,0.8))',
+    backgroundColor: "linear-gradient(transparent, rgba(0,0,0,0.8))",
   },
   infoSection: {
     marginBottom: 16,
   },
   title: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#fff',
+    fontWeight: "600",
+    color: "#fff",
     marginBottom: 8,
     lineHeight: 22,
   },
   statsRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 16,
   },
   statItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6,
   },
   statText: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.8)',
-    fontWeight: '500',
+    color: "rgba(255,255,255,0.8)",
+    fontWeight: "500",
   },
   actionButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexDirection: "row",
+    justifyContent: "space-around",
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.2)',
+    borderTopColor: "rgba(255,255,255,0.2)",
   },
   actionButton: {
-    alignItems: 'center',
+    alignItems: "center",
     gap: 6,
   },
   actionIconContainer: {
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(255,255,255,0.2)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   actionIconLiked: {
-    backgroundColor: 'rgba(255,68,68,0.2)',
+    backgroundColor: "rgba(255,68,68,0.2)",
   },
   actionLabel: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.8)',
-    fontWeight: '500',
+    color: "rgba(255,255,255,0.8)",
+    fontWeight: "500",
   },
 });

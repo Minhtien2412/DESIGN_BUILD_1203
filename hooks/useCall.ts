@@ -13,7 +13,6 @@ import {
     callService,
     CallType,
     getCallDisplayInfo,
-    MOCK_CALL_HISTORY,
 } from "@/services/api/call.service";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -123,23 +122,12 @@ export function useCall(options: UseCallOptions = {}): UseCallReturn {
         }
         setError(null);
 
-        // Try API first, fallback to mock data
-        let calls: Call[] = [];
-        let hasMore = false;
-
-        try {
-          const response = await callService.getCallHistory({
-            page,
-            limit: historyLimit,
-          });
-          calls = response.calls;
-          hasMore = response.hasMore;
-        } catch {
-          // Fallback to mock data in development
-          console.warn("[useCall] API failed, using mock data");
-          calls = MOCK_CALL_HISTORY;
-          hasMore = false;
-        }
+        const response = await callService.getCallHistory({
+          page,
+          limit: historyLimit,
+        });
+        const calls = response.calls;
+        const hasMore = response.hasMore;
 
         // Transform to CallHistoryItem
         const historyItems = calls.map((call) =>

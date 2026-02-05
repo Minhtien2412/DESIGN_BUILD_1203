@@ -1,21 +1,22 @@
 /**
  * CommentSection Component
  * Comments with reactions and replies
- * 
+ *
  * @author AI Assistant
  * @date 23/12/2025
  */
 
-import { useAuth } from '@/context/AuthContext';
-import { useSocial } from '@/context/SocialContext';
+import { useAuth } from "@/context/AuthContext";
+import { useSocial } from "@/context/SocialContext";
+import { Comment, REACTION_EMOJIS } from "@/types/social";
+import { formatTimeAgo } from "@/utils/format";
 import {
-    Comment,
-    REACTION_EMOJIS
-} from '@/types/social';
-import { formatTimeAgo } from '@/utils/format';
-import { errorNotification, lightImpact, successNotification } from '@/utils/haptics';
-import { Ionicons } from '@expo/vector-icons';
-import { memo, useCallback, useEffect, useState } from 'react';
+    errorNotification,
+    lightImpact,
+    successNotification,
+} from "@/utils/haptics";
+import { Ionicons } from "@expo/vector-icons";
+import { memo, useCallback, useEffect, useState } from "react";
 import {
     ActivityIndicator,
     FlatList,
@@ -27,8 +28,8 @@ import {
     TextInput,
     TouchableOpacity,
     View,
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface CommentSectionProps {
   postId: string;
@@ -68,7 +69,11 @@ const CommentItem = memo(function CommentItemComponent({
   return (
     <View style={[styles.commentItem, { marginLeft: level * 40 }]}>
       <Image
-        source={{ uri: comment.author.avatar || 'https://via.placeholder.com/32' }}
+        source={{
+          uri:
+            comment.author.avatar ||
+            "https://ui-avatars.com/api/?name=User&size=32&background=4CAF50&color=fff",
+        }}
         style={styles.commentAvatar}
       />
       <View style={styles.commentContent}>
@@ -79,10 +84,17 @@ const CommentItem = memo(function CommentItemComponent({
 
         {/* Comment Actions */}
         <View style={styles.commentActions}>
-          <Text style={styles.commentTime}>{formatTimeAgo(comment.createdAt)}</Text>
-          
+          <Text style={styles.commentTime}>
+            {formatTimeAgo(comment.createdAt)}
+          </Text>
+
           <TouchableOpacity onPress={handleLike}>
-            <Text style={[styles.commentAction, isLiked && styles.commentActionActive]}>
+            <Text
+              style={[
+                styles.commentAction,
+                isLiked && styles.commentActionActive,
+              ]}
+            >
               Thích
             </Text>
           </TouchableOpacity>
@@ -94,7 +106,7 @@ const CommentItem = memo(function CommentItemComponent({
           {comment.reactionsCount > 0 && (
             <View style={styles.commentReactions}>
               <Text style={styles.reactionEmoji}>
-                {REACTION_EMOJIS[comment.reactions.topReactions[0] || 'like']}
+                {REACTION_EMOJIS[comment.reactions.topReactions[0] || "like"]}
               </Text>
               <Text style={styles.reactionCount}>{comment.reactionsCount}</Text>
             </View>
@@ -103,7 +115,10 @@ const CommentItem = memo(function CommentItemComponent({
 
         {/* Replies */}
         {comment.repliesCount > 0 && !showReplies && (
-          <TouchableOpacity onPress={toggleReplies} style={styles.viewRepliesButton}>
+          <TouchableOpacity
+            onPress={toggleReplies}
+            style={styles.viewRepliesButton}
+          >
             <Ionicons name="return-down-forward" size={14} color="#65676B" />
             <Text style={styles.viewRepliesText}>
               Xem {comment.repliesCount} phản hồi
@@ -113,7 +128,7 @@ const CommentItem = memo(function CommentItemComponent({
 
         {showReplies && comment.replies && (
           <View style={styles.repliesContainer}>
-            {comment.replies.map(reply => (
+            {comment.replies.map((reply) => (
               <CommentItem
                 key={reply.id}
                 comment={reply}
@@ -129,12 +144,15 @@ const CommentItem = memo(function CommentItemComponent({
 });
 
 // Main Component
-function CommentSectionComponent({ postId, initialCommentsCount }: CommentSectionProps) {
+function CommentSectionComponent({
+  postId,
+  initialCommentsCount,
+}: CommentSectionProps) {
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
   const { loadComments, addComment, state } = useSocial();
 
-  const [commentText, setCommentText] = useState('');
+  const [commentText, setCommentText] = useState("");
   const [replyingTo, setReplyingTo] = useState<Comment | null>(null);
   const [isSending, setIsSending] = useState(false);
 
@@ -166,7 +184,7 @@ function CommentSectionComponent({ postId, initialCommentsCount }: CommentSectio
 
     try {
       await addComment(postId, text, replyingTo?.id);
-      setCommentText('');
+      setCommentText("");
       setReplyingTo(null);
       successNotification();
     } catch (error) {
@@ -181,7 +199,7 @@ function CommentSectionComponent({ postId, initialCommentsCount }: CommentSectio
     ({ item }: { item: Comment }) => (
       <CommentItem comment={item} onReply={handleReply} />
     ),
-    [handleReply]
+    [handleReply],
   );
 
   // Key extractor
@@ -190,7 +208,7 @@ function CommentSectionComponent({ postId, initialCommentsCount }: CommentSectio
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
       keyboardVerticalOffset={100}
     >
       {/* Comments List */}
@@ -201,7 +219,9 @@ function CommentSectionComponent({ postId, initialCommentsCount }: CommentSectio
       ) : comments.length === 0 ? (
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyText}>Chưa có bình luận nào</Text>
-          <Text style={styles.emptySubtext}>Hãy là người đầu tiên bình luận!</Text>
+          <Text style={styles.emptySubtext}>
+            Hãy là người đầu tiên bình luận!
+          </Text>
         </View>
       ) : (
         <FlatList
@@ -217,7 +237,10 @@ function CommentSectionComponent({ postId, initialCommentsCount }: CommentSectio
       {replyingTo && (
         <View style={styles.replyingContainer}>
           <Text style={styles.replyingText}>
-            Đang trả lời <Text style={styles.replyingName}>{replyingTo.author.displayName}</Text>
+            Đang trả lời{" "}
+            <Text style={styles.replyingName}>
+              {replyingTo.author.displayName}
+            </Text>
           </Text>
           <TouchableOpacity onPress={cancelReply}>
             <Ionicons name="close" size={20} color="#65676B" />
@@ -226,15 +249,25 @@ function CommentSectionComponent({ postId, initialCommentsCount }: CommentSectio
       )}
 
       {/* Input */}
-      <View style={[styles.inputContainer, { paddingBottom: insets.bottom + 8 }]}>
+      <View
+        style={[styles.inputContainer, { paddingBottom: insets.bottom + 8 }]}
+      >
         <Image
-          source={{ uri: user?.avatar || 'https://via.placeholder.com/32' }}
+          source={{
+            uri:
+              user?.avatar ||
+              "https://ui-avatars.com/api/?name=Me&size=32&background=FF6B35&color=fff",
+          }}
           style={styles.inputAvatar}
         />
         <View style={styles.inputWrapper}>
           <TextInput
             style={styles.input}
-            placeholder={replyingTo ? `Trả lời ${replyingTo.author.displayName}...` : 'Viết bình luận...'}
+            placeholder={
+              replyingTo
+                ? `Trả lời ${replyingTo.author.displayName}...`
+                : "Viết bình luận..."
+            }
             placeholderTextColor="#65676B"
             value={commentText}
             onChangeText={setCommentText}
@@ -251,7 +284,10 @@ function CommentSectionComponent({ postId, initialCommentsCount }: CommentSectio
           </View>
         </View>
         <TouchableOpacity
-          style={[styles.sendButton, !commentText.trim() && styles.sendButtonDisabled]}
+          style={[
+            styles.sendButton,
+            !commentText.trim() && styles.sendButtonDisabled,
+          ]}
           onPress={handleSend}
           disabled={!commentText.trim() || isSending}
         >
@@ -261,7 +297,7 @@ function CommentSectionComponent({ postId, initialCommentsCount }: CommentSectio
             <Ionicons
               name="send"
               size={20}
-              color={commentText.trim() ? '#1877F2' : '#BCC0C4'}
+              color={commentText.trim() ? "#1877F2" : "#BCC0C4"}
             />
           )}
         </TouchableOpacity>
@@ -273,35 +309,35 @@ function CommentSectionComponent({ postId, initialCommentsCount }: CommentSectio
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     paddingVertical: 40,
   },
   emptyContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     paddingVertical: 40,
   },
   emptyText: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#050505',
+    fontWeight: "600",
+    color: "#050505",
   },
   emptySubtext: {
     fontSize: 14,
-    color: '#65676B',
+    color: "#65676B",
     marginTop: 4,
   },
   commentsList: {
     padding: 12,
   },
   commentItem: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: 12,
   },
   commentAvatar: {
@@ -314,50 +350,50 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   commentBubble: {
-    backgroundColor: '#F0F2F5',
+    backgroundColor: "#F0F2F5",
     borderRadius: 18,
     paddingHorizontal: 12,
     paddingVertical: 8,
-    alignSelf: 'flex-start',
-    maxWidth: '100%',
+    alignSelf: "flex-start",
+    maxWidth: "100%",
   },
   commentAuthor: {
     fontSize: 13,
-    fontWeight: '600',
-    color: '#050505',
+    fontWeight: "600",
+    color: "#050505",
   },
   commentText: {
     fontSize: 15,
-    color: '#050505',
+    color: "#050505",
     lineHeight: 20,
   },
   commentActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginTop: 4,
     paddingLeft: 12,
     gap: 12,
   },
   commentTime: {
     fontSize: 12,
-    color: '#65676B',
+    color: "#65676B",
   },
   commentAction: {
     fontSize: 12,
-    fontWeight: '600',
-    color: '#65676B',
+    fontWeight: "600",
+    color: "#65676B",
   },
   commentActionActive: {
-    color: '#1877F2',
+    color: "#1877F2",
   },
   commentReactions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 10,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
@@ -368,50 +404,50 @@ const styles = StyleSheet.create({
   },
   reactionCount: {
     fontSize: 11,
-    color: '#65676B',
+    color: "#65676B",
     marginLeft: 2,
   },
   viewRepliesButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginTop: 8,
     paddingLeft: 12,
     gap: 6,
   },
   viewRepliesText: {
     fontSize: 13,
-    fontWeight: '600',
-    color: '#65676B',
+    fontWeight: "600",
+    color: "#65676B",
   },
   repliesContainer: {
     marginTop: 8,
   },
   replyingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 12,
     paddingVertical: 8,
-    backgroundColor: '#F0F2F5',
+    backgroundColor: "#F0F2F5",
     borderTopWidth: 1,
-    borderTopColor: '#E4E6EB',
+    borderTopColor: "#E4E6EB",
   },
   replyingText: {
     fontSize: 13,
-    color: '#65676B',
+    color: "#65676B",
   },
   replyingName: {
-    fontWeight: '600',
-    color: '#050505',
+    fontWeight: "600",
+    color: "#050505",
   },
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
+    flexDirection: "row",
+    alignItems: "flex-end",
     paddingHorizontal: 12,
     paddingTop: 8,
     borderTopWidth: 1,
-    borderTopColor: '#E4E6EB',
-    backgroundColor: '#FFFFFF',
+    borderTopColor: "#E4E6EB",
+    backgroundColor: "#FFFFFF",
   },
   inputAvatar: {
     width: 32,
@@ -422,9 +458,9 @@ const styles = StyleSheet.create({
   },
   inputWrapper: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    backgroundColor: '#F0F2F5',
+    flexDirection: "row",
+    alignItems: "flex-end",
+    backgroundColor: "#F0F2F5",
     borderRadius: 20,
     paddingHorizontal: 12,
     paddingVertical: 8,
@@ -433,12 +469,12 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 15,
-    color: '#050505',
+    color: "#050505",
     maxHeight: 100,
     paddingVertical: 0,
   },
   inputActions: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 8,
     marginLeft: 8,
   },

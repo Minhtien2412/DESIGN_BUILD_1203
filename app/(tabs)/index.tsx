@@ -2,7 +2,7 @@
  * Home Screen - Enhanced with Horizontal Scrollable Sections
  * Each section displays 2 rows x 4 columns, scrollable left/right
  * Includes external content from Pexels/GNews APIs when DB data is empty
- * @updated 2026-01-15
+ * @updated 2026-02-04
  */
 
 import { Ionicons } from "@expo/vector-icons";
@@ -24,12 +24,24 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // External content hooks and components
-import {
-    ExternalNewsSection,
-    ExternalVideoSection,
-} from "@/components/ExternalContentSection";
-import { useExternalNews, useExternalVideos } from "@/hooks/useExternalContent";
+import { ExternalVideoSection } from "@/components/ExternalContentSection";
+import { MainHeader } from "@/components/navigation/MainHeader";
+import { useExternalVideos } from "@/hooks/useExternalContent";
+import { useHomeColors, useIsDarkMode } from "@/hooks/useHomeColors";
 import { useWorkerStats, WORKER_TYPE_MAP } from "@/hooks/useWorkerStats";
+
+// NEW: Enhanced Home Sections
+import {
+    AIAssistantButton,
+    DealBannersRow,
+    FlashSaleSection,
+    LiveVideoSection,
+    PromoBannerSlider,
+    QuickActionsSection,
+    RecentProjectsSection,
+    TopRatedWorkersSection,
+    WeatherWidget,
+} from "@/components/home/EnhancedHomeSections";
 
 const { width } = Dimensions.get("window");
 const ITEM_WIDTH = (width - 16) / 4; // 4 items per row - tighter padding
@@ -976,21 +988,44 @@ function groupItemsIntoPages<T>(items: T[], itemsPerPage: number = 8): T[][] {
 }
 
 // ============================================================================
+// SafeImage - Image with fallback for production builds
+// ============================================================================
+const SafeImage = memo<{
+  source: any;
+  style?: any;
+  resizeMode?: "cover" | "contain" | "stretch" | "center";
+  fallback?: any;
+}>(({ source, style, resizeMode = "contain", fallback = FALLBACK_ICON }) => {
+  const [hasError, setHasError] = useState(false);
+
+  const handleError = useCallback(() => {
+    console.log("[SafeImage] Load error, using fallback. Source:", source);
+    setHasError(true);
+  }, [source]);
+
+  // For local assets (require()), source is a number (asset ID)
+  // For remote images, source is { uri: string }
+  const isValidSource =
+    source &&
+    (typeof source === "number" || (typeof source === "object" && source.uri));
+  const finalSource = hasError || !isValidSource ? fallback : source;
+
+  return (
+    <Image
+      source={finalSource}
+      style={style}
+      resizeMode={resizeMode}
+      onError={handleError}
+      fadeDuration={0}
+    />
+  );
+});
+
+// ============================================================================
 // COMPONENTS
 // ============================================================================
 
-// Header
-const Header = memo(() => (
-  <View style={styles.header}>
-    <TouchableOpacity onPress={() => router.push("/(tabs)/menu" as Href)}>
-      <Ionicons name="menu-outline" size={28} color={COLORS.text} />
-    </TouchableOpacity>
-    <Text style={styles.logoText}>APP Design Build</Text>
-    <TouchableOpacity onPress={() => router.push("/notifications" as Href)}>
-      <Ionicons name="notifications-outline" size={26} color={COLORS.text} />
-    </TouchableOpacity>
-  </View>
-));
+// Header đã được thay thế bằng MainHeader từ components/navigation
 
 // Search Bar
 const SearchBar = memo(() => (
@@ -1014,7 +1049,11 @@ const ServiceItem = memo<{ item: (typeof SERVICES)[0] }>(({ item }) => (
     activeOpacity={0.7}
   >
     <View style={styles.serviceIconContainer}>
-      <Image source={item.icon} style={styles.iconImage} resizeMode="contain" />
+      <SafeImage
+        source={item.icon}
+        style={styles.iconImage}
+        resizeMode="contain"
+      />
     </View>
     <Text style={styles.serviceLabel} numberOfLines={2}>
       {item.label}
@@ -1065,7 +1104,11 @@ const DesignLiveItem = memo<{ item: (typeof DESIGN_LIVE)[0] }>(({ item }) => (
     onPress={() => router.push(item.route as Href)}
     activeOpacity={0.7}
   >
-    <Image source={{ uri: item.image }} style={styles.designLiveImage} />
+    <SafeImage
+      source={{ uri: item.image }}
+      style={styles.designLiveImage}
+      resizeMode="cover"
+    />
     {item.badge && (
       <View style={styles.liveBadge}>
         <View style={styles.liveDot} />
@@ -1120,7 +1163,7 @@ const DesignServiceItem = memo<{ item: (typeof DESIGN_SERVICES)[0] }>(
       activeOpacity={0.7}
     >
       <View style={styles.designServiceIcon}>
-        <Image
+        <SafeImage
           source={item.icon}
           style={styles.iconImage}
           resizeMode="contain"
@@ -1133,7 +1176,7 @@ const DesignServiceItem = memo<{ item: (typeof DESIGN_SERVICES)[0] }>(
         {item.price}
       </Text>
     </TouchableOpacity>
-  )
+  ),
 );
 
 // Design Service Section with horizontal scroll
@@ -1181,7 +1224,7 @@ const EquipmentItemComponent = memo<{ item: (typeof EQUIPMENT_ITEMS)[0] }>(
       activeOpacity={0.7}
     >
       <View style={styles.equipmentIcon}>
-        <Image
+        <SafeImage
           source={item.icon}
           style={styles.iconImage}
           resizeMode="contain"
@@ -1191,7 +1234,7 @@ const EquipmentItemComponent = memo<{ item: (typeof EQUIPMENT_ITEMS)[0] }>(
         {item.label}
       </Text>
     </TouchableOpacity>
-  )
+  ),
 );
 
 // Equipment Section
@@ -1239,7 +1282,7 @@ const LibraryItemComponent = memo<{ item: (typeof LIBRARY_ITEMS)[0] }>(
       activeOpacity={0.7}
     >
       <View style={styles.libraryIcon}>
-        <Image
+        <SafeImage
           source={item.icon}
           style={styles.iconImage}
           resizeMode="contain"
@@ -1249,7 +1292,7 @@ const LibraryItemComponent = memo<{ item: (typeof LIBRARY_ITEMS)[0] }>(
         {item.label}
       </Text>
     </TouchableOpacity>
-  )
+  ),
 );
 
 // Library Section
@@ -1297,7 +1340,7 @@ const ConstructionWorkerItem = memo<{ item: (typeof CONSTRUCTION_WORKERS)[0] }>(
       activeOpacity={0.7}
     >
       <View style={styles.workerIcon}>
-        <Image
+        <SafeImage
           source={item.icon}
           style={styles.iconImage}
           resizeMode="contain"
@@ -1312,7 +1355,7 @@ const ConstructionWorkerItem = memo<{ item: (typeof CONSTRUCTION_WORKERS)[0] }>(
         </Text>
       )}
     </TouchableOpacity>
-  )
+  ),
 );
 
 // Construction Worker Section
@@ -1360,7 +1403,11 @@ const VideoItemComponent = memo<{ item: (typeof VIDEO_ITEMS)[0] }>(
       activeOpacity={0.7}
     >
       <View style={styles.videoImageContainer}>
-        <Image source={{ uri: item.image }} style={styles.videoImage} />
+        <SafeImage
+          source={{ uri: item.image }}
+          style={styles.videoImage}
+          resizeMode="cover"
+        />
         {item.live && (
           <View style={styles.videoLiveBadge}>
             <View style={styles.videoLiveDot} />
@@ -1375,7 +1422,7 @@ const VideoItemComponent = memo<{ item: (typeof VIDEO_ITEMS)[0] }>(
         {item.label}
       </Text>
     </TouchableOpacity>
-  )
+  ),
 );
 
 // Video Section
@@ -1412,7 +1459,7 @@ const FinishingWorkerItem = memo<{ item: (typeof FINISHING_WORKERS)[0] }>(
       activeOpacity={0.7}
     >
       <View style={styles.finishingIcon}>
-        <Image
+        <SafeImage
           source={item.icon}
           style={styles.iconImage}
           resizeMode="contain"
@@ -1427,7 +1474,7 @@ const FinishingWorkerItem = memo<{ item: (typeof FINISHING_WORKERS)[0] }>(
         </Text>
       )}
     </TouchableOpacity>
-  )
+  ),
 );
 
 // Finishing Worker Section
@@ -1473,7 +1520,11 @@ const CategoryCard = memo<{ item: (typeof CATEGORY_ITEMS)[0] }>(({ item }) => (
     onPress={() => router.push(item.route as Href)}
     activeOpacity={0.7}
   >
-    <Image source={{ uri: item.image }} style={styles.categoryImage} />
+    <SafeImage
+      source={{ uri: item.image }}
+      style={styles.categoryImage}
+      resizeMode="cover"
+    />
     <Text style={styles.categoryLabel}>{item.label}</Text>
   </TouchableOpacity>
 ));
@@ -1485,6 +1536,10 @@ const CategoryCard = memo<{ item: (typeof CATEGORY_ITEMS)[0] }>(({ item }) => (
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const [refreshing, setRefreshing] = useState(false);
+
+  // Theme colors for dark mode support
+  const themeColors = useHomeColors();
+  const isDarkMode = useIsDarkMode();
 
   // Worker stats from API
   const {
@@ -1533,34 +1588,28 @@ export default function HomeScreen() {
     perPage: 8,
     enabled: true,
   });
-  const {
-    articles: externalNews,
-    isLoading: newsLoading,
-    refetch: refetchNews,
-  } = useExternalNews({
-    category: "general",
-    max: 8, // Load sẵn 8 tin
-    enabled: true,
-  });
-
   // Tính tổng số content mới
-  const totalNewContent = externalVideos.length + externalNews.length;
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     // Also refresh external content and worker stats
-    Promise.all([refetchVideos(), refetchNews(), refreshStats()]).finally(
-      () => {
-        setTimeout(() => setRefreshing(false), 1500);
-      }
-    );
-  }, [refetchVideos, refetchNews, refreshStats]);
+    Promise.all([refetchVideos(), refreshStats()]).finally(() => {
+      setTimeout(() => setRefreshing(false), 1500);
+    });
+  }, [refetchVideos, refreshStats]);
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      <StatusBar barStyle="dark-content" backgroundColor={COLORS.white} />
+    <View style={[styles.container, { backgroundColor: themeColors.bg }]}>
+      <StatusBar
+        barStyle={isDarkMode ? "light-content" : "dark-content"}
+        backgroundColor={themeColors.bg}
+      />
 
-      <Header />
+      {/* Main Header với gradient */}
+      <MainHeader
+        showSearch={false}
+        searchPlaceholder="Tìm kiếm dịch vụ, thợ, vật liệu..."
+      />
 
       <ScrollView
         style={styles.scrollView}
@@ -1569,7 +1618,7 @@ export default function HomeScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={[COLORS.primary]}
+            colors={[themeColors.primary]}
           />
         }
       >
@@ -1577,6 +1626,12 @@ export default function HomeScreen() {
         <View style={styles.searchSection}>
           <SearchBar />
         </View>
+
+        {/* 🆕 PROMO BANNER SLIDER */}
+        <PromoBannerSlider />
+
+        {/* 🆕 QUICK ACTIONS - Truy cập nhanh */}
+        <QuickActionsSection />
 
         {/* DỊCH VỤ - 2 rows x 4 cols, scrollable */}
         <View style={styles.section}>
@@ -1611,6 +1666,21 @@ export default function HomeScreen() {
           <GreenBanner />
         </View>
 
+        {/* 🆕 WEATHER WIDGET */}
+        <WeatherWidget />
+
+        {/* 🆕 DEAL BANNERS - SHOPEE STYLE */}
+        <DealBannersRow />
+
+        {/* 🆕 FLASH SALE */}
+        <FlashSaleSection />
+
+        {/* 🆕 LIVE & VIDEO SECTION - SHOPEE STYLE */}
+        <LiveVideoSection />
+
+        {/* 🆕 RECENT PROJECTS */}
+        <RecentProjectsSection />
+
         {/* TIỆN ÍCH THIẾT KẾ */}
         <DesignServiceSection
           title="TIỆN ÍCH THIẾT KẾ"
@@ -1638,6 +1708,9 @@ export default function HomeScreen() {
           data={dynamicConstructionWorkers}
           seeMoreRoute="/workers"
         />
+
+        {/* 🆕 TOP RATED WORKERS */}
+        <TopRatedWorkersSection />
 
         {/* VIDEO CONSTRUCTIONS */}
         <VideoSection
@@ -1691,22 +1764,12 @@ export default function HomeScreen() {
           </View>
         )}
 
-        {/* External News from GNews */}
-        {externalNews.length > 0 && (
-          <View style={styles.section}>
-            <ExternalNewsSection
-              articles={externalNews}
-              title="📰 Tin tức xây dựng"
-              subtitle="Tin từ GNews API"
-              isLoading={newsLoading}
-              onSeeAll={() => router.push("/news" as Href)}
-            />
-          </View>
-        )}
-
         {/* Bottom Padding */}
         <View style={{ height: 100 }} />
       </ScrollView>
+
+      {/* 🆕 AI ASSISTANT FLOATING BUTTON */}
+      <AIAssistantButton />
     </View>
   );
 }
@@ -1722,24 +1785,6 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-  },
-
-  // Header
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.md,
-    backgroundColor: COLORS.white,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
-  },
-  logoText: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: COLORS.primary,
-    letterSpacing: 1,
   },
 
   // Search
@@ -1815,9 +1860,9 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   iconImage: {
-    width: 68,
-    height: 68,
-    borderRadius: 8,
+    width: 50,
+    height: 50,
+    borderRadius: 6,
   },
   serviceLabel: {
     fontSize: 10,
@@ -1836,9 +1881,9 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   designLiveImage: {
-    width: 90,
-    height: 90,
-    borderRadius: 8,
+    width: 70,
+    height: 70,
+    borderRadius: 6,
     backgroundColor: COLORS.border,
   },
   liveBadge: {
@@ -1867,27 +1912,27 @@ const styles = StyleSheet.create({
 
   // Green Banner
   greenBanner: {
-    height: 160,
-    borderRadius: 8,
+    height: 130,
+    borderRadius: 6,
     overflow: "hidden",
   },
   greenBannerGradient: {
     flex: 1,
     flexDirection: "row",
-    padding: SPACING.lg,
+    padding: SPACING.md,
   },
   greenBannerContent: {
     flex: 1,
     justifyContent: "space-between",
   },
   greenBannerTitle: {
-    fontSize: 22,
-    fontWeight: "800",
+    fontSize: 18,
+    fontWeight: "700",
     color: COLORS.white,
   },
   greenBannerSubtitle: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: 14,
+    fontWeight: "500",
     color: COLORS.white,
     marginTop: 2,
   },
@@ -1928,14 +1973,14 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.sm,
   },
   designServiceIcon: {
-    width: 66,
-    height: 66,
-    borderRadius: 8,
+    width: 52,
+    height: 52,
+    borderRadius: 6,
     backgroundColor: COLORS.white,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 2,
-    borderWidth: 1,
+    borderWidth: 0.5,
     borderColor: COLORS.border,
   },
   designServiceLabel: {
@@ -1959,14 +2004,14 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.sm,
   },
   equipmentIcon: {
-    width: 66,
-    height: 66,
-    borderRadius: 8,
+    width: 52,
+    height: 52,
+    borderRadius: 6,
     backgroundColor: COLORS.white,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 2,
-    borderWidth: 1,
+    borderWidth: 0.5,
     borderColor: COLORS.border,
   },
   equipmentLabel: {
@@ -1983,14 +2028,14 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.sm,
   },
   libraryIcon: {
-    width: 66,
-    height: 66,
-    borderRadius: 8,
+    width: 52,
+    height: 52,
+    borderRadius: 6,
     backgroundColor: COLORS.white,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 2,
-    borderWidth: 1,
+    borderWidth: 0.5,
     borderColor: COLORS.border,
   },
   libraryLabel: {
@@ -2007,14 +2052,14 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.sm,
   },
   workerIcon: {
-    width: 66,
-    height: 66,
-    borderRadius: 8,
+    width: 52,
+    height: 52,
+    borderRadius: 6,
     backgroundColor: COLORS.white,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 2,
-    borderWidth: 1,
+    borderWidth: 0.5,
     borderColor: COLORS.border,
   },
   workerLabel: {
@@ -2036,16 +2081,16 @@ const styles = StyleSheet.create({
     paddingRight: SPACING.lg,
   },
   videoItem: {
-    width: 100,
+    width: 80,
     marginRight: SPACING.md,
   },
   videoImageContainer: {
     position: "relative",
   },
   videoImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 8,
+    width: 80,
+    height: 80,
+    borderRadius: 6,
     backgroundColor: COLORS.border,
   },
   videoLiveBadge: {
@@ -2073,8 +2118,8 @@ const styles = StyleSheet.create({
   },
   videoPlayIcon: {
     position: "absolute",
-    top: 38,
-    left: 38,
+    top: 28,
+    left: 28,
     width: 24,
     height: 24,
     borderRadius: 12,
@@ -2096,14 +2141,14 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.sm,
   },
   finishingIcon: {
-    width: 66,
-    height: 66,
-    borderRadius: 8,
+    width: 52,
+    height: 52,
+    borderRadius: 6,
     backgroundColor: COLORS.white,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 2,
-    borderWidth: 1,
+    borderWidth: 0.5,
     borderColor: COLORS.border,
   },
   finishingLabel: {
@@ -2125,22 +2170,22 @@ const styles = StyleSheet.create({
     paddingRight: SPACING.lg,
   },
   categoryCard: {
-    width: 120,
+    width: 100,
     marginRight: SPACING.md,
     backgroundColor: COLORS.white,
-    borderRadius: 8,
+    borderRadius: 6,
     overflow: "hidden",
-    borderWidth: 1,
+    borderWidth: 0.5,
     borderColor: COLORS.border,
   },
   categoryImage: {
     width: "100%",
-    height: 80,
+    height: 65,
     backgroundColor: COLORS.border,
   },
   categoryLabel: {
-    fontSize: 11,
-    fontWeight: "600",
+    fontSize: 10,
+    fontWeight: "500",
     color: COLORS.text,
     padding: SPACING.sm,
     textAlign: "center",

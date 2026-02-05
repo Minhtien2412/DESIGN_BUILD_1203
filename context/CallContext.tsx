@@ -1,13 +1,27 @@
-import { apiFetch } from '@/services/api';
-import { getItem } from '@/utils/storage';
-import { VideoCallManager } from '@/utils/VideoCallManager';
-import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
-import socketIOClient, { Socket } from 'socket.io-client';
-import { useAuth } from './AuthContext';
+import { apiFetch } from "@/services/api";
+import type { Socket } from "@/utils/socketIo";
+import { getSocketIo } from "@/utils/socketIo";
+import { getItem } from "@/utils/storage";
+import { VideoCallManager } from "@/utils/VideoCallManager";
+import React, {
+    createContext,
+    useCallback,
+    useContext,
+    useEffect,
+    useRef,
+    useState,
+} from "react";
+import { useAuth } from "./AuthContext";
 
 // Types
-export type CallType = 'video' | 'audio';
-export type CallStatus = 'pending' | 'ringing' | 'active' | 'ended' | 'rejected' | 'missed';
+export type CallType = "video" | "audio";
+export type CallStatus =
+  | "pending"
+  | "ringing"
+  | "active"
+  | "ended"
+  | "rejected"
+  | "missed";
 
 export interface Call {
   id: number;
@@ -32,7 +46,7 @@ export interface Call {
 }
 
 export interface CallSignal {
-  type: 'offer' | 'answer' | 'ice-candidate';
+  type: "offer" | "answer" | "ice-candidate";
   data: any;
 }
 
@@ -41,30 +55,30 @@ interface CallContextValue {
   currentCall: Call | null;
   incomingCall: Call | null;
   callHistory: Call[];
-  connected: boolean;  // Renamed from isConnected for consistency
+  connected: boolean; // Renamed from isConnected for consistency
   localStream: MediaStream | null;
   remoteStream: MediaStream | null;
-  
+
   // Actions
   startCall: (calleeId: number, type: CallType) => Promise<Call>;
   acceptCall: (callId: number) => Promise<void>;
   rejectCall: (callId: number) => Promise<void>;
   endCall: () => Promise<void>;
   sendCallSignal: (signal: CallSignal) => void;
-  
+
   // WebRTC controls
   toggleMicrophone: () => boolean;
   toggleCamera: () => boolean;
   switchCamera: () => Promise<void>;
   toggleSpeaker: () => boolean;
-  
+
   // Event handlers
   onCallSignal?: (signal: CallSignal) => void;
 }
 
 const CallContext = createContext<CallContextValue | undefined>(undefined);
 
-const WS_URL = 'wss://baotienweb.cloud';
+const WS_URL = "wss://baotienweb.cloud";
 
 export function CallProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
@@ -75,13 +89,15 @@ export function CallProvider({ children }: { children: React.ReactNode }) {
   const [callHistory, setCallHistory] = useState<Call[]>([]);
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
-  
-  const signalHandlerRef = useRef<((signal: CallSignal) => void) | undefined>(undefined);
+
+  const signalHandlerRef = useRef<((signal: CallSignal) => void) | undefined>(
+    undefined,
+  );
   const videoCallManagerRef = useRef<VideoCallManager | null>(null);
   const socketRef = useRef<Socket | null>(null);
   const connectionAttemptedRef = useRef(false);
 
-  // Initialize WebSocket connection
+  // Initialize WebSocket connection - DEFERRED to avoid blocking startup
   useEffect(() => {
     if (!user) {
       if (socketRef.current) {
@@ -99,25 +115,32 @@ export function CallProvider({ children }: { children: React.ReactNode }) {
     }
 
     let isMounted = true;
+    let timeoutId: ReturnType<typeof setTimeout>;
 
     const connectSocket = async () => {
       try {
         // Get access token for WebSocket authentication
-        const accessToken = await getItem('accessToken');
-        
+        const accessToken = await getItem("accessToken");
+
         if (!isMounted) return;
-        
+
         // Skip connection if no token (user not fully authenticated)
         if (!accessToken) {
-          console.log('📞 Call WebSocket: No access token, skipping connection');
+          console.log(
+            "📞 Call WebSocket: No access token, skipping connection",
+          );
           return;
         }
 
         connectionAttemptedRef.current = true;
 
-        const newSocket = socketIOClient(`${WS_URL}/call`, {
-          transports: ['websocket'],
-          reconnection: false, // Disable auto reconnection to prevent spam
+        const io = await getSocketIo();
+        const newSocket = io(`${WS_URL}/call`, {
+          transports: ["websocket", "polling"], // Fallback to polling if websocket fails
+          reconnection: true, // Enable reconnection for better network handling
+          reconnectionAttempts: 5, // Retry 5 times
+          reconnectionDelay: 1000, // Start with 1s delay
+          reconnectionDelayMax: 10000, // Max 10s delay
           timeout: 5000,
           auth: {
             token: accessToken,
@@ -129,149 +152,192 @@ export function CallProvider({ children }: { children: React.ReactNode }) {
 
         socketRef.current = newSocket;
 
-        newSocket.on('connect', () => {
+        newSocket.on("connect", () => {
           if (!isMounted) return;
-          console.log('📞 Call WebSocket connected');
+          console.log("📞 Call WebSocket connected");
           setConnected(true);
           setSocket(newSocket);
-          newSocket.emit('register', { userId: user.id });
+          newSocket.emit("register", { userId: user.id });
         });
 
-        newSocket.on('disconnect', () => {
+        newSocket.on("disconnect", () => {
           if (!isMounted) return;
-          console.log('📞 Call WebSocket disconnected');
+          console.log("📞 Call WebSocket disconnected");
           setConnected(false);
         });
 
-        newSocket.on('connect_error', (error: any) => {
+        newSocket.on("connect_error", (error: any) => {
           // Silently handle expected auth errors
-          if (error?.message?.includes('Authentication') || error?.message?.includes('Invalid token')) {
-            console.log('📞 Call WebSocket: Auth required (backend may not be configured)');
+          if (
+            error?.message?.includes("Authentication") ||
+            error?.message?.includes("Invalid token")
+          ) {
+            console.log(
+              "📞 Call WebSocket: Auth required (backend may not be configured)",
+            );
           } else {
-            console.warn('📞 Call WebSocket connection error:', error?.message || 'Connection failed');
+            console.warn(
+              "📞 Call WebSocket connection error:",
+              error?.message || "Connection failed",
+            );
           }
           setConnected(false);
           // Don't retry - will reconnect on next user login
         });
 
-        newSocket.on('error', (error: any) => {
+        newSocket.on("error", (error: any) => {
           // Handle server-side error events gracefully
-          const message = error?.message || (typeof error === 'string' ? error : 'Unknown error');
-          if (message.includes('Authentication')) {
-            console.log('📞 Call WebSocket: Server requires authentication');
+          const message =
+            error?.message ||
+            (typeof error === "string" ? error : "Unknown error");
+          if (message.includes("Authentication")) {
+            console.log("📞 Call WebSocket: Server requires authentication");
           } else {
-            console.warn('📞 Call WebSocket server error:', message);
+            console.warn("📞 Call WebSocket server error:", message);
           }
         });
 
-        newSocket.on('incoming_call', (call: Call) => {
-          console.log('📞 Incoming call from:', call.caller?.name);
+        newSocket.on("incoming_call", (call: Call) => {
+          console.log("📞 Incoming call from:", call.caller?.name);
           setIncomingCall(call);
         });
 
-    newSocket.on('call_accepted', (data: { callId: number; acceptedBy: number }) => {
-      console.log('📞 Call accepted:', data);
-      if (currentCall?.id === data.callId) {
-        setCurrentCall(prev => prev ? { ...prev, status: 'active' } : null);
-      }
-    });
-
-    newSocket.on('call_rejected', (data: { callId: number; rejectedBy: number }) => {
-      console.log('📞 Call rejected:', data);
-      if (currentCall?.id === data.callId) {
-        setCurrentCall(null);
-      }
-      if (incomingCall?.id === data.callId) {
-        setIncomingCall(null);
-      }
-    });
-
-    newSocket.on('call_ended', (data: { callId: number; endedBy: number }) => {
-      console.log('📞 Call ended:', data);
-      if (currentCall?.id === data.callId) {
-        setCurrentCall(null);
-      }
-      if (incomingCall?.id === data.callId) {
-        setIncomingCall(null);
-      }
-    });
-
-    newSocket.on('call_signal', async (signal: CallSignal) => {
-      console.log('📞 Call signal received:', signal.type);
-      
-      try {
-        const videoCallManager = videoCallManagerRef.current;
-
-        if (signal.type === 'offer') {
-          console.log('📨 Received offer, creating answer...');
-          
-          if (!videoCallManager) {
-            const newManager = new VideoCallManager({
-              onLocalStream: (stream) => {
-                console.log('📹 Local stream ready');
-                setLocalStream(stream);
-              },
-              onRemoteStream: (stream) => {
-                console.log('📹 Remote stream ready');
-                setRemoteStream(stream);
-              },
-              onIceCandidate: (candidate) => {
-                console.log('🧊 Sending ICE candidate');
-                if (socket) {
-                  socket.emit('call_signal', {
-                    callId: currentCall?.id,
-                    signal: { type: 'ice-candidate', data: candidate },
-                  });
-                }
-              },
-              onConnectionStateChange: (state) => {
-                console.log('🔌 Connection state:', state);
-              },
-              onError: (error) => {
-                console.error('❌ WebRTC error:', error);
-              },
-            });
-            
-            videoCallManagerRef.current = newManager;
-            const answer = await newManager.createAnswer(signal.data, true, true);
-            
-            if (socket && currentCall) {
-              socket.emit('call_signal', {
-                callId: currentCall.id,
-                signal: { type: 'answer', data: answer },
-              });
+        newSocket.on(
+          "call_accepted",
+          (data: { callId: number; acceptedBy: number }) => {
+            console.log("📞 Call accepted:", data);
+            if (currentCall?.id === data.callId) {
+              setCurrentCall((prev) =>
+                prev ? { ...prev, status: "active" } : null,
+              );
             }
-          }
-        } else if (signal.type === 'answer') {
-          console.log('📨 Received answer');
-          if (videoCallManager) {
-            await videoCallManager.handleAnswer(signal.data);
-          }
-        } else if (signal.type === 'ice-candidate') {
-          console.log('🧊 Received ICE candidate');
-          if (videoCallManager) {
-            await videoCallManager.addIceCandidate(signal.data);
-          }
-        }
-      } catch (error) {
-        console.error('❌ Error handling call signal:', error);
-      }
+          },
+        );
 
-      if (signalHandlerRef.current) {
-        signalHandlerRef.current(signal);
-      }
-    });
+        newSocket.on(
+          "call_rejected",
+          (data: { callId: number; rejectedBy: number }) => {
+            console.log("📞 Call rejected:", data);
+            if (currentCall?.id === data.callId) {
+              setCurrentCall(null);
+            }
+            if (incomingCall?.id === data.callId) {
+              setIncomingCall(null);
+            }
+          },
+        );
+
+        newSocket.on(
+          "call_ended",
+          (data: { callId: number; endedBy: number }) => {
+            console.log("📞 Call ended:", data);
+            if (currentCall?.id === data.callId) {
+              setCurrentCall(null);
+            }
+            if (incomingCall?.id === data.callId) {
+              setIncomingCall(null);
+            }
+          },
+        );
+
+        newSocket.on(
+          "call_signal",
+          async (signal: CallSignal & { from?: number }) => {
+            console.log(
+              "📞 Call signal received:",
+              signal.type,
+              "from:",
+              signal.from,
+            );
+
+            try {
+              const videoCallManager = videoCallManagerRef.current;
+
+              if (signal.type === "offer") {
+                console.log("📨 Received offer, creating answer...");
+
+                if (!videoCallManager) {
+                  const newManager = new VideoCallManager({
+                    onLocalStream: (stream) => {
+                      console.log("📹 Local stream ready");
+                      setLocalStream(stream);
+                    },
+                    onRemoteStream: (stream) => {
+                      console.log("📹 Remote stream ready");
+                      setRemoteStream(stream);
+                    },
+                    onIceCandidate: (candidate) => {
+                      console.log("🧊 Sending ICE candidate");
+                      if (newSocket && signal.from) {
+                        // BE expects: { to: targetUserId, signal: any }
+                        newSocket.emit("call_signal", {
+                          to: signal.from, // Send back to caller
+                          signal: { type: "ice-candidate", data: candidate },
+                        });
+                      }
+                    },
+                    onConnectionStateChange: (state) => {
+                      console.log("🔌 Connection state:", state);
+                    },
+                    onError: (error) => {
+                      console.error("❌ WebRTC error:", error);
+                    },
+                  });
+
+                  videoCallManagerRef.current = newManager;
+                  const answer = await newManager.createAnswer(
+                    signal.data,
+                    true,
+                    true,
+                  );
+
+                  if (newSocket && signal.from) {
+                    // BE expects: { to: targetUserId, signal: any }
+                    newSocket.emit("call_signal", {
+                      to: signal.from, // Send answer back to caller
+                      signal: { type: "answer", data: answer },
+                    });
+                  }
+                }
+              } else if (signal.type === "answer") {
+                console.log("📨 Received answer");
+                if (videoCallManager) {
+                  await videoCallManager.handleAnswer(signal.data);
+                }
+              } else if (signal.type === "ice-candidate") {
+                console.log("🧊 Received ICE candidate");
+                if (videoCallManager) {
+                  await videoCallManager.addIceCandidate(signal.data);
+                }
+              }
+            } catch (error) {
+              console.error("❌ Error handling call signal:", error);
+            }
+
+            if (signalHandlerRef.current) {
+              signalHandlerRef.current(signal);
+            }
+          },
+        );
 
         setSocket(newSocket);
       } catch (error) {
-        console.log('📞 Call WebSocket initialization skipped:', error instanceof Error ? error.message : 'Unknown error');
+        console.log(
+          "📞 Call WebSocket initialization skipped:",
+          error instanceof Error ? error.message : "Unknown error",
+        );
       }
     };
 
-    connectSocket();
+    // Defer WebSocket connection to avoid blocking startup
+    // Wait 2 seconds after user available before connecting
+    timeoutId = setTimeout(() => {
+      connectSocket();
+    }, 2000);
 
     return () => {
       isMounted = false;
+      clearTimeout(timeoutId);
       if (socketRef.current) {
         socketRef.current.disconnect();
         socketRef.current = null;
@@ -281,10 +347,11 @@ export function CallProvider({ children }: { children: React.ReactNode }) {
 
   const loadCallHistory = useCallback(async () => {
     try {
-      const data = await apiFetch('/api/v1/call/history');
+      // apiFetch base URL already contains /api/v1
+      const data = await apiFetch("/call/history");
       setCallHistory(data);
     } catch (error) {
-      console.error('Failed to load call history:', error);
+      console.error("Failed to load call history:", error);
     }
   }, []);
 
@@ -294,105 +361,122 @@ export function CallProvider({ children }: { children: React.ReactNode }) {
     }
   }, [user, loadCallHistory]);
 
-  const startCall = useCallback(async (calleeId: number, type: CallType): Promise<Call> => {
-    if (!user) throw new Error('Not authenticated');
+  const startCall = useCallback(
+    async (calleeId: number, type: CallType): Promise<Call> => {
+      if (!user) throw new Error("Not authenticated");
 
-    try {
-      const call = await apiFetch('/api/v1/call/start', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ calleeId, type }),
-      });
-
-      setCurrentCall(call);
-
-      const videoCallManager = new VideoCallManager({
-        onLocalStream: (stream) => {
-          console.log('📹 Local stream ready');
-          setLocalStream(stream);
-        },
-        onRemoteStream: (stream) => {
-          console.log('📹 Remote stream ready');
-          setRemoteStream(stream);
-        },
-        onIceCandidate: (candidate) => {
-          console.log('🧊 Sending ICE candidate');
-          if (socket) {
-            socket.emit('call_signal', {
-              callId: call.id,
-              signal: { type: 'ice-candidate', data: candidate },
-            });
-          }
-        },
-        onConnectionStateChange: (state) => {
-          console.log('🔌 Connection state:', state);
-        },
-        onError: (error) => {
-          console.error('❌ WebRTC error:', error);
-        },
-      });
-
-      videoCallManagerRef.current = videoCallManager;
-
-      const offer = await videoCallManager.createOffer(type === 'video', true);
-      
-      if (socket) {
-        socket.emit('call_signal', {
-          callId: call.id,
-          signal: { type: 'offer', data: offer },
+      try {
+        // apiFetch base URL already contains /api/v1
+        const call = await apiFetch("/call/start", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ calleeId, type }),
         });
+
+        setCurrentCall(call);
+
+        const videoCallManager = new VideoCallManager({
+          onLocalStream: (stream) => {
+            console.log("📹 Local stream ready");
+            setLocalStream(stream);
+          },
+          onRemoteStream: (stream) => {
+            console.log("📹 Remote stream ready");
+            setRemoteStream(stream);
+          },
+          onIceCandidate: (candidate) => {
+            console.log("🧊 Sending ICE candidate");
+            if (socket) {
+              // BE expects: { to: targetUserId, signal: any }
+              socket.emit("call_signal", {
+                to: calleeId,
+                signal: { type: "ice-candidate", data: candidate },
+              });
+            }
+          },
+          onConnectionStateChange: (state) => {
+            console.log("🔌 Connection state:", state);
+          },
+          onError: (error) => {
+            console.error("❌ WebRTC error:", error);
+          },
+        });
+
+        videoCallManagerRef.current = videoCallManager;
+
+        const offer = await videoCallManager.createOffer(
+          type === "video",
+          true,
+        );
+
+        if (socket) {
+          // BE expects: { to: targetUserId, signal: any }
+          socket.emit("call_signal", {
+            to: calleeId,
+            signal: { type: "offer", data: offer },
+          });
+        }
+
+        return call;
+      } catch (error) {
+        console.error("Failed to start call:", error);
+        throw error;
       }
+    },
+    [user, socket],
+  );
 
-      return call;
-    } catch (error) {
-      console.error('Failed to start call:', error);
-      throw error;
-    }
-  }, [user, socket]);
+  const acceptCall = useCallback(
+    async (callId: number) => {
+      if (!user || !socket) throw new Error("Not ready");
 
-  const acceptCall = useCallback(async (callId: number) => {
-    if (!user || !socket) throw new Error('Not ready');
+      try {
+        socket.emit("accept_call", { callId });
 
-    try {
-      socket.emit('accept_call', { callId });
-      
-      if (incomingCall?.id === callId) {
-        setCurrentCall({ ...incomingCall, status: 'active' });
-        setIncomingCall(null);
+        if (incomingCall?.id === callId) {
+          setCurrentCall({ ...incomingCall, status: "active" });
+          setIncomingCall(null);
+        }
+      } catch (error) {
+        console.error("Failed to accept call:", error);
+        throw error;
       }
-    } catch (error) {
-      console.error('Failed to accept call:', error);
-      throw error;
-    }
-  }, [user, socket, incomingCall]);
+    },
+    [user, socket, incomingCall],
+  );
 
-  const rejectCall = useCallback(async (callId: number) => {
-    if (!user) throw new Error('Not authenticated');
+  const rejectCall = useCallback(
+    async (callId: number) => {
+      if (!user) throw new Error("Not authenticated");
 
-    try {
-      await apiFetch(`/api/v1/call/reject/${callId}`, {
-        method: 'POST',
-      });
+      try {
+        // apiFetch base URL already contains /api/v1
+        await apiFetch(`/call/reject/${callId}`, {
+          method: "POST",
+        });
 
-      if (incomingCall?.id === callId) {
-        setIncomingCall(null);
+        if (incomingCall?.id === callId) {
+          setIncomingCall(null);
+        }
+        if (currentCall?.id === callId) {
+          setCurrentCall(null);
+        }
+      } catch (error) {
+        console.error("Failed to reject call:", error);
+        throw error;
       }
-      if (currentCall?.id === callId) {
-        setCurrentCall(null);
-      }
-    } catch (error) {
-      console.error('Failed to reject call:', error);
-      throw error;
-    }
-  }, [user, incomingCall, currentCall]);
+    },
+    [user, incomingCall, currentCall],
+  );
 
   const endCall = useCallback(async () => {
     if (!user || !currentCall) return;
 
     try {
-      await apiFetch('/api/v1/call/end', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      // apiFetch base URL already contains /api/v1
+      await apiFetch("/call/end", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ callId: currentCall.id }),
       });
 
@@ -404,22 +488,32 @@ export function CallProvider({ children }: { children: React.ReactNode }) {
       setCurrentCall(null);
       setLocalStream(null);
       setRemoteStream(null);
-      
+
       loadCallHistory();
     } catch (error) {
-      console.error('Failed to end call:', error);
+      console.error("Failed to end call:", error);
       throw error;
     }
   }, [user, currentCall]);
 
-  const sendCallSignal = useCallback((signal: CallSignal) => {
-    if (!socket || !currentCall) return;
+  const sendCallSignal = useCallback(
+    (signal: CallSignal, targetUserId?: number) => {
+      if (!socket || !currentCall) return;
 
-    socket.emit('call_signal', {
-      callId: currentCall.id,
-      signal,
-    });
-  }, [socket, currentCall]);
+      // BE expects: { to: targetUserId, signal: any }
+      const toUserId =
+        targetUserId ||
+        (currentCall.callerId === Number(user?.id)
+          ? currentCall.calleeId
+          : currentCall.callerId);
+
+      socket.emit("call_signal", {
+        to: toUserId,
+        signal,
+      });
+    },
+    [socket, currentCall, user?.id],
+  );
 
   const toggleMicrophone = useCallback((): boolean => {
     if (!videoCallManagerRef.current) return false;
@@ -466,7 +560,7 @@ export function CallProvider({ children }: { children: React.ReactNode }) {
 export function useCall() {
   const context = useContext(CallContext);
   if (!context) {
-    throw new Error('useCall must be used within CallProvider');
+    throw new Error("useCall must be used within CallProvider");
   }
   return context;
 }
@@ -474,15 +568,15 @@ export function useCall() {
 export function useCallSignalHandler(handler: (signal: CallSignal) => void) {
   const context = useContext(CallContext);
   if (!context) {
-    throw new Error('useCallSignalHandler must be used within CallProvider');
+    throw new Error("useCallSignalHandler must be used within CallProvider");
   }
-  
+
   useEffect(() => {
     const ref = (context as any).signalHandlerRef;
     if (ref) {
       ref.current = handler;
     }
-    
+
     return () => {
       if (ref) {
         ref.current = undefined;

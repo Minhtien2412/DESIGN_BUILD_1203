@@ -1,39 +1,50 @@
-import { useThemeColor } from '@/hooks/use-theme-color';
-import { Ionicons } from '@expo/vector-icons';
-import { Stack, useRouter } from 'expo-router';
-import React, { useRef, useState } from 'react';
-import { Animated, Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useThemeColor } from "@/hooks/use-theme-color";
+import { Ionicons } from "@expo/vector-icons";
+import { Stack, useRouter } from "expo-router";
+import React, { useRef, useState } from "react";
+import {
+    Animated,
+    Dimensions,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from "react-native";
 
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get("window");
 
 const products = [
   {
-    id: '1',
-    name: 'Gạch Granite 60x60cm',
-    image: 'https://via.placeholder.com/300',
-    model3d: 'granite_tile.glb',
-    variants: ['Xám', 'Trắng', 'Đen', 'Vân gỗ'],
+    id: "1",
+    name: "Gạch Granite 60x60cm",
+    image:
+      "https://images.unsplash.com/photo-1615971677499-5467cbab01c0?w=300&q=80",
+    model3d: "granite_tile.glb",
+    variants: ["Xám", "Trắng", "Đen", "Vân gỗ"],
   },
   {
-    id: '2',
-    name: 'Bồn cầu TOTO',
-    image: 'https://via.placeholder.com/300',
-    model3d: 'toto_toilet.glb',
-    variants: ['Trắng', 'Kem'],
+    id: "2",
+    name: "Bồn cầu TOTO",
+    image:
+      "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=300&q=80",
+    model3d: "toto_toilet.glb",
+    variants: ["Trắng", "Kem"],
   },
   {
-    id: '3',
-    name: 'Lavabo Caesar',
-    image: 'https://via.placeholder.com/300',
-    model3d: 'caesar_lavabo.glb',
-    variants: ['Trắng', 'Đen matt'],
+    id: "3",
+    name: "Lavabo Caesar",
+    image:
+      "https://images.unsplash.com/photo-1584622781564-1d987f7333c1?w=300&q=80",
+    model3d: "caesar_lavabo.glb",
+    variants: ["Trắng", "Đen matt"],
   },
 ];
 
 export default function ARViewerScreen() {
-  const backgroundColor = useThemeColor({}, 'background');
-  const textColor = useThemeColor({}, 'text');
-  const cardBg = useThemeColor({}, 'card');
+  const backgroundColor = useThemeColor({}, "background");
+  const textColor = useThemeColor({}, "text");
+  const cardBg = useThemeColor({}, "card");
   const router = useRouter();
   const [selectedProduct, setSelectedProduct] = useState(products[0]);
   const [selectedVariant, setSelectedVariant] = useState(0);
@@ -46,7 +57,7 @@ export default function ARViewerScreen() {
         toValue: 1,
         duration: 8000,
         useNativeDriver: true,
-      })
+      }),
     ).start();
   };
 
@@ -56,13 +67,13 @@ export default function ARViewerScreen() {
 
   const spin = rotateAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: ['0deg', '360deg'],
+    outputRange: ["0deg", "360deg"],
   });
 
   return (
     <View style={[styles.container, { backgroundColor }]}>
-      <Stack.Screen options={{ title: 'AR Viewer', headerShown: true }} />
-      
+      <Stack.Screen options={{ title: "AR Viewer", headerShown: true }} />
+
       {/* AR View / 3D Preview */}
       <View style={styles.arViewer}>
         {isARMode ? (
@@ -73,7 +84,9 @@ export default function ARViewerScreen() {
                 <View style={[styles.arCrosshairLine, styles.arCrosshairH]} />
                 <View style={[styles.arCrosshairLine, styles.arCrosshairV]} />
               </View>
-              <Text style={styles.arInstructions}>Di chuyển điện thoại để quét mặt phẳng</Text>
+              <Text style={styles.arInstructions}>
+                Di chuyển điện thoại để quét mặt phẳng
+              </Text>
             </View>
             <View style={styles.arBadge}>
               <Ionicons name="scan-outline" size={16} color="#fff" />
@@ -83,13 +96,15 @@ export default function ARViewerScreen() {
         ) : (
           // 3D Model Preview Placeholder
           <View style={styles.modelViewer}>
-            <Animated.View style={[styles.modelContainer, { transform: [{ rotate: spin }] }]}>
+            <Animated.View
+              style={[styles.modelContainer, { transform: [{ rotate: spin }] }]}
+            >
               <View style={styles.modelPlaceholder}>
                 <Ionicons name="cube" size={80} color="#FF6B35" />
                 <Text style={styles.modelName}>{selectedProduct.name}</Text>
               </View>
             </Animated.View>
-            
+
             {/* Controls */}
             <View style={styles.viewerControls}>
               <TouchableOpacity style={styles.controlBtn}>
@@ -110,15 +125,23 @@ export default function ARViewerScreen() {
           style={[styles.arToggle, isARMode && styles.arToggleActive]}
           onPress={() => setIsARMode(!isARMode)}
         >
-          <Ionicons name={isARMode ? 'cube-outline' : 'camera-outline'} size={24} color="#fff" />
-          <Text style={styles.arToggleText}>{isARMode ? 'Xem 3D' : 'Xem AR'}</Text>
+          <Ionicons
+            name={isARMode ? "cube-outline" : "camera-outline"}
+            size={24}
+            color="#fff"
+          />
+          <Text style={styles.arToggleText}>
+            {isARMode ? "Xem 3D" : "Xem AR"}
+          </Text>
         </TouchableOpacity>
       </View>
 
       {/* Product Info */}
       <View style={[styles.productInfo, { backgroundColor: cardBg }]}>
-        <Text style={[styles.productName, { color: textColor }]}>{selectedProduct.name}</Text>
-        
+        <Text style={[styles.productName, { color: textColor }]}>
+          {selectedProduct.name}
+        </Text>
+
         {/* Variants */}
         <View style={styles.variantsSection}>
           <Text style={styles.variantLabel}>Màu sắc / Loại:</Text>
@@ -132,10 +155,12 @@ export default function ARViewerScreen() {
                 ]}
                 onPress={() => setSelectedVariant(index)}
               >
-                <Text style={[
-                  styles.variantBtnText,
-                  selectedVariant === index && styles.variantBtnTextActive,
-                ]}>
+                <Text
+                  style={[
+                    styles.variantBtnText,
+                    selectedVariant === index && styles.variantBtnTextActive,
+                  ]}
+                >
                   {variant}
                 </Text>
               </TouchableOpacity>
@@ -161,7 +186,11 @@ export default function ARViewerScreen() {
       </View>
 
       {/* Product Selector */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.productSelector}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.productSelector}
+      >
         {products.map((product) => (
           <TouchableOpacity
             key={product.id}
@@ -175,12 +204,19 @@ export default function ARViewerScreen() {
             }}
           >
             <View style={styles.thumbImage}>
-              <Ionicons name="cube-outline" size={28} color={selectedProduct.id === product.id ? '#FF6B35' : '#999'} />
+              <Ionicons
+                name="cube-outline"
+                size={28}
+                color={selectedProduct.id === product.id ? "#FF6B35" : "#999"}
+              />
             </View>
-            <Text style={[
-              styles.thumbName,
-              selectedProduct.id === product.id && { color: '#FF6B35' },
-            ]} numberOfLines={1}>
+            <Text
+              style={[
+                styles.thumbName,
+                selectedProduct.id === product.id && { color: "#FF6B35" },
+              ]}
+              numberOfLines={1}
+            >
               {product.name}
             </Text>
           </TouchableOpacity>
@@ -208,28 +244,28 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   arViewer: {
     height: height * 0.45,
-    backgroundColor: '#1a1a2e',
-    position: 'relative',
+    backgroundColor: "#1a1a2e",
+    position: "relative",
   },
   modelViewer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   modelContainer: {
     width: 200,
     height: 200,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   modelPlaceholder: {
-    alignItems: 'center',
+    alignItems: "center",
   },
-  modelName: { color: '#fff', fontSize: 14, marginTop: 12, opacity: 0.8 },
+  modelName: { color: "#fff", fontSize: 14, marginTop: 12, opacity: 0.8 },
   viewerControls: {
-    position: 'absolute',
+    position: "absolute",
     right: 16,
-    top: '50%',
+    top: "50%",
     transform: [{ translateY: -60 }],
     gap: 8,
   },
@@ -237,25 +273,25 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(255,255,255,0.2)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   arCameraPlaceholder: {
     flex: 1,
-    backgroundColor: '#0f0f1a',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#0f0f1a",
+    justifyContent: "center",
+    alignItems: "center",
   },
-  arOverlay: { alignItems: 'center' },
+  arOverlay: { alignItems: "center" },
   arCrosshair: {
     width: 80,
     height: 80,
-    position: 'relative',
+    position: "relative",
   },
   arCrosshairLine: {
-    position: 'absolute',
-    backgroundColor: '#FF6B35',
+    position: "absolute",
+    backgroundColor: "#FF6B35",
   },
   arCrosshairH: {
     width: 80,
@@ -267,84 +303,84 @@ const styles = StyleSheet.create({
     height: 80,
     left: 39,
   },
-  arInstructions: { color: '#aaa', marginTop: 24, fontSize: 13 },
+  arInstructions: { color: "#aaa", marginTop: 24, fontSize: 13 },
   arBadge: {
-    position: 'absolute',
+    position: "absolute",
     top: 16,
     left: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FF6B35',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FF6B35",
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
     gap: 6,
   },
-  arBadgeText: { color: '#fff', fontSize: 12, fontWeight: '500' },
+  arBadgeText: { color: "#fff", fontSize: 12, fontWeight: "500" },
   arToggle: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 20,
-    left: '50%',
+    left: "50%",
     transform: [{ translateX: -60 }],
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.6)',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.6)",
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 24,
     gap: 8,
   },
-  arToggleActive: { backgroundColor: '#FF6B35' },
-  arToggleText: { color: '#fff', fontWeight: '500' },
+  arToggleActive: { backgroundColor: "#FF6B35" },
+  arToggleText: { color: "#fff", fontWeight: "500" },
   productInfo: {
     padding: 16,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     marginTop: -20,
   },
-  productName: { fontSize: 20, fontWeight: 'bold' },
+  productName: { fontSize: 20, fontWeight: "bold" },
   variantsSection: { marginTop: 16 },
-  variantLabel: { color: '#666', fontSize: 13, marginBottom: 10 },
-  variantOptions: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  variantLabel: { color: "#666", fontSize: 13, marginBottom: 10 },
+  variantOptions: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   variantBtn: {
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: "#f0f0f0",
   },
-  variantBtnActive: { backgroundColor: '#FF6B35' },
-  variantBtnText: { color: '#666', fontSize: 13 },
-  variantBtnTextActive: { color: '#fff' },
+  variantBtnActive: { backgroundColor: "#FF6B35" },
+  variantBtnText: { color: "#666", fontSize: 13 },
+  variantBtnTextActive: { color: "#fff" },
   gesturesGuide: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexDirection: "row",
+    justifyContent: "space-around",
     marginTop: 16,
     paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: '#eee',
+    borderTopColor: "#eee",
   },
-  gestureItem: { alignItems: 'center' },
-  gestureText: { color: '#666', fontSize: 11, marginTop: 4 },
+  gestureItem: { alignItems: "center" },
+  gestureText: { color: "#666", fontSize: 11, marginTop: 4 },
   productSelector: { maxHeight: 90, paddingHorizontal: 16 },
   productThumb: {
-    alignItems: 'center',
+    alignItems: "center",
     marginRight: 16,
     padding: 8,
     borderRadius: 12,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
   },
-  productThumbActive: { borderWidth: 2, borderColor: '#FF6B35' },
+  productThumbActive: { borderWidth: 2, borderColor: "#FF6B35" },
   thumbImage: {
     width: 50,
     height: 50,
     borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
-  thumbName: { color: '#666', fontSize: 11, marginTop: 4, maxWidth: 70 },
+  thumbName: { color: "#666", fontSize: 11, marginTop: 4, maxWidth: 70 },
   actionsBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: 16,
     gap: 12,
   },
@@ -352,19 +388,19 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 12,
-    backgroundColor: '#f0f0f0',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#f0f0f0",
+    justifyContent: "center",
+    alignItems: "center",
   },
   addToCartBtn: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#FF6B35',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#FF6B35",
     paddingVertical: 14,
     borderRadius: 12,
     gap: 8,
   },
-  addToCartText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  addToCartText: { color: "#fff", fontSize: 16, fontWeight: "600" },
 });

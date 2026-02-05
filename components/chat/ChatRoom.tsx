@@ -1,10 +1,10 @@
-import { TappableImage } from '@/components/ui/full-media-viewer';
-import { useAuth } from '@/context/AuthContext';
-import { useThemeColor } from '@/hooks/use-theme-color';
-import { Ionicons } from '@expo/vector-icons';
-import * as DocumentPicker from 'expo-document-picker';
-import * as ImagePicker from 'expo-image-picker';
-import { useEffect, useRef, useState } from 'react';
+import { TappableImage } from "@/components/ui/full-media-viewer";
+import { useAuth } from "@/context/AuthContext";
+import { useThemeColor } from "@/hooks/use-theme-color";
+import { Ionicons } from "@expo/vector-icons";
+import * as DocumentPicker from "expo-document-picker";
+import * as ImagePicker from "expo-image-picker";
+import { useEffect, useRef, useState } from "react";
 import {
     Alert,
     FlatList,
@@ -14,8 +14,8 @@ import {
     Text,
     TextInput,
     TouchableOpacity,
-    View
-} from 'react-native';
+    View,
+} from "react-native";
 
 export interface ChatMessage {
   id: string;
@@ -24,12 +24,12 @@ export interface ChatMessage {
   senderName: string;
   senderAvatar?: string;
   content?: string;
-  type: 'text' | 'image' | 'file' | 'system';
+  type: "text" | "image" | "file" | "system";
   fileUrl?: string;
   fileName?: string;
   fileSize?: number;
   timestamp: Date;
-  status: 'sending' | 'sent' | 'delivered' | 'read';
+  status: "sending" | "sent" | "delivered" | "read";
   replyTo?: string;
 }
 
@@ -51,15 +51,15 @@ class MockChatService {
   }
 
   disconnect() {
-    console.log('Disconnecting from chat');
+    console.log("Disconnecting from chat");
   }
 
-  sendMessage(message: Omit<ChatMessage, 'id' | 'timestamp' | 'status'>) {
+  sendMessage(message: Omit<ChatMessage, "id" | "timestamp" | "status">) {
     const newMessage: ChatMessage = {
       ...message,
       id: Math.random().toString(36).substr(2, 9),
       timestamp: new Date(),
-      status: 'sending',
+      status: "sending",
     };
 
     this.messages.push(newMessage);
@@ -67,12 +67,12 @@ class MockChatService {
 
     // Simulate message delivery
     setTimeout(() => {
-      newMessage.status = 'sent';
+      newMessage.status = "sent";
       this.notifyListeners({ ...newMessage });
     }, 1000);
 
     setTimeout(() => {
-      newMessage.status = 'delivered';
+      newMessage.status = "delivered";
       this.notifyListeners({ ...newMessage });
     }, 2000);
 
@@ -82,22 +82,25 @@ class MockChatService {
   onMessage(callback: (message: ChatMessage) => void) {
     this.listeners.push(callback);
     return () => {
-      this.listeners = this.listeners.filter(l => l !== callback);
+      this.listeners = this.listeners.filter((l) => l !== callback);
     };
   }
 
   private notifyListeners(message: ChatMessage) {
-    this.listeners.forEach(listener => listener(message));
+    this.listeners.forEach((listener) => listener(message));
   }
 
   getMessages(conversationId: string): ChatMessage[] {
-    return this.messages.filter(m => m.conversationId === conversationId);
+    return this.messages.filter((m) => m.conversationId === conversationId);
   }
 
   markAsRead(conversationId: string, messageIds: string[]) {
-    this.messages = this.messages.map(message => {
-      if (message.conversationId === conversationId && messageIds.includes(message.id)) {
-        return { ...message, status: 'read' };
+    this.messages = this.messages.map((message) => {
+      if (
+        message.conversationId === conversationId &&
+        messageIds.includes(message.id)
+      ) {
+        return { ...message, status: "read" };
       }
       return message;
     });
@@ -106,18 +109,23 @@ class MockChatService {
 
 const chatService = new MockChatService();
 
-export function ChatRoom({ conversationId, recipientName, recipientAvatar, onBack }: ChatRoomProps) {
+export function ChatRoom({
+  conversationId,
+  recipientName,
+  recipientAvatar,
+  onBack,
+}: ChatRoomProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [inputText, setInputText] = useState('');
+  const [inputText, setInputText] = useState("");
   const [replyingTo, setReplyingTo] = useState<ChatMessage | null>(null);
   const [typing, setTyping] = useState(false);
-  
+
   const { user } = useAuth();
   const flatListRef = useRef<FlatList>(null);
-  
-  const backgroundColor = useThemeColor({}, 'background');
-  const textColor = useThemeColor({}, 'text');
-  const primaryColor = useThemeColor({}, 'tint');
+
+  const backgroundColor = useThemeColor({}, "background");
+  const textColor = useThemeColor({}, "text");
+  const primaryColor = useThemeColor({}, "tint");
 
   useEffect(() => {
     chatService.connect(conversationId);
@@ -125,10 +133,10 @@ export function ChatRoom({ conversationId, recipientName, recipientAvatar, onBac
 
     const unsubscribe = chatService.onMessage((message) => {
       if (message.conversationId === conversationId) {
-        setMessages(prev => {
-          const existing = prev.find(m => m.id === message.id);
+        setMessages((prev) => {
+          const existing = prev.find((m) => m.id === message.id);
           if (existing) {
-            return prev.map(m => m.id === message.id ? message : m);
+            return prev.map((m) => (m.id === message.id ? message : m));
           }
           return [...prev, message];
         });
@@ -141,15 +149,19 @@ export function ChatRoom({ conversationId, recipientName, recipientAvatar, onBac
     };
   }, [conversationId]);
 
-  const sendMessage = (content: string, type: 'text' | 'image' | 'file' = 'text', fileData?: any) => {
-    if (!content.trim() && type === 'text') return;
+  const sendMessage = (
+    content: string,
+    type: "text" | "image" | "file" = "text",
+    fileData?: any,
+  ) => {
+    if (!content.trim() && type === "text") return;
 
     const message = {
       conversationId,
-      senderId: user?.id || 'current-user',
-      senderName: user?.name || 'You',
+      senderId: user?.id || "current-user",
+      senderName: user?.name || "You",
       senderAvatar: user?.avatar,
-      content: type === 'text' ? content : undefined,
+      content: type === "text" ? content : undefined,
       type,
       fileUrl: fileData?.uri,
       fileName: fileData?.name,
@@ -158,9 +170,9 @@ export function ChatRoom({ conversationId, recipientName, recipientAvatar, onBac
     };
 
     chatService.sendMessage(message);
-    setInputText('');
+    setInputText("");
     setReplyingTo(null);
-    
+
     // Scroll to bottom
     setTimeout(() => {
       flatListRef.current?.scrollToEnd({ animated: true });
@@ -168,24 +180,25 @@ export function ChatRoom({ conversationId, recipientName, recipientAvatar, onBac
   };
 
   const pickImage = async () => {
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+
     if (!permissionResult.granted) {
-      Alert.alert('Cần cấp quyền', 'Vui lòng cấp quyền truy cập thư viện ảnh.');
+      Alert.alert("Cần cấp quyền", "Vui lòng cấp quyền truy cập thư viện ảnh.");
       return;
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
+      mediaTypes: ["images"],
       quality: 0.8,
       allowsMultipleSelection: false,
     });
 
     if (!result.canceled && result.assets[0]) {
       const asset = result.assets[0];
-      sendMessage('', 'image', {
+      sendMessage("", "image", {
         uri: asset.uri,
-        name: asset.fileName || 'image.jpg',
+        name: asset.fileName || "image.jpg",
         size: asset.fileSize,
       });
     }
@@ -194,135 +207,183 @@ export function ChatRoom({ conversationId, recipientName, recipientAvatar, onBac
   const pickDocument = async () => {
     try {
       const result = await DocumentPicker.getDocumentAsync({
-        type: '*/*',
+        type: "*/*",
         copyToCacheDirectory: true,
       });
 
       if (!result.canceled) {
         const file = result.assets[0];
-        sendMessage('', 'file', {
+        sendMessage("", "file", {
           uri: file.uri,
           name: file.name,
           size: file.size,
         });
       }
     } catch (error) {
-      Alert.alert('Lỗi', 'Không thể chọn file');
+      Alert.alert("Lỗi", "Không thể chọn file");
     }
   };
 
   const formatFileSize = (bytes: number): string => {
-    if (bytes === 0) return '0 Bytes';
+    if (bytes === 0) return "0 Bytes";
     const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
-  const getStatusIcon = (status: ChatMessage['status']) => {
+  const getStatusIcon = (status: ChatMessage["status"]) => {
     switch (status) {
-      case 'sending':
-        return 'time-outline';
-      case 'sent':
-        return 'checkmark-outline';
-      case 'delivered':
-        return 'checkmark-done-outline';
-      case 'read':
-        return 'checkmark-done';
+      case "sending":
+        return "time-outline";
+      case "sent":
+        return "checkmark-outline";
+      case "delivered":
+        return "checkmark-done-outline";
+      case "read":
+        return "checkmark-done";
       default:
-        return 'time-outline';
+        return "time-outline";
     }
   };
 
-  const getStatusColor = (status: ChatMessage['status']) => {
+  const getStatusColor = (status: ChatMessage["status"]) => {
     switch (status) {
-      case 'read':
+      case "read":
         return primaryColor;
-      case 'delivered':
-      case 'sent':
-        return '#0066CC';
+      case "delivered":
+      case "sent":
+        return "#0066CC";
       default:
-        return '#6B7280';
+        return "#6B7280";
     }
   };
 
   const renderMessage = ({ item }: { item: ChatMessage }) => {
     const isOwn = item.senderId === user?.id;
-    const replyMessage = item.replyTo ? messages.find(m => m.id === item.replyTo) : null;
+    const replyMessage = item.replyTo
+      ? messages.find((m) => m.id === item.replyTo)
+      : null;
 
     return (
-      <View style={[styles.messageContainer, isOwn ? styles.ownMessage : styles.otherMessage]}>
+      <View
+        style={[
+          styles.messageContainer,
+          isOwn ? styles.ownMessage : styles.otherMessage,
+        ]}
+      >
         {!isOwn && (
-          <Image 
-            source={{ uri: item.senderAvatar || 'https://via.placeholder.com/32' }}
+          <Image
+            source={{
+              uri:
+                item.senderAvatar ||
+                "https://ui-avatars.com/api/?name=User&size=32&background=4CAF50&color=fff",
+            }}
             style={styles.avatar}
           />
         )}
-        
-        <View style={[styles.messageBubble, isOwn ? styles.ownBubble : styles.otherBubble]}>
+
+        <View
+          style={[
+            styles.messageBubble,
+            isOwn ? styles.ownBubble : styles.otherBubble,
+          ]}
+        >
           {replyMessage && (
             <View style={styles.replyContainer}>
-              <View style={[styles.replyBar, { backgroundColor: primaryColor }]} />
+              <View
+                style={[styles.replyBar, { backgroundColor: primaryColor }]}
+              />
               <View style={styles.replyContent}>
                 <Text style={[styles.replyAuthor, { color: primaryColor }]}>
                   {replyMessage.senderName}
                 </Text>
-                <Text style={[styles.replyText, { color: textColor }]} numberOfLines={2}>
-                  {replyMessage.content || `${replyMessage.type === 'image' ? '📷' : '📎'} ${replyMessage.fileName || 'File'}`}
+                <Text
+                  style={[styles.replyText, { color: textColor }]}
+                  numberOfLines={2}
+                >
+                  {replyMessage.content ||
+                    `${replyMessage.type === "image" ? "📷" : "📎"} ${replyMessage.fileName || "File"}`}
                 </Text>
               </View>
             </View>
           )}
 
-          {item.type === 'text' && (
-            <Text style={[styles.messageText, { color: isOwn ? 'white' : textColor }]}>
+          {item.type === "text" && (
+            <Text
+              style={[
+                styles.messageText,
+                { color: isOwn ? "white" : textColor },
+              ]}
+            >
               {item.content}
             </Text>
           )}
 
-          {item.type === 'image' && item.fileUrl && (
-            <TappableImage 
-              source={{ uri: item.fileUrl }} 
+          {item.type === "image" && item.fileUrl && (
+            <TappableImage
+              source={{ uri: item.fileUrl }}
               style={styles.imageMessage}
               title={`Ảnh từ ${item.senderName}`}
-              description={new Date(item.timestamp).toLocaleString('vi-VN')}
+              description={new Date(item.timestamp).toLocaleString("vi-VN")}
             />
           )}
 
-          {item.type === 'file' && (
-            <TouchableOpacity 
+          {item.type === "file" && (
+            <TouchableOpacity
               style={styles.fileMessage}
               onPress={() => {
                 if (item.fileUrl) {
                   Linking.openURL(item.fileUrl).catch(() => {
-                    Alert.alert('Lỗi', 'Không thể mở file');
+                    Alert.alert("Lỗi", "Không thể mở file");
                   });
                 }
               }}
             >
-              <Ionicons name="document-outline" size={24} color={isOwn ? 'white' : primaryColor} />
+              <Ionicons
+                name="document-outline"
+                size={24}
+                color={isOwn ? "white" : primaryColor}
+              />
               <View style={styles.fileInfo}>
-                <Text style={[styles.fileName, { color: isOwn ? 'white' : textColor }]}>
+                <Text
+                  style={[
+                    styles.fileName,
+                    { color: isOwn ? "white" : textColor },
+                  ]}
+                >
                   {item.fileName}
                 </Text>
-                <Text style={[styles.fileSize, { color: isOwn ? 'rgba(255,255,255,0.7)' : '#6B7280' }]}>
-                  {item.fileSize ? formatFileSize(item.fileSize) : 'Unknown size'}
+                <Text
+                  style={[
+                    styles.fileSize,
+                    { color: isOwn ? "rgba(255,255,255,0.7)" : "#6B7280" },
+                  ]}
+                >
+                  {item.fileSize
+                    ? formatFileSize(item.fileSize)
+                    : "Unknown size"}
                 </Text>
               </View>
             </TouchableOpacity>
           )}
 
           <View style={styles.messageFooter}>
-            <Text style={[styles.timestamp, { color: isOwn ? 'rgba(255,255,255,0.7)' : '#6B7280' }]}>
-              {new Date(item.timestamp).toLocaleTimeString('vi-VN', { 
-                hour: '2-digit', 
-                minute: '2-digit' 
+            <Text
+              style={[
+                styles.timestamp,
+                { color: isOwn ? "rgba(255,255,255,0.7)" : "#6B7280" },
+              ]}
+            >
+              {new Date(item.timestamp).toLocaleTimeString("vi-VN", {
+                hour: "2-digit",
+                minute: "2-digit",
               })}
             </Text>
             {isOwn && (
-              <Ionicons 
-                name={getStatusIcon(item.status)} 
-                size={12} 
+              <Ionicons
+                name={getStatusIcon(item.status)}
+                size={12}
                 color={getStatusColor(item.status)}
                 style={styles.statusIcon}
               />
@@ -349,8 +410,12 @@ export function ChatRoom({ conversationId, recipientName, recipientAvatar, onBac
             <Text style={[styles.replyLabel, { color: primaryColor }]}>
               Trả lời {replyingTo.senderName}
             </Text>
-            <Text style={[styles.replyText, { color: textColor }]} numberOfLines={1}>
-              {replyingTo.content || `${replyingTo.type === 'image' ? '📷' : '📎'} ${replyingTo.fileName || 'File'}`}
+            <Text
+              style={[styles.replyText, { color: textColor }]}
+              numberOfLines={1}
+            >
+              {replyingTo.content ||
+                `${replyingTo.type === "image" ? "📷" : "📎"} ${replyingTo.fileName || "File"}`}
             </Text>
           </View>
           <TouchableOpacity onPress={() => setReplyingTo(null)}>
@@ -363,7 +428,7 @@ export function ChatRoom({ conversationId, recipientName, recipientAvatar, onBac
         <TouchableOpacity style={styles.attachButton} onPress={pickImage}>
           <Ionicons name="image-outline" size={24} color={primaryColor} />
         </TouchableOpacity>
-        
+
         <TouchableOpacity style={styles.attachButton} onPress={pickDocument}>
           <Ionicons name="attach-outline" size={24} color={primaryColor} />
         </TouchableOpacity>
@@ -377,7 +442,7 @@ export function ChatRoom({ conversationId, recipientName, recipientAvatar, onBac
           maxLength={1000}
         />
 
-        <TouchableOpacity 
+        <TouchableOpacity
           style={[styles.sendButton, { backgroundColor: primaryColor }]}
           onPress={() => sendMessage(inputText)}
           disabled={!inputText.trim()}
@@ -391,19 +456,27 @@ export function ChatRoom({ conversationId, recipientName, recipientAvatar, onBac
   return (
     <View style={[styles.container, { backgroundColor }]}>
       {/* Header */}
-      <View style={[styles.header, { borderBottomColor: '#E5E7EB' }]}>
+      <View style={[styles.header, { borderBottomColor: "#E5E7EB" }]}>
         <TouchableOpacity onPress={onBack}>
           <Ionicons name="arrow-back" size={24} color={textColor} />
         </TouchableOpacity>
-        
+
         <View style={styles.headerInfo}>
-          <Image 
-            source={{ uri: recipientAvatar || 'https://via.placeholder.com/40' }}
+          <Image
+            source={{
+              uri:
+                recipientAvatar ||
+                "https://ui-avatars.com/api/?name=Chat&size=40&background=FF6B35&color=fff",
+            }}
             style={styles.headerAvatar}
           />
           <View>
-            <Text style={[styles.headerName, { color: textColor }]}>{recipientName}</Text>
-            <Text style={[styles.headerStatus, { color: '#0066CC' }]}>Đang hoạt động</Text>
+            <Text style={[styles.headerName, { color: textColor }]}>
+              {recipientName}
+            </Text>
+            <Text style={[styles.headerStatus, { color: "#0066CC" }]}>
+              Đang hoạt động
+            </Text>
           </View>
         </View>
 
@@ -422,7 +495,9 @@ export function ChatRoom({ conversationId, recipientName, recipientAvatar, onBac
         keyExtractor={(item) => item.id}
         renderItem={renderMessage}
         style={styles.messagesList}
-        onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
+        onContentSizeChange={() =>
+          flatListRef.current?.scrollToEnd({ animated: true })
+        }
         showsVerticalScrollIndicator={false}
       />
 
@@ -437,8 +512,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
@@ -446,8 +521,8 @@ const styles = StyleSheet.create({
   },
   headerInfo: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 12,
   },
   headerAvatar: {
@@ -457,7 +532,7 @@ const styles = StyleSheet.create({
   },
   headerName: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   headerStatus: {
     fontSize: 12,
@@ -468,15 +543,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   messageContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginVertical: 4,
-    alignItems: 'flex-end',
+    alignItems: "flex-end",
   },
   ownMessage: {
-    justifyContent: 'flex-end',
+    justifyContent: "flex-end",
   },
   otherMessage: {
-    justifyContent: 'flex-start',
+    justifyContent: "flex-start",
   },
   avatar: {
     width: 32,
@@ -485,16 +560,16 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   messageBubble: {
-    maxWidth: '70%',
+    maxWidth: "70%",
     borderRadius: 16,
     padding: 12,
     marginHorizontal: 4,
   },
   ownBubble: {
-    backgroundColor: '#007AFF',
+    backgroundColor: "#007AFF",
   },
   otherBubble: {
-    backgroundColor: '#F1F1F1',
+    backgroundColor: "#F1F1F1",
   },
   messageText: {
     fontSize: 16,
@@ -506,8 +581,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   fileMessage: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 12,
   },
   fileInfo: {
@@ -515,15 +590,15 @@ const styles = StyleSheet.create({
   },
   fileName: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   fileSize: {
     fontSize: 12,
     marginTop: 2,
   },
   messageFooter: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginTop: 4,
     gap: 4,
   },
@@ -538,7 +613,7 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   replyContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: 8,
     opacity: 0.8,
   },
@@ -552,7 +627,7 @@ const styles = StyleSheet.create({
   },
   replyAuthor: {
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   replyText: {
     fontSize: 12,
@@ -562,23 +637,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
+    borderTopColor: "#E5E7EB",
   },
   replyPreview: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: 12,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: "#F9FAFB",
     borderRadius: 8,
     marginBottom: 8,
   },
   replyLabel: {
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   inputRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
+    flexDirection: "row",
+    alignItems: "flex-end",
     gap: 8,
   },
   attachButton: {
@@ -587,19 +662,19 @@ const styles = StyleSheet.create({
   textInput: {
     flex: 1,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: "#E5E7EB",
     borderRadius: 20,
     paddingHorizontal: 16,
     paddingVertical: 8,
     maxHeight: 100,
     fontSize: 16,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: "#F9FAFB",
   },
   sendButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

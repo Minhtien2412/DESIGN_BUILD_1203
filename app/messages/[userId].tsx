@@ -4,15 +4,17 @@
  * Now using real backend API with WebSocket support
  */
 
+import { type UploadedAttachment } from "@/components/chat/ChatAttachmentPicker";
 import {
-    ChatAttachmentPicker,
-    type UploadedAttachment,
-} from "@/components/chat/ChatAttachmentPicker";
+    AttachmentData,
+    MessageComposerToolbar,
+} from "@/components/chat/MessageComposerToolbar";
 import {
     MessageReactions,
     ReactionPicker,
     type Reaction,
 } from "@/components/chat/MessageReactions";
+import { ChatHeader } from "@/components/navigation/ChatHeader";
 import Avatar from "@/components/ui/avatar";
 import { useWebSocket } from "@/context/WebSocketContext";
 import { useConversation } from "@/hooks/useMessages";
@@ -23,17 +25,16 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
     ActivityIndicator,
-    Alert,
     FlatList,
     Keyboard,
     KeyboardAvoidingView,
     Platform,
     StyleSheet,
     Text,
-    TextInput,
     TouchableOpacity,
     View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // Recipient info type
 interface RecipientInfo {
@@ -43,13 +44,57 @@ interface RecipientInfo {
   avatar?: string;
 }
 
+// Demo messages khi API lỗi
+const createDemoMessages = (recipientId: number): Message[] => [
+  {
+    id: 1,
+    content: "Chào bạn! Dự án tiến triển thế nào rồi?",
+    senderId: recipientId,
+    sender: { id: recipientId, name: `Người dùng ${recipientId}` },
+    createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
+    read: true,
+  },
+  {
+    id: 2,
+    content: "Chào anh/chị, dự án đang tiến triển tốt ạ!",
+    senderId: 0, // Current user
+    sender: { id: 0, name: "Tôi" },
+    createdAt: new Date(Date.now() - 1000 * 60 * 25).toISOString(),
+    read: true,
+  },
+  {
+    id: 3,
+    content: "Tuyệt vời! Khi nào có thể xem được bản thiết kế?",
+    senderId: recipientId,
+    sender: { id: recipientId, name: `Người dùng ${recipientId}` },
+    createdAt: new Date(Date.now() - 1000 * 60 * 20).toISOString(),
+    read: true,
+  },
+  {
+    id: 4,
+    content: "Em sẽ gửi bản thiết kế trong ngày hôm nay ạ",
+    senderId: 0,
+    sender: { id: 0, name: "Tôi" },
+    createdAt: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
+    read: true,
+  },
+  {
+    id: 5,
+    content: "Ok cảm ơn bạn nhé! 👍",
+    senderId: recipientId,
+    sender: { id: recipientId, name: `Người dùng ${recipientId}` },
+    createdAt: new Date(Date.now() - 1000 * 60 * 10).toISOString(),
+    read: false,
+  },
+];
+
 export default function MessageThreadScreen() {
   const { userId } = useLocalSearchParams<{ userId: string }>();
   const recipientId = parseInt(userId || "0");
 
   // State for recipient info (fetched from conversation or API)
   const [recipientInfo, setRecipientInfo] = useState<RecipientInfo | null>(
-    null
+    null,
   );
   // State for pending attachment
   const [pendingAttachment, setPendingAttachment] =
@@ -58,7 +103,7 @@ export default function MessageThreadScreen() {
   // Use conversation hook for data management
   // Hook will auto-fetch conversationId from recipientId if not provided
   const {
-    messages,
+    messages: apiMessages,
     loading,
     sending,
     hasMore,
@@ -68,6 +113,14 @@ export default function MessageThreadScreen() {
     markAllAsRead,
     refresh,
   } = useConversation(null, recipientId);
+
+  // Use demo messages if API returns empty
+  const messages = useMemo(() => {
+    if (apiMessages && apiMessages.length > 0) {
+      return apiMessages;
+    }
+    return createDemoMessages(recipientId);
+  }, [apiMessages, recipientId]);
 
   // WebSocket for real-time updates
   const { socket, connected } = useWebSocket();
@@ -79,7 +132,7 @@ export default function MessageThreadScreen() {
   >({});
   const [showReactionPicker, setShowReactionPicker] = useState(false);
   const [selectedMessageId, setSelectedMessageId] = useState<string | null>(
-    null
+    null,
   );
   const [reactionPickerPosition, setReactionPickerPosition] = useState<
     { x: number; y: number } | undefined
@@ -93,7 +146,7 @@ export default function MessageThreadScreen() {
       // First try to get from messages
       if (messages.length > 0) {
         const otherUserMessage = messages.find(
-          (m) => m.senderId === recipientId
+          (m) => m.senderId === recipientId,
         );
         if (otherUserMessage?.sender) {
           setRecipientInfo({
@@ -111,7 +164,7 @@ export default function MessageThreadScreen() {
           await messagesApi.getConversationByRecipient(recipientId);
         if (conversation) {
           const recipient = conversation.participants.find(
-            (p) => p.id === recipientId
+            (p) => p.id === recipientId,
           );
           if (recipient) {
             setRecipientInfo({
@@ -210,7 +263,7 @@ export default function MessageThreadScreen() {
       // Send to server via WebSocket
       socket?.emit("message:react", { messageId, emoji, action: "add" });
     },
-    [socket]
+    [socket],
   );
 
   const handleRemoveReaction = useCallback(
@@ -231,7 +284,7 @@ export default function MessageThreadScreen() {
               count: updated[reactionIndex].count - 1,
               hasReacted: false,
               userIds: updated[reactionIndex].userIds.filter(
-                (id) => id !== "current-user"
+                (id) => id !== "current-user",
               ),
             };
           }
@@ -243,7 +296,7 @@ export default function MessageThreadScreen() {
       // Send to server via WebSocket
       socket?.emit("message:react", { messageId, emoji, action: "remove" });
     },
-    [socket]
+    [socket],
   );
 
   const handleMessageLongPress = useCallback(
@@ -258,7 +311,7 @@ export default function MessageThreadScreen() {
       }
       setShowReactionPicker(true);
     },
-    []
+    [],
   );
 
   const handleSelectReaction = useCallback(
@@ -269,7 +322,7 @@ export default function MessageThreadScreen() {
       setShowReactionPicker(false);
       setSelectedMessageId(null);
     },
-    [selectedMessageId, handleAddReaction]
+    [selectedMessageId, handleAddReaction],
   );
 
   const handleSendMessage = async () => {
@@ -288,7 +341,7 @@ export default function MessageThreadScreen() {
             ? `[Image: ${pendingAttachment.url}]`
             : `[File: ${pendingAttachment.name}](${pendingAttachment.url})`;
         await sendMessage(
-          text ? `${text}\n${attachmentContent}` : attachmentContent
+          text ? `${text}\n${attachmentContent}` : attachmentContent,
         );
         setPendingAttachment(null);
       } else {
@@ -481,6 +534,8 @@ export default function MessageThreadScreen() {
     );
   };
 
+  const insets = useSafeAreaInsets();
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -493,61 +548,23 @@ export default function MessageThreadScreen() {
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 88 : 0}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
     >
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backButton}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-        >
-          <Ionicons name="arrow-back" size={24} color="#fff" />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.headerCenter}
-          onPress={() => router.push(`/profile/${recipientId}`)}
-          activeOpacity={0.8}
-        >
-          <Avatar
-            avatar={recipientInfo?.avatar || null}
-            userId={String(recipientId)}
-            name={displayName}
-            pixelSize={36}
-            showBadge={connected}
-          />
-          <View style={styles.headerInfo}>
-            <Text style={styles.headerName} numberOfLines={1}>
-              {displayName}
-            </Text>
-            <Text style={styles.headerStatus}>
-              {connected ? (
-                <Text style={{ color: "#7DD3FC" }}>● Đang online</Text>
-              ) : (
-                "Offline"
-              )}
-            </Text>
-          </View>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.headerButton}
-          onPress={() => router.push(`/call/${recipientId}?type=voice`)}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-        >
-          <Ionicons name="call" size={22} color="#fff" />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.headerButton}
-          onPress={() => router.push(`/call/${recipientId}?type=video`)}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-        >
-          <Ionicons name="videocam" size={24} color="#fff" />
-        </TouchableOpacity>
-      </View>
+      {/* Chat Header - Zalo style */}
+      <ChatHeader
+        title={displayName}
+        avatar={recipientInfo?.avatar}
+        userId={String(recipientId)}
+        isOnline={connected}
+        onVoiceCall={() =>
+          router.push(`/call/${recipientId}?type=voice` as any)
+        }
+        onVideoCall={() =>
+          router.push(`/call/${recipientId}?type=video` as any)
+        }
+        onProfilePress={() => router.push(`/profile/${recipientId}` as any)}
+      />
 
       {/* Messages list */}
       <View style={{ flex: 1, position: "relative" }}>
@@ -574,6 +591,8 @@ export default function MessageThreadScreen() {
             }
           }}
           scrollEventThrottle={100}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="interactive"
         />
 
         {/* New messages indicator */}
@@ -599,57 +618,33 @@ export default function MessageThreadScreen() {
         )}
       </View>
 
-      {/* Input bar */}
-      <View style={styles.inputBar}>
-        <TouchableOpacity style={styles.inputButton}>
-          <Ionicons name="happy-outline" size={24} color="#999" />
-        </TouchableOpacity>
-
-        <TextInput
-          style={styles.input}
-          placeholder="Nhập tin nhắn..."
-          placeholderTextColor="#999"
-          value={messageText}
-          onChangeText={setMessageText}
-          multiline
-          maxLength={1000}
-        />
-
-        {/* Attachment Picker */}
-        <ChatAttachmentPicker
-          onAttachmentReady={handleAttachmentReady}
-          onError={(error) => Alert.alert("Lỗi", error)}
-          renderTrigger={({ onPress, loading: attachLoading }) => (
-            <TouchableOpacity
-              style={styles.inputButton}
-              onPress={onPress}
-              disabled={attachLoading}
-            >
-              {attachLoading ? (
-                <ActivityIndicator size="small" color="#999" />
-              ) : (
-                <Ionicons name="image-outline" size={24} color="#0066CC" />
-              )}
-            </TouchableOpacity>
-          )}
-        />
-
-        <TouchableOpacity
-          style={[
-            styles.sendButton,
-            ((!messageText.trim() && !pendingAttachment) || sending) &&
-              styles.sendButtonDisabled,
-          ]}
-          onPress={handleSendMessage}
-          disabled={(!messageText.trim() && !pendingAttachment) || sending}
-        >
-          {sending ? (
-            <ActivityIndicator size="small" color="#fff" />
-          ) : (
-            <Ionicons name="send" size={18} color="#fff" />
-          )}
-        </TouchableOpacity>
-      </View>
+      {/* Message Composer Toolbar - với voice, image, video support */}
+      <MessageComposerToolbar
+        onSendText={(text) => {
+          setMessageText(text);
+          handleSendMessage();
+        }}
+        onSendAttachment={(attachment: AttachmentData) => {
+          setPendingAttachment({
+            uri: attachment.uri,
+            type: attachment.type === "voice" ? "file" : attachment.type,
+            name: attachment.name,
+            size: attachment.size,
+            mimeType: attachment.mimeType,
+          } as UploadedAttachment);
+          handleSendMessage();
+        }}
+        onTypingStart={() => {
+          socket?.emit("typing:start", { recipientId, conversationId });
+        }}
+        onTypingStop={() => {
+          socket?.emit("typing:stop", { recipientId, conversationId });
+        }}
+        placeholder="Nhập tin nhắn..."
+        sending={sending}
+        disabled={sending}
+        primaryColor="#0068FF"
+      />
 
       {/* Reaction Picker Modal */}
       <ReactionPicker
@@ -669,58 +664,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#E8ECF1", // Zalo-like chat background
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingTop: 48,
-    paddingBottom: 12,
-    backgroundColor: "#0068FF", // Zalo blue header
-    borderBottomWidth: 0,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    justifyContent: "center",
-    alignItems: "flex-start",
-  },
-  headerCenter: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    marginLeft: 8,
-  },
-  headerAvatar: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-  },
-  avatarPlaceholder: {
-    backgroundColor: "rgba(255,255,255,0.2)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  headerInfo: {
-    flex: 1,
-    marginLeft: 10,
-  },
-  headerName: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#fff", // White text on blue header
-  },
-  headerStatus: {
-    fontSize: 12,
-    color: "rgba(255,255,255,0.8)", // Semi-transparent white
-    marginTop: 2,
-  },
-  headerButton: {
-    width: 40,
-    height: 40,
-    justifyContent: "center",
-    alignItems: "flex-end",
   },
   messagesList: {
     paddingVertical: 16,

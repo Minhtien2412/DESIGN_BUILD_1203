@@ -3,21 +3,28 @@
  * Shows how to use the new API services
  */
 
-import { Button } from '@/components/ui/button';
-import { Container } from '@/components/ui/container';
-import { Section } from '@/components/ui/section';
-import { useChat, useNotifications } from '@/hooks/useSocket';
-import { login, logout } from '@/services/authApi';
-import { createPayment } from '@/services/paymentsApi';
-import { getProducts } from '@/services/productsApi';
-import { createProject, getProjects } from '@/services/projectsApi';
-import { handleApiError } from '@/utils/errorHandler';
-import { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Button } from "@/components/ui/button";
+import { Container } from "@/components/ui/container";
+import { Section } from "@/components/ui/section";
+import { useChat, useNotifications } from "@/hooks/useSocket";
+import { login, logout } from "@/services/authApi";
+import { createPayment } from "@/services/paymentsApi";
+import { getProducts } from "@/services/productsApi";
+import { createProject, getProjects } from "@/services/projectsApi";
+import { handleApiError } from "@/utils/errorHandler";
+import { useState } from "react";
+import {
+    Alert,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    View,
+} from "react-native";
 
 export default function ApiExampleScreen() {
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<string>('');
+  const [result, setResult] = useState<string>("");
 
   // =========================================================================
   // Authentication Examples
@@ -27,15 +34,15 @@ export default function ApiExampleScreen() {
     setLoading(true);
     try {
       const response = await login({
-        email: 'test@example.com',
-        password: 'test123',
+        email: "test@example.com",
+        password: "test123",
       });
       setResult(`✅ Logged in: ${response.user.fullName}`);
-      Alert.alert('Success', 'Logged in successfully');
+      Alert.alert("Success", "Logged in successfully");
     } catch (error) {
       const errorInfo = handleApiError(error);
       setResult(`❌ Error: ${errorInfo.message}`);
-      Alert.alert('Error', errorInfo.message);
+      Alert.alert("Error", errorInfo.message);
     } finally {
       setLoading(false);
     }
@@ -44,13 +51,13 @@ export default function ApiExampleScreen() {
   const testLogout = async () => {
     setLoading(true);
     try {
-      await logout('refresh_token_here');
-      setResult('✅ Logged out successfully');
-      Alert.alert('Success', 'Logged out successfully');
+      await logout("refresh_token_here");
+      setResult("✅ Logged out successfully");
+      Alert.alert("Success", "Logged out successfully");
     } catch (error) {
       const errorInfo = handleApiError(error);
       setResult(`❌ Error: ${errorInfo.message}`);
-      Alert.alert('Error', errorInfo.message);
+      Alert.alert("Error", errorInfo.message);
     } finally {
       setLoading(false);
     }
@@ -66,10 +73,10 @@ export default function ApiExampleScreen() {
       const response = await getProjects({
         page: 1,
         limit: 10,
-        status: 'active',
+        status: "active",
       });
       setResult(`✅ Found ${response.data.length} projects`);
-      console.log('Projects:', response.data);
+      console.log("Projects:", response.data);
     } catch (error) {
       const errorInfo = handleApiError(error);
       setResult(`❌ Error: ${errorInfo.message}`);
@@ -82,19 +89,19 @@ export default function ApiExampleScreen() {
     setLoading(true);
     try {
       const project = await createProject({
-        name: 'Test Resort Project',
-        description: 'A test resort project',
+        name: "Test Resort Project",
+        description: "A test resort project",
         budget: 10000000000,
-        startDate: '2025-01-01',
-        endDate: '2025-12-31',
-        category: 'resort-design',
+        startDate: "2025-01-01",
+        endDate: "2025-12-31",
+        category: "resort-design",
       });
       setResult(`✅ Created project: ${project.name}`);
-      Alert.alert('Success', 'Project created successfully');
+      Alert.alert("Success", "Project created successfully");
     } catch (error) {
       const errorInfo = handleApiError(error);
       setResult(`❌ Error: ${errorInfo.message}`);
-      Alert.alert('Error', errorInfo.message);
+      Alert.alert("Error", errorInfo.message);
     } finally {
       setLoading(false);
     }
@@ -110,10 +117,10 @@ export default function ApiExampleScreen() {
       const response = await getProducts({
         page: 1,
         limit: 10,
-        category: 'resort-design',
+        category: "resort-design",
       });
       setResult(`✅ Found ${response.data.length} products`);
-      console.log('Products:', response.data);
+      console.log("Products:", response.data);
     } catch (error) {
       const errorInfo = handleApiError(error);
       setResult(`❌ Error: ${errorInfo.message}`);
@@ -130,17 +137,17 @@ export default function ApiExampleScreen() {
     setLoading(true);
     try {
       const payment = await createPayment({
-        projectId: 'proj_123',
+        projectId: "proj_123",
         amount: 50000000,
-        method: 'bank_transfer',
-        description: 'Test payment',
+        method: "bank_transfer",
+        description: "Test payment",
       });
       setResult(`✅ Created payment: ${payment.id}`);
-      Alert.alert('Success', 'Payment created successfully');
+      Alert.alert("Success", "Payment created successfully");
     } catch (error) {
       const errorInfo = handleApiError(error);
       setResult(`❌ Error: ${errorInfo.message}`);
-      Alert.alert('Error', errorInfo.message);
+      Alert.alert("Error", errorInfo.message);
     } finally {
       setLoading(false);
     }
@@ -200,17 +207,17 @@ export default function ApiExampleScreen() {
         <Section title="📊 Result">
           <View style={styles.resultBox}>
             <Text style={styles.resultText}>
-              {result || 'Click a button to test API'}
+              {result || "Click a button to test API"}
             </Text>
           </View>
         </Section>
 
         <Section title="💡 Tips">
           <Text style={styles.tipText}>
-            • Check console logs for detailed responses{'\n'}
-            • Update API_BASE_URL in config/env.ts for local testing{'\n'}
-            • Use real credentials for login test{'\n'}
-            • Refer to API_INTEGRATION.md for full documentation
+            • Check console logs for detailed responses{"\n"}• Update
+            API_BASE_URL in config/env.ts for local testing{"\n"}• Use real
+            credentials for login test{"\n"}• Refer to API_INTEGRATION.md for
+            full documentation
           </Text>
         </Section>
       </ScrollView>
@@ -223,13 +230,20 @@ export default function ApiExampleScreen() {
 // ============================================================================
 
 export function ChatExample({ projectId }: { projectId: string }) {
-  const { connected, messages, sendMessage, typingUsers, startTyping, stopTyping } = useChat(projectId);
-  const [text, setText] = useState('');
+  const {
+    connected,
+    messages,
+    sendMessage,
+    typingUsers,
+    startTyping,
+    stopTyping,
+  } = useChat(projectId);
+  const [text, setText] = useState("");
 
   const handleSend = () => {
     if (text.trim()) {
-      sendMessage(text, 'text');
-      setText('');
+      sendMessage(text, "text");
+      setText("");
       stopTyping();
     }
   };
@@ -246,21 +260,23 @@ export function ChatExample({ projectId }: { projectId: string }) {
   return (
     <View style={styles.chatContainer}>
       <Text style={styles.statusText}>
-        Status: {connected ? '🟢 Connected' : '🔴 Disconnected'}
+        Status: {connected ? "🟢 Connected" : "🔴 Disconnected"}
       </Text>
 
       <ScrollView style={styles.messagesContainer}>
-        {messages.map(msg => (
+        {messages.map((msg) => (
           <View key={msg.id} style={styles.messageItem}>
-            <Text style={styles.messageUser}>{msg.user.fullName}</Text>
-            <Text style={styles.messageContent}>{msg.content}</Text>
+            <Text style={styles.messageUser}>
+              {msg.senderName || "Unknown"}
+            </Text>
+            <Text style={styles.messageContent}>{msg.body}</Text>
           </View>
         ))}
       </ScrollView>
 
       {typingUsers.length > 0 && (
         <Text style={styles.typingText}>
-          {typingUsers.map(u => u.fullName).join(', ')} đang gõ...
+          {typingUsers.map((u) => u.userName).join(", ")} đang gõ...
         </Text>
       )}
 
@@ -288,17 +304,15 @@ export function NotificationsExample() {
   return (
     <View style={styles.notificationsContainer}>
       <Text style={styles.statusText}>
-        Status: {connected ? '🟢 Connected' : '🔴 Disconnected'}
+        Status: {connected ? "🟢 Connected" : "🔴 Disconnected"}
       </Text>
-      <Text style={styles.unreadText}>
-        Unread: {unreadCount}
-      </Text>
+      <Text style={styles.unreadText}>Unread: {unreadCount}</Text>
 
       <ScrollView>
-        {notifications.map(notif => (
+        {notifications.map((notif) => (
           <View key={notif.id} style={styles.notificationItem}>
             <Text style={styles.notificationTitle}>{notif.title}</Text>
-            <Text style={styles.notificationMessage}>{notif.message}</Text>
+            <Text style={styles.notificationMessage}>{notif.body}</Text>
             <Text style={styles.notificationTime}>
               {new Date(notif.createdAt).toLocaleString()}
             </Text>
@@ -318,18 +332,18 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   resultBox: {
-    backgroundColor: '#F5F5F5',
+    backgroundColor: "#F5F5F5",
     padding: 16,
     borderRadius: 8,
     minHeight: 100,
   },
   resultText: {
     fontSize: 14,
-    fontFamily: 'monospace',
+    fontFamily: "monospace",
   },
   tipText: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
     lineHeight: 22,
   },
   chatContainer: {
@@ -337,7 +351,7 @@ const styles = StyleSheet.create({
   },
   statusText: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 8,
   },
   messagesContainer: {
@@ -347,12 +361,12 @@ const styles = StyleSheet.create({
   messageItem: {
     marginBottom: 12,
     padding: 12,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: "#F5F5F5",
     borderRadius: 8,
   },
   messageUser: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 4,
   },
   messageContent: {
@@ -360,20 +374,20 @@ const styles = StyleSheet.create({
   },
   typingText: {
     fontSize: 12,
-    color: '#666',
-    fontStyle: 'italic',
+    color: "#666",
+    fontStyle: "italic",
     marginBottom: 8,
   },
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
   },
   input: {
     flex: 1,
     height: 44,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: "#E0E0E0",
     borderRadius: 8,
     paddingHorizontal: 12,
     fontSize: 14,
@@ -383,19 +397,19 @@ const styles = StyleSheet.create({
   },
   unreadText: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#E82A34',
+    fontWeight: "600",
+    color: "#E82A34",
     marginBottom: 16,
   },
   notificationItem: {
     marginBottom: 12,
     padding: 12,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: "#F5F5F5",
     borderRadius: 8,
   },
   notificationTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 4,
   },
   notificationMessage: {
@@ -404,6 +418,6 @@ const styles = StyleSheet.create({
   },
   notificationTime: {
     fontSize: 12,
-    color: '#666',
+    color: "#666",
   },
 });

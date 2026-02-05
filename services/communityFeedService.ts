@@ -11,8 +11,7 @@
  */
 
 import {
-    Announcement,
-    communicationService,
+    Announcement
 } from "./api/communication.service";
 import {
     ExternalPhoto,
@@ -177,7 +176,7 @@ export function clearFeedCache(): void {
 // ============================================
 
 function transformAnnouncement(
-  announcement: Announcement
+  announcement: Announcement,
 ): AnnouncementFeedItem {
   // Map priority from Announcement type (LOW, NORMAL, HIGH, URGENT)
   const priorityMap: Record<string, FeedItemPriority> = {
@@ -222,7 +221,7 @@ function transformAnnouncement(
 
 function transformNewsArticle(
   article: NewsArticle,
-  source: FeedItemSource = "gnews"
+  source: FeedItemSource = "gnews",
 ): NewsFeedItem {
   return {
     id: `news-${article.id}`,
@@ -375,19 +374,26 @@ async function getDevelopmentPlans(): Promise<DevelopmentPlanFeedItem[]> {
 
 /**
  * Fetch announcements from backend
+ * NOTE: /announcements endpoint returns 404 - not yet implemented
+ * Using mock data fallback
  */
 async function fetchBackendAnnouncements(
-  projectId?: number
+  projectId?: number,
 ): Promise<AnnouncementFeedItem[]> {
   try {
-    const response = await communicationService.getAnnouncements(
-      projectId || 0,
-      true
-    );
+    // TODO: Uncomment when backend implements /announcements endpoint
+    // const response = await communicationService.getAnnouncements(
+    //   projectId || 0,\n    //   true,
+    // );
+    //
+    // if (response.success && response.data) {
+    //   return response.data.map(transformAnnouncement);
+    // }
 
-    if (response.success && response.data) {
-      return response.data.map(transformAnnouncement);
-    }
+    // For now, endpoint not available - using empty array
+    console.warn(
+      "[CommunityFeed] /announcements endpoint not available, skipping",
+    );
     return [];
   } catch (error) {
     console.error("[CommunityFeed] Error fetching announcements:", error);
@@ -397,35 +403,61 @@ async function fetchBackendAnnouncements(
 
 /**
  * Fetch news from multiple sources
+ * Uses GNews/mock data on mobile (NewsAPI free plan doesn't support mobile apps)
  */
 async function fetchNews(
   category?: string,
-  limit = 10
+  limit = 10,
 ): Promise<NewsFeedItem[]> {
   try {
-    const [constructionNews, realEstateNews] = await Promise.all([
+    const [constructionNews, realEstateNews] = await Promise.allSettled([
       getConstructionNews(limit),
       getRealEstateNews(limit),
     ]);
 
-    const allNews = [
-      ...constructionNews.map((a) => transformNewsArticle(a, "gnews")),
-      ...realEstateNews.map((a) => transformNewsArticle(a, "gnews")),
-    ];
+    const allNews: NewsFeedItem[] = [];
+
+    if (constructionNews.status === "fulfilled") {
+      allNews.push(
+        ...constructionNews.value.map((a) => transformNewsArticle(a, "gnews")),
+      );
+    }
+
+    if (realEstateNews.status === "fulfilled") {
+      allNews.push(
+        ...realEstateNews.value.map((a) => transformNewsArticle(a, "gnews")),
+      );
+    }
+
+    if (allNews.length === 0) {
+      console.log(
+        "[CommunityFeed] No news available from APIs, will use mock data from newsApi service",
+      );
+      // The newsApi service already returns mock data as fallback
+      const mockConstructionNews = await getConstructionNews(limit);
+      const mockRealEstateNews = await getRealEstateNews(limit);
+      return [
+        ...mockConstructionNews.map((a) => transformNewsArticle(a, "mock")),
+        ...mockRealEstateNews.map((a) => transformNewsArticle(a, "mock")),
+      ];
+    }
 
     // Sort by date and remove duplicates
     return allNews
       .filter(
         (item, index, self) =>
-          index === self.findIndex((i) => i.title === item.title)
+          index === self.findIndex((i) => i.title === item.title),
       )
       .sort(
         (a, b) =>
-          new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+          new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime(),
       )
       .slice(0, limit * 2);
   } catch (error) {
-    console.error("[CommunityFeed] Error fetching news:", error);
+    console.log(
+      "[CommunityFeed] News fetch error, returning empty array:",
+      error,
+    );
     return [];
   }
 }
@@ -435,7 +467,7 @@ async function fetchNews(
  */
 async function fetchVideos(
   category?: string,
-  limit = 10
+  limit = 10,
 ): Promise<VideoFeedItem[]> {
   try {
     // getConstructionVideos(page, perPage, category)
@@ -452,7 +484,7 @@ async function fetchVideos(
  */
 async function fetchPhotos(
   category?: string,
-  limit = 10
+  limit = 10,
 ): Promise<PhotoFeedItem[]> {
   try {
     // getConstructionPhotos(page, perPage, category)
@@ -473,7 +505,7 @@ export async function getCommunityFeed(
     page?: number;
     pageSize?: number;
     projectId?: number;
-  } = {}
+  } = {},
 ): Promise<FeedResponse> {
   const { filter, page = 1, pageSize = 20, projectId } = options;
   const cacheKey = `feed-${JSON.stringify(options)}`;
@@ -511,7 +543,7 @@ export async function getCommunityFeed(
 
     if (filter.sources && filter.sources.length > 0) {
       allItems = allItems.filter((item) =>
-        filter.sources!.includes(item.source)
+        filter.sources!.includes(item.source),
       );
     }
 
@@ -520,21 +552,21 @@ export async function getCommunityFeed(
       allItems = allItems.filter(
         (item) =>
           item.title.toLowerCase().includes(searchLower) ||
-          item.description?.toLowerCase().includes(searchLower)
+          item.description?.toLowerCase().includes(searchLower),
       );
     }
 
     if (filter.startDate) {
       const startTime = new Date(filter.startDate).getTime();
       allItems = allItems.filter(
-        (item) => new Date(item.createdAt).getTime() >= startTime
+        (item) => new Date(item.createdAt).getTime() >= startTime,
       );
     }
 
     if (filter.endDate) {
       const endTime = new Date(filter.endDate).getTime();
       allItems = allItems.filter(
-        (item) => new Date(item.createdAt).getTime() <= endTime
+        (item) => new Date(item.createdAt).getTime() <= endTime,
       );
     }
   }
@@ -559,7 +591,7 @@ export async function getCommunityFeed(
   const sources = {
     backend: allItems.filter((i) => i.source === "backend").length,
     gnews: allItems.filter(
-      (i) => i.source === "gnews" || i.source === "newsapi"
+      (i) => i.source === "gnews" || i.source === "newsapi",
     ).length,
     pexels: allItems.filter((i) => i.source === "pexels").length,
     other: allItems.filter((i) => i.source === "mock").length,
@@ -583,7 +615,7 @@ export async function getCommunityFeed(
  */
 export async function getFeedByType(
   type: FeedItemType,
-  limit = 10
+  limit = 10,
 ): Promise<CommunityFeedItem[]> {
   const response = await getCommunityFeed({
     filter: { types: [type] },
@@ -597,7 +629,7 @@ export async function getFeedByType(
  */
 export async function getAnnouncements(
   projectId?: number,
-  limit = 10
+  limit = 10,
 ): Promise<AnnouncementFeedItem[]> {
   const items = await getFeedByType("announcement", limit);
   return items as AnnouncementFeedItem[];
@@ -607,7 +639,7 @@ export async function getAnnouncements(
  * Get development plans only
  */
 export async function getDevelopmentPlansFeed(
-  limit = 10
+  limit = 10,
 ): Promise<DevelopmentPlanFeedItem[]> {
   const items = await getFeedByType("development_plan", limit);
   return items as DevelopmentPlanFeedItem[];
@@ -645,7 +677,7 @@ export async function searchCommunityFeed(
   options: {
     types?: FeedItemType[];
     limit?: number;
-  } = {}
+  } = {},
 ): Promise<CommunityFeedItem[]> {
   const { types, limit = 20 } = options;
 
@@ -664,7 +696,7 @@ export async function searchCommunityFeed(
  * Get trending content (most viewed/liked)
  */
 export async function getTrendingContent(
-  limit = 10
+  limit = 10,
 ): Promise<CommunityFeedItem[]> {
   // Fetch videos with views for trending
   const videos = await fetchVideos(undefined, limit);

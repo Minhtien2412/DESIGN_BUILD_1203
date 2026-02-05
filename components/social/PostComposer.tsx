@@ -1,22 +1,22 @@
 /**
  * PostComposer Component
  * Create new posts with text, images, privacy settings
- * 
+ *
  * @author AI Assistant
  * @date 23/12/2025
  */
 
-import { useAuth } from '@/context/AuthContext';
-import { useSocial } from '@/context/SocialContext';
+import { useAuth } from "@/context/AuthContext";
+import { useSocial } from "@/context/SocialContext";
+import { FEELINGS, PostPrivacy, PRIVACY_OPTIONS } from "@/types/social";
 import {
-    FEELINGS,
-    PostPrivacy,
-    PRIVACY_OPTIONS,
-} from '@/types/social';
-import { errorNotification, lightImpact, successNotification } from '@/utils/haptics';
-import { Ionicons } from '@expo/vector-icons';
-import * as ImagePicker from 'expo-image-picker';
-import { memo, useCallback, useState } from 'react';
+    errorNotification,
+    lightImpact,
+    successNotification,
+} from "@/utils/haptics";
+import { Ionicons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
+import { memo, useCallback, useState } from "react";
 import {
     ActivityIndicator,
     Alert,
@@ -30,8 +30,8 @@ import {
     TextInput,
     TouchableOpacity,
     View,
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface PostComposerProps {
   visible: boolean;
@@ -39,14 +39,18 @@ interface PostComposerProps {
   onSuccess?: () => void;
 }
 
-function PostComposerComponent({ visible, onClose, onSuccess }: PostComposerProps) {
+function PostComposerComponent({
+  visible,
+  onClose,
+  onSuccess,
+}: PostComposerProps) {
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
   const { createPost, state } = useSocial();
 
-  const [content, setContent] = useState('');
+  const [content, setContent] = useState("");
   const [images, setImages] = useState<string[]>([]);
-  const [privacy, setPrivacy] = useState<PostPrivacy>('friends');
+  const [privacy, setPrivacy] = useState<PostPrivacy>("friends");
   const [feeling, setFeeling] = useState<string | null>(null);
   const [showPrivacyPicker, setShowPrivacyPicker] = useState(false);
   const [showFeelingPicker, setShowFeelingPicker] = useState(false);
@@ -56,30 +60,26 @@ function PostComposerComponent({ visible, onClose, onSuccess }: PostComposerProp
 
   // Reset state
   const resetState = useCallback(() => {
-    setContent('');
+    setContent("");
     setImages([]);
-    setPrivacy('friends');
+    setPrivacy("friends");
     setFeeling(null);
   }, []);
 
   // Handle close
   const handleClose = useCallback(() => {
     if (content.trim() || images.length > 0) {
-      Alert.alert(
-        'Hủy bài viết?',
-        'Bài viết chưa được đăng sẽ bị xóa.',
-        [
-          { text: 'Tiếp tục chỉnh sửa', style: 'cancel' },
-          {
-            text: 'Hủy bài viết',
-            style: 'destructive',
-            onPress: () => {
-              resetState();
-              onClose();
-            },
+      Alert.alert("Hủy bài viết?", "Bài viết chưa được đăng sẽ bị xóa.", [
+        { text: "Tiếp tục chỉnh sửa", style: "cancel" },
+        {
+          text: "Hủy bài viết",
+          style: "destructive",
+          onPress: () => {
+            resetState();
+            onClose();
           },
-        ]
-      );
+        },
+      ]);
     } else {
       onClose();
     }
@@ -90,21 +90,24 @@ function PostComposerComponent({ visible, onClose, onSuccess }: PostComposerProp
     lightImpact();
 
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Cần quyền truy cập', 'Vui lòng cho phép truy cập thư viện ảnh');
+    if (status !== "granted") {
+      Alert.alert(
+        "Cần quyền truy cập",
+        "Vui lòng cho phép truy cập thư viện ảnh",
+      );
       return;
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
+      mediaTypes: ["images"],
       allowsMultipleSelection: true,
       quality: 0.8,
       selectionLimit: 10 - images.length,
     });
 
     if (!result.canceled && result.assets) {
-      const newImages = result.assets.map(asset => asset.uri);
-      setImages(prev => [...prev, ...newImages].slice(0, 10));
+      const newImages = result.assets.map((asset) => asset.uri);
+      setImages((prev) => [...prev, ...newImages].slice(0, 10));
     }
   }, [images.length]);
 
@@ -113,8 +116,8 @@ function PostComposerComponent({ visible, onClose, onSuccess }: PostComposerProp
     lightImpact();
 
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Cần quyền truy cập', 'Vui lòng cho phép truy cập camera');
+    if (status !== "granted") {
+      Alert.alert("Cần quyền truy cập", "Vui lòng cho phép truy cập camera");
       return;
     }
 
@@ -123,14 +126,14 @@ function PostComposerComponent({ visible, onClose, onSuccess }: PostComposerProp
     });
 
     if (!result.canceled && result.assets?.[0]) {
-      setImages(prev => [...prev, result.assets[0].uri].slice(0, 10));
+      setImages((prev) => [...prev, result.assets[0].uri].slice(0, 10));
     }
   }, []);
 
   // Remove image
   const handleRemoveImage = useCallback((index: number) => {
     lightImpact();
-    setImages(prev => prev.filter((_, i) => i !== index));
+    setImages((prev) => prev.filter((_, i) => i !== index));
   }, []);
 
   // Submit post
@@ -145,18 +148,30 @@ function PostComposerComponent({ visible, onClose, onSuccess }: PostComposerProp
       onSuccess?.();
     } catch (error) {
       errorNotification();
-      Alert.alert('Lỗi', 'Không thể đăng bài. Vui lòng thử lại.');
+      Alert.alert("Lỗi", "Không thể đăng bài. Vui lòng thử lại.");
     }
-  }, [canPost, isPosting, content, images, privacy, createPost, resetState, onClose, onSuccess]);
+  }, [
+    canPost,
+    isPosting,
+    content,
+    images,
+    privacy,
+    createPost,
+    resetState,
+    onClose,
+    onSuccess,
+  ]);
 
   // Get privacy label
   const getPrivacyLabel = () => {
-    return PRIVACY_OPTIONS.find(p => p.value === privacy)?.label || 'Bạn bè';
+    return PRIVACY_OPTIONS.find((p) => p.value === privacy)?.label || "Bạn bè";
   };
 
   // Get privacy icon
   const getPrivacyIcon = () => {
-    return PRIVACY_OPTIONS.find(p => p.value === privacy)?.icon || 'people-outline';
+    return (
+      PRIVACY_OPTIONS.find((p) => p.value === privacy)?.icon || "people-outline"
+    );
   };
 
   return (
@@ -168,7 +183,7 @@ function PostComposerComponent({ visible, onClose, onSuccess }: PostComposerProp
     >
       <KeyboardAvoidingView
         style={[styles.container, { paddingTop: insets.top }]}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         {/* Header */}
         <View style={styles.header}>
@@ -186,7 +201,12 @@ function PostComposerComponent({ visible, onClose, onSuccess }: PostComposerProp
             {isPosting ? (
               <ActivityIndicator size="small" color="#FFFFFF" />
             ) : (
-              <Text style={[styles.postButtonText, !canPost && styles.postButtonTextDisabled]}>
+              <Text
+                style={[
+                  styles.postButtonText,
+                  !canPost && styles.postButtonTextDisabled,
+                ]}
+              >
                 Đăng
               </Text>
             )}
@@ -196,16 +216,24 @@ function PostComposerComponent({ visible, onClose, onSuccess }: PostComposerProp
         {/* User Info & Privacy */}
         <View style={styles.userSection}>
           <Image
-            source={{ uri: user?.avatar || 'https://via.placeholder.com/40' }}
+            source={{
+              uri:
+                user?.avatar ||
+                "https://ui-avatars.com/api/?name=User&size=40&background=FF6B35&color=fff",
+            }}
             style={styles.avatar}
           />
           <View style={styles.userInfo}>
-            <Text style={styles.userName}>{user?.name || 'Người dùng'}</Text>
+            <Text style={styles.userName}>{user?.name || "Người dùng"}</Text>
             <TouchableOpacity
               style={styles.privacyButton}
               onPress={() => setShowPrivacyPicker(true)}
             >
-              <Ionicons name={getPrivacyIcon() as any} size={12} color="#65676B" />
+              <Ionicons
+                name={getPrivacyIcon() as any}
+                size={12}
+                color="#65676B"
+              />
               <Text style={styles.privacyText}>{getPrivacyLabel()}</Text>
               <Ionicons name="caret-down" size={12} color="#65676B" />
             </TouchableOpacity>
@@ -213,7 +241,10 @@ function PostComposerComponent({ visible, onClose, onSuccess }: PostComposerProp
         </View>
 
         {/* Content Input */}
-        <ScrollView style={styles.scrollView} keyboardShouldPersistTaps="handled">
+        <ScrollView
+          style={styles.scrollView}
+          keyboardShouldPersistTaps="handled"
+        >
           <TextInput
             style={styles.textInput}
             placeholder="Bạn đang nghĩ gì?"
@@ -253,14 +284,22 @@ function PostComposerComponent({ visible, onClose, onSuccess }: PostComposerProp
         </ScrollView>
 
         {/* Bottom Actions */}
-        <View style={[styles.bottomActions, { paddingBottom: insets.bottom + 8 }]}>
+        <View
+          style={[styles.bottomActions, { paddingBottom: insets.bottom + 8 }]}
+        >
           <Text style={styles.addToPostText}>Thêm vào bài viết</Text>
           <View style={styles.actionButtons}>
-            <TouchableOpacity style={styles.actionButton} onPress={handlePickImages}>
+            <TouchableOpacity
+              style={styles.actionButton}
+              onPress={handlePickImages}
+            >
               <Ionicons name="images" size={24} color="#45BD62" />
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.actionButton} onPress={handleTakePhoto}>
+            <TouchableOpacity
+              style={styles.actionButton}
+              onPress={handleTakePhoto}
+            >
               <Ionicons name="camera" size={24} color="#1877F2" />
             </TouchableOpacity>
 
@@ -293,9 +332,16 @@ function PostComposerComponent({ visible, onClose, onSuccess }: PostComposerProp
             activeOpacity={1}
             onPress={() => setShowPrivacyPicker(false)}
           >
-            <View style={[styles.pickerContainer, { paddingBottom: insets.bottom + 16 }]}>
-              <Text style={styles.pickerTitle}>Ai có thể xem bài viết này?</Text>
-              {PRIVACY_OPTIONS.map(option => (
+            <View
+              style={[
+                styles.pickerContainer,
+                { paddingBottom: insets.bottom + 16 },
+              ]}
+            >
+              <Text style={styles.pickerTitle}>
+                Ai có thể xem bài viết này?
+              </Text>
+              {PRIVACY_OPTIONS.map((option) => (
                 <TouchableOpacity
                   key={option.value}
                   style={[
@@ -307,10 +353,18 @@ function PostComposerComponent({ visible, onClose, onSuccess }: PostComposerProp
                     setShowPrivacyPicker(false);
                   }}
                 >
-                  <Ionicons name={option.icon as any} size={24} color="#050505" />
+                  <Ionicons
+                    name={option.icon as any}
+                    size={24}
+                    color="#050505"
+                  />
                   <Text style={styles.pickerItemText}>{option.label}</Text>
                   {privacy === option.value && (
-                    <Ionicons name="checkmark-circle" size={24} color="#1877F2" />
+                    <Ionicons
+                      name="checkmark-circle"
+                      size={24}
+                      color="#1877F2"
+                    />
                   )}
                 </TouchableOpacity>
               ))}
@@ -330,10 +384,15 @@ function PostComposerComponent({ visible, onClose, onSuccess }: PostComposerProp
             activeOpacity={1}
             onPress={() => setShowFeelingPicker(false)}
           >
-            <View style={[styles.pickerContainer, { paddingBottom: insets.bottom + 16 }]}>
+            <View
+              style={[
+                styles.pickerContainer,
+                { paddingBottom: insets.bottom + 16 },
+              ]}
+            >
               <Text style={styles.pickerTitle}>Bạn đang cảm thấy thế nào?</Text>
               <ScrollView style={styles.feelingsList}>
-                {FEELINGS.map(f => (
+                {FEELINGS.map((f) => (
                   <TouchableOpacity
                     key={f}
                     style={[
@@ -345,10 +404,16 @@ function PostComposerComponent({ visible, onClose, onSuccess }: PostComposerProp
                       setShowFeelingPicker(false);
                     }}
                   >
-                    <Text style={styles.feelingEmoji}>{f.split(' ')[0]}</Text>
-                    <Text style={styles.pickerItemText}>{f.split(' ').slice(1).join(' ')}</Text>
+                    <Text style={styles.feelingEmoji}>{f.split(" ")[0]}</Text>
+                    <Text style={styles.pickerItemText}>
+                      {f.split(" ").slice(1).join(" ")}
+                    </Text>
                     {feeling === f && (
-                      <Ionicons name="checkmark-circle" size={24} color="#1877F2" />
+                      <Ionicons
+                        name="checkmark-circle"
+                        size={24}
+                        color="#1877F2"
+                      />
                     )}
                   </TouchableOpacity>
                 ))}
@@ -364,47 +429,47 @@ function PostComposerComponent({ visible, onClose, onSuccess }: PostComposerProp
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 12,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#E4E6EB',
+    borderBottomColor: "#E4E6EB",
   },
   headerButton: {
     padding: 4,
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#050505',
+    fontWeight: "600",
+    color: "#050505",
   },
   postButton: {
-    backgroundColor: '#1877F2',
+    backgroundColor: "#1877F2",
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 6,
     minWidth: 60,
-    alignItems: 'center',
+    alignItems: "center",
   },
   postButtonDisabled: {
-    backgroundColor: '#E4E6EB',
+    backgroundColor: "#E4E6EB",
   },
   postButtonText: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#FFFFFF',
+    fontWeight: "600",
+    color: "#FFFFFF",
   },
   postButtonTextDisabled: {
-    color: '#BCC0C4',
+    color: "#BCC0C4",
   },
   userSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: 12,
   },
   avatar: {
@@ -417,13 +482,13 @@ const styles = StyleSheet.create({
   },
   userName: {
     fontSize: 15,
-    fontWeight: '600',
-    color: '#050505',
+    fontWeight: "600",
+    color: "#050505",
   },
   privacyButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#E4E6EB',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#E4E6EB",
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 6,
@@ -432,67 +497,67 @@ const styles = StyleSheet.create({
   },
   privacyText: {
     fontSize: 12,
-    color: '#050505',
+    color: "#050505",
   },
   scrollView: {
     flex: 1,
   },
   textInput: {
     fontSize: 20,
-    color: '#050505',
+    color: "#050505",
     padding: 12,
     minHeight: 100,
-    textAlignVertical: 'top',
+    textAlignVertical: "top",
   },
   feelingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 12,
     paddingVertical: 8,
-    backgroundColor: '#F0F2F5',
+    backgroundColor: "#F0F2F5",
     marginHorizontal: 12,
     borderRadius: 8,
   },
   feelingText: {
     fontSize: 14,
-    color: '#65676B',
+    color: "#65676B",
   },
   imagesContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     padding: 8,
     gap: 8,
   },
   imageWrapper: {
-    position: 'relative',
-    width: '31%',
+    position: "relative",
+    width: "31%",
     aspectRatio: 1,
   },
   previewImage: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
     borderRadius: 8,
   },
   removeImageButton: {
-    position: 'absolute',
+    position: "absolute",
     top: 4,
     right: 4,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: "rgba(0,0,0,0.5)",
     borderRadius: 12,
   },
   bottomActions: {
     borderTopWidth: 1,
-    borderTopColor: '#E4E6EB',
+    borderTopColor: "#E4E6EB",
     padding: 12,
   },
   addToPostText: {
     fontSize: 14,
-    color: '#65676B',
+    color: "#65676B",
     marginBottom: 8,
   },
   actionButtons: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 16,
   },
   actionButton: {
@@ -500,37 +565,37 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'flex-end',
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "flex-end",
   },
   pickerContainer: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     padding: 16,
-    maxHeight: '70%',
+    maxHeight: "70%",
   },
   pickerTitle: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#050505',
-    textAlign: 'center',
+    fontWeight: "600",
+    color: "#050505",
+    textAlign: "center",
     marginBottom: 16,
   },
   pickerItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: 12,
     borderRadius: 8,
     gap: 12,
   },
   pickerItemActive: {
-    backgroundColor: '#E7F3FF',
+    backgroundColor: "#E7F3FF",
   },
   pickerItemText: {
     flex: 1,
     fontSize: 16,
-    color: '#050505',
+    color: "#050505",
   },
   feelingsList: {
     maxHeight: 300,

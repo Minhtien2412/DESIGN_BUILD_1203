@@ -8,10 +8,10 @@
  * - Response caching
  */
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import NetInfo from '@react-native-community/netinfo';
-import { Platform } from 'react-native';
-import { ApiError, apiFetch, ApiFetchOptions } from '../api';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import NetInfo from "@react-native-community/netinfo";
+import { Platform } from "react-native";
+import { ApiError, apiFetch, ApiFetchOptions } from "../api";
 
 // ==================== TYPES ====================
 
@@ -62,7 +62,7 @@ const DEFAULT_RETRY_CONFIG: RetryConfig = {
 const DEFAULT_CACHE_CONFIG: CacheConfig = {
   enabled: false,
   ttl: 5 * 60 * 1000, // 5 minutes
-  key: '',
+  key: "",
 };
 
 // ==================== BASE SERVICE CLASS ====================
@@ -72,14 +72,17 @@ export abstract class BaseApiService {
   protected retryConfig: RetryConfig;
   protected cacheConfig: CacheConfig;
   protected offlineSupport: boolean;
-  
+
   // Request deduplication cache
   private pendingRequests = new Map<string, Promise<any>>();
-  
+
   // Offline status
   private isOnline: boolean = true;
   private offlineQueue: OfflineQueueItem[] = [];
   private isProcessingQueue: boolean = false;
+
+  // Track which services have logged network status to prevent spam
+  private static networkLoggedServices = new Set<string>();
 
   constructor(serviceName: string, config?: ServiceConfig) {
     this.serviceName = serviceName;
@@ -89,7 +92,7 @@ export abstract class BaseApiService {
 
     // Initialize network monitoring
     this.initNetworkMonitoring();
-    
+
     // Load offline queue on startup
     this.loadOfflineQueue();
   }
@@ -97,11 +100,24 @@ export abstract class BaseApiService {
   // ==================== NETWORK MONITORING ====================
 
   private initNetworkMonitoring() {
-    NetInfo.addEventListener(state => {
+    // Skip network monitoring on web - always assume online
+    if (Platform.OS === "web") {
+      this.isOnline = true;
+      return;
+    }
+
+    NetInfo.addEventListener((state) => {
       const wasOffline = !this.isOnline;
       this.isOnline = state.isConnected ?? false;
 
-      console.log(`[${this.serviceName}] Network status:`, this.isOnline ? 'ONLINE' : 'OFFLINE');
+      // Only log once per service to prevent spam during re-renders
+      if (!BaseApiService.networkLoggedServices.has(this.serviceName)) {
+        console.log(
+          `[${this.serviceName}] Network status:`,
+          this.isOnline ? "ONLINE" : "OFFLINE",
+        );
+        BaseApiService.networkLoggedServices.add(this.serviceName);
+      }
 
       // Process queue when coming back online
       if (wasOffline && this.isOnline && this.offlineSupport) {
@@ -116,8 +132,10 @@ export abstract class BaseApiService {
     if (!this.offlineSupport) return;
 
     // Skip on web - AsyncStorage uses window which doesn't exist in SSR
-    if (Platform.OS === 'web') {
-      console.log(`[${this.serviceName}] Skipping offline queue on web platform`);
+    if (Platform.OS === "web") {
+      console.log(
+        `[${this.serviceName}] Skipping offline queue on web platform`,
+      );
       return;
     }
 
@@ -126,10 +144,15 @@ export abstract class BaseApiService {
       const stored = await AsyncStorage.getItem(queueKey);
       if (stored) {
         this.offlineQueue = JSON.parse(stored);
-        console.log(`[${this.serviceName}] Loaded ${this.offlineQueue.length} offline requests`);
+        console.log(
+          `[${this.serviceName}] Loaded ${this.offlineQueue.length} offline requests`,
+        );
       }
     } catch (error) {
-      console.error(`[${this.serviceName}] Failed to load offline queue:`, error);
+      console.error(
+        `[${this.serviceName}] Failed to load offline queue:`,
+        error,
+      );
     }
   }
 
@@ -137,20 +160,23 @@ export abstract class BaseApiService {
     if (!this.offlineSupport) return;
 
     // Skip on web
-    if (Platform.OS === 'web') return;
+    if (Platform.OS === "web") return;
 
     try {
       const queueKey = `offline_queue_${this.serviceName}`;
       await AsyncStorage.setItem(queueKey, JSON.stringify(this.offlineQueue));
     } catch (error) {
-      console.error(`[${this.serviceName}] Failed to save offline queue:`, error);
+      console.error(
+        `[${this.serviceName}] Failed to save offline queue:`,
+        error,
+      );
     }
   }
 
   protected async queueOfflineRequest(
     endpoint: string,
     method: string,
-    data?: any
+    data?: any,
   ): Promise<void> {
     const item: OfflineQueueItem = {
       id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -163,7 +189,7 @@ export abstract class BaseApiService {
 
     this.offlineQueue.push(item);
     await this.saveOfflineQueue();
-    
+
     console.log(`[${this.serviceName}] Queued offline request:`, endpoint);
   }
 
@@ -171,7 +197,9 @@ export abstract class BaseApiService {
     if (this.isProcessingQueue || this.offlineQueue.length === 0) return;
 
     this.isProcessingQueue = true;
-    console.log(`[${this.serviceName}] Processing ${this.offlineQueue.length} offline requests`);
+    console.log(
+      `[${this.serviceName}] Processing ${this.offlineQueue.length} offline requests`,
+    );
 
     const results = {
       success: 0,
@@ -181,23 +209,25 @@ export abstract class BaseApiService {
 
     while (this.offlineQueue.length > 0 && this.isOnline) {
       const item = this.offlineQueue[0];
-      
+
       try {
         await apiFetch(item.endpoint, {
           method: item.method as any,
           data: item.data,
         });
-        
+
         // Success - remove from queue
         this.offlineQueue.shift();
         results.success++;
-        
       } catch (error) {
         item.retries++;
-        
+
         // Max retries reached - remove from queue
         if (item.retries >= this.retryConfig.maxRetries) {
-          console.error(`[${this.serviceName}] Max retries for offline request:`, item.endpoint);
+          console.error(
+            `[${this.serviceName}] Max retries for offline request:`,
+            item.endpoint,
+          );
           this.offlineQueue.shift();
           results.failed++;
         } else {
@@ -216,17 +246,20 @@ export abstract class BaseApiService {
   // ==================== CACHING ====================
 
   private getCacheKey(endpoint: string, params?: any): string {
-    const paramsStr = params ? JSON.stringify(params) : '';
+    const paramsStr = params ? JSON.stringify(params) : "";
     return `cache_${this.serviceName}_${endpoint}_${paramsStr}`;
   }
 
-  protected async getCachedData<T>(endpoint: string, params?: any): Promise<T | null> {
+  protected async getCachedData<T>(
+    endpoint: string,
+    params?: any,
+  ): Promise<T | null> {
     if (!this.cacheConfig.enabled) return null;
 
     try {
       const cacheKey = this.getCacheKey(endpoint, params);
       const cached = await AsyncStorage.getItem(cacheKey);
-      
+
       if (!cached) return null;
 
       const { data, timestamp } = JSON.parse(cached);
@@ -247,7 +280,11 @@ export abstract class BaseApiService {
     }
   }
 
-  protected async setCachedData<T>(endpoint: string, data: T, params?: any): Promise<void> {
+  protected async setCachedData<T>(
+    endpoint: string,
+    data: T,
+    params?: any,
+  ): Promise<void> {
     if (!this.cacheConfig.enabled) return;
 
     try {
@@ -268,19 +305,22 @@ export abstract class BaseApiService {
       if (endpoint) {
         // Invalidate specific endpoint
         const keys = await AsyncStorage.getAllKeys();
-        const cacheKeys = keys.filter(key => 
-          key.startsWith(`cache_${this.serviceName}_${endpoint}`)
+        const cacheKeys = keys.filter((key) =>
+          key.startsWith(`cache_${this.serviceName}_${endpoint}`),
         );
         await AsyncStorage.multiRemove(cacheKeys);
       } else {
         // Invalidate all cache for this service
         const keys = await AsyncStorage.getAllKeys();
-        const cacheKeys = keys.filter(key => 
-          key.startsWith(`cache_${this.serviceName}_`)
+        const cacheKeys = keys.filter((key) =>
+          key.startsWith(`cache_${this.serviceName}_`),
         );
         await AsyncStorage.multiRemove(cacheKeys);
       }
-      console.log(`[${this.serviceName}] Cache invalidated:`, endpoint || 'all');
+      console.log(
+        `[${this.serviceName}] Cache invalidated:`,
+        endpoint || "all",
+      );
     } catch (error) {
       console.error(`[${this.serviceName}] Cache invalidation error:`, error);
     }
@@ -294,10 +334,10 @@ export abstract class BaseApiService {
 
   protected async deduplicatedRequest<T>(
     endpoint: string,
-    options?: ApiFetchOptions
+    options?: ApiFetchOptions,
   ): Promise<T> {
     const key = this.getRequestKey(endpoint, options);
-    
+
     // Check if request is already pending
     const pending = this.pendingRequests.get(key);
     if (pending) {
@@ -322,17 +362,17 @@ export abstract class BaseApiService {
 
   protected async requestWithRetry<T>(
     endpoint: string,
-    options?: ApiFetchOptions
+    options?: ApiFetchOptions,
   ): Promise<T> {
     let lastError: ApiError | null = null;
-    
+
     for (let attempt = 0; attempt <= this.retryConfig.maxRetries; attempt++) {
       try {
         const result = await apiFetch<T>(endpoint, options);
         return result;
       } catch (error) {
         lastError = error as ApiError;
-        
+
         // Don't retry if shouldRetry returns false
         if (!this.retryConfig.shouldRetry(lastError)) {
           throw lastError;
@@ -346,15 +386,15 @@ export abstract class BaseApiService {
         // Calculate delay with exponential backoff
         const delay = Math.min(
           this.retryConfig.baseDelay * Math.pow(2, attempt),
-          this.retryConfig.maxDelay
+          this.retryConfig.maxDelay,
         );
 
         console.log(
           `[${this.serviceName}] Retry ${attempt + 1}/${this.retryConfig.maxRetries} after ${delay}ms:`,
-          endpoint
+          endpoint,
         );
 
-        await new Promise(resolve => setTimeout(resolve, delay));
+        await new Promise((resolve) => setTimeout(resolve, delay));
       }
     }
 
@@ -369,7 +409,7 @@ export abstract class BaseApiService {
     options?: {
       cache?: boolean;
       deduplicate?: boolean;
-    }
+    },
   ): Promise<T> {
     // Try cache first
     if (options?.cache) {
@@ -377,15 +417,24 @@ export abstract class BaseApiService {
       if (cached) return cached;
     }
 
-    // Build URL with params
-    const url = params 
-      ? `${endpoint}?${new URLSearchParams(params as any)}`
-      : endpoint;
+    // Build URL with params - filter out undefined/null values
+    let url = endpoint;
+    if (params) {
+      const filteredParams: Record<string, string> = {};
+      for (const [key, value] of Object.entries(params)) {
+        if (value !== undefined && value !== null) {
+          filteredParams[key] = String(value);
+        }
+      }
+      if (Object.keys(filteredParams).length > 0) {
+        url = `${endpoint}?${new URLSearchParams(filteredParams)}`;
+      }
+    }
 
     // Make request
     const request = options?.deduplicate
-      ? () => this.deduplicatedRequest<T>(url, { method: 'GET' })
-      : () => this.requestWithRetry<T>(url, { method: 'GET' });
+      ? () => this.deduplicatedRequest<T>(url, { method: "GET" })
+      : () => this.requestWithRetry<T>(url, { method: "GET" });
 
     const result = await request();
 
@@ -402,18 +451,18 @@ export abstract class BaseApiService {
     data?: any,
     options?: {
       offlineQueue?: boolean;
-    }
+    },
   ): Promise<T> {
     // Queue for offline if not connected
     if (!this.isOnline && this.offlineSupport && options?.offlineQueue) {
-      await this.queueOfflineRequest(endpoint, 'POST', data);
-      throw new ApiError('Request queued for offline processing', {
-        code: 'OFFLINE_QUEUED',
+      await this.queueOfflineRequest(endpoint, "POST", data);
+      throw new ApiError("Request queued for offline processing", {
+        code: "OFFLINE_QUEUED",
       });
     }
 
     return this.requestWithRetry<T>(endpoint, {
-      method: 'POST',
+      method: "POST",
       data,
     });
   }
@@ -423,18 +472,18 @@ export abstract class BaseApiService {
     data?: any,
     options?: {
       offlineQueue?: boolean;
-    }
+    },
   ): Promise<T> {
     // Queue for offline if not connected
     if (!this.isOnline && this.offlineSupport && options?.offlineQueue) {
-      await this.queueOfflineRequest(endpoint, 'PUT', data);
-      throw new ApiError('Request queued for offline processing', {
-        code: 'OFFLINE_QUEUED',
+      await this.queueOfflineRequest(endpoint, "PUT", data);
+      throw new ApiError("Request queued for offline processing", {
+        code: "OFFLINE_QUEUED",
       });
     }
 
     return this.requestWithRetry<T>(endpoint, {
-      method: 'PUT',
+      method: "PUT",
       data,
     });
   }
@@ -444,18 +493,18 @@ export abstract class BaseApiService {
     data?: any,
     options?: {
       offlineQueue?: boolean;
-    }
+    },
   ): Promise<T> {
     // Queue for offline if not connected
     if (!this.isOnline && this.offlineSupport && options?.offlineQueue) {
-      await this.queueOfflineRequest(endpoint, 'PATCH', data);
-      throw new ApiError('Request queued for offline processing', {
-        code: 'OFFLINE_QUEUED',
+      await this.queueOfflineRequest(endpoint, "PATCH", data);
+      throw new ApiError("Request queued for offline processing", {
+        code: "OFFLINE_QUEUED",
       });
     }
 
     return this.requestWithRetry<T>(endpoint, {
-      method: 'PATCH',
+      method: "PATCH",
       data,
     });
   }
@@ -464,18 +513,18 @@ export abstract class BaseApiService {
     endpoint: string,
     options?: {
       offlineQueue?: boolean;
-    }
+    },
   ): Promise<T> {
     // Queue for offline if not connected
     if (!this.isOnline && this.offlineSupport && options?.offlineQueue) {
-      await this.queueOfflineRequest(endpoint, 'DELETE');
-      throw new ApiError('Request queued for offline processing', {
-        code: 'OFFLINE_QUEUED',
+      await this.queueOfflineRequest(endpoint, "DELETE");
+      throw new ApiError("Request queued for offline processing", {
+        code: "OFFLINE_QUEUED",
       });
     }
 
     return this.requestWithRetry<T>(endpoint, {
-      method: 'DELETE',
+      method: "DELETE",
     });
   }
 

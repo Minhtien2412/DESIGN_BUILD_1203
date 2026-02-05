@@ -8,7 +8,9 @@
 
 import { Ionicons } from "@expo/vector-icons";
 import Slider from "@react-native-community/slider";
-import { AVPlaybackStatus, ResizeMode, Video } from "expo-av";
+// Video playback with expo-video
+import { useEvent, useEventListener } from "expo";
+import { VideoView, useVideoPlayer } from "expo-video";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
     ActivityIndicator,
@@ -32,7 +34,7 @@ import {
     usePlaybackPosition,
     usePlaylist,
     useVideoSettings,
-    VideoSource
+    VideoSource,
 } from "../../services/VideoViewerService";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
@@ -58,10 +60,9 @@ export default function VideoViewerScreen({
   onClose,
   onVideoChange,
 }: VideoViewerScreenProps) {
-  const videoRef = useRef<Video>(null);
   const { settings, updateSettings } = useVideoSettings();
   const { position: savedPosition, savePosition } = usePlaybackPosition(
-    video.id
+    video.id,
   );
   const {
     playlist: userPlaylist,
@@ -72,13 +73,14 @@ export default function VideoViewerScreen({
   } = usePlaylist();
   const { isOffline, download } = useOfflineVideos();
 
+
   // Playback state
   const [isPlaying, setIsPlaying] = useState(settings.autoPlay);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isBuffering, setIsBuffering] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState(
-    settings.defaultPlaybackSpeed
+    settings.defaultPlaybackSpeed,
   );
   const [volume, setVolume] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
@@ -86,7 +88,7 @@ export default function VideoViewerScreen({
   // UI state
   const [showControls, setShowControls] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(
-    settings.fullscreenByDefault
+    settings.fullscreenByDefault,
   );
   const [showPlaylistModal, setShowPlaylistModal] = useState(false);
   const [showSpeedModal, setShowSpeedModal] = useState(false);
@@ -94,7 +96,26 @@ export default function VideoViewerScreen({
   const [downloadProgress, setDownloadProgress] = useState(0);
   const [isDownloading, setIsDownloading] = useState(false);
 
-  const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const player = useVideoPlayer(video.uri, (player) => {
+    player.loop = settings.loopVideo;
+    player.muted = isMuted;
+    player.volume = volume;
+    player.playbackRate = playbackSpeed;
+    player.preservesPitch = true;
+    player.timeUpdateEventInterval = 0.5;
+  });
+  const status = useEvent(player, "statusChange", { status: player.status });
+  const playing = useEvent(player, "playingChange", {
+    isPlaying: player.playing,
+  });
+  const timeUpdate = useEvent(player, "timeUpdate", {
+    currentTime: player.currentTime,
+    bufferedPosition: player.bufferedPosition,
+    currentLiveTimestamp: null,
+    currentOffsetFromLive: null,
+  });
+
+  const controlsTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // =============================================================================
   // Effects
@@ -107,10 +128,10 @@ export default function VideoViewerScreen({
       shouldResumePlayback(
         savedPosition.position,
         savedPosition.duration,
-        settings.resumeThreshold
+        settings.resumeThreshold,
       )
     ) {
-      videoRef.current?.setPositionAsync(savedPosition.position * 1000);
+      player.currentTime = savedPosition.position;
     }
 
     return () => {
@@ -119,7 +140,15 @@ export default function VideoViewerScreen({
         savePosition(currentTime, duration);
       }
     };
-  }, []);
+  }, [
+    savedPosition,
+    settings.resumeThreshold,
+    settings.savePlaybackPosition,
+    duration,
+    currentTime,
+    player,
+    savePosition,
+  ]);
 
   useEffect(() => {
     // Auto-hide controls
@@ -141,39 +170,56 @@ export default function VideoViewerScreen({
     }, settings.autoHideControlsDelay);
   }, [settings.autoHideControlsDelay]);
 
-  const handlePlaybackStatusUpdate = useCallback(
-    (status: AVPlaybackStatus) => {
-      if (status.isLoaded) {
-        setCurrentTime(status.positionMillis / 1000);
-        setDuration(status.durationMillis ? status.durationMillis / 1000 : 0);
-        setIsPlaying(status.isPlaying);
-        setIsBuffering(status.isBuffering);
+  useEffect(() => {
+    setIsBuffering(status.status === "loading");
+  }, [status.status]);
 
-        // Handle end of video
-        if (status.didJustFinish) {
-          if (settings.loopVideo) {
-            videoRef.current?.replayAsync();
-          } else if (playlist.length > 0 || userPlaylist.length > 0) {
-            handleNext();
-          }
-        }
-      }
-    },
-    [settings.loopVideo, playlist, userPlaylist]
-  );
+  useEffect(() => {
+    setIsPlaying(playing.isPlaying);
+  }, [playing.isPlaying]);
 
-  const togglePlayPause = async () => {
-    if (isPlaying) {
-      await videoRef.current?.pauseAsync();
+  useEffect(() => {
+    setCurrentTime(timeUpdate.currentTime);
+    setDuration(player.duration || 0);
+  }, [timeUpdate.currentTime, player.duration]);
+
+  useEffect(() => {
+    player.loop = settings.loopVideo;
+  }, [settings.loopVideo, player]);
+
+  useEffect(() => {
+    if (settings.autoPlay) {
+      player.play();
     } else {
-      await videoRef.current?.playAsync();
+      player.pause();
+    }
+  }, [settings.autoPlay, player]);
+
+  useEffect(() => {
+    player.volume = volume;
+  }, [volume, player]);
+
+  useEffect(() => {
+    player.muted = isMuted;
+  }, [isMuted, player]);
+
+  useEffect(() => {
+    player.playbackRate = playbackSpeed;
+    player.preservesPitch = true;
+  }, [playbackSpeed, player]);
+
+  const togglePlayPause = () => {
+    if (isPlaying) {
+      player.pause();
+    } else {
+      player.play();
     }
     setShowControls(true);
     resetControlsTimeout();
   };
 
-  const handleSeek = async (value: number) => {
-    await videoRef.current?.setPositionAsync(value * 1000);
+  const handleSeek = (value: number) => {
+    player.currentTime = value;
     setShowControls(true);
     resetControlsTimeout();
   };
@@ -186,7 +232,7 @@ export default function VideoViewerScreen({
   const handleSeekForward = async () => {
     const newTime = Math.min(
       duration,
-      currentTime + settings.seekIntervalSeconds
+      currentTime + settings.seekIntervalSeconds,
     );
     await handleSeek(newTime);
   };
@@ -194,7 +240,7 @@ export default function VideoViewerScreen({
   const handleVolumeChange = async (value: number) => {
     const clamped = clampVolume(value);
     setVolume(clamped);
-    await videoRef.current?.setVolumeAsync(clamped);
+    player.volume = clamped;
     if (clamped > 0) {
       setIsMuted(false);
     }
@@ -203,12 +249,13 @@ export default function VideoViewerScreen({
   const toggleMute = async () => {
     const newMuted = !isMuted;
     setIsMuted(newMuted);
-    await videoRef.current?.setIsMutedAsync(newMuted);
+    player.muted = newMuted;
   };
 
-  const handleSpeedChange = async (speed: number) => {
+  const handleSpeedChange = (speed: number) => {
     setPlaybackSpeed(speed);
-    await videoRef.current?.setRateAsync(speed, true);
+    player.playbackRate = speed;
+    player.preservesPitch = true;
     updateSettings({ defaultPlaybackSpeed: speed });
     setShowSpeedModal(false);
   };
@@ -242,6 +289,14 @@ export default function VideoViewerScreen({
     getPrevious,
     onVideoChange,
   ]);
+
+  useEventListener(player, "playToEnd", () => {
+    if (settings.loopVideo) {
+      player.replay();
+    } else if (playlist.length > 0 || userPlaylist.length > 0) {
+      handleNext();
+    }
+  });
 
   const toggleFullscreen = () => {
     setIsFullscreen(!isFullscreen);
@@ -643,20 +698,12 @@ export default function VideoViewerScreen({
           }
         }}
       >
-        <Video
-          ref={videoRef}
-          source={{ uri: video.uri }}
+        <VideoView
+          player={player}
           style={styles.video}
-          resizeMode={
-            settings.maintainAspectRatio ? ResizeMode.CONTAIN : ResizeMode.COVER
-          }
-          shouldPlay={settings.autoPlay}
-          isLooping={settings.loopVideo}
-          volume={volume}
-          isMuted={isMuted}
-          rate={playbackSpeed}
-          onPlaybackStatusUpdate={handlePlaybackStatusUpdate}
-          useNativeControls={false}
+          contentFit={settings.maintainAspectRatio ? "contain" : "cover"}
+          nativeControls={false}
+          onFirstFrameRender={() => setIsBuffering(false)}
         />
 
         {renderControls()}

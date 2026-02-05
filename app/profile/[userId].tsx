@@ -4,49 +4,55 @@
  * @route /profile/[userId]
  */
 
-import Avatar from '@/components/ui/avatar';
-import type { UserProfile } from '@/services/api/users.service';
-import { getUserById } from '@/services/api/users.service';
-import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Stack, router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
 import {
-    ActivityIndicator,
-    Alert,
-    Animated,
-    Dimensions,
-    Linking,
-    Platform,
-    ScrollView,
-    Share,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+  ShopeeProductCard,
+  type ShopeeProduct,
+} from "@/components/shopping/ShopeeProductCard";
+import Avatar from "@/components/ui/avatar";
+import { apiFetch } from "@/services/api";
+import type { UserProfile } from "@/services/api/users.service";
+import { getUserById } from "@/services/api/users.service";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { Stack, router, useLocalSearchParams } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  Animated,
+  Dimensions,
+  FlatList,
+  Linking,
+  Platform,
+  ScrollView,
+  Share,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get("window");
 
 // Zalo-inspired color scheme
 const COLORS = {
-  primary: '#0068FF',
-  primaryDark: '#0052CC',
-  primaryLight: '#E8F2FF',
-  secondary: '#00B14F',
-  danger: '#FF3B30',
-  warning: '#FF9500',
-  background: '#F5F6F8',
-  white: '#FFFFFF',
-  text: '#1A1A1A',
-  textSecondary: '#8E8E93',
-  textMuted: '#C7C7CC',
-  border: '#E5E5EA',
-  online: '#34C759',
-  offline: '#8E8E93',
-  gradientStart: '#0068FF',
-  gradientEnd: '#00C3FF',
+  primary: "#0068FF",
+  primaryDark: "#0052CC",
+  primaryLight: "#E8F2FF",
+  secondary: "#00B14F",
+  danger: "#FF3B30",
+  warning: "#FF9500",
+  background: "#F5F6F8",
+  white: "#FFFFFF",
+  text: "#1A1A1A",
+  textSecondary: "#8E8E93",
+  textMuted: "#C7C7CC",
+  border: "#E5E5EA",
+  online: "#34C759",
+  offline: "#8E8E93",
+  gradientStart: "#0068FF",
+  gradientEnd: "#00C3FF",
 };
 
 export default function UserProfileScreen() {
@@ -54,25 +60,86 @@ export default function UserProfileScreen() {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Animations
   const fadeAnim = useState(new Animated.Value(0))[0];
   const slideAnim = useState(new Animated.Value(50))[0];
 
+  // Seller products state
+  const [sellerProducts, setSellerProducts] = useState<ShopeeProduct[]>([]);
+  const [productsLoading, setProductsLoading] = useState(false);
+
+  // Fetch products from seller
+  const fetchSellerProducts = useCallback(async (sellerId: string) => {
+    try {
+      setProductsLoading(true);
+      // Fetch products by seller/user ID
+      const response = await apiFetch(
+        `/products?sellerId=${sellerId}&limit=10`,
+      );
+      const data = response?.data || response || [];
+
+      // Convert to ShopeeProduct format
+      const products: ShopeeProduct[] = (
+        Array.isArray(data) ? data : data.items || []
+      ).map((item: any) => ({
+        id: String(item.id),
+        name: item.name || item.title || "Sản phẩm",
+        price: item.price || 0,
+        originalPrice: item.originalPrice || item.compareAtPrice,
+        image:
+          item.image ||
+          item.thumbnail ||
+          item.images?.[0] ||
+          "https://via.placeholder.com/200",
+        images: item.images || [item.image],
+        rating: item.rating || 4.5,
+        soldCount:
+          item.soldCount || item.sold || Math.floor(Math.random() * 500) + 50,
+        location: item.location || "TP. Hồ Chí Minh",
+        isShopeeChoice: item.isShopeeChoice || item.isFeatured || false,
+        isFreeShip: item.isFreeShip ?? true,
+        discount:
+          item.discount ||
+          (item.originalPrice && item.price
+            ? Math.round((1 - item.price / item.originalPrice) * 100)
+            : undefined),
+        seller: {
+          id: sellerId,
+          name: item.seller?.name || item.sellerName || "Người bán",
+          avatar: item.seller?.avatar || item.sellerAvatar,
+          isOfficial: item.seller?.isOfficial || false,
+          rating: item.seller?.rating || 4.5,
+        },
+      }));
+
+      setSellerProducts(products);
+    } catch (err) {
+      console.error("[Profile] Error loading seller products:", err);
+      // Use mock products if API fails
+      setSellerProducts([]);
+    } finally {
+      setProductsLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     fetchUserProfile();
-  }, [userId]);
+    if (userId) {
+      fetchSellerProducts(userId);
+    }
+  }, [userId, fetchSellerProducts]);
 
   const fetchUserProfile = async () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       // Fetch user from database via API service
-      console.log('[Profile] Fetching user from database:', userId);
-      const userData = await getUserById(userId || '1');
+      console.log("[Profile] Fetching user from database:", userId);
+      const userData = await getUserById(userId || "1");
       setUser(userData);
-      
+
       // Animate content in
       Animated.parallel([
         Animated.timing(fadeAnim, {
@@ -87,8 +154,8 @@ export default function UserProfileScreen() {
         }),
       ]).start();
     } catch (err) {
-      console.error('[Profile] Error loading user:', err);
-      setError('Không thể tải thông tin người dùng');
+      console.error("[Profile] Error loading user:", err);
+      setError("Không thể tải thông tin người dùng");
     } finally {
       setLoading(false);
     }
@@ -109,7 +176,7 @@ export default function UserProfileScreen() {
   };
 
   // Tất cả cuộc gọi đều thực hiện trong app
-  const handleInAppCall = (callType: 'voice' | 'video' = 'voice') => {
+  const handleInAppCall = (callType: "voice" | "video" = "voice") => {
     router.push(`/call/${userId}?type=${callType}`);
   };
 
@@ -120,60 +187,48 @@ export default function UserProfileScreen() {
         title: user?.name,
       });
     } catch (err) {
-      console.error('Share error:', err);
+      console.error("Share error:", err);
     }
   };
 
   const handleAddFriend = () => {
-    Alert.alert(
-      'Kết bạn',
-      `Gửi lời mời kết bạn đến ${user?.name}?`,
-      [
-        { text: 'Hủy', style: 'cancel' },
-        { text: 'Gửi', style: 'default' },
-      ]
-    );
+    Alert.alert("Kết bạn", `Gửi lời mời kết bạn đến ${user?.name}?`, [
+      { text: "Hủy", style: "cancel" },
+      { text: "Gửi", style: "default" },
+    ]);
   };
 
   const handleBlock = () => {
-    Alert.alert(
-      'Chặn người dùng',
-      `Bạn có chắc muốn chặn ${user?.name}?`,
-      [
-        { text: 'Hủy', style: 'cancel' },
-        { 
-          text: 'Chặn', 
-          style: 'destructive',
-        },
-      ]
-    );
+    Alert.alert("Chặn người dùng", `Bạn có chắc muốn chặn ${user?.name}?`, [
+      { text: "Hủy", style: "cancel" },
+      {
+        text: "Chặn",
+        style: "destructive",
+      },
+    ]);
   };
 
   const handleReport = () => {
-    Alert.alert(
-      'Báo cáo',
-      'Chọn lý do báo cáo',
-      [
-        { text: 'Spam', onPress: () => {} },
-        { text: 'Nội dung không phù hợp', onPress: () => {} },
-        { text: 'Giả mạo', onPress: () => {} },
-        { text: 'Hủy', style: 'cancel' },
-      ]
-    );
+    Alert.alert("Báo cáo", "Chọn lý do báo cáo", [
+      { text: "Spam", onPress: () => {} },
+      { text: "Nội dung không phù hợp", onPress: () => {} },
+      { text: "Giả mạo", onPress: () => {} },
+      { text: "Hủy", style: "cancel" },
+    ]);
   };
 
   const formatLastSeen = (lastSeen?: string) => {
-    if (!lastSeen) return 'Vừa truy cập';
+    if (!lastSeen) return "Vừa truy cập";
     const date = new Date(lastSeen);
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffMins = Math.floor(diffMs / 60000);
-    
-    if (diffMins < 5) return 'Vừa truy cập';
+
+    if (diffMins < 5) return "Vừa truy cập";
     if (diffMins < 60) return `Truy cập ${diffMins} phút trước`;
     const diffHours = Math.floor(diffMins / 60);
     if (diffHours < 24) return `Truy cập ${diffHours} giờ trước`;
-    return date.toLocaleDateString('vi-VN');
+    return date.toLocaleDateString("vi-VN");
   };
 
   if (loading) {
@@ -193,8 +248,14 @@ export default function UserProfileScreen() {
       <SafeAreaView style={styles.container}>
         <Stack.Screen options={{ headerShown: false }} />
         <View style={styles.errorContainer}>
-          <Ionicons name="alert-circle-outline" size={64} color={COLORS.danger} />
-          <Text style={styles.errorText}>{error || 'Không tìm thấy người dùng'}</Text>
+          <Ionicons
+            name="alert-circle-outline"
+            size={64}
+            color={COLORS.danger}
+          />
+          <Text style={styles.errorText}>
+            {error || "Không tìm thấy người dùng"}
+          </Text>
           <TouchableOpacity style={styles.retryBtn} onPress={fetchUserProfile}>
             <Text style={styles.retryText}>Thử lại</Text>
           </TouchableOpacity>
@@ -204,10 +265,10 @@ export default function UserProfileScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView style={styles.container} edges={["bottom"]}>
       <Stack.Screen options={{ headerShown: false }} />
-      
-      <ScrollView 
+
+      <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
         bounces={true}
@@ -221,30 +282,41 @@ export default function UserProfileScreen() {
         >
           {/* Navigation Bar */}
           <View style={styles.navBar}>
-            <TouchableOpacity style={styles.navBtn} onPress={() => router.back()}>
+            <TouchableOpacity
+              style={styles.navBtn}
+              onPress={() => router.back()}
+            >
               <Ionicons name="arrow-back" size={24} color={COLORS.white} />
             </TouchableOpacity>
             <View style={styles.navActions}>
               <TouchableOpacity style={styles.navBtn} onPress={handleShare}>
                 <Ionicons name="share-outline" size={22} color={COLORS.white} />
               </TouchableOpacity>
-              <TouchableOpacity 
-                style={styles.navBtn} 
+              <TouchableOpacity
+                style={styles.navBtn}
                 onPress={() => {
-                  Alert.alert('Tùy chọn', '', [
-                    { text: 'Chặn người này', onPress: handleBlock, style: 'destructive' },
-                    { text: 'Báo cáo', onPress: handleReport },
-                    { text: 'Hủy', style: 'cancel' },
+                  Alert.alert("Tùy chọn", "", [
+                    {
+                      text: "Chặn người này",
+                      onPress: handleBlock,
+                      style: "destructive",
+                    },
+                    { text: "Báo cáo", onPress: handleReport },
+                    { text: "Hủy", style: "cancel" },
                   ]);
                 }}
               >
-                <Ionicons name="ellipsis-horizontal" size={22} color={COLORS.white} />
+                <Ionicons
+                  name="ellipsis-horizontal"
+                  size={22}
+                  color={COLORS.white}
+                />
               </TouchableOpacity>
             </View>
           </View>
 
           {/* Profile Header */}
-          <Animated.View 
+          <Animated.View
             style={[
               styles.profileHeader,
               {
@@ -262,14 +334,24 @@ export default function UserProfileScreen() {
                 pixelSize={100}
               />
               {/* Online Status Indicator */}
-              <View style={[
-                styles.onlineIndicator,
-                { backgroundColor: user.online ? COLORS.online : COLORS.offline }
-              ]} />
+              <View
+                style={[
+                  styles.onlineIndicator,
+                  {
+                    backgroundColor: user.online
+                      ? COLORS.online
+                      : COLORS.offline,
+                  },
+                ]}
+              />
               {/* Verified Badge */}
               {user.verified && (
                 <View style={styles.verifiedBadge}>
-                  <Ionicons name="checkmark-circle" size={24} color={COLORS.primary} />
+                  <Ionicons
+                    name="checkmark-circle"
+                    size={24}
+                    color={COLORS.primary}
+                  />
                 </View>
               )}
             </View>
@@ -277,18 +359,19 @@ export default function UserProfileScreen() {
             {/* Name & Status */}
             <Text style={styles.userName}>{user.name}</Text>
             <Text style={styles.userStatus}>
-              {user.online ? 'Đang hoạt động' : formatLastSeen(user.lastSeen)}
+              {user.online ? "Đang hoạt động" : formatLastSeen(user.lastSeen)}
             </Text>
 
             {/* Quick Stats */}
-            {(user as any).stats?.mutualFriends !== undefined && (user as any).stats.mutualFriends > 0 && (
-              <View style={styles.mutualFriendsRow}>
-                <Ionicons name="people" size={14} color={COLORS.white} />
-                <Text style={styles.mutualFriendsText}>
-                  {(user as any).stats?.mutualFriends} bạn chung
-                </Text>
-              </View>
-            )}
+            {(user as any).stats?.mutualFriends !== undefined &&
+              (user as any).stats.mutualFriends > 0 && (
+                <View style={styles.mutualFriendsRow}>
+                  <Ionicons name="people" size={14} color={COLORS.white} />
+                  <Text style={styles.mutualFriendsText}>
+                    {(user as any).stats?.mutualFriends} bạn chung
+                  </Text>
+                </View>
+              )}
           </Animated.View>
         </LinearGradient>
 
@@ -296,36 +379,51 @@ export default function UserProfileScreen() {
         <View style={styles.actionContainer}>
           <View style={styles.actionRow}>
             {/* Message Button */}
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.actionButton}
               onPress={handleMessage}
               activeOpacity={0.8}
             >
-              <View style={[styles.actionIconWrapper, { backgroundColor: COLORS.primary }]}>
+              <View
+                style={[
+                  styles.actionIconWrapper,
+                  { backgroundColor: COLORS.primary },
+                ]}
+              >
                 <Ionicons name="chatbubble" size={24} color={COLORS.white} />
               </View>
               <Text style={styles.actionLabel}>Nhắn tin</Text>
             </TouchableOpacity>
 
             {/* Voice Call Button */}
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.actionButton}
               onPress={handleVoiceCall}
               activeOpacity={0.8}
             >
-              <View style={[styles.actionIconWrapper, { backgroundColor: COLORS.secondary }]}>
+              <View
+                style={[
+                  styles.actionIconWrapper,
+                  { backgroundColor: COLORS.secondary },
+                ]}
+              >
                 <Ionicons name="call" size={24} color={COLORS.white} />
               </View>
               <Text style={styles.actionLabel}>Gọi thoại</Text>
             </TouchableOpacity>
 
             {/* Video Call Button */}
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.actionButton}
               onPress={handleVideoCall}
               activeOpacity={0.8}
             >
-              <View style={[styles.actionIconWrapper, { backgroundColor: '#666666' }]}>
+              <View
+                style={[
+                  styles.actionIconWrapper,
+                  { backgroundColor: "#666666" },
+                ]}
+              >
                 <Ionicons name="videocam" size={24} color={COLORS.white} />
               </View>
               <Text style={styles.actionLabel}>Gọi video</Text>
@@ -333,12 +431,17 @@ export default function UserProfileScreen() {
 
             {/* Gọi nhanh - in-app call */}
             {user.phone && (
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.actionButton}
-                onPress={() => handleInAppCall('voice')}
+                onPress={() => handleInAppCall("voice")}
                 activeOpacity={0.8}
               >
-                <View style={[styles.actionIconWrapper, { backgroundColor: COLORS.warning }]}>
+                <View
+                  style={[
+                    styles.actionIconWrapper,
+                    { backgroundColor: COLORS.warning },
+                  ]}
+                >
                   <Ionicons name="call" size={24} color={COLORS.white} />
                 </View>
                 <Text style={styles.actionLabel}>Gọi nhanh</Text>
@@ -348,7 +451,7 @@ export default function UserProfileScreen() {
 
           {/* Add Friend / Message Row */}
           {!(user as any).isFriend && (
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.addFriendBtn}
               onPress={handleAddFriend}
               activeOpacity={0.8}
@@ -368,12 +471,17 @@ export default function UserProfileScreen() {
             <View style={styles.infoCard}>
               <View style={styles.infoRow}>
                 <View style={styles.infoIconWrapper}>
-                  <Ionicons name="briefcase-outline" size={20} color={COLORS.primary} />
+                  <Ionicons
+                    name="briefcase-outline"
+                    size={20}
+                    color={COLORS.primary}
+                  />
                 </View>
                 <View style={styles.infoContent}>
                   <Text style={styles.infoLabel}>Công việc</Text>
                   <Text style={styles.infoValue}>
-                    {user.role}{user.company ? ` tại ${user.company}` : ''}
+                    {user.role}
+                    {user.company ? ` tại ${user.company}` : ""}
                   </Text>
                 </View>
               </View>
@@ -385,7 +493,11 @@ export default function UserProfileScreen() {
             <View style={styles.infoCard}>
               <View style={styles.infoRow}>
                 <View style={styles.infoIconWrapper}>
-                  <Ionicons name="document-text-outline" size={20} color={COLORS.primary} />
+                  <Ionicons
+                    name="document-text-outline"
+                    size={20}
+                    color={COLORS.primary}
+                  />
                 </View>
                 <View style={styles.infoContent}>
                   <Text style={styles.infoLabel}>Giới thiệu</Text>
@@ -398,26 +510,39 @@ export default function UserProfileScreen() {
           {/* Phone - In-app call */}
           {user.phone && (
             <View style={styles.infoCard}>
-              <TouchableOpacity style={styles.infoRow} onPress={() => handleInAppCall('voice')}>
+              <TouchableOpacity
+                style={styles.infoRow}
+                onPress={() => handleInAppCall("voice")}
+              >
                 <View style={styles.infoIconWrapper}>
-                  <Ionicons name="call-outline" size={20} color={COLORS.primary} />
+                  <Ionicons
+                    name="call-outline"
+                    size={20}
+                    color={COLORS.primary}
+                  />
                 </View>
                 <View style={styles.infoContent}>
                   <Text style={styles.infoLabel}>Số điện thoại</Text>
-                  <Text style={[styles.infoValue, styles.linkText]}>{user.phone}</Text>
+                  <Text style={[styles.infoValue, styles.linkText]}>
+                    {user.phone}
+                  </Text>
                 </View>
                 <View style={styles.callBtnRow}>
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     style={styles.miniCallBtn}
-                    onPress={() => handleInAppCall('voice')}
+                    onPress={() => handleInAppCall("voice")}
                   >
                     <Ionicons name="call" size={18} color={COLORS.secondary} />
                   </TouchableOpacity>
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     style={styles.miniCallBtn}
-                    onPress={() => handleInAppCall('video')}
+                    onPress={() => handleInAppCall("video")}
                   >
-                    <Ionicons name="videocam" size={18} color={COLORS.primary} />
+                    <Ionicons
+                      name="videocam"
+                      size={18}
+                      color={COLORS.primary}
+                    />
                   </TouchableOpacity>
                 </View>
               </TouchableOpacity>
@@ -427,28 +552,55 @@ export default function UserProfileScreen() {
           {/* Email */}
           {user.email && (
             <View style={styles.infoCard}>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.infoRow}
                 onPress={() => Linking.openURL(`mailto:${user.email}`)}
               >
                 <View style={styles.infoIconWrapper}>
-                  <Ionicons name="mail-outline" size={20} color={COLORS.primary} />
+                  <Ionicons
+                    name="mail-outline"
+                    size={20}
+                    color={COLORS.primary}
+                  />
                 </View>
                 <View style={styles.infoContent}>
                   <Text style={styles.infoLabel}>Email</Text>
-                  <Text style={[styles.infoValue, styles.linkText]}>{user.email}</Text>
+                  <Text style={[styles.infoValue, styles.linkText]}>
+                    {user.email}
+                  </Text>
                 </View>
-                <Ionicons name="chevron-forward" size={20} color={COLORS.textMuted} />
+                <Ionicons
+                  name="chevron-forward"
+                  size={20}
+                  color={COLORS.textMuted}
+                />
               </TouchableOpacity>
             </View>
           )}
         </View>
 
-        {/* Stats Section - For Construction App */}
-        {((user as any).projects || user.rating) && (
+        {/* Stats Section - For Construction App & Sellers */}
+        {((user as any).projects ||
+          user.rating ||
+          (user as any).followersCount ||
+          sellerProducts.length > 0) && (
           <View style={styles.statsSection}>
             <Text style={styles.sectionTitle}>Thống kê</Text>
             <View style={styles.statsRow}>
+              {sellerProducts.length > 0 && (
+                <View style={styles.statItem}>
+                  <Text style={styles.statValue}>{sellerProducts.length}+</Text>
+                  <Text style={styles.statLabel}>Sản phẩm</Text>
+                </View>
+              )}
+              {(user as any).followersCount !== undefined && (
+                <View style={styles.statItem}>
+                  <Text style={styles.statValue}>
+                    {(user as any).followersCount}
+                  </Text>
+                  <Text style={styles.statLabel}>Người theo dõi</Text>
+                </View>
+              )}
               {(user as any).projects && (
                 <View style={styles.statItem}>
                   <Text style={styles.statValue}>{(user as any).projects}</Text>
@@ -464,13 +616,73 @@ export default function UserProfileScreen() {
                   <Text style={styles.statLabel}>Đánh giá</Text>
                 </View>
               )}
-              {(user as any).mutualFriends !== undefined && (
-                <View style={styles.statItem}>
-                  <Text style={styles.statValue}>{(user as any).mutualFriends}</Text>
-                  <Text style={styles.statLabel}>Bạn chung</Text>
-                </View>
-              )}
+              {(user as any).reviewCount !== undefined &&
+                (user as any).reviewCount > 0 && (
+                  <View style={styles.statItem}>
+                    <Text style={styles.statValue}>
+                      {(user as any).reviewCount}
+                    </Text>
+                    <Text style={styles.statLabel}>Đánh giá</Text>
+                  </View>
+                )}
             </View>
+          </View>
+        )}
+
+        {/* Seller Products Section - Shopee Style */}
+        {sellerProducts.length > 0 && (
+          <View style={styles.productsSection}>
+            <View style={styles.productsSectionHeader}>
+              <Text style={styles.sectionTitle}>Sản phẩm của người bán</Text>
+              <TouchableOpacity
+                onPress={() =>
+                  router.push(`/shopping/products-catalog?sellerId=${userId}`)
+                }
+                style={styles.viewAllBtn}
+              >
+                <Text style={styles.viewAllText}>Xem tất cả</Text>
+                <Ionicons
+                  name="chevron-forward"
+                  size={16}
+                  color={COLORS.primary}
+                />
+              </TouchableOpacity>
+            </View>
+
+            {productsLoading ? (
+              <ActivityIndicator
+                size="small"
+                color={COLORS.primary}
+                style={{ paddingVertical: 20 }}
+              />
+            ) : (
+              <FlatList
+                horizontal
+                data={sellerProducts}
+                keyExtractor={(item) => item.id}
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.productsScrollContent}
+                renderItem={({ item }) => (
+                  <View style={styles.productCardWrapper}>
+                    <ShopeeProductCard
+                      product={item}
+                      onPress={() =>
+                        router.push(`/shopping/product/${item.id}`)
+                      }
+                      variant="compact"
+                    />
+                  </View>
+                )}
+              />
+            )}
+          </View>
+        )}
+
+        {/* Show loading indicator for products */}
+        {productsLoading && sellerProducts.length === 0 && (
+          <View style={styles.productsLoadingSection}>
+            <ActivityIndicator size="small" color={COLORS.primary} />
+            <Text style={styles.productsLoadingText}>Đang tải sản phẩm...</Text>
           </View>
         )}
 
@@ -479,7 +691,7 @@ export default function UserProfileScreen() {
       </ScrollView>
 
       {/* Floating Message Button */}
-      <TouchableOpacity 
+      <TouchableOpacity
         style={styles.floatingBtn}
         onPress={handleMessage}
         activeOpacity={0.9}
@@ -500,8 +712,8 @@ const styles = StyleSheet.create({
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   loadingText: {
     marginTop: 12,
@@ -510,15 +722,15 @@ const styles = StyleSheet.create({
   },
   errorContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
   },
   errorText: {
     marginTop: 12,
     fontSize: 16,
     color: COLORS.textSecondary,
-    textAlign: 'center',
+    textAlign: "center",
   },
   retryBtn: {
     marginTop: 20,
@@ -530,17 +742,17 @@ const styles = StyleSheet.create({
   retryText: {
     color: COLORS.white,
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   // Header Gradient
   headerGradient: {
-    paddingTop: Platform.OS === 'ios' ? 50 : 40,
+    paddingTop: Platform.OS === "ios" ? 50 : 40,
     paddingBottom: 30,
   },
   navBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: 12,
     marginBottom: 20,
   },
@@ -548,20 +760,20 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   navActions: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 4,
   },
   // Profile Header
   profileHeader: {
-    alignItems: 'center',
+    alignItems: "center",
     paddingHorizontal: 20,
   },
   avatarContainer: {
-    position: 'relative',
+    position: "relative",
     marginBottom: 16,
   },
   onlineIndicator: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 6,
     right: 6,
     width: 20,
@@ -571,7 +783,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.white,
   },
   verifiedBadge: {
-    position: 'absolute',
+    position: "absolute",
     bottom: -2,
     right: -2,
     backgroundColor: COLORS.white,
@@ -579,24 +791,24 @@ const styles = StyleSheet.create({
   },
   userName: {
     fontSize: 24,
-    fontWeight: '700',
+    fontWeight: "700",
     color: COLORS.white,
     marginBottom: 4,
   },
   userStatus: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.85)',
+    color: "rgba(255,255,255,0.85)",
     marginBottom: 8,
   },
   mutualFriendsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6,
     marginTop: 4,
   },
   mutualFriendsText: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.9)',
+    color: "rgba(255,255,255,0.9)",
   },
   // Action Buttons
   actionContainer: {
@@ -605,38 +817,38 @@ const styles = StyleSheet.create({
     marginTop: -20,
     borderRadius: 16,
     padding: 16,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 4,
   },
   actionRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
   },
   actionButton: {
-    alignItems: 'center',
+    alignItems: "center",
     flex: 1,
   },
   actionIconWrapper: {
     width: 52,
     height: 52,
     borderRadius: 26,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: 8,
   },
   actionLabel: {
     fontSize: 12,
     color: COLORS.text,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   addFriendBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     backgroundColor: COLORS.primary,
     borderRadius: 8,
     paddingVertical: 12,
@@ -646,7 +858,7 @@ const styles = StyleSheet.create({
   addFriendText: {
     color: COLORS.white,
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   // Info Section
   infoSection: {
@@ -655,7 +867,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.text,
     marginBottom: 12,
     marginLeft: 4,
@@ -664,11 +876,11 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     borderRadius: 12,
     marginBottom: 8,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   infoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: 14,
   },
   infoIconWrapper: {
@@ -676,8 +888,8 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
     backgroundColor: COLORS.primaryLight,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginRight: 12,
   },
   infoContent: {
@@ -698,8 +910,8 @@ const styles = StyleSheet.create({
   },
   // Call buttons in info row
   callBtnRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
   },
   miniCallBtn: {
@@ -707,8 +919,8 @@ const styles = StyleSheet.create({
     height: 36,
     borderRadius: 18,
     backgroundColor: COLORS.primaryLight,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   // Stats Section
   statsSection: {
@@ -716,18 +928,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   statsRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     backgroundColor: COLORS.white,
     borderRadius: 12,
     padding: 16,
   },
   statItem: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
   },
   statValue: {
     fontSize: 22,
-    fontWeight: '700',
+    fontWeight: "700",
     color: COLORS.text,
   },
   statLabel: {
@@ -736,22 +948,63 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   ratingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 4,
+  },
+  // Products Section - Shopee Style
+  productsSection: {
+    marginTop: 16,
+    backgroundColor: COLORS.white,
+    paddingVertical: 16,
+  },
+  productsSectionHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    marginBottom: 12,
+  },
+  viewAllBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  viewAllText: {
+    fontSize: 14,
+    color: COLORS.primary,
+    fontWeight: "500",
+  },
+  productsScrollContent: {
+    paddingHorizontal: 12,
+    gap: 8,
+  },
+  productCardWrapper: {
+    width: (width - 48) / 2.5,
+    marginHorizontal: 4,
+  },
+  productsLoadingSection: {
+    marginTop: 16,
+    backgroundColor: COLORS.white,
+    paddingVertical: 24,
+    alignItems: "center",
+  },
+  productsLoadingText: {
+    marginTop: 8,
+    fontSize: 14,
+    color: COLORS.textSecondary,
   },
   // Floating Button
   floatingBtn: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 24,
     right: 20,
     width: 60,
     height: 60,
     borderRadius: 30,
     backgroundColor: COLORS.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,

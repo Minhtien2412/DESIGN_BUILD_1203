@@ -313,7 +313,11 @@ export function ChatRoomContainer({
         </TouchableOpacity>
 
         <Image
-          source={{ uri: avatarUrl || "https://via.placeholder.com/40" }}
+          source={{
+            uri:
+              avatarUrl ||
+              "https://ui-avatars.com/api/?name=Chat&size=40&background=FF6B35&color=fff",
+          }}
           style={styles.avatar}
         />
 

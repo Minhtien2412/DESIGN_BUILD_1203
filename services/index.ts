@@ -5,6 +5,17 @@ export * from "./bids";
 export * from "./categoryPosts";
 export * from "./cloud";
 export * from "./demoUsers";
+
+// New startup/optimization services
+export { appInitializer } from "./appInitializer";
+export type { InitPhase, InitResult, InitTask } from "./appInitializer";
+export { lazyLoader, useLazyLoad, useWaitForPriority } from "./lazyLoader";
+export type { LazyTask, LoadPriority, TaskResult } from "./lazyLoader";
+export { requestThrottle, throttledFetch } from "./requestThrottle";
+export type { RequestPriority, ThrottleConfig } from "./requestThrottle";
+export { wsManager } from "./wsManager";
+export type { ConnectionState, SocketConfig } from "./wsManager";
+
 export {
     captureAndUploadConstructionPhoto,
     deleteUploadedFile,
@@ -283,4 +294,133 @@ export type {
     ZaloTokenResponse,
     ZaloUser
 } from "./zaloAuthService";
+
+// Mock Data Service (fallback for missing BE endpoints)
+export {
+    fetchWithMockFallback,
+    getMockData,
+    hasMockData,
+    mockAdminDashboard,
+    mockAdminStats,
+    mockBanners,
+    mockCommunications,
+    mockCommunityFeed,
+    mockContracts,
+    mockCrmActivities,
+    mockCrmClients,
+    mockCrmDeals,
+    mockCrmLeads,
+    mockDocuments,
+    mockEquipment,
+    mockFeaturedServices,
+    mockFetch,
+    mockFiles,
+    mockFlashSales,
+    mockInvoices,
+    mockNews,
+    mockPayments,
+    mockVideos
+} from "./mockDataService";
+
+// CRM Service
+export {
+    completeActivity,
+    createActivity,
+    createDeal,
+    createLead,
+    getActivities,
+    getClientById,
+    getClients,
+    getCrmDashboardStats,
+    getDealById,
+    getDeals,
+    getLeadById,
+    getLeads,
+    getUpcomingActivities,
+    updateLead
+} from "./crmService";
+export type {
+    CrmActivity,
+    CrmClient,
+    CrmDashboardStats,
+    CrmDeal,
+    CrmLead
+} from "./crmService";
+
+// Business Operations Service
+export {
+    assignEquipment,
+    createPayment as createBusinessPayment,
+    createContract,
+    createInvoice,
+    getActiveContracts,
+    getAvailableEquipment,
+    getBusinessDashboardStats,
+    getPayments as getBusinessPayments,
+    getCommunications,
+    getContractById,
+    getContracts,
+    getDocumentById,
+    getDocuments,
+    getEquipment,
+    getEquipmentById,
+    getFiles,
+    getInvoiceById,
+    getInvoices,
+    getPaymentsByInvoice,
+    getPendingInvoices,
+    sendEmail,
+    uploadFile
+} from "./businessService";
+export type {
+    BusinessDashboardStats,
+    Payment as BusinessPayment,
+    Communication,
+    Contract,
+    Document,
+    Equipment,
+    FileItem,
+    Invoice
+} from "./businessService";
+
+// Admin Dashboard Service
+export {
+    getAdminDashboard, getProjectStats as getAdminProjectStats, getAdminStats,
+    getAdminUsers,
+    getDashboardOverview,
+    getFinanceStats, getProjectsByStatus,
+    getRecentActivities,
+    getRevenueChart,
+    getSystemHealth,
+    getTopPerformers,
+    getUserStats,
+    suspendUser,
+    updateUserRole
+} from "./adminService";
+export type {
+    AdminDashboard, ProjectStats as AdminProjectStats, AdminStats,
+    AdminUser,
+    DashboardOverview,
+    FinanceStats, ProjectsByStatus,
+    RecentActivity,
+    RevenueDataPoint,
+    SystemHealth,
+    TopPerformer,
+    UserStats
+} from "./adminService";
+
+// API with Fallback
+export {
+    fetchWithFallback,
+    getBanners,
+    getCommunityFeed as getCommunityFeedFallback,
+    getCrmActivities as getCrmActivitiesFallback,
+    getCrmClients as getCrmClientsFallback,
+    getCrmDeals as getCrmDealsFallback,
+    getCrmLeads as getCrmLeadsFallback,
+    getFeaturedServices,
+    getFlashSales,
+    getNews as getNewsFallback,
+    getVideos as getVideosFallback
+} from "./apiWithFallback";
 

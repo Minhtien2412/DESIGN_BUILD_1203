@@ -169,7 +169,7 @@ export function useUnifiedMessaging(options: UseUnifiedMessagingOptions = {}) {
       console.log(
         "[useUnifiedMessaging] Loaded",
         sorted.length,
-        "conversations"
+        "conversations",
       );
     } catch (err) {
       const errorMsg =
@@ -204,7 +204,7 @@ export function useUnifiedMessaging(options: UseUnifiedMessagingOptions = {}) {
 
         console.log(
           "[useUnifiedMessaging] Loading messages for:",
-          conversationId
+          conversationId,
         );
 
         const data = await UnifiedChatService.getMessages(conversationId, {
@@ -235,7 +235,7 @@ export function useUnifiedMessaging(options: UseUnifiedMessagingOptions = {}) {
         setLoadingMessages(false);
       }
     },
-    [conversations, pageSize, enableRealtime]
+    [conversations, pageSize, enableRealtime],
   );
 
   const loadMoreMessages = useCallback(async () => {
@@ -250,7 +250,7 @@ export function useUnifiedMessaging(options: UseUnifiedMessagingOptions = {}) {
         {
           limit: pageSize,
           before: oldestMessage?.createdAt,
-        }
+        },
       );
 
       setMessages((prev) => [...prev, ...data]);
@@ -313,12 +313,12 @@ export function useUnifiedMessaging(options: UseUnifiedMessagingOptions = {}) {
         const sentMessage = await UnifiedChatService.sendMessage(
           params.conversationId,
           params.content,
-          params.mediaUrl ? [params.mediaUrl] : undefined
+          params.mediaUrl ? [params.mediaUrl] : undefined,
         );
 
         // Replace optimistic message with real message
         setMessages((prev) =>
-          prev.map((m) => (m.id === optimisticMessage.id ? sentMessage : m))
+          prev.map((m) => (m.id === optimisticMessage.id ? sentMessage : m)),
         );
 
         // Update conversation's lastMessage
@@ -330,8 +330,8 @@ export function useUnifiedMessaging(options: UseUnifiedMessagingOptions = {}) {
                   lastMessage: sentMessage,
                   updatedAt: sentMessage.createdAt,
                 }
-              : c
-          )
+              : c,
+          ),
         );
 
         // Also send via WebSocket for realtime delivery
@@ -339,7 +339,7 @@ export function useUnifiedMessaging(options: UseUnifiedMessagingOptions = {}) {
           chatService.sendMessage(
             params.conversationId,
             params.content,
-            params.replyToId
+            params.replyToId,
           );
         }
 
@@ -350,8 +350,8 @@ export function useUnifiedMessaging(options: UseUnifiedMessagingOptions = {}) {
           prev.map((m) =>
             m.deliveryStatus === "sending"
               ? { ...m, deliveryStatus: "failed" as DeliveryStatus }
-              : m
-          )
+              : m,
+          ),
         );
         setError("Gửi tin nhắn thất bại");
         console.error("[useUnifiedMessaging] Send error:", err);
@@ -360,22 +360,22 @@ export function useUnifiedMessaging(options: UseUnifiedMessagingOptions = {}) {
         setSending(false);
       }
     },
-    [currentUserId, user, messages, enableRealtime]
+    [currentUserId, user, messages, enableRealtime],
   );
 
   // ==================== TYPING ====================
 
   const setTyping = useCallback(
     (conversationId: string, isTyping: boolean) => {
-      if (!enableRealtime) return;
+      if (!enableRealtime || !currentUserId) return;
 
       if (isTyping) {
-        chatService.startTyping(conversationId);
+        chatService.startTyping(conversationId, currentUserId);
       } else {
-        chatService.stopTyping(conversationId);
+        chatService.stopTyping(conversationId, currentUserId);
       }
     },
-    [enableRealtime]
+    [enableRealtime, currentUserId],
   );
 
   // ==================== MARK AS READ ====================
@@ -389,8 +389,8 @@ export function useUnifiedMessaging(options: UseUnifiedMessagingOptions = {}) {
         // Optimistic update
         setConversations((prev) =>
           prev.map((c) =>
-            c.id === conversationId ? { ...c, unreadCount: 0 } : c
-          )
+            c.id === conversationId ? { ...c, unreadCount: 0 } : c,
+          ),
         );
         setMessages((prev) => prev.map((m) => ({ ...m, isRead: true })));
 
@@ -406,13 +406,13 @@ export function useUnifiedMessaging(options: UseUnifiedMessagingOptions = {}) {
         if (unreadBefore > 0 && badgeSyncCallback) {
           const newTotalUnread = conversations.reduce(
             (sum, c) => sum + (c.id === conversationId ? 0 : c.unreadCount),
-            0
+            0,
           );
           const missedCalls = conversations.filter(
             (c) =>
               c.lastMessage?.type === "call" &&
               c.lastMessage?.callStatus === "missed" &&
-              !c.lastMessage?.isRead
+              !c.lastMessage?.isRead,
           ).length;
           badgeSyncCallback(newTotalUnread, missedCalls);
         }
@@ -422,14 +422,14 @@ export function useUnifiedMessaging(options: UseUnifiedMessagingOptions = {}) {
         console.error("[useUnifiedMessaging] Error marking as read:", err);
       }
     },
-    [conversations, enableRealtime]
+    [conversations, enableRealtime],
   );
 
   // ==================== COUNTS ====================
 
   const totalUnreadCount = useMemo(
     () => conversations.reduce((sum, c) => sum + c.unreadCount, 0),
-    [conversations]
+    [conversations],
   );
 
   const missedCallsCount = useMemo(
@@ -438,9 +438,9 @@ export function useUnifiedMessaging(options: UseUnifiedMessagingOptions = {}) {
         (c) =>
           c.lastMessage?.type === "call" &&
           c.lastMessage?.callStatus === "missed" &&
-          !c.lastMessage?.isRead
+          !c.lastMessage?.isRead,
       ).length,
-    [conversations]
+    [conversations],
   );
 
   // ==================== SEARCH ====================
@@ -451,10 +451,10 @@ export function useUnifiedMessaging(options: UseUnifiedMessagingOptions = {}) {
       return conversations.filter(
         (c) =>
           c.name.toLowerCase().includes(lower) ||
-          c.lastMessage?.content.toLowerCase().includes(lower)
+          c.lastMessage?.content.toLowerCase().includes(lower),
       );
     },
-    [conversations]
+    [conversations],
   );
 
   const searchMessages = useCallback(
@@ -463,10 +463,10 @@ export function useUnifiedMessaging(options: UseUnifiedMessagingOptions = {}) {
       return messages.filter(
         (m) =>
           m.conversationId === conversationId &&
-          m.content.toLowerCase().includes(lower)
+          m.content.toLowerCase().includes(lower),
       );
     },
-    [messages]
+    [messages],
   );
 
   // ==================== CALL ACTIONS ====================
@@ -476,7 +476,7 @@ export function useUnifiedMessaging(options: UseUnifiedMessagingOptions = {}) {
       console.log("[useUnifiedMessaging] Starting call:", userId, type);
       // TODO: Integrate with CallService
     },
-    []
+    [],
   );
 
   // ==================== CONVERSATION ACTIONS ====================
@@ -485,7 +485,7 @@ export function useUnifiedMessaging(options: UseUnifiedMessagingOptions = {}) {
     async (conversationId: string, pinned: boolean) => {
       setConversations((prev) => {
         const updated = prev.map((c) =>
-          c.id === conversationId ? { ...c, isPinned: pinned } : c
+          c.id === conversationId ? { ...c, isPinned: pinned } : c,
         );
         return updated.sort((a, b) => {
           if (a.isPinned !== b.isPinned) return a.isPinned ? -1 : 1;
@@ -496,19 +496,19 @@ export function useUnifiedMessaging(options: UseUnifiedMessagingOptions = {}) {
       });
       // TODO: API call to persist pin status
     },
-    []
+    [],
   );
 
   const muteConversation = useCallback(
     async (conversationId: string, muted: boolean) => {
       setConversations((prev) =>
         prev.map((c) =>
-          c.id === conversationId ? { ...c, isMuted: muted } : c
-        )
+          c.id === conversationId ? { ...c, isMuted: muted } : c,
+        ),
       );
       // TODO: API call to persist mute status
     },
-    []
+    [],
   );
 
   const deleteConversation = useCallback(
@@ -520,7 +520,7 @@ export function useUnifiedMessaging(options: UseUnifiedMessagingOptions = {}) {
       }
       // TODO: API call to delete conversation
     },
-    [currentConversation]
+    [currentConversation],
   );
 
   // ==================== MESSAGE ACTIONS ====================
@@ -532,7 +532,7 @@ export function useUnifiedMessaging(options: UseUnifiedMessagingOptions = {}) {
         chatService.deleteMessage(currentConversation.id, messageId);
       }
     },
-    [enableRealtime, currentConversation]
+    [enableRealtime, currentConversation],
   );
 
   const addReaction = useCallback(
@@ -546,7 +546,7 @@ export function useUnifiedMessaging(options: UseUnifiedMessagingOptions = {}) {
             return {
               ...m,
               reactions: reactions.map((r) =>
-                r.userId === currentUserId ? { ...r, emoji } : r
+                r.userId === currentUserId ? { ...r, emoji } : r,
               ),
             };
           }
@@ -557,10 +557,10 @@ export function useUnifiedMessaging(options: UseUnifiedMessagingOptions = {}) {
               { emoji, userId: currentUserId, userName: user?.name || "You" },
             ],
           };
-        })
+        }),
       );
     },
-    [currentUserId, user]
+    [currentUserId, user],
   );
 
   const removeReaction = useCallback(
@@ -571,13 +571,13 @@ export function useUnifiedMessaging(options: UseUnifiedMessagingOptions = {}) {
           return {
             ...m,
             reactions: (m.reactions || []).filter(
-              (r) => !(r.userId === currentUserId && r.emoji === emoji)
+              (r) => !(r.userId === currentUserId && r.emoji === emoji),
             ),
           };
-        })
+        }),
       );
     },
-    [currentUserId]
+    [currentUserId],
   );
 
   // ==================== GET OR CREATE CONVERSATION ====================
@@ -591,7 +591,7 @@ export function useUnifiedMessaging(options: UseUnifiedMessagingOptions = {}) {
     }): Promise<string> => {
       // Check if conversation already exists
       const existingConv = conversations.find((c) =>
-        c.participants.some((p) => p.id === params.userId)
+        c.participants.some((p) => p.id === params.userId),
       );
 
       if (existingConv) {
@@ -604,7 +604,7 @@ export function useUnifiedMessaging(options: UseUnifiedMessagingOptions = {}) {
           params.userName,
           [params.userId],
           undefined,
-          false
+          false,
         );
 
         setConversations((prev) => [newConv, ...prev]);
@@ -612,12 +612,12 @@ export function useUnifiedMessaging(options: UseUnifiedMessagingOptions = {}) {
       } catch (err) {
         console.error(
           "[useUnifiedMessaging] Error creating conversation:",
-          err
+          err,
         );
         throw err;
       }
     },
-    [conversations]
+    [conversations],
   );
 
   // ==================== WEBSOCKET REALTIME ====================
@@ -678,7 +678,7 @@ export function useUnifiedMessaging(options: UseUnifiedMessagingOptions = {}) {
                   };
                 }
                 return c;
-              })
+              }),
             );
 
             // Sync badge
@@ -687,11 +687,11 @@ export function useUnifiedMessaging(options: UseUnifiedMessagingOptions = {}) {
                 (sum, c) =>
                   sum +
                   (c.id === msg.roomId ? c.unreadCount + 1 : c.unreadCount),
-                0
+                0,
               );
               badgeSyncCallback(newTotalUnread, missedCallsCount);
             }
-          }
+          },
         );
 
         // Listen for typing indicators
@@ -712,7 +712,7 @@ export function useUnifiedMessaging(options: UseUnifiedMessagingOptions = {}) {
               });
             } else {
               setTypingUsers((prev) =>
-                prev.filter((u) => u.id.toString() !== data.userId)
+                prev.filter((u) => u.id.toString() !== data.userId),
               );
             }
           }
@@ -729,10 +729,10 @@ export function useUnifiedMessaging(options: UseUnifiedMessagingOptions = {}) {
                       isRead: true,
                       deliveryStatus: "read",
                     }
-                  : m
-              )
+                  : m,
+              ),
             );
-          }
+          },
         );
 
         // Listen for online status
@@ -747,16 +747,16 @@ export function useUnifiedMessaging(options: UseUnifiedMessagingOptions = {}) {
                         ...p,
                         onlineStatus: data.isOnline ? "online" : "offline",
                       }
-                    : p
+                    : p,
                 ),
                 isOnline: c.participants.some((p) =>
                   p.id.toString() === data.userId
                     ? data.isOnline
-                    : p.onlineStatus === "online"
+                    : p.onlineStatus === "online",
                 ),
-              }))
+              })),
             );
-          }
+          },
         );
 
         // Store cleanup function

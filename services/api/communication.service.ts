@@ -3,14 +3,12 @@
  * Handle team chat, announcements, file sharing, meeting notes
  */
 
-import { BaseApiService } from './base.service';
-import type { ApiResponse } from './types';
+import { BaseApiService } from "./base.service";
+import type { ApiResponse } from "./types";
 
-// ==================== TYPES ====================
-
-export type MessageType = 'TEXT' | 'FILE' | 'IMAGE' | 'SYSTEM';
-export type ChannelType = 'PROJECT' | 'TEAM' | 'DIRECT' | 'ANNOUNCEMENT';
-export type MemberRole = 'ADMIN' | 'MODERATOR' | 'MEMBER';
+export type MessageType = "TEXT" | "FILE" | "IMAGE" | "SYSTEM";
+export type ChannelType = "PROJECT" | "TEAM" | "DIRECT" | "ANNOUNCEMENT";
+export type MemberRole = "ADMIN" | "MODERATOR" | "MEMBER";
 
 export interface Channel {
   id: number;
@@ -72,10 +70,10 @@ export interface Announcement {
   projectId: number;
   title: string;
   content: string;
-  priority: 'LOW' | 'NORMAL' | 'HIGH' | 'URGENT';
+  priority: "LOW" | "NORMAL" | "HIGH" | "URGENT";
   isPinned: boolean;
   attachments: AnnouncementAttachment[];
-  targetAudience: 'ALL' | 'TEAM' | 'CLIENTS' | 'CONTRACTORS';
+  targetAudience: "ALL" | "TEAM" | "CLIENTS" | "CONTRACTORS";
   publishedBy: number;
   publishedByName?: string;
   publishedAt?: string;
@@ -133,7 +131,7 @@ export interface MeetingActionItem {
   assignedTo: number;
   assignedToName?: string;
   dueDate?: string;
-  status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
+  status: "PENDING" | "IN_PROGRESS" | "COMPLETED";
   completedAt?: string;
 }
 
@@ -183,11 +181,13 @@ export interface CreateAnnouncementData {
   projectId: number;
   title: string;
   content: string;
-  priority?: 'LOW' | 'NORMAL' | 'HIGH' | 'URGENT';
+  priority?: "LOW" | "NORMAL" | "HIGH" | "URGENT";
   isPinned?: boolean;
-  targetAudience?: 'ALL' | 'TEAM' | 'CLIENTS' | 'CONTRACTORS';
+  targetAudience?: "ALL" | "TEAM" | "CLIENTS" | "CONTRACTORS";
   expiresAt?: string;
-  attachments?: { name: string; url: string; type: string; size: number }[] | File[];
+  attachments?:
+    | { name: string; url: string; type: string; size: number }[]
+    | File[];
 }
 
 export interface CreateMeetingNoteData {
@@ -196,11 +196,11 @@ export interface CreateMeetingNoteData {
   meetingDate: string;
   duration?: number;
   location?: string;
-  attendees: Omit<MeetingAttendee, 'userName'>[];
+  attendees: Omit<MeetingAttendee, "userName">[];
   agenda: string[];
   notes: string;
-  decisions?: Omit<MeetingDecision, 'id' | 'decidedByName' | 'decidedAt'>[];
-  actionItems?: Omit<MeetingActionItem, 'id' | 'assignedToName'>[];
+  decisions?: Omit<MeetingDecision, "id" | "decidedByName" | "decidedAt">[];
+  actionItems?: Omit<MeetingActionItem, "id" | "assignedToName">[];
 }
 
 export interface MessageFilters {
@@ -217,7 +217,7 @@ export interface MessageFilters {
 
 class CommunicationService extends BaseApiService {
   constructor() {
-    super('Communication', {
+    super("Communication", {
       retry: {
         maxRetries: 2,
         baseDelay: 500,
@@ -237,41 +237,11 @@ class CommunicationService extends BaseApiService {
    * Get user's channels
    */
   async getChannels(projectId?: number): Promise<ApiResponse<Channel[]>> {
-    return this.get<ApiResponse<Channel[]>>('/channels', { projectId }, {
-      cache: true,
-      deduplicate: true,
-    });
-  }
-
-  /**
-   * Get channel by ID
-   */
-  async getChannel(id: number): Promise<ApiResponse<Channel>> {
-    return this.get<ApiResponse<Channel>>(`/channels/${id}`);
-  }
-
-  /**
-   * Create channel
-   */
-  async createChannel(data: CreateChannelData): Promise<ApiResponse<Channel>> {
-    const result = await this.post<ApiResponse<Channel>>('/channels', data, {
-      offlineQueue: true,
-    });
-
-    await this.invalidateCache('/channels');
-
-    return result;
-  }
-
-  /**
-   * Update channel
-   */
-  async updateChannel(id: number, data: UpdateChannelData): Promise<ApiResponse<Channel>> {
-    const result = await this.put<ApiResponse<Channel>>(`/channels/${id}`, data, {
-      offlineQueue: true,
-    });
-
-    await this.invalidateCache('/channels');
+    const result = await this.get<ApiResponse<Channel[]>>(
+      `/chat/rooms`,
+      projectId ? { projectId } : undefined,
+      { cache: true },
+    );
 
     return result;
   }
@@ -280,11 +250,11 @@ class CommunicationService extends BaseApiService {
    * Delete channel
    */
   async deleteChannel(id: number): Promise<ApiResponse<void>> {
-    const result = await this.delete<ApiResponse<void>>(`/channels/${id}`, {
+    const result = await this.delete<ApiResponse<void>>(`/chat/rooms/${id}`, {
       offlineQueue: true,
     });
 
-    await this.invalidateCache('/channels');
+    await this.invalidateCache("/chat/rooms");
 
     return result;
   }
@@ -294,40 +264,66 @@ class CommunicationService extends BaseApiService {
   /**
    * Get channel members
    */
-  async getChannelMembers(channelId: number): Promise<ApiResponse<ChannelMember[]>> {
-    return this.get<ApiResponse<ChannelMember[]>>(`/channels/${channelId}/members`);
+  async getChannelMembers(
+    channelId: number,
+  ): Promise<ApiResponse<ChannelMember[]>> {
+    return this.get<ApiResponse<ChannelMember[]>>(
+      `/chat/rooms/${channelId}/members`,
+    );
   }
 
   /**
    * Add member to channel
    */
-  async addMember(channelId: number, userId: number, role: MemberRole = 'MEMBER'): Promise<ApiResponse<ChannelMember>> {
-    return this.post<ApiResponse<ChannelMember>>(`/channels/${channelId}/members`, {
-      userId,
-      role,
-    }, {
-      offlineQueue: true,
-    });
+  async addMember(
+    channelId: number,
+    userId: number,
+    role: MemberRole = "MEMBER",
+  ): Promise<ApiResponse<ChannelMember>> {
+    return this.post<ApiResponse<ChannelMember>>(
+      `/chat/rooms/${channelId}/members`,
+      {
+        userId,
+        role,
+      },
+      {
+        offlineQueue: true,
+      },
+    );
   }
 
   /**
    * Remove member from channel
    */
-  async removeMember(channelId: number, userId: number): Promise<ApiResponse<void>> {
-    return this.delete<ApiResponse<void>>(`/channels/${channelId}/members/${userId}`, {
-      offlineQueue: true,
-    });
+  async removeMember(
+    channelId: number,
+    userId: number,
+  ): Promise<ApiResponse<void>> {
+    return this.delete<ApiResponse<void>>(
+      `/chat/rooms/${channelId}/members/${userId}`,
+      {
+        offlineQueue: true,
+      },
+    );
   }
 
   /**
    * Update member role
    */
-  async updateMemberRole(channelId: number, userId: number, role: MemberRole): Promise<ApiResponse<ChannelMember>> {
-    return this.put<ApiResponse<ChannelMember>>(`/channels/${channelId}/members/${userId}`, {
-      role,
-    }, {
-      offlineQueue: true,
-    });
+  async updateMemberRole(
+    channelId: number,
+    userId: number,
+    role: MemberRole,
+  ): Promise<ApiResponse<ChannelMember>> {
+    return this.put<ApiResponse<ChannelMember>>(
+      `/chat/rooms/${channelId}/members/${userId}`,
+      {
+        role,
+      },
+      {
+        offlineQueue: true,
+      },
+    );
   }
 
   // ==================== MESSAGES ====================
@@ -336,14 +332,14 @@ class CommunicationService extends BaseApiService {
    * Get messages for channel
    */
   async getMessages(filters: MessageFilters): Promise<ApiResponse<Message[]>> {
-    return this.get<ApiResponse<Message[]>>('/messages', filters as any);
+    return this.get<ApiResponse<Message[]>>("/messages", filters as any);
   }
 
   /**
    * Send message
    */
   async sendMessage(data: SendMessageData): Promise<ApiResponse<Message>> {
-    return this.post<ApiResponse<Message>>('/messages', data, {
+    return this.post<ApiResponse<Message>>("/messages", data, {
       offlineQueue: true,
     });
   }
@@ -351,10 +347,17 @@ class CommunicationService extends BaseApiService {
   /**
    * Update message
    */
-  async updateMessage(id: number, content: string): Promise<ApiResponse<Message>> {
-    return this.put<ApiResponse<Message>>(`/messages/${id}`, { content }, {
-      offlineQueue: true,
-    });
+  async updateMessage(
+    id: number,
+    content: string,
+  ): Promise<ApiResponse<Message>> {
+    return this.put<ApiResponse<Message>>(
+      `/messages/${id}`,
+      { content },
+      {
+        offlineQueue: true,
+      },
+    );
   }
 
   /**
@@ -369,42 +372,78 @@ class CommunicationService extends BaseApiService {
   /**
    * Add reaction to message
    */
-  async addReaction(messageId: number, emoji: string): Promise<ApiResponse<Message>> {
-    return this.post<ApiResponse<Message>>(`/messages/${messageId}/reactions`, { emoji }, {
-      offlineQueue: true,
-    });
+  async addReaction(
+    messageId: number,
+    emoji: string,
+  ): Promise<ApiResponse<Message>> {
+    return this.post<ApiResponse<Message>>(
+      `/messages/${messageId}/reactions`,
+      { emoji },
+      {
+        offlineQueue: true,
+      },
+    );
   }
 
   /**
    * Remove reaction from message
    */
-  async removeReaction(messageId: number, emoji: string): Promise<ApiResponse<Message>> {
-    return this.delete<ApiResponse<Message>>(`/messages/${messageId}/reactions/${emoji}`, {
-      offlineQueue: true,
-    });
+  async removeReaction(
+    messageId: number,
+    emoji: string,
+  ): Promise<ApiResponse<Message>> {
+    return this.delete<ApiResponse<Message>>(
+      `/messages/${messageId}/reactions/${emoji}`,
+      {
+        offlineQueue: true,
+      },
+    );
   }
 
   /**
    * Mark channel as read
    */
   async markAsRead(channelId: number): Promise<ApiResponse<void>> {
-    return this.post<ApiResponse<void>>(`/channels/${channelId}/read`, undefined, {
-      offlineQueue: true,
-    });
+    return this.post<ApiResponse<void>>(
+      `/chat/rooms/${channelId}/read`,
+      undefined,
+      {
+        offlineQueue: true,
+      },
+    );
   }
 
   // ==================== ANNOUNCEMENTS ====================
 
   /**
    * Get announcements for project
+   * NOTE: Endpoint not implemented on backend - returns 404
+   * Temporarily disabled
    */
-  async getAnnouncements(projectId: number, includePast: boolean = false): Promise<ApiResponse<Announcement[]>> {
-    return this.get<ApiResponse<Announcement[]>>('/announcements', {
-      projectId,
-      includePast,
-    }, {
-      cache: true,
-    });
+  async getAnnouncements(
+    projectId: number,
+    includePast: boolean = false,
+  ): Promise<ApiResponse<Announcement[]>> {
+    // Endpoint not implemented - return empty response
+    console.warn(
+      "[CommunicationService] /announcements endpoint not available",
+    );
+    return {
+      success: false,
+      data: [],
+      message: "Announcements endpoint not implemented",
+    };
+    // TODO: Uncomment when backend implements /announcements endpoint:
+    // return this.get<ApiResponse<Announcement[]>>(
+    //   "/announcements",
+    //   {
+    //     projectId,
+    //     includePast,
+    //   },
+    //   {
+    //     cache: true,
+    //   },
+    // );
   }
 
   /**
@@ -417,17 +456,20 @@ class CommunicationService extends BaseApiService {
   /**
    * Create announcement
    */
-  async createAnnouncement(data: CreateAnnouncementData): Promise<ApiResponse<Announcement>> {
+  async createAnnouncement(
+    data: CreateAnnouncementData,
+  ): Promise<ApiResponse<Announcement>> {
     const formData = new FormData();
-    formData.append('projectId', data.projectId.toString());
-    formData.append('title', data.title);
-    formData.append('content', data.content);
-    
-    if (data.priority) formData.append('priority', data.priority);
-    if (data.isPinned) formData.append('isPinned', data.isPinned.toString());
-    if (data.targetAudience) formData.append('targetAudience', data.targetAudience);
-    if (data.expiresAt) formData.append('expiresAt', data.expiresAt);
-    
+    formData.append("projectId", data.projectId.toString());
+    formData.append("title", data.title);
+    formData.append("content", data.content);
+
+    if (data.priority) formData.append("priority", data.priority);
+    if (data.isPinned) formData.append("isPinned", data.isPinned.toString());
+    if (data.targetAudience)
+      formData.append("targetAudience", data.targetAudience);
+    if (data.expiresAt) formData.append("expiresAt", data.expiresAt);
+
     if (data.attachments) {
       data.attachments.forEach((file, index) => {
         // Only append actual File objects to FormData
@@ -440,11 +482,15 @@ class CommunicationService extends BaseApiService {
       });
     }
 
-    const result = await this.post<ApiResponse<Announcement>>('/announcements', formData, {
-      offlineQueue: false,
-    });
+    const result = await this.post<ApiResponse<Announcement>>(
+      "/announcements",
+      formData,
+      {
+        offlineQueue: false,
+      },
+    );
 
-    await this.invalidateCache('/announcements');
+    await this.invalidateCache("/announcements");
 
     return result;
   }
@@ -452,12 +498,19 @@ class CommunicationService extends BaseApiService {
   /**
    * Update announcement
    */
-  async updateAnnouncement(id: number, data: Partial<CreateAnnouncementData>): Promise<ApiResponse<Announcement>> {
-    const result = await this.put<ApiResponse<Announcement>>(`/announcements/${id}`, data, {
-      offlineQueue: true,
-    });
+  async updateAnnouncement(
+    id: number,
+    data: Partial<CreateAnnouncementData>,
+  ): Promise<ApiResponse<Announcement>> {
+    const result = await this.put<ApiResponse<Announcement>>(
+      `/announcements/${id}`,
+      data,
+      {
+        offlineQueue: true,
+      },
+    );
 
-    await this.invalidateCache('/announcements');
+    await this.invalidateCache("/announcements");
 
     return result;
   }
@@ -466,11 +519,14 @@ class CommunicationService extends BaseApiService {
    * Delete announcement
    */
   async deleteAnnouncement(id: number): Promise<ApiResponse<void>> {
-    const result = await this.delete<ApiResponse<void>>(`/announcements/${id}`, {
-      offlineQueue: true,
-    });
+    const result = await this.delete<ApiResponse<void>>(
+      `/announcements/${id}`,
+      {
+        offlineQueue: true,
+      },
+    );
 
-    await this.invalidateCache('/announcements');
+    await this.invalidateCache("/announcements");
 
     return result;
   }
@@ -479,38 +535,54 @@ class CommunicationService extends BaseApiService {
    * Track announcement view
    */
   async trackView(id: number): Promise<ApiResponse<void>> {
-    return this.post<ApiResponse<void>>(`/announcements/${id}/view`, undefined, {
-      offlineQueue: true,
-    });
-  }
-
-  // ==================== MEETING NOTES ====================
-
-  /**
-   * Get meeting notes for project
-   */
-  async getMeetingNotes(projectId: number): Promise<ApiResponse<MeetingNote[]>> {
-    return this.get<ApiResponse<MeetingNote[]>>('/meeting-notes', { projectId }, {
-      cache: true,
-    });
+    return this.post<ApiResponse<void>>(
+      `/announcements/${id}/view`,
+      undefined,
+      {
+        offlineQueue: true,
+      },
+    );
   }
 
   /**
    * Get meeting note by ID
    */
   async getMeetingNote(id: number): Promise<ApiResponse<MeetingNote>> {
-    return this.get<ApiResponse<MeetingNote>>(`/meeting-notes/${id}`);
+    return this.get<ApiResponse<MeetingNote>>(
+      `/meeting-notes/${id}`,
+      {},
+      { cache: true }, // Use default cache TTL
+    );
+  }
+
+  /**
+   * Get meeting notes by project
+   */
+  async getMeetingNotes(
+    projectId: number,
+  ): Promise<ApiResponse<MeetingNote[]>> {
+    return this.get<ApiResponse<MeetingNote[]>>(
+      "/meeting-notes",
+      { projectId },
+      { cache: true },
+    );
   }
 
   /**
    * Create meeting note
    */
-  async createMeetingNote(data: CreateMeetingNoteData): Promise<ApiResponse<MeetingNote>> {
-    const result = await this.post<ApiResponse<MeetingNote>>('/meeting-notes', data, {
-      offlineQueue: true,
-    });
+  async createMeetingNote(
+    data: CreateMeetingNoteData,
+  ): Promise<ApiResponse<MeetingNote>> {
+    const result = await this.post<ApiResponse<MeetingNote>>(
+      "/meeting-notes",
+      data,
+      {
+        offlineQueue: true,
+      },
+    );
 
-    await this.invalidateCache('/meeting-notes');
+    await this.invalidateCache("/meeting-notes");
 
     return result;
   }
@@ -518,12 +590,19 @@ class CommunicationService extends BaseApiService {
   /**
    * Update meeting note
    */
-  async updateMeetingNote(id: number, data: Partial<CreateMeetingNoteData>): Promise<ApiResponse<MeetingNote>> {
-    const result = await this.put<ApiResponse<MeetingNote>>(`/meeting-notes/${id}`, data, {
-      offlineQueue: true,
-    });
+  async updateMeetingNote(
+    id: number,
+    data: Partial<CreateMeetingNoteData>,
+  ): Promise<ApiResponse<MeetingNote>> {
+    const result = await this.put<ApiResponse<MeetingNote>>(
+      `/meeting-notes/${id}`,
+      data,
+      {
+        offlineQueue: true,
+      },
+    );
 
-    await this.invalidateCache('/meeting-notes');
+    await this.invalidateCache("/meeting-notes");
 
     return result;
   }
@@ -532,11 +611,14 @@ class CommunicationService extends BaseApiService {
    * Delete meeting note
    */
   async deleteMeetingNote(id: number): Promise<ApiResponse<void>> {
-    const result = await this.delete<ApiResponse<void>>(`/meeting-notes/${id}`, {
-      offlineQueue: true,
-    });
+    const result = await this.delete<ApiResponse<void>>(
+      `/meeting-notes/${id}`,
+      {
+        offlineQueue: true,
+      },
+    );
 
-    await this.invalidateCache('/meeting-notes');
+    await this.invalidateCache("/meeting-notes");
 
     return result;
   }
@@ -547,12 +629,12 @@ class CommunicationService extends BaseApiService {
   async updateActionItem(
     meetingId: number,
     actionItemId: number,
-    status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED'
+    status: "PENDING" | "IN_PROGRESS" | "COMPLETED",
   ): Promise<ApiResponse<MeetingNote>> {
     return this.put<ApiResponse<MeetingNote>>(
       `/meeting-notes/${meetingId}/action-items/${actionItemId}`,
       { status },
-      { offlineQueue: true }
+      { offlineQueue: true },
     );
   }
 
@@ -566,17 +648,17 @@ class CommunicationService extends BaseApiService {
     file: File | Blob,
     description?: string,
     tags?: string[],
-    channelId?: number
+    channelId?: number,
   ): Promise<ApiResponse<FileShare>> {
     const formData = new FormData();
-    formData.append('file', file as any);
-    formData.append('projectId', projectId.toString());
-    
-    if (description) formData.append('description', description);
-    if (tags) formData.append('tags', JSON.stringify(tags));
-    if (channelId) formData.append('channelId', channelId.toString());
+    formData.append("file", file as any);
+    formData.append("projectId", projectId.toString());
 
-    return this.post<ApiResponse<FileShare>>('/shared-files', formData, {
+    if (description) formData.append("description", description);
+    if (tags) formData.append("tags", JSON.stringify(tags));
+    if (channelId) formData.append("channelId", channelId.toString());
+
+    return this.post<ApiResponse<FileShare>>("/shared-files", formData, {
       offlineQueue: false,
     });
   }
@@ -584,31 +666,20 @@ class CommunicationService extends BaseApiService {
   /**
    * Get shared files
    */
-  async getSharedFiles(projectId: number, channelId?: number): Promise<ApiResponse<FileShare[]>> {
-    return this.get<ApiResponse<FileShare[]>>('/shared-files', {
-      projectId,
-      channelId,
-    }, {
-      cache: true,
-    });
-  }
-
-  /**
-   * Delete shared file
-   */
-  async deleteSharedFile(id: number): Promise<ApiResponse<void>> {
-    return this.delete<ApiResponse<void>>(`/shared-files/${id}`, {
-      offlineQueue: true,
-    });
-  }
-
-  /**
-   * Track file download
-   */
-  async trackDownload(id: number): Promise<ApiResponse<void>> {
-    return this.post<ApiResponse<void>>(`/shared-files/${id}/download`, undefined, {
-      offlineQueue: true,
-    });
+  async getSharedFiles(
+    projectId: number,
+    channelId?: number,
+  ): Promise<ApiResponse<FileShare[]>> {
+    return this.get<ApiResponse<FileShare[]>>(
+      "/shared-files",
+      {
+        projectId,
+        channelId,
+      },
+      {
+        cache: true,
+      },
+    );
   }
 
   // ==================== SEARCH ====================
@@ -616,8 +687,11 @@ class CommunicationService extends BaseApiService {
   /**
    * Search messages
    */
-  async searchMessages(channelId: number, query: string): Promise<ApiResponse<Message[]>> {
-    return this.get<ApiResponse<Message[]>>('/messages/search', {
+  async searchMessages(
+    channelId: number,
+    query: string,
+  ): Promise<ApiResponse<Message[]>> {
+    return this.get<ApiResponse<Message[]>>("/messages/search", {
       channelId,
       q: query,
     });
@@ -626,8 +700,10 @@ class CommunicationService extends BaseApiService {
   /**
    * Get unread count
    */
-  async getUnreadCount(): Promise<ApiResponse<{ total: number; byChannel: Record<number, number> }>> {
-    return this.get<ApiResponse<any>>('/channels/unread-count');
+  async getUnreadCount(): Promise<
+    ApiResponse<{ total: number; byChannel: Record<number, number> }>
+  > {
+    return this.get<ApiResponse<any>>("/chat/rooms/unread-count");
   }
 }
 

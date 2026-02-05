@@ -25,31 +25,31 @@ export default function QCQALayout() {
       <Stack.Screen
         name="inspections"
         options={{
-          title: "Inspections",
+          title: "Kiểm tra",
         }}
       />
       <Stack.Screen
         name="checklists"
         options={{
-          title: "Checklists",
+          title: "Danh sách kiểm tra",
         }}
       />
       <Stack.Screen
         name="defects"
         options={{
-          title: "Defects",
+          title: "Lỗi thi công",
         }}
       />
       <Stack.Screen
         name="reports"
         options={{
-          title: "QC Reports",
+          title: "Báo cáo chất lượng",
         }}
       />
       <Stack.Screen
         name="standards"
         options={{
-          title: "Standards",
+          title: "Tiêu chuẩn",
         }}
       />
     </Stack>

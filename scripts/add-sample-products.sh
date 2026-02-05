@@ -40,7 +40,7 @@ curl -X POST "$API_URL/products" \
     "price": 3500000,
     "category": "kitchen-equipment",
     "stock": 50,
-    "images": ["https://via.placeholder.com/300x300/FF6B35/ffffff?text=Bep+Tu"]
+    "images": ["https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=300&q=80"]
   }'
 
 curl -X POST "$API_URL/products" \
@@ -53,7 +53,7 @@ curl -X POST "$API_URL/products" \
     "price": 2800000,
     "category": "kitchen-equipment",
     "stock": 30,
-    "images": ["https://via.placeholder.com/300x300/4CAF50/ffffff?text=Lo+Vi+Song"]
+    "images": ["https://images.unsplash.com/photo-1574269909862-7e1d70bb8078?w=300&q=80"]
   }'
 
 curl -X POST "$API_URL/products" \
@@ -66,7 +66,7 @@ curl -X POST "$API_URL/products" \
     "price": 4200000,
     "category": "kitchen-equipment",
     "stock": 20,
-    "images": ["https://via.placeholder.com/300x300/2196F3/ffffff?text=May+Hut+Mui"]
+    "images": ["https://images.unsplash.com/photo-1584568694244-14fbdf83bd30?w=300&q=80"]
   }'
 
 echo -e "\n=== THÊM SẢN PHẨM THIẾT BỊ VỆ SINH ==="
@@ -81,7 +81,7 @@ curl -X POST "$API_URL/products" \
     "price": 5800000,
     "category": "sanitary-ware",
     "stock": 25,
-    "images": ["https://via.placeholder.com/300x300/9C27B0/ffffff?text=Bon+Cau"]
+    "images": ["https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=300&q=80"]
   }'
 
 curl -X POST "$API_URL/products" \
@@ -94,7 +94,7 @@ curl -X POST "$API_URL/products" \
     "price": 1200000,
     "category": "sanitary-ware",
     "stock": 40,
-    "images": ["https://via.placeholder.com/300x300/FF9800/ffffff?text=Lavabo"]
+    "images": ["https://images.unsplash.com/photo-1584622781564-1d987f7333c1?w=300&q=80"]
   }'
 
 curl -X POST "$API_URL/products" \
@@ -107,7 +107,7 @@ curl -X POST "$API_URL/products" \
     "price": 980000,
     "category": "sanitary-ware",
     "stock": 60,
-    "images": ["https://via.placeholder.com/300x300/00BCD4/ffffff?text=Voi+Sen"]
+    "images": ["https://images.unsplash.com/photo-1620626011761-996317b8d101?w=300&q=80"]
   }'
 
 echo -e "\n=== THÊM SẢN PHẨM PCCC ==="
@@ -122,7 +122,7 @@ curl -X POST "$API_URL/products" \
     "price": 280000,
     "category": "fire-safety",
     "stock": 100,
-    "images": ["https://via.placeholder.com/300x300/F44336/ffffff?text=Binh+Chua+Chay"]
+    "images": ["https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&q=80"]
   }'
 
 curl -X POST "$API_URL/products" \
@@ -135,7 +135,7 @@ curl -X POST "$API_URL/products" \
     "price": 150000,
     "category": "fire-safety",
     "stock": 200,
-    "images": ["https://via.placeholder.com/300x300/E91E63/ffffff?text=Dau+Phun"]
+    "images": ["https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=300&q=80"]
   }'
 
 echo -e "\n=== THÊM BÀN ĂN ==="
@@ -150,7 +150,7 @@ curl -X POST "$API_URL/products" \
     "price": 8500000,
     "category": "dining-table",
     "stock": 15,
-    "images": ["https://via.placeholder.com/300x300/795548/ffffff?text=Ban+An"]
+    "images": ["https://images.unsplash.com/photo-1617806118233-18e1de247200?w=300&q=80"]
   }'
 
 curl -X POST "$API_URL/products" \
@@ -163,7 +163,7 @@ curl -X POST "$API_URL/products" \
     "price": 6200000,
     "category": "dining-table",
     "stock": 20,
-    "images": ["https://via.placeholder.com/300x300/607D8B/ffffff?text=Ban+Da"]
+    "images": ["https://images.unsplash.com/photo-1604578762246-41134e37f9cc?w=300&q=80"]
   }'
 
 echo -e "\n=== THÊM BÀN HỌC ==="
@@ -178,7 +178,7 @@ curl -X POST "$API_URL/products" \
     "price": 2800000,
     "category": "study-table",
     "stock": 35,
-    "images": ["https://via.placeholder.com/300x300/3F51B5/ffffff?text=Ban+Hoc"]
+    "images": ["https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?w=300&q=80"]
   }'
 
 curl -X POST "$API_URL/products" \
@@ -191,7 +191,7 @@ curl -X POST "$API_URL/products" \
     "price": 1900000,
     "category": "study-table",
     "stock": 50,
-    "images": ["https://via.placeholder.com/300x300/009688/ffffff?text=Ban+Lam+Viec"]
+    "images": ["https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=300&q=80"]
   }'
 
 echo -e "\n=== THÊM SOFA ==="
@@ -206,7 +206,7 @@ curl -X POST "$API_URL/products" \
     "price": 28000000,
     "category": "sofa",
     "stock": 8,
-    "images": ["https://via.placeholder.com/300x300/8BC34A/ffffff?text=Sofa+Da"]
+    "images": ["https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=300&q=80"]
   }'
 
 curl -X POST "$API_URL/products" \
@@ -219,7 +219,7 @@ curl -X POST "$API_URL/products" \
     "price": 8500000,
     "category": "sofa",
     "stock": 25,
-    "images": ["https://via.placeholder.com/300x300/CDDC39/ffffff?text=Sofa+Vai"]
+    "images": ["https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=300&q=80"]
   }'
 
 echo -e "\n✅ HOÀN THÀNH! Đã thêm 15 sản phẩm mẫu"

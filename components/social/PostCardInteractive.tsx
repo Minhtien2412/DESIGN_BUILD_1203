@@ -7,12 +7,12 @@
  * - Swipe down to dismiss media viewer
  * - Pinch to zoom images
  * - Pull down to refresh
- * 
+ *
  * @updated 2026-01-05
  */
 
-import { Ionicons } from '@expo/vector-icons';
-import { useCallback, useRef, useState } from 'react';
+import { Ionicons } from "@expo/vector-icons";
+import { useCallback, useRef, useState } from "react";
 import {
     Animated,
     Dimensions,
@@ -23,19 +23,19 @@ import {
     Text,
     TouchableOpacity,
     TouchableWithoutFeedback,
-    View
-} from 'react-native';
+    View,
+} from "react-native";
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 // Reaction types - Facebook style
 const REACTIONS = [
-  { id: 'like', icon: '👍', label: 'Thích', color: '#0066CC' },
-  { id: 'love', icon: '❤️', label: 'Yêu thích', color: '#FF0000' },
-  { id: 'haha', icon: '😆', label: 'Haha', color: '#FFC107' },
-  { id: 'wow', icon: '😮', label: 'Wow', color: '#FFC107' },
-  { id: 'sad', icon: '😢', label: 'Buồn', color: '#FFC107' },
-  { id: 'angry', icon: '😠', label: 'Phẫn nộ', color: '#FF6B00' },
+  { id: "like", icon: "👍", label: "Thích", color: "#0066CC" },
+  { id: "love", icon: "❤️", label: "Yêu thích", color: "#FF0000" },
+  { id: "haha", icon: "😆", label: "Haha", color: "#FFC107" },
+  { id: "wow", icon: "😮", label: "Wow", color: "#FFC107" },
+  { id: "sad", icon: "😢", label: "Buồn", color: "#FFC107" },
+  { id: "angry", icon: "😠", label: "Phẫn nộ", color: "#FF6B00" },
 ];
 
 interface PostData {
@@ -73,8 +73,10 @@ export function PostCardInteractive({
   const [liked, setLiked] = useState(post.liked || false);
   const [reaction, setReaction] = useState<string | undefined>(post.reaction);
   const [showReactions, setShowReactions] = useState(false);
-  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
-  
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(
+    null,
+  );
+
   // Animation values
   const heartScale = useRef(new Animated.Value(0)).current;
   const reactionScale = useRef(new Animated.Value(0)).current;
@@ -91,9 +93,9 @@ export function PostCardInteractive({
       // Double tap detected
       if (!liked) {
         setLiked(true);
-        setReaction('like');
-        onLike?.(post.id, 'like');
-        
+        setReaction("like");
+        onLike?.(post.id, "like");
+
         // Animate heart
         heartScale.setValue(0);
         Animated.sequence([
@@ -136,18 +138,21 @@ export function PostCardInteractive({
     }
   }, []);
 
-  const handleSelectReaction = useCallback((reactionId: string) => {
-    setLiked(true);
-    setReaction(reactionId);
-    setShowReactions(false);
-    onLike?.(post.id, reactionId);
-    
-    Animated.timing(reactionScale, {
-      toValue: 0,
-      duration: 200,
-      useNativeDriver: true,
-    }).start();
-  }, [onLike, post.id, reactionScale]);
+  const handleSelectReaction = useCallback(
+    (reactionId: string) => {
+      setLiked(true);
+      setReaction(reactionId);
+      setShowReactions(false);
+      onLike?.(post.id, reactionId);
+
+      Animated.timing(reactionScale, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }).start();
+    },
+    [onLike, post.id, reactionScale],
+  );
 
   const handleCloseReactions = useCallback(() => {
     setShowReactions(false);
@@ -177,7 +182,7 @@ export function PostCardInteractive({
           useNativeDriver: true,
         }).start();
       },
-    })
+    }),
   ).current;
 
   const handleToggleLike = useCallback(() => {
@@ -196,7 +201,9 @@ export function PostCardInteractive({
     }
   }, [liked, reaction, onLike, post.id, reactionScale]);
 
-  const currentReaction = reaction ? REACTIONS.find(r => r.id === reaction) : null;
+  const currentReaction = reaction
+    ? REACTIONS.find((r) => r.id === reaction)
+    : null;
 
   return (
     <View style={styles.container}>
@@ -207,7 +214,12 @@ export function PostCardInteractive({
           <View style={styles.nameRow}>
             <Text style={styles.userName}>{post.user.name}</Text>
             {post.user.verified && (
-              <Ionicons name="checkmark-circle" size={14} color="#0066CC" style={styles.verifiedIcon} />
+              <Ionicons
+                name="checkmark-circle"
+                size={14}
+                color="#0066CC"
+                style={styles.verifiedIcon}
+              />
             )}
           </View>
           <Text style={styles.time}>{post.time}</Text>
@@ -233,7 +245,7 @@ export function PostCardInteractive({
               style={styles.image}
               resizeMode="cover"
             />
-            
+
             {/* Double-tap heart animation */}
             <Animated.View
               style={[
@@ -244,9 +256,9 @@ export function PostCardInteractive({
                     outputRange: [0, 0.8, 1, 0],
                   }),
                   transform: [{ scale: heartScale }],
+                  pointerEvents: "none" as const,
                 },
               ]}
-              pointerEvents="none"
             >
               <Text style={styles.heartIcon}>❤️</Text>
             </Animated.View>
@@ -272,7 +284,9 @@ export function PostCardInteractive({
           )}
           <Text style={styles.statsText}>{post.likes} lượt thích</Text>
         </View>
-        <Text style={styles.statsText}>{post.comments} bình luận • {post.shares} chia sẻ</Text>
+        <Text style={styles.statsText}>
+          {post.comments} bình luận • {post.shares} chia sẻ
+        </Text>
       </View>
 
       {/* Actions */}
@@ -288,20 +302,36 @@ export function PostCardInteractive({
             }).start();
           }}
         >
-          <Text style={[styles.actionIcon, liked && { color: currentReaction?.color || '#0066CC' }]}>
-            {currentReaction?.icon || '👍'}
+          <Text
+            style={[
+              styles.actionIcon,
+              liked && { color: currentReaction?.color || "#0066CC" },
+            ]}
+          >
+            {currentReaction?.icon || "👍"}
           </Text>
-          <Text style={[styles.actionText, liked && { color: currentReaction?.color || '#0066CC' }]}>
-            {currentReaction?.label || 'Thích'}
+          <Text
+            style={[
+              styles.actionText,
+              liked && { color: currentReaction?.color || "#0066CC" },
+            ]}
+          >
+            {currentReaction?.label || "Thích"}
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.actionButton} onPress={() => onComment?.(post.id)}>
+        <TouchableOpacity
+          style={styles.actionButton}
+          onPress={() => onComment?.(post.id)}
+        >
           <Ionicons name="chatbubble-outline" size={20} color="#666" />
           <Text style={styles.actionText}>Bình luận</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.actionButton} onPress={() => onShare?.(post.id)}>
+        <TouchableOpacity
+          style={styles.actionButton}
+          onPress={() => onShare?.(post.id)}
+        >
           <Ionicons name="arrow-redo-outline" size={20} color="#666" />
           <Text style={styles.actionText}>Chia sẻ</Text>
         </TouchableOpacity>
@@ -347,7 +377,10 @@ export function PostCardInteractive({
       {/* Full-screen image viewer with pinch-to-zoom */}
       {selectedImageIndex !== null && post.images && (
         <Modal visible transparent>
-          <View style={styles.imageViewerContainer} {...imagePanResponder.panHandlers}>
+          <View
+            style={styles.imageViewerContainer}
+            {...imagePanResponder.panHandlers}
+          >
             <TouchableOpacity
               style={styles.imageViewerClose}
               onPress={() => setSelectedImageIndex(null)}
@@ -356,7 +389,10 @@ export function PostCardInteractive({
             </TouchableOpacity>
             <Animated.Image
               source={{ uri: post.images[selectedImageIndex] }}
-              style={[styles.imageViewerImage, { transform: [{ scale: imageScale }] }]}
+              style={[
+                styles.imageViewerImage,
+                { transform: [{ scale: imageScale }] },
+              ]}
               resizeMode="contain"
             />
           </View>
@@ -368,13 +404,13 @@ export function PostCardInteractive({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     marginBottom: 8,
     paddingVertical: 12,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 12,
     marginBottom: 12,
   },
@@ -388,20 +424,20 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   nameRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   userName: {
     fontSize: 15,
-    fontWeight: '600',
-    color: '#000',
+    fontWeight: "600",
+    color: "#000",
   },
   verifiedIcon: {
     marginLeft: 4,
   },
   time: {
     fontSize: 12,
-    color: '#666',
+    color: "#666",
     marginTop: 2,
   },
   moreButton: {
@@ -409,7 +445,7 @@ const styles = StyleSheet.create({
   },
   content: {
     fontSize: 14,
-    color: '#000',
+    color: "#000",
     paddingHorizontal: 12,
     marginBottom: 12,
     lineHeight: 20,
@@ -417,17 +453,17 @@ const styles = StyleSheet.create({
   imageContainer: {
     width: SCREEN_WIDTH,
     height: SCREEN_WIDTH * 0.75,
-    backgroundColor: '#f0f0f0',
-    position: 'relative',
+    backgroundColor: "#f0f0f0",
+    position: "relative",
   },
   image: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
   heartAnimation: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
+    position: "absolute",
+    top: "50%",
+    left: "50%",
     marginTop: -50,
     marginLeft: -50,
   },
@@ -435,58 +471,58 @@ const styles = StyleSheet.create({
     fontSize: 100,
   },
   imageCountBadge: {
-    position: 'absolute',
+    position: "absolute",
     top: 12,
     right: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.6)',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.6)",
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 16,
     gap: 4,
   },
   imageCountText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   stats: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     paddingHorizontal: 12,
     paddingVertical: 10,
   },
   statsLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6,
   },
   reactionIcon: {
     width: 18,
     height: 18,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   reactionEmoji: {
     fontSize: 16,
   },
   statsText: {
     fontSize: 13,
-    color: '#666',
+    color: "#666",
   },
   actions: {
-    flexDirection: 'row',
+    flexDirection: "row",
     borderTopWidth: 1,
-    borderTopColor: '#E8E8E8',
+    borderTopColor: "#E8E8E8",
     paddingTop: 8,
     paddingHorizontal: 12,
   },
   actionButton: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     paddingVertical: 8,
     gap: 6,
   },
@@ -495,22 +531,22 @@ const styles = StyleSheet.create({
   },
   actionText: {
     fontSize: 14,
-    color: '#666',
-    fontWeight: '500',
+    color: "#666",
+    fontWeight: "500",
   },
   reactionOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.3)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(0,0,0,0.3)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   reactionPicker: {
-    flexDirection: 'row',
-    backgroundColor: '#fff',
+    flexDirection: "row",
+    backgroundColor: "#fff",
     borderRadius: 50,
     paddingHorizontal: 12,
     paddingVertical: 8,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -518,7 +554,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   reactionButton: {
-    alignItems: 'center',
+    alignItems: "center",
     padding: 8,
   },
   reactionButtonIcon: {
@@ -527,17 +563,17 @@ const styles = StyleSheet.create({
   },
   reactionButtonLabel: {
     fontSize: 10,
-    color: '#666',
-    fontWeight: '500',
+    color: "#666",
+    fontWeight: "500",
   },
   imageViewerContainer: {
     flex: 1,
-    backgroundColor: '#000',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#000",
+    justifyContent: "center",
+    alignItems: "center",
   },
   imageViewerClose: {
-    position: 'absolute',
+    position: "absolute",
     top: 50,
     right: 20,
     zIndex: 10,

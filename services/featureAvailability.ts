@@ -76,10 +76,10 @@ export const FEATURE_CONFIG: Record<string, FeatureConfig> = {
   },
   TIMELINE: {
     name: 'Lịch sử Hoạt động',
-    status: 'degraded',
-    endpoints: ['/timeline'], // Endpoint cũ - không hoạt động
-    alternativeEndpoint: '/projects/{projectId}/timeline', // Endpoint đúng
-    fallbackMessage: 'Vui lòng chọn dự án để xem timeline',
+    status: 'available',
+    endpoints: ['/timeline/projects/{projectId}'],
+    alternativeEndpoint: '/timeline/projects/{projectId}',
+    fallbackMessage: '',
   },
   
   // ❌ FEATURES CHƯA CÓ BACKEND

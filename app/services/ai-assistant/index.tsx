@@ -3,15 +3,15 @@
  * Main interface for GPT-4 powered construction assistant
  */
 
-import { AIChatBubble } from '@/components/ai/AIChatBubble';
-import { AIThinkingIndicator } from '@/components/ai/AIThinkingIndicator';
-import { MessageInput } from '@/components/ai/MessageInput';
-import { useThemeColor } from '@/hooks/use-theme-color';
-import { useAIChat } from '@/hooks/useAI';
-import type { AIChatMessage } from '@/types/ai';
-import { Ionicons } from '@expo/vector-icons';
-import { Stack, useLocalSearchParams } from 'expo-router';
-import { useEffect, useRef } from 'react';
+import { AIChatBubble } from "@/components/ai/AIChatBubble";
+import { AIThinkingIndicator } from "@/components/ai/AIThinkingIndicator";
+import { MessageInput } from "@/components/ai/MessageInput";
+import { useThemeColor } from "@/hooks/use-theme-color";
+import { useAIChat } from "@/hooks/useAI";
+import type { AIChatMessage } from "@/types/ai";
+import { Ionicons } from "@expo/vector-icons";
+import { Stack, useLocalSearchParams } from "expo-router";
+import { useEffect, useRef } from "react";
 import {
     Alert,
     FlatList,
@@ -21,13 +21,13 @@ import {
     Text,
     TouchableOpacity,
     View,
-} from 'react-native';
+} from "react-native";
 
 export default function AIAssistantScreen() {
   const params = useLocalSearchParams<{ projectId?: string }>();
-  const backgroundColor = useThemeColor({}, 'background');
-  const tintColor = useThemeColor({}, 'tint');
-  
+  const backgroundColor = useThemeColor({}, "background");
+  const tintColor = useThemeColor({}, "tint");
+
   const {
     messages,
     loading,
@@ -59,31 +59,31 @@ export default function AIAssistantScreen() {
   const handleSend = async (message: string, imageUrls?: string[]) => {
     const success = await sendMessage(message, imageUrls);
     if (!success && error) {
-      Alert.alert('Lỗi', error);
+      Alert.alert("Lỗi", error);
     }
   };
 
   const handleImagePick = async (): Promise<string[] | undefined> => {
     // TODO: Integrate with ImagePicker when file upload is implemented
     Alert.alert(
-      'Upload ảnh',
-      'Tính năng upload ảnh sẽ được tích hợp trong Task #43-45'
+      "Upload ảnh",
+      "Tính năng upload ảnh sẽ được tích hợp trong Task #43-45",
     );
     return undefined;
   };
 
   const handleClearChat = () => {
     Alert.alert(
-      'Xóa cuộc trò chuyện',
-      'Bạn có chắc muốn xóa toàn bộ lịch sử chat?',
+      "Xóa cuộc trò chuyện",
+      "Bạn có chắc muốn xóa toàn bộ lịch sử chat?",
       [
-        { text: 'Hủy', style: 'cancel' },
+        { text: "Hủy", style: "cancel" },
         {
-          text: 'Xóa',
-          style: 'destructive',
+          text: "Xóa",
+          style: "destructive",
           onPress: clearChat,
         },
-      ]
+      ],
     );
   };
 
@@ -101,7 +101,7 @@ export default function AIAssistantScreen() {
       <View style={styles.suggestionsContainer}>
         <TouchableOpacity
           style={[styles.suggestionChip, { borderColor: tintColor }]}
-          onPress={() => handleSend('Phân tích tiến độ dự án hiện tại')}
+          onPress={() => handleSend("Phân tích tiến độ dự án hiện tại")}
         >
           <Text style={[styles.suggestionText, { color: tintColor }]}>
             Phân tích tiến độ
@@ -109,7 +109,7 @@ export default function AIAssistantScreen() {
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.suggestionChip, { borderColor: tintColor }]}
-          onPress={() => handleSend('Kiểm tra chất lượng thi công')}
+          onPress={() => handleSend("Kiểm tra chất lượng thi công")}
         >
           <Text style={[styles.suggestionText, { color: tintColor }]}>
             Kiểm tra chất lượng
@@ -117,7 +117,7 @@ export default function AIAssistantScreen() {
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.suggestionChip, { borderColor: tintColor }]}
-          onPress={() => handleSend('Ước tính vật liệu cần thiết')}
+          onPress={() => handleSend("Ước tính vật liệu cần thiết")}
         >
           <Text style={[styles.suggestionText, { color: tintColor }]}>
             Ước tính vật liệu
@@ -131,9 +131,12 @@ export default function AIAssistantScreen() {
     <>
       <Stack.Screen
         options={{
-          title: 'AI Assistant',
+          title: "Trợ lý AI",
           headerRight: () => (
-            <TouchableOpacity onPress={handleClearChat} style={{ marginRight: 16 }}>
+            <TouchableOpacity
+              onPress={handleClearChat}
+              style={{ marginRight: 16 }}
+            >
               <Ionicons name="trash-outline" size={22} color={tintColor} />
             </TouchableOpacity>
           ),
@@ -141,7 +144,7 @@ export default function AIAssistantScreen() {
       />
       <KeyboardAvoidingView
         style={[styles.container, { backgroundColor }]}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
         keyboardVerticalOffset={100}
       >
         {/* Messages List */}
@@ -185,26 +188,26 @@ const styles = StyleSheet.create({
   },
   emptyContainer: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     paddingHorizontal: 32,
   },
   emptyTitle: {
     fontSize: 20,
-    fontWeight: '600',
+    fontWeight: "600",
     marginTop: 16,
-    color: '#333',
+    color: "#333",
   },
   emptySubtitle: {
     fontSize: 15,
-    color: '#666',
+    color: "#666",
     marginTop: 8,
-    textAlign: 'center',
+    textAlign: "center",
   },
   suggestionsContainer: {
     marginTop: 24,
     gap: 12,
-    alignItems: 'center',
+    alignItems: "center",
   },
   suggestionChip: {
     paddingHorizontal: 20,
@@ -214,19 +217,19 @@ const styles = StyleSheet.create({
   },
   suggestionText: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   errorContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: "#F5F5F5",
   },
   errorText: {
     flex: 1,
     fontSize: 13,
-    color: '#000000',
+    color: "#000000",
   },
 });

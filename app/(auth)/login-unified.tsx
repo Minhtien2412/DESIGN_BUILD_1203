@@ -41,7 +41,7 @@ import {
     View,
 } from "react-native";
 
-const { width, height } = Dimensions.get("window");
+const { width: _width, height: _height } = Dimensions.get("window");
 
 // ==================== THEME ====================
 
@@ -147,7 +147,7 @@ export default function UnifiedLoginScreen() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [otpTimer, setOtpTimer] = useState(0);
-  const [isNewUser, setIsNewUser] = useState(false);
+  const [_isNewUser, setIsNewUser] = useState(false);
 
   // Biometric state
   const [biometricAvailable, setBiometricAvailable] = useState(false);
@@ -321,7 +321,7 @@ export default function UnifiedLoginScreen() {
         // Use stored credentials to restore session
         const restored = await restoreSessionFromBiometric(
           result.credentials.accessToken,
-          result.credentials.refreshToken
+          result.credentials.refreshToken,
         );
 
         if (!restored) {
@@ -365,7 +365,7 @@ export default function UnifiedLoginScreen() {
       setPendingCredentials(credentials);
       setShowBiometricSetup(true);
     },
-    [biometricAvailable]
+    [biometricAvailable],
   );
 
   // Handle biometric setup confirmation
@@ -391,7 +391,7 @@ export default function UnifiedLoginScreen() {
               text: "Tuyệt vời",
               onPress: () => router.replace("/(tabs)" as any),
             },
-          ]
+          ],
         );
       } else {
         Alert.alert("Lỗi", result.message);
@@ -473,7 +473,7 @@ export default function UnifiedLoginScreen() {
           [
             { text: "Không, gửi OTP", onPress: () => proceedSendOTP() },
             { text: "Đăng nhập", onPress: () => handleAutoLogin() },
-          ]
+          ],
         );
         return;
       }
@@ -575,7 +575,7 @@ export default function UnifiedLoginScreen() {
       Alert.alert(
         "Zalo Mini App",
         "Tính năng đăng nhập Zalo Mini App đang được phát triển. Vui lòng sử dụng đăng nhập bằng OTP.",
-        [{ text: "OK" }]
+        [{ text: "OK" }],
       );
 
       /*

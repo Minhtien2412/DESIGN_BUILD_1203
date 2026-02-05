@@ -3,22 +3,30 @@
  * Form for adding new expenses to project budgets
  */
 
-import { Button } from '@/components/ui/button';
-import { BudgetCategory } from '@/components/ui/cost-tracker';
-import { SpacingSemantic } from '@/constants/spacing';
-import { TextVariants } from '@/constants/typography';
-import { useThemeColor } from '@/hooks/use-theme-color';
-import { Ionicons } from '@expo/vector-icons';
-import { useState } from 'react';
-import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Button } from "@/components/ui/button";
+import { BudgetCategory } from "@/components/ui/cost-tracker";
+import { SpacingSemantic } from "@/constants/spacing";
+import { TextVariants } from "@/constants/typography";
+import { useThemeColor } from "@/hooks/use-theme-color";
+import { Ionicons } from "@expo/vector-icons";
+import { useState } from "react";
+import {
+    Modal,
+    Pressable,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    View,
+} from "react-native";
 
 export interface ExpenseFormData {
   category: string;
   description: string;
   amount: number;
   date: string;
-  type: 'expense' | 'income';
-  status: 'pending' | 'approved' | 'paid';
+  type: "expense" | "income";
+  status: "pending" | "approved" | "paid";
 }
 
 interface AddExpenseFormProps {
@@ -35,57 +43,59 @@ export default function AddExpenseForm({
   onSubmit,
   categories,
 }: AddExpenseFormProps) {
-  const background = useThemeColor({}, 'background');
-  const text = useThemeColor({}, 'text');
-  const textMuted = useThemeColor({}, 'textMuted');
-  const border = useThemeColor({}, 'border');
-  const primary = useThemeColor({}, 'primary');
-  const chipBackground = useThemeColor({}, 'chipBackground');
+  const background = useThemeColor({}, "background");
+  const text = useThemeColor({}, "text");
+  const textMuted = useThemeColor({}, "textMuted");
+  const border = useThemeColor({}, "border");
+  const primary = useThemeColor({}, "primary");
+  const chipBackground = useThemeColor({}, "chipBackground");
 
   const [formData, setFormData] = useState<ExpenseFormData>({
-    category: categories[0]?.id || '',
-    description: '',
+    category: categories[0]?.id || "",
+    description: "",
     amount: 0,
-    date: new Date().toISOString().split('T')[0],
-    type: 'expense',
-    status: 'pending',
+    date: new Date().toISOString().split("T")[0],
+    type: "expense",
+    status: "pending",
   });
 
-  const [errors, setErrors] = useState<Partial<Record<keyof ExpenseFormData, string>>>({});
-  const [amountText, setAmountText] = useState('');
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof ExpenseFormData, string>>
+  >({});
+  const [amountText, setAmountText] = useState("");
 
   const handleAmountChange = (value: string) => {
     // Remove non-numeric characters except decimal point
-    const cleaned = value.replace(/[^0-9]/g, '');
+    const cleaned = value.replace(/[^0-9]/g, "");
     setAmountText(cleaned);
-    
+
     const numValue = parseInt(cleaned) || 0;
-    setFormData(prev => ({ ...prev, amount: numValue }));
-    
+    setFormData((prev) => ({ ...prev, amount: numValue }));
+
     if (errors.amount) {
-      setErrors(prev => ({ ...prev, amount: undefined }));
+      setErrors((prev) => ({ ...prev, amount: undefined }));
     }
   };
 
   const formatAmount = (value: string) => {
-    if (!value) return '';
-    return parseInt(value).toLocaleString('vi-VN');
+    if (!value) return "";
+    return parseInt(value).toLocaleString("vi-VN");
   };
 
   const validate = (): boolean => {
     const newErrors: Partial<Record<keyof ExpenseFormData, string>> = {};
 
     if (!formData.category) {
-      newErrors.category = 'Vui lòng chọn danh mục';
+      newErrors.category = "Vui lòng chọn danh mục";
     }
     if (!formData.description.trim()) {
-      newErrors.description = 'Vui lòng nhập mô tả';
+      newErrors.description = "Vui lòng nhập mô tả";
     }
     if (formData.amount <= 0) {
-      newErrors.amount = 'Số tiền phải lớn hơn 0';
+      newErrors.amount = "Số tiền phải lớn hơn 0";
     }
     if (!formData.date) {
-      newErrors.date = 'Vui lòng chọn ngày';
+      newErrors.date = "Vui lòng chọn ngày";
     }
 
     setErrors(newErrors);
@@ -102,19 +112,19 @@ export default function AddExpenseForm({
   const handleClose = () => {
     // Reset form
     setFormData({
-      category: categories[0]?.id || '',
-      description: '',
+      category: categories[0]?.id || "",
+      description: "",
       amount: 0,
-      date: new Date().toISOString().split('T')[0],
-      type: 'expense',
-      status: 'pending',
+      date: new Date().toISOString().split("T")[0],
+      type: "expense",
+      status: "pending",
     });
-    setAmountText('');
+    setAmountText("");
     setErrors({});
     onClose();
   };
 
-  const selectedCategory = categories.find(c => c.id === formData.category);
+  const selectedCategory = categories.find((c) => c.id === formData.category);
 
   return (
     <Modal
@@ -128,35 +138,45 @@ export default function AddExpenseForm({
           {/* Header */}
           <View style={[styles.header, { borderBottomColor: border }]}>
             <Text style={[TextVariants.h3, { color: text }]}>
-              {formData.type === 'expense' ? 'Thêm chi phí' : 'Thêm thu nhập'}
+              {formData.type === "expense" ? "Thêm chi phí" : "Thêm thu nhập"}
             </Text>
             <Pressable onPress={handleClose} hitSlop={8}>
               <Ionicons name="close" size={24} color={text} />
             </Pressable>
           </View>
 
-          <ScrollView style={styles.scrollContent} showsVerticalScrollIndicator={false}>
+          <ScrollView
+            style={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+          >
             {/* Type Toggle */}
             <View style={styles.field}>
-              <Text style={[styles.label, { color: text }]}>Loại giao dịch</Text>
+              <Text style={[styles.label, { color: text }]}>
+                Loại giao dịch
+              </Text>
               <View style={styles.typeToggle}>
                 <Pressable
                   style={[
                     styles.typeButton,
                     { borderColor: border, backgroundColor: chipBackground },
-                    formData.type === 'expense' && { backgroundColor: primary, borderColor: primary },
+                    formData.type === "expense" && {
+                      backgroundColor: primary,
+                      borderColor: primary,
+                    },
                   ]}
-                  onPress={() => setFormData(prev => ({ ...prev, type: 'expense' }))}
+                  onPress={() =>
+                    setFormData((prev) => ({ ...prev, type: "expense" }))
+                  }
                 >
                   <Ionicons
                     name="arrow-down-circle-outline"
                     size={20}
-                    color={formData.type === 'expense' ? '#fff' : textMuted}
+                    color={formData.type === "expense" ? "#fff" : textMuted}
                   />
                   <Text
                     style={[
                       styles.typeButtonText,
-                      { color: formData.type === 'expense' ? '#fff' : text },
+                      { color: formData.type === "expense" ? "#fff" : text },
                     ]}
                   >
                     Chi phí
@@ -166,19 +186,24 @@ export default function AddExpenseForm({
                   style={[
                     styles.typeButton,
                     { borderColor: border, backgroundColor: chipBackground },
-                    formData.type === 'income' && { backgroundColor: '#0066CC', borderColor: '#0066CC' },
+                    formData.type === "income" && {
+                      backgroundColor: "#0066CC",
+                      borderColor: "#0066CC",
+                    },
                   ]}
-                  onPress={() => setFormData(prev => ({ ...prev, type: 'income' }))}
+                  onPress={() =>
+                    setFormData((prev) => ({ ...prev, type: "income" }))
+                  }
                 >
                   <Ionicons
                     name="arrow-up-circle-outline"
                     size={20}
-                    color={formData.type === 'income' ? '#fff' : textMuted}
+                    color={formData.type === "income" ? "#fff" : textMuted}
                   />
                   <Text
                     style={[
                       styles.typeButtonText,
-                      { color: formData.type === 'income' ? '#fff' : text },
+                      { color: formData.type === "income" ? "#fff" : text },
                     ]}
                   >
                     Thu nhập
@@ -200,14 +225,17 @@ export default function AddExpenseForm({
                       styles.categoryChip,
                       { borderColor: border, backgroundColor: chipBackground },
                       formData.category === category.id && {
-                        backgroundColor: category.color + '20',
+                        backgroundColor: category.color + "20",
                         borderColor: category.color,
                       },
                     ]}
                     onPress={() => {
-                      setFormData(prev => ({ ...prev, category: category.id }));
+                      setFormData((prev) => ({
+                        ...prev,
+                        category: category.id,
+                      }));
                       if (errors.category) {
-                        setErrors(prev => ({ ...prev, category: undefined }));
+                        setErrors((prev) => ({ ...prev, category: undefined }));
                       }
                     }}
                   >
@@ -215,13 +243,22 @@ export default function AddExpenseForm({
                       <Ionicons
                         name={category.icon}
                         size={16}
-                        color={formData.category === category.id ? category.color : textMuted}
+                        color={
+                          formData.category === category.id
+                            ? category.color
+                            : textMuted
+                        }
                       />
                     )}
                     <Text
                       style={[
                         styles.categoryChipText,
-                        { color: formData.category === category.id ? category.color : text },
+                        {
+                          color:
+                            formData.category === category.id
+                              ? category.color
+                              : text,
+                        },
                       ]}
                       numberOfLines={1}
                     >
@@ -230,7 +267,9 @@ export default function AddExpenseForm({
                   </Pressable>
                 ))}
               </View>
-              {errors.category && <Text style={styles.errorText}>{errors.category}</Text>}
+              {errors.category && (
+                <Text style={styles.errorText}>{errors.category}</Text>
+              )}
             </View>
 
             {/* Amount Input */}
@@ -238,22 +277,29 @@ export default function AddExpenseForm({
               <Text style={[styles.label, { color: text }]}>
                 Số tiền (VND) <Text style={styles.required}>*</Text>
               </Text>
-              <View style={[styles.inputContainer, { borderColor: errors.amount ? '#000000' : border }]}>
+              <View
+                style={[
+                  styles.inputContainer,
+                  { borderColor: errors.amount ? "#000000" : border },
+                ]}
+              >
                 <Ionicons name="cash-outline" size={20} color={textMuted} />
                 <TextInput
                   style={[styles.input, { color: text }]}
-                  value={amountText ? formatAmount(amountText) : ''}
+                  value={amountText ? formatAmount(amountText) : ""}
                   onChangeText={handleAmountChange}
                   placeholder="0"
                   placeholderTextColor={textMuted}
                   keyboardType="number-pad"
                 />
               </View>
-              {errors.amount && <Text style={styles.errorText}>{errors.amount}</Text>}
+              {errors.amount && (
+                <Text style={styles.errorText}>{errors.amount}</Text>
+              )}
               {selectedCategory && formData.amount > 0 && (
                 <Text style={[styles.hint, { color: textMuted }]}>
-                  Đã chi: ₫{selectedCategory.spent.toLocaleString('vi-VN')} / ₫
-                  {selectedCategory.budgeted.toLocaleString('vi-VN')}
+                  Đã chi: ₫{selectedCategory.spent.toLocaleString("vi-VN")} / ₫
+                  {selectedCategory.budgeted.toLocaleString("vi-VN")}
                 </Text>
               )}
             </View>
@@ -263,15 +309,27 @@ export default function AddExpenseForm({
               <Text style={[styles.label, { color: text }]}>
                 Mô tả <Text style={styles.required}>*</Text>
               </Text>
-              <View style={[styles.inputContainer, { borderColor: errors.description ? '#000000' : border }]}>
-                <Ionicons name="document-text-outline" size={20} color={textMuted} />
+              <View
+                style={[
+                  styles.inputContainer,
+                  { borderColor: errors.description ? "#000000" : border },
+                ]}
+              >
+                <Ionicons
+                  name="document-text-outline"
+                  size={20}
+                  color={textMuted}
+                />
                 <TextInput
                   style={[styles.input, { color: text }]}
                   value={formData.description}
                   onChangeText={(value) => {
-                    setFormData(prev => ({ ...prev, description: value }));
+                    setFormData((prev) => ({ ...prev, description: value }));
                     if (errors.description) {
-                      setErrors(prev => ({ ...prev, description: undefined }));
+                      setErrors((prev) => ({
+                        ...prev,
+                        description: undefined,
+                      }));
                     }
                   }}
                   placeholder="VD: Xi măng Holcim 100 bao"
@@ -280,7 +338,9 @@ export default function AddExpenseForm({
                   numberOfLines={2}
                 />
               </View>
-              {errors.description && <Text style={styles.errorText}>{errors.description}</Text>}
+              {errors.description && (
+                <Text style={styles.errorText}>{errors.description}</Text>
+              )}
             </View>
 
             {/* Date Input */}
@@ -288,41 +348,50 @@ export default function AddExpenseForm({
               <Text style={[styles.label, { color: text }]}>
                 Ngày <Text style={styles.required}>*</Text>
               </Text>
-              <View style={[styles.inputContainer, { borderColor: errors.date ? '#000000' : border }]}>
+              <View
+                style={[
+                  styles.inputContainer,
+                  { borderColor: errors.date ? "#000000" : border },
+                ]}
+              >
                 <Ionicons name="calendar-outline" size={20} color={textMuted} />
                 <TextInput
                   style={[styles.input, { color: text }]}
                   value={formData.date}
                   onChangeText={(value) => {
-                    setFormData(prev => ({ ...prev, date: value }));
+                    setFormData((prev) => ({ ...prev, date: value }));
                     if (errors.date) {
-                      setErrors(prev => ({ ...prev, date: undefined }));
+                      setErrors((prev) => ({ ...prev, date: undefined }));
                     }
                   }}
                   placeholder="YYYY-MM-DD"
                   placeholderTextColor={textMuted}
                 />
               </View>
-              {errors.date && <Text style={styles.errorText}>{errors.date}</Text>}
-              <Text style={[styles.hint, { color: textMuted }]}>Định dạng: YYYY-MM-DD</Text>
+              {errors.date && (
+                <Text style={styles.errorText}>{errors.date}</Text>
+              )}
+              <Text style={[styles.hint, { color: textMuted }]}>
+                Định dạng: YYYY-MM-DD
+              </Text>
             </View>
 
             {/* Status Selection */}
             <View style={styles.field}>
               <Text style={[styles.label, { color: text }]}>Trạng thái</Text>
               <View style={styles.statusGrid}>
-                {(['pending', 'approved', 'paid'] as const).map((status) => (
+                {(["pending", "approved", "paid"] as const).map((status) => (
                   <Pressable
                     key={status}
                     style={[
                       styles.statusChip,
                       { borderColor: border, backgroundColor: chipBackground },
                       formData.status === status && {
-                        backgroundColor: primary + '20',
+                        backgroundColor: primary + "20",
                         borderColor: primary,
                       },
                     ]}
-                    onPress={() => setFormData(prev => ({ ...prev, status }))}
+                    onPress={() => setFormData((prev) => ({ ...prev, status }))}
                   >
                     <Text
                       style={[
@@ -330,9 +399,13 @@ export default function AddExpenseForm({
                         { color: formData.status === status ? primary : text },
                       ]}
                     >
-                      {status === 'pending' && 'Chờ duyệt'}
-                      {status === 'approved' && 'Đã duyệt'}
-                      {status === 'paid' && 'Đã thanh toán'}
+                      {status === "pending"
+                        ? "Chờ duyệt"
+                        : status === "approved"
+                          ? "Đã duyệt"
+                          : status === "paid"
+                            ? "Đã thanh toán"
+                            : ""}
                     </Text>
                   </Pressable>
                 ))}
@@ -348,11 +421,7 @@ export default function AddExpenseForm({
               onPress={handleClose}
               style={{ flex: 1 }}
             />
-            <Button
-              title="Thêm"
-              onPress={handleSubmit}
-              style={{ flex: 1 }}
-            />
+            <Button title="Thêm" onPress={handleSubmit} style={{ flex: 1 }} />
           </View>
         </View>
       </View>
@@ -363,18 +432,18 @@ export default function AddExpenseForm({
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-end',
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "flex-end",
   },
   modalContent: {
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    maxHeight: '90%',
+    maxHeight: "90%",
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     padding: SpacingSemantic.lg,
     borderBottomWidth: 1,
   },
@@ -386,15 +455,15 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: SpacingSemantic.sm,
   },
   required: {
-    color: '#000000',
+    color: "#000000",
   },
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     borderWidth: 1,
     borderRadius: 12,
     paddingHorizontal: SpacingSemantic.md,
@@ -407,7 +476,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   errorText: {
-    color: '#000000',
+    color: "#000000",
     fontSize: 12,
     marginTop: 4,
   },
@@ -416,14 +485,14 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   typeToggle: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: SpacingSemantic.sm,
   },
   typeButton: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     gap: SpacingSemantic.sm,
     paddingVertical: SpacingSemantic.md,
     borderRadius: 12,
@@ -431,16 +500,16 @@ const styles = StyleSheet.create({
   },
   typeButtonText: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   categoryGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: SpacingSemantic.sm,
   },
   categoryChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6,
     paddingHorizontal: 12,
     paddingVertical: 8,
@@ -450,10 +519,10 @@ const styles = StyleSheet.create({
   },
   categoryChipText: {
     fontSize: 13,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   statusGrid: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: SpacingSemantic.sm,
   },
   statusChip: {
@@ -461,14 +530,14 @@ const styles = StyleSheet.create({
     paddingVertical: SpacingSemantic.md,
     borderRadius: 12,
     borderWidth: 1,
-    alignItems: 'center',
+    alignItems: "center",
   },
   statusChipText: {
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   footer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: SpacingSemantic.md,
     padding: SpacingSemantic.lg,
     borderTopWidth: 1,

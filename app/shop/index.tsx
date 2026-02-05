@@ -34,7 +34,8 @@ const featuredProducts = [
     originalPrice: 220000,
     rating: 4.8,
     sold: 2345,
-    image: "https://via.placeholder.com/150",
+    image:
+      "https://images.pexels.com/photos/6044266/pexels-photo-6044266.jpeg?auto=compress&cs=tinysrgb&w=150",
   },
   {
     id: "2",
@@ -43,7 +44,8 @@ const featuredProducts = [
     originalPrice: 1050000,
     rating: 4.9,
     sold: 1234,
-    image: "https://via.placeholder.com/150",
+    image:
+      "https://images.pexels.com/photos/6474471/pexels-photo-6474471.jpeg?auto=compress&cs=tinysrgb&w=150",
   },
   {
     id: "3",
@@ -52,7 +54,8 @@ const featuredProducts = [
     originalPrice: 9800000,
     rating: 4.9,
     sold: 567,
-    image: "https://via.placeholder.com/150",
+    image:
+      "https://images.pexels.com/photos/6585763/pexels-photo-6585763.jpeg?auto=compress&cs=tinysrgb&w=150",
   },
   {
     id: "4",
@@ -61,19 +64,22 @@ const featuredProducts = [
     originalPrice: 550000,
     rating: 4.7,
     sold: 890,
-    image: "https://via.placeholder.com/150",
+    image:
+      "https://images.pexels.com/photos/3935333/pexels-photo-3935333.jpeg?auto=compress&cs=tinysrgb&w=150",
   },
 ];
 
 const banners = [
   {
     id: "1",
-    image: "https://via.placeholder.com/350x150/FF6B35/fff?text=SALE+50%",
+    image:
+      "https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=350",
     title: "Giảm đến 50%",
   },
   {
     id: "2",
-    image: "https://via.placeholder.com/350x150/4CAF50/fff?text=FREE+SHIP",
+    image:
+      "https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=350",
     title: "Freeship mọi đơn",
   },
 ];
@@ -107,7 +113,7 @@ export default function ShopScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor }]}>
-      <Stack.Screen options={{ title: "Shop", headerShown: true }} />
+      <Stack.Screen options={{ title: "Cửa hàng", headerShown: true }} />
 
       {/* Search Header */}
       <View style={[styles.searchHeader, { backgroundColor: "#FF6B35" }]}>

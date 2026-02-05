@@ -2,10 +2,17 @@
  * Change Orders List Screen
  */
 
-import { useChangeOrderAnalytics, useChangeOrders } from '@/hooks/useChangeOrder';
-import type { ChangeOrderStatus, ChangeOrderType, CostImpactType } from '@/types/change-order';
-import { Ionicons } from '@expo/vector-icons';
-import { useState } from 'react';
+import {
+    useChangeOrderAnalytics,
+    useChangeOrders,
+} from "@/hooks/useChangeOrder";
+import type {
+    ChangeOrderStatus,
+    ChangeOrderType,
+    CostImpactType,
+} from "@/types/change-order";
+import { Ionicons } from "@expo/vector-icons";
+import { useState } from "react";
 import {
     ActivityIndicator,
     ScrollView,
@@ -14,49 +21,81 @@ import {
     TextInput,
     TouchableOpacity,
     View,
-} from 'react-native';
+} from "react-native";
 
-const TYPE_FILTERS: { value: ChangeOrderType | 'ALL'; label: string; icon: string }[] = [
-  { value: 'ALL', label: 'All', icon: 'list-outline' },
-  { value: 'SCOPE_CHANGE' as ChangeOrderType, label: 'Scope', icon: 'resize-outline' },
-  { value: 'DESIGN_CHANGE' as ChangeOrderType, label: 'Design', icon: 'color-palette-outline' },
-  { value: 'MATERIAL_SUBSTITUTION' as ChangeOrderType, label: 'Material', icon: 'cube-outline' },
-  { value: 'FIELD_CONDITION' as ChangeOrderType, label: 'Field', icon: 'location-outline' },
-  { value: 'OWNER_REQUEST' as ChangeOrderType, label: 'Owner', icon: 'person-outline' },
-  { value: 'VALUE_ENGINEERING' as ChangeOrderType, label: 'VE', icon: 'trending-down-outline' },
+const TYPE_FILTERS: {
+  value: ChangeOrderType | "ALL";
+  label: string;
+  icon: string;
+}[] = [
+  { value: "ALL", label: "All", icon: "list-outline" },
+  {
+    value: "SCOPE_CHANGE" as ChangeOrderType,
+    label: "Scope",
+    icon: "resize-outline",
+  },
+  {
+    value: "DESIGN_CHANGE" as ChangeOrderType,
+    label: "Design",
+    icon: "color-palette-outline",
+  },
+  {
+    value: "MATERIAL_SUBSTITUTION" as ChangeOrderType,
+    label: "Material",
+    icon: "cube-outline",
+  },
+  {
+    value: "FIELD_CONDITION" as ChangeOrderType,
+    label: "Field",
+    icon: "location-outline",
+  },
+  {
+    value: "OWNER_REQUEST" as ChangeOrderType,
+    label: "Owner",
+    icon: "person-outline",
+  },
+  {
+    value: "VALUE_ENGINEERING" as ChangeOrderType,
+    label: "VE",
+    icon: "trending-down-outline",
+  },
 ];
 
-const STATUS_FILTERS: { value: ChangeOrderStatus | 'ALL'; label: string }[] = [
-  { value: 'ALL', label: 'All' },
-  { value: 'DRAFT' as ChangeOrderStatus, label: 'Draft' },
-  { value: 'SUBMITTED' as ChangeOrderStatus, label: 'Submitted' },
-  { value: 'UNDER_REVIEW' as ChangeOrderStatus, label: 'Review' },
-  { value: 'APPROVED' as ChangeOrderStatus, label: 'Approved' },
-  { value: 'IMPLEMENTED' as ChangeOrderStatus, label: 'Implemented' },
+const STATUS_FILTERS: { value: ChangeOrderStatus | "ALL"; label: string }[] = [
+  { value: "ALL", label: "All" },
+  { value: "DRAFT" as ChangeOrderStatus, label: "Draft" },
+  { value: "SUBMITTED" as ChangeOrderStatus, label: "Submitted" },
+  { value: "UNDER_REVIEW" as ChangeOrderStatus, label: "Review" },
+  { value: "APPROVED" as ChangeOrderStatus, label: "Approved" },
+  { value: "IMPLEMENTED" as ChangeOrderStatus, label: "Implemented" },
 ];
 
 const STATUS_COLORS: Record<ChangeOrderStatus, string> = {
-  DRAFT: '#666666',
-  SUBMITTED: '#0080FF',
-  UNDER_REVIEW: '#0066CC',
-  PENDING_APPROVAL: '#0080FF',
-  APPROVED: '#000000',
-  REJECTED: '#999999',
-  IMPLEMENTED: '#0066CC',
-  CLOSED: '#666666',
-  CANCELLED: '#CCCCCC',
+  DRAFT: "#666666",
+  SUBMITTED: "#0080FF",
+  UNDER_REVIEW: "#0066CC",
+  PENDING_APPROVAL: "#0080FF",
+  APPROVED: "#000000",
+  REJECTED: "#999999",
+  IMPLEMENTED: "#0066CC",
+  CLOSED: "#666666",
+  CANCELLED: "#CCCCCC",
 };
 
 const COST_IMPACT_COLORS: Record<CostImpactType, string> = {
-  INCREASE: '#000000',
-  DECREASE: '#0066CC',
-  NO_IMPACT: '#666666',
+  INCREASE: "#000000",
+  DECREASE: "#0066CC",
+  NO_IMPACT: "#666666",
 };
 
 export default function ChangeOrdersScreen() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedType, setSelectedType] = useState<ChangeOrderType | 'ALL'>('ALL');
-  const [selectedStatus, setSelectedStatus] = useState<ChangeOrderStatus | 'ALL'>('ALL');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedType, setSelectedType] = useState<ChangeOrderType | "ALL">(
+    "ALL",
+  );
+  const [selectedStatus, setSelectedStatus] = useState<
+    ChangeOrderStatus | "ALL"
+  >("ALL");
 
   const {
     changeOrders,
@@ -67,32 +106,32 @@ export default function ChangeOrdersScreen() {
     approveChangeOrder,
     implementChangeOrder,
   } = useChangeOrders({
-    type: selectedType !== 'ALL' ? selectedType : undefined,
-    status: selectedStatus !== 'ALL' ? selectedStatus : undefined,
+    type: selectedType !== "ALL" ? selectedType : undefined,
+    status: selectedStatus !== "ALL" ? selectedStatus : undefined,
   });
 
   const { analytics } = useChangeOrderAnalytics();
 
   const filteredChangeOrders = changeOrders.filter(
-    co =>
+    (co) =>
       co.changeOrderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
       co.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      co.description.toLowerCase().includes(searchQuery.toLowerCase())
+      co.description.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   const handleSubmit = async (id: string) => {
     try {
       await submitChangeOrder(id);
     } catch (err) {
-      console.error('Failed to submit:', err);
+      console.error("Failed to submit:", err);
     }
   };
 
   const handleApprove = async (id: string) => {
     try {
-      await approveChangeOrder(id, { decision: 'APPROVE' });
+      await approveChangeOrder(id, { decision: "APPROVE" });
     } catch (err) {
-      console.error('Failed to approve:', err);
+      console.error("Failed to approve:", err);
     }
   };
 
@@ -104,39 +143,60 @@ export default function ChangeOrdersScreen() {
     );
   }
 
-  const submittedCount = changeOrders.filter(co => co.status === 'SUBMITTED').length;
-  const underReviewCount = changeOrders.filter(co => co.status === 'UNDER_REVIEW').length;
-  const approvedCount = changeOrders.filter(co => co.status === 'APPROVED').length;
+  const submittedCount = changeOrders.filter(
+    (co) => co.status === "SUBMITTED",
+  ).length;
+  const underReviewCount = changeOrders.filter(
+    (co) => co.status === "UNDER_REVIEW",
+  ).length;
+  const approvedCount = changeOrders.filter(
+    (co) => co.status === "APPROVED",
+  ).length;
   const totalCostIncrease = changeOrders
-    .filter(co => co.costImpact.type === 'INCREASE')
+    .filter((co) => co.costImpact.type === "INCREASE")
     .reduce((sum, co) => sum + co.costImpact.changeAmount, 0);
 
   return (
     <View style={styles.container}>
       {/* Stats Cards */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.statsContainer}>
-        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.statsContainer}
+      >
+        <View style={[styles.statCard, { backgroundColor: "#E8F4FF" }]}>
           <Text style={styles.statValue}>{changeOrders.length}</Text>
           <Text style={styles.statLabel}>Total</Text>
         </View>
 
-        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
-          <Text style={[styles.statValue, { color: '#3B82F6' }]}>{submittedCount}</Text>
+        <View style={[styles.statCard, { backgroundColor: "#E8F4FF" }]}>
+          <Text style={[styles.statValue, { color: "#3B82F6" }]}>
+            {submittedCount}
+          </Text>
           <Text style={styles.statLabel}>Submitted</Text>
         </View>
 
-        <View style={[styles.statCard, { backgroundColor: '#FEF3C7' }]}>
-          <Text style={[styles.statValue, { color: '#0066CC' }]}>{underReviewCount}</Text>
+        <View style={[styles.statCard, { backgroundColor: "#FEF3C7" }]}>
+          <Text style={[styles.statValue, { color: "#0066CC" }]}>
+            {underReviewCount}
+          </Text>
           <Text style={styles.statLabel}>Under Review</Text>
         </View>
 
-        <View style={[styles.statCard, { backgroundColor: '#D1FAE5' }]}>
-          <Text style={[styles.statValue, { color: '#0066CC' }]}>{approvedCount}</Text>
+        <View style={[styles.statCard, { backgroundColor: "#D1FAE5" }]}>
+          <Text style={[styles.statValue, { color: "#0066CC" }]}>
+            {approvedCount}
+          </Text>
           <Text style={styles.statLabel}>Approved</Text>
         </View>
 
-        <View style={[styles.statCard, { backgroundColor: '#FEE2E2', minWidth: 140 }]}>
-          <Text style={[styles.statValue, { color: '#000000', fontSize: 18 }]}>
+        <View
+          style={[
+            styles.statCard,
+            { backgroundColor: "#FEE2E2", minWidth: 140 },
+          ]}
+        >
+          <Text style={[styles.statValue, { color: "#000000", fontSize: 18 }]}>
             ${(totalCostIncrease / 1000).toFixed(0)}K
           </Text>
           <Text style={styles.statLabel}>Cost Increase</Text>
@@ -145,7 +205,12 @@ export default function ChangeOrdersScreen() {
 
       {/* Search */}
       <View style={styles.searchContainer}>
-        <Ionicons name="search" size={20} color="#9CA3AF" style={styles.searchIcon} />
+        <Ionicons
+          name="search"
+          size={20}
+          color="#9CA3AF"
+          style={styles.searchIcon}
+        />
         <TextInput
           style={styles.searchInput}
           placeholder="Search by CO number, title..."
@@ -156,8 +221,12 @@ export default function ChangeOrdersScreen() {
       </View>
 
       {/* Type Filters */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterContainer}>
-        {TYPE_FILTERS.map(type => (
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.filterContainer}
+      >
+        {TYPE_FILTERS.map((type) => (
           <TouchableOpacity
             key={type.value}
             style={[
@@ -169,7 +238,7 @@ export default function ChangeOrdersScreen() {
             <Ionicons
               name={type.icon as any}
               size={16}
-              color={selectedType === type.value ? '#FFFFFF' : '#6B7280'}
+              color={selectedType === type.value ? "#FFFFFF" : "#6B7280"}
               style={{ marginRight: 4 }}
             />
             <Text
@@ -185,8 +254,12 @@ export default function ChangeOrdersScreen() {
       </ScrollView>
 
       {/* Status Filters */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterContainer}>
-        {STATUS_FILTERS.map(status => (
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.filterContainer}
+      >
+        {STATUS_FILTERS.map((status) => (
           <TouchableOpacity
             key={status.value}
             style={[
@@ -209,7 +282,7 @@ export default function ChangeOrdersScreen() {
 
       {/* Change Orders List */}
       <ScrollView style={styles.listContainer}>
-        {filteredChangeOrders.map(co => {
+        {filteredChangeOrders.map((co) => {
           const statusColor = STATUS_COLORS[co.status];
           const costImpactColor = COST_IMPACT_COLORS[co.costImpact.type];
 
@@ -217,20 +290,25 @@ export default function ChangeOrdersScreen() {
             <View key={co.id} style={styles.card}>
               {/* Header */}
               <View style={styles.cardHeader}>
-                <View style={[styles.iconContainer, { backgroundColor: `${statusColor}26` }]}>
+                <View
+                  style={[
+                    styles.iconContainer,
+                    { backgroundColor: `${statusColor}26` },
+                  ]}
+                >
                   <Ionicons
                     name={
-                      co.type === 'SCOPE_CHANGE'
-                        ? 'resize'
-                        : co.type === 'DESIGN_CHANGE'
-                        ? 'color-palette'
-                        : co.type === 'MATERIAL_SUBSTITUTION'
-                        ? 'cube'
-                        : co.type === 'FIELD_CONDITION'
-                        ? 'location'
-                        : co.type === 'VALUE_ENGINEERING'
-                        ? 'trending-down'
-                        : 'document-text'
+                      co.type === "SCOPE_CHANGE"
+                        ? "resize"
+                        : co.type === "DESIGN_CHANGE"
+                          ? "color-palette"
+                          : co.type === "MATERIAL_SUBSTITUTION"
+                            ? "cube"
+                            : co.type === "FIELD_CONDITION"
+                              ? "location"
+                              : co.type === "VALUE_ENGINEERING"
+                                ? "trending-down"
+                                : "document-text"
                     }
                     size={28}
                     color={statusColor}
@@ -241,12 +319,17 @@ export default function ChangeOrdersScreen() {
                   <View style={styles.headerRow}>
                     <Text style={styles.coNumber}>
                       {co.changeOrderNumber}
-                      {co.revisionNumber !== '0' && ` Rev ${co.revisionNumber}`}
+                      {co.revisionNumber !== "0" && ` Rev ${co.revisionNumber}`}
                     </Text>
                     <View style={styles.badges}>
-                      <View style={[styles.statusBadge, { backgroundColor: statusColor }]}>
+                      <View
+                        style={[
+                          styles.statusBadge,
+                          { backgroundColor: statusColor },
+                        ]}
+                      >
                         <Text style={styles.statusBadgeText}>
-                          {co.status.replace(/_/g, ' ')}
+                          {co.status.replace(/_/g, " ")}
                         </Text>
                       </View>
                     </View>
@@ -257,7 +340,9 @@ export default function ChangeOrdersScreen() {
                   </Text>
 
                   <View style={styles.typeBadge}>
-                    <Text style={styles.typeBadgeText}>{co.type.replace(/_/g, ' ')}</Text>
+                    <Text style={styles.typeBadgeText}>
+                      {co.type.replace(/_/g, " ")}
+                    </Text>
                   </View>
                 </View>
               </View>
@@ -267,7 +352,8 @@ export default function ChangeOrdersScreen() {
                 <View style={styles.infoRow}>
                   <Ionicons name="person-outline" size={14} color="#6B7280" />
                   <Text style={styles.infoText}>
-                    Requested by: {co.requestedBy.name} ({co.requestedBy.company})
+                    Requested by: {co.requestedBy.name} (
+                    {co.requestedBy.company})
                   </Text>
                 </View>
 
@@ -280,7 +366,11 @@ export default function ChangeOrdersScreen() {
 
                 {co.approvedDate && (
                   <View style={styles.infoRow}>
-                    <Ionicons name="checkmark-circle-outline" size={14} color="#6B7280" />
+                    <Ionicons
+                      name="checkmark-circle-outline"
+                      size={14}
+                      color="#6B7280"
+                    />
                     <Text style={styles.infoText}>
                       Approved: {new Date(co.approvedDate).toLocaleDateString()}
                     </Text>
@@ -289,9 +379,14 @@ export default function ChangeOrdersScreen() {
 
                 {co.currentApprover && (
                   <View style={styles.infoRow}>
-                    <Ionicons name="person-circle-outline" size={14} color="#6B7280" />
+                    <Ionicons
+                      name="person-circle-outline"
+                      size={14}
+                      color="#6B7280"
+                    />
                     <Text style={styles.infoText}>
-                      Pending: {co.currentApprover.name} ({co.currentApprover.role})
+                      Pending: {co.currentApprover.name} (
+                      {co.currentApprover.role})
                     </Text>
                   </View>
                 )}
@@ -302,7 +397,11 @@ export default function ChangeOrdersScreen() {
                 <View style={styles.impactRow}>
                   <View style={styles.impactItem}>
                     <View style={styles.impactHeader}>
-                      <Ionicons name="cash-outline" size={16} color={costImpactColor} />
+                      <Ionicons
+                        name="cash-outline"
+                        size={16}
+                        color={costImpactColor}
+                      />
                       <Text style={styles.impactLabel}>Cost Impact</Text>
                     </View>
                     <Text
@@ -313,12 +412,13 @@ export default function ChangeOrdersScreen() {
                         },
                       ]}
                     >
-                      {co.costImpact.type === 'INCREASE' && '+'}
-                      {co.costImpact.type === 'DECREASE' && '-'}
-                      {co.costImpact.currency} {Math.abs(co.costImpact.changeAmount).toLocaleString()}
+                      {co.costImpact.type === "INCREASE" ? "+" : ""}
+                      {co.costImpact.type === "DECREASE" ? "-" : ""}
+                      {co.costImpact.currency}{" "}
+                      {Math.abs(co.costImpact.changeAmount).toLocaleString()}
                     </Text>
                     <Text style={styles.impactSubtext}>
-                      {co.costImpact.type.replace(/_/g, ' ')}
+                      {co.costImpact.type.replace(/_/g, " ")}
                     </Text>
                   </View>
 
@@ -330,11 +430,11 @@ export default function ChangeOrdersScreen() {
                         name="time-outline"
                         size={16}
                         color={
-                          co.scheduleImpact.type === 'DELAY'
-                            ? '#0066CC'
-                            : co.scheduleImpact.type === 'ACCELERATION'
-                            ? '#0066CC'
-                            : '#6B7280'
+                          co.scheduleImpact.type === "DELAY"
+                            ? "#0066CC"
+                            : co.scheduleImpact.type === "ACCELERATION"
+                              ? "#0066CC"
+                              : "#6B7280"
                         }
                       />
                       <Text style={styles.impactLabel}>Schedule Impact</Text>
@@ -344,21 +444,21 @@ export default function ChangeOrdersScreen() {
                         styles.impactValue,
                         {
                           color:
-                            co.scheduleImpact.type === 'DELAY'
-                              ? '#0066CC'
-                              : co.scheduleImpact.type === 'ACCELERATION'
-                              ? '#0066CC'
-                              : '#6B7280',
+                            co.scheduleImpact.type === "DELAY"
+                              ? "#0066CC"
+                              : co.scheduleImpact.type === "ACCELERATION"
+                                ? "#0066CC"
+                                : "#6B7280",
                         },
                       ]}
                     >
-                      {co.scheduleImpact.type === 'DELAY' && '+'}
-                      {co.scheduleImpact.type === 'ACCELERATION' && '-'}
+                      {co.scheduleImpact.type === "DELAY" ? "+" : ""}
+                      {co.scheduleImpact.type === "ACCELERATION" ? "-" : ""}
                       {Math.abs(co.scheduleImpact.changeDuration)} days
                     </Text>
                     <Text style={styles.impactSubtext}>
-                      {co.scheduleImpact.type.replace(/_/g, ' ')}
-                      {co.scheduleImpact.criticalPath && ' (Critical)'}
+                      {co.scheduleImpact.type.replace(/_/g, " ")}
+                      {co.scheduleImpact.criticalPath ? " (Critical)" : ""}
                     </Text>
                   </View>
                 </View>
@@ -368,8 +468,12 @@ export default function ChangeOrdersScreen() {
               {co.approvalWorkflow && co.approvalWorkflow.length > 0 && (
                 <View style={styles.approvalSection}>
                   <Text style={styles.approvalTitle}>
-                    Approval Progress ({co.approvalWorkflow.filter(a => a.status === 'APPROVED').length}/
-                    {co.approvalWorkflow.length})
+                    Approval Progress (
+                    {
+                      co.approvalWorkflow.filter((a) => a.status === "APPROVED")
+                        .length
+                    }
+                    /{co.approvalWorkflow.length})
                   </Text>
                   <View style={styles.approvalList}>
                     {co.approvalWorkflow.slice(0, 3).map((approval, index) => (
@@ -379,23 +483,26 @@ export default function ChangeOrdersScreen() {
                             styles.approvalStatus,
                             {
                               backgroundColor:
-                                approval.status === 'APPROVED'
-                                  ? '#0066CC'
-                                  : approval.status === 'REJECTED'
-                                  ? '#000000'
-                                  : approval.status === 'IN_PROGRESS'
-                                  ? '#0066CC'
-                                  : '#6B7280',
+                                approval.status === "APPROVED"
+                                  ? "#0066CC"
+                                  : approval.status === "REJECTED"
+                                    ? "#000000"
+                                    : approval.status === "IN_PROGRESS"
+                                      ? "#0066CC"
+                                      : "#6B7280",
                             },
                           ]}
                         />
                         <Text style={styles.approvalName} numberOfLines={1}>
-                          {approval.approver.name} ({approval.level.replace(/_/g, ' ')})
+                          {approval.approver.name} (
+                          {approval.level.replace(/_/g, " ")})
                         </Text>
                       </View>
                     ))}
                     {co.approvalWorkflow.length > 3 && (
-                      <Text style={styles.moreApprovals}>+{co.approvalWorkflow.length - 3} more</Text>
+                      <Text style={styles.moreApprovals}>
+                        +{co.approvalWorkflow.length - 3} more
+                      </Text>
                     )}
                   </View>
                 </View>
@@ -405,18 +512,29 @@ export default function ChangeOrdersScreen() {
               {co.implementation && (
                 <View style={styles.implementationSection}>
                   <View style={styles.implementationHeader}>
-                    <Ionicons name="construct-outline" size={16} color="#666666" />
-                    <Text style={styles.implementationTitle}>Implementation</Text>
+                    <Ionicons
+                      name="construct-outline"
+                      size={16}
+                      color="#666666"
+                    />
+                    <Text style={styles.implementationTitle}>
+                      Implementation
+                    </Text>
                     <Text style={styles.implementationStatus}>
-                      {co.implementation.status.replace(/_/g, ' ')}
+                      {co.implementation.status.replace(/_/g, " ")}
                     </Text>
                   </View>
                   <View style={styles.progressBarContainer}>
                     <View
-                      style={[styles.progressBarFill, { width: `${co.implementation.progress}%` }]}
+                      style={[
+                        styles.progressBarFill,
+                        { width: `${co.implementation.progress}%` },
+                      ]}
                     />
                   </View>
-                  <Text style={styles.progressText}>{co.implementation.progress}% Complete</Text>
+                  <Text style={styles.progressText}>
+                    {co.implementation.progress}% Complete
+                  </Text>
                 </View>
               )}
 
@@ -427,30 +545,53 @@ export default function ChangeOrdersScreen() {
                   <Text style={styles.actionButtonText}>View</Text>
                 </TouchableOpacity>
 
-                {co.status === 'DRAFT' && (
+                {co.status === "DRAFT" && (
                   <TouchableOpacity
                     style={[styles.actionButton, styles.actionButtonPrimary]}
                     onPress={() => handleSubmit(co.id)}
                   >
                     <Ionicons name="send-outline" size={18} color="#FFFFFF" />
-                    <Text style={[styles.actionButtonText, { color: '#FFFFFF' }]}>Submit</Text>
+                    <Text
+                      style={[styles.actionButtonText, { color: "#FFFFFF" }]}
+                    >
+                      Submit
+                    </Text>
                   </TouchableOpacity>
                 )}
 
-                {(co.status === 'SUBMITTED' || co.status === 'UNDER_REVIEW') && (
+                {(co.status === "SUBMITTED" ||
+                  co.status === "UNDER_REVIEW") && (
                   <TouchableOpacity
                     style={[styles.actionButton, styles.actionButtonSuccess]}
                     onPress={() => handleApprove(co.id)}
                   >
-                    <Ionicons name="checkmark-outline" size={18} color="#FFFFFF" />
-                    <Text style={[styles.actionButtonText, { color: '#FFFFFF' }]}>Approve</Text>
+                    <Ionicons
+                      name="checkmark-outline"
+                      size={18}
+                      color="#FFFFFF"
+                    />
+                    <Text
+                      style={[styles.actionButtonText, { color: "#FFFFFF" }]}
+                    >
+                      Approve
+                    </Text>
                   </TouchableOpacity>
                 )}
 
-                {co.status === 'APPROVED' && !co.implementation && (
-                  <TouchableOpacity style={[styles.actionButton, styles.actionButtonWarning]}>
-                    <Ionicons name="construct-outline" size={18} color="#FFFFFF" />
-                    <Text style={[styles.actionButtonText, { color: '#FFFFFF' }]}>Implement</Text>
+                {co.status === "APPROVED" && !co.implementation && (
+                  <TouchableOpacity
+                    style={[styles.actionButton, styles.actionButtonWarning]}
+                  >
+                    <Ionicons
+                      name="construct-outline"
+                      size={18}
+                      color="#FFFFFF"
+                    />
+                    <Text
+                      style={[styles.actionButtonText, { color: "#FFFFFF" }]}
+                    >
+                      Implement
+                    </Text>
                   </TouchableOpacity>
                 )}
 
@@ -477,12 +618,12 @@ export default function ChangeOrdersScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: "#F9FAFB",
   },
   centered: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   statsContainer: {
     padding: 16,
@@ -493,28 +634,28 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginRight: 12,
     minWidth: 100,
-    alignItems: 'center',
+    alignItems: "center",
   },
   statValue: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1F2937',
+    fontWeight: "bold",
+    color: "#1F2937",
     marginBottom: 4,
   },
   statLabel: {
     fontSize: 12,
-    color: '#6B7280',
+    color: "#6B7280",
   },
   searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
     marginHorizontal: 16,
     marginBottom: 12,
     paddingHorizontal: 12,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: "#E5E7EB",
   },
   searchIcon: {
     marginRight: 8,
@@ -523,75 +664,75 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 12,
     fontSize: 14,
-    color: '#1F2937',
+    color: "#1F2937",
   },
   filterContainer: {
     paddingHorizontal: 16,
     marginBottom: 12,
   },
   filterChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: "#E5E7EB",
     marginRight: 8,
   },
   filterChipActive: {
-    backgroundColor: '#3B82F6',
-    borderColor: '#3B82F6',
+    backgroundColor: "#3B82F6",
+    borderColor: "#3B82F6",
   },
   filterChipText: {
     fontSize: 13,
-    color: '#6B7280',
-    fontWeight: '500',
+    color: "#6B7280",
+    fontWeight: "500",
   },
   filterChipTextActive: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
   },
   listContainer: {
     flex: 1,
     paddingHorizontal: 16,
   },
   card: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: "#E5E7EB",
   },
   cardHeader: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: 12,
   },
   iconContainer: {
     width: 56,
     height: 56,
     borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginRight: 12,
   },
   cardHeaderText: {
     flex: 1,
   },
   headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 4,
   },
   coNumber: {
     fontSize: 12,
-    fontWeight: 'bold',
-    color: '#1F2937',
+    fontWeight: "bold",
+    color: "#1F2937",
   },
   badges: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 6,
   },
   statusBadge: {
@@ -601,79 +742,79 @@ const styles = StyleSheet.create({
   },
   statusBadgeText: {
     fontSize: 9,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    textTransform: 'uppercase',
+    fontWeight: "bold",
+    color: "#FFFFFF",
+    textTransform: "uppercase",
   },
   title: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#1F2937',
+    fontWeight: "600",
+    color: "#1F2937",
     marginBottom: 6,
   },
   typeBadge: {
     paddingHorizontal: 8,
     paddingVertical: 4,
-    backgroundColor: '#EDE9FE',
+    backgroundColor: "#EDE9FE",
     borderRadius: 6,
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
   },
   typeBadgeText: {
     fontSize: 10,
-    fontWeight: '600',
-    color: '#666666',
-    textTransform: 'capitalize',
+    fontWeight: "600",
+    color: "#666666",
+    textTransform: "capitalize",
   },
   infoSection: {
     marginBottom: 12,
   },
   infoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 6,
   },
   infoText: {
     fontSize: 12,
-    color: '#6B7280',
+    color: "#6B7280",
     marginLeft: 6,
     flex: 1,
   },
   impactSection: {
-    backgroundColor: '#F9FAFB',
+    backgroundColor: "#F9FAFB",
     padding: 12,
     borderRadius: 8,
     marginBottom: 12,
   },
   impactRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   impactItem: {
     flex: 1,
   },
   impactHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 6,
   },
   impactLabel: {
     fontSize: 11,
-    color: '#6B7280',
+    color: "#6B7280",
     marginLeft: 4,
   },
   impactValue: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 2,
   },
   impactSubtext: {
     fontSize: 10,
-    color: '#9CA3AF',
+    color: "#9CA3AF",
   },
   impactDivider: {
     width: 1,
     height: 40,
-    backgroundColor: '#E5E7EB',
+    backgroundColor: "#E5E7EB",
     marginHorizontal: 12,
   },
   approvalSection: {
@@ -681,16 +822,16 @@ const styles = StyleSheet.create({
   },
   approvalTitle: {
     fontSize: 12,
-    fontWeight: '600',
-    color: '#1F2937',
+    fontWeight: "600",
+    color: "#1F2937",
     marginBottom: 8,
   },
   approvalList: {
     gap: 6,
   },
   approvalItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   approvalStatus: {
     width: 8,
@@ -700,90 +841,90 @@ const styles = StyleSheet.create({
   },
   approvalName: {
     fontSize: 11,
-    color: '#4B5563',
+    color: "#4B5563",
     flex: 1,
   },
   moreApprovals: {
     fontSize: 11,
-    color: '#6B7280',
-    fontStyle: 'italic',
+    color: "#6B7280",
+    fontStyle: "italic",
     marginTop: 4,
   },
   implementationSection: {
-    backgroundColor: '#F5F3FF',
+    backgroundColor: "#F5F3FF",
     padding: 10,
     borderRadius: 8,
     marginBottom: 12,
   },
   implementationHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 8,
   },
   implementationTitle: {
     fontSize: 11,
-    fontWeight: '600',
-    color: '#6B21A8',
+    fontWeight: "600",
+    color: "#6B21A8",
     marginLeft: 6,
     flex: 1,
   },
   implementationStatus: {
     fontSize: 10,
-    color: '#666666',
-    textTransform: 'capitalize',
+    color: "#666666",
+    textTransform: "capitalize",
   },
   progressBarContainer: {
     height: 6,
-    backgroundColor: '#DDD6FE',
+    backgroundColor: "#DDD6FE",
     borderRadius: 3,
-    overflow: 'hidden',
+    overflow: "hidden",
     marginBottom: 4,
   },
   progressBarFill: {
-    height: '100%',
-    backgroundColor: '#666666',
+    height: "100%",
+    backgroundColor: "#666666",
   },
   progressText: {
     fontSize: 10,
-    color: '#6B21A8',
-    textAlign: 'right',
+    color: "#6B21A8",
+    textAlign: "right",
   },
   actions: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 8,
   },
   actionButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 8,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: "#F3F4F6",
   },
   actionButtonPrimary: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: "#3B82F6",
   },
   actionButtonSuccess: {
-    backgroundColor: '#0066CC',
+    backgroundColor: "#0066CC",
   },
   actionButtonWarning: {
-    backgroundColor: '#0066CC',
+    backgroundColor: "#0066CC",
   },
   actionButtonText: {
     fontSize: 12,
-    fontWeight: '600',
-    color: '#4B5563',
+    fontWeight: "600",
+    color: "#4B5563",
     marginLeft: 4,
   },
   emptyState: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     paddingVertical: 48,
   },
   emptyStateText: {
     fontSize: 14,
-    color: '#9CA3AF',
+    color: "#9CA3AF",
     marginTop: 12,
   },
 });

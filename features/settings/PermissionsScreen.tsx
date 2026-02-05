@@ -10,11 +10,11 @@ import {
     requestPermissionWithAlert,
     type PermissionStatus,
     type PermissionType,
-} from '@/utils/devicePermissions';
-import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
-import { router } from 'expo-router';
-import React, { useCallback, useEffect, useState } from 'react';
+} from "@/utils/devicePermissions";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { router } from "expo-router";
+import React, { useCallback, useEffect, useState } from "react";
 import {
     Alert,
     RefreshControl,
@@ -22,9 +22,9 @@ import {
     StyleSheet,
     Text,
     TouchableOpacity,
-    View
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+    View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 interface PermissionItemProps {
   type: PermissionType;
@@ -44,27 +44,32 @@ const PermissionItem: React.FC<PermissionItemProps> = ({
   onRequest,
 }) => {
   const getStatusColor = () => {
-    if (status.granted) return '#22c55e';
-    if (status.status === 'denied') return '#ef4444';
-    return '#f59e0b';
+    if (status.granted) return "#22c55e";
+    if (status.status === "denied") return "#ef4444";
+    return "#f59e0b";
   };
 
   const getStatusText = () => {
-    if (status.granted) return 'Đã cấp quyền';
-    if (status.status === 'denied') return 'Bị từ chối';
-    return 'Chưa cấp quyền';
+    if (status.granted) return "Đã cấp quyền";
+    if (status.status === "denied") return "Bị từ chối";
+    return "Chưa cấp quyền";
   };
 
   const getStatusIcon = (): keyof typeof Ionicons.glyphMap => {
-    if (status.granted) return 'checkmark-circle';
-    if (status.status === 'denied') return 'close-circle';
-    return 'help-circle';
+    if (status.granted) return "checkmark-circle";
+    if (status.status === "denied") return "close-circle";
+    return "help-circle";
   };
 
   return (
     <View style={styles.permissionCard}>
       <View style={styles.permissionHeader}>
-        <View style={[styles.iconContainer, { backgroundColor: getStatusColor() + '20' }]}>
+        <View
+          style={[
+            styles.iconContainer,
+            { backgroundColor: getStatusColor() + "20" },
+          ]}
+        >
           <Ionicons name={icon} size={24} color={getStatusColor()} />
         </View>
         <View style={styles.permissionInfo}>
@@ -72,7 +77,7 @@ const PermissionItem: React.FC<PermissionItemProps> = ({
           <Text style={styles.permissionDesc}>{description}</Text>
         </View>
       </View>
-      
+
       <View style={styles.permissionStatus}>
         <View style={styles.statusBadge}>
           <Ionicons name={getStatusIcon()} size={16} color={getStatusColor()} />
@@ -80,14 +85,16 @@ const PermissionItem: React.FC<PermissionItemProps> = ({
             {getStatusText()}
           </Text>
         </View>
-        
+
         {!status.granted && (
           <TouchableOpacity
             style={[styles.requestButton, { borderColor: getStatusColor() }]}
             onPress={onRequest}
           >
-            <Text style={[styles.requestButtonText, { color: getStatusColor() }]}>
-              {status.canAskAgain ? 'Yêu cầu' : 'Cài đặt'}
+            <Text
+              style={[styles.requestButtonText, { color: getStatusColor() }]}
+            >
+              {status.canAskAgain ? "Yêu cầu" : "Cài đặt"}
             </Text>
           </TouchableOpacity>
         )}
@@ -97,7 +104,10 @@ const PermissionItem: React.FC<PermissionItemProps> = ({
 };
 
 export default function PermissionsScreen() {
-  const [permissions, setPermissions] = useState<Record<PermissionType, PermissionStatus> | null>(null);
+  const [permissions, setPermissions] = useState<Record<
+    PermissionType,
+    PermissionStatus
+  > | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
   const loadPermissions = useCallback(async () => {
@@ -124,67 +134,79 @@ export default function PermissionsScreen() {
 
   const handleOpenSettings = () => {
     Alert.alert(
-      'Mở Cài đặt',
-      'Bạn sẽ được chuyển đến cài đặt ứng dụng để quản lý quyền truy cập.',
+      "Mở Cài đặt",
+      "Bạn sẽ được chuyển đến cài đặt ứng dụng để quản lý quyền truy cập.",
       [
-        { text: 'Hủy', style: 'cancel' },
-        { text: 'Mở Cài đặt', onPress: openAppSettings },
-      ]
+        { text: "Hủy", style: "cancel" },
+        { text: "Mở Cài đặt", onPress: openAppSettings },
+      ],
     );
   };
 
   const permissionItems = [
     {
-      type: 'camera' as PermissionType,
-      name: 'Camera',
-      description: 'Chụp ảnh, quay video, gọi video call',
-      icon: 'camera' as const,
+      type: "camera" as PermissionType,
+      name: "Camera",
+      description: "Chụp ảnh, quay video, gọi video call",
+      icon: "camera" as const,
     },
     {
-      type: 'storage' as PermissionType,
-      name: 'Bộ nhớ / Thư viện',
-      description: 'Truy cập ảnh, video trong thiết bị',
-      icon: 'images' as const,
+      type: "storage" as PermissionType,
+      name: "Bộ nhớ / Thư viện",
+      description: "Truy cập ảnh, video trong thiết bị",
+      icon: "images" as const,
     },
     {
-      type: 'location' as PermissionType,
-      name: 'Vị trí',
-      description: 'Xác định vị trí công trình, điểm giao hàng',
-      icon: 'location' as const,
+      type: "location" as PermissionType,
+      name: "Vị trí",
+      description: "Xác định vị trí công trình, điểm giao hàng",
+      icon: "location" as const,
     },
     {
-      type: 'notifications' as PermissionType,
-      name: 'Thông báo',
-      description: 'Nhận thông báo đơn hàng, tin nhắn',
-      icon: 'notifications' as const,
+      type: "notifications" as PermissionType,
+      name: "Thông báo",
+      description: "Nhận thông báo đơn hàng, tin nhắn",
+      icon: "notifications" as const,
     },
     {
-      type: 'microphone' as PermissionType,
-      name: 'Microphone',
-      description: 'Ghi âm, gọi điện, tìm kiếm giọng nói',
-      icon: 'mic' as const,
+      type: "microphone" as PermissionType,
+      name: "Microphone",
+      description: "Ghi âm, gọi điện, tìm kiếm giọng nói",
+      icon: "mic" as const,
+    },
+    {
+      type: "contacts" as PermissionType,
+      name: "Danh bạ",
+      description: "Đồng bộ liên hệ, mời bạn bè vào dự án",
+      icon: "people" as const,
     },
   ];
 
-  const grantedCount = permissions 
-    ? Object.values(permissions).filter(p => p.granted).length 
+  const grantedCount = permissions
+    ? Object.values(permissions).filter((p) => p.granted).length
     : 0;
   const totalCount = permissionItems.length;
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={["top"]}>
       {/* Header */}
       <LinearGradient
-        colors={['#6366f1', '#8b5cf6']}
+        colors={["#6366f1", "#8b5cf6"]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
         style={styles.header}
       >
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={styles.backButton}
+        >
           <Ionicons name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Quyền truy cập</Text>
-        <TouchableOpacity onPress={handleOpenSettings} style={styles.settingsButton}>
+        <TouchableOpacity
+          onPress={handleOpenSettings}
+          style={styles.settingsButton}
+        >
           <Ionicons name="settings-outline" size={24} color="#fff" />
         </TouchableOpacity>
       </LinearGradient>
@@ -207,11 +229,11 @@ export default function PermissionsScreen() {
             </Text>
           </View>
           <View style={styles.progressBar}>
-            <View 
+            <View
               style={[
-                styles.progressFill, 
-                { width: `${(grantedCount / totalCount) * 100}%` }
-              ]} 
+                styles.progressFill,
+                { width: `${(grantedCount / totalCount) * 100}%` },
+              ]}
             />
           </View>
         </View>
@@ -220,20 +242,26 @@ export default function PermissionsScreen() {
         <View style={styles.infoBox}>
           <Ionicons name="information-circle" size={20} color="#3b82f6" />
           <Text style={styles.infoText}>
-            Các quyền này giúp ứng dụng hoạt động đầy đủ tính năng. 
-            Bạn có thể thay đổi bất cứ lúc nào trong Cài đặt.
+            Các quyền này giúp ứng dụng hoạt động đầy đủ tính năng. Bạn có thể
+            thay đổi bất cứ lúc nào trong Cài đặt.
           </Text>
         </View>
 
         {/* Permission List */}
         <View style={styles.permissionList}>
           <Text style={styles.sectionTitle}>Danh sách quyền</Text>
-          
+
           {permissionItems.map((item) => (
             <PermissionItem
               key={item.type}
               {...item}
-              status={permissions?.[item.type] || { granted: false, canAskAgain: true, status: 'undetermined' }}
+              status={
+                permissions?.[item.type] || {
+                  granted: false,
+                  canAskAgain: true,
+                  status: "undetermined",
+                }
+              }
               onRequest={() => handleRequestPermission(item.type)}
             />
           ))}
@@ -242,26 +270,30 @@ export default function PermissionsScreen() {
         {/* Additional Features */}
         <View style={styles.featuresSection}>
           <Text style={styles.sectionTitle}>Tính năng liên quan</Text>
-          
-          <TouchableOpacity 
+
+          <TouchableOpacity
             style={styles.featureCard}
-            onPress={() => router.push('/demo-videos' as any)}
+            onPress={() => router.push("/demo-videos" as any)}
           >
             <View style={styles.featureIcon}>
               <Ionicons name="videocam" size={24} color="#8b5cf6" />
             </View>
             <View style={styles.featureInfo}>
               <Text style={styles.featureName}>Video Demo Xây dựng</Text>
-              <Text style={styles.featureDesc}>Xem các video hướng dẫn và tiến độ</Text>
+              <Text style={styles.featureDesc}>
+                Xem các video hướng dẫn và tiến độ
+              </Text>
             </View>
             <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
           </TouchableOpacity>
 
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.featureCard}
-            onPress={() => router.push('/settings/api-status' as any)}
+            onPress={() => router.push("/settings/api-status" as any)}
           >
-            <View style={[styles.featureIcon, { backgroundColor: '#10b98120' }]}>
+            <View
+              style={[styles.featureIcon, { backgroundColor: "#10b98120" }]}
+            >
               <Ionicons name="cloud-done" size={24} color="#10b981" />
             </View>
             <View style={styles.featureInfo}>
@@ -281,12 +313,12 @@ export default function PermissionsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: "#f8fafc",
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 16,
     paddingVertical: 16,
   },
@@ -295,8 +327,8 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#fff',
+    fontWeight: "600",
+    color: "#fff",
   },
   settingsButton: {
     padding: 8,
@@ -306,14 +338,14 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   summaryCard: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 16,
     padding: 20,
     marginBottom: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    shadowColor: '#000',
+    flexDirection: "row",
+    alignItems: "center",
+    flexWrap: "wrap",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 8,
@@ -323,9 +355,9 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#6366f120',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#6366f120",
+    justifyContent: "center",
+    alignItems: "center",
   },
   summaryInfo: {
     flex: 1,
@@ -333,72 +365,72 @@ const styles = StyleSheet.create({
   },
   summaryTitle: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#1f2937',
+    fontWeight: "600",
+    color: "#1f2937",
   },
   summaryText: {
     fontSize: 14,
-    color: '#6b7280',
+    color: "#6b7280",
     marginTop: 2,
   },
   progressBar: {
-    width: '100%',
+    width: "100%",
     height: 6,
-    backgroundColor: '#e5e7eb',
+    backgroundColor: "#e5e7eb",
     borderRadius: 3,
     marginTop: 16,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   progressFill: {
-    height: '100%',
-    backgroundColor: '#22c55e',
+    height: "100%",
+    backgroundColor: "#22c55e",
     borderRadius: 3,
   },
   infoBox: {
-    backgroundColor: '#eff6ff',
+    backgroundColor: "#eff6ff",
     borderRadius: 12,
     padding: 16,
-    flexDirection: 'row',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    alignItems: "flex-start",
     marginBottom: 24,
     gap: 12,
   },
   infoText: {
     flex: 1,
     fontSize: 13,
-    color: '#1e40af',
+    color: "#1e40af",
     lineHeight: 20,
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#374151',
+    fontWeight: "600",
+    color: "#374151",
     marginBottom: 12,
   },
   permissionList: {
     marginBottom: 24,
   },
   permissionCard: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.03,
     shadowRadius: 4,
     elevation: 1,
   },
   permissionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   iconContainer: {
     width: 44,
     height: 44,
     borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   permissionInfo: {
     flex: 1,
@@ -406,31 +438,31 @@ const styles = StyleSheet.create({
   },
   permissionName: {
     fontSize: 15,
-    fontWeight: '600',
-    color: '#1f2937',
+    fontWeight: "600",
+    color: "#1f2937",
   },
   permissionDesc: {
     fontSize: 12,
-    color: '#6b7280',
+    color: "#6b7280",
     marginTop: 2,
   },
   permissionStatus: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     marginTop: 12,
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#f3f4f6',
+    borderTopColor: "#f3f4f6",
   },
   statusBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6,
   },
   statusText: {
     fontSize: 13,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   requestButton: {
     paddingHorizontal: 16,
@@ -440,19 +472,19 @@ const styles = StyleSheet.create({
   },
   requestButtonText: {
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   featuresSection: {
     marginBottom: 24,
   },
   featureCard: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    shadowColor: '#000',
+    flexDirection: "row",
+    alignItems: "center",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.03,
     shadowRadius: 4,
@@ -462,9 +494,9 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 12,
-    backgroundColor: '#8b5cf620',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#8b5cf620",
+    justifyContent: "center",
+    alignItems: "center",
   },
   featureInfo: {
     flex: 1,
@@ -472,12 +504,12 @@ const styles = StyleSheet.create({
   },
   featureName: {
     fontSize: 15,
-    fontWeight: '600',
-    color: '#1f2937',
+    fontWeight: "600",
+    color: "#1f2937",
   },
   featureDesc: {
     fontSize: 12,
-    color: '#6b7280',
+    color: "#6b7280",
     marginTop: 2,
   },
 });

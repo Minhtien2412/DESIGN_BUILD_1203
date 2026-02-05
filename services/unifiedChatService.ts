@@ -26,7 +26,7 @@ const CACHE_KEY_MESSAGES = "@chat_messages_";
  * Convert ChatRoom from API -> UnifiedConversation for UI
  */
 export function convertRoomToConversation(
-  room: chatApi.ChatRoom
+  room: chatApi.ChatRoom,
 ): UnifiedConversation {
   return {
     id: room.id.toString(),
@@ -104,7 +104,7 @@ export async function getConversations(): Promise<UnifiedConversation[]> {
     // Cache for offline
     await AsyncStorage.setItem(
       CACHE_KEY_CONVERSATIONS,
-      JSON.stringify(conversations)
+      JSON.stringify(conversations),
     );
 
     return conversations;
@@ -133,7 +133,7 @@ export async function getConversations(): Promise<UnifiedConversation[]> {
  */
 export async function getMessages(
   conversationId: string,
-  params?: chatApi.MessageQueryParams
+  params?: chatApi.MessageQueryParams,
 ): Promise<UnifiedMessage[]> {
   try {
     const roomId = parseInt(conversationId, 10);
@@ -149,7 +149,7 @@ export async function getMessages(
     console.error(
       "[UnifiedChatService] Error fetching messages:",
       conversationId,
-      error
+      error,
     );
 
     // Try cache
@@ -177,7 +177,7 @@ export async function getMessages(
 export async function sendMessage(
   conversationId: string,
   content: string,
-  attachments?: string[]
+  attachments?: string[],
 ): Promise<UnifiedMessage> {
   try {
     const roomId = parseInt(conversationId, 10);
@@ -219,7 +219,7 @@ export async function createConversation(
   name: string,
   memberIds: number[],
   projectId?: number,
-  isGroup?: boolean
+  isGroup?: boolean,
 ): Promise<UnifiedConversation> {
   try {
     const room = await chatApi.createRoom({
@@ -241,12 +241,12 @@ export async function createConversation(
  */
 export async function addMembersToConversation(
   conversationId: string,
-  memberIds: number[]
+  memberIds: number[],
 ): Promise<void> {
   try {
     // TODO: Implement addMembers API endpoint
     console.warn(
-      "[UnifiedChatService] addMembersToConversation not implemented yet"
+      "[UnifiedChatService] addMembersToConversation not implemented yet",
     );
     // const roomId = parseInt(conversationId, 10);
     // await chatApi.addMembers(roomId, memberIds);
@@ -261,12 +261,12 @@ export async function addMembersToConversation(
  */
 export async function removeMemberFromConversation(
   conversationId: string,
-  memberId: number
+  memberId: number,
 ): Promise<void> {
   try {
     // TODO: Implement removeMember API endpoint
     console.warn(
-      "[UnifiedChatService] removeMemberFromConversation not implemented yet"
+      "[UnifiedChatService] removeMemberFromConversation not implemented yet",
     );
     // const roomId = parseInt(conversationId, 10);
     // await chatApi.removeMember(roomId, memberId);
@@ -285,7 +285,7 @@ export async function clearCache(): Promise<void> {
     // Clear all message caches (they start with CACHE_KEY_MESSAGES)
     const allKeys = await AsyncStorage.getAllKeys();
     const messageKeys = allKeys.filter((key) =>
-      key.startsWith(CACHE_KEY_MESSAGES)
+      key.startsWith(CACHE_KEY_MESSAGES),
     );
     if (messageKeys.length > 0) {
       await AsyncStorage.multiRemove(messageKeys);
@@ -296,17 +296,152 @@ export async function clearCache(): Promise<void> {
   }
 }
 
+// ==================== AI CHAT INTEGRATION ====================
+
+import {
+    CSKH_INFO,
+    getAIBotUserInfo,
+    getOrCreateConversation as getOrCreateAIConversation,
+    isAIBotUser,
+    sendCSKHMessage,
+} from "./aiCustomerSupport";
+
+/**
+ * Kiểm tra conversation với AI bot
+ */
+export function isAIConversation(
+  conversationIdOrUserId: string | number,
+): boolean {
+  return isAIBotUser(conversationIdOrUserId);
+}
+
+/**
+ * Gửi tin nhắn (tự động route đến AI hoặc WebSocket)
+ */
+export async function sendMessageSmart(
+  conversationId: string,
+  content: string,
+  userId: string,
+  recipientId?: string,
+): Promise<UnifiedMessage | null> {
+  // Nếu recipient là AI bot, gửi qua AI service
+  if (recipientId && isAIBotUser(recipientId)) {
+    return sendMessageToAI(conversationId, content, userId);
+  }
+
+  // Ngược lại gửi qua WebSocket/REST API
+  return sendMessage(conversationId, content);
+}
+
+/**
+ * Gửi tin nhắn đến AI CSKH
+ */
+export async function sendMessageToAI(
+  conversationId: string,
+  content: string,
+  userId: string,
+): Promise<UnifiedMessage | null> {
+  try {
+    console.log("[UnifiedChatService] Routing message to AI CSKH");
+
+    // Get/create AI conversation
+    const aiConversation = await getOrCreateAIConversation(userId);
+
+    // Send to AI
+    const response = await sendCSKHMessage(
+      userId,
+      aiConversation.id,
+      content,
+      aiConversation.messages,
+    );
+
+    if (response.success && response.data) {
+      const now = new Date().toISOString();
+      // Return AI response as UnifiedMessage
+      return {
+        id: response.data.messageId,
+        conversationId: conversationId,
+        senderId: parseInt(CSKH_INFO.AI_USER_ID) || 0,
+        sender: {
+          id: parseInt(CSKH_INFO.AI_USER_ID) || 0,
+          name: CSKH_INFO.name,
+          avatar: CSKH_INFO.avatar,
+          onlineStatus: "online" as const,
+        },
+        content: response.data.reply,
+        type: "text",
+        deliveryStatus: "delivered" as const,
+        isRead: false,
+        createdAt: now,
+        updatedAt: now,
+      } as UnifiedMessage;
+    }
+
+    console.error("[UnifiedChatService] AI response failed:", response.error);
+    return null;
+  } catch (error) {
+    console.error("[UnifiedChatService] Error sending to AI:", error);
+    throw error;
+  }
+}
+
+/**
+ * Lấy AI Bot conversation (để hiển thị trong danh sách)
+ */
+export function getAIConversation(): UnifiedConversation {
+  const botInfo = getAIBotUserInfo();
+  const now = new Date().toISOString();
+  return {
+    id: `ai-${CSKH_INFO.AI_USER_ID}`,
+    type: "direct",
+    name: botInfo.name,
+    avatar: botInfo.avatar,
+    participants: [
+      {
+        id: parseInt(botInfo.id) || 0,
+        name: botInfo.name,
+        email: "cskh@thietkeresort.vn",
+        avatar: botInfo.avatar,
+        role: "support",
+        onlineStatus: "online",
+        lastSeen: undefined,
+      },
+    ],
+    lastMessage: undefined,
+    unreadCount: 0,
+    isPinned: true, // Pin AI support at top
+    isMuted: false,
+    isBlocked: false,
+    isOnline: true,
+    typingUsers: [],
+    createdAt: now,
+    updatedAt: now,
+    metadata: {
+      isAIBot: true,
+    },
+  } as UnifiedConversation;
+}
+
+// Re-export AI utilities
+export { CSKH_INFO, getAIBotUserInfo, isAIBotUser };
+
 // ==================== EXPORTS ====================
 
 export const UnifiedChatService = {
   getConversations,
   getMessages,
   sendMessage,
+  sendMessageSmart,
+  sendMessageToAI,
   markAsRead,
   createConversation,
   addMembersToConversation,
   removeMemberFromConversation,
   clearCache,
+  // AI Chat
+  isAIConversation,
+  getAIConversation,
+  isAIBotUser,
   // Expose converters for testing/debugging
   convertRoomToConversation,
   convertChatMessage,

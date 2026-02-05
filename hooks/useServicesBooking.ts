@@ -75,13 +75,15 @@ export function useServicesBooking(): UseServicesReturn {
     null,
   );
   const [loadingServices, setLoadingServices] = useState(false);
-  const [_servicesPagination, _setServicesPagination] =
+  const [servicesPagination, setServicesPagination] =
     useState<UseServicesPagination>({
       total: 0,
       page: 1,
       totalPages: 0,
       hasMore: false,
     });
+  // Expose for potential future use
+  void servicesPagination;
 
   // Bookings state
   const [bookings, setBookings] = useState<ServiceBooking[]>([]);

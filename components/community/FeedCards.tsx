@@ -442,6 +442,7 @@ export const VideoCard = memo(function VideoCard({
         <Image
           source={{ uri: item.thumbnailUrl }}
           style={styles.videoThumbnailSmall}
+          resizeMode="contain"
         />
         <LinearGradient
           colors={["transparent", "rgba(0,0,0,0.7)"]}
@@ -479,6 +480,7 @@ export const VideoCard = memo(function VideoCard({
       <Image
         source={{ uri: item.thumbnailUrl }}
         style={styles.videoThumbnail}
+        resizeMode="contain"
       />
       <LinearGradient
         colors={["transparent", "rgba(0,0,0,0.8)"]}
@@ -925,19 +927,21 @@ const styles = StyleSheet.create({
     color: COLORS.textTertiary,
   },
 
-  // Video Card
+  // Video Card - Use aspectRatio for responsive video sizing (no cropping)
   videoCard: {
     width: SCREEN_WIDTH - SPACING.lg * 2,
-    height: 220,
+    aspectRatio: 16 / 9, // Changed from fixed height to aspectRatio for full video display
     borderRadius: RADIUS.lg,
     marginHorizontal: SPACING.lg,
     marginBottom: SPACING.md,
     overflow: "hidden",
+    backgroundColor: "#000", // Black background for letterboxing
     ...SHADOWS.md,
   },
   videoThumbnail: {
     width: "100%",
     height: "100%",
+    resizeMode: "contain", // Added to prevent video cropping
   },
   videoGradient: {
     ...StyleSheet.absoluteFillObject,
@@ -1018,17 +1022,19 @@ const styles = StyleSheet.create({
     color: "rgba(255,255,255,0.8)",
   },
 
-  // Video Small
+  // Video Small - Use aspectRatio for responsive sizing
   videoCardSmall: {
     width: 140,
-    height: 200,
+    aspectRatio: 9 / 16, // Changed from fixed height for vertical video support
     borderRadius: RADIUS.lg,
     marginRight: SPACING.md,
     overflow: "hidden",
+    backgroundColor: "#000", // Black background for letterboxing
   },
   videoThumbnailSmall: {
     width: "100%",
     height: "100%",
+    resizeMode: "contain", // Added to prevent video cropping
   },
   durationBadge: {
     backgroundColor: "rgba(0,0,0,0.7)",

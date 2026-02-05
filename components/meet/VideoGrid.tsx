@@ -146,7 +146,7 @@ function VideoTile({
         <View style={styles.nameContainer}>
           <Text style={styles.tileName} numberOfLines={1}>
             {participant.name}
-            {participant.isLocal && " (Bạn)"}
+            {participant.isLocal ? " (Bạn)" : ""}
           </Text>
         </View>
 
@@ -326,7 +326,7 @@ export function VideoGrid({
 
       return { cols, rows, tileWidth, tileHeight };
     },
-    [maxVisibleParticipants]
+    [maxVisibleParticipants],
   );
 
   const handleModeChange = useCallback(
@@ -334,14 +334,14 @@ export function VideoGrid({
       setCurrentMode(mode);
       onViewModeChange?.(mode);
     },
-    [onViewModeChange]
+    [onViewModeChange],
   );
 
   const handleParticipantPress = useCallback(
     (participant: VideoParticipant) => {
       onParticipantPress?.(participant);
     },
-    [onParticipantPress]
+    [onParticipantPress],
   );
 
   const handleParticipantLongPress = useCallback(
@@ -359,7 +359,7 @@ export function VideoGrid({
         onSpotlightChange?.(participant.id);
       }
     },
-    [currentMode, spotlightParticipantId, onSpotlightChange, handleModeChange]
+    [currentMode, spotlightParticipantId, onSpotlightChange, handleModeChange],
   );
 
   // ============================================================================
@@ -369,11 +369,11 @@ export function VideoGrid({
   const renderGridView = () => {
     const visibleParticipants = allParticipants.slice(
       0,
-      maxVisibleParticipants
+      maxVisibleParticipants,
     );
     const hiddenCount = allParticipants.length - maxVisibleParticipants;
     const { cols, tileWidth, tileHeight } = calculateGridLayout(
-      visibleParticipants.length
+      visibleParticipants.length,
     );
 
     return (
@@ -414,7 +414,7 @@ export function VideoGrid({
   const renderSpeakerView = () => {
     const mainParticipant = activeSpeaker || allParticipants[0];
     const thumbnailParticipants = allParticipants.filter(
-      (p) => p.id !== mainParticipant?.id
+      (p) => p.id !== mainParticipant?.id,
     );
 
     const mainSize = {
@@ -470,7 +470,7 @@ export function VideoGrid({
     const mainParticipant =
       spotlightParticipant || activeSpeaker || allParticipants[0];
     const thumbnailParticipants = allParticipants.filter(
-      (p) => p.id !== mainParticipant?.id
+      (p) => p.id !== mainParticipant?.id,
     );
 
     const mainSize = {

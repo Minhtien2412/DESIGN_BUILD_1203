@@ -2,7 +2,7 @@
  * Memoization optimizations for performance-critical components
  */
 
-import React from 'react';
+import React from "react";
 
 /**
  * Memoized Live Stream Card Component
@@ -20,9 +20,9 @@ export const MemoizedLiveStreamCard = React.memo(
       prevProps.stream.viewerCount === nextProps.stream.viewerCount &&
       prevProps.stream.status === nextProps.stream.status
     );
-  }
+  },
 );
-MemoizedLiveStreamCard.displayName = 'MemoizedLiveStreamCard';
+MemoizedLiveStreamCard.displayName = "MemoizedLiveStreamCard";
 
 /**
  * Memoized Activity Feed Item Component
@@ -38,9 +38,9 @@ export const MemoizedActivityItem = React.memo(
       prevProps.activity.id === nextProps.activity.id &&
       prevProps.activity.timestamp === nextProps.activity.timestamp
     );
-  }
+  },
 );
-MemoizedActivityItem.displayName = 'MemoizedActivityItem';
+MemoizedActivityItem.displayName = "MemoizedActivityItem";
 
 /**
  * Memoized Product Card Component
@@ -58,9 +58,9 @@ export const MemoizedProductCard = React.memo(
       prevProps.product.stock === nextProps.product.stock &&
       prevProps.onPress === nextProps.onPress
     );
-  }
+  },
 );
-MemoizedProductCard.displayName = 'MemoizedProductCard';
+MemoizedProductCard.displayName = "MemoizedProductCard";
 
 /**
  * Memoized Story Item Component
@@ -76,9 +76,9 @@ export const MemoizedStoryItem = React.memo(
       prevProps.hasUnviewed === nextProps.hasUnviewed &&
       prevProps.onPress === nextProps.onPress
     );
-  }
+  },
 );
-MemoizedStoryItem.displayName = 'MemoizedStoryItem';
+MemoizedStoryItem.displayName = "MemoizedStoryItem";
 
 /**
  * Hook: Memoized expensive calculations
@@ -87,7 +87,7 @@ MemoizedStoryItem.displayName = 'MemoizedStoryItem';
 export function useMemoizedFilter<T>(
   items: T[],
   filterFn: (item: T) => boolean,
-  sortFn?: (a: T, b: T) => number
+  sortFn?: (a: T, b: T) => number,
 ) {
   return React.useMemo(() => {
     const filtered = items.filter(filterFn);
@@ -102,7 +102,7 @@ export function useMemoizedFilter<T>(
 export function useMemoizedSearch<T>(
   items: T[],
   searchTerm: string,
-  searchFields: (keyof T)[]
+  searchFields: (keyof T)[],
 ) {
   return React.useMemo(() => {
     if (!searchTerm.trim()) return items;
@@ -112,10 +112,9 @@ export function useMemoizedSearch<T>(
       searchFields.some((field) => {
         const value = item[field];
         return (
-          typeof value === 'string' &&
-          value.toLowerCase().includes(lowerSearch)
+          typeof value === "string" && value.toLowerCase().includes(lowerSearch)
         );
-      })
+      }),
     );
   }, [items, searchTerm, searchFields]);
 }
@@ -126,7 +125,7 @@ export function useMemoizedSearch<T>(
  */
 export function useMemoizedGroupBy<T>(
   items: T[],
-  keySelector: (item: T) => string
+  keySelector: (item: T) => string,
 ) {
   return React.useMemo(() => {
     const groups = new Map<string, T[]>();
@@ -148,7 +147,7 @@ export function useMemoizedGroupBy<T>(
  */
 export function useStableCallback<T extends (...args: any[]) => any>(
   callback: T,
-  deps: React.DependencyList
+  deps: React.DependencyList,
 ): T {
   return React.useCallback(callback, deps) as T;
 }
@@ -159,7 +158,7 @@ export function useStableCallback<T extends (...args: any[]) => any>(
  */
 export function useMemoizedDerivedState<T, R>(
   sourceData: T,
-  deriveFn: (data: T) => R
+  deriveFn: (data: T) => R,
 ): R {
   return React.useMemo(() => deriveFn(sourceData), [sourceData, deriveFn]);
 }
@@ -168,7 +167,9 @@ export function useMemoizedDerivedState<T, R>(
  * Component: Memoized list renderer
  * Optimizes FlatList rendering performance
  */
-export function memoizedKeyExtractor<T extends { id: string }>(item: T): string {
+export function memoizedKeyExtractor<T extends { id: string }>(
+  item: T,
+): string {
   return item.id;
 }
 
@@ -178,14 +179,14 @@ export function memoizedKeyExtractor<T extends { id: string }>(item: T): string 
  */
 export function createMemoizedRenderItem<T>(
   Component: React.ComponentType<{ item: T; index: number }>,
-  arePropsEqual?: (prevProps: any, nextProps: any) => boolean
+  arePropsEqual?: (prevProps: any, nextProps: any) => boolean,
 ) {
   const MemoizedComponent = React.memo(Component, arePropsEqual);
 
   const RenderItem = ({ item, index }: { item: T; index: number }) => (
     <MemoizedComponent item={item} index={index} />
   );
-  RenderItem.displayName = 'MemoizedRenderItem';
+  RenderItem.displayName = "MemoizedRenderItem";
   return RenderItem;
 }
 
@@ -194,7 +195,7 @@ export function createMemoizedRenderItem<T>(
  */
 export function withMemo<P extends object>(
   Component: React.ComponentType<P>,
-  arePropsEqual?: (prevProps: P, nextProps: P) => boolean
+  arePropsEqual?: (prevProps: P, nextProps: P) => boolean,
 ) {
   return React.memo(Component, arePropsEqual);
 }
@@ -208,7 +209,9 @@ export function useRenderCount(componentName: string) {
 
   React.useEffect(() => {
     renderCount.current += 1;
-    console.log(`[Perf] ${componentName} rendered ${renderCount.current} times`);
+    console.log(
+      `[Perf] ${componentName} rendered ${renderCount.current} times`,
+    );
   });
 
   return renderCount.current;
@@ -236,7 +239,8 @@ export const shallowEqual = (obj1: any, obj2: any): boolean => {
 export const deepEqual = (obj1: any, obj2: any): boolean => {
   if (obj1 === obj2) return true;
   if (!obj1 || !obj2) return false;
-  if (typeof obj1 !== 'object' || typeof obj2 !== 'object') return obj1 === obj2;
+  if (typeof obj1 !== "object" || typeof obj2 !== "object")
+    return obj1 === obj2;
 
   const keys1 = Object.keys(obj1);
   const keys2 = Object.keys(obj2);

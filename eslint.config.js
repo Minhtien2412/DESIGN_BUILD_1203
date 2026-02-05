@@ -8,42 +8,65 @@ module.exports = defineConfig([
     ignores: [
       "dist/*",
       "services/legacy/*",
-      "BE-baotienweb.cloud/*",
+      "BE-baotienweb.cloud/**/*",
       "lib/construction-map/examples/*",
-      "backups/*",
-      "src/*", // Legacy src folder
-      "testing/*",
-      "scripts/*",
-      "mocks/*",
+      "backups/**/*",
+      "src/**/*", // Legacy src folder - entire directory
+      "testing/**/*",
+      "scripts/**/*",
+      "mocks/**/*",
       "*.config.js",
-      "coverage/*",
-      "perfex-crm-ai-architect/*",
-      "web/*",
-      "e2e/*",
+      "coverage/**/*",
+      "perfex-crm-ai-architect/**/*",
+      "lib/construction-map/vite.config.ts",
+      "lib/construction-map/dist/**/*",
+      "features/progress-report-source/**/*",
+      "features/call/CallScreen.tsx.disabled",
+      "lib/communication/webrtc.ts", // Uses react-native-webrtc which is not installed
+      "shared/utils/deviceUtils.ts", // Contains non-hook functions with Hook-like names
+      "**/vite.config.ts",
+      "**/vite.config.*.ts",
+      "web/**/*",
+      "e2e/**/*",
+      "__tests__/**/*",
+      "backend/**/*",
+      "docs/**/*",
+      "deployment/**/*",
+      "prisma/**/*",
+      "openapi/**/*",
     ],
   },
   {
     // Customize rules for the main app - reduce noise for production
     rules: {
-      // Unused vars - allow underscore prefix AND ignore rest siblings
-      "@typescript-eslint/no-unused-vars": [
-        "warn",
-        {
-          argsIgnorePattern: "^_",
-          varsIgnorePattern: "^_|^(width|height|error|err|e)$",
-          caughtErrorsIgnorePattern: "^_|^(error|err|e)$",
-          ignoreRestSiblings: true,
-        },
-      ],
       // exhaustive-deps - downgrade to off for animations (common pattern)
       "react-hooks/exhaustive-deps": "off",
       // Import warnings - reduce noise
       "import/no-named-as-default": "off",
       "import/no-named-as-default-member": "off",
+      "import/no-duplicates": "off",
+      "import/first": "off",
       // React specific - reduce noise for anonymous functions
       "react/display-name": "off",
       // Allow unescaped quotes in JSX (common in Vietnamese text)
       "react/no-unescaped-entities": "off",
+      // Allow unused vars with _ prefix (intentionally ignored)
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_",
+        },
+      ],
+      // Allow require() imports for assets and dynamic imports
+      "@typescript-eslint/no-require-imports": "off",
+      // Allow Array<T> syntax
+      "@typescript-eslint/array-type": "off",
+      // Allow empty interfaces
+      "@typescript-eslint/no-empty-object-type": "off",
+      // Allow expressions
+      "no-unused-expressions": "off",
     },
   },
 ]);

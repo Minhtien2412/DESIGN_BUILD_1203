@@ -7,6 +7,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as FileSystem from 'expo-file-system';
 import { Platform } from 'react-native';
+import ENV from '@/config/env';
 
 // Keys for offline storage
 const STORAGE_KEYS = {
@@ -26,6 +27,15 @@ export interface OfflineDocument {
   type: string;
   size: number;
   localUri?: string;
+  fileName?: string;
+  mimeType?: string;
+  category?: string;
+  description?: string;
+  tags?: string[];
+  folderId?: string;
+  accessLevel?: string;
+  metadata?: Record<string, any>;
+  remoteUrl?: string;
   createdAt: string;
   updatedAt: string;
   syncStatus: 'pending' | 'synced' | 'error';
@@ -66,6 +76,8 @@ export interface PendingUpload {
   createdAt: string;
   retryCount: number;
   lastError?: string;
+  offlineDocId?: string;
+  projectId?: string;
 }
 
 export interface CachedFile {
@@ -404,50 +416,157 @@ export const SyncService = {
       errors: [] as string[],
     };
 
-    // Sync pending documents
-    const documents = await OfflineDocuments.getAll();
-    const pendingDocs = documents.filter(d => d.syncStatus === 'pending');
-    
-    for (const doc of pendingDocs) {
-      try {
-        // TODO: Khi BE endpoint /documents sẵn sàng, implement sync logic ở đây
-        // const response = await fetch(`${apiBaseUrl}/documents`, {
-        //   method: 'POST',
-        //   headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
-        //   body: JSON.stringify(doc),
-        // });
-        // if (response.ok) {
-        //   await OfflineDocuments.update(doc.id, { syncStatus: 'synced' });
-        //   results.documents++;
-        // }
-        console.log(`[SYNC] Document ${doc.id} pending sync (BE not ready)`);
-      } catch (error) {
-        results.errors.push(`Document ${doc.id}: ${error}`);
-        await OfflineDocuments.update(doc.id, { syncStatus: 'error' });
-      }
+    const headers: Record<string, string> = {
+      Authorization: `Bearer ${authToken}`,
+    };
+    if (ENV.API_KEY) {
+      headers['X-API-Key'] = ENV.API_KEY;
     }
 
-    // Sync pending uploads
+    const uploadDocument = async (payload: {
+      localUri: string;
+      fileName: string;
+      mimeType: string;
+      projectId: string;
+      name: string;
+      description?: string;
+      category?: string;
+      folderId?: string;
+      tags?: string[];
+      accessLevel?: string;
+      metadata?: Record<string, any>;
+    }) => {
+      const formData = new FormData();
+      formData.append('file', {
+        uri: payload.localUri,
+        name: payload.fileName,
+        type: payload.mimeType,
+      } as any);
+      formData.append('projectId', payload.projectId);
+      formData.append('name', payload.name);
+      if (payload.description) formData.append('description', payload.description);
+      if (payload.category) formData.append('category', payload.category);
+      if (payload.folderId) formData.append('folderId', payload.folderId);
+      if (payload.tags?.length) formData.append('tags', JSON.stringify(payload.tags));
+      if (payload.accessLevel) formData.append('accessLevel', payload.accessLevel);
+      if (payload.metadata) formData.append('metadata', JSON.stringify(payload.metadata));
+
+      const response = await fetch(`${apiBaseUrl}/documents/upload`, {
+        method: 'POST',
+        headers,
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Upload failed (${response.status})`);
+      }
+
+      return response.json().catch(() => ({}));
+    };
+
+    // Sync pending uploads first (documents)
     const pendingUploads = await FileCache.getPendingUploads();
-    
+    const processedDocIds = new Set<string>();
+
     for (const upload of pendingUploads) {
       if (upload.retryCount >= 3) {
         results.errors.push(`Upload ${upload.id}: Max retries exceeded`);
         continue;
       }
 
-      try {
-        // TODO: Implement upload sync when BE ready
-        console.log(`[SYNC] Upload ${upload.id} pending sync (BE not ready)`);
-        await FileCache.updatePendingUpload(upload.id, { 
-          retryCount: upload.retryCount + 1 
+      if (upload.type !== 'document') {
+        await FileCache.updatePendingUpload(upload.id, {
+          retryCount: upload.retryCount + 1,
+          lastError: 'Unsupported upload type for sync',
         });
+        continue;
+      }
+
+      try {
+        const offlineDoc = upload.offlineDocId
+          ? await OfflineDocuments.getById(upload.offlineDocId)
+          : undefined;
+
+        const projectId = upload.projectId || offlineDoc?.projectId;
+        if (!projectId) {
+          throw new Error('Missing projectId for document upload');
+        }
+
+        const responseData = await uploadDocument({
+          localUri: upload.localUri,
+          fileName: upload.fileName,
+          mimeType: upload.mimeType || 'application/octet-stream',
+          projectId,
+          name: offlineDoc?.name || upload.fileName,
+          description: offlineDoc?.description,
+          category: offlineDoc?.category,
+          folderId: offlineDoc?.folderId,
+          tags: offlineDoc?.tags,
+          accessLevel: offlineDoc?.accessLevel,
+          metadata: offlineDoc?.metadata,
+        });
+
+        await FileCache.removePendingUpload(upload.id);
+
+        if (offlineDoc) {
+          const docData = responseData?.data ?? responseData;
+          const remoteUrl =
+            docData?.fileUrl || docData?.url || docData?.fileUrl;
+          await OfflineDocuments.update(offlineDoc.id, {
+            syncStatus: 'synced',
+            remoteUrl: remoteUrl || offlineDoc.remoteUrl,
+          });
+          processedDocIds.add(offlineDoc.id);
+          results.documents++;
+        }
+
+        results.uploads++;
       } catch (error) {
         results.errors.push(`Upload ${upload.id}: ${error}`);
-        await FileCache.updatePendingUpload(upload.id, { 
+        await FileCache.updatePendingUpload(upload.id, {
           retryCount: upload.retryCount + 1,
           lastError: String(error),
         });
+      }
+    }
+
+    // Sync pending documents that are not tied to uploads
+    const documents = await OfflineDocuments.getAll();
+    const pendingDocs = documents.filter((d) => d.syncStatus === 'pending');
+
+    for (const doc of pendingDocs) {
+      if (processedDocIds.has(doc.id)) continue;
+      if (!doc.localUri) continue;
+
+      try {
+        const projectId = doc.projectId;
+        if (!projectId) throw new Error('Missing projectId for document sync');
+
+        const responseData = await uploadDocument({
+          localUri: doc.localUri,
+          fileName: doc.fileName || doc.name,
+          mimeType: doc.mimeType || 'application/octet-stream',
+          projectId,
+          name: doc.name,
+          description: doc.description,
+          category: doc.category,
+          folderId: doc.folderId,
+          tags: doc.tags,
+          accessLevel: doc.accessLevel,
+          metadata: doc.metadata,
+        });
+
+        const docData = responseData?.data ?? responseData;
+        const remoteUrl = docData?.fileUrl || docData?.url || docData?.fileUrl;
+
+        await OfflineDocuments.update(doc.id, {
+          syncStatus: 'synced',
+          remoteUrl: remoteUrl || doc.remoteUrl,
+        });
+        results.documents++;
+      } catch (error) {
+        results.errors.push(`Document ${doc.id}: ${error}`);
+        await OfflineDocuments.update(doc.id, { syncStatus: 'error' });
       }
     }
 

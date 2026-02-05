@@ -7,7 +7,8 @@
  */
 
 import { Ionicons } from "@expo/vector-icons";
-import { ResizeMode, Video } from "expo-av";
+import { useEvent } from "expo";
+import { VideoView, useVideoPlayer } from "expo-video";
 import { File as ExpoFile, Paths } from "expo-file-system";
 import { Image, ImageContentFit } from "expo-image";
 import * as ImageManipulator from "expo-image-manipulator";
@@ -18,6 +19,7 @@ import React, {
     createContext,
     useCallback,
     useContext,
+    useEffect,
     useMemo,
     useRef,
     useState,
@@ -369,8 +371,13 @@ function FullMediaViewerContent({
 
       {/* Controls Overlay */}
       <Animated.View
-        style={[styles.controlsOverlay, { opacity: controlsOpacity }]}
-        pointerEvents={showControls ? "auto" : "none"}
+        style={[
+          styles.controlsOverlay,
+          {
+            opacity: controlsOpacity,
+            pointerEvents: showControls ? "auto" : "none",
+          },
+        ]}
       >
         {/* Header */}
         <SafeAreaView style={styles.header}>
@@ -594,39 +601,50 @@ interface VideoPlayerProps {
 }
 
 function VideoPlayer({ file, onTap }: VideoPlayerProps) {
-  const videoRef = useRef<Video>(null);
+  const player = useVideoPlayer(file.uri, (player) => {
+    player.loop = false;
+    player.timeUpdateEventInterval = 0.5;
+  });
+  const status = useEvent(player, "statusChange", { status: player.status });
+  const playing = useEvent(player, "playingChange", {
+    isPlaying: player.playing,
+  });
+  const timeUpdate = useEvent(player, "timeUpdate", {
+    currentTime: player.currentTime,
+    bufferedPosition: player.bufferedPosition,
+    currentLiveTimestamp: null,
+    currentOffsetFromLive: null,
+  });
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const [showControls, setShowControls] = useState(true);
 
-  const togglePlayPause = useCallback(async () => {
-    if (videoRef.current) {
-      if (isPlaying) {
-        await videoRef.current.pauseAsync();
-      } else {
-        await videoRef.current.playAsync();
-      }
-      setIsPlaying(!isPlaying);
-    }
-  }, [isPlaying]);
+  useEffect(() => {
+    setIsLoading(status.status !== "readyToPlay");
+  }, [status.status]);
 
-  const handleLoad = useCallback((status: any) => {
-    setIsLoading(false);
-    if (status.durationMillis) {
-      setDuration(status.durationMillis);
-    }
-  }, []);
+  useEffect(() => {
+    setIsPlaying(playing.isPlaying);
+  }, [playing.isPlaying]);
 
-  const handlePlaybackStatusUpdate = useCallback((status: any) => {
-    if (status.isLoaded) {
-      setIsPlaying(status.isPlaying);
-      if (status.positionMillis && status.durationMillis) {
-        setProgress(status.positionMillis / status.durationMillis);
-      }
+  useEffect(() => {
+    const durationMs = player.duration ? player.duration * 1000 : 0;
+    if (durationMs > 0) {
+      setDuration(durationMs);
+      setProgress(timeUpdate.currentTime / (player.duration || 1));
     }
-  }, []);
+  }, [timeUpdate.currentTime, player.duration]);
+
+  const togglePlayPause = useCallback(() => {
+    if (isPlaying) {
+      player.pause();
+    } else {
+      player.play();
+    }
+    setIsPlaying(!isPlaying);
+  }, [isPlaying, player]);
 
   const formatTime = (millis: number) => {
     const totalSeconds = Math.floor(millis / 1000);
@@ -641,26 +659,22 @@ function VideoPlayer({ file, onTap }: VideoPlayerProps) {
   }, [onTap]);
 
   const handleSeek = useCallback(
-    async (value: number) => {
-      if (videoRef.current && duration > 0) {
-        await videoRef.current.setPositionAsync(value * duration);
+    (value: number) => {
+      if (duration > 0) {
+        player.currentTime = (value * duration) / 1000;
       }
     },
-    [duration],
+    [duration, player],
   );
 
   return (
     <View style={videoStyles.container}>
-      <Video
-        ref={videoRef}
-        source={{ uri: file.uri }}
+      <VideoView
+        player={player}
         style={videoStyles.video}
-        resizeMode={ResizeMode.CONTAIN}
-        shouldPlay={false}
-        isLooping={false}
-        onLoad={handleLoad}
-        onPlaybackStatusUpdate={handlePlaybackStatusUpdate}
-        useNativeControls={false}
+        contentFit="contain"
+        nativeControls={false}
+        onFirstFrameRender={() => setIsLoading(false)}
       />
 
       {/* Loading indicator */}

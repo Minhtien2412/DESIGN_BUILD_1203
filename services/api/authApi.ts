@@ -125,7 +125,7 @@ export async function register(dto: RegisterDto): Promise<AuthResponse> {
  * Returns new access token and refresh token
  */
 export async function refreshAccessToken(
-  refreshToken: string
+  refreshToken: string,
 ): Promise<RefreshTokenResponse> {
   try {
     console.log("[authApi] Attempting token refresh");
@@ -294,7 +294,7 @@ export interface ResetPasswordDto {
  * Endpoint: POST /auth/forgot-password
  */
 export async function forgotPassword(
-  dto: ForgotPasswordDto
+  dto: ForgotPasswordDto,
 ): Promise<{ success: boolean; message: string }> {
   try {
     console.log("[authApi] Requesting password reset for:", dto.email);
@@ -316,7 +316,7 @@ export async function forgotPassword(
  * Endpoint: POST /auth/reset-password
  */
 export async function resetPassword(
-  dto: ResetPasswordDto
+  dto: ResetPasswordDto,
 ): Promise<{ success: boolean; message: string }> {
   try {
     console.log("[authApi] Resetting password with token");
@@ -329,6 +329,202 @@ export async function resetPassword(
     });
   } catch (error) {
     console.error("[authApi] resetPassword error:", error);
+    throw error;
+  }
+}
+
+// ==================== 2FA (Two-Factor Authentication) ====================
+
+// 2FA Registration Types
+export interface TwoFARegisterSendOtpDto {
+  email: string;
+}
+
+export interface TwoFARegisterSendOtpResponse {
+  success: boolean;
+  message: string;
+}
+
+export interface TwoFARegisterVerifyDto {
+  email: string;
+  otp: string;
+  password: string;
+  name: string;
+  phone?: string;
+}
+
+export interface TwoFARegisterVerifyResponse {
+  accessToken: string;
+  refreshToken: string;
+  user: User;
+}
+
+// 2FA Login Types
+export interface TwoFALoginRequestOtpDto {
+  email: string;
+  password: string;
+}
+
+export interface TwoFALoginRequestOtpResponse {
+  success: boolean;
+  message: string;
+  tempToken: string; // Temporary token for 2FA verification
+}
+
+export interface TwoFALoginVerifyDto {
+  email: string;
+  tempToken: string;
+  otp: string;
+}
+
+export interface TwoFALoginVerifyResponse {
+  accessToken: string;
+  refreshToken: string;
+  user: User;
+}
+
+export interface TwoFAResendOtpDto {
+  email: string;
+}
+
+export interface TwoFAResendOtpResponse {
+  success: boolean;
+  message: string;
+}
+
+// ==================== 2FA API METHODS ====================
+
+/**
+ * 2FA Registration - Step 1: Send OTP to email
+ * Endpoint: POST /auth/2fa/register/send-otp
+ */
+export async function twoFARegisterSendOtp(
+  dto: TwoFARegisterSendOtpDto,
+): Promise<TwoFARegisterSendOtpResponse> {
+  try {
+    console.log("[authApi] 2FA Register - Sending OTP to:", dto.email);
+    return await apiFetch<TwoFARegisterSendOtpResponse>(
+      "/auth/2fa/register/send-otp",
+      {
+        method: "POST",
+        data: dto,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
+  } catch (error) {
+    console.error("[authApi] twoFARegisterSendOtp error:", error);
+    throw error;
+  }
+}
+
+/**
+ * 2FA Registration - Step 2: Verify OTP and create account
+ * Endpoint: POST /auth/2fa/register/verify
+ */
+export async function twoFARegisterVerify(
+  dto: TwoFARegisterVerifyDto,
+): Promise<TwoFARegisterVerifyResponse> {
+  try {
+    console.log("[authApi] 2FA Register - Verifying OTP for:", dto.email);
+    return await apiFetch<TwoFARegisterVerifyResponse>(
+      "/auth/2fa/register/verify",
+      {
+        method: "POST",
+        data: dto,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
+  } catch (error) {
+    console.error("[authApi] twoFARegisterVerify error:", error);
+    throw error;
+  }
+}
+
+/**
+ * 2FA Registration - Resend OTP
+ * Endpoint: POST /auth/2fa/register/resend-otp
+ */
+export async function twoFARegisterResendOtp(
+  dto: TwoFAResendOtpDto,
+): Promise<TwoFAResendOtpResponse> {
+  try {
+    console.log("[authApi] 2FA Register - Resending OTP to:", dto.email);
+    return await apiFetch<TwoFAResendOtpResponse>(
+      "/auth/2fa/register/resend-otp",
+      {
+        method: "POST",
+        data: dto,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
+  } catch (error) {
+    console.error("[authApi] twoFARegisterResendOtp error:", error);
+    throw error;
+  }
+}
+
+/**
+ * 2FA Login - Step 1: Verify password and request OTP
+ * Endpoint: POST /auth/2fa/login/request-otp
+ */
+export async function twoFALoginRequestOtp(
+  dto: TwoFALoginRequestOtpDto,
+): Promise<TwoFALoginRequestOtpResponse> {
+  try {
+    console.log("[authApi] 2FA Login - Requesting OTP for:", dto.email);
+    return await apiFetch<TwoFALoginRequestOtpResponse>(
+      "/auth/2fa/login/request-otp",
+      {
+        method: "POST",
+        data: dto,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
+  } catch (error) {
+    console.error("[authApi] twoFALoginRequestOtp error:", error);
+    throw error;
+  }
+}
+
+/**
+ * 2FA Login - Step 2: Verify OTP and get tokens
+ * Endpoint: POST /auth/2fa/login/verify
+ */
+export async function twoFALoginVerify(
+  dto: TwoFALoginVerifyDto,
+): Promise<TwoFALoginVerifyResponse> {
+  try {
+    console.log("[authApi] 2FA Login - Verifying OTP for:", dto.email);
+    return await apiFetch<TwoFALoginVerifyResponse>("/auth/2fa/login/verify", {
+      method: "POST",
+      data: dto,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    console.error("[authApi] twoFALoginVerify error:", error);
+    throw error;
+  }
+}
+
+/**
+ * 2FA Login - Resend OTP
+ * Endpoint: POST /auth/2fa/login/resend-otp
+ */
+export async function twoFALoginResendOtp(
+  dto: TwoFAResendOtpDto,
+): Promise<TwoFAResendOtpResponse> {
+  try {
+    console.log("[authApi] 2FA Login - Resending OTP to:", dto.email);
+    return await apiFetch<TwoFAResendOtpResponse>(
+      "/auth/2fa/login/resend-otp",
+      {
+        method: "POST",
+        data: dto,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
+  } catch (error) {
+    console.error("[authApi] twoFALoginResendOtp error:", error);
     throw error;
   }
 }
@@ -349,6 +545,13 @@ export const authApi = {
   // Password Reset
   forgotPassword,
   resetPassword,
+  // 2FA (Two-Factor Authentication)
+  twoFARegisterSendOtp,
+  twoFARegisterVerify,
+  twoFARegisterResendOtp,
+  twoFALoginRequestOtp,
+  twoFALoginVerify,
+  twoFALoginResendOtp,
   // Generic POST helper for custom endpoints
   post: async (endpoint: string, data: any) => {
     return await apiFetch(`${BASE_URL}${endpoint}`, {

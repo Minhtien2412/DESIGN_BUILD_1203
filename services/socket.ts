@@ -1,7 +1,7 @@
 /**
  * Socket.IO Client Service
  * Based on FRONTEND-INTEGRATION-GUIDE.md
- * 
+ *
  * Features:
  * - Real-time chat
  * - Notifications
@@ -9,13 +9,11 @@
  * - Typing indicators
  */
 
-import ENV from '@/config/env';
-import { Platform } from 'react-native';
-import io from 'socket.io-client';
-import { getAccessToken } from './apiClient';
-
-// Extract Socket type from io return type
-type Socket = ReturnType<typeof io>;
+import ENV from "@/config/env";
+import type { Socket } from "@/utils/socketIo";
+import { getSocketIo } from "@/utils/socketIo";
+import { Platform } from "react-native";
+import { getAccessToken } from "./apiClient";
 
 // ============================================================================
 // Types
@@ -26,7 +24,7 @@ export interface ChatMessage {
   projectId: string;
   userId: string;
   content: string;
-  type: 'text' | 'image' | 'file';
+  type: "text" | "image" | "file";
   createdAt: string;
   user: {
     id: string;
@@ -40,7 +38,7 @@ export interface Notification {
   userId: string;
   title: string;
   message: string;
-  type: 'payment' | 'project' | 'message' | 'system';
+  type: "payment" | "project" | "message" | "system";
   read: boolean;
   createdAt: string;
   data?: any;
@@ -48,7 +46,11 @@ export interface Notification {
 
 export interface ProjectUpdate {
   projectId: string;
-  type: 'status_changed' | 'member_added' | 'milestone_completed' | 'task_updated';
+  type:
+    | "status_changed"
+    | "member_added"
+    | "milestone_completed"
+    | "task_updated";
   data: any;
 }
 
@@ -60,13 +62,24 @@ export interface TypingIndicator {
 
 export interface LiveStreamEvent {
   streamId: string;
-  type: 'started' | 'ended' | 'viewer_joined' | 'viewer_left' | 'comment' | 'reaction';
+  type:
+    | "started"
+    | "ended"
+    | "viewer_joined"
+    | "viewer_left"
+    | "comment"
+    | "reaction";
   data?: any;
 }
 
 export interface ActivityFeedEvent {
   id: string;
-  type: 'project_created' | 'payment_received' | 'milestone_completed' | 'user_joined' | 'comment_added';
+  type:
+    | "project_created"
+    | "payment_received"
+    | "milestone_completed"
+    | "user_joined"
+    | "comment_added";
   userId: string;
   userName: string;
   userAvatar?: string;
@@ -83,15 +96,15 @@ class SocketManager {
   private socket: Socket | null = null;
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
-  private namespace: string = '/chat'; // Default namespace
+  private namespace: string = "/chat"; // Default namespace
 
   /**
    * Initialize socket connection to a specific namespace
    * @param namespace - Socket.IO namespace ('/chat', '/call', '/progress')
    */
-  async connect(namespace: string = '/chat'): Promise<Socket> {
+  async connect(namespace: string = "/chat"): Promise<Socket> {
     if (this.socket?.connected && this.namespace === namespace) {
-      console.log('[Socket] Already connected to', namespace);
+      console.log("[Socket] Already connected to", namespace);
       return this.socket;
     }
 
@@ -102,19 +115,22 @@ class SocketManager {
 
     const token = await getAccessToken();
     if (!token) {
-      throw new Error('No access token available for socket connection');
+      throw new Error("No access token available for socket connection");
     }
 
     // Use base URL + namespace (e.g., wss://baotienweb.cloud + /chat)
-    const baseUrl = this.normalizeWsUrl(ENV.WS_BASE_URL || ENV.WS_URL || ENV.API_BASE_URL);
+    const baseUrl = this.normalizeWsUrl(
+      ENV.WS_BASE_URL || ENV.WS_URL || ENV.API_BASE_URL,
+    );
     const wsUrl = `${baseUrl}${namespace}`;
-    
-    console.log('[Socket] Connecting to:', wsUrl);
+
+    console.log("[Socket] Connecting to:", wsUrl);
     this.namespace = namespace;
 
+    const io = await getSocketIo();
     this.socket = io(wsUrl, {
       auth: { token },
-      transports: ['websocket', 'polling'],
+      transports: ["websocket", "polling"],
       reconnection: true,
       reconnectionAttempts: this.maxReconnectAttempts,
       reconnectionDelay: 1000,
@@ -130,21 +146,21 @@ class SocketManager {
    * Connect to Chat namespace
    */
   async connectChat(): Promise<Socket> {
-    return this.connect(ENV.WS_CHAT_NS || '/chat');
+    return this.connect(ENV.WS_CHAT_NS || "/chat");
   }
 
   /**
    * Connect to Call namespace
    */
   async connectCall(): Promise<Socket> {
-    return this.connect(ENV.WS_CALL_NS || '/call');
+    return this.connect(ENV.WS_CALL_NS || "/call");
   }
 
   /**
    * Connect to Progress namespace
    */
   async connectProgress(): Promise<Socket> {
-    return this.connect(ENV.WS_PROGRESS_NS || '/progress');
+    return this.connect(ENV.WS_PROGRESS_NS || "/progress");
   }
 
   /**
@@ -153,28 +169,28 @@ class SocketManager {
   private normalizeWsUrl(url: string): string {
     try {
       const wsUrl = new URL(url);
-      
+
       // Android emulator cannot reach localhost on host machine
       if (
-        Platform.OS === 'android' &&
-        (wsUrl.hostname === 'localhost' || wsUrl.hostname === '127.0.0.1')
+        Platform.OS === "android" &&
+        (wsUrl.hostname === "localhost" || wsUrl.hostname === "127.0.0.1")
       ) {
-        wsUrl.hostname = '10.0.2.2';
+        wsUrl.hostname = "10.0.2.2";
       }
 
-      return wsUrl.toString().replace(/\/$/, '');
+      return wsUrl.toString().replace(/\/$/, "");
     } catch {
       // Fallback for non-URL strings
       if (
-        Platform.OS === 'android' &&
-        (url.includes('localhost') || url.includes('127.0.0.1'))
+        Platform.OS === "android" &&
+        (url.includes("localhost") || url.includes("127.0.0.1"))
       ) {
         return url
-          .replace('localhost', '10.0.2.2')
-          .replace('127.0.0.1', '10.0.2.2')
-          .replace(/\/$/, '');
+          .replace("localhost", "10.0.2.2")
+          .replace("127.0.0.1", "10.0.2.2")
+          .replace(/\/$/, "");
       }
-      return url.replace(/\/$/, '');
+      return url.replace(/\/$/, "");
     }
   }
 
@@ -184,36 +200,42 @@ class SocketManager {
   private setupEventListeners() {
     if (!this.socket) return;
 
-    this.socket.on('connect', () => {
-      console.log('[Socket] ✅ Connected:', this.socket?.id);
+    this.socket.on("connect", () => {
+      console.log("[Socket] ✅ Connected:", this.socket?.id);
       this.reconnectAttempts = 0;
     });
 
-    this.socket.on('disconnect', (reason: string) => {
-      console.log('[Socket] ❌ Disconnected:', reason);
+    this.socket.on("disconnect", (reason: string) => {
+      console.log("[Socket] ❌ Disconnected:", reason);
     });
 
-    this.socket.on('connect_error', (error: Error) => {
+    this.socket.on("connect_error", (error: Error) => {
       // Safely log error to prevent Babel construct.js crash
       try {
-        console.warn('[Socket] Connection error:', error?.message || 'Unknown error');
+        console.warn(
+          "[Socket] Connection error:",
+          error?.message || "Unknown error",
+        );
       } catch (e) {
-        console.warn('[Socket] Connection error occurred');
+        console.warn("[Socket] Connection error occurred");
       }
       this.reconnectAttempts++;
 
       if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-        console.warn('[Socket] Max reconnection attempts reached');
+        console.warn("[Socket] Max reconnection attempts reached");
         this.disconnect();
       }
     });
 
-    this.socket.on('error', (error: Error) => {
+    this.socket.on("error", (error: Error) => {
       // Safely log error to prevent Babel crash
       try {
-        console.warn('[Socket] Error:', error?.message || 'Unknown socket error');
+        console.warn(
+          "[Socket] Error:",
+          error?.message || "Unknown socket error",
+        );
       } catch (e) {
-        console.warn('[Socket] Error occurred');
+        console.warn("[Socket] Error occurred");
       }
     });
   }
@@ -223,7 +245,7 @@ class SocketManager {
    */
   disconnect() {
     if (this.socket) {
-      console.log('[Socket] Disconnecting...');
+      console.log("[Socket] Disconnecting...");
       this.socket.disconnect();
       this.socket = null;
     }
@@ -252,10 +274,10 @@ class SocketManager {
    */
   joinChat(projectId: string) {
     if (!this.socket) {
-      throw new Error('Socket not connected');
+      throw new Error("Socket not connected");
     }
-    console.log('[Socket] Joining chat:', projectId);
-    this.socket.emit('join:chat', { projectId });
+    console.log("[Socket] Joining chat:", projectId);
+    this.socket.emit("join:chat", { projectId });
   }
 
   /**
@@ -263,19 +285,23 @@ class SocketManager {
    */
   leaveChat(projectId: string) {
     if (!this.socket) return;
-    console.log('[Socket] Leaving chat:', projectId);
-    this.socket.emit('leave:chat', { projectId });
+    console.log("[Socket] Leaving chat:", projectId);
+    this.socket.emit("leave:chat", { projectId });
   }
 
   /**
    * Send chat message
    */
-  sendMessage(projectId: string, content: string, type: 'text' | 'image' | 'file' = 'text') {
+  sendMessage(
+    projectId: string,
+    content: string,
+    type: "text" | "image" | "file" = "text",
+  ) {
     if (!this.socket) {
-      throw new Error('Socket not connected');
+      throw new Error("Socket not connected");
     }
-    console.log('[Socket] Sending message to:', projectId);
-    this.socket.emit('message:send', { projectId, content, type });
+    console.log("[Socket] Sending message to:", projectId);
+    this.socket.emit("message:send", { projectId, content, type });
   }
 
   /**
@@ -283,7 +309,7 @@ class SocketManager {
    */
   onNewMessage(callback: (message: ChatMessage) => void) {
     if (!this.socket) return;
-    this.socket.on('message:new', callback);
+    this.socket.on("message:new", callback);
   }
 
   /**
@@ -292,9 +318,9 @@ class SocketManager {
   offNewMessage(callback?: (message: ChatMessage) => void) {
     if (!this.socket) return;
     if (callback) {
-      this.socket.off('message:new', callback);
+      this.socket.off("message:new", callback);
     } else {
-      this.socket.off('message:new');
+      this.socket.off("message:new");
     }
   }
 
@@ -303,7 +329,7 @@ class SocketManager {
    */
   startTyping(projectId: string) {
     if (!this.socket) return;
-    this.socket.emit('typing:start', { projectId });
+    this.socket.emit("typing:start", { projectId });
   }
 
   /**
@@ -311,7 +337,7 @@ class SocketManager {
    */
   stopTyping(projectId: string) {
     if (!this.socket) return;
-    this.socket.emit('typing:stop', { projectId });
+    this.socket.emit("typing:stop", { projectId });
   }
 
   /**
@@ -319,7 +345,7 @@ class SocketManager {
    */
   onTyping(callback: (data: TypingIndicator) => void) {
     if (!this.socket) return;
-    this.socket.on('typing:user', callback);
+    this.socket.on("typing:user", callback);
   }
 
   /**
@@ -328,9 +354,9 @@ class SocketManager {
   offTyping(callback?: (data: TypingIndicator) => void) {
     if (!this.socket) return;
     if (callback) {
-      this.socket.off('typing:user', callback);
+      this.socket.off("typing:user", callback);
     } else {
-      this.socket.off('typing:user');
+      this.socket.off("typing:user");
     }
   }
 
@@ -340,10 +366,14 @@ class SocketManager {
 
   /**
    * Listen for new notifications
+   * NOTE: Backend /chat namespace uses 'notification:new',
+   *       Backend /notifications namespace uses 'notification'
    */
   onNotification(callback: (notification: Notification) => void) {
     if (!this.socket) return;
-    this.socket.on('notification:new', callback);
+    // Listen to both event names for compatibility
+    this.socket.on("notification:new", callback);
+    this.socket.on("notification", callback);
   }
 
   /**
@@ -352,9 +382,11 @@ class SocketManager {
   offNotification(callback?: (notification: Notification) => void) {
     if (!this.socket) return;
     if (callback) {
-      this.socket.off('notification:new', callback);
+      this.socket.off("notification:new", callback);
+      this.socket.off("notification", callback);
     } else {
-      this.socket.off('notification:new');
+      this.socket.off("notification:new");
+      this.socket.off("notification");
     }
   }
 
@@ -367,10 +399,10 @@ class SocketManager {
    */
   subscribeToProject(projectId: string) {
     if (!this.socket) {
-      throw new Error('Socket not connected');
+      throw new Error("Socket not connected");
     }
-    console.log('[Socket] Subscribing to project:', projectId);
-    this.socket.emit('subscribe:project', { projectId });
+    console.log("[Socket] Subscribing to project:", projectId);
+    this.socket.emit("subscribe:project", { projectId });
   }
 
   /**
@@ -378,8 +410,8 @@ class SocketManager {
    */
   unsubscribeFromProject(projectId: string) {
     if (!this.socket) return;
-    console.log('[Socket] Unsubscribing from project:', projectId);
-    this.socket.emit('unsubscribe:project', { projectId });
+    console.log("[Socket] Unsubscribing from project:", projectId);
+    this.socket.emit("unsubscribe:project", { projectId });
   }
 
   /**
@@ -387,7 +419,7 @@ class SocketManager {
    */
   onProjectUpdate(callback: (update: ProjectUpdate) => void) {
     if (!this.socket) return;
-    this.socket.on('project:update', callback);
+    this.socket.on("project:update", callback);
   }
 
   /**
@@ -396,9 +428,9 @@ class SocketManager {
   offProjectUpdate(callback?: (update: ProjectUpdate) => void) {
     if (!this.socket) return;
     if (callback) {
-      this.socket.off('project:update', callback);
+      this.socket.off("project:update", callback);
     } else {
-      this.socket.off('project:update');
+      this.socket.off("project:update");
     }
   }
 
@@ -411,10 +443,10 @@ class SocketManager {
    */
   joinLiveStream(streamId: string) {
     if (!this.socket) {
-      throw new Error('Socket not connected');
+      throw new Error("Socket not connected");
     }
-    console.log('[Socket] Joining live stream:', streamId);
-    this.socket.emit('stream:join', { streamId });
+    console.log("[Socket] Joining live stream:", streamId);
+    this.socket.emit("stream:join", { streamId });
   }
 
   /**
@@ -422,8 +454,8 @@ class SocketManager {
    */
   leaveLiveStream(streamId: string) {
     if (!this.socket) return;
-    console.log('[Socket] Leaving live stream:', streamId);
-    this.socket.emit('stream:leave', { streamId });
+    console.log("[Socket] Leaving live stream:", streamId);
+    this.socket.emit("stream:leave", { streamId });
   }
 
   /**
@@ -431,7 +463,7 @@ class SocketManager {
    */
   onLiveStreamEvent(callback: (event: LiveStreamEvent) => void) {
     if (!this.socket) return;
-    this.socket.on('stream:event', callback);
+    this.socket.on("stream:event", callback);
   }
 
   /**
@@ -440,9 +472,9 @@ class SocketManager {
   offLiveStreamEvent(callback?: (event: LiveStreamEvent) => void) {
     if (!this.socket) return;
     if (callback) {
-      this.socket.off('stream:event', callback);
+      this.socket.off("stream:event", callback);
     } else {
-      this.socket.off('stream:event');
+      this.socket.off("stream:event");
     }
   }
 
@@ -455,10 +487,10 @@ class SocketManager {
    */
   subscribeToActivityFeed() {
     if (!this.socket) {
-      throw new Error('Socket not connected');
+      throw new Error("Socket not connected");
     }
-    console.log('[Socket] Subscribing to activity feed');
-    this.socket.emit('subscribe:activity');
+    console.log("[Socket] Subscribing to activity feed");
+    this.socket.emit("subscribe:activity");
   }
 
   /**
@@ -466,8 +498,8 @@ class SocketManager {
    */
   unsubscribeFromActivityFeed() {
     if (!this.socket) return;
-    console.log('[Socket] Unsubscribing from activity feed');
-    this.socket.emit('unsubscribe:activity');
+    console.log("[Socket] Unsubscribing from activity feed");
+    this.socket.emit("unsubscribe:activity");
   }
 
   /**
@@ -475,7 +507,7 @@ class SocketManager {
    */
   onActivityFeed(callback: (event: ActivityFeedEvent) => void) {
     if (!this.socket) return;
-    this.socket.on('activity:new', callback);
+    this.socket.on("activity:new", callback);
   }
 
   /**
@@ -484,9 +516,9 @@ class SocketManager {
   offActivityFeed(callback?: (event: ActivityFeedEvent) => void) {
     if (!this.socket) return;
     if (callback) {
-      this.socket.off('activity:new', callback);
+      this.socket.off("activity:new", callback);
     } else {
-      this.socket.off('activity:new');
+      this.socket.off("activity:new");
     }
   }
 }

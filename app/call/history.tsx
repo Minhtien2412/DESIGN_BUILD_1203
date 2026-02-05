@@ -2,35 +2,37 @@
  * Call History Screen
  * Displays call history with video/audio calls, missed/completed status
  * + Badge sync với UnifiedBadgeContext (Zalo-style)
- * Updated: 03/01/2026
+ * Updated: 03/02/2026
  */
 
-import Avatar from '@/components/ui/avatar';
-import { useUnifiedBadge } from '@/context/UnifiedBadgeContext';
-import { useCall } from '@/hooks/useCall';
+import { CallHistoryHeader } from "@/components/navigation/CallHeader";
+import Avatar from "@/components/ui/avatar";
+import { useUnifiedBadge } from "@/context/UnifiedBadgeContext";
+import { useCall } from "@/hooks/useCall";
 import {
     CallHistoryItem,
     getCallStatusColor,
-} from '@/services/api/call.service';
-import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
-import { useEffect } from 'react';
+} from "@/services/api/call.service";
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import { useEffect, useMemo, useState } from "react";
 import {
     ActivityIndicator,
     FlatList,
     RefreshControl,
+    StatusBar,
     StyleSheet,
     Text,
     TouchableOpacity,
     View,
-} from 'react-native';
+} from "react-native";
 
 export default function CallHistoryScreen() {
   // Unified Badge Context - clear missed calls badge khi xem lịch sử
   const { clearBadge, badges } = useUnifiedBadge();
 
   const {
-    callHistory,
+    callHistory: apiCallHistory,
     loading,
     refreshing,
     hasMoreHistory,
@@ -38,10 +40,34 @@ export default function CallHistoryScreen() {
     loadMoreHistory,
   } = useCall({ autoLoadHistory: true, historyLimit: 50 });
 
+  // Filter state
+  const [activeFilter, setActiveFilter] = useState<
+    "all" | "missed" | "incoming" | "outgoing"
+  >("all");
+
+  const callHistory = useMemo(() => apiCallHistory, [apiCallHistory]);
+
+  // Filter calls based on active filter
+  const filteredCalls = useMemo(() => {
+    if (activeFilter === "all") return callHistory;
+    if (activeFilter === "missed")
+      return callHistory.filter((c) => c.status === "missed");
+    if (activeFilter === "incoming")
+      return callHistory.filter((c) => !c.isOutgoing);
+    if (activeFilter === "outgoing")
+      return callHistory.filter((c) => c.isOutgoing);
+    return callHistory;
+  }, [callHistory, activeFilter]);
+
+  // Count missed calls
+  const missedCount = useMemo(() => {
+    return callHistory.filter((c) => c.status === "missed").length;
+  }, [callHistory]);
+
   // Clear missed calls badge khi vào màn hình này (Zalo-style)
   useEffect(() => {
     if (badges.missedCalls > 0) {
-      clearBadge('missedCalls');
+      clearBadge("missedCalls");
     }
   }, [badges.missedCalls, clearBadge]);
 
@@ -59,98 +85,109 @@ export default function CallHistoryScreen() {
     const diffHours = Math.floor(diffMs / 3600000);
     const diffDays = Math.floor(diffMs / 86400000);
 
-    if (diffMins < 1) return 'Vừa xong';
+    if (diffMins < 1) return "Vừa xong";
     if (diffMins < 60) return `${diffMins} phút trước`;
     if (diffHours < 24) return `${diffHours} giờ trước`;
     if (diffDays < 7) return `${diffDays} ngày trước`;
-    
-    return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+
+    return date.toLocaleDateString("vi-VN", {
+      day: "2-digit",
+      month: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   const getCallIcon = (call: CallHistoryItem) => {
-    if (call.status === 'missed') {
-      return 'call-outline';
+    if (call.status === "missed") {
+      return "call-outline";
     }
-    return 'call';
+    return "call";
   };
 
   const renderCall = ({ item }: { item: CallHistoryItem }) => {
     const isIncoming = !item.isOutgoing;
     const statusColor = getCallStatusColor(item.status);
-    
+
     return (
-    <TouchableOpacity
-      style={styles.callItem}
-      onPress={() => handleCallPress(item)}
-      activeOpacity={0.7}
-    >
-      {/* Avatar */}
-      <View style={styles.avatarContainer}>
-        <Avatar
-          avatar={item.otherUser.avatar || null}
-          userId={String(item.otherUser.id)}
-          name={item.otherUser.name}
-          pixelSize={56}
-        />
-        
-        {/* Call type badge */}
-        <View style={[
-          styles.callTypeBadge,
-          item.type === 'video' ? styles.videoBadge : styles.audioBadge
-        ]}>
-          <Ionicons 
-            name={item.type === 'video' ? 'videocam' : 'call'} 
-            size={12} 
-            color="#fff" 
-          />
-        </View>
-      </View>
-
-      {/* Call info */}
-      <View style={styles.callInfo}>
-        <Text style={styles.userName} numberOfLines={1}>
-          {item.otherUser.name}
-        </Text>
-        
-        <View style={styles.callDetails}>
-          <Ionicons 
-            name={getCallIcon(item)} 
-            size={14} 
-            color={statusColor}
-            style={{ 
-              transform: [{ 
-                rotate: isIncoming ? '135deg' : '-45deg' 
-              }] 
-            }}
-          />
-          <Text style={[styles.callStatus, { color: statusColor }]}>
-            {item.statusText}
-          </Text>
-          {item.durationText && item.durationText !== '0:00' && (
-            <>
-              <Text style={styles.separator}>•</Text>
-              <Text style={styles.duration}>{item.durationText}</Text>
-            </>
-          )}
-        </View>
-
-        <Text style={styles.timeText}>{formatTime(item.createdAt)}</Text>
-      </View>
-
-      {/* Call action button - gọi trực tiếp trong app */}
-      <TouchableOpacity 
-        style={styles.callButton}
-        onPress={() => router.push(`/call/${item.otherUser.id}?type=${item.type}`)}
-        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+      <TouchableOpacity
+        style={styles.callItem}
+        onPress={() => handleCallPress(item)}
+        activeOpacity={0.7}
       >
-        <Ionicons 
-          name={item.type === 'video' ? 'videocam' : 'call'} 
-          size={22} 
-          color="#0068FF" 
-        />
+        {/* Avatar */}
+        <View style={styles.avatarContainer}>
+          <Avatar
+            avatar={item.otherUser.avatar || null}
+            userId={String(item.otherUser.id)}
+            name={item.otherUser.name}
+            pixelSize={56}
+          />
+
+          {/* Call type badge */}
+          <View
+            style={[
+              styles.callTypeBadge,
+              item.type === "video" ? styles.videoBadge : styles.audioBadge,
+            ]}
+          >
+            <Ionicons
+              name={item.type === "video" ? "videocam" : "call"}
+              size={12}
+              color="#fff"
+            />
+          </View>
+        </View>
+
+        {/* Call info */}
+        <View style={styles.callInfo}>
+          <Text style={styles.userName} numberOfLines={1}>
+            {item.otherUser.name}
+          </Text>
+
+          <View style={styles.callDetails}>
+            <Ionicons
+              name={getCallIcon(item)}
+              size={14}
+              color={statusColor}
+              style={{
+                transform: [
+                  {
+                    rotate: isIncoming ? "135deg" : "-45deg",
+                  },
+                ],
+              }}
+            />
+            <Text style={[styles.callStatus, { color: statusColor }]}>
+              {item.statusText}
+            </Text>
+            {item.durationText && item.durationText !== "0:00" && (
+              <>
+                <Text style={styles.separator}>•</Text>
+                <Text style={styles.duration}>{item.durationText}</Text>
+              </>
+            )}
+          </View>
+
+          <Text style={styles.timeText}>{formatTime(item.createdAt)}</Text>
+        </View>
+
+        {/* Call action button - gọi trực tiếp trong app */}
+        <TouchableOpacity
+          style={styles.callButton}
+          onPress={() =>
+            router.push(`/call/${item.otherUser.id}?type=${item.type}`)
+          }
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <Ionicons
+            name={item.type === "video" ? "videocam" : "call"}
+            size={22}
+            color="#0068FF"
+          />
+        </TouchableOpacity>
       </TouchableOpacity>
-    </TouchableOpacity>
-  );
+    );
   };
 
   const renderFooter = () => {
@@ -187,29 +224,31 @@ export default function CallHistoryScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backButton}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-        >
-          <Ionicons name="arrow-back" size={24} color="#111" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Cuộc gọi</Text>
-        <View style={styles.headerButton} />
-      </View>
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor="#22C55E"
+        translucent
+      />
+
+      {/* Call History Header - Zalo style */}
+      <CallHistoryHeader
+        title="Cuộc gọi"
+        missedCount={missedCount}
+        activeFilter={activeFilter}
+        onFilterChange={setActiveFilter}
+        onSearchPress={() => router.push("/search-messages")}
+      />
 
       {/* Calls list */}
       <FlatList
-        data={callHistory}
+        data={filteredCalls}
         renderItem={renderCall}
         keyExtractor={(item) => item.id.toString()}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
             onRefresh={refreshHistory}
-            colors={['#3b82f6']}
+            colors={["#3b82f6"]}
             tintColor="#3b82f6"
           />
         }
@@ -217,7 +256,9 @@ export default function CallHistoryScreen() {
         onEndReachedThreshold={0.5}
         ListFooterComponent={renderFooter}
         ListEmptyComponent={renderEmpty}
-        contentContainerStyle={callHistory.length === 0 ? styles.emptyList : undefined}
+        contentContainerStyle={
+          callHistory.length === 0 ? styles.emptyList : undefined
+        }
       />
     </View>
   );
@@ -226,46 +267,18 @@ export default function CallHistoryScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingTop: 48,
-    paddingBottom: 12,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#111',
-    flex: 1,
-    textAlign: 'center',
-  },
-  headerButton: {
-    width: 40,
-    height: 40,
+    backgroundColor: "#fff",
   },
   callItem: {
-    flexDirection: 'row',
+    flexDirection: "row",
     padding: 16,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderBottomWidth: 1,
-    borderBottomColor: '#f5f5f5',
-    alignItems: 'center',
+    borderBottomColor: "#f5f5f5",
+    alignItems: "center",
   },
   avatarContainer: {
-    position: 'relative',
+    position: "relative",
     marginRight: 12,
   },
   avatar: {
@@ -274,40 +287,40 @@ const styles = StyleSheet.create({
     borderRadius: 28,
   },
   avatarPlaceholder: {
-    backgroundColor: '#f0f0f0',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#f0f0f0",
+    justifyContent: "center",
+    alignItems: "center",
   },
   callTypeBadge: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 0,
     right: 0,
     width: 24,
     height: 24,
     borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     borderWidth: 2,
-    borderColor: '#fff',
+    borderColor: "#fff",
   },
   videoBadge: {
-    backgroundColor: '#3b82f6',
+    backgroundColor: "#3b82f6",
   },
   audioBadge: {
-    backgroundColor: '#0066CC',
+    backgroundColor: "#0066CC",
   },
   callInfo: {
     flex: 1,
   },
   userName: {
     fontSize: 15,
-    fontWeight: '600',
-    color: '#111',
+    fontWeight: "600",
+    color: "#111",
     marginBottom: 4,
   },
   callDetails: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 4,
   },
   callStatus: {
@@ -316,60 +329,60 @@ const styles = StyleSheet.create({
   },
   separator: {
     fontSize: 13,
-    color: '#999',
+    color: "#999",
     marginHorizontal: 6,
   },
   duration: {
     fontSize: 13,
-    color: '#666',
+    color: "#666",
   },
   timeText: {
     fontSize: 12,
-    color: '#999',
+    color: "#999",
   },
   callButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#f0f9ff',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#f0f9ff",
+    justifyContent: "center",
+    alignItems: "center",
     marginLeft: 12,
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff",
   },
   loadingFooter: {
     paddingVertical: 20,
-    alignItems: 'center',
+    alignItems: "center",
   },
   loadingText: {
     marginTop: 8,
     fontSize: 13,
-    color: '#999',
+    color: "#999",
   },
   emptyList: {
     flexGrow: 1,
   },
   emptyContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     paddingHorizontal: 32,
   },
   emptyTitle: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#666',
+    fontWeight: "600",
+    color: "#666",
     marginTop: 16,
   },
   emptySubtitle: {
     fontSize: 14,
-    color: '#999',
+    color: "#999",
     marginTop: 8,
-    textAlign: 'center',
+    textAlign: "center",
   },
 });

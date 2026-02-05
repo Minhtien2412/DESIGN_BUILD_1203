@@ -1,6 +1,6 @@
-import { Ionicons } from '@expo/vector-icons';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { RatingStars } from './rating-stars';
+import { Ionicons } from "@expo/vector-icons";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { RatingStars } from "./rating-stars";
 
 export interface Review {
   id: string;
@@ -28,8 +28,8 @@ export function ReviewCard({ review, onHelpful, onReport }: ReviewCardProps) {
     const diffMs = now.getTime() - reviewDate.getTime();
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-    if (diffDays === 0) return 'Hôm nay';
-    if (diffDays === 1) return 'Hôm qua';
+    if (diffDays === 0) return "Hôm nay";
+    if (diffDays === 1) return "Hôm qua";
     if (diffDays < 7) return `${diffDays} ngày trước`;
     if (diffDays < 30) return `${Math.floor(diffDays / 7)} tuần trước`;
     if (diffDays < 365) return `${Math.floor(diffDays / 30)} tháng trước`;
@@ -41,7 +41,11 @@ export function ReviewCard({ review, onHelpful, onReport }: ReviewCardProps) {
       {/* User Info */}
       <View style={styles.header}>
         <Image
-          source={{ uri: review.userAvatar || 'https://via.placeholder.com/40' }}
+          source={{
+            uri:
+              review.userAvatar ||
+              "https://ui-avatars.com/api/?name=User&size=40&background=4CAF50&color=fff",
+          }}
           style={styles.avatar}
         />
         <View style={styles.userInfo}>
@@ -68,7 +72,11 @@ export function ReviewCard({ review, onHelpful, onReport }: ReviewCardProps) {
       {review.images && review.images.length > 0 && (
         <View style={styles.imagesRow}>
           {review.images.slice(0, 3).map((img, index) => (
-            <Image key={index} source={{ uri: img }} style={styles.reviewImage} />
+            <Image
+              key={index}
+              source={{ uri: img }}
+              style={styles.reviewImage}
+            />
           ))}
         </View>
       )}
@@ -96,67 +104,67 @@ export function ReviewCard({ review, onHelpful, onReport }: ReviewCardProps) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: "#f0f0f0",
   },
   header: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: 12,
   },
   avatar: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: "#f0f0f0",
   },
   userInfo: {
     flex: 1,
     marginLeft: 12,
   },
   nameRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 4,
   },
   userName: {
     fontSize: 15,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
   },
   verifiedBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginLeft: 8,
-    backgroundColor: '#ECFDF5',
+    backgroundColor: "#ECFDF5",
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 4,
   },
   verifiedText: {
     fontSize: 11,
-    color: '#0066CC',
+    color: "#0066CC",
     marginLeft: 2,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   ratingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   date: {
     fontSize: 12,
-    color: '#999',
+    color: "#999",
     marginLeft: 8,
   },
   comment: {
     fontSize: 14,
-    color: '#333',
+    color: "#333",
     lineHeight: 20,
     marginBottom: 12,
   },
   imagesRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 8,
     marginBottom: 12,
   },
@@ -164,19 +172,19 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 8,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: "#f0f0f0",
   },
   actions: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 16,
   },
   actionBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 4,
   },
   actionText: {
     fontSize: 13,
-    color: '#666',
+    color: "#666",
   },
 });

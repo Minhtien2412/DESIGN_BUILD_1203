@@ -1,7 +1,10 @@
 // ThietKe Resort API Integration Examples
 // Matches the style from your specification
 
-const BASE = 'https://api.thietkeresort.com.vn';
+import ENV from "@/config/env";
+
+// Use centralized ENV configuration
+const BASE = ENV.API_BASE_URL;
 
 // Health Check
 export async function checkHealth() {
@@ -20,8 +23,8 @@ export async function getVideos(limit = 20) {
 // Payments
 export async function createPayment(payload: any) {
   const r = await fetch(`${BASE}/payments`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
   if (!r.ok) throw new Error(`HTTP ${r.status}`);
@@ -40,10 +43,14 @@ export async function getPaymentDetails(id: string) {
   return r.json();
 }
 
-export async function confirmPayment(id: string, status = 'paid', meta: any = {}) {
+export async function confirmPayment(
+  id: string,
+  status = "paid",
+  meta: any = {},
+) {
   const r = await fetch(`${BASE}/payments/${id}/confirm`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ status, meta }),
   });
   if (!r.ok) throw new Error(`HTTP ${r.status}`);
@@ -53,8 +60,8 @@ export async function confirmPayment(id: string, status = 'paid', meta: any = {}
 // Metrics
 export async function logAppEvent(e: any) {
   const r = await fetch(`${BASE}/metrics/app-events`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(e),
   });
   return r.ok;
@@ -73,53 +80,53 @@ async function examplePaymentFlow() {
   try {
     // 1. Create payment
     const payment = await createPayment({
-      order_code: 'DH1001',
+      order_code: "DH1001",
       amount: 1000000,
-      currency: 'VND',
-      provider: 'momo',
+      currency: "VND",
+      provider: "momo",
       meta: {
-        customer_name: 'Nguyen Van A',
-        description: 'Thiết kế nhà 3 tầng'
-      }
+        customer_name: "Nguyen Van A",
+        description: "Thiết kế nhà 3 tầng",
+      },
     });
-    
-    console.log('Payment created:', payment);
-    
+
+    console.log("Payment created:", payment);
+
     // 2. Log the event
     await logAppEvent({
-      event_type: 'user_action',
-      level: 'info',
-      message: 'Payment created successfully',
+      event_type: "user_action",
+      level: "info",
+      message: "Payment created successfully",
       data: {
         payment_id: payment.payment.id,
         order_code: payment.payment.order_code,
-        amount: payment.payment.amount
-      }
+        amount: payment.payment.amount,
+      },
     });
-    
+
     // 3. Confirm payment (manual)
-    const confirmed = await confirmPayment(payment.payment.id, 'paid', {
-      confirmed_by: 'admin_user',
-      confirmation_method: 'manual'
+    const confirmed = await confirmPayment(payment.payment.id, "paid", {
+      confirmed_by: "admin_user",
+      confirmation_method: "manual",
     });
-    
-    console.log('Payment confirmed:', confirmed);
-    
+
+    console.log("Payment confirmed:", confirmed);
+
     return confirmed;
   } catch (error) {
-    console.error('Payment flow error:', error);
-    
+    console.error("Payment flow error:", error);
+
     // Log error
     await logAppEvent({
-      event_type: 'payment_error',
-      level: 'error',
-      message: 'Payment flow failed',
+      event_type: "payment_error",
+      level: "error",
+      message: "Payment flow failed",
       data: {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        step: 'payment_creation'
-      }
+        error: error instanceof Error ? error.message : "Unknown error",
+        step: "payment_creation",
+      },
     });
-    
+
     throw error;
   }
 }
@@ -128,10 +135,10 @@ async function examplePaymentFlow() {
 async function exampleHealthCheck() {
   try {
     const health = await checkHealth();
-    console.log('API Health:', health);
+    console.log("API Health:", health);
     return health;
   } catch (error) {
-    console.error('Health check failed:', error);
+    console.error("Health check failed:", error);
     return null;
   }
 }
@@ -140,25 +147,25 @@ async function exampleHealthCheck() {
 async function exampleVideosList() {
   try {
     const videos = await getVideos(10);
-    console.log('Videos:', videos);
-    
+    console.log("Videos:", videos);
+
     await logAppEvent({
-      event_type: 'user_action',
-      level: 'info',
-      message: 'Videos fetched',
+      event_type: "user_action",
+      level: "info",
+      message: "Videos fetched",
       data: {
-        count: videos.videos?.length || 0
-      }
+        count: videos.videos?.length || 0,
+      },
     });
-    
+
     return videos;
   } catch (error) {
-    console.error('Videos fetch failed:', error);
+    console.error("Videos fetch failed:", error);
     await logAppEvent({
-      event_type: 'api_error',
-      level: 'error',
-      message: 'Failed to fetch videos',
-      data: { error: error instanceof Error ? error.message : 'Unknown error' }
+      event_type: "api_error",
+      level: "error",
+      message: "Failed to fetch videos",
+      data: { error: error instanceof Error ? error.message : "Unknown error" },
     });
     return null;
   }
@@ -168,20 +175,20 @@ async function exampleVideosList() {
 export const ThietKeAPI = {
   // Health
   checkHealth,
-  
+
   // Videos
   getVideos,
-  
+
   // Payments
   createPayment,
   getPaymentsByOrder,
   getPaymentDetails,
   confirmPayment,
-  
+
   // Metrics
   logAppEvent,
   getAppEvents,
-  
+
   // Examples
   examplePaymentFlow,
   exampleHealthCheck,

@@ -3,58 +3,79 @@
  * Kết hợp với communication.service.ts và chat.service.ts
  */
 
-import { ChatRoom as APIChatRoom, ChatMessage as APIMessage, chatService } from './api/chat.service';
+import {
+    ChatRoom as APIChatRoom,
+    ChatMessage as APIMessage,
+    chatService,
+} from "./api/chat.service";
 import communicationService, {
     Channel,
     ChannelMember,
     Message,
-    MessageFilters
-} from './api/communication.service';
-import type { Attachment, ChatMessage, ChatParticipant, ChatRoom, MessageStatus, MessageType } from './ChatService';
+    MessageFilters,
+} from "./api/communication.service";
+import type {
+    Attachment,
+    ChatMessage,
+    ChatParticipant,
+    ChatRoom,
+    MessageStatus,
+    MessageType,
+} from "./ChatService";
 
 // ==================== API ENDPOINTS ====================
 
-const API_BASE = 'https://baotienweb.cloud/api/v1';
+const API_BASE = "https://baotienweb.cloud/api/v1";
 
 // ==================== TYPE CONVERTERS ====================
 
 /**
  * Convert API Message to ChatMessage format
  */
-export function convertAPIMessageToChatMessage(msg: Message | APIMessage): ChatMessage {
-  if ('channelId' in msg) {
+export function convertAPIMessageToChatMessage(
+  msg: Message | APIMessage,
+): ChatMessage {
+  if ("channelId" in msg) {
     // From communication.service Message
     const commMsg = msg as Message;
     return {
       id: String(commMsg.id),
       chatId: String(commMsg.channelId),
       senderId: String(commMsg.userId),
-      senderName: commMsg.userName || 'Unknown',
+      senderName: commMsg.userName || "Unknown",
       senderAvatar: commMsg.userAvatar,
       type: convertMessageType(commMsg.type),
       content: commMsg.content,
-      attachments: commMsg.fileUrl ? [{
-        type: getAttachmentType(commMsg.fileUrl),
-        url: commMsg.fileUrl,
-        name: commMsg.fileName,
-        size: commMsg.fileSize,
-      }] : undefined,
-      reactions: commMsg.reactions?.map(r => ({
+      attachments: commMsg.fileUrl
+        ? [
+            {
+              type: getAttachmentType(commMsg.fileUrl),
+              url: commMsg.fileUrl,
+              name: commMsg.fileName,
+              size: commMsg.fileSize,
+            },
+          ]
+        : undefined,
+      reactions: commMsg.reactions?.map((r) => ({
         emoji: r.emoji,
         userId: String(r.userIds[0] || 0),
-        userName: '',
+        userName: "",
         timestamp: Date.now(),
       })),
-      replyTo: commMsg.replyTo ? {
-        id: String(commMsg.replyTo.id),
-        senderId: String(commMsg.replyTo.userId),
-        senderName: commMsg.replyTo.userName || '',
-        content: commMsg.replyTo.content,
-        type: convertMessageType(commMsg.replyTo.type),
-      } : undefined,
-      status: commMsg.isDeleted ? 'failed' : 'read',
+      replyTo: commMsg.replyTo
+        ? {
+            id: String(commMsg.replyTo.id),
+            senderId: String(commMsg.replyTo.userId),
+            senderName: commMsg.replyTo.userName || "",
+            content: commMsg.replyTo.content,
+            type: convertMessageType(commMsg.replyTo.type),
+          }
+        : undefined,
+      status: commMsg.isDeleted ? "failed" : "read",
       timestamp: new Date(commMsg.createdAt).getTime(),
-      editedAt: commMsg.isEdited ? new Date(commMsg.updatedAt).getTime() : undefined,
+      editedAt: commMsg.isEdited
+        ? new Date(commMsg.updatedAt).getTime()
+        : undefined,
     };
   } else {
     // From chat.service ChatMessage
@@ -63,15 +84,15 @@ export function convertAPIMessageToChatMessage(msg: Message | APIMessage): ChatM
       id: String(chatMsg.id),
       chatId: String(chatMsg.roomId),
       senderId: String(chatMsg.senderId),
-      senderName: chatMsg.sender?.name || 'Unknown',
+      senderName: chatMsg.sender?.name || "Unknown",
       senderAvatar: chatMsg.sender?.avatar,
       type: convertMessageType(chatMsg.type as any),
       content: chatMsg.content,
-      attachments: chatMsg.attachments?.map(url => ({
+      attachments: chatMsg.attachments?.map((url) => ({
         type: getAttachmentType(url),
         url,
       })),
-      status: chatMsg.readBy?.length > 0 ? 'read' : 'delivered',
+      status: chatMsg.readBy?.length > 0 ? "read" : "delivered",
       timestamp: new Date(chatMsg.createdAt).getTime(),
       readBy: chatMsg.readBy?.map(String),
     };
@@ -86,9 +107,16 @@ export function convertChannelToChatRoom(channel: Channel): ChatRoom {
     id: String(channel.id),
     name: channel.name,
     avatar: channel.avatar,
-    type: channel.type === 'DIRECT' ? 'private' : channel.type === 'PROJECT' ? 'channel' : 'group',
+    type:
+      channel.type === "DIRECT"
+        ? "private"
+        : channel.type === "PROJECT"
+          ? "channel"
+          : "group",
     participants: [], // Will be loaded separately
-    lastMessage: channel.lastMessage ? convertAPIMessageToChatMessage(channel.lastMessage) : undefined,
+    lastMessage: channel.lastMessage
+      ? convertAPIMessageToChatMessage(channel.lastMessage)
+      : undefined,
     unreadCount: channel.unreadCount || 0,
     isPinned: false,
     isMuted: false,
@@ -104,14 +132,22 @@ export function convertAPIChatRoomToChatRoom(room: APIChatRoom): ChatRoom {
   return {
     id: String(room.id),
     name: room.name,
-    type: room.type === 'DIRECT' ? 'private' : room.type === 'PROJECT' ? 'channel' : 'group',
-    participants: room.members?.map(m => ({
-      id: String(m.userId),
-      name: m.user?.name || '',
-      avatar: m.user?.avatar,
-      role: m.role === 'OWNER' || m.role === 'ADMIN' ? 'admin' : 'member',
-    })) || [],
-    lastMessage: room.lastMessage ? convertAPIMessageToChatMessage(room.lastMessage) : undefined,
+    type:
+      room.type === "DIRECT"
+        ? "private"
+        : room.type === "PROJECT"
+          ? "channel"
+          : "group",
+    participants:
+      room.members?.map((m) => ({
+        id: String(m.userId),
+        name: m.user?.name || "",
+        avatar: m.user?.avatar,
+        role: m.role === "OWNER" || m.role === "ADMIN" ? "admin" : "member",
+      })) || [],
+    lastMessage: room.lastMessage
+      ? convertAPIMessageToChatMessage(room.lastMessage)
+      : undefined,
     unreadCount: room.unreadCount || 0,
     createdAt: new Date(room.createdAt).getTime(),
     updatedAt: new Date(room.updatedAt).getTime(),
@@ -121,56 +157,75 @@ export function convertAPIChatRoomToChatRoom(room: APIChatRoom): ChatRoom {
 /**
  * Convert ChannelMember to ChatParticipant
  */
-export function convertMemberToParticipant(member: ChannelMember): ChatParticipant {
+export function convertMemberToParticipant(
+  member: ChannelMember,
+): ChatParticipant {
   return {
     id: String(member.userId),
-    name: member.userName || '',
+    name: member.userName || "",
     avatar: member.userAvatar,
-    role: member.role === 'ADMIN' || member.role === 'MODERATOR' ? 'admin' : 'member',
-    lastSeen: member.lastReadAt ? new Date(member.lastReadAt).getTime() : undefined,
+    role:
+      member.role === "ADMIN" || member.role === "MODERATOR"
+        ? "admin"
+        : "member",
+    lastSeen: member.lastReadAt
+      ? new Date(member.lastReadAt).getTime()
+      : undefined,
   };
 }
 
 function convertMessageType(type: string): MessageType {
   const typeMap: Record<string, MessageType> = {
-    'TEXT': 'text',
-    'IMAGE': 'image',
-    'FILE': 'file',
-    'SYSTEM': 'system',
-    'VIDEO': 'video',
-    'AUDIO': 'audio',
+    TEXT: "text",
+    IMAGE: "image",
+    FILE: "file",
+    SYSTEM: "system",
+    VIDEO: "video",
+    AUDIO: "audio",
   };
-  return typeMap[type] || 'text';
+  return typeMap[type] || "text";
 }
 
-function getAttachmentType(url: string): 'image' | 'video' | 'file' | 'audio' | 'location' {
-  const ext = url.split('.').pop()?.toLowerCase();
-  if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext || '')) return 'image';
-  if (['mp4', 'mov', 'avi', 'webm'].includes(ext || '')) return 'video';
-  if (['mp3', 'wav', 'ogg', 'm4a'].includes(ext || '')) return 'audio';
-  return 'file';
+function getAttachmentType(
+  url: string,
+): "image" | "video" | "file" | "audio" | "location" {
+  const ext = url.split(".").pop()?.toLowerCase();
+  if (["jpg", "jpeg", "png", "gif", "webp"].includes(ext || "")) return "image";
+  if (["mp4", "mov", "avi", "webm"].includes(ext || "")) return "video";
+  if (["mp3", "wav", "ogg", "m4a"].includes(ext || "")) return "audio";
+  return "file";
 }
 
 // ==================== MOCK DATA ====================
 
 const MOCK_CHAT_ROOMS: ChatRoom[] = [
   {
-    id: 'mock_1',
-    name: 'Nhóm Dự án Villa Premium',
-    avatar: 'https://ui-avatars.com/api/?name=VP&background=2E7D32&color=fff',
-    type: 'group',
+    id: "mock_1",
+    name: "Nhóm Dự án Villa Premium",
+    avatar: "https://ui-avatars.com/api/?name=VP&background=2E7D32&color=fff",
+    type: "group",
     participants: [
-      { id: '1', name: 'Nguyễn Văn A', avatar: 'https://ui-avatars.com/api/?name=NA', role: 'admin' },
-      { id: '2', name: 'Trần Thị B', avatar: 'https://ui-avatars.com/api/?name=TB', role: 'member' },
+      {
+        id: "1",
+        name: "Nguyễn Văn A",
+        avatar: "https://ui-avatars.com/api/?name=NA",
+        role: "admin",
+      },
+      {
+        id: "2",
+        name: "Trần Thị B",
+        avatar: "https://ui-avatars.com/api/?name=TB",
+        role: "member",
+      },
     ],
     lastMessage: {
-      id: 'msg_1',
-      chatId: 'mock_1',
-      senderId: '2',
-      senderName: 'Trần Thị B',
-      type: 'text',
-      content: 'Em đã gửi bản thiết kế mới cho anh review.',
-      status: 'read',
+      id: "msg_1",
+      chatId: "mock_1",
+      senderId: "2",
+      senderName: "Trần Thị B",
+      type: "text",
+      content: "Em đã gửi bản thiết kế mới cho anh review.",
+      status: "read",
       timestamp: Date.now() - 5 * 60 * 1000,
     },
     unreadCount: 2,
@@ -180,21 +235,26 @@ const MOCK_CHAT_ROOMS: ChatRoom[] = [
     updatedAt: Date.now() - 5 * 60 * 1000,
   },
   {
-    id: 'mock_2',
-    name: 'Lê Văn C - Kiến trúc sư',
-    avatar: 'https://ui-avatars.com/api/?name=LC&background=1976D2&color=fff',
-    type: 'private',
+    id: "mock_2",
+    name: "Lê Văn C - Kiến trúc sư",
+    avatar: "https://ui-avatars.com/api/?name=LC&background=1976D2&color=fff",
+    type: "private",
     participants: [
-      { id: '3', name: 'Lê Văn C', avatar: 'https://ui-avatars.com/api/?name=LC', role: 'member' },
+      {
+        id: "3",
+        name: "Lê Văn C",
+        avatar: "https://ui-avatars.com/api/?name=LC",
+        role: "member",
+      },
     ],
     lastMessage: {
-      id: 'msg_2',
-      chatId: 'mock_2',
-      senderId: '3',
-      senderName: 'Lê Văn C',
-      type: 'text',
-      content: 'Chiều nay họp online lúc 3h nhé!',
-      status: 'delivered',
+      id: "msg_2",
+      chatId: "mock_2",
+      senderId: "3",
+      senderName: "Lê Văn C",
+      type: "text",
+      content: "Chiều nay họp online lúc 3h nhé!",
+      status: "delivered",
       timestamp: Date.now() - 2 * 60 * 60 * 1000,
     },
     unreadCount: 0,
@@ -204,19 +264,19 @@ const MOCK_CHAT_ROOMS: ChatRoom[] = [
     updatedAt: Date.now() - 2 * 60 * 60 * 1000,
   },
   {
-    id: 'mock_3',
-    name: 'Phòng Kỹ thuật',
-    avatar: 'https://ui-avatars.com/api/?name=KT&background=FF5722&color=fff',
-    type: 'channel',
+    id: "mock_3",
+    name: "Phòng Kỹ thuật",
+    avatar: "https://ui-avatars.com/api/?name=KT&background=FF5722&color=fff",
+    type: "channel",
     participants: [],
     lastMessage: {
-      id: 'msg_3',
-      chatId: 'mock_3',
-      senderId: '1',
-      senderName: 'Admin',
-      type: 'text',
-      content: 'Thông báo: Cập nhật quy trình làm việc mới',
-      status: 'read',
+      id: "msg_3",
+      chatId: "mock_3",
+      senderId: "1",
+      senderName: "Admin",
+      type: "text",
+      content: "Thông báo: Cập nhật quy trình làm việc mới",
+      status: "read",
       timestamp: Date.now() - 24 * 60 * 60 * 1000,
     },
     unreadCount: 5,
@@ -240,24 +300,24 @@ class ChatAPIService {
   async getChatRooms(projectId?: number): Promise<ChatRoom[]> {
     try {
       // Try communication channels first
-      const channelsResponse = await communicationService.getChannels(projectId);
+      const channelsResponse =
+        await communicationService.getChannels(projectId);
       if (channelsResponse.data && channelsResponse.data.length > 0) {
         return channelsResponse.data.map(convertChannelToChatRoom);
       }
-      
+
       // Fallback to chat rooms
       const rooms = await chatService.getRooms({ projectId });
       if (rooms && rooms.length > 0) {
         return rooms.map(convertAPIChatRoomToChatRoom);
       }
-      
+
       // Return mock data when API returns empty
-      console.log('[ChatAPI] No rooms from API, using mock data');
+      console.log("[ChatAPI] No rooms from API, using mock data");
       return MOCK_CHAT_ROOMS;
     } catch (error) {
-      console.error('[ChatAPI] Get rooms failed:', error);
-      // Return mock data as fallback
-      console.log('[ChatAPI] Error loading rooms, using mock data');
+      // Expected when backend chat module isn't deployed - use mock data silently
+      console.log("[ChatAPI] Chat API unavailable, using mock data");
       return MOCK_CHAT_ROOMS;
     }
   }
@@ -270,13 +330,13 @@ class ChatAPIService {
       const room = await chatService.getRoom(Number(roomId));
       return convertAPIChatRoomToChatRoom(room);
     } catch (error) {
-      console.error('[ChatAPI] Get room failed:', error);
       // Try to find in mock data
-      const mockRoom = MOCK_CHAT_ROOMS.find(r => r.id === roomId);
+      const mockRoom = MOCK_CHAT_ROOMS.find((r) => r.id === roomId);
       if (mockRoom) {
-        console.log('[ChatAPI] Using mock room:', roomId);
+        console.log("[ChatAPI] Using mock room:", roomId);
         return mockRoom;
       }
+      console.log("[ChatAPI] Room not found:", roomId);
       return null;
     }
   }
@@ -287,19 +347,24 @@ class ChatAPIService {
   async createChatRoom(data: {
     name: string;
     projectId?: number;
-    type?: 'private' | 'group' | 'channel';
+    type?: "private" | "group" | "channel";
     memberIds?: number[];
   }): Promise<ChatRoom | null> {
     try {
       const room = await chatService.createRoom({
         name: data.name,
         projectId: data.projectId,
-        type: data.type === 'private' ? 'DIRECT' : data.type === 'channel' ? 'PROJECT' : 'GROUP',
+        type:
+          data.type === "private"
+            ? "DIRECT"
+            : data.type === "channel"
+              ? "PROJECT"
+              : "GROUP",
         members: data.memberIds,
       });
       return convertAPIChatRoomToChatRoom(room);
     } catch (error) {
-      console.error('[ChatAPI] Create room failed:', error);
+      console.error("[ChatAPI] Create room failed:", error);
       return null;
     }
   }
@@ -310,12 +375,12 @@ class ChatAPIService {
    * Lấy tin nhắn trong phòng chat
    */
   async getMessages(
-    chatId: string, 
-    options?: { 
-      limit?: number; 
+    chatId: string,
+    options?: {
+      limit?: number;
       before?: string;
       page?: number;
-    }
+    },
   ): Promise<{ messages: ChatMessage[]; hasMore: boolean }> {
     try {
       // Try communication messages first
@@ -344,11 +409,11 @@ class ChatAPIService {
         hasMore: chatResponse.hasMore,
       };
     } catch (error) {
-      console.error('[ChatAPI] Get messages failed:', error);
+      console.error("[ChatAPI] Get messages failed:", error);
       // Return mock messages for mock rooms
       const mockMessages = this.getMockMessages(chatId);
       if (mockMessages.length > 0) {
-        console.log('[ChatAPI] Using mock messages for room:', chatId);
+        console.log("[ChatAPI] Using mock messages for room:", chatId);
         return { messages: mockMessages, hasMore: false };
       }
       return { messages: [], hasMore: false };
@@ -360,125 +425,128 @@ class ChatAPIService {
    */
   private getMockMessages(chatId: string): ChatMessage[] {
     const currentTime = Date.now();
-    const currentUserId = 'current_user';
-    
+    const currentUserId = "current_user";
+
     const mockMessagesByRoom: Record<string, ChatMessage[]> = {
-      'mock_1': [
+      mock_1: [
         {
-          id: 'msg_1_1',
-          chatId: 'mock_1',
-          senderId: '2',
-          senderName: 'Trần Thị B',
-          senderAvatar: 'https://ui-avatars.com/api/?name=TB',
-          type: 'text',
-          content: 'Em đã gửi bản thiết kế mới cho anh review.',
-          status: 'read',
+          id: "msg_1_1",
+          chatId: "mock_1",
+          senderId: "2",
+          senderName: "Trần Thị B",
+          senderAvatar: "https://ui-avatars.com/api/?name=TB",
+          type: "text",
+          content: "Em đã gửi bản thiết kế mới cho anh review.",
+          status: "read",
           timestamp: currentTime - 5 * 60 * 1000,
         },
         {
-          id: 'msg_1_2',
-          chatId: 'mock_1',
+          id: "msg_1_2",
+          chatId: "mock_1",
           senderId: currentUserId,
-          senderName: 'Bạn',
-          type: 'text',
-          content: 'OK em, anh sẽ review trong hôm nay.',
-          status: 'sent',
+          senderName: "Bạn",
+          type: "text",
+          content: "OK em, anh sẽ review trong hôm nay.",
+          status: "sent",
           timestamp: currentTime - 10 * 60 * 1000,
         },
         {
-          id: 'msg_1_3',
-          chatId: 'mock_1',
-          senderId: '1',
-          senderName: 'Nguyễn Văn A',
-          senderAvatar: 'https://ui-avatars.com/api/?name=NA',
-          type: 'text',
-          content: 'Tiến độ dự án tuần này thế nào rồi nhỉ?',
-          status: 'read',
+          id: "msg_1_3",
+          chatId: "mock_1",
+          senderId: "1",
+          senderName: "Nguyễn Văn A",
+          senderAvatar: "https://ui-avatars.com/api/?name=NA",
+          type: "text",
+          content: "Tiến độ dự án tuần này thế nào rồi nhỉ?",
+          status: "read",
           timestamp: currentTime - 30 * 60 * 1000,
         },
         {
-          id: 'msg_1_4',
-          chatId: 'mock_1',
-          senderId: '2',
-          senderName: 'Trần Thị B',
-          senderAvatar: 'https://ui-avatars.com/api/?name=TB',
-          type: 'text',
-          content: 'Dạ em đã hoàn thành 80% phần nội thất ạ!',
-          status: 'read',
+          id: "msg_1_4",
+          chatId: "mock_1",
+          senderId: "2",
+          senderName: "Trần Thị B",
+          senderAvatar: "https://ui-avatars.com/api/?name=TB",
+          type: "text",
+          content: "Dạ em đã hoàn thành 80% phần nội thất ạ!",
+          status: "read",
           timestamp: currentTime - 25 * 60 * 1000,
         },
       ],
-      'mock_2': [
+      mock_2: [
         {
-          id: 'msg_2_1',
-          chatId: 'mock_2',
-          senderId: '3',
-          senderName: 'Lê Văn C',
-          senderAvatar: 'https://ui-avatars.com/api/?name=LC',
-          type: 'text',
-          content: 'Chiều nay họp online lúc 3h nhé!',
-          status: 'delivered',
+          id: "msg_2_1",
+          chatId: "mock_2",
+          senderId: "3",
+          senderName: "Lê Văn C",
+          senderAvatar: "https://ui-avatars.com/api/?name=LC",
+          type: "text",
+          content: "Chiều nay họp online lúc 3h nhé!",
+          status: "delivered",
           timestamp: currentTime - 2 * 60 * 60 * 1000,
         },
         {
-          id: 'msg_2_2',
-          chatId: 'mock_2',
+          id: "msg_2_2",
+          chatId: "mock_2",
           senderId: currentUserId,
-          senderName: 'Bạn',
-          type: 'text',
-          content: 'OK anh, em sẽ chuẩn bị tài liệu.',
-          status: 'sent',
+          senderName: "Bạn",
+          type: "text",
+          content: "OK anh, em sẽ chuẩn bị tài liệu.",
+          status: "sent",
           timestamp: currentTime - 3 * 60 * 60 * 1000,
         },
         {
-          id: 'msg_2_3',
-          chatId: 'mock_2',
-          senderId: '3',
-          senderName: 'Lê Văn C',
-          senderAvatar: 'https://ui-avatars.com/api/?name=LC',
-          type: 'text',
-          content: 'Bên mình cần trao đổi về concept mới của Villa Resort.',
-          status: 'read',
+          id: "msg_2_3",
+          chatId: "mock_2",
+          senderId: "3",
+          senderName: "Lê Văn C",
+          senderAvatar: "https://ui-avatars.com/api/?name=LC",
+          type: "text",
+          content: "Bên mình cần trao đổi về concept mới của Villa Resort.",
+          status: "read",
           timestamp: currentTime - 4 * 60 * 60 * 1000,
         },
       ],
-      'mock_3': [
+      mock_3: [
         {
-          id: 'msg_3_1',
-          chatId: 'mock_3',
-          senderId: '1',
-          senderName: 'Admin',
-          senderAvatar: 'https://ui-avatars.com/api/?name=AD&background=FF5722&color=fff',
-          type: 'text',
-          content: 'Thông báo: Cập nhật quy trình làm việc mới',
-          status: 'read',
+          id: "msg_3_1",
+          chatId: "mock_3",
+          senderId: "1",
+          senderName: "Admin",
+          senderAvatar:
+            "https://ui-avatars.com/api/?name=AD&background=FF5722&color=fff",
+          type: "text",
+          content: "Thông báo: Cập nhật quy trình làm việc mới",
+          status: "read",
           timestamp: currentTime - 24 * 60 * 60 * 1000,
         },
         {
-          id: 'msg_3_2',
-          chatId: 'mock_3',
-          senderId: '1',
-          senderName: 'Admin',
-          senderAvatar: 'https://ui-avatars.com/api/?name=AD&background=FF5722&color=fff',
-          type: 'text',
-          content: 'Các bạn vui lòng đọc kỹ tài liệu đính kèm và phản hồi trước 5h chiều nay.',
-          status: 'read',
+          id: "msg_3_2",
+          chatId: "mock_3",
+          senderId: "1",
+          senderName: "Admin",
+          senderAvatar:
+            "https://ui-avatars.com/api/?name=AD&background=FF5722&color=fff",
+          type: "text",
+          content:
+            "Các bạn vui lòng đọc kỹ tài liệu đính kèm và phản hồi trước 5h chiều nay.",
+          status: "read",
           timestamp: currentTime - 24 * 60 * 60 * 1000 + 5 * 60 * 1000,
         },
         {
-          id: 'msg_3_3',
-          chatId: 'mock_3',
-          senderId: '2',
-          senderName: 'Trần Thị B',
-          senderAvatar: 'https://ui-avatars.com/api/?name=TB',
-          type: 'text',
-          content: 'Em đã đọc và xác nhận ạ! 👍',
-          status: 'read',
+          id: "msg_3_3",
+          chatId: "mock_3",
+          senderId: "2",
+          senderName: "Trần Thị B",
+          senderAvatar: "https://ui-avatars.com/api/?name=TB",
+          type: "text",
+          content: "Em đã đọc và xác nhận ạ! 👍",
+          status: "read",
           timestamp: currentTime - 20 * 60 * 60 * 1000,
         },
       ],
     };
-    
+
     return mockMessagesByRoom[chatId] || [];
   }
 
@@ -497,7 +565,12 @@ class ChatAPIService {
       const commResponse = await communicationService.sendMessage({
         channelId: Number(data.chatId),
         content: data.content,
-        type: data.type === 'image' ? 'IMAGE' : data.type === 'file' ? 'FILE' : 'TEXT',
+        type:
+          data.type === "image"
+            ? "IMAGE"
+            : data.type === "file"
+              ? "FILE"
+              : "TEXT",
         fileUrl: data.attachments?.[0]?.url,
         fileName: data.attachments?.[0]?.name,
         replyToId: data.replyToId ? Number(data.replyToId) : undefined,
@@ -511,13 +584,18 @@ class ChatAPIService {
       const chatResponse = await chatService.sendMessage({
         roomId: Number(data.chatId),
         content: data.content,
-        type: data.type === 'image' ? 'IMAGE' : data.type === 'file' ? 'FILE' : 'TEXT',
-        attachments: data.attachments?.map(a => a.url || '').filter(Boolean),
+        type:
+          data.type === "image"
+            ? "IMAGE"
+            : data.type === "file"
+              ? "FILE"
+              : "TEXT",
+        attachments: data.attachments?.map((a) => a.url || "").filter(Boolean),
       });
 
       return convertAPIMessageToChatMessage(chatResponse);
     } catch (error) {
-      console.error('[ChatAPI] Send message failed:', error);
+      console.error("[ChatAPI] Send message failed:", error);
       return null;
     }
   }
@@ -525,15 +603,21 @@ class ChatAPIService {
   /**
    * Sửa tin nhắn
    */
-  async editMessage(messageId: string, content: string): Promise<ChatMessage | null> {
+  async editMessage(
+    messageId: string,
+    content: string,
+  ): Promise<ChatMessage | null> {
     try {
-      const response = await communicationService.updateMessage(Number(messageId), content);
+      const response = await communicationService.updateMessage(
+        Number(messageId),
+        content,
+      );
       if (response.data) {
         return convertAPIMessageToChatMessage(response.data);
       }
       return null;
     } catch (error) {
-      console.error('[ChatAPI] Edit message failed:', error);
+      console.error("[ChatAPI] Edit message failed:", error);
       return null;
     }
   }
@@ -546,7 +630,7 @@ class ChatAPIService {
       await communicationService.deleteMessage(Number(messageId));
       return true;
     } catch (error) {
-      console.error('[ChatAPI] Delete message failed:', error);
+      console.error("[ChatAPI] Delete message failed:", error);
       return false;
     }
   }
@@ -559,7 +643,7 @@ class ChatAPIService {
       await communicationService.addReaction(Number(messageId), emoji);
       return true;
     } catch (error) {
-      console.error('[ChatAPI] Add reaction failed:', error);
+      console.error("[ChatAPI] Add reaction failed:", error);
       return false;
     }
   }
@@ -572,7 +656,7 @@ class ChatAPIService {
       await communicationService.removeReaction(Number(messageId), emoji);
       return true;
     } catch (error) {
-      console.error('[ChatAPI] Remove reaction failed:', error);
+      console.error("[ChatAPI] Remove reaction failed:", error);
       return false;
     }
   }
@@ -585,7 +669,7 @@ class ChatAPIService {
       await communicationService.markAsRead(Number(chatId));
       return true;
     } catch (error) {
-      console.error('[ChatAPI] Mark as read failed:', error);
+      console.error("[ChatAPI] Mark as read failed:", error);
       return false;
     }
   }
@@ -597,13 +681,15 @@ class ChatAPIService {
    */
   async getChatMembers(chatId: string): Promise<ChatParticipant[]> {
     try {
-      const response = await communicationService.getChannelMembers(Number(chatId));
+      const response = await communicationService.getChannelMembers(
+        Number(chatId),
+      );
       if (response.data) {
         return response.data.map(convertMemberToParticipant);
       }
       return [];
     } catch (error) {
-      console.error('[ChatAPI] Get members failed:', error);
+      console.error("[ChatAPI] Get members failed:", error);
       return [];
     }
   }
@@ -616,7 +702,7 @@ class ChatAPIService {
       await communicationService.addMember(Number(chatId), userId);
       return true;
     } catch (error) {
-      console.error('[ChatAPI] Add member failed:', error);
+      console.error("[ChatAPI] Add member failed:", error);
       return false;
     }
   }
@@ -629,7 +715,7 @@ class ChatAPIService {
       await communicationService.removeMember(Number(chatId), userId);
       return true;
     } catch (error) {
-      console.error('[ChatAPI] Remove member failed:', error);
+      console.error("[ChatAPI] Remove member failed:", error);
       return false;
     }
   }
@@ -639,13 +725,19 @@ class ChatAPIService {
   /**
    * Direct fetch messages from API (fallback)
    */
-  async fetchMessagesDirectly(channelId: number, limit = 50): Promise<ChatMessage[]> {
+  async fetchMessagesDirectly(
+    channelId: number,
+    limit = 50,
+  ): Promise<ChatMessage[]> {
     try {
-      const response = await fetch(`${this.baseUrl}/messages?channelId=${channelId}&limit=${limit}`, {
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `${this.baseUrl}/messages?channelId=${channelId}&limit=${limit}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
         },
-      });
+      );
 
       if (!response.ok) {
         throw new Error(`API error: ${response.status}`);
@@ -653,24 +745,24 @@ class ChatAPIService {
 
       const data = await response.json();
       const messages = data.data || data.messages || data;
-      
+
       if (Array.isArray(messages)) {
         return messages.map((msg: any) => ({
           id: String(msg.id),
           chatId: String(msg.channelId || msg.roomId),
           senderId: String(msg.userId || msg.senderId),
-          senderName: msg.userName || msg.sender?.name || 'Unknown',
+          senderName: msg.userName || msg.sender?.name || "Unknown",
           senderAvatar: msg.userAvatar || msg.sender?.avatar,
-          type: convertMessageType(msg.type || 'TEXT'),
-          content: msg.content || msg.text || '',
-          status: 'read' as MessageStatus,
+          type: convertMessageType(msg.type || "TEXT"),
+          content: msg.content || msg.text || "",
+          status: "read" as MessageStatus,
           timestamp: new Date(msg.createdAt || msg.timestamp).getTime(),
         }));
       }
-      
+
       return [];
     } catch (error) {
-      console.error('[ChatAPI] Direct fetch failed:', error);
+      console.error("[ChatAPI] Direct fetch failed:", error);
       return [];
     }
   }
@@ -692,7 +784,7 @@ class ChatAPIService {
       }
       return [];
     } catch (error) {
-      console.error('[ChatAPI] Search failed:', error);
+      console.error("[ChatAPI] Search failed:", error);
       return [];
     }
   }

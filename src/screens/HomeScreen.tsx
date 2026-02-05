@@ -1,18 +1,24 @@
-import { Ionicons } from '@expo/vector-icons';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useAuthStore } from '../store/auth';
+import { Ionicons } from "@expo/vector-icons";
+import {
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useAuthStore } from "../store/auth";
 
 const HomeScreen = () => {
   const { user } = useAuthStore();
 
   const menuItems = [
-    { title: 'Dự án mới', icon: 'add-circle', color: '#10B981' },
-    { title: 'Quản lý dự án', icon: 'folder', color: '#0A6847' },
-    { title: 'Báo cáo', icon: 'bar-chart', color: '#10B981' },
-    { title: 'Tài chính', icon: 'card', color: '#0A6847' },
-    { title: 'Nhân sự', icon: 'people', color: '#0A6847' },
-    { title: 'Kho vật tư', icon: 'cube', color: '#666666' },
+    { title: "Dự án mới", icon: "add-circle", color: "#10B981" },
+    { title: "Quản lý dự án", icon: "folder", color: "#0A6847" },
+    { title: "Báo cáo", icon: "bar-chart", color: "#10B981" },
+    { title: "Tài chính", icon: "card", color: "#0A6847" },
+    { title: "Nhân sự", icon: "people", color: "#0A6847" },
+    { title: "Kho vật tư", icon: "cube", color: "#666666" },
   ];
 
   return (
@@ -22,10 +28,15 @@ const HomeScreen = () => {
           <Text style={styles.greeting}>Chào mừng trở lại!</Text>
           <Text style={styles.userName}>{user?.name}</Text>
           <Text style={styles.userRole}>
-            {user?.role === 'khach-hang' && 'Khách hàng'}
-            {user?.role === 'nha-thau' && 'Nhà thầu'}
-            {user?.role === 'thau-phu' && 'Thầu phụ'}
-            {user?.role === 'cong-ty' && 'Công ty'}
+            {user?.role === "khach-hang"
+              ? "Khách hàng"
+              : user?.role === "nha-thau"
+                ? "Nhà thầu"
+                : user?.role === "thau-phu"
+                  ? "Thầu phụ"
+                  : user?.role === "cong-ty"
+                    ? "Công ty"
+                    : ""}
           </Text>
         </View>
 
@@ -45,7 +56,9 @@ const HomeScreen = () => {
           <View style={styles.menuGrid}>
             {menuItems.map((item, index) => (
               <TouchableOpacity key={index} style={styles.menuItem}>
-                <View style={[styles.menuIcon, { backgroundColor: item.color }]}>
+                <View
+                  style={[styles.menuIcon, { backgroundColor: item.color }]}
+                >
                   <Ionicons name={item.icon as any} size={24} color="white" />
                 </View>
                 <Text style={styles.menuText}>{item.title}</Text>
@@ -63,7 +76,9 @@ const HomeScreen = () => {
           </View>
           <View style={styles.activityCard}>
             <Text style={styles.activityTitle}>Dự án Nhà phố An Phú</Text>
-            <Text style={styles.activityDescription}>Hoàn thành giai đoạn thô</Text>
+            <Text style={styles.activityDescription}>
+              Hoàn thành giai đoạn thô
+            </Text>
             <Text style={styles.activityTime}>1 ngày trước</Text>
           </View>
         </View>
@@ -75,41 +90,41 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
   },
   header: {
-    backgroundColor: '#007AFF',
+    backgroundColor: "#007AFF",
     padding: 20,
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
   },
   greeting: {
     fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.8)',
+    color: "rgba(255, 255, 255, 0.8)",
   },
   userName: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: 'white',
+    fontWeight: "bold",
+    color: "white",
     marginTop: 5,
   },
   userRole: {
     fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.9)',
+    color: "rgba(255, 255, 255, 0.9)",
     marginTop: 2,
   },
   statsContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     padding: 20,
     gap: 15,
   },
   statCard: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     padding: 20,
     borderRadius: 12,
-    alignItems: 'center',
-    shadowColor: '#000',
+    alignItems: "center",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -117,13 +132,13 @@ const styles = StyleSheet.create({
   },
   statNumber: {
     fontSize: 28,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
   },
   statLabel: {
     fontSize: 12,
-    color: '#666',
-    textAlign: 'center',
+    color: "#666",
+    textAlign: "center",
     marginTop: 5,
   },
   menuContainer: {
@@ -131,23 +146,23 @@ const styles = StyleSheet.create({
   },
   menuTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
     marginBottom: 15,
   },
   menuGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
   },
   menuItem: {
-    width: '48%',
-    backgroundColor: 'white',
+    width: "48%",
+    backgroundColor: "white",
     padding: 20,
     borderRadius: 12,
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 15,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -157,31 +172,31 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     marginBottom: 10,
   },
   menuText: {
     fontSize: 14,
-    color: '#333',
-    textAlign: 'center',
-    fontWeight: '500',
+    color: "#333",
+    textAlign: "center",
+    fontWeight: "500",
   },
   recentSection: {
     padding: 20,
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
     marginBottom: 15,
   },
   activityCard: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     padding: 15,
     borderRadius: 12,
     marginBottom: 10,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -189,17 +204,17 @@ const styles = StyleSheet.create({
   },
   activityTitle: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
   },
   activityDescription: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
     marginTop: 5,
   },
   activityTime: {
     fontSize: 12,
-    color: '#999',
+    color: "#999",
     marginTop: 5,
   },
 });

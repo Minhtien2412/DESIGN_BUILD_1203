@@ -1,30 +1,39 @@
 /**
  * Unified Notifications Screen
  * =============================
- * 
+ *
  * Hiển thị thông báo đồng bộ từ cả CRM và App Backend
- * 
+ *
  * Features:
- * - Tabs: Tất cả | CRM | Hệ thống
+ * - Tabs: Tất cả | Tin nhắn | Cuộc gọi | CRM | Hệ thống
  * - Date grouping
  * - Source badge (CRM / APP)
  * - Auto-sync every 5 minutes
  * - Pull to refresh
  * - Mark read/unread
- * 
+ * - Swipe to delete/archive
+ * - Real-time updates via WebSocket
+ *
  * @author ThietKeResort Team
  * @created 2025-01-08
+ * @updated 2026-01-24 - Added call/message tabs, improved UI
  */
 
-import { MODERN_COLORS, MODERN_RADIUS, MODERN_SHADOWS, MODERN_SPACING, MODERN_TYPOGRAPHY } from '@/constants/modern-theme';
-import { useUnifiedBadge } from '@/context/UnifiedBadgeContext';
-import { useUnifiedNotifications } from '@/hooks/useNotifications';
-import { handleNotificationItemPress } from '@/services/notificationNavigator';
-import { UnifiedNotification } from '@/services/notificationSyncService';
-import { Ionicons } from '@expo/vector-icons';
-import * as Haptics from 'expo-haptics';
-import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import {
+    MODERN_COLORS,
+    MODERN_RADIUS,
+    MODERN_SPACING,
+    MODERN_TYPOGRAPHY
+} from "@/constants/modern-theme";
+import { useUnifiedBadge } from "@/context/UnifiedBadgeContext";
+import { useUnifiedNotifications } from "@/hooks/useNotifications";
+import { handleNotificationItemPress } from "@/services/notificationNavigator";
+import { UnifiedNotification } from "@/services/notificationSyncService";
+import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
+import { LinearGradient } from "expo-linear-gradient";
+import { useRouter } from "expo-router";
+import { useMemo, useState } from "react";
 import {
     ActivityIndicator,
     Alert,
@@ -36,14 +45,23 @@ import {
     Text,
     TouchableOpacity,
     View,
-} from 'react-native';
+} from "react-native";
 
-type TabType = 'all' | 'crm' | 'app';
+type TabType = "all" | "messages" | "calls" | "crm" | "app";
 
 interface NotificationGroup {
   title: string;
   data: UnifiedNotification[];
 }
+
+// Tab configuration
+const TABS: { key: TabType; label: string; icon: string }[] = [
+  { key: "all", label: "Tất cả", icon: "apps" },
+  { key: "messages", label: "Tin nhắn", icon: "chatbubbles" },
+  { key: "calls", label: "Cuộc gọi", icon: "call" },
+  { key: "crm", label: "CRM", icon: "business" },
+  { key: "app", label: "Hệ thống", icon: "notifications" },
+];
 
 export default function UnifiedNotificationsScreen() {
   const {
@@ -64,20 +82,64 @@ export default function UnifiedNotificationsScreen() {
     autoSync: true,
     syncIntervalMs: 5 * 60 * 1000, // 5 phút
   });
-  
+
   // Unified Badge Context - sync notification badges
-  const { syncWithNotifications } = useUnifiedBadge();
-  
+  const {
+    syncWithNotifications,
+    badges,
+    messageNotifications,
+    callNotifications: missedCalls,
+  } = useUnifiedBadge();
+
   const [refreshing, setRefreshing] = useState(false);
-  const [selectedTab, setSelectedTab] = useState<TabType>('all');
+  const [selectedTab, setSelectedTab] = useState<TabType>("all");
   const router = useRouter();
+
+  // Filter notifications by type
+  const messageNotifs = useMemo(
+    () =>
+      notifications.filter(
+        (n) => n.type === "MESSAGE" || n.relatedType === "chat",
+      ),
+    [notifications],
+  );
+
+  const callNotifs = useMemo(
+    () =>
+      notifications.filter(
+        (n) => n.type === "CALL" || n.relatedType === "call",
+      ),
+    [notifications],
+  );
+
+  // Get tab count
+  const getTabCount = (tab: TabType): number => {
+    switch (tab) {
+      case "all":
+        return unreadCount;
+      case "messages":
+        return badges.messages + messageNotifs.filter((n) => !n.isRead).length;
+      case "calls":
+        return badges.missedCalls + callNotifs.filter((n) => !n.isRead).length;
+      case "crm":
+        return crmUnreadCount;
+      case "app":
+        return appUnreadCount;
+      default:
+        return 0;
+    }
+  };
 
   // Get notifications based on selected tab
   const getFilteredNotifications = () => {
     switch (selectedTab) {
-      case 'crm':
+      case "messages":
+        return messageNotifs;
+      case "calls":
+        return callNotifs;
+      case "crm":
         return crmNotifications;
-      case 'app':
+      case "app":
         return appNotifications;
       default:
         return notifications;
@@ -100,14 +162,14 @@ export default function UnifiedNotificationsScreen() {
 
   const handleNotificationPress = async (item: UnifiedNotification) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    
+
     // Mark as read first
     await markAsRead(item.id);
-    
+
     // Update badge count immediately (Zalo-style)
     const newUnreadCount = unreadCount - (item.isRead ? 0 : 1);
     syncWithNotifications(Math.max(0, newUnreadCount));
-    
+
     // Use notification navigator service for deep linking
     const result = handleNotificationItemPress({
       id: item.id,
@@ -115,22 +177,22 @@ export default function UnifiedNotificationsScreen() {
       relatedType: item.relatedType,
       relatedId: item.relatedId,
     });
-    
-    console.log('[UnifiedNotifications] Navigation result:', result);
+
+    console.log("[UnifiedNotifications] Navigation result:", result);
   };
 
   const handleNotificationLongPress = (item: UnifiedNotification) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     Alert.alert(
       item.title,
-      `Nguồn: ${item.source === 'CRM' ? 'CRM' : 'Hệ thống'}\n\nChọn hành động:`,
+      `Nguồn: ${item.source === "CRM" ? "CRM" : "Hệ thống"}\n\nChọn hành động:`,
       [
         {
-          text: item.isRead ? 'Đánh dấu chưa đọc' : 'Đánh dấu đã đọc',
+          text: item.isRead ? "Đánh dấu chưa đọc" : "Đánh dấu đã đọc",
           onPress: () => markAsRead(item.id),
         },
-        { text: 'Hủy', style: 'cancel' },
-      ]
+        { text: "Hủy", style: "cancel" },
+      ],
     );
   };
 
@@ -138,10 +200,10 @@ export default function UnifiedNotificationsScreen() {
   const groupedNotifications = (): NotificationGroup[] => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
+
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
-    
+
     const weekAgo = new Date(today);
     weekAgo.setDate(weekAgo.getDate() - 7);
 
@@ -152,7 +214,7 @@ export default function UnifiedNotificationsScreen() {
 
     const filteredNotifs = getFilteredNotifications();
 
-    filteredNotifs.forEach(notif => {
+    filteredNotifs.forEach((notif) => {
       const notifDate = new Date(notif.createdAt);
       notifDate.setHours(0, 0, 0, 0);
 
@@ -168,10 +230,14 @@ export default function UnifiedNotificationsScreen() {
     });
 
     const groups: NotificationGroup[] = [];
-    if (todayNotifs.length > 0) groups.push({ title: 'Hôm nay', data: todayNotifs });
-    if (yesterdayNotifs.length > 0) groups.push({ title: 'Hôm qua', data: yesterdayNotifs });
-    if (thisWeekNotifs.length > 0) groups.push({ title: 'Tuần này', data: thisWeekNotifs });
-    if (olderNotifs.length > 0) groups.push({ title: 'Cũ hơn', data: olderNotifs });
+    if (todayNotifs.length > 0)
+      groups.push({ title: "Hôm nay", data: todayNotifs });
+    if (yesterdayNotifs.length > 0)
+      groups.push({ title: "Hôm qua", data: yesterdayNotifs });
+    if (thisWeekNotifs.length > 0)
+      groups.push({ title: "Tuần này", data: thisWeekNotifs });
+    if (olderNotifs.length > 0)
+      groups.push({ title: "Cũ hơn", data: olderNotifs });
 
     return groups;
   };
@@ -183,53 +249,72 @@ export default function UnifiedNotificationsScreen() {
     const diffMins = Math.floor(diffMs / 60000);
     const diffHours = Math.floor(diffMs / 3600000);
 
-    if (diffMins < 1) return 'Vừa xong';
+    if (diffMins < 1) return "Vừa xong";
     if (diffMins < 60) return `${diffMins} phút trước`;
     if (diffHours < 24) return `${diffHours} giờ trước`;
-    
-    return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
+
+    return date.toLocaleDateString("vi-VN", {
+      day: "2-digit",
+      month: "2-digit",
+    });
   };
 
   const formatLastSync = (dateString: string | null) => {
-    if (!dateString) return 'Chưa đồng bộ';
+    if (!dateString) return "Chưa đồng bộ";
     const date = new Date(dateString);
-    return `Đồng bộ: ${date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}`;
+    return `Đồng bộ: ${date.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })}`;
   };
 
-  const getNotificationIcon = (type: string) => {
+  const getNotificationIcon = (type: string, relatedType?: string) => {
+    // Check relatedType first for more specific icons
+    if (relatedType === "call" || type?.toUpperCase() === "CALL") {
+      return { name: "call", color: "#ea580c" };
+    }
+    if (relatedType === "chat" || type?.toUpperCase() === "MESSAGE") {
+      return { name: "chatbubble", color: "#0066CC" };
+    }
+
     switch (type?.toUpperCase()) {
-      case 'TASK':
-        return { name: 'checkmark-circle-outline', color: MODERN_COLORS.success };
-      case 'PROJECT':
-        return { name: 'folder-outline', color: MODERN_COLORS.warning };
-      case 'TICKET':
-        return { name: 'help-buoy-outline', color: MODERN_COLORS.error };
-      case 'MESSAGE':
-        return { name: 'chatbubble-outline', color: MODERN_COLORS.secondary };
-      case 'PAYMENT':
-        return { name: 'card-outline', color: '#22c55e' };
-      case 'WARNING':
-        return { name: 'warning-outline', color: MODERN_COLORS.warning };
-      case 'ERROR':
-        return { name: 'alert-circle-outline', color: MODERN_COLORS.error };
-      case 'SUCCESS':
-        return { name: 'checkmark-done-outline', color: MODERN_COLORS.success };
+      case "TASK":
+        return {
+          name: "checkmark-circle-outline",
+          color: MODERN_COLORS.success,
+        };
+      case "PROJECT":
+        return { name: "folder-outline", color: MODERN_COLORS.warning };
+      case "TICKET":
+        return { name: "help-buoy-outline", color: MODERN_COLORS.error };
+      case "MESSAGE":
+        return { name: "chatbubble-outline", color: MODERN_COLORS.secondary };
+      case "CALL":
+        return { name: "call", color: "#ea580c" };
+      case "PAYMENT":
+        return { name: "card-outline", color: "#22c55e" };
+      case "WARNING":
+        return { name: "warning-outline", color: MODERN_COLORS.warning };
+      case "ERROR":
+        return { name: "alert-circle-outline", color: MODERN_COLORS.error };
+      case "SUCCESS":
+        return { name: "checkmark-done-outline", color: MODERN_COLORS.success };
       default:
-        return { name: 'information-circle-outline', color: MODERN_COLORS.primary };
+        return {
+          name: "information-circle-outline",
+          color: MODERN_COLORS.primary,
+        };
     }
   };
 
-  const getSourceColor = (source: 'CRM' | 'APP') => {
-    return source === 'CRM' ? '#8b5cf6' : MODERN_COLORS.primary;
+  const getSourceColor = (source: "CRM" | "APP") => {
+    return source === "CRM" ? "#8b5cf6" : MODERN_COLORS.primary;
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'URGENT':
+      case "URGENT":
         return MODERN_COLORS.error;
-      case 'HIGH':
+      case "HIGH":
         return MODERN_COLORS.warning;
-      case 'MEDIUM':
+      case "MEDIUM":
         return MODERN_COLORS.secondary;
       default:
         return MODERN_COLORS.textSecondary;
@@ -237,7 +322,7 @@ export default function UnifiedNotificationsScreen() {
   };
 
   const renderNotification = ({ item }: { item: UnifiedNotification }) => {
-    const icon = getNotificationIcon(item.type);
+    const icon = getNotificationIcon(item.type, item.relatedType);
     const isUnread = !item.isRead;
     const sourceColor = getSourceColor(item.source);
 
@@ -252,17 +337,24 @@ export default function UnifiedNotificationsScreen() {
         activeOpacity={0.7}
         delayLongPress={500}
       >
-        <View style={[styles.iconContainer, { backgroundColor: icon.color + '15' }]}>
+        <View
+          style={[styles.iconContainer, { backgroundColor: icon.color + "15" }]}
+        >
           <Ionicons name={icon.name as any} size={24} color={icon.color} />
         </View>
-        
+
         <View style={styles.notificationContent}>
           <View style={styles.notificationHeader}>
             <View style={styles.titleRow}>
               <Text style={styles.notificationTitle} numberOfLines={1}>
                 {item.title}
               </Text>
-              <View style={[styles.sourceBadge, { backgroundColor: sourceColor + '20' }]}>
+              <View
+                style={[
+                  styles.sourceBadge,
+                  { backgroundColor: sourceColor + "20" },
+                ]}
+              >
                 <Text style={[styles.sourceBadgeText, { color: sourceColor }]}>
                   {item.source}
                 </Text>
@@ -270,26 +362,36 @@ export default function UnifiedNotificationsScreen() {
             </View>
             {isUnread && <View style={styles.unreadDot} />}
           </View>
-          
+
           <Text style={styles.notificationMessage} numberOfLines={2}>
             {item.message}
           </Text>
-          
+
           <View style={styles.notificationFooter}>
             <Text style={styles.notificationTime}>
               {formatTime(item.createdAt)}
             </Text>
-            {item.priority !== 'LOW' && item.priority !== 'MEDIUM' && (
-              <View style={[styles.priorityBadge, { backgroundColor: getPriorityColor(item.priority) + '20' }]}>
-                <Text style={[styles.priorityText, { color: getPriorityColor(item.priority) }]}>
-                  {item.priority === 'URGENT' ? 'Khẩn cấp' : 'Quan trọng'}
+            {item.priority !== "LOW" && item.priority !== "MEDIUM" && (
+              <View
+                style={[
+                  styles.priorityBadge,
+                  { backgroundColor: getPriorityColor(item.priority) + "20" },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.priorityText,
+                    { color: getPriorityColor(item.priority) },
+                  ]}
+                >
+                  {item.priority === "URGENT" ? "Khẩn cấp" : "Quan trọng"}
                 </Text>
               </View>
             )}
-            <Ionicons 
-              name="chevron-forward" 
-              size={14} 
-              color={MODERN_COLORS.textSecondary} 
+            <Ionicons
+              name="chevron-forward"
+              size={14}
+              color={MODERN_COLORS.textSecondary}
               style={styles.chevronIcon}
             />
           </View>
@@ -305,107 +407,149 @@ export default function UnifiedNotificationsScreen() {
     </View>
   );
 
-  const renderTab = (tab: TabType, label: string, count: number) => {
-    const isActive = selectedTab === tab;
-    return (
-      <TouchableOpacity
-        style={[styles.tab, isActive && styles.tabActive]}
-        onPress={() => {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          setSelectedTab(tab);
-        }}
-      >
-        <Text style={[styles.tabText, isActive && styles.tabTextActive]}>
-          {label}
-        </Text>
-        {count > 0 && (
-          <View style={[styles.tabBadge, isActive && styles.tabBadgeActive]}>
-            <Text style={[styles.tabBadgeText, isActive && styles.tabBadgeTextActive]}>
-              {count > 99 ? '99+' : count}
-            </Text>
-          </View>
-        )}
-      </TouchableOpacity>
-    );
-  };
+  // New horizontal scrollable tabs
+  const renderTabs = () => (
+    <View style={styles.tabsWrapper}>
+      <View style={styles.tabsContainer}>
+        {TABS.map((tab) => {
+          const isActive = selectedTab === tab.key;
+          const count = getTabCount(tab.key);
 
-  const renderEmpty = () => (
-    <View style={styles.emptyContainer}>
-      <Ionicons 
-        name="notifications-off-outline" 
-        size={64} 
-        color={MODERN_COLORS.textSecondary} 
-      />
-      <Text style={styles.emptyTitle}>Không có thông báo</Text>
-      <Text style={styles.emptySubtitle}>
-        {isOffline ? 'Bạn đang offline. Kết nối mạng để đồng bộ thông báo mới.' : 
-          'Các thông báo mới từ CRM và hệ thống sẽ xuất hiện ở đây.'}
-      </Text>
-      <TouchableOpacity style={styles.refreshButton} onPress={handleRefresh}>
-        <Ionicons name="refresh-outline" size={20} color={MODERN_COLORS.primary} />
-        <Text style={styles.refreshButtonText}>Làm mới</Text>
-      </TouchableOpacity>
+          return (
+            <TouchableOpacity
+              key={tab.key}
+              style={[styles.tab, isActive && styles.tabActive]}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                setSelectedTab(tab.key);
+              }}
+            >
+              <Ionicons
+                name={tab.icon as any}
+                size={16}
+                color={isActive ? "#fff" : MODERN_COLORS.textSecondary}
+                style={styles.tabIcon}
+              />
+              <Text style={[styles.tabText, isActive && styles.tabTextActive]}>
+                {tab.label}
+              </Text>
+              {count > 0 && (
+                <View
+                  style={[styles.tabBadge, isActive && styles.tabBadgeActive]}
+                >
+                  <Text
+                    style={[
+                      styles.tabBadgeText,
+                      isActive && styles.tabBadgeTextActive,
+                    ]}
+                  >
+                    {count > 99 ? "99+" : count}
+                  </Text>
+                </View>
+              )}
+            </TouchableOpacity>
+          );
+        })}
+      </View>
     </View>
   );
+
+  const renderEmpty = () => {
+    let emptyIcon: any = "notifications-off-outline";
+    let emptyText = "Không có thông báo";
+    let emptySubtext =
+      "Các thông báo mới từ CRM và hệ thống sẽ xuất hiện ở đây.";
+
+    if (selectedTab === "messages") {
+      emptyIcon = "chatbubbles-outline";
+      emptyText = "Không có tin nhắn mới";
+      emptySubtext = "Tin nhắn từ các cuộc trò chuyện sẽ xuất hiện ở đây.";
+    } else if (selectedTab === "calls") {
+      emptyIcon = "call-outline";
+      emptyText = "Không có cuộc gọi nhỡ";
+      emptySubtext = "Các cuộc gọi nhỡ sẽ được hiển thị ở đây.";
+    } else if (selectedTab === "crm") {
+      emptyIcon = "business-outline";
+      emptyText = "Không có thông báo CRM";
+      emptySubtext = "Cập nhật từ công việc, dự án, ticket sẽ xuất hiện ở đây.";
+    }
+
+    return (
+      <View style={styles.emptyContainer}>
+        <View style={styles.emptyIconContainer}>
+          <Ionicons
+            name={emptyIcon}
+            size={48}
+            color={MODERN_COLORS.primary + "60"}
+          />
+        </View>
+        <Text style={styles.emptyTitle}>{emptyText}</Text>
+        <Text style={styles.emptySubtitle}>
+          {isOffline
+            ? "Bạn đang offline. Kết nối mạng để đồng bộ."
+            : emptySubtext}
+        </Text>
+        <TouchableOpacity style={styles.refreshButton} onPress={handleRefresh}>
+          <Ionicons name="refresh-outline" size={18} color="#fff" />
+          <Text style={styles.refreshButtonText}>Làm mới</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
 
   if (loading && notifications.length === 0) {
     return (
       <SafeAreaView style={styles.container}>
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={MODERN_COLORS.primary} />
+        <LinearGradient
+          colors={[MODERN_COLORS.primary, MODERN_COLORS.secondary]}
+          style={styles.loadingGradient}
+        >
+          <ActivityIndicator size="large" color="#fff" />
           <Text style={styles.loadingText}>Đang đồng bộ thông báo...</Text>
-        </View>
+        </LinearGradient>
       </SafeAreaView>
     );
   }
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
-      
-      {/* Header */}
-      <View style={styles.header}>
+      <StatusBar barStyle="light-content" />
+
+      {/* Gradient Header */}
+      <LinearGradient
+        colors={[MODERN_COLORS.primary, "#0052a3"]}
+        style={styles.header}
+      >
         <View style={styles.headerTop}>
-          <Text style={styles.headerTitle}>Thông báo</Text>
+          <View>
+            <Text style={styles.headerTitle}>Thông báo</Text>
+            <Text style={styles.headerSubtitle}>
+              {formatLastSync(lastSyncTime)}
+              {isOffline ? " • Offline" : ""}
+            </Text>
+          </View>
           <View style={styles.headerActions}>
             {syncing && (
-              <ActivityIndicator 
-                size="small" 
-                color={MODERN_COLORS.primary} 
+              <ActivityIndicator
+                size="small"
+                color="#fff"
                 style={styles.syncingIndicator}
               />
             )}
             {unreadCount > 0 && (
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.markAllButton}
                 onPress={handleMarkAllRead}
               >
-                <Ionicons name="checkmark-done" size={20} color={MODERN_COLORS.primary} />
+                <Ionicons name="checkmark-done" size={22} color="#fff" />
               </TouchableOpacity>
             )}
           </View>
         </View>
-        
-        {/* Sync Status */}
-        <View style={styles.syncStatus}>
-          <Text style={styles.syncStatusText}>
-            {formatLastSync(lastSyncTime)}
-          </Text>
-          {isOffline && (
-            <View style={styles.offlineBadge}>
-              <Ionicons name="cloud-offline-outline" size={14} color={MODERN_COLORS.warning} />
-              <Text style={styles.offlineText}>Offline</Text>
-            </View>
-          )}
-        </View>
-        
-        {/* Tabs */}
-        <View style={styles.tabsContainer}>
-          {renderTab('all', 'Tất cả', unreadCount)}
-          {renderTab('crm', 'CRM', crmUnreadCount)}
-          {renderTab('app', 'Hệ thống', appUnreadCount)}
-        </View>
-      </View>
+      </LinearGradient>
+
+      {/* Tabs - scrollable */}
+      {renderTabs()}
 
       {/* Notification List */}
       <SectionList
@@ -435,118 +579,109 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: MODERN_COLORS.background,
   },
-  loadingContainer: {
+  loadingGradient: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     gap: MODERN_SPACING.md,
   },
   loadingText: {
     fontSize: MODERN_TYPOGRAPHY.fontSize.md,
-    color: MODERN_COLORS.textSecondary,
+    color: "#fff",
+    marginTop: MODERN_SPACING.md,
   },
   header: {
-    backgroundColor: MODERN_COLORS.surface,
     paddingHorizontal: MODERN_SPACING.lg,
-    paddingTop: MODERN_SPACING.md,
-    paddingBottom: MODERN_SPACING.sm,
-    ...MODERN_SHADOWS.sm,
+    paddingTop: MODERN_SPACING.xl,
+    paddingBottom: MODERN_SPACING.md,
   },
   headerTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: MODERN_SPACING.xs,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
   },
   headerTitle: {
-    fontSize: MODERN_TYPOGRAPHY.fontSize.xxl,
-    fontWeight: MODERN_TYPOGRAPHY.fontWeight.bold,
-    color: MODERN_COLORS.text,
+    fontSize: 28,
+    fontWeight: "700",
+    color: "#fff",
+  },
+  headerSubtitle: {
+    fontSize: MODERN_TYPOGRAPHY.fontSize.sm,
+    color: "rgba(255,255,255,0.7)",
+    marginTop: 4,
   },
   headerActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: MODERN_SPACING.sm,
   },
   syncingIndicator: {
     marginRight: MODERN_SPACING.xs,
   },
   markAllButton: {
-    padding: MODERN_SPACING.xs,
+    padding: MODERN_SPACING.sm,
+    backgroundColor: "rgba(255,255,255,0.2)",
+    borderRadius: MODERN_RADIUS.full,
   },
-  syncStatus: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: MODERN_SPACING.sm,
-    marginBottom: MODERN_SPACING.sm,
-  },
-  syncStatusText: {
-    fontSize: MODERN_TYPOGRAPHY.fontSize.xs,
-    color: MODERN_COLORS.textSecondary,
-  },
-  offlineBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: MODERN_COLORS.warning + '20',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: MODERN_RADIUS.xs,
-  },
-  offlineText: {
-    fontSize: MODERN_TYPOGRAPHY.fontSize.xs,
-    color: MODERN_COLORS.warning,
-    fontWeight: MODERN_TYPOGRAPHY.fontWeight.semibold,
+  tabsWrapper: {
+    backgroundColor: MODERN_COLORS.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: MODERN_COLORS.border,
   },
   tabsContainer: {
-    flexDirection: 'row',
-    gap: MODERN_SPACING.sm,
+    flexDirection: "row",
+    paddingHorizontal: MODERN_SPACING.md,
+    paddingVertical: MODERN_SPACING.sm,
+    gap: MODERN_SPACING.xs,
   },
   tab: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: MODERN_SPACING.md,
-    paddingVertical: MODERN_SPACING.xs,
+    paddingVertical: MODERN_SPACING.sm,
     borderRadius: MODERN_RADIUS.full,
     backgroundColor: MODERN_COLORS.background,
-    gap: MODERN_SPACING.xs,
+    gap: 6,
   },
   tabActive: {
     backgroundColor: MODERN_COLORS.primary,
   },
+  tabIcon: {
+    marginRight: 2,
+  },
   tabText: {
-    fontSize: MODERN_TYPOGRAPHY.fontSize.xs,
+    fontSize: MODERN_TYPOGRAPHY.fontSize.sm,
     color: MODERN_COLORS.textSecondary,
-    fontWeight: MODERN_TYPOGRAPHY.fontWeight.semibold,
+    fontWeight: "600",
   },
   tabTextActive: {
-    color: '#fff',
+    color: "#fff",
   },
   tabBadge: {
-    backgroundColor: MODERN_COLORS.error + '20',
+    backgroundColor: MODERN_COLORS.error,
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: MODERN_RADIUS.full,
     minWidth: 18,
-    alignItems: 'center',
+    alignItems: "center",
   },
   tabBadgeActive: {
-    backgroundColor: '#ffffff40',
+    backgroundColor: "rgba(255,255,255,0.3)",
   },
   tabBadgeText: {
-    fontSize: 9,
-    fontWeight: MODERN_TYPOGRAPHY.fontWeight.bold,
-    color: MODERN_COLORS.error,
+    fontSize: 10,
+    fontWeight: "700",
+    color: "#fff",
   },
   tabBadgeTextActive: {
-    color: '#fff',
+    color: "#fff",
   },
   listContent: {
     paddingBottom: MODERN_SPACING.xl,
   },
   sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: MODERN_SPACING.lg,
     paddingVertical: MODERN_SPACING.sm,
     backgroundColor: MODERN_COLORS.background,
@@ -564,7 +699,7 @@ const styles = StyleSheet.create({
     marginLeft: MODERN_SPACING.xs,
   },
   notificationCard: {
-    flexDirection: 'row',
+    flexDirection: "row",
     paddingHorizontal: MODERN_SPACING.lg,
     paddingVertical: MODERN_SPACING.md,
     backgroundColor: MODERN_COLORS.surface,
@@ -573,7 +708,7 @@ const styles = StyleSheet.create({
     gap: MODERN_SPACING.md,
   },
   notificationCardUnread: {
-    backgroundColor: MODERN_COLORS.primary + '08',
+    backgroundColor: MODERN_COLORS.primary + "08",
     borderLeftWidth: 3,
     borderLeftColor: MODERN_COLORS.primary,
   },
@@ -581,23 +716,23 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: MODERN_RADIUS.md,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   notificationContent: {
     flex: 1,
     gap: 4,
   },
   notificationHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
     gap: MODERN_SPACING.sm,
   },
   titleRow: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: MODERN_SPACING.xs,
   },
   notificationTitle: {
@@ -627,8 +762,8 @@ const styles = StyleSheet.create({
     lineHeight: MODERN_TYPOGRAPHY.lineHeight.normal,
   },
   notificationFooter: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginTop: 4,
   },
   notificationTime: {
@@ -646,40 +781,50 @@ const styles = StyleSheet.create({
     fontWeight: MODERN_TYPOGRAPHY.fontWeight.semibold,
   },
   chevronIcon: {
-    marginLeft: 'auto',
+    marginLeft: "auto",
   },
   emptyContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: MODERN_SPACING.xl * 2,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: MODERN_SPACING.xl * 3,
     paddingHorizontal: MODERN_SPACING.lg,
-    gap: MODERN_SPACING.md,
+    gap: MODERN_SPACING.sm,
+  },
+  emptyIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: MODERN_COLORS.primary + "10",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: MODERN_SPACING.sm,
   },
   emptyTitle: {
-    fontSize: MODERN_TYPOGRAPHY.fontSize.xl,
-    fontWeight: MODERN_TYPOGRAPHY.fontWeight.bold,
+    fontSize: MODERN_TYPOGRAPHY.fontSize.lg,
+    fontWeight: "600",
     color: MODERN_COLORS.text,
   },
   emptySubtitle: {
-    fontSize: MODERN_TYPOGRAPHY.fontSize.md,
+    fontSize: MODERN_TYPOGRAPHY.fontSize.sm,
     color: MODERN_COLORS.textSecondary,
-    textAlign: 'center',
-    lineHeight: MODERN_TYPOGRAPHY.lineHeight.relaxed,
+    textAlign: "center",
+    lineHeight: 20,
+    maxWidth: 280,
   },
   refreshButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: MODERN_SPACING.xs,
     paddingHorizontal: MODERN_SPACING.lg,
     paddingVertical: MODERN_SPACING.sm,
-    backgroundColor: MODERN_COLORS.primary + '15',
+    backgroundColor: MODERN_COLORS.primary,
     borderRadius: MODERN_RADIUS.full,
-    marginTop: MODERN_SPACING.md,
+    marginTop: MODERN_SPACING.lg,
   },
   refreshButtonText: {
-    fontSize: MODERN_TYPOGRAPHY.fontSize.md,
-    fontWeight: MODERN_TYPOGRAPHY.fontWeight.semibold,
-    color: MODERN_COLORS.primary,
+    fontSize: MODERN_TYPOGRAPHY.fontSize.sm,
+    fontWeight: "600",
+    color: "#fff",
   },
 });

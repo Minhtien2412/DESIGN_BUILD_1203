@@ -148,10 +148,23 @@ const SHARE_OPTIONS: ShareOption[] = [
 // ============================================
 const ShareSheetContext = createContext<ShareSheetContextType | null>(null);
 
-export const useShareSheet = () => {
+// Noop fallback when provider is not available
+const noopShareSheet: ShareSheetContextType = {
+  open: () => console.warn("[ShareSheet] Provider not available"),
+  close: () => {},
+  isOpen: false,
+};
+
+export const useShareSheet = (): ShareSheetContextType => {
   const context = useContext(ShareSheetContext);
+  // Return noop fallback instead of throwing to prevent crashes during hydration
   if (!context) {
-    throw new Error("useShareSheet must be used within a ShareSheetProvider");
+    if (__DEV__) {
+      console.warn(
+        "[ShareSheet] useShareSheet called outside of ShareSheetProvider",
+      );
+    }
+    return noopShareSheet;
   }
   return context;
 };

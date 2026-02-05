@@ -1,21 +1,21 @@
 // Offline message queue for handling messages when network is unavailable
 // Integrates with existing AsyncStorage patterns and socket manager
 
-import { AppState, AppStateStatus } from 'react-native';
-import socketManager from './socketManager';
-import { storage } from './storage';
+import { AppState, AppStateStatus } from "react-native";
+import socketManager from "./socketManager";
+import { storage } from "./storage";
 
 interface QueuedMessage {
   id: string;
   chatId: string;
-  type: 'text' | 'image' | 'file';
+  type: "text" | "image" | "file";
   body: string;
   metadata?: any;
   clientId: string;
   timestamp: number;
   retries: number;
   maxRetries: number;
-  status: 'pending' | 'sending' | 'failed' | 'sent';
+  status: "pending" | "sending" | "failed" | "sent";
 }
 
 interface QueueStats {
@@ -27,7 +27,7 @@ interface QueueStats {
 
 class OfflineQueue {
   private queue: QueuedMessage[] = [];
-  private readonly QUEUE_KEY = 'offline_message_queue';
+  private readonly QUEUE_KEY = "offline_message_queue";
   private readonly MAX_QUEUE_SIZE = 1000;
   private readonly DEFAULT_MAX_RETRIES = 3;
   private isProcessing = false;
@@ -41,22 +41,25 @@ class OfflineQueue {
   async initialize(): Promise<void> {
     await this.loadQueue();
     this.startProcessing();
-    
+
     // Listen for socket connection changes
-    socketManager.on('connect', () => {
+    socketManager.on("connect", () => {
       this.processQueue();
     });
   }
 
   private setupAppStateHandler(): void {
-    this.appStateSubscription = AppState.addEventListener('change', (nextAppState: AppStateStatus) => {
-      if (nextAppState === 'active') {
-        this.startProcessing();
-        this.processQueue();
-      } else if (nextAppState === 'background') {
-        this.stopProcessing();
-      }
-    });
+    this.appStateSubscription = AppState.addEventListener(
+      "change",
+      (nextAppState: AppStateStatus) => {
+        if (nextAppState === "active") {
+          this.startProcessing();
+          this.processQueue();
+        } else if (nextAppState === "background") {
+          this.stopProcessing();
+        }
+      },
+    );
   }
 
   private startProcessing(): void {
@@ -75,13 +78,15 @@ class OfflineQueue {
     }
   }
 
-  async addMessage(message: Omit<QueuedMessage, 'id' | 'timestamp' | 'retries' | 'status'>): Promise<string> {
+  async addMessage(
+    message: Omit<QueuedMessage, "id" | "timestamp" | "retries" | "status">,
+  ): Promise<string> {
     const queuedMessage: QueuedMessage = {
       id: this.generateMessageId(),
       ...message,
       timestamp: Date.now(),
       retries: 0,
-      status: 'pending',
+      status: "pending",
       maxRetries: message.maxRetries || this.DEFAULT_MAX_RETRIES,
     };
 
@@ -110,8 +115,10 @@ class OfflineQueue {
     this.isProcessing = true;
 
     try {
-      const pendingMessages = this.queue.filter(msg => msg.status === 'pending');
-      
+      const pendingMessages = this.queue.filter(
+        (msg) => msg.status === "pending",
+      );
+
       for (const message of pendingMessages) {
         try {
           await this.sendQueuedMessage(message);
@@ -120,7 +127,7 @@ class OfflineQueue {
         }
       }
     } catch (error) {
-      console.error('Error processing message queue:', error);
+      console.error("Error processing message queue:", error);
     } finally {
       this.isProcessing = false;
       await this.saveQueue();
@@ -129,7 +136,7 @@ class OfflineQueue {
 
   private async sendQueuedMessage(message: QueuedMessage): Promise<void> {
     // Update status to sending
-    message.status = 'sending';
+    message.status = "sending";
     await this.saveQueue();
 
     try {
@@ -137,41 +144,56 @@ class OfflineQueue {
         type: message.type,
         body: message.body,
         metadata: message.metadata,
-        clientId: message.clientId,
+        // Note: clientId is stored locally for dedup but not sent via socket
       });
 
       if (response.ok) {
-        message.status = 'sent';
-        this.emit('message:sent', { queueId: message.id, messageId: (response as any).messageId });
+        message.status = "sent";
+        this.emit("message:sent", {
+          queueId: message.id,
+          messageId: (response as any).messageId,
+        });
       } else {
-        throw new Error((response as any).error || 'Failed to send message');
+        throw new Error((response as any).error || "Failed to send message");
       }
     } catch (error) {
-      message.status = 'pending'; // Reset to pending for retry
+      message.status = "pending"; // Reset to pending for retry
       throw error;
     }
   }
 
-  private async handleFailedMessage(message: QueuedMessage, error: any): Promise<void> {
+  private async handleFailedMessage(
+    message: QueuedMessage,
+    error: any,
+  ): Promise<void> {
     message.retries++;
-    
+
     if (message.retries >= message.maxRetries) {
-      message.status = 'failed';
-      console.error(`Message ${message.id} failed after ${message.retries} attempts:`, error);
-      this.emit('message:failed', { queueId: message.id, error: error.message });
+      message.status = "failed";
+      console.error(
+        `Message ${message.id} failed after ${message.retries} attempts:`,
+        error,
+      );
+      this.emit("message:failed", {
+        queueId: message.id,
+        error: error.message,
+      });
     } else {
-      message.status = 'pending';
-      console.warn(`Message ${message.id} failed, retry ${message.retries}/${message.maxRetries}:`, error);
+      message.status = "pending";
+      console.warn(
+        `Message ${message.id} failed, retry ${message.retries}/${message.maxRetries}:`,
+        error,
+      );
     }
   }
 
   async retryMessage(messageId: string): Promise<boolean> {
-    const message = this.queue.find(msg => msg.id === messageId);
-    if (!message || message.status !== 'failed') {
+    const message = this.queue.find((msg) => msg.id === messageId);
+    if (!message || message.status !== "failed") {
       return false;
     }
 
-    message.status = 'pending';
+    message.status = "pending";
     message.retries = 0; // Reset retry count
     await this.saveQueue();
 
@@ -183,7 +205,7 @@ class OfflineQueue {
   }
 
   async removeMessage(messageId: string): Promise<boolean> {
-    const index = this.queue.findIndex(msg => msg.id === messageId);
+    const index = this.queue.findIndex((msg) => msg.id === messageId);
     if (index === -1) return false;
 
     this.queue.splice(index, 1);
@@ -197,26 +219,29 @@ class OfflineQueue {
   }
 
   async clearFailedMessages(): Promise<void> {
-    this.queue = this.queue.filter(msg => msg.status !== 'failed');
+    this.queue = this.queue.filter((msg) => msg.status !== "failed");
     await this.saveQueue();
   }
 
   private cleanupQueue(): void {
     // Remove old sent messages (older than 24 hours)
-    const dayAgo = Date.now() - (24 * 60 * 60 * 1000);
-    
-    this.queue = this.queue.filter(msg => {
-      return msg.status !== 'sent' || msg.timestamp > dayAgo;
+    const dayAgo = Date.now() - 24 * 60 * 60 * 1000;
+
+    this.queue = this.queue.filter((msg) => {
+      return msg.status !== "sent" || msg.timestamp > dayAgo;
     });
 
     // If still too large, remove oldest failed messages
     if (this.queue.length >= this.MAX_QUEUE_SIZE) {
       const failedMessages = this.queue
-        .filter(msg => msg.status === 'failed')
+        .filter((msg) => msg.status === "failed")
         .sort((a, b) => a.timestamp - b.timestamp);
 
-      const toRemove = Math.min(failedMessages.length, this.queue.length - this.MAX_QUEUE_SIZE + 100);
-      
+      const toRemove = Math.min(
+        failedMessages.length,
+        this.queue.length - this.MAX_QUEUE_SIZE + 100,
+      );
+
       for (let i = 0; i < toRemove; i++) {
         const index = this.queue.indexOf(failedMessages[i]);
         if (index > -1) {
@@ -234,11 +259,11 @@ class OfflineQueue {
     try {
       const queueData = await storage.get(this.QUEUE_KEY);
       this.queue = queueData ? JSON.parse(queueData) : [];
-      
+
       // Clean up on load
       this.cleanupQueue();
     } catch (error) {
-      console.error('Failed to load offline queue:', error);
+      console.error("Failed to load offline queue:", error);
       this.queue = [];
     }
   }
@@ -247,7 +272,7 @@ class OfflineQueue {
     try {
       await storage.set(this.QUEUE_KEY, JSON.stringify(this.queue));
     } catch (error) {
-      console.error('Failed to save offline queue:', error);
+      console.error("Failed to save offline queue:", error);
     }
   }
 
@@ -279,11 +304,11 @@ class OfflineQueue {
   private emit(event: string, data: any): void {
     const callbacks = this.listeners.get(event);
     if (callbacks) {
-      callbacks.forEach(callback => {
+      callbacks.forEach((callback) => {
         try {
           callback(data);
         } catch (error) {
-          console.error('Error in queue event callback:', error);
+          console.error("Error in queue event callback:", error);
         }
       });
     }
@@ -302,15 +327,15 @@ class OfflineQueue {
       sending: 0,
     };
 
-    this.queue.forEach(msg => {
+    this.queue.forEach((msg) => {
       switch (msg.status) {
-        case 'pending':
+        case "pending":
           stats.pending++;
           break;
-        case 'failed':
+        case "failed":
           stats.failed++;
           break;
-        case 'sending':
+        case "sending":
           stats.sending++;
           break;
       }
@@ -321,33 +346,35 @@ class OfflineQueue {
 
   getQueuedMessages(chatId?: string): QueuedMessage[] {
     let messages = [...this.queue];
-    
+
     if (chatId) {
-      messages = messages.filter(msg => msg.chatId === chatId);
+      messages = messages.filter((msg) => msg.chatId === chatId);
     }
-    
+
     return messages.sort((a, b) => a.timestamp - b.timestamp);
   }
 
   getPendingMessages(chatId?: string): QueuedMessage[] {
-    return this.getQueuedMessages(chatId).filter(msg => 
-      msg.status === 'pending' || msg.status === 'sending'
+    return this.getQueuedMessages(chatId).filter(
+      (msg) => msg.status === "pending" || msg.status === "sending",
     );
   }
 
   getFailedMessages(chatId?: string): QueuedMessage[] {
-    return this.getQueuedMessages(chatId).filter(msg => msg.status === 'failed');
+    return this.getQueuedMessages(chatId).filter(
+      (msg) => msg.status === "failed",
+    );
   }
 
   isMessageQueued(clientId: string): boolean {
-    return this.queue.some(msg => msg.clientId === clientId);
+    return this.queue.some((msg) => msg.clientId === clientId);
   }
 
   // Cleanup
   destroy(): void {
     this.stopProcessing();
     this.listeners.clear();
-    
+
     if (this.appStateSubscription) {
       this.appStateSubscription.remove();
       this.appStateSubscription = null;

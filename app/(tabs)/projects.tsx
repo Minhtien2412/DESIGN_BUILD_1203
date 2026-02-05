@@ -1,7 +1,8 @@
 /**
- * Projects Tab - Role-based Project Management Hub
+ * Projects Tab - Uses consolidated exports
  * Features: Customer management, Timeline Mindmap, Todo management
  * @route /(tabs)/projects
  */
+import { ProjectsScreen } from "@/features";
 
-export { default } from '../../features/projects/ProjectsHubScreen';
+export default ProjectsScreen;

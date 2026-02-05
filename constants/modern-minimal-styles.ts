@@ -43,10 +43,14 @@ export const MODERN_COLORS = {
   textSecondary: "#6B7280",
   textTertiary: "#9CA3AF",
   textInverse: "#FFFFFF",
+  textDisabled: "#D1D5DB",
 
   // Text Aliases (for convenience)
   text: "#1F2937",
   textLight: "#9CA3AF",
+
+  // Divider
+  divider: "#E5E7EB",
 
   // Gradients (as arrays for LinearGradient)
   gradientPrimary: ["#0066CC", "#004C99"],

@@ -84,7 +84,7 @@ export interface UseChatReturn {
     content: string,
     type?: MessageType,
     attachments?: Attachment[],
-    replyToId?: string
+    replyToId?: string,
   ) => Promise<MessageAck>;
   loadMoreMessages: () => Promise<void>;
   markAsRead: (seq?: number) => void;
@@ -102,7 +102,7 @@ export interface UseChatReturn {
 
 export function useChat(
   conversationId: string,
-  options: UseChatOptions = {}
+  options: UseChatOptions = {},
 ): UseChatReturn {
   const {
     autoConnect = true,
@@ -113,7 +113,7 @@ export function useChat(
   const { user } = useAuth();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isConnected, setIsConnected] = useState(
-    realtimeMessaging.isConnected()
+    realtimeMessaging.isConnected(),
   );
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
@@ -121,7 +121,9 @@ export function useChat(
   const [error, setError] = useState<string | null>(null);
 
   const cursorRef = useRef<string | undefined>(undefined);
-  const typingTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
   const lastReadSeqRef = useRef<number>(0);
 
   // ============================================
@@ -164,7 +166,7 @@ export function useChat(
         const existingIndex = prev.findIndex(
           (m) =>
             m.clientMessageId === payload.messageId ||
-            m.id === payload.messageId
+            m.id === payload.messageId,
         );
 
         const newMessage: ChatMessage = {
@@ -215,7 +217,7 @@ export function useChat(
             return { ...m, status: "read" as const };
           }
           return m;
-        })
+        }),
       );
     };
 
@@ -232,7 +234,7 @@ export function useChat(
             };
           }
           return m;
-        })
+        }),
       );
     };
 
@@ -260,12 +262,13 @@ export function useChat(
             });
           } else {
             reactions = reactions.filter(
-              (r) => !(r.userId === payload.userId && r.emoji === payload.emoji)
+              (r) =>
+                !(r.userId === payload.userId && r.emoji === payload.emoji),
             );
           }
 
           return { ...m, reactions };
-        })
+        }),
       );
     };
 
@@ -376,7 +379,7 @@ export function useChat(
       content: string,
       type: MessageType = "TEXT",
       attachments?: Attachment[],
-      replyToId?: string
+      replyToId?: string,
     ): Promise<MessageAck> => {
       if (!user) {
         return {
@@ -430,12 +433,12 @@ export function useChat(
             };
           }
           return m;
-        })
+        }),
       );
 
       return ack;
     },
-    [conversationId, user, messages]
+    [conversationId, user, messages],
   );
 
   // ============================================
@@ -473,7 +476,7 @@ export function useChat(
         realtimeMessaging.markAsRead(conversationId, targetSeq);
       }
     },
-    [conversationId, messages]
+    [conversationId, messages],
   );
 
   // ============================================
@@ -483,7 +486,7 @@ export function useChat(
   const retryMessage = useCallback(
     async (clientMessageId: string) => {
       const message = messages.find(
-        (m) => m.clientMessageId === clientMessageId
+        (m) => m.clientMessageId === clientMessageId,
       );
       if (!message) return;
 
@@ -491,8 +494,8 @@ export function useChat(
         prev.map((m) =>
           m.clientMessageId === clientMessageId
             ? { ...m, status: "sending" as const }
-            : m
-        )
+            : m,
+        ),
       );
 
       const ack = await realtimeMessaging.sendMessage({
@@ -509,23 +512,23 @@ export function useChat(
             return { ...m, status: ack.success ? "sent" : "failed" };
           }
           return m;
-        })
+        }),
       );
     },
-    [conversationId, messages]
+    [conversationId, messages],
   );
 
   const deleteMessage = useCallback(
     async (messageId: string, forAll = false) => {
       await del(
-        `/conversations/${conversationId}/messages/${messageId}?deleteForAll=${forAll}`
+        `/conversations/${conversationId}/messages/${messageId}?deleteForAll=${forAll}`,
       );
 
       if (forAll) {
         setMessages((prev) => prev.filter((m) => m.id !== messageId));
       }
     },
-    [conversationId]
+    [conversationId],
   );
 
   const addReaction = useCallback(
@@ -534,19 +537,19 @@ export function useChat(
         `/conversations/${conversationId}/messages/${messageId}/reactions`,
         {
           emoji,
-        }
+        },
       );
     },
-    [conversationId]
+    [conversationId],
   );
 
   const removeReaction = useCallback(
     async (messageId: string, emoji: string) => {
       await del(
-        `/conversations/${conversationId}/messages/${messageId}/reactions/${encodeURIComponent(emoji)}`
+        `/conversations/${conversationId}/messages/${messageId}/reactions/${encodeURIComponent(emoji)}`,
       );
     },
-    [conversationId]
+    [conversationId],
   );
 
   // ============================================
@@ -568,7 +571,7 @@ export function useChat(
 
     const subscription = AppState.addEventListener(
       "change",
-      handleAppStateChange
+      handleAppStateChange,
     );
 
     return () => subscription.remove();

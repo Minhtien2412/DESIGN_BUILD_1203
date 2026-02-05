@@ -4,10 +4,10 @@
  * @updated 2025-12-25
  */
 
-import { CATEGORIES } from '@/constants/categories';
-import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Stack, router } from 'expo-router';
+import { CATEGORIES } from "@/constants/categories";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { Stack, router } from "expo-router";
 import {
     Dimensions,
     Platform,
@@ -17,20 +17,20 @@ import {
     Text,
     TouchableOpacity,
     View,
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 const CARD_WIDTH = (width - 48) / 2;
 
 const COLORS = {
-  bg: '#F8FAFC',
-  card: '#FFFFFF',
-  text: '#0F172A',
-  textSecondary: '#64748B',
-  textMuted: '#94A3B8',
-  accent: '#0066CC', // Shopee Orange
-  border: '#E2E8F0',
+  bg: "#F8FAFC",
+  card: "#FFFFFF",
+  text: "#0F172A",
+  textSecondary: "#64748B",
+  textMuted: "#94A3B8",
+  accent: "#0066CC", // Shopee Orange
+  border: "#E2E8F0",
 };
 
 export default function CategoriesHubScreen() {
@@ -43,7 +43,7 @@ export default function CategoriesHubScreen() {
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.bg} />
-      
+
       <Stack.Screen
         options={{
           headerShown: false,
@@ -58,7 +58,7 @@ export default function CategoriesHubScreen() {
         <Text style={styles.headerTitle}>Danh mục</Text>
         <TouchableOpacity
           style={styles.searchBtn}
-          onPress={() => router.push('/search' as any)}
+          onPress={() => router.push("/unified-search" as any)}
         >
           <Ionicons name="search-outline" size={24} color={COLORS.text} />
         </TouchableOpacity>
@@ -72,11 +72,11 @@ export default function CategoriesHubScreen() {
         {/* Featured Banner */}
         <TouchableOpacity
           style={styles.featuredBanner}
-          onPress={() => router.push('/utilities/sitemap' as any)}
+          onPress={() => router.push("/utilities/sitemap" as any)}
           activeOpacity={0.9}
         >
           <LinearGradient
-            colors={['#0066CC', '#3399FF']}
+            colors={["#0066CC", "#3399FF"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.featuredGradient}
@@ -108,7 +108,7 @@ export default function CategoriesHubScreen() {
                 <View
                   style={[
                     styles.categoryIconBox,
-                    { backgroundColor: category.color + '15' },
+                    { backgroundColor: category.color + "15" },
                   ]}
                 >
                   <Ionicons
@@ -149,10 +149,14 @@ export default function CategoriesHubScreen() {
                 <View
                   style={[
                     styles.quickAccessIcon,
-                    { backgroundColor: item.color + '15' },
+                    { backgroundColor: item.color + "15" },
                   ]}
                 >
-                  <Ionicons name={item.icon as any} size={24} color={item.color} />
+                  <Ionicons
+                    name={item.icon as any}
+                    size={24}
+                    color={item.color}
+                  />
                 </View>
                 <Text style={styles.quickAccessLabel}>{item.label}</Text>
               </TouchableOpacity>
@@ -169,45 +173,45 @@ export default function CategoriesHubScreen() {
 const QUICK_ACCESS_ITEMS = [
   {
     id: 1,
-    label: 'Thiết kế',
-    icon: 'home-outline',
-    route: '/services/house-design',
-    color: '#0066CC',
+    label: "Thiết kế",
+    icon: "home-outline",
+    route: "/services/house-design",
+    color: "#0066CC",
   },
   {
     id: 2,
-    label: 'Thi công',
-    icon: 'construct-outline',
-    route: '/construction/progress',
-    color: '#000000',
+    label: "Thi công",
+    icon: "construct-outline",
+    route: "/construction/progress",
+    color: "#000000",
   },
   {
     id: 3,
-    label: 'Vật liệu',
-    icon: 'cube-outline',
-    route: '/materials/index',
-    color: '#666666',
+    label: "Vật liệu",
+    icon: "cube-outline",
+    route: "/materials/index",
+    color: "#666666",
   },
   {
     id: 4,
-    label: 'Hoàn thiện',
-    icon: 'color-fill-outline',
-    route: '/finishing/index',
-    color: '#0080FF',
+    label: "Hoàn thiện",
+    icon: "color-fill-outline",
+    route: "/finishing/index",
+    color: "#0080FF",
   },
   {
     id: 5,
-    label: 'Báo cáo',
-    icon: 'newspaper-outline',
-    route: '/reports/index',
-    color: '#333333',
+    label: "Báo cáo",
+    icon: "newspaper-outline",
+    route: "/reports/index",
+    color: "#333333",
   },
   {
     id: 6,
-    label: 'AI Assistant',
-    icon: 'sparkles',
-    route: '/ai',
-    color: '#0066CC',
+    label: "AI Assistant",
+    icon: "sparkles",
+    route: "/ai",
+    color: "#0066CC",
   },
 ];
 
@@ -217,9 +221,9 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.bg,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 16,
     paddingVertical: 12,
     backgroundColor: COLORS.card,
@@ -230,12 +234,12 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.text,
     letterSpacing: -0.3,
   },
@@ -243,8 +247,8 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   scrollView: {
     flex: 1,
@@ -254,11 +258,11 @@ const styles = StyleSheet.create({
   },
   featuredBanner: {
     borderRadius: 16,
-    overflow: 'hidden',
+    overflow: "hidden",
     marginBottom: 24,
     ...Platform.select({
       ios: {
-        shadowColor: '#0066CC',
+        shadowColor: "#0066CC",
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.2,
         shadowRadius: 8,
@@ -269,33 +273,33 @@ const styles = StyleSheet.create({
     }),
   },
   featuredGradient: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     padding: 20,
   },
   featuredLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 16,
   },
   featuredIconBox: {
     width: 56,
     height: 56,
     borderRadius: 16,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "rgba(255,255,255,0.2)",
+    alignItems: "center",
+    justifyContent: "center",
   },
   featuredTitle: {
     fontSize: 18,
-    fontWeight: '700',
-    color: '#fff',
+    fontWeight: "700",
+    color: "#fff",
     letterSpacing: -0.3,
   },
   featuredSubtitle: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.85)',
+    color: "rgba(255,255,255,0.85)",
     marginTop: 2,
   },
   categoriesSection: {
@@ -303,14 +307,14 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.text,
     marginBottom: 16,
     letterSpacing: -0.2,
   },
   categoriesGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 12,
   },
   categoryCard: {
@@ -320,19 +324,19 @@ const styles = StyleSheet.create({
     padding: 16,
     borderWidth: 1,
     borderColor: COLORS.border,
-    position: 'relative',
+    position: "relative",
   },
   categoryIconBox: {
     width: 56,
     height: 56,
     borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     marginBottom: 12,
   },
   categoryLabel: {
     fontSize: 15,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.text,
     marginBottom: 4,
     letterSpacing: -0.2,
@@ -342,7 +346,7 @@ const styles = StyleSheet.create({
     color: COLORS.textMuted,
   },
   categoryArrow: {
-    position: 'absolute',
+    position: "absolute",
     top: 16,
     right: 16,
   },
@@ -350,8 +354,8 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   quickAccessGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 12,
   },
   quickAccessItem: {
@@ -359,7 +363,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.card,
     borderRadius: 12,
     padding: 12,
-    alignItems: 'center',
+    alignItems: "center",
     borderWidth: 1,
     borderColor: COLORS.border,
   },
@@ -367,14 +371,14 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     marginBottom: 8,
   },
   quickAccessLabel: {
     fontSize: 12,
-    fontWeight: '500',
+    fontWeight: "500",
     color: COLORS.text,
-    textAlign: 'center',
+    textAlign: "center",
   },
 });

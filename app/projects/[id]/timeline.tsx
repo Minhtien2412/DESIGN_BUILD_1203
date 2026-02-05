@@ -31,54 +31,6 @@ type TimelinePhase = {
   color: string;
 };
 
-// Fallback data khi CRM không khả dụng
-const FALLBACK_TIMELINE: TimelinePhase[] = [
-  {
-    id: '1',
-    name: 'Khởi công',
-    status: 'completed',
-    startDate: '01/10/2024',
-    endDate: '05/10/2024',
-    progress: 100,
-    tasks: ['Khảo sát mặt bằng', 'Chuẩn bị vật tư', 'Làm móng'],
-    icon: 'flag',
-    color: '#0066CC',
-  },
-  {
-    id: '2',
-    name: 'Đổ móng',
-    status: 'completed',
-    startDate: '06/10/2024',
-    endDate: '15/10/2024',
-    progress: 100,
-    tasks: ['Đào đất', 'Đổ bê tông móng', 'Kiểm tra chất lượng'],
-    icon: 'foundation',
-    color: '#0066CC',
-  },
-  {
-    id: '3',
-    name: 'Xây tường',
-    status: 'active',
-    startDate: '16/10/2024',
-    endDate: '30/10/2024',
-    progress: 65,
-    tasks: ['Xây tường tầng 1', 'Xây tường tầng 2', 'Tô trát'],
-    icon: 'wall',
-    color: '#3B82F6',
-  },
-  {
-    id: '4',
-    name: 'Hoàn thiện',
-    status: 'pending',
-    startDate: '01/11/2024',
-    endDate: '30/11/2024',
-    progress: 0,
-    tasks: ['Lát gạch', 'Sơn tường', 'Lắp đặt điện nước'],
-    icon: 'hammer-wrench',
-    color: '#6B7280',
-  },
-];
-
 // Phase configs for grouping tasks
 const PHASE_CONFIG: Record<string, { icon: string; order: number }> = {
   'khởi công': { icon: 'flag', order: 1 },
@@ -109,7 +61,7 @@ function formatDate(dateStr: string): string {
 
 // Convert Perfex tasks to timeline phases
 function convertTasksToTimeline(tasks: PerfexTask[]): TimelinePhase[] {
-  if (!tasks.length) return FALLBACK_TIMELINE;
+  if (!tasks.length) return [];
   
   // Group tasks by milestone or just show individual tasks as phases
   const phases: TimelinePhase[] = tasks.map((task, index) => {
@@ -248,8 +200,8 @@ export default function ProjectTimelineScreen() {
   
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [timeline, setTimeline] = useState<TimelinePhase[]>(FALLBACK_TIMELINE);
-  const [dataSource, setDataSource] = useState<'crm' | 'mock'>('mock');
+  const [timeline, setTimeline] = useState<TimelinePhase[]>([]);
+  const [dataSource, setDataSource] = useState<'crm' | 'empty'>('empty');
   
   // Load tasks from CRM
   const loadTimeline = useCallback(async () => {
@@ -264,15 +216,15 @@ export default function ProjectTimelineScreen() {
       if (response.success && response.data) {
         const phases = convertTasksToTimeline(response.data);
         setTimeline(phases);
-        setDataSource('crm');
+        setDataSource(phases.length ? 'crm' : 'empty');
         console.log(`✅ Loaded ${phases.length} phases from CRM tasks`);
       } else {
         throw new Error('CRM không phản hồi');
       }
     } catch (error) {
-      console.warn('⚠️ CRM không khả dụng, sử dụng dữ liệu mẫu:', error);
-      setTimeline(FALLBACK_TIMELINE);
-      setDataSource('mock');
+      console.warn('CRM unavailable, showing empty timeline:', error);
+      setTimeline([]);
+      setDataSource('empty');
     } finally {
       setLoading(false);
     }
@@ -317,9 +269,9 @@ export default function ProjectTimelineScreen() {
         }
       >
         {/* Data Source Indicator */}
-        {dataSource === 'mock' && (
+        {dataSource === 'empty' && (
           <View style={styles.mockIndicator}>
-            <Text style={styles.mockIndicatorText}>📋 Dữ liệu mẫu - CRM không khả dụng</Text>
+            <Text style={styles.mockIndicatorText}>No timeline data yet.</Text>
           </View>
         )}
         

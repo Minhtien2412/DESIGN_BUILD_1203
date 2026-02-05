@@ -3,13 +3,11 @@
  * Khách hàng tạo yêu cầu báo giá
  */
 
-import { useAuth } from '@/context/AuthContext';
-import { useThemeColor } from '@/hooks/use-theme-color';
-import { mockAIReview } from '@/services/moderation.service';
-import { ContentType } from '@/types/permissions';
-import { Ionicons } from '@expo/vector-icons';
-import { Href, router } from 'expo-router';
-import { useState } from 'react';
+import { useAuth } from "@/context/AuthContext";
+import { useThemeColor } from "@/hooks/use-theme-color";
+import { Ionicons } from "@expo/vector-icons";
+import { Href, router } from "expo-router";
+import { useState } from "react";
 import {
     ActivityIndicator,
     Alert,
@@ -21,115 +19,107 @@ import {
     TextInput,
     TouchableOpacity,
     View,
-} from 'react-native';
+} from "react-native";
 
 export default function QuoteRequestScreen() {
   const { user } = useAuth();
-  const [projectName, setProjectName] = useState('');
-  const [projectType, setProjectType] = useState('');
-  const [area, setArea] = useState('');
-  const [budget, setBudget] = useState('');
-  const [description, setDescription] = useState('');
-  const [contactName, setContactName] = useState(user?.name || '');
-  const [contactPhone, setContactPhone] = useState('');
-  const [contactEmail, setContactEmail] = useState(user?.email || '');
-  const [address, setAddress] = useState('');
+  const [projectName, setProjectName] = useState("");
+  const [projectType, setProjectType] = useState<ProjectType | "">("");
+  const [area, setArea] = useState("");
+  const [budget, setBudget] = useState("");
+  const [description, setDescription] = useState("");
+  const [contactName, setContactName] = useState(user?.name || "");
+  const [contactPhone, setContactPhone] = useState("");
+  const [contactEmail, setContactEmail] = useState(user?.email || "");
+  const [address, setAddress] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  const primary = useThemeColor({}, 'primary');
-  const background = useThemeColor({}, 'background');
-  const textColor = useThemeColor({}, 'text');
+  const primary = useThemeColor({}, "primary");
+  const background = useThemeColor({}, "background");
+  const textColor = useThemeColor({}, "text");
 
-  const projectTypes = [
-    { value: 'residential', label: 'Nhà ở' },
-    { value: 'commercial', label: 'Thương mại' },
-    { value: 'office', label: 'Văn phòng' },
-    { value: 'restaurant', label: 'Nhà hàng' },
-    { value: 'hotel', label: 'Khách sạn' },
-    { value: 'other', label: 'Khác' },
+  const projectTypes: { value: ProjectType; label: string }[] = [
+    { value: "construction", label: "Xây dựng" },
+    { value: "renovation", label: "Cải tạo" },
+    { value: "design", label: "Thiết kế" },
+    { value: "consultation", label: "Tư vấn" },
+    { value: "maintenance", label: "Bảo trì" },
+    { value: "other", label: "Khác" },
   ];
 
   const handleSubmit = async () => {
     // Validation
     if (!projectName.trim()) {
-      Alert.alert('Thiếu thông tin', 'Vui lòng nhập tên dự án');
+      Alert.alert("Thiếu thông tin", "Vui lòng nhập tên dự án");
       return;
     }
     if (!projectType) {
-      Alert.alert('Thiếu thông tin', 'Vui lòng chọn loại dự án');
+      Alert.alert("Thiếu thông tin", "Vui lòng chọn loại dự án");
       return;
     }
     if (!description.trim()) {
-      Alert.alert('Thiếu thông tin', 'Vui lòng mô tả yêu cầu');
+      Alert.alert("Thiếu thông tin", "Vui lòng mô tả yêu cầu");
       return;
     }
     if (!contactPhone.trim()) {
-      Alert.alert('Thiếu thông tin', 'Vui lòng nhập số điện thoại');
+      Alert.alert("Thiếu thông tin", "Vui lòng nhập số điện thoại");
       return;
     }
 
     setSubmitting(true);
 
     try {
-      // Create submission
-      const submission = {
-        type: ContentType.QUOTE_REQUEST,
-        title: `Báo giá: ${projectName}`,
-        content: `
-Loại dự án: ${projectTypes.find(t => t.value === projectType)?.label}
-Diện tích: ${area || 'Chưa xác định'} m²
-Ngân sách dự kiến: ${budget || 'Chưa xác định'}
-
-Mô tả yêu cầu:
-${description}
-
-Thông tin liên hệ:
-- Tên: ${contactName}
-- SĐT: ${contactPhone}
-- Email: ${contactEmail}
-- Địa chỉ: ${address || 'Chưa cung cấp'}
-        `.trim(),
-        createdBy: {
-          id: user?.id || 0,
-          name: user?.name || contactName,
-          role: user?.role || 'customer',
-        } as any,
+      // Create submission data for BE API using new service
+      const quoteRequestData: CreateQuoteRequestInput = {
+        projectName: projectName.trim(),
+        projectType: projectType as ProjectType,
+        description: description.trim(),
+        contactName: contactName || user?.name || "Khách",
+        contactPhone: contactPhone.trim(),
+        contactEmail: contactEmail || user?.email || undefined,
+        address: address || undefined,
+        budget: budget ? parseFloat(budget.replace(/[^0-9]/g, "")) : undefined,
       };
 
-      // AI review (auto-approve for quote requests)
-      const reviewed = mockAIReview(submission);
+      // Send to backend API using new service
+      const result = await createQuoteRequest(quoteRequestData);
 
-      // TODO: Send to backend
-      // await apiFetch('/quote-requests', {
-      //   method: 'POST',
-      //   body: JSON.stringify(submission),
-      // });
+      if (!result.ok) {
+        throw new Error(result.error?.message || "Không thể gửi yêu cầu");
+      }
+
+      // Show success with quote code
+      const quoteCode = result.data?.code || `QR-${Date.now()}`;
 
       // Show success
       Alert.alert(
-        'Gửi yêu cầu thành công!',
-        'Chúng tôi sẽ liên hệ với bạn trong vòng 24 giờ.\n\nMã yêu cầu: ' + reviewed.id,
+        "Gửi yêu cầu thành công!",
+        `Chúng tôi sẽ liên hệ với bạn trong vòng 24 giờ.\n\nMã yêu cầu: ${quoteCode}`,
         [
           {
-            text: 'Xem yêu cầu của tôi',
-            onPress: () => router.push('/my-requests' as Href),
+            text: "Xem yêu cầu của tôi",
+            onPress: () => router.push("/profile/my-requests" as Href),
           },
           {
-            text: 'Tạo yêu cầu mới',
+            text: "Tạo yêu cầu mới",
             onPress: () => {
               // Reset form
-              setProjectName('');
-              setProjectType('');
-              setArea('');
-              setBudget('');
-              setDescription('');
-              setAddress('');
+              setProjectName("");
+              setProjectType("");
+              setArea("");
+              setBudget("");
+              setDescription("");
+              setAddress("");
             },
           },
-        ]
+        ],
       );
-    } catch (error) {
-      Alert.alert('Lỗi', 'Không thể gửi yêu cầu. Vui lòng thử lại.');
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Không thể gửi yêu cầu. Vui lòng thử lại.";
+      Alert.alert("Lỗi", errorMessage);
     } finally {
       setSubmitting(false);
     }
@@ -138,13 +128,18 @@ Thông tin liên hệ:
   return (
     <KeyboardAvoidingView
       style={[styles.container, { backgroundColor: background }]}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={styles.backButton}
+        >
           <Ionicons name="arrow-back" size={24} color={textColor} />
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: textColor }]}>Yêu cầu báo giá</Text>
+        <Text style={[styles.headerTitle, { color: textColor }]}>
+          Yêu cầu báo giá
+        </Text>
         <View style={{ width: 40 }} />
       </View>
 
@@ -168,8 +163,12 @@ Thông tin liên hệ:
             <Text style={styles.label}>
               Loại dự án <Text style={styles.required}>*</Text>
             </Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chips}>
-              {projectTypes.map(type => (
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={styles.chips}
+            >
+              {projectTypes.map((type) => (
                 <TouchableOpacity
                   key={type.value}
                   style={[
@@ -181,7 +180,7 @@ Thông tin liên hệ:
                   <Text
                     style={[
                       styles.chipText,
-                      projectType === type.value && { color: '#fff' },
+                      projectType === type.value && { color: "#fff" },
                     ]}
                   >
                     {type.label}
@@ -282,8 +281,8 @@ Thông tin liên hệ:
         <View style={styles.infoBox}>
           <Ionicons name="information-circle" size={20} color={primary} />
           <Text style={styles.infoText}>
-            Yêu cầu của bạn sẽ được gửi đến đội ngũ tư vấn. Chúng tôi sẽ liên hệ với bạn trong
-            vòng 24 giờ.
+            Yêu cầu của bạn sẽ được gửi đến đội ngũ tư vấn. Chúng tôi sẽ liên hệ
+            với bạn trong vòng 24 giờ.
           </Text>
         </View>
       </ScrollView>
@@ -313,38 +312,38 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 16,
     paddingTop: 48,
     paddingBottom: 16,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e5e5',
+    borderBottomColor: "#e5e5e5",
   },
   backButton: {
     width: 40,
     height: 40,
-    justifyContent: 'center',
-    alignItems: 'flex-start',
+    justifyContent: "center",
+    alignItems: "flex-start",
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   content: {
     flex: 1,
   },
   section: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     padding: 16,
     marginBottom: 16,
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '700',
-    color: '#111',
+    fontWeight: "700",
+    color: "#111",
     marginBottom: 16,
   },
   field: {
@@ -352,46 +351,46 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#111',
+    fontWeight: "600",
+    color: "#111",
     marginBottom: 8,
   },
   required: {
-    color: '#000000',
+    color: "#000000",
   },
   input: {
-    backgroundColor: '#f9fafb',
+    backgroundColor: "#f9fafb",
     borderRadius: 12,
     padding: 14,
     fontSize: 15,
-    color: '#111',
+    color: "#111",
     borderWidth: 1,
-    borderColor: '#e5e5e5',
+    borderColor: "#e5e5e5",
   },
   textArea: {
     minHeight: 120,
     paddingTop: 14,
   },
   row: {
-    flexDirection: 'row',
+    flexDirection: "row",
   },
   chips: {
-    flexDirection: 'row',
+    flexDirection: "row",
   },
   chip: {
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
     marginRight: 8,
   },
   chipText: {
     fontSize: 14,
-    color: '#111',
+    color: "#111",
   },
   infoBox: {
-    flexDirection: 'row',
-    backgroundColor: '#E8F4FF',
+    flexDirection: "row",
+    backgroundColor: "#E8F4FF",
     padding: 16,
     borderRadius: 12,
     marginHorizontal: 16,
@@ -400,27 +399,27 @@ const styles = StyleSheet.create({
   infoText: {
     flex: 1,
     fontSize: 13,
-    color: '#1e40af',
+    color: "#1e40af",
     lineHeight: 18,
     marginLeft: 12,
   },
   footer: {
     padding: 16,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderTopWidth: 1,
-    borderTopColor: '#e5e5e5',
+    borderTopColor: "#e5e5e5",
   },
   submitButton: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     paddingVertical: 16,
     borderRadius: 12,
     gap: 8,
   },
   submitButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });

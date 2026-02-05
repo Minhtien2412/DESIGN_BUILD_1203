@@ -2,9 +2,9 @@
  * Real-time Chat Service - WebSocket Integration
  * Handles real-time messaging for construction team communication
  */
-import { ENV } from '@/config/env';
-import { getToken } from '@/utils/storage';
-import { socketManager } from './websocket/socketManager';
+import { ENV } from "@/config/env";
+import { getToken } from "@/utils/storage";
+import { socketManager } from "./websocket/socketManager";
 
 // ============================================================================
 // Types
@@ -17,20 +17,20 @@ export interface ChatMessage {
   senderName: string;
   senderAvatar?: string;
   message: string;
-  type: 'text' | 'image' | 'file' | 'system';
+  type: "text" | "image" | "file" | "system";
   fileUrl?: string;
   fileName?: string;
   fileSize?: number;
   replyTo?: string; // Message ID being replied to
   createdAt: string;
   updatedAt?: string;
-  status: 'sending' | 'sent' | 'delivered' | 'read' | 'failed';
+  status: "sending" | "sent" | "delivered" | "read" | "failed";
 }
 
 export interface ChatRoom {
   id: string;
   name: string;
-  type: 'direct' | 'group' | 'project';
+  type: "direct" | "group" | "project";
   projectId?: number;
   participants: ChatParticipant[];
   lastMessage?: ChatMessage;
@@ -68,7 +68,10 @@ export interface MessageReadReceipt {
 type MessageCallback = (message: ChatMessage) => void;
 type TypingCallback = (data: TypingIndicator) => void;
 type ReadReceiptCallback = (data: MessageReadReceipt) => void;
-type OnlineStatusCallback = (data: { userId: string; isOnline: boolean }) => void;
+type OnlineStatusCallback = (data: {
+  userId: string;
+  isOnline: boolean;
+}) => void;
 type RoomUpdateCallback = (room: ChatRoom) => void;
 
 // ============================================================================
@@ -84,16 +87,16 @@ class ChatService {
    */
   async connect(): Promise<void> {
     if (this.isConnected) {
-      console.log('[Chat] Already connected');
+      console.log("[Chat] Already connected");
       return;
     }
 
     try {
-      await socketManager.connect('chat');
+      await socketManager.connect("chat");
       this.isConnected = true;
-      console.log('[Chat] Connected successfully');
+      console.log("[Chat] Connected successfully");
     } catch (error) {
-      console.error('[Chat] Connection failed:', error);
+      console.error("[Chat] Connection failed:", error);
       throw error;
     }
   }
@@ -102,10 +105,10 @@ class ChatService {
    * Disconnect from chat server
    */
   disconnect(): void {
-    socketManager.disconnect('chat');
+    socketManager.disconnect("chat");
     this.isConnected = false;
     this.currentRoomId = null;
-    console.log('[Chat] Disconnected');
+    console.log("[Chat] Disconnected");
   }
 
   /**
@@ -113,7 +116,7 @@ class ChatService {
    */
   joinRoom(roomId: string): void {
     if (!this.isConnected) {
-      console.warn('[Chat] Not connected. Call connect() first.');
+      console.warn("[Chat] Not connected. Call connect() first.");
       return;
     }
 
@@ -122,7 +125,11 @@ class ChatService {
       this.leaveRoom(this.currentRoomId);
     }
 
-    socketManager.emit('chat', 'join_room', { roomId });
+    // Event name must match BE: @SubscribeMessage('joinRoom')
+    socketManager.emit("chat", "joinRoom", {
+      roomId: parseInt(roomId),
+      userId: null,
+    });
     this.currentRoomId = roomId;
     console.log(`[Chat] Joined room: ${roomId}`);
   }
@@ -133,12 +140,16 @@ class ChatService {
   leaveRoom(roomId: string): void {
     if (!this.isConnected) return;
 
-    socketManager.emit('chat', 'leave_room', { roomId });
-    
+    // Event name must match BE: @SubscribeMessage('leaveRoom')
+    socketManager.emit("chat", "leaveRoom", {
+      roomId: parseInt(roomId),
+      userId: null,
+    });
+
     if (this.currentRoomId === roomId) {
       this.currentRoomId = null;
     }
-    
+
     console.log(`[Chat] Left room: ${roomId}`);
   }
 
@@ -147,16 +158,16 @@ class ChatService {
    */
   sendMessage(roomId: string, message: string, replyTo?: string): void {
     if (!this.isConnected) {
-      console.warn('[Chat] Not connected');
+      console.warn("[Chat] Not connected");
       return;
     }
 
-    socketManager.emit('chat', 'send_message', {
-      roomId,
-      message,
-      type: 'text',
-      replyTo,
-      timestamp: new Date().toISOString(),
+    // Event name must match BE: @SubscribeMessage('sendMessage')
+    socketManager.emit("chat", "sendMessage", {
+      roomId: parseInt(roomId),
+      content: message,
+      attachments: [],
+      senderId: null, // Will be set by BE from auth token
     });
   }
 
@@ -165,14 +176,14 @@ class ChatService {
    */
   sendImageMessage(roomId: string, imageUrl: string, caption?: string): void {
     if (!this.isConnected) {
-      console.warn('[Chat] Not connected');
+      console.warn("[Chat] Not connected");
       return;
     }
 
-    socketManager.emit('chat', 'send_message', {
+    socketManager.emit("chat", "send_message", {
       roomId,
-      message: caption || '',
-      type: 'image',
+      message: caption || "",
+      type: "image",
       fileUrl: imageUrl,
       timestamp: new Date().toISOString(),
     });
@@ -186,17 +197,17 @@ class ChatService {
     fileUrl: string,
     fileName: string,
     fileSize: number,
-    message?: string
+    message?: string,
   ): void {
     if (!this.isConnected) {
-      console.warn('[Chat] Not connected');
+      console.warn("[Chat] Not connected");
       return;
     }
 
-    socketManager.emit('chat', 'send_message', {
+    socketManager.emit("chat", "send_message", {
       roomId,
-      message: message || '',
-      type: 'file',
+      message: message || "",
+      type: "file",
       fileUrl,
       fileName,
       fileSize,
@@ -207,25 +218,39 @@ class ChatService {
   /**
    * Start typing indicator
    */
-  startTyping(roomId: string): void {
+  startTyping(roomId: string, userId: number): void {
     if (!this.isConnected) return;
-    socketManager.emit('chat', 'typing_start', { roomId });
+    // Event name must match BE: @SubscribeMessage('typing')
+    socketManager.emit("chat", "typing", {
+      roomId: parseInt(roomId),
+      userId,
+      isTyping: true,
+    });
   }
 
   /**
    * Stop typing indicator
    */
-  stopTyping(roomId: string): void {
+  stopTyping(roomId: string, userId: number): void {
     if (!this.isConnected) return;
-    socketManager.emit('chat', 'typing_stop', { roomId });
+    socketManager.emit("chat", "typing", {
+      roomId: parseInt(roomId),
+      userId,
+      isTyping: false,
+    });
   }
 
   /**
    * Mark message as read
    */
-  markAsRead(roomId: string, messageId: string): void {
+  markAsRead(roomId: string, messageId: string, userId: number): void {
     if (!this.isConnected) return;
-    socketManager.emit('chat', 'mark_read', { roomId, messageId });
+    // Event name must match BE: @SubscribeMessage('markAsRead')
+    socketManager.emit("chat", "markAsRead", {
+      roomId: parseInt(roomId),
+      messageId: parseInt(messageId),
+      userId,
+    });
   }
 
   /**
@@ -233,7 +258,7 @@ class ChatService {
    */
   markRoomAsRead(roomId: string): void {
     if (!this.isConnected) return;
-    socketManager.emit('chat', 'mark_room_read', { roomId });
+    socketManager.emit("chat", "mark_room_read", { roomId });
   }
 
   /**
@@ -241,7 +266,7 @@ class ChatService {
    */
   deleteMessage(roomId: string, messageId: string): void {
     if (!this.isConnected) return;
-    socketManager.emit('chat', 'delete_message', { roomId, messageId });
+    socketManager.emit("chat", "delete_message", { roomId, messageId });
   }
 
   /**
@@ -249,7 +274,7 @@ class ChatService {
    */
   editMessage(roomId: string, messageId: string, newMessage: string): void {
     if (!this.isConnected) return;
-    socketManager.emit('chat', 'edit_message', {
+    socketManager.emit("chat", "edit_message", {
       roomId,
       messageId,
       message: newMessage,
@@ -264,56 +289,68 @@ class ChatService {
    * Listen for new messages
    */
   onMessage(callback: MessageCallback): () => void {
-    socketManager.on('chat', 'new_message', callback);
-    return () => socketManager.off('chat', 'new_message', callback);
+    // BE emits: this.server.to(roomName).emit('newMessage', message);
+    socketManager.on("chat", "newMessage", callback);
+    return () => socketManager.off("chat", "newMessage", callback);
   }
 
   /**
    * Listen for message updates (edits, deletions)
    */
   onMessageUpdate(callback: MessageCallback): () => void {
-    socketManager.on('chat', 'message_updated', callback);
-    return () => socketManager.off('chat', 'message_updated', callback);
+    socketManager.on("chat", "message_updated", callback);
+    return () => socketManager.off("chat", "message_updated", callback);
   }
 
   /**
    * Listen for typing indicators
    */
   onTyping(callback: TypingCallback): () => void {
-    socketManager.on('chat', 'user_typing', callback);
-    return () => socketManager.off('chat', 'user_typing', callback);
+    // BE emits: client.to(roomName).emit('userTyping', {...});
+    socketManager.on("chat", "userTyping", callback);
+    return () => socketManager.off("chat", "userTyping", callback);
   }
 
   /**
    * Listen for read receipts
    */
   onReadReceipt(callback: ReadReceiptCallback): () => void {
-    socketManager.on('chat', 'message_read', callback);
-    return () => socketManager.off('chat', 'message_read', callback);
+    // BE emits: this.server.to(roomName).emit('messageRead', {...});
+    socketManager.on("chat", "messageRead", callback);
+    return () => socketManager.off("chat", "messageRead", callback);
   }
 
   /**
    * Listen for online status changes
    */
   onOnlineStatus(callback: OnlineStatusCallback): () => void {
-    socketManager.on('chat', 'user_status', callback);
-    return () => socketManager.off('chat', 'user_status', callback);
+    // BE emits: this.server.emit('userOnline'/'userOffline', { userId });
+    const onlineHandler = (data: { userId: string }) =>
+      callback({ ...data, isOnline: true });
+    const offlineHandler = (data: { userId: string }) =>
+      callback({ ...data, isOnline: false });
+    socketManager.on("chat", "userOnline", onlineHandler);
+    socketManager.on("chat", "userOffline", offlineHandler);
+    return () => {
+      socketManager.off("chat", "userOnline", onlineHandler);
+      socketManager.off("chat", "userOffline", offlineHandler);
+    };
   }
 
   /**
    * Listen for room updates
    */
   onRoomUpdate(callback: RoomUpdateCallback): () => void {
-    socketManager.on('chat', 'room_updated', callback);
-    return () => socketManager.off('chat', 'room_updated', callback);
+    socketManager.on("chat", "room_updated", callback);
+    return () => socketManager.off("chat", "room_updated", callback);
   }
 
   /**
    * Listen for connection errors
    */
   onError(callback: (error: Error) => void): () => void {
-    socketManager.on('chat', 'error', callback);
-    return () => socketManager.off('chat', 'error', callback);
+    socketManager.on("chat", "error", callback);
+    return () => socketManager.off("chat", "error", callback);
   }
 
   // ========================================================================
@@ -329,17 +366,17 @@ class ChatService {
       const response = await fetch(`${ENV.API_BASE_URL}/chat/rooms`, {
         headers: {
           Authorization: `Bearer ${token}`,
-          'x-api-key': ENV.API_KEY,
+          "x-api-key": ENV.API_KEY,
         },
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch chat rooms');
+        throw new Error("Failed to fetch chat rooms");
       }
 
       return await response.json();
     } catch (error) {
-      console.error('[Chat] Failed to fetch rooms:', error);
+      console.error("[Chat] Failed to fetch rooms:", error);
       return [];
     }
   }
@@ -350,7 +387,7 @@ class ChatService {
   async getMessageHistory(
     roomId: string,
     limit = 50,
-    before?: string
+    before?: string,
   ): Promise<ChatMessage[]> {
     try {
       const token = await getToken();
@@ -364,18 +401,18 @@ class ChatService {
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            'x-api-key': ENV.API_KEY,
+            "x-api-key": ENV.API_KEY,
           },
-        }
+        },
       );
 
       if (!response.ok) {
-        throw new Error('Failed to fetch message history');
+        throw new Error("Failed to fetch message history");
       }
 
       return await response.json();
     } catch (error) {
-      console.error('[Chat] Failed to fetch message history:', error);
+      console.error("[Chat] Failed to fetch message history:", error);
       return [];
     }
   }
@@ -385,18 +422,18 @@ class ChatService {
    */
   async createRoom(
     name: string,
-    type: 'direct' | 'group' | 'project',
+    type: "direct" | "group" | "project",
     participantIds: string[],
-    projectId?: number
+    projectId?: number,
   ): Promise<ChatRoom | null> {
     try {
       const token = await getToken();
       const response = await fetch(`${ENV.API_BASE_URL}/chat/rooms`, {
-        method: 'POST',
+        method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
-          'x-api-key': ENV.API_KEY,
-          'Content-Type': 'application/json',
+          "x-api-key": ENV.API_KEY,
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           name,
@@ -407,12 +444,12 @@ class ChatService {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to create room');
+        throw new Error("Failed to create room");
       }
 
       return await response.json();
     } catch (error) {
-      console.error('[Chat] Failed to create room:', error);
+      console.error("[Chat] Failed to create room:", error);
       return null;
     }
   }
@@ -433,18 +470,18 @@ class ChatService {
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            'x-api-key': ENV.API_KEY,
+            "x-api-key": ENV.API_KEY,
           },
-        }
+        },
       );
 
       if (!response.ok) {
-        throw new Error('Failed to search messages');
+        throw new Error("Failed to search messages");
       }
 
       return await response.json();
     } catch (error) {
-      console.error('[Chat] Failed to search messages:', error);
+      console.error("[Chat] Failed to search messages:", error);
       return [];
     }
   }

@@ -223,7 +223,7 @@ export const MOCK_DOCUMENTS: ProjectDocument[] = [
 
 interface GetWorkflowResponse {
   phases: WorkflowPhase[];
-  dataSource: 'api' | 'mock';
+  dataSource: 'api' | 'empty';
 }
 
 /**
@@ -242,21 +242,21 @@ async function getProjectWorkflow(projectId: string): Promise<GetWorkflowRespons
 
     const data = await response.json();
     return {
-      phases: data.phases || MOCK_WORKFLOW,
+      phases: data.phases || [],
       dataSource: 'api',
     };
   } catch (error) {
-    console.warn('[ProjectDetailService] Failed to fetch workflow, using mock data:', error);
+    console.warn('[ProjectDetailService] Failed to fetch workflow:', error);
     return {
-      phases: MOCK_WORKFLOW,
-      dataSource: 'mock',
+      phases: [],
+      dataSource: 'empty',
     };
   }
 }
 
 interface GetTeamResponse {
   members: TeamMember[];
-  dataSource: 'api' | 'mock';
+  dataSource: 'api' | 'empty';
 }
 
 /**
@@ -275,21 +275,21 @@ async function getProjectTeam(projectId: string): Promise<GetTeamResponse> {
 
     const data = await response.json();
     return {
-      members: data.members || MOCK_TEAM,
+      members: data.members || [],
       dataSource: 'api',
     };
   } catch (error) {
-    console.warn('[ProjectDetailService] Failed to fetch team, using mock data:', error);
+    console.warn('[ProjectDetailService] Failed to fetch team:', error);
     return {
-      members: MOCK_TEAM,
-      dataSource: 'mock',
+      members: [],
+      dataSource: 'empty',
     };
   }
 }
 
 interface GetDocumentsResponse {
   documents: ProjectDocument[];
-  dataSource: 'api' | 'mock';
+  dataSource: 'api' | 'empty';
 }
 
 /**
@@ -308,14 +308,14 @@ async function getProjectDocuments(projectId: string): Promise<GetDocumentsRespo
 
     const data = await response.json();
     return {
-      documents: data.documents || MOCK_DOCUMENTS,
+      documents: data.documents || [],
       dataSource: 'api',
     };
   } catch (error) {
-    console.warn('[ProjectDetailService] Failed to fetch documents, using mock data:', error);
+    console.warn('[ProjectDetailService] Failed to fetch documents:', error);
     return {
-      documents: MOCK_DOCUMENTS,
-      dataSource: 'mock',
+      documents: [],
+      dataSource: 'empty',
     };
   }
 }
@@ -338,11 +338,7 @@ async function addTeamMember(projectId: string, member: Omit<TeamMember, 'id'>):
     return await response.json();
   } catch (error) {
     console.warn('[ProjectDetailService] Failed to add team member:', error);
-    // Return mock response for optimistic update
-    return {
-      id: `member_${Date.now()}`,
-      ...member,
-    };
+    throw error;
   }
 }
 

@@ -162,12 +162,23 @@ const CommentsSheetContext = createContext<CommentsSheetContextType | null>(
   null,
 );
 
-export const useCommentsSheet = () => {
+// Noop fallback when provider is not available
+const noopCommentsSheet: CommentsSheetContextType = {
+  open: () => console.warn("[CommentsSheet] Provider not available"),
+  close: () => {},
+  isOpen: false,
+};
+
+export const useCommentsSheet = (): CommentsSheetContextType => {
   const context = useContext(CommentsSheetContext);
+  // Return noop fallback instead of throwing to prevent crashes during hydration
   if (!context) {
-    throw new Error(
-      "useCommentsSheet must be used within a CommentsSheetProvider",
-    );
+    if (__DEV__) {
+      console.warn(
+        "[CommentsSheet] useCommentsSheet called outside of CommentsSheetProvider",
+      );
+    }
+    return noopCommentsSheet;
   }
   return context;
 };

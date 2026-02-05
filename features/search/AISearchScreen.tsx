@@ -4,7 +4,8 @@
  * Sử dụng Gemini AI để hiểu ngữ cảnh tìm kiếm
  */
 
-import { searchVideos } from "@/app/social/reels-viewer";
+import { searchVideos } from "@/app/social/shorts";
+import VoiceSearch from "@/components/VoiceSearch";
 import {
     MODERN_COLORS,
     MODERN_RADIUS,
@@ -15,6 +16,7 @@ import {
 import { Product, PRODUCTS } from "@/data/products";
 import { geminiAI, GeminiMessage } from "@/services/geminiAI";
 import { Reel } from "@/services/reelsService";
+import { VoiceSearchResult } from "@/services/voiceSearchService";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router, useLocalSearchParams } from "expo-router";
@@ -138,6 +140,7 @@ export default function AISearchScreen() {
   const [aiResponse, setAiResponse] = useState<string>("");
   const [relatedSearches, setRelatedSearches] = useState<string[]>([]);
   const [showAIChat, setShowAIChat] = useState(false);
+  const [showVoiceSearch, setShowVoiceSearch] = useState(false);
   const [aiMessages, setAiMessages] = useState<GeminiMessage[]>([]);
   const [searchHistory, setSearchHistory] = useState<SearchHistory[]>([]);
 
@@ -241,7 +244,7 @@ export default function AISearchScreen() {
           p.tags.some(
             (tag) =>
               tag.toLowerCase().includes(originalQuery) ||
-              normalizeVietnamese(tag).includes(normalizedQuery)
+              normalizeVietnamese(tag).includes(normalizedQuery),
           )
         ) {
           return true;
@@ -257,7 +260,7 @@ export default function AISearchScreen() {
       setVideoResults(videoSearchResults);
       return productResults;
     },
-    [normalizeVietnamese]
+    [normalizeVietnamese],
   );
 
   // AI-powered search
@@ -292,14 +295,14 @@ export default function AISearchScreen() {
               // Set AI response
               setAiResponse(
                 aiResult.response ||
-                  `Tìm thấy ${basicResults.length} kết quả cho "${searchQuery}"`
+                  `Tìm thấy ${basicResults.length} kết quả cho "${searchQuery}"`,
               );
               setRelatedSearches(
                 aiResult.suggestions || [
                   `${searchQuery} giá rẻ`,
                   `${searchQuery} cao cấp`,
                   `${searchQuery} uy tín`,
-                ]
+                ],
               );
 
               // Filter results by AI-detected category
@@ -307,7 +310,7 @@ export default function AISearchScreen() {
                 const filteredResults = basicResults.filter(
                   (p) =>
                     p.category?.toLowerCase() ===
-                    aiResult.category.toLowerCase()
+                    aiResult.category.toLowerCase(),
                 );
                 if (filteredResults.length > 0) {
                   setSearchResults(filteredResults);
@@ -316,13 +319,13 @@ export default function AISearchScreen() {
             } else {
               // No JSON but AI responded
               setAiResponse(
-                `Đã tìm kiếm: "${searchQuery}". Tìm thấy ${basicResults.length} kết quả.`
+                `Đã tìm kiếm: "${searchQuery}". Tìm thấy ${basicResults.length} kết quả.`,
               );
             }
           } catch {
             // If JSON parse fails, show friendly message
             setAiResponse(
-              `Tìm thấy ${basicResults.length} kết quả cho "${searchQuery}"`
+              `Tìm thấy ${basicResults.length} kết quả cho "${searchQuery}"`,
             );
           }
 
@@ -340,7 +343,7 @@ export default function AISearchScreen() {
           setAiResponse(
             basicResults.length > 0
               ? `Tìm thấy ${basicResults.length} kết quả cho "${searchQuery}"`
-              : `Không tìm thấy kết quả cho "${searchQuery}". Thử từ khóa khác.`
+              : `Không tìm thấy kết quả cho "${searchQuery}". Thử từ khóa khác.`,
           );
           setRelatedSearches([
             "Biệt thự hiện đại",
@@ -356,7 +359,7 @@ export default function AISearchScreen() {
         setAiResponse(
           fallbackResults.length > 0
             ? `Tìm thấy ${fallbackResults.length} kết quả cho "${searchQuery}"`
-            : `Không tìm thấy kết quả. Thử tìm: Biệt thự, Nội thất, Vật liệu`
+            : `Không tìm thấy kết quả. Thử tìm: Biệt thự, Nội thất, Vật liệu`,
         );
         setRelatedSearches([
           "Biệt thự hiện đại",
@@ -368,7 +371,7 @@ export default function AISearchScreen() {
         setIsLoading(false);
       }
     },
-    [basicSearch]
+    [basicSearch],
   );
 
   // Handle search submit
@@ -391,6 +394,34 @@ export default function AISearchScreen() {
       }
     }
   }, [query, searchMode, aiSearch, basicSearch]);
+
+  // Handle voice search result
+  const handleVoiceSearchResult = useCallback(
+    (result: VoiceSearchResult) => {
+      if (result.success && result.query) {
+        setQuery(result.query);
+        // Add to history as voice search
+        setSearchHistory((prev) => [
+          {
+            query: result.query!,
+            timestamp: Date.now(),
+            type: "voice",
+          },
+          ...prev.slice(0, 9),
+        ]);
+        // Apply AI suggestions if available
+        if (result.suggestions && result.suggestions.length > 0) {
+          setRelatedSearches(result.suggestions);
+        }
+        if (result.intent) {
+          setAiResponse(`Tìm kiếm: "${result.query}" - ${result.intent}`);
+        }
+        // Perform search with transcribed text
+        aiSearch(result.query);
+      }
+    },
+    [aiSearch],
+  );
 
   // Handle AI chat
   const sendAIMessage = useCallback(
@@ -419,7 +450,7 @@ export default function AISearchScreen() {
         setAiThinking(false);
       }
     },
-    [aiMessages]
+    [aiMessages],
   );
 
   // Filter products by category
@@ -490,7 +521,10 @@ export default function AISearchScreen() {
 
       <TouchableOpacity
         style={[styles.modeTab, searchMode === "voice" && styles.modeTabActive]}
-        onPress={() => setSearchMode("voice")}
+        onPress={() => {
+          setSearchMode("voice");
+          setShowVoiceSearch(true);
+        }}
       >
         <Ionicons
           name="mic"
@@ -838,6 +872,13 @@ export default function AISearchScreen() {
           </TouchableOpacity>
 
           <View style={styles.searchBox}>
+            {/* Unified Search Button */}
+            <TouchableOpacity
+              style={styles.unifiedSearchBtn}
+              onPress={() => router.push("/unified-search")}
+            >
+              <Ionicons name="apps" size={18} color={MODERN_COLORS.primary} />
+            </TouchableOpacity>
             <Ionicons
               name="search"
               size={20}
@@ -946,7 +987,7 @@ export default function AISearchScreen() {
                 </View>
                 <TouchableOpacity
                   style={styles.sortBtn}
-                  onPress={() => router.push("/social/reels-viewer")}
+                  onPress={() => router.push("/social/shorts")}
                 >
                   <Text
                     style={[styles.sortText, { color: MODERN_COLORS.primary }]}
@@ -973,9 +1014,7 @@ export default function AISearchScreen() {
                   <TouchableOpacity
                     key={video.id}
                     style={styles.videoCard}
-                    onPress={() =>
-                      router.push(`/social/reels-viewer?id=${video.id}`)
-                    }
+                    onPress={() => router.push(`/social/shorts?id=${video.id}`)}
                   >
                     <Image
                       source={{ uri: video.thumbnail }}
@@ -1066,6 +1105,21 @@ export default function AISearchScreen() {
             />
           </LinearGradient>
         </TouchableOpacity>
+
+        {/* Voice Search Modal */}
+        <VoiceSearch
+          visible={showVoiceSearch}
+          onClose={() => setShowVoiceSearch(false)}
+          onResult={handleVoiceSearchResult}
+          onTextResult={(text) => setQuery(text)}
+          config={{
+            language: "vi",
+            category: selectedFilter !== "all" ? selectedFilter : undefined,
+          }}
+          title="Đang nghe..."
+          subtitle="Nói để tìm kiếm sản phẩm, dịch vụ"
+          maxDuration={15000}
+        />
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -1117,6 +1171,15 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     alignItems: "center",
     justifyContent: "center",
+  },
+  unifiedSearchBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: MODERN_COLORS.primary + "15",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 4,
   },
 
   // Search Modes

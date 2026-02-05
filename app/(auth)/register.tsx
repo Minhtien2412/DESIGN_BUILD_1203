@@ -1,17 +1,10 @@
-import { useRouter } from "expo-router";
-import { useEffect } from "react";
+/**
+ * Register Screen - Redirect to Modern Auth
+ * This file redirects to the new combined auth screen with register mode
+ */
 
-export default function RegisterScreen() {
-  const router = useRouter();
+import { Redirect } from "expo-router";
 
-  // Redirect to unified register screen
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      router.replace("/(auth)/register-unified" as any);
-    }, 0);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  return null;
+export default function RegisterRedirect() {
+  return <Redirect href="/(auth)/auth" />;
 }

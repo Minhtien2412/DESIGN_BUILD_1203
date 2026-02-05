@@ -1,1 +1,0 @@
-{"version":3,"names":["getTestId","elementName"],"sources":["test-id.js"],"sourcesContent":["export function getTestId(elementName) {\n    return `toast${elementName}`;\n}\n"],"mappings":";;;;AAAO,SAASA,SAASA,CAACC,WAAW,EAAE;EACnC,OAAO,QAAQA,WAAW,EAAE;AAChC","ignoreList":[]}

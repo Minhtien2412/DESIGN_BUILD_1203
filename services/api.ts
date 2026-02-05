@@ -214,8 +214,30 @@ export async function apiFetch<T = any>(
   options: ApiFetchOptions = {},
 ): Promise<T> {
   const isAbsolute = /^https?:/i.test(path);
-  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
-  // Avoid double prefix if caller already included '/api'
+  let normalizedPath = path.startsWith("/") ? path : `/${path}`;
+
+  // Auto-strip duplicate version prefixes from path if API_BASE_URL already contains them
+  // This prevents double prefixing like /api/v1/api/v1/... or /api/v1/v1/...
+  if (API.includes("/api/v1")) {
+    // Remove /api/v1/ prefix
+    if (normalizedPath.startsWith("/api/v1/")) {
+      normalizedPath = normalizedPath.slice(7); // Remove '/api/v1'
+    }
+    // Remove /api/ prefix
+    else if (normalizedPath.startsWith("/api/")) {
+      normalizedPath = normalizedPath.slice(4); // Remove '/api'
+    }
+    // Remove /v1/ prefix (when caller uses /v1/path instead of /path)
+    else if (normalizedPath.startsWith("/v1/")) {
+      normalizedPath = normalizedPath.slice(3); // Remove '/v1'
+    }
+  } else if (API.includes("/api")) {
+    if (normalizedPath.startsWith("/api/")) {
+      normalizedPath = normalizedPath.slice(4); // Remove '/api'
+    }
+  }
+
+  // Avoid double prefix if caller already included API_PREFIX
   const prefixedPath =
     !API_PREFIX || normalizedPath.startsWith(API_PREFIX + "/")
       ? normalizedPath
@@ -236,20 +258,19 @@ export async function apiFetch<T = any>(
   const token = (options as any).token || authToken;
   if (token) {
     headers.Authorization = `Bearer ${token}`;
-    console.log("[API] Sending request with token to:", path);
-  } else {
-    console.warn("[API] No token available for request to:", path);
   }
 
   // Add API key if available
   // Backend requires API key for ALL endpoints including auth
   if (apiKey) {
     headers["X-API-Key"] = apiKey;
+  }
+
+  // Single consolidated log (only in dev mode)
+  if (__DEV__) {
     const logPath = isAbsolute ? path : prefixedPath;
-    console.log("[API] Sending request with API key to:", logPath);
-  } else {
-    const logPath = isAbsolute ? path : prefixedPath;
-    console.log("[API] WARNING: No API key available for request to:", logPath);
+    const authInfo = token ? "token" : apiKey ? "API key" : "no auth";
+    console.log(`[API] ${options.method || "GET"} ${logPath} (${authInfo})`);
   }
 
   const controller = new AbortController();

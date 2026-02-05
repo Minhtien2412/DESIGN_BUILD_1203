@@ -198,20 +198,23 @@ export const DocumentsService = {
       };
     } catch (error) {
       // Fallback to offline
+      const offlineDoc = await OfflineDocuments.add({
+        name: file.name,
+        type: file.type?.split('/')[1] || 'other',
+        size: file.size || 0,
+        localUri: file.uri,
+        fileName: file.name,
+        mimeType: file.type || 'application/octet-stream',
+        projectId,
+      });
+
       const pendingUpload = await FileCache.addPendingUpload({
         type: 'document',
         localUri: file.uri,
         targetEndpoint: '/upload/single',
         fileName: file.name,
         mimeType: file.type || 'application/octet-stream',
-      });
-      
-      // Lưu document metadata offline
-      const offlineDoc = await OfflineDocuments.add({
-        name: file.name,
-        type: file.type?.split('/')[1] || 'other',
-        size: file.size || 0,
-        localUri: file.uri,
+        offlineDocId: offlineDoc.id,
         projectId,
       });
       
@@ -219,7 +222,7 @@ export const DocumentsService = {
         success: true,
         data: { document: offlineDoc, upload: pendingUpload },
         source: 'offline',
-        message: 'Không thể upload. Đã lưu offline để upload sau.',
+        message: 'Upload failed. Saved offline for later sync.',
         isOffline: true,
       };
     }
@@ -545,13 +548,13 @@ export const ConstructionProgressService = {
   },
 
   /**
-   * Lấy timeline theo project - SỬA DÙNG /projects/{id}/timeline
+   * L?y timeline theo project - S?A D?NG /timeline/projects/{projectId}
    */
   async getTimeline(projectId: string): Promise<ServiceResponse<any>> {
     const alternativeEndpoint = getAlternativeEndpoint('TIMELINE');
     const endpoint = alternativeEndpoint 
       ? alternativeEndpoint.replace('{projectId}', projectId)
-      : `/projects/${projectId}/timeline`;
+      : `/timeline/projects/${projectId}`;
     
     try {
       const response = await apiFetch(endpoint);

@@ -70,6 +70,11 @@ export type Product = {
   seller?: Seller;
   soldCount?: number;
   location?: string;
+  // New Shopee-style fields
+  deliveryDays?: string; // e.g., "2-3 ngày", "3-5 ngày"
+  voucher?: string; // e.g., "2.2", "SALE"
+  isLive?: boolean; // Live selling badge
+  ratingCount?: number; // Number of ratings
 };
 
 // Empty sellers array - data from API only
@@ -950,7 +955,7 @@ export function searchProducts(query: string): Product[] {
       p.tags.some(
         (tag) =>
           tag.toLowerCase().includes(originalQuery) ||
-          normalizeVietnamese(tag).includes(normalizedQuery)
+          normalizeVietnamese(tag).includes(normalizedQuery),
       )
     ) {
       return true;

@@ -54,6 +54,7 @@ interface AuthState {
   user: User | null;
   loading: boolean;
   isAuthenticated: boolean;
+  accessToken?: string | null;
 }
 
 // OTP Authentication types
@@ -81,6 +82,26 @@ interface SignInResult {
   refreshToken: string;
 }
 
+// 2FA Types
+interface TwoFASendOtpResult {
+  success: boolean;
+  message: string;
+}
+
+interface TwoFALoginRequestResult {
+  success: boolean;
+  message: string;
+  tempToken?: string;
+}
+
+interface TwoFAVerifyResult {
+  success: boolean;
+  message: string;
+  user?: User;
+  accessToken?: string;
+  refreshToken?: string;
+}
+
 interface AuthContextType extends AuthState {
   signIn: (
     email: string,
@@ -100,6 +121,26 @@ interface AuthContextType extends AuthState {
     phone?: string,
     location?: { latitude: number; longitude: number; address?: string },
   ) => Promise<void>;
+  // 2FA Authentication
+  twoFARegisterSendOtp: (email: string) => Promise<TwoFASendOtpResult>;
+  twoFARegisterVerify: (
+    email: string,
+    otp: string,
+    password: string,
+    name: string,
+    phone?: string,
+  ) => Promise<TwoFAVerifyResult>;
+  twoFARegisterResendOtp: (email: string) => Promise<TwoFASendOtpResult>;
+  twoFALoginRequestOtp: (
+    email: string,
+    password: string,
+  ) => Promise<TwoFALoginRequestResult>;
+  twoFALoginVerify: (
+    email: string,
+    tempToken: string,
+    otp: string,
+  ) => Promise<TwoFAVerifyResult>;
+  twoFALoginResendOtp: (email: string) => Promise<TwoFASendOtpResult>;
   // OTP Authentication
   sendOTP: (
     phone: string,
@@ -159,6 +200,10 @@ interface AuthContextType extends AuthState {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Global state to prevent duplicate session loads across re-mounts
+let authSessionLoaded = false;
+let authSessionLoading = false;
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   // Map backend API user to app User shape
   const mapUser = (apiUser: ApiUser): User => ({
@@ -183,28 +228,90 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const [state, setState] = useState<AuthState>({
     user: null,
-    loading: true,
+    loading: !authSessionLoaded, // Don't show loading if already loaded
     isAuthenticated: false,
+    accessToken: null,
   });
 
+  // Keep accessToken in sync with token service
   useEffect(() => {
-    loadSession();
+    const syncToken = async () => {
+      if (state.isAuthenticated) {
+        const token = await getAccessToken();
+        if (token && token !== state.accessToken) {
+          setState((prev) => ({ ...prev, accessToken: token }));
+        }
+      }
+    };
+    syncToken();
+  }, [state.isAuthenticated]);
 
-    // Setup logout callback for api.ts when token refresh fails
-    (async () => {
-      const { setLogoutCallback } = await import("../services/api");
+  useEffect(() => {
+    // Skip if already loaded or loading
+    if (authSessionLoaded || authSessionLoading) {
+      setState((prev) => ({ ...prev, loading: false }));
+      return;
+    }
+
+    // Defer loadSession to avoid blocking startup
+    // Use requestAnimationFrame to let UI render first
+    const frameId = requestAnimationFrame(() => {
+      loadSession();
+    });
+
+    // Setup logout callback and token persistor for api.ts (deferred)
+    const timeoutId = setTimeout(async () => {
+      const { setLogoutCallback, setTokenPersistor } =
+        await import("../services/api");
+
+      // Auto-logout when token refresh fails
       setLogoutCallback(async () => {
         console.log("[AuthContext] Auto-logout triggered by API");
         await signOut();
       });
-    })();
+
+      // Persist new token when refresh succeeds (for persistent login)
+      setTokenPersistor(async (newToken: string | null) => {
+        if (newToken) {
+          console.log(
+            "[AuthContext] Persisting refreshed token for persistent login",
+          );
+          const { getRefreshToken } = await import("../services/api");
+          const currentRefresh = getRefreshToken();
+          const expiresAt = calculateExpiryTimestamp("30d");
+          await saveTokens({
+            accessToken: newToken,
+            refreshToken: currentRefresh || "",
+            expiresAt,
+          });
+        }
+      });
+    }, 500);
+
+    return () => {
+      cancelAnimationFrame(frameId);
+      clearTimeout(timeoutId);
+    };
   }, []);
 
   const loadSession = async () => {
+    // Double check with global state
+    if (authSessionLoaded || authSessionLoading) {
+      return;
+    }
+    authSessionLoading = true;
+
     try {
       const token = await getAccessToken();
       if (!token) {
-        setState({ user: null, loading: false, isAuthenticated: false });
+        authSessionLoaded = true;
+        authSessionLoading = false;
+        setState({
+          user: null,
+          loading: false,
+          isAuthenticated: false,
+          accessToken: null,
+        });
         return;
       }
 
@@ -218,20 +325,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Try to get current user profile from backend
       try {
         const apiUser = await authApi.getProfile(token);
+        authSessionLoaded = true;
+        authSessionLoading = false;
         setState({
           user: mapUser(apiUser),
           loading: false,
           isAuthenticated: true,
+          accessToken: token,
         });
       } catch (userError) {
         console.warn("[Auth] Failed to get profile, clearing session");
         await clearTokens();
-        setState({ user: null, loading: false, isAuthenticated: false });
+        authSessionLoaded = true;
+        authSessionLoading = false;
+        setState({
+          user: null,
+          loading: false,
+          isAuthenticated: false,
+          accessToken: null,
+        });
       }
     } catch (error) {
       console.error("Failed to load session:", error);
       await clearTokens();
-      setState({ user: null, loading: false, isAuthenticated: false });
+      authSessionLoading = false;
+      setState({
+        user: null,
+        loading: false,
+        isAuthenticated: false,
+        accessToken: null,
+      });
     }
   };
 
@@ -247,7 +370,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const response = await authApi.login({ email, password });
 
       // Store tokens securely using token service
-      const expiresAt = calculateExpiryTimestamp("7d"); // 7 days for access token
+      // Use 30 days for persistent login (will auto-refresh if needed)
+      const expiresAt = calculateExpiryTimestamp("30d");
       await saveTokens({
         accessToken: response.accessToken,
         refreshToken: response.refreshToken,
@@ -266,6 +390,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         loading: false,
         isAuthenticated: true,
+        accessToken: response.accessToken,
       });
 
       // Đồng bộ với Perfex CRM sau khi đăng nhập thành công (async, không block)
@@ -1072,6 +1197,218 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  // ============================================
+  // 2FA (Two-Factor Authentication via Email)
+  // ============================================
+
+  /**
+   * 2FA Registration - Step 1: Send OTP to email
+   */
+  const twoFARegisterSendOtp = async (
+    email: string,
+  ): Promise<TwoFASendOtpResult> => {
+    try {
+      console.log("[AuthContext] 2FA Register - Sending OTP to:", email);
+      const response = await authApi.twoFARegisterSendOtp({ email });
+      return {
+        success: response.success,
+        message: response.message,
+      };
+    } catch (error: any) {
+      console.error("[AuthContext] 2FA Register Send OTP error:", error);
+      return {
+        success: false,
+        message: error.message || "Không thể gửi OTP. Vui lòng thử lại.",
+      };
+    }
+  };
+
+  /**
+   * 2FA Registration - Step 2: Verify OTP and create account
+   */
+  const twoFARegisterVerify = async (
+    email: string,
+    otp: string,
+    password: string,
+    name: string,
+    phone?: string,
+  ): Promise<TwoFAVerifyResult> => {
+    try {
+      setState((prev) => ({ ...prev, loading: true }));
+      console.log("[AuthContext] 2FA Register - Verifying OTP for:", email);
+
+      const response = await authApi.twoFARegisterVerify({
+        email,
+        otp,
+        password,
+        name,
+        phone,
+      });
+
+      // Store tokens
+      const expiresAt = calculateExpiryTimestamp("7d");
+      await saveTokens({
+        accessToken: response.accessToken,
+        refreshToken: response.refreshToken,
+        expiresAt,
+      });
+
+      // Set tokens in api.ts
+      const { setToken, setRefreshToken } = await import("../services/api");
+      setToken(response.accessToken);
+      setRefreshToken(response.refreshToken);
+
+      const user = mapUser(response.user);
+
+      console.log("[AuthContext] 2FA Register successful");
+      setState({
+        user,
+        loading: false,
+        isAuthenticated: true,
+      });
+
+      return {
+        success: true,
+        message: "Đăng ký thành công",
+        user,
+        accessToken: response.accessToken,
+        refreshToken: response.refreshToken,
+      };
+    } catch (error: any) {
+      console.error("[AuthContext] 2FA Register Verify error:", error);
+      setState((prev) => ({ ...prev, loading: false }));
+      return {
+        success: false,
+        message: error.message || "Mã OTP không đúng. Vui lòng thử lại.",
+      };
+    }
+  };
+
+  /**
+   * 2FA Registration - Resend OTP
+   */
+  const twoFARegisterResendOtp = async (
+    email: string,
+  ): Promise<TwoFASendOtpResult> => {
+    try {
+      console.log("[AuthContext] 2FA Register - Resending OTP to:", email);
+      const response = await authApi.twoFARegisterResendOtp({ email });
+      return {
+        success: response.success,
+        message: response.message,
+      };
+    } catch (error: any) {
+      console.error("[AuthContext] 2FA Register Resend OTP error:", error);
+      return {
+        success: false,
+        message: error.message || "Không thể gửi lại OTP. Vui lòng thử lại.",
+      };
+    }
+  };
+
+  /**
+   * 2FA Login - Step 1: Verify password and request OTP
+   */
+  const twoFALoginRequestOtp = async (
+    email: string,
+    password: string,
+  ): Promise<TwoFALoginRequestResult> => {
+    try {
+      console.log("[AuthContext] 2FA Login - Requesting OTP for:", email);
+      const response = await authApi.twoFALoginRequestOtp({ email, password });
+      return {
+        success: response.success,
+        message: response.message,
+        tempToken: response.tempToken,
+      };
+    } catch (error: any) {
+      console.error("[AuthContext] 2FA Login Request OTP error:", error);
+      return {
+        success: false,
+        message: error.message || "Email hoặc mật khẩu không chính xác.",
+      };
+    }
+  };
+
+  /**
+   * 2FA Login - Step 2: Verify OTP and get tokens
+   */
+  const twoFALoginVerify = async (
+    email: string,
+    tempToken: string,
+    otp: string,
+  ): Promise<TwoFAVerifyResult> => {
+    try {
+      setState((prev) => ({ ...prev, loading: true }));
+      console.log("[AuthContext] 2FA Login - Verifying OTP for:", email);
+
+      const response = await authApi.twoFALoginVerify({
+        email,
+        tempToken,
+        otp,
+      });
+
+      // Store tokens
+      const expiresAt = calculateExpiryTimestamp("7d");
+      await saveTokens({
+        accessToken: response.accessToken,
+        refreshToken: response.refreshToken,
+        expiresAt,
+      });
+
+      // Set tokens in api.ts
+      const { setToken, setRefreshToken } = await import("../services/api");
+      setToken(response.accessToken);
+      setRefreshToken(response.refreshToken);
+
+      const user = mapUser(response.user);
+
+      console.log("[AuthContext] 2FA Login successful");
+      setState({
+        user,
+        loading: false,
+        isAuthenticated: true,
+      });
+
+      return {
+        success: true,
+        message: "Đăng nhập thành công",
+        user,
+        accessToken: response.accessToken,
+        refreshToken: response.refreshToken,
+      };
+    } catch (error: any) {
+      console.error("[AuthContext] 2FA Login Verify error:", error);
+      setState((prev) => ({ ...prev, loading: false }));
+      return {
+        success: false,
+        message: error.message || "Mã OTP không đúng. Vui lòng thử lại.",
+      };
+    }
+  };
+
+  /**
+   * 2FA Login - Resend OTP
+   */
+  const twoFALoginResendOtp = async (
+    email: string,
+  ): Promise<TwoFASendOtpResult> => {
+    try {
+      console.log("[AuthContext] 2FA Login - Resending OTP to:", email);
+      const response = await authApi.twoFALoginResendOtp({ email });
+      return {
+        success: response.success,
+        message: response.message,
+      };
+    } catch (error: any) {
+      console.error("[AuthContext] 2FA Login Resend OTP error:", error);
+      return {
+        success: false,
+        message: error.message || "Không thể gửi lại OTP. Vui lòng thử lại.",
+      };
+    }
+  };
+
   /**
    * Register new user with phone after OTP verification
    * Uses backend API: POST /zalo/register-phone
@@ -1157,6 +1494,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signIn,
         restoreSessionFromBiometric,
         signUp,
+        // 2FA Authentication
+        twoFARegisterSendOtp,
+        twoFARegisterVerify,
+        twoFARegisterResendOtp,
+        twoFALoginRequestOtp,
+        twoFALoginVerify,
+        twoFALoginResendOtp,
+        // OTP via Phone
         sendOTP,
         verifyOTP,
         checkTrustedDevice,

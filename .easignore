@@ -31,6 +31,15 @@ BE-baotienweb.cloud/
 strapi-cms/
 admin-web/
 perfex-module/
+perfex-crm-ai-architect/
+backups/
+web/
+coverage/
+e2e/
+mocks/
+testing/
+web-build/
+**/node_modules/
 
 # ============================================
 # ARCHIVED & BACKUP (KHÔNG CẦN)
@@ -223,3 +232,7 @@ backend-api-spec.json
 # OpenAPI and documentation
 openapi/
 docs/
+**/*.zip
+**/*.7z
+**/*.tar
+**/*.tar.gz

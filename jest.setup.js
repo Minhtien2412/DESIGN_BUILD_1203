@@ -251,6 +251,76 @@ jest.mock("expo-av", () => ({
   Video: "Video",
 }));
 
+// Mock expo-audio (SDK 54+)
+jest.mock("expo-audio", () => {
+  const mockRecording = {
+    prepareToRecordAsync: jest.fn(() => Promise.resolve()),
+    startAsync: jest.fn(() => Promise.resolve()),
+    stopAndUnloadAsync: jest.fn(() => Promise.resolve()),
+    pauseAsync: jest.fn(() => Promise.resolve()),
+    getStatusAsync: jest.fn(() =>
+      Promise.resolve({ isRecording: false, durationMillis: 0 }),
+    ),
+    getURI: jest.fn(() => "file:///mock-recording.m4a"),
+    setOnRecordingStatusUpdate: jest.fn(),
+  };
+
+  const MockAudioRecorder = jest.fn().mockImplementation(() => ({
+    record: jest.fn(() => Promise.resolve()),
+    stop: jest.fn(() => Promise.resolve()),
+    pause: jest.fn(() => Promise.resolve()),
+    getStatus: jest.fn(() => Promise.resolve({ isRecording: false })),
+    uri: "file:///mock-recording.m4a",
+  }));
+
+  return {
+    // Permissions
+    getRecordingPermissionsAsync: jest.fn(() =>
+      Promise.resolve({ status: "granted", granted: true }),
+    ),
+    requestRecordingPermissionsAsync: jest.fn(() =>
+      Promise.resolve({ status: "granted", granted: true }),
+    ),
+    // Audio Module
+    AudioModule: {
+      AudioRecorder: MockAudioRecorder,
+      setAudioModeAsync: jest.fn(() => Promise.resolve()),
+    },
+    // Sound
+    useAudioPlayer: jest.fn(() => ({
+      play: jest.fn(),
+      pause: jest.fn(),
+      stop: jest.fn(),
+      seekTo: jest.fn(),
+      isPlaying: false,
+      duration: 0,
+      currentTime: 0,
+    })),
+    createAudioPlayer: jest.fn(() => ({
+      play: jest.fn(() => Promise.resolve()),
+      pause: jest.fn(() => Promise.resolve()),
+      stop: jest.fn(() => Promise.resolve()),
+      seekTo: jest.fn(() => Promise.resolve()),
+      release: jest.fn(() => Promise.resolve()),
+    })),
+    // Recording constants
+    RecordingPresets: {
+      HIGH_QUALITY: {
+        android: { extension: ".m4a" },
+        ios: { extension: ".m4a" },
+        web: { extension: ".webm" },
+      },
+      LOW_QUALITY: {
+        android: { extension: ".m4a" },
+        ios: { extension: ".m4a" },
+        web: { extension: ".webm" },
+      },
+    },
+    // Types - export as values for runtime
+    AudioRecorder: MockAudioRecorder,
+  };
+});
+
 // Mock Animated - for jest-expo preset
 // NativeAnimatedHelper mock handled by jest-expo
 

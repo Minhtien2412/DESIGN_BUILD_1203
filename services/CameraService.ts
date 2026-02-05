@@ -14,7 +14,10 @@
  */
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Audio } from "expo-av";
+import {
+  getRecordingPermissionsAsync,
+  requestRecordingPermissionsAsync,
+} from "expo-audio";
 import * as ImagePicker from "expo-image-picker";
 import * as Linking from "expo-linking";
 import * as MediaLibrary from "expo-media-library";
@@ -108,7 +111,7 @@ const MIN_VIDEO_DURATION = 3; // 3 seconds
 export async function checkCameraPermissions(): Promise<CameraPermissionState> {
   const [camera, microphone, mediaLibrary] = await Promise.all([
     ImagePicker.getCameraPermissionsAsync(),
-    Audio.getPermissionsAsync(),
+    getRecordingPermissionsAsync(),
     MediaLibrary.getPermissionsAsync(),
   ]);
 
@@ -131,7 +134,7 @@ export async function requestCameraPermission(): Promise<boolean> {
  * Request microphone permission (for video)
  */
 export async function requestMicrophonePermission(): Promise<boolean> {
-  const { status } = await Audio.requestPermissionsAsync();
+  const { status } = await requestRecordingPermissionsAsync();
   return status === "granted";
 }
 
@@ -151,7 +154,7 @@ export async function requestAllPermissions(
 ): Promise<CameraPermissionState> {
   const [camera, microphone, mediaLibrary] = await Promise.all([
     ImagePicker.requestCameraPermissionsAsync(),
-    Audio.requestPermissionsAsync(),
+    requestRecordingPermissionsAsync(),
     includeMediaLibrary
       ? MediaLibrary.requestPermissionsAsync()
       : Promise.resolve({ status: "undetermined" as const }),
@@ -320,9 +323,9 @@ export async function captureVideoWithPicker(
   }
 
   // Check microphone permission
-  const micStatus = await Audio.getPermissionsAsync();
+  const micStatus = await getRecordingPermissionsAsync();
   if (micStatus.status !== "granted") {
-    const result = await Audio.requestPermissionsAsync();
+    const result = await requestRecordingPermissionsAsync();
     if (result.status !== "granted") {
       showPermissionDeniedAlert("microphone");
       return null;

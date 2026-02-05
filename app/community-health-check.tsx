@@ -1,7 +1,7 @@
 /**
  * Community Features Health Check Screen
  * Kiểm tra các chức năng Community hoạt động đúng
- * 
+ *
  * @author AI Assistant
  * @date 16/01/2026
  */
@@ -12,11 +12,11 @@ import {
     COMMUNITY_SHADOWS as SHADOWS,
     COMMUNITY_SPACING as SPACING,
     COMMUNITY_TYPOGRAPHY as TYPOGRAPHY,
-} from '@/constants/community-theme';
-import { PRODUCTS } from '@/data/products';
-import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
+} from "@/constants/community-theme";
+import { PRODUCTS } from "@/data/products";
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
 import {
     ActivityIndicator,
     Alert,
@@ -27,14 +27,14 @@ import {
     Text,
     TouchableOpacity,
     View,
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // ==================== TYPES ====================
 
 interface CheckResult {
   name: string;
-  status: 'pending' | 'success' | 'error' | 'warning';
+  status: "pending" | "success" | "error" | "warning";
   message: string;
   duration?: number;
 }
@@ -50,55 +50,113 @@ export default function CommunityHealthCheckScreen() {
   const insets = useSafeAreaInsets();
   const [isRunning, setIsRunning] = useState(false);
   const [checkGroups, setCheckGroups] = useState<CheckGroup[]>([]);
-  const [overallStatus, setOverallStatus] = useState<'idle' | 'running' | 'pass' | 'fail'>('idle');
+  const [overallStatus, setOverallStatus] = useState<
+    "idle" | "running" | "pass" | "fail"
+  >("idle");
 
   // Initialize check groups
   useEffect(() => {
     setCheckGroups([
       {
-        title: '📦 Theme & Constants',
+        title: "📦 Theme & Constants",
         checks: [
-          { name: 'COMMUNITY_COLORS', status: 'pending', message: 'Chờ kiểm tra...' },
-          { name: 'COMMUNITY_SPACING', status: 'pending', message: 'Chờ kiểm tra...' },
-          { name: 'COMMUNITY_TYPOGRAPHY', status: 'pending', message: 'Chờ kiểm tra...' },
+          {
+            name: "COMMUNITY_COLORS",
+            status: "pending",
+            message: "Chờ kiểm tra...",
+          },
+          {
+            name: "COMMUNITY_SPACING",
+            status: "pending",
+            message: "Chờ kiểm tra...",
+          },
+          {
+            name: "COMMUNITY_TYPOGRAPHY",
+            status: "pending",
+            message: "Chờ kiểm tra...",
+          },
         ],
       },
       {
-        title: '🎬 Video System',
+        title: "🎬 Video System",
         checks: [
-          { name: 'Import searchVideos', status: 'pending', message: 'Chờ kiểm tra...' },
-          { name: 'Import findVideoByIdOrSlug', status: 'pending', message: 'Chờ kiểm tra...' },
-          { name: 'Search "kiến trúc"', status: 'pending', message: 'Chờ kiểm tra...' },
-          { name: 'Find video by slug', status: 'pending', message: 'Chờ kiểm tra...' },
+          {
+            name: "Import searchVideos",
+            status: "pending",
+            message: "Chờ kiểm tra...",
+          },
+          {
+            name: "Import findVideoByIdOrSlug",
+            status: "pending",
+            message: "Chờ kiểm tra...",
+          },
+          {
+            name: 'Search "kiến trúc"',
+            status: "pending",
+            message: "Chờ kiểm tra...",
+          },
+          {
+            name: "Find video by slug",
+            status: "pending",
+            message: "Chờ kiểm tra...",
+          },
         ],
       },
       {
-        title: '🛒 Products Data',
+        title: "🛒 Products Data",
         checks: [
-          { name: 'Products loaded', status: 'pending', message: 'Chờ kiểm tra...' },
-          { name: 'Product search', status: 'pending', message: 'Chờ kiểm tra...' },
+          {
+            name: "Products loaded",
+            status: "pending",
+            message: "Chờ kiểm tra...",
+          },
+          {
+            name: "Product search",
+            status: "pending",
+            message: "Chờ kiểm tra...",
+          },
         ],
       },
       {
-        title: '🧭 Navigation',
+        title: "🧭 Navigation",
         checks: [
-          { name: 'Route to Social', status: 'pending', message: 'Chờ kiểm tra...' },
-          { name: 'Route to Video Discovery', status: 'pending', message: 'Chờ kiểm tra...' },
-          { name: 'Route to Reels Viewer', status: 'pending', message: 'Chờ kiểm tra...' },
-          { name: 'Route to Create Post', status: 'pending', message: 'Chờ kiểm tra...' },
+          {
+            name: "Route to Social",
+            status: "pending",
+            message: "Chờ kiểm tra...",
+          },
+          {
+            name: "Route to Video Discovery",
+            status: "pending",
+            message: "Chờ kiểm tra...",
+          },
+          {
+            name: "Route to Reels Viewer",
+            status: "pending",
+            message: "Chờ kiểm tra...",
+          },
+          {
+            name: "Route to Create Post",
+            status: "pending",
+            message: "Chờ kiểm tra...",
+          },
         ],
       },
     ]);
   }, []);
 
   // Update single check result
-  const updateCheck = (groupIndex: number, checkIndex: number, result: Partial<CheckResult>) => {
-    setCheckGroups(prev => {
+  const updateCheck = (
+    groupIndex: number,
+    checkIndex: number,
+    result: Partial<CheckResult>,
+  ) => {
+    setCheckGroups((prev) => {
       const newGroups = [...prev];
       newGroups[groupIndex] = {
         ...newGroups[groupIndex],
         checks: newGroups[groupIndex].checks.map((c, i) =>
-          i === checkIndex ? { ...c, ...result } : c
+          i === checkIndex ? { ...c, ...result } : c,
         ),
       };
       return newGroups;
@@ -108,7 +166,7 @@ export default function CommunityHealthCheckScreen() {
   // Run all checks
   const runAllChecks = useCallback(async () => {
     setIsRunning(true);
-    setOverallStatus('running');
+    setOverallStatus("running");
     let hasError = false;
 
     // ============ Group 0: Theme & Constants ============
@@ -117,15 +175,15 @@ export default function CommunityHealthCheckScreen() {
       const startColors = Date.now();
       if (COLORS && COLORS.primary && COLORS.secondary && COLORS.background) {
         updateCheck(0, 0, {
-          status: 'success',
+          status: "success",
           message: `✓ primary: ${COLORS.primary}, background: ${COLORS.background}`,
           duration: Date.now() - startColors,
         });
       } else {
-        throw new Error('Missing color values');
+        throw new Error("Missing color values");
       }
     } catch (e: any) {
-      updateCheck(0, 0, { status: 'error', message: `✗ ${e.message}` });
+      updateCheck(0, 0, { status: "error", message: `✗ ${e.message}` });
       hasError = true;
     }
 
@@ -134,15 +192,15 @@ export default function CommunityHealthCheckScreen() {
       const startSpacing = Date.now();
       if (SPACING && SPACING.xs && SPACING.sm && SPACING.md && SPACING.lg) {
         updateCheck(0, 1, {
-          status: 'success',
+          status: "success",
           message: `✓ xs: ${SPACING.xs}, sm: ${SPACING.sm}, md: ${SPACING.md}, lg: ${SPACING.lg}`,
           duration: Date.now() - startSpacing,
         });
       } else {
-        throw new Error('Missing spacing values');
+        throw new Error("Missing spacing values");
       }
     } catch (e: any) {
-      updateCheck(0, 1, { status: 'error', message: `✗ ${e.message}` });
+      updateCheck(0, 1, { status: "error", message: `✗ ${e.message}` });
       hasError = true;
     }
 
@@ -151,15 +209,15 @@ export default function CommunityHealthCheckScreen() {
       const startTypo = Date.now();
       if (TYPOGRAPHY && TYPOGRAPHY.fontSize && TYPOGRAPHY.fontWeight) {
         updateCheck(0, 2, {
-          status: 'success',
+          status: "success",
           message: `✓ fontSize.md: ${TYPOGRAPHY.fontSize.md}, fontWeight.bold: ${TYPOGRAPHY.fontWeight.bold}`,
           duration: Date.now() - startTypo,
         });
       } else {
-        throw new Error('Missing typography values');
+        throw new Error("Missing typography values");
       }
     } catch (e: any) {
-      updateCheck(0, 2, { status: 'error', message: `✗ ${e.message}` });
+      updateCheck(0, 2, { status: "error", message: `✗ ${e.message}` });
       hasError = true;
     }
 
@@ -167,82 +225,82 @@ export default function CommunityHealthCheckScreen() {
     try {
       // Import and check searchVideos
       const startImport1 = Date.now();
-      const { searchVideos } = await import('@/app/social/reels-viewer');
-      if (typeof searchVideos === 'function') {
+      const { searchVideos } = await import("@/app/social/shorts");
+      if (typeof searchVideos === "function") {
         updateCheck(1, 0, {
-          status: 'success',
-          message: '✓ searchVideos function imported',
+          status: "success",
+          message: "✓ searchVideos function imported",
           duration: Date.now() - startImport1,
         });
       } else {
-        throw new Error('searchVideos is not a function');
+        throw new Error("searchVideos is not a function");
       }
     } catch (e: any) {
-      updateCheck(1, 0, { status: 'error', message: `✗ ${e.message}` });
+      updateCheck(1, 0, { status: "error", message: `✗ ${e.message}` });
       hasError = true;
     }
 
     try {
       // Import and check findVideoByIdOrSlug
       const startImport2 = Date.now();
-      const { findVideoByIdOrSlug } = await import('@/app/social/reels-viewer');
-      if (typeof findVideoByIdOrSlug === 'function') {
+      const { findVideoByIdOrSlug } = await import("@/app/social/shorts");
+      if (typeof findVideoByIdOrSlug === "function") {
         updateCheck(1, 1, {
-          status: 'success',
-          message: '✓ findVideoByIdOrSlug function imported',
+          status: "success",
+          message: "✓ findVideoByIdOrSlug function imported",
           duration: Date.now() - startImport2,
         });
       } else {
-        throw new Error('findVideoByIdOrSlug is not a function');
+        throw new Error("findVideoByIdOrSlug is not a function");
       }
     } catch (e: any) {
-      updateCheck(1, 1, { status: 'error', message: `✗ ${e.message}` });
+      updateCheck(1, 1, { status: "error", message: `✗ ${e.message}` });
       hasError = true;
     }
 
     try {
       // Test search "kiến trúc"
       const startSearch = Date.now();
-      const { searchVideos } = await import('@/app/social/reels-viewer');
-      const results = searchVideos('kiến trúc');
+      const { searchVideos } = await import("@/app/social/shorts");
+      const results = searchVideos("kiến trúc");
       if (results && results.length > 0) {
         updateCheck(1, 2, {
-          status: 'success',
+          status: "success",
           message: `✓ Tìm thấy ${results.length} video cho "kiến trúc"`,
           duration: Date.now() - startSearch,
         });
       } else {
         updateCheck(1, 2, {
-          status: 'warning',
-          message: '⚠ Không tìm thấy video, nhưng function hoạt động',
+          status: "warning",
+          message: "⚠ Không tìm thấy video, nhưng function hoạt động",
           duration: Date.now() - startSearch,
         });
       }
     } catch (e: any) {
-      updateCheck(1, 2, { status: 'error', message: `✗ ${e.message}` });
+      updateCheck(1, 2, { status: "error", message: `✗ ${e.message}` });
       hasError = true;
     }
 
     try {
       // Test find by slug
       const startFind = Date.now();
-      const { findVideoByIdOrSlug } = await import('@/app/social/reels-viewer');
-      const video = findVideoByIdOrSlug('kien-truc-hien-dai-2026');
+      const { findVideoByIdOrSlug } = await import("@/app/social/shorts");
+      const video = findVideoByIdOrSlug("kien-truc-hien-dai-2026");
       if (video) {
         updateCheck(1, 3, {
-          status: 'success',
+          status: "success",
           message: `✓ Tìm thấy video: "${video.title || video.slug}"`,
           duration: Date.now() - startFind,
         });
       } else {
         updateCheck(1, 3, {
-          status: 'warning',
-          message: '⚠ Không tìm thấy video theo slug, nhưng function hoạt động',
+          status: "warning",
+          message: "⚠ Không tìm thấy video theo slug, nhưng function hoạt động",
           duration: Date.now() - startFind,
         });
       }
     } catch (e: any) {
-      updateCheck(1, 3, { status: 'error', message: `✗ ${e.message}` });
+      updateCheck(1, 3, { status: "error", message: `✗ ${e.message}` });
       hasError = true;
     }
 
@@ -251,63 +309,65 @@ export default function CommunityHealthCheckScreen() {
       const startProducts = Date.now();
       if (PRODUCTS && PRODUCTS.length > 0) {
         updateCheck(2, 0, {
-          status: 'success',
+          status: "success",
           message: `✓ ${PRODUCTS.length} sản phẩm đã load`,
           duration: Date.now() - startProducts,
         });
       } else {
-        throw new Error('No products found');
+        throw new Error("No products found");
       }
     } catch (e: any) {
-      updateCheck(2, 0, { status: 'error', message: `✗ ${e.message}` });
+      updateCheck(2, 0, { status: "error", message: `✗ ${e.message}` });
       hasError = true;
     }
 
     try {
       const startProdSearch = Date.now();
-      const results = PRODUCTS.filter(p =>
-        p.name.toLowerCase().includes('villa') ||
-        p.category?.toLowerCase().includes('villa')
+      const results = PRODUCTS.filter(
+        (p) =>
+          p.name.toLowerCase().includes("villa") ||
+          p.category?.toLowerCase().includes("villa"),
       );
       updateCheck(2, 1, {
-        status: results.length > 0 ? 'success' : 'warning',
-        message: results.length > 0 
-          ? `✓ Tìm thấy ${results.length} sản phẩm "villa"`
-          : '⚠ Không tìm thấy sản phẩm "villa"',
+        status: results.length > 0 ? "success" : "warning",
+        message:
+          results.length > 0
+            ? `✓ Tìm thấy ${results.length} sản phẩm "villa"`
+            : '⚠ Không tìm thấy sản phẩm "villa"',
         duration: Date.now() - startProdSearch,
       });
     } catch (e: any) {
-      updateCheck(2, 1, { status: 'error', message: `✗ ${e.message}` });
+      updateCheck(2, 1, { status: "error", message: `✗ ${e.message}` });
       hasError = true;
     }
 
     // ============ Group 3: Navigation ============
     const routes = [
-      { path: '/(tabs)/social', name: 'Route to Social' },
-      { path: '/social/video-discovery', name: 'Route to Video Discovery' },
-      { path: '/social/reels-viewer', name: 'Route to Reels Viewer' },
-      { path: '/social/create-post', name: 'Route to Create Post' },
+      { path: "/(tabs)/social", name: "Route to Social" },
+      { path: "/social/explore", name: "Route to Explore" },
+      { path: "/social/shorts", name: "Route to Shorts" },
+      { path: "/social/create-post", name: "Route to Create Post" },
     ];
 
     routes.forEach((route, index) => {
       try {
         // Just check if router exists - actual navigation test would require user action
-        if (router && typeof router.push === 'function') {
+        if (router && typeof router.push === "function") {
           updateCheck(3, index, {
-            status: 'success',
+            status: "success",
             message: `✓ Route ${route.path} ready`,
           });
         } else {
-          throw new Error('Router not available');
+          throw new Error("Router not available");
         }
       } catch (e: any) {
-        updateCheck(3, index, { status: 'error', message: `✗ ${e.message}` });
+        updateCheck(3, index, { status: "error", message: `✗ ${e.message}` });
         hasError = true;
       }
     });
 
     // Set overall status
-    setOverallStatus(hasError ? 'fail' : 'pass');
+    setOverallStatus(hasError ? "fail" : "pass");
     setIsRunning(false);
   }, []);
 
@@ -324,42 +384,59 @@ export default function CommunityHealthCheckScreen() {
     try {
       router.push(path as any);
     } catch (e) {
-      Alert.alert('Error', `Cannot navigate to ${path}`);
+      Alert.alert("Error", `Cannot navigate to ${path}`);
     }
   };
 
   // Get status color
-  const getStatusColor = (status: CheckResult['status']) => {
+  const getStatusColor = (status: CheckResult["status"]) => {
     switch (status) {
-      case 'success': return '#22c55e';
-      case 'error': return '#ef4444';
-      case 'warning': return '#f59e0b';
-      default: return COLORS.textTertiary;
+      case "success":
+        return "#22c55e";
+      case "error":
+        return "#ef4444";
+      case "warning":
+        return "#f59e0b";
+      default:
+        return COLORS.textTertiary;
     }
   };
 
   // Get status icon
-  const getStatusIcon = (status: CheckResult['status']) => {
+  const getStatusIcon = (status: CheckResult["status"]) => {
     switch (status) {
-      case 'success': return 'checkmark-circle';
-      case 'error': return 'close-circle';
-      case 'warning': return 'warning';
-      default: return 'ellipse-outline';
+      case "success":
+        return "checkmark-circle";
+      case "error":
+        return "close-circle";
+      case "warning":
+        return "warning";
+      default:
+        return "ellipse-outline";
     }
   };
 
   // Count results
   const countResults = () => {
-    let success = 0, error = 0, warning = 0, pending = 0;
-    checkGroups.forEach(group => {
-      group.checks.forEach(check => {
-        if (check.status === 'success') success++;
-        else if (check.status === 'error') error++;
-        else if (check.status === 'warning') warning++;
+    let success = 0,
+      error = 0,
+      warning = 0,
+      pending = 0;
+    checkGroups.forEach((group) => {
+      group.checks.forEach((check) => {
+        if (check.status === "success") success++;
+        else if (check.status === "error") error++;
+        else if (check.status === "warning") warning++;
         else pending++;
       });
     });
-    return { success, error, warning, pending, total: success + error + warning + pending };
+    return {
+      success,
+      error,
+      warning,
+      pending,
+      total: success + error + warning + pending,
+    };
   };
 
   const results = countResults();
@@ -374,8 +451,8 @@ export default function CommunityHealthCheckScreen() {
           <Ionicons name="arrow-back" size={24} color={COLORS.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Health Check</Text>
-        <TouchableOpacity 
-          onPress={runAllChecks} 
+        <TouchableOpacity
+          onPress={runAllChecks}
           style={styles.refreshBtn}
           disabled={isRunning}
         >
@@ -389,22 +466,68 @@ export default function CommunityHealthCheckScreen() {
 
       {/* Summary */}
       <View style={styles.summary}>
-        <View style={[styles.summaryBadge, { backgroundColor: overallStatus === 'pass' ? '#dcfce7' : overallStatus === 'fail' ? '#fee2e2' : '#f3f4f6' }]}>
-          <Ionicons 
-            name={overallStatus === 'pass' ? 'checkmark-circle' : overallStatus === 'fail' ? 'alert-circle' : 'hourglass-outline'} 
-            size={24} 
-            color={overallStatus === 'pass' ? '#22c55e' : overallStatus === 'fail' ? '#ef4444' : COLORS.textSecondary}
+        <View
+          style={[
+            styles.summaryBadge,
+            {
+              backgroundColor:
+                overallStatus === "pass"
+                  ? "#dcfce7"
+                  : overallStatus === "fail"
+                    ? "#fee2e2"
+                    : "#f3f4f6",
+            },
+          ]}
+        >
+          <Ionicons
+            name={
+              overallStatus === "pass"
+                ? "checkmark-circle"
+                : overallStatus === "fail"
+                  ? "alert-circle"
+                  : "hourglass-outline"
+            }
+            size={24}
+            color={
+              overallStatus === "pass"
+                ? "#22c55e"
+                : overallStatus === "fail"
+                  ? "#ef4444"
+                  : COLORS.textSecondary
+            }
           />
-          <Text style={[styles.summaryText, { 
-            color: overallStatus === 'pass' ? '#166534' : overallStatus === 'fail' ? '#991b1b' : COLORS.textSecondary 
-          }]}>
-            {overallStatus === 'pass' ? 'All Checks Passed' : overallStatus === 'fail' ? 'Some Checks Failed' : overallStatus === 'running' ? 'Running...' : 'Ready'}
+          <Text
+            style={[
+              styles.summaryText,
+              {
+                color:
+                  overallStatus === "pass"
+                    ? "#166534"
+                    : overallStatus === "fail"
+                      ? "#991b1b"
+                      : COLORS.textSecondary,
+              },
+            ]}
+          >
+            {overallStatus === "pass"
+              ? "All Checks Passed"
+              : overallStatus === "fail"
+                ? "Some Checks Failed"
+                : overallStatus === "running"
+                  ? "Running..."
+                  : "Ready"}
           </Text>
         </View>
         <View style={styles.summaryStats}>
-          <Text style={[styles.statText, { color: '#22c55e' }]}>✓ {results.success}</Text>
-          <Text style={[styles.statText, { color: '#ef4444' }]}>✗ {results.error}</Text>
-          <Text style={[styles.statText, { color: '#f59e0b' }]}>⚠ {results.warning}</Text>
+          <Text style={[styles.statText, { color: "#22c55e" }]}>
+            ✓ {results.success}
+          </Text>
+          <Text style={[styles.statText, { color: "#ef4444" }]}>
+            ✗ {results.error}
+          </Text>
+          <Text style={[styles.statText, { color: "#f59e0b" }]}>
+            ⚠ {results.warning}
+          </Text>
         </View>
       </View>
 
@@ -422,17 +545,22 @@ export default function CommunityHealthCheckScreen() {
             {group.checks.map((check, checkIndex) => (
               <View key={checkIndex} style={styles.checkItem}>
                 <View style={styles.checkHeader}>
-                  <Ionicons 
-                    name={getStatusIcon(check.status) as any} 
-                    size={20} 
-                    color={getStatusColor(check.status)} 
+                  <Ionicons
+                    name={getStatusIcon(check.status) as any}
+                    size={20}
+                    color={getStatusColor(check.status)}
                   />
                   <Text style={styles.checkName}>{check.name}</Text>
                   {check.duration !== undefined && (
                     <Text style={styles.checkDuration}>{check.duration}ms</Text>
                   )}
                 </View>
-                <Text style={[styles.checkMessage, { color: getStatusColor(check.status) }]}>
+                <Text
+                  style={[
+                    styles.checkMessage,
+                    { color: getStatusColor(check.status) },
+                  ]}
+                >
                   {check.message}
                 </Text>
               </View>
@@ -443,30 +571,65 @@ export default function CommunityHealthCheckScreen() {
         {/* Quick Navigation Tests */}
         <View style={styles.group}>
           <Text style={styles.groupTitle}>🧪 Quick Tests</Text>
-          <TouchableOpacity style={styles.testBtn} onPress={() => navigateTo('/(tabs)/social')}>
+          <TouchableOpacity
+            style={styles.testBtn}
+            onPress={() => navigateTo("/(tabs)/social")}
+          >
             <Ionicons name="people" size={20} color={COLORS.primary} />
             <Text style={styles.testBtnText}>Mở Social Tab</Text>
-            <Ionicons name="chevron-forward" size={18} color={COLORS.textTertiary} />
+            <Ionicons
+              name="chevron-forward"
+              size={18}
+              color={COLORS.textTertiary}
+            />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.testBtn} onPress={() => navigateTo('/social/video-discovery')}>
+          <TouchableOpacity
+            style={styles.testBtn}
+            onPress={() => navigateTo("/social/explore")}
+          >
             <Ionicons name="compass" size={20} color={COLORS.primary} />
-            <Text style={styles.testBtnText}>Mở Video Discovery</Text>
-            <Ionicons name="chevron-forward" size={18} color={COLORS.textTertiary} />
+            <Text style={styles.testBtnText}>Mở Khám phá</Text>
+            <Ionicons
+              name="chevron-forward"
+              size={18}
+              color={COLORS.textTertiary}
+            />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.testBtn} onPress={() => navigateTo('/social/reels-viewer')}>
+          <TouchableOpacity
+            style={styles.testBtn}
+            onPress={() => navigateTo("/social/shorts")}
+          >
             <Ionicons name="play-circle" size={20} color={COLORS.primary} />
-            <Text style={styles.testBtnText}>Mở Reels Viewer</Text>
-            <Ionicons name="chevron-forward" size={18} color={COLORS.textTertiary} />
+            <Text style={styles.testBtnText}>Mở Video ngắn</Text>
+            <Ionicons
+              name="chevron-forward"
+              size={18}
+              color={COLORS.textTertiary}
+            />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.testBtn} onPress={() => navigateTo('/social/create-post')}>
+          <TouchableOpacity
+            style={styles.testBtn}
+            onPress={() => navigateTo("/social/create-post")}
+          >
             <Ionicons name="add-circle" size={20} color={COLORS.primary} />
             <Text style={styles.testBtnText}>Mở Create Post</Text>
-            <Ionicons name="chevron-forward" size={18} color={COLORS.textTertiary} />
+            <Ionicons
+              name="chevron-forward"
+              size={18}
+              color={COLORS.textTertiary}
+            />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.testBtn} onPress={() => navigateTo('/search')}>
+          <TouchableOpacity
+            style={styles.testBtn}
+            onPress={() => navigateTo("/unified-search")}
+          >
             <Ionicons name="search" size={20} color={COLORS.primary} />
-            <Text style={styles.testBtnText}>Mở AI Search</Text>
-            <Ionicons name="chevron-forward" size={18} color={COLORS.textTertiary} />
+            <Text style={styles.testBtnText}>Mở Tìm kiếm thống nhất</Text>
+            <Ionicons
+              name="chevron-forward"
+              size={18}
+              color={COLORS.textTertiary}
+            />
           </TouchableOpacity>
         </View>
 
@@ -484,9 +647,9 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.md,
     backgroundColor: COLORS.surface,
@@ -496,8 +659,8 @@ const styles = StyleSheet.create({
   backBtn: {
     width: 40,
     height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   headerTitle: {
     fontSize: TYPOGRAPHY.fontSize.lg,
@@ -507,13 +670,13 @@ const styles = StyleSheet.create({
   refreshBtn: {
     width: 40,
     height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   summary: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.md,
     backgroundColor: COLORS.surface,
@@ -521,8 +684,8 @@ const styles = StyleSheet.create({
     borderBottomColor: COLORS.border,
   },
   summaryBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.sm,
     borderRadius: RADIUS.full,
@@ -533,7 +696,7 @@ const styles = StyleSheet.create({
     fontWeight: TYPOGRAPHY.fontWeight.medium,
   },
   summaryStats: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: SPACING.md,
   },
   statText: {
@@ -563,8 +726,8 @@ const styles = StyleSheet.create({
     borderBottomColor: COLORS.border,
   },
   checkHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: SPACING.sm,
   },
   checkName: {
@@ -582,8 +745,8 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   testBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingVertical: SPACING.md,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.border,

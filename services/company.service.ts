@@ -72,6 +72,14 @@ export interface CompanyListItem {
   location: string;
   specialties: string[];
   verified: boolean;
+  // Extended fields (may be undefined from API)
+  scale?: string;
+  region?: string;
+  reviews?: number;
+  projects?: number;
+  yearEstablished?: number;
+  featured?: boolean;
+  featuredProjects?: { image: string; title?: string }[];
 }
 
 export interface CompanyListResponse {
@@ -304,11 +312,11 @@ const MOCK_COMPANIES: Record<string, CompanyProfile> = {
  * Get company detail by ID
  */
 export async function getCompanyById(
-  companyId: string | number
+  companyId: string | number,
 ): Promise<CompanyDetailResponse> {
   try {
     const response = await apiFetch<CompanyDetailResponse>(
-      `/companies/${companyId}`
+      `/companies/${companyId}`,
     );
     return response;
   } catch (error: any) {
@@ -327,18 +335,18 @@ export async function getCompanyById(
  * Get company detail by slug
  */
 export async function getCompanyBySlug(
-  slug: string
+  slug: string,
 ): Promise<CompanyDetailResponse> {
   try {
     const response = await apiFetch<CompanyDetailResponse>(
-      `/companies/slug/${slug}`
+      `/companies/slug/${slug}`,
     );
     return response;
   } catch (error: any) {
     console.error("[CompanyService] Error fetching company by slug:", error);
     // Find in mock data by slug
     const mockCompany = Object.values(MOCK_COMPANIES).find(
-      (c) => c.slug === slug
+      (c) => c.slug === slug,
     );
     if (mockCompany) {
       return { success: true, data: mockCompany };
@@ -366,7 +374,7 @@ export async function getCompanies(params?: {
     if (params?.search) queryParams.append("search", params.search);
 
     const response = await apiFetch<CompanyListResponse>(
-      `/companies?${queryParams}`
+      `/companies?${queryParams}`,
     );
     return response;
   } catch (error: any) {
@@ -382,13 +390,58 @@ export async function getCompanies(params?: {
         location: c.location,
         specialties: c.specialties,
         verified: c.verified || false,
-      })
+      }),
     );
     return {
       data: mockList,
       meta: { total: mockList.length, page: 1, limit: 10, totalPages: 1 },
     };
   }
+}
+
+/**
+ * Get list of design companies specifically
+ */
+export async function getDesignCompanies(params?: {
+  page?: number;
+  limit?: number;
+  location?: string;
+  search?: string;
+}): Promise<CompanyListResponse> {
+  return getCompanies({
+    ...params,
+    type: "design",
+  });
+}
+
+/**
+ * Get list of construction companies specifically
+ */
+export async function getConstructionCompanies(params?: {
+  page?: number;
+  limit?: number;
+  location?: string;
+  search?: string;
+}): Promise<CompanyListResponse> {
+  return getCompanies({
+    ...params,
+    type: "construction",
+  });
+}
+
+/**
+ * Get list of interior design companies specifically
+ */
+export async function getInteriorCompanies(params?: {
+  page?: number;
+  limit?: number;
+  location?: string;
+  search?: string;
+}): Promise<CompanyListResponse> {
+  return getCompanies({
+    ...params,
+    type: "design",
+  });
 }
 
 export { MOCK_COMPANIES };

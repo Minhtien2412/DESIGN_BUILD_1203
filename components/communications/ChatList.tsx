@@ -3,17 +3,17 @@
  * Main conversation list with search, filters, and pinned chats
  */
 
-import { Ionicons } from '@expo/vector-icons';
-import { useState } from 'react';
+import { Ionicons } from "@expo/vector-icons";
+import { useState } from "react";
 import {
-    FlatList,
-    Image,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
-} from 'react-native';
+  FlatList,
+  Image,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 interface Participant {
   id: number;
@@ -24,7 +24,7 @@ interface Participant {
 
 interface LastMessage {
   content: string;
-  type: 'text' | 'image' | 'file' | 'system';
+  type: "text" | "image" | "file" | "system";
   sentAt: string;
   isFromMe: boolean;
   isRead: boolean;
@@ -33,7 +33,7 @@ interface LastMessage {
 
 export interface Conversation {
   id: number;
-  type: 'direct' | 'group' | 'meeting';
+  type: "direct" | "group" | "meeting";
   name?: string; // For group chats
   participants: Participant[];
   lastMessage?: LastMessage;
@@ -62,26 +62,28 @@ export function ChatList({
   onContactsPress,
   onNewChatPress,
 }: ChatListProps) {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterActive, setFilterActive] = useState<'all' | 'unread' | 'pinned'>('all');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterActive, setFilterActive] = useState<"all" | "unread" | "pinned">(
+    "all",
+  );
 
   // Tạo cuộc trò chuyện đặc biệt với AI và Admin
   const specialConversations: Conversation[] = [
     {
       id: -2,
-      type: 'direct',
-      name: 'Trợ lý AI',
+      type: "direct",
+      name: "Trợ lý AI",
       participants: [
         {
           id: -2,
-          name: 'Trợ lý AI',
+          name: "Trợ lý AI",
           avatar: null,
           isOnline: true,
         },
       ],
       lastMessage: {
-        content: 'Tôi có thể giúp bạn về dự án xây dựng, vật liệu, thiết kế...',
-        type: 'text',
+        content: "Tôi có thể giúp bạn về dự án xây dựng, vật liệu, thiết kế...",
+        type: "text",
         sentAt: new Date().toISOString(),
         isFromMe: false,
         isRead: false,
@@ -93,19 +95,19 @@ export function ChatList({
     },
     {
       id: -3,
-      type: 'direct',
-      name: 'Hỗ trợ Admin',
+      type: "direct",
+      name: "Hỗ trợ Admin",
       participants: [
         {
           id: -3,
-          name: 'Hỗ trợ Admin',
+          name: "Hỗ trợ Admin",
           avatar: null,
           isOnline: true,
         },
       ],
       lastMessage: {
-        content: 'Đội ngũ hỗ trợ sẵn sàng giúp bạn 24/7',
-        type: 'text',
+        content: "Đội ngũ hỗ trợ sẵn sàng giúp bạn 24/7",
+        type: "text",
         sentAt: new Date().toISOString(),
         isFromMe: false,
         isRead: false,
@@ -124,24 +126,25 @@ export function ChatList({
     // Search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      const name = conv.type === 'group' 
-        ? conv.name || ''
-        : conv.participants.find(p => p.id !== 0)?.name || '';
-      
+      const name =
+        conv.type === "group"
+          ? conv.name || ""
+          : conv.participants.find((p) => p.id !== 0)?.name || "";
+
       if (!name.toLowerCase().includes(query)) {
         return false;
       }
     }
 
     // Status filter
-    if (filterActive === 'unread' && conv.unreadCount === 0) return false;
-    if (filterActive === 'pinned' && !conv.isPinned) return false;
+    if (filterActive === "unread" && conv.unreadCount === 0) return false;
+    if (filterActive === "pinned" && !conv.isPinned) return false;
 
     return true;
   });
 
-  const pinnedChats = filteredConversations.filter(c => c.isPinned);
-  const regularChats = filteredConversations.filter(c => !c.isPinned);
+  const pinnedChats = filteredConversations.filter((c) => c.isPinned);
+  const regularChats = filteredConversations.filter((c) => !c.isPinned);
 
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
@@ -149,26 +152,29 @@ export function ChatList({
     const diffMs = now.getTime() - date.getTime();
     const diffMins = Math.floor(diffMs / 60000);
 
-    if (diffMins < 1) return 'Vừa xong';
+    if (diffMins < 1) return "Vừa xong";
     if (diffMins < 60) return `${diffMins}p`;
-    
+
     const diffHours = Math.floor(diffMins / 60);
     if (diffHours < 24) return `${diffHours}h`;
-    
+
     const diffDays = Math.floor(diffHours / 24);
-    if (diffDays === 1) return 'Hôm qua';
+    if (diffDays === 1) return "Hôm qua";
     if (diffDays < 7) return `${diffDays} ngày`;
-    
-    return date.toLocaleDateString('vi-VN', { day: 'numeric', month: 'numeric' });
+
+    return date.toLocaleDateString("vi-VN", {
+      day: "numeric",
+      month: "numeric",
+    });
   };
 
   const getOtherParticipant = (conv: Conversation): Participant | undefined => {
-    return conv.participants.find(p => p.id !== 0); // Assuming 0 is current user
+    return conv.participants.find((p) => p.id !== 0); // Assuming 0 is current user
   };
 
   const renderChatItem = ({ item }: { item: Conversation }) => {
     const otherUser = getOtherParticipant(item);
-    const displayName = item.type === 'group' ? item.name : otherUser?.name;
+    const displayName = item.type === "group" ? item.name : otherUser?.name;
     const displayAvatar = otherUser?.avatar;
     const isOnline = otherUser?.isOnline;
     const isSystemMessage = item.id === -1;
@@ -204,17 +210,19 @@ export function ChatList({
             <Image source={{ uri: displayAvatar }} style={styles.avatar} />
           ) : (
             <View style={[styles.avatar, styles.avatarPlaceholder]}>
-              <Ionicons 
-                name={item.type === 'group' ? 'people' : 'person'} 
-                size={24} 
-                color="#8A8886" 
+              <Ionicons
+                name={item.type === "group" ? "people" : "person"}
+                size={24}
+                color="#8A8886"
               />
             </View>
           )}
-          {isOnline && item.type === 'direct' && !isSystemMessage && !isAIAssistant && !isAdminSupport && (
-            <View style={styles.onlineIndicator} />
-          )}
-          {item.type === 'meeting' && (
+          {isOnline &&
+            item.type === "direct" &&
+            !isSystemMessage &&
+            !isAIAssistant &&
+            !isAdminSupport && <View style={styles.onlineIndicator} />}
+          {item.type === "meeting" && (
             <View style={styles.meetingBadge}>
               <Ionicons name="videocam" size={12} color="#fff" />
             </View>
@@ -226,9 +234,14 @@ export function ChatList({
           <View style={styles.chatHeader}>
             <View style={styles.titleRow}>
               {item.isPinned && (
-                <Ionicons name="pin" size={14} color="#6264A7" style={styles.pinIcon} />
+                <Ionicons
+                  name="pin"
+                  size={14}
+                  color="#6264A7"
+                  style={styles.pinIcon}
+                />
               )}
-              <Text 
+              <Text
                 style={[
                   styles.chatName,
                   item.unreadCount > 0 && styles.chatNameUnread,
@@ -239,43 +252,48 @@ export function ChatList({
               </Text>
             </View>
             <Text style={styles.timeText}>
-              {item.lastMessage ? formatTime(item.lastMessage.sentAt) : ''}
+              {item.lastMessage ? formatTime(item.lastMessage.sentAt) : ""}
             </Text>
           </View>
 
           {item.lastMessage && (
             <View style={styles.messageRow}>
               <View style={styles.messagePreview}>
-                {item.type === 'group' && !item.lastMessage.isFromMe && (
+                {item.type === "group" && !item.lastMessage.isFromMe && (
                   <Text style={styles.senderName}>
-                    {item.lastMessage.sender?.name}: 
+                    {item.lastMessage.sender?.name}:
                   </Text>
                 )}
-                {item.lastMessage.type === 'text' ? (
-                  <Text 
+                {item.lastMessage.type === "text" ? (
+                  <Text
                     style={[
                       styles.messageText,
                       item.unreadCount > 0 && styles.messageTextUnread,
                     ]}
                     numberOfLines={1}
                   >
-                    {item.lastMessage.isFromMe && 'Bạn: '}
+                    {item.lastMessage.isFromMe ? "Bạn: " : ""}
                     {item.lastMessage.content}
                   </Text>
                 ) : (
                   <View style={styles.mediaMessage}>
-                    <Ionicons 
+                    <Ionicons
                       name={
-                        item.lastMessage.type === 'image' ? 'image' :
-                        item.lastMessage.type === 'file' ? 'document' : 'alert-circle'
-                      } 
-                      size={14} 
-                      color="#8A8886" 
+                        item.lastMessage.type === "image"
+                          ? "image"
+                          : item.lastMessage.type === "file"
+                            ? "document"
+                            : "alert-circle"
+                      }
+                      size={14}
+                      color="#8A8886"
                     />
                     <Text style={styles.mediaText}>
-                      {item.lastMessage.type === 'image' ? 'Đã gửi ảnh' : 
-                       item.lastMessage.type === 'file' ? 'Đã gửi tệp' : 
-                       'Tin nhắn hệ thống'}
+                      {item.lastMessage.type === "image"
+                        ? "Đã gửi ảnh"
+                        : item.lastMessage.type === "file"
+                          ? "Đã gửi tệp"
+                          : "Tin nhắn hệ thống"}
                     </Text>
                   </View>
                 )}
@@ -284,12 +302,16 @@ export function ChatList({
               {/* Right side indicators */}
               <View style={styles.indicators}>
                 {item.isMuted && (
-                  <Ionicons name="notifications-off" size={16} color="#8A8886" />
+                  <Ionicons
+                    name="notifications-off"
+                    size={16}
+                    color="#8A8886"
+                  />
                 )}
                 {item.unreadCount > 0 && (
                   <View style={styles.unreadBadge}>
                     <Text style={styles.unreadText}>
-                      {item.unreadCount > 99 ? '99+' : item.unreadCount}
+                      {item.unreadCount > 99 ? "99+" : item.unreadCount}
                     </Text>
                   </View>
                 )}
@@ -313,19 +335,16 @@ export function ChatList({
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Chat</Text>
         <View style={styles.headerActions}>
-          <TouchableOpacity 
-            style={styles.headerButton}
-            onPress={onSearchPress}
-          >
+          <TouchableOpacity style={styles.headerButton} onPress={onSearchPress}>
             <Ionicons name="search" size={18} color="#424242" />
           </TouchableOpacity>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.headerButton}
             onPress={onContactsPress}
           >
             <Ionicons name="people" size={18} color="#424242" />
           </TouchableOpacity>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.headerButton}
             onPress={onNewChatPress}
           >
@@ -345,7 +364,7 @@ export function ChatList({
           onChangeText={setSearchQuery}
         />
         {searchQuery.length > 0 && (
-          <TouchableOpacity onPress={() => setSearchQuery('')}>
+          <TouchableOpacity onPress={() => setSearchQuery("")}>
             <Ionicons name="close-circle" size={18} color="#8A8886" />
           </TouchableOpacity>
         )}
@@ -354,26 +373,50 @@ export function ChatList({
       {/* Filters */}
       <View style={styles.filterContainer}>
         <TouchableOpacity
-          style={[styles.filterChip, filterActive === 'all' && styles.filterChipActive]}
-          onPress={() => setFilterActive('all')}
+          style={[
+            styles.filterChip,
+            filterActive === "all" && styles.filterChipActive,
+          ]}
+          onPress={() => setFilterActive("all")}
         >
-          <Text style={[styles.filterText, filterActive === 'all' && styles.filterTextActive]}>
+          <Text
+            style={[
+              styles.filterText,
+              filterActive === "all" && styles.filterTextActive,
+            ]}
+          >
             Tất cả
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.filterChip, filterActive === 'unread' && styles.filterChipActive]}
-          onPress={() => setFilterActive('unread')}
+          style={[
+            styles.filterChip,
+            filterActive === "unread" && styles.filterChipActive,
+          ]}
+          onPress={() => setFilterActive("unread")}
         >
-          <Text style={[styles.filterText, filterActive === 'unread' && styles.filterTextActive]}>
+          <Text
+            style={[
+              styles.filterText,
+              filterActive === "unread" && styles.filterTextActive,
+            ]}
+          >
             Chưa đọc
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.filterChip, filterActive === 'pinned' && styles.filterChipActive]}
-          onPress={() => setFilterActive('pinned')}
+          style={[
+            styles.filterChip,
+            filterActive === "pinned" && styles.filterChipActive,
+          ]}
+          onPress={() => setFilterActive("pinned")}
         >
-          <Text style={[styles.filterText, filterActive === 'pinned' && styles.filterTextActive]}>
+          <Text
+            style={[
+              styles.filterText,
+              filterActive === "pinned" && styles.filterTextActive,
+            ]}
+          >
             Đã ghim
           </Text>
         </TouchableOpacity>
@@ -382,16 +425,20 @@ export function ChatList({
       {/* Chat List */}
       <FlatList
         data={[
-          ...(pinnedChats.length > 0 ? [{ type: 'header', title: 'Đã ghim' }] : []),
-          ...pinnedChats.map(c => ({ type: 'chat', data: c })),
-          ...(regularChats.length > 0 && pinnedChats.length > 0 ? [{ type: 'header', title: 'Gần đây' }] : []),
-          ...regularChats.map(c => ({ type: 'chat', data: c })),
+          ...(pinnedChats.length > 0
+            ? [{ type: "header", title: "Đã ghim" }]
+            : []),
+          ...pinnedChats.map((c) => ({ type: "chat", data: c })),
+          ...(regularChats.length > 0 && pinnedChats.length > 0
+            ? [{ type: "header", title: "Gần đây" }]
+            : []),
+          ...regularChats.map((c) => ({ type: "chat", data: c })),
         ]}
-        keyExtractor={(item: any, index) => 
-          item.type === 'header' ? `header-${index}` : `chat-${item.data.id}`
+        keyExtractor={(item: any, index) =>
+          item.type === "header" ? `header-${index}` : `chat-${item.data.id}`
         }
-        renderItem={({ item }: any) => 
-          item.type === 'header' 
+        renderItem={({ item }: any) =>
+          item.type === "header"
             ? renderSectionHeader(item.title)
             : renderChatItem({ item: item.data })
         }
@@ -405,36 +452,36 @@ export function ChatList({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: 20,
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#E1DFDD',
+    borderBottomColor: "#E1DFDD",
   },
   headerTitle: {
     fontSize: 24,
-    fontWeight: '600',
-    color: '#242424',
+    fontWeight: "600",
+    color: "#242424",
   },
   headerActions: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 12,
   },
   headerButton: {
     width: 32,
     height: 32,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F3F2F1',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F3F2F1",
     borderRadius: 4,
     paddingHorizontal: 12,
     paddingVertical: 8,
@@ -445,12 +492,12 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 14,
-    color: '#242424',
+    color: "#242424",
     marginLeft: 8,
     padding: 0,
   },
   filterContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     paddingHorizontal: 20,
     paddingVertical: 8,
     gap: 8,
@@ -459,19 +506,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
-    backgroundColor: '#F3F2F1',
+    backgroundColor: "#F3F2F1",
   },
   filterChipActive: {
-    backgroundColor: '#E8E8F8',
+    backgroundColor: "#E8E8F8",
   },
   filterText: {
     fontSize: 13,
-    fontWeight: '500',
-    color: '#616161',
+    fontWeight: "500",
+    color: "#616161",
   },
   filterTextActive: {
-    color: '#6264A7',
-    fontWeight: '600',
+    color: "#6264A7",
+    fontWeight: "600",
   },
   listContent: {
     paddingBottom: 16,
@@ -483,27 +530,27 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 12,
-    fontWeight: '600',
-    color: '#8A8886',
-    textTransform: 'uppercase',
+    fontWeight: "600",
+    color: "#8A8886",
+    textTransform: "uppercase",
     letterSpacing: 0.5,
   },
   chatItem: {
-    flexDirection: 'row',
+    flexDirection: "row",
     paddingHorizontal: 20,
     paddingVertical: 12,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   chatItemUnread: {
-    backgroundColor: '#F5F5FF',
+    backgroundColor: "#F5F5FF",
   },
   systemChatItem: {
-    backgroundColor: '#f0f9ff',
+    backgroundColor: "#f0f9ff",
     borderLeftWidth: 3,
-    borderLeftColor: '#3b82f6',
+    borderLeftColor: "#3b82f6",
   },
   avatarContainer: {
-    position: 'relative',
+    position: "relative",
     marginRight: 12,
   },
   avatar: {
@@ -512,61 +559,61 @@ const styles = StyleSheet.create({
     borderRadius: 24,
   },
   systemAvatar: {
-    backgroundColor: '#3b82f6',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#3b82f6",
+    justifyContent: "center",
+    alignItems: "center",
   },
   aiAvatar: {
-    backgroundColor: '#666666',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#666666",
+    justifyContent: "center",
+    alignItems: "center",
   },
   adminAvatar: {
-    backgroundColor: '#0066CC',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#0066CC",
+    justifyContent: "center",
+    alignItems: "center",
   },
   avatarPlaceholder: {
-    backgroundColor: '#E1DFDD',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#E1DFDD",
+    justifyContent: "center",
+    alignItems: "center",
   },
   onlineIndicator: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 0,
     right: 0,
     width: 14,
     height: 14,
     borderRadius: 7,
-    backgroundColor: '#92C353',
+    backgroundColor: "#92C353",
     borderWidth: 2,
-    borderColor: '#fff',
+    borderColor: "#fff",
   },
   meetingBadge: {
-    position: 'absolute',
+    position: "absolute",
     bottom: -2,
     right: -2,
     width: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: '#6264A7',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#6264A7",
+    justifyContent: "center",
+    alignItems: "center",
     borderWidth: 2,
-    borderColor: '#fff',
+    borderColor: "#fff",
   },
   chatContent: {
     flex: 1,
   },
   chatHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 4,
   },
   titleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     flex: 1,
   },
   pinIcon: {
@@ -574,56 +621,56 @@ const styles = StyleSheet.create({
   },
   chatName: {
     fontSize: 15,
-    fontWeight: '500',
-    color: '#242424',
+    fontWeight: "500",
+    color: "#242424",
     flex: 1,
   },
   chatNameUnread: {
-    fontWeight: '600',
+    fontWeight: "600",
   },
   timeText: {
     fontSize: 12,
-    color: '#8A8886',
+    color: "#8A8886",
     marginLeft: 8,
   },
   messageRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   messagePreview: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   senderName: {
     fontSize: 13,
-    fontWeight: '500',
-    color: '#8A8886',
+    fontWeight: "500",
+    color: "#8A8886",
     marginRight: 4,
   },
   messageText: {
     fontSize: 13,
-    color: '#616161',
+    color: "#616161",
     flex: 1,
   },
   messageTextUnread: {
-    color: '#242424',
-    fontWeight: '500',
+    color: "#242424",
+    fontWeight: "500",
   },
   mediaMessage: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 4,
   },
   mediaText: {
     fontSize: 13,
-    color: '#8A8886',
-    fontStyle: 'italic',
+    color: "#8A8886",
+    fontStyle: "italic",
   },
   indicators: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
     marginLeft: 8,
   },
@@ -631,14 +678,14 @@ const styles = StyleSheet.create({
     minWidth: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: '#C4314B',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#C4314B",
+    justifyContent: "center",
+    alignItems: "center",
     paddingHorizontal: 6,
   },
   unreadText: {
     fontSize: 11,
-    fontWeight: '700',
-    color: '#fff',
+    fontWeight: "700",
+    color: "#fff",
   },
 });

@@ -3,9 +3,14 @@ import { CommentsSheetProvider } from "@/components/community/CommentsSheet";
 import { MoreOptionsProvider } from "@/components/community/MoreOptionsMenu";
 import { ShareSheetProvider } from "@/components/community/ShareSheet";
 import { VerticalVideoFeedProvider } from "@/components/community/VerticalVideoFeed";
+import {
+    DeferredProviderWrapper,
+    LazyProvider,
+} from "@/components/DeferredProviders";
 import { FormErrorBoundary } from "@/components/FormErrorBoundary";
 import { NotificationToast } from "@/components/notifications/NotificationToast";
 import { FullMediaViewerProvider } from "@/components/ui/full-media-viewer";
+import { GlobalTextSafetyProvider } from "@/components/ui/global-text-safety-provider";
 import { OfflineIndicator } from "@/components/ui/OfflineIndicator";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { CallProvider } from "@/context/CallContext";
@@ -13,25 +18,25 @@ import { CartProvider } from "@/context/cart-context";
 import { CommunicationHubProvider } from "@/context/CommunicationHubContext";
 import { FavoritesProvider } from "@/context/FavoritesContext";
 import { MeetingProvider } from "@/context/MeetingContext";
-import { NotificationProvider } from "@/context/NotificationContext";
-import { NotificationsProvider } from "@/context/NotificationsContext";
 import { PerfexAuthProvider } from "@/context/PerfexAuthContext";
 import { PermissionProvider } from "@/context/PermissionContext";
 import { ProfileProvider } from "@/context/ProfileContext";
 import { ProgressWebSocketProvider } from "@/context/ProgressWebSocketContext";
 import { ProjectDataProvider } from "@/context/project-data-context";
-import { PushNotificationProvider } from "@/context/PushNotificationContext";
 import { UnifiedBadgeProvider } from "@/context/UnifiedBadgeContext";
+import { UnifiedNotificationProvider } from "@/context/UnifiedNotificationContext";
 import { UtilitiesProvider } from "@/context/UtilitiesContext";
 import { VideoInteractionsProvider } from "@/context/VideoInteractionsContext";
 import { ViewHistoryProvider } from "@/context/ViewHistoryContext";
 import { WebSocketProvider } from "@/context/WebSocketContext";
 import { useScreenTracking } from "@/hooks/useAnalytics";
 import { useCachedResources } from "@/hooks/useCachedResources";
+import { I18nProvider } from "@/services/i18nService";
 import { initAnalyticsSession } from "@/utils/analytics";
 import * as Sentry from "@sentry/react-native";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { useEffect } from "react";
+import { InteractionManager } from "react-native";
 import Toast from "react-native-toast-message";
 
 Sentry.init({
@@ -64,9 +69,15 @@ function AuthNavigator() {
   // Auto-track screen views
   useScreenTracking();
 
-  // Initialize analytics session
+  // Initialize analytics session - DEFERRED
   useEffect(() => {
-    initAnalyticsSession();
+    // Defer analytics init to not block startup
+    const timeoutId = setTimeout(() => {
+      InteractionManager.runAfterInteractions(() => {
+        initAnalyticsSession();
+      });
+    }, 2000);
+    return () => clearTimeout(timeoutId);
   }, []);
 
   useEffect(() => {
@@ -108,99 +119,116 @@ export default Sentry.wrap(function RootLayout() {
   }
 
   return (
-    <FormErrorBoundary>
-      <FullMediaViewerProvider>
-        <VerticalVideoFeedProvider>
-          <CommentsSheetProvider>
-            <ShareSheetProvider>
-              <MoreOptionsProvider>
-                <PermissionProvider>
-                  <AuthProvider>
-                    <PerfexAuthProvider>
-                      <CartProvider>
+    <GlobalTextSafetyProvider>
+      <FormErrorBoundary>
+        <I18nProvider>
+          {/* PHASE 1: Essential UI providers - load immediately */}
+          <FullMediaViewerProvider>
+            <PermissionProvider>
+              <AuthProvider>
+                <PerfexAuthProvider>
+                  <CartProvider>
+                    {/* Deferred Provider Wrapper manages loading phases */}
+                    <DeferredProviderWrapper>
+                      {/* PHASE 2: Deferred providers - load after UI ready */}
+                      <LazyProvider waitForPhase={1}>
                         <FavoritesProvider>
                           <ViewHistoryProvider>
-                            <MeetingProvider>
-                              <CallProvider>
-                                <CommunicationHubProvider>
-                                  <WebSocketProvider>
-                                    <ProgressWebSocketProvider>
-                                      <UtilitiesProvider>
-                                        <ProjectDataProvider>
-                                          <VideoInteractionsProvider>
-                                            <ProfileProvider>
-                                              <NotificationProvider>
-                                                <PushNotificationProvider>
-                                                  <NotificationsProvider>
-                                                    <UnifiedBadgeProvider>
-                                                      <OfflineIndicator />
-                                                      <IncomingCallModal />
-                                                      <NotificationToast />
-                                                      <AuthNavigator />
-                                                      <Stack
-                                                        screenOptions={{
-                                                          headerShown: false,
-                                                        }}
-                                                        initialRouteName="(tabs)"
-                                                      >
-                                                        <Stack.Screen
-                                                          name="(tabs)"
-                                                          options={{
-                                                            headerShown: false,
-                                                          }}
-                                                        />
-                                                        <Stack.Screen
-                                                          name="(auth)"
-                                                          options={{
-                                                            headerShown: false,
-                                                          }}
-                                                        />
-                                                        <Stack.Screen
-                                                          name="crm"
-                                                          options={{
-                                                            headerShown: false,
-                                                          }}
-                                                        />
-                                                        <Stack.Screen
-                                                          name="communication/index"
-                                                          options={{
-                                                            headerShown: false,
-                                                          }}
-                                                        />
-                                                        <Stack.Screen
-                                                          name="call/active"
-                                                          options={{
-                                                            headerShown: false,
-                                                            presentation:
-                                                              "fullScreenModal",
-                                                          }}
-                                                        />
-                                                      </Stack>
-                                                      <Toast />
-                                                    </UnifiedBadgeProvider>
-                                                  </NotificationsProvider>
-                                                </PushNotificationProvider>
-                                              </NotificationProvider>
-                                            </ProfileProvider>
-                                          </VideoInteractionsProvider>
-                                        </ProjectDataProvider>
-                                      </UtilitiesProvider>
-                                    </ProgressWebSocketProvider>
-                                  </WebSocketProvider>
-                                </CommunicationHubProvider>
-                              </CallProvider>
-                            </MeetingProvider>
+                            <UtilitiesProvider>
+                              <ProjectDataProvider>
+                                <ProfileProvider>
+                                  {/* PHASE 3: Communication providers - load last */}
+                                  <LazyProvider waitForPhase={2}>
+                                    <MeetingProvider>
+                                      <CallProvider>
+                                        <CommunicationHubProvider>
+                                          <WebSocketProvider>
+                                            <ProgressWebSocketProvider>
+                                              <VideoInteractionsProvider>
+                                                <UnifiedNotificationProvider>
+                                                  <UnifiedBadgeProvider>
+                                                    {/* Community UI providers */}
+                                                    <VerticalVideoFeedProvider>
+                                                      <CommentsSheetProvider>
+                                                        <ShareSheetProvider>
+                                                          <MoreOptionsProvider>
+                                                            {/* Global overlays */}
+                                                            <OfflineIndicator />
+                                                            <LazyProvider
+                                                              waitForPhase={2}
+                                                            >
+                                                              <IncomingCallModal />
+                                                            </LazyProvider>
+                                                            <NotificationToast />
+                                                            <AuthNavigator />
+                                                            {/* Main navigation */}
+                                                            <Stack
+                                                              screenOptions={{
+                                                                headerShown: false,
+                                                              }}
+                                                              initialRouteName="(tabs)"
+                                                            >
+                                                              <Stack.Screen
+                                                                name="(tabs)"
+                                                                options={{
+                                                                  headerShown: false,
+                                                                }}
+                                                              />
+                                                              <Stack.Screen
+                                                                name="(auth)"
+                                                                options={{
+                                                                  headerShown: false,
+                                                                }}
+                                                              />
+                                                              <Stack.Screen
+                                                                name="crm"
+                                                                options={{
+                                                                  headerShown: false,
+                                                                }}
+                                                              />
+                                                              <Stack.Screen
+                                                                name="communication/index"
+                                                                options={{
+                                                                  headerShown: false,
+                                                                }}
+                                                              />
+                                                              <Stack.Screen
+                                                                name="call/active"
+                                                                options={{
+                                                                  headerShown: false,
+                                                                  presentation:
+                                                                    "fullScreenModal",
+                                                                }}
+                                                              />
+                                                            </Stack>
+                                                            <Toast />
+                                                          </MoreOptionsProvider>
+                                                        </ShareSheetProvider>
+                                                      </CommentsSheetProvider>
+                                                    </VerticalVideoFeedProvider>
+                                                  </UnifiedBadgeProvider>
+                                                </UnifiedNotificationProvider>
+                                              </VideoInteractionsProvider>
+                                            </ProgressWebSocketProvider>
+                                          </WebSocketProvider>
+                                        </CommunicationHubProvider>
+                                      </CallProvider>
+                                    </MeetingProvider>
+                                  </LazyProvider>
+                                </ProfileProvider>
+                              </ProjectDataProvider>
+                            </UtilitiesProvider>
                           </ViewHistoryProvider>
                         </FavoritesProvider>
-                      </CartProvider>
-                    </PerfexAuthProvider>
-                  </AuthProvider>
-                </PermissionProvider>
-              </MoreOptionsProvider>
-            </ShareSheetProvider>
-          </CommentsSheetProvider>
-        </VerticalVideoFeedProvider>
-      </FullMediaViewerProvider>
-    </FormErrorBoundary>
+                      </LazyProvider>
+                    </DeferredProviderWrapper>
+                  </CartProvider>
+                </PerfexAuthProvider>
+              </AuthProvider>
+            </PermissionProvider>
+          </FullMediaViewerProvider>
+        </I18nProvider>
+      </FormErrorBoundary>
+    </GlobalTextSafetyProvider>
   );
 });

@@ -1,49 +1,49 @@
 /**
  * TikTok Layout
  * Stack navigator for TikTok screens
- * 
+ *
  * @author AI Assistant
  * @date 23/12/2025
  */
 
-import { Stack } from 'expo-router';
+import { Stack } from "expo-router";
 
 export default function TikTokLayout() {
   return (
     <Stack
       screenOptions={{
         headerShown: false,
-        animation: 'slide_from_right',
+        animation: "slide_from_right",
       }}
     >
-      <Stack.Screen 
-        name="index" 
+      <Stack.Screen
+        name="index"
         options={{
           headerShown: false,
         }}
       />
-      <Stack.Screen 
+      <Stack.Screen
         name="profile/[id]"
         options={{
           headerShown: true,
           headerTransparent: true,
-          headerTitle: '',
-          headerBackTitle: '',
+          headerTitle: "",
+          headerBackTitle: "",
         }}
       />
-      <Stack.Screen 
+      <Stack.Screen
         name="search"
         options={{
           headerShown: true,
-          headerTitle: 'Search',
-          animation: 'slide_from_bottom',
+          headerTitle: "Tìm kiếm",
+          animation: "slide_from_bottom",
         }}
       />
-      <Stack.Screen 
+      <Stack.Screen
         name="video/[id]"
         options={{
           headerShown: false,
-          animation: 'fade',
+          animation: "fade",
         }}
       />
     </Stack>

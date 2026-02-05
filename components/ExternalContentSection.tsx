@@ -2,14 +2,14 @@
  * External Content Section Component
  * Hiển thị nội dung bổ sung từ API external (Pexels, GNews)
  * Dùng khi không có dữ liệu từ database
- * 
+ *
  * @created 16/01/2026
  */
 
-import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
-import { router } from 'expo-router';
-import { memo } from 'react';
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { router } from "expo-router";
+import { memo } from "react";
 import {
     ActivityIndicator,
     Dimensions,
@@ -20,29 +20,29 @@ import {
     Text,
     TouchableOpacity,
     View,
-} from 'react-native';
+} from "react-native";
 
 import {
     ExternalArticle,
     ExternalPhoto,
     ExternalVideo,
-} from '@/services/externalContentService';
+} from "@/services/externalContentService";
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 
 // ==================== COLORS ====================
 
 const COLORS = {
-  bg: '#F8F9FA',
-  white: '#FFFFFF',
-  primary: '#7CB342',
-  secondary: '#FF7043',
-  text: '#212121',
-  textLight: '#757575',
-  textMuted: '#9E9E9E',
-  border: '#E0E0E0',
-  external: '#2196F3', // Badge color for external content
-  overlay: 'rgba(0,0,0,0.4)',
+  bg: "#F8F9FA",
+  white: "#FFFFFF",
+  primary: "#7CB342",
+  secondary: "#FF7043",
+  text: "#212121",
+  textLight: "#757575",
+  textMuted: "#9E9E9E",
+  border: "#E0E0E0",
+  external: "#2196F3", // Badge color for external content
+  overlay: "rgba(0,0,0,0.4)",
 };
 
 // ==================== EXTERNAL VIDEO CARD ====================
@@ -50,13 +50,13 @@ const COLORS = {
 interface ExternalVideoCardProps {
   video: ExternalVideo;
   onPress?: () => void;
-  size?: 'small' | 'medium' | 'large';
+  size?: "small" | "medium" | "large";
 }
 
 export const ExternalVideoCard = memo(function ExternalVideoCard({
   video,
   onPress,
-  size = 'medium',
+  size = "medium",
 }: ExternalVideoCardProps) {
   const dimensions = {
     small: { width: 120, height: 180 },
@@ -72,7 +72,7 @@ export const ExternalVideoCard = memo(function ExternalVideoCard({
     } else {
       // Navigate to video player or open URL
       router.push({
-        pathname: '/social/reels-viewer',
+        pathname: "/social/shorts",
         params: { videoUrl: video.videoUrl, title: video.title },
       });
     }
@@ -81,7 +81,7 @@ export const ExternalVideoCard = memo(function ExternalVideoCard({
   const formatDuration = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
   return (
@@ -91,9 +91,9 @@ export const ExternalVideoCard = memo(function ExternalVideoCard({
       activeOpacity={0.8}
     >
       <Image source={{ uri: video.thumbnail }} style={styles.videoThumbnail} />
-      
+
       <LinearGradient
-        colors={['transparent', 'rgba(0,0,0,0.7)']}
+        colors={["transparent", "rgba(0,0,0,0.7)"]}
         style={styles.videoGradient}
       >
         {/* External badge */}
@@ -105,7 +105,9 @@ export const ExternalVideoCard = memo(function ExternalVideoCard({
         {/* Duration */}
         <View style={styles.durationBadge}>
           <Ionicons name="play" size={10} color="#FFF" />
-          <Text style={styles.durationText}>{formatDuration(video.duration)}</Text>
+          <Text style={styles.durationText}>
+            {formatDuration(video.duration)}
+          </Text>
         </View>
 
         {/* Title */}
@@ -127,13 +129,13 @@ export const ExternalVideoCard = memo(function ExternalVideoCard({
 interface ExternalArticleCardProps {
   article: ExternalArticle;
   onPress?: () => void;
-  layout?: 'horizontal' | 'vertical';
+  layout?: "horizontal" | "vertical";
 }
 
 export const ExternalArticleCard = memo(function ExternalArticleCard({
   article,
   onPress,
-  layout = 'horizontal',
+  layout = "horizontal",
 }: ExternalArticleCardProps) {
   const handlePress = () => {
     if (onPress) {
@@ -149,23 +151,26 @@ export const ExternalArticleCard = memo(function ExternalArticleCard({
     const now = new Date();
     const diff = now.getTime() - date.getTime();
     const hours = Math.floor(diff / (1000 * 60 * 60));
-    
-    if (hours < 1) return 'Vừa xong';
+
+    if (hours < 1) return "Vừa xong";
     if (hours < 24) return `${hours} giờ trước`;
     const days = Math.floor(hours / 24);
     if (days < 7) return `${days} ngày trước`;
-    return date.toLocaleDateString('vi-VN');
+    return date.toLocaleDateString("vi-VN");
   };
 
-  if (layout === 'vertical') {
+  if (layout === "vertical") {
     return (
       <TouchableOpacity
         style={styles.articleCardVertical}
         onPress={handlePress}
         activeOpacity={0.8}
       >
-        <Image source={{ uri: article.image }} style={styles.articleImageVertical} />
-        
+        <Image
+          source={{ uri: article.image }}
+          style={styles.articleImageVertical}
+        />
+
         <View style={styles.articleContent}>
           {/* External badge */}
           <View style={styles.articleExternalBadge}>
@@ -176,12 +181,14 @@ export const ExternalArticleCard = memo(function ExternalArticleCard({
           <Text style={styles.articleTitle} numberOfLines={2}>
             {article.title}
           </Text>
-          
+
           <Text style={styles.articleDescription} numberOfLines={2}>
             {article.description}
           </Text>
-          
-          <Text style={styles.articleDate}>{formatDate(article.publishedAt)}</Text>
+
+          <Text style={styles.articleDate}>
+            {formatDate(article.publishedAt)}
+          </Text>
         </View>
       </TouchableOpacity>
     );
@@ -193,8 +200,11 @@ export const ExternalArticleCard = memo(function ExternalArticleCard({
       onPress={handlePress}
       activeOpacity={0.8}
     >
-      <Image source={{ uri: article.image }} style={styles.articleImageHorizontal} />
-      
+      <Image
+        source={{ uri: article.image }}
+        style={styles.articleImageHorizontal}
+      />
+
       <View style={styles.articleContentHorizontal}>
         {/* External badge */}
         <View style={styles.articleExternalBadge}>
@@ -205,8 +215,10 @@ export const ExternalArticleCard = memo(function ExternalArticleCard({
         <Text style={styles.articleTitleSmall} numberOfLines={2}>
           {article.title}
         </Text>
-        
-        <Text style={styles.articleDate}>{formatDate(article.publishedAt)}</Text>
+
+        <Text style={styles.articleDate}>
+          {formatDate(article.publishedAt)}
+        </Text>
       </View>
     </TouchableOpacity>
   );
@@ -217,13 +229,13 @@ export const ExternalArticleCard = memo(function ExternalArticleCard({
 interface ExternalPhotoCardProps {
   photo: ExternalPhoto;
   onPress?: () => void;
-  size?: 'small' | 'medium' | 'large';
+  size?: "small" | "medium" | "large";
 }
 
 export const ExternalPhotoCard = memo(function ExternalPhotoCard({
   photo,
   onPress,
-  size = 'medium',
+  size = "medium",
 }: ExternalPhotoCardProps) {
   const dimensions = {
     small: { width: 100, height: 100 },
@@ -253,7 +265,7 @@ export const ExternalPhotoCard = memo(function ExternalPhotoCard({
         style={styles.photoImage}
         resizeMode="cover"
       />
-      
+
       {/* External badge */}
       <View style={styles.photoExternalBadge}>
         <Ionicons name="camera-outline" size={10} color="#FFF" />
@@ -282,8 +294,8 @@ interface ExternalVideoSectionProps {
 
 export const ExternalVideoSection = memo(function ExternalVideoSection({
   videos,
-  title = 'Video tham khảo',
-  subtitle = 'Nội dung từ Pexels',
+  title = "Video tham khảo",
+  subtitle = "Nội dung từ Pexels",
   isLoading,
   onSeeAll,
 }: ExternalVideoSectionProps) {
@@ -332,16 +344,16 @@ interface ExternalNewsSectionProps {
   title?: string;
   subtitle?: string;
   isLoading?: boolean;
-  layout?: 'horizontal' | 'vertical';
+  layout?: "horizontal" | "vertical";
   onSeeAll?: () => void;
 }
 
 export const ExternalNewsSection = memo(function ExternalNewsSection({
   articles,
-  title = 'Tin tham khảo',
-  subtitle = 'Tin tức từ GNews',
+  title = "Tin tham khảo",
+  subtitle = "Tin tức từ GNews",
   isLoading,
-  layout = 'horizontal',
+  layout = "horizontal",
   onSeeAll,
 }: ExternalNewsSectionProps) {
   if (isLoading) {
@@ -369,7 +381,7 @@ export const ExternalNewsSection = memo(function ExternalNewsSection({
         )}
       </View>
 
-      {layout === 'horizontal' ? (
+      {layout === "horizontal" ? (
         <FlatList
           data={articles}
           keyExtractor={(item) => item.id}
@@ -406,8 +418,8 @@ interface ExternalPhotoSectionProps {
 
 export const ExternalPhotoSection = memo(function ExternalPhotoSection({
   photos,
-  title = 'Ảnh tư liệu',
-  subtitle = 'Ảnh từ Pexels',
+  title = "Ảnh tư liệu",
+  subtitle = "Ảnh từ Pexels",
   isLoading,
   onSeeAll,
 }: ExternalPhotoSectionProps) {
@@ -461,7 +473,7 @@ interface EmptyWithExternalProps {
 }
 
 export const EmptyWithExternal = memo(function EmptyWithExternal({
-  message = 'Chưa có dữ liệu',
+  message = "Chưa có dữ liệu",
   videos = [],
   articles = [],
   isLoading,
@@ -499,16 +511,16 @@ const styles = StyleSheet.create({
   // Video Card
   videoCard: {
     borderRadius: 12,
-    overflow: 'hidden',
+    overflow: "hidden",
     backgroundColor: COLORS.bg,
   },
   videoThumbnail: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
   },
   videoGradient: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
@@ -516,11 +528,11 @@ const styles = StyleSheet.create({
     paddingTop: 40,
   },
   externalBadge: {
-    position: 'absolute',
+    position: "absolute",
     top: -30,
     left: 0,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: COLORS.external,
     paddingHorizontal: 6,
     paddingVertical: 2,
@@ -529,16 +541,16 @@ const styles = StyleSheet.create({
   },
   externalBadgeText: {
     fontSize: 9,
-    color: '#FFF',
-    fontWeight: '600',
+    color: "#FFF",
+    fontWeight: "600",
   },
   durationBadge: {
-    position: 'absolute',
+    position: "absolute",
     top: -30,
     right: 0,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.6)',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.6)",
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 4,
@@ -546,18 +558,18 @@ const styles = StyleSheet.create({
   },
   durationText: {
     fontSize: 10,
-    color: '#FFF',
-    fontWeight: '500',
+    color: "#FFF",
+    fontWeight: "500",
   },
   videoTitle: {
     fontSize: 12,
-    fontWeight: '600',
-    color: '#FFF',
+    fontWeight: "600",
+    color: "#FFF",
     marginBottom: 2,
   },
   videoAuthor: {
     fontSize: 10,
-    color: 'rgba(255,255,255,0.8)',
+    color: "rgba(255,255,255,0.8)",
   },
 
   // Article Card - Vertical
@@ -565,35 +577,35 @@ const styles = StyleSheet.create({
     width: 200,
     backgroundColor: COLORS.white,
     borderRadius: 12,
-    overflow: 'hidden',
-    shadowColor: '#000',
+    overflow: "hidden",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
   },
   articleImageVertical: {
-    width: '100%',
+    width: "100%",
     height: 120,
-    resizeMode: 'cover',
+    resizeMode: "cover",
   },
   articleContent: {
     padding: 10,
   },
   articleExternalBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 4,
     marginBottom: 6,
   },
   articleSourceText: {
     fontSize: 10,
     color: COLORS.external,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   articleTitle: {
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.text,
     marginBottom: 4,
     lineHeight: 18,
@@ -611,12 +623,12 @@ const styles = StyleSheet.create({
 
   // Article Card - Horizontal
   articleCardHorizontal: {
-    flexDirection: 'row',
+    flexDirection: "row",
     backgroundColor: COLORS.white,
     borderRadius: 10,
-    overflow: 'hidden',
+    overflow: "hidden",
     marginBottom: 12,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.08,
     shadowRadius: 2,
@@ -625,16 +637,16 @@ const styles = StyleSheet.create({
   articleImageHorizontal: {
     width: 100,
     height: 80,
-    resizeMode: 'cover',
+    resizeMode: "cover",
   },
   articleContentHorizontal: {
     flex: 1,
     padding: 10,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   articleTitleSmall: {
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.text,
     marginBottom: 4,
     lineHeight: 16,
@@ -643,19 +655,19 @@ const styles = StyleSheet.create({
   // Photo Card
   photoCard: {
     borderRadius: 10,
-    overflow: 'hidden',
+    overflow: "hidden",
     backgroundColor: COLORS.bg,
   },
   photoImage: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
   photoExternalBadge: {
-    position: 'absolute',
+    position: "absolute",
     top: 6,
     left: 6,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: COLORS.external,
     paddingHorizontal: 6,
     paddingVertical: 2,
@@ -664,22 +676,22 @@ const styles = StyleSheet.create({
   },
   photoBadgeText: {
     fontSize: 9,
-    color: '#FFF',
-    fontWeight: '600',
+    color: "#FFF",
+    fontWeight: "600",
   },
   photographerBadge: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 6,
     left: 6,
     right: 6,
-    backgroundColor: 'rgba(0,0,0,0.6)',
+    backgroundColor: "rgba(0,0,0,0.6)",
     paddingHorizontal: 6,
     paddingVertical: 3,
     borderRadius: 4,
   },
   photographerText: {
     fontSize: 9,
-    color: '#FFF',
+    color: "#FFF",
   },
 
   // Section
@@ -687,15 +699,15 @@ const styles = StyleSheet.create({
     marginVertical: 16,
   },
   sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: 16,
     marginBottom: 12,
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: "700",
     color: COLORS.text,
   },
   sectionSubtitle: {
@@ -706,7 +718,7 @@ const styles = StyleSheet.create({
   seeAllText: {
     fontSize: 13,
     color: COLORS.primary,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   listContent: {
     paddingHorizontal: 16,
@@ -718,8 +730,8 @@ const styles = StyleSheet.create({
   // Loading
   loadingContainer: {
     padding: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   loadingText: {
     fontSize: 12,
@@ -734,14 +746,14 @@ const styles = StyleSheet.create({
   },
   emptyMessage: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.text,
-    textAlign: 'center',
+    textAlign: "center",
   },
   emptySubtitle: {
     fontSize: 13,
     color: COLORS.textMuted,
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: 4,
     marginBottom: 20,
   },

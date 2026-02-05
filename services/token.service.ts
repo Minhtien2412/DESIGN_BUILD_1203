@@ -1,6 +1,9 @@
 /**
  * Token Management Service
  * Centralized token handling for Frontend apps
+ *
+ * PERSISTENT LOGIN: Uses localStorage on web for permanent sessions
+ * Mobile uses SecureStore (iOS Keychain / Android Keystore)
  */
 
 import * as SecureStore from "expo-secure-store";
@@ -12,6 +15,7 @@ const STORAGE_KEYS = {
   REFRESH_TOKEN: "auth_refresh_token",
   USER_ID: "auth_user_id",
   TOKEN_EXPIRY: "auth_token_expiry",
+  REMEMBER_ME: "auth_remember_me", // For persistent login
 } as const;
 
 /**
@@ -24,33 +28,69 @@ export interface TokenData {
 }
 
 /**
+ * Web Storage helper - uses localStorage for persistent login
+ */
+const webStorage = {
+  getItem: (key: string): string | null => {
+    try {
+      // Try localStorage first (persistent), then sessionStorage (fallback)
+      return localStorage.getItem(key) ?? sessionStorage.getItem(key);
+    } catch {
+      return null;
+    }
+  },
+  setItem: (key: string, value: string): void => {
+    try {
+      // Always use localStorage for persistent login
+      localStorage.setItem(key, value);
+    } catch (e) {
+      console.warn(
+        "[TokenService] localStorage failed, using sessionStorage",
+        e,
+      );
+      sessionStorage.setItem(key, value);
+    }
+  },
+  removeItem: (key: string): void => {
+    try {
+      localStorage.removeItem(key);
+      sessionStorage.removeItem(key); // Clear both
+    } catch {
+      // Ignore
+    }
+  },
+};
+
+/**
  * Store tokens securely
  */
 export const saveTokens = async (tokens: TokenData): Promise<void> => {
   try {
     if (Platform.OS === "web") {
-      // Web: use sessionStorage (more secure than localStorage)
-      sessionStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, tokens.accessToken);
-      sessionStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, tokens.refreshToken);
-      sessionStorage.setItem(
+      // Web: use localStorage for persistent login
+      webStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, tokens.accessToken);
+      webStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, tokens.refreshToken);
+      webStorage.setItem(
         STORAGE_KEYS.TOKEN_EXPIRY,
-        tokens.expiresAt.toString()
+        tokens.expiresAt.toString(),
       );
+      webStorage.setItem(STORAGE_KEYS.REMEMBER_ME, "true");
     } else {
       // Mobile: use SecureStore (iOS Keychain / Android Keystore)
       await Promise.all([
         SecureStore.setItemAsync(STORAGE_KEYS.ACCESS_TOKEN, tokens.accessToken),
         SecureStore.setItemAsync(
           STORAGE_KEYS.REFRESH_TOKEN,
-          tokens.refreshToken
+          tokens.refreshToken,
         ),
         SecureStore.setItemAsync(
           STORAGE_KEYS.TOKEN_EXPIRY,
-          tokens.expiresAt.toString()
+          tokens.expiresAt.toString(),
         ),
+        SecureStore.setItemAsync(STORAGE_KEYS.REMEMBER_ME, "true"),
       ]);
     }
-    console.log("[TokenService] ✅ Tokens saved securely");
+    console.log("[TokenService] ✅ Tokens saved (persistent login enabled)");
   } catch (error) {
     console.error("[TokenService] ❌ Failed to save tokens:", error);
     throw error;
@@ -63,7 +103,7 @@ export const saveTokens = async (tokens: TokenData): Promise<void> => {
 export const getAccessToken = async (): Promise<string | null> => {
   try {
     if (Platform.OS === "web") {
-      return sessionStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+      return webStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     } else {
       return await SecureStore.getItemAsync(STORAGE_KEYS.ACCESS_TOKEN);
     }
@@ -79,7 +119,7 @@ export const getAccessToken = async (): Promise<string | null> => {
 export const getRefreshToken = async (): Promise<string | null> => {
   try {
     if (Platform.OS === "web") {
-      return sessionStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
+      return webStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
     } else {
       return await SecureStore.getItemAsync(STORAGE_KEYS.REFRESH_TOKEN);
     }
@@ -96,7 +136,7 @@ export const isTokenExpired = async (): Promise<boolean> => {
   try {
     let expiryStr: string | null;
     if (Platform.OS === "web") {
-      expiryStr = sessionStorage.getItem(STORAGE_KEYS.TOKEN_EXPIRY);
+      expiryStr = webStorage.getItem(STORAGE_KEYS.TOKEN_EXPIRY);
     } else {
       expiryStr = await SecureStore.getItemAsync(STORAGE_KEYS.TOKEN_EXPIRY);
     }
@@ -128,21 +168,39 @@ export const isTokenExpired = async (): Promise<boolean> => {
 export const clearTokens = async (): Promise<void> => {
   try {
     if (Platform.OS === "web") {
-      sessionStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
-      sessionStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
-      sessionStorage.removeItem(STORAGE_KEYS.TOKEN_EXPIRY);
-      sessionStorage.removeItem(STORAGE_KEYS.USER_ID);
+      webStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
+      webStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
+      webStorage.removeItem(STORAGE_KEYS.TOKEN_EXPIRY);
+      webStorage.removeItem(STORAGE_KEYS.USER_ID);
+      webStorage.removeItem(STORAGE_KEYS.REMEMBER_ME);
     } else {
       await Promise.all([
         SecureStore.deleteItemAsync(STORAGE_KEYS.ACCESS_TOKEN),
         SecureStore.deleteItemAsync(STORAGE_KEYS.REFRESH_TOKEN),
         SecureStore.deleteItemAsync(STORAGE_KEYS.TOKEN_EXPIRY),
         SecureStore.deleteItemAsync(STORAGE_KEYS.USER_ID),
+        SecureStore.deleteItemAsync(STORAGE_KEYS.REMEMBER_ME),
       ]);
     }
     console.log("[TokenService] 🗑️ Tokens cleared");
   } catch (error) {
     console.error("[TokenService] ❌ Failed to clear tokens:", error);
+  }
+};
+
+/**
+ * Check if persistent login is enabled
+ */
+export const isPersistentLoginEnabled = async (): Promise<boolean> => {
+  try {
+    if (Platform.OS === "web") {
+      return webStorage.getItem(STORAGE_KEYS.REMEMBER_ME) === "true";
+    } else {
+      const value = await SecureStore.getItemAsync(STORAGE_KEYS.REMEMBER_ME);
+      return value === "true";
+    }
+  } catch {
+    return false;
   }
 };
 
@@ -200,7 +258,7 @@ export const parseJwtExpiry = (token: string): number | null => {
 export const saveUserId = async (userId: string): Promise<void> => {
   try {
     if (Platform.OS === "web") {
-      sessionStorage.setItem(STORAGE_KEYS.USER_ID, userId);
+      webStorage.setItem(STORAGE_KEYS.USER_ID, userId);
     } else {
       await SecureStore.setItemAsync(STORAGE_KEYS.USER_ID, userId);
     }
@@ -215,7 +273,7 @@ export const saveUserId = async (userId: string): Promise<void> => {
 export const getUserId = async (): Promise<string | null> => {
   try {
     if (Platform.OS === "web") {
-      return sessionStorage.getItem(STORAGE_KEYS.USER_ID);
+      return webStorage.getItem(STORAGE_KEYS.USER_ID);
     } else {
       return await SecureStore.getItemAsync(STORAGE_KEYS.USER_ID);
     }
@@ -237,7 +295,7 @@ export const getAllTokens = async (): Promise<{
     getAccessToken(),
     getRefreshToken(),
     Platform.OS === "web"
-      ? sessionStorage.getItem(STORAGE_KEYS.TOKEN_EXPIRY)
+      ? webStorage.getItem(STORAGE_KEYS.TOKEN_EXPIRY)
       : SecureStore.getItemAsync(STORAGE_KEYS.TOKEN_EXPIRY),
   ]);
 

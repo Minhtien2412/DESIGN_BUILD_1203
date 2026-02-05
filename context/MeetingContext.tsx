@@ -1,7 +1,17 @@
-import { MOCK_MEETINGS, calculateDistance, generateSimpleRoute } from '@/data/meetings';
-import { Coordinates, Meeting, Participant } from '@/types/meeting';
-import * as Location from 'expo-location';
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import {
+    MOCK_MEETINGS,
+    calculateDistance,
+    generateSimpleRoute,
+} from "@/data/meetings";
+import { Coordinates, Meeting, Participant } from "@/types/meeting";
+import * as Location from "expo-location";
+import React, {
+    createContext,
+    useCallback,
+    useContext,
+    useEffect,
+    useState,
+} from "react";
 
 interface MeetingContextType {
   meetings: Meeting[];
@@ -10,14 +20,21 @@ interface MeetingContextType {
   locationPermission: boolean;
   loading: boolean;
   error: string | null;
-  
+
   // Actions
   setActiveMeeting: (meeting: Meeting | null) => void;
-  updateParticipantLocation: (meetingId: string, participantId: string, location: Coordinates) => void;
+  updateParticipantLocation: (
+    meetingId: string,
+    participantId: string,
+    location: Coordinates,
+  ) => void;
   checkInToMeeting: (meetingId: string) => Promise<boolean>;
   refreshLocation: () => Promise<void>;
   getMeetingById: (id: string) => Meeting | undefined;
-  getParticipantRoute: (participant: Participant, destination: Coordinates) => Coordinates[];
+  getParticipantRoute: (
+    participant: Participant,
+    destination: Coordinates,
+  ) => Coordinates[];
 }
 
 const MeetingContext = createContext<MeetingContextType | undefined>(undefined);
@@ -30,29 +47,46 @@ export function MeetingProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Request location permission and get initial location
+  // Request location permission and get initial location - DEFERRED
   useEffect(() => {
-    (async () => {
+    let isMounted = true;
+
+    // Defer location request to avoid blocking startup
+    const timeoutId = setTimeout(async () => {
+      if (!isMounted) return;
+
       try {
         const { status } = await Location.requestForegroundPermissionsAsync();
-        setLocationPermission(status === 'granted');
+        if (!isMounted) return;
 
-        if (status === 'granted') {
+        setLocationPermission(status === "granted");
+
+        if (status === "granted") {
           const location = await Location.getCurrentPositionAsync({
-            accuracy: Location.Accuracy.Balanced
+            accuracy: Location.Accuracy.Balanced,
           });
-          
+
+          if (!isMounted) return;
+
           setUserLocation({
             latitude: location.coords.latitude,
-            longitude: location.coords.longitude
+            longitude: location.coords.longitude,
           });
         }
       } catch (err) {
-        setError('Không thể lấy vị trí: ' + (err as Error).message);
+        if (!isMounted) return;
+        setError("Không thể lấy vị trí: " + (err as Error).message);
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
-    })();
+    }, 1500); // Defer 1.5s after mount
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timeoutId);
+    };
   }, []);
 
   // Watch location updates when there's an active meeting
@@ -63,22 +97,22 @@ export function MeetingProvider({ children }: { children: React.ReactNode }) {
       {
         accuracy: Location.Accuracy.Balanced,
         timeInterval: 10000, // Update every 10 seconds
-        distanceInterval: 50 // or when moved 50 meters
+        distanceInterval: 50, // or when moved 50 meters
       },
       (location) => {
         const newLocation = {
           latitude: location.coords.latitude,
-          longitude: location.coords.longitude
+          longitude: location.coords.longitude,
         };
         setUserLocation(newLocation);
-        
+
         // Auto-update user's participant location in active meeting
         // (In real app, you'd identify current user's participant ID)
-      }
+      },
     );
 
     return () => {
-      subscription.then(sub => sub.remove());
+      subscription.then((sub) => sub.remove());
     };
   }, [activeMeeting, locationPermission]);
 
@@ -88,13 +122,13 @@ export function MeetingProvider({ children }: { children: React.ReactNode }) {
 
   const updateParticipantLocation = useCallback(
     (meetingId: string, participantId: string, location: Coordinates) => {
-      setMeetings(prevMeetings =>
-        prevMeetings.map(meeting => {
+      setMeetings((prevMeetings) =>
+        prevMeetings.map((meeting) => {
           if (meeting.id !== meetingId) return meeting;
 
           return {
             ...meeting,
-            participants: meeting.participants.map(participant => {
+            participants: meeting.participants.map((participant) => {
               if (participant.id !== participantId) return participant;
 
               // Calculate distance to meeting location
@@ -102,14 +136,16 @@ export function MeetingProvider({ children }: { children: React.ReactNode }) {
 
               // Update ETA based on distance (rough estimate: 30 km/h average speed)
               const estimatedMinutes = Math.ceil((distance / 30) * 60);
-              const estimatedArrival = new Date(Date.now() + estimatedMinutes * 60 * 1000).toISOString();
+              const estimatedArrival = new Date(
+                Date.now() + estimatedMinutes * 60 * 1000,
+              ).toISOString();
 
               // Auto-update status based on distance
               let status = participant.status;
               if (distance < 0.1) {
-                status = 'arrived';
-              } else if (distance < 10 && status === 'not-started') {
-                status = 'on-the-way';
+                status = "arrived";
+              } else if (distance < 10 && status === "not-started") {
+                status = "on-the-way";
               }
 
               return {
@@ -117,26 +153,26 @@ export function MeetingProvider({ children }: { children: React.ReactNode }) {
                 currentLocation: location,
                 distance: parseFloat(distance.toFixed(2)),
                 estimatedArrival,
-                status
+                status,
               };
-            })
+            }),
           };
-        })
+        }),
       );
     },
-    []
+    [],
   );
 
   const checkInToMeeting = useCallback(
     async (meetingId: string): Promise<boolean> => {
       if (!userLocation) {
-        setError('Không xác định được vị trí của bạn');
+        setError("Không xác định được vị trí của bạn");
         return false;
       }
 
-      const meeting = meetings.find(m => m.id === meetingId);
+      const meeting = meetings.find((m) => m.id === meetingId);
       if (!meeting) {
-        setError('Không tìm thấy cuộc họp');
+        setError("Không tìm thấy cuộc họp");
         return false;
       }
 
@@ -145,23 +181,23 @@ export function MeetingProvider({ children }: { children: React.ReactNode }) {
 
       if (meeting.checkInRequired && meeting.checkInRadius) {
         if (distanceInMeters > meeting.checkInRadius) {
-          setError(`Bạn phải ở trong bán kính ${meeting.checkInRadius}m để check-in`);
+          setError(
+            `Bạn phải ở trong bán kính ${meeting.checkInRadius}m để check-in`,
+          );
           return false;
         }
       }
 
       // Success - update meeting status
-      setMeetings(prevMeetings =>
-        prevMeetings.map(m =>
-          m.id === meetingId
-            ? { ...m, status: 'in-progress' as const }
-            : m
-        )
+      setMeetings((prevMeetings) =>
+        prevMeetings.map((m) =>
+          m.id === meetingId ? { ...m, status: "in-progress" as const } : m,
+        ),
       );
 
       return true;
     },
-    [userLocation, meetings]
+    [userLocation, meetings],
   );
 
   const refreshLocation = useCallback(async () => {
@@ -169,22 +205,22 @@ export function MeetingProvider({ children }: { children: React.ReactNode }) {
 
     try {
       const location = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.High
+        accuracy: Location.Accuracy.High,
       });
-      
+
       setUserLocation({
         latitude: location.coords.latitude,
-        longitude: location.coords.longitude
+        longitude: location.coords.longitude,
       });
       setError(null);
     } catch (err) {
-      setError('Không thể cập nhật vị trí: ' + (err as Error).message);
+      setError("Không thể cập nhật vị trí: " + (err as Error).message);
     }
   }, [locationPermission]);
 
   const getMeetingById = useCallback(
-    (id: string) => meetings.find(m => m.id === id),
-    [meetings]
+    (id: string) => meetings.find((m) => m.id === id),
+    [meetings],
   );
 
   const getParticipantRoute = useCallback(
@@ -192,7 +228,7 @@ export function MeetingProvider({ children }: { children: React.ReactNode }) {
       if (!participant.currentLocation) return [];
       return generateSimpleRoute(participant.currentLocation, destination);
     },
-    []
+    [],
   );
 
   const value: MeetingContextType = {
@@ -207,20 +243,18 @@ export function MeetingProvider({ children }: { children: React.ReactNode }) {
     checkInToMeeting,
     refreshLocation,
     getMeetingById,
-    getParticipantRoute
+    getParticipantRoute,
   };
 
   return (
-    <MeetingContext.Provider value={value}>
-      {children}
-    </MeetingContext.Provider>
+    <MeetingContext.Provider value={value}>{children}</MeetingContext.Provider>
   );
 }
 
 export function useMeeting() {
   const context = useContext(MeetingContext);
   if (!context) {
-    throw new Error('useMeeting must be used within MeetingProvider');
+    throw new Error("useMeeting must be used within MeetingProvider");
   }
   return context;
 }

@@ -3,22 +3,40 @@
  * Uses expo-notifications for local and push notifications
  */
 
-import * as Notifications from 'expo-notifications';
-import { Platform } from 'react-native';
+import Constants from "expo-constants";
+import { Platform } from "react-native";
 
-// Configure notification behavior
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-    shouldShowBanner: true,
-    shouldShowList: true,
-  }),
-});
+// Lazy load expo-notifications to avoid Expo Go SDK 53+ crash
+let Notifications: typeof import("expo-notifications") | null = null;
+const isExpoGo = Constants.appOwnership === "expo";
+
+if (!isExpoGo) {
+  try {
+    Notifications = require("expo-notifications");
+  } catch (e) {
+    console.warn("[notificationService] expo-notifications not available");
+  }
+}
+
+// Configure notification behavior (only if Notifications available)
+if (Notifications) {
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: true,
+      shouldShowBanner: true,
+      shouldShowList: true,
+    }),
+  });
+}
 
 export interface AINotificationData {
-  type: 'analysis_complete' | 'report_ready' | 'material_check' | 'chat_response';
+  type:
+    | "analysis_complete"
+    | "report_ready"
+    | "material_check"
+    | "chat_response";
   projectId?: number;
   projectName?: string;
   resultId?: number;
@@ -31,34 +49,49 @@ class NotificationService {
    * Request notification permissions
    */
   async requestPermissions(): Promise<boolean> {
-    if (Platform.OS === 'android') {
-      await Notifications.setNotificationChannelAsync('ai-notifications', {
-        name: 'AI Notifications',
+    if (!Notifications) {
+      console.log(
+        "[notificationService] Notifications not available in Expo Go",
+      );
+      return false;
+    }
+
+    if (Platform.OS === "android") {
+      await Notifications.setNotificationChannelAsync("ai-notifications", {
+        name: "AI Notifications",
         importance: Notifications.AndroidImportance.MAX,
         vibrationPattern: [0, 250, 250, 250],
-        lightColor: '#3B82F6',
+        lightColor: "#3B82F6",
       });
     }
 
-    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    const { status: existingStatus } =
+      await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
 
-    if (existingStatus !== 'granted') {
+    if (existingStatus !== "granted") {
       const { status } = await Notifications.requestPermissionsAsync();
       finalStatus = status;
     }
 
-    return finalStatus === 'granted';
+    return finalStatus === "granted";
   }
 
   /**
    * Schedule notification for AI task completion
    */
   async scheduleAINotification(data: AINotificationData): Promise<string> {
+    if (!Notifications) {
+      console.log(
+        "[notificationService] Notifications not available in Expo Go",
+      );
+      return "";
+    }
+
     const hasPermission = await this.requestPermissions();
     if (!hasPermission) {
-      console.warn('Notification permission not granted');
-      return '';
+      console.warn("Notification permission not granted");
+      return "";
     }
 
     const notificationId = await Notifications.scheduleNotificationAsync({
@@ -86,13 +119,13 @@ class NotificationService {
   async notifyAnalysisComplete(
     projectName: string,
     completionPercentage: number,
-    resultId: number
+    resultId: number,
   ): Promise<string> {
     return this.scheduleAINotification({
-      type: 'analysis_complete',
+      type: "analysis_complete",
       projectName,
       resultId,
-      title: '📸 Phân tích ảnh hoàn tất',
+      title: "📸 Phân tích ảnh hoàn tất",
       body: `Dự án "${projectName}" - Tiến độ: ${completionPercentage}%. Nhấn để xem chi tiết.`,
     });
   }
@@ -103,13 +136,13 @@ class NotificationService {
   async notifyReportReady(
     projectName: string,
     reportType: string,
-    resultId: number
+    resultId: number,
   ): Promise<string> {
     return this.scheduleAINotification({
-      type: 'report_ready',
+      type: "report_ready",
       projectName,
       resultId,
-      title: '📄 Báo cáo AI đã sẵn sàng',
+      title: "📄 Báo cáo AI đã sẵn sàng",
       body: `Báo cáo ${reportType} cho dự án "${projectName}" đã được tạo. Nhấn để xem.`,
     });
   }
@@ -120,13 +153,13 @@ class NotificationService {
   async notifyMaterialCheckComplete(
     materialType: string,
     isCompliant: boolean,
-    resultId: number
+    resultId: number,
   ): Promise<string> {
-    const icon = isCompliant ? '✅' : '⚠️';
-    const status = isCompliant ? 'Đạt chuẩn' : 'Cần kiểm tra';
+    const icon = isCompliant ? "✅" : "⚠️";
+    const status = isCompliant ? "Đạt chuẩn" : "Cần kiểm tra";
 
     return this.scheduleAINotification({
-      type: 'material_check',
+      type: "material_check",
       resultId,
       title: `${icon} Kiểm tra ${materialType}`,
       body: `Kết quả: ${status}. Nhấn để xem chi tiết đánh giá.`,
@@ -138,9 +171,9 @@ class NotificationService {
    */
   async notifyChatResponse(message: string): Promise<string> {
     return this.scheduleAINotification({
-      type: 'chat_response',
-      title: '💬 AI Assistant trả lời',
-      body: message.length > 100 ? message.substring(0, 100) + '...' : message,
+      type: "chat_response",
+      title: "💬 AI Assistant trả lời",
+      body: message.length > 100 ? message.substring(0, 100) + "..." : message,
     });
   }
 
@@ -148,6 +181,7 @@ class NotificationService {
    * Cancel specific notification
    */
   async cancelNotification(notificationId: string): Promise<void> {
+    if (!Notifications) return;
     await Notifications.cancelScheduledNotificationAsync(notificationId);
   }
 
@@ -155,6 +189,7 @@ class NotificationService {
    * Cancel all AI notifications
    */
   async cancelAllNotifications(): Promise<void> {
+    if (!Notifications) return;
     await Notifications.cancelAllScheduledNotificationsAsync();
   }
 
@@ -162,6 +197,7 @@ class NotificationService {
    * Get badge count
    */
   async getBadgeCount(): Promise<number> {
+    if (!Notifications) return 0;
     return await Notifications.getBadgeCountAsync();
   }
 
@@ -169,24 +205,23 @@ class NotificationService {
    * Set badge count
    */
   async setBadgeCount(count: number): Promise<void> {
+    if (!Notifications) return;
     await Notifications.setBadgeCountAsync(count);
   }
 
   /**
    * Add notification received listener
    */
-  addNotificationReceivedListener(
-    listener: (notification: Notifications.Notification) => void
-  ): Notifications.Subscription {
+  addNotificationReceivedListener(listener: (notification: any) => void): any {
+    if (!Notifications) return { remove: () => {} };
     return Notifications.addNotificationReceivedListener(listener);
   }
 
   /**
    * Add notification response listener (when user taps notification)
    */
-  addNotificationResponseListener(
-    listener: (response: Notifications.NotificationResponse) => void
-  ): Notifications.Subscription {
+  addNotificationResponseListener(listener: (response: any) => void): any {
+    if (!Notifications) return { remove: () => {} };
     return Notifications.addNotificationResponseReceivedListener(listener);
   }
 }

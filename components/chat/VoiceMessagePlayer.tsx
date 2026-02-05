@@ -8,13 +8,16 @@
  * - Progress tracking
  * - Playback speed control
  *
+ * Uses audioWrapper for compatibility with future expo-audio migration
+ *
  * @author ThietKeResort Team
  * @created 2026-01-22
+ * @updated 2026-01-26 - Migrated to audioWrapper
  */
 
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { AudioPlaybackStatus, AudioPlayer } from "@/utils/audioWrapper";
 import { Ionicons } from "@expo/vector-icons";
-import { Audio, AVPlaybackStatus } from "expo-av";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
@@ -48,7 +51,7 @@ export function VoiceMessagePlayer({
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
 
   // Refs
-  const soundRef = useRef<Audio.Sound | null>(null);
+  const playerRef = useRef<AudioPlayer | null>(null);
 
   // Colors based on sender
   const accentColor = isFromMe ? "#FFFFFF" : colors.primary;
@@ -63,16 +66,17 @@ export function VoiceMessagePlayer({
   // ============================================
 
   const loadSound = useCallback(async () => {
-    if (soundRef.current) return;
+    if (playerRef.current) return;
 
     try {
       setIsLoading(true);
-      const { sound } = await Audio.Sound.createAsync(
-        { uri },
-        { shouldPlay: false, progressUpdateIntervalMillis: 100 },
-        onPlaybackStatusUpdate,
-      );
-      soundRef.current = sound;
+      playerRef.current = new AudioPlayer({
+        uri,
+        shouldPlay: false,
+        progressUpdateIntervalMillis: 100,
+        onPlaybackStatusUpdate: onPlaybackStatusUpdate,
+      });
+      await playerRef.current.load();
     } catch (error) {
       console.error("Error loading voice message:", error);
     } finally {
@@ -80,7 +84,7 @@ export function VoiceMessagePlayer({
     }
   }, [uri]);
 
-  const onPlaybackStatusUpdate = useCallback((status: AVPlaybackStatus) => {
+  const onPlaybackStatusUpdate = useCallback((status: AudioPlaybackStatus) => {
     if (status.isLoaded) {
       setPosition(status.positionMillis / 1000);
       setIsPlaying(status.isPlaying);
@@ -89,26 +93,26 @@ export function VoiceMessagePlayer({
         setIsPlaying(false);
         setPosition(0);
         // Reset to beginning
-        soundRef.current?.setPositionAsync(0);
+        playerRef.current?.seekTo(0);
       }
     }
   }, []);
 
   const togglePlayback = useCallback(async () => {
     try {
-      if (!soundRef.current) {
+      if (!playerRef.current) {
         await loadSound();
       }
 
-      if (!soundRef.current) return;
+      if (!playerRef.current) return;
 
-      const status = await soundRef.current.getStatusAsync();
-      if (!status.isLoaded) return;
+      const status = await playerRef.current.getStatus();
+      if (!status?.isLoaded) return;
 
       if (status.isPlaying) {
-        await soundRef.current.pauseAsync();
+        await playerRef.current.pause();
       } else {
-        await soundRef.current.playAsync();
+        await playerRef.current.play();
       }
     } catch (error) {
       console.error("Error toggling playback:", error);
@@ -121,21 +125,21 @@ export function VoiceMessagePlayer({
     const nextSpeed = speeds[(currentIndex + 1) % speeds.length];
     setPlaybackSpeed(nextSpeed);
 
-    if (soundRef.current) {
-      await soundRef.current.setRateAsync(nextSpeed, true);
+    if (playerRef.current) {
+      await playerRef.current.setRate(nextSpeed, true);
     }
   }, [playbackSpeed]);
 
   // Seek on waveform press
   const handleWaveformPress = useCallback(
     async (progressPercent: number) => {
-      if (!soundRef.current) {
+      if (!playerRef.current) {
         await loadSound();
       }
 
-      if (soundRef.current) {
+      if (playerRef.current) {
         const newPosition = progressPercent * duration;
-        await soundRef.current.setPositionAsync(newPosition * 1000);
+        await playerRef.current.seekTo(newPosition * 1000);
         setPosition(newPosition);
       }
     },
@@ -145,8 +149,8 @@ export function VoiceMessagePlayer({
   // Cleanup
   useEffect(() => {
     return () => {
-      if (soundRef.current) {
-        soundRef.current.unloadAsync();
+      if (playerRef.current) {
+        playerRef.current.unload();
       }
     };
   }, []);

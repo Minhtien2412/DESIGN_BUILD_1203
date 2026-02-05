@@ -2,10 +2,10 @@
  * RFIs List Screen
  */
 
-import { useRFIAnalytics, useRFIs } from '@/hooks/useRFI';
-import { RFICategory, RFIPriority, RFIStatus } from '@/types/rfi';
-import { Ionicons } from '@expo/vector-icons';
-import { useState } from 'react';
+import { useRFIAnalytics, useRFIs } from "@/hooks/useRFI";
+import { RFICategory, RFIPriority, RFIStatus } from "@/types/rfi";
+import { Ionicons } from "@expo/vector-icons";
+import { useState } from "react";
 import {
     ActivityIndicator,
     ScrollView,
@@ -14,78 +14,103 @@ import {
     TextInput,
     TouchableOpacity,
     View,
-} from 'react-native';
+} from "react-native";
 
-const CATEGORY_FILTERS: { value: RFICategory | 'ALL'; label: string; icon: string }[] = [
-  { value: 'ALL', label: 'All', icon: 'list-outline' },
-  { value: RFICategory.DESIGN_CLARIFICATION, label: 'Design', icon: 'color-palette-outline' },
-  { value: RFICategory.DRAWING_DISCREPANCY, label: 'Drawing', icon: 'document-text-outline' },
-  { value: RFICategory.MATERIAL_SUBSTITUTION, label: 'Material', icon: 'cube-outline' },
-  { value: RFICategory.CONSTRUCTION_METHOD, label: 'Method', icon: 'hammer-outline' },
-  { value: RFICategory.COORDINATION, label: 'Coordination', icon: 'people-outline' },
-  { value: RFICategory.FIELD_CONDITION, label: 'Field', icon: 'location-outline' },
+const CATEGORY_FILTERS: {
+  value: RFICategory | "ALL";
+  label: string;
+  icon: string;
+}[] = [
+  { value: "ALL", label: "All", icon: "list-outline" },
+  {
+    value: RFICategory.DESIGN_CLARIFICATION,
+    label: "Design",
+    icon: "color-palette-outline",
+  },
+  {
+    value: RFICategory.DRAWING_DISCREPANCY,
+    label: "Drawing",
+    icon: "document-text-outline",
+  },
+  {
+    value: RFICategory.MATERIAL_SUBSTITUTION,
+    label: "Material",
+    icon: "cube-outline",
+  },
+  {
+    value: RFICategory.CONSTRUCTION_METHOD,
+    label: "Method",
+    icon: "hammer-outline",
+  },
+  {
+    value: RFICategory.COORDINATION,
+    label: "Coordination",
+    icon: "people-outline",
+  },
+  {
+    value: RFICategory.FIELD_CONDITION,
+    label: "Field",
+    icon: "location-outline",
+  },
 ];
 
-const STATUS_FILTERS: { value: RFIStatus | 'ALL'; label: string }[] = [
-  { value: 'ALL', label: 'All' },
-  { value: RFIStatus.DRAFT, label: 'Draft' },
-  { value: RFIStatus.SUBMITTED, label: 'Submitted' },
-  { value: RFIStatus.UNDER_REVIEW, label: 'Under Review' },
-  { value: RFIStatus.ANSWERED, label: 'Answered' },
-  { value: RFIStatus.CLOSED, label: 'Closed' },
+const STATUS_FILTERS: { value: RFIStatus | "ALL"; label: string }[] = [
+  { value: "ALL", label: "All" },
+  { value: RFIStatus.DRAFT, label: "Draft" },
+  { value: RFIStatus.SUBMITTED, label: "Submitted" },
+  { value: RFIStatus.UNDER_REVIEW, label: "Under Review" },
+  { value: RFIStatus.ANSWERED, label: "Answered" },
+  { value: RFIStatus.CLOSED, label: "Closed" },
 ];
 
 const STATUS_COLORS: Record<RFIStatus, string> = {
-  DRAFT: '#6B7280',
-  SUBMITTED: '#3B82F6',
-  UNDER_REVIEW: '#0066CC',
-  ANSWERED: '#0066CC',
-  CLARIFICATION_REQUIRED: '#666666',
-  CLOSED: '#0066CC',
-  CANCELLED: '#9CA3AF',
-  REOPENED: '#0066CC',
+  DRAFT: "#6B7280",
+  SUBMITTED: "#3B82F6",
+  UNDER_REVIEW: "#0066CC",
+  ANSWERED: "#0066CC",
+  CLARIFICATION_REQUIRED: "#666666",
+  CLOSED: "#0066CC",
+  CANCELLED: "#9CA3AF",
+  REOPENED: "#0066CC",
 };
 
 const PRIORITY_COLORS: Record<RFIPriority, string> = {
-  LOW: '#0066CC',
-  MEDIUM: '#3B82F6',
-  HIGH: '#0066CC',
-  URGENT: '#0066CC',
-  CRITICAL: '#000000',
+  LOW: "#0066CC",
+  MEDIUM: "#3B82F6",
+  HIGH: "#0066CC",
+  URGENT: "#0066CC",
+  CRITICAL: "#000000",
 };
 
 export default function RFIsScreen() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<RFICategory | 'ALL'>('ALL');
-  const [selectedStatus, setSelectedStatus] = useState<RFIStatus | 'ALL'>('ALL');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<RFICategory | "ALL">(
+    "ALL",
+  );
+  const [selectedStatus, setSelectedStatus] = useState<RFIStatus | "ALL">(
+    "ALL",
+  );
 
-  const {
-    rfis,
-    loading,
-    error,
-    refresh,
-    submitRFI,
-    respondToRFI,
-    closeRFI,
-  } = useRFIs({
-    category: selectedCategory !== 'ALL' ? selectedCategory : undefined,
-    status: selectedStatus !== 'ALL' ? selectedStatus : undefined,
-  });
+  const { rfis, loading, error, refresh, submitRFI, respondToRFI, closeRFI } =
+    useRFIs({
+      category: selectedCategory !== "ALL" ? selectedCategory : undefined,
+      status: selectedStatus !== "ALL" ? selectedStatus : undefined,
+    });
 
   const { analytics } = useRFIAnalytics();
 
   const filteredRFIs = rfis.filter(
-    rfi =>
+    (rfi) =>
       rfi.rfiNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
       rfi.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      rfi.description.toLowerCase().includes(searchQuery.toLowerCase())
+      rfi.description.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   const handleSubmit = async (id: string) => {
     try {
       await submitRFI(id);
     } catch (err) {
-      console.error('Failed to submit:', err);
+      console.error("Failed to submit:", err);
     }
   };
 
@@ -93,7 +118,7 @@ export default function RFIsScreen() {
     try {
       await closeRFI(id);
     } catch (err) {
-      console.error('Failed to close:', err);
+      console.error("Failed to close:", err);
     }
   };
 
@@ -105,38 +130,52 @@ export default function RFIsScreen() {
     );
   }
 
-  const submittedCount = rfis.filter(r => r.status === 'SUBMITTED').length;
-  const underReviewCount = rfis.filter(r => r.status === 'UNDER_REVIEW').length;
-  const answeredCount = rfis.filter(r => r.status === 'ANSWERED').length;
-  const overdueCount = rfis.filter(r => r.isOverdue).length;
+  const submittedCount = rfis.filter((r) => r.status === "SUBMITTED").length;
+  const underReviewCount = rfis.filter(
+    (r) => r.status === "UNDER_REVIEW",
+  ).length;
+  const answeredCount = rfis.filter((r) => r.status === "ANSWERED").length;
+  const overdueCount = rfis.filter((r) => r.isOverdue).length;
 
   return (
     <View style={styles.container}>
       {/* Stats Cards */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.statsContainer}>
-        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.statsContainer}
+      >
+        <View style={[styles.statCard, { backgroundColor: "#E8F4FF" }]}>
           <Text style={styles.statValue}>{rfis.length}</Text>
           <Text style={styles.statLabel}>Total</Text>
         </View>
 
-        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
-          <Text style={[styles.statValue, { color: '#3B82F6' }]}>{submittedCount}</Text>
+        <View style={[styles.statCard, { backgroundColor: "#E8F4FF" }]}>
+          <Text style={[styles.statValue, { color: "#3B82F6" }]}>
+            {submittedCount}
+          </Text>
           <Text style={styles.statLabel}>Submitted</Text>
         </View>
 
-        <View style={[styles.statCard, { backgroundColor: '#FEF3C7' }]}>
-          <Text style={[styles.statValue, { color: '#0066CC' }]}>{underReviewCount}</Text>
+        <View style={[styles.statCard, { backgroundColor: "#FEF3C7" }]}>
+          <Text style={[styles.statValue, { color: "#0066CC" }]}>
+            {underReviewCount}
+          </Text>
           <Text style={styles.statLabel}>Under Review</Text>
         </View>
 
-        <View style={[styles.statCard, { backgroundColor: '#D1FAE5' }]}>
-          <Text style={[styles.statValue, { color: '#0066CC' }]}>{answeredCount}</Text>
+        <View style={[styles.statCard, { backgroundColor: "#D1FAE5" }]}>
+          <Text style={[styles.statValue, { color: "#0066CC" }]}>
+            {answeredCount}
+          </Text>
           <Text style={styles.statLabel}>Answered</Text>
         </View>
 
         {overdueCount > 0 && (
-          <View style={[styles.statCard, { backgroundColor: '#FEE2E2' }]}>
-            <Text style={[styles.statValue, { color: '#000000' }]}>{overdueCount}</Text>
+          <View style={[styles.statCard, { backgroundColor: "#FEE2E2" }]}>
+            <Text style={[styles.statValue, { color: "#000000" }]}>
+              {overdueCount}
+            </Text>
             <Text style={styles.statLabel}>Overdue</Text>
           </View>
         )}
@@ -144,7 +183,12 @@ export default function RFIsScreen() {
 
       {/* Search */}
       <View style={styles.searchContainer}>
-        <Ionicons name="search" size={20} color="#9CA3AF" style={styles.searchIcon} />
+        <Ionicons
+          name="search"
+          size={20}
+          color="#9CA3AF"
+          style={styles.searchIcon}
+        />
         <TextInput
           style={styles.searchInput}
           placeholder="Search by RFI number, subject..."
@@ -155,8 +199,12 @@ export default function RFIsScreen() {
       </View>
 
       {/* Category Filters */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterContainer}>
-        {CATEGORY_FILTERS.map(category => (
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.filterContainer}
+      >
+        {CATEGORY_FILTERS.map((category) => (
           <TouchableOpacity
             key={category.value}
             style={[
@@ -168,13 +216,16 @@ export default function RFIsScreen() {
             <Ionicons
               name={category.icon as any}
               size={16}
-              color={selectedCategory === category.value ? '#FFFFFF' : '#6B7280'}
+              color={
+                selectedCategory === category.value ? "#FFFFFF" : "#6B7280"
+              }
               style={{ marginRight: 4 }}
             />
             <Text
               style={[
                 styles.filterChipText,
-                selectedCategory === category.value && styles.filterChipTextActive,
+                selectedCategory === category.value &&
+                  styles.filterChipTextActive,
               ]}
             >
               {category.label}
@@ -184,8 +235,12 @@ export default function RFIsScreen() {
       </ScrollView>
 
       {/* Status Filters */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterContainer}>
-        {STATUS_FILTERS.map(status => (
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.filterContainer}
+      >
+        {STATUS_FILTERS.map((status) => (
           <TouchableOpacity
             key={status.value}
             style={[
@@ -208,13 +263,14 @@ export default function RFIsScreen() {
 
       {/* RFIs List */}
       <ScrollView style={styles.listContainer}>
-        {filteredRFIs.map(rfi => {
+        {filteredRFIs.map((rfi) => {
           const statusColor = STATUS_COLORS[rfi.status];
           const priorityColor = PRIORITY_COLORS[rfi.priority];
           const daysToRespond = rfi.responseDueDate
             ? Math.ceil(
-                (new Date(rfi.responseDueDate).getTime() - new Date().getTime()) /
-                  (1000 * 60 * 60 * 24)
+                (new Date(rfi.responseDueDate).getTime() -
+                  new Date().getTime()) /
+                  (1000 * 60 * 60 * 24),
               )
             : null;
 
@@ -222,20 +278,25 @@ export default function RFIsScreen() {
             <View key={rfi.id} style={styles.card}>
               {/* Header */}
               <View style={styles.cardHeader}>
-                <View style={[styles.iconContainer, { backgroundColor: `${statusColor}26` }]}>
+                <View
+                  style={[
+                    styles.iconContainer,
+                    { backgroundColor: `${statusColor}26` },
+                  ]}
+                >
                   <Ionicons
                     name={
-                      rfi.category === 'DESIGN_CLARIFICATION'
-                        ? 'color-palette'
-                        : rfi.category === 'DRAWING_DISCREPANCY'
-                        ? 'document-text'
-                        : rfi.category === 'MATERIAL_SUBSTITUTION'
-                        ? 'cube'
-                        : rfi.category === 'CONSTRUCTION_METHOD'
-                        ? 'hammer'
-                        : rfi.category === 'COORDINATION'
-                        ? 'people'
-                        : 'help-circle'
+                      rfi.category === "DESIGN_CLARIFICATION"
+                        ? "color-palette"
+                        : rfi.category === "DRAWING_DISCREPANCY"
+                          ? "document-text"
+                          : rfi.category === "MATERIAL_SUBSTITUTION"
+                            ? "cube"
+                            : rfi.category === "CONSTRUCTION_METHOD"
+                              ? "hammer"
+                              : rfi.category === "COORDINATION"
+                                ? "people"
+                                : "help-circle"
                     }
                     size={28}
                     color={statusColor}
@@ -246,17 +307,30 @@ export default function RFIsScreen() {
                   <View style={styles.headerRow}>
                     <Text style={styles.rfiNumber}>
                       {rfi.rfiNumber}
-                      {rfi.revisionNumber !== '0' && ` Rev ${rfi.revisionNumber}`}
+                      {rfi.revisionNumber !== "0" &&
+                        ` Rev ${rfi.revisionNumber}`}
                     </Text>
                     <View style={styles.badges}>
-                      <View style={[styles.statusBadge, { backgroundColor: statusColor }]}>
+                      <View
+                        style={[
+                          styles.statusBadge,
+                          { backgroundColor: statusColor },
+                        ]}
+                      >
                         <Text style={styles.statusBadgeText}>
-                          {rfi.status.replace(/_/g, ' ')}
+                          {rfi.status.replace(/_/g, " ")}
                         </Text>
                       </View>
-                      {rfi.priority !== 'MEDIUM' && (
-                        <View style={[styles.priorityBadge, { backgroundColor: priorityColor }]}>
-                          <Text style={styles.priorityBadgeText}>{rfi.priority}</Text>
+                      {rfi.priority !== "MEDIUM" && (
+                        <View
+                          style={[
+                            styles.priorityBadge,
+                            { backgroundColor: priorityColor },
+                          ]}
+                        >
+                          <Text style={styles.priorityBadgeText}>
+                            {rfi.priority}
+                          </Text>
                         </View>
                       )}
                     </View>
@@ -268,7 +342,7 @@ export default function RFIsScreen() {
 
                   <View style={styles.categoryBadge}>
                     <Text style={styles.categoryBadgeText}>
-                      {rfi.category.replace(/_/g, ' ')}
+                      {rfi.category.replace(/_/g, " ")}
                     </Text>
                   </View>
                 </View>
@@ -284,7 +358,11 @@ export default function RFIsScreen() {
                 </View>
 
                 <View style={styles.infoRow}>
-                  <Ionicons name="person-circle-outline" size={14} color="#6B7280" />
+                  <Ionicons
+                    name="person-circle-outline"
+                    size={14}
+                    color="#6B7280"
+                  />
                   <Text style={styles.infoText}>
                     To: {rfi.assignedTo.name} ({rfi.assignedTo.company})
                   </Text>
@@ -301,19 +379,20 @@ export default function RFIsScreen() {
                   <View style={styles.infoRow}>
                     <Ionicons name="time-outline" size={14} color="#6B7280" />
                     <Text style={styles.infoText}>
-                      Response due: {new Date(rfi.responseDueDate).toLocaleDateString()}
+                      Response due:{" "}
+                      {new Date(rfi.responseDueDate).toLocaleDateString()}
                       {daysToRespond !== null && (
                         <Text
                           style={{
                             color:
                               daysToRespond < 0
-                                ? '#000000'
+                                ? "#000000"
                                 : daysToRespond < 3
-                                ? '#0066CC'
-                                : '#6B7280',
+                                  ? "#0066CC"
+                                  : "#6B7280",
                           }}
                         >
-                          {' '}
+                          {" "}
                           (
                           {daysToRespond < 0
                             ? `${Math.abs(daysToRespond)} days late`
@@ -327,32 +406,40 @@ export default function RFIsScreen() {
 
                 {rfi.location.specificLocation && (
                   <View style={styles.infoRow}>
-                    <Ionicons name="location-outline" size={14} color="#6B7280" />
-                    <Text style={styles.infoText}>{rfi.location.specificLocation}</Text>
+                    <Ionicons
+                      name="location-outline"
+                      size={14}
+                      color="#6B7280"
+                    />
+                    <Text style={styles.infoText}>
+                      {rfi.location.specificLocation}
+                    </Text>
                   </View>
                 )}
 
                 <View style={styles.infoRow}>
                   <Ionicons name="attach-outline" size={14} color="#6B7280" />
-                  <Text style={styles.infoText}>{rfi.totalAttachments} attachment(s)</Text>
+                  <Text style={styles.infoText}>
+                    {rfi.totalAttachments} attachment(s)
+                  </Text>
                 </View>
               </View>
 
               {/* Impact Section */}
-              {rfi.impact.level !== 'NO_IMPACT' && (
+              {rfi.impact.level !== "NO_IMPACT" && (
                 <View style={styles.impactSection}>
                   <View
                     style={[
                       styles.impactBadge,
                       {
                         backgroundColor:
-                          rfi.impact.level === 'CRITICAL'
-                            ? '#FEE2E2'
-                            : rfi.impact.level === 'SIGNIFICANT'
-                            ? '#FED7AA'
-                            : rfi.impact.level === 'MODERATE'
-                            ? '#FEF3C7'
-                            : '#E8F4FF',
+                          rfi.impact.level === "CRITICAL"
+                            ? "#FEE2E2"
+                            : rfi.impact.level === "SIGNIFICANT"
+                              ? "#FED7AA"
+                              : rfi.impact.level === "MODERATE"
+                                ? "#FEF3C7"
+                                : "#E8F4FF",
                       },
                     ]}
                   >
@@ -360,13 +447,13 @@ export default function RFIsScreen() {
                       name="warning"
                       size={14}
                       color={
-                        rfi.impact.level === 'CRITICAL'
-                          ? '#000000'
-                          : rfi.impact.level === 'SIGNIFICANT'
-                          ? '#EA580C'
-                          : rfi.impact.level === 'MODERATE'
-                          ? '#D97706'
-                          : '#0066CC'
+                        rfi.impact.level === "CRITICAL"
+                          ? "#000000"
+                          : rfi.impact.level === "SIGNIFICANT"
+                            ? "#EA580C"
+                            : rfi.impact.level === "MODERATE"
+                              ? "#D97706"
+                              : "#0066CC"
                       }
                     />
                     <Text
@@ -374,13 +461,13 @@ export default function RFIsScreen() {
                         styles.impactBadgeText,
                         {
                           color:
-                            rfi.impact.level === 'CRITICAL'
-                              ? '#000000'
-                              : rfi.impact.level === 'SIGNIFICANT'
-                              ? '#EA580C'
-                              : rfi.impact.level === 'MODERATE'
-                              ? '#D97706'
-                              : '#0066CC',
+                            rfi.impact.level === "CRITICAL"
+                              ? "#000000"
+                              : rfi.impact.level === "SIGNIFICANT"
+                                ? "#EA580C"
+                                : rfi.impact.level === "MODERATE"
+                                  ? "#D97706"
+                                  : "#0066CC",
                         },
                       ]}
                     >
@@ -394,7 +481,9 @@ export default function RFIsScreen() {
                         <Ionicons name="calendar" size={12} color="#0066CC" />
                         <Text style={styles.impactItemText}>
                           Schedule: {rfi.impact.schedule.delayDays} days
-                          {rfi.impact.schedule.criticalPath && ' (Critical)'}
+                          {rfi.impact.schedule.criticalPath
+                            ? " (Critical)"
+                            : ""}
                         </Text>
                       </View>
                     )}
@@ -402,14 +491,18 @@ export default function RFIsScreen() {
                       <View style={styles.impactItem}>
                         <Ionicons name="cash" size={12} color="#0066CC" />
                         <Text style={styles.impactItemText}>
-                          Cost: {rfi.impact.cost.currency}{' '}
+                          Cost: {rfi.impact.cost.currency}{" "}
                           {rfi.impact.cost.estimatedAmount?.toLocaleString()}
                         </Text>
                       </View>
                     )}
                     {rfi.impact.safety.affectsSafety && (
                       <View style={styles.impactItem}>
-                        <Ionicons name="shield-checkmark" size={12} color="#000000" />
+                        <Ionicons
+                          name="shield-checkmark"
+                          size={12}
+                          color="#000000"
+                        />
                         <Text style={styles.impactItemText}>Safety Impact</Text>
                       </View>
                     )}
@@ -421,14 +514,20 @@ export default function RFIsScreen() {
               {rfi.response && (
                 <View style={styles.responsePreview}>
                   <View style={styles.responseHeader}>
-                    <Ionicons name="chatbox-ellipses" size={16} color="#0066CC" />
-                    <Text style={styles.responseHeaderText}>Response Received</Text>
+                    <Ionicons
+                      name="chatbox-ellipses"
+                      size={16}
+                      color="#0066CC"
+                    />
+                    <Text style={styles.responseHeaderText}>
+                      Response Received
+                    </Text>
                   </View>
                   <Text style={styles.responseText} numberOfLines={2}>
                     {rfi.response.answer}
                   </Text>
                   <Text style={styles.responseBy}>
-                    by {rfi.responseBy?.name} on{' '}
+                    by {rfi.responseBy?.name} on{" "}
                     {new Date(rfi.respondedDate!).toLocaleDateString()}
                   </Text>
                 </View>
@@ -451,30 +550,53 @@ export default function RFIsScreen() {
                   <Text style={styles.actionButtonText}>View</Text>
                 </TouchableOpacity>
 
-                {rfi.status === 'DRAFT' && (
+                {rfi.status === "DRAFT" && (
                   <TouchableOpacity
                     style={[styles.actionButton, styles.actionButtonPrimary]}
                     onPress={() => handleSubmit(rfi.id)}
                   >
                     <Ionicons name="send-outline" size={18} color="#FFFFFF" />
-                    <Text style={[styles.actionButtonText, { color: '#FFFFFF' }]}>Submit</Text>
+                    <Text
+                      style={[styles.actionButtonText, { color: "#FFFFFF" }]}
+                    >
+                      Submit
+                    </Text>
                   </TouchableOpacity>
                 )}
 
-                {(rfi.status === 'SUBMITTED' || rfi.status === 'UNDER_REVIEW') && (
-                  <TouchableOpacity style={[styles.actionButton, styles.actionButtonSuccess]}>
-                    <Ionicons name="chatbox-ellipses-outline" size={18} color="#FFFFFF" />
-                    <Text style={[styles.actionButtonText, { color: '#FFFFFF' }]}>Respond</Text>
+                {(rfi.status === "SUBMITTED" ||
+                  rfi.status === "UNDER_REVIEW") && (
+                  <TouchableOpacity
+                    style={[styles.actionButton, styles.actionButtonSuccess]}
+                  >
+                    <Ionicons
+                      name="chatbox-ellipses-outline"
+                      size={18}
+                      color="#FFFFFF"
+                    />
+                    <Text
+                      style={[styles.actionButtonText, { color: "#FFFFFF" }]}
+                    >
+                      Respond
+                    </Text>
                   </TouchableOpacity>
                 )}
 
-                {rfi.status === 'ANSWERED' && (
+                {rfi.status === "ANSWERED" && (
                   <TouchableOpacity
                     style={[styles.actionButton, styles.actionButtonSuccess]}
                     onPress={() => handleClose(rfi.id)}
                   >
-                    <Ionicons name="checkmark-circle-outline" size={18} color="#FFFFFF" />
-                    <Text style={[styles.actionButtonText, { color: '#FFFFFF' }]}>Close</Text>
+                    <Ionicons
+                      name="checkmark-circle-outline"
+                      size={18}
+                      color="#FFFFFF"
+                    />
+                    <Text
+                      style={[styles.actionButtonText, { color: "#FFFFFF" }]}
+                    >
+                      Close
+                    </Text>
                   </TouchableOpacity>
                 )}
 
@@ -501,12 +623,12 @@ export default function RFIsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: "#F9FAFB",
   },
   centered: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   statsContainer: {
     padding: 16,
@@ -517,28 +639,28 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginRight: 12,
     minWidth: 100,
-    alignItems: 'center',
+    alignItems: "center",
   },
   statValue: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1F2937',
+    fontWeight: "bold",
+    color: "#1F2937",
     marginBottom: 4,
   },
   statLabel: {
     fontSize: 12,
-    color: '#6B7280',
+    color: "#6B7280",
   },
   searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
     marginHorizontal: 16,
     marginBottom: 12,
     paddingHorizontal: 12,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: "#E5E7EB",
   },
   searchIcon: {
     marginRight: 8,
@@ -547,75 +669,75 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 12,
     fontSize: 14,
-    color: '#1F2937',
+    color: "#1F2937",
   },
   filterContainer: {
     paddingHorizontal: 16,
     marginBottom: 12,
   },
   filterChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: "#E5E7EB",
     marginRight: 8,
   },
   filterChipActive: {
-    backgroundColor: '#3B82F6',
-    borderColor: '#3B82F6',
+    backgroundColor: "#3B82F6",
+    borderColor: "#3B82F6",
   },
   filterChipText: {
     fontSize: 13,
-    color: '#6B7280',
-    fontWeight: '500',
+    color: "#6B7280",
+    fontWeight: "500",
   },
   filterChipTextActive: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
   },
   listContainer: {
     flex: 1,
     paddingHorizontal: 16,
   },
   card: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: "#E5E7EB",
   },
   cardHeader: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: 12,
   },
   iconContainer: {
     width: 56,
     height: 56,
     borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginRight: 12,
   },
   cardHeaderText: {
     flex: 1,
   },
   headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 4,
   },
   rfiNumber: {
     fontSize: 12,
-    fontWeight: 'bold',
-    color: '#1F2937',
+    fontWeight: "bold",
+    color: "#1F2937",
   },
   badges: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 6,
   },
   statusBadge: {
@@ -625,9 +747,9 @@ const styles = StyleSheet.create({
   },
   statusBadgeText: {
     fontSize: 9,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    textTransform: 'uppercase',
+    fontWeight: "bold",
+    color: "#FFFFFF",
+    textTransform: "uppercase",
   },
   priorityBadge: {
     paddingHorizontal: 8,
@@ -636,151 +758,151 @@ const styles = StyleSheet.create({
   },
   priorityBadgeText: {
     fontSize: 9,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
+    fontWeight: "bold",
+    color: "#FFFFFF",
   },
   subject: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#1F2937',
+    fontWeight: "600",
+    color: "#1F2937",
     marginBottom: 6,
   },
   categoryBadge: {
     paddingHorizontal: 8,
     paddingVertical: 4,
-    backgroundColor: '#EDE9FE',
+    backgroundColor: "#EDE9FE",
     borderRadius: 6,
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
   },
   categoryBadgeText: {
     fontSize: 10,
-    fontWeight: '600',
-    color: '#666666',
-    textTransform: 'capitalize',
+    fontWeight: "600",
+    color: "#666666",
+    textTransform: "capitalize",
   },
   infoSection: {
     marginBottom: 12,
   },
   infoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 6,
   },
   infoText: {
     fontSize: 12,
-    color: '#6B7280',
+    color: "#6B7280",
     marginLeft: 6,
     flex: 1,
   },
   impactSection: {
     marginBottom: 12,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: "#F9FAFB",
     padding: 10,
     borderRadius: 8,
   },
   impactBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 6,
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
     marginBottom: 8,
   },
   impactBadgeText: {
     fontSize: 11,
-    fontWeight: '600',
+    fontWeight: "600",
     marginLeft: 4,
   },
   impactDetails: {
     gap: 4,
   },
   impactItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   impactItemText: {
     fontSize: 11,
-    color: '#4B5563',
+    color: "#4B5563",
     marginLeft: 6,
   },
   responsePreview: {
-    backgroundColor: '#ECFDF5',
+    backgroundColor: "#ECFDF5",
     padding: 10,
     borderRadius: 8,
     marginBottom: 12,
     borderLeftWidth: 3,
-    borderLeftColor: '#0066CC',
+    borderLeftColor: "#0066CC",
   },
   responseHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 6,
   },
   responseHeaderText: {
     fontSize: 11,
-    fontWeight: '600',
-    color: '#0066CC',
+    fontWeight: "600",
+    color: "#0066CC",
     marginLeft: 6,
   },
   responseText: {
     fontSize: 12,
-    color: '#065F46',
+    color: "#065F46",
     marginBottom: 4,
   },
   responseBy: {
     fontSize: 10,
-    color: '#0066CC',
-    fontStyle: 'italic',
+    color: "#0066CC",
+    fontStyle: "italic",
   },
   overdueWarning: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FEE2E2',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FEE2E2",
     padding: 10,
     borderRadius: 8,
     marginBottom: 12,
   },
   overdueWarningText: {
     fontSize: 11,
-    color: '#000000',
-    fontWeight: '600',
+    color: "#000000",
+    fontWeight: "600",
     marginLeft: 6,
     flex: 1,
   },
   actions: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 8,
   },
   actionButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 8,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: "#F3F4F6",
   },
   actionButtonPrimary: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: "#3B82F6",
   },
   actionButtonSuccess: {
-    backgroundColor: '#0066CC',
+    backgroundColor: "#0066CC",
   },
   actionButtonText: {
     fontSize: 12,
-    fontWeight: '600',
-    color: '#4B5563',
+    fontWeight: "600",
+    color: "#4B5563",
     marginLeft: 4,
   },
   emptyState: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     paddingVertical: 48,
   },
   emptyStateText: {
     fontSize: 14,
-    color: '#9CA3AF',
+    color: "#9CA3AF",
     marginTop: 12,
   },
 });

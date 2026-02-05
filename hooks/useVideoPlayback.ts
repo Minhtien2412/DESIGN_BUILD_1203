@@ -11,7 +11,7 @@ import {
     VideoPlayerController,
     VideoPlayerState,
 } from "@/services/VideoPlayerController";
-import { VideoPlayer } from "expo-video";
+import type { VideoPlayer } from "expo-video";
 import { useCallback, useEffect, useState } from "react";
 
 interface UseVideoPlaybackOptions {

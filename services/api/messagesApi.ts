@@ -4,10 +4,16 @@
  * Backend: https://baotienweb.cloud/api/v1/messages
  */
 
+import { getAccessToken } from "@/services/token.service";
 import { getItem } from "@/utils/storage";
 import ENV from "../../config/env";
 
-const BASE_URL = `${ENV.API_BASE_URL}/messages`;
+// Backend uses /chat for chat rooms, /conversation-messages for DM conversations
+const CHAT_URL = `${ENV.API_BASE_URL}/chat`;
+const MESSAGES_URL = `${ENV.API_BASE_URL}/conversation-messages`;
+
+// Flag to enable mock data when API fails
+const USE_MOCK_FALLBACK = false;
 
 // ==================== TYPES ====================
 
@@ -19,6 +25,7 @@ export interface Message {
   isRead: boolean;
   createdAt: string;
   updatedAt: string;
+  type?: "text" | "image" | "voice" | "file" | "video" | "system"; // Message type
   sender: {
     id: number;
     name: string;
@@ -49,7 +56,13 @@ export interface MessageQueryParams {
 
 export interface SendMessageDto {
   recipientId: number;
+  conversationId?: number;
   content: string;
+  // Attachment support
+  attachmentUrl?: string;
+  attachmentType?: "image" | "video" | "voice" | "file";
+  attachmentName?: string;
+  attachmentSize?: number;
 }
 
 // ==================== MOCK DATA (Demo) ====================
@@ -147,57 +160,131 @@ const MOCK_CONVERSATIONS: Conversation[] = [
 // ==================== AUTH HELPER ====================
 
 async function getAuthHeaders(): Promise<HeadersInit> {
-  const token = await getItem("accessToken");
-  return {
+  const token = (await getAccessToken()) ?? (await getItem("accessToken"));
+  const headers: HeadersInit = {
     "Content-Type": "application/json",
-    Authorization: `Bearer ${token}`,
   };
+
+  if (ENV.API_KEY) {
+    headers["X-API-Key"] = ENV.API_KEY;
+  }
+
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  return headers;
 }
+
+// ==================== DEDUPLICATION ====================
+
+// Global state for deduplication
+let conversationsFetchInProgress = false;
+let cachedConversations: Conversation[] | null = null;
+let lastConversationsFetchTime = 0;
+const CONVERSATIONS_CACHE_MS = 5000; // Cache for 5 seconds
 
 // ==================== API METHODS ====================
 
 /**
  * Get all conversations for current user
- * Endpoint: GET /messages/conversations
+ * Backend: GET /chat/rooms (for project chat rooms)
+ * Also supports: GET /conversation-messages/conversations (for DM)
  */
 export async function getConversations(): Promise<Conversation[]> {
+  const now = Date.now();
+
+  // Return cached response if within cache window
+  if (
+    cachedConversations &&
+    now - lastConversationsFetchTime < CONVERSATIONS_CACHE_MS
+  ) {
+    return cachedConversations;
+  }
+
+  // Prevent concurrent fetches
+  if (conversationsFetchInProgress) {
+    if (cachedConversations) return cachedConversations;
+    if (USE_MOCK_FALLBACK) return MOCK_CONVERSATIONS;
+  }
+
+  conversationsFetchInProgress = true;
+
   try {
     const headers = await getAuthHeaders();
-    const response = await fetch(`${BASE_URL}/conversations`, {
+
+    // Try chat rooms first (group chats for projects)
+    const response = await fetch(`${CHAT_URL}/rooms`, {
       method: "GET",
       headers,
     });
 
     if (!response.ok) {
+      // If unauthorized or error, try conversation-messages endpoint
+      if (response.status === 401 || response.status === 404) {
+        const dmResponse = await fetch(`${MESSAGES_URL}/conversations`, {
+          method: "GET",
+          headers,
+        });
+
+        if (dmResponse.ok) {
+          const result = await dmResponse.json();
+          cachedConversations = result;
+          lastConversationsFetchTime = Date.now();
+          return result;
+        }
+      }
       throw new Error(`Failed to fetch conversations: ${response.statusText}`);
     }
 
-    return await response.json();
+    // Transform chat rooms to conversation format
+    const rooms = await response.json();
+    const result = rooms.map((room: any) => ({
+      id: room.id,
+      participants: room.members || [],
+      lastMessage: room.lastMessage,
+      unreadCount: room.unreadCount || 0,
+      createdAt: room.createdAt,
+      updatedAt: room.updatedAt,
+    }));
+
+    cachedConversations = result;
+    lastConversationsFetchTime = Date.now();
+    return result;
   } catch (error) {
     console.error("[messagesApi] getConversations error:", error);
-    console.log("[messagesApi] Using mock conversations data");
-    // Return mock data as fallback when API unavailable
-    return MOCK_CONVERSATIONS;
+    if (USE_MOCK_FALLBACK) {
+      console.log("[messagesApi] Using mock conversations data");
+      cachedConversations = MOCK_CONVERSATIONS;
+      lastConversationsFetchTime = Date.now();
+      return MOCK_CONVERSATIONS;
+    }
+    throw error;
+  } finally {
+    conversationsFetchInProgress = false;
   }
 }
 
 /**
  * Get messages in a specific conversation
- * Endpoint: GET /messages/conversations/:id
+ * Backend: GET /chat/rooms/:roomId/messages
  */
 export async function getMessages(
   conversationId: number,
-  params?: MessageQueryParams
+  params?: MessageQueryParams,
 ): Promise<Message[]> {
   try {
     const headers = await getAuthHeaders();
     const queryParams = new URLSearchParams();
 
-    if (params?.page) queryParams.append("page", params.page.toString());
+    if (params?.page)
+      queryParams.append(
+        "offset",
+        ((params.page - 1) * (params.limit || 50)).toString(),
+      );
     if (params?.limit) queryParams.append("limit", params.limit.toString());
-    if (params?.before) queryParams.append("before", params.before);
 
-    const url = `${BASE_URL}/conversations/${conversationId}${
+    const url = `${CHAT_URL}/rooms/${conversationId}/messages${
       queryParams.toString() ? `?${queryParams.toString()}` : ""
     }`;
 
@@ -213,43 +300,93 @@ export async function getMessages(
     return await response.json();
   } catch (error) {
     console.error("[messagesApi] getMessages error:", error);
+    if (USE_MOCK_FALLBACK) {
+      console.log("[messagesApi] Using empty messages array as fallback");
+      return [];
+    }
     throw error;
   }
 }
 
 /**
  * Send a message (creates conversation if doesn't exist)
- * Endpoint: POST /messages
+ * Backend: POST /chat/messages
+ * Supports text, image, video, voice, file attachments
  */
 export async function sendMessage(dto: SendMessageDto): Promise<Message> {
   try {
     const headers = await getAuthHeaders();
-    const response = await fetch(BASE_URL, {
+
+    // Build message body with attachment support
+    const body: any = {
+      roomId: dto.conversationId ?? dto.recipientId,
+      content: dto.content,
+    };
+
+    // Add attachment info if provided
+    if (dto.attachmentUrl) {
+      body.attachmentUrl = dto.attachmentUrl;
+      body.attachmentType = dto.attachmentType || "file";
+      body.attachmentName = dto.attachmentName;
+    }
+
+    const response = await fetch(`${CHAT_URL}/messages`, {
       method: "POST",
       headers,
-      body: JSON.stringify(dto),
+      body: JSON.stringify(body),
     });
 
     if (!response.ok) {
+      const errorText = await response.text();
+      console.warn(
+        `[messagesApi] sendMessage API failed: ${response.statusText} - ${errorText}`,
+      );
       throw new Error(`Failed to send message: ${response.statusText}`);
     }
 
-    return await response.json();
+    const result = await response.json();
+    console.log("[messagesApi] Message sent successfully via API");
+    return result;
   } catch (error) {
     console.error("[messagesApi] sendMessage error:", error);
+    if (USE_MOCK_FALLBACK) {
+      // Return a mock message for demo purposes
+      console.log("[messagesApi] Returning mock sent message");
+      return {
+        id: Date.now(),
+        content: dto.content,
+        senderId: 1,
+        conversationId: dto.recipientId,
+        isRead: false,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        sender: {
+          id: 1,
+          name: "You",
+          email: "you@example.com",
+          role: "CLIENT",
+        },
+        // Include attachment info in mock
+        ...(dto.attachmentUrl && {
+          type: dto.attachmentType || "file",
+          attachmentUrl: dto.attachmentUrl,
+          attachmentName: dto.attachmentName,
+        }),
+      };
+    }
     throw error;
   }
 }
 
 /**
  * Mark a message as read
- * Endpoint: PATCH /messages/:id/read
+ * Backend: POST /chat/messages/:messageId/read
  */
 export async function markAsRead(messageId: number): Promise<void> {
   try {
     const headers = await getAuthHeaders();
-    const response = await fetch(`${BASE_URL}/${messageId}/read`, {
-      method: "PATCH",
+    const response = await fetch(`${CHAT_URL}/messages/${messageId}/read`, {
+      method: "POST",
       headers,
     });
 
@@ -258,103 +395,108 @@ export async function markAsRead(messageId: number): Promise<void> {
     }
   } catch (error) {
     console.error("[messagesApi] markAsRead error:", error);
-    throw error;
+    // Silent fail for marking as read - not critical
   }
 }
 
 /**
  * Mark all messages in a conversation as read
- * Endpoint: PATCH /messages/conversations/:id/read-all
+ * This functionality may need to be implemented on backend
  */
 export async function markAllAsRead(conversationId: number): Promise<void> {
+  // Validate conversationId to avoid unnecessary API calls
+  if (!conversationId || conversationId <= 0) {
+    console.log("[messagesApi] markAllAsRead skipped: invalid conversationId");
+    return;
+  }
+
   try {
     const headers = await getAuthHeaders();
     const response = await fetch(
-      `${BASE_URL}/conversations/${conversationId}/read-all`,
+      `${CHAT_URL}/rooms/${conversationId}/read-all`,
       {
-        method: "PATCH",
+        method: "POST",
         headers,
-      }
+      },
     );
 
-    if (!response.ok) {
-      throw new Error(`Failed to mark all as read: ${response.statusText}`);
+    // Silent fail if endpoint doesn't exist
+    if (!response.ok && response.status !== 404) {
+      console.warn(
+        `[messagesApi] markAllAsRead failed: ${response.statusText}`,
+      );
     }
   } catch (error) {
-    console.error("[messagesApi] markAllAsRead error:", error);
-    throw error;
+    // Silent fail - not critical, don't log repeatedly
+    // console.error("[messagesApi] markAllAsRead error:", error);
   }
 }
 
 /**
  * Get unread message count
- * Endpoint: GET /messages/unread-count
+ * This may need to be calculated from rooms data
  */
 export async function getUnreadCount(): Promise<{ count: number }> {
   try {
     const headers = await getAuthHeaders();
-    const response = await fetch(`${BASE_URL}/unread-count`, {
+    // Try to get rooms and calculate unread count
+    const response = await fetch(`${CHAT_URL}/rooms`, {
       method: "GET",
       headers,
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to get unread count: ${response.statusText}`);
+      if (USE_MOCK_FALLBACK) {
+        console.log("[messagesApi] Using mock unread count data");
+        return {
+          count: MOCK_CONVERSATIONS.reduce((sum, c) => sum + c.unreadCount, 0),
+        };
+      }
+      return { count: 0 };
     }
 
-    return await response.json();
+    const rooms = await response.json();
+    const totalUnread = rooms.reduce(
+      (sum: number, room: any) => sum + (room.unreadCount || 0),
+      0,
+    );
+    return { count: totalUnread };
   } catch (error) {
-    console.error("[messagesApi] getUnreadCount error:", error);
-    console.log("[messagesApi] Using mock unread count data");
-    // Return zero count as fallback when API unavailable
+    // Silent fail - return mock data
+    if (USE_MOCK_FALLBACK) {
+      console.log("[messagesApi] Using mock unread count data");
+      return {
+        count: MOCK_CONVERSATIONS.reduce((sum, c) => sum + c.unreadCount, 0),
+      };
+    }
     return { count: 0 };
   }
 }
 
 /**
  * Get or create conversation with a specific user
- * Endpoint: GET /messages/conversations/user/:recipientId
- * Returns existing conversation or creates new one
+ * For project-based chat, this would create/get a room
  */
 export async function getConversationByRecipient(
-  recipientId: number
+  recipientId: number,
 ): Promise<Conversation | null> {
   try {
-    const headers = await getAuthHeaders();
-    const response = await fetch(
-      `${BASE_URL}/conversations/user/${recipientId}`,
-      {
-        method: "GET",
-        headers,
-      }
+    // First, try to find existing conversation in rooms
+    const allConversations = await getConversations();
+    const existing = allConversations.find((conv) =>
+      conv.participants.some((p) => p.id === recipientId),
     );
 
-    if (!response.ok) {
-      // If not found, try to get all conversations and find matching one
-      if (response.status === 404) {
-        const allConversations = await getConversations();
-        const existing = allConversations.find((conv) =>
-          conv.participants.some((p) => p.id === recipientId)
-        );
-        return existing || null;
-      }
-      throw new Error(`Failed to get conversation: ${response.statusText}`);
+    if (existing) {
+      return existing;
     }
 
-    return await response.json();
+    // If not found and need to create, the createRoom endpoint would be used
+    // For now, return null and let the UI handle room creation
+    return null;
   } catch (error) {
     console.error("[messagesApi] getConversationByRecipient error:", error);
-    // Fallback: search in existing conversations
-    try {
-      const allConversations = await getConversations();
-      const existing = allConversations.find((conv) =>
-        conv.participants.some((p) => p.id === recipientId)
-      );
-      return existing || null;
-    } catch (fallbackError) {
-      console.error("[messagesApi] Fallback search failed:", fallbackError);
-      return null;
-    }
+    return null;
   }
 }
 
@@ -384,10 +526,10 @@ export interface SearchMessagesResponse {
 
 /**
  * Search messages across conversations
- * Endpoint: GET /messages/search
+ * May need backend implementation
  */
 export async function searchMessages(
-  params: SearchMessagesParams
+  params: SearchMessagesParams,
 ): Promise<SearchMessagesResponse> {
   try {
     const headers = await getAuthHeaders();
@@ -404,16 +546,17 @@ export async function searchMessages(
       queryParams.append("hasAttachment", params.hasAttachment.toString());
     if (params.limit) queryParams.append("limit", params.limit.toString());
 
+    // Try conversation-messages search endpoint
     const response = await fetch(
-      `${BASE_URL}/search?${queryParams.toString()}`,
+      `${MESSAGES_URL}/search?${queryParams.toString()}`,
       {
         method: "GET",
         headers,
-      }
+      },
     );
 
     if (!response.ok) {
-      // If search endpoint doesn't exist, return empty results
+      // Search may not be implemented
       console.warn("[messagesApi] Search endpoint not available");
       return { messages: [], total: 0 };
     }
@@ -422,6 +565,46 @@ export async function searchMessages(
   } catch (error) {
     console.error("[messagesApi] searchMessages error:", error);
     return { messages: [], total: 0 };
+  }
+}
+
+// ==================== CREATE ROOM ====================
+
+export interface CreateRoomDto {
+  name: string;
+  projectId?: number;
+  memberIds: number[];
+}
+
+/**
+ * Create a new chat room
+ * Backend: POST /chat/rooms
+ */
+export async function createRoom(dto: CreateRoomDto): Promise<Conversation> {
+  try {
+    const headers = await getAuthHeaders();
+    const response = await fetch(`${CHAT_URL}/rooms`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(dto),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to create room: ${response.statusText}`);
+    }
+
+    const room = await response.json();
+    return {
+      id: room.id,
+      participants: room.members || [],
+      lastMessage: room.lastMessage,
+      unreadCount: 0,
+      createdAt: room.createdAt,
+      updatedAt: room.updatedAt,
+    };
+  } catch (error) {
+    console.error("[messagesApi] createRoom error:", error);
+    throw error;
   }
 }
 
@@ -436,6 +619,7 @@ export const messagesApi = {
   getUnreadCount,
   getConversationByRecipient,
   searchMessages,
+  createRoom,
 };
 
 export default messagesApi;

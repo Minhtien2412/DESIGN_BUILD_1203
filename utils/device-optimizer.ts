@@ -3,20 +3,20 @@
  * Tự động điều chỉnh hiệu suất theo thiết bị
  */
 
-import React from 'react';
-import { Dimensions, PixelRatio, Platform } from 'react-native';
+import React from "react";
+import { Dimensions, PixelRatio, Platform } from "react-native";
 
 // =================
 // DEVICE DETECTION
 // =================
 
 interface DeviceInfo {
-  platform: 'ios' | 'android' | 'web';
+  platform: "ios" | "android" | "web";
   isTablet: boolean;
-  screenSize: 'small' | 'medium' | 'large' | 'xlarge';
-  density: 'low' | 'medium' | 'high' | 'xhigh';
-  memoryClass: 'low' | 'medium' | 'high';
-  performanceClass: 'low' | 'medium' | 'high';
+  screenSize: "small" | "medium" | "large" | "xlarge";
+  density: "low" | "medium" | "high" | "xhigh";
+  memoryClass: "low" | "medium" | "high";
+  performanceClass: "low" | "medium" | "high";
 }
 
 export class DeviceProfiler {
@@ -33,60 +33,65 @@ export class DeviceProfiler {
   async getDeviceInfo(): Promise<DeviceInfo> {
     if (this.deviceInfo) return this.deviceInfo;
 
-    const { width, height } = Dimensions.get('window');
+    const { width, height } = Dimensions.get("window");
     const pixelRatio = PixelRatio.get();
-    const screenDiagonal = Math.sqrt(width * width + height * height) / pixelRatio;
+    const screenDiagonal =
+      Math.sqrt(width * width + height * height) / pixelRatio;
 
     // Determine screen size
-    let screenSize: DeviceInfo['screenSize'];
-    if (screenDiagonal < 5) screenSize = 'small';
-    else if (screenDiagonal < 7) screenSize = 'medium';
-    else if (screenDiagonal < 10) screenSize = 'large';
-    else screenSize = 'xlarge';
+    let screenSize: DeviceInfo["screenSize"];
+    if (screenDiagonal < 5) screenSize = "small";
+    else if (screenDiagonal < 7) screenSize = "medium";
+    else if (screenDiagonal < 10) screenSize = "large";
+    else screenSize = "xlarge";
 
     // Determine pixel density
-    let density: DeviceInfo['density'];
-    if (pixelRatio < 1.5) density = 'low';
-    else if (pixelRatio < 2.5) density = 'medium';
-    else if (pixelRatio < 3.5) density = 'high';
-    else density = 'xhigh';
+    let density: DeviceInfo["density"];
+    if (pixelRatio < 1.5) density = "low";
+    else if (pixelRatio < 2.5) density = "medium";
+    else if (pixelRatio < 3.5) density = "high";
+    else density = "xhigh";
 
     // Determine memory class
-    let memoryClass: DeviceInfo['memoryClass'] = 'medium';
+    let memoryClass: DeviceInfo["memoryClass"] = "medium";
     try {
       // Fallback memory detection based on platform and screen size
-      if (Platform.OS === 'web') {
+      if (Platform.OS === "web") {
         // @ts-ignore - navigator memory is experimental
         const memory = (navigator as any).deviceMemory;
         if (memory) {
-          if (memory < 2) memoryClass = 'low';
-          else if (memory > 6) memoryClass = 'high';
+          if (memory < 2) memoryClass = "low";
+          else if (memory > 6) memoryClass = "high";
         } else {
-          memoryClass = 'high'; // Assume high for web
+          memoryClass = "high"; // Assume high for web
         }
       } else {
         // Use screen size and density as proxy for memory on mobile
-        if (screenSize === 'small' && density === 'low') memoryClass = 'low';
-        else if (screenSize === 'xlarge' && density === 'xhigh') memoryClass = 'high';
+        if (screenSize === "small" && density === "low") memoryClass = "low";
+        else if (screenSize === "xlarge" && density === "xhigh")
+          memoryClass = "high";
       }
     } catch {
       // Fallback based on platform
-      if (Platform.OS === 'web') memoryClass = 'high';
+      if (Platform.OS === "web") memoryClass = "high";
     }
 
     // Determine performance class
-    let performanceClass: DeviceInfo['performanceClass'];
-    if (memoryClass === 'low' || screenSize === 'small') {
-      performanceClass = 'low';
-    } else if (memoryClass === 'high' && (screenSize === 'large' || screenSize === 'xlarge')) {
-      performanceClass = 'high';
+    let performanceClass: DeviceInfo["performanceClass"];
+    if (memoryClass === "low" || screenSize === "small") {
+      performanceClass = "low";
+    } else if (
+      memoryClass === "high" &&
+      (screenSize === "large" || screenSize === "xlarge")
+    ) {
+      performanceClass = "high";
     } else {
-      performanceClass = 'medium';
+      performanceClass = "medium";
     }
 
     this.deviceInfo = {
       platform: Platform.OS as any,
-      isTablet: screenSize === 'large' || screenSize === 'xlarge',
+      isTablet: screenSize === "large" || screenSize === "xlarge",
       screenSize,
       density,
       memoryClass,
@@ -107,22 +112,22 @@ interface PerformanceConfig {
   initialNumToRender: number;
   windowSize: number;
   removeClippedSubviews: boolean;
-  
+
   // Image loading
-  imageQuality: 'low' | 'medium' | 'high';
+  imageQuality: "low" | "medium" | "high";
   imageCacheSize: number;
   enableImageCompression: boolean;
-  
+
   // Animation
   enableAnimations: boolean;
   animationScale: number;
   useNativeDriver: boolean;
-  
+
   // Network
   requestTimeout: number;
   maxConcurrentRequests: number;
   enableRequestDeduplication: boolean;
-  
+
   // Memory
   enableMemoryWarning: boolean;
   gcInterval: number;
@@ -144,14 +149,14 @@ export class PerformanceManager {
     if (this.config) return this.config;
 
     const deviceInfo = await DeviceProfiler.getInstance().getDeviceInfo();
-    
+
     // Base configuration
     let config: PerformanceConfig = {
       maxRenderBatch: 10,
       initialNumToRender: 10,
       windowSize: 10,
       removeClippedSubviews: true,
-      imageQuality: 'medium',
+      imageQuality: "medium",
       imageCacheSize: 50,
       enableImageCompression: true,
       enableAnimations: true,
@@ -167,13 +172,13 @@ export class PerformanceManager {
 
     // Adjust based on performance class
     switch (deviceInfo.performanceClass) {
-      case 'low':
+      case "low":
         config = {
           ...config,
           maxRenderBatch: 5,
           initialNumToRender: 5,
           windowSize: 5,
-          imageQuality: 'low',
+          imageQuality: "low",
           imageCacheSize: 20,
           enableAnimations: false,
           animationScale: 0.5,
@@ -183,14 +188,14 @@ export class PerformanceManager {
           cacheSize: 50,
         };
         break;
-        
-      case 'high':
+
+      case "high":
         config = {
           ...config,
           maxRenderBatch: 20,
           initialNumToRender: 20,
           windowSize: 20,
-          imageQuality: 'high',
+          imageQuality: "high",
           imageCacheSize: 100,
           enableImageCompression: false,
           animationScale: 1.2,
@@ -203,12 +208,12 @@ export class PerformanceManager {
     }
 
     // Platform-specific adjustments
-    if (deviceInfo.platform === 'web') {
+    if (deviceInfo.platform === "web") {
       config.useNativeDriver = false;
       config.removeClippedSubviews = false;
     }
 
-    if (deviceInfo.platform === 'android') {
+    if (deviceInfo.platform === "android") {
       // Android specific optimizations
       config.enableImageCompression = true;
       config.removeClippedSubviews = true;
@@ -230,8 +235,12 @@ export class PerformanceManager {
 
 export const useDeviceOptimization = () => {
   const [deviceInfo, setDeviceInfo] = React.useState<DeviceInfo | null>(null);
-  const [performanceConfig, setPerformanceConfig] = React.useState<PerformanceConfig | null>(null);
-  const [memoryUsage, setMemoryUsage] = React.useState<{ used: number; total: number } | null>(null);
+  const [performanceConfig, setPerformanceConfig] =
+    React.useState<PerformanceConfig | null>(null);
+  const [memoryUsage, setMemoryUsage] = React.useState<{
+    used: number;
+    total: number;
+  } | null>(null);
 
   React.useEffect(() => {
     const initializeDeviceInfo = async () => {
@@ -252,7 +261,7 @@ export const useDeviceOptimization = () => {
           // Memory info not available
         }
       } catch (error) {
-        console.warn('Failed to initialize device optimization:', error);
+        console.warn("Failed to initialize device optimization:", error);
       }
     };
 
@@ -275,12 +284,16 @@ export const useDeviceOptimization = () => {
   const getImageProps = React.useMemo(() => {
     if (!performanceConfig) return {};
 
-    const _quality = performanceConfig.imageQuality === 'high' ? 1 : 
-                   performanceConfig.imageQuality === 'medium' ? 0.8 : 0.6;
+    const _quality =
+      performanceConfig.imageQuality === "high"
+        ? 1
+        : performanceConfig.imageQuality === "medium"
+          ? 0.8
+          : 0.6;
 
     return {
-      cachePolicy: 'memory-disk' as const,
-      contentFit: 'cover' as const,
+      cachePolicy: "memory-disk" as const,
+      contentFit: "cover" as const,
       transition: performanceConfig.enableAnimations ? 300 : 0,
     };
   }, [performanceConfig]);
@@ -290,8 +303,9 @@ export const useDeviceOptimization = () => {
 
     return {
       useNativeDriver: performanceConfig.useNativeDriver,
-      duration: performanceConfig.enableAnimations ? 
-        Math.round(300 * performanceConfig.animationScale) : 0,
+      duration: performanceConfig.enableAnimations
+        ? Math.round(300 * performanceConfig.animationScale)
+        : 0,
     };
   }, [performanceConfig]);
 
@@ -302,8 +316,8 @@ export const useDeviceOptimization = () => {
     getFlatListProps,
     getImageProps,
     getAnimationConfig,
-    isLowPerformanceDevice: deviceInfo?.performanceClass === 'low',
-    isHighPerformanceDevice: deviceInfo?.performanceClass === 'high',
+    isLowPerformanceDevice: deviceInfo?.performanceClass === "low",
+    isHighPerformanceDevice: deviceInfo?.performanceClass === "high",
   };
 };
 
@@ -329,12 +343,12 @@ export class PerformanceMonitor {
       try {
         // Mock memory monitoring for demo
         const mockUsedMemory = Math.random() * 4 * 1024 * 1024 * 1024; // Random usage up to 4GB
-        this.recordMetric('memory_usage', mockUsedMemory);
-        
+        this.recordMetric("memory_usage", mockUsedMemory);
+
         // Trigger warning if memory usage is high
         const mockTotalMemory = 4 * 1024 * 1024 * 1024; // 4GB total
         const usagePercentage = (mockUsedMemory / mockTotalMemory) * 100;
-        
+
         if (usagePercentage > 85) {
           this.triggerMemoryWarning(usagePercentage);
         }
@@ -355,17 +369,19 @@ export class PerformanceMonitor {
     if (!this.metrics.has(name)) {
       this.metrics.set(name, []);
     }
-    
+
     const values = this.metrics.get(name)!;
     values.push(value);
-    
+
     // Keep only last 100 values
     if (values.length > 100) {
       values.shift();
     }
   }
 
-  getMetrics(name: string): { avg: number; min: number; max: number; latest: number } | null {
+  getMetrics(
+    name: string,
+  ): { avg: number; min: number; max: number; latest: number } | null {
     const values = this.metrics.get(name);
     if (!values || values.length === 0) return null;
 
@@ -379,13 +395,13 @@ export class PerformanceMonitor {
 
   private triggerMemoryWarning(usagePercentage: number): void {
     console.warn(`High memory usage detected: ${usagePercentage.toFixed(1)}%`);
-    
+
     // Emit custom event for memory cleanup
     try {
       // Custom event emission without global EventEmitter
-      if (typeof document !== 'undefined') {
-        const event = new CustomEvent('memoryWarning', { 
-          detail: { usagePercentage } 
+      if (typeof document !== "undefined") {
+        const event = new CustomEvent("memoryWarning", {
+          detail: { usagePercentage },
         });
         document.dispatchEvent(event);
       }

@@ -3,10 +3,11 @@
  * Connects to /progress namespace for real-time task/project progress updates
  */
 
-import ENV from '@/config/env';
-import { Platform } from 'react-native';
-import io, { Socket } from 'socket.io-client';
-import { getAccessToken } from './apiClient';
+import ENV from "@/config/env";
+import { Platform } from "react-native";
+import { getSocketIo } from "@/utils/socketIo";
+import type { Socket } from "@/utils/socketIo";
+import { getAccessToken } from "./apiClient";
 
 // ============================================================================
 // Types
@@ -104,6 +105,7 @@ class ProgressSocketManager {
     
     console.log('[ProgressSocket] Connecting to:', wsUrl);
 
+    const io = await getSocketIo();
     this.socket = io(wsUrl, {
       auth: { token },
       transports: ['websocket', 'polling'],

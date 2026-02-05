@@ -127,7 +127,7 @@ function countMatches(content: string, query: string): number {
 // ============================================================================
 
 export function useMessageSearch(
-  options: UseMessageSearchOptions = {}
+  options: UseMessageSearchOptions = {},
 ): UseMessageSearchReturn {
   const {
     minQueryLength = 2,
@@ -141,9 +141,9 @@ export function useMessageSearch(
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
-  const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(
-    null
-  );
+  const [debounceTimeout, setDebounceTimeout] = useState<ReturnType<
+    typeof setTimeout
+  > | null>(null);
 
   // Load recent searches on mount
   useEffect(() => {
@@ -174,7 +174,7 @@ export function useMessageSearch(
       const updated = [
         searchQuery.trim(),
         ...recentSearches.filter(
-          (s) => s.toLowerCase() !== searchQuery.toLowerCase()
+          (s) => s.toLowerCase() !== searchQuery.toLowerCase(),
         ),
       ].slice(0, MAX_RECENT_SEARCHES);
 
@@ -241,7 +241,7 @@ export function useMessageSearch(
             senderName: msg.sender?.name || "Unknown",
             createdAt: msg.createdAt,
             matchCount: countMatches(msg.content, searchQuery),
-          })
+          }),
         );
 
         // Sort by match count and date
@@ -268,7 +268,7 @@ export function useMessageSearch(
         setLoading(false);
       }
     },
-    [minQueryLength, maxResults, saveRecentSearches]
+    [minQueryLength, maxResults, saveRecentSearches],
   );
 
   // Debounced query setter
@@ -294,7 +294,7 @@ export function useMessageSearch(
 
       setDebounceTimeout(timeout);
     },
-    [debounceMs, minQueryLength, search, debounceTimeout]
+    [debounceMs, minQueryLength, search, debounceTimeout],
   );
 
   const clearResults = useCallback(() => {

@@ -3,22 +3,13 @@
  * Tích hợp với unified API service
  */
 
-import { storage } from '@/services/storage';
-import { AuthUser, Role } from '../types/auth';
-import { apiFetch } from './api';
+import ENV from "@/config/env";
+import { storage } from "@/services/storage";
+import { AuthUser, Role } from "../types/auth";
+import { API_BASE as API_BASE_EXPORT, apiFetch } from "./api";
 
-// API_BASE may not be exported from the canonical api module in all variants.
-// Use a fallback to process.env when available.
-const API_BASE = ((): string => {
-  try {
-    // attempt to read export dynamically if present at runtime
-     
-    const mod = require('./api');
-    return mod.API_BASE || process.env.EXPO_PUBLIC_API_BASE || 'https://api.thietkeresort.com.vn';
-  } catch {
-    return process.env.EXPO_PUBLIC_API_BASE || 'https://api.thietkeresort.com.vn';
-  }
-})();
+// Use ENV.API_BASE_URL for consistency, fallback to exported API_BASE
+const API_BASE = API_BASE_EXPORT || ENV.API_BASE_URL;
 
 // API Response Types theo API docs
 interface ApiResponse<T = any> {
@@ -82,24 +73,24 @@ class EnhancedAuthService {
   async login(credentials: LoginRequest): Promise<ApiResponse<LoginResponse>> {
     try {
       const response = await fetch(`${this.baseUrl}/auth/login`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
+          "Content-Type": "application/json",
+          Accept: "application/json",
         },
         body: JSON.stringify(credentials),
       });
 
       // Check if response is HTML (indicates wrong endpoint or server issue)
-      const contentType = response.headers.get('content-type');
-      if (contentType && contentType.includes('text/html')) {
-        console.warn('[EnhancedAuth] Received HTML response instead of JSON');
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("text/html")) {
+        console.warn("[EnhancedAuth] Received HTML response instead of JSON");
         return {
           success: false,
           error: {
-            code: 'INVALID_ENDPOINT',
-            message: 'API endpoint không hỗ trợ đăng nhập, sử dụng mock data'
-          }
+            code: "INVALID_ENDPOINT",
+            message: "API endpoint không hỗ trợ đăng nhập, sử dụng mock data",
+          },
         };
       }
 
@@ -107,13 +98,13 @@ class EnhancedAuthService {
       try {
         data = await response.json();
       } catch (parseError) {
-        console.warn('[EnhancedAuth] Failed to parse JSON response');
+        console.warn("[EnhancedAuth] Failed to parse JSON response");
         return {
           success: false,
           error: {
-            code: 'INVALID_RESPONSE',
-            message: 'Server trả về dữ liệu không hợp lệ'
-          }
+            code: "INVALID_RESPONSE",
+            message: "Server trả về dữ liệu không hợp lệ",
+          },
         };
       }
 
@@ -121,24 +112,24 @@ class EnhancedAuthService {
         return {
           success: false,
           error: data.error || {
-            code: 'UNKNOWN_ERROR',
-            message: data.message || 'Đăng nhập thất bại'
-          }
+            code: "UNKNOWN_ERROR",
+            message: data.message || "Đăng nhập thất bại",
+          },
         };
       }
 
       return {
         success: true,
-        data: data
+        data: data,
       };
     } catch (error) {
-      console.error('[EnhancedAuth] Login error:', error);
+      console.error("[EnhancedAuth] Login error:", error);
       return {
         success: false,
         error: {
-          code: 'NETWORK_ERROR',
-          message: 'Lỗi kết nối mạng'
-        }
+          code: "NETWORK_ERROR",
+          message: "Lỗi kết nối mạng",
+        },
       };
     }
   }
@@ -146,13 +137,15 @@ class EnhancedAuthService {
   /**
    * Đăng ký tài khoản mới
    */
-  async register(userData: RegisterRequest): Promise<ApiResponse<RegisterResponse>> {
+  async register(
+    userData: RegisterRequest,
+  ): Promise<ApiResponse<RegisterResponse>> {
     try {
       const response = await fetch(`${this.baseUrl}/auth/register`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
+          "Content-Type": "application/json",
+          Accept: "application/json",
         },
         body: JSON.stringify(userData),
       });
@@ -163,24 +156,24 @@ class EnhancedAuthService {
         return {
           success: false,
           error: data.error || {
-            code: 'UNKNOWN_ERROR',
-            message: data.message || 'Đăng ký thất bại'
-          }
+            code: "UNKNOWN_ERROR",
+            message: data.message || "Đăng ký thất bại",
+          },
         };
       }
 
       return {
         success: true,
-        data: data
+        data: data,
       };
     } catch (error) {
-      console.error('[EnhancedAuth] Register error:', error);
+      console.error("[EnhancedAuth] Register error:", error);
       return {
         success: false,
         error: {
-          code: 'NETWORK_ERROR',
-          message: 'Lỗi kết nối mạng'
-        }
+          code: "NETWORK_ERROR",
+          message: "Lỗi kết nối mạng",
+        },
       };
     }
   }
@@ -190,36 +183,38 @@ class EnhancedAuthService {
    */
   async getCurrentUser(token?: string): Promise<ApiResponse<MeResponse>> {
     try {
-  const authToken = token || await storage.get('accessToken');
-      
+      const authToken = token || (await storage.get("accessToken"));
+
       if (!authToken) {
         return {
           success: false,
           error: {
-            code: 'NO_TOKEN',
-            message: 'Chưa đăng nhập'
-          }
+            code: "NO_TOKEN",
+            message: "Chưa đăng nhập",
+          },
         };
       }
 
       const response = await fetch(`${this.baseUrl}/auth/me`, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'Authorization': `Bearer ${authToken}`,
-          'Accept': 'application/json',
+          Authorization: `Bearer ${authToken}`,
+          Accept: "application/json",
         },
       });
 
       // Check if response is HTML (indicates wrong endpoint or server issue)
-      const contentType = response.headers.get('content-type');
-      if (contentType && contentType.includes('text/html')) {
-        console.warn('[EnhancedAuth] Received HTML response instead of JSON for /auth/me');
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("text/html")) {
+        console.warn(
+          "[EnhancedAuth] Received HTML response instead of JSON for /auth/me",
+        );
         return {
           success: false,
           error: {
-            code: 'INVALID_ENDPOINT',
-            message: 'API endpoint không hỗ trợ thông tin user'
-          }
+            code: "INVALID_ENDPOINT",
+            message: "API endpoint không hỗ trợ thông tin user",
+          },
         };
       }
 
@@ -227,13 +222,15 @@ class EnhancedAuthService {
       try {
         data = await response.json();
       } catch (parseError) {
-        console.warn('[EnhancedAuth] Failed to parse JSON response for /auth/me');
+        console.warn(
+          "[EnhancedAuth] Failed to parse JSON response for /auth/me",
+        );
         return {
           success: false,
           error: {
-            code: 'INVALID_RESPONSE',
-            message: 'Server trả về dữ liệu không hợp lệ'
-          }
+            code: "INVALID_RESPONSE",
+            message: "Server trả về dữ liệu không hợp lệ",
+          },
         };
       }
 
@@ -241,24 +238,24 @@ class EnhancedAuthService {
         return {
           success: false,
           error: data.error || {
-            code: 'UNKNOWN_ERROR',
-            message: data.message || 'Không thể lấy thông tin người dùng'
-          }
+            code: "UNKNOWN_ERROR",
+            message: data.message || "Không thể lấy thông tin người dùng",
+          },
         };
       }
 
       return {
         success: true,
-        data: data.user || data
+        data: data.user || data,
       };
     } catch (error) {
-      console.error('[EnhancedAuth] Get current user error:', error);
+      console.error("[EnhancedAuth] Get current user error:", error);
       return {
         success: false,
         error: {
-          code: 'NETWORK_ERROR',
-          message: 'Lỗi kết nối mạng'
-        }
+          code: "NETWORK_ERROR",
+          message: "Lỗi kết nối mạng",
+        },
       };
     }
   }
@@ -268,39 +265,39 @@ class EnhancedAuthService {
    */
   async logout(): Promise<ApiResponse> {
     try {
-  const token = await storage.get('accessToken');
-      
+      const token = await storage.get("accessToken");
+
       if (token) {
         // Call logout endpoint if available
         try {
           await fetch(`${this.baseUrl}/auth/logout`, {
-            method: 'POST',
+            method: "POST",
             headers: {
-              'Authorization': `Bearer ${token}`,
-              'Accept': 'application/json',
+              Authorization: `Bearer ${token}`,
+              Accept: "application/json",
             },
           });
         } catch (error) {
           // Ignore logout endpoint errors
-          console.warn('[EnhancedAuth] Logout endpoint error:', error);
+          console.warn("[EnhancedAuth] Logout endpoint error:", error);
         }
       }
 
       // Clear local storage
-            await storage.remove('accessToken');
-            await storage.remove('refreshToken');
-            await storage.remove('auth:currentUserId');
-            await storage.remove('auth:currentUser');
+      await storage.remove("accessToken");
+      await storage.remove("refreshToken");
+      await storage.remove("auth:currentUserId");
+      await storage.remove("auth:currentUser");
 
       return { success: true };
     } catch (error) {
-      console.error('[EnhancedAuth] Logout error:', error);
+      console.error("[EnhancedAuth] Logout error:", error);
       return {
         success: false,
         error: {
-          code: 'LOGOUT_ERROR',
-          message: 'Lỗi khi đăng xuất'
-        }
+          code: "LOGOUT_ERROR",
+          message: "Lỗi khi đăng xuất",
+        },
       };
     }
   }
@@ -310,23 +307,23 @@ class EnhancedAuthService {
    */
   async refreshToken(): Promise<ApiResponse<{ token: string }>> {
     try {
-  const currentToken = await storage.get('accessToken');
-      
+      const currentToken = await storage.get("accessToken");
+
       if (!currentToken) {
         return {
           success: false,
           error: {
-            code: 'NO_TOKEN',
-            message: 'Chưa đăng nhập'
-          }
+            code: "NO_TOKEN",
+            message: "Chưa đăng nhập",
+          },
         };
       }
 
       const response = await fetch(`${this.baseUrl}/auth/refresh`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${currentToken}`,
-          'Accept': 'application/json',
+          Authorization: `Bearer ${currentToken}`,
+          Accept: "application/json",
         },
       });
 
@@ -336,24 +333,24 @@ class EnhancedAuthService {
         return {
           success: false,
           error: data.error || {
-            code: 'REFRESH_FAILED',
-            message: 'Không thể làm mới token'
-          }
+            code: "REFRESH_FAILED",
+            message: "Không thể làm mới token",
+          },
         };
       }
 
       return {
         success: true,
-        data: data
+        data: data,
       };
     } catch (error) {
-      console.error('[EnhancedAuth] Refresh token error:', error);
+      console.error("[EnhancedAuth] Refresh token error:", error);
       return {
         success: false,
         error: {
-          code: 'NETWORK_ERROR',
-          message: 'Lỗi kết nối mạng'
-        }
+          code: "NETWORK_ERROR",
+          message: "Lỗi kết nối mạng",
+        },
       };
     }
   }
@@ -361,26 +358,29 @@ class EnhancedAuthService {
   /**
    * Đổi mật khẩu
    */
-  async changePassword(oldPassword: string, newPassword: string): Promise<ApiResponse> {
+  async changePassword(
+    oldPassword: string,
+    newPassword: string,
+  ): Promise<ApiResponse> {
     try {
-  const token = await storage.get('accessToken');
-      
+      const token = await storage.get("accessToken");
+
       if (!token) {
         return {
           success: false,
           error: {
-            code: 'NO_TOKEN',
-            message: 'Chưa đăng nhập'
-          }
+            code: "NO_TOKEN",
+            message: "Chưa đăng nhập",
+          },
         };
       }
 
       const response = await fetch(`${this.baseUrl}/auth/change-password`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+          Accept: "application/json",
         },
         body: JSON.stringify({
           old_password: oldPassword,
@@ -394,21 +394,21 @@ class EnhancedAuthService {
         return {
           success: false,
           error: data.error || {
-            code: 'CHANGE_PASSWORD_FAILED',
-            message: 'Không thể đổi mật khẩu'
-          }
+            code: "CHANGE_PASSWORD_FAILED",
+            message: "Không thể đổi mật khẩu",
+          },
         };
       }
 
       return { success: true, data };
     } catch (error) {
-      console.error('[EnhancedAuth] Change password error:', error);
+      console.error("[EnhancedAuth] Change password error:", error);
       return {
         success: false,
         error: {
-          code: 'NETWORK_ERROR',
-          message: 'Lỗi kết nối mạng'
-        }
+          code: "NETWORK_ERROR",
+          message: "Lỗi kết nối mạng",
+        },
       };
     }
   }
@@ -419,10 +419,10 @@ class EnhancedAuthService {
   async forgotPassword(email: string): Promise<ApiResponse> {
     try {
       const response = await fetch(`${this.baseUrl}/auth/forgot-password`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
+          "Content-Type": "application/json",
+          Accept: "application/json",
         },
         body: JSON.stringify({ email }),
       });
@@ -433,21 +433,21 @@ class EnhancedAuthService {
         return {
           success: false,
           error: data.error || {
-            code: 'FORGOT_PASSWORD_FAILED',
-            message: 'Không thể gửi email khôi phục mật khẩu'
-          }
+            code: "FORGOT_PASSWORD_FAILED",
+            message: "Không thể gửi email khôi phục mật khẩu",
+          },
         };
       }
 
       return { success: true, data };
     } catch (error) {
-      console.error('[EnhancedAuth] Forgot password error:', error);
+      console.error("[EnhancedAuth] Forgot password error:", error);
       return {
         success: false,
         error: {
-          code: 'NETWORK_ERROR',
-          message: 'Lỗi kết nối mạng'
-        }
+          code: "NETWORK_ERROR",
+          message: "Lỗi kết nối mạng",
+        },
       };
     }
   }
@@ -455,13 +455,16 @@ class EnhancedAuthService {
   /**
    * Reset mật khẩu
    */
-  async resetPassword(token: string, newPassword: string): Promise<ApiResponse> {
+  async resetPassword(
+    token: string,
+    newPassword: string,
+  ): Promise<ApiResponse> {
     try {
       const response = await fetch(`${this.baseUrl}/auth/reset-password`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
+          "Content-Type": "application/json",
+          Accept: "application/json",
         },
         body: JSON.stringify({
           token,
@@ -475,21 +478,21 @@ class EnhancedAuthService {
         return {
           success: false,
           error: data.error || {
-            code: 'RESET_PASSWORD_FAILED',
-            message: 'Không thể đặt lại mật khẩu'
-          }
+            code: "RESET_PASSWORD_FAILED",
+            message: "Không thể đặt lại mật khẩu",
+          },
         };
       }
 
       return { success: true, data };
     } catch (error) {
-      console.error('[EnhancedAuth] Reset password error:', error);
+      console.error("[EnhancedAuth] Reset password error:", error);
       return {
         success: false,
         error: {
-          code: 'NETWORK_ERROR',
-          message: 'Lỗi kết nối mạng'
-        }
+          code: "NETWORK_ERROR",
+          message: "Lỗi kết nối mạng",
+        },
       };
     }
   }
@@ -497,26 +500,28 @@ class EnhancedAuthService {
   /**
    * Cập nhật profile
    */
-  async updateProfile(updates: Partial<MeResponse>): Promise<ApiResponse<MeResponse>> {
+  async updateProfile(
+    updates: Partial<MeResponse>,
+  ): Promise<ApiResponse<MeResponse>> {
     try {
-  const token = await storage.get('accessToken');
-      
+      const token = await storage.get("accessToken");
+
       if (!token) {
         return {
           success: false,
           error: {
-            code: 'NO_TOKEN',
-            message: 'Chưa đăng nhập'
-          }
+            code: "NO_TOKEN",
+            message: "Chưa đăng nhập",
+          },
         };
       }
 
       const response = await fetch(`${this.baseUrl}/me`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+          Accept: "application/json",
         },
         body: JSON.stringify(updates),
       });
@@ -527,24 +532,24 @@ class EnhancedAuthService {
         return {
           success: false,
           error: data.error || {
-            code: 'UPDATE_PROFILE_FAILED',
-            message: 'Không thể cập nhật thông tin'
-          }
+            code: "UPDATE_PROFILE_FAILED",
+            message: "Không thể cập nhật thông tin",
+          },
         };
       }
 
       return {
         success: true,
-        data: data.data || data.user || data
+        data: data.data || data.user || data,
       };
     } catch (error) {
-      console.error('[EnhancedAuth] Update profile error:', error);
+      console.error("[EnhancedAuth] Update profile error:", error);
       return {
         success: false,
         error: {
-          code: 'NETWORK_ERROR',
-          message: 'Lỗi kết nối mạng'
-        }
+          code: "NETWORK_ERROR",
+          message: "Lỗi kết nối mạng",
+        },
       };
     }
   }
@@ -555,16 +560,19 @@ class EnhancedAuthService {
   async checkHealth(): Promise<ApiResponse> {
     try {
       // Use centralized apiFetch to leverage origin routing and health fallback
-      const data = await apiFetch<any>('/health', { method: 'GET', timeoutMs: 8000 });
+      const data = await apiFetch<any>("/health", {
+        method: "GET",
+        timeoutMs: 8000,
+      });
       return { success: true, data };
     } catch (error) {
-      console.error('[EnhancedAuth] Health check error:', error);
+      console.error("[EnhancedAuth] Health check error:", error);
       return {
         success: false,
         error: {
-          code: 'NETWORK_ERROR',
-          message: 'API không khả dụng'
-        }
+          code: "NETWORK_ERROR",
+          message: "API không khả dụng",
+        },
       };
     }
   }
@@ -575,19 +583,19 @@ class EnhancedAuthService {
   convertToAuthUser(apiUser: MeResponse): AuthUser {
     return {
       id: apiUser.sub,
-      phone: '', // Not provided by this API
+      phone: "", // Not provided by this API
       name: apiUser.fullName,
-      email: apiUser.email || '',
-      avatar: '', // Not provided by this API
-      role: (apiUser.roles?.[0] as Role) || 'khach-hang',
+      email: apiUser.email || "",
+      avatar: "", // Not provided by this API
+      role: (apiUser.roles?.[0] as Role) || "khach-hang",
       is_active: true, // Assume active if user can authenticate
       created_at: new Date(apiUser.iat * 1000).toISOString(), // Convert from timestamp
       updated_at: new Date().toISOString(),
       companies: [], // Will be populated separately if needed
-      current_company_id: 'default-company',
-      is_admin: apiUser.roles?.includes('admin') || false,
+      current_company_id: "default-company",
+      is_admin: apiUser.roles?.includes("admin") || false,
       scopes: [],
-      global_roles: (apiUser.roles as Role[]) || ['khach-hang'],
+      global_roles: (apiUser.roles as Role[]) || ["khach-hang"],
       reward_points: 100, // Default reward points
     };
   }

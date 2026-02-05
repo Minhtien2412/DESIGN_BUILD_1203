@@ -159,10 +159,23 @@ const getMenuOptions = (item: MoreOptionsItem): MenuOption[] => {
 // ============================================
 const MoreOptionsContext = createContext<MoreOptionsContextType | null>(null);
 
-export const useMoreOptions = () => {
+// Noop fallback when provider is not available
+const noopMoreOptions: MoreOptionsContextType = {
+  open: () => console.warn("[MoreOptions] Provider not available"),
+  close: () => {},
+  isOpen: false,
+};
+
+export const useMoreOptions = (): MoreOptionsContextType => {
   const context = useContext(MoreOptionsContext);
+  // Return noop fallback instead of throwing to prevent crashes during hydration
   if (!context) {
-    throw new Error("useMoreOptions must be used within a MoreOptionsProvider");
+    if (__DEV__) {
+      console.warn(
+        "[MoreOptions] useMoreOptions called outside of MoreOptionsProvider",
+      );
+    }
+    return noopMoreOptions;
   }
   return context;
 };

@@ -4,19 +4,20 @@
  * @updated 2025-12-24
  */
 
-import { OptimizedImage } from '@/components/ui/optimized-image';
-import { useThemeColor } from '@/hooks/use-theme-color';
+import { OptimizedImage } from "@/components/ui/optimized-image";
+import { useThemeColor } from "@/hooks/use-theme-color";
+import { useGlobalMute, useVideoPlayback } from "@/hooks/useVideoPlayback";
 import {
     MOCK_COMMENTS,
     MOCK_VIDEOS,
     ShortVideoService,
     type ShortVideo,
-    type VideoComment
-} from '@/services/shortVideoService';
-import { Ionicons } from '@expo/vector-icons';
-import * as Haptics from 'expo-haptics';
-import { VideoView, useVideoPlayer } from 'expo-video';
-import { useCallback, useEffect, useRef, useState } from 'react';
+    type VideoComment,
+} from "@/services/shortVideoService";
+import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
+import { VideoView, useVideoPlayer } from "expo-video";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
     ActivityIndicator,
     Animated,
@@ -38,10 +39,10 @@ import {
     TouchableOpacity,
     TouchableWithoutFeedback,
     View,
-    type ViewToken
-} from 'react-native';
+    type ViewToken,
+} from "react-native";
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 // Use types from service
 type Comment = VideoComment;
@@ -55,21 +56,30 @@ export default function ShortVideosScreen() {
   const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
   const flatListRef = useRef<FlatList>(null);
 
+  // Use global mute hook and ensure unmuted when entering screen
+  const { setMuted } = useGlobalMute();
+
+  // Unmute when entering the video screen (better UX)
+  useEffect(() => {
+    // Reset to unmuted when entering video screen
+    setMuted(false);
+  }, [setMuted]);
+
   // Fetch videos from API (background, non-blocking)
   const fetchVideos = useCallback(async () => {
     try {
       // Add timeout to prevent hanging
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 5000);
-      
+
       const response = await ShortVideoService.getVideos(1, 20);
       clearTimeout(timeoutId);
-      
+
       if (response.videos.length > 0) {
         setVideos(response.videos);
       }
     } catch (error) {
-      console.warn('Failed to fetch videos, using mock data:', error);
+      console.warn("Failed to fetch videos, using mock data:", error);
       // Keep existing mock data
     } finally {
       setLoading(false);
@@ -98,14 +108,20 @@ export default function ShortVideosScreen() {
           setCurrentIndex(index);
         }
       }
-    }
+    },
   ).current;
 
   const viewabilityConfig = {
     itemVisiblePercentThreshold: 80,
   };
 
-  const renderVideo = ({ item, index }: { item: ShortVideo; index: number }) => (
+  const renderVideo = ({
+    item,
+    index,
+  }: {
+    item: ShortVideo;
+    index: number;
+  }) => (
     <VideoItem
       video={item}
       isActive={index === currentIndex}
@@ -117,11 +133,17 @@ export default function ShortVideosScreen() {
   );
 
   const handleLike = (videoId: string) => {
-    setVideos(prev => prev.map(v => 
-      v.id === videoId 
-        ? { ...v, liked: !v.liked, likes: v.liked ? v.likes - 1 : v.likes + 1 }
-        : v
-    ));
+    setVideos((prev) =>
+      prev.map((v) =>
+        v.id === videoId
+          ? {
+              ...v,
+              liked: !v.liked,
+              likes: v.liked ? v.likes - 1 : v.likes + 1,
+            }
+          : v,
+      ),
+    );
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
 
@@ -137,18 +159,22 @@ export default function ShortVideosScreen() {
         title: video.caption,
       });
       // Update share count
-      setVideos(prev => prev.map(v => 
-        v.id === video.id ? { ...v, shares: v.shares + 1 } : v
-      ));
+      setVideos((prev) =>
+        prev.map((v) =>
+          v.id === video.id ? { ...v, shares: v.shares + 1 } : v,
+        ),
+      );
     } catch (error) {
-      console.log('Share error:', error);
+      console.log("Share error:", error);
     }
   };
 
   const handleFollow = (videoId: string) => {
-    setVideos(prev => prev.map(v => 
-      v.id === videoId ? { ...v, following: !v.following } : v
-    ));
+    setVideos((prev) =>
+      prev.map((v) =>
+        v.id === videoId ? { ...v, following: !v.following } : v,
+      ),
+    );
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
   };
 
@@ -192,9 +218,9 @@ export default function ShortVideosScreen() {
           </View>
         }
       />
-      
+
       {/* Comments Bottom Sheet */}
-      <CommentsSheet 
+      <CommentsSheet
         visible={showComments}
         videoId={activeVideoId}
         onClose={() => setShowComments(false)}
@@ -212,14 +238,24 @@ interface VideoItemProps {
   onFollow: () => void;
 }
 
-function VideoItem({ video, isActive, onLike, onComment, onShare, onFollow }: VideoItemProps) {
-  const textColor = useThemeColor({}, 'text');
+function VideoItem({
+  video,
+  isActive,
+  onLike,
+  onComment,
+  onShare,
+  onFollow,
+}: VideoItemProps) {
+  const textColor = useThemeColor({}, "text");
   const [liked, setLiked] = useState(video.liked);
   const [following, setFollowing] = useState(video.following);
-  const [muted, setMuted] = useState(false);
   const [showHeart, setShowHeart] = useState(false);
   const [progress, setProgress] = useState(0);
-  
+
+  // Use centralized video playback controller - ensures only 1 video plays at a time
+  const { isPlaying, registerPlayer, play, pause } = useVideoPlayback(video.id);
+  const { isMuted, toggleMute } = useGlobalMute();
+
   // Animations
   const heartScale = useRef(new Animated.Value(0)).current;
   const likeButtonScale = useRef(new Animated.Value(1)).current;
@@ -229,25 +265,35 @@ function VideoItem({ video, isActive, onLike, onComment, onShare, onFollow }: Vi
   // Video player setup
   const player = useVideoPlayer(video.videoUrl, (player) => {
     player.loop = true;
-    player.muted = muted;
+    player.muted = isMuted;
   });
 
-  // Auto-play when active
-  useEffect(() => {
-    if (isActive) {
-      player.play();
-    } else {
-      player.pause();
-      setProgress(0);
-    }
-  }, [isActive, player]);
-
-  // Update mute state
+  // Register player with controller when mounted
   useEffect(() => {
     if (player) {
-      player.muted = muted;
+      registerPlayer(player);
     }
-  }, [muted, player]);
+  }, [player, registerPlayer]);
+
+  // Auto-play when this video becomes active (visible in viewport)
+  // VideoPlayerController ensures only 1 video plays at a time
+  useEffect(() => {
+    if (isActive) {
+      // Play through controller - it will pause any other playing video
+      play();
+    } else {
+      // Pause when not visible
+      pause();
+      setProgress(0);
+    }
+  }, [isActive, play, pause]);
+
+  // Sync mute state with player
+  useEffect(() => {
+    if (player) {
+      player.muted = isMuted;
+    }
+  }, [isMuted, player]);
 
   // Track video progress
   useEffect(() => {
@@ -257,7 +303,7 @@ function VideoItem({ video, isActive, onLike, onComment, onShare, onFollow }: Vi
       if (player && video.duration) {
         // This is a mock - real implementation would get actual playback position
         setProgress((prev) => {
-          const newProgress = prev + (100 / video.duration);
+          const newProgress = prev + 100 / video.duration;
           return newProgress >= 100 ? 0 : newProgress;
         });
       }
@@ -268,19 +314,19 @@ function VideoItem({ video, isActive, onLike, onComment, onShare, onFollow }: Vi
 
   // Rotate disc animation
   useEffect(() => {
-    if (isActive && !muted) {
+    if (isActive && !isMuted) {
       Animated.loop(
         Animated.timing(discRotation, {
           toValue: 1,
           duration: 3000,
           easing: Easing.linear,
           useNativeDriver: true,
-        })
+        }),
       ).start();
     } else {
       discRotation.setValue(0);
     }
-  }, [isActive, muted, discRotation]);
+  }, [isActive, isMuted, discRotation]);
 
   // Double tap to like
   const handleDoubleTap = () => {
@@ -292,7 +338,7 @@ function VideoItem({ video, isActive, onLike, onComment, onShare, onFollow }: Vi
       if (!liked) {
         setLiked(true);
         onLike();
-        
+
         // Show heart animation
         setShowHeart(true);
         Animated.sequence([
@@ -317,7 +363,7 @@ function VideoItem({ video, isActive, onLike, onComment, onShare, onFollow }: Vi
   const handleLikePress = () => {
     setLiked(!liked);
     onLike();
-    
+
     // Button scale animation
     Animated.sequence([
       Animated.timing(likeButtonScale, {
@@ -339,7 +385,8 @@ function VideoItem({ video, isActive, onLike, onComment, onShare, onFollow }: Vi
   };
 
   const handleMuteToggle = () => {
-    setMuted(!muted);
+    // Use global mute toggle - affects all videos
+    toggleMute();
   };
 
   return (
@@ -355,10 +402,10 @@ function VideoItem({ video, isActive, onLike, onComment, onShare, onFollow }: Vi
 
         {/* Double-tap heart animation */}
         {showHeart && (
-          <Animated.View 
+          <Animated.View
             style={[
               styles.doubleTapHeart,
-              { transform: [{ scale: heartScale }] }
+              { transform: [{ scale: heartScale }] },
             ]}
           >
             <Ionicons name="heart" size={100} color="#FFFFFF" />
@@ -368,7 +415,11 @@ function VideoItem({ video, isActive, onLike, onComment, onShare, onFollow }: Vi
         {/* Play/Pause overlay */}
         {!isActive && (
           <View style={styles.pausedOverlay}>
-            <Ionicons name="play-circle" size={64} color="rgba(255,255,255,0.8)" />
+            <Ionicons
+              name="play-circle"
+              size={64}
+              color="rgba(255,255,255,0.8)"
+            />
           </View>
         )}
 
@@ -377,23 +428,15 @@ function VideoItem({ video, isActive, onLike, onComment, onShare, onFollow }: Vi
 
         {/* Video progress bar */}
         <View style={styles.progressBarContainer}>
-          <View 
-            style={[
-              styles.progressBar, 
-              { width: `${progress}%` }
-            ]} 
-          />
+          <View style={[styles.progressBar, { width: `${progress}%` }]} />
         </View>
 
         {/* Sound control button */}
-        <Pressable 
-          style={styles.muteButton}
-          onPress={handleMuteToggle}
-        >
-          <Ionicons 
-            name={muted ? 'volume-mute' : 'volume-high'} 
-            size={24} 
-            color="#FFFFFF" 
+        <Pressable style={styles.muteButton} onPress={handleMuteToggle}>
+          <Ionicons
+            name={isMuted ? "volume-mute" : "volume-high"}
+            size={24}
+            color="#FFFFFF"
           />
         </Pressable>
 
@@ -412,7 +455,7 @@ function VideoItem({ video, isActive, onLike, onComment, onShare, onFollow }: Vi
               />
               <Text style={styles.userName}>{video.userName}</Text>
               {!following && (
-                <Pressable 
+                <Pressable
                   style={styles.followButton}
                   onPress={handleFollowPress}
                 >
@@ -441,11 +484,13 @@ function VideoItem({ video, isActive, onLike, onComment, onShare, onFollow }: Vi
           <Animated.View style={{ transform: [{ scale: likeButtonScale }] }}>
             <Pressable style={styles.actionButton} onPress={handleLikePress}>
               <Ionicons
-                name={liked ? 'heart' : 'heart-outline'}
+                name={liked ? "heart" : "heart-outline"}
                 size={32}
-                color={liked ? '#000000' : '#FFFFFF'}
+                color={liked ? "#000000" : "#FFFFFF"}
               />
-              <Text style={styles.actionText}>{formatCount(video.likes + (liked && !video.liked ? 1 : 0))}</Text>
+              <Text style={styles.actionText}>
+                {formatCount(video.likes + (liked && !video.liked ? 1 : 0))}
+              </Text>
             </Pressable>
           </Animated.View>
 
@@ -462,17 +507,19 @@ function VideoItem({ video, isActive, onLike, onComment, onShare, onFollow }: Vi
           </Pressable>
 
           {/* Rotating disc for sound */}
-          <Animated.View 
+          <Animated.View
             style={[
               styles.soundDisc,
               {
-                transform: [{
-                  rotate: discRotation.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: ['0deg', '360deg']
-                  })
-                }]
-              }
+                transform: [
+                  {
+                    rotate: discRotation.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: ["0deg", "360deg"],
+                    }),
+                  },
+                ],
+              },
             ]}
           >
             <Ionicons name="disc" size={40} color="#FFFFFF" />
@@ -484,7 +531,7 @@ function VideoItem({ video, isActive, onLike, onComment, onShare, onFollow }: Vi
 }
 
 function formatCount(count: number | undefined): string {
-  if (count === undefined || count === null) return '0';
+  if (count === undefined || count === null) return "0";
   if (count >= 1000000) {
     return `${(count / 1000000).toFixed(1)}M`;
   }
@@ -510,7 +557,7 @@ interface CommentsSheetProps {
 function CommentsSheet({ visible, videoId, onClose }: CommentsSheetProps) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [loadingComments, setLoadingComments] = useState(false);
-  const [newComment, setNewComment] = useState('');
+  const [newComment, setNewComment] = useState("");
   const [replyTo, setReplyTo] = useState<Comment | null>(null);
   const slideAnim = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
 
@@ -521,7 +568,7 @@ function CommentsSheet({ visible, videoId, onClose }: CommentsSheetProps) {
       const response = await ShortVideoService.getVideoComments(vidId);
       setComments(response.comments);
     } catch (error) {
-      console.error('Failed to fetch comments:', error);
+      console.error("Failed to fetch comments:", error);
       setComments(MOCK_COMMENTS[vidId] || []);
     } finally {
       setLoadingComments(false);
@@ -547,21 +594,21 @@ function CommentsSheet({ visible, videoId, onClose }: CommentsSheetProps) {
 
   const handleSendComment = async () => {
     if (!newComment.trim() || !videoId) return;
-    
+
     // Optimistic update
     const comment: Comment = {
       id: `c_${Date.now()}`,
-      userId: 'me',
-      userName: 'You',
-      userAvatar: 'https://i.pravatar.cc/150?img=20',
+      userId: "me",
+      userName: "You",
+      userAvatar: "https://i.pravatar.cc/150?img=20",
       text: newComment,
       likes: 0,
       liked: false,
-      timestamp: 'Vừa xong',
+      timestamp: "Vừa xong",
     };
-    
-    setComments(prev => [comment, ...prev]);
-    setNewComment('');
+
+    setComments((prev) => [comment, ...prev]);
+    setNewComment("");
     setReplyTo(null);
     Keyboard.dismiss();
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -570,17 +617,23 @@ function CommentsSheet({ visible, videoId, onClose }: CommentsSheetProps) {
     try {
       await ShortVideoService.addComment(videoId, newComment);
     } catch (error) {
-      console.warn('Failed to send comment to API:', error);
+      console.warn("Failed to send comment to API:", error);
       // Keep optimistic update - comment already shows locally
     }
   };
 
   const handleLikeComment = (commentId: string) => {
-    setComments(prev => prev.map(c => 
-      c.id === commentId 
-        ? { ...c, liked: !c.liked, likes: c.liked ? c.likes - 1 : c.likes + 1 }
-        : c
-    ));
+    setComments((prev) =>
+      prev.map((c) =>
+        c.id === commentId
+          ? {
+              ...c,
+              liked: !c.liked,
+              likes: c.liked ? c.likes - 1 : c.likes + 1,
+            }
+          : c,
+      ),
+    );
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
 
@@ -601,11 +654,11 @@ function CommentsSheet({ visible, videoId, onClose }: CommentsSheetProps) {
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={commentsStyles.overlay} />
       </TouchableWithoutFeedback>
-      
-      <Animated.View 
+
+      <Animated.View
         style={[
           commentsStyles.container,
-          { transform: [{ translateY: slideAnim }] }
+          { transform: [{ translateY: slideAnim }] },
         ]}
       >
         {/* Header */}
@@ -618,7 +671,7 @@ function CommentsSheet({ visible, videoId, onClose }: CommentsSheetProps) {
         </View>
 
         {/* Comments List */}
-        <ScrollView 
+        <ScrollView
           style={commentsStyles.list}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
@@ -627,38 +680,46 @@ function CommentsSheet({ visible, videoId, onClose }: CommentsSheetProps) {
             <View style={commentsStyles.emptyState}>
               <Ionicons name="chatbubble-outline" size={48} color="#ccc" />
               <Text style={commentsStyles.emptyText}>No comments yet</Text>
-              <Text style={commentsStyles.emptySubtext}>Be the first to comment!</Text>
+              <Text style={commentsStyles.emptySubtext}>
+                Be the first to comment!
+              </Text>
             </View>
           ) : (
-            comments.map(comment => (
+            comments.map((comment) => (
               <View key={comment.id} style={commentsStyles.commentItem}>
-                <Image 
-                  source={{ uri: comment.userAvatar }} 
+                <Image
+                  source={{ uri: comment.userAvatar }}
                   style={commentsStyles.avatar}
                 />
                 <View style={commentsStyles.commentContent}>
-                  <Text style={commentsStyles.userName}>{comment.userName}</Text>
+                  <Text style={commentsStyles.userName}>
+                    {comment.userName}
+                  </Text>
                   <Text style={commentsStyles.commentText}>{comment.text}</Text>
                   <View style={commentsStyles.commentActions}>
-                    <Text style={commentsStyles.timestamp}>{comment.timestamp}</Text>
+                    <Text style={commentsStyles.timestamp}>
+                      {comment.timestamp}
+                    </Text>
                     <TouchableOpacity onPress={() => handleReply(comment)}>
                       <Text style={commentsStyles.replyBtn}>Reply</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={commentsStyles.likeBtn}
                   onPress={() => handleLikeComment(comment.id)}
                 >
-                  <Ionicons 
-                    name={comment.liked ? 'heart' : 'heart-outline'} 
-                    size={18} 
-                    color={comment.liked ? '#000000' : '#666'} 
+                  <Ionicons
+                    name={comment.liked ? "heart" : "heart-outline"}
+                    size={18}
+                    color={comment.liked ? "#000000" : "#666"}
                   />
-                  <Text style={[
-                    commentsStyles.likeCount,
-                    comment.liked && { color: '#000000' }
-                  ]}>
+                  <Text
+                    style={[
+                      commentsStyles.likeCount,
+                      comment.liked && { color: "#000000" },
+                    ]}
+                  >
                     {comment.likes}
                   </Text>
                 </TouchableOpacity>
@@ -669,8 +730,8 @@ function CommentsSheet({ visible, videoId, onClose }: CommentsSheetProps) {
         </ScrollView>
 
         {/* Input Area */}
-        <KeyboardAvoidingView 
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
           keyboardVerticalOffset={0}
         >
           <View style={commentsStyles.inputContainer}>
@@ -679,17 +740,19 @@ function CommentsSheet({ visible, videoId, onClose }: CommentsSheetProps) {
                 <Text style={commentsStyles.replyingText}>
                   Replying to @{replyTo.userName}
                 </Text>
-                <TouchableOpacity onPress={() => {
-                  setReplyTo(null);
-                  setNewComment('');
-                }}>
+                <TouchableOpacity
+                  onPress={() => {
+                    setReplyTo(null);
+                    setNewComment("");
+                  }}
+                >
                   <Ionicons name="close-circle" size={20} color="#666" />
                 </TouchableOpacity>
               </View>
             )}
             <View style={commentsStyles.inputRow}>
-              <Image 
-                source={{ uri: 'https://i.pravatar.cc/150?img=20' }} 
+              <Image
+                source={{ uri: "https://i.pravatar.cc/150?img=20" }}
                 style={commentsStyles.inputAvatar}
               />
               <TextInput
@@ -701,18 +764,18 @@ function CommentsSheet({ visible, videoId, onClose }: CommentsSheetProps) {
                 multiline
                 maxLength={500}
               />
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={[
                   commentsStyles.sendBtn,
-                  !newComment.trim() && commentsStyles.sendBtnDisabled
+                  !newComment.trim() && commentsStyles.sendBtnDisabled,
                 ]}
                 onPress={handleSendComment}
                 disabled={!newComment.trim()}
               >
-                <Ionicons 
-                  name="send" 
-                  size={20} 
-                  color={newComment.trim() ? '#fff' : '#999'} 
+                <Ionicons
+                  name="send"
+                  size={20}
+                  color={newComment.trim() ? "#fff" : "#999"}
                 />
               </TouchableOpacity>
             </View>
@@ -726,41 +789,41 @@ function CommentsSheet({ visible, videoId, onClose }: CommentsSheetProps) {
 const commentsStyles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
   container: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
     height: SCREEN_HEIGHT * 0.65,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: "#f0f0f0",
   },
   handle: {
-    position: 'absolute',
+    position: "absolute",
     top: 8,
     width: 40,
     height: 4,
-    backgroundColor: '#ddd',
+    backgroundColor: "#ddd",
     borderRadius: 2,
   },
   title: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#1a1a1a',
+    fontWeight: "600",
+    color: "#1a1a1a",
   },
   closeBtn: {
-    position: 'absolute',
+    position: "absolute",
     right: 16,
     top: 12,
     padding: 4,
@@ -770,22 +833,22 @@ const commentsStyles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   emptyState: {
-    alignItems: 'center',
+    alignItems: "center",
     paddingTop: 60,
   },
   emptyText: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#666',
+    fontWeight: "600",
+    color: "#666",
     marginTop: 16,
   },
   emptySubtext: {
     fontSize: 14,
-    color: '#999',
+    color: "#999",
     marginTop: 4,
   },
   commentItem: {
-    flexDirection: 'row',
+    flexDirection: "row",
     paddingVertical: 12,
     gap: 12,
   },
@@ -799,59 +862,59 @@ const commentsStyles = StyleSheet.create({
   },
   userName: {
     fontSize: 13,
-    fontWeight: '600',
-    color: '#1a1a1a',
+    fontWeight: "600",
+    color: "#1a1a1a",
     marginBottom: 2,
   },
   commentText: {
     fontSize: 14,
-    color: '#333',
+    color: "#333",
     lineHeight: 20,
   },
   commentActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 16,
     marginTop: 6,
   },
   timestamp: {
     fontSize: 12,
-    color: '#999',
+    color: "#999",
   },
   replyBtn: {
     fontSize: 12,
-    fontWeight: '600',
-    color: '#666',
+    fontWeight: "600",
+    color: "#666",
   },
   likeBtn: {
-    alignItems: 'center',
+    alignItems: "center",
     gap: 2,
   },
   likeCount: {
     fontSize: 11,
-    color: '#666',
+    color: "#666",
   },
   inputContainer: {
     borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
-    backgroundColor: '#fff',
-    paddingBottom: Platform.OS === 'ios' ? 34 : 16,
+    borderTopColor: "#f0f0f0",
+    backgroundColor: "#fff",
+    paddingBottom: Platform.OS === "ios" ? 34 : 16,
   },
   replyingTo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
   },
   replyingText: {
     fontSize: 13,
-    color: '#666',
+    color: "#666",
   },
   inputRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 16,
     paddingTop: 12,
     gap: 12,
@@ -864,80 +927,80 @@ const commentsStyles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 14,
-    color: '#1a1a1a',
+    color: "#1a1a1a",
     maxHeight: 80,
     paddingVertical: 8,
     paddingHorizontal: 12,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
     borderRadius: 20,
   },
   sendBtn: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#000000',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#000000",
+    alignItems: "center",
+    justifyContent: "center",
   },
   sendBtnDisabled: {
-    backgroundColor: '#f0f0f0',
+    backgroundColor: "#f0f0f0",
   },
 });
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: "#000",
   },
   videoContainer: {
     width: SCREEN_WIDTH,
     height: SCREEN_HEIGHT,
-    position: 'relative',
+    position: "relative",
   },
   video: {
     width: SCREEN_WIDTH,
     height: SCREEN_HEIGHT,
   },
   pausedOverlay: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.3)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.3)",
   },
   topGradient: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 0,
     right: 0,
     height: 100,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
   progressBarContainer: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 0,
     right: 0,
     height: 3,
-    backgroundColor: 'rgba(255,255,255,0.3)',
+    backgroundColor: "rgba(255,255,255,0.3)",
   },
   progressBar: {
-    height: '100%',
-    backgroundColor: '#FFFFFF',
+    height: "100%",
+    backgroundColor: "#FFFFFF",
   },
   bottomGradient: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
     height: 200,
-    backgroundColor: 'rgba(0,0,0,0.7)',
+    backgroundColor: "rgba(0,0,0,0.7)",
   },
   bottomContent: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 80,
     left: 16,
     right: 80,
@@ -946,109 +1009,109 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   userInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 12,
   },
   userName: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   followButton: {
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: '#000000',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#000000",
+    justifyContent: "center",
+    alignItems: "center",
     marginLeft: -4,
   },
   caption: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
     fontSize: 14,
     lineHeight: 20,
     marginBottom: 8,
   },
   soundInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6,
     marginBottom: 4,
   },
   soundName: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
     fontSize: 12,
     flex: 1,
   },
   views: {
-    color: 'rgba(255,255,255,0.8)',
+    color: "rgba(255,255,255,0.8)",
     fontSize: 12,
   },
   muteButton: {
-    position: 'absolute',
+    position: "absolute",
     top: 50,
     right: 16,
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
     zIndex: 10,
   },
   doubleTapHeart: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
+    position: "absolute",
+    top: "50%",
+    left: "50%",
     marginLeft: -50,
     marginTop: -50,
     zIndex: 100,
   },
   actionButtons: {
-    position: 'absolute',
+    position: "absolute",
     right: 16,
     bottom: 80,
     gap: 24,
   },
   actionButton: {
-    alignItems: 'center',
+    alignItems: "center",
     gap: 4,
   },
   actionText: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   soundDisc: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
     marginTop: 8,
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#000000',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#000000",
   },
   loadingText: {
     marginTop: 12,
     fontSize: 14,
-    color: '#FFFFFF',
+    color: "#FFFFFF",
   },
   emptyContainer: {
     height: SCREEN_HEIGHT,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#000000',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#000000",
   },
   emptyText: {
     marginTop: 12,
     fontSize: 16,
-    color: '#666666',
+    color: "#666666",
   },
 });

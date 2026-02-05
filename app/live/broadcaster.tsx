@@ -62,7 +62,7 @@ export default function LivestreamBroadcasterScreen() {
   const [status, setStatus] = useState<BroadcasterStatus>("setup");
   const [streamInfo, setStreamInfo] = useState<LivestreamInfo | null>(null);
   const [credentials, setCredentials] = useState<StreamCredentials | null>(
-    null
+    null,
   );
   const [connected, setConnected] = useState(false);
   const [connecting, setConnecting] = useState(false);
@@ -84,7 +84,7 @@ export default function LivestreamBroadcasterScreen() {
   // Refs
   const cleanupRef = useRef<(() => void)[]>([]);
   const durationIntervalRef = useRef<ReturnType<typeof setInterval> | null>(
-    null
+    null,
   );
   const commentsListRef = useRef<FlatList>(null);
 
@@ -118,7 +118,7 @@ export default function LivestreamBroadcasterScreen() {
         setStreamInfo(stream);
         setCredentials(creds);
         setStatus("preview");
-      }
+      },
     );
     cleanupRef.current.push(unsubCreated);
 
@@ -128,7 +128,7 @@ export default function LivestreamBroadcasterScreen() {
         console.log("[Broadcaster] Stream started:", streamId);
         setStatus("live");
         startDurationTimer();
-      }
+      },
     );
     cleanupRef.current.push(unsubStarted);
 
@@ -144,7 +144,7 @@ export default function LivestreamBroadcasterScreen() {
     const unsubViewerCount = livestreamSocketService.onViewerCount(
       ({ count }) => {
         setViewerCount(count);
-      }
+      },
     );
     cleanupRef.current.push(unsubViewerCount);
 
@@ -158,7 +158,7 @@ export default function LivestreamBroadcasterScreen() {
     const unsubLike = livestreamSocketService.onLikeReceived(
       ({ totalLikes }) => {
         setLikeCount(totalLikes);
-      }
+      },
     );
     cleanupRef.current.push(unsubLike);
 
@@ -260,7 +260,7 @@ export default function LivestreamBroadcasterScreen() {
             }
           },
         },
-      ]
+      ],
     );
   }, [streamInfo]);
 
@@ -276,7 +276,7 @@ export default function LivestreamBroadcasterScreen() {
     (tag: string) => {
       setTags(tags.filter((t) => t !== tag));
     },
-    [tags]
+    [tags],
   );
 
   const handleCreatePoll = useCallback(() => {
@@ -292,7 +292,7 @@ export default function LivestreamBroadcasterScreen() {
       streamInfo.id,
       pollQuestion.trim(),
       validOptions.map((opt) => opt.trim()),
-      pollDuration
+      pollDuration,
     );
 
     // Reset form
@@ -312,7 +312,7 @@ export default function LivestreamBroadcasterScreen() {
       if (!streamInfo) return;
       livestreamSocketService.pinComment(streamInfo.id, commentId);
     },
-    [streamInfo]
+    [streamInfo],
   );
 
   const handleDeleteComment = useCallback(
@@ -321,7 +321,7 @@ export default function LivestreamBroadcasterScreen() {
       livestreamSocketService.deleteComment(streamInfo.id, commentId);
       setComments((prev) => prev.filter((c) => c.id !== commentId));
     },
-    [streamInfo]
+    [streamInfo],
   );
 
   const handleClose = useCallback(() => {
@@ -341,7 +341,7 @@ export default function LivestreamBroadcasterScreen() {
               router.back();
             },
           },
-        ]
+        ],
       );
     } else {
       router.back();
@@ -725,11 +725,17 @@ export default function LivestreamBroadcasterScreen() {
           <Ionicons name="close" size={24} color="#FFF" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>
-          {status === "setup" && "Tạo livestream"}
-          {status === "preview" && "Chuẩn bị"}
-          {status === "starting" && "Đang bắt đầu..."}
-          {status === "live" && "Đang LIVE"}
-          {status === "ending" && "Kết thúc"}
+          {status === "setup"
+            ? "Tạo livestream"
+            : status === "preview"
+              ? "Chuẩn bị"
+              : status === "starting"
+                ? "Đang bắt đầu..."
+                : status === "live"
+                  ? "Đang LIVE"
+                  : status === "ending"
+                    ? "Kết thúc"
+                    : ""}
         </Text>
         <View style={styles.headerRight} />
       </View>

@@ -4,7 +4,7 @@ import authApi from "@/services/api/authApi";
 import {
     isValidVietnamesePhone,
     maskPhone,
-    zaloOTPAuth
+    zaloOTPAuth,
 } from "@/services/zaloOTPAuthService";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -93,7 +93,7 @@ export default function ForgotPasswordScreen() {
     if (!isValidVietnamesePhone(trimmedPhone)) {
       Alert.alert(
         "Lỗi",
-        "Số điện thoại không hợp lệ. Vui lòng nhập số điện thoại Việt Nam."
+        "Số điện thoại không hợp lệ. Vui lòng nhập số điện thoại Việt Nam.",
       );
       return;
     }
@@ -112,12 +112,12 @@ export default function ForgotPasswordScreen() {
         setTimeout(() => otpRefs.current[0]?.focus(), 300);
         Alert.alert(
           "Thành công",
-          result.message || `Mã OTP đã được gửi đến Zalo/SMS của bạn!`
+          result.message || `Mã OTP đã được gửi đến Zalo/SMS của bạn!`,
         );
       } else {
         Alert.alert(
           "Lỗi",
-          result.message || "Không thể gửi mã OTP. Vui lòng thử lại."
+          result.message || "Không thể gửi mã OTP. Vui lòng thử lại.",
         );
       }
     } catch (error: any) {
@@ -179,17 +179,17 @@ export default function ForgotPasswordScreen() {
           setTimeout(() => otpRefs.current[0]?.focus(), 300);
           Alert.alert(
             "Thành công",
-            response.message || "Mã OTP đã được gửi đến email của bạn!"
+            response.message || "Mã OTP đã được gửi đến email của bạn!",
           );
         }
-      } catch (otpError) {
+      } catch (_otpError) {
         // Fallback to forgot-password endpoint
         const response = await authApi.forgotPassword({ email: trimmedEmail });
         if (response.success) {
           Alert.alert(
             "Thành công",
             "Link đặt lại mật khẩu đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư.",
-            [{ text: "OK", onPress: () => router.back() }]
+            [{ text: "OK", onPress: () => router.back() }],
           );
         }
       }
@@ -277,7 +277,7 @@ export default function ForgotPasswordScreen() {
           } else {
             Alert.alert("Lỗi", response.message || "Mã OTP không đúng");
           }
-        } catch (apiError) {
+        } catch (_apiError) {
           // Demo mode: accept any 6 digits
           setVerifyToken(otpCode);
           setStep(3);
@@ -334,7 +334,7 @@ export default function ForgotPasswordScreen() {
         const result = await zaloOTPAuth.resetPassword(
           phone.trim(),
           newPassword,
-          verifyToken
+          verifyToken,
         );
 
         if (result.success) {
@@ -346,7 +346,7 @@ export default function ForgotPasswordScreen() {
                 text: "Đăng nhập",
                 onPress: () => router.replace("/(auth)/login"),
               },
-            ]
+            ],
           );
         } else {
           Alert.alert("Lỗi", result.message || "Không thể đặt lại mật khẩu");
@@ -437,17 +437,24 @@ export default function ForgotPasswordScreen() {
 
           <View style={styles.header}>
             <Text style={[styles.title, { color: text }]}>
-              {step === 1 && "Quên mật khẩu?"}
-              {step === 2 && "Xác thực OTP"}
-              {step === 3 && "Đặt mật khẩu mới"}
+              {step === 1
+                ? "Quên mật khẩu?"
+                : step === 2
+                  ? "Xác thực OTP"
+                  : step === 3
+                    ? "Đặt mật khẩu mới"
+                    : ""}
             </Text>
             <Text style={[styles.subtitle, { color: textMuted }]}>
-              {step === 1 &&
-                (verifyMethod === "phone"
+              {step === 1
+                ? verifyMethod === "phone"
                   ? "Nhập số điện thoại để nhận OTP qua Zalo/SMS"
-                  : "Nhập email để nhận mã xác thực")}
-              {step === 2 && `Nhập mã 6 số đã gửi đến ${maskedContact}`}
-              {step === 3 && "Tạo mật khẩu mới cho tài khoản"}
+                  : "Nhập email để nhận mã xác thực"
+                : step === 2
+                  ? `Nhập mã 6 số đã gửi đến ${maskedContact}`
+                  : step === 3
+                    ? "Tạo mật khẩu mới cho tài khoản"
+                    : ""}
             </Text>
           </View>
 

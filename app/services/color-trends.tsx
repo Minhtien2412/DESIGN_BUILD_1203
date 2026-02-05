@@ -1,7 +1,7 @@
-import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
-import { router } from 'expo-router';
-import { useState } from 'react';
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { router } from "expo-router";
+import { useState } from "react";
 import {
     Alert,
     Dimensions,
@@ -13,25 +13,25 @@ import {
     Text,
     TouchableOpacity,
     View,
-} from 'react-native';
+} from "react-native";
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 const CARD_WIDTH = (width - 48) / 2;
 
 // Mock data for color trends
 const TREND_YEARS = [
-  { id: '2025', label: '2025', active: true },
-  { id: '2024', label: '2024', active: false },
-  { id: '2023', label: '2023', active: false },
+  { id: "2025", label: "2025", active: true },
+  { id: "2024", label: "2024", active: false },
+  { id: "2023", label: "2023", active: false },
 ];
 
 const INTERIOR_STYLES = [
-  { id: 'all', name: 'Tất cả', icon: 'apps' },
-  { id: 'modern', name: 'Hiện đại', icon: 'cube-outline' },
-  { id: 'classic', name: 'Cổ điển', icon: 'business-outline' },
-  { id: 'minimal', name: 'Tối giản', icon: 'remove-outline' },
-  { id: 'luxury', name: 'Sang trọng', icon: 'diamond-outline' },
-  { id: 'tropical', name: 'Nhiệt đới', icon: 'leaf-outline' },
+  { id: "all", name: "Tất cả", icon: "apps" },
+  { id: "modern", name: "Hiện đại", icon: "cube-outline" },
+  { id: "classic", name: "Cổ điển", icon: "business-outline" },
+  { id: "minimal", name: "Tối giản", icon: "remove-outline" },
+  { id: "luxury", name: "Sang trọng", icon: "diamond-outline" },
+  { id: "tropical", name: "Nhiệt đới", icon: "leaf-outline" },
 ];
 
 interface ColorTrend {
@@ -50,136 +50,139 @@ interface ColorTrend {
 
 const COLOR_TRENDS: ColorTrend[] = [
   {
-    id: '1',
-    name: 'Peach Fuzz',
-    hexCode: '#FFBE98',
-    pantone: 'PANTONE 13-1023',
-    year: '2025',
-    style: ['modern', 'minimal', 'luxury'],
+    id: "1",
+    name: "Peach Fuzz",
+    hexCode: "#FFBE98",
+    pantone: "PANTONE 13-1023",
+    year: "2025",
+    style: ["modern", "minimal", "luxury"],
     popularity: 95,
-    description: 'Màu cam đào nhẹ nhàng, mang lại cảm giác ấm áp và thư giãn',
-    usageRooms: ['Phòng khách', 'Phòng ngủ', 'Phòng ăn'],
-    combinations: ['#FFFFFF', '#F5E6D3', '#8B7355'],
+    description: "Màu cam đào nhẹ nhàng, mang lại cảm giác ấm áp và thư giãn",
+    usageRooms: ["Phòng khách", "Phòng ngủ", "Phòng ăn"],
+    combinations: ["#FFFFFF", "#F5E6D3", "#8B7355"],
   },
   {
-    id: '2',
-    name: 'Digital Lavender',
-    hexCode: '#B9A0D4',
-    pantone: 'PANTONE 18-3838',
-    year: '2025',
-    style: ['modern', 'luxury'],
+    id: "2",
+    name: "Digital Lavender",
+    hexCode: "#B9A0D4",
+    pantone: "PANTONE 18-3838",
+    year: "2025",
+    style: ["modern", "luxury"],
     popularity: 88,
-    description: 'Tím lavender kỹ thuật số, hiện đại và thanh lịch',
-    usageRooms: ['Phòng ngủ', 'Phòng làm việc', 'Spa'],
-    combinations: ['#FFFFFF', '#E8DFF5', '#4A4A4A'],
+    description: "Tím lavender kỹ thuật số, hiện đại và thanh lịch",
+    usageRooms: ["Phòng ngủ", "Phòng làm việc", "Spa"],
+    combinations: ["#FFFFFF", "#E8DFF5", "#4A4A4A"],
   },
   {
-    id: '3',
-    name: 'Terracotta',
-    hexCode: '#E07856',
-    pantone: 'PANTONE 16-1440',
-    year: '2025',
-    style: ['tropical', 'classic'],
+    id: "3",
+    name: "Terracotta",
+    hexCode: "#E07856",
+    pantone: "PANTONE 16-1440",
+    year: "2025",
+    style: ["tropical", "classic"],
     popularity: 82,
-    description: 'Cam đất nung ấm áp, gợi nhớ đến thiên nhiên',
-    usageRooms: ['Phòng khách', 'Ban công', 'Sân vườn'],
-    combinations: ['#F8F5F0', '#2C5F2D', '#D4AF37'],
+    description: "Cam đất nung ấm áp, gợi nhớ đến thiên nhiên",
+    usageRooms: ["Phòng khách", "Ban công", "Sân vườn"],
+    combinations: ["#F8F5F0", "#2C5F2D", "#D4AF37"],
   },
   {
-    id: '4',
-    name: 'Forest Green',
-    hexCode: '#2C5F2D',
-    pantone: 'PANTONE 19-0230',
-    year: '2025',
-    style: ['tropical', 'minimal'],
+    id: "4",
+    name: "Forest Green",
+    hexCode: "#2C5F2D",
+    pantone: "PANTONE 19-0230",
+    year: "2025",
+    style: ["tropical", "minimal"],
     popularity: 79,
-    description: 'Xanh rừng sâu, mang lại sự tĩnh lặng và gần gũi thiên nhiên',
-    usageRooms: ['Phòng khách', 'Phòng ngủ', 'Phòng tắm'],
-    combinations: ['#FFFFFF', '#F5E6D3', '#D4AF37'],
+    description: "Xanh rừng sâu, mang lại sự tĩnh lặng và gần gũi thiên nhiên",
+    usageRooms: ["Phòng khách", "Phòng ngủ", "Phòng tắm"],
+    combinations: ["#FFFFFF", "#F5E6D3", "#D4AF37"],
   },
   {
-    id: '5',
-    name: 'Butter Yellow',
-    hexCode: '#F5DEB3',
-    pantone: 'PANTONE 13-0739',
-    year: '2025',
-    style: ['modern', 'tropical'],
+    id: "5",
+    name: "Butter Yellow",
+    hexCode: "#F5DEB3",
+    pantone: "PANTONE 13-0739",
+    year: "2025",
+    style: ["modern", "tropical"],
     popularity: 75,
-    description: 'Vàng bơ tươi sáng, tạo không gian vui tươi',
-    usageRooms: ['Bếp', 'Phòng ăn', 'Phòng trẻ em'],
-    combinations: ['#FFFFFF', '#4A4A4A', '#E07856'],
+    description: "Vàng bơ tươi sáng, tạo không gian vui tươi",
+    usageRooms: ["Bếp", "Phòng ăn", "Phòng trẻ em"],
+    combinations: ["#FFFFFF", "#4A4A4A", "#E07856"],
   },
   {
-    id: '6',
-    name: 'Velvet Blue',
-    hexCode: '#1E3A5F',
-    pantone: 'PANTONE 19-4052',
-    year: '2024',
-    style: ['luxury', 'classic'],
+    id: "6",
+    name: "Velvet Blue",
+    hexCode: "#1E3A5F",
+    pantone: "PANTONE 19-4052",
+    year: "2024",
+    style: ["luxury", "classic"],
     popularity: 85,
-    description: 'Xanh nhung sang trọng và bí ẩn',
-    usageRooms: ['Phòng ngủ master', 'Phòng khách', 'Thư viện'],
-    combinations: ['#D4AF37', '#FFFFFF', '#8B7355'],
+    description: "Xanh nhung sang trọng và bí ẩn",
+    usageRooms: ["Phòng ngủ master", "Phòng khách", "Thư viện"],
+    combinations: ["#D4AF37", "#FFFFFF", "#8B7355"],
   },
   {
-    id: '7',
-    name: 'Sage Green',
-    hexCode: '#9CAF88',
-    pantone: 'PANTONE 15-6316',
-    year: '2024',
-    style: ['minimal', 'tropical'],
+    id: "7",
+    name: "Sage Green",
+    hexCode: "#9CAF88",
+    pantone: "PANTONE 15-6316",
+    year: "2024",
+    style: ["minimal", "tropical"],
     popularity: 81,
-    description: 'Xanh sage nhẹ nhàng, thư giãn',
-    usageRooms: ['Phòng ngủ', 'Phòng tắm', 'Yoga room'],
-    combinations: ['#F8F5F0', '#FFFFFF', '#8B7355'],
+    description: "Xanh sage nhẹ nhàng, thư giãn",
+    usageRooms: ["Phòng ngủ", "Phòng tắm", "Yoga room"],
+    combinations: ["#F8F5F0", "#FFFFFF", "#8B7355"],
   },
   {
-    id: '8',
-    name: 'Warm Taupe',
-    hexCode: '#8B7355',
-    pantone: 'PANTONE 17-1417',
-    year: '2024',
-    style: ['classic', 'luxury', 'minimal'],
+    id: "8",
+    name: "Warm Taupe",
+    hexCode: "#8B7355",
+    pantone: "PANTONE 17-1417",
+    year: "2024",
+    style: ["classic", "luxury", "minimal"],
     popularity: 77,
-    description: 'Nâu taupe ấm áp, trung tính và sang trọng',
-    usageRooms: ['Tất cả phòng'],
-    combinations: ['#FFFFFF', '#2C5F2D', '#D4AF37'],
+    description: "Nâu taupe ấm áp, trung tính và sang trọng",
+    usageRooms: ["Tất cả phòng"],
+    combinations: ["#FFFFFF", "#2C5F2D", "#D4AF37"],
   },
 ];
 
 const TREND_ARTICLES = [
   {
-    id: '1',
-    title: 'Top 10 Màu Sắc Xu Hướng 2025',
-    image: 'https://via.placeholder.com/400x200/FFBE98/FFFFFF?text=2025+Trends',
-    date: '15/11/2025',
+    id: "1",
+    title: "Top 10 Màu Sắc Xu Hướng 2025",
+    image:
+      "https://images.unsplash.com/photo-1615873968403-89e068629265?w=400&h=200&q=80",
+    date: "15/11/2025",
     views: 1234,
   },
   {
-    id: '2',
-    title: 'Cách Phối Màu Cho Phòng Khách Hiện Đại',
-    image: 'https://via.placeholder.com/400x200/B9A0D4/FFFFFF?text=Modern+Living',
-    date: '10/11/2025',
+    id: "2",
+    title: "Cách Phối Màu Cho Phòng Khách Hiện Đại",
+    image:
+      "https://images.unsplash.com/photo-1600210492493-0946911123ea?w=400&h=200&q=80",
+    date: "10/11/2025",
     views: 987,
   },
 ];
 
 export default function ColorTrendsScreen() {
-  const [selectedYear, setSelectedYear] = useState('2025');
-  const [selectedStyle, setSelectedStyle] = useState('all');
+  const [selectedYear, setSelectedYear] = useState("2025");
+  const [selectedStyle, setSelectedStyle] = useState("all");
   const [selectedColor, setSelectedColor] = useState<ColorTrend | null>(null);
   const [showDetail, setShowDetail] = useState(false);
   const [favorites, setFavorites] = useState<string[]>([]);
 
   const filteredTrends = COLOR_TRENDS.filter((trend) => {
     const matchYear = trend.year === selectedYear;
-    const matchStyle = selectedStyle === 'all' || trend.style.includes(selectedStyle);
+    const matchStyle =
+      selectedStyle === "all" || trend.style.includes(selectedStyle);
     return matchYear && matchStyle;
   });
 
   const toggleFavorite = (id: string) => {
     setFavorites((prev) =>
-      prev.includes(id) ? prev.filter((fav) => fav !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((fav) => fav !== id) : [...prev, id],
     );
   };
 
@@ -189,7 +192,7 @@ export default function ColorTrendsScreen() {
         message: `Màu ${color.name} (${color.hexCode}) - ${color.description}\nPantone: ${color.pantone}`,
       });
     } catch (error) {
-      Alert.alert('Lỗi', 'Không thể chia sẻ');
+      Alert.alert("Lỗi", "Không thể chia sẻ");
     }
   };
 
@@ -201,7 +204,7 @@ export default function ColorTrendsScreen() {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <LinearGradient colors={['#0066CC', '#3399FF']} style={styles.header}>
+      <LinearGradient colors={["#0066CC", "#3399FF"]} style={styles.header}>
         <View style={styles.headerTop}>
           <TouchableOpacity
             onPress={() => router.back()}
@@ -257,7 +260,7 @@ export default function ColorTrendsScreen() {
                   <Ionicons
                     name={style.icon as any}
                     size={18}
-                    color={selectedStyle === style.id ? '#fff' : '#666'}
+                    color={selectedStyle === style.id ? "#fff" : "#666"}
                   />
                   <Text
                     style={[
@@ -297,14 +300,18 @@ export default function ColorTrendsScreen() {
                     onPress={() => toggleFavorite(color.id)}
                   >
                     <Ionicons
-                      name={favorites.includes(color.id) ? 'heart' : 'heart-outline'}
+                      name={
+                        favorites.includes(color.id) ? "heart" : "heart-outline"
+                      }
                       size={20}
-                      color={favorites.includes(color.id) ? '#ff4444' : '#fff'}
+                      color={favorites.includes(color.id) ? "#ff4444" : "#fff"}
                     />
                   </TouchableOpacity>
                   <View style={styles.popularityBadge}>
                     <Ionicons name="trending-up" size={12} color="#fff" />
-                    <Text style={styles.popularityText}>{color.popularity}%</Text>
+                    <Text style={styles.popularityText}>
+                      {color.popularity}%
+                    </Text>
                   </View>
                 </View>
                 <View style={styles.colorInfo}>
@@ -377,13 +384,17 @@ export default function ColorTrendsScreen() {
                     { backgroundColor: selectedColor.hexCode },
                   ]}
                 >
-                  <Text style={styles.modalColorName}>{selectedColor.name}</Text>
+                  <Text style={styles.modalColorName}>
+                    {selectedColor.name}
+                  </Text>
                 </View>
 
                 <View style={styles.modalSection}>
                   <Text style={styles.modalLabel}>Mã màu</Text>
                   <View style={styles.codeRow}>
-                    <Text style={styles.codeText}>HEX: {selectedColor.hexCode}</Text>
+                    <Text style={styles.codeText}>
+                      HEX: {selectedColor.hexCode}
+                    </Text>
                     <Text style={styles.codeText}>{selectedColor.pantone}</Text>
                   </View>
                 </View>
@@ -446,8 +457,8 @@ export default function ColorTrendsScreen() {
                     <Ionicons
                       name={
                         favorites.includes(selectedColor.id)
-                          ? 'heart'
-                          : 'heart-outline'
+                          ? "heart"
+                          : "heart-outline"
                       }
                       size={24}
                       color="#0066CC"
@@ -474,7 +485,7 @@ export default function ColorTrendsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
   },
   header: {
     paddingTop: 50,
@@ -482,9 +493,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   headerTop: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     marginBottom: 16,
   },
   backButton: {
@@ -492,32 +503,32 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#fff',
+    fontWeight: "600",
+    color: "#fff",
   },
   headerRight: {
     padding: 8,
   },
   yearSelector: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 12,
   },
   yearButton: {
     paddingVertical: 8,
     paddingHorizontal: 20,
     borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.2)',
+    backgroundColor: "rgba(255,255,255,0.2)",
   },
   yearButtonActive: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   yearText: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#fff',
+    fontWeight: "600",
+    color: "#fff",
   },
   yearTextActive: {
-    color: '#0066CC',
+    color: "#0066CC",
   },
   content: {
     flex: 1,
@@ -526,59 +537,59 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 12,
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
     marginBottom: 12,
   },
   seeAllText: {
     fontSize: 14,
-    color: '#0066CC',
+    color: "#0066CC",
   },
   styleRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 8,
   },
   styleChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6,
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 20,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderWidth: 1,
-    borderColor: '#e0e0e0',
+    borderColor: "#e0e0e0",
   },
   styleChipActive: {
-    backgroundColor: '#0066CC',
-    borderColor: '#0066CC',
+    backgroundColor: "#0066CC",
+    borderColor: "#0066CC",
   },
   styleChipText: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
   },
   styleChipTextActive: {
-    color: '#fff',
-    fontWeight: '500',
+    color: "#fff",
+    fontWeight: "500",
   },
   trendsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 12,
   },
   colorCard: {
     width: CARD_WIDTH,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 12,
-    overflow: 'hidden',
-    shadowColor: '#000',
+    overflow: "hidden",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -586,216 +597,216 @@ const styles = StyleSheet.create({
   },
   colorSwatch: {
     height: 120,
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
     padding: 12,
   },
   favoriteIcon: {
-    alignSelf: 'flex-end',
-    backgroundColor: 'rgba(0,0,0,0.3)',
+    alignSelf: "flex-end",
+    backgroundColor: "rgba(0,0,0,0.3)",
     borderRadius: 20,
     padding: 6,
   },
   popularityBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 4,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    alignSelf: 'flex-start',
+    backgroundColor: "rgba(0,0,0,0.5)",
+    alignSelf: "flex-start",
     paddingVertical: 4,
     paddingHorizontal: 8,
     borderRadius: 12,
   },
   popularityText: {
     fontSize: 11,
-    color: '#fff',
-    fontWeight: '600',
+    color: "#fff",
+    fontWeight: "600",
   },
   colorInfo: {
     padding: 12,
   },
   colorName: {
     fontSize: 15,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
     marginBottom: 4,
   },
   colorCode: {
     fontSize: 13,
-    color: '#666',
+    color: "#666",
     marginBottom: 2,
   },
   colorPantone: {
     fontSize: 11,
-    color: '#999',
+    color: "#999",
   },
   articleCard: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 12,
-    overflow: 'hidden',
+    overflow: "hidden",
     marginBottom: 12,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
   },
   articleImage: {
-    width: '100%',
+    width: "100%",
     height: 150,
-    resizeMode: 'cover',
+    resizeMode: "cover",
   },
   articleContent: {
     padding: 12,
   },
   articleTitle: {
     fontSize: 15,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
     marginBottom: 8,
   },
   articleMeta: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 16,
   },
   metaItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 4,
   },
   metaText: {
     fontSize: 12,
-    color: '#999',
+    color: "#999",
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'flex-end',
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "flex-end",
   },
   modalContent: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    maxHeight: '90%',
+    maxHeight: "90%",
     paddingBottom: 20,
   },
   modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: "#f0f0f0",
   },
   modalTitle: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
   },
   modalColorSwatch: {
     height: 150,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   modalColorName: {
     fontSize: 24,
-    fontWeight: '700',
-    color: '#fff',
+    fontWeight: "700",
+    color: "#fff",
   },
   modalSection: {
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: "#f0f0f0",
   },
   modalLabel: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#666',
+    fontWeight: "600",
+    color: "#666",
     marginBottom: 8,
   },
   codeRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   codeText: {
     fontSize: 14,
-    color: '#333',
-    fontFamily: 'monospace',
+    color: "#333",
+    fontFamily: "monospace",
   },
   modalDescription: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
     lineHeight: 20,
   },
   popularityBar: {
     height: 8,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: "#f0f0f0",
     borderRadius: 4,
-    overflow: 'hidden',
+    overflow: "hidden",
     marginBottom: 8,
   },
   popularityFill: {
-    height: '100%',
-    backgroundColor: '#0066CC',
+    height: "100%",
+    backgroundColor: "#0066CC",
   },
   popularityLabel: {
     fontSize: 12,
-    color: '#666',
+    color: "#666",
   },
   roomTags: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 8,
   },
   roomTag: {
-    backgroundColor: '#fff5f0',
+    backgroundColor: "#fff5f0",
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#0066CC',
+    borderColor: "#0066CC",
   },
   roomTagText: {
     fontSize: 13,
-    color: '#0066CC',
+    color: "#0066CC",
   },
   combinationRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 12,
   },
   combinationSwatch: {
     flex: 1,
     height: 60,
     borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     borderWidth: 1,
-    borderColor: '#e0e0e0',
+    borderColor: "#e0e0e0",
   },
   combinationCode: {
     fontSize: 11,
-    fontWeight: '600',
-    color: '#fff',
+    fontWeight: "600",
+    color: "#fff",
   },
   modalActions: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 12,
     padding: 16,
   },
   actionButton: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     gap: 8,
     paddingVertical: 12,
     borderRadius: 8,
-    backgroundColor: '#fff5f0',
+    backgroundColor: "#fff5f0",
     borderWidth: 1,
-    borderColor: '#0066CC',
+    borderColor: "#0066CC",
   },
   actionButtonText: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#0066CC',
+    fontWeight: "600",
+    color: "#0066CC",
   },
 });

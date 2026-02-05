@@ -1,17 +1,23 @@
 /**
  * Messages List Screen - Modernized with Nordic Green Theme
  * Shopee/Grab style conversation list
- * Updated: 13/12/2025
+ * Updated: 03/02/2026
  */
 
-import Avatar from '@/components/ui/avatar';
-import { ContactSection } from '@/components/ui/contact-section';
-import { MODERN_COLORS, MODERN_RADIUS, MODERN_SPACING, MODERN_TYPOGRAPHY } from '@/constants/modern-theme';
-import { useMessages } from '@/hooks/useMessages';
-import type { Conversation } from '@/services/api/messagesApi';
-import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
-import React from 'react';
+import { MessagesListHeader } from "@/components/navigation/ChatHeader";
+import Avatar from "@/components/ui/avatar";
+import { ContactSection } from "@/components/ui/contact-section";
+import {
+    MODERN_COLORS,
+    MODERN_RADIUS,
+    MODERN_SPACING,
+    MODERN_TYPOGRAPHY,
+} from "@/constants/modern-theme";
+import { useMessages } from "@/hooks/useMessages";
+import type { Conversation } from "@/services/api/messagesApi";
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import React, { useMemo } from "react";
 import {
     ActivityIndicator,
     FlatList,
@@ -21,16 +27,24 @@ import {
     Text,
     TouchableOpacity,
     View,
-} from 'react-native';
+} from "react-native";
 
 export default function MessagesScreen() {
-  const { 
-    conversations, 
-    loading, 
-    error, 
-    unreadCount,
-    refreshConversations 
+  const {
+    conversations: apiConversations,
+    loading,
+    error,
+    unreadCount: apiUnreadCount,
+    refreshConversations,
+    markConversationAsRead,
   } = useMessages();
+
+  const conversations = useMemo(() => apiConversations, [apiConversations]);
+
+  const unreadCount = useMemo(() => {
+    if (apiUnreadCount > 0) return apiUnreadCount;
+    return conversations.reduce((sum, c) => sum + (c.unreadCount || 0), 0);
+  }, [apiUnreadCount, conversations]);
 
   const [refreshing, setRefreshing] = React.useState(false);
 
@@ -40,7 +54,12 @@ export default function MessagesScreen() {
     setRefreshing(false);
   };
 
-  const handleConversationPress = (conversation: Conversation) => {
+  const handleConversationPress = async (conversation: Conversation) => {
+    // Mark conversation as read when opening
+    if (conversation.unreadCount > 0) {
+      markConversationAsRead(conversation.id);
+    }
+
     // Navigate to chat with the other participant
     const otherParticipant = conversation.participants[0];
     router.push(`/messages/${otherParticipant.id}`);
@@ -54,23 +73,26 @@ export default function MessagesScreen() {
     const diffHours = Math.floor(diffMs / 3600000);
     const diffDays = Math.floor(diffMs / 86400000);
 
-    if (diffMins < 1) return 'Vừa xong';
+    if (diffMins < 1) return "Vừa xong";
     if (diffMins < 60) return `${diffMins} phút`;
     if (diffHours < 24) return `${diffHours} giờ`;
     if (diffDays < 7) return `${diffDays} ngày`;
-    
-    return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
+
+    return date.toLocaleDateString("vi-VN", {
+      day: "2-digit",
+      month: "2-digit",
+    });
   };
 
   const truncateMessage = (content: string, maxLength = 50) => {
     if (content.length <= maxLength) return content;
-    return content.substring(0, maxLength) + '...';
+    return content.substring(0, maxLength) + "...";
   };
 
   const renderConversation = ({ item }: { item: Conversation }) => {
     const otherParticipant = item.participants[0];
     const lastMsg = item.lastMessage;
-    
+
     return (
       <TouchableOpacity
         style={styles.conversationItem}
@@ -104,23 +126,24 @@ export default function MessagesScreen() {
           <View style={styles.messageRow}>
             <View style={{ flex: 1 }}>
               {lastMsg ? (
-                <Text 
-                  style={[styles.messageText, item.unreadCount > 0 && styles.unreadText]} 
+                <Text
+                  style={[
+                    styles.messageText,
+                    item.unreadCount > 0 && styles.unreadText,
+                  ]}
                   numberOfLines={1}
                 >
                   {truncateMessage(lastMsg.content)}
                 </Text>
               ) : (
-                <Text style={styles.messageText}>
-                  Chưa có tin nhắn
-                </Text>
+                <Text style={styles.messageText}>Chưa có tin nhắn</Text>
               )}
             </View>
 
             {item.unreadCount > 0 && (
               <View style={styles.unreadBadge}>
                 <Text style={styles.unreadBadgeText}>
-                  {item.unreadCount > 99 ? '99+' : item.unreadCount}
+                  {item.unreadCount > 99 ? "99+" : item.unreadCount}
                 </Text>
               </View>
             )}
@@ -132,17 +155,14 @@ export default function MessagesScreen() {
 
   const renderEmpty = () => {
     if (loading) return null;
-    
+
     if (error) {
       return (
         <View style={styles.emptyContainer}>
           <Ionicons name="alert-circle-outline" size={64} color="#000000" />
           <Text style={styles.emptyTitle}>Lỗi tải dữ liệu</Text>
           <Text style={styles.emptySubtitle}>{error}</Text>
-          <TouchableOpacity 
-            style={styles.retryButton}
-            onPress={handleRefresh}
-          >
+          <TouchableOpacity style={styles.retryButton} onPress={handleRefresh}>
             <Text style={styles.retryText}>Thử lại</Text>
           </TouchableOpacity>
         </View>
@@ -152,8 +172,14 @@ export default function MessagesScreen() {
     return (
       <View style={styles.emptyContainer}>
         <View style={styles.welcomeSection}>
-          <Ionicons name="chatbubbles" size={56} color={MODERN_COLORS.primary} />
-          <Text style={styles.welcomeTitle}>Chào mừng bạn đến với Tin nhắn!</Text>
+          <Ionicons
+            name="chatbubbles"
+            size={56}
+            color={MODERN_COLORS.primary}
+          />
+          <Text style={styles.welcomeTitle}>
+            Chào mừng bạn đến với Tin nhắn!
+          </Text>
           <Text style={styles.welcomeSubtitle}>
             Bắt đầu trò chuyện với AI trợ lý hoặc nhân viên hỗ trợ của chúng tôi
           </Text>
@@ -162,41 +188,58 @@ export default function MessagesScreen() {
         {/* Suggested conversations */}
         <View style={styles.suggestedSection}>
           <Text style={styles.suggestedTitle}>Bắt đầu trò chuyện</Text>
-          
+
           {/* AI Assistant suggestion */}
           <TouchableOpacity
             style={styles.suggestedItem}
-            onPress={() => router.push('/messages/ai-assistant')}
+            onPress={() => router.push("/messages/ai-assistant")}
             activeOpacity={0.7}
           >
-            <View style={[styles.suggestedAvatar, { backgroundColor: '#666666' }]}>
+            <View
+              style={[styles.suggestedAvatar, { backgroundColor: "#666666" }]}
+            >
               <Ionicons name="sparkles" size={28} color="#fff" />
             </View>
             <View style={styles.suggestedContent}>
               <Text style={styles.suggestedName}>AI Trợ lý Xây dựng</Text>
               <Text style={styles.suggestedMessage}>
-                Xin chào! Tôi có thể giúp bạn về tư vấn xây dựng, báo giá, và theo dõi tiến độ 24/7
+                Xin chào! Tôi có thể giúp bạn về tư vấn xây dựng, báo giá, và
+                theo dõi tiến độ 24/7
               </Text>
             </View>
-            <Ionicons name="chevron-forward" size={20} color={MODERN_COLORS.textTertiary} />
+            <Ionicons
+              name="chevron-forward"
+              size={20}
+              color={MODERN_COLORS.textTertiary}
+            />
           </TouchableOpacity>
 
           {/* Customer Service suggestion */}
           <TouchableOpacity
             style={styles.suggestedItem}
-            onPress={() => router.push('/messages/customer-service')}
+            onPress={() => router.push("/messages/customer-service")}
             activeOpacity={0.7}
           >
-            <View style={[styles.suggestedAvatar, { backgroundColor: MODERN_COLORS.primary }]}>
+            <View
+              style={[
+                styles.suggestedAvatar,
+                { backgroundColor: MODERN_COLORS.primary },
+              ]}
+            >
               <Ionicons name="headset" size={28} color="#fff" />
             </View>
             <View style={styles.suggestedContent}>
               <Text style={styles.suggestedName}>Nhân viên CSKH</Text>
               <Text style={styles.suggestedMessage}>
-                Chúng tôi luôn sẵn sàng hỗ trợ bạn về dịch vụ, giải đáp thắc mắc và xử lý yêu cầu
+                Chúng tôi luôn sẵn sàng hỗ trợ bạn về dịch vụ, giải đáp thắc mắc
+                và xử lý yêu cầu
               </Text>
             </View>
-            <Ionicons name="chevron-forward" size={20} color={MODERN_COLORS.textTertiary} />
+            <Ionicons
+              name="chevron-forward"
+              size={20}
+              color={MODERN_COLORS.textTertiary}
+            />
           </TouchableOpacity>
         </View>
 
@@ -208,22 +251,22 @@ export default function MessagesScreen() {
           style={styles.contactSection}
           methods={[
             {
-              type: 'phone',
-              label: 'Hotline 24/7',
-              value: '1900 6789',
-              subtitle: 'Miễn phí gọi trong nước',
+              type: "phone",
+              label: "Hotline 24/7",
+              value: "1900 6789",
+              subtitle: "Miễn phí gọi trong nước",
             },
             {
-              type: 'email',
-              label: 'Email hỗ trợ',
-              value: 'support@baotienweb.cloud',
-              subtitle: 'Phản hồi trong 2 giờ',
+              type: "email",
+              label: "Email hỗ trợ",
+              value: "support@baotienweb.cloud",
+              subtitle: "Phản hồi trong 2 giờ",
             },
             {
-              type: 'location',
-              label: 'Showroom',
-              value: '123 Nguyễn Huệ, Q.1, TP.HCM',
-              subtitle: 'Thứ 2 - CN: 8h00 - 20h00',
+              type: "location",
+              label: "Showroom",
+              value: "123 Nguyễn Huệ, Q.1, TP.HCM",
+              subtitle: "Thứ 2 - CN: 8h00 - 20h00",
             },
           ]}
         />
@@ -242,51 +285,55 @@ export default function MessagesScreen() {
 
   return (
     <>
-      <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
-      <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backButton}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-        >
-          <Ionicons name="arrow-back" size={24} color={MODERN_COLORS.text} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>
-          Tin nhắn {unreadCount > 0 && `(${unreadCount})`}
-        </Text>
-        <TouchableOpacity
-          style={styles.headerButton}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-        >
-          <Ionicons name="create-outline" size={24} color={MODERN_COLORS.text} />
-        </TouchableOpacity>
-      </View>
-
-      {/* Search bar */}
-      <View style={styles.searchContainer}>
-        <Ionicons name="search" size={20} color={MODERN_COLORS.textSecondary} />
-        <Text style={styles.searchPlaceholder}>Tìm kiếm tin nhắn</Text>
-      </View>
-
-      {/* Conversations list */}
-      <FlatList
-        data={conversations}
-        renderItem={renderConversation}
-        keyExtractor={(item) => item.id.toString()}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={handleRefresh}
-            colors={[MODERN_COLORS.primary]}
-            tintColor={MODERN_COLORS.primary}
-          />
-        }
-        ListEmptyComponent={renderEmpty}
-        contentContainerStyle={conversations.length === 0 ? styles.emptyList : undefined}
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor="#0068FF"
+        translucent
       />
-    </View>
+      <View style={styles.container}>
+        {/* Messages List Header - Zalo style */}
+        <MessagesListHeader
+          title="Tin nhắn"
+          unreadCount={unreadCount}
+          onNewConversation={() => router.push("/messages/new-conversation")}
+          onSearchPress={() => router.push("/messages/new-conversation")}
+        />
+
+        {/* Search bar - clickable to search */}
+        <TouchableOpacity
+          style={styles.searchContainer}
+          onPress={() => router.push("/messages/new-conversation")}
+          activeOpacity={0.7}
+        >
+          <Ionicons
+            name="search"
+            size={20}
+            color={MODERN_COLORS.textSecondary}
+          />
+          <Text style={styles.searchPlaceholder}>
+            Tìm kiếm người dùng, số điện thoại, email...
+          </Text>
+        </TouchableOpacity>
+
+        {/* Conversations list */}
+        <FlatList
+          data={conversations}
+          renderItem={renderConversation}
+          keyExtractor={(item) => item.id.toString()}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={handleRefresh}
+              colors={[MODERN_COLORS.primary]}
+              tintColor={MODERN_COLORS.primary}
+            />
+          }
+          ListEmptyComponent={renderEmpty}
+          contentContainerStyle={
+            conversations.length === 0 ? styles.emptyList : undefined
+          }
+        />
+      </View>
     </>
   );
 }
@@ -296,39 +343,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: MODERN_COLORS.background,
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: MODERN_SPACING.md,
-    paddingTop: 44,
-    paddingBottom: MODERN_SPACING.sm,
-    backgroundColor: MODERN_COLORS.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: MODERN_COLORS.divider,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-  },
-  headerTitle: {
-    fontSize: MODERN_TYPOGRAPHY.fontSize.lg,
-    fontWeight: MODERN_TYPOGRAPHY.fontWeight.bold,
-    color: MODERN_COLORS.text,
-    flex: 1,
-    textAlign: 'center',
-  },
-  headerButton: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'flex-end',
-  },
   searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: MODERN_COLORS.background,
     borderRadius: MODERN_RADIUS.full,
     paddingHorizontal: MODERN_SPACING.md,
@@ -344,14 +361,14 @@ const styles = StyleSheet.create({
     color: MODERN_COLORS.textSecondary,
   },
   conversationItem: {
-    flexDirection: 'row',
+    flexDirection: "row",
     padding: MODERN_SPACING.md,
     backgroundColor: MODERN_COLORS.surface,
     borderBottomWidth: 1,
     borderBottomColor: MODERN_COLORS.divider,
   },
   avatarContainer: {
-    position: 'relative',
+    position: "relative",
     marginRight: MODERN_SPACING.md,
   },
   avatar: {
@@ -361,11 +378,11 @@ const styles = StyleSheet.create({
   },
   avatarPlaceholder: {
     backgroundColor: MODERN_COLORS.background,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   onlineIndicator: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 2,
     right: 2,
     width: 14,
@@ -377,12 +394,12 @@ const styles = StyleSheet.create({
   },
   messageContent: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: MODERN_SPACING.xxs,
   },
   userName: {
@@ -397,9 +414,9 @@ const styles = StyleSheet.create({
     color: MODERN_COLORS.textSecondary,
   },
   messageRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   messageText: {
     fontSize: MODERN_TYPOGRAPHY.fontSize.sm,
@@ -416,8 +433,8 @@ const styles = StyleSheet.create({
     minWidth: 20,
     height: 20,
     paddingHorizontal: MODERN_SPACING.xs,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginLeft: MODERN_SPACING.sm,
   },
   unreadBadgeText: {
@@ -427,13 +444,13 @@ const styles = StyleSheet.create({
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     backgroundColor: MODERN_COLORS.background,
   },
   loadingFooter: {
     paddingVertical: MODERN_SPACING.lg,
-    alignItems: 'center',
+    alignItems: "center",
   },
   loadingText: {
     marginTop: MODERN_SPACING.sm,
@@ -445,13 +462,13 @@ const styles = StyleSheet.create({
   },
   emptyContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     paddingHorizontal: MODERN_SPACING.xl,
     paddingVertical: MODERN_SPACING.xl,
   },
   welcomeSection: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: MODERN_SPACING.xl,
   },
   welcomeTitle: {
@@ -459,17 +476,17 @@ const styles = StyleSheet.create({
     fontWeight: MODERN_TYPOGRAPHY.fontWeight.bold,
     color: MODERN_COLORS.text,
     marginTop: MODERN_SPACING.md,
-    textAlign: 'center',
+    textAlign: "center",
   },
   welcomeSubtitle: {
     fontSize: MODERN_TYPOGRAPHY.fontSize.sm,
     color: MODERN_COLORS.textSecondary,
     marginTop: MODERN_SPACING.sm,
-    textAlign: 'center',
+    textAlign: "center",
     lineHeight: MODERN_TYPOGRAPHY.lineHeight.relaxed,
   },
   suggestedSection: {
-    width: '100%',
+    width: "100%",
     marginTop: MODERN_SPACING.md,
   },
   suggestedTitle: {
@@ -477,12 +494,12 @@ const styles = StyleSheet.create({
     fontWeight: MODERN_TYPOGRAPHY.fontWeight.semibold,
     color: MODERN_COLORS.textSecondary,
     marginBottom: MODERN_SPACING.md,
-    textTransform: 'uppercase',
+    textTransform: "uppercase",
     letterSpacing: 0.5,
   },
   suggestedItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: MODERN_COLORS.surface,
     borderRadius: MODERN_RADIUS.lg,
     padding: MODERN_SPACING.md,
@@ -494,8 +511,8 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: MODERN_RADIUS.full,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginRight: MODERN_SPACING.md,
   },
   suggestedContent: {
@@ -514,7 +531,7 @@ const styles = StyleSheet.create({
     lineHeight: MODERN_TYPOGRAPHY.lineHeight.normal,
   },
   contactSection: {
-    width: '100%',
+    width: "100%",
     marginTop: MODERN_SPACING.xl,
   },
   emptyTitle: {
@@ -527,7 +544,7 @@ const styles = StyleSheet.create({
     fontSize: MODERN_TYPOGRAPHY.fontSize.sm,
     color: MODERN_COLORS.textSecondary,
     marginTop: MODERN_SPACING.sm,
-    textAlign: 'center',
+    textAlign: "center",
   },
   retryButton: {
     marginTop: MODERN_SPACING.md,
@@ -540,6 +557,6 @@ const styles = StyleSheet.create({
     color: MODERN_COLORS.surface,
     fontSize: MODERN_TYPOGRAPHY.fontSize.md,
     fontWeight: MODERN_TYPOGRAPHY.fontWeight.semibold,
-    textAlign: 'center',
+    textAlign: "center",
   },
 });

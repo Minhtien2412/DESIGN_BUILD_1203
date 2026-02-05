@@ -3,9 +3,9 @@
  * Monitor network connectivity and provide offline status
  */
 
-import NetInfo, { NetInfoState } from '@react-native-community/netinfo';
-import { useEffect, useState } from 'react';
-import { Platform } from 'react-native';
+import NetInfo, { NetInfoState } from "@react-native-community/netinfo";
+import { useEffect, useState } from "react";
+import { Platform } from "react-native";
 
 export interface NetworkStatus {
   isConnected: boolean;
@@ -18,17 +18,52 @@ export function useNetworkStatus(): NetworkStatus {
   const [status, setStatus] = useState<NetworkStatus>({
     isConnected: true,
     isInternetReachable: true,
-    type: Platform.OS === 'web' ? 'wifi' : null,
+    type: Platform.OS === "web" ? "wifi" : null,
     isOffline: false,
   });
 
   useEffect(() => {
-    // Web platform: always assume online (NetInfo unreliable on web)
-    if (Platform.OS === 'web') {
+    // Web platform: Use browser navigator.onLine API
+    if (Platform.OS === "web") {
+      if (typeof window !== "undefined" && typeof navigator !== "undefined") {
+        const handleOnline = () => {
+          setStatus({
+            isConnected: true,
+            isInternetReachable: true,
+            type: "wifi",
+            isOffline: false,
+          });
+        };
+
+        const handleOffline = () => {
+          setStatus({
+            isConnected: false,
+            isInternetReachable: false,
+            type: "none",
+            isOffline: true,
+          });
+        };
+
+        // Set initial state based on navigator.onLine
+        setStatus({
+          isConnected: navigator.onLine,
+          isInternetReachable: navigator.onLine,
+          type: navigator.onLine ? "wifi" : "none",
+          isOffline: !navigator.onLine,
+        });
+
+        window.addEventListener("online", handleOnline);
+        window.addEventListener("offline", handleOffline);
+
+        return () => {
+          window.removeEventListener("online", handleOnline);
+          window.removeEventListener("offline", handleOffline);
+        };
+      }
       return;
     }
 
-    // Get initial network state
+    // Native platforms: Use NetInfo
     NetInfo.fetch().then((state: NetInfoState) => {
       setStatus({
         isConnected: state.isConnected ?? false,
@@ -38,7 +73,6 @@ export function useNetworkStatus(): NetworkStatus {
       });
     });
 
-    // Subscribe to network state changes
     const unsubscribe = NetInfo.addEventListener((state: NetInfoState) => {
       const newStatus = {
         isConnected: state.isConnected ?? false,
@@ -46,15 +80,8 @@ export function useNetworkStatus(): NetworkStatus {
         type: state.type,
         isOffline: !state.isConnected || state.isInternetReachable === false,
       };
-      
+
       setStatus(newStatus);
-      
-      console.log('[NetworkStatus] Network state changed:', {
-        isConnected: newStatus.isConnected,
-        isInternetReachable: newStatus.isInternetReachable,
-        type: newStatus.type,
-        isOffline: newStatus.isOffline,
-      });
     });
 
     return () => {

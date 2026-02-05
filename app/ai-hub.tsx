@@ -202,7 +202,7 @@ export default function AIHubScreen() {
       totalFeatures: aiRouterService.getAllFeatures().length,
       categories: Object.keys(CATEGORY_CONFIG).length,
     }),
-    []
+    [],
   );
 
   // Handlers
@@ -214,9 +214,9 @@ export default function AIHubScreen() {
   const handleSearchPress = useCallback((query?: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (query) {
-      router.push(`/search?q=${encodeURIComponent(query)}`);
+      router.push(`/unified-search?q=${encodeURIComponent(query)}` as any);
     } else {
-      router.push("/search");
+      router.push("/unified-search" as any);
     }
   }, []);
 

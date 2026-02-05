@@ -1,27 +1,23 @@
 /**
  * Voice Recording Service
  * Record and send voice messages in chat
- * 
- * Note: Using expo-av for audio recording (deprecated in SDK 54)
- * TODO: Migrate to expo-audio when available
- * For now, silence warning with conditional import
  */
 
-import * as FileSystem from 'expo-file-system';
-
-// Conditional import to suppress deprecation warning in dev
- 
-let Audio: any = null;
-try {
-  const expoAv = require('expo-av');
-  Audio = expoAv.Audio;
-} catch (e) {
-  console.warn('[VoiceRecording] expo-av not available, voice recording disabled');
-}
+import {
+    AudioModule,
+    AudioPlayer,
+    RecordingPresets,
+    createAudioPlayer,
+    requestRecordingPermissionsAsync,
+    setAudioModeAsync,
+    type AudioRecorder,
+    type RecordingOptions,
+} from "expo-audio";
+import * as FileSystem from "expo-file-system";
 
 export interface VoiceRecordingOptions {
   maxDuration?: number; // milliseconds
-  quality?: 'low' | 'medium' | 'high';
+  quality?: "low" | "medium" | "high";
 }
 
 export interface VoiceRecording {
@@ -32,9 +28,7 @@ export interface VoiceRecording {
 }
 
 class VoiceRecorder {
-  // Using any type since Audio is dynamically imported
-   
-  private recording: any = null;
+  private recording: AudioRecorder | null = null;
   private isRecording = false;
   private startTime: number = 0;
 
@@ -43,10 +37,10 @@ class VoiceRecorder {
    */
   async requestPermission(): Promise<boolean> {
     try {
-      const { status } = await Audio.requestPermissionsAsync();
-      return status === 'granted';
+      const { status } = await requestRecordingPermissionsAsync();
+      return status === "granted";
     } catch (error) {
-      console.error('Failed to request microphone permission:', error);
+      console.error("Failed to request microphone permission:", error);
       return false;
     }
   }
@@ -56,32 +50,36 @@ class VoiceRecorder {
    */
   async startRecording(options: VoiceRecordingOptions = {}): Promise<void> {
     if (this.isRecording) {
-      throw new Error('Already recording');
+      throw new Error("Already recording");
     }
 
     const hasPermission = await this.requestPermission();
     if (!hasPermission) {
-      throw new Error('Microphone permission not granted');
+      throw new Error("Microphone permission not granted");
     }
 
     try {
-      // Set audio mode for recording
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
-        playsInSilentModeIOS: true,
+      await setAudioModeAsync({
+        allowsRecording: true,
+        playsInSilentMode: true,
+        interruptionMode: "doNotMix",
+        shouldPlayInBackground: false,
+        shouldRouteThroughEarpiece: false,
       });
 
-      // Configure recording options
-      const recordingOptions = this.getRecordingOptions(options.quality || 'medium');
+      const recordingOptions = this.getRecordingOptions(
+        options.quality || "medium",
+      );
 
-      // Create and start recording
-      const { recording } = await Audio.Recording.createAsync(recordingOptions);
-      
-      this.recording = recording;
+      // eslint-disable-next-line import/namespace -- AudioRecorder is a valid class in expo-audio SDK 54
+      const recorder = new AudioModule.AudioRecorder(recordingOptions);
+      await recorder.prepareToRecordAsync();
+      recorder.record();
+
+      this.recording = recorder;
       this.isRecording = true;
       this.startTime = Date.now();
 
-      // Set max duration timer if specified
       if (options.maxDuration) {
         setTimeout(() => {
           if (this.isRecording) {
@@ -90,7 +88,7 @@ class VoiceRecorder {
         }, options.maxDuration);
       }
     } catch (error) {
-      console.error('Failed to start recording:', error);
+      console.error("Failed to start recording:", error);
       throw error;
     }
   }
@@ -100,41 +98,41 @@ class VoiceRecorder {
    */
   async stopRecording(): Promise<VoiceRecording> {
     if (!this.recording || !this.isRecording) {
-      throw new Error('Not currently recording');
+      throw new Error("Not currently recording");
     }
 
     try {
-      await this.recording.stopAndUnloadAsync();
-      const uri = this.recording.getURI();
-      
+      await this.recording.stop();
+      const uri = this.recording.uri;
+
       if (!uri) {
-        throw new Error('Recording URI not available');
+        throw new Error("Recording URI not available");
       }
 
-      // Get file info
+      const status = this.recording.getStatus();
+      const duration = status.durationMillis || Date.now() - this.startTime;
+
       const fileInfo = await FileSystem.getInfoAsync(uri);
-      const duration = Date.now() - this.startTime;
 
       const result: VoiceRecording = {
         uri,
         duration,
         size: fileInfo.exists ? fileInfo.size || 0 : 0,
-        mimeType: 'audio/m4a',
+        mimeType: "audio/m4a",
       };
 
-      // Reset state
       this.recording = null;
       this.isRecording = false;
       this.startTime = 0;
 
-      // Reset audio mode
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: false,
+      await setAudioModeAsync({
+        allowsRecording: false,
+        playsInSilentMode: true,
       });
 
       return result;
     } catch (error) {
-      console.error('Failed to stop recording:', error);
+      console.error("Failed to stop recording:", error);
       throw error;
     }
   }
@@ -148,10 +146,9 @@ class VoiceRecorder {
     }
 
     try {
-      await this.recording.stopAndUnloadAsync();
-      const uri = this.recording.getURI();
-      
-      // Delete the file
+      await this.recording.stop();
+      const uri = this.recording.uri;
+
       if (uri) {
         await FileSystem.deleteAsync(uri, { idempotent: true });
       }
@@ -160,11 +157,12 @@ class VoiceRecorder {
       this.isRecording = false;
       this.startTime = 0;
 
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: false,
+      await setAudioModeAsync({
+        allowsRecording: false,
+        playsInSilentMode: true,
       });
     } catch (error) {
-      console.error('Failed to cancel recording:', error);
+      console.error("Failed to cancel recording:", error);
     }
   }
 
@@ -185,52 +183,35 @@ class VoiceRecorder {
 
   /**
    * Get recording options based on quality
-   * Returns type any since Audio module is dynamically imported
    */
-  private getRecordingOptions(quality: 'low' | 'medium' | 'high'): any {
-    const baseOptions: any = {
-      isMeteringEnabled: true,
-      android: {
-        extension: '.m4a',
-        outputFormat: Audio?.AndroidOutputFormat?.MPEG_4,
-        audioEncoder: Audio?.AndroidAudioEncoder?.AAC,
-        sampleRate: 44100,
-        numberOfChannels: 1,
-        bitRate: 128000,
-      },
-      ios: {
-        extension: '.m4a',
-        outputFormat: Audio?.IOSOutputFormat?.MPEG4AAC,
-        audioQuality: Audio?.IOSAudioQuality?.HIGH,
-        sampleRate: 44100,
-        numberOfChannels: 1,
-        bitRate: 128000,
-        linearPCMBitDepth: 16,
-        linearPCMIsBigEndian: false,
-        linearPCMIsFloat: false,
-      },
-      web: {
-        mimeType: 'audio/webm',
-        bitsPerSecond: 128000,
-      },
-    };
+  private getRecordingOptions(
+    quality: "low" | "medium" | "high",
+  ): RecordingOptions {
+    const base =
+      quality === "low"
+        ? RecordingPresets.LOW_QUALITY
+        : RecordingPresets.HIGH_QUALITY;
 
-    switch (quality) {
-      case 'low':
-        if (baseOptions.android) baseOptions.android.bitRate = 64000;
-        if (baseOptions.ios) baseOptions.ios.bitRate = 64000;
-        if (baseOptions.web) baseOptions.web.bitsPerSecond = 64000;
-        break;
-      case 'high':
-        if (baseOptions.android) baseOptions.android.bitRate = 192000;
-        if (baseOptions.ios) baseOptions.ios.bitRate = 192000;
-        if (baseOptions.web) baseOptions.web.bitsPerSecond = 192000;
-        break;
-      default: // medium
-        break;
+    if (quality !== "medium") {
+      return {
+        ...base,
+        android: { ...base.android },
+        ios: { ...base.ios },
+        web: { ...base.web },
+      };
     }
 
-    return baseOptions;
+    // Medium quality: between LOW and HIGH
+    return {
+      ...base,
+      bitRate: 96000,
+      android: { ...base.android },
+      ios: { ...base.ios },
+      web: {
+        ...base.web,
+        bitsPerSecond: 96000,
+      },
+    };
   }
 }
 
@@ -239,18 +220,14 @@ export const voiceRecorder = new VoiceRecorder();
 
 /**
  * Play a voice recording
- * Returns type any since Audio.Sound is from dynamically imported module
  */
-export async function playVoiceRecording(uri: string): Promise<any> {
+export async function playVoiceRecording(uri: string): Promise<AudioPlayer> {
   try {
-    const { sound } = await Audio.Sound.createAsync(
-      { uri },
-      { shouldPlay: true }
-    );
-    
-    return sound;
+    const player = createAudioPlayer({ uri }, { updateInterval: 500 });
+    player.play();
+    return player;
   } catch (error) {
-    console.error('Failed to play voice recording:', error);
+    console.error("Failed to play voice recording:", error);
     throw error;
   }
 }
@@ -262,7 +239,7 @@ export function formatVoiceDuration(milliseconds: number): string {
   const seconds = Math.floor(milliseconds / 1000);
   const mins = Math.floor(seconds / 60);
   const secs = seconds % 60;
-  return `${mins}:${secs.toString().padStart(2, '0')}`;
+  return `${mins}:${secs.toString().padStart(2, "0")}`;
 }
 
 /**

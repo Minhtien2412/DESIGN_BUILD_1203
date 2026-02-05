@@ -1,1 +1,0 @@
-{"version":3,"names":["_reactNative","require","isIOS","Platform","OS"],"sources":["platform.js"],"sourcesContent":["import { Platform } from 'react-native';\nexport function isIOS() {\n    return Platform.OS === 'ios';\n}\n"],"mappings":";;;;AAAA,IAAAA,YAAA,GAAAC,OAAA;AACO,SAASC,KAAKA,CAAA,EAAG;EACpB,OAAOC,qBAAQ,CAACC,EAAE,KAAK,KAAK;AAChC","ignoreList":[]}

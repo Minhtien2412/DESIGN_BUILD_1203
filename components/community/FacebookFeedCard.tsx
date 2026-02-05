@@ -398,23 +398,69 @@ const ContentSection = memo(
           )}
         </View>
 
-        {/* Video Content - Auto-play inline */}
-        {type === "video" && videoUrl && itemId && (
-          <View style={styles.videoContainer}>
-            <FeedVideoPlayer
-              videoId={itemId}
-              videoUrl={videoUrl}
-              thumbnailUrl={imageUrl}
-              title={title}
-              duration={duration}
-              views={views}
-              isVisible={isVisible}
-              onPress={onMediaPress}
-              index={index}
-              autoPlay={true}
-              startMuted={true}
-            />
-          </View>
+        {/* Video Content - Auto-play inline or show thumbnail if no videoUrl */}
+        {type === "video" && (
+          <TouchableOpacity
+            style={styles.videoContainer}
+            onPress={onMediaPress}
+            activeOpacity={0.9}
+          >
+            {videoUrl && itemId ? (
+              <FeedVideoPlayer
+                videoId={itemId}
+                videoUrl={videoUrl}
+                thumbnailUrl={imageUrl}
+                title={title}
+                duration={duration}
+                views={views}
+                isVisible={isVisible}
+                onPress={onMediaPress}
+                index={index}
+                autoPlay={true}
+                startMuted={true}
+              />
+            ) : (
+              // Fallback: Show thumbnail with play button if no video URL
+              <View style={styles.videoThumbnailContainer}>
+                <Image
+                  source={{
+                    uri:
+                      imageUrl ||
+                      "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=400&h=500&q=80",
+                  }}
+                  style={styles.mediaImage}
+                  contentFit="cover"
+                />
+                <View style={styles.videoPlayOverlay}>
+                  <View style={styles.playButtonCircle}>
+                    <Ionicons name="play" size={32} color="white" />
+                  </View>
+                </View>
+                {/* Video stats overlay */}
+                <View style={styles.videoStatsOverlay}>
+                  {views !== undefined && (
+                    <View style={styles.videoStatBadge}>
+                      <Ionicons name="eye" size={12} color="white" />
+                      <Text style={styles.videoStatText}>
+                        {views >= 1000
+                          ? `${(views / 1000).toFixed(1)}K`
+                          : views}
+                      </Text>
+                    </View>
+                  )}
+                  {duration !== undefined && (
+                    <View style={styles.videoStatBadge}>
+                      <Ionicons name="time" size={12} color="white" />
+                      <Text style={styles.videoStatText}>
+                        {Math.floor(duration / 60)}:
+                        {String(Math.floor(duration % 60)).padStart(2, "0")}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              </View>
+            )}
+          </TouchableOpacity>
         )}
 
         {/* Image/Photo Content - Clickable for direct viewing */}
@@ -954,7 +1000,11 @@ export const StoryCard = memo(({ item, onPress }: StoryCardProps) => {
   return (
     <TouchableOpacity style={styles.storyCard} onPress={onPress}>
       <Image
-        source={{ uri: item.imageUrl || "https://via.placeholder.com/100" }}
+        source={{
+          uri:
+            item.imageUrl ||
+            "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=100&q=80",
+        }}
         style={styles.storyImage}
         contentFit="cover"
       />
@@ -1165,14 +1215,55 @@ const styles = StyleSheet.create({
   videoContainer: {
     position: "relative",
     width: "100%",
-    aspectRatio: 16 / 9,
+    aspectRatio: 4 / 5, // Facebook-style: taller than wide (4:5 ratio)
     backgroundColor: "#000",
     overflow: "hidden",
+  },
+  videoThumbnailContainer: {
+    position: "relative",
+    width: "100%",
+    height: "100%",
+  },
+  videoPlayOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.3)",
+  },
+  playButtonCircle: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingLeft: 4,
+  },
+  videoStatsOverlay: {
+    position: "absolute",
+    bottom: SPACING.sm,
+    left: SPACING.sm,
+    flexDirection: "row",
+    gap: SPACING.sm,
+  },
+  videoStatBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.7)",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+    gap: 4,
+  },
+  videoStatText: {
+    fontSize: 12,
+    fontWeight: "500",
+    color: "white",
   },
   mediaContainer: {
     position: "relative",
     width: "100%",
-    aspectRatio: 16 / 9,
+    aspectRatio: 4 / 5, // Match video ratio for consistency
   },
   mediaImage: {
     width: "100%",

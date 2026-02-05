@@ -1,17 +1,10 @@
-import { useRouter } from "expo-router";
-import { useEffect } from "react";
+/**
+ * Login Screen - Redirect to Modern Auth
+ * This file redirects to the new combined auth screen
+ */
 
-export default function LoginScreen() {
-  const router = useRouter();
+import { Redirect } from "expo-router";
 
-  // Redirect to unified login screen
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      router.replace("/(auth)/login-unified" as any);
-    }, 0);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  return null;
+export default function LoginRedirect() {
+  return <Redirect href="/(auth)/auth" />;
 }

@@ -1,34 +1,42 @@
-import { getItem, setItem } from '@/utils/storage';
-import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import { getItem, setItem } from "@/utils/storage";
+import {
+    createContext,
+    ReactNode,
+    useContext,
+    useEffect,
+    useState,
+} from "react";
 
 interface FavoriteItem {
   id: string;
   name: string;
   price: number;
   image: string;
-  type: 'product' | 'service' | 'worker';
+  type: "product" | "service" | "worker";
   addedAt: string;
 }
 
 interface FavoritesContextType {
   favorites: FavoriteItem[];
-  addFavorite: (item: Omit<FavoriteItem, 'addedAt'>) => Promise<void>;
+  addFavorite: (item: Omit<FavoriteItem, "addedAt">) => Promise<void>;
   removeFavorite: (id: string) => Promise<void>;
   isFavorite: (id: string) => boolean;
-  toggleFavorite: (item: Omit<FavoriteItem, 'addedAt'>) => Promise<void>;
+  toggleFavorite: (item: Omit<FavoriteItem, "addedAt">) => Promise<void>;
   clearFavorites: () => Promise<void>;
   totalFavorites: number;
 }
 
-const FavoritesContext = createContext<FavoritesContextType | undefined>(undefined);
+const FavoritesContext = createContext<FavoritesContextType | undefined>(
+  undefined,
+);
 
-const FAVORITES_KEY = 'user_favorites';
+const FAVORITES_KEY = "user_favorites";
 
 export function FavoritesProvider({ children }: { children: ReactNode }) {
   const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
   const [loaded, setLoaded] = useState(false);
 
-  // Load favorites from local storage (backend doesn't have favorites endpoint)
+  // Load favorites from local storage - DEFERRED to avoid blocking startup
   useEffect(() => {
     const loadFavorites = async () => {
       try {
@@ -37,12 +45,16 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
           setFavorites(JSON.parse(stored));
         }
       } catch (error) {
-        console.error('[FavoritesContext] Failed to load from storage:', error);
+        console.error("[FavoritesContext] Failed to load from storage:", error);
       } finally {
         setLoaded(true);
       }
     };
-    loadFavorites();
+    // Defer to next frame
+    const frameId = requestAnimationFrame(() => {
+      loadFavorites();
+    });
+    return () => cancelAnimationFrame(frameId);
   }, []);
 
   // Persist favorites to storage
@@ -52,11 +64,11 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
     }
   }, [favorites, loaded]);
 
-  const addFavorite = async (item: Omit<FavoriteItem, 'addedAt'>) => {
+  const addFavorite = async (item: Omit<FavoriteItem, "addedAt">) => {
     // Update state
     const newItem = { ...item, addedAt: new Date().toISOString() };
-    setFavorites(prev => {
-      const exists = prev.find(f => f.id === item.id);
+    setFavorites((prev) => {
+      const exists = prev.find((f) => f.id === item.id);
       if (exists) return prev;
       const updated = [...prev, newItem];
       // Persist to storage (fire-and-forget)
@@ -66,8 +78,8 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
   };
 
   const removeFavorite = async (id: string) => {
-    setFavorites(prev => {
-      const updated = prev.filter(f => f.id !== id);
+    setFavorites((prev) => {
+      const updated = prev.filter((f) => f.id !== id);
       // Persist to storage (fire-and-forget)
       setItem(FAVORITES_KEY, JSON.stringify(updated)).catch(console.error);
       return updated;
@@ -75,10 +87,10 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
   };
 
   const isFavorite = (id: string): boolean => {
-    return favorites.some(f => f.id === id);
+    return favorites.some((f) => f.id === id);
   };
 
-  const toggleFavorite = async (item: Omit<FavoriteItem, 'addedAt'>) => {
+  const toggleFavorite = async (item: Omit<FavoriteItem, "addedAt">) => {
     if (isFavorite(item.id)) {
       await removeFavorite(item.id);
     } else {
@@ -114,7 +126,7 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
 export function useFavorites() {
   const context = useContext(FavoritesContext);
   if (!context) {
-    throw new Error('useFavorites must be used within FavoritesProvider');
+    throw new Error("useFavorites must be used within FavoritesProvider");
   }
   return context;
 }

@@ -1,3 +1,7 @@
-import ProfileScreenModernized from '@/features/profile/ProfileScreenModernized';
+/**
+ * Profile Tab - Uses consolidated exports
+ * @route /(tabs)/profile
+ */
+import { ProfileScreen } from "@/features";
 
-export default ProfileScreenModernized;
+export default ProfileScreen;

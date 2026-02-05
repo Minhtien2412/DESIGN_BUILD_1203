@@ -10,10 +10,31 @@
 //     markNotificationAsRead,
 //     setBadgeCount,
 // } from '@/services/pushNotifications';
-import { handleNotificationTap as navigateFromNotification } from '@/services/notificationNavigator';
-import { socketManager } from '@/services/websocket/socketManager';
-import * as Notifications from 'expo-notifications';
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { useAuth } from "@/context/AuthContext";
+import { apiFetch } from "@/services/api";
+import { handleNotificationTap as navigateFromNotification } from "@/services/notificationNavigator";
+import { socketManager } from "@/services/websocket/socketManager";
+import Constants from "expo-constants";
+import React, {
+    createContext,
+    useCallback,
+    useContext,
+    useEffect,
+    useRef,
+    useState,
+} from "react";
+
+// Lazy import expo-notifications to avoid crash in Expo Go SDK 53+
+let Notifications: typeof import("expo-notifications") | null = null;
+const isExpoGo = Constants.appOwnership === "expo";
+
+if (!isExpoGo) {
+  try {
+    Notifications = require("expo-notifications");
+  } catch (e) {
+    console.warn("[NotificationsContext] expo-notifications not available");
+  }
+}
 
 // ============================================================================
 // Types
@@ -21,7 +42,7 @@ import React, { createContext, useCallback, useContext, useEffect, useState } fr
 
 export interface AppNotification {
   id: string;
-  type: 'task' | 'message' | 'project' | 'meeting' | 'alert' | 'system';
+  type: "task" | "message" | "project" | "meeting" | "alert" | "system";
   title: string;
   body: string;
   data?: Record<string, any>;
@@ -34,7 +55,7 @@ interface NotificationsContextType {
   unreadCount: number;
   loading: boolean;
   isConnected: boolean;
-  addNotification: (notification: Omit<AppNotification, 'id'>) => void;
+  addNotification: (notification: Omit<AppNotification, "id">) => void;
   refreshNotifications: () => Promise<void>;
   markAsRead: (id: string) => Promise<void>;
   markAllAsRead: () => Promise<void>;
@@ -46,12 +67,27 @@ interface NotificationsContextType {
 // Context
 // ============================================================================
 
-const NotificationsContext = createContext<NotificationsContextType | undefined>(undefined);
+const NotificationsContext = createContext<
+  NotificationsContextType | undefined
+>(undefined);
+
+// Helper to safely call Notifications methods
+async function safeSetBadgeCount(count: number): Promise<void> {
+  if (Notifications) {
+    try {
+      await Notifications.setBadgeCountAsync(count);
+    } catch (error) {
+      console.warn("[NotificationsContext] Failed to set badge:", error);
+    }
+  }
+}
 
 export function useNotifications() {
   const context = useContext(NotificationsContext);
   if (!context) {
-    throw new Error('useNotifications must be used within NotificationsProvider');
+    throw new Error(
+      "useNotifications must be used within NotificationsProvider",
+    );
   }
   return context;
 }
@@ -64,22 +100,29 @@ interface NotificationsProviderProps {
   children: React.ReactNode;
 }
 
-export function NotificationsProvider({ children }: NotificationsProviderProps) {
+export function NotificationsProvider({
+  children,
+}: NotificationsProviderProps) {
+  const { user, isAuthenticated } = useAuth();
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [loading, setLoading] = useState(true);
   const [isConnected, setIsConnected] = useState(false);
+  const initializedRef = useRef(false);
 
   // Computed unread count
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   // ========================================================================
-  // Initialization
+  // Initialization - Only when authenticated
   // ========================================================================
 
   useEffect(() => {
-    initializeNotifications();
+    if (isAuthenticated && user?.id && !initializedRef.current) {
+      initializedRef.current = true;
+      initializeNotifications();
+    }
     return cleanup;
-  }, []);
+  }, [isAuthenticated, user?.id]);
 
   const initializeNotifications = async () => {
     try {
@@ -99,14 +142,15 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
       // Check for notification that opened the app
       await handleInitialNotification();
     } catch (error) {
-      console.error('[NotificationsContext] Initialization failed:', error);
+      console.error("[NotificationsContext] Initialization failed:", error);
     } finally {
       setLoading(false);
     }
   };
 
   const cleanup = () => {
-    socketManager.disconnect('notifications');
+    socketManager.disconnect("notifications");
+    initializedRef.current = false;
   };
 
   // ========================================================================
@@ -115,18 +159,38 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
 
   const connectWebSocket = async () => {
     try {
-      await socketManager.connect('notifications');
+      const socket = await socketManager.connect("notifications");
       setIsConnected(true);
 
+      // Register user with backend for targeted notifications
+      if (user?.id) {
+        socket.emit("register", { userId: user.id });
+        console.log(`[NotificationsContext] 📝 Registered userId: ${user.id}`);
+      }
+
       // Listen for new notifications
-      socketManager.on('notifications', 'new_notification', handleNewNotification);
+      socketManager.on(
+        "notifications",
+        "new_notification",
+        handleNewNotification,
+      );
+
+      // Also listen for "notification" event (backend uses this name)
+      socketManager.on("notifications", "notification", handleNewNotification);
 
       // Listen for notification updates
-      socketManager.on('notifications', 'notification_read', handleNotificationRead);
+      socketManager.on(
+        "notifications",
+        "notification_read",
+        handleNotificationRead,
+      );
 
-      console.log('[NotificationsContext] ✅ WebSocket connected');
+      console.log("[NotificationsContext] ✅ WebSocket connected");
     } catch (error) {
-      console.error('[NotificationsContext] WebSocket connection failed:', error);
+      console.error(
+        "[NotificationsContext] WebSocket connection failed:",
+        error,
+      );
       setIsConnected(false);
     }
   };
@@ -135,44 +199,72 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
   // Notification Handlers
   // ========================================================================
 
-  const handleNewNotification = useCallback(async (notification: AppNotification) => {
-    console.log('[NotificationsContext] 🔔 New notification:', notification.title);
-    
-    setNotifications((prev) => [notification, ...prev]);
-    
-    // Update badge count
-    const newUnreadCount = unreadCount + 1;
-    await Notifications.setBadgeCountAsync(newUnreadCount);
-  }, [unreadCount]);
+  const handleNewNotification = useCallback(
+    async (notification: AppNotification) => {
+      console.log(
+        "[NotificationsContext] 🔔 New notification:",
+        notification.title,
+      );
 
-  const handleNotificationRead = useCallback(async (data: { notificationId: string }) => {
-    console.log('[NotificationsContext] ✓ Notification marked as read:', data.notificationId);
-    
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === data.notificationId ? { ...n, read: true } : n))
-    );
+      setNotifications((prev) => [notification, ...prev]);
 
-    // Update badge count
-    const newUnreadCount = Math.max(0, unreadCount - 1);
-    await Notifications.setBadgeCountAsync(newUnreadCount);
-  }, [unreadCount]);
+      // Update badge count
+      const newUnreadCount = unreadCount + 1;
+      await safeSetBadgeCount(newUnreadCount);
+    },
+    [unreadCount],
+  );
+
+  const handleNotificationRead = useCallback(
+    async (data: { notificationId: string }) => {
+      console.log(
+        "[NotificationsContext] ✓ Notification marked as read:",
+        data.notificationId,
+      );
+
+      setNotifications((prev) =>
+        prev.map((n) =>
+          n.id === data.notificationId ? { ...n, read: true } : n,
+        ),
+      );
+
+      // Update badge count
+      const newUnreadCount = Math.max(0, unreadCount - 1);
+      await safeSetBadgeCount(newUnreadCount);
+    },
+    [unreadCount],
+  );
 
   // ========================================================================
   // Push Notification Listeners
   // ========================================================================
 
   const setupNotificationListeners = () => {
+    // Skip if Notifications not available (Expo Go SDK 53+)
+    if (!Notifications) {
+      console.log(
+        "[NotificationsContext] Notifications not available in Expo Go",
+      );
+      return () => {};
+    }
+
     // Listen for notifications received while app is in foreground
-    const receivedSubscription = Notifications.addNotificationReceivedListener((notification: any) => {
-      console.log('[NotificationsContext] 📬 Notification received:', notification);
-      // Notification already handled by WebSocket or will be loaded on refresh
-    });
+    const receivedSubscription = Notifications.addNotificationReceivedListener(
+      (notification: any) => {
+        console.log(
+          "[NotificationsContext] 📬 Notification received:",
+          notification,
+        );
+        // Notification already handled by WebSocket or will be loaded on refresh
+      },
+    );
 
     // Listen for user tapping on notification
-    const responseSubscription = Notifications.addNotificationResponseReceivedListener((response: any) => {
-      console.log('[NotificationsContext] 👆 Notification tapped:', response);
-      handleNotificationTap(response);
-    });
+    const responseSubscription =
+      Notifications.addNotificationResponseReceivedListener((response: any) => {
+        console.log("[NotificationsContext] 👆 Notification tapped:", response);
+        handleNotificationTap(response);
+      });
 
     return () => {
       receivedSubscription.remove();
@@ -181,55 +273,104 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
   };
 
   const handleInitialNotification = async () => {
+    if (!Notifications) return;
+
     try {
       const response = await Notifications.getLastNotificationResponseAsync();
       if (response) {
-        console.log('[NotificationsContext] 🚀 App opened from notification');
+        console.log("[NotificationsContext] 🚀 App opened from notification");
         handleNotificationTap(response);
       }
     } catch (error) {
-      console.warn('[NotificationsContext] Failed to get initial notification:', error);
+      console.warn(
+        "[NotificationsContext] Failed to get initial notification:",
+        error,
+      );
     }
   };
 
-  const handleNotificationTap = (response: Notifications.NotificationResponse) => {
+  const handleNotificationTap = (
+    response: any, // NotificationResponse type
+  ) => {
     const data = response.notification.request.content.data as any;
-    
+
     // Mark as read
-    if (data.id && typeof data.id === 'string') {
+    if (data.id && typeof data.id === "string") {
       markAsRead(data.id);
     }
 
     // Use notification navigator service for deep linking
     const result = navigateFromNotification(response);
-    console.log('[NotificationsContext] Navigation result:', result);
+    console.log("[NotificationsContext] Navigation result:", result);
   };
 
   // ========================================================================
   // API Methods
   // ========================================================================
 
-  const addNotification = useCallback((notification: Omit<AppNotification, 'id'>) => {
-    const newNotification: AppNotification = {
-      ...notification,
-      id: Date.now().toString() + Math.random().toString(36).substring(7),
-    };
-    setNotifications((prev) => [newNotification, ...prev]);
-  }, []);
+  const addNotification = useCallback(
+    (notification: Omit<AppNotification, "id">) => {
+      const newNotification: AppNotification = {
+        ...notification,
+        id: Date.now().toString() + Math.random().toString(36).substring(7),
+      };
+      setNotifications((prev) => [newNotification, ...prev]);
+    },
+    [],
+  );
 
   const refreshNotifications = async () => {
     try {
       setLoading(true);
-      
-      // TODO: Implement notifications API endpoint on backend
-      // For now, use empty array to prevent errors
-      console.log('[NotificationsContext] Using mock data (API endpoint not ready)');
-      setNotifications([]);
 
-      // Update badge count
-      await Notifications.setBadgeCountAsync(0);
-    } catch (error) {
-      console.error('[NotificationsContext] Failed to refresh:', error);
+      // Fetch notifications from backend API
+      const response = await apiFetch<{
+        data: Array<{
+          id: number;
+          type: string;
+          title: string;
+          message: string;
+          data?: Record<string, any>;
+          read: boolean;
+          createdAt: string;
+        }>;
+        meta?: { total: number; unread: number };
+      }>("/notifications", {
+        method: "GET",
+      });
+
+      if (response?.data) {
+        const mapped: AppNotification[] = response.data.map((n) => ({
+          id: String(n.id),
+          type: (n.type?.toLowerCase() || "system") as AppNotification["type"],
+          title: n.title || "Thông báo",
+          body: n.message || "",
+          data: n.data,
+          read: n.read ?? false,
+          createdAt: n.createdAt || new Date().toISOString(),
+        }));
+        setNotifications(mapped);
+
+        // Update badge count
+        const unread = mapped.filter((n) => !n.read).length;
+        await safeSetBadgeCount(unread);
+        console.log(
+          `[NotificationsContext] ✅ Loaded ${mapped.length} notifications (${unread} unread)`,
+        );
+      } else {
+        setNotifications([]);
+        await safeSetBadgeCount(0);
+      }
+    } catch (error: any) {
+      // 401 = not logged in - use empty array
+      if (error?.status === 401) {
+        console.log(
+          "[NotificationsContext] User not authenticated, using empty notifications",
+        );
+        setNotifications([]);
+      } else {
+        console.error("[NotificationsContext] Failed to refresh:", error);
+      }
     } finally {
       setLoading(false);
     }
@@ -237,70 +378,67 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
 
   const markAsRead = async (id: string) => {
     try {
-      // Call API to mark as read
-      const response = await fetch(`https://baotienweb.cloud/api/v1/notifications/${id}/read`, {
-        method: 'PUT',
+      // Backend uses PATCH /notifications/:id/read
+      await apiFetch(`/notifications/${id}/read`, {
+        method: "PATCH",
       });
-      const success = response.ok;
-      if (success) {
-        setNotifications((prev) =>
-          prev.map((n) => (n.id === id ? { ...n, read: true } : n))
-        );
 
-        // Emit to WebSocket for other devices
-        socketManager.emit('notifications', 'mark_read', { notificationId: id });
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === id ? { ...n, read: true } : n)),
+      );
 
-        // Update badge
-        const newUnreadCount = Math.max(0, unreadCount - 1);
-        await Notifications.setBadgeCountAsync(newUnreadCount);
-      }
+      // Emit to WebSocket for other devices
+      socketManager.emit("notifications", "mark_read", { notificationId: id });
+
+      // Update badge
+      const newUnreadCount = Math.max(0, unreadCount - 1);
+      await safeSetBadgeCount(newUnreadCount);
     } catch (error) {
-      console.error('[NotificationsContext] Failed to mark as read:', error);
+      console.error("[NotificationsContext] Failed to mark as read:", error);
     }
   };
 
   const markAllAsRead = async () => {
     try {
-      // Mark all on backend
-      const response = await fetch('https://baotienweb.cloud/api/v1/notifications/mark-all-read', {
-        method: 'POST',
+      // Backend uses PATCH /notifications/read-all
+      await apiFetch("/notifications/read-all", {
+        method: "PATCH",
       });
 
-      if (response.ok) {
-        setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-        await Notifications.setBadgeCountAsync(0);
-      }
+      setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+      await safeSetBadgeCount(0);
     } catch (error) {
-      console.error('[NotificationsContext] Failed to mark all as read:', error);
+      console.error(
+        "[NotificationsContext] Failed to mark all as read:",
+        error,
+      );
     }
   };
 
   const deleteNotification = async (id: string) => {
     try {
-      const response = await fetch(`https://baotienweb.cloud/api/v1/notifications/${id}`, {
-        method: 'DELETE',
+      // Backend uses PATCH /notifications/:id/archive
+      await apiFetch(`/notifications/${id}/archive`, {
+        method: "PATCH",
       });
 
-      if (response.ok) {
-        setNotifications((prev) => prev.filter((n) => n.id !== id));
-      }
+      setNotifications((prev) => prev.filter((n) => n.id !== id));
     } catch (error) {
-      console.error('[NotificationsContext] Failed to delete:', error);
+      console.error("[NotificationsContext] Failed to delete:", error);
     }
   };
 
   const clearAll = async () => {
     try {
-      const response = await fetch('https://baotienweb.cloud/api/v1/notifications', {
-        method: 'DELETE',
+      // Use apiFetch for proper auth headers and API key
+      await apiFetch("/notifications", {
+        method: "DELETE",
       });
 
-      if (response.ok) {
-        setNotifications([]);
-        await Notifications.setBadgeCountAsync(0);
-      }
+      setNotifications([]);
+      await safeSetBadgeCount(0);
     } catch (error) {
-      console.error('[NotificationsContext] Failed to clear all:', error);
+      console.error("[NotificationsContext] Failed to clear all:", error);
     }
   };
 

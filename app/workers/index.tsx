@@ -1,86 +1,109 @@
 /**
- * Workers Screen - Modern Real-time Worker Finder
- * Optimized for construction industry with real-time availability
- * @updated 2026-01-19
+ * Workers Screen - Modern & Simplified
+ * Clean, minimal design with easy-to-use filters
+ * @updated 2025-01-30
  */
 
+import { ChipFilter, FilterModal, SortBar } from "@/components/ui/ModernFilter";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { LOCATIONS, useWorkerStats } from "@/hooks/useWorkerStats";
+import { useWorkersAPI } from "@/hooks/useWorkersAPI";
+import { Worker, WorkerType } from "@/services/workers.api";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
-    ActivityIndicator,
-    Dimensions,
-    FlatList,
-    Image,
-    Modal,
-    RefreshControl,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Dimensions,
+  FlatList,
+  Image,
+  Modal,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const { width } = Dimensions.get("window");
 
 // ============================================================================
-// COLORS & CONSTANTS
+// COLORS
 // ============================================================================
 const COLORS = {
   primary: "#FF6B35",
   primaryLight: "#FFF0EB",
   success: "#4CAF50",
-  successLight: "#E8F5E9",
   warning: "#FF9800",
-  warningLight: "#FFF3E0",
   danger: "#F44336",
   text: "#212121",
   textSecondary: "#757575",
-  border: "#E0E0E0",
-  background: "#F5F5F5",
+  border: "#E8E8E8",
+  background: "#F8F9FA",
   white: "#FFFFFF",
   star: "#FFB800",
   online: "#00C853",
 };
 
-// Worker specialties with icons
+// ============================================================================
+// FILTER OPTIONS - Gọn gàng hơn
+// ============================================================================
 const SPECIALTIES = [
-  { id: "all", label: "Tất cả", icon: "grid-outline" },
-  { id: "ep-coc", label: "Ép cọc", icon: "arrow-down-outline" },
-  { id: "dao-dat", label: "Đào đất", icon: "construct-outline" },
-  { id: "nhan-cong", label: "Nhân công", icon: "people-outline" },
-  { id: "tho-xay", label: "Thợ xây", icon: "cube-outline" },
-  { id: "tho-sat", label: "Thợ sắt", icon: "hammer-outline" },
-  { id: "tho-coffa", label: "Thợ coffa", icon: "layers-outline" },
-  { id: "co-khi", label: "Cơ khí", icon: "settings-outline" },
-  { id: "to-tuong", label: "Tô tường", icon: "brush-outline" },
-  { id: "cop-pha", label: "Cốp pha", icon: "copy-outline" },
   { id: "dien", label: "Thợ điện", icon: "flash-outline" },
   { id: "nuoc", label: "Thợ nước", icon: "water-outline" },
   { id: "son", label: "Thợ sơn", icon: "color-palette-outline" },
   { id: "moc", label: "Thợ mộc", icon: "construct-outline" },
   { id: "xay", label: "Thợ xây", icon: "cube-outline" },
   { id: "han", label: "Thợ hàn", icon: "flame-outline" },
-  { id: "gach", label: "Thợ lát gạch", icon: "apps-outline" },
-  { id: "thach-cao", label: "Thợ thạch cao", icon: "layers-outline" },
-  { id: "camera", label: "Thợ camera", icon: "videocam-outline" },
+  { id: "gach", label: "Lát gạch", icon: "apps-outline" },
+  { id: "thach-cao", label: "Thạch cao", icon: "layers-outline" },
+  { id: "camera", label: "Camera", icon: "videocam-outline" },
+  { id: "ep-coc", label: "Ép cọc", icon: "arrow-down-outline" },
+  { id: "dao-dat", label: "Đào đất", icon: "construct-outline" },
+  { id: "nhan-cong", label: "Nhân công", icon: "people-outline" },
 ];
 
-// Sort options
 const SORT_OPTIONS = [
-  { id: "nearest", label: "Gần nhất", icon: "location-outline" },
-  { id: "rating", label: "Đánh giá cao", icon: "star-outline" },
-  { id: "price-low", label: "Giá thấp nhất", icon: "trending-down-outline" },
-  { id: "price-high", label: "Giá cao nhất", icon: "trending-up-outline" },
-  { id: "available", label: "Sẵn sàng", icon: "checkmark-circle-outline" },
+  { id: "nearest", label: "Gần nhất" },
+  { id: "rating", label: "Đánh giá cao" },
+  { id: "price-low", label: "Giá thấp" },
+  { id: "price-high", label: "Giá cao" },
 ];
 
-// Mock workers data - sẽ được thay bằng API thực
+const FILTER_CONFIG = [
+  {
+    id: "availability",
+    label: "Tình trạng",
+    options: [
+      { id: "available", label: "Sẵn sàng" },
+      { id: "online", label: "Đang online" },
+    ],
+  },
+  {
+    id: "experience",
+    label: "Kinh nghiệm",
+    options: [
+      { id: "1-3", label: "1-3 năm" },
+      { id: "3-5", label: "3-5 năm" },
+      { id: "5+", label: "5+ năm" },
+    ],
+  },
+  {
+    id: "price",
+    label: "Mức giá",
+    options: [
+      { id: "low", label: "< 200K" },
+      { id: "medium", label: "200-300K" },
+      { id: "high", label: "> 300K" },
+    ],
+  },
+];
+
+// Mock data
 const MOCK_WORKERS = [
   {
     id: "1",
@@ -91,16 +114,12 @@ const MOCK_WORKERS = [
     reviews: 127,
     price: 200000,
     experience: 8,
-    distance: 2.3,
     available: true,
     isOnline: true,
-    avatar:
-      "https://ui-avatars.com/api/?name=An&background=FF6B35&color=fff&size=128",
+    avatar: "https://ui-avatars.com/api/?name=An&background=FF6B35&color=fff",
     completedJobs: 342,
-    responseTime: "< 5 phút",
     location: "Quận 1, TP.HCM",
     verified: true,
-    badges: ["top-rated", "fast-response"],
   },
   {
     id: "2",
@@ -111,16 +130,12 @@ const MOCK_WORKERS = [
     reviews: 89,
     price: 180000,
     experience: 6,
-    distance: 1.5,
     available: true,
     isOnline: true,
-    avatar:
-      "https://ui-avatars.com/api/?name=Binh&background=4CAF50&color=fff&size=128",
+    avatar: "https://ui-avatars.com/api/?name=Binh&background=4CAF50&color=fff",
     completedJobs: 256,
-    responseTime: "< 10 phút",
     location: "Quận 3, TP.HCM",
     verified: true,
-    badges: ["experienced"],
   },
   {
     id: "3",
@@ -131,16 +146,12 @@ const MOCK_WORKERS = [
     reviews: 156,
     price: 220000,
     experience: 10,
-    distance: 3.1,
     available: false,
     isOnline: false,
-    avatar:
-      "https://ui-avatars.com/api/?name=Cuong&background=2196F3&color=fff&size=128",
+    avatar: "https://ui-avatars.com/api/?name=Cuong&background=2196F3&color=fff",
     completedJobs: 489,
-    responseTime: "< 15 phút",
-    location: "Quận Bình Thạnh, TP.HCM",
+    location: "Bình Thạnh, TP.HCM",
     verified: true,
-    badges: ["expert", "top-rated"],
   },
   {
     id: "4",
@@ -151,633 +162,273 @@ const MOCK_WORKERS = [
     reviews: 203,
     price: 250000,
     experience: 12,
-    distance: 4.2,
     available: true,
     isOnline: true,
-    avatar:
-      "https://ui-avatars.com/api/?name=Duc&background=9C27B0&color=fff&size=128",
+    avatar: "https://ui-avatars.com/api/?name=Duc&background=9C27B0&color=fff",
     completedJobs: 567,
-    responseTime: "< 5 phút",
     location: "Quận 7, TP.HCM",
     verified: true,
-    badges: ["master", "top-rated", "fast-response"],
-  },
-  {
-    id: "5",
-    name: "Hoàng Văn Em",
-    specialty: "Thợ xây",
-    specialtyId: "xay",
-    rating: 4.6,
-    reviews: 78,
-    price: 190000,
-    experience: 5,
-    distance: 1.8,
-    available: true,
-    isOnline: false,
-    avatar:
-      "https://ui-avatars.com/api/?name=Em&background=FF9800&color=fff&size=128",
-    completedJobs: 156,
-    responseTime: "< 30 phút",
-    location: "Quận 2, TP.HCM",
-    verified: false,
-    badges: [],
-  },
-  {
-    id: "6",
-    name: "Võ Thanh Phong",
-    specialty: "Thợ hàn",
-    specialtyId: "han",
-    rating: 4.8,
-    reviews: 134,
-    price: 230000,
-    experience: 9,
-    distance: 2.7,
-    available: true,
-    isOnline: true,
-    avatar:
-      "https://ui-avatars.com/api/?name=Phong&background=E91E63&color=fff&size=128",
-    completedJobs: 423,
-    responseTime: "< 10 phút",
-    location: "Quận Tân Bình, TP.HCM",
-    verified: true,
-    badges: ["expert", "fast-response"],
   },
 ];
 
 // ============================================================================
-// COMPONENTS
+// WORKER CARD - Clean & Modern
 // ============================================================================
-
-// Search Header Component
-const SearchHeader = ({
-  searchQuery,
-  onSearchChange,
-  selectedLocation,
-  onLocationPress,
-}: {
-  searchQuery: string;
-  onSearchChange: (text: string) => void;
-  selectedLocation: string;
-  onLocationPress: () => void;
-}) => (
-  <View style={styles.searchHeader}>
-    {/* Location Selector */}
-    <TouchableOpacity style={styles.locationSelector} onPress={onLocationPress}>
-      <Ionicons name="location" size={18} color={COLORS.primary} />
-      <Text style={styles.locationText} numberOfLines={1}>
-        {selectedLocation}
-      </Text>
-      <Ionicons name="chevron-down" size={16} color={COLORS.textSecondary} />
-    </TouchableOpacity>
-
-    {/* Search Input */}
-    <View style={styles.searchInputContainer}>
-      <Ionicons name="search-outline" size={20} color={COLORS.textSecondary} />
-      <TextInput
-        style={styles.searchInput}
-        placeholder="Tìm thợ theo tên, chuyên môn..."
-        placeholderTextColor={COLORS.textSecondary}
-        value={searchQuery}
-        onChangeText={onSearchChange}
-      />
-      {searchQuery.length > 0 && (
-        <TouchableOpacity onPress={() => onSearchChange("")}>
-          <Ionicons
-            name="close-circle"
-            size={20}
-            color={COLORS.textSecondary}
-          />
-        </TouchableOpacity>
-      )}
-    </View>
-  </View>
-);
-
-// Specialty Filter Chip
-const SpecialtyChip = ({
-  item,
-  isActive,
-  onPress,
-}: {
-  item: (typeof SPECIALTIES)[0];
-  isActive: boolean;
-  onPress: () => void;
-}) => (
-  <TouchableOpacity
-    style={[styles.specialtyChip, isActive && styles.specialtyChipActive]}
-    onPress={onPress}
-    activeOpacity={0.7}
-  >
-    <Ionicons
-      name={item.icon as any}
-      size={16}
-      color={isActive ? COLORS.white : COLORS.textSecondary}
-    />
-    <Text
-      style={[
-        styles.specialtyChipText,
-        isActive && styles.specialtyChipTextActive,
-      ]}
-    >
-      {item.label}
-    </Text>
-  </TouchableOpacity>
-);
-
-// Quick Stats Bar
-const QuickStatsBar = ({
-  totalWorkers,
-  availableWorkers,
-  onlineWorkers,
-}: {
-  totalWorkers: number;
-  availableWorkers: number;
-  onlineWorkers: number;
-}) => (
-  <View style={styles.statsBar}>
-    <View style={styles.statItem}>
-      <Text style={styles.statValue}>{totalWorkers}</Text>
-      <Text style={styles.statLabel}>Tổng số thợ</Text>
-    </View>
-    <View style={styles.statDivider} />
-    <View style={styles.statItem}>
-      <View style={styles.statValueRow}>
-        <View style={[styles.statusDot, { backgroundColor: COLORS.success }]} />
-        <Text style={[styles.statValue, { color: COLORS.success }]}>
-          {availableWorkers}
-        </Text>
-      </View>
-      <Text style={styles.statLabel}>Sẵn sàng</Text>
-    </View>
-    <View style={styles.statDivider} />
-    <View style={styles.statItem}>
-      <View style={styles.statValueRow}>
-        <View style={[styles.statusDot, { backgroundColor: COLORS.online }]} />
-        <Text style={[styles.statValue, { color: COLORS.online }]}>
-          {onlineWorkers}
-        </Text>
-      </View>
-      <Text style={styles.statLabel}>Đang online</Text>
-    </View>
-  </View>
-);
-
-// Worker Badge
-const WorkerBadge = ({ badge }: { badge: string }) => {
-  const badgeConfig: Record<
-    string,
-    { label: string; color: string; icon: string }
-  > = {
-    "top-rated": { label: "Top", color: "#FFB800", icon: "star" },
-    "fast-response": { label: "Nhanh", color: "#4CAF50", icon: "flash" },
-    experienced: { label: "5+ năm", color: "#2196F3", icon: "ribbon" },
-    expert: { label: "Chuyên gia", color: "#9C27B0", icon: "medal" },
-    master: { label: "Bậc thầy", color: "#FF5722", icon: "trophy" },
-  };
-
-  const config = badgeConfig[badge];
-  if (!config) return null;
-
-  return (
-    <View
-      style={[styles.workerBadge, { backgroundColor: `${config.color}20` }]}
-    >
-      <Ionicons name={config.icon as any} size={10} color={config.color} />
-      <Text style={[styles.workerBadgeText, { color: config.color }]}>
-        {config.label}
-      </Text>
-    </View>
-  );
-};
-
-// Worker Card Component
-const WorkerCard = ({
-  worker,
-  onPress,
-  onCall,
-  onBook,
-}: {
-  worker: (typeof MOCK_WORKERS)[0];
+interface WorkerCardProps {
+  worker: any;
   onPress: () => void;
   onCall: () => void;
   onBook: () => void;
-}) => (
-  <TouchableOpacity
-    style={styles.workerCard}
-    onPress={onPress}
-    activeOpacity={0.95}
-  >
-    {/* Card Header */}
-    <View style={styles.workerCardHeader}>
-      {/* Avatar with online status */}
-      <View style={styles.avatarContainer}>
+}
+
+const WorkerCard = ({ worker, onPress, onCall, onBook }: WorkerCardProps) => (
+  <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.9}>
+    {/* Header */}
+    <View style={styles.cardHeader}>
+      <View style={styles.avatarWrapper}>
         <Image source={{ uri: worker.avatar }} style={styles.avatar} />
-        {worker.isOnline && <View style={styles.onlineIndicator} />}
+        {worker.isOnline && <View style={styles.onlineDot} />}
       </View>
 
-      {/* Worker Info */}
-      <View style={styles.workerMainInfo}>
+      <View style={styles.cardInfo}>
         <View style={styles.nameRow}>
-          <Text style={styles.workerName}>{worker.name}</Text>
+          <Text style={styles.workerName} numberOfLines={1}>{worker.name}</Text>
           {worker.verified && (
-            <Ionicons
-              name="checkmark-circle"
-              size={16}
-              color={COLORS.primary}
-            />
+            <Ionicons name="checkmark-circle" size={16} color={COLORS.primary} />
           )}
         </View>
-        <View style={styles.specialtyRow}>
-          <Text style={styles.workerSpecialty}>{worker.specialty}</Text>
-          <Text style={styles.experienceText}>
-            • {worker.experience} năm KN
-          </Text>
-        </View>
+        <Text style={styles.workerSpecialty}>
+          {worker.specialty} • {worker.experience} năm
+        </Text>
         <View style={styles.ratingRow}>
           <Ionicons name="star" size={14} color={COLORS.star} />
-          <Text style={styles.ratingText}>{worker.rating}</Text>
-          <Text style={styles.reviewsText}>({worker.reviews})</Text>
-          <Text style={styles.completedText}>
-            • {worker.completedJobs} việc
-          </Text>
+          <Text style={styles.rating}>{worker.rating}</Text>
+          <Text style={styles.reviews}>({worker.reviews})</Text>
+          <Text style={styles.jobs}>• {worker.completedJobs} việc</Text>
         </View>
       </View>
 
-      {/* Status Badge */}
-      <View
-        style={[
-          styles.statusBadge,
-          worker.available ? styles.statusAvailable : styles.statusBusy,
-        ]}
-      >
-        <View
-          style={[
-            styles.statusDotSmall,
-            {
-              backgroundColor: worker.available
-                ? COLORS.success
-                : COLORS.danger,
-            },
-          ]}
-        />
-        <Text
-          style={[
-            styles.statusText,
-            { color: worker.available ? COLORS.success : COLORS.danger },
-          ]}
-        >
+      <View style={[
+        styles.statusBadge,
+        worker.available ? styles.statusAvailable : styles.statusBusy
+      ]}>
+        <Text style={[
+          styles.statusText,
+          { color: worker.available ? COLORS.success : COLORS.danger }
+        ]}>
           {worker.available ? "Sẵn sàng" : "Bận"}
         </Text>
       </View>
     </View>
 
-    {/* Badges */}
-    {worker.badges.length > 0 && (
-      <View style={styles.badgesRow}>
-        {worker.badges.slice(0, 3).map((badge) => (
-          <WorkerBadge key={badge} badge={badge} />
-        ))}
+    {/* Footer */}
+    <View style={styles.cardFooter}>
+      <View style={styles.locationRow}>
+        <Ionicons name="location-outline" size={14} color={COLORS.textSecondary} />
+        <Text style={styles.location} numberOfLines={1}>{worker.location}</Text>
       </View>
-    )}
 
-    {/* Location & Response */}
-    <View style={styles.locationRow}>
-      <View style={styles.locationInfo}>
-        <Ionicons
-          name="location-outline"
-          size={14}
-          color={COLORS.textSecondary}
-        />
-        <Text style={styles.locationText2}>{worker.distance} km</Text>
-        <Text style={styles.locationDot}>•</Text>
-        <Text style={styles.locationAddress} numberOfLines={1}>
-          {worker.location}
-        </Text>
-      </View>
-      <View style={styles.responseInfo}>
-        <Ionicons name="time-outline" size={14} color={COLORS.success} />
-        <Text style={styles.responseText}>{worker.responseTime}</Text>
+      <View style={styles.priceRow}>
+        <Text style={styles.price}>{worker.price.toLocaleString("vi-VN")}đ</Text>
+        <Text style={styles.priceUnit}>/giờ</Text>
       </View>
     </View>
 
-    {/* Card Footer */}
-    <View style={styles.workerCardFooter}>
-      <View style={styles.priceContainer}>
-        <Text style={styles.priceLabel}>Giá từ</Text>
-        <Text style={styles.priceValue}>
-          {worker.price.toLocaleString("vi-VN")}đ
-          <Text style={styles.priceUnit}>/giờ</Text>
+    {/* Actions */}
+    <View style={styles.cardActions}>
+      <TouchableOpacity 
+        style={styles.callBtn} 
+        onPress={onCall}
+        disabled={!worker.available}
+      >
+        <Ionicons 
+          name="call-outline" 
+          size={18} 
+          color={worker.available ? COLORS.primary : COLORS.textSecondary} 
+        />
+      </TouchableOpacity>
+      <TouchableOpacity 
+        style={[styles.bookBtn, !worker.available && styles.bookBtnDisabled]}
+        onPress={onBook}
+        disabled={!worker.available}
+      >
+        <Text style={styles.bookBtnText}>
+          {worker.available ? "Đặt ngay" : "Không khả dụng"}
         </Text>
-      </View>
-
-      <View style={styles.actionButtons}>
-        <TouchableOpacity
-          style={styles.callButton}
-          onPress={onCall}
-          disabled={!worker.available}
-        >
-          <Ionicons
-            name="call-outline"
-            size={18}
-            color={worker.available ? COLORS.primary : COLORS.textSecondary}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.bookButton,
-            !worker.available && styles.bookButtonDisabled,
-          ]}
-          onPress={onBook}
-          disabled={!worker.available}
-        >
-          <Text style={styles.bookButtonText}>
-            {worker.available ? "Đặt ngay" : "Không khả dụng"}
-          </Text>
-        </TouchableOpacity>
-      </View>
+      </TouchableOpacity>
     </View>
   </TouchableOpacity>
-);
-
-// Location Modal
-const LocationModal = ({
-  visible,
-  selectedLocation,
-  onSelect,
-  onClose,
-}: {
-  visible: boolean;
-  selectedLocation: string;
-  onSelect: (location: string) => void;
-  onClose: () => void;
-}) => (
-  <Modal
-    visible={visible}
-    transparent
-    animationType="slide"
-    onRequestClose={onClose}
-  >
-    <View style={styles.modalOverlay}>
-      <View style={styles.modalContent}>
-        <View style={styles.modalHeader}>
-          <Text style={styles.modalTitle}>Chọn khu vực</Text>
-          <TouchableOpacity onPress={onClose}>
-            <Ionicons name="close" size={24} color={COLORS.text} />
-          </TouchableOpacity>
-        </View>
-        <ScrollView>
-          {LOCATIONS.map((location) => (
-            <TouchableOpacity
-              key={location}
-              style={[
-                styles.locationOption,
-                selectedLocation === location && styles.locationOptionActive,
-              ]}
-              onPress={() => {
-                onSelect(location);
-                onClose();
-              }}
-            >
-              <Ionicons
-                name={
-                  selectedLocation === location
-                    ? "radio-button-on"
-                    : "radio-button-off"
-                }
-                size={20}
-                color={
-                  selectedLocation === location
-                    ? COLORS.primary
-                    : COLORS.textSecondary
-                }
-              />
-              <Text
-                style={[
-                  styles.locationOptionText,
-                  selectedLocation === location &&
-                    styles.locationOptionTextActive,
-                ]}
-              >
-                {location}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </View>
-    </View>
-  </Modal>
 );
 
 // ============================================================================
 // MAIN SCREEN
 // ============================================================================
-
 export default function WorkersScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const backgroundColor = useThemeColor({}, "background");
-
-  // Get query params from URL
-  const { specialty: specialtyParam } = useLocalSearchParams<{
-    specialty?: string;
-  }>();
+  const { specialty: specialtyParam } = useLocalSearchParams<{ specialty?: string }>();
 
   // States
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSpecialty, setSelectedSpecialty] = useState("all");
   const [selectedSort, setSelectedSort] = useState("nearest");
-  const [refreshing, setRefreshing] = useState(false);
+  const [filterValues, setFilterValues] = useState<Record<string, string>>({});
+  const [showFilterModal, setShowFilterModal] = useState(false);
   const [showLocationModal, setShowLocationModal] = useState(false);
-  const [selectedLocation, setSelectedLocation] = useState("Sài Gòn");
+  const [selectedLocation, setSelectedLocation] = useState("TP.HCM");
+  const [refreshing, setRefreshing] = useState(false);
 
-  // Set specialty from URL param on mount
+  // API Hooks
+  const { stats, loading: statsLoading, refresh: refreshStats } = useWorkerStats();
+  const {
+    workers: apiWorkers,
+    loading: workersLoading,
+    refreshWorkers,
+    loadWorkers,
+  } = useWorkersAPI({ autoLoad: true });
+
+  // Set specialty from URL
   useEffect(() => {
     if (specialtyParam) {
-      // Check if specialty exists in SPECIALTIES
       const exists = SPECIALTIES.some((s) => s.id === specialtyParam);
-      if (exists) {
-        setSelectedSpecialty(specialtyParam);
-      }
+      if (exists) setSelectedSpecialty(specialtyParam);
     }
   }, [specialtyParam]);
 
-  // Worker stats from API
-  const { stats, loading, refresh } = useWorkerStats();
-
-  // Filter and sort workers
+  // Filter workers
   const filteredWorkers = useMemo(() => {
-    let result = [...MOCK_WORKERS];
+    let workers = apiWorkers.length > 0 ? apiWorkers.map(normalizeWorker) : MOCK_WORKERS;
 
-    // Filter by search
     if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      result = result.filter(
+      const q = searchQuery.toLowerCase();
+      workers = workers.filter(
         (w) =>
-          w.name.toLowerCase().includes(query) ||
-          w.specialty.toLowerCase().includes(query)
+          w.name.toLowerCase().includes(q) ||
+          w.specialty.toLowerCase().includes(q)
       );
     }
 
-    // Filter by specialty
     if (selectedSpecialty !== "all") {
-      result = result.filter((w) => w.specialtyId === selectedSpecialty);
+      workers = workers.filter((w) => w.specialtyId === selectedSpecialty);
+    }
+
+    if (filterValues.availability === "available") {
+      workers = workers.filter((w) => w.available);
+    } else if (filterValues.availability === "online") {
+      workers = workers.filter((w) => w.isOnline);
     }
 
     // Sort
-    switch (selectedSort) {
-      case "nearest":
-        result.sort((a, b) => a.distance - b.distance);
-        break;
-      case "rating":
-        result.sort((a, b) => b.rating - a.rating);
-        break;
-      case "price-low":
-        result.sort((a, b) => a.price - b.price);
-        break;
-      case "price-high":
-        result.sort((a, b) => b.price - a.price);
-        break;
-      case "available":
-        result.sort((a, b) => (b.available ? 1 : 0) - (a.available ? 1 : 0));
-        break;
+    if (selectedSort === "rating") {
+      workers = [...workers].sort((a, b) => b.rating - a.rating);
+    } else if (selectedSort === "price-low") {
+      workers = [...workers].sort((a, b) => a.price - b.price);
+    } else if (selectedSort === "price-high") {
+      workers = [...workers].sort((a, b) => b.price - a.price);
     }
 
-    return result;
-  }, [searchQuery, selectedSpecialty, selectedSort]);
+    return workers;
+  }, [apiWorkers, searchQuery, selectedSpecialty, selectedSort, filterValues]);
 
   // Stats
-  const totalWorkers = MOCK_WORKERS.length;
-  const availableWorkers = MOCK_WORKERS.filter((w) => w.available).length;
-  const onlineWorkers = MOCK_WORKERS.filter((w) => w.isOnline).length;
+  const totalWorkers = filteredWorkers.length;
+  const availableWorkers = filteredWorkers.filter((w) => w.available).length;
+  const loading = workersLoading || statsLoading;
 
   // Handlers
-  const onRefresh = useCallback(() => {
+  const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    refresh().finally(() => setRefreshing(false));
-  }, [refresh]);
+    await Promise.all([refreshWorkers(), refreshStats()]);
+    setRefreshing(false);
+  }, [refreshWorkers, refreshStats]);
 
-  const handleWorkerPress = (worker: (typeof MOCK_WORKERS)[0]) => {
-    router.push(`/finishing/worker-profile/${worker.id}` as any);
+  const handleFilterChange = (filterId: string, value: string | string[]) => {
+    setFilterValues((prev) => ({ ...prev, [filterId]: value as string }));
   };
 
-  const handleCall = (worker: (typeof MOCK_WORKERS)[0]) => {
-    // TODO: Implement call functionality
-    console.log("Calling:", worker.name);
+  const clearFilters = () => {
+    setFilterValues({});
+    setSelectedSpecialty("all");
   };
 
-  const handleBook = (worker: (typeof MOCK_WORKERS)[0]) => {
-    router.push(`/booking/worker/${worker.id}` as any);
-  };
+  const activeFilterCount = Object.values(filterValues).filter(
+    (v) => v && v !== "all"
+  ).length + (selectedSpecialty !== "all" ? 1 : 0);
 
   return (
-    <View style={[styles.container, { backgroundColor: COLORS.background }]}>
-      <Stack.Screen
-        options={{
-          headerShown: false,
-        }}
-      />
+    <View style={styles.container}>
+      <Stack.Screen options={{ headerShown: false }} />
 
-      {/* Custom Header */}
+      {/* Header */}
       <LinearGradient
         colors={[COLORS.primary, "#FF8A5B"]}
         style={[styles.header, { paddingTop: insets.top + 8 }]}
       >
-        <View style={styles.headerTop}>
-          <TouchableOpacity
-            onPress={() => router.back()}
-            style={styles.backButton}
-          >
+        <View style={styles.headerRow}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
             <Ionicons name="arrow-back" size={24} color={COLORS.white} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Tìm thợ</Text>
-          <TouchableOpacity style={styles.mapButton}>
-            <Ionicons name="map-outline" size={24} color={COLORS.white} />
+          <TouchableOpacity 
+            style={styles.locationBtn}
+            onPress={() => setShowLocationModal(true)}
+          >
+            <Ionicons name="location" size={18} color={COLORS.white} />
+            <Text style={styles.locationBtnText}>{selectedLocation}</Text>
           </TouchableOpacity>
         </View>
 
-        <SearchHeader
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          selectedLocation={selectedLocation}
-          onLocationPress={() => setShowLocationModal(true)}
-        />
+        {/* Search */}
+        <View style={styles.searchBar}>
+          <Ionicons name="search" size={20} color={COLORS.textSecondary} />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Tìm theo tên, chuyên môn..."
+            placeholderTextColor={COLORS.textSecondary}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+          {searchQuery.length > 0 && (
+            <TouchableOpacity onPress={() => setSearchQuery("")}>
+              <Ionicons name="close-circle" size={18} color={COLORS.textSecondary} />
+            </TouchableOpacity>
+          )}
+          <View style={styles.searchDivider} />
+          <TouchableOpacity 
+            style={styles.filterBtn}
+            onPress={() => setShowFilterModal(true)}
+          >
+            <Ionicons name="options-outline" size={20} color={COLORS.primary} />
+            {activeFilterCount > 0 && (
+              <View style={styles.filterBadge}>
+                <Text style={styles.filterBadgeText}>{activeFilterCount}</Text>
+              </View>
+            )}
+          </TouchableOpacity>
+        </View>
       </LinearGradient>
 
-      {/* Quick Stats */}
-      <QuickStatsBar
-        totalWorkers={totalWorkers}
-        availableWorkers={availableWorkers}
-        onlineWorkers={onlineWorkers}
+      {/* Specialty Filter Chips */}
+      <ChipFilter
+        options={SPECIALTIES}
+        selected={selectedSpecialty}
+        onSelect={setSelectedSpecialty}
+        showAll={true}
       />
 
-      {/* Specialty Filter */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.specialtyFilter}
-        contentContainerStyle={styles.specialtyFilterContent}
-      >
-        {SPECIALTIES.map((item) => (
-          <SpecialtyChip
-            key={item.id}
-            item={item}
-            isActive={selectedSpecialty === item.id}
-            onPress={() => setSelectedSpecialty(item.id)}
-          />
-        ))}
-      </ScrollView>
-
-      {/* Sort Options */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.sortFilter}
-        contentContainerStyle={styles.sortFilterContent}
-      >
-        {SORT_OPTIONS.map((item) => (
-          <TouchableOpacity
-            key={item.id}
-            style={[
-              styles.sortChip,
-              selectedSort === item.id && styles.sortChipActive,
-            ]}
-            onPress={() => setSelectedSort(item.id)}
-          >
-            <Ionicons
-              name={item.icon as any}
-              size={14}
-              color={
-                selectedSort === item.id ? COLORS.primary : COLORS.textSecondary
-              }
-            />
-            <Text
-              style={[
-                styles.sortChipText,
-                selectedSort === item.id && styles.sortChipTextActive,
-              ]}
-            >
-              {item.label}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-
-      {/* Results Count */}
-      <View style={styles.resultsHeader}>
-        <Text style={styles.resultsCount}>
-          {filteredWorkers.length} thợ{" "}
-          {selectedSpecialty !== "all"
-            ? `"${SPECIALTIES.find((s) => s.id === selectedSpecialty)?.label}"`
-            : ""}{" "}
-          tại {selectedLocation}
-        </Text>
-      </View>
+      {/* Sort & Results */}
+      <SortBar
+        options={SORT_OPTIONS}
+        selected={selectedSort}
+        onSelect={setSelectedSort}
+        resultCount={totalWorkers}
+      />
 
       {/* Workers List */}
       {loading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={COLORS.primary} />
-          <Text style={styles.loadingText}>Đang tìm thợ gần bạn...</Text>
+          <Text style={styles.loadingText}>Đang tìm thợ...</Text>
         </View>
       ) : (
         <FlatList
@@ -785,9 +436,9 @@ export default function WorkersScreen() {
           renderItem={({ item }) => (
             <WorkerCard
               worker={item}
-              onPress={() => handleWorkerPress(item)}
-              onCall={() => handleCall(item)}
-              onBook={() => handleBook(item)}
+              onPress={() => router.push(`/finishing/worker-profile/${item.id}` as any)}
+              onCall={() => console.log("Call:", item.name)}
+              onBook={() => router.push(`/booking/worker/${item.id}` as any)}
             />
           )}
           keyExtractor={(item) => item.id}
@@ -805,45 +456,124 @@ export default function WorkersScreen() {
               <Ionicons name="search-outline" size={64} color={COLORS.border} />
               <Text style={styles.emptyTitle}>Không tìm thấy thợ</Text>
               <Text style={styles.emptyText}>
-                Thử thay đổi bộ lọc hoặc tìm kiếm với từ khóa khác
+                Thử thay đổi bộ lọc hoặc từ khóa khác
               </Text>
             </View>
           }
         />
       )}
 
-      {/* Location Modal */}
-      <LocationModal
-        visible={showLocationModal}
-        selectedLocation={selectedLocation}
-        onSelect={setSelectedLocation}
-        onClose={() => setShowLocationModal(false)}
+      {/* Filter Modal */}
+      <FilterModal
+        visible={showFilterModal}
+        onClose={() => setShowFilterModal(false)}
+        filters={FILTER_CONFIG}
+        values={filterValues}
+        onChange={handleFilterChange}
+        onApply={() => setShowFilterModal(false)}
+        onClear={clearFilters}
       />
+
+      {/* Location Modal */}
+      <Modal
+        visible={showLocationModal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowLocationModal(false)}
+      >
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={() => setShowLocationModal(false)}
+        >
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Chọn khu vực</Text>
+              <TouchableOpacity onPress={() => setShowLocationModal(false)}>
+                <Ionicons name="close" size={24} color={COLORS.text} />
+              </TouchableOpacity>
+            </View>
+            <ScrollView>
+              {LOCATIONS.map((loc) => (
+                <TouchableOpacity
+                  key={loc}
+                  style={[
+                    styles.locationOption,
+                    selectedLocation === loc && styles.locationOptionActive,
+                  ]}
+                  onPress={() => {
+                    setSelectedLocation(loc);
+                    setShowLocationModal(false);
+                  }}
+                >
+                  <Text
+                    style={[
+                      styles.locationOptionText,
+                      selectedLocation === loc && styles.locationOptionTextActive,
+                    ]}
+                  >
+                    {loc}
+                  </Text>
+                  {selectedLocation === loc && (
+                    <Ionicons name="checkmark" size={20} color={COLORS.primary} />
+                  )}
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </View>
   );
+}
+
+// Helper to normalize API worker
+function normalizeWorker(w: Worker) {
+  const labels: Record<string, string> = {
+    EP_COC: "Ép cọc", DAO_DAT: "Đào đất", THO_XAY: "Thợ xây",
+    THO_DIEN: "Thợ điện", THO_NUOC: "Thợ nước", THO_SON: "Thợ sơn",
+    THO_MOC: "Thợ mộc", THO_HAN: "Thợ hàn", THO_GACH: "Thợ lát gạch",
+    THO_THACH_CAO: "Thợ thạch cao", THO_CAMERA: "Thợ camera",
+  };
+  return {
+    id: w.id,
+    name: w.name,
+    specialty: labels[w.workerType] || w.workerType,
+    specialtyId: w.workerType.toLowerCase().replace("_", "-"),
+    rating: w.rating || 4.5,
+    reviews: w.reviewCount || 0,
+    price: w.dailyRate || 300000,
+    experience: w.experience || 0,
+    available: w.availability === "available",
+    isOnline: w.availability !== "offline",
+    avatar: w.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(w.name)}&background=FF6B35&color=fff`,
+    completedJobs: w.completedJobs || 0,
+    location: w.location || "",
+    verified: w.verified || false,
+  };
 }
 
 // ============================================================================
 // STYLES
 // ============================================================================
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: COLORS.background,
   },
 
   // Header
   header: {
     paddingBottom: 16,
   },
-  headerTop: {
+  headerRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 16,
     marginBottom: 12,
   },
-  backButton: {
+  backBtn: {
     width: 40,
     height: 40,
     borderRadius: 20,
@@ -856,183 +586,81 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: COLORS.white,
   },
-  mapButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "rgba(255,255,255,0.2)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  // Search Header
-  searchHeader: {
-    paddingHorizontal: 16,
-    gap: 10,
-  },
-  locationSelector: {
+  locationBtn: {
     flexDirection: "row",
     alignItems: "center",
+    backgroundColor: "rgba(255,255,255,0.2)",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
     gap: 4,
   },
-  locationText: {
+  locationBtnText: {
     color: COLORS.white,
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: "500",
-    maxWidth: 150,
   },
-  searchInputContainer: {
+
+  // Search
+  searchBar: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: COLORS.white,
+    marginHorizontal: 16,
     borderRadius: 12,
-    paddingHorizontal: 12,
-    height: 44,
-    gap: 8,
+    paddingHorizontal: 14,
+    height: 48,
+    gap: 10,
   },
   searchInput: {
     flex: 1,
     fontSize: 15,
     color: COLORS.text,
   },
-
-  // Stats Bar
-  statsBar: {
-    flexDirection: "row",
-    backgroundColor: COLORS.white,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
-  },
-  statItem: {
-    flex: 1,
-    alignItems: "center",
-  },
-  statValueRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-  },
-  statusDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-  statValue: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: COLORS.text,
-  },
-  statLabel: {
-    fontSize: 11,
-    color: COLORS.textSecondary,
-    marginTop: 2,
-  },
-  statDivider: {
+  searchDivider: {
     width: 1,
-    height: "100%",
+    height: 24,
     backgroundColor: COLORS.border,
   },
-
-  // Specialty Filter
-  specialtyFilter: {
-    backgroundColor: COLORS.white,
-    maxHeight: 56,
+  filterBtn: {
+    padding: 6,
+    position: "relative",
   },
-  specialtyFilterContent: {
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    gap: 8,
-  },
-  specialtyChip: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: COLORS.background,
-    marginRight: 8,
-    gap: 6,
-  },
-  specialtyChipActive: {
+  filterBadge: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    width: 16,
+    height: 16,
+    borderRadius: 8,
     backgroundColor: COLORS.primary,
+    alignItems: "center",
+    justifyContent: "center",
   },
-  specialtyChipText: {
-    fontSize: 13,
-    color: COLORS.textSecondary,
-    fontWeight: "500",
-  },
-  specialtyChipTextActive: {
+  filterBadgeText: {
+    fontSize: 10,
+    fontWeight: "700",
     color: COLORS.white,
   },
 
-  // Sort Filter
-  sortFilter: {
+  // Card
+  card: {
     backgroundColor: COLORS.white,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
-    maxHeight: 48,
-  },
-  sortFilterContent: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    gap: 8,
-  },
-  sortChip: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 16,
-    backgroundColor: "transparent",
-    marginRight: 6,
-    gap: 4,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
-  sortChipActive: {
-    borderColor: COLORS.primary,
-    backgroundColor: COLORS.primaryLight,
-  },
-  sortChipText: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
-  },
-  sortChipTextActive: {
-    color: COLORS.primary,
-    fontWeight: "500",
-  },
-
-  // Results Header
-  resultsHeader: {
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    backgroundColor: COLORS.background,
-  },
-  resultsCount: {
-    fontSize: 13,
-    color: COLORS.textSecondary,
-  },
-
-  // Worker Card
-  workerCard: {
-    backgroundColor: COLORS.white,
-    borderRadius: 16,
     marginHorizontal: 16,
     marginBottom: 12,
+    borderRadius: 16,
     padding: 16,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.06,
     shadowRadius: 8,
-    elevation: 2,
+    elevation: 3,
   },
-  workerCardHeader: {
+  cardHeader: {
     flexDirection: "row",
     alignItems: "flex-start",
   },
-  avatarContainer: {
+  avatarWrapper: {
     position: "relative",
   },
   avatar: {
@@ -1040,7 +668,7 @@ const styles = StyleSheet.create({
     height: 56,
     borderRadius: 28,
   },
-  onlineIndicator: {
+  onlineDot: {
     position: "absolute",
     bottom: 2,
     right: 2,
@@ -1051,102 +679,64 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: COLORS.white,
   },
-  workerMainInfo: {
+  cardInfo: {
     flex: 1,
     marginLeft: 12,
   },
   nameRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 4,
+    gap: 6,
   },
   workerName: {
     fontSize: 16,
     fontWeight: "600",
     color: COLORS.text,
-  },
-  specialtyRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 2,
+    flex: 1,
   },
   workerSpecialty: {
     fontSize: 13,
-    color: COLORS.primary,
-    fontWeight: "500",
-  },
-  experienceText: {
-    fontSize: 12,
     color: COLORS.textSecondary,
-    marginLeft: 4,
+    marginTop: 2,
   },
   ratingRow: {
     flexDirection: "row",
     alignItems: "center",
     marginTop: 4,
+    gap: 4,
   },
-  ratingText: {
+  rating: {
     fontSize: 13,
     fontWeight: "600",
     color: COLORS.text,
-    marginLeft: 4,
   },
-  reviewsText: {
+  reviews: {
     fontSize: 12,
     color: COLORS.textSecondary,
-    marginLeft: 2,
   },
-  completedText: {
+  jobs: {
     fontSize: 12,
     color: COLORS.textSecondary,
     marginLeft: 4,
   },
   statusBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 8,
+    paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
-    gap: 4,
   },
   statusAvailable: {
-    backgroundColor: COLORS.successLight,
+    backgroundColor: "#E8F5E9",
   },
   statusBusy: {
     backgroundColor: "#FFEBEE",
-  },
-  statusDotSmall: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
   },
   statusText: {
     fontSize: 11,
     fontWeight: "600",
   },
 
-  // Badges
-  badgesRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    marginTop: 10,
-    gap: 6,
-  },
-  workerBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 10,
-    gap: 3,
-  },
-  workerBadgeText: {
-    fontSize: 10,
-    fontWeight: "600",
-  },
-
-  // Location Row
-  locationRow: {
+  // Card Footer
+  cardFooter: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -1155,125 +745,95 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: COLORS.border,
   },
-  locationInfo: {
-    flexDirection: "row",
-    alignItems: "center",
-    flex: 1,
-  },
-  locationText2: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
-    marginLeft: 4,
-    fontWeight: "500",
-  },
-  locationDot: {
-    color: COLORS.border,
-    marginHorizontal: 6,
-  },
-  locationAddress: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
-    flex: 1,
-  },
-  responseInfo: {
+  locationRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
+    flex: 1,
   },
-  responseText: {
-    fontSize: 11,
-    color: COLORS.success,
-    fontWeight: "500",
-  },
-
-  // Card Footer
-  workerCardFooter: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginTop: 12,
-  },
-  priceContainer: {},
-  priceLabel: {
-    fontSize: 11,
+  location: {
+    fontSize: 12,
     color: COLORS.textSecondary,
+    flex: 1,
   },
-  priceValue: {
-    fontSize: 18,
+  priceRow: {
+    flexDirection: "row",
+    alignItems: "baseline",
+  },
+  price: {
+    fontSize: 16,
     fontWeight: "700",
     color: COLORS.primary,
   },
   priceUnit: {
-    fontSize: 13,
-    fontWeight: "400",
+    fontSize: 12,
     color: COLORS.textSecondary,
+    marginLeft: 2,
   },
-  actionButtons: {
+
+  // Actions
+  cardActions: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
+    marginTop: 12,
+    gap: 12,
   },
-  callButton: {
+  callBtn: {
     width: 44,
     height: 44,
-    borderRadius: 22,
-    borderWidth: 1,
-    borderColor: COLORS.primary,
+    borderRadius: 12,
+    backgroundColor: COLORS.primaryLight,
     alignItems: "center",
     justifyContent: "center",
   },
-  bookButton: {
+  bookBtn: {
+    flex: 1,
+    height: 44,
+    borderRadius: 12,
     backgroundColor: COLORS.primary,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 22,
+    alignItems: "center",
+    justifyContent: "center",
   },
-  bookButtonDisabled: {
+  bookBtnDisabled: {
     backgroundColor: COLORS.border,
   },
-  bookButtonText: {
-    color: COLORS.white,
+  bookBtnText: {
     fontSize: 14,
     fontWeight: "600",
+    color: COLORS.white,
   },
 
   // List
   listContent: {
+    padding: 16,
     paddingTop: 8,
-    paddingBottom: 20,
   },
 
-  // Loading
+  // Loading & Empty
   loadingContainer: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 60,
+    gap: 12,
   },
   loadingText: {
-    marginTop: 12,
-    color: COLORS.textSecondary,
     fontSize: 14,
+    color: COLORS.textSecondary,
   },
-
-  // Empty State
   emptyState: {
     alignItems: "center",
     paddingVertical: 60,
-    paddingHorizontal: 40,
+    gap: 12,
   },
   emptyTitle: {
     fontSize: 18,
     fontWeight: "600",
     color: COLORS.text,
-    marginTop: 16,
   },
   emptyText: {
     fontSize: 14,
     color: COLORS.textSecondary,
     textAlign: "center",
-    marginTop: 8,
-    lineHeight: 20,
   },
 
   // Modal
@@ -1292,23 +852,21 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: 16,
+    padding: 20,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.border,
   },
   modalTitle: {
     fontSize: 18,
-    fontWeight: "600",
+    fontWeight: "700",
     color: COLORS.text,
   },
   locationOption: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    gap: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    paddingVertical: 16,
   },
   locationOptionActive: {
     backgroundColor: COLORS.primaryLight,
@@ -1319,6 +877,6 @@ const styles = StyleSheet.create({
   },
   locationOptionTextActive: {
     color: COLORS.primary,
-    fontWeight: "500",
+    fontWeight: "600",
   },
 });

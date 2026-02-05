@@ -10,12 +10,17 @@
  * - Progress indicator
  * - Tap to open full-screen viewer
  *
+ * Uses expo-video for playback
+ *
  * @author ThietKeResort Team
  * @created 2026-01-22
+ * @updated 2026-02-02 - Migrated to expo-video
  */
 
+import { VideoPreloader } from "@/utils/videoWrapper";
 import { Ionicons } from "@expo/vector-icons";
-import { AVPlaybackStatus, ResizeMode, Video } from "expo-av";
+import { useEvent } from "expo";
+import { VideoView, useVideoPlayer } from "expo-video";
 import * as Haptics from "expo-haptics";
 import { Image } from "expo-image";
 import {
@@ -29,7 +34,6 @@ import {
 } from "react";
 import {
     Dimensions,
-    Platform,
     Pressable,
     StyleSheet,
     Text,
@@ -90,99 +94,6 @@ export interface FeedVideoPlayerRef {
 }
 
 // ============================================
-// Video Preloader Manager (Singleton)
-// ============================================
-class VideoPreloader {
-  private static instance: VideoPreloader;
-  private preloadedUrls: Set<string> = new Set();
-  private preloadQueue: string[] = [];
-  private isPreloading: boolean = false;
-  private maxPreloaded: number = 3;
-
-  static getInstance(): VideoPreloader {
-    if (!VideoPreloader.instance) {
-      VideoPreloader.instance = new VideoPreloader();
-    }
-    return VideoPreloader.instance;
-  }
-
-  /**
-   * Queue videos for preloading
-   * @param urls Array of video URLs to preload
-   * @param currentIndex Current visible video index
-   */
-  queuePreload(urls: string[], currentIndex: number): void {
-    // Preload next 2 and previous 1 videos
-    const toPreload: string[] = [];
-
-    for (
-      let i = currentIndex + 1;
-      i <= currentIndex + 2 && i < urls.length;
-      i++
-    ) {
-      if (urls[i] && !this.preloadedUrls.has(urls[i])) {
-        toPreload.push(urls[i]);
-      }
-    }
-
-    if (
-      currentIndex > 0 &&
-      urls[currentIndex - 1] &&
-      !this.preloadedUrls.has(urls[currentIndex - 1])
-    ) {
-      toPreload.push(urls[currentIndex - 1]);
-    }
-
-    this.preloadQueue = toPreload;
-    this.processQueue();
-  }
-
-  private async processQueue(): Promise<void> {
-    if (this.isPreloading || this.preloadQueue.length === 0) return;
-
-    this.isPreloading = true;
-    const url = this.preloadQueue.shift();
-
-    if (url) {
-      try {
-        // For web, we use link preload
-        if (Platform.OS === "web") {
-          const link = document.createElement("link");
-          link.rel = "preload";
-          link.as = "video";
-          link.href = url;
-          document.head.appendChild(link);
-        }
-        // For native, the Video component handles caching
-
-        this.preloadedUrls.add(url);
-
-        // Limit cached URLs
-        if (this.preloadedUrls.size > this.maxPreloaded * 2) {
-          const oldest = Array.from(this.preloadedUrls)[0];
-          this.preloadedUrls.delete(oldest);
-        }
-
-        console.log("[VideoPreloader] Preloaded:", url.substring(0, 50));
-      } catch (error) {
-        console.warn("[VideoPreloader] Failed to preload:", url);
-      }
-    }
-
-    this.isPreloading = false;
-
-    // Process next in queue
-    if (this.preloadQueue.length > 0) {
-      setTimeout(() => this.processQueue(), 100);
-    }
-  }
-
-  isPreloaded(url: string): boolean {
-    return this.preloadedUrls.has(url);
-  }
-}
-
-// ============================================
 // Main Component
 // ============================================
 export const FeedVideoPlayer = memo(
@@ -199,7 +110,7 @@ export const FeedVideoPlayer = memo(
         onPress,
         onPlay,
         onPause,
-        aspectRatio = 16 / 9,
+        aspectRatio = 4 / 5, // Facebook-style: taller than wide
         autoPlay = true,
         startMuted = true,
         showControls = true,
@@ -207,10 +118,23 @@ export const FeedVideoPlayer = memo(
       },
       ref,
     ) => {
-      const videoRef = useRef<Video>(null);
+      const player = useVideoPlayer(videoUrl, (player) => {
+        player.loop = true;
+        player.muted = startMuted;
+        player.timeUpdateEventInterval = 0.5;
+      });
+      const status = useEvent(player, "statusChange", { status: player.status });
+      const playing = useEvent(player, "playingChange", {
+        isPlaying: player.playing,
+      });
+      const timeUpdate = useEvent(player, "timeUpdate", {
+        currentTime: player.currentTime,
+        bufferedPosition: player.bufferedPosition,
+        currentLiveTimestamp: null,
+        currentOffsetFromLive: null,
+      });
       const [isPlaying, setIsPlaying] = useState(false);
       const [isMuted, setIsMuted] = useState(startMuted);
-      const [isLoaded, setIsLoaded] = useState(false);
       const [isBuffering, setIsBuffering] = useState(false);
       const [progress, setProgress] = useState(0);
       const [showThumbnail, setShowThumbnail] = useState(true);
@@ -227,11 +151,11 @@ export const FeedVideoPlayer = memo(
         play: () => handlePlay(),
         pause: () => handlePause(),
         seek: (position: number) => {
-          videoRef.current?.setPositionAsync(position * 1000);
+          player.currentTime = position;
         },
         setMuted: (muted: boolean) => {
           setIsMuted(muted);
-          videoRef.current?.setIsMutedAsync(muted);
+          player.muted = muted;
         },
       }));
 
@@ -240,8 +164,8 @@ export const FeedVideoPlayer = memo(
         if (isVisible && !wasVisible.current && autoPlay) {
           // Became visible - start playing
           handlePlay();
-          // Preload nearby videos
-          VideoPreloader.getInstance().queuePreload([videoUrl], index);
+          // Preload nearby videos using imported VideoPreloader
+          VideoPreloader.preloadAround([videoUrl], index, 2);
         } else if (!isVisible && wasVisible.current) {
           // Became invisible - pause
           handlePause();
@@ -265,66 +189,52 @@ export const FeedVideoPlayer = memo(
         };
       }, [isPlaying, controlsVisible]);
 
-      // ==================== Playback Status Handler ====================
-      const handlePlaybackStatusUpdate = useCallback(
-        (status: AVPlaybackStatus) => {
-          if (!status.isLoaded) {
-            setIsBuffering(true);
-            return;
-          }
+      // ==================== Player State Sync ====================
+      useEffect(() => {
+        setIsBuffering(status.status === "loading");
+      }, [status.status]);
 
-          setIsLoaded(true);
-          setIsBuffering(status.isBuffering);
-          setIsPlaying(status.isPlaying);
+      useEffect(() => {
+        setIsPlaying(playing.isPlaying);
+        if (playing.isPlaying && showThumbnail) {
+          setShowThumbnail(false);
+        }
+      }, [playing.isPlaying, showThumbnail]);
 
-          if (status.durationMillis && status.positionMillis) {
-            const newProgress = status.positionMillis / status.durationMillis;
-            setProgress(newProgress);
-            progressWidth.value = withTiming(newProgress * 100, {
-              duration: 100,
-            });
-          }
+      useEffect(() => {
+        const durationSeconds = player.duration || 0;
+        if (durationSeconds <= 0) return;
+        const newProgress = timeUpdate.currentTime / durationSeconds;
+        setProgress(newProgress);
+        progressWidth.value = withTiming(newProgress * 100, { duration: 100 });
+      }, [timeUpdate.currentTime, player.duration, progressWidth]);
 
-          // Hide thumbnail once video starts playing
-          if (status.isPlaying && showThumbnail) {
-            setShowThumbnail(false);
-          }
-
-          // Loop video
-          if (status.didJustFinish) {
-            videoRef.current?.setPositionAsync(0);
-            videoRef.current?.playAsync();
-          }
-        },
-        [progressWidth, showThumbnail],
-      );
+      useEffect(() => {
+        player.muted = isMuted;
+      }, [isMuted, player]);
 
       // ==================== Play/Pause Handlers ====================
-      const handlePlay = useCallback(async () => {
+      const handlePlay = useCallback(() => {
         try {
-          if (videoRef.current) {
-            await videoRef.current.playAsync();
-            setIsPlaying(true);
-            playIconOpacity.value = withTiming(0, { duration: 200 });
-            onPlay?.();
-          }
+          player.play();
+          setIsPlaying(true);
+          playIconOpacity.value = withTiming(0, { duration: 200 });
+          onPlay?.();
         } catch (error) {
           console.warn("[FeedVideoPlayer] Play error:", error);
         }
-      }, [onPlay, playIconOpacity]);
+      }, [onPlay, playIconOpacity, player]);
 
-      const handlePause = useCallback(async () => {
+      const handlePause = useCallback(() => {
         try {
-          if (videoRef.current) {
-            await videoRef.current.pauseAsync();
-            setIsPlaying(false);
-            playIconOpacity.value = withTiming(1, { duration: 200 });
-            onPause?.();
-          }
+          player.pause();
+          setIsPlaying(false);
+          playIconOpacity.value = withTiming(1, { duration: 200 });
+          onPause?.();
         } catch (error) {
           console.warn("[FeedVideoPlayer] Pause error:", error);
         }
-      }, [onPause, playIconOpacity]);
+      }, [onPause, playIconOpacity, player]);
 
       // ==================== Tap Handlers ====================
       const handleTap = useCallback(() => {
@@ -350,8 +260,8 @@ export const FeedVideoPlayer = memo(
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         const newMuted = !isMuted;
         setIsMuted(newMuted);
-        videoRef.current?.setIsMutedAsync(newMuted);
-      }, [isMuted]);
+        player.muted = newMuted;
+      }, [isMuted, player]);
 
       const handleFullscreen = useCallback(() => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -386,18 +296,12 @@ export const FeedVideoPlayer = memo(
       return (
         <View style={[styles.container, { aspectRatio }]}>
           {/* Video Player - CONTAIN to show full frame without cropping */}
-          <Video
-            ref={videoRef}
-            source={{ uri: videoUrl }}
+          <VideoView
+            player={player}
             style={styles.video}
-            resizeMode={ResizeMode.CONTAIN}
-            shouldPlay={false}
-            isLooping
-            isMuted={isMuted}
-            onPlaybackStatusUpdate={handlePlaybackStatusUpdate}
-            posterSource={thumbnailUrl ? { uri: thumbnailUrl } : undefined}
-            usePoster={!!thumbnailUrl}
-            posterStyle={styles.poster}
+            contentFit="contain"
+            nativeControls={false}
+            onFirstFrameRender={() => setShowThumbnail(false)}
           />
 
           {/* Thumbnail Overlay (shown until video starts) */}
@@ -512,11 +416,6 @@ const styles = StyleSheet.create({
   video: {
     width: "100%",
     height: "100%",
-  },
-  poster: {
-    width: "100%",
-    height: "100%",
-    resizeMode: "contain",
   },
   thumbnailOverlay: {
     ...StyleSheet.absoluteFillObject,

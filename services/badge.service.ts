@@ -5,8 +5,20 @@
  * @created 20/01/2026
  */
 
-import * as Notifications from "expo-notifications";
+import Constants from "expo-constants";
 import { Platform } from "react-native";
+
+// Lazy import expo-notifications to avoid crash in Expo Go SDK 53+
+let Notifications: typeof import("expo-notifications") | null = null;
+const isExpoGo = Constants.appOwnership === "expo";
+
+if (!isExpoGo) {
+  try {
+    Notifications = require("expo-notifications");
+  } catch (e) {
+    console.warn("[Badge] expo-notifications not available");
+  }
+}
 
 class MessagingBadgeService {
   private _badgeCount: number = 0;
@@ -19,7 +31,7 @@ class MessagingBadgeService {
     this._badgeCount = Math.max(0, count);
 
     try {
-      if (Platform.OS !== "web") {
+      if (Platform.OS !== "web" && Notifications) {
         await Notifications.setBadgeCountAsync(this._badgeCount);
       }
     } catch (error) {
@@ -41,7 +53,7 @@ class MessagingBadgeService {
 
   async getBadgeCount(): Promise<number> {
     try {
-      if (Platform.OS !== "web") {
+      if (Platform.OS !== "web" && Notifications) {
         return await Notifications.getBadgeCountAsync();
       }
     } catch (error) {

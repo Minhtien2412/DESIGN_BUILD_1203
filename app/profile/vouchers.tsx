@@ -1,12 +1,12 @@
-import { Loader } from '@/components/ui/loader';
-import { useThemeColor } from '@/hooks/use-theme-color';
+import { Loader } from "@/components/ui/loader";
+import { useThemeColor } from "@/hooks/use-theme-color";
 import VoucherService, {
     MOCK_VOUCHERS as FALLBACK_VOUCHERS,
-    Voucher as VoucherType
-} from '@/services/voucherService';
-import { Ionicons } from '@expo/vector-icons';
-import { router, Stack } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
+    Voucher as VoucherType,
+} from "@/services/voucherService";
+import { Ionicons } from "@expo/vector-icons";
+import { router, Stack } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
 import {
     Alert,
     Platform,
@@ -16,7 +16,7 @@ import {
     Text,
     TouchableOpacity,
     View,
-} from 'react-native';
+} from "react-native";
 
 interface Voucher {
   id: string;
@@ -26,7 +26,7 @@ interface Voucher {
   discount: string;
   expiryDate: string;
   minOrder: number;
-  type: 'discount' | 'shipping' | 'cashback';
+  type: "discount" | "shipping" | "cashback";
   isUsed: boolean;
   isExpired: boolean;
 }
@@ -37,13 +37,14 @@ function transformVoucher(apiVoucher: VoucherType): Voucher {
     id: apiVoucher.id,
     code: apiVoucher.code,
     title: apiVoucher.title,
-    description: apiVoucher.description || '',
-    discount: apiVoucher.type === 'percent' 
-      ? `${apiVoucher.discount}%` 
-      : new Intl.NumberFormat('vi-VN').format(apiVoucher.discount) + 'đ',
-    expiryDate: new Date(apiVoucher.expiresAt).toLocaleDateString('vi-VN'),
+    description: apiVoucher.description || "",
+    discount:
+      apiVoucher.type === "percent"
+        ? `${apiVoucher.discount}%`
+        : new Intl.NumberFormat("vi-VN").format(apiVoucher.discount) + "đ",
+    expiryDate: new Date(apiVoucher.expiresAt).toLocaleDateString("vi-VN"),
     minOrder: apiVoucher.minOrder || 0,
-    type: apiVoucher.type === 'percent' ? 'discount' : 'shipping',
+    type: apiVoucher.type === "percent" ? "discount" : "shipping",
     isUsed: apiVoucher.isUsed,
     isExpired: apiVoucher.isExpired,
   };
@@ -54,38 +55,40 @@ const MOCK_VOUCHERS: Voucher[] = FALLBACK_VOUCHERS.map(transformVoucher);
 
 const VOUCHER_TYPE_CONFIG = {
   discount: {
-    label: 'Giảm giá',
-    icon: 'pricetag' as const,
-    color: '#000000',
-    bg: '#FEE2E2',
+    label: "Giảm giá",
+    icon: "pricetag" as const,
+    color: "#000000",
+    bg: "#FEE2E2",
   },
   shipping: {
-    label: 'Miễn ship',
-    icon: 'car' as const,
-    color: '#3B82F6',
-    bg: '#E8F4FF',
+    label: "Miễn ship",
+    icon: "car" as const,
+    color: "#3B82F6",
+    bg: "#E8F4FF",
   },
   cashback: {
-    label: 'Hoàn tiền',
-    icon: 'wallet' as const,
-    color: '#0066CC',
-    bg: '#D1FAE5',
+    label: "Hoàn tiền",
+    icon: "wallet" as const,
+    color: "#0066CC",
+    bg: "#D1FAE5",
   },
 };
 
 export default function VouchersScreen() {
-  const bg = useThemeColor({}, 'background');
-  const surface = useThemeColor({}, 'surface');
-  const text = useThemeColor({}, 'text');
-  const textMuted = useThemeColor({}, 'textMuted');
-  const border = useThemeColor({}, 'border');
-  const primary = useThemeColor({}, 'primary');
+  const bg = useThemeColor({}, "background");
+  const surface = useThemeColor({}, "surface");
+  const text = useThemeColor({}, "text");
+  const textMuted = useThemeColor({}, "textMuted");
+  const border = useThemeColor({}, "border");
+  const primary = useThemeColor({}, "primary");
 
-  const [selectedTab, setSelectedTab] = useState<'available' | 'used' | 'expired'>('available');
+  const [selectedTab, setSelectedTab] = useState<
+    "available" | "used" | "expired"
+  >("available");
   const [vouchers, setVouchers] = useState<Voucher[]>(MOCK_VOUCHERS);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [dataSource, setDataSource] = useState<'api' | 'mock'>('mock');
+  const [dataSource, setDataSource] = useState<"api" | "mock">("mock");
 
   // Fetch vouchers from API
   const fetchVouchers = useCallback(async (showLoading = true) => {
@@ -94,16 +97,16 @@ export default function VouchersScreen() {
       const result = await VoucherService.getMyVouchers();
       if (result.ok && result.data?.vouchers) {
         setVouchers(result.data.vouchers.map(transformVoucher));
-        setDataSource('api');
+        setDataSource("api");
       } else {
         // Fallback to mock data
         setVouchers(MOCK_VOUCHERS);
-        setDataSource('mock');
+        setDataSource("mock");
       }
     } catch (error) {
-      console.error('Error fetching vouchers:', error);
+      console.error("Error fetching vouchers:", error);
       setVouchers(MOCK_VOUCHERS);
-      setDataSource('mock');
+      setDataSource("mock");
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -120,54 +123,63 @@ export default function VouchersScreen() {
   }, [fetchVouchers]);
 
   const tabs = [
-    { key: 'available' as const, label: 'Có thể dùng', count: vouchers.filter(v => !v.isUsed && !v.isExpired).length },
-    { key: 'used' as const, label: 'Đã dùng', count: vouchers.filter(v => v.isUsed).length },
-    { key: 'expired' as const, label: 'Hết hạn', count: vouchers.filter(v => v.isExpired).length },
+    {
+      key: "available" as const,
+      label: "Có thể dùng",
+      count: vouchers.filter((v) => !v.isUsed && !v.isExpired).length,
+    },
+    {
+      key: "used" as const,
+      label: "Đã dùng",
+      count: vouchers.filter((v) => v.isUsed).length,
+    },
+    {
+      key: "expired" as const,
+      label: "Hết hạn",
+      count: vouchers.filter((v) => v.isExpired).length,
+    },
   ];
 
-  const filteredVouchers = vouchers.filter(voucher => {
-    if (selectedTab === 'available') return !voucher.isUsed && !voucher.isExpired;
-    if (selectedTab === 'used') return voucher.isUsed;
-    if (selectedTab === 'expired') return voucher.isExpired;
+  const filteredVouchers = vouchers.filter((voucher) => {
+    if (selectedTab === "available")
+      return !voucher.isUsed && !voucher.isExpired;
+    if (selectedTab === "used") return voucher.isUsed;
+    if (selectedTab === "expired") return voucher.isExpired;
     return false;
   });
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND',
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
     }).format(amount);
   };
 
   const handleUseVoucher = (voucher: Voucher) => {
     if (voucher.isExpired) {
-      Alert.alert('Thông báo', 'Mã này đã hết hạn');
+      Alert.alert("Thông báo", "Mã này đã hết hạn");
       return;
     }
     if (voucher.isUsed) {
-      Alert.alert('Thông báo', 'Mã này đã được sử dụng');
+      Alert.alert("Thông báo", "Mã này đã được sử dụng");
       return;
     }
-    
-    Alert.alert(
-      'Sử dụng mã',
-      `Áp dụng mã ${voucher.code} cho đơn hàng?`,
-      [
-        { text: 'Hủy', style: 'cancel' },
-        {
-          text: 'Đồng ý',
-          onPress: () => {
-            // Navigate to cart with voucher code
-            router.push('/(tabs)' as any);
-          },
+
+    Alert.alert("Sử dụng mã", `Áp dụng mã ${voucher.code} cho đơn hàng?`, [
+      { text: "Hủy", style: "cancel" },
+      {
+        text: "Đồng ý",
+        onPress: () => {
+          // Navigate to cart with voucher code
+          router.push("/(tabs)" as any);
         },
-      ]
-    );
+      },
+    ]);
   };
 
   const handleCopyCode = (code: string) => {
     // In a real app, copy to clipboard
-    Alert.alert('Đã sao chép', `Mã ${code} đã được sao chép`);
+    Alert.alert("Đã sao chép", `Mã ${code} đã được sao chép`);
   };
 
   if (loading) {
@@ -178,27 +190,37 @@ export default function VouchersScreen() {
     <View style={[styles.container, { backgroundColor: bg }]}>
       <Stack.Screen
         options={{
-          title: 'Kho Voucher',
+          title: "Kho Voucher",
           headerShown: true,
         }}
       />
 
       {/* Data Source Indicator */}
-      {dataSource === 'mock' && (
-        <View style={[styles.mockBanner, { backgroundColor: '#FEF3C7' }]}>
+      {dataSource === "mock" && (
+        <View style={[styles.mockBanner, { backgroundColor: "#FEF3C7" }]}>
           <Ionicons name="information-circle" size={16} color="#92400E" />
-          <Text style={styles.mockBannerText}>📋 Dữ liệu mẫu - API đang cập nhật</Text>
+          <Text style={styles.mockBannerText}>
+            📋 Dữ liệu mẫu - API đang cập nhật
+          </Text>
         </View>
       )}
 
       {/* Tabs */}
-      <View style={[styles.tabsContainer, { backgroundColor: surface, borderBottomColor: border }]}>
-        {tabs.map(tab => (
+      <View
+        style={[
+          styles.tabsContainer,
+          { backgroundColor: surface, borderBottomColor: border },
+        ]}
+      >
+        {tabs.map((tab) => (
           <TouchableOpacity
             key={tab.key}
             style={[
               styles.tab,
-              selectedTab === tab.key && [styles.activeTab, { borderBottomColor: primary }],
+              selectedTab === tab.key && [
+                styles.activeTab,
+                { borderBottomColor: primary },
+              ],
             ]}
             onPress={() => setSelectedTab(tab.key)}
           >
@@ -221,13 +243,13 @@ export default function VouchersScreen() {
       </View>
 
       {/* Vouchers List */}
-      <ScrollView 
+      <ScrollView
         contentContainerStyle={styles.content}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        {filteredVouchers.map(voucher => {
+        {filteredVouchers.map((voucher) => {
           const typeConfig = VOUCHER_TYPE_CONFIG[voucher.type];
           const isDisabled = voucher.isUsed || voucher.isExpired;
 
@@ -266,7 +288,12 @@ export default function VouchersScreen() {
                   >
                     {voucher.title}
                   </Text>
-                  <Text style={[styles.voucherDiscount, { color: isDisabled ? textMuted : typeConfig.color }]}>
+                  <Text
+                    style={[
+                      styles.voucherDiscount,
+                      { color: isDisabled ? textMuted : typeConfig.color },
+                    ]}
+                  >
                     {voucher.discount}
                   </Text>
                 </View>
@@ -282,7 +309,12 @@ export default function VouchersScreen() {
                     onPress={() => handleCopyCode(voucher.code)}
                     disabled={isDisabled}
                   >
-                    <Text style={[styles.code, { color: isDisabled ? textMuted : primary }]}>
+                    <Text
+                      style={[
+                        styles.code,
+                        { color: isDisabled ? textMuted : primary },
+                      ]}
+                    >
                       {voucher.code}
                     </Text>
                     <Ionicons
@@ -308,15 +340,25 @@ export default function VouchersScreen() {
                 {/* Status & Action */}
                 <View style={styles.voucherActions}>
                   {voucher.isUsed && (
-                    <View style={[styles.statusBadge, { backgroundColor: '#F3F4F6' }]}>
+                    <View
+                      style={[
+                        styles.statusBadge,
+                        { backgroundColor: "#F3F4F6" },
+                      ]}
+                    >
                       <Text style={[styles.statusText, { color: textMuted }]}>
                         Đã sử dụng
                       </Text>
                     </View>
                   )}
                   {voucher.isExpired && (
-                    <View style={[styles.statusBadge, { backgroundColor: '#FEE2E2' }]}>
-                      <Text style={[styles.statusText, { color: '#000000' }]}>
+                    <View
+                      style={[
+                        styles.statusBadge,
+                        { backgroundColor: "#FEE2E2" },
+                      ]}
+                    >
+                      <Text style={[styles.statusText, { color: "#000000" }]}>
                         Hết hạn
                       </Text>
                     </View>
@@ -340,9 +382,13 @@ export default function VouchersScreen() {
           <View style={styles.emptyContainer}>
             <Ionicons name="ticket-outline" size={80} color={textMuted} />
             <Text style={[styles.emptyTitle, { color: text }]}>
-              {selectedTab === 'available' && 'Không có voucher khả dụng'}
-              {selectedTab === 'used' && 'Chưa sử dụng voucher nào'}
-              {selectedTab === 'expired' && 'Không có voucher hết hạn'}
+              {selectedTab === "available"
+                ? "Không có voucher khả dụng"
+                : selectedTab === "used"
+                  ? "Chưa sử dụng voucher nào"
+                  : selectedTab === "expired"
+                    ? "Không có voucher hết hạn"
+                    : ""}
             </Text>
             <Text style={[styles.emptySubtitle, { color: textMuted }]}>
               Khám phá các ưu đãi mới từ shop
@@ -359,29 +405,29 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   mockBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     paddingVertical: 8,
     gap: 6,
   },
   mockBannerText: {
-    color: '#92400E',
+    color: "#92400E",
     fontSize: 12,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   tabsContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     borderBottomWidth: 1,
   },
   tab: {
     flex: 1,
     paddingVertical: 12,
     borderBottomWidth: 2,
-    borderBottomColor: 'transparent',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    borderBottomColor: "transparent",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     gap: 6,
   },
   activeTab: {
@@ -389,22 +435,22 @@ const styles = StyleSheet.create({
   },
   tabText: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   activeTabText: {
-    fontWeight: '600',
+    fontWeight: "600",
   },
   badge: {
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 10,
     minWidth: 20,
-    alignItems: 'center',
+    alignItems: "center",
   },
   badgeText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 11,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   content: {
     padding: 16,
@@ -414,7 +460,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 16,
     marginBottom: 16,
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 12,
   },
   disabledCard: {
@@ -424,29 +470,29 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   disabledBadge: {
-    backgroundColor: '#F3F4F6',
+    backgroundColor: "#F3F4F6",
   },
   voucherContent: {
     flex: 1,
   },
   voucherHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
     marginBottom: 4,
   },
   voucherTitle: {
     flex: 1,
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   voucherDiscount: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginLeft: 8,
   },
   voucherDescription: {
@@ -455,29 +501,29 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   voucherFooter: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     marginBottom: 8,
   },
   codeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6,
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 6,
     borderWidth: 1,
-    borderStyle: 'dashed',
+    borderStyle: "dashed",
   },
   code: {
     fontSize: 13,
-    fontWeight: '600',
-    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
+    fontWeight: "600",
+    fontFamily: Platform.OS === "ios" ? "Courier" : "monospace",
   },
   expiryContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 4,
   },
   expiry: {
@@ -488,9 +534,9 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   voucherActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-end",
     gap: 8,
   },
   statusBadge: {
@@ -500,7 +546,7 @@ const styles = StyleSheet.create({
   },
   statusText: {
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   useButton: {
     paddingHorizontal: 16,
@@ -508,23 +554,23 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   useButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   emptyContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     paddingVertical: 60,
   },
   emptyTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginTop: 16,
     marginBottom: 8,
   },
   emptySubtitle: {
     fontSize: 14,
-    textAlign: 'center',
+    textAlign: "center",
   },
 });

@@ -10,16 +10,20 @@ import {
     shareVideo,
     toggleVideoLike,
     trackVideoView,
-} from '@/services/video-interactions';
-import type {
-    VideoComment,
-    VideoStats
-} from '@/types/video-interactions';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as Crypto from 'expo-crypto';
-import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { Platform } from 'react-native';
-import { useAuth } from './AuthContext';
+} from "@/services/video-interactions";
+import type { VideoComment, VideoStats } from "@/types/video-interactions";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Crypto from "expo-crypto";
+import React, {
+    createContext,
+    useCallback,
+    useContext,
+    useEffect,
+    useRef,
+    useState,
+} from "react";
+import { Platform } from "react-native";
+import { useAuth } from "./AuthContext";
 
 // Helper function to generate UUID compatible with web and native
 const generateUUID = (): string => {
@@ -28,7 +32,7 @@ const generateUUID = (): string => {
     return Crypto.randomUUID();
   } catch (nativeError) {
     // For web, try secure crypto API (only works on localhost or https)
-    if (Platform.OS === 'web' && typeof window !== 'undefined') {
+    if (Platform.OS === "web" && typeof window !== "undefined") {
       try {
         if (window.crypto?.randomUUID) {
           return window.crypto.randomUUID();
@@ -37,11 +41,11 @@ const generateUUID = (): string => {
         // Web Crypto API blocked (non-secure origin), fall through
       }
     }
-    
+
     // Fallback: Manual UUID v4 generation (works everywhere)
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
       const r = (Math.random() * 16) | 0;
-      const v = c === 'x' ? r : (r & 0x3) | 0x8;
+      const v = c === "x" ? r : (r & 0x3) | 0x8;
       return v.toString(16);
     });
   }
@@ -60,7 +64,11 @@ interface VideoInteractionsContextType {
   getCommentsCount: (videoId: string) => number;
 
   // View
-  trackView: (videoId: string, duration: number, completed: boolean) => Promise<void>;
+  trackView: (
+    videoId: string,
+    duration: number,
+    completed: boolean,
+  ) => Promise<void>;
   getVideoViews: (videoId: string) => number;
   // Derived/local view aggregates for live metrics
   getDerivedStats: (videoId: string) => VideoStats | null;
@@ -68,7 +76,7 @@ interface VideoInteractionsContextType {
   // Share
   trackShare: (
     videoId: string,
-    platform: 'facebook' | 'messenger' | 'zalo' | 'copy-link' | 'other'
+    platform: "facebook" | "messenger" | "zalo" | "copy-link" | "other",
   ) => Promise<void>;
   getVideoShares: (videoId: string) => number;
 
@@ -80,24 +88,32 @@ interface VideoInteractionsContextType {
   clearCache: () => void;
 }
 
-const VideoInteractionsContext = createContext<VideoInteractionsContextType | undefined>(
-  undefined
-);
+const VideoInteractionsContext = createContext<
+  VideoInteractionsContextType | undefined
+>(undefined);
 
-const STORAGE_KEY = '@video_interactions';
-const DEVICE_ID_KEY = '@device_id';
-const QUEUE_KEY = '@video_interactions_queue';
+const STORAGE_KEY = "@video_interactions";
+const DEVICE_ID_KEY = "@device_id";
+const QUEUE_KEY = "@video_interactions_queue";
 
 type PendingEvent =
   | {
-      type: 'view';
+      type: "view";
       videoId: string;
-      payload: { userId?: string; deviceId: string; duration: number; completed: boolean };
+      payload: {
+        userId?: string;
+        deviceId: string;
+        duration: number;
+        completed: boolean;
+      };
     }
   | {
-      type: 'share';
+      type: "share";
       videoId: string;
-      payload: { userId?: string; platform: 'facebook' | 'messenger' | 'zalo' | 'copy-link' | 'other' };
+      payload: {
+        userId?: string;
+        platform: "facebook" | "messenger" | "zalo" | "copy-link" | "other";
+      };
     };
 
 type LocalViewAgg = {
@@ -106,29 +122,39 @@ type LocalViewAgg = {
   pendingCompleted: number;
 };
 
-export const VideoInteractionsProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const VideoInteractionsProvider: React.FC<{
+  children: React.ReactNode;
+}> = ({ children }) => {
   const { user } = useAuth();
-  const [deviceId, setDeviceId] = useState<string>('');
-  
+  const [deviceId, setDeviceId] = useState<string>("");
+
   // Local state for fast UI updates
   const [likedVideos, setLikedVideos] = useState<Set<string>>(new Set());
-  const [commentsCache, setCommentsCache] = useState<Record<string, VideoComment[]>>({});
+  const [commentsCache, setCommentsCache] = useState<
+    Record<string, VideoComment[]>
+  >({});
   const [statsCache, setStatsCache] = useState<Record<string, VideoStats>>({});
-  const [localViewAgg, setLocalViewAgg] = useState<Record<string, LocalViewAgg>>({});
+  const [localViewAgg, setLocalViewAgg] = useState<
+    Record<string, LocalViewAgg>
+  >({});
   const [queue, setQueue] = useState<PendingEvent[]>([]);
   const isFlushingRef = useRef(false);
   const flushTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Initialize device ID
+  // Initialize device ID - DEFERRED
   useEffect(() => {
-    loadDeviceId();
+    const frameId = requestAnimationFrame(() => {
+      loadDeviceId();
+    });
+    return () => cancelAnimationFrame(frameId);
   }, []);
 
-  // Load interactions from storage
+  // Load interactions from storage - DEFERRED
   useEffect(() => {
-    loadInteractions();
+    const frameId = requestAnimationFrame(() => {
+      loadInteractions();
+    });
+    return () => cancelAnimationFrame(frameId);
   }, []);
 
   const loadDeviceId = async () => {
@@ -140,7 +166,7 @@ export const VideoInteractionsProvider: React.FC<{ children: React.ReactNode }> 
       }
       setDeviceId(id);
     } catch (error) {
-      console.error('[VideoInteractions] Error loading device ID:', error);
+      console.error("[VideoInteractions] Error loading device ID:", error);
       setDeviceId(generateUUID());
     }
   };
@@ -160,7 +186,7 @@ export const VideoInteractionsProvider: React.FC<{ children: React.ReactNode }> 
         setQueue(JSON.parse(q) as PendingEvent[]);
       }
     } catch (error) {
-      console.error('[VideoInteractions] Error loading interactions:', error);
+      console.error("[VideoInteractions] Error loading interactions:", error);
     }
   };
 
@@ -175,7 +201,7 @@ export const VideoInteractionsProvider: React.FC<{ children: React.ReactNode }> 
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(data));
       await AsyncStorage.setItem(QUEUE_KEY, JSON.stringify(queue));
     } catch (error) {
-      console.error('[VideoInteractions] Error saving interactions:', error);
+      console.error("[VideoInteractions] Error saving interactions:", error);
     }
   };
 
@@ -193,7 +219,7 @@ export const VideoInteractionsProvider: React.FC<{ children: React.ReactNode }> 
         const remaining: PendingEvent[] = [];
         for (const evt of queue) {
           try {
-            if (evt.type === 'view') {
+            if (evt.type === "view") {
               const res = await trackVideoView({
                 videoId: evt.videoId,
                 userId: evt.payload.userId,
@@ -218,20 +244,30 @@ export const VideoInteractionsProvider: React.FC<{ children: React.ReactNode }> 
                   },
                 }));
                 setLocalViewAgg((prev) => {
-                  const cur = prev[evt.videoId] || { pendingViews: 0, pendingWatchTime: 0, pendingCompleted: 0 };
+                  const cur = prev[evt.videoId] || {
+                    pendingViews: 0,
+                    pendingWatchTime: 0,
+                    pendingCompleted: 0,
+                  };
                   return {
                     ...prev,
                     [evt.videoId]: {
                       pendingViews: Math.max(0, cur.pendingViews - 1),
-                      pendingWatchTime: Math.max(0, cur.pendingWatchTime - evt.payload.duration),
-                      pendingCompleted: Math.max(0, cur.pendingCompleted - (evt.payload.completed ? 1 : 0)),
+                      pendingWatchTime: Math.max(
+                        0,
+                        cur.pendingWatchTime - evt.payload.duration,
+                      ),
+                      pendingCompleted: Math.max(
+                        0,
+                        cur.pendingCompleted - (evt.payload.completed ? 1 : 0),
+                      ),
                     },
                   };
                 });
               } else {
                 remaining.push(evt);
               }
-            } else if (evt.type === 'share') {
+            } else if (evt.type === "share") {
               const res = await shareVideo({
                 videoId: evt.videoId,
                 userId: evt.payload.userId,
@@ -279,12 +315,12 @@ export const VideoInteractionsProvider: React.FC<{ children: React.ReactNode }> 
   const likeVideo = useCallback(
     async (videoId: string) => {
       if (!user) {
-        console.warn('[VideoInteractions] User not logged in');
+        console.warn("[VideoInteractions] User not logged in");
         return;
       }
 
       const isLiked = likedVideos.has(videoId);
-      
+
       // Optimistic update
       setLikedVideos((prev) => {
         const next = new Set(prev);
@@ -336,7 +372,7 @@ export const VideoInteractionsProvider: React.FC<{ children: React.ReactNode }> 
           }));
         }
       } catch (error) {
-        console.error('[VideoInteractions] Error liking video:', error);
+        console.error("[VideoInteractions] Error liking video:", error);
         // Revert optimistic update
         setLikedVideos((prev) => {
           const next = new Set(prev);
@@ -349,21 +385,21 @@ export const VideoInteractionsProvider: React.FC<{ children: React.ReactNode }> 
         });
       }
     },
-    [user, likedVideos]
+    [user, likedVideos],
   );
 
   const isVideoLiked = useCallback(
     (videoId: string) => {
       return likedVideos.has(videoId);
     },
-    [likedVideos]
+    [likedVideos],
   );
 
   const getVideoLikes = useCallback(
     (videoId: string) => {
       return statsCache[videoId]?.likes || 0;
     },
-    [statsCache]
+    [statsCache],
   );
 
   /**
@@ -372,13 +408,13 @@ export const VideoInteractionsProvider: React.FC<{ children: React.ReactNode }> 
   const commentVideo = useCallback(
     async (videoId: string, content: string) => {
       if (!user) {
-        throw new Error('User not logged in');
+        throw new Error("User not logged in");
       }
 
       const response = await addVideoComment({
         videoId,
         userId: user.id,
-        userName: user.email || 'User',
+        userName: user.email || "User",
         userAvatar: undefined,
         content,
       });
@@ -408,7 +444,7 @@ export const VideoInteractionsProvider: React.FC<{ children: React.ReactNode }> 
         }));
       }
     },
-    [user]
+    [user],
   );
 
   const getComments = useCallback(
@@ -430,14 +466,16 @@ export const VideoInteractionsProvider: React.FC<{ children: React.ReactNode }> 
 
       return [];
     },
-    [commentsCache]
+    [commentsCache],
   );
 
   const getCommentsCount = useCallback(
     (videoId: string) => {
-      return statsCache[videoId]?.comments || commentsCache[videoId]?.length || 0;
+      return (
+        statsCache[videoId]?.comments || commentsCache[videoId]?.length || 0
+      );
     },
-    [statsCache, commentsCache]
+    [statsCache, commentsCache],
   );
 
   /**
@@ -450,7 +488,11 @@ export const VideoInteractionsProvider: React.FC<{ children: React.ReactNode }> 
       try {
         // Optimistic local aggregation
         setLocalViewAgg((prev) => {
-          const cur = prev[videoId] || { pendingViews: 0, pendingWatchTime: 0, pendingCompleted: 0 };
+          const cur = prev[videoId] || {
+            pendingViews: 0,
+            pendingWatchTime: 0,
+            pendingCompleted: 0,
+          };
           return {
             ...prev,
             [videoId]: {
@@ -487,27 +529,38 @@ export const VideoInteractionsProvider: React.FC<{ children: React.ReactNode }> 
           }));
           // Decrement one pending view now that server confirmed it
           setLocalViewAgg((prev) => {
-            const cur = prev[videoId] || { pendingViews: 0, pendingWatchTime: 0, pendingCompleted: 0 };
+            const cur = prev[videoId] || {
+              pendingViews: 0,
+              pendingWatchTime: 0,
+              pendingCompleted: 0,
+            };
             return {
               ...prev,
               [videoId]: {
                 pendingViews: Math.max(0, cur.pendingViews - 1),
                 pendingWatchTime: Math.max(0, cur.pendingWatchTime - duration),
-                pendingCompleted: Math.max(0, cur.pendingCompleted - (completed ? 1 : 0)),
+                pendingCompleted: Math.max(
+                  0,
+                  cur.pendingCompleted - (completed ? 1 : 0),
+                ),
               },
             };
           });
         }
       } catch (error) {
-        console.error('[VideoInteractions] Error tracking view:', error);
+        console.error("[VideoInteractions] Error tracking view:", error);
         // Enqueue for retry later
         setQueue((prev) => [
           ...prev,
-          { type: 'view', videoId, payload: { userId: user?.id, deviceId, duration, completed } },
+          {
+            type: "view",
+            videoId,
+            payload: { userId: user?.id, deviceId, duration, completed },
+          },
         ]);
       }
     },
-    [user, deviceId]
+    [user, deviceId],
   );
 
   const getVideoViews = useCallback(
@@ -516,7 +569,7 @@ export const VideoInteractionsProvider: React.FC<{ children: React.ReactNode }> 
       const pending = localViewAgg[videoId]?.pendingViews || 0;
       return base + pending;
     },
-    [statsCache, localViewAgg]
+    [statsCache, localViewAgg],
   );
 
   /**
@@ -525,7 +578,7 @@ export const VideoInteractionsProvider: React.FC<{ children: React.ReactNode }> 
   const trackShare = useCallback(
     async (
       videoId: string,
-      platform: 'facebook' | 'messenger' | 'zalo' | 'copy-link' | 'other'
+      platform: "facebook" | "messenger" | "zalo" | "copy-link" | "other",
     ) => {
       try {
         const response = await shareVideo({
@@ -552,22 +605,22 @@ export const VideoInteractionsProvider: React.FC<{ children: React.ReactNode }> 
           }));
         }
       } catch (error) {
-        console.error('[VideoInteractions] Error tracking share:', error);
+        console.error("[VideoInteractions] Error tracking share:", error);
         // Enqueue share event for retry later
         setQueue((prev) => [
           ...prev,
-          { type: 'share', videoId, payload: { userId: user?.id, platform } },
+          { type: "share", videoId, payload: { userId: user?.id, platform } },
         ]);
       }
     },
-    [user]
+    [user],
   );
 
   const getVideoShares = useCallback(
     (videoId: string) => {
       return statsCache[videoId]?.shares || 0;
     },
-    [statsCache]
+    [statsCache],
   );
 
   /**
@@ -577,7 +630,7 @@ export const VideoInteractionsProvider: React.FC<{ children: React.ReactNode }> 
     (videoId: string) => {
       return statsCache[videoId] || null;
     },
-    [statsCache]
+    [statsCache],
   );
 
   const getDerivedStats = useCallback(
@@ -589,7 +642,9 @@ export const VideoInteractionsProvider: React.FC<{ children: React.ReactNode }> 
       const serverViews = base?.views || 0;
       const serverAvgWT = base?.averageWatchTime || 0;
       const serverCompletionRate = base?.completionRate || 0; // percent
-      const serverCompletionsApprox = Math.round((serverViews * serverCompletionRate) / 100);
+      const serverCompletionsApprox = Math.round(
+        (serverViews * serverCompletionRate) / 100,
+      );
 
       const pendingViews = agg?.pendingViews || 0;
       const pendingWT = agg?.pendingWatchTime || 0;
@@ -600,7 +655,8 @@ export const VideoInteractionsProvider: React.FC<{ children: React.ReactNode }> 
       const totalWT = serverViews * serverAvgWT + pendingWT;
 
       const avgWT = totalViews > 0 ? totalWT / totalViews : 0;
-      const completionRate = totalViews > 0 ? (totalCompletions / totalViews) * 100 : 0;
+      const completionRate =
+        totalViews > 0 ? (totalCompletions / totalViews) * 100 : 0;
 
       return {
         videoId,
@@ -613,7 +669,7 @@ export const VideoInteractionsProvider: React.FC<{ children: React.ReactNode }> 
         updatedAt: new Date().toISOString(),
       } as VideoStats;
     },
-    [statsCache, localViewAgg]
+    [statsCache, localViewAgg],
   );
 
   const refreshStats = useCallback(async (videoId: string) => {
@@ -646,7 +702,7 @@ export const VideoInteractionsProvider: React.FC<{ children: React.ReactNode }> 
     getCommentsCount,
     trackView,
     getVideoViews,
-  getDerivedStats,
+    getDerivedStats,
     trackShare,
     getVideoShares,
     getStats,
@@ -664,7 +720,9 @@ export const VideoInteractionsProvider: React.FC<{ children: React.ReactNode }> 
 export const useVideoInteractions = () => {
   const context = useContext(VideoInteractionsContext);
   if (!context) {
-    throw new Error('useVideoInteractions must be used within VideoInteractionsProvider');
+    throw new Error(
+      "useVideoInteractions must be used within VideoInteractionsProvider",
+    );
   }
   return context;
 };
@@ -672,7 +730,9 @@ export const useVideoInteractions = () => {
 // Convenience hook to consume merged, live-updating stats in UI components
 export const useVideoStats = (videoId: string): VideoStats | null => {
   const { getDerivedStats } = useVideoInteractions();
-  const [stats, setStats] = useState<VideoStats | null>(() => getDerivedStats(videoId));
+  const [stats, setStats] = useState<VideoStats | null>(() =>
+    getDerivedStats(videoId),
+  );
 
   useEffect(() => {
     setStats(getDerivedStats(videoId));

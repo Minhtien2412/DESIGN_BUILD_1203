@@ -3,8 +3,8 @@
  * Quản lý bộ nhớ và cache thông minh
  */
 
-import { storage } from '@/services/storage';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { storage } from "@/services/storage";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 // =================
 // MEMORY CACHE MANAGER
@@ -17,7 +17,10 @@ interface CacheConfig {
 }
 
 class MemoryCache {
-  private cache = new Map<string, { data: any; timestamp: number; accessCount: number }>();
+  private cache = new Map<
+    string,
+    { data: any; timestamp: number; accessCount: number }
+  >();
   private config: CacheConfig;
   private gcTimer: any = null;
 
@@ -80,7 +83,7 @@ class MemoryCache {
   }
 
   private evictLeastRecentlyUsed(): void {
-    let lruKey = '';
+    let lruKey = "";
     let lruAccessCount = Infinity;
 
     for (const [key, entry] of this.cache.entries()) {
@@ -124,9 +127,18 @@ class MemoryCache {
 }
 
 // Global cache instances
-export const imageCache = new MemoryCache({ maxSize: 50, maxAge: 60 * 60 * 1000 }); // 1 hour
-export const dataCache = new MemoryCache({ maxSize: 100, maxAge: 30 * 60 * 1000 }); // 30 minutes
-export const apiCache = new MemoryCache({ maxSize: 200, maxAge: 10 * 60 * 1000 }); // 10 minutes
+export const imageCache = new MemoryCache({
+  maxSize: 50,
+  maxAge: 60 * 60 * 1000,
+}); // 1 hour
+export const dataCache = new MemoryCache({
+  maxSize: 100,
+  maxAge: 30 * 60 * 1000,
+}); // 30 minutes
+export const apiCache = new MemoryCache({
+  maxSize: 200,
+  maxAge: 10 * 60 * 1000,
+}); // 10 minutes
 
 // =================
 // PERSISTENT CACHE MANAGER
@@ -135,7 +147,7 @@ export const apiCache = new MemoryCache({ maxSize: 200, maxAge: 10 * 60 * 1000 }
 class PersistentCache {
   private prefix: string;
 
-  constructor(prefix: string = 'app_cache_') {
+  constructor(prefix: string = "app_cache_") {
     this.prefix = prefix;
   }
 
@@ -149,13 +161,13 @@ class PersistentCache {
 
       await storage.set(`${this.prefix}${key}`, JSON.stringify(cacheData));
     } catch (error) {
-      console.warn('PersistentCache set error:', error);
+      console.warn("PersistentCache set error:", error);
     }
   }
 
   async get(key: string): Promise<any | null> {
     try {
-  const cached = await storage.get(`${this.prefix}${key}`);
+      const cached = await storage.get(`${this.prefix}${key}`);
       if (!cached) return null;
 
       const cacheData = JSON.parse(cached);
@@ -168,7 +180,7 @@ class PersistentCache {
 
       return cacheData.data;
     } catch (error) {
-      console.warn('PersistentCache get error:', error);
+      console.warn("PersistentCache get error:", error);
       return null;
     }
   }
@@ -180,33 +192,33 @@ class PersistentCache {
 
   async delete(key: string): Promise<void> {
     try {
-  await storage.remove(`${this.prefix}${key}`);
+      await storage.remove(`${this.prefix}${key}`);
     } catch (error) {
-      console.warn('PersistentCache delete error:', error);
+      console.warn("PersistentCache delete error:", error);
     }
   }
 
   async clear(): Promise<void> {
     try {
-  const keys = await storage.keys();
-  const cacheKeys = keys.filter(k => k.startsWith(this.prefix));
-  await storage.multiRemove(cacheKeys);
+      const keys = await storage.keys();
+      const cacheKeys = keys.filter((k) => k.startsWith(this.prefix));
+      await storage.multiRemove(cacheKeys);
     } catch (error) {
-      console.warn('PersistentCache clear error:', error);
+      console.warn("PersistentCache clear error:", error);
     }
   }
 
   async cleanup(): Promise<void> {
     try {
-  const keys = await storage.keys();
-  const cacheKeys = keys.filter(k => k.startsWith(this.prefix));
-      
+      const keys = await storage.keys();
+      const cacheKeys = keys.filter((k) => k.startsWith(this.prefix));
+
       for (const key of cacheKeys) {
-        const _data = await this.get(key.replace(this.prefix, ''));
+        const _data = await this.get(key.replace(this.prefix, ""));
         // Cleanup will be handled by get() if expired
       }
     } catch (error) {
-      console.warn('PersistentCache cleanup error:', error);
+      console.warn("PersistentCache cleanup error:", error);
     }
   }
 }
@@ -225,14 +237,14 @@ export const useMemoryOptimization = () => {
     // Setup memory warning handler
     const _handleMemoryWarning = () => {
       setMemoryWarning(true);
-      
+
       // Clear memory caches
       imageCache.clear();
       dataCache.clear();
-      
+
       // Run registered cleanup functions
-      cleanupRef.current.forEach(cleanup => cleanup());
-      
+      cleanupRef.current.forEach((cleanup) => cleanup());
+
       // Force garbage collection if available
       if (global.gc) {
         global.gc();
@@ -243,18 +255,18 @@ export const useMemoryOptimization = () => {
 
     // Register memory warning listener (platform specific)
     if (__DEV__) {
-      console.log('Memory optimization hooks initialized');
+      console.log("Memory optimization hooks initialized");
     }
 
     return () => {
       // Cleanup on unmount
-      cleanupRef.current.forEach(cleanup => cleanup());
+      cleanupRef.current.forEach((cleanup) => cleanup());
     };
   }, []);
 
   const registerCleanup = useCallback((cleanup: () => void) => {
     cleanupRef.current.push(cleanup);
-    
+
     return () => {
       const index = cleanupRef.current.indexOf(cleanup);
       if (index > -1) {
@@ -268,10 +280,10 @@ export const useMemoryOptimization = () => {
     imageCache.clear();
     dataCache.clear();
     apiCache.clear();
-    
+
     // Run cleanup functions
-    cleanupRef.current.forEach(cleanup => cleanup());
-    
+    cleanupRef.current.forEach((cleanup) => cleanup());
+
     if (global.gc) {
       global.gc();
     }
@@ -292,78 +304,85 @@ export const useCachedData = <T>(
   key: string,
   fetcher: () => Promise<T>,
   options: {
-    cacheType?: 'memory' | 'persistent' | 'both';
+    cacheType?: "memory" | "persistent" | "both";
     expiry?: number;
     enableRefresh?: boolean;
-  } = {}
+  } = {},
 ) => {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const {
-    cacheType = 'memory',
+    cacheType = "memory",
     expiry = 30 * 60 * 1000, // 30 minutes
     enableRefresh = true,
   } = options;
 
-  const fetchData = useCallback(async (force = false) => {
-    setLoading(true);
-    setError(null);
+  const fetchData = useCallback(
+    async (force = false) => {
+      setLoading(true);
+      setError(null);
 
-    try {
-      // Check cache first (unless forced)
-      if (!force) {
-        let cachedData: T | null = null;
+      try {
+        // Check cache first (unless forced)
+        if (!force) {
+          let cachedData: T | null = null;
 
-        if (cacheType === 'memory' || cacheType === 'both') {
-          cachedData = dataCache.get(key);
+          if (cacheType === "memory" || cacheType === "both") {
+            cachedData = dataCache.get(key);
+          }
+
+          if (
+            !cachedData &&
+            (cacheType === "persistent" || cacheType === "both")
+          ) {
+            cachedData = await persistentCache.get(key);
+          }
+
+          if (cachedData) {
+            setData(cachedData);
+            setLoading(false);
+            return cachedData;
+          }
         }
 
-        if (!cachedData && (cacheType === 'persistent' || cacheType === 'both')) {
-          cachedData = await persistentCache.get(key);
+        // Fetch fresh data
+        const freshData = await fetcher();
+        setData(freshData);
+
+        // Cache the data
+        if (cacheType === "memory" || cacheType === "both") {
+          dataCache.set(key, freshData);
         }
 
-        if (cachedData) {
-          setData(cachedData);
-          setLoading(false);
-          return cachedData;
+        if (cacheType === "persistent" || cacheType === "both") {
+          await persistentCache.set(key, freshData, expiry);
         }
+
+        return freshData;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Unknown error";
+        setError(errorMessage);
+        throw err;
+      } finally {
+        setLoading(false);
       }
-
-      // Fetch fresh data
-      const freshData = await fetcher();
-      setData(freshData);
-
-      // Cache the data
-      if (cacheType === 'memory' || cacheType === 'both') {
-        dataCache.set(key, freshData);
-      }
-
-      if (cacheType === 'persistent' || cacheType === 'both') {
-        await persistentCache.set(key, freshData, expiry);
-      }
-
-      return freshData;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-      setError(errorMessage);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [key, fetcher, cacheType, expiry]);
+    },
+    [key, fetcher, cacheType, expiry],
+  );
 
   const refresh = useCallback(() => {
     return fetchData(true);
   }, [fetchData]);
 
   const clearCache = useCallback(async () => {
-    if (cacheType === 'memory' || cacheType === 'both') {
+    if (cacheType === "memory" || cacheType === "both") {
       dataCache.delete(key);
     }
 
-    if (cacheType === 'persistent' || cacheType === 'both') {
+    if (cacheType === "persistent" || cacheType === "both") {
       await persistentCache.delete(key);
     }
   }, [key, cacheType]);

@@ -548,7 +548,7 @@ export function useRealTimeCommunication(
 
   const toggleSpeaker = useCallback(() => {
     setCallState((prev) => ({ ...prev, isSpeakerOn: !prev.isSpeakerOn }));
-    // Note: Actual speaker toggle requires native module (expo-av or similar)
+    // Note: Actual speaker toggle requires native module (expo-audio or similar)
   }, []);
 
   // ==================== CHAT METHODS ====================

@@ -1,7 +1,7 @@
 /**
  * FilterPanel.tsx
  * Advanced multi-criteria filtering for Construction Map tasks and stages
- * 
+ *
  * Features:
  * - Multi-select status filter (Pending/InProgress/Completed/Cancelled)
  * - Priority filter (Low/Medium/High)
@@ -13,10 +13,10 @@
  * - Clear all filters
  */
 
-import { TaskPriority, TaskStatus } from '@/types/construction-map';
-import { Ionicons } from '@expo/vector-icons';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import React, { useEffect, useState } from 'react';
+import { TaskPriority, TaskStatus } from "@/types/construction-map";
+import { Ionicons } from "@expo/vector-icons";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import React, { useEffect, useState } from "react";
 import {
     Modal,
     ScrollView,
@@ -26,30 +26,30 @@ import {
     TextInput,
     TouchableOpacity,
     View,
-} from 'react-native';
+} from "react-native";
 
 export interface FilterCriteria {
   // Status filters
   statuses: TaskStatus[];
-  
+
   // Priority filters
   priorities: TaskPriority[];
-  
+
   // Assignee filters
   assigneeIds: string[];
-  
+
   // Date range
   startDateFrom?: Date;
   startDateTo?: Date;
   endDateFrom?: Date;
   endDateTo?: Date;
-  
+
   // Text search
   searchText: string;
-  
+
   // Show only overdue tasks
   onlyOverdue: boolean;
-  
+
   // Show only unassigned tasks
   onlyUnassigned: boolean;
 }
@@ -77,7 +77,7 @@ const defaultFilters: FilterCriteria = {
   statuses: [],
   priorities: [],
   assigneeIds: [],
-  searchText: '',
+  searchText: "",
   onlyOverdue: false,
   onlyUnassigned: false,
 };
@@ -95,11 +95,13 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
 }) => {
   const [filters, setFilters] = useState<FilterCriteria>(currentFilters);
   const [showDatePicker, setShowDatePicker] = useState<{
-    field: 'startFrom' | 'startTo' | 'endFrom' | 'endTo' | null;
+    field: "startFrom" | "startTo" | "endFrom" | "endTo" | null;
   }>({ field: null });
   const [showPresetSave, setShowPresetSave] = useState(false);
-  const [presetName, setPresetName] = useState('');
-  const [expandedSection, setExpandedSection] = useState<string | null>('status');
+  const [presetName, setPresetName] = useState("");
+  const [expandedSection, setExpandedSection] = useState<string | null>(
+    "status",
+  );
 
   useEffect(() => {
     if (visible) {
@@ -139,7 +141,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
 
   // Handle date picker
   const handleDateChange = (event: any, selectedDate?: Date) => {
-    if (event.type === 'dismissed') {
+    if (event.type === "dismissed") {
       setShowDatePicker({ field: null });
       return;
     }
@@ -148,10 +150,10 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
       const field = showDatePicker.field;
       setFilters((prev) => ({
         ...prev,
-        ...(field === 'startFrom' && { startDateFrom: selectedDate }),
-        ...(field === 'startTo' && { startDateTo: selectedDate }),
-        ...(field === 'endFrom' && { endDateFrom: selectedDate }),
-        ...(field === 'endTo' && { endDateTo: selectedDate }),
+        ...(field === "startFrom" && { startDateFrom: selectedDate }),
+        ...(field === "startTo" && { startDateTo: selectedDate }),
+        ...(field === "endFrom" && { endDateFrom: selectedDate }),
+        ...(field === "endTo" && { endDateTo: selectedDate }),
       }));
     }
     setShowDatePicker({ field: null });
@@ -172,7 +174,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
   const handleSavePreset = () => {
     if (presetName.trim() && onSavePreset) {
       onSavePreset(presetName.trim(), filters);
-      setPresetName('');
+      setPresetName("");
       setShowPresetSave(false);
     }
   };
@@ -202,21 +204,30 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
   // Get status color
   const getStatusColor = (status: TaskStatus): string => {
     switch (status) {
-      case 'pending': return '#0066CC';
-      case 'in-progress': return '#3B82F6';
-      case 'completed': return '#0066CC';
-      case 'blocked': return '#000000';
-      default: return '#6B7280';
+      case "pending":
+        return "#0066CC";
+      case "in-progress":
+        return "#3B82F6";
+      case "completed":
+        return "#0066CC";
+      case "blocked":
+        return "#000000";
+      default:
+        return "#6B7280";
     }
   };
 
   // Get priority color
   const getPriorityColor = (priority: TaskPriority): string => {
     switch (priority) {
-      case 'low': return '#0066CC';
-      case 'medium': return '#0066CC';
-      case 'high': return '#000000';
-      default: return '#6B7280';
+      case "low":
+        return "#0066CC";
+      case "medium":
+        return "#0066CC";
+      case "high":
+        return "#000000";
+      default:
+        return "#6B7280";
     }
   };
 
@@ -225,7 +236,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
     title: string,
     key: string,
     content: React.ReactNode,
-    badgeCount?: number
+    badgeCount?: number,
   ) => {
     const isExpanded = expandedSection === key;
     return (
@@ -243,7 +254,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
             )}
           </View>
           <Ionicons
-            name={isExpanded ? 'chevron-up' : 'chevron-down'}
+            name={isExpanded ? "chevron-up" : "chevron-down"}
             size={20}
             color="#6B7280"
           />
@@ -294,7 +305,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
               {filters.searchText.length > 0 && (
                 <TouchableOpacity
                   onPress={() =>
-                    setFilters((prev) => ({ ...prev, searchText: '' }))
+                    setFilters((prev) => ({ ...prev, searchText: "" }))
                   }
                 >
                   <Ionicons name="close-circle" size={20} color="#9CA3AF" />
@@ -304,61 +315,29 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
 
             {/* Status Filter */}
             {renderSection(
-              'Trạng Thái',
-              'status',
+              "Trạng Thái",
+              "status",
               <View style={styles.chipContainer}>
-                {(['pending', 'in-progress', 'completed', 'blocked'] as TaskStatus[]).map(
-                  (status) => {
-                    const isSelected = filters.statuses.includes(status);
-                    return (
-                      <TouchableOpacity
-                        key={status}
-                        style={[
-                          styles.chip,
-                          isSelected && {
-                            backgroundColor: getStatusColor(status),
-                            borderColor: getStatusColor(status),
-                          },
-                        ]}
-                        onPress={() => toggleStatus(status)}
-                      >
-                        <Text
-                          style={[
-                            styles.chipText,
-                            isSelected && styles.chipTextSelected,
-                          ]}
-                        >
-                          {status === 'pending' && 'Đang Chờ'}
-                          {status === 'in-progress' && 'Đang Làm'}
-                          {status === 'completed' && 'Hoàn Thành'}
-                          {status === 'blocked' && 'Bị Chặn'}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  }
-                )}
-              </View>,
-              filters.statuses.length
-            )}
-
-            {/* Priority Filter */}
-            {renderSection(
-              'Độ Ưu Tiên',
-              'priority',
-              <View style={styles.chipContainer}>
-                {(['low', 'medium', 'high'] as TaskPriority[]).map((priority) => {
-                  const isSelected = filters.priorities.includes(priority);
+                {(
+                  [
+                    "pending",
+                    "in-progress",
+                    "completed",
+                    "blocked",
+                  ] as TaskStatus[]
+                ).map((status) => {
+                  const isSelected = filters.statuses.includes(status);
                   return (
                     <TouchableOpacity
-                      key={priority}
+                      key={status}
                       style={[
                         styles.chip,
                         isSelected && {
-                          backgroundColor: getPriorityColor(priority),
-                          borderColor: getPriorityColor(priority),
+                          backgroundColor: getStatusColor(status),
+                          borderColor: getStatusColor(status),
                         },
                       ]}
-                      onPress={() => togglePriority(priority)}
+                      onPress={() => toggleStatus(status)}
                     >
                       <Text
                         style={[
@@ -366,25 +345,75 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                           isSelected && styles.chipTextSelected,
                         ]}
                       >
-                        {priority === 'low' && 'Thấp'}
-                        {priority === 'medium' && 'Trung Bình'}
-                        {priority === 'high' && 'Cao'}
+                        {status === "pending"
+                          ? "Đang Chờ"
+                          : status === "in-progress"
+                            ? "Đang Làm"
+                            : status === "completed"
+                              ? "Hoàn Thành"
+                              : status === "blocked"
+                                ? "Bị Chặn"
+                                : ""}
                       </Text>
                     </TouchableOpacity>
                   );
                 })}
               </View>,
-              filters.priorities.length
+              filters.statuses.length,
+            )}
+
+            {/* Priority Filter */}
+            {renderSection(
+              "Độ Ưu Tiên",
+              "priority",
+              <View style={styles.chipContainer}>
+                {(["low", "medium", "high"] as TaskPriority[]).map(
+                  (priority) => {
+                    const isSelected = filters.priorities.includes(priority);
+                    return (
+                      <TouchableOpacity
+                        key={priority}
+                        style={[
+                          styles.chip,
+                          isSelected && {
+                            backgroundColor: getPriorityColor(priority),
+                            borderColor: getPriorityColor(priority),
+                          },
+                        ]}
+                        onPress={() => togglePriority(priority)}
+                      >
+                        <Text
+                          style={[
+                            styles.chipText,
+                            isSelected && styles.chipTextSelected,
+                          ]}
+                        >
+                          {priority === "low"
+                            ? "Thấp"
+                            : priority === "medium"
+                              ? "Trung Bình"
+                              : priority === "high"
+                                ? "Cao"
+                                : ""}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  },
+                )}
+              </View>,
+              filters.priorities.length,
             )}
 
             {/* Assignee Filter */}
             {assigneeOptions.length > 0 &&
               renderSection(
-                'Người Thực Hiện',
-                'assignee',
+                "Người Thực Hiện",
+                "assignee",
                 <View style={styles.assigneeList}>
                   {assigneeOptions.map((assignee) => {
-                    const isSelected = filters.assigneeIds.includes(assignee.id);
+                    const isSelected = filters.assigneeIds.includes(
+                      assignee.id,
+                    );
                     return (
                       <TouchableOpacity
                         key={assignee.id}
@@ -406,31 +435,38 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                     );
                   })}
                 </View>,
-                filters.assigneeIds.length
+                filters.assigneeIds.length,
               )}
 
             {/* Date Range Filter */}
             {renderSection(
-              'Ngày Bắt Đầu',
-              'startDate',
+              "Ngày Bắt Đầu",
+              "startDate",
               <View style={styles.dateRangeContainer}>
                 <View style={styles.dateRow}>
                   <Text style={styles.dateLabel}>Từ:</Text>
                   <TouchableOpacity
                     style={styles.dateButton}
-                    onPress={() => setShowDatePicker({ field: 'startFrom' })}
+                    onPress={() => setShowDatePicker({ field: "startFrom" })}
                   >
                     <Text style={styles.dateButtonText}>
                       {filters.startDateFrom
-                        ? filters.startDateFrom.toLocaleDateString('vi-VN')
-                        : 'Chọn ngày'}
+                        ? filters.startDateFrom.toLocaleDateString("vi-VN")
+                        : "Chọn ngày"}
                     </Text>
-                    <Ionicons name="calendar-outline" size={20} color="#3B82F6" />
+                    <Ionicons
+                      name="calendar-outline"
+                      size={20}
+                      color="#3B82F6"
+                    />
                   </TouchableOpacity>
                   {filters.startDateFrom && (
                     <TouchableOpacity
                       onPress={() =>
-                        setFilters((prev) => ({ ...prev, startDateFrom: undefined }))
+                        setFilters((prev) => ({
+                          ...prev,
+                          startDateFrom: undefined,
+                        }))
                       }
                     >
                       <Ionicons name="close-circle" size={20} color="#000000" />
@@ -441,19 +477,26 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                   <Text style={styles.dateLabel}>Đến:</Text>
                   <TouchableOpacity
                     style={styles.dateButton}
-                    onPress={() => setShowDatePicker({ field: 'startTo' })}
+                    onPress={() => setShowDatePicker({ field: "startTo" })}
                   >
                     <Text style={styles.dateButtonText}>
                       {filters.startDateTo
-                        ? filters.startDateTo.toLocaleDateString('vi-VN')
-                        : 'Chọn ngày'}
+                        ? filters.startDateTo.toLocaleDateString("vi-VN")
+                        : "Chọn ngày"}
                     </Text>
-                    <Ionicons name="calendar-outline" size={20} color="#3B82F6" />
+                    <Ionicons
+                      name="calendar-outline"
+                      size={20}
+                      color="#3B82F6"
+                    />
                   </TouchableOpacity>
                   {filters.startDateTo && (
                     <TouchableOpacity
                       onPress={() =>
-                        setFilters((prev) => ({ ...prev, startDateTo: undefined }))
+                        setFilters((prev) => ({
+                          ...prev,
+                          startDateTo: undefined,
+                        }))
                       }
                     >
                       <Ionicons name="close-circle" size={20} color="#000000" />
@@ -461,29 +504,33 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                   )}
                 </View>
               </View>,
-              (filters.startDateFrom || filters.startDateTo) ? 1 : 0
+              filters.startDateFrom || filters.startDateTo ? 1 : 0,
             )}
 
             {/* Toggle Filters */}
             <View style={styles.section}>
               <View style={styles.toggleRow}>
-                <Text style={styles.toggleLabel}>Chỉ hiện công việc quá hạn</Text>
+                <Text style={styles.toggleLabel}>
+                  Chỉ hiện công việc quá hạn
+                </Text>
                 <Switch
                   value={filters.onlyOverdue}
                   onValueChange={(value) =>
                     setFilters((prev) => ({ ...prev, onlyOverdue: value }))
                   }
-                  trackColor={{ false: '#D1D5DB', true: '#3B82F6' }}
+                  trackColor={{ false: "#D1D5DB", true: "#3B82F6" }}
                 />
               </View>
               <View style={styles.toggleRow}>
-                <Text style={styles.toggleLabel}>Chỉ hiện công việc chưa giao</Text>
+                <Text style={styles.toggleLabel}>
+                  Chỉ hiện công việc chưa giao
+                </Text>
                 <Switch
                   value={filters.onlyUnassigned}
                   onValueChange={(value) =>
                     setFilters((prev) => ({ ...prev, onlyUnassigned: value }))
                   }
-                  trackColor={{ false: '#D1D5DB', true: '#3B82F6' }}
+                  trackColor={{ false: "#D1D5DB", true: "#3B82F6" }}
                 />
               </View>
             </View>
@@ -506,7 +553,11 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                         <TouchableOpacity
                           onPress={() => onDeletePreset(preset.id)}
                         >
-                          <Ionicons name="trash-outline" size={18} color="#000000" />
+                          <Ionicons
+                            name="trash-outline"
+                            size={18}
+                            color="#000000"
+                          />
                         </TouchableOpacity>
                       )}
                     </View>
@@ -546,10 +597,10 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
       {showDatePicker.field && (
         <DateTimePicker
           value={
-            (showDatePicker.field === 'startFrom' && filters.startDateFrom) ||
-            (showDatePicker.field === 'startTo' && filters.startDateTo) ||
-            (showDatePicker.field === 'endFrom' && filters.endDateFrom) ||
-            (showDatePicker.field === 'endTo' && filters.endDateTo) ||
+            (showDatePicker.field === "startFrom" && filters.startDateFrom) ||
+            (showDatePicker.field === "startTo" && filters.startDateTo) ||
+            (showDatePicker.field === "endFrom" && filters.endDateFrom) ||
+            (showDatePicker.field === "endTo" && filters.endDateTo) ||
             new Date()
           }
           mode="date"
@@ -580,7 +631,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                 style={styles.presetCancelButton}
                 onPress={() => {
                   setShowPresetSave(false);
-                  setPresetName('');
+                  setPresetName("");
                 }}
               >
                 <Text style={styles.presetCancelButtonText}>Hủy</Text>
@@ -606,46 +657,46 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-end',
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "flex-end",
   },
   modalContent: {
-    backgroundColor: '#FFF',
+    backgroundColor: "#FFF",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    maxHeight: '90%',
+    maxHeight: "90%",
     paddingBottom: 20,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: "#E5E7EB",
   },
   headerLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#111827',
+    fontWeight: "600",
+    color: "#111827",
   },
   activeCountBadge: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: "#3B82F6",
     borderRadius: 12,
     paddingHorizontal: 8,
     paddingVertical: 2,
     minWidth: 24,
-    alignItems: 'center',
+    alignItems: "center",
   },
   activeCountText: {
-    color: '#FFF',
+    color: "#FFF",
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   closeButton: {
     padding: 4,
@@ -654,9 +705,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F3F4F6',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F3F4F6",
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 10,
@@ -666,47 +717,47 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 14,
-    color: '#111827',
+    color: "#111827",
   },
   section: {
     marginBottom: 16,
     paddingHorizontal: 16,
   },
   sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingVertical: 12,
   },
   sectionTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#111827',
+    fontWeight: "600",
+    color: "#111827",
   },
   badge: {
-    backgroundColor: '#E8F4FF',
+    backgroundColor: "#E8F4FF",
     borderRadius: 10,
     paddingHorizontal: 6,
     paddingVertical: 2,
     minWidth: 20,
-    alignItems: 'center',
+    alignItems: "center",
   },
   badgeText: {
-    color: '#1E40AF',
+    color: "#1E40AF",
     fontSize: 11,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   sectionContent: {
     paddingTop: 8,
   },
   chipContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 8,
   },
   chip: {
@@ -714,179 +765,179 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 20,
     borderWidth: 1.5,
-    borderColor: '#D1D5DB',
-    backgroundColor: '#FFF',
+    borderColor: "#D1D5DB",
+    backgroundColor: "#FFF",
   },
   chipText: {
     fontSize: 13,
-    color: '#6B7280',
-    fontWeight: '500',
+    color: "#6B7280",
+    fontWeight: "500",
   },
   chipTextSelected: {
-    color: '#FFF',
-    fontWeight: '600',
+    color: "#FFF",
+    fontWeight: "600",
   },
   assigneeList: {
     gap: 8,
   },
   assigneeItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingVertical: 10,
     paddingHorizontal: 12,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: "#F9FAFB",
     borderRadius: 8,
   },
   assigneeName: {
     fontSize: 14,
-    color: '#111827',
+    color: "#111827",
   },
   checkbox: {
     width: 22,
     height: 22,
     borderRadius: 4,
     borderWidth: 2,
-    borderColor: '#D1D5DB',
-    alignItems: 'center',
-    justifyContent: 'center',
+    borderColor: "#D1D5DB",
+    alignItems: "center",
+    justifyContent: "center",
   },
   checkboxSelected: {
-    backgroundColor: '#3B82F6',
-    borderColor: '#3B82F6',
+    backgroundColor: "#3B82F6",
+    borderColor: "#3B82F6",
   },
   dateRangeContainer: {
     gap: 12,
   },
   dateRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
   },
   dateLabel: {
     fontSize: 14,
-    color: '#6B7280',
+    color: "#6B7280",
     width: 40,
   },
   dateButton: {
     flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: 12,
     paddingVertical: 10,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: "#F9FAFB",
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: "#E5E7EB",
   },
   dateButtonText: {
     fontSize: 14,
-    color: '#111827',
+    color: "#111827",
   },
   toggleRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingVertical: 12,
   },
   toggleLabel: {
     fontSize: 14,
-    color: '#111827',
+    color: "#111827",
   },
   presetList: {
     gap: 8,
     marginTop: 8,
   },
   presetItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingVertical: 10,
     paddingHorizontal: 12,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: "#F9FAFB",
     borderRadius: 8,
   },
   presetButton: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
   },
   presetName: {
     fontSize: 14,
-    color: '#111827',
+    color: "#111827",
   },
   footer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     paddingHorizontal: 16,
     paddingTop: 16,
     gap: 8,
     borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
+    borderTopColor: "#E5E7EB",
   },
   clearButton: {
     flex: 1,
     paddingVertical: 12,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#000000',
-    alignItems: 'center',
+    borderColor: "#000000",
+    alignItems: "center",
   },
   clearButtonText: {
-    color: '#000000',
+    color: "#000000",
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   savePresetButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6,
     paddingVertical: 12,
     paddingHorizontal: 16,
-    backgroundColor: '#6B7280',
+    backgroundColor: "#6B7280",
     borderRadius: 8,
   },
   savePresetButtonText: {
-    color: '#FFF',
+    color: "#FFF",
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   applyButton: {
     flex: 1,
     paddingVertical: 12,
-    backgroundColor: '#3B82F6',
+    backgroundColor: "#3B82F6",
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
   },
   applyButtonText: {
-    color: '#FFF',
+    color: "#FFF",
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   presetModalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
   },
   presetModalContent: {
-    backgroundColor: '#FFF',
+    backgroundColor: "#FFF",
     borderRadius: 12,
     padding: 20,
-    width: '100%',
+    width: "100%",
     maxWidth: 400,
   },
   presetModalTitle: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#111827',
+    fontWeight: "600",
+    color: "#111827",
     marginBottom: 16,
   },
   presetInput: {
     borderWidth: 1,
-    borderColor: '#D1D5DB',
+    borderColor: "#D1D5DB",
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 10,
@@ -894,7 +945,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   presetModalActions: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 12,
   },
   presetCancelButton: {
@@ -902,27 +953,27 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#D1D5DB',
-    alignItems: 'center',
+    borderColor: "#D1D5DB",
+    alignItems: "center",
   },
   presetCancelButtonText: {
-    color: '#6B7280',
+    color: "#6B7280",
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   presetSaveButton: {
     flex: 1,
     paddingVertical: 10,
-    backgroundColor: '#3B82F6',
+    backgroundColor: "#3B82F6",
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
   },
   presetSaveButtonDisabled: {
-    backgroundColor: '#9CA3AF',
+    backgroundColor: "#9CA3AF",
   },
   presetSaveButtonText: {
-    color: '#FFF',
+    color: "#FFF",
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });

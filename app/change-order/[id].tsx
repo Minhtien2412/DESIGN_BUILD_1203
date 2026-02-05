@@ -6,10 +6,10 @@ import {
     useChangeOrder,
     useChangeOrderLogs,
     useChangeOrders,
-} from '@/hooks/useChangeOrder';
-import { Ionicons } from '@expo/vector-icons';
-import { router, useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
+} from "@/hooks/useChangeOrder";
+import { Ionicons } from "@expo/vector-icons";
+import { router, useLocalSearchParams } from "expo-router";
+import { useState } from "react";
 import {
     ActivityIndicator,
     Alert,
@@ -20,21 +20,25 @@ import {
     TextInput,
     TouchableOpacity,
     View,
-} from 'react-native';
+} from "react-native";
 
 // ApprovalDecision type defined locally - matches backend enum
-type ApprovalDecision = 'APPROVE' | 'REJECT' | 'CONDITIONAL_APPROVE' | 'REQUEST_REVISION';
+type ApprovalDecision =
+  | "APPROVE"
+  | "REJECT"
+  | "CONDITIONAL_APPROVE"
+  | "REQUEST_REVISION";
 
 const STATUS_COLORS: Record<string, string> = {
-  DRAFT: '#6B7280',
-  SUBMITTED: '#3B82F6',
-  UNDER_REVIEW: '#0066CC',
-  PENDING_APPROVAL: '#666666',
-  APPROVED: '#0066CC',
-  REJECTED: '#000000',
-  IMPLEMENTED: '#0066CC',
-  CLOSED: '#6B7280',
-  CANCELLED: '#9CA3AF',
+  DRAFT: "#6B7280",
+  SUBMITTED: "#3B82F6",
+  UNDER_REVIEW: "#0066CC",
+  PENDING_APPROVAL: "#666666",
+  APPROVED: "#0066CC",
+  REJECTED: "#000000",
+  IMPLEMENTED: "#0066CC",
+  CLOSED: "#6B7280",
+  CANCELLED: "#9CA3AF",
 };
 
 export default function ChangeOrderDetailsScreen() {
@@ -51,14 +55,15 @@ export default function ChangeOrderDetailsScreen() {
   } = useChangeOrders({});
 
   const [showApprovalModal, setShowApprovalModal] = useState(false);
-  const [approvalDecision, setApprovalDecision] = useState<ApprovalDecision>('APPROVE');
-  const [approvalComments, setApprovalComments] = useState('');
+  const [approvalDecision, setApprovalDecision] =
+    useState<ApprovalDecision>("APPROVE");
+  const [approvalComments, setApprovalComments] = useState("");
   const [approvalConditions, setApprovalConditions] = useState<string[]>([]);
-  const [conditionText, setConditionText] = useState('');
+  const [conditionText, setConditionText] = useState("");
 
   const [showImplementModal, setShowImplementModal] = useState(false);
-  const [progressValue, setProgressValue] = useState('');
-  const [progressDescription, setProgressDescription] = useState('');
+  const [progressValue, setProgressValue] = useState("");
+  const [progressDescription, setProgressDescription] = useState("");
 
   if (loading || !changeOrder) {
     return (
@@ -70,18 +75,18 @@ export default function ChangeOrderDetailsScreen() {
 
   const statusColor = STATUS_COLORS[changeOrder.status];
   const costImpactColor =
-    changeOrder.costImpact.type === 'INCREASE'
-      ? '#000000'
-      : changeOrder.costImpact.type === 'DECREASE'
-      ? '#0066CC'
-      : '#6B7280';
+    changeOrder.costImpact.type === "INCREASE"
+      ? "#000000"
+      : changeOrder.costImpact.type === "DECREASE"
+        ? "#0066CC"
+        : "#6B7280";
 
   const handleSubmit = async () => {
     try {
       await submitChangeOrder(changeOrder.id);
-      Alert.alert('Success', 'Change order submitted');
+      Alert.alert("Success", "Change order submitted");
     } catch (err) {
-      Alert.alert('Error', 'Failed to submit change order');
+      Alert.alert("Error", "Failed to submit change order");
     }
   };
 
@@ -90,12 +95,13 @@ export default function ChangeOrderDetailsScreen() {
       await approveChangeOrder(changeOrder.id, {
         decision: approvalDecision,
         comments: approvalComments,
-        conditions: approvalConditions.length > 0 ? approvalConditions : undefined,
+        conditions:
+          approvalConditions.length > 0 ? approvalConditions : undefined,
       });
       setShowApprovalModal(false);
-      Alert.alert('Success', `Change order ${approvalDecision.toLowerCase()}`);
+      Alert.alert("Success", `Change order ${approvalDecision.toLowerCase()}`);
     } catch (err) {
-      Alert.alert('Error', 'Failed to approve change order');
+      Alert.alert("Error", "Failed to approve change order");
     }
   };
 
@@ -103,9 +109,9 @@ export default function ChangeOrderDetailsScreen() {
     try {
       await rejectChangeOrder(changeOrder.id, approvalComments);
       setShowApprovalModal(false);
-      Alert.alert('Success', 'Change order rejected');
+      Alert.alert("Success", "Change order rejected");
     } catch (err) {
-      Alert.alert('Error', 'Failed to reject change order');
+      Alert.alert("Error", "Failed to reject change order");
     }
   };
 
@@ -113,31 +119,38 @@ export default function ChangeOrderDetailsScreen() {
     try {
       const progress = parseInt(progressValue, 10);
       if (isNaN(progress) || progress < 0 || progress > 100) {
-        Alert.alert('Error', 'Please enter a valid progress percentage (0-100)');
+        Alert.alert(
+          "Error",
+          "Please enter a valid progress percentage (0-100)",
+        );
         return;
       }
 
-      await updateImplementationProgress(changeOrder.id, progress, progressDescription);
+      await updateImplementationProgress(
+        changeOrder.id,
+        progress,
+        progressDescription,
+      );
       setShowImplementModal(false);
-      setProgressValue('');
-      setProgressDescription('');
-      Alert.alert('Success', 'Implementation progress updated');
+      setProgressValue("");
+      setProgressDescription("");
+      Alert.alert("Success", "Implementation progress updated");
     } catch (err) {
-      Alert.alert('Error', 'Failed to update progress');
+      Alert.alert("Error", "Failed to update progress");
     }
   };
 
   const handleComplete = async () => {
-    Alert.alert('Complete Implementation', 'Mark implementation as complete?', [
-      { text: 'Cancel', style: 'cancel' },
+    Alert.alert("Complete Implementation", "Mark implementation as complete?", [
+      { text: "Cancel", style: "cancel" },
       {
-        text: 'Complete',
+        text: "Complete",
         onPress: async () => {
           try {
             await completeChangeOrder(changeOrder.id);
-            Alert.alert('Success', 'Change order implementation completed');
+            Alert.alert("Success", "Change order implementation completed");
           } catch (err) {
-            Alert.alert('Error', 'Failed to complete implementation');
+            Alert.alert("Error", "Failed to complete implementation");
           }
         },
       },
@@ -147,7 +160,7 @@ export default function ChangeOrderDetailsScreen() {
   const addCondition = () => {
     if (conditionText.trim()) {
       setApprovalConditions([...approvalConditions, conditionText.trim()]);
-      setConditionText('');
+      setConditionText("");
     }
   };
 
@@ -161,22 +174,32 @@ export default function ChangeOrderDetailsScreen() {
         {/* Header */}
         <View style={[styles.header, { backgroundColor: `${statusColor}15` }]}>
           <View style={styles.headerTop}>
-            <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+            <TouchableOpacity
+              onPress={() => router.back()}
+              style={styles.backButton}
+            >
               <Ionicons name="arrow-back" size={24} color="#1F2937" />
             </TouchableOpacity>
-            <View style={[styles.statusBadge, { backgroundColor: statusColor }]}>
-              <Text style={styles.statusText}>{changeOrder.status.replace(/_/g, ' ')}</Text>
+            <View
+              style={[styles.statusBadge, { backgroundColor: statusColor }]}
+            >
+              <Text style={styles.statusText}>
+                {changeOrder.status.replace(/_/g, " ")}
+              </Text>
             </View>
           </View>
 
           <Text style={styles.coNumber}>
             {changeOrder.changeOrderNumber}
-            {changeOrder.revisionNumber !== '0' && ` Rev ${changeOrder.revisionNumber}`}
+            {changeOrder.revisionNumber !== "0" &&
+              ` Rev ${changeOrder.revisionNumber}`}
           </Text>
           <Text style={styles.title}>{changeOrder.title}</Text>
 
           <View style={styles.typeBadge}>
-            <Text style={styles.typeText}>{changeOrder.type.replace(/_/g, ' ')}</Text>
+            <Text style={styles.typeText}>
+              {changeOrder.type.replace(/_/g, " ")}
+            </Text>
           </View>
         </View>
 
@@ -213,11 +236,19 @@ export default function ChangeOrderDetailsScreen() {
           <View style={styles.contactCard}>
             <Ionicons name="person-circle" size={40} color="#3B82F6" />
             <View style={styles.contactInfo}>
-              <Text style={styles.contactName}>{changeOrder.requestedBy.name}</Text>
-              <Text style={styles.contactDetail}>{changeOrder.requestedBy.company}</Text>
-              <Text style={styles.contactDetail}>{changeOrder.requestedBy.role}</Text>
+              <Text style={styles.contactName}>
+                {changeOrder.requestedBy.name}
+              </Text>
+              <Text style={styles.contactDetail}>
+                {changeOrder.requestedBy.company}
+              </Text>
+              <Text style={styles.contactDetail}>
+                {changeOrder.requestedBy.role}
+              </Text>
               {changeOrder.requestedBy.email && (
-                <Text style={styles.contactDetail}>{changeOrder.requestedBy.email}</Text>
+                <Text style={styles.contactDetail}>
+                  {changeOrder.requestedBy.email}
+                </Text>
               )}
             </View>
           </View>
@@ -241,46 +272,65 @@ export default function ChangeOrderDetailsScreen() {
 
             <View style={styles.scopeBlock}>
               <Text style={styles.scopeLabel}>Original Scope:</Text>
-              <Text style={styles.scopeText}>{changeOrder.scopeChange.originalScope}</Text>
+              <Text style={styles.scopeText}>
+                {changeOrder.scopeChange.originalScope}
+              </Text>
             </View>
 
             <View style={styles.scopeBlock}>
               <Text style={styles.scopeLabel}>Proposed Scope:</Text>
-              <Text style={styles.scopeText}>{changeOrder.scopeChange.proposedScope}</Text>
+              <Text style={styles.scopeText}>
+                {changeOrder.scopeChange.proposedScope}
+              </Text>
             </View>
 
             {changeOrder.scopeChange.deletions &&
               changeOrder.scopeChange.deletions.length > 0 && (
                 <View style={styles.changesList}>
-                  <Text style={[styles.changesTitle, { color: '#000000' }]}>Deletions:</Text>
+                  <Text style={[styles.changesTitle, { color: "#000000" }]}>
+                    Deletions:
+                  </Text>
                   {changeOrder.scopeChange.deletions.map((item, index) => (
                     <View key={index} style={styles.changesItem}>
-                      <Ionicons name="remove-circle" size={16} color="#000000" />
+                      <Ionicons
+                        name="remove-circle"
+                        size={16}
+                        color="#000000"
+                      />
                       <Text style={styles.changesText}>{item}</Text>
                     </View>
                   ))}
                 </View>
               )}
 
-            {changeOrder.scopeChange.additions && changeOrder.scopeChange.additions.length > 0 && (
-              <View style={styles.changesList}>
-                <Text style={[styles.changesTitle, { color: '#0066CC' }]}>Additions:</Text>
-                {changeOrder.scopeChange.additions.map((item, index) => (
-                  <View key={index} style={styles.changesItem}>
-                    <Ionicons name="add-circle" size={16} color="#0066CC" />
-                    <Text style={styles.changesText}>{item}</Text>
-                  </View>
-                ))}
-              </View>
-            )}
+            {changeOrder.scopeChange.additions &&
+              changeOrder.scopeChange.additions.length > 0 && (
+                <View style={styles.changesList}>
+                  <Text style={[styles.changesTitle, { color: "#0066CC" }]}>
+                    Additions:
+                  </Text>
+                  {changeOrder.scopeChange.additions.map((item, index) => (
+                    <View key={index} style={styles.changesItem}>
+                      <Ionicons name="add-circle" size={16} color="#0066CC" />
+                      <Text style={styles.changesText}>{item}</Text>
+                    </View>
+                  ))}
+                </View>
+              )}
 
             {changeOrder.scopeChange.modifications &&
               changeOrder.scopeChange.modifications.length > 0 && (
                 <View style={styles.changesList}>
-                  <Text style={[styles.changesTitle, { color: '#0066CC' }]}>Modifications:</Text>
+                  <Text style={[styles.changesTitle, { color: "#0066CC" }]}>
+                    Modifications:
+                  </Text>
                   {changeOrder.scopeChange.modifications.map((item, index) => (
                     <View key={index} style={styles.changesItem}>
-                      <Ionicons name="swap-horizontal" size={16} color="#0066CC" />
+                      <Ionicons
+                        name="swap-horizontal"
+                        size={16}
+                        color="#0066CC"
+                      />
                       <Text style={styles.changesText}>{item}</Text>
                     </View>
                   ))}
@@ -297,7 +347,7 @@ export default function ChangeOrderDetailsScreen() {
               <View style={styles.impactItem}>
                 <Text style={styles.impactLabel}>Original</Text>
                 <Text style={styles.impactValue}>
-                  {changeOrder.costImpact.currency}{' '}
+                  {changeOrder.costImpact.currency}{" "}
                   {changeOrder.costImpact.originalAmount.toLocaleString()}
                 </Text>
               </View>
@@ -305,21 +355,26 @@ export default function ChangeOrderDetailsScreen() {
               <View style={styles.impactItem}>
                 <Text style={styles.impactLabel}>Proposed</Text>
                 <Text style={styles.impactValue}>
-                  {changeOrder.costImpact.currency}{' '}
+                  {changeOrder.costImpact.currency}{" "}
                   {changeOrder.costImpact.proposedAmount.toLocaleString()}
                 </Text>
               </View>
             </View>
 
-            <View style={[styles.changeBadge, { backgroundColor: `${costImpactColor}15` }]}>
+            <View
+              style={[
+                styles.changeBadge,
+                { backgroundColor: `${costImpactColor}15` },
+              ]}
+            >
               <Text style={[styles.changeText, { color: costImpactColor }]}>
-                {changeOrder.costImpact.type === 'INCREASE' && '+'}
-                {changeOrder.costImpact.type === 'DECREASE' && '-'}
-                {changeOrder.costImpact.currency}{' '}
+                {changeOrder.costImpact.type === "INCREASE" ? "+" : ""}
+                {changeOrder.costImpact.type === "DECREASE" ? "-" : ""}
+                {changeOrder.costImpact.currency}{" "}
                 {Math.abs(changeOrder.costImpact.changeAmount).toLocaleString()}
-                {' ('}
-                {changeOrder.costImpact.type.replace(/_/g, ' ')}
-                {')'}
+                {" ("}
+                {changeOrder.costImpact.type.replace(/_/g, " ")}
+                {")"}
               </Text>
             </View>
 
@@ -330,8 +385,10 @@ export default function ChangeOrderDetailsScreen() {
                   <View style={styles.breakdownItem}>
                     <Text style={styles.breakdownLabel}>Labor</Text>
                     <Text style={styles.breakdownValue}>
-                      {changeOrder.costImpact.currency}{' '}
-                      {(changeOrder.costImpact.breakdown.labor ?? 0).toLocaleString()}
+                      {changeOrder.costImpact.currency}{" "}
+                      {(
+                        changeOrder.costImpact.breakdown.labor ?? 0
+                      ).toLocaleString()}
                     </Text>
                   </View>
                 )}
@@ -339,8 +396,10 @@ export default function ChangeOrderDetailsScreen() {
                   <View style={styles.breakdownItem}>
                     <Text style={styles.breakdownLabel}>Material</Text>
                     <Text style={styles.breakdownValue}>
-                      {changeOrder.costImpact.currency}{' '}
-                      {(changeOrder.costImpact.breakdown.material ?? 0).toLocaleString()}
+                      {changeOrder.costImpact.currency}{" "}
+                      {(
+                        changeOrder.costImpact.breakdown.material ?? 0
+                      ).toLocaleString()}
                     </Text>
                   </View>
                 )}
@@ -348,8 +407,10 @@ export default function ChangeOrderDetailsScreen() {
                   <View style={styles.breakdownItem}>
                     <Text style={styles.breakdownLabel}>Equipment</Text>
                     <Text style={styles.breakdownValue}>
-                      {changeOrder.costImpact.currency}{' '}
-                      {(changeOrder.costImpact.breakdown.equipment ?? 0).toLocaleString()}
+                      {changeOrder.costImpact.currency}{" "}
+                      {(
+                        changeOrder.costImpact.breakdown.equipment ?? 0
+                      ).toLocaleString()}
                     </Text>
                   </View>
                 )}
@@ -357,8 +418,10 @@ export default function ChangeOrderDetailsScreen() {
                   <View style={styles.breakdownItem}>
                     <Text style={styles.breakdownLabel}>Subcontractor</Text>
                     <Text style={styles.breakdownValue}>
-                      {changeOrder.costImpact.currency}{' '}
-                      {(changeOrder.costImpact.breakdown.subcontractor ?? 0).toLocaleString()}
+                      {changeOrder.costImpact.currency}{" "}
+                      {(
+                        changeOrder.costImpact.breakdown.subcontractor ?? 0
+                      ).toLocaleString()}
                     </Text>
                   </View>
                 )}
@@ -367,11 +430,13 @@ export default function ChangeOrderDetailsScreen() {
 
             {changeOrder.costImpact.estimatedBy && (
               <Text style={styles.estimatorText}>
-                Estimated by: {changeOrder.costImpact.estimatedBy} on{' '}
-                {new Date(changeOrder.costImpact.estimatedDate).toLocaleDateString()}
+                Estimated by: {changeOrder.costImpact.estimatedBy} on{" "}
+                {new Date(
+                  changeOrder.costImpact.estimatedDate,
+                ).toLocaleDateString()}
                 {changeOrder.costImpact.verified && (
-                  <Text style={{ color: '#0066CC' }}>
-                    {' '}
+                  <Text style={{ color: "#0066CC" }}>
+                    {" "}
                     • Verified by {changeOrder.costImpact.verifiedBy}
                   </Text>
                 )}
@@ -388,11 +453,11 @@ export default function ChangeOrderDetailsScreen() {
               styles.impactCard,
               {
                 borderColor:
-                  changeOrder.scheduleImpact.type === 'DELAY'
-                    ? '#0066CC'
-                    : changeOrder.scheduleImpact.type === 'ACCELERATION'
-                    ? '#0066CC'
-                    : '#6B7280',
+                  changeOrder.scheduleImpact.type === "DELAY"
+                    ? "#0066CC"
+                    : changeOrder.scheduleImpact.type === "ACCELERATION"
+                      ? "#0066CC"
+                      : "#6B7280",
               },
             ]}
           >
@@ -417,11 +482,11 @@ export default function ChangeOrderDetailsScreen() {
                 styles.changeBadge,
                 {
                   backgroundColor:
-                    changeOrder.scheduleImpact.type === 'DELAY'
-                      ? '#FEF3C7'
-                      : changeOrder.scheduleImpact.type === 'ACCELERATION'
-                      ? '#D1FAE5'
-                      : '#F3F4F6',
+                    changeOrder.scheduleImpact.type === "DELAY"
+                      ? "#FEF3C7"
+                      : changeOrder.scheduleImpact.type === "ACCELERATION"
+                        ? "#D1FAE5"
+                        : "#F3F4F6",
                 },
               ]}
             >
@@ -430,33 +495,39 @@ export default function ChangeOrderDetailsScreen() {
                   styles.changeText,
                   {
                     color:
-                      changeOrder.scheduleImpact.type === 'DELAY'
-                        ? '#0066CC'
-                        : changeOrder.scheduleImpact.type === 'ACCELERATION'
-                        ? '#0066CC'
-                        : '#6B7280',
+                      changeOrder.scheduleImpact.type === "DELAY"
+                        ? "#0066CC"
+                        : changeOrder.scheduleImpact.type === "ACCELERATION"
+                          ? "#0066CC"
+                          : "#6B7280",
                   },
                 ]}
               >
-                {changeOrder.scheduleImpact.type === 'DELAY' && '+'}
-                {changeOrder.scheduleImpact.type === 'ACCELERATION' && '-'}
+                {changeOrder.scheduleImpact.type === "DELAY" ? "+" : ""}
+                {changeOrder.scheduleImpact.type === "ACCELERATION" ? "-" : ""}
                 {Math.abs(changeOrder.scheduleImpact.changeDuration)} days
-                {' ('}
-                {changeOrder.scheduleImpact.type.replace(/_/g, ' ')}
-                {')'}
-                {changeOrder.scheduleImpact.criticalPath && ' - CRITICAL PATH'}
+                {" ("}
+                {changeOrder.scheduleImpact.type.replace(/_/g, " ")}
+                {")"}
+                {changeOrder.scheduleImpact.criticalPath
+                  ? " - CRITICAL PATH"
+                  : ""}
               </Text>
             </View>
 
             {changeOrder.scheduleImpact.affectedActivities &&
               changeOrder.scheduleImpact.affectedActivities.length > 0 && (
                 <View style={styles.activitiesList}>
-                  <Text style={styles.activitiesTitle}>Affected Activities:</Text>
-                  {changeOrder.scheduleImpact.affectedActivities.map((activity, index) => (
-                    <Text key={index} style={styles.activityText}>
-                      • {activity}
-                    </Text>
-                  ))}
+                  <Text style={styles.activitiesTitle}>
+                    Affected Activities:
+                  </Text>
+                  {changeOrder.scheduleImpact.affectedActivities.map(
+                    (activity, index) => (
+                      <Text key={index} style={styles.activityText}>
+                        • {activity}
+                      </Text>
+                    ),
+                  )}
                 </View>
               )}
 
@@ -472,122 +543,129 @@ export default function ChangeOrderDetailsScreen() {
         </View>
 
         {/* Approval Workflow */}
-        {changeOrder.approvalWorkflow && changeOrder.approvalWorkflow.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Approval Workflow</Text>
-            {changeOrder.approvalWorkflow.map((approval, index) => (
-              <View key={index} style={styles.approvalCard}>
-                <View style={styles.approvalHeader}>
-                  <View
-                    style={[
-                      styles.approvalIcon,
-                      {
-                        backgroundColor:
-                          approval.status === 'APPROVED'
-                            ? '#D1FAE5'
-                            : approval.status === 'REJECTED'
-                            ? '#FEE2E2'
-                            : approval.status === 'IN_PROGRESS'
-                            ? '#FEF3C7'
-                            : '#F3F4F6',
-                      },
-                    ]}
-                  >
-                    <Ionicons
-                      name={
-                        approval.status === 'APPROVED'
-                          ? 'checkmark-circle'
-                          : approval.status === 'REJECTED'
-                          ? 'close-circle'
-                          : approval.status === 'IN_PROGRESS'
-                          ? 'time'
-                          : 'ellipse-outline'
-                      }
-                      size={24}
-                      color={
-                        approval.status === 'APPROVED'
-                          ? '#0066CC'
-                          : approval.status === 'REJECTED'
-                          ? '#000000'
-                          : approval.status === 'IN_PROGRESS'
-                          ? '#0066CC'
-                          : '#9CA3AF'
-                      }
-                    />
-                  </View>
-                  <View style={styles.approvalInfo}>
-                    <Text style={styles.approvalName}>{approval.approver.name}</Text>
-                    <Text style={styles.approvalRole}>
-                      {approval.level.replace(/_/g, ' ')} • {approval.approver.role}
-                    </Text>
-                  </View>
-                  {approval.isRequired && (
-                    <View style={styles.requiredBadge}>
-                      <Text style={styles.requiredText}>Required</Text>
-                    </View>
-                  )}
-                </View>
-
-                {approval.decision && (
-                  <View
-                    style={[
-                      styles.decisionBadge,
-                      {
-                        backgroundColor:
-                          approval.decision === 'APPROVE'
-                            ? '#D1FAE5'
-                            : approval.decision === 'REJECT'
-                            ? '#FEE2E2'
-                            : approval.decision === 'CONDITIONAL_APPROVE'
-                            ? '#FEF3C7'
-                            : '#E0E7FF',
-                      },
-                    ]}
-                  >
-                    <Text
+        {changeOrder.approvalWorkflow &&
+          changeOrder.approvalWorkflow.length > 0 && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Approval Workflow</Text>
+              {changeOrder.approvalWorkflow.map((approval, index) => (
+                <View key={index} style={styles.approvalCard}>
+                  <View style={styles.approvalHeader}>
+                    <View
                       style={[
-                        styles.decisionText,
+                        styles.approvalIcon,
                         {
-                          color:
-                            approval.decision === 'APPROVE'
-                              ? '#0066CC'
-                              : approval.decision === 'REJECT'
-                              ? '#000000'
-                              : approval.decision === 'CONDITIONAL_APPROVE'
-                              ? '#0066CC'
-                              : '#3B82F6',
+                          backgroundColor:
+                            approval.status === "APPROVED"
+                              ? "#D1FAE5"
+                              : approval.status === "REJECTED"
+                                ? "#FEE2E2"
+                                : approval.status === "IN_PROGRESS"
+                                  ? "#FEF3C7"
+                                  : "#F3F4F6",
                         },
                       ]}
                     >
-                      {approval.decision.replace(/_/g, ' ')}
-                    </Text>
-                  </View>
-                )}
-
-                {approval.comments && (
-                  <Text style={styles.approvalComments}>{approval.comments}</Text>
-                )}
-
-                {approval.conditions && approval.conditions.length > 0 && (
-                  <View style={styles.conditionsList}>
-                    <Text style={styles.conditionsTitle}>Conditions:</Text>
-                    {approval.conditions.map((condition, i) => (
-                      <Text key={i} style={styles.conditionText}>
-                        {i + 1}. {condition}
+                      <Ionicons
+                        name={
+                          approval.status === "APPROVED"
+                            ? "checkmark-circle"
+                            : approval.status === "REJECTED"
+                              ? "close-circle"
+                              : approval.status === "IN_PROGRESS"
+                                ? "time"
+                                : "ellipse-outline"
+                        }
+                        size={24}
+                        color={
+                          approval.status === "APPROVED"
+                            ? "#0066CC"
+                            : approval.status === "REJECTED"
+                              ? "#000000"
+                              : approval.status === "IN_PROGRESS"
+                                ? "#0066CC"
+                                : "#9CA3AF"
+                        }
+                      />
+                    </View>
+                    <View style={styles.approvalInfo}>
+                      <Text style={styles.approvalName}>
+                        {approval.approver.name}
                       </Text>
-                    ))}
+                      <Text style={styles.approvalRole}>
+                        {approval.level.replace(/_/g, " ")} •{" "}
+                        {approval.approver.role}
+                      </Text>
+                    </View>
+                    {approval.isRequired && (
+                      <View style={styles.requiredBadge}>
+                        <Text style={styles.requiredText}>Required</Text>
+                      </View>
+                    )}
                   </View>
-                )}
 
-                {approval.reviewedDate && (
-                  <Text style={styles.reviewDate}>
-                    Reviewed: {new Date(approval.reviewedDate).toLocaleDateString()}
-                  </Text>
-                )}
-              </View>
-            ))}
-          </View>
-        )}
+                  {approval.decision && (
+                    <View
+                      style={[
+                        styles.decisionBadge,
+                        {
+                          backgroundColor:
+                            approval.decision === "APPROVE"
+                              ? "#D1FAE5"
+                              : approval.decision === "REJECT"
+                                ? "#FEE2E2"
+                                : approval.decision === "CONDITIONAL_APPROVE"
+                                  ? "#FEF3C7"
+                                  : "#E0E7FF",
+                        },
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.decisionText,
+                          {
+                            color:
+                              approval.decision === "APPROVE"
+                                ? "#0066CC"
+                                : approval.decision === "REJECT"
+                                  ? "#000000"
+                                  : approval.decision === "CONDITIONAL_APPROVE"
+                                    ? "#0066CC"
+                                    : "#3B82F6",
+                          },
+                        ]}
+                      >
+                        {approval.decision.replace(/_/g, " ")}
+                      </Text>
+                    </View>
+                  )}
+
+                  {approval.comments && (
+                    <Text style={styles.approvalComments}>
+                      {approval.comments}
+                    </Text>
+                  )}
+
+                  {approval.conditions && approval.conditions.length > 0 && (
+                    <View style={styles.conditionsList}>
+                      <Text style={styles.conditionsTitle}>Conditions:</Text>
+                      {approval.conditions.map((condition, i) => (
+                        <Text key={i} style={styles.conditionText}>
+                          {i + 1}. {condition}
+                        </Text>
+                      ))}
+                    </View>
+                  )}
+
+                  {approval.reviewedDate && (
+                    <Text style={styles.reviewDate}>
+                      Reviewed:{" "}
+                      {new Date(approval.reviewedDate).toLocaleDateString()}
+                    </Text>
+                  )}
+                </View>
+              ))}
+            </View>
+          )}
 
         {/* Implementation Progress */}
         {changeOrder.implementation && (
@@ -596,7 +674,7 @@ export default function ChangeOrderDetailsScreen() {
             <View style={styles.implementCard}>
               <View style={styles.implementHeader}>
                 <Text style={styles.implementStatus}>
-                  {changeOrder.implementation.status.replace(/_/g, ' ')}
+                  {changeOrder.implementation.status.replace(/_/g, " ")}
                 </Text>
                 <Text style={styles.implementProgress}>
                   {changeOrder.implementation.progress}%
@@ -620,24 +698,34 @@ export default function ChangeOrderDetailsScreen() {
 
               {changeOrder.implementation.targetCompletionDate && (
                 <Text style={styles.implementDate}>
-                  Target: {new Date(changeOrder.implementation.targetCompletionDate).toLocaleDateString()}
+                  Target:{" "}
+                  {new Date(
+                    changeOrder.implementation.targetCompletionDate,
+                  ).toLocaleDateString()}
                 </Text>
               )}
 
-              {changeOrder.implementation.workLog && changeOrder.implementation.workLog.length > 0 && (
-                <View style={styles.workLog}>
-                  <Text style={styles.workLogTitle}>Work Log:</Text>
-                  {changeOrder.implementation.workLog.slice(0, 3).map((log, index) => (
-                    <View key={index} style={styles.workLogItem}>
-                      <Text style={styles.workLogDate}>
-                        {new Date(log.date).toLocaleDateString()}
-                      </Text>
-                      <Text style={styles.workLogDesc}>{log.description}</Text>
-                      <Text style={styles.workLogBy}>By: {log.performedBy}</Text>
-                    </View>
-                  ))}
-                </View>
-              )}
+              {changeOrder.implementation.workLog &&
+                changeOrder.implementation.workLog.length > 0 && (
+                  <View style={styles.workLog}>
+                    <Text style={styles.workLogTitle}>Work Log:</Text>
+                    {changeOrder.implementation.workLog
+                      .slice(0, 3)
+                      .map((log, index) => (
+                        <View key={index} style={styles.workLogItem}>
+                          <Text style={styles.workLogDate}>
+                            {new Date(log.date).toLocaleDateString()}
+                          </Text>
+                          <Text style={styles.workLogDesc}>
+                            {log.description}
+                          </Text>
+                          <Text style={styles.workLogBy}>
+                            By: {log.performedBy}
+                          </Text>
+                        </View>
+                      ))}
+                  </View>
+                )}
             </View>
           </View>
         )}
@@ -650,39 +738,43 @@ export default function ChangeOrderDetailsScreen() {
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Related Items</Text>
 
-              {changeOrder.relatedItems.rfis && changeOrder.relatedItems.rfis.length > 0 && (
-                <View style={styles.relatedBox}>
-                  <Text style={styles.relatedLabel}>RFIs:</Text>
-                  {changeOrder.relatedItems.rfis.map((rfi, index) => (
-                    <Text key={index} style={styles.relatedText}>
-                      • {rfi}
-                    </Text>
-                  ))}
-                </View>
-              )}
-
-              {changeOrder.relatedItems.submittals &&
-                changeOrder.relatedItems.submittals.length > 0 && (
+              {changeOrder.relatedItems.rfis &&
+                changeOrder.relatedItems.rfis.length > 0 && (
                   <View style={styles.relatedBox}>
-                    <Text style={styles.relatedLabel}>Submittals:</Text>
-                    {changeOrder.relatedItems.submittals.map((submittal, index) => (
+                    <Text style={styles.relatedLabel}>RFIs:</Text>
+                    {changeOrder.relatedItems.rfis.map((rfi, index) => (
                       <Text key={index} style={styles.relatedText}>
-                        • {submittal}
+                        • {rfi}
                       </Text>
                     ))}
                   </View>
                 )}
 
-              {changeOrder.relatedItems.drawings && changeOrder.relatedItems.drawings.length > 0 && (
-                <View style={styles.relatedBox}>
-                  <Text style={styles.relatedLabel}>Drawings:</Text>
-                  {changeOrder.relatedItems.drawings.map((drawing, index) => (
-                    <Text key={index} style={styles.relatedText}>
-                      • {drawing}
-                    </Text>
-                  ))}
-                </View>
-              )}
+              {changeOrder.relatedItems.submittals &&
+                changeOrder.relatedItems.submittals.length > 0 && (
+                  <View style={styles.relatedBox}>
+                    <Text style={styles.relatedLabel}>Submittals:</Text>
+                    {changeOrder.relatedItems.submittals.map(
+                      (submittal, index) => (
+                        <Text key={index} style={styles.relatedText}>
+                          • {submittal}
+                        </Text>
+                      ),
+                    )}
+                  </View>
+                )}
+
+              {changeOrder.relatedItems.drawings &&
+                changeOrder.relatedItems.drawings.length > 0 && (
+                  <View style={styles.relatedBox}>
+                    <Text style={styles.relatedLabel}>Drawings:</Text>
+                    {changeOrder.relatedItems.drawings.map((drawing, index) => (
+                      <Text key={index} style={styles.relatedText}>
+                        • {drawing}
+                      </Text>
+                    ))}
+                  </View>
+                )}
             </View>
           )}
 
@@ -694,14 +786,23 @@ export default function ChangeOrderDetailsScreen() {
               <View key={index} style={styles.workflowStep}>
                 <View style={styles.stepIcon}>
                   <View style={styles.stepDot} />
-                  {index < changeOrder.workflowSteps!.length - 1 && <View style={styles.stepLine} />}
+                  {index < changeOrder.workflowSteps!.length - 1 && (
+                    <View style={styles.stepLine} />
+                  )}
                 </View>
                 <View style={styles.stepContent}>
-                  <Text style={styles.stepAction}>{step.actionTaken || step.name}</Text>
-                  <Text style={styles.stepBy}>
-                    {step.assignee || step.assigneeRole} • {step.completedAt ? new Date(step.completedAt).toLocaleString() : 'Pending'}
+                  <Text style={styles.stepAction}>
+                    {step.actionTaken || step.name}
                   </Text>
-                  {step.comments && <Text style={styles.stepComments}>{step.comments}</Text>}
+                  <Text style={styles.stepBy}>
+                    {step.assignee || step.assigneeRole} •{" "}
+                    {step.completedAt
+                      ? new Date(step.completedAt).toLocaleString()
+                      : "Pending"}
+                  </Text>
+                  {step.comments && (
+                    <Text style={styles.stepComments}>{step.comments}</Text>
+                  )}
                 </View>
               </View>
             ))}
@@ -711,19 +812,23 @@ export default function ChangeOrderDetailsScreen() {
 
       {/* Action Buttons */}
       <View style={styles.actionBar}>
-        {changeOrder.status === 'DRAFT' && (
-          <TouchableOpacity style={[styles.actionBtn, styles.submitBtn]} onPress={handleSubmit}>
+        {changeOrder.status === "DRAFT" && (
+          <TouchableOpacity
+            style={[styles.actionBtn, styles.submitBtn]}
+            onPress={handleSubmit}
+          >
             <Ionicons name="send" size={20} color="#FFFFFF" />
             <Text style={styles.actionBtnText}>Submit</Text>
           </TouchableOpacity>
         )}
 
-        {(changeOrder.status === 'SUBMITTED' || changeOrder.status === 'UNDER_REVIEW') && (
+        {(changeOrder.status === "SUBMITTED" ||
+          changeOrder.status === "UNDER_REVIEW") && (
           <>
             <TouchableOpacity
               style={[styles.actionBtn, styles.approveBtn]}
               onPress={() => {
-                setApprovalDecision('APPROVE');
+                setApprovalDecision("APPROVE");
                 setShowApprovalModal(true);
               }}
             >
@@ -734,7 +839,7 @@ export default function ChangeOrderDetailsScreen() {
             <TouchableOpacity
               style={[styles.actionBtn, styles.rejectBtn]}
               onPress={() => {
-                setApprovalDecision('REJECT');
+                setApprovalDecision("REJECT");
                 setShowApprovalModal(true);
               }}
             >
@@ -744,7 +849,7 @@ export default function ChangeOrderDetailsScreen() {
           </>
         )}
 
-        {changeOrder.status === 'APPROVED' && changeOrder.implementation && (
+        {changeOrder.status === "APPROVED" && changeOrder.implementation && (
           <>
             <TouchableOpacity
               style={[styles.actionBtn, styles.implementBtn]}
@@ -768,7 +873,9 @@ export default function ChangeOrderDetailsScreen() {
 
         <TouchableOpacity style={[styles.actionBtn, styles.exportBtn]}>
           <Ionicons name="download" size={20} color="#6B7280" />
-          <Text style={[styles.actionBtnText, { color: '#6B7280' }]}>Export</Text>
+          <Text style={[styles.actionBtnText, { color: "#6B7280" }]}>
+            Export
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -778,26 +885,29 @@ export default function ChangeOrderDetailsScreen() {
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>
-                {approvalDecision === 'APPROVE' ? 'Approve' : 'Reject'} Change Order
+                {approvalDecision === "APPROVE" ? "Approve" : "Reject"} Change
+                Order
               </Text>
               <TouchableOpacity onPress={() => setShowApprovalModal(false)}>
                 <Ionicons name="close" size={24} color="#6B7280" />
               </TouchableOpacity>
             </View>
 
-            {approvalDecision !== 'REJECT' && (
+            {approvalDecision !== "REJECT" && (
               <View style={styles.decisionSelector}>
                 <TouchableOpacity
                   style={[
                     styles.decisionOption,
-                    approvalDecision === 'APPROVE' && styles.decisionOptionActive,
+                    approvalDecision === "APPROVE" &&
+                      styles.decisionOptionActive,
                   ]}
-                  onPress={() => setApprovalDecision('APPROVE')}
+                  onPress={() => setApprovalDecision("APPROVE")}
                 >
                   <Text
                     style={[
                       styles.decisionOptionText,
-                      approvalDecision === 'APPROVE' && styles.decisionOptionTextActive,
+                      approvalDecision === "APPROVE" &&
+                        styles.decisionOptionTextActive,
                     ]}
                   >
                     Approve
@@ -807,14 +917,16 @@ export default function ChangeOrderDetailsScreen() {
                 <TouchableOpacity
                   style={[
                     styles.decisionOption,
-                    approvalDecision === 'CONDITIONAL_APPROVE' && styles.decisionOptionActive,
+                    approvalDecision === "CONDITIONAL_APPROVE" &&
+                      styles.decisionOptionActive,
                   ]}
-                  onPress={() => setApprovalDecision('CONDITIONAL_APPROVE')}
+                  onPress={() => setApprovalDecision("CONDITIONAL_APPROVE")}
                 >
                   <Text
                     style={[
                       styles.decisionOptionText,
-                      approvalDecision === 'CONDITIONAL_APPROVE' && styles.decisionOptionTextActive,
+                      approvalDecision === "CONDITIONAL_APPROVE" &&
+                        styles.decisionOptionTextActive,
                     ]}
                   >
                     Conditional
@@ -824,14 +936,16 @@ export default function ChangeOrderDetailsScreen() {
                 <TouchableOpacity
                   style={[
                     styles.decisionOption,
-                    approvalDecision === 'REQUEST_REVISION' && styles.decisionOptionActive,
+                    approvalDecision === "REQUEST_REVISION" &&
+                      styles.decisionOptionActive,
                   ]}
-                  onPress={() => setApprovalDecision('REQUEST_REVISION')}
+                  onPress={() => setApprovalDecision("REQUEST_REVISION")}
                 >
                   <Text
                     style={[
                       styles.decisionOptionText,
-                      approvalDecision === 'REQUEST_REVISION' && styles.decisionOptionTextActive,
+                      approvalDecision === "REQUEST_REVISION" &&
+                        styles.decisionOptionTextActive,
                     ]}
                   >
                     Request Revision
@@ -850,7 +964,7 @@ export default function ChangeOrderDetailsScreen() {
               textAlignVertical="top"
             />
 
-            {approvalDecision === 'CONDITIONAL_APPROVE' && (
+            {approvalDecision === "CONDITIONAL_APPROVE" && (
               <View style={styles.conditionsSection}>
                 <Text style={styles.conditionsSectionTitle}>Conditions:</Text>
                 {approvalConditions.map((condition, index) => (
@@ -868,7 +982,10 @@ export default function ChangeOrderDetailsScreen() {
                     value={conditionText}
                     onChangeText={setConditionText}
                   />
-                  <TouchableOpacity style={styles.addConditionBtn} onPress={addCondition}>
+                  <TouchableOpacity
+                    style={styles.addConditionBtn}
+                    onPress={addCondition}
+                  >
                     <Ionicons name="add" size={20} color="#3B82F6" />
                   </TouchableOpacity>
                 </View>
@@ -885,12 +1002,16 @@ export default function ChangeOrderDetailsScreen() {
               <TouchableOpacity
                 style={[
                   styles.modalBtn,
-                  approvalDecision === 'REJECT' ? styles.rejectBtn : styles.approveBtn,
+                  approvalDecision === "REJECT"
+                    ? styles.rejectBtn
+                    : styles.approveBtn,
                 ]}
-                onPress={approvalDecision === 'REJECT' ? handleReject : handleApprove}
+                onPress={
+                  approvalDecision === "REJECT" ? handleReject : handleApprove
+                }
               >
                 <Text style={styles.actionBtnText}>
-                  {approvalDecision === 'REJECT' ? 'Reject' : 'Submit'}
+                  {approvalDecision === "REJECT" ? "Reject" : "Submit"}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -903,7 +1024,9 @@ export default function ChangeOrderDetailsScreen() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Update Implementation Progress</Text>
+              <Text style={styles.modalTitle}>
+                Update Implementation Progress
+              </Text>
               <TouchableOpacity onPress={() => setShowImplementModal(false)}>
                 <Ionicons name="close" size={24} color="#6B7280" />
               </TouchableOpacity>
@@ -953,12 +1076,12 @@ export default function ChangeOrderDetailsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: "#F9FAFB",
   },
   centered: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   content: {
     flex: 1,
@@ -968,9 +1091,9 @@ const styles = StyleSheet.create({
     paddingTop: 48,
   },
   headerTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 12,
   },
   backButton: {
@@ -983,68 +1106,68 @@ const styles = StyleSheet.create({
   },
   statusText: {
     fontSize: 11,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    textTransform: 'uppercase',
+    fontWeight: "bold",
+    color: "#FFFFFF",
+    textTransform: "uppercase",
   },
   coNumber: {
     fontSize: 14,
-    fontWeight: 'bold',
-    color: '#1F2937',
+    fontWeight: "bold",
+    color: "#1F2937",
     marginBottom: 6,
   },
   title: {
     fontSize: 20,
-    fontWeight: 'bold',
-    color: '#1F2937',
+    fontWeight: "bold",
+    color: "#1F2937",
     marginBottom: 12,
   },
   typeBadge: {
     paddingHorizontal: 12,
     paddingVertical: 6,
-    backgroundColor: '#EDE9FE',
+    backgroundColor: "#EDE9FE",
     borderRadius: 8,
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
   },
   typeText: {
     fontSize: 11,
-    fontWeight: '600',
-    color: '#666666',
-    textTransform: 'capitalize',
+    fontWeight: "600",
+    color: "#666666",
+    textTransform: "capitalize",
   },
   section: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     padding: 16,
     marginBottom: 8,
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#1F2937',
+    fontWeight: "bold",
+    color: "#1F2937",
     marginBottom: 12,
   },
   grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 12,
   },
   gridItem: {
-    width: '48%',
+    width: "48%",
   },
   gridLabel: {
     fontSize: 12,
-    color: '#6B7280',
+    color: "#6B7280",
     marginBottom: 4,
   },
   gridValue: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#1F2937',
+    fontWeight: "600",
+    color: "#1F2937",
   },
   contactCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F9FAFB',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F9FAFB",
     padding: 12,
     borderRadius: 12,
   },
@@ -1054,18 +1177,18 @@ const styles = StyleSheet.create({
   },
   contactName: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#1F2937',
+    fontWeight: "600",
+    color: "#1F2937",
     marginBottom: 4,
   },
   contactDetail: {
     fontSize: 12,
-    color: '#6B7280',
+    color: "#6B7280",
     marginBottom: 2,
   },
   description: {
     fontSize: 14,
-    color: '#4B5563',
+    color: "#4B5563",
     lineHeight: 20,
   },
   scopeBlock: {
@@ -1073,15 +1196,15 @@ const styles = StyleSheet.create({
   },
   scopeLabel: {
     fontSize: 12,
-    fontWeight: '600',
-    color: '#6B7280',
+    fontWeight: "600",
+    color: "#6B7280",
     marginBottom: 6,
   },
   scopeText: {
     fontSize: 14,
-    color: '#1F2937',
+    color: "#1F2937",
     lineHeight: 20,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: "#F9FAFB",
     padding: 10,
     borderRadius: 8,
   },
@@ -1090,17 +1213,17 @@ const styles = StyleSheet.create({
   },
   changesTitle: {
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 6,
   },
   changesItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 4,
   },
   changesText: {
     fontSize: 13,
-    color: '#4B5563',
+    color: "#4B5563",
     marginLeft: 6,
   },
   impactCard: {
@@ -1109,24 +1232,24 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   impactRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 12,
   },
   impactItem: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
   },
   impactLabel: {
     fontSize: 12,
-    color: '#6B7280',
+    color: "#6B7280",
     marginBottom: 4,
   },
   impactValue: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#1F2937',
+    fontWeight: "bold",
+    color: "#1F2937",
   },
   changeBadge: {
     padding: 12,
@@ -1135,87 +1258,87 @@ const styles = StyleSheet.create({
   },
   changeText: {
     fontSize: 14,
-    fontWeight: '600',
-    textAlign: 'center',
+    fontWeight: "600",
+    textAlign: "center",
   },
   breakdown: {
-    backgroundColor: '#F9FAFB',
+    backgroundColor: "#F9FAFB",
     padding: 10,
     borderRadius: 8,
     marginBottom: 8,
   },
   breakdownTitle: {
     fontSize: 12,
-    fontWeight: '600',
-    color: '#6B7280',
+    fontWeight: "600",
+    color: "#6B7280",
     marginBottom: 8,
   },
   breakdownItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginBottom: 4,
   },
   breakdownLabel: {
     fontSize: 12,
-    color: '#4B5563',
+    color: "#4B5563",
   },
   breakdownValue: {
     fontSize: 12,
-    fontWeight: '600',
-    color: '#1F2937',
+    fontWeight: "600",
+    color: "#1F2937",
   },
   estimatorText: {
     fontSize: 11,
-    color: '#6B7280',
-    fontStyle: 'italic',
+    color: "#6B7280",
+    fontStyle: "italic",
   },
   activitiesList: {
     marginTop: 8,
   },
   activitiesTitle: {
     fontSize: 12,
-    fontWeight: '600',
-    color: '#6B7280',
+    fontWeight: "600",
+    color: "#6B7280",
     marginBottom: 4,
   },
   activityText: {
     fontSize: 12,
-    color: '#4B5563',
+    color: "#4B5563",
     marginBottom: 2,
   },
   mitigationBox: {
-    backgroundColor: '#F9FAFB',
+    backgroundColor: "#F9FAFB",
     padding: 10,
     borderRadius: 8,
     marginTop: 8,
   },
   mitigationTitle: {
     fontSize: 12,
-    fontWeight: '600',
-    color: '#6B7280',
+    fontWeight: "600",
+    color: "#6B7280",
     marginBottom: 4,
   },
   mitigationText: {
     fontSize: 12,
-    color: '#4B5563',
+    color: "#4B5563",
   },
   approvalCard: {
-    backgroundColor: '#F9FAFB',
+    backgroundColor: "#F9FAFB",
     padding: 12,
     borderRadius: 12,
     marginBottom: 12,
   },
   approvalHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 8,
   },
   approvalIcon: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginRight: 12,
   },
   approvalInfo: {
@@ -1223,106 +1346,106 @@ const styles = StyleSheet.create({
   },
   approvalName: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#1F2937',
+    fontWeight: "600",
+    color: "#1F2937",
     marginBottom: 2,
   },
   approvalRole: {
     fontSize: 11,
-    color: '#6B7280',
+    color: "#6B7280",
   },
   requiredBadge: {
     paddingHorizontal: 8,
     paddingVertical: 4,
-    backgroundColor: '#FEE2E2',
+    backgroundColor: "#FEE2E2",
     borderRadius: 6,
   },
   requiredText: {
     fontSize: 10,
-    fontWeight: '600',
-    color: '#000000',
+    fontWeight: "600",
+    color: "#000000",
   },
   decisionBadge: {
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 8,
     marginBottom: 8,
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
   },
   decisionText: {
     fontSize: 11,
-    fontWeight: '600',
-    textTransform: 'capitalize',
+    fontWeight: "600",
+    textTransform: "capitalize",
   },
   approvalComments: {
     fontSize: 13,
-    color: '#4B5563',
-    fontStyle: 'italic',
+    color: "#4B5563",
+    fontStyle: "italic",
     marginBottom: 8,
   },
   conditionsList: {
-    backgroundColor: '#FFFBEB',
+    backgroundColor: "#FFFBEB",
     padding: 10,
     borderRadius: 8,
     marginBottom: 8,
   },
   conditionsTitle: {
     fontSize: 12,
-    fontWeight: '600',
-    color: '#D97706',
+    fontWeight: "600",
+    color: "#D97706",
     marginBottom: 6,
   },
   conditionText: {
     fontSize: 12,
-    color: '#92400E',
+    color: "#92400E",
     marginBottom: 4,
   },
   reviewDate: {
     fontSize: 11,
-    color: '#9CA3AF',
-    textAlign: 'right',
+    color: "#9CA3AF",
+    textAlign: "right",
   },
   implementCard: {
-    backgroundColor: '#F5F3FF',
+    backgroundColor: "#F5F3FF",
     padding: 12,
     borderRadius: 12,
   },
   implementHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 8,
   },
   implementStatus: {
     fontSize: 12,
-    fontWeight: '600',
-    color: '#666666',
-    textTransform: 'capitalize',
+    fontWeight: "600",
+    color: "#666666",
+    textTransform: "capitalize",
   },
   implementProgress: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#666666',
+    fontWeight: "bold",
+    color: "#666666",
   },
   progressBar: {
     height: 8,
-    backgroundColor: '#DDD6FE',
+    backgroundColor: "#DDD6FE",
     borderRadius: 4,
-    overflow: 'hidden',
+    overflow: "hidden",
     marginBottom: 8,
   },
   progressFill: {
-    height: '100%',
-    backgroundColor: '#666666',
+    height: "100%",
+    backgroundColor: "#666666",
   },
   implementAssigned: {
     fontSize: 12,
-    color: '#6B21A8',
+    color: "#6B21A8",
     marginBottom: 4,
   },
   implementDate: {
     fontSize: 12,
-    color: '#6B21A8',
+    color: "#6B21A8",
     marginBottom: 8,
   },
   workLog: {
@@ -1330,66 +1453,66 @@ const styles = StyleSheet.create({
   },
   workLogTitle: {
     fontSize: 12,
-    fontWeight: '600',
-    color: '#6B21A8',
+    fontWeight: "600",
+    color: "#6B21A8",
     marginBottom: 6,
   },
   workLogItem: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     padding: 8,
     borderRadius: 8,
     marginBottom: 6,
   },
   workLogDate: {
     fontSize: 10,
-    color: '#9CA3AF',
+    color: "#9CA3AF",
     marginBottom: 2,
   },
   workLogDesc: {
     fontSize: 12,
-    color: '#4B5563',
+    color: "#4B5563",
     marginBottom: 2,
   },
   workLogBy: {
     fontSize: 10,
-    color: '#6B7280',
-    fontStyle: 'italic',
+    color: "#6B7280",
+    fontStyle: "italic",
   },
   relatedBox: {
-    backgroundColor: '#F9FAFB',
+    backgroundColor: "#F9FAFB",
     padding: 10,
     borderRadius: 8,
     marginBottom: 8,
   },
   relatedLabel: {
     fontSize: 12,
-    fontWeight: '600',
-    color: '#6B7280',
+    fontWeight: "600",
+    color: "#6B7280",
     marginBottom: 4,
   },
   relatedText: {
     fontSize: 12,
-    color: '#4B5563',
+    color: "#4B5563",
     marginBottom: 2,
   },
   workflowStep: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: 12,
   },
   stepIcon: {
-    alignItems: 'center',
+    alignItems: "center",
     marginRight: 12,
   },
   stepDot: {
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: '#3B82F6',
+    backgroundColor: "#3B82F6",
   },
   stepLine: {
     width: 2,
     flex: 1,
-    backgroundColor: '#E5E7EB',
+    backgroundColor: "#E5E7EB",
     marginTop: 4,
   },
   stepContent: {
@@ -1397,85 +1520,85 @@ const styles = StyleSheet.create({
   },
   stepAction: {
     fontSize: 13,
-    fontWeight: '600',
-    color: '#1F2937',
+    fontWeight: "600",
+    color: "#1F2937",
     marginBottom: 2,
   },
   stepBy: {
     fontSize: 11,
-    color: '#6B7280',
+    color: "#6B7280",
     marginBottom: 4,
   },
   stepComments: {
     fontSize: 12,
-    color: '#4B5563',
-    fontStyle: 'italic',
+    color: "#4B5563",
+    fontStyle: "italic",
   },
   actionBar: {
-    flexDirection: 'row',
+    flexDirection: "row",
     padding: 16,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
+    borderTopColor: "#E5E7EB",
     gap: 8,
   },
   actionBtn: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     paddingVertical: 12,
     borderRadius: 12,
     gap: 6,
   },
   submitBtn: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: "#3B82F6",
   },
   approveBtn: {
-    backgroundColor: '#0066CC',
+    backgroundColor: "#0066CC",
   },
   rejectBtn: {
-    backgroundColor: '#000000',
+    backgroundColor: "#000000",
   },
   implementBtn: {
-    backgroundColor: '#666666',
+    backgroundColor: "#666666",
   },
   completeBtn: {
-    backgroundColor: '#0066CC',
+    backgroundColor: "#0066CC",
   },
   exportBtn: {
-    backgroundColor: '#F3F4F6',
+    backgroundColor: "#F3F4F6",
   },
   actionBtnText: {
     fontSize: 13,
-    fontWeight: '600',
-    color: '#FFFFFF',
+    fontWeight: "600",
+    color: "#FFFFFF",
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-end',
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "flex-end",
   },
   modalContent: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 20,
-    maxHeight: '80%',
+    maxHeight: "80%",
   },
   modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 16,
   },
   modalTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1F2937',
+    fontWeight: "bold",
+    color: "#1F2937",
   },
   decisionSelector: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 8,
     marginBottom: 16,
   },
@@ -1483,34 +1606,34 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 10,
     borderRadius: 8,
-    backgroundColor: '#F3F4F6',
-    alignItems: 'center',
+    backgroundColor: "#F3F4F6",
+    alignItems: "center",
   },
   decisionOptionActive: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: "#3B82F6",
   },
   decisionOptionText: {
     fontSize: 12,
-    fontWeight: '600',
-    color: '#6B7280',
+    fontWeight: "600",
+    color: "#6B7280",
   },
   decisionOptionTextActive: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
   },
   inputLabel: {
     fontSize: 13,
-    fontWeight: '600',
-    color: '#4B5563',
+    fontWeight: "600",
+    color: "#4B5563",
     marginBottom: 8,
   },
   modalInput: {
-    backgroundColor: '#F9FAFB',
+    backgroundColor: "#F9FAFB",
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: "#E5E7EB",
     borderRadius: 12,
     padding: 12,
     fontSize: 14,
-    color: '#1F2937',
+    color: "#1F2937",
     marginBottom: 16,
   },
   conditionsSection: {
@@ -1518,15 +1641,15 @@ const styles = StyleSheet.create({
   },
   conditionsSectionTitle: {
     fontSize: 13,
-    fontWeight: '600',
-    color: '#4B5563',
+    fontWeight: "600",
+    color: "#4B5563",
     marginBottom: 8,
   },
   conditionItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#FFFBEB',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#FFFBEB",
     padding: 10,
     borderRadius: 8,
     marginBottom: 6,
@@ -1534,17 +1657,17 @@ const styles = StyleSheet.create({
   conditionItemText: {
     flex: 1,
     fontSize: 12,
-    color: '#92400E',
+    color: "#92400E",
   },
   conditionInputRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 8,
   },
   conditionInput: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: "#F9FAFB",
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: "#E5E7EB",
     borderRadius: 8,
     padding: 10,
     fontSize: 13,
@@ -1553,26 +1676,26 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 8,
-    backgroundColor: '#E8F4FF',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#E8F4FF",
+    justifyContent: "center",
+    alignItems: "center",
   },
   modalActions: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 12,
   },
   modalBtn: {
     flex: 1,
     paddingVertical: 14,
     borderRadius: 12,
-    alignItems: 'center',
+    alignItems: "center",
   },
   cancelBtn: {
-    backgroundColor: '#F3F4F6',
+    backgroundColor: "#F3F4F6",
   },
   cancelBtnText: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#6B7280',
+    fontWeight: "600",
+    color: "#6B7280",
   },
 });

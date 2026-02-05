@@ -1,9 +1,9 @@
 /**
  * API Integration Examples
  * =========================
- * 
+ *
  * Ví dụ sử dụng API hooks trong các component
- * 
+ *
  * @author ThietKeResort Team
  * @created 2025-12-31
  */
@@ -13,10 +13,10 @@ import {
     useCreateProject,
     usePerfexCustomers,
     useProject,
-    useProjects
-} from '@/hooks/useApiIntegration';
-import { Ionicons } from '@expo/vector-icons';
-import React from 'react';
+    useProjects,
+} from "@/hooks/useApiIntegration";
+import { Ionicons } from "@expo/vector-icons";
+import React from "react";
 import {
     ActivityIndicator,
     Alert,
@@ -26,25 +26,31 @@ import {
     Text,
     TouchableOpacity,
     View,
-} from 'react-native';
+} from "react-native";
 
 // ==================== EXAMPLE 1: PROJECT LIST ====================
 
 export function ProjectListExample() {
-  const { data: projects, loading, error, source, refetch } = useProjects({
+  const {
+    data: projects,
+    loading,
+    error,
+    source,
+    refetch,
+  } = useProjects({
     cache: true,
     onSuccess: (data) => {
-      console.log('✅ Projects loaded:', data.length);
+      console.log("✅ Projects loaded:", data.length);
     },
     onError: (err) => {
-      console.error('❌ Failed to load projects:', err.message);
+      console.error("❌ Failed to load projects:", err.message);
     },
   });
 
   const clearCache = useClearCache();
 
   const handleClearCache = () => {
-    clearCache('projects');
+    clearCache("projects");
     refetch();
   };
 
@@ -73,16 +79,35 @@ export function ProjectListExample() {
     <View style={styles.container}>
       {/* Data Source Badge */}
       <View style={styles.sourceContainer}>
-        <View style={[styles.sourceBadge, source === 'api' ? styles.source_api : source === 'cache' ? styles.source_cache : styles.source_mock]}>
+        <View
+          style={[
+            styles.sourceBadge,
+            source === "api"
+              ? styles.source_api
+              : source === "cache"
+                ? styles.source_cache
+                : styles.source_mock,
+          ]}
+        >
           <Ionicons
-            name={source === 'api' ? 'cloud-done' : source === 'cache' ? 'time' : 'folder'}
+            name={
+              source === "api"
+                ? "cloud-done"
+                : source === "cache"
+                  ? "time"
+                  : "folder"
+            }
             size={14}
             color="#fff"
           />
           <Text style={styles.sourceText}>
-            {source === 'api' && 'API Live'}
-            {source === 'cache' && 'Cached'}
-            {source === 'mock' && 'Offline'}
+            {source === "api"
+              ? "API Live"
+              : source === "cache"
+                ? "Cached"
+                : source === "mock"
+                  ? "Offline"
+                  : ""}
           </Text>
         </View>
         <TouchableOpacity onPress={handleClearCache}>
@@ -145,7 +170,7 @@ export function ProjectDetailExample({ projectId }: { projectId: string }) {
   return (
     <View style={styles.container}>
       {/* Live indicator */}
-      {source === 'api' && (
+      {source === "api" && (
         <View style={styles.liveIndicator}>
           <View style={styles.liveDot} />
           <Text style={styles.liveText}>Live data</Text>
@@ -173,27 +198,27 @@ export function ProjectDetailExample({ projectId }: { projectId: string }) {
 
 export function CreateProjectExample() {
   const [formData, setFormData] = React.useState({
-    name: '',
-    description: '',
-    budget: '',
-    startDate: '',
-    endDate: '',
+    name: "",
+    description: "",
+    budget: "",
+    startDate: "",
+    endDate: "",
   });
 
   const { mutate, loading, error, success } = useCreateProject({
     onSuccess: (project) => {
-      Alert.alert('Thành công', `Đã tạo dự án: ${project.name}`);
-      console.log('✅ Project created:', project);
+      Alert.alert("Thành công", `Đã tạo dự án: ${project.name}`);
+      console.log("✅ Project created:", project);
       // Navigate or refresh list
     },
     onError: (err) => {
-      Alert.alert('Lỗi', err.message);
+      Alert.alert("Lỗi", err.message);
     },
   });
 
   const handleSubmit = async () => {
     if (!formData.name || !formData.budget) {
-      Alert.alert('Lỗi', 'Vui lòng điền đầy đủ thông tin');
+      Alert.alert("Lỗi", "Vui lòng điền đầy đủ thông tin");
       return;
     }
 
@@ -208,11 +233,11 @@ export function CreateProjectExample() {
     if (result) {
       // Clear form
       setFormData({
-        name: '',
-        description: '',
-        budget: '',
-        startDate: '',
-        endDate: '',
+        name: "",
+        description: "",
+        budget: "",
+        startDate: "",
+        endDate: "",
       });
     }
   };
@@ -234,9 +259,7 @@ export function CreateProjectExample() {
         )}
       </TouchableOpacity>
 
-      {error && (
-        <Text style={styles.formError}>{error.message}</Text>
-      )}
+      {error && <Text style={styles.formError}>{error.message}</Text>}
 
       {success && (
         <View style={styles.successBanner}>
@@ -251,7 +274,12 @@ export function CreateProjectExample() {
 // ==================== EXAMPLE 4: PERFEX CUSTOMERS ====================
 
 export function PerfexCustomersExample() {
-  const { data: customers, loading, error, source } = usePerfexCustomers({
+  const {
+    data: customers,
+    loading,
+    error,
+    source,
+  } = usePerfexCustomers({
     cache: true,
     refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
   });
@@ -270,9 +298,22 @@ export function PerfexCustomersExample() {
       {/* Source indicator */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Khách hàng</Text>
-        <View style={[styles.sourceBadge, source === 'api' ? styles.source_api : source === 'cache' ? styles.source_cache : styles.source_mock]}>
+        <View
+          style={[
+            styles.sourceBadge,
+            source === "api"
+              ? styles.source_api
+              : source === "cache"
+                ? styles.source_cache
+                : styles.source_mock,
+          ]}
+        >
           <Text style={styles.sourceText}>
-            {source === 'api' ? '🟢 Live' : source === 'cache' ? '🟡 Cache' : '🔴 Offline'}
+            {source === "api"
+              ? "🟢 Live"
+              : source === "cache"
+                ? "🟡 Cache"
+                : "🔴 Offline"}
           </Text>
         </View>
       </View>
@@ -300,7 +341,9 @@ function ProjectCard({ project }: { project: any }) {
       <Text style={styles.cardTitle}>{project.name}</Text>
       <Text style={styles.cardSubtitle}>{project.status}</Text>
       <View style={styles.progressBar}>
-        <View style={[styles.progressFill, { width: `${project.progress}%` }]} />
+        <View
+          style={[styles.progressFill, { width: `${project.progress}%` }]}
+        />
       </View>
       <Text style={styles.progressText}>{project.progress}%</Text>
     </View>
@@ -317,9 +360,9 @@ function StatCard({ label, value }: { label: string; value: string }) {
 }
 
 function formatVND(amount: number): string {
-  return new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND',
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
   }).format(amount);
 }
 
@@ -328,82 +371,82 @@ function formatVND(amount: number): string {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: "#F9FAFB",
   },
   center: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
   },
-  
+
   // Loading
   loadingText: {
     marginTop: 12,
     fontSize: 14,
-    color: '#6B7280',
+    color: "#6B7280",
   },
-  
+
   // Error
   errorText: {
     marginTop: 12,
     fontSize: 14,
-    color: '#000000',
-    textAlign: 'center',
+    color: "#000000",
+    textAlign: "center",
   },
   retryButton: {
     marginTop: 16,
     paddingHorizontal: 24,
     paddingVertical: 12,
-    backgroundColor: '#3B82F6',
+    backgroundColor: "#3B82F6",
     borderRadius: 8,
   },
   retryText: {
-    color: '#fff',
-    fontWeight: '600',
+    color: "#fff",
+    fontWeight: "600",
   },
-  
+
   // Source badge
   sourceContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     padding: 12,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: "#E5E7EB",
   },
   sourceBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 12,
   },
   source_api: {
-    backgroundColor: '#0066CC',
+    backgroundColor: "#0066CC",
   },
   source_cache: {
-    backgroundColor: '#0066CC',
+    backgroundColor: "#0066CC",
   },
   source_mock: {
-    backgroundColor: '#6B7280',
+    backgroundColor: "#6B7280",
   },
   sourceText: {
     fontSize: 12,
-    fontWeight: '600',
-    color: '#fff',
+    fontWeight: "600",
+    color: "#fff",
   },
-  
+
   // Cards
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     padding: 16,
     marginHorizontal: 16,
     marginVertical: 8,
     borderRadius: 12,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -411,139 +454,139 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#111827',
+    fontWeight: "600",
+    color: "#111827",
     marginBottom: 4,
   },
   cardSubtitle: {
     fontSize: 14,
-    color: '#6B7280',
+    color: "#6B7280",
     marginBottom: 12,
   },
-  
+
   // Progress
   progressBar: {
     height: 8,
-    backgroundColor: '#E5E7EB',
+    backgroundColor: "#E5E7EB",
     borderRadius: 4,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   progressFill: {
-    height: '100%',
-    backgroundColor: '#3B82F6',
+    height: "100%",
+    backgroundColor: "#3B82F6",
   },
   progressText: {
     marginTop: 4,
     fontSize: 12,
-    color: '#6B7280',
-    textAlign: 'right',
+    color: "#6B7280",
+    textAlign: "right",
   },
-  
+
   // Empty state
   empty: {
     padding: 40,
-    alignItems: 'center',
+    alignItems: "center",
   },
   emptyText: {
     marginTop: 12,
     fontSize: 14,
-    color: '#9CA3AF',
+    color: "#9CA3AF",
   },
-  
+
   // Form
   form: {
     padding: 20,
   },
   formTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
-    color: '#111827',
+    fontWeight: "bold",
+    color: "#111827",
     marginBottom: 20,
   },
   submitButton: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: "#3B82F6",
     padding: 16,
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
   },
   submitButtonDisabled: {
     opacity: 0.5,
   },
   submitText: {
-    color: '#fff',
-    fontWeight: '600',
+    color: "#fff",
+    fontWeight: "600",
     fontSize: 16,
   },
   formError: {
     marginTop: 12,
-    color: '#000000',
+    color: "#000000",
     fontSize: 14,
   },
   successBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
     marginTop: 12,
     padding: 12,
-    backgroundColor: '#D1FAE5',
+    backgroundColor: "#D1FAE5",
     borderRadius: 8,
   },
   successText: {
-    color: '#065F46',
-    fontWeight: '600',
+    color: "#065F46",
+    fontWeight: "600",
   },
-  
+
   // Project details
   projectName: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#111827',
+    fontWeight: "bold",
+    color: "#111827",
     marginBottom: 8,
   },
   projectDescription: {
     fontSize: 14,
-    color: '#6B7280',
+    color: "#6B7280",
     marginBottom: 20,
   },
   statsRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 12,
     marginBottom: 20,
   },
   statCard: {
     flex: 1,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: "#F3F4F6",
     padding: 12,
     borderRadius: 8,
   },
   statLabel: {
     fontSize: 12,
-    color: '#6B7280',
+    color: "#6B7280",
     marginBottom: 4,
   },
   statValue: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#111827',
+    fontWeight: "600",
+    color: "#111827",
   },
   refreshButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     gap: 8,
     padding: 12,
-    backgroundColor: '#3B82F6',
+    backgroundColor: "#3B82F6",
     borderRadius: 8,
   },
   refreshText: {
-    color: '#fff',
-    fontWeight: '600',
+    color: "#fff",
+    fontWeight: "600",
   },
-  
+
   // Live indicator
   liveIndicator: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6,
     marginBottom: 12,
   },
@@ -551,33 +594,33 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#0066CC',
+    backgroundColor: "#0066CC",
   },
   liveText: {
     fontSize: 12,
-    color: '#0066CC',
-    fontWeight: '600',
+    color: "#0066CC",
+    fontWeight: "600",
   },
-  
+
   // Header
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     padding: 16,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: "#E5E7EB",
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#111827',
+    fontWeight: "600",
+    color: "#111827",
   },
-  
+
   // Customer card
   customerCard: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     padding: 16,
     marginHorizontal: 16,
     marginVertical: 8,
@@ -585,17 +628,17 @@ const styles = StyleSheet.create({
   },
   customerName: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#111827',
+    fontWeight: "600",
+    color: "#111827",
     marginBottom: 4,
   },
   customerPhone: {
     fontSize: 14,
-    color: '#6B7280',
+    color: "#6B7280",
   },
   customerCity: {
     fontSize: 12,
-    color: '#9CA3AF',
+    color: "#9CA3AF",
   },
 });
 

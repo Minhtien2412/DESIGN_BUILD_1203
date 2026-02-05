@@ -1,4 +1,5 @@
 import { ConstructionProgressService } from '@/services/featureServiceWrapper';
+import photoTimelineService, { PhotoCategory, PhotoPhase } from '@/services/api/photo-timeline.service';
 import { Ionicons } from '@expo/vector-icons';
 import { Href, router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
@@ -7,14 +8,16 @@ import {
     Animated,
     Dimensions,
     Image,
+    Modal,
     ScrollView,
     StyleSheet,
     Text,
     TouchableOpacity,
     View,
 } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 interface Milestone {
   id: string;
@@ -113,9 +116,12 @@ export default function ConstructionProgressScreen() {
   
   const [project, setProject] = useState<Project>(MOCK_PROJECT);
   const [milestones, setMilestones] = useState<Milestone[]>(MOCK_MILESTONES);
-  const [selectedMilestone, setSelectedMilestone] = useState<Milestone | null>(null);
   const [loading, setLoading] = useState(true);
   const [dataSource, setDataSource] = useState<'api' | 'mock'>('mock');
+  const [galleryVisible, setGalleryVisible] = useState(false);
+  const [galleryPhotos, setGalleryPhotos] = useState<string[]>([]);
+  const [galleryIndex, setGalleryIndex] = useState(0);
+  const [uploading, setUploading] = useState(false);
   
   const scrollY = useRef(new Animated.Value(0)).current;
 
@@ -180,6 +186,16 @@ export default function ConstructionProgressScreen() {
     extrapolate: 'clamp',
   });
 
+  const mapMilestoneToPhotoMeta = (milestone: Milestone): { category: PhotoCategory; phase: PhotoPhase } => {
+    const title = milestone.title.toLowerCase();
+    if (title.includes('móng') || title.includes('foundation')) return { category: 'FOUNDATION', phase: 'FOUNDATION' };
+    if (title.includes('kết cấu') || title.includes('structure')) return { category: 'STRUCTURE', phase: 'STRUCTURE' };
+    if (title.includes('mái') || title.includes('roof')) return { category: 'ROOFING', phase: 'ENCLOSURE' };
+    if (title.includes('nội thất') || title.includes('interior')) return { category: 'INTERIOR', phase: 'INTERIOR' };
+    if (title.includes('hoàn thiện') || title.includes('finishing')) return { category: 'FINISHING', phase: 'FINISHING' };
+    return { category: 'OVERALL', phase: 'STRUCTURE' };
+  };
+
   const handlePayment = (milestone: Milestone) => {
     if (milestone.status === 'completed') {
       Alert.alert(
@@ -201,14 +217,72 @@ export default function ConstructionProgressScreen() {
     }
   };
 
-  const handleUploadPhoto = (milestone: Milestone) => {
-    Alert.alert('Tải ảnh lên', 'Chức năng upload ảnh tiến độ');
-    // TODO: Implement photo upload
+  const handleUploadPhoto = async (milestone: Milestone) => {
+    if (uploading) return;
+
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (permission.status !== 'granted') {
+      Alert.alert('Thiếu quyền', 'Vui lòng cấp quyền truy cập thư viện ảnh để tải lên.');
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 0.8,
+    });
+
+    if (result.canceled || !result.assets?.length) return;
+
+    const asset = result.assets[0];
+    const fileName = asset.fileName || `progress_${Date.now()}.jpg`;
+    const mimeType = asset.mimeType || 'image/jpeg';
+    const projectIdNumber = Number(projectId);
+
+    if (!projectIdNumber || Number.isNaN(projectIdNumber)) {
+      Alert.alert('Lỗi', 'Không xác định được dự án để tải ảnh.');
+      return;
+    }
+
+    try {
+      setUploading(true);
+      const { category, phase } = mapMilestoneToPhotoMeta(milestone);
+      const response = await photoTimelineService.uploadPhoto({
+        projectId: projectIdNumber,
+        category,
+        phase,
+        location: project.address || 'Công trình',
+        description: milestone.title,
+        file: {
+          uri: asset.uri,
+          name: fileName,
+          type: mimeType,
+        } as any,
+        capturedAt: new Date().toISOString(),
+      });
+
+      const uploaded = response.data ?? (response as any);
+      const photoUrl = uploaded?.imageUrl || uploaded?.url || asset.uri;
+
+      setMilestones((prev) =>
+        prev.map((m) =>
+          m.id === milestone.id
+            ? { ...m, photos: [photoUrl, ...m.photos] }
+            : m
+        )
+      );
+      Alert.alert('Thành công', 'Đã tải ảnh tiến độ.');
+    } catch (error) {
+      console.error('[Progress] Upload photo error:', error);
+      Alert.alert('Lỗi', 'Không thể tải ảnh. Vui lòng thử lại.');
+    } finally {
+      setUploading(false);
+    }
   };
 
-  const handleViewPhotos = (milestone: Milestone) => {
-    setSelectedMilestone(milestone);
-    // TODO: Open photo gallery modal
+  const handleViewPhotos = (milestone: Milestone, index = 0) => {
+    setGalleryPhotos(milestone.photos);
+    setGalleryIndex(index);
+    setGalleryVisible(true);
   };
 
   const handleCallWorker = () => {
@@ -391,7 +465,7 @@ export default function ConstructionProgressScreen() {
                 {milestone.photos.map((photo, idx) => (
                   <TouchableOpacity 
                     key={idx}
-                    onPress={() => handleViewPhotos(milestone)}
+                    onPress={() => handleViewPhotos(milestone, idx)}
                   >
                     <Image source={{ uri: photo }} style={styles.photoThumbnail} />
                   </TouchableOpacity>
@@ -446,6 +520,40 @@ export default function ConstructionProgressScreen() {
   return (
     <View style={styles.container}>
       {renderHeader()}
+
+      <Modal
+        visible={galleryVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setGalleryVisible(false)}
+      >
+        <View style={styles.galleryBackdrop}>
+          <View style={styles.galleryHeader}>
+            <TouchableOpacity onPress={() => setGalleryVisible(false)} style={styles.galleryClose}>
+              <Ionicons name="close" size={26} color="#fff" />
+            </TouchableOpacity>
+            <Text style={styles.galleryTitle}>
+              Ảnh tiến độ {galleryIndex + 1}/{galleryPhotos.length}
+            </Text>
+          </View>
+          <ScrollView
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            contentOffset={{ x: galleryIndex * width, y: 0 }}
+            onMomentumScrollEnd={(e) => {
+              const nextIndex = Math.round(e.nativeEvent.contentOffset.x / width);
+              setGalleryIndex(nextIndex);
+            }}
+          >
+            {galleryPhotos.map((photo, idx) => (
+              <View key={`${photo}_${idx}`} style={styles.gallerySlide}>
+                <Image source={{ uri: photo }} style={styles.galleryImage} />
+              </View>
+            ))}
+          </ScrollView>
+        </View>
+      </Modal>
       
       <Animated.ScrollView
         style={styles.scrollView}
@@ -870,5 +978,39 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#00B14F',
+  },
+  galleryBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.92)',
+    justifyContent: 'center',
+  },
+  galleryHeader: {
+    position: 'absolute',
+    top: 40,
+    left: 16,
+    right: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    zIndex: 2,
+  },
+  galleryClose: {
+    padding: 8,
+    marginRight: 12,
+  },
+  galleryTitle: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  gallerySlide: {
+    width,
+    height,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  galleryImage: {
+    width,
+    height: height * 0.7,
+    resizeMode: 'contain',
   },
 });

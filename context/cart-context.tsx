@@ -1,8 +1,14 @@
-import { Product } from '@/data/products';
-import { cartBadge } from '@/services/notification-badge';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
-import Toast from 'react-native-toast-message';
+import { Product } from "@/data/products";
+import { cartBadge } from "@/services/notification-badge";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+    createContext,
+    ReactNode,
+    useContext,
+    useEffect,
+    useState,
+} from "react";
+import Toast from "react-native-toast-message";
 
 // Cart Item Type
 export interface CartItem {
@@ -18,7 +24,12 @@ interface CartContextType {
   items: CartItem[];
   totalItems: number;
   totalPrice: number;
-  addToCart: (product: Product, quantity?: number, size?: string, color?: string) => void;
+  addToCart: (
+    product: Product,
+    quantity?: number,
+    size?: string,
+    color?: string,
+  ) => void;
   removeFromCart: (itemId: string) => void;
   updateQuantity: (itemId: string, quantity: number) => void;
   clearCart: () => void;
@@ -29,16 +40,20 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 // Storage Key
-const CART_STORAGE_KEY = '@shopping_cart';
+const CART_STORAGE_KEY = "@shopping_cart";
 
 // Cart Provider Component
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Load cart from storage on mount
+  // Load cart from storage on mount - DEFERRED to avoid blocking startup
   useEffect(() => {
-    loadCart();
+    // Use requestAnimationFrame to let first frame render
+    const frameId = requestAnimationFrame(() => {
+      loadCart();
+    });
+    return () => cancelAnimationFrame(frameId);
   }, []);
 
   // Save cart to storage whenever items change
@@ -47,7 +62,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
       saveCart();
       // Update cart badge
       const totalQty = items.reduce((sum, item) => sum + item.quantity, 0);
-      cartBadge.set(totalQty).catch(err => console.warn('Failed to update cart badge:', err));
+      cartBadge
+        .set(totalQty)
+        .catch((err) => console.warn("Failed to update cart badge:", err));
     }
   }, [items, isLoaded]);
 
@@ -60,7 +77,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         setItems(parsedCart);
       }
     } catch (error) {
-      console.error('Error loading cart:', error);
+      console.error("Error loading cart:", error);
     } finally {
       setIsLoaded(true);
     }
@@ -71,7 +88,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     try {
       await AsyncStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
     } catch (error) {
-      console.error('Error saving cart:', error);
+      console.error("Error saving cart:", error);
     }
   };
 
@@ -80,7 +97,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     product: Product,
     quantity: number = 1,
     size?: string,
-    color?: string
+    color?: string,
   ) => {
     setItems((currentItems) => {
       // Check if item with same product, size, and color already exists
@@ -88,7 +105,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         (item) =>
           item.product.id === product.id &&
           item.selectedSize === size &&
-          item.selectedColor === color
+          item.selectedColor === color,
       );
 
       if (existingItemIndex > -1) {
@@ -102,22 +119,22 @@ export function CartProvider({ children }: { children: ReactNode }) {
       } else {
         // Add new item
         const newItem: CartItem = {
-          id: `${product.id}-${size || 'default'}-${color || 'default'}-${Date.now()}`,
+          id: `${product.id}-${size || "default"}-${color || "default"}-${Date.now()}`,
           product,
           quantity,
           selectedSize: size,
           selectedColor: color,
         };
-        
+
         // Show success toast
         Toast.show({
-          type: 'success',
-          text1: 'Đã thêm vào giỏ hàng',
+          type: "success",
+          text1: "Đã thêm vào giỏ hàng",
           text2: `${product.name} (${quantity})`,
-          position: 'bottom',
+          position: "bottom",
           visibilityTime: 2000,
         });
-        
+
         return [...currentItems, newItem];
       }
     });
@@ -125,16 +142,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // Remove item from cart
   const removeFromCart = (itemId: string) => {
-    const item = items.find(i => i.id === itemId);
-    setItems((currentItems) => currentItems.filter((item) => item.id !== itemId));
-    
+    const item = items.find((i) => i.id === itemId);
+    setItems((currentItems) =>
+      currentItems.filter((item) => item.id !== itemId),
+    );
+
     // Show toast
     if (item) {
       Toast.show({
-        type: 'info',
-        text1: 'Đã xóa khỏi giỏ hàng',
+        type: "info",
+        text1: "Đã xóa khỏi giỏ hàng",
         text2: item.product.name,
-        position: 'bottom',
+        position: "bottom",
         visibilityTime: 2000,
       });
     }
@@ -149,8 +168,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
     setItems((currentItems) =>
       currentItems.map((item) =>
-        item.id === itemId ? { ...item, quantity } : item
-      )
+        item.id === itemId ? { ...item, quantity } : item,
+      ),
     );
   };
 
@@ -190,7 +209,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 export function useCart() {
   const context = useContext(CartContext);
   if (context === undefined) {
-    throw new Error('useCart must be used within a CartProvider');
+    throw new Error("useCart must be used within a CartProvider");
   }
   return context;
 }

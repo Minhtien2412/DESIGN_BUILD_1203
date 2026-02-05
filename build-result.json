@@ -1,0 +1,53 @@
+﻿{
+  "id": "6b9e3294-c893-4632-a7f9-8ff4d24d2dd4",
+  "status": "ERRORED",
+  "platform": "ANDROID",
+  "error": {
+    "errorCode": "EAS_BUILD_UNKNOWN_GRADLE_ERROR",
+    "message": "Gradle build failed with unknown error. See logs for the \"Run gradlew\" phase for more information."
+  },
+  "artifacts": {},
+  "fingerprint": {
+    "id": "019c235d-c364-7d91-944e-cd41db016da2",
+    "hash": "bf458d07e84dc2767d395a20817016973e55c05e"
+  },
+  "initiatingActor": {
+    "id": "c0c928ca-1d60-446b-9b64-b46d121cd1f8",
+    "displayName": "adminmarketingnx"
+  },
+  "logFiles": [
+    "https://job-logs.eascdn.net/production/6b9e3294-c893-4632-a7f9-8ff4d24d2dd4/1770119873653-b7a1fff3-08de-44a1-ae95-efb37529b5fe.txt?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=www-production%40exponentjs.iam.gserviceaccount.com%2F20260203%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260203T121719Z&X-Goog-Expires=900&X-Goog-SignedHeaders=host&X-Goog-Signature=4d51eec55a8a34396973a16b01035df2d047e06bfe693cfbdafffb022c7676bf336b1024ff62276df971ecc278d4db2e32100abaee14817513edd2e115120c9fdbbafd0478f77ce51d8e73c96e20fa1613d96969c614327f673b85089c351958b9b886c72af9eb65ec4a6f02f542e22a6e74fbf1b950c2bd755379bc35bbe961e72e9cc2a19ae72fac8badf6e250ed0447b0dce941d280ded6527724f0e63ee6a37f802da8a102b7f02c4eefdf66b3694de42a180814505bb2d8e2eeb91ec8c57b3bac2663145b7f02e45a3961c5ed89671a6aa6d47d29df9aacfb896ca750179e987f43f6a6726e4453acc35f48b820bbacaf6d84fcd66cb1a49f56866e0fd0",
+    "https://job-logs.eascdn.net/production/6b9e3294-c893-4632-a7f9-8ff4d24d2dd4/1770120172207-a0e9b297-42bc-459d-9444-53cb0bc0248c.txt?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=www-production%40exponentjs.iam.gserviceaccount.com%2F20260203%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260203T121719Z&X-Goog-Expires=900&X-Goog-SignedHeaders=host&X-Goog-Signature=3f109ec86b0ec1df3081516c982c46af816f117ad40607090b948aa8736e9b3cecfcef1039dc9a277f2685e759afdfb9c99aa28e616268fa8b96d15d5bb8e2b1f6b0e59ccf73dea94350cf1407acb806b463732508c805203999b099368aa6c610daafb13ab83552bcaf30a6d2e3d21cc3b2c40526cf65bb9ff152169d4e33dcede05145333bf715bd473797992b1bdc48acfa72ddde3405b447ef65d848246882a28c26e6b798831d2d321f8607af7b1b603bd8ca0f0fa31041f9818c8089310b813aefadda13872265e095c6b5450e993609675402a50e032aea12640788fa7ae827da6391bf19b2e05e68bec0511a0108e4688808802a4e5b888d2f3c2d8e",
+    "https://job-logs.eascdn.net/production/6b9e3294-c893-4632-a7f9-8ff4d24d2dd4/1770120172444-f1f26af2-117d-4e0a-893d-bcbec9d3304a.txt?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=www-production%40exponentjs.iam.gserviceaccount.com%2F20260203%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260203T121719Z&X-Goog-Expires=900&X-Goog-SignedHeaders=host&X-Goog-Signature=043e587f16e3a37180c161b82a3ce7401fc69df83472b6048fdfdaa85c2991d4365ae454676db8907cb99022e10154d1315916383bf92f3b573e63d21e106d12220579567d49e58b838e2a44a284f9b019e98257073856fa495b56c58357aa5cb393901076baf10338491752b70a5d2c43e3270b8c9cc964f736c4eaf112b4b337f9b69838fc36708e4a2326234f3775aedd8fda2210d4b10260dc075b4bbc1fbf3c75a70302f8c43c47aa757e68c3087fd6726e21772014c8d3ef0c1b683fc8781e1624a9f9d8e723f2003716cf646d24d7dc8bb057c9427a6e73b3e66456f807b3e0f09e8e65de38d19b014194a269802c06047da7f11bd6a1d20707d94139",
+    "https://job-logs.eascdn.net/production/6b9e3294-c893-4632-a7f9-8ff4d24d2dd4/1770120172656-27074811-0518-4025-886f-59f0eb66ccbe.txt?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=www-production%40exponentjs.iam.gserviceaccount.com%2F20260203%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260203T121719Z&X-Goog-Expires=900&X-Goog-SignedHeaders=host&X-Goog-Signature=555d0ce23d74e76b9396a943167986197e81114d28d302898bf5e3b84c0181392316b0ccef327e6e9511c5b9f0d885c10ebb50492b6c258d6568d44783ccdacbdbaa561e946c8e61c587e51ffea434c98376bb2c42db1d61d17c6795ed4e8bae658942778e638f80c65ff440b050b0c69269b429283f6ad706a2c1bf389ad0b4dfcb3b6e89ca586e23053be92e4d3299fa18b1eced53b9f930abd7b78bd886116cc180f56ed29383756e3d1ac60d834c85d88144f468eb47fb137aaab26c3ee055fcccf7d097680100224af72df9d16129f19b57411d92ae6c00e1fa14f4c5f50e6ded8ebe80204dcb953764cee069828c6c26901c0bc6c82b67591293d8d96a"
+  ],
+  "project": {
+    "id": "54fbd98b-b34c-47eb-afd1-450b8ee4ca98",
+    "name": "APP_DESIGN_BUILD",
+    "slug": "APP_DESIGN_BUILD",
+    "ownerAccount": {
+      "id": "50ad5b65-a105-4e56-9782-0e7ae427a3fe",
+      "name": "adminmarketingnx"
+    }
+  },
+  "channel": "preview",
+  "distribution": "INTERNAL",
+  "buildProfile": "preview",
+  "sdkVersion": "54.0.0",
+  "appVersion": "1.0.0",
+  "appBuildVersion": "1",
+  "runtimeVersion": "1.0.0",
+  "gitCommitHash": "40b926aea015458bbdb374e5a3573b0e464b6fe5",
+  "gitCommitMessage": "fix: add submodules checkout for BE-baotienweb.cloud",
+  "priority": "NORMAL",
+  "createdAt": "2026-02-03T11:57:53.276Z",
+  "updatedAt": "2026-02-03T12:15:10.072Z",
+  "completedAt": "2026-02-03T12:14:57.101Z",
+  "expirationDate": "2026-02-17T11:57:53.372Z",
+  "isForIosSimulator": false,
+  "metrics": {
+    "buildWaitTime": 269,
+    "buildQueueTime": 354780,
+    "buildDuration": 668328
+  }
+}

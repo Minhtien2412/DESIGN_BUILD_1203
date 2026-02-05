@@ -1,620 +1,548 @@
 /**
- * Video Discovery Screen - Minimalist Monochrome Design
- * Features: Category filter, trending videos, creators, grid view
- * Theme: Monochrome (#1a1a1a, #9ca3af, #fafafa)
- * 
- * @author AI Assistant
- * @date 16/01/2026
+ * Video Discovery Page - Khám phá video
+ * Route: /social/video-discovery
  */
 
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Href, router, Stack } from "expo-router";
+import { useState } from "react";
 import {
-  COMMUNITY_COLORS as COLORS,
-  COMMUNITY_RADIUS as RADIUS,
-  COMMUNITY_SHADOWS as SHADOWS,
-  COMMUNITY_SPACING as SPACING,
-  COMMUNITY_TYPOGRAPHY as TYPOGRAPHY,
-} from '@/constants/community-theme';
-import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
-import { useCallback, useState } from 'react';
-import {
-  Dimensions,
-  Image,
-  RefreshControl,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+    Dimensions,
+    FlatList,
+    Image,
+    Pressable,
+    RefreshControl,
+    StyleSheet,
+    View,
+} from "react-native";
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+import { ThemedText } from "@/components/themed-text";
+import { useThemeColor } from "@/hooks/useThemeColor";
 
-// ==================== DATA ====================
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
+const VIDEO_WIDTH = (SCREEN_WIDTH - 48) / 2;
+const VIDEO_HEIGHT = VIDEO_WIDTH * 1.6;
+
+interface VideoItem {
+  id: string;
+  title: string;
+  thumbnail: string;
+  duration: string;
+  views: number;
+  likes: number;
+  author: {
+    id: string;
+    name: string;
+    avatar: string;
+    verified: boolean;
+  };
+  tags: string[];
+  isLive?: boolean;
+}
+
+const MOCK_VIDEOS: VideoItem[] = [
+  {
+    id: "vid-1",
+    title: "Hướng dẫn lát gạch phòng tắm chuẩn kỹ thuật",
+    thumbnail: "https://picsum.photos/400/640?random=1",
+    duration: "12:35",
+    views: 125000,
+    likes: 8500,
+    author: {
+      id: "u1",
+      name: "Thợ Xây Minh",
+      avatar: "https://i.pravatar.cc/150?img=1",
+      verified: true,
+    },
+    tags: ["lát gạch", "phòng tắm", "hướng dẫn"],
+  },
+  {
+    id: "vid-2",
+    title: "Review máy khoan Bosch GSB 13RE sau 2 năm sử dụng",
+    thumbnail: "https://picsum.photos/400/640?random=2",
+    duration: "8:20",
+    views: 45600,
+    likes: 3200,
+    author: {
+      id: "u2",
+      name: "KTS Hùng",
+      avatar: "https://i.pravatar.cc/150?img=2",
+      verified: true,
+    },
+    tags: ["review", "dụng cụ", "Bosch"],
+  },
+  {
+    id: "vid-3",
+    title: "Thi công sàn gỗ công nghiệp - Những lưu ý quan trọng",
+    thumbnail: "https://picsum.photos/400/640?random=3",
+    duration: "15:45",
+    views: 89000,
+    likes: 6700,
+    author: {
+      id: "u3",
+      name: "Nội thất Hoàng Gia",
+      avatar: "https://i.pravatar.cc/150?img=3",
+      verified: false,
+    },
+    tags: ["sàn gỗ", "thi công", "tips"],
+  },
+  {
+    id: "vid-4",
+    title: "🔴 LIVE: Thi công trần thạch cao hiện đại",
+    thumbnail: "https://picsum.photos/400/640?random=4",
+    duration: "LIVE",
+    views: 1234,
+    likes: 450,
+    author: {
+      id: "u4",
+      name: "Thạch cao Tân Phát",
+      avatar: "https://i.pravatar.cc/150?img=4",
+      verified: true,
+    },
+    tags: ["thạch cao", "trần", "live"],
+    isLive: true,
+  },
+  {
+    id: "vid-5",
+    title: "So sánh các loại sơn ngoại thất phổ biến 2024",
+    thumbnail: "https://picsum.photos/400/640?random=5",
+    duration: "18:30",
+    views: 67800,
+    likes: 4500,
+    author: {
+      id: "u5",
+      name: "Sơn Việt",
+      avatar: "https://i.pravatar.cc/150?img=5",
+      verified: true,
+    },
+    tags: ["sơn", "so sánh", "ngoại thất"],
+  },
+  {
+    id: "vid-6",
+    title: "Cách đọc bản vẽ xây dựng cho người mới bắt đầu",
+    thumbnail: "https://picsum.photos/400/640?random=6",
+    duration: "22:15",
+    views: 234000,
+    likes: 15800,
+    author: {
+      id: "u6",
+      name: "Học Xây Dựng",
+      avatar: "https://i.pravatar.cc/150?img=6",
+      verified: true,
+    },
+    tags: ["bản vẽ", "hướng dẫn", "cơ bản"],
+  },
+];
 
 const CATEGORIES = [
-  { id: 'all', name: 'Tất cả', icon: 'apps' },
-  { id: 'kientruc', name: 'Kiến trúc', icon: 'business' },
-  { id: 'noithat', name: 'Nội thất', icon: 'bed' },
-  { id: 'thicong', name: 'Thi công', icon: 'construct' },
-  { id: 'vatlieu', name: 'Vật liệu', icon: 'cube' },
-  { id: 'diy', name: 'DIY', icon: 'hammer' },
-  { id: 'tips', name: 'Mẹo hay', icon: 'bulb' },
+  { id: "all", label: "Tất cả", icon: "apps" },
+  { id: "live", label: "Đang Live", icon: "radio-outline" },
+  { id: "tutorial", label: "Hướng dẫn", icon: "school-outline" },
+  { id: "review", label: "Review", icon: "star-outline" },
+  { id: "tips", label: "Mẹo hay", icon: "bulb-outline" },
 ];
 
-const TRENDING_VIDEOS = [
-  {
-    id: 'trend_1',
-    thumbnail: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600',
-    title: 'Top 10 mẫu biệt thự đẹp nhất 2026',
-    user: { name: 'Kiến Trúc A&A', avatar: 'https://i.pravatar.cc/150?u=arch1', verified: true },
-    views: '1.2M',
-    duration: '5:45',
-    category: 'kientruc',
-  },
-  {
-    id: 'trend_2',
-    thumbnail: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600',
-    title: 'Xu hướng nội thất 2026',
-    user: { name: 'Nội Thất Luxury', avatar: 'https://i.pravatar.cc/150?u=int1', verified: true },
-    views: '856K',
-    duration: '8:12',
-    category: 'noithat',
-  },
-  {
-    id: 'trend_3',
-    thumbnail: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600',
-    title: 'Kỹ thuật xây móng chuẩn',
-    user: { name: 'Thợ Xây Pro', avatar: 'https://i.pravatar.cc/150?u=worker1', verified: false },
-    views: '543K',
-    duration: '12:30',
-    category: 'thicong',
-  },
-];
+function formatViews(views: number): string {
+  if (views >= 1000000) return `${(views / 1000000).toFixed(1)}M`;
+  if (views >= 1000) return `${(views / 1000).toFixed(1)}K`;
+  return views.toString();
+}
 
-const CREATORS = [
-  { id: 'c1', name: 'Kiến Trúc Sư Minh', avatar: 'https://i.pravatar.cc/150?u=c1', followers: '234K', verified: true },
-  { id: 'c2', name: 'Thợ Xây Bền', avatar: 'https://i.pravatar.cc/150?u=c2', followers: '189K', verified: false },
-  { id: 'c3', name: 'Nội Thất Studio', avatar: 'https://i.pravatar.cc/150?u=c3', followers: '312K', verified: true },
-  { id: 'c4', name: 'DIY Việt Nam', avatar: 'https://i.pravatar.cc/150?u=c4', followers: '567K', verified: true },
-];
-
-const ALL_VIDEOS = [
-  { id: 'v1', thumbnail: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400', title: 'Nhà phố 5x20m tối ưu', user: 'HomeDesign', views: '234K', duration: '3:45', category: 'kientruc' },
-  { id: 'v2', thumbnail: 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=400', title: 'Phòng ngủ master 30m²', user: 'Interior Pro', views: '156K', duration: '4:20', category: 'noithat' },
-  { id: 'v3', thumbnail: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400', title: 'So sánh gạch ốp lát', user: 'Vật Liệu XD', views: '89K', duration: '6:15', category: 'vatlieu' },
-  { id: 'v4', thumbnail: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400', title: 'Phong thủy nhà ở', user: 'Phong Thủy VN', views: '445K', duration: '7:30', category: 'tips' },
-  { id: 'v5', thumbnail: 'https://images.unsplash.com/photo-1585704032915-c3400ca199e7?w=400', title: 'Tự sửa vòi nước', user: 'DIY Master', views: '123K', duration: '5:45', category: 'diy' },
-  { id: 'v6', thumbnail: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=400', title: 'Đổ bê tông đúng kỹ thuật', user: 'Xây Dựng Pro', views: '234K', duration: '8:45', category: 'thicong' },
-];
-
-// ==================== COMPONENTS ====================
-
-// Category Chip - Minimal
-const CategoryChip = ({ item, isSelected, onPress }: { 
-  item: typeof CATEGORIES[0]; 
-  isSelected: boolean; 
-  onPress: () => void 
-}) => (
-  <TouchableOpacity 
-    style={[styles.categoryChip, isSelected && styles.categoryChipActive]} 
-    onPress={onPress}
-    activeOpacity={0.7}
-  >
-    <Ionicons 
-      name={item.icon as any} 
-      size={16} 
-      color={isSelected ? COLORS.textInverse : COLORS.textSecondary} 
-    />
-    <Text style={[styles.categoryText, isSelected && styles.categoryTextActive]}>
-      {item.name}
-    </Text>
-  </TouchableOpacity>
-);
-
-// Trending Video Card - Minimal horizontal
-const TrendingCard = ({ item, index, onPress }: { 
-  item: typeof TRENDING_VIDEOS[0]; 
-  index: number;
-  onPress: () => void 
-}) => (
-  <TouchableOpacity style={styles.trendingCard} onPress={onPress} activeOpacity={0.8}>
-    <Image source={{ uri: item.thumbnail }} style={styles.trendingImage} />
-    <View style={styles.trendingOverlay}>
-      <View style={styles.trendingRank}>
-        <Text style={styles.trendingRankText}>#{index + 1}</Text>
-      </View>
-      <View style={styles.trendingDuration}>
-        <Text style={styles.durationText}>{item.duration}</Text>
-      </View>
-    </View>
-    <View style={styles.trendingInfo}>
-      <Text style={styles.trendingTitle} numberOfLines={2}>{item.title}</Text>
-      <View style={styles.trendingMeta}>
-        <Text style={styles.trendingUser}>{item.user.name}</Text>
-        <Text style={styles.trendingViews}>{item.views}</Text>
-      </View>
-    </View>
-  </TouchableOpacity>
-);
-
-// Creator Card - Minimal circle
-const CreatorCard = ({ item, onPress }: { item: typeof CREATORS[0]; onPress: () => void }) => {
-  const [following, setFollowing] = useState(false);
-  
+function VideoCard({
+  video,
+  onPress,
+}: {
+  video: VideoItem;
+  onPress: () => void;
+}) {
   return (
-    <TouchableOpacity style={styles.creatorCard} onPress={onPress} activeOpacity={0.7}>
-      <Image source={{ uri: item.avatar }} style={styles.creatorAvatar} />
-      <Text style={styles.creatorName} numberOfLines={1}>{item.name}</Text>
-      <Text style={styles.creatorFollowers}>{item.followers}</Text>
-      <TouchableOpacity 
-        style={[styles.followBtn, following && styles.followingBtn]}
-        onPress={() => setFollowing(!following)}
-      >
-        <Text style={[styles.followBtnText, following && styles.followingBtnText]}>
-          {following ? 'Đang theo' : 'Theo dõi'}
-        </Text>
-      </TouchableOpacity>
-    </TouchableOpacity>
-  );
-};
+    <Pressable style={styles.videoCard} onPress={onPress}>
+      {/* Thumbnail */}
+      <View style={styles.thumbnailContainer}>
+        <Image source={{ uri: video.thumbnail }} style={styles.thumbnail} />
 
-// Video Grid Item - Minimal
-const VideoGridItem = ({ item, onPress }: { item: typeof ALL_VIDEOS[0]; onPress: () => void }) => (
-  <TouchableOpacity style={styles.gridItem} onPress={onPress} activeOpacity={0.8}>
-    <View style={styles.gridThumbnail}>
-      <Image source={{ uri: item.thumbnail }} style={styles.gridImage} />
-      <View style={styles.gridDuration}>
-        <Text style={styles.durationText}>{item.duration}</Text>
-      </View>
-      <View style={styles.gridPlayIcon}>
-        <Ionicons name="play" size={24} color={COLORS.textInverse} />
-      </View>
-    </View>
-    <Text style={styles.gridTitle} numberOfLines={2}>{item.title}</Text>
-    <Text style={styles.gridMeta}>{item.user} • {item.views}</Text>
-  </TouchableOpacity>
-);
-
-// Section Header
-const SectionHeader = ({ title, onSeeAll }: { title: string; onSeeAll?: () => void }) => (
-  <View style={styles.sectionHeader}>
-    <Text style={styles.sectionTitle}>{title}</Text>
-    {onSeeAll && (
-      <TouchableOpacity onPress={onSeeAll}>
-        <Text style={styles.seeAllText}>Xem tất cả</Text>
-      </TouchableOpacity>
-    )}
-  </View>
-);
-
-// ==================== MAIN COMPONENT ====================
-
-export default function VideoDiscoveryScreen() {
-  const insets = useSafeAreaInsets();
-  const [refreshing, setRefreshing] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
-  
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setRefreshing(false);
-  }, []);
-  
-  const handleVideoPress = (videoId: string) => {
-    router.push(`/social/reels-viewer?id=${videoId}` as any);
-  };
-  
-  const handleCreatorPress = (creatorId: string) => {
-    router.push(`/social/profile/${creatorId}` as any);
-  };
-  
-  const filteredVideos = selectedCategory === 'all' 
-    ? ALL_VIDEOS 
-    : ALL_VIDEOS.filter(v => v.category === selectedCategory);
-
-  return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
-      
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <Ionicons name="arrow-back" size={24} color={COLORS.primary} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Khám phá Video</Text>
-        <TouchableOpacity style={styles.headerBtn}>
-          <Ionicons name="options-outline" size={22} color={COLORS.primary} />
-        </TouchableOpacity>
-      </View>
-      
-      {/* Search Bar */}
-      <View style={styles.searchContainer}>
-        <Ionicons name="search" size={18} color={COLORS.textTertiary} />
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Tìm kiếm video..."
-          placeholderTextColor={COLORS.textTertiary}
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
-        {searchQuery.length > 0 && (
-          <TouchableOpacity onPress={() => setSearchQuery('')}>
-            <Ionicons name="close-circle" size={18} color={COLORS.textTertiary} />
-          </TouchableOpacity>
+        {video.isLive ? (
+          <View style={styles.liveBadge}>
+            <View style={styles.liveDot} />
+            <ThemedText style={styles.liveText}>LIVE</ThemedText>
+          </View>
+        ) : (
+          <View style={styles.durationBadge}>
+            <ThemedText style={styles.durationText}>
+              {video.duration}
+            </ThemedText>
+          </View>
         )}
       </View>
-      
-      {/* Content */}
-      <ScrollView
-        style={styles.content}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor={COLORS.primary}
+
+      {/* Info */}
+      <View style={styles.videoInfo}>
+        <View style={styles.authorRow}>
+          <Image
+            source={{ uri: video.author.avatar }}
+            style={styles.authorAvatar}
           />
-        }
-      >
-        {/* Categories */}
-        <ScrollView 
-          horizontal 
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.categoriesContainer}
-        >
-          {CATEGORIES.map(cat => (
-            <CategoryChip
-              key={cat.id}
-              item={cat}
-              isSelected={selectedCategory === cat.id}
-              onPress={() => setSelectedCategory(cat.id)}
-            />
-          ))}
-        </ScrollView>
-        
-        {/* Trending Section */}
-        <SectionHeader 
-          title="Xu hướng" 
-          onSeeAll={() => router.push('/social/reels-viewer')}
-        />
-        <ScrollView 
-          horizontal 
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.trendingContainer}
-        >
-          {TRENDING_VIDEOS.map((video, index) => (
-            <TrendingCard
-              key={video.id}
-              item={video}
-              index={index}
-              onPress={() => handleVideoPress(video.id)}
-            />
-          ))}
-        </ScrollView>
-        
-        {/* Creators Section */}
-        <SectionHeader title="Nhà sáng tạo" />
-        <ScrollView 
-          horizontal 
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.creatorsContainer}
-        >
-          {CREATORS.map(creator => (
-            <CreatorCard
-              key={creator.id}
-              item={creator}
-              onPress={() => handleCreatorPress(creator.id)}
-            />
-          ))}
-        </ScrollView>
-        
-        {/* All Videos Grid */}
-        <SectionHeader title={selectedCategory === 'all' ? 'Tất cả video' : CATEGORIES.find(c => c.id === selectedCategory)?.name || 'Video'} />
-        <View style={styles.videoGrid}>
-          {filteredVideos.map(video => (
-            <VideoGridItem
-              key={video.id}
-              item={video}
-              onPress={() => handleVideoPress(video.id)}
-            />
-          ))}
+          <View style={styles.authorInfo}>
+            <View style={styles.authorNameRow}>
+              <ThemedText style={styles.authorName} numberOfLines={1}>
+                {video.author.name}
+              </ThemedText>
+              {video.author.verified && (
+                <Ionicons name="checkmark-circle" size={12} color="#2196F3" />
+              )}
+            </View>
+          </View>
         </View>
-        
-        {/* Bottom Padding */}
-        <View style={{ height: 100 }} />
-      </ScrollView>
-    </View>
+
+        <ThemedText style={styles.videoTitle} numberOfLines={2}>
+          {video.title}
+        </ThemedText>
+
+        <View style={styles.statsRow}>
+          <View style={styles.statItem}>
+            <Ionicons name="eye-outline" size={12} color="#888" />
+            <ThemedText style={styles.statText}>
+              {formatViews(video.views)}
+            </ThemedText>
+          </View>
+          <View style={styles.statItem}>
+            <Ionicons name="heart-outline" size={12} color="#888" />
+            <ThemedText style={styles.statText}>
+              {formatViews(video.likes)}
+            </ThemedText>
+          </View>
+        </View>
+      </View>
+    </Pressable>
   );
 }
 
-// ==================== STYLES ====================
+export default function VideoDiscoveryScreen() {
+  const [refreshing, setRefreshing] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const backgroundColor = useThemeColor({}, "background");
 
-const GRID_ITEM_WIDTH = (SCREEN_WIDTH - SPACING.lg * 2 - SPACING.md) / 2;
+  const filteredVideos =
+    selectedCategory === "all"
+      ? MOCK_VIDEOS
+      : selectedCategory === "live"
+        ? MOCK_VIDEOS.filter((v) => v.isLive)
+        : MOCK_VIDEOS;
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    setTimeout(() => setRefreshing(false), 1000);
+  };
+
+  return (
+    <>
+      <Stack.Screen
+        options={{
+          title: "Khám phá Video",
+          headerStyle: { backgroundColor: "#FF5722" },
+          headerTintColor: "#FFFFFF",
+          headerRight: () => (
+            <View style={styles.headerActions}>
+              <Pressable style={styles.headerButton}>
+                <Ionicons name="search" size={22} color="#FFFFFF" />
+              </Pressable>
+              <Pressable
+                style={styles.headerButton}
+                onPress={() => router.push("/social/create-post" as Href)}
+              >
+                <Ionicons name="videocam" size={22} color="#FFFFFF" />
+              </Pressable>
+            </View>
+          ),
+        }}
+      />
+
+      <View style={[styles.container, { backgroundColor }]}>
+        {/* Categories */}
+        <View style={styles.categoriesContainer}>
+          <FlatList
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            data={CATEGORIES}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={styles.categoriesList}
+            renderItem={({ item }) => (
+              <Pressable
+                style={[
+                  styles.categoryChip,
+                  selectedCategory === item.id && styles.categoryChipActive,
+                ]}
+                onPress={() => setSelectedCategory(item.id)}
+              >
+                <Ionicons
+                  name={item.icon as any}
+                  size={16}
+                  color={selectedCategory === item.id ? "#FFFFFF" : "#666"}
+                />
+                <ThemedText
+                  style={[
+                    styles.categoryText,
+                    selectedCategory === item.id && styles.categoryTextActive,
+                  ]}
+                >
+                  {item.label}
+                </ThemedText>
+              </Pressable>
+            )}
+          />
+        </View>
+
+        {/* Featured Banner */}
+        <Pressable style={styles.featuredBanner}>
+          <View style={styles.featuredGradient}>
+            <Ionicons name="play-circle" size={48} color="#FFFFFF" />
+            <View style={styles.featuredInfo}>
+              <ThemedText style={styles.featuredLabel}>Xu hướng</ThemedText>
+              <ThemedText style={styles.featuredTitle}>
+                Video Hot Tuần Này
+              </ThemedText>
+              <ThemedText style={styles.featuredSubtitle}>
+                Khám phá những video được xem nhiều nhất
+              </ThemedText>
+            </View>
+          </View>
+        </Pressable>
+
+        {/* Video Grid */}
+        <FlatList
+          data={filteredVideos}
+          keyExtractor={(item) => item.id}
+          numColumns={2}
+          columnWrapperStyle={styles.videoRow}
+          renderItem={({ item }) => (
+            <VideoCard
+              video={item}
+              onPress={() => router.push(`/social/shorts` as Href)}
+            />
+          )}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={["#FF5722"]}
+            />
+          }
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <MaterialCommunityIcons
+                name="video-off-outline"
+                size={64}
+                color="#CCCCCC"
+              />
+              <ThemedText style={styles.emptyText}>
+                Chưa có video nào
+              </ThemedText>
+            </View>
+          }
+        />
+      </View>
+    </>
+  );
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
   },
-  
-  // Header
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.md,
-    backgroundColor: COLORS.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+  headerActions: {
+    flexDirection: "row",
+    gap: 8,
   },
-  backBtn: {
-    width: 40,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
+  headerButton: {
+    padding: 8,
   },
-  headerTitle: {
-    fontSize: TYPOGRAPHY.fontSize.lg,
-    fontWeight: TYPOGRAPHY.fontWeight.semibold,
-    color: COLORS.text,
-  },
-  headerBtn: {
-    width: 40,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  
-  // Search
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.surfaceElevated,
-    marginHorizontal: SPACING.lg,
-    marginVertical: SPACING.md,
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.sm,
-    borderRadius: RADIUS.lg,
-    gap: SPACING.sm,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: TYPOGRAPHY.fontSize.md,
-    color: COLORS.text,
-    paddingVertical: 0,
-  },
-  
-  // Content
-  content: {
-    flex: 1,
-  },
-  
-  // Categories
   categoriesContainer: {
-    paddingHorizontal: SPACING.lg,
-    paddingBottom: SPACING.lg,
-    gap: SPACING.sm,
+    backgroundColor: "#FFFFFF",
+    borderBottomWidth: 1,
+    borderBottomColor: "#E0E0E0",
+  },
+  categoriesList: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    gap: 8,
   },
   categoryChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.surfaceElevated,
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.sm,
-    borderRadius: RADIUS.full,
-    gap: SPACING.xs,
-    marginRight: SPACING.sm,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: "#F5F5F5",
+    marginRight: 8,
   },
   categoryChipActive: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: "#FF5722",
   },
   categoryText: {
-    fontSize: TYPOGRAPHY.fontSize.sm,
-    color: COLORS.textSecondary,
-    fontWeight: TYPOGRAPHY.fontWeight.medium,
+    fontSize: 13,
+    color: "#666666",
   },
   categoryTextActive: {
-    color: COLORS.textInverse,
+    color: "#FFFFFF",
+    fontWeight: "600",
   },
-  
-  // Section Header
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: SPACING.lg,
-    paddingTop: SPACING.lg,
-    paddingBottom: SPACING.md,
+  featuredBanner: {
+    marginHorizontal: 16,
+    marginTop: 16,
+    borderRadius: 12,
+    overflow: "hidden",
+    backgroundColor: "#FF5722",
   },
-  sectionTitle: {
-    fontSize: TYPOGRAPHY.fontSize.md,
-    fontWeight: TYPOGRAPHY.fontWeight.semibold,
-    color: COLORS.text,
+  featuredGradient: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 16,
+    gap: 16,
   },
-  seeAllText: {
-    fontSize: TYPOGRAPHY.fontSize.sm,
-    color: COLORS.textSecondary,
+  featuredInfo: {
+    flex: 1,
   },
-  
-  // Trending
-  trendingContainer: {
-    paddingHorizontal: SPACING.lg,
-    gap: SPACING.md,
+  featuredLabel: {
+    fontSize: 11,
+    color: "rgba(255,255,255,0.8)",
+    textTransform: "uppercase",
+    letterSpacing: 1,
   },
-  trendingCard: {
-    width: 260,
-    marginRight: SPACING.md,
-    borderRadius: RADIUS.lg,
-    overflow: 'hidden',
-    backgroundColor: COLORS.surface,
-    ...SHADOWS.sm,
+  featuredTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#FFFFFF",
+    marginTop: 4,
   },
-  trendingImage: {
-    width: '100%',
-    height: 140,
+  featuredSubtitle: {
+    fontSize: 12,
+    color: "rgba(255,255,255,0.9)",
+    marginTop: 4,
   },
-  trendingOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    height: 140,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: SPACING.sm,
+  listContent: {
+    padding: 16,
+    paddingTop: 12,
   },
-  trendingRank: {
-    backgroundColor: COLORS.primary,
-    paddingHorizontal: SPACING.sm,
+  videoRow: {
+    justifyContent: "space-between",
+    marginBottom: 16,
+  },
+  videoCard: {
+    width: VIDEO_WIDTH,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 10,
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  thumbnailContainer: {
+    width: "100%",
+    height: VIDEO_HEIGHT * 0.6,
+    position: "relative",
+  },
+  thumbnail: {
+    width: "100%",
+    height: "100%",
+    backgroundColor: "#E0E0E0",
+  },
+  durationBadge: {
+    position: "absolute",
+    bottom: 8,
+    right: 8,
+    backgroundColor: "rgba(0,0,0,0.7)",
+    paddingHorizontal: 6,
     paddingVertical: 2,
-    borderRadius: RADIUS.sm,
-    alignSelf: 'flex-start',
-  },
-  trendingRankText: {
-    fontSize: TYPOGRAPHY.fontSize.xs,
-    fontWeight: TYPOGRAPHY.fontWeight.bold,
-    color: COLORS.textInverse,
-  },
-  trendingDuration: {
-    backgroundColor: 'rgba(0,0,0,0.6)',
-    paddingHorizontal: SPACING.xs,
-    paddingVertical: 2,
-    borderRadius: RADIUS.xs,
-    alignSelf: 'flex-start',
+    borderRadius: 4,
   },
   durationText: {
-    fontSize: TYPOGRAPHY.fontSize.xs,
-    color: COLORS.textInverse,
+    fontSize: 11,
+    color: "#FFFFFF",
+    fontWeight: "500",
   },
-  trendingInfo: {
-    padding: SPACING.md,
+  liveBadge: {
+    position: "absolute",
+    top: 8,
+    left: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    backgroundColor: "#F44336",
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 4,
   },
-  trendingTitle: {
-    fontSize: TYPOGRAPHY.fontSize.md,
-    fontWeight: TYPOGRAPHY.fontWeight.medium,
-    color: COLORS.text,
-    marginBottom: SPACING.xs,
+  liveDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: "#FFFFFF",
   },
-  trendingMeta: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  liveText: {
+    fontSize: 10,
+    color: "#FFFFFF",
+    fontWeight: "700",
   },
-  trendingUser: {
-    fontSize: TYPOGRAPHY.fontSize.sm,
-    color: COLORS.textSecondary,
+  videoInfo: {
+    padding: 10,
   },
-  trendingViews: {
-    fontSize: TYPOGRAPHY.fontSize.sm,
-    color: COLORS.textTertiary,
+  authorRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 8,
   },
-  
-  // Creators
-  creatorsContainer: {
-    paddingHorizontal: SPACING.lg,
-    gap: SPACING.md,
+  authorAvatar: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: "#E0E0E0",
   },
-  creatorCard: {
-    width: 120,
-    alignItems: 'center',
-    padding: SPACING.md,
-    backgroundColor: COLORS.surface,
-    borderRadius: RADIUS.lg,
-    marginRight: SPACING.md,
-    ...SHADOWS.sm,
+  authorInfo: {
+    flex: 1,
   },
-  creatorAvatar: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    marginBottom: SPACING.sm,
+  authorNameRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
   },
-  creatorName: {
-    fontSize: TYPOGRAPHY.fontSize.sm,
-    fontWeight: TYPOGRAPHY.fontWeight.medium,
-    color: COLORS.text,
-    textAlign: 'center',
-    marginBottom: 2,
+  authorName: {
+    fontSize: 11,
+    color: "#666666",
+    flex: 1,
   },
-  creatorFollowers: {
-    fontSize: TYPOGRAPHY.fontSize.xs,
-    color: COLORS.textTertiary,
-    marginBottom: SPACING.sm,
-  },
-  followBtn: {
-    backgroundColor: COLORS.primary,
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.xs,
-    borderRadius: RADIUS.full,
-  },
-  followingBtn: {
-    backgroundColor: COLORS.surfaceElevated,
-  },
-  followBtnText: {
-    fontSize: TYPOGRAPHY.fontSize.xs,
-    fontWeight: TYPOGRAPHY.fontWeight.medium,
-    color: COLORS.textInverse,
-  },
-  followingBtnText: {
-    color: COLORS.textSecondary,
-  },
-  
-  // Video Grid
-  videoGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    paddingHorizontal: SPACING.lg,
-    gap: SPACING.md,
-  },
-  gridItem: {
-    width: GRID_ITEM_WIDTH,
-    marginBottom: SPACING.md,
-  },
-  gridThumbnail: {
-    width: '100%',
-    height: 100,
-    borderRadius: RADIUS.md,
-    overflow: 'hidden',
-    backgroundColor: COLORS.surfaceElevated,
-  },
-  gridImage: {
-    width: '100%',
-    height: '100%',
-  },
-  gridDuration: {
-    position: 'absolute',
-    bottom: SPACING.xs,
-    right: SPACING.xs,
-    backgroundColor: 'rgba(0,0,0,0.6)',
-    paddingHorizontal: SPACING.xs,
-    paddingVertical: 2,
-    borderRadius: RADIUS.xs,
-  },
-  gridPlayIcon: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    marginTop: -12,
-    marginLeft: -12,
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  gridTitle: {
-    fontSize: TYPOGRAPHY.fontSize.sm,
-    fontWeight: TYPOGRAPHY.fontWeight.medium,
-    color: COLORS.text,
-    marginTop: SPACING.sm,
+  videoTitle: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#212121",
     lineHeight: 18,
+    marginBottom: 8,
   },
-  gridMeta: {
-    fontSize: TYPOGRAPHY.fontSize.xs,
-    color: COLORS.textTertiary,
-    marginTop: 2,
+  statsRow: {
+    flexDirection: "row",
+    gap: 12,
+  },
+  statItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  statText: {
+    fontSize: 11,
+    color: "#888888",
+  },
+  emptyContainer: {
+    alignItems: "center",
+    paddingVertical: 60,
+    gap: 12,
+  },
+  emptyText: {
+    fontSize: 14,
+    color: "#888888",
   },
 });

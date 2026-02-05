@@ -2,13 +2,22 @@
  * Labor/Provider API Client
  * For construction labor teams, contractors and service providers
  */
-import { apiFetch } from '../api';
+import { apiFetch } from "../api";
 
 // Types for Labor Teams/Providers
 export interface LaborProvider {
   id: string;
   name: string;
-  type: 'coffa' | 'xay' | 'dien-nuoc' | 'be-tong' | 'dao-dat' | 'vat-lieu' | 'nhan-cong' | 'ep-coc' | 'design-team';
+  type:
+    | "coffa"
+    | "xay"
+    | "dien-nuoc"
+    | "be-tong"
+    | "dao-dat"
+    | "vat-lieu"
+    | "nhan-cong"
+    | "ep-coc"
+    | "design-team";
   avatar?: string;
   coverImage?: string;
   phone: string;
@@ -29,7 +38,7 @@ export interface LaborProvider {
   services: string[];
   certifications?: string[];
   gallery?: string[];
-  availability: 'available' | 'busy' | 'unavailable';
+  availability: "available" | "busy" | "unavailable";
   verified: boolean;
   featured: boolean;
   reviews?: LaborReview[];
@@ -54,21 +63,21 @@ export interface LaborQuery {
   page?: number;
   limit?: number;
   search?: string;
-  type?: LaborProvider['type'];
+  type?: LaborProvider["type"];
   district?: string;
   city?: string;
   minRating?: number;
   maxPrice?: number;
-  availability?: LaborProvider['availability'];
+  availability?: LaborProvider["availability"];
   verified?: boolean;
   featured?: boolean;
-  sortBy?: 'rating' | 'price' | 'reviewCount' | 'projectCount' | 'createdAt';
-  sortOrder?: 'asc' | 'desc';
+  sortBy?: "rating" | "price" | "reviewCount" | "projectCount" | "createdAt";
+  sortOrder?: "asc" | "desc";
 }
 
 export interface CreateLaborProviderDto {
   name: string;
-  type: LaborProvider['type'];
+  type: LaborProvider["type"];
   phone: string;
   email?: string;
   address: string;
@@ -130,12 +139,13 @@ export interface BookingRequest {
 export interface BookingResponse {
   id: string;
   providerId: string;
-  status: 'pending' | 'confirmed' | 'rejected' | 'completed';
+  status: "pending" | "confirmed" | "rejected" | "completed";
   createdAt: string;
 }
 
 class LaborService {
-  private readonly baseUrl = '/labor-providers';
+  // Backend route: /api/v1/labor (NOT /labor-providers)
+  private readonly baseUrl = "/labor";
 
   /**
    * Get all labor providers with optional filtering
@@ -157,7 +167,10 @@ class LaborService {
   /**
    * Get providers by type (coffa, xay, dien-nuoc, etc.)
    */
-  async getProvidersByType(type: LaborProvider['type'], query?: Omit<LaborQuery, 'type'>): Promise<LaborProvidersResponse> {
+  async getProvidersByType(
+    type: LaborProvider["type"],
+    query?: Omit<LaborQuery, "type">,
+  ): Promise<LaborProvidersResponse> {
     return this.getProviders({ ...query, type });
   }
 
@@ -171,18 +184,26 @@ class LaborService {
   /**
    * Get reviews for a provider
    */
-  async getProviderReviews(providerId: string, page = 1, limit = 10): Promise<LaborReviewsResponse> {
+  async getProviderReviews(
+    providerId: string,
+    page = 1,
+    limit = 10,
+  ): Promise<LaborReviewsResponse> {
     const params = new URLSearchParams({
       page: String(page),
       limit: String(limit),
     });
-    return apiFetch<LaborReviewsResponse>(`${this.baseUrl}/${providerId}/reviews?${params.toString()}`);
+    return apiFetch<LaborReviewsResponse>(
+      `${this.baseUrl}/${providerId}/reviews?${params.toString()}`,
+    );
   }
 
   /**
    * Get featured/recommended providers
    */
-  async getFeaturedProviders(type?: LaborProvider['type']): Promise<LaborProvidersResponse> {
+  async getFeaturedProviders(
+    type?: LaborProvider["type"],
+  ): Promise<LaborProvidersResponse> {
     const query: LaborQuery = { featured: true, limit: 10 };
     if (type) query.type = type;
     return this.getProviders(query);
@@ -191,7 +212,10 @@ class LaborService {
   /**
    * Search providers by keyword
    */
-  async searchProviders(keyword: string, type?: LaborProvider['type']): Promise<LaborProvidersResponse> {
+  async searchProviders(
+    keyword: string,
+    type?: LaborProvider["type"],
+  ): Promise<LaborProvidersResponse> {
     const query: LaborQuery = { search: keyword };
     if (type) query.type = type;
     return this.getProviders(query);
@@ -202,7 +226,7 @@ class LaborService {
    */
   async createProvider(data: CreateLaborProviderDto): Promise<LaborProvider> {
     return apiFetch<LaborProvider>(this.baseUrl, {
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify(data),
     });
   }
@@ -210,9 +234,12 @@ class LaborService {
   /**
    * Update provider profile
    */
-  async updateProvider(id: string, data: UpdateLaborProviderDto): Promise<LaborProvider> {
+  async updateProvider(
+    id: string,
+    data: UpdateLaborProviderDto,
+  ): Promise<LaborProvider> {
     return apiFetch<LaborProvider>(`${this.baseUrl}/${id}`, {
-      method: 'PATCH',
+      method: "PATCH",
       body: JSON.stringify(data),
     });
   }
@@ -222,7 +249,7 @@ class LaborService {
    */
   async deleteProvider(id: string): Promise<void> {
     return apiFetch<void>(`${this.baseUrl}/${id}`, {
-      method: 'DELETE',
+      method: "DELETE",
     });
   }
 
@@ -231,7 +258,7 @@ class LaborService {
    */
   async addReview(data: CreateReviewDto): Promise<LaborReview> {
     return apiFetch<LaborReview>(`${this.baseUrl}/${data.providerId}/reviews`, {
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify(data),
     });
   }
@@ -240,23 +267,34 @@ class LaborService {
    * Book/request a provider
    */
   async requestBooking(data: BookingRequest): Promise<BookingResponse> {
-    return apiFetch<BookingResponse>(`${this.baseUrl}/${data.providerId}/bookings`, {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
+    return apiFetch<BookingResponse>(
+      `${this.baseUrl}/${data.providerId}/bookings`,
+      {
+        method: "POST",
+        body: JSON.stringify(data),
+      },
+    );
   }
 
   /**
    * Get nearby providers based on location
+   * Backend: GET /labor/nearby?latitude=...&longitude=...&radius=...&skills=...
    */
-  async getNearbyProviders(latitude: number, longitude: number, radius = 10, type?: LaborProvider['type']): Promise<LaborProvidersResponse> {
+  async getNearbyProviders(
+    latitude: number,
+    longitude: number,
+    options?: { radius?: number; skills?: string[]; limit?: number },
+  ): Promise<LaborProvidersResponse> {
     const params = new URLSearchParams({
-      lat: String(latitude),
-      lng: String(longitude),
-      radius: String(radius),
+      latitude: String(latitude),
+      longitude: String(longitude),
     });
-    if (type) params.append('type', type);
-    return apiFetch<LaborProvidersResponse>(`${this.baseUrl}/nearby?${params.toString()}`);
+    if (options?.radius) params.append("radius", String(options.radius));
+    if (options?.skills) params.append("skills", options.skills.join(","));
+    if (options?.limit) params.append("limit", String(options.limit));
+    return apiFetch<LaborProvidersResponse>(
+      `${this.baseUrl}/nearby?${params.toString()}`,
+    );
   }
 }
 

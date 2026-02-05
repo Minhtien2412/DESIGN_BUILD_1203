@@ -1,3 +1,8 @@
-import AISearchScreen from '@/features/search/AISearchScreen';
+/**
+ * Search Route - Redirect to Unified Search
+ * Route: /search -> /unified-search
+ */
 
-export default AISearchScreen;
+import UnifiedSearchScreen from "@/features/search/UnifiedSearchScreen";
+
+export default UnifiedSearchScreen;
