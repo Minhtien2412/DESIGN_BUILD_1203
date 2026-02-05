@@ -105,12 +105,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onPress }) => {
     return new Intl.NumberFormat("vi-VN").format(num) + "đ";
   };
 
-  // Handle both string[] and object[] formats from API
-  const imageUrl = product.images?.[0]
-    ? typeof product.images[0] === "string"
-      ? product.images[0]
-      : (product.images[0] as any).url
-    : "https://images.unsplash.com/photo-1600210492493-0946911123ea?w=400";
+  // Get image URL from ProductImage object
+  const imageUrl =
+    product.images?.[0]?.url ||
+    "https://images.unsplash.com/photo-1600210492493-0946911123ea?w=400";
 
   return (
     <TouchableOpacity

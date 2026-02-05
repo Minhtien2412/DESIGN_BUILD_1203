@@ -553,6 +553,15 @@ export enum ProductStatus {
   REJECTED = "REJECTED",
 }
 
+export interface ProductImage {
+  id: number;
+  productId: number;
+  url: string;
+  isPrimary: boolean;
+  displayOrder: number;
+  createdAt: string;
+}
+
 export interface Product {
   id: number;
   name: string;
@@ -561,7 +570,7 @@ export interface Product {
   category: ProductCategory;
   status: ProductStatus;
   stock: number;
-  images: string[];
+  images: ProductImage[];
   createdBy: number;
   reviewedBy?: number;
   reviewedAt?: string;

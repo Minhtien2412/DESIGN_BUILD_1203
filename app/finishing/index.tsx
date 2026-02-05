@@ -184,9 +184,17 @@ const FeaturedProductCard: React.FC<{
     return new Intl.NumberFormat("vi-VN").format(num) + "đ";
   };
 
+  // Get image URL from ProductImage object
   const imageUrl =
     product.images?.[0]?.url ||
     "https://images.unsplash.com/photo-1600210492493-0946911123ea?w=400";
+
+  console.log(
+    "[FeaturedProduct] Image URL:",
+    imageUrl,
+    "Images:",
+    product.images,
+  );
 
   return (
     <TouchableOpacity

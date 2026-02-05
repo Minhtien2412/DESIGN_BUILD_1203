@@ -164,10 +164,8 @@ export default function FinishingProductDetailScreen() {
         "https://images.unsplash.com/photo-1600210492493-0946911123ea?w=800",
       ];
     }
-    // Handle both string[] and object[] formats from API
-    return product.images.map((img: string | { url: string }) =>
-      typeof img === "string" ? img : img.url,
-    );
+    // ProductImage objects have url property
+    return product.images.map((img) => img.url);
   }, [product]);
 
   const formatPrice = (price: string | number) => {
@@ -489,11 +487,11 @@ export default function FinishingProductDetailScreen() {
 
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               {sellerProducts.map((item) => {
-                // Handle both string[] and object[] formats
-                const imageUrl = item.images?.[0] 
-                  ? (typeof item.images[0] === 'string' ? item.images[0] : (item.images[0] as any).url)
-                  : "https://images.unsplash.com/photo-1600210492493-0946911123ea?w=400";
-                
+                // Get image URL from ProductImage object
+                const imageUrl =
+                  item.images?.[0]?.url ||
+                  "https://images.unsplash.com/photo-1600210492493-0946911123ea?w=400";
+
                 return (
                   <TouchableOpacity
                     key={item.id}
