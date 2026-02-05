@@ -169,11 +169,13 @@ export default function NearbyScreen() {
         </View>
 
         <View style={styles.tagsRow}>
-          {(item.categories || item.services)?.slice(0, 3).map((tag, index) => (
-            <View key={index} style={styles.tag}>
-              <Text style={styles.tagText}>{tag}</Text>
-            </View>
-          ))}
+          {(item as { services?: string[] }).services
+            ?.slice(0, 3)
+            .map((tag: string, index: number) => (
+              <View key={index} style={styles.tag}>
+                <Text style={styles.tagText}>{tag}</Text>
+              </View>
+            ))}
         </View>
       </View>
 
