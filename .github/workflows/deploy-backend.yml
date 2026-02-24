@@ -4,7 +4,9 @@ on:
   push:
     branches: [main, master]
     paths:
+      - "BE-baotienweb.cloud"
       - "BE-baotienweb.cloud/**"
+      - ".gitmodules"
       - ".github/workflows/deploy-backend.yml"
   workflow_dispatch:
     inputs:
@@ -34,7 +36,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          submodules: true
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Ensure BE code is present
+        working-directory: .
+        run: |
+          if [ ! -f "BE-baotienweb.cloud/package.json" ]; then
+            echo "Submodule not checked out, cloning directly..."
+            rm -rf BE-baotienweb.cloud
+            git clone https://github.com/appdesignbuild/demo28.git BE-baotienweb.cloud
+          fi
+          ls BE-baotienweb.cloud/package.json
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -66,7 +79,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          submodules: true
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Ensure BE code is present
+        run: |
+          if [ ! -f "BE-baotienweb.cloud/package.json" ]; then
+            echo "Submodule not checked out, cloning directly..."
+            rm -rf BE-baotienweb.cloud
+            git clone https://github.com/appdesignbuild/demo28.git BE-baotienweb.cloud
+          fi
+          ls BE-baotienweb.cloud/package.json
 
       - name: Create deployment package
         run: |
