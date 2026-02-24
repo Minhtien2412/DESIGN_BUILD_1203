@@ -57,13 +57,13 @@ export default function HistoryScreen() {
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      pending: '#0066CC',
-      confirmed: '#0066CC',
+      pending: '#0D9488',
+      confirmed: '#0D9488',
       cancelled: '#000000',
       completed: '#6B7280',
-      'in-review': '#3B82F6',
+      'in-review': '#0D9488',
       quoted: '#666666',
-      accepted: '#0066CC',
+      accepted: '#0D9488',
       rejected: '#000000',
     };
     return colors[status] || '#6B7280';

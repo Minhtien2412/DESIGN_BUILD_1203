@@ -645,7 +645,7 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 8,
     borderLeftWidth: 3,
-    borderLeftColor: '#0066CC',
+    borderLeftColor: '#0D9488',
   },
   testimonial: {
     flex: 1,

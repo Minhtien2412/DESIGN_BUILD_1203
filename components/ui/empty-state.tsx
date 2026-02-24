@@ -17,7 +17,7 @@ const VARIANT_CONFIG = {
     icon: 'folder-open-outline',
   },
   search: {
-    iconColor: '#3B82F6',
+    iconColor: '#0D9488',
     icon: 'search-outline',
   },
   error: {
@@ -25,7 +25,7 @@ const VARIANT_CONFIG = {
     icon: 'alert-circle-outline',
   },
   info: {
-    iconColor: '#3B82F6',
+    iconColor: '#0D9488',
     icon: 'information-circle-outline',
   },
 };
@@ -40,7 +40,7 @@ export default function EmptyState({
 }: EmptyStateProps) {
   const textColor = useThemeColor({}, 'text');
   const mutedColor = '#6B7280';
-  const primaryColor = '#0066CC';
+  const primaryColor = '#0D9488';
   
   const config = VARIANT_CONFIG[variant];
   const displayIcon = icon || config.icon;

@@ -46,7 +46,7 @@ export const ActivityLogItem = ({ event }: ActivityLogItemProps) => {
 
   const getIconColor = () => {
     switch (event.type) {
-      case 'login': return '#0066CC'; // Blue
+      case 'login': return '#0D9488'; // Blue
       case 'logout': return '#666666'; // Gray
       case 'security': return '#0080FF'; // Bright Blue
       case 'action': return '#000000'; // Black

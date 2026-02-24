@@ -122,20 +122,20 @@ export default function ActivityLogScreen() {
 
   const getActionColor = (action: string) => {
     switch (action) {
-      case 'CREATE': return '#0066CC';
-      case 'UPDATE': return '#3B82F6';
+      case 'CREATE': return '#0D9488';
+      case 'UPDATE': return '#0D9488';
       case 'DELETE': return '#000000';
       case 'LOGIN': return '#666666';
-      case 'EXPORT': return '#0066CC';
+      case 'EXPORT': return '#0D9488';
       default: return '#94A3B8';
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'success': return '#0066CC';
+      case 'success': return '#0D9488';
       case 'failed': return '#000000';
-      case 'warning': return '#0066CC';
+      case 'warning': return '#0D9488';
       default: return '#94A3B8';
     }
   };
@@ -183,13 +183,13 @@ export default function ActivityLogScreen() {
         {/* Summary */}
         <View style={styles.summaryRow}>
           <View style={[styles.summaryCard, { backgroundColor: '#ECFDF5' }]}>
-            <Text style={[styles.summaryNumber, { color: '#0066CC' }]}>
+            <Text style={[styles.summaryNumber, { color: '#0D9488' }]}>
               {activities.filter(a => a.status === 'success').length}
             </Text>
             <Text style={styles.summaryLabel}>Thành công</Text>
           </View>
           <View style={[styles.summaryCard, { backgroundColor: '#FEF3C7' }]}>
-            <Text style={[styles.summaryNumber, { color: '#0066CC' }]}>
+            <Text style={[styles.summaryNumber, { color: '#0D9488' }]}>
               {activities.filter(a => a.status === 'warning').length}
             </Text>
             <Text style={styles.summaryLabel}>Cảnh báo</Text>

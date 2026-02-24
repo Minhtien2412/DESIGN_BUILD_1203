@@ -125,7 +125,7 @@ const UserRoleManager: React.FC<UserRoleManagerProps> = ({
             setShowRoleModal(true);
           }}
         >
-          <Ionicons name="settings" size={16} color="#0066CC" />
+          <Ionicons name="settings" size={16} color="#0D9488" />
           <Text style={styles.assignButtonText}>Phân quyền</Text>
         </TouchableOpacity>
       )}
@@ -251,7 +251,7 @@ const UserRoleManager: React.FC<UserRoleManagerProps> = ({
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           {loading ? (
             <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color="#0066CC" />
+              <ActivityIndicator size="large" color="#0D9488" />
               <Text style={styles.loadingText}>Đang tải danh sách người dùng...</Text>
             </View>
           ) : (
@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   userCountBadge: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     color: '#FFFFFF',
     paddingHorizontal: 12,
     paddingVertical: 4,
@@ -400,7 +400,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#E8F5E8',
   },
   inactiveBadge: {
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
   },
   suspendedBadge: {
     backgroundColor: '#FFEBEE',
@@ -410,10 +410,10 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   activeText: {
-    color: '#0066CC',
+    color: '#0D9488',
   },
   inactiveText: {
-    color: '#0066CC',
+    color: '#0D9488',
   },
   suspendedText: {
     color: '#000000',
@@ -423,12 +423,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 12,
     paddingVertical: 6,
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     borderRadius: 6,
     marginLeft: 12,
   },
   assignButtonText: {
-    color: '#0066CC',
+    color: '#0D9488',
     fontSize: 12,
     fontWeight: '500',
     marginLeft: 4,
@@ -480,7 +480,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   selectedRoleOption: {
-    borderColor: '#0066CC',
+    borderColor: '#0D9488',
     backgroundColor: '#F1F8E9',
   },
   roleOptionContent: {
@@ -492,7 +492,7 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   selectedRoleText: {
-    color: '#0066CC',
+    color: '#0D9488',
   },
   permissionCountText: {
     fontSize: 12,
@@ -509,8 +509,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   selectedRadio: {
-    backgroundColor: '#0066CC',
-    borderColor: '#0066CC',
+    backgroundColor: '#0D9488',
+    borderColor: '#0D9488',
   },
   modalActions: {
     flexDirection: 'row',
@@ -527,7 +527,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   saveButton: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     marginLeft: 8,
   },
   cancelButtonText: {

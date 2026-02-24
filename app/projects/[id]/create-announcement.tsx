@@ -27,8 +27,8 @@ type Priority = 'LOW' | 'NORMAL' | 'HIGH' | 'URGENT';
 
 const PRIORITIES: { value: Priority; label: string; color: string; icon: string }[] = [
   { value: 'LOW', label: 'Thấp', color: '#6B7280', icon: 'chatbubble-outline' },
-  { value: 'NORMAL', label: 'Bình thường', color: '#3B82F6', icon: 'information-circle-outline' },
-  { value: 'HIGH', label: 'Cao', color: '#0066CC', icon: 'warning-outline' },
+  { value: 'NORMAL', label: 'Bình thường', color: '#0D9488', icon: 'information-circle-outline' },
+  { value: 'HIGH', label: 'Cao', color: '#0D9488', icon: 'warning-outline' },
   { value: 'URGENT', label: 'Khẩn cấp', color: '#000000', icon: 'alert-circle-outline' },
 ];
 

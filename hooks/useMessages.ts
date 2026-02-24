@@ -283,8 +283,8 @@ export function useConversation(
           setConversationId(newMessage.conversationId);
         }
 
-        // Add new message to top of list
-        setMessages((prev) => [newMessage, ...prev]);
+        // Add new message to end of list (messages display chronologically)
+        setMessages((prev) => [...prev, newMessage]);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to send message");
         console.error("[useConversation] Error sending message:", err);

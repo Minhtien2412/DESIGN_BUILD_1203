@@ -158,7 +158,7 @@ export default function WorkerProfileScreen() {
           key={star}
           name={star <= rating ? 'star' : star - 0.5 <= rating ? 'star-half' : 'star-outline'}
           size={16}
-          color="#0066CC"
+          color="#0D9488"
         />
       ))}
     </View>
@@ -737,7 +737,7 @@ const styles = StyleSheet.create({
   },
   projectTypeTag: {
     alignSelf: 'flex-start',
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     borderRadius: 6,
     paddingHorizontal: 8,
     paddingVertical: 3,

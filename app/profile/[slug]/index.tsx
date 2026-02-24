@@ -506,7 +506,7 @@ export default function PublicProfilePage() {
   if (loading && !profile) {
     return (
       <SafeAreaView style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#FF6B35" />
+        <ActivityIndicator size="large" color="#14B8A6" />
         <Text style={styles.loadingText}>Đang tải hồ sơ...</Text>
       </SafeAreaView>
     );
@@ -682,7 +682,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     paddingHorizontal: 24,
     paddingVertical: 12,
-    backgroundColor: "#FF6B35",
+    backgroundColor: "#14B8A6",
     borderRadius: 8,
   },
   retryBtnText: {

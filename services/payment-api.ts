@@ -256,9 +256,9 @@ export function formatCurrency(amount: number, currency: string): string {
 export function getPaymentStatusColor(status: Payment['status']): string {
   switch (status) {
     case 'completed':
-      return '#0066CC'; // Emerald
+      return '#0D9488'; // Emerald
     case 'pending':
-      return '#0066CC'; // Emerald
+      return '#0D9488'; // Emerald
     case 'failed':
       return '#1A1A1A'; // Black
     case 'refunded':
@@ -348,9 +348,9 @@ export function getSubscriptionPlanLabel(plan: Subscription['plan']): string {
 export function getSubscriptionStatusColor(status: Subscription['status']): string {
   switch (status) {
     case 'active':
-      return '#0066CC'; // Emerald
+      return '#0D9488'; // Emerald
     case 'past_due':
-      return '#0066CC'; // Emerald
+      return '#0D9488'; // Emerald
     case 'cancelled':
     case 'unpaid':
       return '#1A1A1A'; // Black

@@ -68,10 +68,10 @@ export function MessageReactions({
                 styles.reactionBubble,
                 {
                   backgroundColor: reaction.hasReacted
-                    ? '#3b82f6'
+                    ? '#0D9488'
                     : backgroundColor,
                   borderColor: reaction.hasReacted
-                    ? '#3b82f6'
+                    ? '#0D9488'
                     : borderColor,
                 },
                 pressed && styles.reactionPressed,

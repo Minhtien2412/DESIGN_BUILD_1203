@@ -97,7 +97,7 @@ export default function DiaryListScreen() {
     return (
       <Container fullWidth>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#3b82f6" />
+          <ActivityIndicator size="large" color="#0D9488" />
           <Text style={styles.loadingText}>Đang tải nhật ký...</Text>
         </View>
       </Container>
@@ -120,7 +120,7 @@ export default function DiaryListScreen() {
           </View>
           <Link href={`/projects/${projectId}/diary/create`} asChild>
             <TouchableOpacity style={styles.addButton}>
-              <Ionicons name="add-circle" size={28} color="#3b82f6" />
+              <Ionicons name="add-circle" size={28} color="#0D9488" />
             </TouchableOpacity>
           </Link>
         </View>
@@ -156,7 +156,7 @@ export default function DiaryListScreen() {
                 label="Nhân công TB"
                 value={stats.avgDailyWorkforce}
                 subtitle="người/ngày"
-                gradientColors={['#3b82f6', '#0066CC']}
+                gradientColors={['#0D9488', '#0D9488']}
                 style={styles.statCard}
               />
               <MetricCard
@@ -172,7 +172,7 @@ export default function DiaryListScreen() {
                 label="Sự cố"
                 value={`${stats.resolvedIncidents}/${stats.totalIncidents}`}
                 subtitle="đã xử lý"
-                gradientColors={['#0066CC', '#d97706']}
+                gradientColors={['#0D9488', '#d97706']}
                 style={styles.statCard}
               />
             </ScrollView>
@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   filterButtonActive: {
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#0D9488',
   },
   filterText: {
     fontSize: 13,
@@ -318,7 +318,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   emptyButton: {
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#0D9488',
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 12,

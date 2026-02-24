@@ -52,7 +52,7 @@ export default function IncidentDetailScreen() {
                 router.push(`/safety/incidents/edit?id=${incident.id}`)
               }
             >
-              <Ionicons name="create" size={24} color="#0066CC" style={{ marginRight: 8 }} />
+              <Ionicons name="create" size={24} color="#0D9488" style={{ marginRight: 8 }} />
             </TouchableOpacity>
           ),
         }}
@@ -146,7 +146,7 @@ export default function IncidentDetailScreen() {
                   </View>
                 )}
                 {incident.lostWorkDays && incident.lostWorkDays > 0 && (
-                  <View style={[styles.medicalBadge, { backgroundColor: '#0066CC' }]}>
+                  <View style={[styles.medicalBadge, { backgroundColor: '#0D9488' }]}>
                     <Ionicons name="calendar" size={14} color="#FFF" />
                     <Text style={styles.medicalBadgeText}>{incident.lostWorkDays} ngày nghỉ</Text>
                   </View>
@@ -187,7 +187,7 @@ export default function IncidentDetailScreen() {
             <Text style={styles.sectionTitle}>Hành động khắc phục</Text>
             {incident.correctiveActions.map((action, index) => (
               <View key={index} style={styles.actionItem}>
-                <Ionicons name="checkmark-circle" size={20} color="#0066CC" />
+                <Ionicons name="checkmark-circle" size={20} color="#0D9488" />
                 <Text style={styles.actionItemText}>{action}</Text>
               </View>
             ))}
@@ -200,7 +200,7 @@ export default function IncidentDetailScreen() {
             <Text style={styles.sectionTitle}>Biện pháp phòng ngừa</Text>
             {incident.preventiveMeasures.map((measure, index) => (
               <View key={index} style={styles.actionItem}>
-                <Ionicons name="shield-checkmark" size={20} color="#0066CC" />
+                <Ionicons name="shield-checkmark" size={20} color="#0D9488" />
                 <Text style={styles.actionItemText}>{measure}</Text>
               </View>
             ))}
@@ -234,19 +234,19 @@ export default function IncidentDetailScreen() {
             )}
             {incident.environmentalImpact && (
               <View style={styles.additionalItem}>
-                <Ionicons name="leaf" size={18} color="#0066CC" />
+                <Ionicons name="leaf" size={18} color="#0D9488" />
                 <Text style={styles.additionalText}>Có tác động môi trường</Text>
               </View>
             )}
             {incident.osha300Required && (
               <View style={styles.additionalItem}>
-                <Ionicons name="document-text" size={18} color="#0066CC" />
+                <Ionicons name="document-text" size={18} color="#0D9488" />
                 <Text style={styles.additionalText}>Yêu cầu OSHA 300</Text>
               </View>
             )}
             {incident.regulatoryReported && (
               <View style={styles.additionalItem}>
-                <Ionicons name="shield" size={18} color="#0066CC" />
+                <Ionicons name="shield" size={18} color="#0D9488" />
                 <Text style={styles.additionalText}>Đã báo cáo cơ quan quản lý</Text>
               </View>
             )}
@@ -265,14 +265,14 @@ export default function IncidentDetailScreen() {
           <View style={styles.timeline}>
             <TimelineItem
               icon="create"
-              color="#0066CC"
+              color="#0D9488"
               title="Báo cáo"
               subtitle={`${incident.reportedBy} - ${new Date(incident.reportedAt).toLocaleString('vi-VN')}`}
             />
             {incident.investigatedBy && incident.investigationDate && (
               <TimelineItem
                 icon="search"
-                color="#0066CC"
+                color="#0D9488"
                 title="Điều tra"
                 subtitle={`${incident.investigatedBy} - ${new Date(incident.investigationDate).toLocaleString('vi-VN')}`}
               />
@@ -288,7 +288,7 @@ export default function IncidentDetailScreen() {
             {incident.closedBy && incident.closedAt && (
               <TimelineItem
                 icon="checkmark-circle"
-                color="#0066CC"
+                color="#0D9488"
                 title="Đóng"
                 subtitle={`${incident.closedBy} - ${new Date(incident.closedAt).toLocaleString('vi-VN')}`}
               />
@@ -349,9 +349,9 @@ function getSeverityColor(severity: IncidentSeverity): string {
     case IncidentSeverity.SERIOUS:
       return '#000000';
     case IncidentSeverity.MODERATE:
-      return '#0066CC';
+      return '#0D9488';
     case IncidentSeverity.MINOR:
-      return '#0066CC';
+      return '#0D9488';
     default:
       return '#999999';
   }
@@ -373,11 +373,11 @@ function getStatusColor(status: IncidentStatus): string {
     case IncidentStatus.REPORTED:
       return '#000000';
     case IncidentStatus.INVESTIGATING:
-      return '#0066CC';
+      return '#0D9488';
     case IncidentStatus.UNDER_REVIEW:
-      return '#0066CC';
+      return '#0D9488';
     case IncidentStatus.RESOLVED:
-      return '#0066CC';
+      return '#0D9488';
     case IncidentStatus.CLOSED:
       return '#999999';
     default:
@@ -601,11 +601,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   actionBox: {
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     padding: 12,
     borderRadius: 8,
     borderLeftWidth: 3,
-    borderLeftColor: '#0066CC',
+    borderLeftColor: '#0D9488',
   },
   actionText: {
     fontSize: 14,
@@ -613,11 +613,11 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   investigationBox: {
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     padding: 12,
     borderRadius: 8,
     borderLeftWidth: 3,
-    borderLeftColor: '#0066CC',
+    borderLeftColor: '#0D9488',
   },
   investigationText: {
     fontSize: 14,
@@ -627,7 +627,7 @@ const styles = StyleSheet.create({
   },
   investigationMeta: {
     fontSize: 12,
-    color: '#0066CC',
+    color: '#0D9488',
   },
   actionItem: {
     flexDirection: 'row',

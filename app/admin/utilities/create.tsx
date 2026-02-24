@@ -23,10 +23,10 @@ import {
 } from 'react-native';
 
 const UTILITY_TYPES = [
-  { id: 'CALCULATOR', name: 'Công cụ tính', icon: 'calculator', color: '#3B82F6' },
+  { id: 'CALCULATOR', name: 'Công cụ tính', icon: 'calculator', color: '#0D9488' },
   { id: 'AI', name: 'Trí tuệ nhân tạo', icon: 'sparkles', color: '#666666' },
   { id: 'MEDIA', name: 'Đa phương tiện', icon: 'film', color: '#000000' },
-  { id: 'DOCUMENT', name: 'Tài liệu', icon: 'document-text', color: '#0066CC' },
+  { id: 'DOCUMENT', name: 'Tài liệu', icon: 'document-text', color: '#0D9488' },
   { id: 'OTHER', name: 'Khác', icon: 'ellipsis-horizontal', color: '#6B7280' },
 ];
 
@@ -44,10 +44,10 @@ const ICON_OPTIONS = [
 ];
 
 const COLOR_OPTIONS = [
-  '#3B82F6',
+  '#0D9488',
   '#666666',
-  '#0066CC',
-  '#0066CC',
+  '#0D9488',
+  '#0D9488',
   '#000000',
   '#06B6D4',
   '#666666',
@@ -66,7 +66,7 @@ export default function CreateUtility() {
     name: '',
     type: '' as UtilityType | '',
     icon: 'calculator-outline',
-    color: '#3B82F6',
+    color: '#0D9488',
     description: '',
     route: '',
     enabled: true,

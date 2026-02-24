@@ -356,7 +356,7 @@ function BadgeTag({ text }: { text: string }) {
         marginRight: 6,
       }}
     >
-      <Text style={{ fontSize: 11, color: "#0066CC" }}>{text}</Text>
+      <Text style={{ fontSize: 11, color: "#0D9488" }}>{text}</Text>
     </View>
   );
 }
@@ -571,7 +571,7 @@ export default function ProductsCatalogScreen() {
         <Ionicons
           name={favorites[item.id] ? "heart" : "heart-outline"}
           size={18}
-          color={favorites[item.id] ? "#0066CC" : "#fff"}
+          color={favorites[item.id] ? "#0D9488" : "#fff"}
         />
       </TouchableOpacity>
 
@@ -632,7 +632,7 @@ export default function ProductsCatalogScreen() {
 
       {/* Header */}
       <LinearGradient
-        colors={["#0066CC", "#3399FF"]}
+        colors={["#0D9488", "#14B8A6"]}
         style={[styles.header, { paddingTop: insets.top + 8 }]}
       >
         <View style={styles.headerRow}>
@@ -737,7 +737,7 @@ export default function ProductsCatalogScreen() {
             <Ionicons
               name="filter"
               size={16}
-              color={showFilter ? "#0066CC" : "#666"}
+              color={showFilter ? "#0D9488" : "#666"}
             />
             <Text
               style={[styles.sortText, showFilter && styles.sortTextActive]}
@@ -756,7 +756,7 @@ export default function ProductsCatalogScreen() {
       {/* Loading State */}
       {loading && products.length === 0 && (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#0066CC" />
+          <ActivityIndicator size="large" color="#0D9488" />
           <Text style={styles.loadingText}>Đang tải sản phẩm...</Text>
         </View>
       )}
@@ -764,7 +764,7 @@ export default function ProductsCatalogScreen() {
       {/* Error State */}
       {error && products.length === 0 && !loading && (
         <View style={styles.errorContainer}>
-          <Ionicons name="alert-circle-outline" size={48} color="#0066CC" />
+          <Ionicons name="alert-circle-outline" size={48} color="#0D9488" />
           <Text style={styles.errorText}>{error}</Text>
           <TouchableOpacity
             style={styles.retryBtn}
@@ -797,7 +797,7 @@ export default function ProductsCatalogScreen() {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={onRefresh}
-              colors={["#EE4D2D"]}
+              colors={["#0D9488"]}
             />
           }
         />
@@ -968,8 +968,8 @@ const styles = StyleSheet.create({
     borderColor: "#e0e0e0",
   },
   categoryChipActive: {
-    backgroundColor: "#0066CC",
-    borderColor: "#0066CC",
+    backgroundColor: "#0D9488",
+    borderColor: "#0D9488",
   },
   categoryText: {
     fontSize: 14,
@@ -1006,14 +1006,14 @@ const styles = StyleSheet.create({
   },
   sortChipActive: {
     backgroundColor: "#fff0e8",
-    borderColor: "#0066CC",
+    borderColor: "#0D9488",
   },
   sortText: {
     fontSize: 13,
     color: "#666",
   },
   sortTextActive: {
-    color: "#0066CC",
+    color: "#0D9488",
     fontWeight: "600",
   },
   productsList: {
@@ -1063,7 +1063,7 @@ const styles = StyleSheet.create({
   discountText: {
     fontSize: 11,
     fontWeight: "700",
-    color: "#0066CC",
+    color: "#0D9488",
   },
   productInfo: {
     padding: 12,
@@ -1103,7 +1103,7 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 16,
     fontWeight: "700",
-    color: "#0066CC",
+    color: "#0D9488",
   },
   oldPrice: {
     fontSize: 12,
@@ -1119,7 +1119,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    backgroundColor: "#0066CC",
+    backgroundColor: "#0D9488",
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 16,
@@ -1228,7 +1228,7 @@ const styles = StyleSheet.create({
   },
   toggleBtnActive: {
     backgroundColor: "#fff0e8",
-    borderColor: "#0066CC",
+    borderColor: "#0D9488",
   },
   toggleText: {
     fontSize: 12,
@@ -1236,7 +1236,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   toggleTextActive: {
-    color: "#0066CC",
+    color: "#0D9488",
     fontWeight: "600",
   },
   filterFooter: {
@@ -1262,7 +1262,7 @@ const styles = StyleSheet.create({
   },
   applyBtn: {
     flex: 1,
-    backgroundColor: "#0066CC",
+    backgroundColor: "#0D9488",
     paddingVertical: 12,
     borderRadius: 22,
     alignItems: "center",
@@ -1299,7 +1299,7 @@ const styles = StyleSheet.create({
   },
   retryBtn: {
     marginTop: 16,
-    backgroundColor: "#0066CC",
+    backgroundColor: "#0D9488",
     paddingHorizontal: 24,
     paddingVertical: 10,
     borderRadius: 20,

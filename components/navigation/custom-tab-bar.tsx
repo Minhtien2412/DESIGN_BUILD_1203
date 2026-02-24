@@ -80,6 +80,12 @@ const TABS_CONFIG = [
     activeIcon: "home" as const,
   },
   {
+    name: "shop",
+    label: "Cửa hàng",
+    icon: "storefront-outline" as const,
+    activeIcon: "storefront" as const,
+  },
+  {
     name: "social",
     label: "Cộng đồng",
     icon: "people-outline" as const,
@@ -323,7 +329,7 @@ export function CustomTabBar({
           {
             paddingBottom: Platform.select({
               ios: insets.bottom > 0 ? insets.bottom : 12,
-              android: 12,
+              android: Math.max(insets.bottom, 12),
               default: 12,
             }),
           },
@@ -333,13 +339,13 @@ export function CustomTabBar({
         <View style={styles.topGlow} />
 
         <View style={styles.tabsContainer}>
-          {/* Left tabs (Home, Social) */}
+          {/* Left tabs (Home, Shop) */}
           {TABS_CONFIG.slice(0, 2).map((tab, index) => renderTab(tab, index))}
 
           {/* Center FAB Spacer */}
           <View style={styles.fabSpacer} />
 
-          {/* Right tabs (Projects, Profile) */}
+          {/* Right tabs (Social, Projects, Profile) */}
           {TABS_CONFIG.slice(2).map((tab, index) => renderTab(tab, index + 2))}
         </View>
       </LinearGradient>

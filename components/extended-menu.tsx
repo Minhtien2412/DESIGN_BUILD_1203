@@ -327,7 +327,7 @@ const styles = StyleSheet.create({
   categoryIndicator: {
     width: 4,
     height: 20,
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#0D9488',
     borderRadius: 2,
     marginRight: 12,
   },

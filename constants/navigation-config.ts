@@ -46,23 +46,23 @@ export const ROLE_THEMES = {
     tabBarInactiveTint: '#B2BEC3',
     headerBackground: '#FFFFFF',
     headerTint: '#000000',
-    accent: '#0066CC',
+    accent: '#0D9488',
   },
   user: {
-    primary: '#0066CC',
-    tabBarActiveTint: '#0066CC',
+    primary: '#0D9488',
+    tabBarActiveTint: '#0D9488',
     tabBarInactiveTint: '#B2BEC3',
-    headerBackground: '#0066CC',
+    headerBackground: '#0D9488',
     headerTint: '#FFFFFF',
-    accent: '#0066CC',
+    accent: '#0D9488',
   },
   employee: {
-    primary: '#0080FF',
-    tabBarActiveTint: '#0080FF',
+    primary: '#14B8A6',
+    tabBarActiveTint: '#14B8A6',
     tabBarInactiveTint: '#B2BEC3',
-    headerBackground: '#0080FF',
+    headerBackground: '#14B8A6',
     headerTint: '#FFFFFF',
-    accent: '#0066CC',
+    accent: '#0D9488',
   },
   admin: {
     primary: '#6C5CE7',
@@ -70,7 +70,7 @@ export const ROLE_THEMES = {
     tabBarInactiveTint: '#B2BEC3',
     headerBackground: '#6C5CE7',
     headerTint: '#FFFFFF',
-    accent: '#0066CC',
+    accent: '#0D9488',
   },
 };
 
@@ -514,22 +514,22 @@ export const getDrawerByRole = (role: UserRole): DrawerSection[] => {
 // ============================================================================
 
 export const USER_QUICK_ACTIONS = [
-  { id: 'shopping', title: 'Mua sắm', icon: 'cart-outline', route: '/shopping', color: '#0066CC' },
+  { id: 'shopping', title: 'Mua sắm', icon: 'cart-outline', route: '/shopping', color: '#0D9488' },
   { id: 'booking', title: 'Đặt lịch', icon: 'calendar-outline', route: '/construction/booking', color: '#666666' },
-  { id: 'progress', title: 'Tiến độ', icon: 'trending-up-outline', route: '/construction-progress', color: '#0066CC' },
-  { id: 'ai', title: 'Trợ lý AI', icon: 'sparkles-outline', route: '/ai', color: '#0066CC' },
+  { id: 'progress', title: 'Tiến độ', icon: 'trending-up-outline', route: '/construction-progress', color: '#0D9488' },
+  { id: 'ai', title: 'Trợ lý AI', icon: 'sparkles-outline', route: '/ai', color: '#0D9488' },
 ];
 
 export const EMPLOYEE_QUICK_ACTIONS = [
   { id: 'tasks', title: 'Nhiệm vụ', icon: 'checkbox-outline', route: '/projects', color: '#6C5CE7' },
-  { id: 'daily', title: 'Nhật ký', icon: 'today-outline', route: '/daily-report', color: '#0080FF' },
+  { id: 'daily', title: 'Nhật ký', icon: 'today-outline', route: '/daily-report', color: '#14B8A6' },
   { id: 'qa', title: 'QA/QC', icon: 'checkmark-circle-outline', route: '/quality-assurance', color: '#666666' },
   { id: 'messages', title: 'Tin nhắn', icon: 'chatbubbles-outline', route: '/messages', color: '#0984E3' },
 ];
 
 export const ADMIN_QUICK_ACTIONS = [
-  { id: 'analytics', title: 'Phân tích', icon: 'bar-chart-outline', route: '/analytics', color: '#0066CC' },
-  { id: 'products', title: 'Sản phẩm', icon: 'pricetag-outline', route: '/admin/products', color: '#0066CC' },
+  { id: 'analytics', title: 'Phân tích', icon: 'bar-chart-outline', route: '/analytics', color: '#0D9488' },
+  { id: 'products', title: 'Sản phẩm', icon: 'pricetag-outline', route: '/admin/products', color: '#0D9488' },
   { id: 'users', title: 'Users', icon: 'people-outline', route: '/admin/staff', color: '#6C5CE7' },
   { id: 'reports', title: 'Báo cáo', icon: 'document-text-outline', route: '/reports', color: '#A29BFE' },
 ];

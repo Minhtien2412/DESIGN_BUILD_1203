@@ -1,6 +1,6 @@
 import { hasPermission as checkRolePermission } from "@/constants/roles";
 import type { User as ApiUser } from "@/services/api/authApi";
-import authApi, { getCurrentUser } from "@/services/api/authApi";
+import authApi, { getCurrentUser, socialLogin } from "@/services/api/authApi";
 import {
     calculateExpiryTimestamp,
     clearTokens,
@@ -599,10 +599,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       //   console.warn('[AuthContext] Biometric clear failed:', bioError);
       // }
 
-      // 6. TODO: Close WebSocket connection when enabled
-      // socketManager.disconnect();
+      // 6. Close all WebSocket connections to prevent jwt expired reconnection loops
+      try {
+        const { socketManager } = await import("../services/socketManager");
+        socketManager.disconnect();
+        console.log("[AuthContext] Disconnected socketManager");
+      } catch (socketError) {
+        console.warn(
+          "[AuthContext] socketManager disconnect failed:",
+          socketError,
+        );
+      }
+      try {
+        const socketService = await import("../services/socket");
+        socketService.default.disconnect();
+        console.log("[AuthContext] Disconnected socket service");
+      } catch (socketError) {
+        console.warn(
+          "[AuthContext] socket service disconnect failed:",
+          socketError,
+        );
+      }
 
-      // 6. TODO: Clear message/notification caches when integrated
+      // 7. TODO: Clear message/notification caches when integrated
       // await deleteItem('messages');
       // await deleteItem('notifications');
 
@@ -641,8 +660,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  // Social authentication - Currently not implemented in backend API v2.0
-  // These are stub implementations that throw errors
+  // Social authentication — unified via POST /auth/social/login
   const signInWithGoogle = async () => {
     throw new Error(
       'Vui lòng sử dụng nút "Đăng nhập với Google" trên màn hình đăng nhập.',
@@ -650,59 +668,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signInWithGoogleCode = async (code: string) => {
-    try {
-      setState((prev) => ({ ...prev, loading: true }));
-
-      // Send authorization code to backend
-      const response = await authApi.post("/auth/google/code", { code });
-
-      if (response.accessToken && response.user) {
-        // Save tokens
-        await saveTokens({
-          accessToken: response.accessToken,
-          refreshToken: response.refreshToken,
-          expiresAt: calculateExpiryTimestamp(response.expiresIn || 3600),
-        });
-
-        // Update state with user
-        setState({
-          user: response.user,
-          loading: false,
-          isAuthenticated: true,
-        });
-      }
-    } catch (error: any) {
-      setState((prev) => ({ ...prev, loading: false }));
-      throw error;
-    }
+    // Authorization code flow not supported — backend expects id_token via /auth/social/login
+    throw new Error(
+      "Google code flow không được hỗ trợ. Hãy dùng signInWithGoogleToken hoặc signInWithGoogleAccessToken.",
+    );
   };
 
   const signInWithGoogleToken = async (
     credential: string,
-    clientId?: string,
+    _clientId?: string,
   ) => {
     try {
       setState((prev) => ({ ...prev, loading: true }));
 
-      // Send ID token to backend for verification
-      const response = await authApi.post("/auth/google/token", {
-        credential,
-        clientId,
+      // Send Google ID token to backend via unified social login endpoint
+      const response = await socialLogin({
+        provider: "GOOGLE",
+        token: credential,
       });
 
       if (response.accessToken && response.user) {
-        // Save tokens
+        const expiresAt = calculateExpiryTimestamp("30d");
         await saveTokens({
           accessToken: response.accessToken,
           refreshToken: response.refreshToken,
-          expiresAt: calculateExpiryTimestamp(response.expiresIn || 3600),
+          expiresAt,
         });
 
-        // Update state with user
+        const { setToken, setRefreshToken } = await import("../services/api");
+        setToken(response.accessToken);
+        setRefreshToken(response.refreshToken);
+
+        const user = mapUser(response.user);
         setState({
-          user: response.user,
+          user,
           loading: false,
           isAuthenticated: true,
+          accessToken: response.accessToken,
         });
       }
     } catch (error: any) {
@@ -715,24 +717,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       setState((prev) => ({ ...prev, loading: true }));
 
-      // Send Google access token to backend
-      const response = await authApi.post("/auth/google", {
+      // Send Google access token to backend via unified social login endpoint
+      const response = await socialLogin({
+        provider: "GOOGLE",
         token: accessToken,
       });
 
       if (response.accessToken && response.user) {
-        // Save tokens
+        const expiresAt = calculateExpiryTimestamp("30d");
         await saveTokens({
           accessToken: response.accessToken,
           refreshToken: response.refreshToken,
-          expiresAt: calculateExpiryTimestamp(response.expiresIn || 3600),
+          expiresAt,
         });
 
-        // Update state with user
+        const { setToken, setRefreshToken } = await import("../services/api");
+        setToken(response.accessToken);
+        setRefreshToken(response.refreshToken);
+
+        const user = mapUser(response.user);
         setState({
-          user: response.user,
+          user,
           loading: false,
           isAuthenticated: true,
+          accessToken: response.accessToken,
         });
       }
     } catch (error: any) {

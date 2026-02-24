@@ -390,7 +390,7 @@ export const getStatusLabel = (status: ProgressStatus): string => {
 export const getStatusColor = (status: ProgressStatus): string => {
   const colors: Record<ProgressStatus, string> = {
     [ProgressStatus.NOT_STARTED]: "#9CA3AF",
-    [ProgressStatus.IN_PROGRESS]: "#3B82F6",
+    [ProgressStatus.IN_PROGRESS]: "#0D9488",
     [ProgressStatus.COMPLETED]: "#10B981",
     [ProgressStatus.DELAYED]: "#EF4444",
     [ProgressStatus.ON_HOLD]: "#F59E0B",
@@ -411,7 +411,7 @@ export const getPriorityLabel = (priority: TaskPriority): string => {
 export const getPriorityColor = (priority: TaskPriority): string => {
   const colors: Record<TaskPriority, string> = {
     [TaskPriority.LOW]: "#9CA3AF",
-    [TaskPriority.MEDIUM]: "#3B82F6",
+    [TaskPriority.MEDIUM]: "#0D9488",
     [TaskPriority.HIGH]: "#F59E0B",
     [TaskPriority.CRITICAL]: "#EF4444",
   };

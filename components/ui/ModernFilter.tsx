@@ -23,7 +23,7 @@ const { width } = Dimensions.get("window");
 // COLORS
 // ============================================================================
 const COLORS = {
-  primary: "#FF6B35",
+  primary: "#14B8A6",
   primaryLight: "#FFF0EB",
   text: "#212121",
   textSecondary: "#757575",

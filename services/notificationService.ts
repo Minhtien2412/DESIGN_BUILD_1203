@@ -61,7 +61,7 @@ class NotificationService {
         name: "AI Notifications",
         importance: Notifications.AndroidImportance.MAX,
         vibrationPattern: [0, 250, 250, 250],
-        lightColor: "#3B82F6",
+        lightColor: "#0D9488",
       });
     }
 

@@ -135,7 +135,7 @@ export default function QuotationListScreen() {
       >
         {error && (
           <View style={styles.errorBanner}>
-            <Ionicons name="alert-circle" size={20} color="#0066CC" />
+            <Ionicons name="alert-circle" size={20} color="#0D9488" />
             <Text style={styles.errorText}>Server không khả dụng - Dùng dữ liệu demo</Text>
           </View>
         )}
@@ -329,7 +329,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   errorText: {
-    color: '#0066CC',
+    color: '#0D9488',
     fontSize: 13,
   },
   header: {

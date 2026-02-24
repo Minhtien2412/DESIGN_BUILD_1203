@@ -454,11 +454,11 @@ export default function FindContractorsScreen() {
             <Animated.View
               style={[
                 styles.errorBanner,
-                { backgroundColor: isDark ? "#1e3a5f" : "#dbeafe" },
+                { backgroundColor: isDark ? "#134E4A" : "#CCFBF1" },
                 { opacity: fadeAnim },
               ]}
             >
-              <Ionicons name="information-circle" size={18} color="#3b82f6" />
+              <Ionicons name="information-circle" size={18} color="#0D9488" />
               <Text style={styles.errorText}>
                 Server không khả dụng - Dùng dữ liệu demo
               </Text>
@@ -656,7 +656,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   errorText: {
-    color: "#3b82f6",
+    color: "#0D9488",
     fontSize: 13,
     fontWeight: "500",
   },

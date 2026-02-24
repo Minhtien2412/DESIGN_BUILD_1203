@@ -1,8 +1,15 @@
+import { GRADIENTS } from "@/constants/modern-ui-styles";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { get } from "@/services/api";
 import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
+import { LinearGradient } from "expo-linear-gradient";
 import { Stack, useRouter } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
 import {
+    Alert,
     Image,
+    RefreshControl,
     ScrollView,
     StyleSheet,
     Text,
@@ -100,6 +107,77 @@ export default function LoyaltyScreen() {
   const textColor = useThemeColor({}, "text");
   const cardBg = useThemeColor({}, "card");
   const router = useRouter();
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [info, setInfo] = useState(loyaltyInfo);
+  const [rewardList, setRewardList] = useState(rewards);
+  const [historyList, setHistoryList] = useState(history);
+  const [checkedIn, setCheckedIn] = useState(false);
+
+  const fetchLoyalty = useCallback(async () => {
+    try {
+      const res = await get("/api/loyalty");
+      if (res?.data) {
+        setInfo(res.data.info || loyaltyInfo);
+        setRewardList(res.data.rewards || rewards);
+        setHistoryList(res.data.history || history);
+      }
+    } catch {
+      /* use mock */
+    }
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    fetchLoyalty();
+  }, [fetchLoyalty]);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchLoyalty();
+    setRefreshing(false);
+  }, [fetchLoyalty]);
+
+  const handleCheckIn = useCallback(() => {
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    setCheckedIn(true);
+    setInfo((prev) => ({ ...prev, points: prev.points + 10 }));
+    Alert.alert("Điểm danh thành công! 🎉", "Bạn nhận được +10 điểm");
+  }, []);
+
+  const handleRedeem = useCallback(
+    (reward: (typeof rewards)[0]) => {
+      if (info.points < reward.points) {
+        Alert.alert(
+          "Không đủ điểm",
+          `Bạn cần ${reward.points - info.points} điểm nữa`,
+        );
+        return;
+      }
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      Alert.alert(
+        "Đổi quà",
+        `Xác nhận đổi ${reward.points} điểm lấy ${reward.name}?`,
+        [
+          { text: "Hủy" },
+          {
+            text: "Đổi ngay",
+            onPress: () => {
+              setInfo((prev) => ({
+                ...prev,
+                points: prev.points - reward.points,
+              }));
+              Alert.alert(
+                "Thành công! 🎁",
+                `Đã đổi ${reward.name}. Kiểm tra tại mục Voucher.`,
+              );
+            },
+          },
+        ],
+      );
+    },
+    [info.points],
+  );
 
   const formatPoints = (points: number) => points.toLocaleString("vi-VN");
 
@@ -107,38 +185,50 @@ export default function LoyaltyScreen() {
     <View style={[styles.container, { backgroundColor }]}>
       <Stack.Screen options={{ title: "Điểm thưởng", headerShown: true }} />
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#14B8A6"
+          />
+        }
+      >
         {/* Points Card */}
-        <View style={styles.pointsCard}>
+        <LinearGradient
+          colors={GRADIENTS.hero}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.pointsCard}
+        >
           <View style={styles.tierBadge}>
             <Ionicons name="diamond" size={20} color="#FFD700" />
-            <Text style={styles.tierText}>{loyaltyInfo.tier}</Text>
+            <Text style={styles.tierText}>{info.tier}</Text>
           </View>
 
           <Text style={styles.pointsLabel}>Điểm hiện có</Text>
-          <Text style={styles.pointsValue}>
-            {formatPoints(loyaltyInfo.points)}
-          </Text>
+          <Text style={styles.pointsValue}>{formatPoints(info.points)}</Text>
 
           <View style={styles.progressSection}>
             <View style={styles.progressLabels}>
-              <Text style={styles.progressText}>{loyaltyInfo.tier}</Text>
-              <Text style={styles.progressText}>{loyaltyInfo.nextTier}</Text>
+              <Text style={styles.progressText}>{info.tier}</Text>
+              <Text style={styles.progressText}>{info.nextTier}</Text>
             </View>
             <View style={styles.progressBar}>
               <View
                 style={[
                   styles.progressFill,
-                  { width: `${loyaltyInfo.tierProgress}%` },
+                  { width: `${info.tierProgress}%` },
                 ]}
               />
             </View>
             <Text style={styles.progressHint}>
-              Còn {formatPoints(loyaltyInfo.pointsToNextTier)} điểm để lên{" "}
-              {loyaltyInfo.nextTier}
+              Còn {formatPoints(info.pointsToNextTier)} điểm để lên{" "}
+              {info.nextTier}
             </Text>
           </View>
-        </View>
+        </LinearGradient>
 
         {/* Quick Actions */}
         <View style={[styles.section, { backgroundColor: cardBg }]}>
@@ -151,12 +241,24 @@ export default function LoyaltyScreen() {
                 Đổi quà
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.quickAction}>
-              <View style={[styles.quickIcon, { backgroundColor: "#E8F5E9" }]}>
-                <Ionicons name="calendar-outline" size={24} color="#4CAF50" />
+            <TouchableOpacity
+              style={styles.quickAction}
+              onPress={handleCheckIn}
+            >
+              <View
+                style={[
+                  styles.quickIcon,
+                  { backgroundColor: checkedIn ? "#C8E6C9" : "#E8F5E9" },
+                ]}
+              >
+                <Ionicons
+                  name={checkedIn ? "checkmark-circle" : "calendar-outline"}
+                  size={24}
+                  color="#4CAF50"
+                />
               </View>
               <Text style={[styles.quickLabel, { color: textColor }]}>
-                Điểm danh
+                {checkedIn ? "Đã điểm danh" : "Điểm danh"}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.quickAction}>
@@ -209,10 +311,10 @@ export default function LoyaltyScreen() {
                 <TouchableOpacity
                   style={[
                     styles.redeemBtn,
-                    loyaltyInfo.points < reward.points &&
-                      styles.redeemBtnDisabled,
+                    info.points < reward.points && styles.redeemBtnDisabled,
                   ]}
-                  disabled={loyaltyInfo.points < reward.points}
+                  disabled={info.points < reward.points}
+                  onPress={() => handleRedeem(reward)}
                 >
                   <Text style={styles.redeemBtnText}>Đổi</Text>
                 </TouchableOpacity>
@@ -233,19 +335,19 @@ export default function LoyaltyScreen() {
                   style={[
                     styles.tierCircle,
                     { borderColor: tier.color },
-                    tier.name === loyaltyInfo.tier && {
+                    tier.name === info.tier && {
                       backgroundColor: tier.color,
                     },
                   ]}
                 >
-                  {tier.name === loyaltyInfo.tier && (
+                  {tier.name === info.tier && (
                     <Ionicons name="checkmark" size={16} color="#fff" />
                   )}
                 </View>
                 <Text
                   style={[
                     styles.tierName,
-                    tier.name === loyaltyInfo.tier && {
+                    tier.name === info.tier && {
                       color: tier.color,
                       fontWeight: "bold",
                     },
@@ -309,13 +411,13 @@ export default function LoyaltyScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { flex: 1, backgroundColor: "#F8FAFB" },
   pointsCard: {
     margin: 16,
     padding: 24,
-    borderRadius: 16,
-    backgroundColor: "#FF6B35",
+    borderRadius: 24,
     alignItems: "center",
+    overflow: "hidden" as const,
   },
   tierBadge: {
     flexDirection: "row",
@@ -331,9 +433,10 @@ const styles = StyleSheet.create({
   pointsLabel: { color: "#fff", opacity: 0.9, fontSize: 14 },
   pointsValue: {
     color: "#fff",
-    fontSize: 42,
-    fontWeight: "bold",
+    fontSize: 48,
+    fontWeight: "800",
     marginVertical: 8,
+    letterSpacing: -1.5,
   },
   progressSection: { width: "100%", marginTop: 12 },
   progressLabels: { flexDirection: "row", justifyContent: "space-between" },
@@ -351,21 +454,31 @@ const styles = StyleSheet.create({
     fontSize: 12,
     textAlign: "center",
   },
-  section: { margin: 16, marginTop: 0, padding: 16, borderRadius: 12 },
+  section: {
+    margin: 16,
+    marginTop: 0,
+    padding: 16,
+    borderRadius: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
+  },
   sectionHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 16,
   },
-  sectionTitle: { fontSize: 18, fontWeight: "600" },
-  viewAll: { color: "#FF6B35", fontSize: 14 },
+  sectionTitle: { fontSize: 18, fontWeight: "700", letterSpacing: -0.3 },
+  viewAll: { color: "#0D9488", fontSize: 14 },
   quickActions: { flexDirection: "row", justifyContent: "space-around" },
   quickAction: { alignItems: "center" },
   quickIcon: {
     width: 56,
     height: 56,
-    borderRadius: 16,
+    borderRadius: 18,
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 8,
@@ -388,13 +501,13 @@ const styles = StyleSheet.create({
   },
   rewardPointsText: { color: "#666", fontSize: 12 },
   redeemBtn: {
-    backgroundColor: "#FF6B35",
+    backgroundColor: "#14B8A6",
     paddingHorizontal: 16,
-    paddingVertical: 6,
-    borderRadius: 4,
+    paddingVertical: 8,
+    borderRadius: 12,
   },
   redeemBtnDisabled: { backgroundColor: "#ccc" },
-  redeemBtnText: { color: "#fff", fontSize: 12, fontWeight: "500" },
+  redeemBtnText: { color: "#fff", fontSize: 13, fontWeight: "600" },
   tiersRow: { flexDirection: "row", justifyContent: "space-between" },
   tierItem: { alignItems: "center" },
   tierCircle: {
@@ -418,7 +531,7 @@ const styles = StyleSheet.create({
   historyIcon: {
     width: 40,
     height: 40,
-    borderRadius: 20,
+    borderRadius: 14,
     justifyContent: "center",
     alignItems: "center",
     marginRight: 12,

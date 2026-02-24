@@ -63,15 +63,15 @@ export function useIsDarkMode(): boolean {
  * Use useHomeColors() instead for dark mode support
  */
 export const LEGACY_COLORS = {
-  bg: "#F8F9FA",
+  bg: "#F0F4F8",
   white: "#FFFFFF",
-  primary: "#7CB342",
-  text: "#212121",
-  textLight: "#757575",
-  border: "#E0E0E0",
-  liveBadge: "#E53935",
-  chipBg: "#F5F5F5",
-  chipActiveBg: "#7CB342",
+  primary: "#0D9488",
+  text: "#1E293B",
+  textLight: "#64748B",
+  border: "#CBD5E1",
+  liveBadge: "#EF4444",
+  chipBg: "#E2E8F0",
+  chipActiveBg: "#0D9488",
   chipActiveText: "#FFFFFF",
 } as const;
 

@@ -128,10 +128,10 @@ export default function RatingReviewScreen() {
   const getRatingLabel = () => {
     switch (rating) {
       case 1: return { text: 'Rất tệ', color: '#000000' };
-      case 2: return { text: 'Tệ', color: '#0066CC' };
-      case 3: return { text: 'Bình thường', color: '#0066CC' };
-      case 4: return { text: 'Tốt', color: '#0066CC' };
-      case 5: return { text: 'Tuyệt vời', color: '#0066CC' };
+      case 2: return { text: 'Tệ', color: '#0D9488' };
+      case 3: return { text: 'Bình thường', color: '#0D9488' };
+      case 4: return { text: 'Tốt', color: '#0D9488' };
+      case 5: return { text: 'Tuyệt vời', color: '#0D9488' };
       default: return { text: 'Chọn đánh giá', color: '#6B7280' };
     }
   };
@@ -194,7 +194,7 @@ export default function RatingReviewScreen() {
                   <Ionicons
                     name={star <= (hoveredRating || rating) ? 'star' : 'star-outline'}
                     size={48}
-                    color={star <= (hoveredRating || rating) ? '#0066CC' : '#D1D5DB'}
+                    color={star <= (hoveredRating || rating) ? '#0D9488' : '#D1D5DB'}
                   />
                 </Animated.View>
               </TouchableOpacity>

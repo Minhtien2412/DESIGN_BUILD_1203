@@ -150,7 +150,7 @@ export default function DependenciesScreen() {
       <ScrollView style={styles.scrollView}>
         {/* Info Card */}
         <View style={styles.infoCard}>
-          <Ionicons name="information-circle" size={20} color="#0066CC" />
+          <Ionicons name="information-circle" size={20} color="#0D9488" />
           <View style={styles.infoContent}>
             <Text style={styles.infoTitle}>Về phụ thuộc công việc</Text>
             <Text style={styles.infoText}>
@@ -224,7 +224,7 @@ export default function DependenciesScreen() {
                     </View>
 
                     <View style={styles.arrow}>
-                      <Ionicons name="arrow-forward" size={20} color="#0066CC" />
+                      <Ionicons name="arrow-forward" size={20} color="#0D9488" />
                     </View>
 
                     <View style={styles.taskBox}>
@@ -242,13 +242,13 @@ export default function DependenciesScreen() {
                       <Ionicons
                         name="time-outline"
                         size={14}
-                        color={dependency.lagDays > 0 ? '#0066CC' : '#0066CC'}
+                        color={dependency.lagDays > 0 ? '#0D9488' : '#0D9488'}
                       />
                       <Text
                         style={[
                           styles.lagText,
                           {
-                            color: dependency.lagDays > 0 ? '#0066CC' : '#0066CC',
+                            color: dependency.lagDays > 0 ? '#0D9488' : '#0D9488',
                           },
                         ]}
                       >
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
   },
   filterChipActive: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   filterChipText: {
     fontSize: 13,
@@ -316,7 +316,7 @@ const styles = StyleSheet.create({
   infoCard: {
     flexDirection: 'row',
     gap: 12,
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     margin: 16,
     padding: 16,
     borderRadius: 8,
@@ -363,7 +363,7 @@ const styles = StyleSheet.create({
   typeBadge: {
     paddingHorizontal: 8,
     paddingVertical: 4,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     borderRadius: 4,
   },
   typeBadgeText: {
@@ -458,7 +458,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',

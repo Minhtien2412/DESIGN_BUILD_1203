@@ -1,11 +1,17 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { get } from "@/services/api";
 import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
+import * as Location from "expo-location";
 import { Stack, useRouter } from "expo-router";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
+    Alert,
     Dimensions,
     FlatList,
     Image,
+    Linking,
+    RefreshControl,
     ScrollView,
     StyleSheet,
     Text,
@@ -93,8 +99,52 @@ export default function NearbyScreen() {
   const router = useRouter();
   const [activeFilter, setActiveFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
+  const [items, setItems] = useState(nearbyItems);
+  const [locationName, setLocationName] = useState("Q.7");
 
-  const filteredItems = nearbyItems.filter((item) => {
+  const fetchNearby = useCallback(async () => {
+    try {
+      const res = await get("/api/nearby");
+      if (res?.data) setItems(res.data);
+    } catch {
+      /* mock */
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchNearby();
+  }, [fetchNearby]);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchNearby();
+    setRefreshing(false);
+  }, [fetchNearby]);
+
+  const requestLocation = useCallback(async () => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert("Quyền vị trí", "Vui lòng cấp quyền vị trí để tìm gần bạn");
+        return;
+      }
+      const loc = await Location.getCurrentPositionAsync({});
+      setLocationName(
+        `${loc.coords.latitude.toFixed(2)}°, ${loc.coords.longitude.toFixed(2)}°`,
+      );
+    } catch {
+      Alert.alert("Lỗi", "Không lấy được vị trí");
+    }
+  }, []);
+
+  const handleDirections = useCallback((item: (typeof nearbyItems)[0]) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    const q = encodeURIComponent(item.address);
+    Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${q}`);
+  }, []);
+
+  const filteredItems = items.filter((item) => {
     if (activeFilter !== "all" && item.type !== activeFilter) return false;
     if (
       searchQuery &&
@@ -163,7 +213,7 @@ export default function NearbyScreen() {
             <Text style={styles.reviewText}>({item.reviews})</Text>
           </View>
           <View style={styles.distanceBox}>
-            <Ionicons name="navigate-outline" size={12} color="#FF6B35" />
+            <Ionicons name="navigate-outline" size={12} color="#14B8A6" />
             <Text style={styles.distanceText}>{item.distance}</Text>
           </View>
         </View>
@@ -179,8 +229,11 @@ export default function NearbyScreen() {
         </View>
       </View>
 
-      <TouchableOpacity style={styles.directionBtn}>
-        <Ionicons name="navigate" size={20} color="#FF6B35" />
+      <TouchableOpacity
+        style={styles.directionBtn}
+        onPress={() => handleDirections(item)}
+      >
+        <Ionicons name="navigate" size={20} color="#14B8A6" />
       </TouchableOpacity>
     </TouchableOpacity>
   );
@@ -199,9 +252,9 @@ export default function NearbyScreen() {
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
-        <TouchableOpacity style={styles.locationBtn}>
-          <Ionicons name="location" size={18} color="#FF6B35" />
-          <Text style={styles.locationText}>Q.7</Text>
+        <TouchableOpacity style={styles.locationBtn} onPress={requestLocation}>
+          <Ionicons name="location" size={18} color="#14B8A6" />
+          <Text style={styles.locationText}>{locationName}</Text>
         </TouchableOpacity>
       </View>
 
@@ -239,14 +292,29 @@ export default function NearbyScreen() {
       </ScrollView>
 
       {/* Map Placeholder */}
-      <TouchableOpacity style={styles.mapPlaceholder}>
-        <Ionicons name="map" size={24} color="#FF6B35" />
+      <TouchableOpacity
+        style={styles.mapPlaceholder}
+        onPress={() => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          Linking.openURL(
+            "https://www.google.com/maps/search/vật+liệu+xây+dựng",
+          );
+        }}
+      >
+        <Ionicons name="map" size={24} color="#14B8A6" />
         <Text style={styles.mapText}>Xem trên bản đồ</Text>
       </TouchableOpacity>
 
       {/* Results */}
       <FlatList
         data={filteredItems}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#14B8A6"
+          />
+        }
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
@@ -262,7 +330,7 @@ export default function NearbyScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { flex: 1, backgroundColor: "#F8FAFB" },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -270,11 +338,11 @@ const styles = StyleSheet.create({
     marginBottom: 0,
     paddingHorizontal: 16,
     paddingVertical: 12,
-    borderRadius: 12,
+    borderRadius: 16,
   },
   searchInput: { flex: 1, marginLeft: 12, fontSize: 15 },
   locationBtn: { flexDirection: "row", alignItems: "center", marginLeft: 8 },
-  locationText: { color: "#FF6B35", fontSize: 13, marginLeft: 4 },
+  locationText: { color: "#0D9488", fontSize: 13, marginLeft: 4 },
   filterContainer: { maxHeight: 50, marginTop: 12 },
   filterContent: { paddingHorizontal: 16, gap: 8 },
   filterBtn: {
@@ -283,37 +351,44 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#FFFFFF",
     marginRight: 8,
     gap: 6,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
   },
-  filterBtnActive: { backgroundColor: "#FF6B35" },
-  filterText: { color: "#666", fontSize: 13 },
-  filterTextActive: { color: "#fff" },
+  filterBtnActive: { backgroundColor: "#0D9488", borderColor: "#0D9488" },
+  filterText: { color: "#6B7280", fontSize: 13, fontWeight: "500" },
+  filterTextActive: { color: "#fff", fontWeight: "600" },
   mapPlaceholder: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     margin: 16,
     padding: 16,
-    borderRadius: 12,
-    backgroundColor: "#FF6B3510",
+    borderRadius: 16,
+    backgroundColor: "#0D948815",
     gap: 8,
   },
-  mapText: { color: "#FF6B35", fontSize: 14, fontWeight: "500" },
+  mapText: { color: "#0D9488", fontSize: 14, fontWeight: "600" },
   listContent: { padding: 16, paddingTop: 0 },
   resultCount: { fontSize: 13, marginBottom: 12 },
   itemCard: {
     flexDirection: "row",
-    padding: 12,
-    borderRadius: 12,
+    padding: 14,
+    borderRadius: 16,
     marginBottom: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    elevation: 1,
   },
   itemImage: {
     width: 70,
     height: 70,
-    borderRadius: 10,
-    backgroundColor: "#f0f0f0",
+    borderRadius: 14,
+    backgroundColor: "#F3F4F6",
   },
   itemContent: { flex: 1, marginLeft: 12 },
   itemHeader: {
@@ -321,10 +396,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
-  itemName: { fontSize: 15, fontWeight: "600", flex: 1, marginRight: 8 },
+  itemName: {
+    fontSize: 15,
+    fontWeight: "700",
+    flex: 1,
+    marginRight: 8,
+    letterSpacing: -0.2,
+  },
   statusBadge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 10 },
   addressRow: { flexDirection: "row", alignItems: "center", marginTop: 4 },
-  addressText: { color: "#666", fontSize: 12, marginLeft: 4 },
+  addressText: { color: "#6B7280", fontSize: 12, marginLeft: 4 },
   infoRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -333,22 +414,22 @@ const styles = StyleSheet.create({
   },
   ratingBox: { flexDirection: "row", alignItems: "center" },
   ratingText: { fontSize: 12, fontWeight: "500", marginLeft: 3 },
-  reviewText: { fontSize: 11, color: "#999", marginLeft: 2 },
+  reviewText: { fontSize: 11, color: "#9CA3AF", marginLeft: 2 },
   distanceBox: { flexDirection: "row", alignItems: "center" },
-  distanceText: { fontSize: 12, color: "#FF6B35", marginLeft: 3 },
+  distanceText: { fontSize: 12, color: "#0D9488", marginLeft: 3 },
   tagsRow: { flexDirection: "row", marginTop: 8, gap: 6 },
   tag: {
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#F3F4F6",
     paddingHorizontal: 8,
     paddingVertical: 3,
-    borderRadius: 6,
+    borderRadius: 10,
   },
-  tagText: { fontSize: 10, color: "#666" },
+  tagText: { fontSize: 10, color: "#6B7280" },
   directionBtn: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "#FF6B3510",
+    backgroundColor: "#0D948815",
     justifyContent: "center",
     alignItems: "center",
     alignSelf: "center",

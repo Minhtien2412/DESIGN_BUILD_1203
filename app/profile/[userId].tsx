@@ -5,8 +5,8 @@
  */
 
 import {
-  ShopeeProductCard,
-  type ShopeeProduct,
+    ShopeeProductCard,
+    type ShopeeProduct,
 } from "@/components/shopping/ShopeeProductCard";
 import Avatar from "@/components/ui/avatar";
 import { apiFetch } from "@/services/api";
@@ -17,19 +17,19 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Stack, router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import {
-  ActivityIndicator,
-  Alert,
-  Animated,
-  Dimensions,
-  FlatList,
-  Linking,
-  Platform,
-  ScrollView,
-  Share,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Alert,
+    Animated,
+    Dimensions,
+    FlatList,
+    Linking,
+    Platform,
+    ScrollView,
+    Share,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -53,6 +53,32 @@ const COLORS = {
   offline: "#8E8E93",
   gradientStart: "#0068FF",
   gradientEnd: "#00C3FF",
+};
+
+// Role-based gradient colors for profile header
+const ROLE_GRADIENTS: Record<string, [string, string]> = {
+  SELLER: ["#F59E0B", "#F97316"],
+  CONTRACTOR: ["#0D9488", "#10B981"],
+  ARCHITECT: ["#6366F1", "#8B5CF6"],
+  DESIGNER: ["#EC4899", "#F472B6"],
+  ENGINEER: ["#0D9488", "#2DD4BF"],
+  WORKER: ["#10B981", "#34D399"],
+  ADMIN: ["#EF4444", "#F87171"],
+  CLIENT: ["#0068FF", "#00C3FF"],
+};
+
+const getRoleGradient = (role?: string): [string, string] =>
+  ROLE_GRADIENTS[role || ""] || [COLORS.gradientStart, COLORS.gradientEnd];
+
+const ROLE_LABELS: Record<string, string> = {
+  SELLER: "🏪 Người bán",
+  CONTRACTOR: "🏗️ Nhà thầu",
+  ARCHITECT: "📐 Kiến trúc sư",
+  DESIGNER: "🎨 Thiết kế",
+  ENGINEER: "⚙️ Kỹ sư",
+  WORKER: "🔨 Thợ thi công",
+  ADMIN: "🛡️ Quản trị viên",
+  CLIENT: "👤 Khách hàng",
 };
 
 export default function UserProfileScreen() {
@@ -275,7 +301,7 @@ export default function UserProfileScreen() {
       >
         {/* Header with Gradient */}
         <LinearGradient
-          colors={[COLORS.gradientStart, COLORS.gradientEnd]}
+          colors={getRoleGradient(user.role)}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.headerGradient}
@@ -358,6 +384,16 @@ export default function UserProfileScreen() {
 
             {/* Name & Status */}
             <Text style={styles.userName}>{user.name}</Text>
+            {/* Role badge */}
+            {user.role && (
+              <View style={styles.roleBadgeRow}>
+                <View style={styles.roleBadge}>
+                  <Text style={styles.roleBadgeText}>
+                    {ROLE_LABELS[user.role] || user.role}
+                  </Text>
+                </View>
+              </View>
+            )}
             <Text style={styles.userStatus}>
               {user.online ? "Đang hoạt động" : formatLastSeen(user.lastSeen)}
             </Text>
@@ -578,6 +614,55 @@ export default function UserProfileScreen() {
             </View>
           )}
         </View>
+
+        {/* Skills & Certifications */}
+        {((user as any).skills?.length > 0 ||
+          (user as any).certifications?.length > 0) && (
+          <View style={styles.infoSection}>
+            {(user as any).skills?.length > 0 && (
+              <>
+                <Text style={styles.sectionTitle}>Kỹ năng chuyên môn</Text>
+                <View style={styles.skillsWrap}>
+                  {(user as any).skills.map((skill: string, idx: number) => (
+                    <View key={idx} style={styles.skillChip}>
+                      <Ionicons
+                        name="checkmark-circle"
+                        size={12}
+                        color={COLORS.secondary}
+                      />
+                      <Text style={styles.skillText}>{skill}</Text>
+                    </View>
+                  ))}
+                </View>
+              </>
+            )}
+            {(user as any).certifications?.length > 0 && (
+              <>
+                <Text style={[styles.sectionTitle, { marginTop: 12 }]}>
+                  Chứng chỉ
+                </Text>
+                <View style={styles.skillsWrap}>
+                  {(user as any).certifications.map(
+                    (cert: string, idx: number) => (
+                      <View
+                        key={idx}
+                        style={[
+                          styles.skillChip,
+                          { backgroundColor: "#FEF3C7" },
+                        ]}
+                      >
+                        <Ionicons name="ribbon" size={12} color="#F59E0B" />
+                        <Text style={[styles.skillText, { color: "#92400E" }]}>
+                          {cert}
+                        </Text>
+                      </View>
+                    ),
+                  )}
+                </View>
+              </>
+            )}
+          </View>
+        )}
 
         {/* Stats Section - For Construction App & Sellers */}
         {((user as any).projects ||
@@ -1009,5 +1094,44 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 8,
+  },
+  // Role badge
+  roleBadgeRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: 6,
+    marginBottom: 2,
+  },
+  roleBadge: {
+    backgroundColor: "rgba(255,255,255,0.25)",
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  roleBadgeText: {
+    color: COLORS.white,
+    fontSize: 12,
+    fontWeight: "600",
+  },
+  // Skills & certifications
+  skillsWrap: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 6,
+    marginTop: 8,
+  },
+  skillChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    backgroundColor: "#E8F5E9",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 16,
+  },
+  skillText: {
+    fontSize: 12,
+    color: "#2E7D32",
+    fontWeight: "500",
   },
 });

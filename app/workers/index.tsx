@@ -5,27 +5,26 @@
  */
 
 import { ChipFilter, FilterModal, SortBar } from "@/components/ui/ModernFilter";
-import { useThemeColor } from "@/hooks/use-theme-color";
 import { LOCATIONS, useWorkerStats } from "@/hooks/useWorkerStats";
 import { useWorkersAPI } from "@/hooks/useWorkersAPI";
-import { Worker, WorkerType } from "@/services/workers.api";
+import { Worker } from "@/services/workers.api";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  ActivityIndicator,
-  Dimensions,
-  FlatList,
-  Image,
-  Modal,
-  RefreshControl,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Dimensions,
+    FlatList,
+    Image,
+    Modal,
+    RefreshControl,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -35,18 +34,20 @@ const { width } = Dimensions.get("window");
 // COLORS
 // ============================================================================
 const COLORS = {
-  primary: "#FF6B35",
-  primaryLight: "#FFF0EB",
-  success: "#4CAF50",
-  warning: "#FF9800",
-  danger: "#F44336",
-  text: "#212121",
-  textSecondary: "#757575",
-  border: "#E8E8E8",
-  background: "#F8F9FA",
+  primary: "#0D9488",
+  primaryLight: "#F0FDFA",
+  accent: "#0F766E",
+  accentLight: "#CCFBF1",
+  success: "#10B981",
+  warning: "#F59E0B",
+  danger: "#EF4444",
+  text: "#0F172A",
+  textSecondary: "#64748B",
+  border: "#E2E8F0",
+  background: "#F1F5F9",
   white: "#FFFFFF",
-  star: "#FFB800",
-  online: "#00C853",
+  star: "#F59E0B",
+  online: "#10B981",
 };
 
 // ============================================================================
@@ -148,7 +149,8 @@ const MOCK_WORKERS = [
     experience: 10,
     available: false,
     isOnline: false,
-    avatar: "https://ui-avatars.com/api/?name=Cuong&background=2196F3&color=fff",
+    avatar:
+      "https://ui-avatars.com/api/?name=Cuong&background=2196F3&color=fff",
     completedJobs: 489,
     location: "Bình Thạnh, TP.HCM",
     verified: true,
@@ -192,9 +194,15 @@ const WorkerCard = ({ worker, onPress, onCall, onBook }: WorkerCardProps) => (
 
       <View style={styles.cardInfo}>
         <View style={styles.nameRow}>
-          <Text style={styles.workerName} numberOfLines={1}>{worker.name}</Text>
+          <Text style={styles.workerName} numberOfLines={1}>
+            {worker.name}
+          </Text>
           {worker.verified && (
-            <Ionicons name="checkmark-circle" size={16} color={COLORS.primary} />
+            <Ionicons
+              name="checkmark-circle"
+              size={16}
+              color={COLORS.primary}
+            />
           )}
         </View>
         <Text style={styles.workerSpecialty}>
@@ -208,14 +216,18 @@ const WorkerCard = ({ worker, onPress, onCall, onBook }: WorkerCardProps) => (
         </View>
       </View>
 
-      <View style={[
-        styles.statusBadge,
-        worker.available ? styles.statusAvailable : styles.statusBusy
-      ]}>
-        <Text style={[
-          styles.statusText,
-          { color: worker.available ? COLORS.success : COLORS.danger }
-        ]}>
+      <View
+        style={[
+          styles.statusBadge,
+          worker.available ? styles.statusAvailable : styles.statusBusy,
+        ]}
+      >
+        <Text
+          style={[
+            styles.statusText,
+            { color: worker.available ? COLORS.success : COLORS.danger },
+          ]}
+        >
           {worker.available ? "Sẵn sàng" : "Bận"}
         </Text>
       </View>
@@ -224,30 +236,38 @@ const WorkerCard = ({ worker, onPress, onCall, onBook }: WorkerCardProps) => (
     {/* Footer */}
     <View style={styles.cardFooter}>
       <View style={styles.locationRow}>
-        <Ionicons name="location-outline" size={14} color={COLORS.textSecondary} />
-        <Text style={styles.location} numberOfLines={1}>{worker.location}</Text>
+        <Ionicons
+          name="location-outline"
+          size={14}
+          color={COLORS.textSecondary}
+        />
+        <Text style={styles.location} numberOfLines={1}>
+          {worker.location}
+        </Text>
       </View>
 
       <View style={styles.priceRow}>
-        <Text style={styles.price}>{worker.price.toLocaleString("vi-VN")}đ</Text>
+        <Text style={styles.price}>
+          {worker.price.toLocaleString("vi-VN")}đ
+        </Text>
         <Text style={styles.priceUnit}>/giờ</Text>
       </View>
     </View>
 
     {/* Actions */}
     <View style={styles.cardActions}>
-      <TouchableOpacity 
-        style={styles.callBtn} 
+      <TouchableOpacity
+        style={styles.callBtn}
         onPress={onCall}
         disabled={!worker.available}
       >
-        <Ionicons 
-          name="call-outline" 
-          size={18} 
-          color={worker.available ? COLORS.primary : COLORS.textSecondary} 
+        <Ionicons
+          name="call-outline"
+          size={18}
+          color={worker.available ? COLORS.primary : COLORS.textSecondary}
         />
       </TouchableOpacity>
-      <TouchableOpacity 
+      <TouchableOpacity
         style={[styles.bookBtn, !worker.available && styles.bookBtnDisabled]}
         onPress={onBook}
         disabled={!worker.available}
@@ -266,7 +286,9 @@ const WorkerCard = ({ worker, onPress, onCall, onBook }: WorkerCardProps) => (
 export default function WorkersScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { specialty: specialtyParam } = useLocalSearchParams<{ specialty?: string }>();
+  const { specialty: specialtyParam } = useLocalSearchParams<{
+    specialty?: string;
+  }>();
 
   // States
   const [searchQuery, setSearchQuery] = useState("");
@@ -279,7 +301,11 @@ export default function WorkersScreen() {
   const [refreshing, setRefreshing] = useState(false);
 
   // API Hooks
-  const { stats, loading: statsLoading, refresh: refreshStats } = useWorkerStats();
+  const {
+    stats,
+    loading: statsLoading,
+    refresh: refreshStats,
+  } = useWorkerStats();
   const {
     workers: apiWorkers,
     loading: workersLoading,
@@ -297,14 +323,15 @@ export default function WorkersScreen() {
 
   // Filter workers
   const filteredWorkers = useMemo(() => {
-    let workers = apiWorkers.length > 0 ? apiWorkers.map(normalizeWorker) : MOCK_WORKERS;
+    let workers =
+      apiWorkers.length > 0 ? apiWorkers.map(normalizeWorker) : MOCK_WORKERS;
 
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       workers = workers.filter(
         (w) =>
           w.name.toLowerCase().includes(q) ||
-          w.specialty.toLowerCase().includes(q)
+          w.specialty.toLowerCase().includes(q),
       );
     }
 
@@ -351,9 +378,9 @@ export default function WorkersScreen() {
     setSelectedSpecialty("all");
   };
 
-  const activeFilterCount = Object.values(filterValues).filter(
-    (v) => v && v !== "all"
-  ).length + (selectedSpecialty !== "all" ? 1 : 0);
+  const activeFilterCount =
+    Object.values(filterValues).filter((v) => v && v !== "all").length +
+    (selectedSpecialty !== "all" ? 1 : 0);
 
   return (
     <View style={styles.container}>
@@ -361,15 +388,20 @@ export default function WorkersScreen() {
 
       {/* Header */}
       <LinearGradient
-        colors={[COLORS.primary, "#FF8A5B"]}
+        colors={["#0D9488", "#0F766E", "#115E59"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
         style={[styles.header, { paddingTop: insets.top + 8 }]}
       >
         <View style={styles.headerRow}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={styles.backBtn}
+          >
             <Ionicons name="arrow-back" size={24} color={COLORS.white} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Tìm thợ</Text>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.locationBtn}
             onPress={() => setShowLocationModal(true)}
           >
@@ -390,11 +422,15 @@ export default function WorkersScreen() {
           />
           {searchQuery.length > 0 && (
             <TouchableOpacity onPress={() => setSearchQuery("")}>
-              <Ionicons name="close-circle" size={18} color={COLORS.textSecondary} />
+              <Ionicons
+                name="close-circle"
+                size={18}
+                color={COLORS.textSecondary}
+              />
             </TouchableOpacity>
           )}
           <View style={styles.searchDivider} />
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.filterBtn}
             onPress={() => setShowFilterModal(true)}
           >
@@ -436,7 +472,9 @@ export default function WorkersScreen() {
           renderItem={({ item }) => (
             <WorkerCard
               worker={item}
-              onPress={() => router.push(`/finishing/worker-profile/${item.id}` as any)}
+              onPress={() =>
+                router.push(`/finishing/worker-profile/${item.id}` as any)
+              }
               onCall={() => console.log("Call:", item.name)}
               onBook={() => router.push(`/booking/worker/${item.id}` as any)}
             />
@@ -509,13 +547,18 @@ export default function WorkersScreen() {
                   <Text
                     style={[
                       styles.locationOptionText,
-                      selectedLocation === loc && styles.locationOptionTextActive,
+                      selectedLocation === loc &&
+                        styles.locationOptionTextActive,
                     ]}
                   >
                     {loc}
                   </Text>
                   {selectedLocation === loc && (
-                    <Ionicons name="checkmark" size={20} color={COLORS.primary} />
+                    <Ionicons
+                      name="checkmark"
+                      size={20}
+                      color={COLORS.primary}
+                    />
                   )}
                 </TouchableOpacity>
               ))}
@@ -530,23 +573,43 @@ export default function WorkersScreen() {
 // Helper to normalize API worker
 function normalizeWorker(w: Worker) {
   const labels: Record<string, string> = {
-    EP_COC: "Ép cọc", DAO_DAT: "Đào đất", THO_XAY: "Thợ xây",
-    THO_DIEN: "Thợ điện", THO_NUOC: "Thợ nước", THO_SON: "Thợ sơn",
-    THO_MOC: "Thợ mộc", THO_HAN: "Thợ hàn", THO_GACH: "Thợ lát gạch",
-    THO_THACH_CAO: "Thợ thạch cao", THO_CAMERA: "Thợ camera",
+    EP_COC: "Ép cọc",
+    DAO_DAT: "Đào đất",
+    THO_XAY: "Thợ xây",
+    THO_DIEN: "Thợ điện",
+    THO_NUOC: "Thợ nước",
+    THO_SON: "Thợ sơn",
+    THO_MOC: "Thợ mộc",
+    THO_HAN: "Thợ hàn",
+    THO_GACH: "Thợ lát gạch",
+    THO_THACH_CAO: "Thợ thạch cao",
+    THO_CAMERA: "Thợ camera",
+    THO_SAT: "Thợ sắt",
+    THO_COFFA: "Thợ coffa",
+    NHAN_CONG: "Nhân công",
+    THO_LAM_CUA: "Thợ làm cửa",
+    THO_LAN_CAN: "Thợ lan can",
+    VAT_LIEU: "Vật liệu",
+    THO_DIEN_NUOC: "Thợ điện nước",
+    THO_NHOM_KINH: "Thợ nhôm kính",
+    KY_SU: "Kỹ sư",
+    GIAM_SAT: "Giám sát",
   };
+  const sid = w.workerType.toLowerCase().replace(/_/g, "-");
   return {
     id: w.id,
     name: w.name,
-    specialty: labels[w.workerType] || w.workerType,
-    specialtyId: w.workerType.toLowerCase().replace("_", "-"),
+    specialty: labels[w.workerType] || w.workerType.replace(/_/g, " "),
+    specialtyId: sid,
     rating: w.rating || 4.5,
     reviews: w.reviewCount || 0,
     price: w.dailyRate || 300000,
     experience: w.experience || 0,
     available: w.availability === "available",
     isOnline: w.availability !== "offline",
-    avatar: w.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(w.name)}&background=FF6B35&color=fff`,
+    avatar:
+      w.avatar ||
+      `https://ui-avatars.com/api/?name=${encodeURIComponent(w.name)}&background=0D9488&color=fff`,
     completedJobs: w.completedJobs || 0,
     location: w.location || "",
     verified: w.verified || false,
@@ -583,8 +646,9 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 20,
-    fontWeight: "700",
+    fontWeight: "800",
     color: COLORS.white,
+    letterSpacing: -0.3,
   },
   locationBtn: {
     flexDirection: "row",
@@ -648,12 +712,14 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     marginHorizontal: 16,
     marginBottom: 12,
-    borderRadius: 16,
+    borderRadius: 18,
     padding: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    shadowColor: "#0D9488",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
     elevation: 3,
   },
   cardHeader: {
@@ -690,7 +756,7 @@ const styles = StyleSheet.create({
   },
   workerName: {
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: "700",
     color: COLORS.text,
     flex: 1,
   },
@@ -789,7 +855,7 @@ const styles = StyleSheet.create({
   bookBtn: {
     flex: 1,
     height: 44,
-    borderRadius: 12,
+    borderRadius: 14,
     backgroundColor: COLORS.primary,
     alignItems: "center",
     justifyContent: "center",

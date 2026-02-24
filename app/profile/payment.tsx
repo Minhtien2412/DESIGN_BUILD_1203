@@ -156,17 +156,17 @@ export default function PaymentScreen() {
 
   const getTransactionColor = (type: Transaction['type']) => {
     switch (type) {
-      case 'deposit': return '#0066CC';
+      case 'deposit': return '#0D9488';
       case 'withdraw': return '#000000';
-      case 'payment': return '#0066CC';
+      case 'payment': return '#0D9488';
       case 'refund': return '#0891B2';
     }
   };
 
   const getStatusColor = (status: Transaction['status']) => {
     switch (status) {
-      case 'completed': return '#0066CC';
-      case 'pending': return '#0066CC';
+      case 'completed': return '#0D9488';
+      case 'pending': return '#0D9488';
       case 'failed': return '#000000';
     }
   };
@@ -364,8 +364,8 @@ export default function PaymentScreen() {
         {/* Quick Actions */}
         <View style={styles.quickActions}>
           <TouchableOpacity style={styles.quickActionButton} onPress={handleDeposit}>
-            <View style={[styles.quickActionIcon, { backgroundColor: '#E8F4FF' }]}>
-              <Ionicons name="add-circle" size={28} color="#3B82F6" />
+            <View style={[styles.quickActionIcon, { backgroundColor: '#F0FDFA' }]}>
+              <Ionicons name="add-circle" size={28} color="#0D9488" />
             </View>
             <Text style={styles.quickActionText}>Nạp tiền</Text>
           </TouchableOpacity>
@@ -379,14 +379,14 @@ export default function PaymentScreen() {
           
           <TouchableOpacity style={styles.quickActionButton}>
             <View style={[styles.quickActionIcon, { backgroundColor: '#D1FAE5' }]}>
-              <Ionicons name="receipt" size={28} color="#0066CC" />
+              <Ionicons name="receipt" size={28} color="#0D9488" />
             </View>
             <Text style={styles.quickActionText}>Lịch sử</Text>
           </TouchableOpacity>
           
           <TouchableOpacity style={styles.quickActionButton}>
             <View style={[styles.quickActionIcon, { backgroundColor: '#FEF3C7' }]}>
-              <Ionicons name="settings" size={28} color="#0066CC" />
+              <Ionicons name="settings" size={28} color="#0D9488" />
             </View>
             <Text style={styles.quickActionText}>Cài đặt</Text>
           </TouchableOpacity>
@@ -419,7 +419,7 @@ export default function PaymentScreen() {
                       <Text style={styles.methodName}>{method.name}</Text>
                       {method.isDefault && (
                         <View style={styles.defaultBadge}>
-                          <Ionicons name="checkmark-circle" size={12} color="#1E40AF" />
+                          <Ionicons name="checkmark-circle" size={12} color="#0F766E" />
                           <Text style={styles.defaultBadgeText}>Mặc định</Text>
                         </View>
                       )}
@@ -460,7 +460,7 @@ export default function PaymentScreen() {
         {/* Transaction History with Filters */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Ionicons name="time-outline" size={24} color="#0066CC" />
+            <Ionicons name="time-outline" size={24} color="#0D9488" />
             <Text style={styles.sectionTitle}>Lịch sử giao dịch</Text>
           </View>
 
@@ -483,7 +483,7 @@ export default function PaymentScreen() {
               style={[styles.filterChip, selectedTypeFilter === 'deposit' && styles.filterChipActive]}
               onPress={() => setSelectedTypeFilter('deposit')}
             >
-              <Ionicons name="arrow-down-circle" size={16} color={selectedTypeFilter === 'deposit' ? '#FFFFFF' : '#0066CC'} />
+              <Ionicons name="arrow-down-circle" size={16} color={selectedTypeFilter === 'deposit' ? '#FFFFFF' : '#0D9488'} />
               <Text style={[styles.filterText, selectedTypeFilter === 'deposit' && styles.filterTextActive]}>
                 Nạp tiền
               </Text>
@@ -501,7 +501,7 @@ export default function PaymentScreen() {
               style={[styles.filterChip, selectedTypeFilter === 'payment' && styles.filterChipActive]}
               onPress={() => setSelectedTypeFilter('payment')}
             >
-              <Ionicons name="card" size={16} color={selectedTypeFilter === 'payment' ? '#FFFFFF' : '#0066CC'} />
+              <Ionicons name="card" size={16} color={selectedTypeFilter === 'payment' ? '#FFFFFF' : '#0D9488'} />
               <Text style={[styles.filterText, selectedTypeFilter === 'payment' && styles.filterTextActive]}>
                 Thanh toán
               </Text>
@@ -536,7 +536,7 @@ export default function PaymentScreen() {
               style={[styles.filterChip, selectedStatusFilter === 'completed' && styles.filterChipActive]}
               onPress={() => setSelectedStatusFilter('completed')}
             >
-              <Ionicons name="checkmark-circle" size={16} color={selectedStatusFilter === 'completed' ? '#FFFFFF' : '#0066CC'} />
+              <Ionicons name="checkmark-circle" size={16} color={selectedStatusFilter === 'completed' ? '#FFFFFF' : '#0D9488'} />
               <Text style={[styles.filterText, selectedStatusFilter === 'completed' && styles.filterTextActive]}>
                 Hoàn thành
               </Text>
@@ -545,7 +545,7 @@ export default function PaymentScreen() {
               style={[styles.filterChip, selectedStatusFilter === 'pending' && styles.filterChipActive]}
               onPress={() => setSelectedStatusFilter('pending')}
             >
-              <Ionicons name="time" size={16} color={selectedStatusFilter === 'pending' ? '#FFFFFF' : '#0066CC'} />
+              <Ionicons name="time" size={16} color={selectedStatusFilter === 'pending' ? '#FFFFFF' : '#0D9488'} />
               <Text style={[styles.filterText, selectedStatusFilter === 'pending' && styles.filterTextActive]}>
                 Đang xử lý
               </Text>
@@ -606,7 +606,7 @@ export default function PaymentScreen() {
                         <Text 
                           style={[
                             styles.transactionAmount,
-                            { color: transaction.amount > 0 ? '#0066CC' : '#000000' }
+                            { color: transaction.amount > 0 ? '#0D9488' : '#000000' }
                           ]}
                         >
                           {transaction.amount > 0 ? '+' : ''}{formatCurrency(transaction.amount)}
@@ -625,7 +625,7 @@ export default function PaymentScreen() {
         {/* Security Notice */}
         <View style={styles.securityCard}>
           <View style={styles.securityHeader}>
-            <Ionicons name="shield-checkmark" size={20} color="#0066CC" />
+            <Ionicons name="shield-checkmark" size={20} color="#0D9488" />
             <Text style={styles.securityTitle}>Thanh toán an toàn</Text>
           </View>
           <Text style={styles.securityText}>
@@ -813,7 +813,7 @@ const styles = StyleSheet.create({
   defaultBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 12,
@@ -822,7 +822,7 @@ const styles = StyleSheet.create({
   defaultBadgeText: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#1E40AF',
+    color: '#0F766E',
   },
   methodDetails: {
     fontSize: 14,

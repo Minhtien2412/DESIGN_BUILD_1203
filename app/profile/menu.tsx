@@ -33,7 +33,7 @@ export default function ProfileMenuScreen() {
       title: "Thông tin cá nhân",
       description: "Quản lý thông tin và hồ sơ",
       route: "/profile/info",
-      color: "#3B82F6",
+      color: "#0D9488",
     },
     {
       icon: "create-outline",
@@ -47,14 +47,14 @@ export default function ProfileMenuScreen() {
       title: "Bảo mật",
       description: "Mật khẩu và xác thực",
       route: "/profile/security",
-      color: "#0066CC",
+      color: "#0D9488",
     },
     {
       icon: "card-outline",
       title: "Phương thức thanh toán",
       description: "Quản lý thẻ và ví điện tử",
       route: "/profile/payment-methods",
-      color: "#0066CC",
+      color: "#0D9488",
     },
     {
       icon: "notifications-outline",
@@ -72,7 +72,7 @@ export default function ProfileMenuScreen() {
       title: "Sản phẩm của tôi",
       description: "Quản lý sản phẩm đã đăng",
       route: "/profile/my-products",
-      color: "#0066CC",
+      color: "#0D9488",
     },
     {
       icon: "heart-outline",
@@ -124,14 +124,14 @@ export default function ProfileMenuScreen() {
       title: "Quyền truy cập",
       description: "Camera, vị trí, thông báo",
       route: "/profile/permissions",
-      color: "#0066CC",
+      color: "#0D9488",
     },
     {
       icon: "lock-closed-outline",
       title: "Bảo mật & Riêng tư",
       description: "Kiểm soát dữ liệu cá nhân",
       route: "/profile/privacy",
-      color: "#0066CC",
+      color: "#0D9488",
     },
   ];
 
@@ -141,7 +141,7 @@ export default function ProfileMenuScreen() {
       title: "Trợ giúp",
       description: "FAQ và hỗ trợ khách hàng",
       route: "/profile/help",
-      color: "#3B82F6",
+      color: "#0D9488",
     },
     {
       icon: "document-text-outline",

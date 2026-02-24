@@ -57,7 +57,7 @@ export function ProjectListExample() {
   if (loading && !projects) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color="#3B82F6" />
+        <ActivityIndicator size="large" color="#0D9488" />
         <Text style={styles.loadingText}>Đang tải dự án...</Text>
       </View>
     );
@@ -151,7 +151,7 @@ export function ProjectDetailExample({ projectId }: { projectId: string }) {
   if (loading && !project) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color="#3B82F6" />
+        <ActivityIndicator size="large" color="#0D9488" />
       </View>
     );
   }
@@ -263,7 +263,7 @@ export function CreateProjectExample() {
 
       {success && (
         <View style={styles.successBanner}>
-          <Ionicons name="checkmark-circle" size={20} color="#0066CC" />
+          <Ionicons name="checkmark-circle" size={20} color="#0D9488" />
           <Text style={styles.successText}>Đã tạo thành công!</Text>
         </View>
       )}
@@ -287,7 +287,7 @@ export function PerfexCustomersExample() {
   if (loading && !customers) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color="#3B82F6" />
+        <ActivityIndicator size="large" color="#0D9488" />
         <Text style={styles.loadingText}>Đang tải khách hàng...</Text>
       </View>
     );
@@ -398,7 +398,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     paddingHorizontal: 24,
     paddingVertical: 12,
-    backgroundColor: "#3B82F6",
+    backgroundColor: "#0D9488",
     borderRadius: 8,
   },
   retryText: {
@@ -425,10 +425,10 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   source_api: {
-    backgroundColor: "#0066CC",
+    backgroundColor: "#0D9488",
   },
   source_cache: {
-    backgroundColor: "#0066CC",
+    backgroundColor: "#0D9488",
   },
   source_mock: {
     backgroundColor: "#6B7280",
@@ -473,7 +473,7 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: "100%",
-    backgroundColor: "#3B82F6",
+    backgroundColor: "#0D9488",
   },
   progressText: {
     marginTop: 4,
@@ -504,7 +504,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   submitButton: {
-    backgroundColor: "#3B82F6",
+    backgroundColor: "#0D9488",
     padding: 16,
     borderRadius: 8,
     alignItems: "center",
@@ -575,7 +575,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 8,
     padding: 12,
-    backgroundColor: "#3B82F6",
+    backgroundColor: "#0D9488",
     borderRadius: 8,
   },
   refreshText: {
@@ -594,11 +594,11 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: "#0066CC",
+    backgroundColor: "#0D9488",
   },
   liveText: {
     fontSize: 12,
-    color: "#0066CC",
+    color: "#0D9488",
     fontWeight: "600",
   },
 

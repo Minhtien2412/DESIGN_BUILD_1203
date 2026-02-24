@@ -304,7 +304,7 @@ export default function ProjectManagementScreen() {
         <TouchableOpacity style={styles.navItem} onPress={() => router.push('/profile')}>
           <View style={styles.navActiveIndicator} />
           <Ionicons name="person" size={16} color="white" />
-          <Text style={[styles.navLabel, { color: '#0066CC' }]}>Trang cá nhân</Text>
+          <Text style={[styles.navLabel, { color: '#0D9488' }]}>Trang cá nhân</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -408,7 +408,7 @@ const styles = StyleSheet.create({
   progressPercent: {
     fontSize: 10,
     fontWeight: '700',
-    color: '#0066CC',
+    color: '#0D9488',
     marginLeft: 8,
   },
   progressBarBg: {
@@ -420,7 +420,7 @@ const styles = StyleSheet.create({
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     borderRadius: 50,
   },
   workflowContainer: {
@@ -454,12 +454,12 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   stepCircleCompleted: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   stepCircleCurrent: {
     backgroundColor: '#C4C4C4',
     borderWidth: 2,
-    borderColor: '#0066CC',
+    borderColor: '#0D9488',
   },
   stepNumber: {
     fontSize: 6,
@@ -529,7 +529,7 @@ const styles = StyleSheet.create({
     width: 16,
     height: 16,
     borderRadius: 8,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     position: 'absolute',
     top: 8,
     justifyContent: 'center',

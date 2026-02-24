@@ -1,9 +1,12 @@
 /**
- * Payment Service
+ * @deprecated Use `services/paymentService.ts` instead — this file is Stripe-only
+ * and not imported by any screen. Kept for barrel re-export compatibility.
+ *
+ * Payment Service (Stripe only)
  * Handles Stripe payment integration
  */
 
-import { apiClient } from './client';
+import { apiClient } from "./client";
 
 // ==================== TYPES ====================
 
@@ -71,28 +74,36 @@ export const paymentService = {
   /**
    * Create Payment Intent (one-time payment)
    */
-  async createPaymentIntent(data: CreatePaymentDto): Promise<PaymentIntentResponse> {
-    return apiClient.post<PaymentIntentResponse>('/payment/intent', data);
+  async createPaymentIntent(
+    data: CreatePaymentDto,
+  ): Promise<PaymentIntentResponse> {
+    return apiClient.post<PaymentIntentResponse>("/payment/intent", data);
   },
 
   /**
    * Confirm payment after client completes on Stripe
    */
   async confirmPayment(paymentIntentId: string): Promise<PaymentResponse> {
-    return apiClient.post<PaymentResponse>(`/payment/intent/${paymentIntentId}/confirm`);
+    return apiClient.post<PaymentResponse>(
+      `/payment/intent/${paymentIntentId}/confirm`,
+    );
   },
 
   /**
    * Create subscription (recurring payment)
    */
-  async createSubscription(data: CreateSubscriptionDto): Promise<SubscriptionResponse> {
-    return apiClient.post<SubscriptionResponse>('/payment/subscription', data);
+  async createSubscription(
+    data: CreateSubscriptionDto,
+  ): Promise<SubscriptionResponse> {
+    return apiClient.post<SubscriptionResponse>("/payment/subscription", data);
   },
 
   /**
    * Cancel subscription
    */
-  async cancelSubscription(subscriptionId: string): Promise<SubscriptionResponse> {
+  async cancelSubscription(
+    subscriptionId: string,
+  ): Promise<SubscriptionResponse> {
     return apiClient.delete(`/payment/subscription/${subscriptionId}`);
   },
 
@@ -109,21 +120,27 @@ export const paymentService = {
     if (params?.limit) queryParams.limit = String(params.limit);
     if (params?.status) queryParams.status = params.status;
 
-    return apiClient.get<PaymentHistory>('/payment/history', queryParams);
+    return apiClient.get<PaymentHistory>("/payment/history", queryParams);
   },
 
   /**
    * Get user subscriptions
    */
   async getSubscriptions(): Promise<SubscriptionResponse[]> {
-    return apiClient.get<SubscriptionResponse[]>('/payment/subscriptions');
+    return apiClient.get<SubscriptionResponse[]>("/payment/subscriptions");
   },
 
   /**
    * Refund payment
    */
-  async refundPayment(paymentId: string, data?: RefundDto): Promise<PaymentResponse> {
-    return apiClient.post<PaymentResponse>(`/payment/refund/${paymentId}`, data);
+  async refundPayment(
+    paymentId: string,
+    data?: RefundDto,
+  ): Promise<PaymentResponse> {
+    return apiClient.post<PaymentResponse>(
+      `/payment/refund/${paymentId}`,
+      data,
+    );
   },
 };
 

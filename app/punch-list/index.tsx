@@ -43,7 +43,7 @@ export default function PunchListScreen() {
   const getStatusColor = (status: PunchListStatus): { bg: string; text: string } => {
     const colors: Record<PunchListStatus, { bg: string; text: string }> = {
       DRAFT: { bg: '#F3F4F6', text: '#374151' },
-      SUBMITTED: { bg: '#E8F4FF', text: '#1E40AF' },
+      SUBMITTED: { bg: '#F0FDFA', text: '#0F766E' },
       IN_PROGRESS: { bg: '#FEF3C7', text: '#92400E' },
       COMPLETED: { bg: '#D1FAE5', text: '#065F46' },
       CLOSED: { bg: '#E5E7EB', text: '#6B7280' },
@@ -94,21 +94,21 @@ export default function PunchListScreen() {
             </ThemedText>
             <View style={styles.statsGrid}>
               <View style={[styles.statCard, { backgroundColor: cardBackground, borderColor }]}>
-                <Ionicons name="document-text-outline" size={24} color="#3B82F6" />
+                <Ionicons name="document-text-outline" size={24} color="#0D9488" />
                 <ThemedText style={styles.statValue}>{summary.totalLists}</ThemedText>
                 <ThemedText style={[styles.statLabel, { color: secondaryText }]}>
                   Total Lists
                 </ThemedText>
               </View>
               <View style={[styles.statCard, { backgroundColor: cardBackground, borderColor }]}>
-                <Ionicons name="list-outline" size={24} color="#0066CC" />
+                <Ionicons name="list-outline" size={24} color="#0D9488" />
                 <ThemedText style={styles.statValue}>{summary.totalItems}</ThemedText>
                 <ThemedText style={[styles.statLabel, { color: secondaryText }]}>
                   Total Items
                 </ThemedText>
               </View>
               <View style={[styles.statCard, { backgroundColor: cardBackground, borderColor }]}>
-                <Ionicons name="checkmark-circle-outline" size={24} color="#0066CC" />
+                <Ionicons name="checkmark-circle-outline" size={24} color="#0D9488" />
                 <ThemedText style={styles.statValue}>{summary.completionRate}%</ThemedText>
                 <ThemedText style={[styles.statLabel, { color: secondaryText }]}>
                   Completion Rate
@@ -195,7 +195,7 @@ export default function PunchListScreen() {
                             list.listType === 'FINAL'
                               ? '#FEE2E2'
                               : list.listType === 'SUBSTANTIAL_COMPLETION'
-                                ? '#E8F4FF'
+                                ? '#F0FDFA'
                                 : '#FEF3C7',
                         },
                       ]}
@@ -208,7 +208,7 @@ export default function PunchListScreen() {
                               list.listType === 'FINAL'
                                 ? '#991B1B'
                                 : list.listType === 'SUBSTANTIAL_COMPLETION'
-                                  ? '#1E40AF'
+                                  ? '#0F766E'
                                   : '#92400E',
                           },
                         ]}
@@ -255,19 +255,19 @@ export default function PunchListScreen() {
                   </View>
                   <View style={styles.statItem}>
                     <ThemedText style={styles.statItemLabel}>Open:</ThemedText>
-                    <ThemedText style={[styles.statItemValue, { color: '#3B82F6' }]}>
+                    <ThemedText style={[styles.statItemValue, { color: '#0D9488' }]}>
                       {list.openItems}
                     </ThemedText>
                   </View>
                   <View style={styles.statItem}>
                     <ThemedText style={styles.statItemLabel}>In Progress:</ThemedText>
-                    <ThemedText style={[styles.statItemValue, { color: '#0066CC' }]}>
+                    <ThemedText style={[styles.statItemValue, { color: '#0D9488' }]}>
                       {list.inProgressItems}
                     </ThemedText>
                   </View>
                   <View style={styles.statItem}>
                     <ThemedText style={styles.statItemLabel}>Completed:</ThemedText>
-                    <ThemedText style={[styles.statItemValue, { color: '#0066CC' }]}>
+                    <ThemedText style={[styles.statItemValue, { color: '#0D9488' }]}>
                       {list.completedItems}
                     </ThemedText>
                   </View>
@@ -282,10 +282,10 @@ export default function PunchListScreen() {
                         width: `${list.completionRate}%`,
                         backgroundColor:
                           list.completionRate === 100
-                            ? '#0066CC'
+                            ? '#0D9488'
                             : list.completionRate >= 50
-                              ? '#3B82F6'
-                              : '#0066CC',
+                              ? '#0D9488'
+                              : '#0D9488',
                       },
                     ]}
                   />
@@ -312,8 +312,8 @@ export default function PunchListScreen() {
                   )}
                   {list.criticalItems > 0 && (
                     <View style={styles.footerItem}>
-                      <Ionicons name="warning" size={14} color="#0066CC" />
-                      <ThemedText style={[styles.footerText, { color: '#0066CC' }]}>
+                      <Ionicons name="warning" size={14} color="#0D9488" />
+                      <ThemedText style={[styles.footerText, { color: '#0D9488' }]}>
                         {list.criticalItems} critical
                       </ThemedText>
                     </View>

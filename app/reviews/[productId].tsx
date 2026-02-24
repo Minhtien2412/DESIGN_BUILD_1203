@@ -31,8 +31,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // Shopee Colors
 const SHOPEE_COLORS = {
-  primary: "#EE4D2D",
-  primaryLight: "#FF6633",
+  primary: "#0D9488",
+  primaryLight: "#14B8A6",
   background: "#F5F5F5",
   surface: "#FFFFFF",
   text: "#000000",

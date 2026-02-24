@@ -134,8 +134,8 @@ export default function HomeConstructionScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={handleRefresh}
-            tintColor="#0066CC"
-            colors={['#0066CC']}
+            tintColor="#0D9488"
+            colors={['#0D9488']}
           />
         }
       >
@@ -182,7 +182,7 @@ export default function HomeConstructionScreen() {
                 onPress={() => navigateToRoute(service.route)}
               >
                 <View style={styles.serviceIcon}>
-                  <Ionicons name={service.icon as any} size={24} color="#0066CC" />
+                  <Ionicons name={service.icon as any} size={24} color="#0D9488" />
                 </View>
                 <Text style={styles.serviceTitle}>{service.title}</Text>
               </TouchableOpacity>
@@ -214,7 +214,7 @@ export default function HomeConstructionScreen() {
                 style={styles.utilityCard}
                 onPress={() => navigateToRoute(util.route)}
               >
-                <Ionicons name={util.icon as any} size={24} color="#0066CC" />
+                <Ionicons name={util.icon as any} size={24} color="#0D9488" />
                 <Text style={styles.utilityTitle}>{util.title}</Text>
                 <Text style={styles.utilityWorkers}>{util.workers} thợ</Text>
               </TouchableOpacity>
@@ -246,7 +246,7 @@ export default function HomeConstructionScreen() {
                       </View>
                     )}
                     <View style={styles.videoPlay}>
-                      <Ionicons name="play" size={28} color="#0066CC" />
+                      <Ionicons name="play" size={28} color="#0D9488" />
                     </View>
                   </View>
                 </View>
@@ -278,7 +278,7 @@ export default function HomeConstructionScreen() {
                 style={styles.utilityCard}
                 onPress={() => navigateToRoute(worker.route)}
               >
-                <Ionicons name={worker.icon as any} size={24} color="#0066CC" />
+                <Ionicons name={worker.icon as any} size={24} color="#0D9488" />
                 <Text style={styles.utilityTitle}>{worker.title}</Text>
                 <Text style={styles.utilityWorkers}>{worker.workers} thợ</Text>
               </TouchableOpacity>
@@ -302,7 +302,7 @@ export default function HomeConstructionScreen() {
                 onPress={() => navigateToRoute(category.route)}
               >
                 <View style={styles.shoppingIcon}>
-                  <Ionicons name={category.icon as any} size={24} color="#0066CC" />
+                  <Ionicons name={category.icon as any} size={24} color="#0D9488" />
                 </View>
                 <Text style={styles.shoppingTitle}>{category.title}</Text>
                 <Text style={styles.shoppingCount}>{category.count} SP</Text>
@@ -327,7 +327,7 @@ export default function HomeConstructionScreen() {
                 onPress={() => navigateToRoute(item.route)}
               >
                 <View style={styles.libraryIcon}>
-                  <Ionicons name={item.icon as any} size={24} color="#0066CC" />
+                  <Ionicons name={item.icon as any} size={24} color="#0D9488" />
                 </View>
                 <Text style={styles.libraryTitle}>{item.title}</Text>
                 <Text style={styles.libraryCount}>{item.count} mẫu</Text>
@@ -351,7 +351,7 @@ export default function HomeConstructionScreen() {
               onPress={() => navigateToRoute(service.route)}
             >
               <View style={styles.designIcon}>
-                <Ionicons name={service.icon as any} size={24} color="#0066CC" />
+                <Ionicons name={service.icon as any} size={24} color="#0D9488" />
               </View>
               <View style={styles.designInfo}>
                 <Text style={styles.designTitle}>{service.title}</Text>
@@ -372,9 +372,9 @@ export default function HomeConstructionScreen() {
             style={styles.allRoutesButton}
             onPress={() => navigateToRoute('/(tabs)/menu')}
           >
-            <Ionicons name="grid" size={24} color="#0066CC" />
+            <Ionicons name="grid" size={24} color="#0D9488" />
             <Text style={styles.allRoutesText}>Xem tất cả tiện ích</Text>
-            <Ionicons name="arrow-forward" size={24} color="#0066CC" />
+            <Ionicons name="arrow-forward" size={24} color="#0D9488" />
           </TouchableOpacity>
         </View>
 
@@ -438,7 +438,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 4,
     right: 4,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     borderRadius: 10,
     width: 20,
     height: 20,
@@ -467,7 +467,7 @@ const styles = StyleSheet.create({
   },
   viewAll: {
     fontSize: 13,
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: '600',
   },
   filterRow: {
@@ -572,7 +572,7 @@ const styles = StyleSheet.create({
     left: 8,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 4,
@@ -712,7 +712,7 @@ const styles = StyleSheet.create({
   priceText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   allRoutesButton: {
     flexDirection: 'row',
@@ -721,7 +721,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F8F8F8',
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#0066CC',
+    borderColor: '#0D9488',
     padding: 14,
     gap: 10,
   },
@@ -729,6 +729,6 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 15,
     fontWeight: '600',
-    color: '#0066CC',
+    color: '#0D9488',
   },
 });

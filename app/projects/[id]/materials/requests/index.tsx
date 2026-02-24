@@ -36,8 +36,8 @@ const STATUS_CONFIG: Record<RequestStatus, {
 };
 
 const URGENCY_CONFIG = {
-  low: { label: 'Thấp', color: '#0066CC' },
-  medium: { label: 'Trung bình', color: '#0066CC' },
+  low: { label: 'Thấp', color: '#0D9488' },
+  medium: { label: 'Trung bình', color: '#0D9488' },
   high: { label: 'Cao', color: '#000000' },
 };
 
@@ -126,7 +126,7 @@ export default function MaterialRequestsScreen() {
     return (
       <Container fullWidth>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#3b82f6" />
+          <ActivityIndicator size="large" color="#0D9488" />
           <Text style={styles.loadingText}>Đang tải yêu cầu...</Text>
         </View>
       </Container>
@@ -151,7 +151,7 @@ export default function MaterialRequestsScreen() {
             style={styles.addButton}
             onPress={() => router.push(`/projects/${projectId}/materials/requests/create`)}
           >
-            <Ionicons name="add-circle" size={28} color="#3b82f6" />
+            <Ionicons name="add-circle" size={28} color="#0D9488" />
           </TouchableOpacity>
         </View>
 
@@ -353,7 +353,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   filterChipActive: {
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#0D9488',
   },
   filterText: {
     fontSize: 13,
@@ -426,7 +426,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   approveButton: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   rejectButton: {
     backgroundColor: '#000000',
@@ -448,7 +448,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   emptyButton: {
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#0D9488',
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 12,

@@ -318,7 +318,7 @@ export default function PrivacyScreen() {
         {/* Data & Privacy */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Ionicons name="shield-checkmark-outline" size={24} color="#0066CC" />
+            <Ionicons name="shield-checkmark-outline" size={24} color="#0D9488" />
             <Text style={styles.sectionTitle}>Dữ liệu & quyền riêng tư</Text>
           </View>
           
@@ -352,7 +352,7 @@ export default function PrivacyScreen() {
         {/* Communication */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Ionicons name="chatbubbles-outline" size={24} color="#0066CC" />
+            <Ionicons name="chatbubbles-outline" size={24} color="#0D9488" />
             <Text style={styles.sectionTitle}>Giao tiếp</Text>
           </View>
           
@@ -532,11 +532,11 @@ const styles = StyleSheet.create({
     color: '#000000',
   },
   infoCard: {
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     borderRadius: 12,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#E8F4FF',
+    borderColor: '#F0FDFA',
   },
   infoHeader: {
     flexDirection: 'row',
@@ -547,7 +547,7 @@ const styles = StyleSheet.create({
   infoTitle: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#1E40AF',
+    color: '#0F766E',
   },
   infoText: {
     fontSize: 14,

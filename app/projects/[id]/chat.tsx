@@ -618,7 +618,7 @@ export default function TeamChatScreen() {
               <View
                 style={[
                   styles.mediaIconWrapper,
-                  { backgroundColor: "#3B82F6" },
+                  { backgroundColor: "#0D9488" },
                 ]}
               >
                 <Ionicons name="images" size={24} color="#fff" />

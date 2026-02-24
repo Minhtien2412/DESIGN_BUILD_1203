@@ -3,12 +3,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { Stack, useRouter } from "expo-router";
 import { useState } from "react";
 import {
-  Dimensions,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    Dimensions,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 const { width } = Dimensions.get("window");
@@ -169,7 +169,7 @@ export default function MaterialCompareScreen() {
           {comparedMaterials.map((material) => (
             <View key={material.id} style={styles.headerItem}>
               <View style={styles.productImagePlaceholder}>
-                <Ionicons name="layers-outline" size={32} color="#FF6B35" />
+                <Ionicons name="layers-outline" size={32} color="#14B8A6" />
               </View>
               <Text
                 style={[styles.productName, { color: textColor }]}
@@ -189,7 +189,7 @@ export default function MaterialCompareScreen() {
         {/* Price Comparison */}
         <View style={[styles.comparisonRow, { backgroundColor: cardBg }]}>
           <View style={styles.rowLabel}>
-            <Ionicons name="pricetag-outline" size={18} color="#FF6B35" />
+            <Ionicons name="pricetag-outline" size={18} color="#14B8A6" />
             <Text style={[styles.rowLabelText, { color: textColor }]}>Giá</Text>
           </View>
           {comparedMaterials.map((material) => (
@@ -291,23 +291,28 @@ export default function MaterialCompareScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { flex: 1, backgroundColor: "#F8FAFB" },
   selectorSection: { padding: 16 },
-  sectionTitle: { fontSize: 16, fontWeight: "600", marginBottom: 12 },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    marginBottom: 12,
+    letterSpacing: -0.3,
+  },
   selectorCard: {
     width: 100,
     padding: 12,
-    borderRadius: 12,
+    borderRadius: 16,
     marginRight: 12,
     alignItems: "center",
     position: "relative",
   },
-  selectorCardActive: { borderWidth: 2, borderColor: "#FF6B35" },
+  selectorCardActive: { borderWidth: 2, borderColor: "#0D9488" },
   selectorImagePlaceholder: {
     width: 50,
     height: 50,
-    borderRadius: 8,
-    backgroundColor: "#f0f0f0",
+    borderRadius: 12,
+    backgroundColor: "#F3F4F6",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -319,7 +324,7 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: "#FF6B35",
+    backgroundColor: "#0D9488",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -327,7 +332,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     padding: 16,
     marginHorizontal: 16,
-    borderRadius: 12,
+    borderRadius: 16,
   },
   headerLabel: { width: 80 },
   headerLabelText: { fontSize: 12, fontWeight: "600" },
@@ -335,16 +340,16 @@ const styles = StyleSheet.create({
   productImagePlaceholder: {
     width: 60,
     height: 60,
-    borderRadius: 12,
-    backgroundColor: "#FF6B3515",
+    borderRadius: 16,
+    backgroundColor: "#0D948815",
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 8,
   },
   productName: { fontSize: 12, fontWeight: "500", textAlign: "center" },
   ratingRow: { flexDirection: "row", alignItems: "center", marginTop: 4 },
-  ratingText: { fontSize: 11, color: "#666", marginLeft: 2 },
-  reviewsText: { fontSize: 10, color: "#999", marginLeft: 2 },
+  ratingText: { fontSize: 11, color: "#6B7280", marginLeft: 2 },
+  reviewsText: { fontSize: 10, color: "#9CA3AF", marginLeft: 2 },
   comparisonRow: {
     flexDirection: "row",
     paddingVertical: 12,
@@ -360,15 +365,20 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   rowLabelText: { fontSize: 13, fontWeight: "500" },
-  specLabel: { fontSize: 12, color: "#666" },
+  specLabel: { fontSize: 12, color: "#6B7280" },
   rowItem: {
     flex: 1,
     alignItems: "center",
     flexDirection: "row",
     justifyContent: "center",
   },
-  priceValue: { color: "#FF6B35", fontSize: 15, fontWeight: "bold" },
-  priceUnit: { color: "#999", fontSize: 11 },
+  priceValue: {
+    color: "#0D9488",
+    fontSize: 15,
+    fontWeight: "800",
+    letterSpacing: -0.3,
+  },
+  priceUnit: { color: "#9CA3AF", fontSize: 11 },
   specValue: { fontSize: 13 },
   actionsSection: {
     flexDirection: "row",
@@ -385,7 +395,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     gap: 8,
   },
-  actionBtnText: { color: "#666", fontSize: 14 },
+  actionBtnText: { color: "#6B7280", fontSize: 14 },
   cartSection: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -397,11 +407,16 @@ const styles = StyleSheet.create({
   addToCartBtn: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FF6B35",
+    backgroundColor: "#0D9488",
     paddingHorizontal: 16,
     paddingVertical: 10,
-    borderRadius: 20,
+    borderRadius: 16,
     gap: 6,
+    shadowColor: "#0D9488",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 3,
   },
-  addToCartText: { color: "#fff", fontSize: 13, fontWeight: "500" },
+  addToCartText: { color: "#fff", fontSize: 13, fontWeight: "600" },
 });

@@ -64,7 +64,7 @@ export function CallButton({
           width: buttonSize,
           height: buttonSize,
           borderRadius: buttonSize / 2,
-          backgroundColor: type === 'video' ? '#0EA5E9' : '#0066CC',
+          backgroundColor: type === 'video' ? '#0EA5E9' : '#0D9488',
         },
         pressed && styles.buttonPressed,
         style,

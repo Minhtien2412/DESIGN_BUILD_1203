@@ -55,11 +55,11 @@ export default function DefectsListScreen() {
       case 'OPEN':
         return '#000000';
       case 'IN_PROGRESS':
-        return '#0066CC';
+        return '#0D9488';
       case 'RESOLVED':
-        return '#0066CC';
+        return '#0D9488';
       case 'VERIFIED':
-        return '#0066CC';
+        return '#0D9488';
       case 'CLOSED':
         return '#999999';
       default:
@@ -72,7 +72,7 @@ export default function DefectsListScreen() {
       case 'CRITICAL':
         return '#D32F2F';
       case 'MAJOR':
-        return '#0066CC';
+        return '#0D9488';
       case 'MINOR':
         return '#FBC02D';
       case 'COSMETIC':
@@ -178,7 +178,7 @@ export default function DefectsListScreen() {
     <View style={styles.container}>
       {/* Stats Cards */}
       <View style={styles.statsContainer}>
-        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
+        <View style={[styles.statCard, { backgroundColor: '#F0FDFA' }]}>
           <Text style={styles.statNumber}>{stats.total}</Text>
           <Text style={styles.statLabel}>Tổng số lỗi</Text>
         </View>
@@ -186,8 +186,8 @@ export default function DefectsListScreen() {
           <Text style={[styles.statNumber, { color: '#000000' }]}>{stats.open}</Text>
           <Text style={styles.statLabel}>Chưa xử lý</Text>
         </View>
-        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
-          <Text style={[styles.statNumber, { color: '#0066CC' }]}>{stats.inProgress}</Text>
+        <View style={[styles.statCard, { backgroundColor: '#F0FDFA' }]}>
+          <Text style={[styles.statNumber, { color: '#0D9488' }]}>{stats.inProgress}</Text>
           <Text style={styles.statLabel}>Đang xử lý</Text>
         </View>
         <View style={[styles.statCard, { backgroundColor: '#FCE4EC' }]}>
@@ -321,7 +321,7 @@ const styles = StyleSheet.create({
   statNumber: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   statLabel: {
     fontSize: 11,
@@ -366,8 +366,8 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   filterChipActive: {
-    backgroundColor: '#0066CC',
-    borderColor: '#0066CC',
+    backgroundColor: '#0D9488',
+    borderColor: '#0D9488',
   },
   filterChipText: {
     fontSize: 13,

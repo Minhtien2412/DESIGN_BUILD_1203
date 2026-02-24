@@ -150,7 +150,7 @@ class PushNotificationService {
           name: "Messages",
           importance: Notifications.AndroidImportance.HIGH,
           vibrationPattern: [0, 250, 250, 250],
-          lightColor: "#3b82f6",
+          lightColor: "#0D9488",
           sound: "default",
         });
 
@@ -158,7 +158,7 @@ class PushNotificationService {
           name: "Calls",
           importance: Notifications.AndroidImportance.MAX,
           vibrationPattern: [0, 500, 250, 500],
-          lightColor: "#0066CC",
+          lightColor: "#0D9488",
           sound: "default",
         });
       }

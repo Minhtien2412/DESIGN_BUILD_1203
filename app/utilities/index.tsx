@@ -29,7 +29,7 @@ const COLORS = {
   text: '#0F172A',
   textSecondary: '#64748B',
   textMuted: '#94A3B8',
-  accent: '#0066CC', // Shopee Orange
+  accent: '#0D9488', // Shopee Orange
   border: '#E2E8F0',
 };
 
@@ -40,7 +40,7 @@ const MANAGEMENT_TOOLS = [
     label: 'Timeline',
     icon: 'git-network-outline',
     route: '/timeline/index',
-    color: '#3B82F6',
+    color: '#0D9488',
     desc: 'Quản lý dòng thời gian',
   },
   {
@@ -48,7 +48,7 @@ const MANAGEMENT_TOOLS = [
     label: 'Ngân sách',
     icon: 'wallet-outline',
     route: '/budget/index',
-    color: '#0066CC',
+    color: '#0D9488',
     desc: 'Quản lý chi phí',
   },
   {
@@ -72,7 +72,7 @@ const MANAGEMENT_TOOLS = [
     label: 'Tài liệu',
     icon: 'document-outline',
     route: '/documents/folders',
-    color: '#0066CC',
+    color: '#0D9488',
     desc: 'Quản lý văn bản',
   },
   {
@@ -115,10 +115,10 @@ const CONSTRUCTION_SERVICES = [
 
 // Tiện ích khác
 const OTHER_UTILITIES = [
-  { id: 'qr-scanner', label: 'Quét QR', icon: 'qr-code-outline', route: '/utilities/qr-scanner', color: '#3B82F6' },
+  { id: 'qr-scanner', label: 'Quét QR', icon: 'qr-code-outline', route: '/utilities/qr-scanner', color: '#0D9488' },
   { id: 'my-qr', label: 'QR của tôi', icon: 'qr-code', route: '/utilities/my-qr-code', color: '#666666' },
-  { id: 'schedule', label: 'Lịch công việc', icon: 'calendar-outline', route: '/utilities/schedule', color: '#0066CC' },
-  { id: 'history', label: 'Lịch sử', icon: 'time-outline', route: '/utilities/history', color: '#0066CC' },
+  { id: 'schedule', label: 'Lịch công việc', icon: 'calendar-outline', route: '/utilities/schedule', color: '#0D9488' },
+  { id: 'history', label: 'Lịch sử', icon: 'time-outline', route: '/utilities/history', color: '#0D9488' },
   { id: 'quote', label: 'Báo giá', icon: 'calculator-outline', route: '/utilities/quote-request', color: '#000000' },
   { id: 'cost', label: 'Ước lượng', icon: 'trending-up-outline', route: '/utilities/cost-estimator', color: '#06B6D4' },
   { id: 'store', label: 'Cửa hàng', icon: 'storefront-outline', route: '/utilities/store-locator', color: '#666666' },
@@ -255,7 +255,7 @@ export default function UtilitiesHubScreen() {
           onPress={() => router.push('/utilities/sitemap' as any)}
         >
           <LinearGradient
-            colors={['#0066CC', '#3399FF']}
+            colors={['#0D9488', '#14B8A6']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.sitemapGradient}
@@ -448,7 +448,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     ...Platform.select({
       ios: {
-        shadowColor: '#0066CC',
+        shadowColor: '#0D9488',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.2,
         shadowRadius: 8,

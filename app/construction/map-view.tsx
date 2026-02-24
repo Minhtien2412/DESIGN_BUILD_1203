@@ -247,7 +247,7 @@ export default function MapViewScreen() {
 
   const getMarkerColor = (progress: number) => {
     if (progress >= 90) return '#10B981'; // Green - Hoàn thiện
-    if (progress >= 50) return '#3B82F6'; // Blue - Đang thi công
+    if (progress >= 50) return '#0D9488'; // Blue - Đang thi công
     return '#F59E0B'; // Orange - Mới khởi công
   };
 
@@ -412,7 +412,7 @@ export default function MapViewScreen() {
             <Text style={styles.legendText}>Khởi công (&lt;50%)</Text>
           </View>
           <View style={styles.legendItem}>
-            <View style={[styles.legendDot, { backgroundColor: '#3B82F6' }]} />
+            <View style={[styles.legendDot, { backgroundColor: '#0D9488' }]} />
             <Text style={styles.legendText}>Đang thi công (50-90%)</Text>
           </View>
           <View style={styles.legendItem}>
@@ -616,7 +616,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 6,

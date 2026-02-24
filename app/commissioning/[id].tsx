@@ -80,21 +80,21 @@ export default function CommissioningDetailScreen() {
       case 'PLANNED':
         return '#9CA3AF';
       case 'IN_PROGRESS':
-        return '#0066CC';
+        return '#0D9488';
       case 'TESTING':
         return '#666666';
       case 'COMPLETED':
-        return '#0066CC';
+        return '#0D9488';
       case 'ON_HOLD':
         return '#6B7280';
       case 'FAILED':
         return '#000000';
       case 'PASSED':
-        return '#0066CC';
+        return '#0D9488';
       case 'NOT_STARTED':
         return '#9CA3AF';
       case 'CONDITIONAL_PASS':
-        return '#0066CC';
+        return '#0D9488';
       case 'RETEST_REQUIRED':
         return '#000000';
       default:
@@ -103,9 +103,9 @@ export default function CommissioningDetailScreen() {
   };
 
   const getProgressColor = (progress: number) => {
-    if (progress >= 100) return '#0066CC';
-    if (progress >= 50) return '#3B82F6';
-    return '#0066CC';
+    if (progress >= 100) return '#0D9488';
+    if (progress >= 50) return '#0D9488';
+    return '#0D9488';
   };
 
   const handleTestPress = (test: any) => {
@@ -192,11 +192,11 @@ export default function CommissioningDetailScreen() {
             <Text style={[styles.statLabel, { color: textMutedColor }]}>Total Systems</Text>
           </View>
           <View style={styles.statBox}>
-            <Text style={[styles.statValue, { color: '#3B82F6' }]}>{plan.totalTests || 0}</Text>
+            <Text style={[styles.statValue, { color: '#0D9488' }]}>{plan.totalTests || 0}</Text>
             <Text style={[styles.statLabel, { color: textMutedColor }]}>Total Tests</Text>
           </View>
           <View style={styles.statBox}>
-            <Text style={[styles.statValue, { color: '#0066CC' }]}>{plan.passedTests || 0}</Text>
+            <Text style={[styles.statValue, { color: '#0D9488' }]}>{plan.passedTests || 0}</Text>
             <Text style={[styles.statLabel, { color: textMutedColor }]}>Passed</Text>
           </View>
           <View style={styles.statBox}>
@@ -274,7 +274,7 @@ export default function CommissioningDetailScreen() {
 
                   <View style={styles.systemStats}>
                     <View style={styles.systemStat}>
-                      <Text style={[styles.systemStatValue, { color: '#3B82F6' }]}>
+                      <Text style={[styles.systemStatValue, { color: '#0D9488' }]}>
                         {system.totalTests || 0}
                       </Text>
                       <Text style={[styles.systemStatLabel, { color: textMutedColor }]}>
@@ -282,7 +282,7 @@ export default function CommissioningDetailScreen() {
                       </Text>
                     </View>
                     <View style={styles.systemStat}>
-                      <Text style={[styles.systemStatValue, { color: '#0066CC' }]}>
+                      <Text style={[styles.systemStatValue, { color: '#0D9488' }]}>
                         {system.passedTests || 0}
                       </Text>
                       <Text style={[styles.systemStatLabel, { color: textMutedColor }]}>

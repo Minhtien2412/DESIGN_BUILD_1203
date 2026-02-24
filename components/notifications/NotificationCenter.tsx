@@ -64,7 +64,7 @@ const NOTIFICATION_ICONS: Record<
   NotificationType,
   { name: string; color: string; bg: string }
 > = {
-  message: { name: "chatbubble", color: "#3B82F6", bg: "#DBEAFE" },
+  message: { name: "chatbubble", color: "#0D9488", bg: "#CCFBF1" },
   call_missed: { name: "call", color: "#EF4444", bg: "#FEE2E2" },
   call_incoming: { name: "call", color: "#10B981", bg: "#D1FAE5" },
   project_update: { name: "folder", color: "#F59E0B", bg: "#FEF3C7" },
@@ -571,7 +571,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: "#3B82F6",
+    backgroundColor: "#0D9488",
   },
   itemAvatar: {
     width: 48,

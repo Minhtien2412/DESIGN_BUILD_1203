@@ -51,7 +51,7 @@ function StaffCard({ staff, colors, onPress }: { staff: StaffMember; colors: any
             <Text style={[styles.staffPhone, { color: colors.textMuted }]}>📞 {staff.phonenumber}</Text>
           )}
         </View>
-        <View style={[styles.staffStatus, { backgroundColor: isActive ? '#0066CC' : '#000000' }]}>
+        <View style={[styles.staffStatus, { backgroundColor: isActive ? '#0D9488' : '#000000' }]}>
           <Text style={styles.staffStatusText}>{isActive ? 'Active' : 'Inactive'}</Text>
         </View>
       </View>

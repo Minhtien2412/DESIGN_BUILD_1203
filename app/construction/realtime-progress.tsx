@@ -25,7 +25,7 @@ import {
     StyleSheet,
     Text,
     TouchableOpacity,
-    View
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -37,7 +37,7 @@ import {
 import { useProgressWebSocket } from "@/context/ProgressWebSocketContext";
 import {
     useMultipleTasksProgress,
-    useProjectProgress
+    useProjectProgress,
 } from "@/hooks/useProgressSocket";
 
 const { width } = Dimensions.get("window");
@@ -237,8 +237,8 @@ const MOCK_PHASES: Phase[] = [
 // ============================================================================
 
 const COLORS = {
-  primary: "#EE4D2D",
-  secondary: "#0066CC",
+  primary: "#0D9488",
+  secondary: "#14B8A6",
   success: "#00BFA5",
   warning: "#FFB800",
   error: "#EF4444",
@@ -403,7 +403,7 @@ export default function RealTimeProgressDashboard() {
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
       {/* Header */}
-      <LinearGradient colors={["#0066CC", "#3399FF"]} style={styles.header}>
+      <LinearGradient colors={["#0D9488", "#14B8A6"]} style={styles.header}>
         <View style={styles.headerTop}>
           <TouchableOpacity
             onPress={() => router.back()}

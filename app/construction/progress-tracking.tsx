@@ -249,9 +249,9 @@ export default function ProgressTrackingScreen() {
   const getStatusColor = (status: Task["status"]) => {
     switch (status) {
       case "completed":
-        return "#0066CC";
+        return "#0D9488";
       case "in-progress":
-        return "#0066CC";
+        return "#0D9488";
       case "delayed":
         return "#000000";
       default:
@@ -286,7 +286,7 @@ export default function ProgressTrackingScreen() {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <LinearGradient colors={["#0066CC", "#3399FF"]} style={styles.header}>
+      <LinearGradient colors={["#0D9488", "#14B8A6"]} style={styles.header}>
         <View style={styles.headerTop}>
           <TouchableOpacity
             onPress={() => router.back()}
@@ -389,9 +389,9 @@ export default function ProgressTrackingScreen() {
                         {
                           backgroundColor:
                             phase.status === "completed"
-                              ? "#0066CC"
+                              ? "#0D9488"
                               : phase.status === "in-progress"
-                                ? "#0066CC"
+                                ? "#0D9488"
                                 : "#999999",
                         },
                       ]}
@@ -511,7 +511,7 @@ export default function ProgressTrackingScreen() {
                               <Ionicons
                                 name="document-text"
                                 size={14}
-                                color="#0066CC"
+                                color="#0D9488"
                               />
                               <Text style={styles.actionChipText}>Bản vẽ</Text>
                             </View>
@@ -521,7 +521,7 @@ export default function ProgressTrackingScreen() {
                               <Ionicons
                                 name="checkmark-circle"
                                 size={14}
-                                color="#0066CC"
+                                color="#0D9488"
                               />
                               <Text style={styles.actionChipText}>Báo cáo</Text>
                             </View>
@@ -531,7 +531,7 @@ export default function ProgressTrackingScreen() {
                               <Ionicons
                                 name="people"
                                 size={14}
-                                color="#0066CC"
+                                color="#0D9488"
                               />
                               <Text style={styles.actionChipText}>
                                 {task.workers} người
@@ -713,7 +713,7 @@ export default function ProgressTrackingScreen() {
                         <Ionicons
                           name="checkmark-circle"
                           size={16}
-                          color="#0066CC"
+                          color="#0D9488"
                         />
                         <Text style={styles.noteText}>{note}</Text>
                       </View>
@@ -751,7 +751,7 @@ export default function ProgressTrackingScreen() {
                     <Ionicons
                       name="document-text-outline"
                       size={24}
-                      color="#0066CC"
+                      color="#0D9488"
                     />
                     <Text style={styles.modalActionText}>Bản vẽ</Text>
                   </TouchableOpacity>
@@ -764,7 +764,7 @@ export default function ProgressTrackingScreen() {
                     <Ionicons
                       name="bar-chart-outline"
                       size={24}
-                      color="#0066CC"
+                      color="#0D9488"
                     />
                     <Text style={styles.modalActionText}>Báo cáo</Text>
                   </TouchableOpacity>
@@ -772,7 +772,7 @@ export default function ProgressTrackingScreen() {
                     style={styles.modalActionButton}
                     onPress={() => Alert.alert("Ghi chú", "Thêm ghi chú mới")}
                   >
-                    <Ionicons name="create-outline" size={24} color="#0066CC" />
+                    <Ionicons name="create-outline" size={24} color="#0D9488" />
                     <Text style={styles.modalActionText}>Ghi chú</Text>
                   </TouchableOpacity>
                 </View>
@@ -941,7 +941,7 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 2,
     borderLeftWidth: 3,
-    borderLeftColor: "#0066CC",
+    borderLeftColor: "#0D9488",
   },
   taskHeader: {
     marginBottom: 12,
@@ -1055,7 +1055,7 @@ const styles = StyleSheet.create({
   ganttPhaseTitle: {
     fontSize: 13,
     fontWeight: "600",
-    color: "#0066CC",
+    color: "#0D9488",
     marginTop: 16,
     marginBottom: 8,
   },
@@ -1207,11 +1207,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: "#fff5f0",
     borderWidth: 1,
-    borderColor: "#0066CC",
+    borderColor: "#0D9488",
   },
   modalActionText: {
     fontSize: 13,
     fontWeight: "600",
-    color: "#0066CC",
+    color: "#0D9488",
   },
 });

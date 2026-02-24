@@ -23,7 +23,7 @@ export default function SummaryCards({ items, columns = 2 }: SummaryCardsProps) 
   return (
     <View style={styles.container}>
       {items.map((item, index) => {
-        const iconColor = item.color || '#3B82F6';
+        const iconColor = item.color || '#0D9488';
         
         return (
           <View

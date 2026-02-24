@@ -100,6 +100,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#404040',
   },
   badgeLive: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
 });

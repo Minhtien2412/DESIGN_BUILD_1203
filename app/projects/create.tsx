@@ -331,7 +331,7 @@ export default function CreateProjectScreen() {
 
         {/* Info Box */}
         <View style={styles.infoBox}>
-          <Ionicons name="information-circle-outline" size={20} color="#0066CC" />
+          <Ionicons name="information-circle-outline" size={20} color="#0D9488" />
           <Text style={styles.infoText}>
             Các thông tin đánh dấu (*) là bắt buộc. Bạn có thể cập nhật thông tin sau khi
             tạo dự án.
@@ -472,7 +472,7 @@ const styles = StyleSheet.create({
   },
   infoBox: {
     flexDirection: 'row',
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     borderRadius: 8,
     padding: 12,
     gap: 8,
@@ -481,7 +481,7 @@ const styles = StyleSheet.create({
   infoText: {
     flex: 1,
     fontSize: 13,
-    color: '#0066CC',
+    color: '#0D9488',
     lineHeight: 18,
   },
   footer: {

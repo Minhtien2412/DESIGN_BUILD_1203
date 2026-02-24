@@ -184,7 +184,7 @@ export default function GanttChartScreen() {
   const getTaskColor = (status: string): string => {
     const colors: Record<string, string> = {
       not_started: '#6b7280',
-      in_progress: '#3b82f6',
+      in_progress: '#0D9488',
       testing: '#8b5cf6',
       awaiting_feedback: '#f59e0b',
       complete: '#22c55e',
@@ -395,7 +395,7 @@ export default function GanttChartScreen() {
           <Text style={[styles.legendText, { color: textColor }]}>Chưa bắt đầu</Text>
         </View>
         <View style={styles.legendItem}>
-          <View style={[styles.legendDot, { backgroundColor: '#3b82f6' }]} />
+          <View style={[styles.legendDot, { backgroundColor: '#0D9488' }]} />
           <Text style={[styles.legendText, { color: textColor }]}>Đang làm</Text>
         </View>
         <View style={styles.legendItem}>

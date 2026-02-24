@@ -17,8 +17,8 @@ const STATUS_CONFIG: Record<DefectStatus | ChecklistStatus, { label: string; col
   },
   IN_PROGRESS: {
     label: 'Đang xử lý',
-    color: '#0066CC',
-    backgroundColor: '#E8F4FF',
+    color: '#0D9488',
+    backgroundColor: '#F0FDFA',
   },
   RESOLVED: {
     label: 'Đã sửa',
@@ -28,7 +28,7 @@ const STATUS_CONFIG: Record<DefectStatus | ChecklistStatus, { label: string; col
   VERIFIED: {
     label: 'Đã kiểm tra',
     color: '#1976D2',
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
   },
   CLOSED: {
     label: 'Đã đóng',
@@ -43,8 +43,8 @@ const STATUS_CONFIG: Record<DefectStatus | ChecklistStatus, { label: string; col
   },
   PENDING_APPROVAL: {
     label: 'Chờ duyệt',
-    color: '#0066CC',
-    backgroundColor: '#E8F4FF',
+    color: '#0D9488',
+    backgroundColor: '#F0FDFA',
   },
   APPROVED: {
     label: 'Đã duyệt',

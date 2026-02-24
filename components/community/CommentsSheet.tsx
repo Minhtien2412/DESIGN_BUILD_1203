@@ -487,7 +487,7 @@ const CommentItem = memo(
     const getBadgeInfo = (badge?: string) => {
       switch (badge) {
         case "top_contributor":
-          return { label: "Top", color: "#FF6B35", bg: "#FFF3ED" };
+          return { label: "Top", color: "#14B8A6", bg: "#FFF3ED" };
         case "expert":
           return { label: "Chuyên gia", color: "#1877F2", bg: "#E7F3FF" };
         case "staff":
@@ -600,7 +600,7 @@ const CommentItem = memo(
             {/* Pinned indicator */}
             {comment.isPinned && (
               <View style={styles.pinnedBadge}>
-                <Ionicons name="pin" size={12} color="#FF6B35" />
+                <Ionicons name="pin" size={12} color="#14B8A6" />
                 <Text style={styles.pinnedText}>Đã ghim</Text>
               </View>
             )}
@@ -1378,7 +1378,7 @@ const styles = StyleSheet.create({
   },
   pinnedText: {
     fontSize: 11,
-    color: "#FF6B35",
+    color: "#14B8A6",
     fontWeight: "500",
   },
   // Stars

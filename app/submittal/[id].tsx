@@ -23,19 +23,19 @@ const ACTION_CODE_OPTIONS: { value: ActionCode; label: string; color: string; ic
   {
     value: ActionCode.NO_EXCEPTION,
     label: 'No Exception',
-    color: '#0066CC',
+    color: '#0D9488',
     icon: 'checkmark-circle',
   },
   {
     value: ActionCode.AS_NOTED,
     label: 'As Noted',
-    color: '#0066CC',
+    color: '#0D9488',
     icon: 'checkmark-circle-outline',
   },
   {
     value: ActionCode.REVISE_RESUBMIT,
     label: 'Revise & Resubmit',
-    color: '#0066CC',
+    color: '#0D9488',
     icon: 'refresh-circle',
   },
   {
@@ -47,15 +47,15 @@ const ACTION_CODE_OPTIONS: { value: ActionCode; label: string; color: string; ic
   {
     value: ActionCode.FOR_INFORMATION,
     label: 'For Information Only',
-    color: '#3B82F6',
+    color: '#0D9488',
     icon: 'information-circle',
   },
 ];
 
 const REVIEW_STATUS_COLORS: Record<ReviewStatus, string> = {
   PENDING: '#6B7280',
-  IN_PROGRESS: '#0066CC',
-  COMPLETED: '#0066CC',
+  IN_PROGRESS: '#0D9488',
+  COMPLETED: '#0D9488',
   OVERDUE: '#000000',
 };
 
@@ -72,7 +72,7 @@ export default function SubmittalDetailsScreen() {
   if (loading) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#3B82F6" />
+        <ActivityIndicator size="large" color="#0D9488" />
       </View>
     );
   }
@@ -162,12 +162,12 @@ export default function SubmittalDetailsScreen() {
                 {
                   backgroundColor:
                     submittal.status === 'APPROVED'
-                      ? '#0066CC'
+                      ? '#0D9488'
                       : submittal.status === 'REJECTED'
                       ? '#000000'
                       : submittal.status === 'UNDER_REVIEW'
-                      ? '#0066CC'
-                      : '#3B82F6',
+                      ? '#0D9488'
+                      : '#0D9488',
                 },
               ]}
             >
@@ -182,10 +182,10 @@ export default function SubmittalDetailsScreen() {
                       submittal.priority === 'CRITICAL'
                         ? '#000000'
                         : submittal.priority === 'URGENT'
-                        ? '#0066CC'
+                        ? '#0D9488'
                         : submittal.priority === 'HIGH'
-                        ? '#0066CC'
-                        : '#0066CC',
+                        ? '#0D9488'
+                        : '#0D9488',
                   },
                 ]}
               >
@@ -356,7 +356,7 @@ export default function SubmittalDetailsScreen() {
                               daysToReview && daysToReview < 0
                                 ? '#000000'
                                 : daysToReview && daysToReview < 3
-                                ? '#0066CC'
+                                ? '#0D9488'
                                 : '#1F2937',
                           },
                         ]}
@@ -390,12 +390,12 @@ export default function SubmittalDetailsScreen() {
                           {
                             backgroundColor:
                               reviewer.actionCode === 'NO_EXCEPTION'
-                                ? '#0066CC'
+                                ? '#0D9488'
                                 : reviewer.actionCode === 'REJECTED'
                                 ? '#000000'
                                 : reviewer.actionCode === 'REVISE_RESUBMIT'
-                                ? '#0066CC'
-                                : '#3B82F6',
+                                ? '#0D9488'
+                                : '#0D9488',
                           },
                         ]}
                       >
@@ -458,7 +458,7 @@ export default function SubmittalDetailsScreen() {
                 </Text>
               </View>
               <TouchableOpacity style={styles.downloadButton}>
-                <Ionicons name="download-outline" size={20} color="#3B82F6" />
+                <Ionicons name="download-outline" size={20} color="#0D9488" />
               </TouchableOpacity>
             </View>
           ))}
@@ -478,9 +478,9 @@ export default function SubmittalDetailsScreen() {
                   {
                     backgroundColor:
                       step.status === 'COMPLETED'
-                        ? '#0066CC'
+                        ? '#0D9488'
                         : step.status === 'IN_PROGRESS'
-                        ? '#0066CC'
+                        ? '#0D9488'
                         : step.status === 'SKIPPED'
                         ? '#9CA3AF'
                         : '#E5E7EB',
@@ -567,7 +567,7 @@ export default function SubmittalDetailsScreen() {
         )}
 
         <TouchableOpacity style={styles.actionBtn}>
-          <Ionicons name="download" size={20} color="#3B82F6" />
+          <Ionicons name="download" size={20} color="#0D9488" />
           <Text style={styles.actionBtnText}>Download Package</Text>
         </TouchableOpacity>
       </View>
@@ -649,7 +649,7 @@ export default function SubmittalDetailsScreen() {
                     </View>
                   ))}
                   <TouchableOpacity style={styles.addChangeBtn} onPress={addChangeField}>
-                    <Ionicons name="add-circle-outline" size={20} color="#3B82F6" />
+                    <Ionicons name="add-circle-outline" size={20} color="#0D9488" />
                     <Text style={styles.addChangeBtnText}>Add Change</Text>
                   </TouchableOpacity>
                 </>
@@ -1034,13 +1034,13 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   actionBtnPrimary: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#0D9488',
   },
   actionBtnSuccess: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   actionBtnWarning: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   actionBtnDanger: {
     backgroundColor: '#000000',
@@ -1132,14 +1132,14 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#3B82F6',
+    borderColor: '#0D9488',
     borderStyle: 'dashed',
     gap: 8,
   },
   addChangeBtnText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#3B82F6',
+    color: '#0D9488',
   },
   modalFooter: {
     flexDirection: 'row',
@@ -1165,7 +1165,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 14,
     borderRadius: 12,
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#0D9488',
     alignItems: 'center',
   },
   modalBtnPrimaryText: {

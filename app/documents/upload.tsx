@@ -29,8 +29,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 const { width } = Dimensions.get('window');
 
 const COLORS = {
-  primary: '#0066CC',
-  primaryLight: '#E8F4FF',
+  primary: '#0D9488',
+  primaryLight: '#F0FDFA',
   background: '#F5F5F5',
   card: '#FFFFFF',
   text: '#222222',

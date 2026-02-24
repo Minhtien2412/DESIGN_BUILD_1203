@@ -164,7 +164,7 @@ export default function JoinMeetingScreen() {
                 Cuộc họp đã được tìm thấy
               </Text>
             </View>
-            <Ionicons name="checkmark-circle" size={24} color="#0066CC" />
+            <Ionicons name="checkmark-circle" size={24} color="#0D9488" />
           </View>
         )}
 

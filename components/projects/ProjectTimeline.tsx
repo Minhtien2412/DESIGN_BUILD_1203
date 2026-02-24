@@ -117,19 +117,19 @@ export default function ProjectTimeline({ projectId, limit = 20 }: Props) {
   const getEventColor = (eventType: string) => {
     switch (eventType) {
       case 'checkin':
-        return '#0066CC';
+        return '#0D9488';
       case 'progress_update':
-        return '#0066CC';
+        return '#0D9488';
       case 'milestone_completed':
-        return '#0066CC';
+        return '#0D9488';
       case 'task_completed':
-        return '#0066CC';
+        return '#0D9488';
       case 'comment':
-        return '#0066CC';
+        return '#0D9488';
       case 'file_upload':
-        return '#0066CC';
+        return '#0D9488';
       case 'status_change':
-        return '#0066CC';
+        return '#0D9488';
       default:
         return colors.accent;
     }
@@ -236,21 +236,21 @@ export default function ProjectTimeline({ projectId, limit = 20 }: Props) {
                 styles.distanceBadge,
                 {
                   backgroundColor: item.metadata.is_within_range
-                    ? '#0066CC' + '20'
-                    : '#0066CC' + '20',
+                    ? '#0D9488' + '20'
+                    : '#0D9488' + '20',
                 },
               ]}
             >
               <Ionicons
                 name={item.metadata.is_within_range ? 'checkmark-circle' : 'warning'}
                 size={14}
-                color={item.metadata.is_within_range ? '#0066CC' : '#0066CC'}
+                color={item.metadata.is_within_range ? '#0D9488' : '#0D9488'}
               />
               <Text
                 style={[
                   styles.distanceText,
                   {
-                    color: item.metadata.is_within_range ? '#0066CC' : '#0066CC',
+                    color: item.metadata.is_within_range ? '#0D9488' : '#0D9488',
                   },
                 ]}
               >

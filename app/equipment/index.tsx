@@ -51,8 +51,8 @@ const FILTER_STATUS_CONFIG = [
     id: EquipmentStatus.IN_USE,
     label: "Đang sử dụng",
     icon: "construct" as const,
-    color: "#3B82F6",
-    gradient: ["#3B82F6", "#60A5FA"] as const,
+    color: "#0D9488",
+    gradient: ["#0D9488", "#2DD4BF"] as const,
   },
   {
     id: EquipmentStatus.MAINTENANCE,
@@ -307,7 +307,7 @@ export default function EquipmentListScreen() {
               <Ionicons
                 name="add-circle"
                 size={28}
-                color="#0066CC"
+                color="#0D9488"
                 style={{ marginRight: 8 }}
               />
             </TouchableOpacity>
@@ -332,8 +332,8 @@ export default function EquipmentListScreen() {
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statItem}>
-          <Ionicons name="construct" size={20} color="#3B82F6" />
-          <Text style={[styles.statValue, { color: "#3B82F6" }]}>
+          <Ionicons name="construct" size={20} color="#0D9488" />
+          <Text style={[styles.statValue, { color: "#0D9488" }]}>
             {inUseCount}
           </Text>
           <Text style={styles.statLabel}>Đang dùng</Text>
@@ -732,11 +732,11 @@ function AddEquipmentModal({
 function getStatusColor(status: EquipmentStatus): string {
   switch (status) {
     case EquipmentStatus.AVAILABLE:
-      return "#0066CC";
+      return "#0D9488";
     case EquipmentStatus.IN_USE:
-      return "#0066CC";
+      return "#0D9488";
     case EquipmentStatus.MAINTENANCE:
-      return "#0066CC";
+      return "#0D9488";
     case EquipmentStatus.REPAIR:
       return "#000000";
     case EquipmentStatus.RESERVED:
@@ -766,11 +766,11 @@ function getStatusLabel(status: EquipmentStatus): string {
 function getConditionColor(condition: EquipmentCondition): string {
   switch (condition) {
     case EquipmentCondition.EXCELLENT:
-      return "#0066CC";
+      return "#0D9488";
     case EquipmentCondition.GOOD:
-      return "#0066CC";
+      return "#0D9488";
     case EquipmentCondition.FAIR:
-      return "#0066CC";
+      return "#0D9488";
     case EquipmentCondition.POOR:
       return "#000000";
     case EquipmentCondition.CRITICAL:
@@ -794,11 +794,11 @@ function getConditionLabel(condition: EquipmentCondition): string {
 function getOwnershipColor(ownership: OwnershipType): string {
   switch (ownership) {
     case OwnershipType.OWNED:
-      return "#0066CC";
+      return "#0D9488";
     case OwnershipType.RENTED:
-      return "#0066CC";
+      return "#0D9488";
     case OwnershipType.LEASED:
-      return "#0066CC";
+      return "#0D9488";
     default:
       return "#666";
   }
@@ -1072,7 +1072,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   addButton: {
-    backgroundColor: "#0066CC",
+    backgroundColor: "#0D9488",
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
@@ -1141,8 +1141,8 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   typeChipActive: {
-    backgroundColor: "#0066CC",
-    borderColor: "#0066CC",
+    backgroundColor: "#0D9488",
+    borderColor: "#0D9488",
   },
   typeChipText: {
     fontSize: 12,
@@ -1199,7 +1199,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 14,
     borderRadius: 8,
-    backgroundColor: "#0066CC",
+    backgroundColor: "#0D9488",
     alignItems: "center",
   },
   createButtonText: {

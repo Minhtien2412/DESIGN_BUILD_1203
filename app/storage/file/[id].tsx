@@ -39,7 +39,7 @@ const getFileIcon = (
   if (mimeType.includes("pdf"))
     return { icon: "document-text", color: "#ef4444" };
   if (mimeType.includes("word") || mimeType.includes("document"))
-    return { icon: "document", color: "#2563eb" };
+    return { icon: "document", color: "#0D9488" };
   if (mimeType.includes("sheet") || mimeType.includes("excel"))
     return { icon: "grid", color: "#22c55e" };
   if (mimeType.includes("zip") || mimeType.includes("archive"))
@@ -228,8 +228,8 @@ export default function FileDetailScreen() {
         {/* Actions */}
         <View style={styles.actionsRow}>
           <TouchableOpacity style={styles.actionBtn} onPress={handleDownload}>
-            <View style={[styles.actionIcon, { backgroundColor: "#2563eb15" }]}>
-              <Ionicons name="download" size={24} color="#2563eb" />
+            <View style={[styles.actionIcon, { backgroundColor: "#0D948815" }]}>
+              <Ionicons name="download" size={24} color="#0D9488" />
             </View>
             <Text style={styles.actionText}>Tải xuống</Text>
           </TouchableOpacity>
@@ -282,7 +282,7 @@ export default function FileDetailScreen() {
           <View style={[styles.detailRow, { borderBottomWidth: 0 }]}>
             <Text style={styles.detailLabel}>Loại lưu trữ</Text>
             <View style={styles.storageBadge}>
-              <Ionicons name="cloud" size={14} color="#2563eb" />
+              <Ionicons name="cloud" size={14} color="#0D9488" />
               <Text style={styles.storageBadgeText}>Cloud</Text>
             </View>
           </View>
@@ -426,7 +426,7 @@ const styles = StyleSheet.create({
   storageBadge: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#2563eb15",
+    backgroundColor: "#0D948815",
     paddingHorizontal: MODERN_SPACING.sm,
     paddingVertical: 4,
     borderRadius: MODERN_RADIUS.full,
@@ -435,7 +435,7 @@ const styles = StyleSheet.create({
   storageBadgeText: {
     fontSize: 12,
     fontWeight: "600",
-    color: "#2563eb",
+    color: "#0D9488",
   },
 
   // Empty

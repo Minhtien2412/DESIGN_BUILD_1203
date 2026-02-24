@@ -1,10 +1,13 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { get } from "@/services/api";
 import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 import { Stack, useRouter } from "expo-router";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
     FlatList,
     Image,
+    RefreshControl,
     ScrollView,
     StyleSheet,
     Text,
@@ -67,6 +70,36 @@ export default function ReviewsScreen() {
   const cardBg = useThemeColor({}, "card");
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("Tất cả");
+  const [refreshing, setRefreshing] = useState(false);
+  const [reviewList, setReviewList] = useState(reviews);
+
+  const fetchReviews = useCallback(async () => {
+    try {
+      const res = await get("/api/reviews/my");
+      if (res?.data) setReviewList(res.data);
+    } catch {
+      /* mock */
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchReviews();
+  }, [fetchReviews]);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchReviews();
+    setRefreshing(false);
+  }, [fetchReviews]);
+
+  const handleLike = useCallback((id: string) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setReviewList((prev) =>
+      prev.map((r) =>
+        r.id === id ? { ...r, likes: r.likes + 1, helpful: true } : r,
+      ),
+    );
+  }, []);
 
   const renderStars = (rating: number) => {
     return (
@@ -132,10 +165,10 @@ export default function ReviewsScreen() {
           <Ionicons
             name={item.helpful ? "thumbs-up" : "thumbs-up-outline"}
             size={18}
-            color={item.helpful ? "#FF6B35" : "#666"}
+            color={item.helpful ? "#14B8A6" : "#666"}
           />
           <Text
-            style={[styles.actionText, item.helpful && { color: "#FF6B35" }]}
+            style={[styles.actionText, item.helpful && { color: "#0D9488" }]}
           >
             Hữu ích ({item.likes})
           </Text>
@@ -159,7 +192,7 @@ export default function ReviewsScreen() {
       />
 
       {/* Stats */}
-      <View style={[styles.statsCard, { backgroundColor: "#FF6B35" }]}>
+      <View style={[styles.statsCard, { backgroundColor: "#0D9488" }]}>
         <View style={styles.statItem}>
           <Text style={styles.statNumber}>23</Text>
           <Text style={styles.statLabel}>Đánh giá</Text>
@@ -200,11 +233,18 @@ export default function ReviewsScreen() {
 
       {/* Reviews List */}
       <FlatList
-        data={reviews}
+        data={reviewList}
         renderItem={renderReview}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#14B8A6"
+          />
+        }
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <Ionicons name="chatbubbles-outline" size={64} color="#ccc" />
@@ -217,34 +257,48 @@ export default function ReviewsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { flex: 1, backgroundColor: "#F8FAFB" },
   statsCard: {
     flexDirection: "row",
     margin: 16,
     padding: 20,
-    borderRadius: 12,
+    borderRadius: 20,
     justifyContent: "space-around",
   },
   statItem: { alignItems: "center" },
-  statNumber: { color: "#fff", fontSize: 28, fontWeight: "bold" },
+  statNumber: {
+    color: "#fff",
+    fontSize: 30,
+    fontWeight: "800",
+    letterSpacing: -0.5,
+  },
   statLabel: { color: "#fff", opacity: 0.9, fontSize: 13, marginTop: 4 },
   statDivider: { width: 1, backgroundColor: "rgba(255,255,255,0.3)" },
   tabsContainer: { paddingVertical: 4, paddingHorizontal: 16 },
   tab: { paddingVertical: 12, paddingHorizontal: 16 },
-  tabActive: { borderBottomWidth: 2, borderBottomColor: "#FF6B35" },
-  tabText: { color: "#666", fontSize: 14 },
-  tabTextActive: { color: "#FF6B35", fontWeight: "600" },
+  tabActive: { borderBottomWidth: 2, borderBottomColor: "#0D9488" },
+  tabText: { color: "#6B7280", fontSize: 14, fontWeight: "500" },
+  tabTextActive: { color: "#0D9488", fontWeight: "700" },
   listContent: { padding: 16 },
-  reviewCard: { borderRadius: 12, padding: 16, marginBottom: 12 },
+  reviewCard: {
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    elevation: 1,
+  },
   itemRow: { flexDirection: "row", marginBottom: 12 },
   itemImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 8,
-    backgroundColor: "#f0f0f0",
+    width: 64,
+    height: 64,
+    borderRadius: 14,
+    backgroundColor: "#F3F4F6",
   },
   itemInfo: { flex: 1, marginLeft: 12, justifyContent: "center" },
-  itemName: { fontSize: 15, fontWeight: "500" },
+  itemName: { fontSize: 15, fontWeight: "600", letterSpacing: -0.2 },
   itemSub: { color: "#666", fontSize: 13, marginTop: 2 },
   ratingRow: {
     flexDirection: "row",
@@ -254,14 +308,14 @@ const styles = StyleSheet.create({
   },
   starsRow: { flexDirection: "row", gap: 2 },
   dateText: { color: "#999", fontSize: 12 },
-  comment: { fontSize: 14, lineHeight: 22, marginBottom: 12 },
+  comment: { fontSize: 14, lineHeight: 22, marginBottom: 12, color: "#374151" },
   imagesRow: { marginBottom: 12 },
   reviewImage: {
     width: 80,
     height: 80,
-    borderRadius: 8,
+    borderRadius: 12,
     marginRight: 8,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#F3F4F6",
   },
   actionsRow: {
     flexDirection: "row",

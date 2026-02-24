@@ -63,9 +63,9 @@ export default function KPIDashboardScreen() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'ON_TRACK':
-        return '#0066CC';
+        return '#0D9488';
       case 'AT_RISK':
-        return '#0066CC';
+        return '#0D9488';
       case 'OFF_TRACK':
         return '#000000';
       default:
@@ -102,7 +102,7 @@ export default function KPIDashboardScreen() {
   const getTrendColor = (trend: string) => {
     switch (trend) {
       case 'UP':
-        return '#0066CC';
+        return '#0D9488';
       case 'DOWN':
         return '#000000';
       case 'STABLE':
@@ -222,7 +222,7 @@ export default function KPIDashboardScreen() {
   if (loading && kpis.length === 0) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#0066CC" />
+        <ActivityIndicator size="large" color="#0D9488" />
         <Text style={styles.loadingText}>Đang tải KPIs...</Text>
       </View>
     );
@@ -237,11 +237,11 @@ export default function KPIDashboardScreen() {
           <Text style={styles.statLabel}>Tổng KPI</Text>
         </View>
         <View style={[styles.statCard, { backgroundColor: '#E8F5E9' }]}>
-          <Text style={[styles.statValue, { color: '#0066CC' }]}>{stats.onTrack}</Text>
+          <Text style={[styles.statValue, { color: '#0D9488' }]}>{stats.onTrack}</Text>
           <Text style={styles.statLabel}>Đạt mục tiêu</Text>
         </View>
-        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
-          <Text style={[styles.statValue, { color: '#0066CC' }]}>{stats.atRisk}</Text>
+        <View style={[styles.statCard, { backgroundColor: '#F0FDFA' }]}>
+          <Text style={[styles.statValue, { color: '#0D9488' }]}>{stats.atRisk}</Text>
           <Text style={styles.statLabel}>Có rủi ro</Text>
         </View>
         <View style={[styles.statCard, { backgroundColor: '#F5F5F5' }]}>
@@ -261,7 +261,7 @@ export default function KPIDashboardScreen() {
             <Ionicons
               name={cat.icon as any}
               size={16}
-              color={selectedCategory === cat.value ? '#0066CC' : '#666'}
+              color={selectedCategory === cat.value ? '#0D9488' : '#666'}
             />
             <Text
               style={[
@@ -282,7 +282,7 @@ export default function KPIDashboardScreen() {
         renderItem={renderKPICard}
         contentContainerStyle={styles.listContent}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} colors={['#0066CC']} />
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} colors={['#0D9488']} />
         }
         ListEmptyComponent={
           <View style={styles.emptyState}>
@@ -349,16 +349,16 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   filterChipActive: {
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     borderBottomWidth: 2,
-    borderBottomColor: '#0066CC',
+    borderBottomColor: '#0D9488',
   },
   filterChipText: {
     fontSize: 13,
     color: '#666',
   },
   filterChipTextActive: {
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: '600',
   },
   listContent: {

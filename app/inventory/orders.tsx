@@ -24,11 +24,11 @@ const STATUS_LABELS: Record<OrderStatus, string> = {
 
 const STATUS_COLORS: Record<OrderStatus, string> = {
   [OrderStatus.DRAFT]: '#999999',
-  [OrderStatus.PENDING]: '#0066CC',
-  [OrderStatus.APPROVED]: '#0066CC',
+  [OrderStatus.PENDING]: '#0D9488',
+  [OrderStatus.APPROVED]: '#0D9488',
   [OrderStatus.ORDERED]: '#666666',
-  [OrderStatus.PARTIALLY_RECEIVED]: '#0066CC',
-  [OrderStatus.RECEIVED]: '#0066CC',
+  [OrderStatus.PARTIALLY_RECEIVED]: '#0D9488',
+  [OrderStatus.RECEIVED]: '#0D9488',
   [OrderStatus.CANCELLED]: '#000000',
 };
 
@@ -220,7 +220,7 @@ export default function OrdersScreen() {
                       style={styles.approveButton}
                       onPress={() => handleApprove(order.id, order.orderNo)}
                     >
-                      <Ionicons name="checkmark-circle-outline" size={16} color="#0066CC" />
+                      <Ionicons name="checkmark-circle-outline" size={16} color="#0D9488" />
                       <Text style={styles.approveButtonText}>Duyệt</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
@@ -240,7 +240,7 @@ export default function OrdersScreen() {
                       router.push(`/inventory/order-detail?orderId=${order.id}&projectId=${projectId}` as Href)
                     }
                   >
-                    <Ionicons name="eye-outline" size={16} color="#0066CC" />
+                    <Ionicons name="eye-outline" size={16} color="#0D9488" />
                     <Text style={styles.viewButtonText}>Xem chi tiết</Text>
                   </TouchableOpacity>
                 )}
@@ -253,7 +253,7 @@ export default function OrdersScreen() {
                       router.push(`/inventory/order-detail?orderId=${order.id}&projectId=${projectId}` as Href)
                     }
                   >
-                    <Ionicons name="download-outline" size={16} color="#0066CC" />
+                    <Ionicons name="download-outline" size={16} color="#0D9488" />
                     <Text style={styles.receiveButtonText}>Nhận hàng</Text>
                   </TouchableOpacity>
                 )}
@@ -313,7 +313,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   filterChipActive: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   filterChipText: {
     fontSize: 13,
@@ -341,7 +341,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     paddingHorizontal: 20,
     paddingVertical: 10,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     borderRadius: 8,
   },
   emptyButtonText: {
@@ -425,7 +425,7 @@ const styles = StyleSheet.create({
   totalValue: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   actions: {
     flexDirection: 'row',
@@ -439,13 +439,13 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingVertical: 8,
     borderWidth: 1,
-    borderColor: '#0066CC',
+    borderColor: '#0D9488',
     borderRadius: 6,
   },
   approveButtonText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   cancelButton: {
     flex: 1,
@@ -471,13 +471,13 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingVertical: 8,
     borderWidth: 1,
-    borderColor: '#0066CC',
+    borderColor: '#0D9488',
     borderRadius: 6,
   },
   viewButtonText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   receiveButton: {
     flex: 1,
@@ -486,7 +486,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 6,
     paddingVertical: 8,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     borderRadius: 6,
   },
   receiveButtonText: {
@@ -510,7 +510,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 4,

@@ -23,19 +23,19 @@ const CATEGORY_CONFIG: Record<
 > = {
   CEMENT: { label: "Xi măng", icon: "cube", color: "#666666" },
   STEEL: { label: "Thép", icon: "git-network", color: "#1A1A1A" },
-  SAND: { label: "Cát", icon: "water", color: "#0066CC" },
+  SAND: { label: "Cát", icon: "water", color: "#0D9488" },
   GRAVEL: { label: "Đá", icon: "shapes", color: "#999999" },
-  BRICK: { label: "Gạch", icon: "grid", color: "#0066CC" },
-  TILE: { label: "Gạch lát", icon: "apps", color: "#0066CC" },
-  PAINT: { label: "Sơn", icon: "color-palette", color: "#0066CC" },
-  WOOD: { label: "Gỗ", icon: "file-tray-stacked", color: "#0066CC" },
-  ELECTRICAL: { label: "Điện", icon: "flash", color: "#0066CC" },
-  PLUMBING: { label: "Nước", icon: "water-outline", color: "#0066CC" },
-  TOOLS: { label: "Dụng cụ", icon: "construct", color: "#0066CC" },
+  BRICK: { label: "Gạch", icon: "grid", color: "#0D9488" },
+  TILE: { label: "Gạch lát", icon: "apps", color: "#0D9488" },
+  PAINT: { label: "Sơn", icon: "color-palette", color: "#0D9488" },
+  WOOD: { label: "Gỗ", icon: "file-tray-stacked", color: "#0D9488" },
+  ELECTRICAL: { label: "Điện", icon: "flash", color: "#0D9488" },
+  PLUMBING: { label: "Nước", icon: "water-outline", color: "#0D9488" },
+  TOOLS: { label: "Dụng cụ", icon: "construct", color: "#0D9488" },
   SAFETY_EQUIPMENT: {
     label: "An toàn",
     icon: "shield-checkmark",
-    color: "#0066CC",
+    color: "#0D9488",
   },
   OTHER: { label: "Khác", icon: "ellipsis-horizontal", color: "#999999" },
 };
@@ -86,7 +86,7 @@ export default function InventoryDashboardScreen() {
           <View style={styles.summarySection}>
             <View style={styles.summaryRow}>
               <View style={[styles.summaryCard, styles.fullCard]}>
-                <Ionicons name="cube-outline" size={24} color="#0066CC" />
+                <Ionicons name="cube-outline" size={24} color="#0D9488" />
                 <Text style={styles.summaryLabel}>Tổng giá trị kho</Text>
                 <Text style={styles.summaryValue}>
                   {formatCurrency(summary.totalValue)}
@@ -99,12 +99,12 @@ export default function InventoryDashboardScreen() {
 
             <View style={styles.summaryRow}>
               <View style={[styles.summaryCard, styles.halfCard]}>
-                <Ionicons name="warning" size={20} color="#0066CC" />
+                <Ionicons name="warning" size={20} color="#0D9488" />
                 <Text style={styles.summaryLabel}>Sắp hết</Text>
                 <Text
                   style={[
                     styles.summaryValue,
-                    { fontSize: 20, color: "#0066CC" },
+                    { fontSize: 20, color: "#0D9488" },
                   ]}
                 >
                   {summary.lowStockItems}
@@ -230,12 +230,12 @@ export default function InventoryDashboardScreen() {
                         <View
                           style={[
                             styles.statusBadge,
-                            { backgroundColor: "#E8F4FF" },
+                            { backgroundColor: "#F0FDFA" },
                           ]}
                         >
-                          <Ionicons name="warning" size={12} color="#0066CC" />
+                          <Ionicons name="warning" size={12} color="#0D9488" />
                           <Text
-                            style={[styles.statusText, { color: "#0066CC" }]}
+                            style={[styles.statusText, { color: "#0D9488" }]}
                           >
                             Thấp
                           </Text>
@@ -313,7 +313,7 @@ export default function InventoryDashboardScreen() {
                               material.currentStock === 0
                                 ? "#F5F5F5"
                                 : stockPercentage < 50
-                                  ? "#E8F4FF"
+                                  ? "#F0FDFA"
                                   : "#FFF9C4",
                           },
                         ]}
@@ -326,8 +326,8 @@ export default function InventoryDashboardScreen() {
                                 material.currentStock === 0
                                   ? "#1A1A1A"
                                   : stockPercentage < 50
-                                    ? "#0066CC"
-                                    : "#0066CC",
+                                    ? "#0D9488"
+                                    : "#0D9488",
                             },
                           ]}
                         >
@@ -346,8 +346,8 @@ export default function InventoryDashboardScreen() {
                               material.currentStock === 0
                                 ? "#1A1A1A"
                                 : stockPercentage < 50
-                                  ? "#0066CC"
-                                  : "#0066CC",
+                                  ? "#0D9488"
+                                  : "#0D9488",
                           },
                         ]}
                       />
@@ -372,7 +372,7 @@ export default function InventoryDashboardScreen() {
                 )
               }
             >
-              <Ionicons name="cube" size={28} color="#0066CC" />
+              <Ionicons name="cube" size={28} color="#0D9488" />
               <Text style={styles.actionLabel}>Vật liệu</Text>
             </TouchableOpacity>
 
@@ -382,7 +382,7 @@ export default function InventoryDashboardScreen() {
                 router.push(`/inventory/orders?projectId=${projectId}` as Href)
               }
             >
-              <Ionicons name="document-text" size={28} color="#0066CC" />
+              <Ionicons name="document-text" size={28} color="#0D9488" />
               <Text style={styles.actionLabel}>Đơn hàng</Text>
             </TouchableOpacity>
 
@@ -394,7 +394,7 @@ export default function InventoryDashboardScreen() {
                 )
               }
             >
-              <Ionicons name="business" size={28} color="#0066CC" />
+              <Ionicons name="business" size={28} color="#0D9488" />
               <Text style={styles.actionLabel}>Nhà cung cấp</Text>
             </TouchableOpacity>
 
@@ -406,7 +406,7 @@ export default function InventoryDashboardScreen() {
                 )
               }
             >
-              <Ionicons name="swap-horizontal" size={28} color="#0066CC" />
+              <Ionicons name="swap-horizontal" size={28} color="#0D9488" />
               <Text style={styles.actionLabel}>Giao dịch</Text>
             </TouchableOpacity>
           </View>
@@ -516,7 +516,7 @@ const styles = StyleSheet.create({
   },
   seeAllText: {
     fontSize: 14,
-    color: "#0066CC",
+    color: "#0D9488",
     fontWeight: "500",
   },
   categoryCard: {

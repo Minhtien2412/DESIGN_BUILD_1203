@@ -177,7 +177,7 @@ export default function AdminPermissionManager() {
                 </View>
                 <View style={styles.userActions}>
                     <View style={[styles.roleBadge, { 
-                        backgroundColor: user.role === USER_ROLES.CLIENT ? '#E8F4FF' : 
+                        backgroundColor: user.role === USER_ROLES.CLIENT ? '#F0FDFA' : 
                                         user.role === USER_ROLES.CONTRACTOR ? '#E8F5E8' : '#FFE5E5' 
                     }]}>
                         <Text style={[styles.roleText, {
@@ -194,7 +194,7 @@ export default function AdminPermissionManager() {
                         <Switch
                             value={user.isActive}
                             onValueChange={() => toggleUserStatus(user.id)}
-                            trackColor={{ false: '#ccc', true: '#0066CC' }}
+                            trackColor={{ false: '#ccc', true: '#0D9488' }}
                             thumbColor={user.isActive ? '#fff' : '#fff'}
                         />
                     </View>
@@ -394,7 +394,7 @@ const styles = StyleSheet.create({
         gap: 6,
     },
     filterButtonActive: {
-        backgroundColor: '#E8F4FF',
+        backgroundColor: '#F0FDFA',
     },
     filterText: {
         fontSize: 14,

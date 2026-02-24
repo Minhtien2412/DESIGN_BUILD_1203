@@ -39,7 +39,7 @@ const STORAGE_CATEGORIES = [
     id: "all",
     name: "Tất cả",
     icon: "folder-open" as const,
-    color: "#2563eb",
+    color: "#0D9488",
     filter: null,
   },
   {
@@ -85,7 +85,7 @@ const QUICK_ACTIONS = [
     id: "upload",
     name: "Tải lên",
     icon: "cloud-upload" as const,
-    color: "#2563eb",
+    color: "#0D9488",
     route: "/file-upload",
   },
   {
@@ -123,7 +123,7 @@ const getFileIcon = (
   if (mimeType.includes("pdf"))
     return { icon: "document-text", color: "#ef4444" };
   if (mimeType.includes("word") || mimeType.includes("document"))
-    return { icon: "document", color: "#2563eb" };
+    return { icon: "document", color: "#0D9488" };
   if (mimeType.includes("sheet") || mimeType.includes("excel"))
     return { icon: "grid", color: "#22c55e" };
   if (mimeType.includes("zip") || mimeType.includes("archive"))
@@ -363,7 +363,7 @@ export default function StorageScreen() {
         {/* Storage Stats Card */}
         <View style={styles.storageCard}>
           <LinearGradient
-            colors={["#2563eb", "#7c3aed"]}
+            colors={["#0D9488", "#7c3aed"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.storageGradient}
@@ -553,7 +553,7 @@ export default function StorageScreen() {
         onPress={() => router.push("/file-upload" as any)}
       >
         <LinearGradient
-          colors={["#2563eb", "#7c3aed"]}
+          colors={["#0D9488", "#7c3aed"]}
           style={styles.fabGradient}
         >
           <Ionicons name="add" size={28} color="#fff" />

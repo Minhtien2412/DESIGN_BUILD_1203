@@ -123,7 +123,7 @@ export default function MinimapEditorScreen() {
     notStarted: '#E5E7EB',
     delayed: '#E82A34',
     border: '#9CA3AF',
-    selected: '#3B82F6',
+    selected: '#0D9488',
     drawing: '#666666',
   };
 

@@ -410,7 +410,7 @@ export default function ShopProfileScreen() {
   if (loading) {
     return (
       <View style={[styles.loadingContainer, { backgroundColor }]}>
-        <ActivityIndicator size="large" color="#EE4D2D" />
+        <ActivityIndicator size="large" color="#0D9488" />
       </View>
     );
   }
@@ -429,7 +429,7 @@ export default function ShopProfileScreen() {
       <Stack.Screen
         options={{
           title: seller.name,
-          headerStyle: { backgroundColor: "#EE4D2D" },
+          headerStyle: { backgroundColor: "#0D9488" },
           headerTintColor: "#FFFFFF",
           headerRight: () => (
             <View style={styles.headerRight}>
@@ -460,7 +460,7 @@ export default function ShopProfileScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={["#EE4D2D"]}
+            colors={["#0D9488"]}
           />
         }
         ListHeaderComponent={
@@ -520,7 +520,7 @@ export default function ShopProfileScreen() {
                   <Ionicons
                     name={isFollowing ? "checkmark" : "add"}
                     size={18}
-                    color={isFollowing ? "#EE4D2D" : "#FFFFFF"}
+                    color={isFollowing ? "#0D9488" : "#FFFFFF"}
                   />
                   <ThemedText
                     style={[
@@ -536,7 +536,7 @@ export default function ShopProfileScreen() {
                   <Ionicons
                     name="chatbubble-outline"
                     size={18}
-                    color="#EE4D2D"
+                    color="#0D9488"
                   />
                   <ThemedText style={styles.chatButtonText}>Chat</ThemedText>
                 </Pressable>
@@ -687,13 +687,13 @@ const styles = StyleSheet.create({
     height: 64,
     borderRadius: 32,
     borderWidth: 3,
-    borderColor: "#EE4D2D",
+    borderColor: "#0D9488",
   },
   avatarBadge: {
     position: "absolute",
     bottom: 0,
     right: 0,
-    backgroundColor: "#EE4D2D",
+    backgroundColor: "#0D9488",
     width: 22,
     height: 22,
     borderRadius: 11,
@@ -713,7 +713,7 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
   },
   mallBadge: {
-    backgroundColor: "#EE4D2D",
+    backgroundColor: "#0D9488",
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 3,
@@ -747,7 +747,7 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingVertical: 10,
     borderRadius: 6,
-    backgroundColor: "#EE4D2D",
+    backgroundColor: "#0D9488",
   },
   followButtonText: {
     color: "#FFFFFF",
@@ -757,10 +757,10 @@ const styles = StyleSheet.create({
   followingButton: {
     backgroundColor: "#FFFFFF",
     borderWidth: 1,
-    borderColor: "#EE4D2D",
+    borderColor: "#0D9488",
   },
   followingButtonText: {
-    color: "#EE4D2D",
+    color: "#0D9488",
   },
   chatButton: {
     flex: 1,
@@ -771,11 +771,11 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: "#EE4D2D",
+    borderColor: "#0D9488",
     backgroundColor: "#FFFFFF",
   },
   chatButtonText: {
-    color: "#EE4D2D",
+    color: "#0D9488",
     fontSize: 14,
     fontWeight: "600",
   },
@@ -796,7 +796,7 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 16,
     fontWeight: "700",
-    color: "#EE4D2D",
+    color: "#0D9488",
   },
   statLabel: {
     fontSize: 11,
@@ -849,14 +849,14 @@ const styles = StyleSheet.create({
     borderBottomColor: "transparent",
   },
   tabActive: {
-    borderBottomColor: "#EE4D2D",
+    borderBottomColor: "#0D9488",
   },
   tabText: {
     fontSize: 14,
     color: "#666666",
   },
   tabTextActive: {
-    color: "#EE4D2D",
+    color: "#0D9488",
     fontWeight: "600",
   },
   sortContainer: {
@@ -878,7 +878,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   sortButtonActive: {
-    backgroundColor: "#EE4D2D",
+    backgroundColor: "#0D9488",
   },
   sortButtonText: {
     fontSize: 12,
@@ -925,7 +925,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 0,
     right: 0,
-    backgroundColor: "#EE4D2D",
+    backgroundColor: "#0D9488",
     paddingHorizontal: 6,
     paddingVertical: 2,
   },
@@ -982,7 +982,7 @@ const styles = StyleSheet.create({
   productPrice: {
     fontSize: 15,
     fontWeight: "700",
-    color: "#EE4D2D",
+    color: "#0D9488",
   },
   originalPrice: {
     fontSize: 12,

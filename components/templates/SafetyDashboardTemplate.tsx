@@ -89,8 +89,8 @@ export default function SafetyDashboardTemplate({
   ]);
 
   const getScoreColor = (score: number) => {
-    if (score >= 80) return "#0066CC";
-    if (score >= 60) return "#0066CC";
+    if (score >= 80) return "#0D9488";
+    if (score >= 60) return "#0D9488";
     return "#000000";
   };
 
@@ -99,17 +99,17 @@ export default function SafetyDashboardTemplate({
       case "critical":
         return "#000000";
       case "major":
-        return "#0066CC";
+        return "#0D9488";
       case "minor":
-        return "#3B82F6";
+        return "#0D9488";
     }
   };
 
   const getStatusBadge = (status: Incident["status"]) => {
     const config = {
       open: { label: "Mới", color: "#000000" },
-      investigating: { label: "Đang xử lý", color: "#0066CC" },
-      resolved: { label: "Đã giải quyết", color: "#0066CC" },
+      investigating: { label: "Đang xử lý", color: "#0D9488" },
+      resolved: { label: "Đã giải quyết", color: "#0D9488" },
     };
     return config[status];
   };
@@ -159,14 +159,14 @@ export default function SafetyDashboardTemplate({
               </Text>
               <Text style={styles.statLabel}>Nghiêm trọng</Text>
             </View>
-            <View style={[styles.statCard, { borderLeftColor: "#0066CC" }]}>
-              <Text style={[styles.statValue, { color: "#0066CC" }]}>
+            <View style={[styles.statCard, { borderLeftColor: "#0D9488" }]}>
+              <Text style={[styles.statValue, { color: "#0D9488" }]}>
                 {stats.major}
               </Text>
               <Text style={styles.statLabel}>Quan trọng</Text>
             </View>
-            <View style={[styles.statCard, { borderLeftColor: "#3B82F6" }]}>
-              <Text style={[styles.statValue, { color: "#3B82F6" }]}>
+            <View style={[styles.statCard, { borderLeftColor: "#0D9488" }]}>
+              <Text style={[styles.statValue, { color: "#0D9488" }]}>
                 {stats.minor}
               </Text>
               <Text style={styles.statLabel}>Nhỏ</Text>
@@ -278,7 +278,7 @@ export default function SafetyDashboardTemplate({
               </View>
             </View>
             <View style={styles.contactRow}>
-              <Ionicons name="call" size={20} color="#0066CC" />
+              <Ionicons name="call" size={20} color="#0D9488" />
               <View style={styles.contactInfo}>
                 <Text style={styles.contactLabel}>Giám sát an toàn</Text>
                 <Text style={styles.contactNumber}>0909 123 456</Text>
@@ -297,7 +297,7 @@ function ChecklistItem({ text, checked }: { text: string; checked: boolean }) {
       <Ionicons
         name={checked ? "checkmark-circle" : "ellipse-outline"}
         size={20}
-        color={checked ? "#0066CC" : MODERN_COLORS.border}
+        color={checked ? "#0D9488" : MODERN_COLORS.border}
       />
       <Text
         style={[styles.checklistText, checked && styles.checklistTextChecked]}
@@ -402,7 +402,7 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: "100%",
-    backgroundColor: "#0066CC",
+    backgroundColor: "#0D9488",
     borderRadius: 4,
   },
   incidentCard: {

@@ -19,15 +19,15 @@ const STATUS_CONFIG: Record<
   PENDING: { label: 'Chờ thực hiện', color: '#999999', icon: 'ellipse-outline' },
   IN_PROGRESS: {
     label: 'Đang thực hiện',
-    color: '#0066CC',
+    color: '#0D9488',
     icon: 'hourglass-outline',
   },
   COMPLETED: {
     label: 'Hoàn thành',
-    color: '#0066CC',
+    color: '#0D9488',
     icon: 'checkmark-circle',
   },
-  PAID: { label: 'Đã thanh toán', color: '#0080FF', icon: 'cash' },
+  PAID: { label: 'Đã thanh toán', color: '#14B8A6', icon: 'cash' },
   OVERDUE: { label: 'Quá hạn', color: '#000000', icon: 'alert-circle' },
 };
 
@@ -121,7 +121,7 @@ export default function MilestonesScreen() {
                 <Text style={styles.statLabel}>Tỷ lệ hoàn thành</Text>
               </View>
               <View style={styles.statCard}>
-                <Text style={[styles.statValue, { color: '#0066CC' }]}>
+                <Text style={[styles.statValue, { color: '#0D9488' }]}>
                   {formatCurrency(stats.paidValue)}
                 </Text>
                 <Text style={styles.statLabel}>Đã thanh toán</Text>
@@ -148,11 +148,11 @@ export default function MilestonesScreen() {
                 <Text style={styles.miniStatText}>{stats.pending} Chờ</Text>
               </View>
               <View style={styles.miniStat}>
-                <Ionicons name="hourglass-outline" size={16} color="#0066CC" />
+                <Ionicons name="hourglass-outline" size={16} color="#0D9488" />
                 <Text style={styles.miniStatText}>{stats.inProgress} Đang làm</Text>
               </View>
               <View style={styles.miniStat}>
-                <Ionicons name="checkmark-circle" size={16} color="#0066CC" />
+                <Ionicons name="checkmark-circle" size={16} color="#0D9488" />
                 <Text style={styles.miniStatText}>{stats.completed} Hoàn thành</Text>
               </View>
               <View style={styles.miniStat}>
@@ -280,14 +280,14 @@ export default function MilestonesScreen() {
 
                         {milestone.notes && (
                           <View style={styles.notesBox}>
-                            <Ionicons name="chatbox-outline" size={16} color="#0066CC" />
+                            <Ionicons name="chatbox-outline" size={16} color="#0D9488" />
                             <Text style={styles.notesText}>{milestone.notes}</Text>
                           </View>
                         )}
 
                         {milestone.completedDate && (
                           <View style={styles.completedBox}>
-                            <Ionicons name="checkmark-circle" size={16} color="#0066CC" />
+                            <Ionicons name="checkmark-circle" size={16} color="#0D9488" />
                             <Text style={styles.completedText}>
                               Hoàn thành: {formatDate(milestone.completedDate)}
                             </Text>
@@ -303,8 +303,8 @@ export default function MilestonesScreen() {
                                 {
                                   color:
                                     milestone.paymentStatus === 'PAID'
-                                      ? '#0066CC'
-                                      : '#0066CC',
+                                      ? '#0D9488'
+                                      : '#0D9488',
                                 },
                               ]}
                             >
@@ -327,7 +327,7 @@ export default function MilestonesScreen() {
                               <Ionicons
                                 name="checkmark-circle"
                                 size={18}
-                                color="#0066CC"
+                                color="#0D9488"
                               />
                               <Text style={styles.completeButtonText}>
                                 Hoàn thành
@@ -416,7 +416,7 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   progressText: {
     fontSize: 12,
@@ -457,7 +457,7 @@ const styles = StyleSheet.create({
   addButton: {
     paddingHorizontal: 20,
     paddingVertical: 10,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     borderRadius: 8,
   },
   addButtonText: {
@@ -526,7 +526,7 @@ const styles = StyleSheet.create({
   milestoneValue: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   statusBadge: {
     flexDirection: 'row',
@@ -577,7 +577,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 8,
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     padding: 12,
     borderRadius: 6,
     marginBottom: 12,
@@ -595,7 +595,7 @@ const styles = StyleSheet.create({
   },
   completedText: {
     fontSize: 13,
-    color: '#0066CC',
+    color: '#0D9488',
   },
   paymentInfo: {
     flexDirection: 'row',
@@ -628,12 +628,12 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     backgroundColor: '#E8F5E9',
     borderWidth: 1,
-    borderColor: '#0066CC',
+    borderColor: '#0D9488',
   },
   completeButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   payButton: {
     flex: 1,
@@ -643,7 +643,7 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingVertical: 10,
     borderRadius: 6,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   payButtonText: {
     fontSize: 14,
@@ -657,7 +657,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',

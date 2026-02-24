@@ -231,7 +231,7 @@ export function NotificationSourcesSummary({
           <Ionicons
             name="refresh"
             size={20}
-            color={isLoading ? '#9ca3af' : '#2563eb'}
+            color={isLoading ? '#9ca3af' : '#0D9488'}
           />
         </Pressable>
       </View>

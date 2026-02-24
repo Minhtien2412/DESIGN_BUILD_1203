@@ -131,7 +131,7 @@ export default function ColorChartScreen() {
       <Stack.Screen
         options={{
           title: 'Bảng màu sơn',
-          headerStyle: { backgroundColor: '#0066CC' },
+          headerStyle: { backgroundColor: '#0D9488' },
           headerTintColor: '#fff',
           headerTitleStyle: { fontWeight: '600' },
         }}
@@ -217,7 +217,7 @@ export default function ColorChartScreen() {
         {comparingColors.length > 0 && (
           <View style={styles.compareBar}>
             <View style={styles.compareInfo}>
-              <Ionicons name="git-compare-outline" size={18} color="#0066CC" />
+              <Ionicons name="git-compare-outline" size={18} color="#0D9488" />
               <Text style={styles.compareText}>
                 Đã chọn {comparingColors.length}/3 màu
               </Text>
@@ -347,7 +347,7 @@ export default function ColorChartScreen() {
                             : 'add-circle-outline'
                         }
                         size={20}
-                        color="#0066CC"
+                        color="#0D9488"
                       />
                       <Text style={styles.modalActionText}>
                         {comparingColors.includes(selectedColor.id)
@@ -502,7 +502,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
   },
   filterChipActive: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   filterChipText: {
     fontSize: 13,
@@ -522,8 +522,8 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   categoryChipActive: {
-    backgroundColor: '#E8F4FF',
-    borderColor: '#0066CC',
+    backgroundColor: '#F0FDFA',
+    borderColor: '#0D9488',
   },
   categoryChipText: {
     fontSize: 12,
@@ -531,7 +531,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   categoryChipTextActive: {
-    color: '#0066CC',
+    color: '#0D9488',
   },
   compareBar: {
     flexDirection: 'row',
@@ -550,11 +550,11 @@ const styles = StyleSheet.create({
   compareText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#0066CC',
+    color: '#0D9488',
     marginLeft: 6,
   },
   compareButton: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     paddingHorizontal: 16,
     paddingVertical: 6,
     borderRadius: 6,
@@ -600,8 +600,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   checkboxActive: {
-    backgroundColor: '#0066CC',
-    borderColor: '#0066CC',
+    backgroundColor: '#0D9488',
+    borderColor: '#0D9488',
   },
   colorSwatch: {
     width: '100%',
@@ -656,7 +656,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   resetButton: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     paddingHorizontal: 24,
     paddingVertical: 10,
     borderRadius: 8,
@@ -731,7 +731,7 @@ const styles = StyleSheet.create({
   modalPriceValue: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   modalPriceUnit: {
     fontSize: 12,
@@ -758,14 +758,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#fff5f0',
     borderWidth: 1,
-    borderColor: '#0066CC',
+    borderColor: '#0D9488',
     paddingVertical: 12,
     borderRadius: 8,
   },
   modalActionText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#0066CC',
+    color: '#0D9488',
     marginLeft: 6,
   },
   modalActionButtonPrimary: {
@@ -773,7 +773,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     paddingVertical: 12,
     borderRadius: 8,
   },

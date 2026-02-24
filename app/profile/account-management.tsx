@@ -46,19 +46,19 @@ const ROLE_CONFIG: Record<UserRole, { label: string; color: string; icon: keyof 
   },
   ENGINEER: {
     label: 'Kỹ sư',
-    color: '#3B82F6',
+    color: '#0D9488',
     icon: 'construct',
     description: 'Quản lý dự án và kỹ thuật',
   },
   CONTRACTOR: {
     label: 'Nhà thầu',
-    color: '#0066CC',
+    color: '#0D9488',
     icon: 'hammer',
     description: 'Thực hiện thi công dự án',
   },
   CLIENT: {
     label: 'Khách hàng',
-    color: '#0066CC',
+    color: '#0D9488',
     icon: 'person',
     description: 'Người dùng thông thường',
   },

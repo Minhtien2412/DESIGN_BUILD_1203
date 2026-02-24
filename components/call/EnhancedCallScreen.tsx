@@ -523,7 +523,7 @@ export function CallHistoryListEnhanced({
   const getCallIcon = (direction: string) => {
     switch (direction) {
       case 'incoming': return { name: 'call', color: '#10B981' };
-      case 'outgoing': return { name: 'call', color: '#3B82F6' };
+      case 'outgoing': return { name: 'call', color: '#0D9488' };
       case 'missed': return { name: 'call', color: '#EF4444' };
       default: return { name: 'call', color: '#6B7280' };
     }
@@ -559,10 +559,10 @@ export function CallHistoryListEnhanced({
         
         <View style={styles.historyActions}>
           <Pressable style={styles.historyActionBtn} onPress={() => onVoiceCall?.(item.user)}>
-            <Ionicons name="call" size={22} color="#3B82F6" />
+            <Ionicons name="call" size={22} color="#0D9488" />
           </Pressable>
           <Pressable style={styles.historyActionBtn} onPress={() => onVideoCall?.(item.user)}>
-            <Ionicons name="videocam" size={22} color="#3B82F6" />
+            <Ionicons name="videocam" size={22} color="#0D9488" />
           </Pressable>
         </View>
       </Pressable>
@@ -619,7 +619,7 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#0D9488',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -825,7 +825,7 @@ const styles = StyleSheet.create({
     width: 52,
     height: 52,
     borderRadius: 26,
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#0D9488',
     justifyContent: 'center',
     alignItems: 'center',
   },

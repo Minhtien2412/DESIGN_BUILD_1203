@@ -192,7 +192,7 @@ export function ProductReviewCard({
       {review.sellerReply && (
         <View style={styles.sellerReply}>
           <View style={styles.replyHeader}>
-            <Ionicons name="storefront" size={12} color="#EE4D2D" />
+            <Ionicons name="storefront" size={12} color="#0D9488" />
             <ThemedText style={styles.replyLabel}>
               Phản hồi của người bán
             </ThemedText>
@@ -209,7 +209,7 @@ export function ProductReviewCard({
           <Ionicons
             name={isLiked ? "thumbs-up" : "thumbs-up-outline"}
             size={16}
-            color={isLiked ? "#EE4D2D" : "#888888"}
+            color={isLiked ? "#0D9488" : "#888888"}
           />
           <ThemedText style={[styles.likeText, isLiked && styles.likedText]}>
             Hữu ích{" "}
@@ -412,7 +412,7 @@ const styles = StyleSheet.create({
   },
   readMore: {
     fontSize: 13,
-    color: "#EE4D2D",
+    color: "#0D9488",
     fontWeight: "500",
   },
 
@@ -435,7 +435,7 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 8,
     borderLeftWidth: 3,
-    borderLeftColor: "#EE4D2D",
+    borderLeftColor: "#0D9488",
     gap: 6,
   },
   replyHeader: {
@@ -446,7 +446,7 @@ const styles = StyleSheet.create({
   replyLabel: {
     fontSize: 12,
     fontWeight: "600",
-    color: "#EE4D2D",
+    color: "#0D9488",
   },
   replyContent: {
     fontSize: 13,
@@ -473,7 +473,7 @@ const styles = StyleSheet.create({
     color: "#888888",
   },
   likedText: {
-    color: "#EE4D2D",
+    color: "#0D9488",
   },
 
   // Summary
@@ -495,11 +495,11 @@ const styles = StyleSheet.create({
   averageValue: {
     fontSize: 32,
     fontWeight: "700",
-    color: "#EE4D2D",
+    color: "#0D9488",
   },
   averageMax: {
     fontSize: 18,
-    color: "#EE4D2D",
+    color: "#0D9488",
   },
   totalReviews: {
     fontSize: 12,
@@ -560,14 +560,14 @@ const styles = StyleSheet.create({
   filterChipActive: {
     backgroundColor: "#FFF0EE",
     borderWidth: 1,
-    borderColor: "#EE4D2D",
+    borderColor: "#0D9488",
   },
   filterChipText: {
     fontSize: 12,
     color: "#666666",
   },
   filterChipTextActive: {
-    color: "#EE4D2D",
+    color: "#0D9488",
     fontWeight: "600",
   },
 });

@@ -35,8 +35,8 @@ export const DESIGN_CATEGORIES = [
     label: "Văn phòng",
     labelEn: "Office",
     icon: "business-outline" as const,
-    color: "#0066CC",
-    gradient: ["#0066CC", "#0080FF"] as [string, string],
+    color: "#0D9488",
+    gradient: ["#0D9488", "#14B8A6"] as [string, string],
     image:
       "https://images.pexels.com/photos/1170412/pexels-photo-1170412.jpeg?auto=compress&cs=tinysrgb&w=400",
     count: 45,
@@ -217,7 +217,7 @@ export default function DesignLibraryIndexScreen() {
       >
         {/* Hero Section */}
         <LinearGradient
-          colors={["#0066CC", "#0080FF"]}
+          colors={["#0D9488", "#14B8A6"]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.heroSection}

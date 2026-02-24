@@ -58,7 +58,7 @@ const WIDGET_CONFIGS: WidgetConfig[] = [
     module: PermissionModule.PROJECTS,
     action: PermissionAction.VIEW,
     getValue: (stats) => stats?.total_projects || 0,
-    color: '#3b82f6',
+    color: '#0D9488',
     route: '/admin/projects',
   },
   {
@@ -68,7 +68,7 @@ const WIDGET_CONFIGS: WidgetConfig[] = [
     module: PermissionModule.PROJECTS,
     action: PermissionAction.VIEW,
     getValue: (stats) => stats?.active_projects || 0,
-    color: '#0066CC',
+    color: '#0D9488',
     route: '/admin/projects?status=active',
   },
   {
@@ -78,7 +78,7 @@ const WIDGET_CONFIGS: WidgetConfig[] = [
     module: PermissionModule.BUDGET,
     action: PermissionAction.VIEW,
     getValue: (stats) => stats?.total_budget ? `${(stats.total_budget / 1000000).toFixed(0)}M` : '0',
-    color: '#0066CC',
+    color: '#0D9488',
     route: '/admin/budget',
   },
   {
@@ -99,7 +99,7 @@ const WIDGET_CONFIGS: WidgetConfig[] = [
     action: PermissionAction.VIEW,
     minRoleLevel: ROLE_HIERARCHY.ADMIN,
     getValue: (stats) => stats?.total_staff || 0,
-    color: '#0066CC',
+    color: '#0D9488',
     route: '/admin/staff',
   },
   {
@@ -140,7 +140,7 @@ const WIDGET_CONFIGS: WidgetConfig[] = [
     module: PermissionModule.MATERIALS,
     action: PermissionAction.VIEW,
     getValue: (stats) => stats?.total_materials || 0,
-    color: '#0066CC',
+    color: '#0D9488',
     route: '/admin/materials',
   },
   {
@@ -185,10 +185,10 @@ function RoleIndicator({ colors }: { colors: any }) {
   if (!userRole) return null;
 
   const getRoleColor = () => {
-    if (roleLevel >= ROLE_HIERARCHY.ADMIN) return '#0066CC';
-    if (roleLevel >= ROLE_HIERARCHY.PROJECT_MANAGER) return '#3b82f6';
+    if (roleLevel >= ROLE_HIERARCHY.ADMIN) return '#0D9488';
+    if (roleLevel >= ROLE_HIERARCHY.PROJECT_MANAGER) return '#0D9488';
     if (roleLevel >= ROLE_HIERARCHY.ENGINEER) return '#666666';
-    return '#0066CC';
+    return '#0D9488';
   };
 
   return (
@@ -453,9 +453,9 @@ export default function AdminDashboardRBAC() {
 // Helper components (reused from original)
 function ProjectCard({ project, colors }: any) {
   const statusColors: any = {
-    planning: '#0066CC',
-    active: '#3b82f6',
-    completed: '#0066CC',
+    planning: '#0D9488',
+    active: '#0D9488',
+    completed: '#0D9488',
     paused: '#000000',
   };
 

@@ -329,7 +329,7 @@ export default function RestaurantDetailScreen() {
           <Text style={styles.restaurantCategory}>{restaurant.category}</Text>
           <View style={styles.statsRow}>
             <View style={styles.statItem}>
-              <Ionicons name="star" size={16} color="#0066CC" />
+              <Ionicons name="star" size={16} color="#0D9488" />
               <Text style={styles.statText}>{restaurant.rating}</Text>
             </View>
             <View style={styles.statItem}>
@@ -565,7 +565,7 @@ const styles = StyleSheet.create({
   popularBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 4,
@@ -601,7 +601,7 @@ const styles = StyleSheet.create({
     color: '#00B14F',
   },
   discountBadge: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 4,

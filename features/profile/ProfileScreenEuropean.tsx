@@ -57,7 +57,7 @@ const COLORS = {
   success: "#10B981",
   warning: "#F59E0B",
   danger: "#EF4444",
-  info: "#3B82F6",
+  info: "#0D9488",
 
   // Surfaces
   border: "#E2E8F0",
@@ -621,7 +621,7 @@ const StatsSection = memo<{ stats: UserStats; isLoading: boolean }>(
         value: stats.totalProjects,
         label: "Dự án",
         color: COLORS.info,
-        gradient: ["#3B82F6", "#1D4ED8"],
+        gradient: ["#0D9488", "#0F766E"],
       },
       {
         icon: "checkmark-done",

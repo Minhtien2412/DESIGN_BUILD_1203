@@ -78,19 +78,19 @@ export function FeatureComingSoon({
           Trong thời gian chờ đợi:
         </Text>
         <View style={styles.infoItem}>
-          <Ionicons name="checkmark-circle" size={16} color="#0066CC" />
+          <Ionicons name="checkmark-circle" size={16} color="#0D9488" />
           <Text style={[styles.infoText, { color: colors.textMuted }]}>
             Bạn có thể sử dụng các tính năng khác
           </Text>
         </View>
         <View style={styles.infoItem}>
-          <Ionicons name="checkmark-circle" size={16} color="#0066CC" />
+          <Ionicons name="checkmark-circle" size={16} color="#0D9488" />
           <Text style={[styles.infoText, { color: colors.textMuted }]}>
             Chúng tôi sẽ thông báo khi sẵn sàng
           </Text>
         </View>
         <View style={styles.infoItem}>
-          <Ionicons name="checkmark-circle" size={16} color="#0066CC" />
+          <Ionicons name="checkmark-circle" size={16} color="#0D9488" />
           <Text style={[styles.infoText, { color: colors.textMuted }]}>
             Liên hệ hỗ trợ nếu cần trợ giúp
           </Text>

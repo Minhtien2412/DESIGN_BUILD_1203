@@ -173,7 +173,7 @@ export default function ActivityScreen() {
 
   const getActivityColor = (type: string): string => {
     const colors: Record<string, string> = {
-      task: '#3b82f6',
+      task: '#0D9488',
       comment: '#22c55e',
       file: '#8b5cf6',
       milestone: '#f59e0b',

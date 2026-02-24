@@ -124,8 +124,8 @@ export default function TaskDetailScreen() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed': return '#0066CC';
-      case 'in_progress': return '#0066CC';
+      case 'completed': return '#0D9488';
+      case 'in_progress': return '#0D9488';
       case 'pending': return '#6b7280';
       default: return '#6b7280';
     }
@@ -134,7 +134,7 @@ export default function TaskDetailScreen() {
   if (loading) {
     return (
       <SafeAreaView style={[styles.container, styles.loadingContainer]} edges={['top']}>
-        <ActivityIndicator size="large" color="#0066CC" />
+        <ActivityIndicator size="large" color="#0D9488" />
         <Text style={styles.loadingText}>Đang tải chi tiết công việc...</Text>
       </SafeAreaView>
     );
@@ -221,7 +221,7 @@ export default function TaskDetailScreen() {
               <View key={index} style={styles.depItem}>
                 <Ionicons name="git-branch-outline" size={16} color="#666" />
                 <Text style={styles.depText}>{dep}</Text>
-                <Ionicons name="checkmark-circle" size={16} color="#0066CC" />
+                <Ionicons name="checkmark-circle" size={16} color="#0D9488" />
               </View>
             ))}
           </View>
@@ -257,7 +257,7 @@ export default function TaskDetailScreen() {
       {/* Bottom Actions */}
       <View style={styles.bottomBar}>
         <TouchableOpacity style={styles.actionBtn}>
-          <Ionicons name="create-outline" size={20} color="#0066CC" />
+          <Ionicons name="create-outline" size={20} color="#0D9488" />
           <Text style={styles.actionBtnText}>Chỉnh sửa</Text>
         </TouchableOpacity>
         <TouchableOpacity style={[styles.actionBtn, styles.primaryBtn]}>
@@ -362,7 +362,7 @@ const styles = StyleSheet.create({
     borderColor: '#e0e0e0',
     alignItems: 'center',
   },
-  progressBtnActive: { backgroundColor: '#0066CC', borderColor: '#0066CC' },
+  progressBtnActive: { backgroundColor: '#0D9488', borderColor: '#0D9488' },
   progressBtnText: { fontSize: 14, fontWeight: '600', color: '#666' },
   progressBtnTextActive: { color: '#fff' },
   noteInput: { 
@@ -389,9 +389,9 @@ const styles = StyleSheet.create({
     paddingVertical: 14, 
     borderRadius: 12, 
     borderWidth: 1, 
-    borderColor: '#0066CC', 
+    borderColor: '#0D9488', 
     gap: 6 
   },
-  actionBtnText: { fontSize: 14, fontWeight: '600', color: '#0066CC' },
-  primaryBtn: { backgroundColor: '#0066CC', borderColor: '#0066CC' },
+  actionBtnText: { fontSize: 14, fontWeight: '600', color: '#0D9488' },
+  primaryBtn: { backgroundColor: '#0D9488', borderColor: '#0D9488' },
 });

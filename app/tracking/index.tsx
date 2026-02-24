@@ -1,8 +1,15 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { get } from "@/services/api";
 import { Ionicons } from "@expo/vector-icons";
+import * as Clipboard from "expo-clipboard";
+import * as Haptics from "expo-haptics";
 import { Stack, useRouter } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
 import {
+    Alert,
     Image,
+    Linking,
+    RefreshControl,
     ScrollView,
     StyleSheet,
     Text,
@@ -86,6 +93,42 @@ export default function TrackingScreen() {
   const textColor = useThemeColor({}, "text");
   const cardBg = useThemeColor({}, "card");
   const router = useRouter();
+  const [refreshing, setRefreshing] = useState(false);
+  const [tracking, setTracking] = useState(trackingData);
+  const [steps, setSteps] = useState(timeline);
+
+  const fetchTracking = useCallback(async () => {
+    try {
+      const res = await get(`/api/orders/${trackingData.orderId}/tracking`);
+      if (res?.data) {
+        setTracking(res.data.tracking || trackingData);
+        setSteps(res.data.timeline || timeline);
+      }
+    } catch {
+      /* mock */
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchTracking();
+  }, [fetchTracking]);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchTracking();
+    setRefreshing(false);
+  }, [fetchTracking]);
+
+  const handleCopyTracking = useCallback(async () => {
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    await Clipboard.setStringAsync(tracking.trackingNumber);
+    Alert.alert("Đã sao chép! ✅", tracking.trackingNumber);
+  }, [tracking.trackingNumber]);
+
+  const handleCallCarrier = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    Linking.openURL("tel:19001234");
+  }, []);
 
   return (
     <View style={[styles.container, { backgroundColor }]}>
@@ -93,7 +136,16 @@ export default function TrackingScreen() {
         options={{ title: "Theo dõi đơn hàng", headerShown: true }}
       />
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#14B8A6"
+          />
+        }
+      >
         {/* Order Info */}
         <View style={[styles.section, { backgroundColor: cardBg }]}>
           <View style={styles.orderHeader}>
@@ -107,7 +159,7 @@ export default function TrackingScreen() {
               <Text style={styles.trackingNum}>
                 {trackingData.trackingNumber}
               </Text>
-              <Ionicons name="copy-outline" size={16} color="#FF6B35" />
+              <Ionicons name="copy-outline" size={16} color="#14B8A6" />
             </TouchableOpacity>
           </View>
 
@@ -124,7 +176,7 @@ export default function TrackingScreen() {
           </View>
 
           <View style={styles.locationBox}>
-            <Ionicons name="location" size={18} color="#FF6B35" />
+            <Ionicons name="location" size={18} color="#14B8A6" />
             <Text style={[styles.locationText, { color: textColor }]}>
               {trackingData.currentLocation}
             </Text>
@@ -206,7 +258,7 @@ export default function TrackingScreen() {
           <TouchableOpacity
             style={[styles.actionBtn, { backgroundColor: cardBg }]}
           >
-            <Ionicons name="call-outline" size={20} color="#FF6B35" />
+            <Ionicons name="call-outline" size={20} color="#14B8A6" />
             <Text style={[styles.actionText, { color: textColor }]}>
               Gọi shipper
             </Text>
@@ -214,13 +266,13 @@ export default function TrackingScreen() {
           <TouchableOpacity
             style={[styles.actionBtn, { backgroundColor: cardBg }]}
           >
-            <Ionicons name="chatbubble-outline" size={20} color="#FF6B35" />
+            <Ionicons name="chatbubble-outline" size={20} color="#14B8A6" />
             <Text style={[styles.actionText, { color: textColor }]}>Chat</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.actionBtn, { backgroundColor: cardBg }]}
           >
-            <Ionicons name="help-circle-outline" size={20} color="#FF6B35" />
+            <Ionicons name="help-circle-outline" size={20} color="#14B8A6" />
             <Text style={[styles.actionText, { color: textColor }]}>
               Hỗ trợ
             </Text>
@@ -232,41 +284,61 @@ export default function TrackingScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  section: { margin: 16, marginBottom: 0, padding: 16, borderRadius: 12 },
-  sectionTitle: { fontSize: 16, fontWeight: "600", marginBottom: 16 },
+  container: { flex: 1, backgroundColor: "#F8FAFB" },
+  section: {
+    margin: 16,
+    marginBottom: 0,
+    padding: 16,
+    borderRadius: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  sectionTitle: {
+    fontSize: 17,
+    fontWeight: "700",
+    marginBottom: 16,
+    letterSpacing: -0.3,
+  },
   orderHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
     marginBottom: 16,
   },
-  orderId: { fontSize: 18, fontWeight: "600" },
+  orderId: { fontSize: 20, fontWeight: "700", letterSpacing: -0.3 },
   carrier: { color: "#666", fontSize: 13, marginTop: 2 },
   copyBtn: { flexDirection: "row", alignItems: "center", gap: 6 },
-  trackingNum: { color: "#FF6B35", fontSize: 13 },
+  trackingNum: { color: "#0D9488", fontSize: 13 },
   deliveryInfo: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 16,
   },
   deliveryIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 52,
+    height: 52,
+    borderRadius: 18,
     justifyContent: "center",
     alignItems: "center",
     marginRight: 12,
   },
   deliveryText: { flex: 1 },
   deliveryLabel: { color: "#666", fontSize: 13 },
-  deliveryDate: { fontSize: 18, fontWeight: "600", marginTop: 2 },
+  deliveryDate: {
+    fontSize: 20,
+    fontWeight: "700",
+    marginTop: 2,
+    letterSpacing: -0.3,
+  },
   locationBox: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFF3E0",
-    padding: 12,
-    borderRadius: 8,
+    backgroundColor: "#F0FDFA",
+    padding: 14,
+    borderRadius: 14,
     gap: 8,
   },
   locationText: { flex: 1, fontSize: 14 },
@@ -283,7 +355,7 @@ const styles = StyleSheet.create({
   },
   timelineDotCompleted: { backgroundColor: "#4CAF50" },
   timelineDotCurrent: {
-    backgroundColor: "#FF6B35",
+    backgroundColor: "#0D9488",
     width: 24,
     height: 24,
     borderRadius: 12,
@@ -298,7 +370,7 @@ const styles = StyleSheet.create({
   timelineLineCompleted: { backgroundColor: "#4CAF50" },
   timelineContent: { flex: 1, marginLeft: 12, paddingBottom: 16 },
   timelineTitle: { fontSize: 15, fontWeight: "500" },
-  timelineTitleCurrent: { color: "#FF6B35", fontWeight: "600" },
+  timelineTitleCurrent: { color: "#0D9488", fontWeight: "600" },
   timelineDesc: { color: "#666", fontSize: 13, marginTop: 2 },
   timelineTime: { color: "#999", fontSize: 12, marginTop: 4 },
   productItem: { flexDirection: "row", alignItems: "center" },
@@ -318,8 +390,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 14,
-    borderRadius: 12,
+    borderRadius: 16,
     gap: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 1,
   },
   actionText: { fontSize: 13, fontWeight: "500" },
 });

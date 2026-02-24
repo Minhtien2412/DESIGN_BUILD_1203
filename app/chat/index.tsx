@@ -215,7 +215,7 @@ export default function ChatListScreen() {
   // Render error state
   const renderError = () => (
     <View style={styles.errorContainer}>
-      <Ionicons name="warning-outline" size={48} color="#ff5722" />
+      <Ionicons name="warning-outline" size={48} color="#F59E0B" />
       <Text style={[styles.errorText, { color: text }]}>{error}</Text>
       <Pressable 
         style={[styles.retryButton, { borderColor: primary }]}

@@ -51,10 +51,10 @@ export default function PurchaseOrderDetailScreen() {
   const getStatusColor = (status: PurchaseOrderStatus) => {
     const statusMap: Partial<Record<PurchaseOrderStatus, string>> = {
       DRAFT: '#6b7280',
-      SENT: '#3b82f6',
+      SENT: '#0D9488',
       CONFIRMED: '#666666',
-      PARTIALLY_RECEIVED: '#0066CC',
-      RECEIVED: '#0066CC',
+      PARTIALLY_RECEIVED: '#0D9488',
+      RECEIVED: '#0D9488',
       CANCELLED: '#000000',
       CLOSED: '#6b7280',
     };
@@ -118,7 +118,7 @@ export default function PurchaseOrderDetailScreen() {
                           styles.progressFill,
                           {
                             width: `${receivedPercentage}%`,
-                            backgroundColor: receivedPercentage === 100 ? '#0066CC' : tintColor,
+                            backgroundColor: receivedPercentage === 100 ? '#0D9488' : tintColor,
                           },
                         ]}
                       />
@@ -307,7 +307,7 @@ export default function PurchaseOrderDetailScreen() {
                     <ThemedText type="default" style={{ color: textMutedColor }}>
                       Discount {purchaseOrder.discountType === 'PERCENTAGE' ? '(%)' : ''}
                     </ThemedText>
-                    <ThemedText type="default" style={{ color: '#0066CC' }}>
+                    <ThemedText type="default" style={{ color: '#0D9488' }}>
                       -{purchaseOrder.discount.toLocaleString()} {purchaseOrder.currency}
                     </ThemedText>
                   </View>
@@ -339,7 +339,7 @@ export default function PurchaseOrderDetailScreen() {
               <View key={item.id} style={[styles.itemCard, { backgroundColor: surfaceColor, borderColor }]}>
                 <View style={styles.itemHeader}>
                   <ThemedText type="title">{item.itemName}</ThemedText>
-                  <View style={[styles.smallBadge, { backgroundColor: item.receivedQuantity >= item.quantity ? '#0066CC' : tintColor }]}>
+                  <View style={[styles.smallBadge, { backgroundColor: item.receivedQuantity >= item.quantity ? '#0D9488' : tintColor }]}>
                     <ThemedText type="default" style={styles.badgeText}>
                       {item.receivedQuantity >= item.quantity ? 'RECEIVED' : 'PENDING'}
                     </ThemedText>
@@ -409,7 +409,7 @@ export default function PurchaseOrderDetailScreen() {
 
               {purchaseOrder.approvedBy && (
                 <View style={styles.timelineItem}>
-                  <View style={[styles.timelineDot, { backgroundColor: '#0066CC' }]} />
+                  <View style={[styles.timelineDot, { backgroundColor: '#0D9488' }]} />
                   <View style={styles.timelineContent}>
                     <ThemedText type="defaultSemiBold">Approved</ThemedText>
                     {purchaseOrder.approvedDate && (
@@ -426,7 +426,7 @@ export default function PurchaseOrderDetailScreen() {
 
               {purchaseOrder.status === 'SENT' && (
                 <View style={styles.timelineItem}>
-                  <View style={[styles.timelineDot, { backgroundColor: '#3b82f6' }]} />
+                  <View style={[styles.timelineDot, { backgroundColor: '#0D9488' }]} />
                   <View style={styles.timelineContent}>
                     <ThemedText type="defaultSemiBold">Sent to Supplier</ThemedText>
                     <ThemedText type="default" style={{ color: textMutedColor }}>
@@ -438,7 +438,7 @@ export default function PurchaseOrderDetailScreen() {
 
               {purchaseOrder.deliveryDate && (
                 <View style={styles.timelineItem}>
-                  <View style={[styles.timelineDot, { backgroundColor: '#0066CC' }]} />
+                  <View style={[styles.timelineDot, { backgroundColor: '#0D9488' }]} />
                   <View style={styles.timelineContent}>
                     <ThemedText type="defaultSemiBold">Delivered</ThemedText>
                     <ThemedText type="default" style={{ color: textMutedColor }}>

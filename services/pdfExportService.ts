@@ -50,13 +50,13 @@ class PDFExportService {
     .header {
       text-align: center;
       margin-bottom: 40px;
-      border-bottom: 3px solid #3B82F6;
+      border-bottom: 3px solid #0D9488;
       padding-bottom: 20px;
     }
     .logo {
       font-size: 32px;
       font-weight: bold;
-      color: #3B82F6;
+      color: #0D9488;
       margin-bottom: 10px;
     }
     .title {
@@ -97,7 +97,7 @@ class PDFExportService {
     }
     .progress-fill {
       height: 100%;
-      background: linear-gradient(90deg, #3B82F6, #0066CC);
+      background: linear-gradient(90deg, #0D9488, #0D9488);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -117,10 +117,10 @@ class PDFExportService {
       border-bottom: 2px solid #E5E7EB;
     }
     .summary {
-      background: #E8F4FF;
+      background: #F0FDFA;
       padding: 20px;
       border-radius: 8px;
-      border-left: 4px solid #3B82F6;
+      border-left: 4px solid #0D9488;
       margin-bottom: 20px;
     }
     .list {
@@ -132,14 +132,14 @@ class PDFExportService {
       margin-bottom: 10px;
       background: #F9FAFB;
       border-radius: 6px;
-      border-left: 3px solid #3B82F6;
+      border-left: 3px solid #0D9488;
     }
     .list-item.success {
-      border-left-color: #0066CC;
+      border-left-color: #0D9488;
       background: #ECFDF5;
     }
     .list-item.warning {
-      border-left-color: #0066CC;
+      border-left-color: #0D9488;
       background: #FFFBEB;
     }
     .list-item.error {

@@ -46,7 +46,7 @@ const { width: _width, height: _height } = Dimensions.get("window");
 // ==================== THEME ====================
 
 const COLORS = {
-  primary: "#0066CC",
+  primary: "#0D9488",
   primaryDark: "#004499",
   primaryLight: "#E6F0FF",
   secondary: "#00C853",

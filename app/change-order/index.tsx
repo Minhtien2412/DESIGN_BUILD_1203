@@ -72,19 +72,19 @@ const STATUS_FILTERS: { value: ChangeOrderStatus | "ALL"; label: string }[] = [
 
 const STATUS_COLORS: Record<ChangeOrderStatus, string> = {
   DRAFT: "#666666",
-  SUBMITTED: "#0080FF",
-  UNDER_REVIEW: "#0066CC",
-  PENDING_APPROVAL: "#0080FF",
+  SUBMITTED: "#14B8A6",
+  UNDER_REVIEW: "#0D9488",
+  PENDING_APPROVAL: "#14B8A6",
   APPROVED: "#000000",
   REJECTED: "#999999",
-  IMPLEMENTED: "#0066CC",
+  IMPLEMENTED: "#0D9488",
   CLOSED: "#666666",
   CANCELLED: "#CCCCCC",
 };
 
 const COST_IMPACT_COLORS: Record<CostImpactType, string> = {
   INCREASE: "#000000",
-  DECREASE: "#0066CC",
+  DECREASE: "#0D9488",
   NO_IMPACT: "#666666",
 };
 
@@ -138,7 +138,7 @@ export default function ChangeOrdersScreen() {
   if (loading && !changeOrders.length) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#3B82F6" />
+        <ActivityIndicator size="large" color="#0D9488" />
       </View>
     );
   }
@@ -164,27 +164,27 @@ export default function ChangeOrdersScreen() {
         showsHorizontalScrollIndicator={false}
         style={styles.statsContainer}
       >
-        <View style={[styles.statCard, { backgroundColor: "#E8F4FF" }]}>
+        <View style={[styles.statCard, { backgroundColor: "#F0FDFA" }]}>
           <Text style={styles.statValue}>{changeOrders.length}</Text>
           <Text style={styles.statLabel}>Total</Text>
         </View>
 
-        <View style={[styles.statCard, { backgroundColor: "#E8F4FF" }]}>
-          <Text style={[styles.statValue, { color: "#3B82F6" }]}>
+        <View style={[styles.statCard, { backgroundColor: "#F0FDFA" }]}>
+          <Text style={[styles.statValue, { color: "#0D9488" }]}>
             {submittedCount}
           </Text>
           <Text style={styles.statLabel}>Submitted</Text>
         </View>
 
         <View style={[styles.statCard, { backgroundColor: "#FEF3C7" }]}>
-          <Text style={[styles.statValue, { color: "#0066CC" }]}>
+          <Text style={[styles.statValue, { color: "#0D9488" }]}>
             {underReviewCount}
           </Text>
           <Text style={styles.statLabel}>Under Review</Text>
         </View>
 
         <View style={[styles.statCard, { backgroundColor: "#D1FAE5" }]}>
-          <Text style={[styles.statValue, { color: "#0066CC" }]}>
+          <Text style={[styles.statValue, { color: "#0D9488" }]}>
             {approvedCount}
           </Text>
           <Text style={styles.statLabel}>Approved</Text>
@@ -431,9 +431,9 @@ export default function ChangeOrdersScreen() {
                         size={16}
                         color={
                           co.scheduleImpact.type === "DELAY"
-                            ? "#0066CC"
+                            ? "#0D9488"
                             : co.scheduleImpact.type === "ACCELERATION"
-                              ? "#0066CC"
+                              ? "#0D9488"
                               : "#6B7280"
                         }
                       />
@@ -445,9 +445,9 @@ export default function ChangeOrdersScreen() {
                         {
                           color:
                             co.scheduleImpact.type === "DELAY"
-                              ? "#0066CC"
+                              ? "#0D9488"
                               : co.scheduleImpact.type === "ACCELERATION"
-                                ? "#0066CC"
+                                ? "#0D9488"
                                 : "#6B7280",
                         },
                       ]}
@@ -484,11 +484,11 @@ export default function ChangeOrdersScreen() {
                             {
                               backgroundColor:
                                 approval.status === "APPROVED"
-                                  ? "#0066CC"
+                                  ? "#0D9488"
                                   : approval.status === "REJECTED"
                                     ? "#000000"
                                     : approval.status === "IN_PROGRESS"
-                                      ? "#0066CC"
+                                      ? "#0D9488"
                                       : "#6B7280",
                             },
                           ]}
@@ -541,7 +541,7 @@ export default function ChangeOrdersScreen() {
               {/* Actions */}
               <View style={styles.actions}>
                 <TouchableOpacity style={styles.actionButton}>
-                  <Ionicons name="eye-outline" size={18} color="#3B82F6" />
+                  <Ionicons name="eye-outline" size={18} color="#0D9488" />
                   <Text style={styles.actionButtonText}>View</Text>
                 </TouchableOpacity>
 
@@ -682,8 +682,8 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   filterChipActive: {
-    backgroundColor: "#3B82F6",
-    borderColor: "#3B82F6",
+    backgroundColor: "#0D9488",
+    borderColor: "#0D9488",
   },
   filterChipText: {
     fontSize: 13,
@@ -903,13 +903,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#F3F4F6",
   },
   actionButtonPrimary: {
-    backgroundColor: "#3B82F6",
+    backgroundColor: "#0D9488",
   },
   actionButtonSuccess: {
-    backgroundColor: "#0066CC",
+    backgroundColor: "#0D9488",
   },
   actionButtonWarning: {
-    backgroundColor: "#0066CC",
+    backgroundColor: "#0D9488",
   },
   actionButtonText: {
     fontSize: 12,

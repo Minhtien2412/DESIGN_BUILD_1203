@@ -22,9 +22,9 @@ import {
 
 const STATUS_COLORS: Record<string, string> = {
   DRAFT: '#6B7280',
-  SUBMITTED: '#3B82F6',
-  UNDER_REVIEW: '#0066CC',
-  APPROVED: '#0066CC',
+  SUBMITTED: '#0D9488',
+  UNDER_REVIEW: '#0D9488',
+  APPROVED: '#0D9488',
   REJECTED: '#000000',
   REVISED: '#666666',
 };
@@ -52,7 +52,7 @@ export default function DailyReportDetailsScreen() {
   if (loading || !dailyReport) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#3B82F6" />
+        <ActivityIndicator size="large" color="#0D9488" />
       </View>
     );
   }
@@ -128,7 +128,7 @@ export default function DailyReportDetailsScreen() {
           <Text style={styles.sectionTitle}>Weather Conditions</Text>
           <View style={styles.weatherCard}>
             <View style={styles.weatherHeader}>
-              <Ionicons name={weatherIcon as any} size={48} color="#0066CC" />
+              <Ionicons name={weatherIcon as any} size={48} color="#0D9488" />
               <View style={styles.weatherInfo}>
                 <Text style={styles.weatherCondition}>
                   {dailyReport.weather.condition.replace(/_/g, ' ')}
@@ -154,7 +154,7 @@ export default function DailyReportDetailsScreen() {
 
             {dailyReport.weather.weatherImpact && (
               <View style={styles.weatherImpact}>
-                <Ionicons name="warning" size={20} color="#0066CC" />
+                <Ionicons name="warning" size={20} color="#0D9488" />
                 <View style={styles.impactInfo}>
                   <Text style={styles.impactText}>
                     {dailyReport.weather.weatherImpactDescription}
@@ -195,7 +195,7 @@ export default function DailyReportDetailsScreen() {
             {dailyReport.workingHours.overtimeHours && (
               <View style={styles.hoursItem}>
                 <Text style={styles.hoursLabel}>Overtime</Text>
-                <Text style={[styles.hoursValue, { color: '#0066CC' }]}>
+                <Text style={[styles.hoursValue, { color: '#0D9488' }]}>
                   {dailyReport.workingHours.overtimeHours}h
                 </Text>
               </View>
@@ -304,10 +304,10 @@ export default function DailyReportDetailsScreen() {
                         {
                           color:
                             eq.status === 'OPERATIONAL'
-                              ? '#0066CC'
+                              ? '#0D9488'
                               : eq.status === 'BREAKDOWN'
                               ? '#000000'
-                              : '#0066CC',
+                              : '#0D9488',
                         },
                       ]}
                     >
@@ -347,12 +347,12 @@ export default function DailyReportDetailsScreen() {
                     <Ionicons
                       name={mat.qualityAccepted ? 'checkmark-circle' : 'close-circle'}
                       size={16}
-                      color={mat.qualityAccepted ? '#0066CC' : '#000000'}
+                      color={mat.qualityAccepted ? '#0D9488' : '#000000'}
                     />
                     <Text
                       style={[
                         styles.qualityText,
-                        { color: mat.qualityAccepted ? '#0066CC' : '#000000' },
+                        { color: mat.qualityAccepted ? '#0D9488' : '#000000' },
                       ]}
                     >
                       {mat.qualityAccepted ? 'Accepted' : 'Rejected'}
@@ -381,7 +381,7 @@ export default function DailyReportDetailsScreen() {
                   <Text
                     style={[
                       styles.progressVariance,
-                      { color: prog.variance >= 0 ? '#0066CC' : '#000000' },
+                      { color: prog.variance >= 0 ? '#0D9488' : '#000000' },
                     ]}
                   >
                     {prog.variance >= 0 ? '+' : ''}
@@ -407,7 +407,7 @@ export default function DailyReportDetailsScreen() {
                           styles.progressBarFill,
                           {
                             width: `${prog.actualProgress}%`,
-                            backgroundColor: prog.variance >= 0 ? '#0066CC' : '#000000',
+                            backgroundColor: prog.variance >= 0 ? '#0D9488' : '#000000',
                           },
                         ]}
                       />
@@ -426,7 +426,7 @@ export default function DailyReportDetailsScreen() {
           <View style={styles.safetyCard}>
             <View style={styles.safetyGrid}>
               <View style={styles.safetyItem}>
-                <Ionicons name="shield-checkmark" size={24} color="#0066CC" />
+                <Ionicons name="shield-checkmark" size={24} color="#0D9488" />
                 <Text style={styles.safetyValue}>{dailyReport.safety.daysWithoutIncident}</Text>
                 <Text style={styles.safetyLabel}>Days w/o Incident</Text>
               </View>
@@ -434,12 +434,12 @@ export default function DailyReportDetailsScreen() {
                 <Ionicons
                   name="alert-circle"
                   size={24}
-                  color={dailyReport.safety.incidentCount > 0 ? '#000000' : '#0066CC'}
+                  color={dailyReport.safety.incidentCount > 0 ? '#000000' : '#0D9488'}
                 />
                 <Text
                   style={[
                     styles.safetyValue,
-                    { color: dailyReport.safety.incidentCount > 0 ? '#000000' : '#0066CC' },
+                    { color: dailyReport.safety.incidentCount > 0 ? '#000000' : '#0D9488' },
                   ]}
                 >
                   {dailyReport.safety.incidentCount}
@@ -447,12 +447,12 @@ export default function DailyReportDetailsScreen() {
                 <Text style={styles.safetyLabel}>Incidents</Text>
               </View>
               <View style={styles.safetyItem}>
-                <Ionicons name="warning" size={24} color="#0066CC" />
+                <Ionicons name="warning" size={24} color="#0D9488" />
                 <Text style={styles.safetyValue}>{dailyReport.safety.nearMissCount}</Text>
                 <Text style={styles.safetyLabel}>Near Misses</Text>
               </View>
               <View style={styles.safetyItem}>
-                <Ionicons name="construct" size={24} color="#3B82F6" />
+                <Ionicons name="construct" size={24} color="#0D9488" />
                 <Text style={styles.safetyValue}>{dailyReport.safety.ppeComplianceRate}%</Text>
                 <Text style={styles.safetyLabel}>PPE Compliance</Text>
               </View>
@@ -460,7 +460,7 @@ export default function DailyReportDetailsScreen() {
 
             {dailyReport.safety.safetyMeetingHeld && (
               <View style={styles.safetyMeeting}>
-                <Ionicons name="people" size={20} color="#3B82F6" />
+                <Ionicons name="people" size={20} color="#0D9488" />
                 <Text style={styles.safetyMeetingText}>
                   Safety meeting held ({dailyReport.safety.safetyMeetingAttendees} attendees)
                 </Text>
@@ -498,7 +498,7 @@ export default function DailyReportDetailsScreen() {
                               ? '#000000'
                               : issue.severity === 'HIGH'
                               ? '#EA580C'
-                              : '#0066CC',
+                              : '#0D9488',
                         },
                       ]}
                     >
@@ -513,7 +513,7 @@ export default function DailyReportDetailsScreen() {
                           issue.status === 'RESOLVED'
                             ? '#D1FAE5'
                             : issue.status === 'IN_PROGRESS'
-                            ? '#E8F4FF'
+                            ? '#F0FDFA'
                             : '#F3F4F6',
                       },
                     ]}
@@ -524,9 +524,9 @@ export default function DailyReportDetailsScreen() {
                         {
                           color:
                             issue.status === 'RESOLVED'
-                              ? '#0066CC'
+                              ? '#0D9488'
                               : issue.status === 'IN_PROGRESS'
-                              ? '#3B82F6'
+                              ? '#0D9488'
                               : '#6B7280',
                         },
                       ]}
@@ -791,7 +791,7 @@ const styles = StyleSheet.create({
   totalBadge: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#3B82F6',
+    color: '#0D9488',
   },
   weatherCard: {
     backgroundColor: '#FFFBEB',
@@ -907,7 +907,7 @@ const styles = StyleSheet.create({
   progressText: {
     fontSize: 13,
     fontWeight: 'bold',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   activityDesc: {
     fontSize: 13,
@@ -1020,7 +1020,7 @@ const styles = StyleSheet.create({
   },
   materialQuantity: {
     fontSize: 13,
-    color: '#3B82F6',
+    color: '#0D9488',
     fontWeight: '600',
     marginBottom: 6,
   },
@@ -1132,13 +1132,13 @@ const styles = StyleSheet.create({
   safetyMeeting: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     padding: 10,
     borderRadius: 8,
   },
   safetyMeetingText: {
     fontSize: 12,
-    color: '#1E40AF',
+    color: '#0F766E',
     marginLeft: 8,
   },
   issueCard: {
@@ -1206,7 +1206,7 @@ const styles = StyleSheet.create({
   delayDuration: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   delayCategory: {
     fontSize: 11,
@@ -1287,10 +1287,10 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   submitBtn: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#0D9488',
   },
   approveBtn: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   rejectBtn: {
     backgroundColor: '#000000',

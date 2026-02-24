@@ -32,7 +32,7 @@ const MOCK_FILES: FileItem[] = [
     size: '125 MB',
     date: '20/10/2024',
     icon: 'folder',
-    color: '#3B82F6',
+    color: '#0D9488',
   },
   {
     id: '2',
@@ -50,7 +50,7 @@ const MOCK_FILES: FileItem[] = [
     size: '3.2 MB',
     date: '15/10/2024',
     icon: 'file-excel',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   {
     id: '4',
@@ -59,7 +59,7 @@ const MOCK_FILES: FileItem[] = [
     size: '85 MB',
     date: '12/10/2024',
     icon: 'folder',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   {
     id: '5',
@@ -68,7 +68,7 @@ const MOCK_FILES: FileItem[] = [
     size: '1.8 MB',
     date: '10/10/2024',
     icon: 'file-word',
-    color: '#3B82F6',
+    color: '#0D9488',
   },
   {
     id: '6',
@@ -144,7 +144,7 @@ export default function CloudStorageScreen() {
         <View style={styles.storageCard}>
           <View style={styles.storageHeader}>
             <View style={styles.cloudIconContainer}>
-              <Ionicons name="cloud-outline" size={32} color="#3B82F6" />
+              <Ionicons name="cloud-outline" size={32} color="#0D9488" />
             </View>
             <View style={styles.storageInfo}>
               <Text style={styles.storageTitle}>Dung lượng đã dùng</Text>
@@ -160,7 +160,7 @@ export default function CloudStorageScreen() {
           
           <TouchableOpacity style={styles.upgradeButton}>
             <Text style={styles.upgradeText}>Nâng cấp dung lượng</Text>
-            <Ionicons name="arrow-forward" size={16} color="#3B82F6" />
+            <Ionicons name="arrow-forward" size={16} color="#0D9488" />
           </TouchableOpacity>
         </View>
 
@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,
@@ -287,7 +287,7 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#0D9488',
     borderRadius: 4,
   },
   upgradeButton: {
@@ -299,19 +299,19 @@ const styles = StyleSheet.create({
   upgradeText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#3B82F6',
+    color: '#0D9488',
     marginRight: 4,
   },
   uploadBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#0D9488',
     marginHorizontal: 16,
     marginBottom: 24,
     paddingVertical: 14,
     borderRadius: 12,
-    shadowColor: '#3B82F6',
+    shadowColor: '#0D9488',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,

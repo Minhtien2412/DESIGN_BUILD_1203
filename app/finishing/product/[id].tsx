@@ -31,7 +31,7 @@ const IMAGE_HEIGHT = SCREEN_WIDTH * 0.9;
 
 // Colors
 const COLORS = {
-  primary: "#0066CC",
+  primary: "#0D9488",
   primaryDark: "#004C99",
   background: "#F5F5F5",
   surface: "#FFFFFF",
@@ -40,7 +40,7 @@ const COLORS = {
   border: "#E0E0E0",
   star: "#FFCE3D",
   success: "#00BFA5",
-  error: "#EE4D2D",
+  error: "#EF4444",
 };
 
 // Seller info interface

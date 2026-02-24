@@ -14,6 +14,7 @@
  */
 
 import ENV from "@/config/env";
+import { getAccessToken } from "@/services/apiClient";
 import { Platform } from "react-native";
 import io, { Socket } from "socket.io-client";
 
@@ -246,6 +247,8 @@ class UnifiedSocketManager {
     this.socket.on("reconnect_attempt", () => {
       this.status = "reconnecting";
       this.emitStatusChange();
+      // Refresh token before reconnecting to avoid jwt expired errors
+      this.refreshAuthToken();
     });
 
     // Message events
@@ -566,11 +569,45 @@ class UnifiedSocketManager {
     );
 
     this.clearReconnectTimeout();
-    this.reconnectTimeout = setTimeout(() => {
+    this.reconnectTimeout = setTimeout(async () => {
       if (this.config) {
+        // Refresh token before reconnecting to avoid jwt expired errors
+        try {
+          const freshToken = await getAccessToken();
+          if (freshToken) {
+            this.config = { ...this.config, token: freshToken };
+            console.log("[SocketManager] Token refreshed for reconnection");
+          }
+        } catch (err) {
+          console.warn(
+            "[SocketManager] Failed to refresh token for reconnection:",
+            err,
+          );
+        }
         this.connect(this.config);
       }
     }, delay);
+  }
+
+  /**
+   * Refresh auth token on the active socket (for Socket.IO auto-reconnection)
+   */
+  private async refreshAuthToken(): Promise<void> {
+    try {
+      const freshToken = await getAccessToken();
+      if (freshToken && this.socket) {
+        (this.socket as any).auth = {
+          ...((this.socket as any).auth || {}),
+          token: freshToken,
+        };
+        if (this.config) {
+          this.config = { ...this.config, token: freshToken };
+        }
+        console.log("[SocketManager] Auth token refreshed for reconnection");
+      }
+    } catch (err) {
+      console.warn("[SocketManager] Failed to refresh auth token:", err);
+    }
   }
 
   /**

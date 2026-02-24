@@ -32,9 +32,9 @@ const CATEGORY_LABELS: Record<EquipmentCategory, string> = {
 };
 
 const STATUS_COLORS: Record<EquipmentStatus, string> = {
-  available: '#0066CC',
-  'in-use': '#3b82f6',
-  maintenance: '#0066CC',
+  available: '#0D9488',
+  'in-use': '#0D9488',
+  maintenance: '#0D9488',
   broken: '#000000',
   reserved: '#666666',
 };
@@ -48,9 +48,9 @@ const STATUS_LABELS: Record<EquipmentStatus, string> = {
 };
 
 const CONDITION_COLORS = {
-  excellent: '#0066CC',
-  good: '#3b82f6',
-  fair: '#0066CC',
+  excellent: '#0D9488',
+  good: '#0D9488',
+  fair: '#0D9488',
   poor: '#000000',
 };
 
@@ -207,7 +207,7 @@ export default function EquipmentScreen() {
               <Ionicons 
                 name="construct-outline" 
                 size={16} 
-                color={maintenanceStatus === 'overdue' ? '#000000' : maintenanceStatus === 'soon' ? '#0066CC' : '#6b7280'} 
+                color={maintenanceStatus === 'overdue' ? '#000000' : maintenanceStatus === 'soon' ? '#0D9488' : '#6b7280'} 
               />
               <Text style={[
                 styles.maintenanceText,
@@ -236,7 +236,7 @@ export default function EquipmentScreen() {
           onPress={() => router.push(`/projects/${projectId}/equipment/bookings`)}
           style={styles.bookingsButton}
         >
-          <Ionicons name="calendar-outline" size={24} color="#3b82f6" />
+          <Ionicons name="calendar-outline" size={24} color="#0D9488" />
         </TouchableOpacity>
       </View>
 
@@ -269,19 +269,19 @@ export default function EquipmentScreen() {
             label="Tổng số"
             value={stats.total.toString()}
             icon="hardware-chip"
-            gradientColors={['#3b82f6', '#0066CC']}
+            gradientColors={['#0D9488', '#0D9488']}
           />
           <MetricCard
             label="Sẵn sàng"
             value={stats.available.toString()}
             icon="checkmark-circle"
-            gradientColors={['#0066CC', '#0066CC']}
+            gradientColors={['#0D9488', '#0D9488']}
           />
           <MetricCard
             label="Đang dùng"
             value={stats.inUse.toString()}
             icon="play-circle"
-            gradientColors={['#0066CC', '#d97706']}
+            gradientColors={['#0D9488', '#d97706']}
           />
           <MetricCard
             label="Cần bảo trì"
@@ -424,8 +424,8 @@ const styles = StyleSheet.create({
     borderColor: '#e5e7eb',
   },
   filterChipActive: {
-    backgroundColor: '#3b82f6',
-    borderColor: '#3b82f6',
+    backgroundColor: '#0D9488',
+    borderColor: '#0D9488',
   },
   filterChipText: {
     fontSize: 14,
@@ -543,7 +543,7 @@ const styles = StyleSheet.create({
     color: '#6b7280',
   },
   maintenanceSoon: {
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: '600',
   },
   maintenanceOverdue: {

@@ -35,19 +35,19 @@ const AVAILABILITY_FILTERS: { value: ResourceAvailability | 'ALL'; label: string
 ];
 
 const AVAILABILITY_COLORS: Record<ResourceAvailability, string> = {
-  AVAILABLE: '#0066CC',
-  PARTIALLY_AVAILABLE: '#3B82F6',
-  ALLOCATED: '#0066CC',
+  AVAILABLE: '#0D9488',
+  PARTIALLY_AVAILABLE: '#0D9488',
+  ALLOCATED: '#0D9488',
   OVERALLOCATED: '#000000',
   UNAVAILABLE: '#6B7280',
   MAINTENANCE: '#666666',
-  RESERVED: '#0066CC',
+  RESERVED: '#0D9488',
 };
 
 const UTILIZATION_COLORS: Record<string, string> = {
-  UNDERUTILIZED: '#0066CC',
-  OPTIMAL: '#3B82F6',
-  HIGH: '#0066CC',
+  UNDERUTILIZED: '#0D9488',
+  OPTIMAL: '#0D9488',
+  HIGH: '#0D9488',
   OVERUTILIZED: '#000000',
 };
 
@@ -87,7 +87,7 @@ export default function ResourcesScreen() {
   if (loading && !resources.length) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#3B82F6" />
+        <ActivityIndicator size="large" color="#0D9488" />
       </View>
     );
   }
@@ -100,18 +100,18 @@ export default function ResourcesScreen() {
     <View style={styles.container}>
       {/* Stats Cards */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.statsContainer}>
-        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
+        <View style={[styles.statCard, { backgroundColor: '#F0FDFA' }]}>
           <Text style={styles.statValue}>{resources.length}</Text>
           <Text style={styles.statLabel}>Total Resources</Text>
         </View>
 
         <View style={[styles.statCard, { backgroundColor: '#D1FAE5' }]}>
-          <Text style={[styles.statValue, { color: '#0066CC' }]}>{availableCount}</Text>
+          <Text style={[styles.statValue, { color: '#0D9488' }]}>{availableCount}</Text>
           <Text style={styles.statLabel}>Available</Text>
         </View>
 
         <View style={[styles.statCard, { backgroundColor: '#FEF3C7' }]}>
-          <Text style={[styles.statValue, { color: '#0066CC' }]}>{allocatedCount}</Text>
+          <Text style={[styles.statValue, { color: '#0D9488' }]}>{allocatedCount}</Text>
           <Text style={styles.statLabel}>Allocated</Text>
         </View>
 
@@ -122,7 +122,7 @@ export default function ResourcesScreen() {
 
         {analytics && (
           <View style={[styles.statCard, { backgroundColor: '#F3F4F6' }]}>
-            <Text style={[styles.statValue, { color: '#3B82F6' }]}>
+            <Text style={[styles.statValue, { color: '#0D9488' }]}>
               {analytics.summary.utilizationRate.toFixed(0)}%
             </Text>
             <Text style={styles.statLabel}>Avg Utilization</Text>
@@ -243,7 +243,7 @@ export default function ResourcesScreen() {
                     <Ionicons
                       name={TYPE_FILTERS.find(t => t.value === resource.type)?.icon as any}
                       size={12}
-                      color="#3B82F6"
+                      color="#0D9488"
                       style={{ marginRight: 4 }}
                     />
                     <Text style={styles.typeBadgeText}>
@@ -344,8 +344,8 @@ export default function ResourcesScreen() {
                   )}
                   {resource.nextMaintenanceDate && (
                     <View style={styles.equipmentRow}>
-                      <Ionicons name="construct-outline" size={12} color="#0066CC" />
-                      <Text style={[styles.equipmentValue, { color: '#0066CC', marginLeft: 4 }]}>
+                      <Ionicons name="construct-outline" size={12} color="#0D9488" />
+                      <Text style={[styles.equipmentValue, { color: '#0D9488', marginLeft: 4 }]}>
                         Maintenance due:{' '}
                         {new Date(resource.nextMaintenanceDate).toLocaleDateString()}
                       </Text>
@@ -374,7 +374,7 @@ export default function ResourcesScreen() {
                           key={i}
                           name={i < resource.qualityRating! ? 'star' : 'star-outline'}
                           size={12}
-                          color="#0066CC"
+                          color="#0D9488"
                         />
                       ))}
                     </View>
@@ -392,7 +392,7 @@ export default function ResourcesScreen() {
               {/* Actions */}
               <View style={styles.actions}>
                 <TouchableOpacity style={styles.actionButton}>
-                  <Ionicons name="eye-outline" size={18} color="#3B82F6" />
+                  <Ionicons name="eye-outline" size={18} color="#0D9488" />
                   <Text style={styles.actionButtonText}>View</Text>
                 </TouchableOpacity>
 
@@ -495,8 +495,8 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   filterChipActive: {
-    backgroundColor: '#3B82F6',
-    borderColor: '#3B82F6',
+    backgroundColor: '#0D9488',
+    borderColor: '#0D9488',
   },
   filterChipText: {
     fontSize: 13,
@@ -566,14 +566,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 8,
     paddingVertical: 4,
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     borderRadius: 6,
     alignSelf: 'flex-start',
   },
   typeBadgeText: {
     fontSize: 10,
     fontWeight: '600',
-    color: '#1D4ED8',
+    color: '#0F766E',
   },
   infoSection: {
     marginBottom: 12,
@@ -637,14 +637,14 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   skillChip: {
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
   },
   skillText: {
     fontSize: 11,
-    color: '#1D4ED8',
+    color: '#0F766E',
     fontWeight: '500',
   },
   moreSkills: {
@@ -713,7 +713,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F3F4F6',
   },
   actionButtonPrimary: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#0D9488',
   },
   actionButtonText: {
     fontSize: 12,

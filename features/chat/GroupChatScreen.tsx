@@ -1067,10 +1067,10 @@ export default function GroupChatScreen() {
                 <View
                   style={[
                     styles.groupActionIcon,
-                    { backgroundColor: "#3B82F615" },
+                    { backgroundColor: "#0D948815" },
                   ]}
                 >
-                  <Ionicons name="notifications" size={22} color="#3B82F6" />
+                  <Ionicons name="notifications" size={22} color="#0D9488" />
                 </View>
                 <Text style={styles.groupActionLabel}>Thông báo</Text>
               </TouchableOpacity>

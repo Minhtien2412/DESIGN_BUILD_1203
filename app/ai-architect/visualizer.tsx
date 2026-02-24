@@ -189,7 +189,7 @@ export default function VisualizerScreen() {
         {/* Info */}
         <View style={styles.section}>
           <View style={styles.infoCard}>
-            <Ionicons name="information-circle" size={24} color="#03a9f4" />
+            <Ionicons name="information-circle" size={24} color="#14B8A6" />
             <View style={styles.infoContent}>
               <Text style={styles.infoTitle}>Cách sử dụng</Text>
               <Text style={styles.infoText}>
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
   },
   tagChipSelected: {
-    backgroundColor: '#03a9f4',
+    backgroundColor: '#14B8A6',
   },
   tagText: {
     color: '#94a3b8',
@@ -299,7 +299,7 @@ const styles = StyleSheet.create({
   },
   detailSubtitle: {
     fontSize: 14,
-    color: '#03a9f4',
+    color: '#14B8A6',
     marginTop: 2,
   },
   detailDescription: {
@@ -325,7 +325,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
   },
   consultButton: {
-    backgroundColor: '#03a9f4',
+    backgroundColor: '#14B8A6',
     padding: 14,
     borderRadius: 10,
     alignItems: 'center',
@@ -361,7 +361,7 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   styleCardSelected: {
-    borderColor: '#03a9f4',
+    borderColor: '#14B8A6',
   },
   styleImage: {
     width: '100%',
@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 8,
     right: 8,
-    backgroundColor: '#03a9f4',
+    backgroundColor: '#14B8A6',
     width: 24,
     height: 24,
     borderRadius: 12,

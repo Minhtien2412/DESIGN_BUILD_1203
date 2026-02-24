@@ -749,7 +749,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   saveButton: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   actionButtonText: {
     color: '#fff',
@@ -910,7 +910,7 @@ const styles = StyleSheet.create({
   skillChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 16,

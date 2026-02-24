@@ -28,7 +28,7 @@ export default function VRPreviewScreen() {
       <View style={styles.vrViewer}>
         <View style={styles.vrPlaceholder}>
           <View style={styles.vrIconContainer}>
-            <Ionicons name="glasses-outline" size={64} color="#FF6B35" />
+            <Ionicons name="glasses-outline" size={64} color="#14B8A6" />
           </View>
           <Text style={styles.vrTitle}>VR 360° Preview</Text>
           <Text style={styles.vrSubtitle}>Trải nghiệm phòng của bạn trong không gian 3D</Text>
@@ -48,7 +48,7 @@ export default function VRPreviewScreen() {
           <TouchableOpacity style={styles.vrControlBtn}>
             <Ionicons name="remove" size={24} color="#fff" />
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.vrControlBtn, { backgroundColor: '#FF6B35' }]}>
+          <TouchableOpacity style={[styles.vrControlBtn, { backgroundColor: '#14B8A6' }]}>
             <Ionicons name="expand" size={24} color="#fff" />
           </TouchableOpacity>
         </View>
@@ -91,8 +91,8 @@ export default function VRPreviewScreen() {
       {/* Features */}
       <ScrollView style={styles.featuresContainer}>
         <View style={[styles.featureCard, { backgroundColor: cardBg }]}>
-          <View style={[styles.featureIcon, { backgroundColor: '#FF6B3515' }]}>
-            <Ionicons name="walk-outline" size={28} color="#FF6B35" />
+          <View style={[styles.featureIcon, { backgroundColor: '#14B8A615' }]}>
+            <Ionicons name="walk-outline" size={28} color="#14B8A6" />
           </View>
           <View style={styles.featureContent}>
             <Text style={[styles.featureTitle, { color: textColor }]}>Di chuyển tự do</Text>
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: '#FF6B3520',
+    backgroundColor: '#14B8A620',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16,
@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
   comingSoonBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#14B8A6',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
     marginRight: 12,
     minWidth: 80,
   },
-  roomBtnActive: { backgroundColor: '#FF6B35' },
+  roomBtnActive: { backgroundColor: '#14B8A6' },
   roomBtnText: { color: '#666', fontSize: 12, marginTop: 6 },
   roomBtnTextActive: { color: '#fff' },
   featuresContainer: { flex: 1, padding: 16 },
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
   ctaBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#14B8A6',
     paddingHorizontal: 32,
     paddingVertical: 14,
     borderRadius: 28,

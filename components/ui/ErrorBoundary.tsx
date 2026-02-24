@@ -164,7 +164,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 onPress={this.handleGoBack}
                 activeOpacity={0.7}
               >
-                <Ionicons name="arrow-back" size={20} color="#3B82F6" />
+                <Ionicons name="arrow-back" size={20} color="#0D9488" />
                 <Text style={[styles.buttonText, styles.backButtonText]}>
                   Quay lại
                 </Text>
@@ -262,12 +262,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   retryButton: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#0D9488',
   },
   backButton: {
     backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#3B82F6',
+    borderColor: '#0D9488',
   },
   buttonText: {
     fontSize: 16,
@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   backButtonText: {
-    color: '#3B82F6',
+    color: '#0D9488',
   },
   helpText: {
     fontSize: 13,

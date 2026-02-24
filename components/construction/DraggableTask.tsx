@@ -37,11 +37,11 @@ const snapToGrid = (value: number, gridSize: number): number => {
 const getStatusColor = (status: Task['status']): string => {
   switch (status) {
     case 'completed':
-      return '#0066CC';
+      return '#0D9488';
     case 'in-progress':
-      return '#3B82F6';
+      return '#0D9488';
     case 'pending':
-      return '#0066CC';
+      return '#0D9488';
     case 'blocked':
       return '#000000';
     default:
@@ -54,9 +54,9 @@ const getPriorityColor = (priority: Task['priority']): string => {
     case 'high':
       return '#000000';
     case 'medium':
-      return '#0066CC';
+      return '#0D9488';
     case 'low':
-      return '#0066CC';
+      return '#0D9488';
     default:
       return '#9CA3AF';
   }
@@ -328,7 +328,7 @@ const styles = StyleSheet.create({
   },
   taskCardSelected: {
     borderWidth: 2,
-    borderColor: '#3B82F6',
+    borderColor: '#0D9488',
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 8,

@@ -299,7 +299,7 @@ export default function CameraInstallerScreen() {
 
               <View style={styles.statsRow}>
                 <View style={styles.statItem}>
-                  <Ionicons name="checkmark-circle-outline" size={16} color="#0066CC" />
+                  <Ionicons name="checkmark-circle-outline" size={16} color="#0D9488" />
                   <Text style={styles.statText}>{worker.completedProjects} công trình</Text>
                 </View>
                 <View
@@ -354,7 +354,7 @@ export default function CameraInstallerScreen() {
 
         {/* Info Banner */}
         <View style={styles.infoBanner}>
-          <Ionicons name="shield-checkmark" size={20} color="#0066CC" />
+          <Ionicons name="shield-checkmark" size={20} color="#0D9488" />
           <Text style={styles.infoBannerText}>
             Lắp đặt chuyên nghiệp • Bảo hành 24 tháng
           </Text>
@@ -707,17 +707,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#e8f5e9',
   },
   availabilityBusy: {
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
   },
   availabilityText: {
     fontSize: 11,
     fontWeight: '500',
   },
   availabilityTextAvailable: {
-    color: '#0066CC',
+    color: '#0D9488',
   },
   availabilityTextBusy: {
-    color: '#0066CC',
+    color: '#0D9488',
   },
   priceRow: {
     flexDirection: 'row',

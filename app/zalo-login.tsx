@@ -16,30 +16,30 @@ import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    KeyboardAvoidingView,
-    Platform,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 // Services
 import { useAuth } from "@/context/AuthContext";
 import { calculateExpiryTimestamp, saveTokens } from "@/services/token.service";
 import {
-    zaloMiniAppAuth,
-    ZaloMiniAppLoginResult,
+  zaloMiniAppAuth,
+  ZaloMiniAppLoginResult,
 } from "@/services/zaloMiniAppAuthService";
 import {
-    isValidVietnamesePhone,
-    maskPhone,
-    zaloOTPAuth,
+  isValidVietnamesePhone,
+  maskPhone,
+  zaloOTPAuth,
 } from "@/services/zaloOTPAuthService";
 
 // ==================== COLORS ====================
@@ -123,7 +123,7 @@ export default function ZaloLoginScreen() {
           result.isNewUser
             ? `Tài khoản ${result.user?.name} đã được tạo thành công!`
             : `Chào mừng ${result.user?.name} quay trở lại!`,
-          [{ text: "OK", onPress: () => router.replace("/(tabs)") }]
+          [{ text: "OK", onPress: () => router.replace("/(tabs)") }],
         );
       } else {
         setError(result.message || "Đăng nhập thất bại");
@@ -221,7 +221,7 @@ export default function ZaloLoginScreen() {
           result.isNewUser
             ? "Tài khoản đã được tạo thành công!"
             : "Đăng nhập thành công!",
-          [{ text: "OK", onPress: () => router.replace("/(tabs)") }]
+          [{ text: "OK", onPress: () => router.replace("/(tabs)") }],
         );
       } else {
         setError(result.message);
@@ -775,6 +775,6 @@ const styles = StyleSheet.create({
   },
   debugText: {
     fontSize: 12,
-    color: "#0369a1",
+    color: "#0F766E",
   },
 });

@@ -41,7 +41,7 @@ const { width } = Dimensions.get('window');
 
 // Theme colors
 const COLORS = {
-  primary: '#0066CC',
+  primary: '#0D9488',
   primaryDark: '#004499',
   background: '#F5F5F5',
   surface: '#FFFFFF',
@@ -50,9 +50,9 @@ const COLORS = {
   textMuted: '#999999',
   border: '#E8E8E8',
   success: '#00C853',
-  warning: '#0066CC',
+  warning: '#0D9488',
   error: '#000000',
-  info: '#0066CC',
+  info: '#0D9488',
 };
 
 // Status tabs
@@ -396,7 +396,7 @@ export default function ProgressDashboardScreen() {
             {/* Rating (for completed projects) */}
             {item.status === 'COMPLETED' && item.averageRating && (
               <View style={styles.ratingRow}>
-                <Ionicons name="star" size={16} color="#0066CC" />
+                <Ionicons name="star" size={16} color="#0D9488" />
                 <Text style={styles.ratingText}>{item.averageRating.toFixed(1)}</Text>
                 <Text style={styles.ratingLabel}>Đánh giá</Text>
               </View>
@@ -465,7 +465,7 @@ export default function ProgressDashboardScreen() {
           {renderStatCard('folder-open', 'Tổng dự án', stats.total, '#FFF', 0)}
           {renderStatCard('hammer', 'Đang làm', stats.active, '#FFF', 50)}
           {renderStatCard('checkmark-circle', 'Hoàn thành', stats.completed, '#FFF', 100)}
-          {renderStatCard('alert-circle', 'Chờ xử lý', stats.pendingActions, '#0066CC', 150)}
+          {renderStatCard('alert-circle', 'Chờ xử lý', stats.pendingActions, '#0D9488', 150)}
         </View>
       </LinearGradient>
 
@@ -610,7 +610,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     right: 0,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     borderRadius: 10,
     minWidth: 18,
     height: 18,

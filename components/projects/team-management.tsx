@@ -31,11 +31,11 @@ type TeamManagementProps = {
 };
 
 const ROLE_COLORS: Record<string, string> = {
-  'Chủ đầu tư': '#0066CC',
-  'Giám đốc dự án': '#0066CC',
-  'Kỹ sư thi công': '#0066CC',
-  'Kiến trúc sư': '#0066CC',
-  'Kỹ thuật viên': '#0066CC',
+  'Chủ đầu tư': '#0D9488',
+  'Giám đốc dự án': '#0D9488',
+  'Kỹ sư thi công': '#0D9488',
+  'Kiến trúc sư': '#0D9488',
+  'Kỹ thuật viên': '#0D9488',
   'default': '#757575',
 };
 
@@ -127,12 +127,12 @@ export default function TeamManagement({
             <View style={styles.contactIcons}>
               {member.phone && (
                 <View style={styles.contactIcon}>
-                  <Ionicons name="call" size={14} color="#0066CC" />
+                  <Ionicons name="call" size={14} color="#0D9488" />
                 </View>
               )}
               {member.email && (
                 <View style={styles.contactIcon}>
-                  <Ionicons name="mail" size={14} color="#0066CC" />
+                  <Ionicons name="mail" size={14} color="#0D9488" />
                 </View>
               )}
             </View>
@@ -180,12 +180,12 @@ export default function TeamManagement({
             <View style={styles.listActions}>
               {member.phone && (
                 <TouchableOpacity style={styles.actionButton}>
-                  <Ionicons name="call-outline" size={20} color="#0066CC" />
+                  <Ionicons name="call-outline" size={20} color="#0D9488" />
                 </TouchableOpacity>
               )}
               {member.email && (
                 <TouchableOpacity style={styles.actionButton}>
-                  <Ionicons name="mail-outline" size={20} color="#0066CC" />
+                  <Ionicons name="mail-outline" size={20} color="#0D9488" />
                 </TouchableOpacity>
               )}
             </View>
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 20,

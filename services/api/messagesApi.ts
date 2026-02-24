@@ -13,7 +13,7 @@ const CHAT_URL = `${ENV.API_BASE_URL}/chat`;
 const MESSAGES_URL = `${ENV.API_BASE_URL}/conversation-messages`;
 
 // Flag to enable mock data when API fails
-const USE_MOCK_FALLBACK = false;
+const USE_MOCK_FALLBACK = true;
 
 // ==================== TYPES ====================
 
@@ -319,9 +319,18 @@ export async function sendMessage(dto: SendMessageDto): Promise<Message> {
 
     // Build message body with attachment support
     const body: any = {
-      roomId: dto.conversationId ?? dto.recipientId,
       content: dto.content,
     };
+
+    // Use conversationId (roomId) if available, otherwise use recipientId
+    if (dto.conversationId && dto.conversationId > 0) {
+      body.roomId = dto.conversationId;
+    } else if (dto.recipientId && dto.recipientId > 0) {
+      body.recipientId = dto.recipientId;
+      body.roomId = dto.recipientId; // Backend may use either
+    } else {
+      throw new Error("No valid conversationId or recipientId provided");
+    }
 
     // Add attachment info if provided
     if (dto.attachmentUrl) {

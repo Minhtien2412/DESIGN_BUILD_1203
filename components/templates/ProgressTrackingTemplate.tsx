@@ -41,10 +41,10 @@ interface ProjectProgress {
 
 const STATUS_CONFIG = {
   pending: { label: "Chờ", color: "#999", icon: "time-outline" },
-  "in-progress": { label: "Đang làm", color: "#0066CC", icon: "sync-outline" },
+  "in-progress": { label: "Đang làm", color: "#0D9488", icon: "sync-outline" },
   completed: {
     label: "Hoàn thành",
-    color: "#0066CC",
+    color: "#0D9488",
     icon: "checkmark-circle",
   },
   delayed: { label: "Trễ", color: "#000000", icon: "alert-circle" },
@@ -170,9 +170,9 @@ export function ProgressTrackingTemplate({
               <Ionicons
                 name="checkmark-circle-outline"
                 size={14}
-                color="#0066CC"
+                color="#0D9488"
               />
-              <Text style={[styles.dateText, { color: "#0066CC" }]}>
+              <Text style={[styles.dateText, { color: "#0D9488" }]}>
                 Hoàn thành:{" "}
                 {new Date(milestone.actualEndDate).toLocaleDateString("vi-VN")}
               </Text>

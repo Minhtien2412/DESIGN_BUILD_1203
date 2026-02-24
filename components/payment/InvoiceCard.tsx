@@ -164,7 +164,7 @@ export function InvoiceCard({
                 style={[styles.actionButton, styles.remindButton]}
                 onPress={handleRemind}
               >
-                <Ionicons name="notifications-outline" size={16} color="#0066CC" />
+                <Ionicons name="notifications-outline" size={16} color="#0D9488" />
               </TouchableOpacity>
             )}
           </View>
@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   payButton: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   payButtonText: {
     fontSize: 13,
@@ -318,7 +318,7 @@ const styles = StyleSheet.create({
     color: '#FFF',
   },
   remindButton: {
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
   },
   transactionInfo: {
     flexDirection: 'row',

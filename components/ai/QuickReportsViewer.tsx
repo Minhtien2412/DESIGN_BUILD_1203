@@ -40,11 +40,11 @@ export default function QuickReportsViewer({
   const getReportTypeColor = (type: string) => {
     switch (type) {
       case 'PROGRESS':
-        return '#3b82f6';
+        return '#0D9488';
       case 'QUALITY':
-        return '#0066CC';
+        return '#0D9488';
       case 'SAFETY':
-        return '#0066CC';
+        return '#0D9488';
       default:
         return '#6b7280';
     }
@@ -85,7 +85,7 @@ export default function QuickReportsViewer({
           <Text style={styles.title}>Báo cáo AI gần đây</Text>
         </View>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#3b82f6" />
+          <ActivityIndicator size="large" color="#0D9488" />
           <Text style={styles.loadingText}>Đang tải...</Text>
         </View>
       </View>
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
   },
   viewAllText: {
     fontSize: 14,
-    color: '#3b82f6',
+    color: '#0D9488',
     fontWeight: '600',
   },
   loadingContainer: {
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#0D9488',
     borderRadius: 6,
   },
   retryButtonText: {

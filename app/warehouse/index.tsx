@@ -1,11 +1,14 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { get } from "@/services/api";
 import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 import { Stack, useRouter } from "expo-router";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
     Dimensions,
     FlatList,
     Image,
+    RefreshControl,
     ScrollView,
     StyleSheet,
     Text,
@@ -75,7 +78,7 @@ const categories = [
 ];
 
 const warehouseStats = [
-  { label: "Tổng SKU", value: "1,234", icon: "cube-outline", color: "#FF6B35" },
+  { label: "Tổng SKU", value: "1,234", icon: "cube-outline", color: "#14B8A6" },
   {
     label: "Giá trị tồn",
     value: "2.5 tỷ",
@@ -109,10 +112,40 @@ export default function WarehouseScreen() {
   const router = useRouter();
   const [activeCategory, setActiveCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
+  const [items, setItems] = useState(warehouseItems);
+
+  const fetchWarehouse = useCallback(async () => {
+    try {
+      const res = await get("/api/warehouse");
+      if (res?.data) setItems(res.data);
+    } catch {
+      /* mock */
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchWarehouse();
+  }, [fetchWarehouse]);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchWarehouse();
+    setRefreshing(false);
+  }, [fetchWarehouse]);
+
+  const handleStockAdjust = useCallback((id: string, delta: number) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setItems((prev) =>
+      prev.map((i) =>
+        i.id === id ? { ...i, stock: Math.max(0, i.stock + delta) } : i,
+      ),
+    );
+  }, []);
 
   const formatPrice = (price: number) => price.toLocaleString("vi-VN") + "đ";
 
-  const filteredItems = warehouseItems.filter((item) => {
+  const filteredItems = items.filter((item) => {
     if (activeCategory !== "all" && item.status !== activeCategory)
       return false;
     if (
@@ -161,10 +194,16 @@ export default function WarehouseScreen() {
               {formatPrice(item.price)}/{item.unit}
             </Text>
             <View style={styles.actionBtns}>
-              <TouchableOpacity style={styles.actionBtn}>
+              <TouchableOpacity
+                style={styles.actionBtn}
+                onPress={() => handleStockAdjust(item.id, 1)}
+              >
                 <Ionicons name="add-circle-outline" size={20} color="#4CAF50" />
               </TouchableOpacity>
-              <TouchableOpacity style={styles.actionBtn}>
+              <TouchableOpacity
+                style={styles.actionBtn}
+                onPress={() => handleStockAdjust(item.id, -1)}
+              >
                 <Ionicons
                   name="remove-circle-outline"
                   size={20}
@@ -193,7 +232,7 @@ export default function WarehouseScreen() {
           onChangeText={setSearchQuery}
         />
         <TouchableOpacity>
-          <Ionicons name="barcode-outline" size={22} color="#FF6B35" />
+          <Ionicons name="barcode-outline" size={22} color="#14B8A6" />
         </TouchableOpacity>
       </View>
 
@@ -256,6 +295,13 @@ export default function WarehouseScreen() {
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#14B8A6"
+          />
+        }
       />
 
       {/* Quick Actions FAB */}
@@ -266,7 +312,7 @@ export default function WarehouseScreen() {
           <Ionicons name="add" size={24} color="#fff" />
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.fabBtn, { backgroundColor: "#FF6B35" }]}
+          style={[styles.fabBtn, { backgroundColor: "#0D9488" }]}
         >
           <Ionicons name="scan-outline" size={24} color="#fff" />
         </TouchableOpacity>
@@ -276,58 +322,70 @@ export default function WarehouseScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { flex: 1, backgroundColor: "#F8FAFB" },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
     margin: 16,
     paddingHorizontal: 16,
     paddingVertical: 12,
-    borderRadius: 12,
+    borderRadius: 16,
   },
   searchInput: { flex: 1, marginLeft: 12, fontSize: 15 },
   statsContainer: { maxHeight: 100, marginBottom: 8 },
   statCard: {
-    padding: 12,
-    borderRadius: 12,
+    padding: 14,
+    borderRadius: 16,
     marginLeft: 16,
     width: 100,
     alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+    elevation: 1,
   },
   statIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
+    width: 40,
+    height: 40,
+    borderRadius: 14,
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 8,
   },
-  statValue: { fontSize: 16, fontWeight: "bold" },
+  statValue: { fontSize: 18, fontWeight: "800", letterSpacing: -0.5 },
   statLabel: { color: "#666", fontSize: 11, marginTop: 2 },
   categoriesContainer: { maxHeight: 50 },
   categoriesContent: { paddingHorizontal: 12 },
   categoryBtn: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 18,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#FFFFFF",
     marginHorizontal: 4,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
   },
-  categoryBtnActive: { backgroundColor: "#FF6B35" },
-  categoryText: { color: "#666", fontSize: 13 },
-  categoryTextActive: { color: "#fff" },
+  categoryBtnActive: { backgroundColor: "#0D9488", borderColor: "#0D9488" },
+  categoryText: { color: "#6B7280", fontSize: 13, fontWeight: "500" },
+  categoryTextActive: { color: "#fff", fontWeight: "600" },
   listContent: { padding: 16 },
   itemCard: {
     flexDirection: "row",
-    borderRadius: 12,
-    padding: 12,
+    borderRadius: 16,
+    padding: 14,
     marginBottom: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    elevation: 1,
   },
   itemImage: {
     width: 80,
     height: 80,
-    borderRadius: 10,
-    backgroundColor: "#f0f0f0",
+    borderRadius: 14,
+    backgroundColor: "#F3F4F6",
   },
   itemContent: { flex: 1, marginLeft: 12 },
   itemHeader: {
@@ -348,7 +406,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 8,
   },
-  priceText: { color: "#FF6B35", fontWeight: "600" },
+  priceText: { color: "#0D9488", fontWeight: "700" },
   actionBtns: { flexDirection: "row", gap: 8 },
   actionBtn: { padding: 4 },
   fabContainer: {

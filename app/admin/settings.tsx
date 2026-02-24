@@ -202,7 +202,7 @@ export default function SettingsScreen() {
                 <Ionicons
                   name={section.icon}
                   size={20}
-                  color={activeSection === section.key ? '#3b82f6' : mutedColor}
+                  color={activeSection === section.key ? '#0D9488' : mutedColor}
                 />
                 <ThemedText
                   style={[
@@ -470,13 +470,13 @@ const styles = StyleSheet.create({
   },
   tabActive: {
     backgroundColor: 'rgba(59, 130, 246, 0.1)',
-    borderColor: '#3b82f6',
+    borderColor: '#0D9488',
   },
   tabText: {
     fontSize: 14,
   },
   tabTextActive: {
-    color: '#3b82f6',
+    color: '#0D9488',
     fontWeight: '600',
   },
   settingsCard: {

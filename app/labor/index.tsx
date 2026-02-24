@@ -45,19 +45,19 @@ const ROLE_ICONS: Record<WorkerRole, string> = {
 };
 
 const ROLE_COLORS: Record<WorkerRole, string> = {
-  [WorkerRole.FOREMAN]: '#0066CC',
-  [WorkerRole.SKILLED_WORKER]: '#0066CC',
+  [WorkerRole.FOREMAN]: '#0D9488',
+  [WorkerRole.SKILLED_WORKER]: '#0D9488',
   [WorkerRole.UNSKILLED_WORKER]: '#999999',
   [WorkerRole.EQUIPMENT_OPERATOR]: '#666666',
-  [WorkerRole.ELECTRICIAN]: '#0066CC',
-  [WorkerRole.PLUMBER]: '#0066CC',
+  [WorkerRole.ELECTRICIAN]: '#0D9488',
+  [WorkerRole.PLUMBER]: '#0D9488',
   [WorkerRole.CARPENTER]: '#666666',
   [WorkerRole.MASON]: '#000000',
-  [WorkerRole.PAINTER]: '#0066CC',
+  [WorkerRole.PAINTER]: '#0D9488',
   [WorkerRole.WELDER]: '#FF6F00',
-  [WorkerRole.SAFETY_OFFICER]: '#0066CC',
-  [WorkerRole.ENGINEER]: '#0066CC',
-  [WorkerRole.SUPERVISOR]: '#0066CC',
+  [WorkerRole.SAFETY_OFFICER]: '#0D9488',
+  [WorkerRole.ENGINEER]: '#0D9488',
+  [WorkerRole.SUPERVISOR]: '#0D9488',
   [WorkerRole.OTHER]: '#4A4A4A',
 };
 
@@ -88,20 +88,20 @@ export default function LaborIndexScreen() {
       <ScrollView style={styles.scrollView}>
         {/* Summary Cards */}
         <View style={styles.summaryRow}>
-          <View style={[styles.summaryCard, { backgroundColor: '#E8F4FF' }]}>
-            <Ionicons name="people" size={28} color="#0066CC" />
+          <View style={[styles.summaryCard, { backgroundColor: '#F0FDFA' }]}>
+            <Ionicons name="people" size={28} color="#0D9488" />
             <Text style={styles.summaryValue}>{workerSummary?.totalWorkers || 0}</Text>
             <Text style={styles.summaryLabel}>Tổng nhân công</Text>
           </View>
 
           <View style={[styles.summaryCard, { backgroundColor: '#E8F5E9' }]}>
-            <Ionicons name="checkmark-circle" size={28} color="#0066CC" />
+            <Ionicons name="checkmark-circle" size={28} color="#0D9488" />
             <Text style={styles.summaryValue}>{workerSummary?.activeWorkers || 0}</Text>
             <Text style={styles.summaryLabel}>Đang làm việc</Text>
           </View>
 
-          <View style={[styles.summaryCard, { backgroundColor: '#E8F4FF' }]}>
-            <Ionicons name="time" size={28} color="#0066CC" />
+          <View style={[styles.summaryCard, { backgroundColor: '#F0FDFA' }]}>
+            <Ionicons name="time" size={28} color="#0D9488" />
             <Text style={styles.summaryValue}>{workerSummary?.onLeave || 0}</Text>
             <Text style={styles.summaryLabel}>Nghỉ phép</Text>
           </View>
@@ -124,7 +124,7 @@ export default function LaborIndexScreen() {
             <View style={styles.attendanceCard}>
               <View style={styles.attendanceRow}>
                 <View style={styles.attendanceItem}>
-                  <View style={[styles.attendanceDot, { backgroundColor: '#0066CC' }]} />
+                  <View style={[styles.attendanceDot, { backgroundColor: '#0D9488' }]} />
                   <Text style={styles.attendanceLabel}>Có mặt</Text>
                   <Text style={styles.attendanceValue}>{attendanceSummary.present}</Text>
                 </View>
@@ -136,13 +136,13 @@ export default function LaborIndexScreen() {
                 </View>
 
                 <View style={styles.attendanceItem}>
-                  <View style={[styles.attendanceDot, { backgroundColor: '#0066CC' }]} />
+                  <View style={[styles.attendanceDot, { backgroundColor: '#0D9488' }]} />
                   <Text style={styles.attendanceLabel}>Trễ</Text>
                   <Text style={styles.attendanceValue}>{attendanceSummary.late}</Text>
                 </View>
 
                 <View style={styles.attendanceItem}>
-                  <View style={[styles.attendanceDot, { backgroundColor: '#0066CC' }]} />
+                  <View style={[styles.attendanceDot, { backgroundColor: '#0D9488' }]} />
                   <Text style={styles.attendanceLabel}>Nghỉ</Text>
                   <Text style={styles.attendanceValue}>{attendanceSummary.onLeave}</Text>
                 </View>
@@ -163,9 +163,9 @@ export default function LaborIndexScreen() {
                       width: `${attendanceSummary.attendanceRate}%`,
                       backgroundColor:
                         attendanceSummary.attendanceRate >= 90
-                          ? '#0066CC'
+                          ? '#0D9488'
                           : attendanceSummary.attendanceRate >= 75
-                          ? '#0066CC'
+                          ? '#0D9488'
                           : '#000000',
                     },
                   ]}
@@ -219,7 +219,7 @@ export default function LaborIndexScreen() {
               style={styles.actionCard}
               onPress={() => router.push(`/labor/workers?projectId=${projectId}` as Href)}
             >
-              <Ionicons name="people-outline" size={32} color="#0066CC" />
+              <Ionicons name="people-outline" size={32} color="#0D9488" />
               <Text style={styles.actionLabel}>Nhân công</Text>
             </TouchableOpacity>
 
@@ -229,7 +229,7 @@ export default function LaborIndexScreen() {
                 router.push(`/labor/attendance?projectId=${projectId}&date=${today}` as Href)
               }
             >
-              <Ionicons name="clipboard-outline" size={32} color="#0066CC" />
+              <Ionicons name="clipboard-outline" size={32} color="#0D9488" />
               <Text style={styles.actionLabel}>Chấm công</Text>
             </TouchableOpacity>
 
@@ -237,7 +237,7 @@ export default function LaborIndexScreen() {
               style={styles.actionCard}
               onPress={() => router.push(`/labor/shifts?projectId=${projectId}` as Href)}
             >
-              <Ionicons name="time-outline" size={32} color="#0066CC" />
+              <Ionicons name="time-outline" size={32} color="#0D9488" />
               <Text style={styles.actionLabel}>Ca làm việc</Text>
             </TouchableOpacity>
 
@@ -253,7 +253,7 @@ export default function LaborIndexScreen() {
               style={styles.actionCard}
               onPress={() => router.push(`/labor/payroll?projectId=${projectId}` as Href)}
             >
-              <Ionicons name="cash-outline" size={32} color="#0066CC" />
+              <Ionicons name="cash-outline" size={32} color="#0D9488" />
               <Text style={styles.actionLabel}>Bảng lương</Text>
             </TouchableOpacity>
           </View>
@@ -316,7 +316,7 @@ const styles = StyleSheet.create({
   },
   seeAll: {
     fontSize: 13,
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: '600',
   },
   attendanceCard: {
@@ -362,7 +362,7 @@ const styles = StyleSheet.create({
   attendanceRateValue: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   progressBar: {
     height: 6,

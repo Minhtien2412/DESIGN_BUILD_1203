@@ -48,8 +48,8 @@ type Props = {
 
 const STATUS_CONFIG = {
   pending: { label: 'Chưa bắt đầu', color: '#999999', fill: '#f0f0f0', progress: 0 },
-  'in-progress': { label: 'Đang thực hiện', color: '#0066CC', fill: '#F0F8FF', progress: 0.5 },
-  done: { label: 'Hoàn thành', color: '#0066CC', fill: '#e8f5e9', progress: 1 },
+  'in-progress': { label: 'Đang thực hiện', color: '#0D9488', fill: '#F0F8FF', progress: 0.5 },
+  done: { label: 'Hoàn thành', color: '#0D9488', fill: '#e8f5e9', progress: 1 },
   late: { label: 'Trễ tiến độ', color: '#000000', fill: '#ffebee', progress: 0.3 },
 };
 

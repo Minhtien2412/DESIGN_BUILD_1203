@@ -99,7 +99,7 @@ export default function DevLoginHelper({ onSelectCredential }: DevLoginHelperPro
                 style={styles.option}
                 onPress={() => handleSelect('admin')}
               >
-                <View style={[styles.iconBadge, { backgroundColor: '#0066CC' }]}>
+                <View style={[styles.iconBadge, { backgroundColor: '#0D9488' }]}>
                   <Ionicons name="shield-checkmark" size={24} color="#fff" />
                 </View>
                 <View style={styles.optionInfo}>
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingVertical: 8,
     paddingHorizontal: 12,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     borderRadius: 8,
     alignSelf: 'center',
     marginVertical: 12,

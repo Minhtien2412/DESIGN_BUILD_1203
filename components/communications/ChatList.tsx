@@ -547,7 +547,7 @@ const styles = StyleSheet.create({
   systemChatItem: {
     backgroundColor: "#f0f9ff",
     borderLeftWidth: 3,
-    borderLeftColor: "#3b82f6",
+    borderLeftColor: "#0D9488",
   },
   avatarContainer: {
     position: "relative",
@@ -559,7 +559,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
   },
   systemAvatar: {
-    backgroundColor: "#3b82f6",
+    backgroundColor: "#0D9488",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -569,7 +569,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   adminAvatar: {
-    backgroundColor: "#0066CC",
+    backgroundColor: "#0D9488",
     justifyContent: "center",
     alignItems: "center",
   },

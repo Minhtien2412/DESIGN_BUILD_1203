@@ -3,18 +3,23 @@
  * Central hub for all legal documentation and services
  */
 
-import { MODERN_COLORS, MODERN_RADIUS, MODERN_SHADOWS, MODERN_SPACING } from '@/constants/modern-theme';
-import { Ionicons } from '@expo/vector-icons';
-import { router, Stack } from 'expo-router';
 import {
-    SafeAreaView,
+    MODERN_COLORS,
+    MODERN_RADIUS,
+    MODERN_SHADOWS,
+    MODERN_SPACING,
+} from "@/constants/modern-theme";
+import { Ionicons } from "@expo/vector-icons";
+import { router, Stack } from "expo-router";
+import {
     ScrollView,
     StatusBar,
     StyleSheet,
     Text,
     TouchableOpacity,
     View,
-} from 'react-native';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 interface LegalItem {
   id: string;
@@ -27,72 +32,72 @@ interface LegalItem {
 
 const LEGAL_DOCUMENTS: LegalItem[] = [
   {
-    id: '1',
-    title: 'Điều khoản sử dụng',
-    description: 'Quy định sử dụng ứng dụng và dịch vụ',
-    icon: 'document-text-outline',
-    route: '/legal/terms-of-service',
+    id: "1",
+    title: "Điều khoản sử dụng",
+    description: "Quy định sử dụng ứng dụng và dịch vụ",
+    icon: "document-text-outline",
+    route: "/legal/terms-of-service",
   },
   {
-    id: '2',
-    title: 'Chính sách bảo mật',
-    description: 'Cách chúng tôi thu thập và bảo vệ dữ liệu',
-    icon: 'shield-checkmark-outline',
-    route: '/legal/privacy-policy',
+    id: "2",
+    title: "Chính sách bảo mật",
+    description: "Cách chúng tôi thu thập và bảo vệ dữ liệu",
+    icon: "shield-checkmark-outline",
+    route: "/legal/privacy-policy",
   },
   {
-    id: '3',
-    title: 'Điều khoản dịch vụ',
-    description: 'Quy định chi tiết về các dịch vụ',
-    icon: 'reader-outline',
-    route: '/legal/terms',
+    id: "3",
+    title: "Điều khoản dịch vụ",
+    description: "Quy định chi tiết về các dịch vụ",
+    icon: "reader-outline",
+    route: "/legal/terms",
   },
   {
-    id: '4',
-    title: 'FAQ - Câu hỏi thường gặp',
-    description: 'Giải đáp thắc mắc phổ biến',
-    icon: 'help-circle-outline',
-    route: '/legal/faq',
+    id: "4",
+    title: "FAQ - Câu hỏi thường gặp",
+    description: "Giải đáp thắc mắc phổ biến",
+    icon: "help-circle-outline",
+    route: "/legal/faq",
   },
   {
-    id: '5',
-    title: 'Về chúng tôi',
-    description: 'Giới thiệu công ty và đội ngũ',
-    icon: 'information-circle-outline',
-    route: '/legal/about-us',
+    id: "5",
+    title: "Về chúng tôi",
+    description: "Giới thiệu công ty và đội ngũ",
+    icon: "information-circle-outline",
+    route: "/legal/about-us",
   },
 ];
 
 const LEGAL_SERVICES: LegalItem[] = [
   {
-    id: 's1',
-    title: 'Tư vấn hợp đồng xây dựng',
-    description: 'Soạn thảo, rà soát hợp đồng xây dựng',
-    icon: 'create-outline',
-    route: '/contracts/index',
-    badge: 'HOT',
+    id: "s1",
+    title: "Tư vấn hợp đồng xây dựng",
+    description: "Soạn thảo, rà soát hợp đồng xây dựng",
+    icon: "create-outline",
+    route: "/contracts/index",
+    badge: "HOT",
   },
   {
-    id: 's2',
-    title: 'Tư vấn giấy phép xây dựng',
-    description: 'Hỗ trợ thủ tục xin phép xây dựng',
-    icon: 'newspaper-outline',
-    route: '/legal/about-us',
-    badge: 'NEW',
+    id: "s2",
+    title: "Tư vấn giấy phép xây dựng",
+    description: "Hỗ trợ thủ tục xin phép xây dựng",
+    icon: "newspaper-outline",
+    route: "/legal/about-us",
+    badge: "NEW",
   },
   {
-    id: 's3',
-    title: 'Giải quyết tranh chấp',
-    description: 'Hỗ trợ giải quyết tranh chấp xây dựng',
-    icon: 'people-outline',
-    route: '/legal/faq',
+    id: "s3",
+    title: "Giải quyết tranh chấp",
+    description: "Hỗ trợ giải quyết tranh chấp xây dựng",
+    icon: "people-outline",
+    route: "/legal/faq",
   },
   {
-    id: 's4',
-    title: 'Bảo hiểm công trình',
-    description: 'Tư vấn bảo hiểm cho dự án xây dựng',
-    icon: 'shield-outline',
-    route: '/warranty/index',
+    id: "s4",
+    title: "Bảo hiểm công trình",
+    description: "Tư vấn bảo hiểm cho dự án xây dựng",
+    icon: "shield-outline",
+    route: "/warranty/index",
   },
 ];
 
@@ -105,12 +110,15 @@ export default function LegalIndexScreen() {
     <>
       <Stack.Screen
         options={{
-          title: 'Tư vấn pháp lý',
+          title: "Tư vấn pháp lý",
           headerStyle: { backgroundColor: MODERN_COLORS.primary },
-          headerTintColor: '#fff',
+          headerTintColor: "#fff",
         }}
       />
-      <StatusBar barStyle="light-content" backgroundColor={MODERN_COLORS.primary} />
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor={MODERN_COLORS.primary}
+      />
       <SafeAreaView style={styles.container}>
         <ScrollView showsVerticalScrollIndicator={false}>
           {/* Header Banner */}
@@ -125,7 +133,11 @@ export default function LegalIndexScreen() {
               </View>
             </View>
             <TouchableOpacity style={styles.hotlineButton}>
-              <Ionicons name="call-outline" size={18} color={MODERN_COLORS.primary} />
+              <Ionicons
+                name="call-outline"
+                size={18}
+                color={MODERN_COLORS.primary}
+              />
               <Text style={styles.hotlineText}>Hotline: 1900-xxxx</Text>
             </TouchableOpacity>
           </View>
@@ -142,7 +154,11 @@ export default function LegalIndexScreen() {
                   activeOpacity={0.7}
                 >
                   <View style={styles.documentIcon}>
-                    <Ionicons name={doc.icon} size={24} color={MODERN_COLORS.primary} />
+                    <Ionicons
+                      name={doc.icon}
+                      size={24}
+                      color={MODERN_COLORS.primary}
+                    />
                   </View>
                   <View style={styles.documentInfo}>
                     <Text style={styles.documentTitle}>{doc.title}</Text>
@@ -167,13 +183,21 @@ export default function LegalIndexScreen() {
                 >
                   <View style={styles.serviceHeader}>
                     <View style={styles.serviceIconBg}>
-                      <Ionicons name={service.icon} size={24} color={MODERN_COLORS.primary} />
+                      <Ionicons
+                        name={service.icon}
+                        size={24}
+                        color={MODERN_COLORS.primary}
+                      />
                     </View>
                     {service.badge && (
-                      <View style={[
-                        styles.badge,
-                        service.badge === 'HOT' ? styles.badgeHot : styles.badgeNew
-                      ]}>
+                      <View
+                        style={[
+                          styles.badge,
+                          service.badge === "HOT"
+                            ? styles.badgeHot
+                            : styles.badgeNew,
+                        ]}
+                      >
                         <Text style={styles.badgeText}>{service.badge}</Text>
                       </View>
                     )}
@@ -189,7 +213,11 @@ export default function LegalIndexScreen() {
           <View style={styles.section}>
             <View style={styles.supportCard}>
               <View style={styles.supportLeft}>
-                <Ionicons name="headset-outline" size={32} color={MODERN_COLORS.primary} />
+                <Ionicons
+                  name="headset-outline"
+                  size={32}
+                  color={MODERN_COLORS.primary}
+                />
                 <View style={styles.supportInfo}>
                   <Text style={styles.supportTitle}>Cần hỗ trợ pháp lý?</Text>
                   <Text style={styles.supportDesc}>
@@ -213,7 +241,7 @@ export default function LegalIndexScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
   },
   headerBanner: {
     backgroundColor: MODERN_COLORS.primary,
@@ -221,8 +249,8 @@ const styles = StyleSheet.create({
     paddingTop: MODERN_SPACING.xl,
   },
   bannerContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: MODERN_SPACING.md,
   },
   bannerTextContainer: {
@@ -230,48 +258,48 @@ const styles = StyleSheet.create({
   },
   bannerTitle: {
     fontSize: 22,
-    fontWeight: '700',
-    color: '#fff',
+    fontWeight: "700",
+    color: "#fff",
     marginBottom: 4,
   },
   bannerSubtitle: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.8)',
+    color: "rgba(255,255,255,0.8)",
   },
   hotlineButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
     paddingHorizontal: MODERN_SPACING.md,
     paddingVertical: 10,
     borderRadius: MODERN_RADIUS.full,
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
     marginTop: MODERN_SPACING.md,
     gap: 8,
   },
   hotlineText: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
     color: MODERN_COLORS.primary,
   },
   section: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     marginTop: 8,
     padding: MODERN_SPACING.md,
   },
   sectionTitle: {
     fontSize: 17,
-    fontWeight: '700',
-    color: '#333',
+    fontWeight: "700",
+    color: "#333",
     marginBottom: MODERN_SPACING.md,
   },
   documentsList: {
     gap: 8,
   },
   documentCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f8f9fa',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f8f9fa",
     borderRadius: MODERN_RADIUS.md,
     padding: MODERN_SPACING.md,
     ...MODERN_SHADOWS.sm,
@@ -281,8 +309,8 @@ const styles = StyleSheet.create({
     height: 44,
     borderRadius: MODERN_RADIUS.md,
     backgroundColor: `${MODERN_COLORS.primary}15`,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginRight: MODERN_SPACING.sm,
   },
   documentInfo: {
@@ -290,30 +318,30 @@ const styles = StyleSheet.create({
   },
   documentTitle: {
     fontSize: 15,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
     marginBottom: 2,
   },
   documentDesc: {
     fontSize: 13,
-    color: '#666',
+    color: "#666",
   },
   servicesGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: MODERN_SPACING.sm,
   },
   serviceCard: {
-    width: '48%',
-    backgroundColor: '#f8f9fa',
+    width: "48%",
+    backgroundColor: "#f8f9fa",
     borderRadius: MODERN_RADIUS.md,
     padding: MODERN_SPACING.md,
     ...MODERN_SHADOWS.sm,
   },
   serviceHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
     marginBottom: MODERN_SPACING.sm,
   },
   serviceIconBg: {
@@ -321,8 +349,8 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: MODERN_RADIUS.sm,
     backgroundColor: `${MODERN_COLORS.primary}15`,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   badge: {
     paddingHorizontal: 8,
@@ -330,31 +358,31 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   badgeHot: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: "#FF6B6B",
   },
   badgeNew: {
-    backgroundColor: '#0066CC',
+    backgroundColor: "#0D9488",
   },
   badgeText: {
     fontSize: 10,
-    fontWeight: '700',
-    color: '#fff',
+    fontWeight: "700",
+    color: "#fff",
   },
   serviceTitle: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
     marginBottom: 4,
   },
   serviceDesc: {
     fontSize: 12,
-    color: '#666',
+    color: "#666",
     lineHeight: 16,
   },
   supportCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     backgroundColor: `${MODERN_COLORS.primary}10`,
     borderRadius: MODERN_RADIUS.md,
     padding: MODERN_SPACING.md,
@@ -362,8 +390,8 @@ const styles = StyleSheet.create({
     borderColor: `${MODERN_COLORS.primary}30`,
   },
   supportLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     flex: 1,
     gap: MODERN_SPACING.sm,
   },
@@ -372,13 +400,13 @@ const styles = StyleSheet.create({
   },
   supportTitle: {
     fontSize: 15,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
     marginBottom: 2,
   },
   supportDesc: {
     fontSize: 12,
-    color: '#666',
+    color: "#666",
   },
   contactButton: {
     backgroundColor: MODERN_COLORS.primary,
@@ -388,7 +416,7 @@ const styles = StyleSheet.create({
   },
   contactButtonText: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#fff',
+    fontWeight: "600",
+    color: "#fff",
   },
 });

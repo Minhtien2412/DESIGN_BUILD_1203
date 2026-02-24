@@ -27,7 +27,7 @@ export default function AIInsightsWidget({
     <View style={styles.container}>
       <View style={styles.header}>
         <View style={styles.titleRow}>
-          <Ionicons name="sparkles" size={20} color="#3b82f6" />
+          <Ionicons name="sparkles" size={20} color="#0D9488" />
           <Text style={styles.title}>Trợ lý AI</Text>
         </View>
         <TouchableOpacity onPress={handleViewAI}>
@@ -64,7 +64,7 @@ export default function AIInsightsWidget({
           style={[styles.actionButton, styles.secondaryButton]}
           onPress={handleViewAI}
         >
-          <Ionicons name="chatbubbles" size={18} color="#3b82f6" />
+          <Ionicons name="chatbubbles" size={18} color="#0D9488" />
           <Text style={styles.secondaryButtonText}>Chat với AI</Text>
         </TouchableOpacity>
       </View>
@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
   },
   viewAllText: {
     fontSize: 14,
-    color: '#3b82f6',
+    color: '#0D9488',
     fontWeight: '600',
   },
   statsRow: {
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#0D9488',
     paddingVertical: 10,
     borderRadius: 8,
     gap: 6,
@@ -157,14 +157,14 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   secondaryButton: {
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     borderWidth: 1,
-    borderColor: '#3b82f6',
+    borderColor: '#0D9488',
   },
   secondaryButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#3b82f6',
+    color: '#0D9488',
   },
   infoBox: {
     flexDirection: 'row',

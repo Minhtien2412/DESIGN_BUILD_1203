@@ -20,13 +20,13 @@ interface ChecklistItemProps {
 const STATUS_CONFIG = {
   pending: {
     icon: 'time-outline' as const,
-    color: '#0066CC',
+    color: '#0D9488',
     bg: '#fef3c7',
     label: 'Chờ',
   },
   passed: {
     icon: 'checkmark-circle' as const,
-    color: '#0066CC',
+    color: '#0D9488',
     bg: '#dcfce7',
     label: 'Đạt',
   },

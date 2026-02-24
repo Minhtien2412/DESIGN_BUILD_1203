@@ -638,7 +638,7 @@ export default function ServiceDetailScreen() {
                     <Ionicons
                       name="checkmark-circle"
                       size={18}
-                      color={selectedPackage === pkg.id ? '#FF6B00' : '#0066CC'}
+                      color={selectedPackage === pkg.id ? '#FF6B00' : '#0D9488'}
                     />
                     <Text style={styles.featureRowText}>{feature}</Text>
                   </View>
@@ -741,7 +741,7 @@ const styles = StyleSheet.create({
   },
   categoryBadge: {
     alignSelf: 'flex-start',
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
@@ -981,9 +981,9 @@ const styles = StyleSheet.create({
   },
   formHeader: {
     padding: 16,
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     borderBottomWidth: 1,
-    borderBottomColor: '#E8F4FF',
+    borderBottomColor: '#F0FDFA',
   },
   formTitle: {
     fontSize: 20,

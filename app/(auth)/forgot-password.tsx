@@ -975,7 +975,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 16,
-    shadowColor: "#0066CC",
+    shadowColor: "#0D9488",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
     shadowRadius: 4,
@@ -1005,7 +1005,7 @@ const styles = StyleSheet.create({
   },
   successIcon: {
     fontSize: 40,
-    color: "#0066CC",
+    color: "#0D9488",
     fontWeight: "bold",
   },
   successTitle: {
@@ -1022,7 +1022,7 @@ const styles = StyleSheet.create({
   },
   emailText: {
     fontWeight: "600",
-    color: "#0066CC",
+    color: "#0D9488",
   },
   successHint: {
     fontSize: 12,
@@ -1054,7 +1054,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   stepDotActive: {
-    backgroundColor: "#0066CC",
+    backgroundColor: "#0D9488",
   },
   stepDotDone: {
     backgroundColor: "#00C853",

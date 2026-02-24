@@ -117,7 +117,7 @@ export default function SitemapScreen() {
 
   const getRoleColor = (role: UserRole) => {
     switch (role) {
-      case 'admin': return '#EE4D2D';
+      case 'admin': return '#0D9488';
       case 'employee': return '#4ECDC4';
       default: return '#000';
     }
@@ -171,12 +171,12 @@ export default function SitemapScreen() {
             <View style={styles.nodeTitleRow}>
               <Text style={styles.nodeTitle}>{node.titleVi}</Text>
               {node.badge && (
-                <View style={[styles.badge, { backgroundColor: node.badge === 'NEW' ? '#22c55e' : node.badge === 'HOT' ? '#EE4D2D' : '#8B5CF6' }]}>
+                <View style={[styles.badge, { backgroundColor: node.badge === 'NEW' ? '#22c55e' : node.badge === 'HOT' ? '#0D9488' : '#8B5CF6' }]}>
                   <Text style={styles.badgeText}>{node.badge}</Text>
                 </View>
               )}
               {node.isPersonalTimeline && (
-                <View style={[styles.badge, { backgroundColor: '#3B82F6' }]}>
+                <View style={[styles.badge, { backgroundColor: '#0D9488' }]}>
                   <Text style={styles.badgeText}>Timeline</Text>
                 </View>
               )}
@@ -290,7 +290,7 @@ export default function SitemapScreen() {
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statItem}>
-          <Text style={[styles.statValue, { color: '#3B82F6' }]}>{timelineRoutes.length}</Text>
+          <Text style={[styles.statValue, { color: '#0D9488' }]}>{timelineRoutes.length}</Text>
           <Text style={styles.statLabel}>Timeline</Text>
         </View>
       </View>
@@ -345,7 +345,7 @@ export default function SitemapScreen() {
             <Text style={styles.controlText}>Mở tất cả</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.controlBtn} onPress={collapseAll}>
-            <Ionicons name="remove-circle-outline" size={16} color="#EE4D2D" />
+            <Ionicons name="remove-circle-outline" size={16} color="#0D9488" />
             <Text style={styles.controlText}>Thu gọn</Text>
           </TouchableOpacity>
         </View>
@@ -386,7 +386,7 @@ export default function SitemapScreen() {
             <Text style={styles.legendText}>Mục trong bảng điều khiển</Text>
           </View>
           <View style={styles.legendRow}>
-            <View style={[styles.badge, { backgroundColor: '#3B82F6' }]}>
+            <View style={[styles.badge, { backgroundColor: '#0D9488' }]}>
               <Text style={styles.badgeText}>Timeline</Text>
             </View>
             <Text style={styles.legendText}>Mục cá nhân riêng tư</Text>
@@ -398,7 +398,7 @@ export default function SitemapScreen() {
             <Text style={styles.legendText}>Tính năng mới</Text>
           </View>
           <View style={styles.legendRow}>
-            <View style={[styles.badge, { backgroundColor: '#EE4D2D' }]}>
+            <View style={[styles.badge, { backgroundColor: '#0D9488' }]}>
               <Text style={styles.badgeText}>HOT</Text>
             </View>
             <Text style={styles.legendText}>Phổ biến</Text>

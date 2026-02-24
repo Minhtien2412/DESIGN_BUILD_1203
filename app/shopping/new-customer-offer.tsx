@@ -31,7 +31,7 @@ export default function NewCustomerOfferScreen() {
     <View style={{ flex: 1, backgroundColor: Colors.light.background }}>
       {/* Header */}
       <View style={{
-        backgroundColor: '#0066CC',
+        backgroundColor: '#0D9488',
         paddingTop: 50,
         paddingBottom: 20,
         paddingHorizontal: 16,
@@ -68,13 +68,13 @@ export default function NewCustomerOfferScreen() {
       <ScrollView style={{ flex: 1 }}>
         {/* Hero Banner */}
         <View style={{
-          backgroundColor: '#0066CC',
+          backgroundColor: '#0D9488',
           marginHorizontal: 16,
           marginTop: 16,
           borderRadius: 16,
           padding: 24,
           alignItems: 'center',
-          shadowColor: '#0066CC',
+          shadowColor: '#0D9488',
           shadowOffset: { width: 0, height: 4 },
           shadowOpacity: 0.3,
           shadowRadius: 8,
@@ -132,7 +132,7 @@ export default function NewCustomerOfferScreen() {
                   justifyContent: 'center',
                   alignItems: 'center'
                 }}>
-                  <Ionicons name={benefit.icon} size={24} color="#0066CC" />
+                  <Ionicons name={benefit.icon} size={24} color="#0D9488" />
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text style={{ fontSize: 15, fontWeight: '700', color: Colors.light.text, marginBottom: 4 }}>
@@ -152,7 +152,7 @@ export default function NewCustomerOfferScreen() {
           <TouchableOpacity
             onPress={() => router.push('/projects')}
             style={{
-              backgroundColor: '#0066CC',
+              backgroundColor: '#0D9488',
               paddingVertical: 16,
               borderRadius: 12,
               alignItems: 'center',
@@ -172,7 +172,7 @@ export default function NewCustomerOfferScreen() {
             gap: 12,
             marginBottom: 24
           }}>
-            <Ionicons name="information-circle" size={24} color="#0066CC" />
+            <Ionicons name="information-circle" size={24} color="#0D9488" />
             <View style={{ flex: 1 }}>
               <Text style={{ fontSize: 13, color: '#92400E', lineHeight: 18 }}>
                 Ưu đãi chỉ áp dụng một lần cho mỗi tài khoản mới. Voucher có hiệu lực trong 30 ngày kể từ ngày đăng ký.

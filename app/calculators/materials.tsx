@@ -34,7 +34,7 @@ const MATERIAL_CATEGORIES = [
   { id: "brick", icon: "🧱", label: "Gạch xây", color: "#ef4444" },
   { id: "cement", icon: "📦", label: "Xi măng", color: "#6b7280" },
   { id: "sand", icon: "⏳", label: "Cát", color: "#f59e0b" },
-  { id: "steel", icon: "🔩", label: "Sắt thép", color: "#3b82f6" },
+  { id: "steel", icon: "🔩", label: "Sắt thép", color: "#0D9488" },
   { id: "stone", icon: "🪨", label: "Đá", color: "#8b5cf6" },
 ];
 
@@ -1074,9 +1074,9 @@ const styles = StyleSheet.create({
     borderColor: "transparent",
     minWidth: 70,
   },
-  steelBtnActive: { borderColor: "#3b82f6", backgroundColor: "#dbeafe" },
+  steelBtnActive: { borderColor: "#0D9488", backgroundColor: "#CCFBF1" },
   steelBtnText: { fontSize: 14, fontWeight: "600", color: MODERN_COLORS.text },
-  steelBtnTextActive: { color: "#2563eb" },
+  steelBtnTextActive: { color: "#0D9488" },
   steelBtnMeta: {
     fontSize: 10,
     color: MODERN_COLORS.textSecondary,

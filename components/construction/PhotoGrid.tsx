@@ -59,7 +59,7 @@ export default function PhotoGrid({
             onPress={onAddPress}
             activeOpacity={0.7}
           >
-            <Ionicons name="add-circle" size={32} color="#3b82f6" />
+            <Ionicons name="add-circle" size={32} color="#0D9488" />
             <Text style={styles.addText}>Thêm ảnh</Text>
           </TouchableOpacity>
         )}

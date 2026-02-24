@@ -9,7 +9,7 @@ const REVIEWS = [
     id: '1',
     userName: 'Nguyễn Văn A',
     userInitial: 'N',
-    userColor: '#E8F4FF',
+    userColor: '#F0FDFA',
     textColor: Colors.light.primary,
     rating: 5,
     date: '2 ngày trước',
@@ -21,7 +21,7 @@ const REVIEWS = [
     userName: 'Trần Thị B',
     userInitial: 'T',
     userColor: '#FCE4EC',
-    textColor: '#0066CC',
+    textColor: '#0D9488',
     rating: 5,
     date: '3 ngày trước',
     service: 'Vật liệu xây dựng',
@@ -32,7 +32,7 @@ const REVIEWS = [
     userName: 'Lê Văn C',
     userInitial: 'L',
     userColor: '#E8F5E9',
-    textColor: '#0066CC',
+    textColor: '#0D9488',
     rating: 4,
     date: '1 tuần trước',
     service: 'Thiết kế',
@@ -42,8 +42,8 @@ const REVIEWS = [
     id: '4',
     userName: 'Phạm Thị D',
     userInitial: 'P',
-    userColor: '#E8F4FF',
-    textColor: '#0066CC',
+    userColor: '#F0FDFA',
+    textColor: '#0D9488',
     rating: 5,
     date: '1 tuần trước',
     service: 'Thợ điện',
@@ -167,7 +167,7 @@ export default function ReviewsScreen() {
               <Ionicons 
                 name="star" 
                 size={14} 
-                color={filter === rating ? '#FFF' : '#0066CC'} 
+                color={filter === rating ? '#FFF' : '#0D9488'} 
               />
             </TouchableOpacity>
           ))}
@@ -215,7 +215,7 @@ export default function ReviewsScreen() {
                         key={i}
                         name={i < review.rating ? 'star' : 'star-outline'}
                         size={14}
-                        color="#0066CC"
+                        color="#0D9488"
                         style={{ marginRight: 2 }}
                       />
                     ))}

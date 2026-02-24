@@ -65,20 +65,20 @@ const STATUS_FILTERS: { value: RFIStatus | "ALL"; label: string }[] = [
 
 const STATUS_COLORS: Record<RFIStatus, string> = {
   DRAFT: "#6B7280",
-  SUBMITTED: "#3B82F6",
-  UNDER_REVIEW: "#0066CC",
-  ANSWERED: "#0066CC",
+  SUBMITTED: "#0D9488",
+  UNDER_REVIEW: "#0D9488",
+  ANSWERED: "#0D9488",
   CLARIFICATION_REQUIRED: "#666666",
-  CLOSED: "#0066CC",
+  CLOSED: "#0D9488",
   CANCELLED: "#9CA3AF",
-  REOPENED: "#0066CC",
+  REOPENED: "#0D9488",
 };
 
 const PRIORITY_COLORS: Record<RFIPriority, string> = {
-  LOW: "#0066CC",
-  MEDIUM: "#3B82F6",
-  HIGH: "#0066CC",
-  URGENT: "#0066CC",
+  LOW: "#0D9488",
+  MEDIUM: "#0D9488",
+  HIGH: "#0D9488",
+  URGENT: "#0D9488",
   CRITICAL: "#000000",
 };
 
@@ -125,7 +125,7 @@ export default function RFIsScreen() {
   if (loading && !rfis.length) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#3B82F6" />
+        <ActivityIndicator size="large" color="#0D9488" />
       </View>
     );
   }
@@ -145,27 +145,27 @@ export default function RFIsScreen() {
         showsHorizontalScrollIndicator={false}
         style={styles.statsContainer}
       >
-        <View style={[styles.statCard, { backgroundColor: "#E8F4FF" }]}>
+        <View style={[styles.statCard, { backgroundColor: "#F0FDFA" }]}>
           <Text style={styles.statValue}>{rfis.length}</Text>
           <Text style={styles.statLabel}>Total</Text>
         </View>
 
-        <View style={[styles.statCard, { backgroundColor: "#E8F4FF" }]}>
-          <Text style={[styles.statValue, { color: "#3B82F6" }]}>
+        <View style={[styles.statCard, { backgroundColor: "#F0FDFA" }]}>
+          <Text style={[styles.statValue, { color: "#0D9488" }]}>
             {submittedCount}
           </Text>
           <Text style={styles.statLabel}>Submitted</Text>
         </View>
 
         <View style={[styles.statCard, { backgroundColor: "#FEF3C7" }]}>
-          <Text style={[styles.statValue, { color: "#0066CC" }]}>
+          <Text style={[styles.statValue, { color: "#0D9488" }]}>
             {underReviewCount}
           </Text>
           <Text style={styles.statLabel}>Under Review</Text>
         </View>
 
         <View style={[styles.statCard, { backgroundColor: "#D1FAE5" }]}>
-          <Text style={[styles.statValue, { color: "#0066CC" }]}>
+          <Text style={[styles.statValue, { color: "#0D9488" }]}>
             {answeredCount}
           </Text>
           <Text style={styles.statLabel}>Answered</Text>
@@ -388,7 +388,7 @@ export default function RFIsScreen() {
                               daysToRespond < 0
                                 ? "#000000"
                                 : daysToRespond < 3
-                                  ? "#0066CC"
+                                  ? "#0D9488"
                                   : "#6B7280",
                           }}
                         >
@@ -439,7 +439,7 @@ export default function RFIsScreen() {
                               ? "#FED7AA"
                               : rfi.impact.level === "MODERATE"
                                 ? "#FEF3C7"
-                                : "#E8F4FF",
+                                : "#F0FDFA",
                       },
                     ]}
                   >
@@ -453,7 +453,7 @@ export default function RFIsScreen() {
                             ? "#EA580C"
                             : rfi.impact.level === "MODERATE"
                               ? "#D97706"
-                              : "#0066CC"
+                              : "#0D9488"
                       }
                     />
                     <Text
@@ -467,7 +467,7 @@ export default function RFIsScreen() {
                                 ? "#EA580C"
                                 : rfi.impact.level === "MODERATE"
                                   ? "#D97706"
-                                  : "#0066CC",
+                                  : "#0D9488",
                         },
                       ]}
                     >
@@ -478,7 +478,7 @@ export default function RFIsScreen() {
                   <View style={styles.impactDetails}>
                     {rfi.impact.schedule.affectsSchedule && (
                       <View style={styles.impactItem}>
-                        <Ionicons name="calendar" size={12} color="#0066CC" />
+                        <Ionicons name="calendar" size={12} color="#0D9488" />
                         <Text style={styles.impactItemText}>
                           Schedule: {rfi.impact.schedule.delayDays} days
                           {rfi.impact.schedule.criticalPath
@@ -489,7 +489,7 @@ export default function RFIsScreen() {
                     )}
                     {rfi.impact.cost.affectsCost && (
                       <View style={styles.impactItem}>
-                        <Ionicons name="cash" size={12} color="#0066CC" />
+                        <Ionicons name="cash" size={12} color="#0D9488" />
                         <Text style={styles.impactItemText}>
                           Cost: {rfi.impact.cost.currency}{" "}
                           {rfi.impact.cost.estimatedAmount?.toLocaleString()}
@@ -517,7 +517,7 @@ export default function RFIsScreen() {
                     <Ionicons
                       name="chatbox-ellipses"
                       size={16}
-                      color="#0066CC"
+                      color="#0D9488"
                     />
                     <Text style={styles.responseHeaderText}>
                       Response Received
@@ -546,7 +546,7 @@ export default function RFIsScreen() {
               {/* Actions */}
               <View style={styles.actions}>
                 <TouchableOpacity style={styles.actionButton}>
-                  <Ionicons name="eye-outline" size={18} color="#3B82F6" />
+                  <Ionicons name="eye-outline" size={18} color="#0D9488" />
                   <Text style={styles.actionButtonText}>View</Text>
                 </TouchableOpacity>
 
@@ -687,8 +687,8 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   filterChipActive: {
-    backgroundColor: "#3B82F6",
-    borderColor: "#3B82F6",
+    backgroundColor: "#0D9488",
+    borderColor: "#0D9488",
   },
   filterChipText: {
     fontSize: 13,
@@ -832,7 +832,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 12,
     borderLeftWidth: 3,
-    borderLeftColor: "#0066CC",
+    borderLeftColor: "#0D9488",
   },
   responseHeader: {
     flexDirection: "row",
@@ -842,7 +842,7 @@ const styles = StyleSheet.create({
   responseHeaderText: {
     fontSize: 11,
     fontWeight: "600",
-    color: "#0066CC",
+    color: "#0D9488",
     marginLeft: 6,
   },
   responseText: {
@@ -852,7 +852,7 @@ const styles = StyleSheet.create({
   },
   responseBy: {
     fontSize: 10,
-    color: "#0066CC",
+    color: "#0D9488",
     fontStyle: "italic",
   },
   overdueWarning: {
@@ -884,10 +884,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#F3F4F6",
   },
   actionButtonPrimary: {
-    backgroundColor: "#3B82F6",
+    backgroundColor: "#0D9488",
   },
   actionButtonSuccess: {
-    backgroundColor: "#0066CC",
+    backgroundColor: "#0D9488",
   },
   actionButtonText: {
     fontSize: 12,

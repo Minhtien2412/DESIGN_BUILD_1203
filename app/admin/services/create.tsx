@@ -23,8 +23,8 @@ import {
 
 const CATEGORIES = [
   { id: 'DESIGN', name: 'Thiết kế', icon: 'color-palette-outline', color: '#666666' },
-  { id: 'CONSTRUCTION', name: 'Thi công', icon: 'construct-outline', color: '#0066CC' },
-  { id: 'CONSULTING', name: 'Tư vấn', icon: 'bulb-outline', color: '#3B82F6' },
+  { id: 'CONSTRUCTION', name: 'Thi công', icon: 'construct-outline', color: '#0D9488' },
+  { id: 'CONSULTING', name: 'Tư vấn', icon: 'bulb-outline', color: '#0D9488' },
   { id: 'MAINTENANCE', name: 'Bảo trì', icon: 'build-outline', color: '#06B6D4' },
   { id: 'INSPECTION', name: 'Giám sát', icon: 'eye-outline', color: '#000000' },
   { id: 'OTHER', name: 'Khác', icon: 'ellipsis-horizontal-circle-outline', color: '#6B7280' },

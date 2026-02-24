@@ -14,7 +14,7 @@ export type HomeV2Props = {
 // Theme (align with the existing green construction vibe)
 const theme = {
   colors: {
-    primary: '#0066CC',
+    primary: '#0D9488',
     primaryAlt: '#7FAB67',
     surface: '#FFFFFF',
     background: '#F7FAF1',

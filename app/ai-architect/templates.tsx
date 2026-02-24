@@ -249,19 +249,19 @@ Yêu cầu:
                 
                 <View style={styles.specsGrid}>
                   <View style={styles.specItem}>
-                    <Ionicons name="resize" size={16} color="#03a9f4" />
+                    <Ionicons name="resize" size={16} color="#14B8A6" />
                     <Text style={styles.specText}>{selectedTemplate.specs.area}</Text>
                   </View>
                   <View style={styles.specItem}>
-                    <Ionicons name="layers" size={16} color="#03a9f4" />
+                    <Ionicons name="layers" size={16} color="#14B8A6" />
                     <Text style={styles.specText}>{selectedTemplate.specs.floors}</Text>
                   </View>
                   <View style={styles.specItem}>
-                    <Ionicons name="bed" size={16} color="#03a9f4" />
+                    <Ionicons name="bed" size={16} color="#14B8A6" />
                     <Text style={styles.specText}>{selectedTemplate.specs.rooms}</Text>
                   </View>
                   <View style={styles.specItem}>
-                    <Ionicons name="cash" size={16} color="#03a9f4" />
+                    <Ionicons name="cash" size={16} color="#14B8A6" />
                     <Text style={styles.specText}>{selectedTemplate.specs.budget}</Text>
                   </View>
                 </View>
@@ -403,7 +403,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   categoryChipSelected: {
-    backgroundColor: '#03a9f4',
+    backgroundColor: '#14B8A6',
   },
   categoryLabel: {
     color: '#94a3b8',
@@ -558,7 +558,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   ctaButton: {
-    backgroundColor: '#03a9f4',
+    backgroundColor: '#14B8A6',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 10,

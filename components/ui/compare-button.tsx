@@ -26,7 +26,7 @@ export function CompareButton({
   size = 24,
   style,
   iconColor = '#666',
-  activeColor = '#3B82F6',
+  activeColor = '#0D9488',
 }: CompareButtonProps) {
   const { isInCompare, addToCompare, removeFromCompare, compareCount, maxCompareItems } = useCompare();
   const inCompare = isInCompare(id);

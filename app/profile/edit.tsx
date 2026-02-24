@@ -532,7 +532,7 @@ export default function EditProfileScreen() {
           <Ionicons
             name="information-circle-outline"
             size={20}
-            color="#0284c7"
+            color="#0D9488"
           />
           <Text style={styles.infoText}>
             Sau khi đổi mật khẩu, bạn sẽ cần đăng nhập lại.
@@ -665,7 +665,7 @@ const styles = StyleSheet.create({
   infoText: {
     flex: 1,
     fontSize: 14,
-    color: "#0284c7",
+    color: "#0D9488",
     lineHeight: 20,
   },
 });

@@ -253,7 +253,7 @@ export function ChatRoom({
         return primaryColor;
       case "delivered":
       case "sent":
-        return "#0066CC";
+        return "#0D9488";
       default:
         return "#6B7280";
     }
@@ -474,7 +474,7 @@ export function ChatRoom({
             <Text style={[styles.headerName, { color: textColor }]}>
               {recipientName}
             </Text>
-            <Text style={[styles.headerStatus, { color: "#0066CC" }]}>
+            <Text style={[styles.headerStatus, { color: "#0D9488" }]}>
               Đang hoạt động
             </Text>
           </View>

@@ -28,7 +28,7 @@ const COLORS = {
   textSecondary: "#64748B",
   border: "#E2E8F0",
   warning: "#F59E0B",
-  info: "#3B82F6",
+  info: "#0D9488",
 };
 
 type BiometricType = "fingerprint" | "facial" | "iris" | "none";

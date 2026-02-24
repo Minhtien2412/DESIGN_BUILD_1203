@@ -312,7 +312,7 @@ export default function CostEstimatorScreen() {
           flexDirection: 'row',
           gap: 12
         }}>
-          <Ionicons name="information-circle" size={24} color="#0066CC" />
+          <Ionicons name="information-circle" size={24} color="#0D9488" />
           <View style={{ flex: 1 }}>
             <Text style={{ fontSize: 13, color: '#92400E', lineHeight: 18 }}>
               Giá trên chưa bao gồm chi phí thiết kế, giám sát và các chi phí phát sinh khác. Để có báo giá chính xác, vui lòng liên hệ với chúng tôi.

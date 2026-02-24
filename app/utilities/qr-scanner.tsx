@@ -107,7 +107,7 @@ export default function QRScannerScreen() {
       {/* Bottom Actions */}
       <View style={styles.bottomActions}>
         <TouchableOpacity style={styles.actionBtn} onPress={handleDemoScan}>
-          <Ionicons name="scan" size={24} color="#0066CC" />
+          <Ionicons name="scan" size={24} color="#0D9488" />
           <Text style={styles.actionBtnText}>Demo Scan</Text>
         </TouchableOpacity>
         
@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
   centerContent: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32 },
   errorTitle: { fontSize: 18, fontWeight: '700', color: '#333', marginTop: 16, marginBottom: 8 },
   errorText: { fontSize: 14, color: '#666', textAlign: 'center', marginBottom: 24 },
-  settingsBtn: { backgroundColor: '#0066CC', paddingHorizontal: 24, paddingVertical: 12, borderRadius: 8 },
+  settingsBtn: { backgroundColor: '#0D9488', paddingHorizontal: 24, paddingVertical: 12, borderRadius: 8 },
   settingsBtnText: { color: '#fff', fontWeight: '600', fontSize: 14 },
   header: {
     flexDirection: 'row',
@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: 40,
     height: 40,
-    borderColor: '#0066CC',
+    borderColor: '#0D9488',
   },
   topLeft: { top: 0, left: 0, borderTopWidth: 4, borderLeftWidth: 4, borderTopLeftRadius: 24 },
   topRight: { top: 0, right: 0, borderTopWidth: 4, borderRightWidth: 4, borderTopRightRadius: 24 },
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
     left: 20,
     right: 20,
     height: 2,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     opacity: 0.8,
   },
   instruction: { color: '#fff', fontSize: 14, marginTop: 24 },

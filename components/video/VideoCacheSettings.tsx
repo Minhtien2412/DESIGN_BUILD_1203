@@ -74,7 +74,7 @@ export function VideoCacheSettings({
   const secondaryText = colors.secondaryText || "#666";
   const background = colors.background || "#fff";
   const cardBg = colors.card || "#f5f5f5";
-  const primaryColor = colors.primary || "#FF6B35";
+  const primaryColor = colors.primary || "#14B8A6";
   const dangerColor = "#FF4444";
 
   const handleClearCache = useCallback(async () => {
@@ -317,7 +317,7 @@ export function VideoCacheQuickStats() {
             styles.quickProgressFill,
             {
               width: `${usagePercentage}%`,
-              backgroundColor: usagePercentage > 90 ? "#FF4444" : "#FF6B35",
+              backgroundColor: usagePercentage > 90 ? "#FF4444" : "#14B8A6",
             },
           ]}
         />

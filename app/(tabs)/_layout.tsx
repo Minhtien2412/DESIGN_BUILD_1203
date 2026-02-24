@@ -16,6 +16,12 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="shop"
+        options={{
+          title: "Cửa hàng",
+        }}
+      />
+      <Tabs.Screen
         name="social"
         options={{
           title: "Cộng đồng",
@@ -124,13 +130,6 @@ export default function TabsLayout() {
         options={{
           href: null, // Hidden - accessible from quick actions
           title: "Liên lạc",
-        }}
-      />
-      <Tabs.Screen
-        name="design-library"
-        options={{
-          href: null, // Hidden - accessible from menu/quick actions
-          title: "Thư viện thiết kế",
         }}
       />
     </Tabs>

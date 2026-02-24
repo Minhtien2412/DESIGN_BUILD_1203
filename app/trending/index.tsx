@@ -1,10 +1,14 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { get } from "@/services/api";
 import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 import { Stack, useRouter } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
 import {
     Dimensions,
     FlatList,
     Image,
+    RefreshControl,
     ScrollView,
     StyleSheet,
     Text,
@@ -96,6 +100,27 @@ export default function TrendingScreen() {
   const textColor = useThemeColor({}, "text");
   const cardBg = useThemeColor({}, "card");
   const router = useRouter();
+  const [refreshing, setRefreshing] = useState(false);
+  const [items, setItems] = useState(trendingItems);
+
+  const fetchTrending = useCallback(async () => {
+    try {
+      const res = await get("/api/trending");
+      if (res?.data) setItems(res.data);
+    } catch {
+      /* mock */
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchTrending();
+  }, [fetchTrending]);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchTrending();
+    setRefreshing(false);
+  }, [fetchTrending]);
 
   const formatPrice = (price: number) => price.toLocaleString("vi-VN") + "đ";
   const formatNumber = (num: number) => {
@@ -113,6 +138,14 @@ export default function TrendingScreen() {
     return (
       <TouchableOpacity
         style={[styles.trendingCard, { backgroundColor: cardBg }]}
+        onPress={() => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          if (item.type === "product")
+            router.push(`/product/${item.id}` as any);
+          else if (item.type === "worker")
+            router.push(`/workers/${item.id}` as any);
+          else router.push("/discover" as any);
+        }}
       >
         <Image source={{ uri: item.image }} style={styles.trendingImage} />
 
@@ -180,7 +213,16 @@ export default function TrendingScreen() {
     <View style={[styles.container, { backgroundColor }]}>
       <Stack.Screen options={{ title: "Xu hướng", headerShown: true }} />
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#14B8A6"
+          />
+        }
+      >
         {/* Categories */}
         <View style={[styles.section, { backgroundColor: cardBg }]}>
           <Text style={[styles.sectionTitle, { color: textColor }]}>
@@ -192,10 +234,10 @@ export default function TrendingScreen() {
                 <View
                   style={[
                     styles.categoryIcon,
-                    { backgroundColor: "#FF6B3520" },
+                    { backgroundColor: "#14B8A620" },
                   ]}
                 >
-                  <Ionicons name={cat.icon as any} size={24} color="#FF6B35" />
+                  <Ionicons name={cat.icon as any} size={24} color="#14B8A6" />
                 </View>
                 <Text style={[styles.categoryName, { color: textColor }]}>
                   {cat.name}
@@ -218,7 +260,7 @@ export default function TrendingScreen() {
           </View>
 
           <FlatList
-            data={trendingItems}
+            data={items}
             renderItem={renderTrendingItem}
             keyExtractor={(item) => item.id}
             horizontal
@@ -228,7 +270,7 @@ export default function TrendingScreen() {
         </View>
 
         {/* Stats */}
-        <View style={[styles.statsCard, { backgroundColor: "#FF6B35" }]}>
+        <View style={[styles.statsCard, { backgroundColor: "#0D9488" }]}>
           <View style={styles.statBox}>
             <Text style={styles.statNumber}>1.2M+</Text>
             <Text style={styles.statLabel}>Lượt xem</Text>
@@ -248,7 +290,7 @@ export default function TrendingScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { flex: 1, backgroundColor: "#F8FAFB" },
   section: { padding: 16 },
   sectionHeader: {
     flexDirection: "row",
@@ -256,8 +298,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 16,
   },
-  sectionTitle: { fontSize: 18, fontWeight: "600", marginBottom: 16 },
-  viewAll: { color: "#FF6B35", fontSize: 14 },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    marginBottom: 16,
+    letterSpacing: -0.3,
+  },
+  viewAll: { color: "#0D9488", fontSize: 14, fontWeight: "500" },
   categoriesGrid: { flexDirection: "row", justifyContent: "space-between" },
   categoryItem: { alignItems: "center", width: "23%" },
   categoryIcon: {
@@ -269,36 +316,47 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   categoryName: { fontSize: 13, fontWeight: "500", marginBottom: 2 },
-  categoryCount: { fontSize: 11, color: "#999" },
+  categoryCount: { fontSize: 11, color: "#9CA3AF" },
   horizontalList: { paddingRight: 16 },
   trendingCard: {
     width: 200,
-    borderRadius: 12,
+    borderRadius: 16,
     marginRight: 12,
     overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+    elevation: 2,
   },
-  trendingImage: { width: "100%", height: 130, backgroundColor: "#f0f0f0" },
+  trendingImage: { width: "100%", height: 130, backgroundColor: "#F3F4F6" },
   trendBadge: {
     position: "absolute",
     top: 8,
     left: 8,
     paddingHorizontal: 8,
     paddingVertical: 4,
-    borderRadius: 4,
+    borderRadius: 10,
   },
   trendBadgeText: { fontSize: 10, fontWeight: "bold" },
   trendingContent: { padding: 12 },
   trendingTitle: {
     fontSize: 14,
-    fontWeight: "500",
+    fontWeight: "600",
     marginBottom: 6,
     height: 40,
+    letterSpacing: -0.2,
   },
-  subText: { color: "#666", fontSize: 12, marginBottom: 4 },
+  subText: { color: "#6B7280", fontSize: 12, marginBottom: 4 },
   statsRow: { flexDirection: "row", alignItems: "center", marginBottom: 4 },
-  statText: { marginLeft: 4, color: "#666", fontSize: 12 },
+  statText: { marginLeft: 4, color: "#6B7280", fontSize: 12 },
   statSeparator: { marginHorizontal: 6, color: "#ccc" },
-  priceText: { color: "#FF6B35", fontSize: 16, fontWeight: "bold" },
+  priceText: {
+    color: "#0D9488",
+    fontSize: 16,
+    fontWeight: "800",
+    letterSpacing: -0.3,
+  },
   bookingsText: { color: "#4CAF50", fontSize: 12, fontWeight: "500" },
   statsCard: {
     margin: 16,
@@ -308,6 +366,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
   },
   statBox: { alignItems: "center" },
-  statNumber: { color: "#fff", fontSize: 24, fontWeight: "bold" },
+  statNumber: {
+    color: "#fff",
+    fontSize: 24,
+    fontWeight: "800",
+    letterSpacing: -0.5,
+  },
   statLabel: { color: "#fff", opacity: 0.9, fontSize: 13, marginTop: 4 },
 });

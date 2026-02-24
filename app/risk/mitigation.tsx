@@ -88,11 +88,11 @@ export default function MitigationActionsScreen() {
   const getStatusColor = (status: MitigationStatus) => {
     switch (status) {
       case 'PLANNED':
-        return '#0066CC';
+        return '#0D9488';
       case 'IN_PROGRESS':
-        return '#0066CC';
+        return '#0D9488';
       case 'COMPLETED':
-        return '#0080FF';
+        return '#14B8A6';
       case 'CANCELLED':
         return '#999999';
       case 'OVERDUE':
@@ -126,9 +126,9 @@ export default function MitigationActionsScreen() {
       case 'HIGH':
         return '#000000';
       case 'MEDIUM':
-        return '#0066CC';
+        return '#0D9488';
       case 'LOW':
-        return '#0080FF';
+        return '#14B8A6';
       default:
         return '#999999';
     }
@@ -181,7 +181,7 @@ export default function MitigationActionsScreen() {
         {/* Cost */}
         {item.cost && (
           <View style={styles.costRow}>
-            <Ionicons name="cash-outline" size={16} color="#0080FF" />
+            <Ionicons name="cash-outline" size={16} color="#14B8A6" />
             <Text style={styles.costText}>
               {item.cost.toLocaleString('vi-VN')} VND
             </Text>
@@ -191,7 +191,7 @@ export default function MitigationActionsScreen() {
         {/* Completed info */}
         {item.status === 'COMPLETED' && item.completedAt && (
           <View style={styles.completedInfo}>
-            <Ionicons name="checkmark-circle" size={16} color="#0080FF" />
+            <Ionicons name="checkmark-circle" size={16} color="#14B8A6" />
             <Text style={styles.completedText}>
               Hoàn thành: {new Date(item.completedAt).toLocaleDateString('vi-VN')}
             </Text>
@@ -211,7 +211,7 @@ export default function MitigationActionsScreen() {
   if (loading && allActions.length === 0) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#0066CC" />
+        <ActivityIndicator size="large" color="#0D9488" />
         <Text style={styles.loadingText}>Đang tải hành động...</Text>
       </View>
     );
@@ -225,12 +225,12 @@ export default function MitigationActionsScreen() {
           <Text style={styles.statValue}>{stats.total}</Text>
           <Text style={styles.statLabel}>Tổng</Text>
         </View>
-        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
-          <Text style={[styles.statValue, { color: '#0066CC' }]}>{stats.planned}</Text>
+        <View style={[styles.statCard, { backgroundColor: '#F0FDFA' }]}>
+          <Text style={[styles.statValue, { color: '#0D9488' }]}>{stats.planned}</Text>
           <Text style={styles.statLabel}>Lên kế hoạch</Text>
         </View>
-        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
-          <Text style={[styles.statValue, { color: '#0066CC' }]}>{stats.inProgress}</Text>
+        <View style={[styles.statCard, { backgroundColor: '#F0FDFA' }]}>
+          <Text style={[styles.statValue, { color: '#0D9488' }]}>{stats.inProgress}</Text>
           <Text style={styles.statLabel}>Đang thực hiện</Text>
         </View>
         <View style={[styles.statCard, { backgroundColor: '#F5F5F5' }]}>
@@ -491,7 +491,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   tabActive: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   tabText: {
     fontSize: 11,
@@ -587,7 +587,7 @@ const styles = StyleSheet.create({
   },
   costText: {
     fontSize: 13,
-    color: '#0080FF',
+    color: '#14B8A6',
     fontWeight: '600',
   },
   completedInfo: {
@@ -602,7 +602,7 @@ const styles = StyleSheet.create({
   },
   completedText: {
     fontSize: 12,
-    color: '#0080FF',
+    color: '#14B8A6',
   },
   actionNotes: {
     fontSize: 13,
@@ -617,7 +617,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
@@ -637,7 +637,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   emptyButton: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
@@ -739,7 +739,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
   },
   modalButtonPrimary: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   modalButtonTextSecondary: {
     fontSize: 14,

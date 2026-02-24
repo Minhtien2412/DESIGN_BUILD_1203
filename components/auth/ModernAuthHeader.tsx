@@ -23,7 +23,7 @@ export function ModernAuthHeader() {
   if (loading) {
     return (
       <View style={styles.container}>
-        <MaterialCommunityIcons name="loading" size={20} color="#0066CC" />
+        <MaterialCommunityIcons name="loading" size={20} color="#0D9488" />
         <Text style={styles.loadingText}>�ang t?i...</Text>
       </View>
     );
@@ -33,7 +33,7 @@ export function ModernAuthHeader() {
     return (
       <TouchableOpacity style={styles.container} onPress={handleAuthAction}>
         <View style={styles.avatarContainer}>
-          <MaterialCommunityIcons name="account-circle" size={24} color="#0066CC" />
+          <MaterialCommunityIcons name="account-circle" size={24} color="#0D9488" />
         </View>
         <View style={styles.userInfo}>
           <Text style={styles.userName} numberOfLines={1}>
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 6,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     gap: 6,
   },
   loginText: {

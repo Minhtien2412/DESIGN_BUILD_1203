@@ -155,7 +155,7 @@ export default function FavoritesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   header: {
     flexDirection: 'row',
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   filterTextActive: {
-    color: '#0066CC',
+    color: '#0D9488',
   },
   list: {
     paddingHorizontal: 16,
@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   meta: {
     flexDirection: 'row',

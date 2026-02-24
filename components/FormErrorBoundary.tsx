@@ -66,7 +66,7 @@ function ErrorFallback({ error, onReset }: { error: Error | null; onReset: () =>
   const bg = useThemeColor({}, 'background');
   const text = useThemeColor({}, 'text');
   const errorColor = '#000000';
-  const buttonBg = '#3b82f6';
+  const buttonBg = '#0D9488';
 
   return (
     <View style={[styles.container, { backgroundColor: bg }]}>

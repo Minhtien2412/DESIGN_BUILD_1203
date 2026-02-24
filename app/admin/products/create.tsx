@@ -264,8 +264,8 @@ const styles = StyleSheet.create({
     borderColor: '#e0e0e0',
   },
   categoryButtonActive: {
-    backgroundColor: '#0066CC',
-    borderColor: '#0066CC',
+    backgroundColor: '#0D9488',
+    borderColor: '#0D9488',
   },
   categoryButtonText: {
     fontSize: 13,
@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   submitButton: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     borderRadius: 8,
     paddingVertical: 16,
     alignItems: 'center',

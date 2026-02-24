@@ -25,7 +25,7 @@ import {
 type CodeType = 'hook' | 'controller' | 'model' | 'helper' | 'api';
 
 const CODE_TYPES: { id: CodeType; label: string; icon: string; color: string }[] = [
-  { id: 'hook', label: 'Hook', icon: '🪝', color: '#03a9f4' },
+  { id: 'hook', label: 'Hook', icon: '🪝', color: '#14B8A6' },
   { id: 'controller', label: 'Controller', icon: '🎮', color: '#8e44ad' },
   { id: 'model', label: 'Model', icon: '📦', color: '#27ae60' },
   { id: 'helper', label: 'Helper', icon: '🔧', color: '#f39c12' },
@@ -184,7 +184,7 @@ export default function ImplementationScreen() {
                 )}
               </View>
               <TouchableOpacity style={styles.copyButton} onPress={handleCopy}>
-                <Ionicons name="copy-outline" size={18} color="#03a9f4" />
+                <Ionicons name="copy-outline" size={18} color="#14B8A6" />
                 <Text style={styles.copyText}>Sao chép</Text>
               </TouchableOpacity>
             </View>
@@ -206,7 +206,7 @@ export default function ImplementationScreen() {
           <View style={styles.structureContainer}>
             {PERFEX_STRUCTURE.map((item, index) => (
               <View key={index} style={styles.structureItem}>
-                <Ionicons name="folder-outline" size={16} color="#03a9f4" />
+                <Ionicons name="folder-outline" size={16} color="#14B8A6" />
                 <View style={styles.structureContent}>
                   <Text style={styles.structurePath}>{item.path}</Text>
                   <Text style={styles.structureDesc}>{item.desc}</Text>
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   templateBadge: {
-    backgroundColor: '#03a9f4',
+    backgroundColor: '#14B8A6',
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 4,
@@ -352,7 +352,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   filename: {
-    color: '#03a9f4',
+    color: '#14B8A6',
     fontSize: 12,
     marginTop: 2,
   },
@@ -362,7 +362,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   copyText: {
-    color: '#03a9f4',
+    color: '#14B8A6',
     fontSize: 14,
   },
   codeScroll: {
@@ -396,7 +396,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   structurePath: {
-    color: '#03a9f4',
+    color: '#14B8A6',
     fontSize: 12,
     fontFamily: 'monospace',
   },

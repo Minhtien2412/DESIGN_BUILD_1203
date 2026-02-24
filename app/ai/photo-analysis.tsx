@@ -148,7 +148,7 @@ export default function PhotoAnalysisScreen() {
         {result && (
           <View style={styles.resultSection}>
             <View style={styles.resultHeader}>
-              <Ionicons name="checkmark-circle" size={24} color="#0066CC" />
+              <Ionicons name="checkmark-circle" size={24} color="#0D9488" />
               <Text style={styles.resultTitle}>Kết quả phân tích</Text>
             </View>
 
@@ -189,7 +189,7 @@ export default function PhotoAnalysisScreen() {
                 <Text style={styles.cardTitle}>Vấn đề phát hiện</Text>
                 {result.issues.map((issue, index) => (
                   <View key={index} style={styles.issueItem}>
-                    <Ionicons name="warning" size={16} color="#0066CC" />
+                    <Ionicons name="warning" size={16} color="#0D9488" />
                     <Text style={styles.issueText}>{issue}</Text>
                   </View>
                 ))}

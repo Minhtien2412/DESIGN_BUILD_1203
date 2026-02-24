@@ -71,7 +71,7 @@ type OrderTab =
 const ORDER_TABS: { key: OrderTab; label: string; color: string }[] = [
   { key: "all", label: "Tất cả", color: "#6B7280" },
   { key: "pending", label: "Chờ xác nhận", color: "#F59E0B" },
-  { key: "confirmed", label: "Đã xác nhận", color: "#3B82F6" },
+  { key: "confirmed", label: "Đã xác nhận", color: "#0D9488" },
   { key: "shipping", label: "Đang giao", color: "#8B5CF6" },
   { key: "delivered", label: "Đã giao", color: "#10B981" },
   { key: "cancelled", label: "Đã hủy", color: "#EF4444" },
@@ -215,7 +215,7 @@ export default function SellerOrdersScreen() {
   const getStatusBadge = (status: SellerOrder["status"]) => {
     const statusMap = {
       PENDING: { color: "#F59E0B", bg: "#FEF3C7", text: "Chờ xác nhận" },
-      CONFIRMED: { color: "#3B82F6", bg: "#DBEAFE", text: "Đã xác nhận" },
+      CONFIRMED: { color: "#0D9488", bg: "#CCFBF1", text: "Đã xác nhận" },
       PROCESSING: { color: "#8B5CF6", bg: "#EDE9FE", text: "Đang xử lý" },
       SHIPPING: { color: "#8B5CF6", bg: "#EDE9FE", text: "Đang giao" },
       DELIVERED: { color: "#10B981", bg: "#D1FAE5", text: "Đã giao" },
@@ -335,7 +335,7 @@ export default function SellerOrdersScreen() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#FF6B35" />
+        <ActivityIndicator size="large" color="#14B8A6" />
       </View>
     );
   }
@@ -344,7 +344,7 @@ export default function SellerOrdersScreen() {
     <SafeAreaView style={styles.container} edges={["bottom"]}>
       {/* Stats Header */}
       <LinearGradient
-        colors={["#FF6B35", "#FF8C5A"]}
+        colors={["#14B8A6", "#FF8C5A"]}
         style={styles.headerGradient}
       >
         <View style={styles.statsRow}>
@@ -410,7 +410,7 @@ export default function SellerOrdersScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={["#FF6B35"]}
+            colors={["#14B8A6"]}
           />
         }
         ListEmptyComponent={
@@ -478,14 +478,14 @@ const styles = StyleSheet.create({
   },
   activeTab: {
     borderBottomWidth: 2,
-    borderBottomColor: "#FF6B35",
+    borderBottomColor: "#14B8A6",
   },
   tabText: {
     fontSize: 14,
     color: "#6B7280",
   },
   activeTabText: {
-    color: "#FF6B35",
+    color: "#14B8A6",
     fontWeight: "600",
   },
   tabBadge: {
@@ -581,7 +581,7 @@ const styles = StyleSheet.create({
   },
   itemPrice: {
     fontSize: 13,
-    color: "#FF6B35",
+    color: "#14B8A6",
     fontWeight: "500",
   },
   orderFooter: {
@@ -598,7 +598,7 @@ const styles = StyleSheet.create({
   totalAmount: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#FF6B35",
+    color: "#14B8A6",
     marginTop: 2,
   },
   orderDate: {
@@ -638,7 +638,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   confirmBtn: {
-    backgroundColor: "#FF6B35",
+    backgroundColor: "#14B8A6",
   },
   confirmBtnText: {
     fontSize: 13,

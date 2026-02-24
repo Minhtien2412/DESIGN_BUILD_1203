@@ -223,7 +223,7 @@ export default function PhotoAnalysisScreen() {
 function FeatureItem({ icon, text }: { icon: string; text: string }) {
   return (
     <View style={styles.featureItem}>
-      <Ionicons name={icon as any} size={20} color="#0066CC" />
+      <Ionicons name={icon as any} size={20} color="#0D9488" />
       <Text style={styles.featureText}>{text}</Text>
     </View>
   );

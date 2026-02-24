@@ -649,8 +649,8 @@ export default function ProjectsScreen() {
       {projects.length > 0 && (
         <View style={[styles.statsOverview, { backgroundColor: colors.chipBackground, borderBottomColor: colors.border }]}>
           <View style={styles.statCard}>
-            <View style={[styles.statIconContainer, { backgroundColor: '#3b82f620' }]}>
-              <Ionicons name="wallet-outline" size={20} color="#3b82f6" />
+            <View style={[styles.statIconContainer, { backgroundColor: '#0D948820' }]}>
+              <Ionicons name="wallet-outline" size={20} color="#0D9488" />
             </View>
             <Text style={[styles.statLabel, { color: colors.textMuted }]}>Ngân sách</Text>
             <Text style={[styles.statValue, { color: colors.text }]}>{overviewStats.budgetPercentage.toFixed(0)}%</Text>

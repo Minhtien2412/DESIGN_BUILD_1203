@@ -33,7 +33,7 @@ const POPULAR_SEARCHES = [
   { text: "gạch men", icon: "grid", color: "#10b981" },
   { text: "sơn", icon: "color-palette", color: "#f59e0b" },
   { text: "cửa gỗ", icon: "enter", color: "#ef4444" },
-  { text: "điều hòa", icon: "snow", color: "#3b82f6" },
+  { text: "điều hòa", icon: "snow", color: "#0D9488" },
   { text: "nội thất", icon: "home", color: "#8b5cf6" },
   { text: "vật liệu xây", icon: "construct", color: "#ec4899" },
   { text: "thợ xây", icon: "person", color: "#14b8a6" },
@@ -78,8 +78,8 @@ const CATEGORIES: {
   {
     name: "Điều hòa",
     icon: "snow-outline",
-    color: "#3b82f6",
-    gradient: ["#3b82f6", "#60a5fa"],
+    color: "#0D9488",
+    gradient: ["#0D9488", "#2DD4BF"],
   },
 ];
 

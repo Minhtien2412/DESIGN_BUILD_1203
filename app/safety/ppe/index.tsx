@@ -71,7 +71,7 @@ export default function PPEInventoryScreen() {
           title: 'Quản lý PPE',
           headerRight: () => (
             <TouchableOpacity onPress={() => setModalVisible(true)}>
-              <Ionicons name="add-circle" size={28} color="#0066CC" style={{ marginRight: 8 }} />
+              <Ionicons name="add-circle" size={28} color="#0D9488" style={{ marginRight: 8 }} />
             </TouchableOpacity>
           ),
         }}
@@ -85,7 +85,7 @@ export default function PPEInventoryScreen() {
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statItem}>
-          <Text style={[styles.statValue, { color: '#0066CC' }]}>{goodCondition.length}</Text>
+          <Text style={[styles.statValue, { color: '#0D9488' }]}>{goodCondition.length}</Text>
           <Text style={styles.statLabel}>Tốt</Text>
         </View>
         <View style={styles.statDivider} />
@@ -219,7 +219,7 @@ function PPECard({ item }: PPECardProps) {
 
       {item.expiryDate && (
         <View style={styles.expiryInfo}>
-          <Ionicons name="time" size={14} color="#0066CC" />
+          <Ionicons name="time" size={14} color="#0D9488" />
           <Text style={styles.expiryText}>
             Hết hạn: {new Date(item.expiryDate).toLocaleDateString('vi-VN')}
           </Text>
@@ -403,11 +403,11 @@ function AddPPEModal({ visible, projectId, onClose, onCreate }: AddPPEModalProps
 function getConditionColor(condition: PPECondition): string {
   switch (condition) {
     case PPECondition.NEW:
-      return '#0066CC';
+      return '#0D9488';
     case PPECondition.GOOD:
-      return '#0066CC';
+      return '#0D9488';
     case PPECondition.FAIR:
-      return '#0066CC';
+      return '#0D9488';
     case PPECondition.WORN:
       return '#000000';
     case PPECondition.DAMAGED:
@@ -501,7 +501,7 @@ const styles = StyleSheet.create({
     borderBottomColor: 'transparent',
   },
   filterTabActive: {
-    borderBottomColor: '#0066CC',
+    borderBottomColor: '#0D9488',
   },
   filterTabText: {
     fontSize: 13,
@@ -509,7 +509,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   filterTabTextActive: {
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: 'bold',
   },
   listContent: {
@@ -576,7 +576,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     padding: 8,
     borderRadius: 6,
     marginTop: 12,
@@ -598,7 +598,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   addButton: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
@@ -668,8 +668,8 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   typeChipActive: {
-    backgroundColor: '#0066CC',
-    borderColor: '#0066CC',
+    backgroundColor: '#0D9488',
+    borderColor: '#0D9488',
   },
   typeChipText: {
     fontSize: 12,
@@ -723,7 +723,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 14,
     borderRadius: 8,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     alignItems: 'center',
   },
   createButtonText: {

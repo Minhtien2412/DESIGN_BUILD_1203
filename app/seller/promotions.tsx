@@ -197,7 +197,7 @@ export default function SellerPromotionsScreen() {
       case "active":
         return { label: "Đang diễn ra", color: "#10B981", bg: "#D1FAE5" };
       case "scheduled":
-        return { label: "Sắp diễn ra", color: "#3B82F6", bg: "#DBEAFE" };
+        return { label: "Sắp diễn ra", color: "#0D9488", bg: "#CCFBF1" };
       case "expired":
         return { label: "Đã kết thúc", color: "#6B7280", bg: "#F3F4F6" };
       case "paused":
@@ -289,7 +289,7 @@ export default function SellerPromotionsScreen() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#FF6B35" />
+        <ActivityIndicator size="large" color="#14B8A6" />
       </View>
     );
   }
@@ -298,7 +298,7 @@ export default function SellerPromotionsScreen() {
     <SafeAreaView style={styles.container} edges={["bottom"]}>
       {/* Stats Header */}
       <LinearGradient
-        colors={["#FF6B35", "#FF8C5A"]}
+        colors={["#14B8A6", "#FF8C5A"]}
         style={styles.statsHeader}
       >
         <View style={styles.statsGrid}>
@@ -350,7 +350,7 @@ export default function SellerPromotionsScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={["#FF6B35"]}
+            colors={["#14B8A6"]}
           />
         }
         contentContainerStyle={styles.listContent}
@@ -477,8 +477,8 @@ export default function SellerPromotionsScreen() {
                       /* Edit */
                     }}
                   >
-                    <Ionicons name="create-outline" size={18} color="#3B82F6" />
-                    <Text style={[styles.actionText, { color: "#3B82F6" }]}>
+                    <Ionicons name="create-outline" size={18} color="#0D9488" />
+                    <Text style={[styles.actionText, { color: "#0D9488" }]}>
                       Sửa
                     </Text>
                   </Pressable>
@@ -522,7 +522,7 @@ export default function SellerPromotionsScreen() {
       {/* FAB - Add Promotion */}
       <Pressable style={styles.fab}>
         <LinearGradient
-          colors={["#FF6B35", "#FF8C5A"]}
+          colors={["#14B8A6", "#FF8C5A"]}
           style={styles.fabGradient}
         >
           <Ionicons name="add" size={28} color="#FFFFFF" />
@@ -584,7 +584,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   activeFilterChip: {
-    backgroundColor: "#FF6B35",
+    backgroundColor: "#14B8A6",
   },
   filterChipText: {
     fontSize: 13,
@@ -611,7 +611,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     paddingHorizontal: 24,
     paddingVertical: 12,
-    backgroundColor: "#FF6B35",
+    backgroundColor: "#14B8A6",
     borderRadius: 8,
   },
   emptyButtonText: {
@@ -642,13 +642,13 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 4,
     borderWidth: 1,
-    borderColor: "#FF6B35",
+    borderColor: "#14B8A6",
     borderStyle: "dashed",
   },
   promoCode: {
     fontSize: 14,
     fontWeight: "bold",
-    color: "#FF6B35",
+    color: "#14B8A6",
   },
   statusBadge: {
     paddingHorizontal: 8,
@@ -684,7 +684,7 @@ const styles = StyleSheet.create({
   valueText: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#FF6B35",
+    color: "#14B8A6",
   },
   maxDiscountText: {
     fontSize: 12,
@@ -763,7 +763,7 @@ const styles = StyleSheet.create({
     right: 16,
     bottom: 24,
     borderRadius: 28,
-    shadowColor: "#FF6B35",
+    shadowColor: "#14B8A6",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,

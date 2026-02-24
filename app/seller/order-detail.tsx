@@ -182,7 +182,7 @@ export default function OrderDetailScreen() {
       },
       confirmed: {
         label: "Đã xác nhận",
-        color: "#3B82F6",
+        color: "#0D9488",
         icon: "checkmark-circle-outline",
       },
       shipping: { label: "Đang giao", color: "#8B5CF6", icon: "car-outline" },
@@ -233,7 +233,7 @@ export default function OrderDetailScreen() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#FF6B35" />
+        <ActivityIndicator size="large" color="#14B8A6" />
       </View>
     );
   }
@@ -530,7 +530,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     paddingHorizontal: 24,
     paddingVertical: 12,
-    backgroundColor: "#FF6B35",
+    backgroundColor: "#14B8A6",
     borderRadius: 8,
   },
   backButtonText: {
@@ -672,7 +672,7 @@ const styles = StyleSheet.create({
   productPrice: {
     fontSize: 15,
     fontWeight: "600",
-    color: "#FF6B35",
+    color: "#14B8A6",
   },
   productQuantity: {
     fontSize: 13,
@@ -705,7 +705,7 @@ const styles = StyleSheet.create({
   totalValue: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#FF6B35",
+    color: "#14B8A6",
   },
   paymentInfo: {
     marginTop: 12,
@@ -753,7 +753,7 @@ const styles = StyleSheet.create({
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: "#FF6B35",
+    backgroundColor: "#14B8A6",
     marginTop: 4,
   },
   timelineLine: {
@@ -793,7 +793,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#10B981",
   },
   shipBtn: {
-    backgroundColor: "#3B82F6",
+    backgroundColor: "#0D9488",
   },
   cancelBtn: {
     backgroundColor: "#FFFFFF",

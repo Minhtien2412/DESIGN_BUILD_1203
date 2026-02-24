@@ -17,8 +17,8 @@ import {
 } from 'react-native';
 
 const SEVERITY_COLORS = {
-  'near-miss': '#3b82f6',
-  'minor': '#0066CC',
+  'near-miss': '#0D9488',
+  'minor': '#0D9488',
   'major': '#000000',
   'fatal': '#7f1d1d'
 };
@@ -31,9 +31,9 @@ const SEVERITY_LABELS = {
 };
 
 const STATUS_COLORS = {
-  'reported': '#0066CC',
-  'investigating': '#3b82f6',
-  'closed': '#0066CC'
+  'reported': '#0D9488',
+  'investigating': '#0D9488',
+  'closed': '#0D9488'
 };
 
 const STATUS_LABELS = {
@@ -124,19 +124,19 @@ export default function SafetyIncidentsScreen() {
               label="Tổng số sự cố"
               value={stats.totalIncidents.toString()}
               icon="alert-circle"
-              gradientColors={['#3b82f6', '#0066CC']}
+              gradientColors={['#0D9488', '#0D9488']}
             />
             <MetricCard
               label="Suýt xảy ra"
               value={stats.nearMisses.toString()}
               icon="alert"
-              gradientColors={['#3b82f6', '#1d4ed8']}
+              gradientColors={['#0D9488', '#0F766E']}
             />
             <MetricCard
               label="Sự cố nhẹ"
               value={stats.minorIncidents.toString()}
               icon="warning"
-              gradientColors={['#0066CC', '#d97706']}
+              gradientColors={['#0D9488', '#d97706']}
             />
             <MetricCard
               label="Nghiêm trọng"
@@ -148,7 +148,7 @@ export default function SafetyIncidentsScreen() {
               label="Ngày không sự cố"
               value={stats.daysWithoutIncident.toString()}
               icon="checkmark-circle"
-              gradientColors={['#0066CC', '#0066CC']}
+              gradientColors={['#0D9488', '#0D9488']}
             />
           </ScrollView>
         )}
@@ -219,7 +219,7 @@ export default function SafetyIncidentsScreen() {
 
           {filteredIncidents.length === 0 ? (
             <View style={styles.emptyState}>
-              <Ionicons name="checkmark-circle-outline" size={64} color="#0066CC" />
+              <Ionicons name="checkmark-circle-outline" size={64} color="#0D9488" />
               <Text style={styles.emptyStateTitle}>Không có sự cố nào</Text>
               <Text style={styles.emptyStateText}>
                 Tuyệt vời! Công trình đang vận hành an toàn
@@ -318,7 +318,7 @@ export default function SafetyIncidentsScreen() {
                     onPress={() => handleViewIncident(incident.id)}
                   >
                     <Text style={styles.viewButtonText}>Xem chi tiết</Text>
-                    <Ionicons name="chevron-forward" size={16} color="#3b82f6" />
+                    <Ionicons name="chevron-forward" size={16} color="#0D9488" />
                   </TouchableOpacity>
                 </View>
               ))}
@@ -413,8 +413,8 @@ const styles = StyleSheet.create({
     gap: 6
   },
   filterChipActive: {
-    backgroundColor: '#3b82f6',
-    borderColor: '#3b82f6'
+    backgroundColor: '#0D9488',
+    borderColor: '#0D9488'
   },
   filterChipText: {
     fontSize: 14,
@@ -517,7 +517,7 @@ const styles = StyleSheet.create({
   actionsTitle: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#0066CC',
+    color: '#0D9488',
     marginBottom: 6
   },
   actionItem: {
@@ -536,7 +536,7 @@ const styles = StyleSheet.create({
   viewButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#3b82f6'
+    color: '#0D9488'
   },
   emptyState: {
     alignItems: 'center',

@@ -47,7 +47,7 @@ function transformHistory(item: ApiHistoryItem): PointHistory {
     description: item.description,
     date: item.createdAt,
     icon: item.type === 'earn' ? 'cart' : 'ticket',
-    color: item.type === 'earn' ? '#0066CC' : '#000000',
+    color: item.type === 'earn' ? '#0D9488' : '#000000',
   };
 }
 
@@ -209,7 +209,7 @@ export default function RewardsScreen() {
       <Text
         style={[
           styles.historyPoints,
-          { color: item.type === 'earn' ? '#0066CC' : '#000000' },
+          { color: item.type === 'earn' ? '#0D9488' : '#000000' },
         ]}
       >
         {item.type === 'earn' ? '+' : ''}{item.points}

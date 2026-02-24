@@ -52,9 +52,9 @@ export default function QCQAIndexScreen() {
   const checklistTypes = [
     { type: 'FOUNDATION', name: 'Móng', icon: 'construct', color: '#666666' },
     { type: 'STRUCTURE', name: 'Kết cấu', icon: 'business', color: '#1A1A1A' },
-    { type: 'MEP', name: 'M&E', icon: 'flash', color: '#0066CC' },
-    { type: 'FINISHING', name: 'Hoàn thiện', icon: 'color-palette', color: '#0066CC' },
-    { type: 'LANDSCAPE', name: 'Cảnh quan', icon: 'leaf', color: '#0066CC' },
+    { type: 'MEP', name: 'M&E', icon: 'flash', color: '#0D9488' },
+    { type: 'FINISHING', name: 'Hoàn thiện', icon: 'color-palette', color: '#0D9488' },
+    { type: 'LANDSCAPE', name: 'Cảnh quan', icon: 'leaf', color: '#0D9488' },
   ];
 
   return (
@@ -66,7 +66,7 @@ export default function QCQAIndexScreen() {
         {/* Header Stats */}
         <View style={styles.headerStats}>
           <View style={styles.statCard}>
-            <Ionicons name="checkmark-circle" size={32} color="#0066CC" />
+            <Ionicons name="checkmark-circle" size={32} color="#0D9488" />
             <Text style={styles.statNumber}>{checklistStats.approved}</Text>
             <Text style={styles.statLabel}>Checklists đã duyệt</Text>
           </View>
@@ -81,14 +81,14 @@ export default function QCQAIndexScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Tổng quan QC/QA</Text>
           <View style={styles.statsGrid}>
-            <View style={[styles.miniStatCard, { backgroundColor: '#E8F4FF' }]}>
-              <Text style={[styles.miniStatNumber, { color: '#0066CC' }]}>
+            <View style={[styles.miniStatCard, { backgroundColor: '#F0FDFA' }]}>
+              <Text style={[styles.miniStatNumber, { color: '#0D9488' }]}>
                 {checklistStats.total}
               </Text>
               <Text style={styles.miniStatLabel}>Tổng Checklists</Text>
             </View>
-            <View style={[styles.miniStatCard, { backgroundColor: '#E8F4FF' }]}>
-              <Text style={[styles.miniStatNumber, { color: '#0066CC' }]}>
+            <View style={[styles.miniStatCard, { backgroundColor: '#F0FDFA' }]}>
+              <Text style={[styles.miniStatNumber, { color: '#0D9488' }]}>
                 {checklistStats.inProgress}
               </Text>
               <Text style={styles.miniStatLabel}>Đang thực hiện</Text>
@@ -174,10 +174,10 @@ export default function QCQAIndexScreen() {
               onPress={() => router.push(`/projects/${projectId}/qc-qa/defects/create`)}
             >
               <View style={styles.defectSummaryHeader}>
-                <Ionicons name="add-circle" size={24} color="#0066CC" />
+                <Ionicons name="add-circle" size={24} color="#0D9488" />
                 <Text style={styles.defectSummaryTitle}>Báo cáo lỗi</Text>
               </View>
-              <Text style={[styles.defectSummaryNumber, { color: '#0066CC' }]}>+</Text>
+              <Text style={[styles.defectSummaryNumber, { color: '#0D9488' }]}>+</Text>
               <View style={styles.defectSummaryFooter}>
                 <Text style={styles.defectSummaryDetail}>Thêm lỗi mới</Text>
               </View>
@@ -205,7 +205,7 @@ export default function QCQAIndexScreen() {
                             defect.severity === 'CRITICAL'
                               ? '#D32F2F'
                               : defect.severity === 'MAJOR'
-                              ? '#0066CC'
+                              ? '#0D9488'
                               : defect.severity === 'MINOR'
                               ? '#FBC02D'
                               : '#689F38',
@@ -236,7 +236,7 @@ export default function QCQAIndexScreen() {
                 router.push(`/projects/${projectId}/qc-qa/reports/compliance`)
               }
             >
-              <Ionicons name="document-text" size={32} color="#0066CC" />
+              <Ionicons name="document-text" size={32} color="#0D9488" />
               <Text style={styles.actionCardText}>Báo cáo tuân thủ</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -245,7 +245,7 @@ export default function QCQAIndexScreen() {
                 router.push(`/projects/${projectId}/qc-qa/reports/quality-metrics`)
               }
             >
-              <Ionicons name="stats-chart" size={32} color="#0066CC" />
+              <Ionicons name="stats-chart" size={32} color="#0D9488" />
               <Text style={styles.actionCardText}>Chỉ số chất lượng</Text>
             </TouchableOpacity>
           </View>
@@ -316,7 +316,7 @@ const styles = StyleSheet.create({
   },
   viewAllText: {
     fontSize: 14,
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: '500',
   },
   statsGrid: {

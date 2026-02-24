@@ -41,7 +41,7 @@ export default function CallTestScreen() {
               <Ionicons
                 name={connected ? "checkmark-circle" : "close-circle"}
                 size={24}
-                color={connected ? "#0066CC" : "#000000"}
+                color={connected ? "#0D9488" : "#000000"}
               />
               <Text style={[styles.statusText, { color: textColor }]}>
                 WebSocket: {connected ? "Đã kết nối" : "Ngắt kết nối"}
@@ -101,7 +101,7 @@ export default function CallTestScreen() {
             )}
 
             <View style={styles.hint}>
-              <Ionicons name="information-circle" size={16} color="#0EA5E9" />
+              <Ionicons name="information-circle" size={16} color="#14B8A6" />
               <Text style={styles.hintText}>
                 Tạo test user trên server để test calling
               </Text>
@@ -121,7 +121,7 @@ export default function CallTestScreen() {
                   <Text style={[styles.value, { color: textColor }]}>
                     {currentCall.callee?.name || currentCall.caller?.name}
                   </Text>
-                  <Text style={[styles.status, { color: "#0EA5E9" }]}>
+                  <Text style={[styles.status, { color: "#14B8A6" }]}>
                     Status: {currentCall.status}
                   </Text>
                 </View>
@@ -132,7 +132,7 @@ export default function CallTestScreen() {
                   <Text style={[styles.label, { color: textColor + "80" }]}>
                     Cuộc gọi đến:
                   </Text>
-                  <Text style={[styles.value, { color: "#0066CC" }]}>
+                  <Text style={[styles.value, { color: "#0D9488" }]}>
                     {incomingCall.caller?.name}
                   </Text>
                 </View>
@@ -221,13 +221,13 @@ const styles = StyleSheet.create({
     gap: 8,
     marginTop: 8,
     padding: 12,
-    backgroundColor: "#E8F4FF",
+    backgroundColor: "#F0FDFA",
     borderRadius: 8,
   },
   hintText: {
     flex: 1,
     fontSize: 13,
-    color: "#1E40AF",
+    color: "#0F766E",
   },
   apiInfo: {
     padding: 16,

@@ -169,7 +169,7 @@ const ConsultantCard: React.FC<ConsultantCardProps> = ({ consultant, onPress, on
             
             <View style={styles.statsRow}>
               <View style={styles.statItem}>
-                <Ionicons name="star" size={14} color="#0066CC" />
+                <Ionicons name="star" size={14} color="#0D9488" />
                 <Text style={styles.statText}>{consultant.rating}</Text>
                 <Text style={styles.statSubtext}>({consultant.reviews})</Text>
               </View>
@@ -279,7 +279,7 @@ export default function QualityConsultingScreen() {
             key={star}
             name={star <= rating ? 'star' : star - 0.5 <= rating ? 'star-half' : 'star-outline'}
             size={16}
-            color="#0066CC"
+            color="#0D9488"
           />
         ))}
       </View>
@@ -530,7 +530,7 @@ export default function QualityConsultingScreen() {
 
                   <TouchableOpacity style={styles.contactOption}>
                     <View style={styles.contactOptionIcon}>
-                      <Ionicons name="chatbubbles" size={20} color="#0066CC" />
+                      <Ionicons name="chatbubbles" size={20} color="#0D9488" />
                     </View>
                     <View style={styles.contactOptionText}>
                       <Text style={styles.contactOptionLabel}>Nhắn tin Zalo</Text>
@@ -541,7 +541,7 @@ export default function QualityConsultingScreen() {
 
                   <TouchableOpacity style={styles.contactOption}>
                     <View style={styles.contactOptionIcon}>
-                      <Ionicons name="mail" size={20} color="#0066CC" />
+                      <Ionicons name="mail" size={20} color="#0D9488" />
                     </View>
                     <View style={styles.contactOptionText}>
                       <Text style={styles.contactOptionLabel}>Gửi email</Text>
@@ -757,7 +757,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   certBadge: {
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 6,
@@ -765,7 +765,7 @@ const styles = StyleSheet.create({
   certText: {
     fontSize: 10,
     fontWeight: '500',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   additionalInfo: {
     flexDirection: 'row',
@@ -829,7 +829,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   resetButton: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     paddingHorizontal: 24,
     paddingVertical: 10,
     borderRadius: 8,
@@ -842,7 +842,7 @@ const styles = StyleSheet.create({
   infoBanner: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     paddingHorizontal: 16,
     paddingVertical: 10,
     gap: 8,

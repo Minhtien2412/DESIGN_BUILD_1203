@@ -87,7 +87,7 @@ function convertTasksToTimeline(tasks: PerfexTask[]): TimelinePhase[] {
       progress,
       tasks: task.description ? task.description.split('\n').filter(Boolean) : ['Công việc đang thực hiện'],
       icon,
-      color: status === 'completed' ? '#0066CC' : status === 'active' ? '#3B82F6' : '#6B7280',
+      color: status === 'completed' ? '#0D9488' : status === 'active' ? '#0D9488' : '#6B7280',
     };
   });
   
@@ -371,7 +371,7 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#3B82F6',
+    color: '#0D9488',
     marginBottom: 4,
   },
   statLabel: {

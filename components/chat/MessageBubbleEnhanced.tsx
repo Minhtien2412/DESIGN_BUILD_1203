@@ -120,7 +120,7 @@ export default function MessageBubbleEnhanced({
       case "delivered":
         return <Ionicons name="checkmark-done" size={12} color={textMuted} />;
       case "read":
-        return <Ionicons name="checkmark-done" size={12} color="#3B82F6" />;
+        return <Ionicons name="checkmark-done" size={12} color="#0D9488" />;
       case "failed":
         return <Ionicons name="alert-circle" size={12} color="#EF4444" />;
       default:
@@ -767,7 +767,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: "#3B82F6",
+    backgroundColor: "#0D9488",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -822,7 +822,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   reactionBadgeActive: {
-    backgroundColor: "#DBEAFE",
+    backgroundColor: "#CCFBF1",
   },
   reactionEmoji: {
     fontSize: 14,

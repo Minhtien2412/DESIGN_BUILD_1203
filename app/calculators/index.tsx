@@ -1,1366 +1,692 @@
 /**
- * Construction Estimate Calculator - Trang chính dự toán xây dựng
- * Comprehensive construction cost estimation tools with CRUD
+ * Dự toán xây dựng — Project Hub
+ * ================================
+ * Grand, modern estimation dashboard with project-based workflow.
+ * Minimal icons, focus on data density and easy project management.
  */
-import {
-    MODERN_COLORS,
-    MODERN_RADIUS,
-    MODERN_SHADOWS,
-    MODERN_SPACING,
-} from "@/constants/modern-minimal-styles";
-import {
-    changeEstimateStatus,
-    deleteEstimate,
-    duplicateEstimate,
-    EstimateItem,
-    EstimateStatus,
-    formatEstimateCurrency,
-    formatEstimateDate,
-    getAllEstimates,
-    getEstimatesStats,
-    getEstimateTypeEmoji,
-    getEstimateTypeLabel,
-    searchEstimates,
-} from "@/services/estimateService";
+
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
-import { router, Stack, useFocusEffect } from "expo-router";
-import { useCallback, useState } from "react";
+import { router, useFocusEffect } from "expo-router";
+import { useCallback, useMemo, useState } from "react";
 import {
     ActivityIndicator,
     Alert,
-    Dimensions,
-    Modal,
+    FlatList,
+    Pressable,
     RefreshControl,
     ScrollView,
+    StatusBar,
     StyleSheet,
     Text,
     TextInput,
-    TouchableOpacity,
     View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const { width: SCREEN_WIDTH } = Dimensions.get("window");
+import {
+    BUILDING_TYPE_META,
+    type EstimateProject,
+    GRADE_META,
+    type ProjectStatus,
+    deleteProject,
+    duplicateProject,
+    formatDate,
+    formatVND,
+    getAllProjects,
+    seqLabel,
+} from "@/services/constructionEstimateEngine";
 
-// Calculator categories
-const CALCULATOR_CATEGORIES = [
-  {
-    id: "total-estimate",
-    title: "Dự toán Tổng hợp",
-    subtitle: "Chi phí xây dựng toàn bộ ngôi nhà",
-    emoji: "🏠",
-    color: "#22c55e",
-    bgColor: "#dcfce7",
-    route: "/calculators/total-estimate",
-    isPrimary: true,
-  },
-  {
-    id: "structure",
-    title: "Xây thô & Kết cấu",
-    subtitle: "Móng, cột, dầm, sàn, mái",
-    emoji: "🧱",
-    color: "#f97316",
-    bgColor: "#ffedd5",
-    route: "/calculators/structure",
-  },
-  {
-    id: "materials",
-    title: "Vật liệu chi tiết",
-    subtitle: "Gạch, xi măng, cát, sắt thép",
-    emoji: "📦",
-    color: "#8b5cf6",
-    bgColor: "#ede9fe",
-    route: "/calculators/materials",
-  },
-  {
-    id: "finishing",
-    title: "Hoàn thiện",
-    subtitle: "Sơn, trát, ốp lát, điện nước",
-    emoji: "✨",
-    color: "#ec4899",
-    bgColor: "#fce7f3",
-    route: "/calculators/finishing",
-  },
-  {
-    id: "mep",
-    title: "Điện - Nước - PCCC",
-    subtitle: "Hệ thống M&E hoàn chỉnh",
-    emoji: "⚡",
-    color: "#0ea5e9",
-    bgColor: "#e0f2fe",
-    route: "/calculators/mep",
-  },
-  {
-    id: "interior",
-    title: "Nội thất",
-    subtitle: "Tủ, bàn, ghế, giường, đèn",
-    emoji: "🛋️",
-    color: "#14b8a6",
-    bgColor: "#ccfbf1",
-    route: "/calculators/interior-estimate",
-  },
-];
+// ─── Palette ───────────────────────────────────────────────────────
+const C = {
+  bg: "#F3F4F6",
+  card: "#FFFFFF",
+  primary: "#0D9488",
+  primaryDark: "#0F766E",
+  primaryLight: "#CCFBF1",
+  accent: "#0D9488",
+  warn: "#F59E0B",
+  danger: "#EF4444",
+  text: "#111827",
+  textSec: "#6B7280",
+  textTer: "#9CA3AF",
+  border: "#E5E7EB",
+  badgeDraft: "#FEF3C7",
+  badgeActive: "#CCFBF1",
+  badgeDone: "#D1FAE5",
+  badgeArchived: "#F3F4F6",
+} as const;
 
-// Quick calculators
-const QUICK_CALCULATORS = [
-  {
-    id: "paint",
-    title: "Sơn",
-    emoji: "🎨",
-    color: "#e74c3c",
-    route: "/calculators/paint",
-  },
-  {
-    id: "tiles",
-    title: "Gạch",
-    emoji: "🧱",
-    color: "#f39c12",
-    route: "/calculators/tiles",
-  },
-  {
-    id: "electrical",
-    title: "Điện",
-    emoji: "⚡",
-    color: "#3498db",
-    route: "/calculators/electrical",
-  },
-  {
-    id: "plumbing",
-    title: "Nước",
-    emoji: "💧",
-    color: "#1abc9c",
-    route: "/calculators/plumbing",
-  },
-  {
-    id: "concrete",
-    title: "Bê tông",
-    emoji: "🏗️",
-    color: "#6b7280",
-    route: "/calculators/concrete",
-  },
-  {
-    id: "steel",
-    title: "Thép",
-    emoji: "🔩",
-    color: "#374151",
-    route: "/calculators/steel",
-  },
-];
+const STATUS_LABEL: Record<ProjectStatus, string> = {
+  draft: "Nháp",
+  "in-progress": "Đang thực hiện",
+  completed: "Hoàn thành",
+  archived: "Lưu trữ",
+};
+const STATUS_COLOR: Record<ProjectStatus, string> = {
+  draft: C.warn,
+  "in-progress": C.accent,
+  completed: C.primary,
+  archived: C.textTer,
+};
+const STATUS_BG: Record<ProjectStatus, string> = {
+  draft: C.badgeDraft,
+  "in-progress": C.badgeActive,
+  completed: C.badgeDone,
+  archived: C.badgeArchived,
+};
 
-// Tips
-const TIPS = [
-  { icon: "bulb-outline", text: "Luôn thêm 10-15% dự phòng khi tính vật liệu" },
-  {
-    icon: "shield-checkmark-outline",
-    text: "Kiểm tra chất lượng vật liệu trước khi thi công",
-  },
-  {
-    icon: "people-outline",
-    text: "Tham khảo ý kiến chuyên gia và so sánh giá",
-  },
-  {
-    icon: "calendar-outline",
-    text: "Lên kế hoạch mua vật liệu theo tiến độ công trình",
-  },
-];
-
-export default function CalculatorsIndexScreen() {
+// ─── Component ─────────────────────────────────────────────────────
+export default function EstimateHub() {
   const insets = useSafeAreaInsets();
-  const [activeTab, setActiveTab] = useState<"calculators" | "saved">(
-    "calculators",
-  );
-
-  // Saved estimates state
-  const [savedEstimates, setSavedEstimates] = useState<EstimateItem[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [projects, setProjects] = useState<EstimateProject[]>([]);
+  const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filterStatus, setFilterStatus] = useState<EstimateStatus | "all">(
+  const [search, setSearch] = useState("");
+  const [filterStatus, setFilterStatus] = useState<ProjectStatus | "all">(
     "all",
   );
-  const [stats, setStats] = useState<{
-    total: number;
-    draft: number;
-    completed: number;
-    totalValue: number;
-  } | null>(null);
 
-  // Selected estimate for actions
-  const [selectedEstimate, setSelectedEstimate] = useState<EstimateItem | null>(
-    null,
-  );
-  const [showActionModal, setShowActionModal] = useState(false);
-
-  // Load saved estimates
-  const loadEstimates = useCallback(async () => {
+  // ── Load ─────────────────
+  const load = useCallback(async () => {
     try {
-      setLoading(true);
-      const [estimates, statsData] = await Promise.all([
-        searchQuery ? searchEstimates(searchQuery) : getAllEstimates(),
-        getEstimatesStats(),
-      ]);
-
-      // Filter by status if needed
-      const filtered =
-        filterStatus === "all"
-          ? estimates
-          : estimates.filter((e) => e.status === filterStatus);
-
-      setSavedEstimates(filtered);
-      setStats(statsData);
-    } catch (error) {
-      console.error("Error loading estimates:", error);
+      const list = await getAllProjects();
+      setProjects(list);
+    } catch {
+      /* noop */
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [searchQuery, filterStatus]);
+  }, []);
 
-  // Reload when screen focused
   useFocusEffect(
     useCallback(() => {
-      loadEstimates();
-    }, [loadEstimates]),
+      load();
+    }, [load]),
   );
 
-  const handleBack = useCallback(() => router.back(), []);
+  // ── Filter & Search ──────
+  const filtered = useMemo(() => {
+    let list = projects;
+    if (filterStatus !== "all")
+      list = list.filter((p) => p.status === filterStatus);
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      list = list.filter(
+        (p) =>
+          p.name.toLowerCase().includes(q) ||
+          (p.clientName && p.clientName.toLowerCase().includes(q)) ||
+          (p.address && p.address.toLowerCase().includes(q)) ||
+          seqLabel(p.seq).toLowerCase().includes(q),
+      );
+    }
+    return list;
+  }, [projects, filterStatus, search]);
 
-  const handleCategoryPress = useCallback((route: string) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    router.push(route as never);
-  }, []);
+  // ── Stats ────────────────
+  const stats = useMemo(() => {
+    const total = projects.length;
+    const active = projects.filter((p) => p.status === "in-progress").length;
+    const completed = projects.filter((p) => p.status === "completed").length;
+    const totalValue = projects.reduce(
+      (s, p) => s + (p.lastResult?.grandTotal || 0),
+      0,
+    );
+    return { total, active, completed, totalValue };
+  }, [projects]);
 
-  const handleRefresh = useCallback(() => {
-    setRefreshing(true);
-    loadEstimates();
-  }, [loadEstimates]);
-
-  // Open estimate for editing
-  const handleOpenEstimate = useCallback((estimate: EstimateItem) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    // Navigate to the appropriate calculator with estimate ID
-    const routeMap: Record<string, string> = {
-      total: "/calculators/total-estimate",
-      structure: "/calculators/structure",
-      materials: "/calculators/materials",
-      finishing: "/calculators/finishing",
-      mep: "/calculators/mep",
-      interior: "/calculators/interior-estimate",
-      concrete: "/calculators/concrete",
-      steel: "/calculators/steel",
-      paint: "/calculators/paint",
-    };
-
-    const route = routeMap[estimate.type] || "/calculators/total-estimate";
-    router.push(`${route}?estimateId=${estimate.id}` as never);
-  }, []);
-
-  // Show action modal
-  const handleShowActions = useCallback((estimate: EstimateItem) => {
+  // ── Actions ──────────────
+  const onNewProject = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    setSelectedEstimate(estimate);
-    setShowActionModal(true);
-  }, []);
+    router.push("/calculators/project-estimate" as any);
+  };
 
-  // Delete estimate
-  const handleDeleteEstimate = useCallback(async () => {
-    if (!selectedEstimate) return;
+  const onOpenProject = (id: string) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    router.push(`/calculators/project-estimate?id=${id}` as any);
+  };
 
+  const onDuplicate = async (p: EstimateProject) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    await duplicateProject(p.id);
+    load();
+  };
+
+  const onDelete = (p: EstimateProject) => {
     Alert.alert(
       "Xóa dự toán",
-      `Bạn có chắc muốn xóa "${selectedEstimate.name}"?\n\nHành động này không thể hoàn tác.`,
+      `Xóa "${p.name}"? Hành động này không thể hoàn tác.`,
       [
         { text: "Hủy", style: "cancel" },
         {
           text: "Xóa",
           style: "destructive",
           onPress: async () => {
-            try {
-              await deleteEstimate(selectedEstimate.id);
-              Haptics.notificationAsync(
-                Haptics.NotificationFeedbackType.Success,
-              );
-              setShowActionModal(false);
-              setSelectedEstimate(null);
-              loadEstimates();
-            } catch (error) {
-              Alert.alert("Lỗi", "Không thể xóa dự toán");
-            }
+            await deleteProject(p.id);
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            load();
           },
         },
       ],
     );
-  }, [selectedEstimate, loadEstimates]);
+  };
 
-  // Duplicate estimate
-  const handleDuplicateEstimate = useCallback(async () => {
-    if (!selectedEstimate) return;
+  const onLongPress = (p: EstimateProject) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    Alert.alert(seqLabel(p.seq), p.name, [
+      { text: "Mở", onPress: () => onOpenProject(p.id) },
+      { text: "Nhân bản", onPress: () => onDuplicate(p) },
+      { text: "Xóa", style: "destructive", onPress: () => onDelete(p) },
+      { text: "Đóng", style: "cancel" },
+    ]);
+  };
 
-    try {
-      await duplicateEstimate(selectedEstimate.id);
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      setShowActionModal(false);
-      setSelectedEstimate(null);
-      loadEstimates();
-      Alert.alert("Thành công", "Đã tạo bản sao dự toán");
-    } catch (error) {
-      Alert.alert("Lỗi", "Không thể tạo bản sao");
-    }
-  }, [selectedEstimate, loadEstimates]);
-
-  // Change status
-  const handleChangeStatus = useCallback(
-    async (status: EstimateStatus) => {
-      if (!selectedEstimate) return;
-
-      try {
-        await changeEstimateStatus(selectedEstimate.id, status);
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        setShowActionModal(false);
-        setSelectedEstimate(null);
-        loadEstimates();
-      } catch (error) {
-        Alert.alert("Lỗi", "Không thể cập nhật trạng thái");
-      }
-    },
-    [selectedEstimate, loadEstimates],
+  // ── Render helpers ───────
+  const renderStatCard = (label: string, value: string, color: string) => (
+    <View style={[styles.statCard, { borderLeftColor: color }]} key={label}>
+      <Text style={styles.statValue}>{value}</Text>
+      <Text style={styles.statLabel}>{label}</Text>
+    </View>
   );
 
-  return (
-    <View style={styles.container}>
-      <Stack.Screen options={{ headerShown: false }} />
+  const renderProject = ({ item }: { item: EstimateProject }) => {
+    const bt = BUILDING_TYPE_META[item.buildingType];
+    const gr = GRADE_META[item.grade];
+    const total = item.lastResult?.grandTotal;
+    const perM2 = item.lastResult?.perM2;
 
-      {/* Header */}
-      <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
-        <TouchableOpacity style={styles.backBtn} onPress={handleBack}>
-          <Ionicons name="chevron-back" size={24} color={MODERN_COLORS.text} />
-        </TouchableOpacity>
-        <View style={styles.headerCenter}>
-          <Text style={styles.headerTitle}>🧮 Tiện ích Dự toán</Text>
-          <Text style={styles.headerSubtitle}>
-            Công cụ tính toán chi phí xây dựng
-          </Text>
+    return (
+      <Pressable
+        style={({ pressed }) => [
+          styles.projectCard,
+          pressed && styles.cardPressed,
+        ]}
+        onPress={() => onOpenProject(item.id)}
+        onLongPress={() => onLongPress(item)}
+        android_ripple={{ color: C.primaryLight }}
+      >
+        {/* Top: seq + status */}
+        <View style={styles.cardTopRow}>
+          <Text style={styles.seqText}>{seqLabel(item.seq)}</Text>
+          <View
+            style={[
+              styles.statusBadge,
+              { backgroundColor: STATUS_BG[item.status] },
+            ]}
+          >
+            <View
+              style={[
+                styles.statusDot,
+                { backgroundColor: STATUS_COLOR[item.status] },
+              ]}
+            />
+            <Text
+              style={[styles.statusText, { color: STATUS_COLOR[item.status] }]}
+            >
+              {STATUS_LABEL[item.status]}
+            </Text>
+          </View>
         </View>
-        <TouchableOpacity style={styles.settingsBtn}>
-          <Ionicons
-            name="settings-outline"
-            size={22}
-            color={MODERN_COLORS.textSecondary}
-          />
-        </TouchableOpacity>
-      </View>
 
-      {/* Tabs */}
-      <View style={styles.tabsContainer}>
-        <TouchableOpacity
-          style={[styles.tab, activeTab === "calculators" && styles.tabActive]}
-          onPress={() => setActiveTab("calculators")}
-        >
-          <Ionicons
-            name="calculator-outline"
-            size={18}
-            color={
-              activeTab === "calculators"
-                ? MODERN_COLORS.primary
-                : MODERN_COLORS.textSecondary
-            }
-          />
-          <Text
-            style={[
-              styles.tabText,
-              activeTab === "calculators" && styles.tabTextActive,
-            ]}
-          >
-            Công cụ
+        {/* Name */}
+        <Text style={styles.cardName} numberOfLines={2}>
+          {item.name}
+        </Text>
+
+        {/* Meta row */}
+        <View style={styles.cardMetaRow}>
+          <Text style={styles.cardMeta}>{bt.label}</Text>
+          <View style={styles.metaDot} />
+          <Text style={styles.cardMeta}>{gr.label}</Text>
+          <View style={styles.metaDot} />
+          <Text style={styles.cardMeta}>{item.floors.length} tầng</Text>
+          <View style={styles.metaDot} />
+          <Text style={styles.cardMeta}>{item.landArea} m²</Text>
+        </View>
+
+        {/* Client + address */}
+        {(item.clientName || item.address) && (
+          <Text style={styles.cardSub} numberOfLines={1}>
+            {[item.clientName, item.address].filter(Boolean).join(" · ")}
           </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.tab, activeTab === "saved" && styles.tabActive]}
-          onPress={() => setActiveTab("saved")}
-        >
-          <Ionicons
-            name="bookmark-outline"
-            size={18}
-            color={
-              activeTab === "saved"
-                ? MODERN_COLORS.primary
-                : MODERN_COLORS.textSecondary
-            }
-          />
-          <Text
-            style={[
-              styles.tabText,
-              activeTab === "saved" && styles.tabTextActive,
-            ]}
-          >
-            Đã lưu
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      <ScrollView
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
-        {activeTab === "calculators" ? (
-          <>
-            {/* Primary Calculator - Total Estimate */}
-            <TouchableOpacity
-              style={styles.primaryCard}
-              onPress={() => handleCategoryPress("/calculators/total-estimate")}
-              activeOpacity={0.9}
-            >
-              <LinearGradient
-                colors={["#22c55e", "#16a34a"]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.primaryGradient}
-              >
-                <View style={styles.primaryLeft}>
-                  <View style={styles.primaryIconBox}>
-                    <Text style={styles.primaryEmoji}>🏠</Text>
-                  </View>
-                  <View style={styles.primaryInfo}>
-                    <Text style={styles.primaryTitle}>Dự toán Tổng hợp</Text>
-                    <Text style={styles.primarySubtitle}>
-                      Tính toán chi phí xây dựng toàn bộ ngôi nhà
-                    </Text>
-                  </View>
-                </View>
-                <View style={styles.primaryArrow}>
-                  <Ionicons name="arrow-forward" size={24} color="#fff" />
-                </View>
-              </LinearGradient>
-            </TouchableOpacity>
-
-            {/* Calculator Categories */}
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Dự toán theo hạng mục</Text>
-              <View style={styles.categoriesGrid}>
-                {CALCULATOR_CATEGORIES.slice(1).map((cat) => (
-                  <TouchableOpacity
-                    key={cat.id}
-                    style={styles.categoryCard}
-                    onPress={() => handleCategoryPress(cat.route)}
-                    activeOpacity={0.8}
-                  >
-                    <View
-                      style={[
-                        styles.categoryIcon,
-                        { backgroundColor: cat.bgColor },
-                      ]}
-                    >
-                      <Text style={styles.categoryEmoji}>{cat.emoji}</Text>
-                    </View>
-                    <Text style={styles.categoryTitle}>{cat.title}</Text>
-                    <Text style={styles.categorySubtitle}>{cat.subtitle}</Text>
-                    <View
-                      style={[
-                        styles.categoryArrow,
-                        { backgroundColor: cat.color },
-                      ]}
-                    >
-                      <Ionicons name="chevron-forward" size={14} color="#fff" />
-                    </View>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
-
-            {/* Quick Calculators */}
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Tính nhanh vật liệu</Text>
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.quickCalcList}
-              >
-                {QUICK_CALCULATORS.map((calc) => (
-                  <TouchableOpacity
-                    key={calc.id}
-                    style={styles.quickCalcItem}
-                    onPress={() => handleCategoryPress(calc.route)}
-                  >
-                    <View
-                      style={[
-                        styles.quickCalcIcon,
-                        { backgroundColor: calc.color + "20" },
-                      ]}
-                    >
-                      <Text style={styles.quickCalcEmoji}>{calc.emoji}</Text>
-                    </View>
-                    <Text style={styles.quickCalcTitle}>{calc.title}</Text>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-            </View>
-
-            {/* Material Management */}
-            <View style={styles.section}>
-              <TouchableOpacity
-                style={styles.materialManageCard}
-                onPress={() =>
-                  handleCategoryPress("/calculators/material-management")
-                }
-                activeOpacity={0.8}
-              >
-                <View style={styles.materialManageLeft}>
-                  <View style={styles.materialManageIcon}>
-                    <Ionicons
-                      name="cube-outline"
-                      size={24}
-                      color={MODERN_COLORS.textSecondary}
-                    />
-                  </View>
-                  <View style={styles.materialManageInfo}>
-                    <Text style={styles.materialManageTitle}>
-                      Quản lý vật liệu
-                    </Text>
-                    <Text style={styles.materialManageSubtitle}>
-                      Thêm, sửa, xóa vật liệu tùy chỉnh
-                    </Text>
-                  </View>
-                </View>
-                <Ionicons
-                  name="chevron-forward"
-                  size={20}
-                  color={MODERN_COLORS.textSecondary}
-                />
-              </TouchableOpacity>
-            </View>
-
-            {/* Tips */}
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Mẹo hay</Text>
-              <View style={styles.tipsCard}>
-                {TIPS.map((tip, index) => (
-                  <View key={index} style={styles.tipItem}>
-                    <Ionicons
-                      name={tip.icon as keyof typeof Ionicons.glyphMap}
-                      size={18}
-                      color={MODERN_COLORS.primary}
-                    />
-                    <Text style={styles.tipText}>{tip.text}</Text>
-                  </View>
-                ))}
-              </View>
-            </View>
-          </>
-        ) : (
-          /* Saved Estimates Tab */
-          <ScrollView
-            style={styles.flex1}
-            showsVerticalScrollIndicator={false}
-            refreshControl={
-              <RefreshControl
-                refreshing={refreshing}
-                onRefresh={handleRefresh}
-                tintColor={MODERN_COLORS.primary}
-              />
-            }
-          >
-            {/* Stats Summary */}
-            {stats && stats.total > 0 && (
-              <View style={styles.statsRow}>
-                <View style={styles.statItem}>
-                  <Text style={styles.statValue}>{stats.total}</Text>
-                  <Text style={styles.statLabel}>Tổng cộng</Text>
-                </View>
-                <View style={styles.statItem}>
-                  <Text style={[styles.statValue, { color: "#f59e0b" }]}>
-                    {stats.draft}
-                  </Text>
-                  <Text style={styles.statLabel}>Bản nháp</Text>
-                </View>
-                <View style={styles.statItem}>
-                  <Text style={[styles.statValue, { color: "#22c55e" }]}>
-                    {stats.completed}
-                  </Text>
-                  <Text style={styles.statLabel}>Hoàn thành</Text>
-                </View>
-                <View style={styles.statItem}>
-                  <Text style={[styles.statValue, { color: "#3b82f6" }]}>
-                    {formatEstimateCurrency(stats.totalValue)}
-                  </Text>
-                  <Text style={styles.statLabel}>Giá trị</Text>
-                </View>
-              </View>
-            )}
-
-            {/* Search & Filter */}
-            <View style={styles.searchFilterRow}>
-              <View style={styles.searchBox}>
-                <Ionicons
-                  name="search"
-                  size={18}
-                  color={MODERN_COLORS.textSecondary}
-                />
-                <TextInput
-                  style={styles.searchInput}
-                  placeholder="Tìm kiếm dự toán..."
-                  placeholderTextColor={MODERN_COLORS.textTertiary}
-                  value={searchQuery}
-                  onChangeText={setSearchQuery}
-                  onSubmitEditing={loadEstimates}
-                  returnKeyType="search"
-                />
-                {searchQuery.length > 0 && (
-                  <TouchableOpacity
-                    onPress={() => {
-                      setSearchQuery("");
-                      loadEstimates();
-                    }}
-                  >
-                    <Ionicons
-                      name="close-circle"
-                      size={18}
-                      color={MODERN_COLORS.textSecondary}
-                    />
-                  </TouchableOpacity>
-                )}
-              </View>
-            </View>
-
-            {/* Filter Tabs */}
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.filterTabs}
-            >
-              {[
-                { key: "all", label: "Tất cả" },
-                { key: "draft", label: "Bản nháp" },
-                { key: "completed", label: "Hoàn thành" },
-                { key: "archived", label: "Lưu trữ" },
-              ].map((f) => (
-                <TouchableOpacity
-                  key={f.key}
-                  style={[
-                    styles.filterTab,
-                    filterStatus === f.key && styles.filterTabActive,
-                  ]}
-                  onPress={() => {
-                    setFilterStatus(f.key as EstimateStatus | "all");
-                    loadEstimates();
-                  }}
-                >
-                  <Text
-                    style={[
-                      styles.filterTabText,
-                      filterStatus === f.key && styles.filterTabTextActive,
-                    ]}
-                  >
-                    {f.label}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-
-            {/* Estimates List */}
-            <View style={styles.savedSection}>
-              {loading ? (
-                <View style={styles.loadingState}>
-                  <ActivityIndicator
-                    size="large"
-                    color={MODERN_COLORS.primary}
-                  />
-                  <Text style={styles.loadingText}>Đang tải...</Text>
-                </View>
-              ) : savedEstimates.length > 0 ? (
-                savedEstimates.map((estimate) => (
-                  <TouchableOpacity
-                    key={estimate.id}
-                    style={styles.savedCard}
-                    onPress={() => handleOpenEstimate(estimate)}
-                    onLongPress={() => handleShowActions(estimate)}
-                  >
-                    <View style={styles.savedLeft}>
-                      <View
-                        style={[
-                          styles.savedIcon,
-                          {
-                            backgroundColor:
-                              estimate.status === "completed"
-                                ? "#dcfce7"
-                                : estimate.status === "archived"
-                                  ? "#f3f4f6"
-                                  : "#fef3c7",
-                          },
-                        ]}
-                      >
-                        <Text style={styles.savedEmoji}>
-                          {getEstimateTypeEmoji(estimate.type)}
-                        </Text>
-                      </View>
-                      <View style={styles.savedInfo}>
-                        <Text style={styles.savedName} numberOfLines={1}>
-                          {estimate.name}
-                        </Text>
-                        <Text style={styles.savedType}>
-                          {getEstimateTypeLabel(estimate.type)}
-                        </Text>
-                        <View style={styles.savedMeta}>
-                          <Text style={styles.savedDate}>
-                            #{estimate.localId} •{" "}
-                            {formatEstimateDate(estimate.updatedAt)}
-                          </Text>
-                          {estimate.isSynced && (
-                            <Ionicons
-                              name="cloud-done"
-                              size={12}
-                              color="#22c55e"
-                            />
-                          )}
-                        </View>
-                      </View>
-                    </View>
-                    <View style={styles.savedRight}>
-                      <Text style={styles.savedTotal}>
-                        {formatEstimateCurrency(estimate.results.totalCost)}
-                      </Text>
-                      <View
-                        style={[
-                          styles.savedStatus,
-                          estimate.status === "completed"
-                            ? styles.savedStatusCompleted
-                            : estimate.status === "archived"
-                              ? styles.savedStatusArchived
-                              : styles.savedStatusDraft,
-                        ]}
-                      >
-                        <Text
-                          style={[
-                            styles.savedStatusText,
-                            estimate.status === "completed"
-                              ? styles.savedStatusTextCompleted
-                              : estimate.status === "archived"
-                                ? styles.savedStatusTextArchived
-                                : styles.savedStatusTextDraft,
-                          ]}
-                        >
-                          {estimate.status === "completed"
-                            ? "Hoàn thành"
-                            : estimate.status === "archived"
-                              ? "Lưu trữ"
-                              : "Bản nháp"}
-                        </Text>
-                      </View>
-                      <TouchableOpacity
-                        style={styles.moreBtn}
-                        onPress={() => handleShowActions(estimate)}
-                      >
-                        <Ionicons
-                          name="ellipsis-vertical"
-                          size={18}
-                          color={MODERN_COLORS.textSecondary}
-                        />
-                      </TouchableOpacity>
-                    </View>
-                  </TouchableOpacity>
-                ))
-              ) : (
-                <View style={styles.emptyState}>
-                  <Ionicons
-                    name="document-outline"
-                    size={64}
-                    color={MODERN_COLORS.textTertiary}
-                  />
-                  <Text style={styles.emptyTitle}>
-                    {searchQuery
-                      ? "Không tìm thấy dự toán"
-                      : "Chưa có dự toán nào"}
-                  </Text>
-                  <Text style={styles.emptySubtitle}>
-                    {searchQuery
-                      ? "Thử tìm kiếm với từ khóa khác"
-                      : "Bắt đầu tạo dự toán đầu tiên của bạn"}
-                  </Text>
-                  {!searchQuery && (
-                    <TouchableOpacity
-                      style={styles.emptyButton}
-                      onPress={() =>
-                        handleCategoryPress("/calculators/total-estimate")
-                      }
-                    >
-                      <LinearGradient
-                        colors={["#22c55e", "#16a34a"]}
-                        style={styles.emptyButtonGradient}
-                      >
-                        <Ionicons name="add" size={20} color="#fff" />
-                        <Text style={styles.emptyButtonText}>
-                          Tạo dự toán mới
-                        </Text>
-                      </LinearGradient>
-                    </TouchableOpacity>
-                  )}
-                </View>
-              )}
-            </View>
-          </ScrollView>
         )}
-        <View style={{ height: 100 }} />
-      </ScrollView>
 
-      {/* Action Modal */}
-      <Modal
-        visible={showActionModal}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowActionModal(false)}
+        {/* Bottom: cost + date */}
+        <View style={styles.cardBottom}>
+          <View>
+            {total ? (
+              <>
+                <Text style={styles.cardTotal}>{formatVND(total)}</Text>
+                {perM2 ? (
+                  <Text style={styles.cardPerM2}>{formatVND(perM2)}/m²</Text>
+                ) : null}
+              </>
+            ) : (
+              <Text style={styles.cardNoCost}>Chưa tính toán</Text>
+            )}
+          </View>
+          <Text style={styles.cardDate}>{formatDate(item.updatedAt)}</Text>
+        </View>
+      </Pressable>
+    );
+  };
+
+  // ── Empty state ──────────
+  const EmptyState = () => (
+    <View style={styles.emptyWrap}>
+      <Ionicons name="document-text-outline" size={56} color={C.textTer} />
+      <Text style={styles.emptyTitle}>
+        {search ? "Không tìm thấy dự toán" : "Chưa có dự toán nào"}
+      </Text>
+      <Text style={styles.emptyDesc}>
+        {search
+          ? "Thử thay đổi từ khóa tìm kiếm"
+          : "Tạo dự toán đầu tiên để bắt đầu tính toán chi phí xây dựng chi tiết"}
+      </Text>
+      {!search && (
+        <Pressable style={styles.emptyBtn} onPress={onNewProject}>
+          <Text style={styles.emptyBtnText}>Tạo dự toán mới</Text>
+        </Pressable>
+      )}
+    </View>
+  );
+
+  // ── Main render ──────────
+  if (loading) {
+    return (
+      <View
+        style={[
+          styles.container,
+          {
+            paddingTop: insets.top,
+            justifyContent: "center",
+            alignItems: "center",
+          },
+        ]}
       >
-        <TouchableOpacity
-          style={styles.modalOverlay}
-          activeOpacity={1}
-          onPress={() => setShowActionModal(false)}
+        <ActivityIndicator size="large" color={C.primary} />
+      </View>
+    );
+  }
+
+  return (
+    <View style={[styles.container, { paddingTop: insets.top }]}>
+      <StatusBar barStyle="light-content" />
+
+      {/* ── Header ── */}
+      <LinearGradient
+        colors={[C.primaryDark, C.primary]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.header}
+      >
+        <View style={styles.headerRow}>
+          <Pressable onPress={() => router.back()} hitSlop={12}>
+            <Ionicons name="chevron-back" size={24} color="#fff" />
+          </Pressable>
+          <View style={{ flex: 1, marginLeft: 12 }}>
+            <Text style={styles.headerTitle}>Dự toán xây dựng</Text>
+            <Text style={styles.headerSub}>Quản lý & tính toán chi phí</Text>
+          </View>
+          <Pressable style={styles.newBtn} onPress={onNewProject}>
+            <Ionicons name="add" size={22} color={C.primary} />
+            <Text style={styles.newBtnText}>Tạo mới</Text>
+          </Pressable>
+        </View>
+
+        {/* Stats */}
+        <View style={styles.statsRow}>
+          {renderStatCard("Tổng dự toán", String(stats.total), "#fff")}
+          {renderStatCard("Đang thực hiện", String(stats.active), C.warn)}
+          {renderStatCard("Hoàn thành", String(stats.completed), "#10B981")}
+          {renderStatCard(
+            "Tổng giá trị",
+            formatVND(stats.totalValue),
+            C.accent,
+          )}
+        </View>
+      </LinearGradient>
+
+      {/* ── Feature Cards ── */}
+      <View style={styles.featureRow}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.featureScroll}
         >
-          <View style={styles.actionModalContent}>
-            <View style={styles.actionModalHeader}>
-              <Text style={styles.actionModalTitle} numberOfLines={1}>
-                {selectedEstimate?.name}
-              </Text>
-              <Text style={styles.actionModalSubtitle}>
-                #{selectedEstimate?.localId} •{" "}
-                {selectedEstimate &&
-                  formatEstimateCurrency(selectedEstimate.results.totalCost)}
-              </Text>
-            </View>
-
-            <View style={styles.actionModalDivider} />
-
-            {/* Actions */}
-            <TouchableOpacity
-              style={styles.actionItem}
+          {(
+            [
+              {
+                icon: "flash-outline" as const,
+                label: "Dự toán nhanh",
+                color: "#F59E0B",
+                route: "/calculators/quick-estimate",
+              },
+              {
+                icon: "albums-outline" as const,
+                label: "Mẫu dự toán",
+                color: "#8B5CF6",
+                route: "/calculators/templates",
+              },
+              {
+                icon: "list-outline" as const,
+                label: "Bảng vật tư",
+                color: "#0D9488",
+                route: "/calculators/material-list",
+              },
+              {
+                icon: "calendar-outline" as const,
+                label: "Lịch thanh toán",
+                color: "#EC4899",
+                route: "/calculators/payment-schedule",
+              },
+              {
+                icon: "git-compare-outline" as const,
+                label: "So sánh",
+                color: "#10B981",
+                route: "/calculators/compare",
+              },
+            ] as const
+          ).map((f) => (
+            <Pressable
+              key={f.route}
+              style={styles.featureCard}
               onPress={() => {
-                setShowActionModal(false);
-                if (selectedEstimate) handleOpenEstimate(selectedEstimate);
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                router.push(f.route as any);
               }}
             >
-              <Ionicons
-                name="pencil-outline"
-                size={22}
-                color={MODERN_COLORS.text}
-              />
-              <Text style={styles.actionItemText}>Chỉnh sửa</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.actionItem}
-              onPress={handleDuplicateEstimate}
-            >
-              <Ionicons
-                name="copy-outline"
-                size={22}
-                color={MODERN_COLORS.text}
-              />
-              <Text style={styles.actionItemText}>Tạo bản sao</Text>
-            </TouchableOpacity>
-
-            <View style={styles.actionModalDivider} />
-
-            {/* Status Change */}
-            <Text style={styles.actionSectionTitle}>Đổi trạng thái</Text>
-
-            {selectedEstimate?.status !== "draft" && (
-              <TouchableOpacity
-                style={styles.actionItem}
-                onPress={() => handleChangeStatus("draft")}
+              <View
+                style={[
+                  styles.featureIcon,
+                  { backgroundColor: f.color + "18" },
+                ]}
               >
-                <Ionicons name="document-outline" size={22} color="#f59e0b" />
-                <Text style={styles.actionItemText}>Bản nháp</Text>
-              </TouchableOpacity>
-            )}
+                <Ionicons name={f.icon} size={20} color={f.color} />
+              </View>
+              <Text style={styles.featureLabel}>{f.label}</Text>
+            </Pressable>
+          ))}
+        </ScrollView>
+      </View>
 
-            {selectedEstimate?.status !== "completed" && (
-              <TouchableOpacity
-                style={styles.actionItem}
-                onPress={() => handleChangeStatus("completed")}
+      {/* ── Search + Filter ── */}
+      <View style={styles.filterBar}>
+        <View style={styles.searchBox}>
+          <Ionicons name="search" size={18} color={C.textTer} />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Tìm theo tên, khách hàng, mã..."
+            placeholderTextColor={C.textTer}
+            value={search}
+            onChangeText={setSearch}
+            returnKeyType="search"
+          />
+          {search.length > 0 && (
+            <Pressable onPress={() => setSearch("")} hitSlop={8}>
+              <Ionicons name="close-circle" size={18} color={C.textTer} />
+            </Pressable>
+          )}
+        </View>
+
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.filterChips}
+        >
+          {(
+            ["all", "draft", "in-progress", "completed", "archived"] as const
+          ).map((st) => {
+            const active = filterStatus === st;
+            const label = st === "all" ? "Tất cả" : STATUS_LABEL[st];
+            return (
+              <Pressable
+                key={st}
+                onPress={() => {
+                  Haptics.selectionAsync();
+                  setFilterStatus(st);
+                }}
+                style={[styles.chip, active && styles.chipActive]}
               >
-                <Ionicons
-                  name="checkmark-circle-outline"
-                  size={22}
-                  color="#22c55e"
-                />
-                <Text style={styles.actionItemText}>Hoàn thành</Text>
-              </TouchableOpacity>
-            )}
+                <Text
+                  style={[styles.chipText, active && styles.chipTextActive]}
+                >
+                  {label}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </ScrollView>
+      </View>
 
-            {selectedEstimate?.status !== "archived" && (
-              <TouchableOpacity
-                style={styles.actionItem}
-                onPress={() => handleChangeStatus("archived")}
-              >
-                <Ionicons name="archive-outline" size={22} color="#6b7280" />
-                <Text style={styles.actionItemText}>Lưu trữ</Text>
-              </TouchableOpacity>
-            )}
-
-            <View style={styles.actionModalDivider} />
-
-            {/* Delete */}
-            <TouchableOpacity
-              style={styles.actionItem}
-              onPress={handleDeleteEstimate}
-            >
-              <Ionicons
-                name="trash-outline"
-                size={22}
-                color={MODERN_COLORS.error}
-              />
-              <Text
-                style={[styles.actionItemText, { color: MODERN_COLORS.error }]}
-              >
-                Xóa dự toán
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.actionCancelBtn}
-              onPress={() => setShowActionModal(false)}
-            >
-              <Text style={styles.actionCancelText}>Đóng</Text>
-            </TouchableOpacity>
-          </View>
-        </TouchableOpacity>
-      </Modal>
+      {/* ── Project List ── */}
+      <FlatList
+        data={filtered}
+        keyExtractor={(p) => p.id}
+        renderItem={renderProject}
+        contentContainerStyle={[
+          styles.listContent,
+          filtered.length === 0 && { flex: 1 },
+        ]}
+        ListEmptyComponent={EmptyState}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={() => {
+              setRefreshing(true);
+              load();
+            }}
+            colors={[C.primary]}
+          />
+        }
+        showsVerticalScrollIndicator={false}
+      />
     </View>
   );
 }
 
+// ============================================================================
+// STYLES
+// ============================================================================
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: MODERN_COLORS.background },
-  header: {
+  container: { flex: 1, backgroundColor: C.bg },
+
+  // Header
+  header: { paddingHorizontal: 16, paddingTop: 12, paddingBottom: 16 },
+  headerRow: { flexDirection: "row", alignItems: "center" },
+  headerTitle: { fontSize: 20, fontWeight: "700", color: "#fff" },
+  headerSub: { fontSize: 12, color: "rgba(255,255,255,0.7)", marginTop: 1 },
+  newBtn: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: MODERN_SPACING.md,
-    paddingBottom: MODERN_SPACING.md,
-    backgroundColor: MODERN_COLORS.surface,
-  },
-  backBtn: {
-    width: 40,
-    height: 40,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  headerCenter: { flex: 1, marginLeft: MODERN_SPACING.sm },
-  headerTitle: { fontSize: 20, fontWeight: "700", color: MODERN_COLORS.text },
-  headerSubtitle: {
-    fontSize: 12,
-    color: MODERN_COLORS.textSecondary,
-    marginTop: 2,
-  },
-  settingsBtn: {
-    width: 40,
-    height: 40,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  tabsContainer: {
-    flexDirection: "row",
-    backgroundColor: MODERN_COLORS.surface,
-    paddingHorizontal: MODERN_SPACING.md,
-    paddingBottom: MODERN_SPACING.sm,
-    gap: MODERN_SPACING.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: MODERN_COLORS.border,
-  },
-  tab: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 6,
-    paddingVertical: 10,
-    borderRadius: MODERN_RADIUS.md,
-    backgroundColor: MODERN_COLORS.background,
-  },
-  tabActive: { backgroundColor: MODERN_COLORS.primaryLight },
-  tabText: {
-    fontSize: 14,
-    fontWeight: "500",
-    color: MODERN_COLORS.textSecondary,
-  },
-  tabTextActive: { color: MODERN_COLORS.primary, fontWeight: "600" },
-  scrollView: { flex: 1 },
-  scrollContent: {
-    paddingTop: MODERN_SPACING.md,
-    paddingHorizontal: MODERN_SPACING.md,
-  },
-  primaryCard: {
-    borderRadius: MODERN_RADIUS.xl,
-    overflow: "hidden",
-    marginBottom: MODERN_SPACING.lg,
-    ...MODERN_SHADOWS.lg,
-  },
-  primaryGradient: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: MODERN_SPACING.lg,
-  },
-  primaryLeft: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: MODERN_SPACING.md,
-  },
-  primaryIconBox: {
-    width: 56,
-    height: 56,
-    borderRadius: 16,
-    backgroundColor: "rgba(255,255,255,0.2)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  primaryEmoji: { fontSize: 28 },
-  primaryInfo: {},
-  primaryTitle: { fontSize: 18, fontWeight: "700", color: "#fff" },
-  primarySubtitle: {
-    fontSize: 12,
-    color: "rgba(255,255,255,0.85)",
-    marginTop: 4,
-    maxWidth: 180,
-  },
-  primaryArrow: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: "rgba(255,255,255,0.2)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  section: { marginBottom: MODERN_SPACING.lg },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: MODERN_COLORS.text,
-    marginBottom: MODERN_SPACING.md,
-  },
-  categoriesGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: MODERN_SPACING.sm,
-  },
-  categoryCard: {
-    width: (SCREEN_WIDTH - MODERN_SPACING.md * 2 - MODERN_SPACING.sm) / 2,
-    backgroundColor: MODERN_COLORS.surface,
-    borderRadius: MODERN_RADIUS.lg,
-    padding: MODERN_SPACING.md,
-    position: "relative",
-    ...MODERN_SHADOWS.sm,
-  },
-  categoryIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 14,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: MODERN_SPACING.sm,
-  },
-  categoryEmoji: { fontSize: 24 },
-  categoryTitle: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: MODERN_COLORS.text,
-    marginBottom: 4,
-  },
-  categorySubtitle: {
-    fontSize: 11,
-    color: MODERN_COLORS.textSecondary,
-    lineHeight: 15,
-  },
-  categoryArrow: {
-    position: "absolute",
-    top: MODERN_SPACING.md,
-    right: MODERN_SPACING.md,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  quickCalcList: { gap: MODERN_SPACING.sm, paddingRight: MODERN_SPACING.md },
-  quickCalcItem: { alignItems: "center", width: 72 },
-  quickCalcIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: 16,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 6,
-  },
-  quickCalcEmoji: { fontSize: 24 },
-  quickCalcTitle: {
-    fontSize: 12,
-    fontWeight: "500",
-    color: MODERN_COLORS.text,
-    textAlign: "center",
-  },
-  tipsCard: {
-    backgroundColor: MODERN_COLORS.surface,
-    borderRadius: MODERN_RADIUS.lg,
-    padding: MODERN_SPACING.md,
-    gap: MODERN_SPACING.sm,
-    ...MODERN_SHADOWS.sm,
-  },
-  tipItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: MODERN_SPACING.sm,
-  },
-  tipText: {
-    flex: 1,
-    fontSize: 13,
-    color: MODERN_COLORS.textSecondary,
-    lineHeight: 18,
-  },
-  savedSection: {
-    gap: MODERN_SPACING.sm,
-    paddingHorizontal: MODERN_SPACING.md,
-  },
-  savedCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: MODERN_COLORS.surface,
-    borderRadius: MODERN_RADIUS.lg,
-    padding: MODERN_SPACING.md,
-    ...MODERN_SHADOWS.sm,
-  },
-  savedLeft: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: MODERN_SPACING.md,
-  },
-  savedIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 12,
-    backgroundColor: MODERN_COLORS.primaryLight,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  savedEmoji: { fontSize: 22 },
-  savedInfo: { flex: 1 },
-  savedName: { fontSize: 15, fontWeight: "600", color: MODERN_COLORS.text },
-  savedType: { fontSize: 11, color: MODERN_COLORS.textSecondary, marginTop: 2 },
-  savedMeta: {
-    flexDirection: "row",
-    alignItems: "center",
+    backgroundColor: "#fff",
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
     gap: 4,
-    marginTop: 2,
   },
-  savedDate: { fontSize: 11, color: MODERN_COLORS.textTertiary },
-  savedRight: { alignItems: "flex-end" },
-  savedTotal: { fontSize: 15, fontWeight: "700", color: MODERN_COLORS.primary },
-  savedStatus: {
-    marginTop: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: MODERN_RADIUS.full,
-  },
-  savedStatusCompleted: { backgroundColor: "#dcfce7" },
-  savedStatusDraft: { backgroundColor: "#fef3c7" },
-  savedStatusArchived: { backgroundColor: "#f3f4f6" },
-  savedStatusText: { fontSize: 10, fontWeight: "600" },
-  savedStatusTextCompleted: { color: "#22c55e" },
-  savedStatusTextDraft: { color: "#f59e0b" },
-  savedStatusTextArchived: { color: "#6b7280" },
-  moreBtn: { padding: 4, marginTop: 4 },
-  emptyState: { alignItems: "center", paddingVertical: MODERN_SPACING.xxxl },
-  emptyTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: MODERN_COLORS.text,
-    marginTop: MODERN_SPACING.md,
-  },
-  emptySubtitle: {
-    fontSize: 13,
-    color: MODERN_COLORS.textSecondary,
-    marginTop: 4,
-    textAlign: "center",
-    paddingHorizontal: MODERN_SPACING.lg,
-  },
-  emptyButton: {
-    marginTop: MODERN_SPACING.lg,
-    borderRadius: MODERN_RADIUS.lg,
-    overflow: "hidden",
-  },
-  emptyButtonGradient: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-  },
-  emptyButtonText: { fontSize: 14, fontWeight: "600", color: "#fff" },
+  newBtnText: { fontSize: 13, fontWeight: "600", color: C.primary },
 
   // Stats
-  statsRow: {
-    flexDirection: "row",
-    backgroundColor: MODERN_COLORS.surface,
-    borderRadius: MODERN_RADIUS.lg,
-    padding: MODERN_SPACING.md,
-    marginHorizontal: MODERN_SPACING.md,
-    marginBottom: MODERN_SPACING.md,
-    ...MODERN_SHADOWS.sm,
+  statsRow: { flexDirection: "row", marginTop: 14, gap: 8 },
+  statCard: {
+    flex: 1,
+    backgroundColor: "rgba(255,255,255,0.15)",
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    borderLeftWidth: 3,
   },
-  statItem: { flex: 1, alignItems: "center" },
-  statValue: { fontSize: 16, fontWeight: "700", color: MODERN_COLORS.text },
-  statLabel: { fontSize: 10, color: MODERN_COLORS.textSecondary, marginTop: 2 },
+  statValue: { fontSize: 16, fontWeight: "700", color: "#fff" },
+  statLabel: { fontSize: 10, color: "rgba(255,255,255,0.75)", marginTop: 2 },
 
-  // Search & Filter
-  searchFilterRow: {
-    paddingHorizontal: MODERN_SPACING.md,
-    marginBottom: MODERN_SPACING.sm,
+  // Feature cards
+  featureRow: {
+    backgroundColor: "#fff",
+    paddingTop: 10,
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: C.border,
+  },
+  featureScroll: {
+    paddingHorizontal: 16,
+    gap: 10,
+  },
+  featureCard: {
+    alignItems: "center",
+    width: 72,
+  },
+  featureIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 4,
+  },
+  featureLabel: {
+    fontSize: 10,
+    fontWeight: "600",
+    color: C.textSec,
+    textAlign: "center",
+  },
+
+  // Filter
+  filterBar: {
+    backgroundColor: "#fff",
+    paddingTop: 10,
+    paddingBottom: 6,
+    borderBottomWidth: 1,
+    borderBottomColor: C.border,
   },
   searchBox: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: MODERN_COLORS.surface,
-    borderRadius: MODERN_RADIUS.md,
-    paddingHorizontal: MODERN_SPACING.sm,
+    backgroundColor: C.bg,
+    marginHorizontal: 16,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    height: 40,
     gap: 8,
-    height: 44,
-    ...MODERN_SHADOWS.sm,
   },
-  searchInput: {
-    flex: 1,
-    fontSize: 14,
-    color: MODERN_COLORS.text,
-    paddingVertical: 8,
-  },
-  filterTabs: {
-    paddingHorizontal: MODERN_SPACING.md,
-    gap: MODERN_SPACING.sm,
-    marginBottom: MODERN_SPACING.md,
-  },
-  filterTab: {
+  searchInput: { flex: 1, fontSize: 14, color: C.text },
+  filterChips: {
     paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: MODERN_RADIUS.full,
-    backgroundColor: MODERN_COLORS.surface,
+    paddingTop: 10,
+    paddingBottom: 6,
+    gap: 8,
   },
-  filterTabActive: { backgroundColor: MODERN_COLORS.primary },
-  filterTabText: {
-    fontSize: 13,
-    fontWeight: "500",
-    color: MODERN_COLORS.textSecondary,
+  chip: {
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 16,
+    backgroundColor: C.bg,
   },
-  filterTabTextActive: { color: "#fff" },
+  chipActive: { backgroundColor: C.primaryLight },
+  chipText: { fontSize: 12, fontWeight: "500", color: C.textSec },
+  chipTextActive: { color: C.primary, fontWeight: "600" },
 
-  // Loading
-  loadingState: {
-    alignItems: "center",
-    paddingVertical: MODERN_SPACING.xxxl,
-  },
-  loadingText: {
-    fontSize: 14,
-    color: MODERN_COLORS.textSecondary,
-    marginTop: MODERN_SPACING.md,
-  },
-  flex1: { flex: 1 },
+  // List
+  listContent: { padding: 16, gap: 12, paddingBottom: 100 },
 
-  // Action Modal
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "flex-end",
+  // Card
+  projectCard: {
+    backgroundColor: C.card,
+    borderRadius: 14,
+    padding: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
   },
-  actionModalContent: {
-    backgroundColor: MODERN_COLORS.surface,
-    borderTopLeftRadius: MODERN_RADIUS.xl,
-    borderTopRightRadius: MODERN_RADIUS.xl,
-    paddingBottom: 34,
-  },
-  actionModalHeader: {
-    padding: MODERN_SPACING.lg,
-  },
-  actionModalTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: MODERN_COLORS.text,
-  },
-  actionModalSubtitle: {
-    fontSize: 13,
-    color: MODERN_COLORS.textSecondary,
-    marginTop: 4,
-  },
-  actionModalDivider: {
-    height: 1,
-    backgroundColor: MODERN_COLORS.border,
-    marginHorizontal: MODERN_SPACING.lg,
-  },
-  actionSectionTitle: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: MODERN_COLORS.textSecondary,
-    paddingHorizontal: MODERN_SPACING.lg,
-    paddingTop: MODERN_SPACING.md,
-    paddingBottom: MODERN_SPACING.sm,
-  },
-  actionItem: {
+  cardPressed: { opacity: 0.92, transform: [{ scale: 0.99 }] },
+  cardTopRow: {
     flexDirection: "row",
-    alignItems: "center",
-    gap: MODERN_SPACING.md,
-    paddingHorizontal: MODERN_SPACING.lg,
-    paddingVertical: MODERN_SPACING.md,
-  },
-  actionItemText: {
-    fontSize: 16,
-    color: MODERN_COLORS.text,
-  },
-  actionCancelBtn: {
-    marginHorizontal: MODERN_SPACING.lg,
-    marginTop: MODERN_SPACING.md,
-    paddingVertical: MODERN_SPACING.md,
-    borderRadius: MODERN_RADIUS.md,
-    backgroundColor: MODERN_COLORS.background,
-    alignItems: "center",
-  },
-  actionCancelText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: MODERN_COLORS.textSecondary,
-  },
-  // Material Management Card
-  materialManageCard: {
-    flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: MODERN_COLORS.surface,
-    borderRadius: MODERN_RADIUS.lg,
-    padding: MODERN_SPACING.md,
-    ...MODERN_SHADOWS.sm,
-    borderWidth: 1,
-    borderColor: "#8b5cf620",
+    alignItems: "center",
+    marginBottom: 6,
   },
-  materialManageLeft: {
+  seqText: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: C.primary,
+    letterSpacing: 0.5,
+  },
+  statusBadge: {
     flexDirection: "row",
     alignItems: "center",
-    flex: 1,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    borderRadius: 12,
+    gap: 5,
   },
-  materialManageIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: MODERN_RADIUS.md,
-    backgroundColor: "#8b5cf615",
+  statusDot: { width: 6, height: 6, borderRadius: 3 },
+  statusText: { fontSize: 11, fontWeight: "600" },
+  cardName: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: C.text,
+    marginBottom: 6,
+    lineHeight: 22,
+  },
+  cardMetaRow: {
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    marginRight: MODERN_SPACING.md,
+    gap: 6,
+    marginBottom: 4,
   },
-  materialManageInfo: {
+  cardMeta: { fontSize: 12, color: C.textSec },
+  metaDot: {
+    width: 3,
+    height: 3,
+    borderRadius: 1.5,
+    backgroundColor: C.border,
+  },
+  cardSub: { fontSize: 12, color: C.textTer, marginTop: 2, marginBottom: 4 },
+  cardBottom: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-end",
+    marginTop: 10,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: C.border,
+  },
+  cardTotal: { fontSize: 18, fontWeight: "800", color: C.primary },
+  cardPerM2: { fontSize: 11, color: C.textSec, marginTop: 1 },
+  cardNoCost: { fontSize: 13, color: C.textTer, fontStyle: "italic" },
+  cardDate: { fontSize: 11, color: C.textTer },
+
+  // Empty
+  emptyWrap: {
     flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 40,
   },
-  materialManageTitle: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: MODERN_COLORS.text,
+  emptyTitle: {
+    fontSize: 17,
+    fontWeight: "700",
+    color: C.text,
+    marginTop: 16,
+    textAlign: "center",
   },
-  materialManageSubtitle: {
-    fontSize: 12,
-    color: MODERN_COLORS.textSecondary,
-    marginTop: 2,
+  emptyDesc: {
+    fontSize: 13,
+    color: C.textSec,
+    marginTop: 8,
+    textAlign: "center",
+    lineHeight: 19,
   },
+  emptyBtn: {
+    marginTop: 20,
+    backgroundColor: C.primary,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 24,
+  },
+  emptyBtnText: { fontSize: 14, fontWeight: "600", color: "#fff" },
 });

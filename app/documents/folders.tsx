@@ -95,7 +95,7 @@ export default function FoldersScreen() {
               <View style={styles.header}>
                 <View style={styles.headerLeft}>
                   <View style={styles.folderIcon}>
-                    <Ionicons name="folder" size={32} color="#0066CC" />
+                    <Ionicons name="folder" size={32} color="#0D9488" />
                   </View>
                   <View style={styles.headerInfo}>
                     <Text style={styles.folderName}>{folder.name}</Text>
@@ -166,7 +166,7 @@ export default function FoldersScreen() {
                     )
                   }
                 >
-                  <Ionicons name="enter-outline" size={18} color="#0066CC" />
+                  <Ionicons name="enter-outline" size={18} color="#0D9488" />
                   <Text style={styles.actionButtonText}>Mở</Text>
                 </TouchableOpacity>
 
@@ -178,7 +178,7 @@ export default function FoldersScreen() {
                     )
                   }
                 >
-                  <Ionicons name="cloud-upload-outline" size={18} color="#0066CC" />
+                  <Ionicons name="cloud-upload-outline" size={18} color="#0D9488" />
                   <Text style={styles.actionButtonText}>Tải lên</Text>
                 </TouchableOpacity>
 
@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     paddingHorizontal: 20,
     paddingVertical: 10,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     borderRadius: 8,
   },
   emptyButtonText: {
@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
     width: 52,
     height: 52,
     borderRadius: 26,
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -350,7 +350,7 @@ const styles = StyleSheet.create({
   actionButtonText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   fab: {
     position: 'absolute',
@@ -359,7 +359,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 4,

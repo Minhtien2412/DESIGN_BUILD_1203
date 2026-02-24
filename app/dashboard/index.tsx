@@ -75,7 +75,7 @@ const QUICK_ACTIONS = [
     icon: "bar-chart",
     label: "Báo cáo",
     route: "/reports/index",
-    color: "#0ea5e9",
+    color: "#14B8A6",
   },
   {
     id: "timeline",

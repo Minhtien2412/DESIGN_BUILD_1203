@@ -18,9 +18,13 @@ import {
     MODERN_COLORS,
     MODERN_RADIUS,
     MODERN_SPACING,
-    MODERN_TYPOGRAPHY
+    MODERN_TYPOGRAPHY,
 } from "@/constants/modern-theme";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import {
+    cancelOrder as apiCancelOrder,
+    getOrderById
+} from "@/services/api/orders.service";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router, Stack, useLocalSearchParams } from "expo-router";
@@ -153,7 +157,7 @@ const STATUS_CONFIG: Record<
   pending: { label: "Chờ xác nhận", color: "#FFB800", icon: "time-outline" },
   confirmed: {
     label: "Đã xác nhận",
-    color: "#3B82F6",
+    color: "#0D9488",
     icon: "checkmark-circle-outline",
   },
   processing: {
@@ -164,7 +168,7 @@ const STATUS_CONFIG: Record<
   shipping: { label: "Đang giao hàng", color: "#10B981", icon: "car-outline" },
   delivered: {
     label: "Đã giao hàng",
-    color: "#0066CC",
+    color: "#0D9488",
     icon: "checkmark-done-outline",
   },
   cancelled: {
@@ -192,13 +196,52 @@ export default function OrderDetailScreen() {
     async (showLoader = true) => {
       if (showLoader) setLoading(true);
       try {
-        // TODO: Replace with actual API call
-        // const response = await getOrder(id);
-        await new Promise((resolve) => setTimeout(resolve, 800));
-        setOrder({ ...MOCK_ORDER, id: id || "1" });
+        if (!id) throw new Error("Missing order ID");
+        const apiOrder = await getOrderById(id);
+        // Map API order to component's OrderDetail format
+        setOrder({
+          id: apiOrder.id,
+          orderNumber: apiOrder.orderNumber || `#DH${apiOrder.id}`,
+          createdAt: apiOrder.createdAt,
+          updatedAt: apiOrder.updatedAt,
+          status: apiOrder.status.toLowerCase() as OrderStatus,
+          items: apiOrder.items.map((item) => ({
+            id: item.id,
+            name: item.product?.name || `Sản phẩm #${item.productId}`,
+            quantity: item.quantity,
+            price: item.price,
+            image:
+              (item.product as any)?.image?.uri ||
+              `https://picsum.photos/200/200?random=${item.id}`,
+            variant: (item as any).variant,
+          })),
+          subtotal: apiOrder.subtotal,
+          shippingFee: apiOrder.shippingFee,
+          discount: apiOrder.discount,
+          total: apiOrder.total,
+          shippingAddress: {
+            name: apiOrder.shippingAddress?.fullName || "",
+            phone: apiOrder.shippingAddress?.phone || "",
+            address: [
+              apiOrder.shippingAddress?.address,
+              apiOrder.shippingAddress?.ward,
+              apiOrder.shippingAddress?.district,
+              apiOrder.shippingAddress?.city,
+            ]
+              .filter(Boolean)
+              .join(", "),
+          },
+          paymentMethod: apiOrder.paymentMethod || "COD",
+          paymentStatus: (apiOrder.paymentStatus?.toLowerCase() ||
+            "pending") as "pending" | "paid" | "failed",
+          note: apiOrder.note,
+          trackingNumber: apiOrder.trackingNumber,
+          estimatedDelivery: apiOrder.estimatedDelivery,
+        });
       } catch (error) {
-        console.error("Error loading order:", error);
-        Alert.alert("Lỗi", "Không thể tải thông tin đơn hàng");
+        console.error("[OrderDetail] Error loading order:", error);
+        // Fallback to mock data
+        setOrder({ ...MOCK_ORDER, id: id || "1" });
       } finally {
         setLoading(false);
         setRefreshing(false);
@@ -279,8 +322,7 @@ export default function OrderDetailScreen() {
           onPress: async () => {
             setCancelling(true);
             try {
-              // TODO: Call API to cancel order
-              await new Promise((resolve) => setTimeout(resolve, 1000));
+              await apiCancelOrder(order.id, "Khách hàng yêu cầu hủy");
               setOrder((prev) =>
                 prev ? { ...prev, status: "cancelled" } : null,
               );

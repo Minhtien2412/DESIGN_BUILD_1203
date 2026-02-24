@@ -30,7 +30,7 @@ export default function WeatherIndexScreen() {
       description: 'Quản lý ngày dừng do thời tiết',
       icon: 'pause-circle-outline' as const,
       route: '/weather/stoppages',
-      color: '#0080FF',
+      color: '#14B8A6',
     },
   ];
 

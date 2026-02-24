@@ -149,7 +149,7 @@ const BADGE_SOURCE_CONFIG: Omit<BadgeSource, "count" | "lastUpdated">[] = [
     icon: "notifications",
     color: "#16a34a",
   },
-  { id: "tasks", name: "Công việc", icon: "checkbox", color: "#2563eb" },
+  { id: "tasks", name: "Công việc", icon: "checkbox", color: "#0D9488" },
   { id: "tickets", name: "Hỗ trợ", icon: "ticket", color: "#7c3aed" },
   { id: "projects", name: "Dự án", icon: "briefcase", color: "#0891b2" },
   { id: "crm", name: "CRM", icon: "business", color: "#be185d" },

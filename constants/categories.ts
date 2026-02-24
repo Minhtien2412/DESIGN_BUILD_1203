@@ -30,8 +30,8 @@ export const CATEGORIES: Category[] = [
     label: '🚀 Tính năng mới',
     description: 'Các công cụ mới và tiện ích',
     icon: 'rocket-outline',
-    color: '#0066CC',
-    gradient: ['#FFFFFF', '#0066CC'],
+    color: '#0D9488',
+    gradient: ['#FFFFFF', '#0D9488'],
     modules: [
       {
         id: 'file-upload',
@@ -148,8 +148,8 @@ export const CATEGORIES: Category[] = [
     label: 'Giao tiếp & Hợp tác',
     description: 'Nhắn tin, cuộc gọi, livestream',
     icon: 'chatbubbles-outline',
-    color: '#0080FF',
-    gradient: ['#0080FF', '#00A3FF'],
+    color: '#14B8A6',
+    gradient: ['#14B8A6', '#2DD4BF'],
     modules: [
       {
         id: 'messages',
@@ -387,8 +387,8 @@ export const CATEGORIES: Category[] = [
     label: 'Báo cáo & Phân tích',
     description: 'Reports, analytics, dashboard',
     icon: 'bar-chart-outline',
-    color: '#0066CC',
-    gradient: ['#0066CC', '#3399FF'],
+    color: '#0D9488',
+    gradient: ['#0D9488', '#3399FF'],
     modules: [
       {
         id: 'reports',
@@ -418,8 +418,8 @@ export const CATEGORIES: Category[] = [
     label: 'Media & Nội dung',
     description: 'Videos, photos, stories',
     icon: 'play-circle-outline',
-    color: '#0080FF',
-    gradient: ['#0066CC', '#0080FF'],
+    color: '#14B8A6',
+    gradient: ['#0D9488', '#14B8A6'],
     modules: [
       {
         id: 'videos',
@@ -529,21 +529,21 @@ export const QUICK_ACTIONS = [
     label: 'Sản phẩm',
     icon: 'storefront-outline',
     route: '/shopping/products-from-backend',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   {
     id: 'file-upload',
     label: 'Upload File',
     icon: 'cloud-upload-outline',
     route: '/file-upload',
-    color: '#0080FF',
+    color: '#14B8A6',
   },
   {
     id: 'progress-tracking',
     label: 'Theo dõi tiến độ',
     icon: 'stats-chart-outline',
     route: '/progress-tracking',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   {
     id: 'create-project',
@@ -557,14 +557,14 @@ export const QUICK_ACTIONS = [
     label: 'Tin nhắn',
     icon: 'mail-outline',
     route: '/messages',
-    color: '#0080FF',
+    color: '#14B8A6',
   },
   {
     id: 'analytics',
     label: 'Phân tích',
     icon: 'analytics-outline',
     route: '/analytics',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   {
     id: 'daily-report',

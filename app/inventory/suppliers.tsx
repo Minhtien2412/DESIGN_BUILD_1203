@@ -66,7 +66,7 @@ export default function SuppliersScreen() {
               {/* Header */}
               <View style={styles.header}>
                 <View style={styles.iconContainer}>
-                  <Ionicons name="business" size={24} color="#0066CC" />
+                  <Ionicons name="business" size={24} color="#0D9488" />
                 </View>
                 <View style={styles.headerInfo}>
                   <Text style={styles.supplierName}>{supplier.name}</Text>
@@ -77,7 +77,7 @@ export default function SuppliersScreen() {
                           key={star}
                           name={star <= supplier.rating! ? 'star' : 'star-outline'}
                           size={14}
-                          color="#0066CC"
+                          color="#0D9488"
                         />
                       ))}
                       <Text style={styles.ratingText}>({supplier.rating})</Text>
@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     paddingHorizontal: 20,
     paddingVertical: 10,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     borderRadius: 8,
   },
   emptyButtonText: {
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -286,7 +286,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 4,

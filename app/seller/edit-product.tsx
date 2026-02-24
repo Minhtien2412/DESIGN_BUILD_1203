@@ -262,7 +262,7 @@ export default function EditProductScreen() {
                   <Ionicons
                     name={cat.icon as any}
                     size={24}
-                    color={category === cat.id ? '#0066CC' : '#999'}
+                    color={category === cat.id ? '#0D9488' : '#999'}
                   />
                   <Text
                     style={[
@@ -291,7 +291,7 @@ export default function EditProductScreen() {
                 autoCapitalize="none"
               />
               <TouchableOpacity style={styles.addImageBtn} onPress={handleAddImage}>
-                <Ionicons name="add-circle" size={28} color="#0066CC" />
+                <Ionicons name="add-circle" size={28} color="#0D9488" />
               </TouchableOpacity>
             </View>
 
@@ -348,7 +348,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 50,
     paddingBottom: 12,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   backBtn: {
     width: 40,
@@ -415,8 +415,8 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   unitChipActive: {
-    backgroundColor: '#0066CC',
-    borderColor: '#0066CC',
+    backgroundColor: '#0D9488',
+    borderColor: '#0D9488',
   },
   unitText: {
     fontSize: 14,
@@ -444,9 +444,9 @@ const styles = StyleSheet.create({
     borderColor: '#e0e0e0',
   },
   categoryCardActive: {
-    borderColor: '#0066CC',
+    borderColor: '#0D9488',
     borderWidth: 2,
-    backgroundColor: '#0066CC10',
+    backgroundColor: '#0D948810',
   },
   categoryLabel: {
     fontSize: 13,
@@ -454,7 +454,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   categoryLabelActive: {
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: '700',
   },
   imageInputRow: {
@@ -513,7 +513,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
     paddingVertical: 14,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     borderRadius: 12,
   },
   submitBtnDisabled: {

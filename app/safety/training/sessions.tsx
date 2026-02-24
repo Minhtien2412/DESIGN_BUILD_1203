@@ -60,7 +60,7 @@ export default function TrainingSessionsScreen() {
           title: 'Buổi đào tạo',
           headerRight: () => (
             <TouchableOpacity onPress={() => setModalVisible(true)}>
-              <Ionicons name="add-circle" size={28} color="#0066CC" style={{ marginRight: 8 }} />
+              <Ionicons name="add-circle" size={28} color="#0D9488" style={{ marginRight: 8 }} />
             </TouchableOpacity>
           ),
         }}
@@ -74,12 +74,12 @@ export default function TrainingSessionsScreen() {
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statItem}>
-          <Text style={[styles.statValue, { color: '#0066CC' }]}>{scheduledCount}</Text>
+          <Text style={[styles.statValue, { color: '#0D9488' }]}>{scheduledCount}</Text>
           <Text style={styles.statLabel}>Sắp tới</Text>
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statItem}>
-          <Text style={[styles.statValue, { color: '#0066CC' }]}>{completedCount}</Text>
+          <Text style={[styles.statValue, { color: '#0D9488' }]}>{completedCount}</Text>
           <Text style={styles.statLabel}>Hoàn thành</Text>
         </View>
       </View>
@@ -249,7 +249,7 @@ function SessionCard({ session }: SessionCardProps) {
 
       {session.actualDuration && (
         <View style={styles.durationInfo}>
-          <Ionicons name="hourglass" size={14} color="#0066CC" />
+          <Ionicons name="hourglass" size={14} color="#0D9488" />
           <Text style={styles.durationText}>
             Thời lượng thực tế: {session.actualDuration} phút
           </Text>
@@ -422,11 +422,11 @@ function CreateSessionModal({
 function getStatusColor(status: TrainingStatus): string {
   switch (status) {
     case TrainingStatus.SCHEDULED:
-      return '#0066CC';
+      return '#0D9488';
     case TrainingStatus.IN_PROGRESS:
-      return '#0066CC';
+      return '#0D9488';
     case TrainingStatus.COMPLETED:
-      return '#0066CC';
+      return '#0D9488';
     case TrainingStatus.CANCELLED:
       return '#999999';
     case TrainingStatus.EXPIRED:
@@ -487,7 +487,7 @@ const styles = StyleSheet.create({
     borderBottomColor: 'transparent',
   },
   filterTabActive: {
-    borderBottomColor: '#0066CC',
+    borderBottomColor: '#0D9488',
   },
   filterTabText: {
     fontSize: 11,
@@ -495,7 +495,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   filterTabTextActive: {
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: 'bold',
   },
   listContent: {
@@ -523,7 +523,7 @@ const styles = StyleSheet.create({
   dateBadge: {
     width: 64,
     height: 64,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
@@ -602,7 +602,7 @@ const styles = StyleSheet.create({
   },
   attendanceProgress: {
     height: '100%',
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   attendanceStats: {
     flexDirection: 'row',
@@ -618,7 +618,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     padding: 8,
     borderRadius: 6,
     marginTop: 12,
@@ -640,7 +640,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   addButton: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
@@ -731,7 +731,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 14,
     borderRadius: 8,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     alignItems: 'center',
   },
   createButtonText: {

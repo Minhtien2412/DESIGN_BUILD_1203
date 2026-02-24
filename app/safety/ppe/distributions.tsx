@@ -64,7 +64,7 @@ export default function PPEDistributionsScreen() {
           title: 'Cấp phát PPE',
           headerRight: () => (
             <TouchableOpacity onPress={() => setModalVisible(true)}>
-              <Ionicons name="add-circle" size={28} color="#0066CC" style={{ marginRight: 8 }} />
+              <Ionicons name="add-circle" size={28} color="#0D9488" style={{ marginRight: 8 }} />
             </TouchableOpacity>
           ),
         }}
@@ -78,12 +78,12 @@ export default function PPEDistributionsScreen() {
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statItem}>
-          <Text style={[styles.statValue, { color: '#0066CC' }]}>{activeDistributions.length}</Text>
+          <Text style={[styles.statValue, { color: '#0D9488' }]}>{activeDistributions.length}</Text>
           <Text style={styles.statLabel}>Đang cấp</Text>
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statItem}>
-          <Text style={[styles.statValue, { color: '#0066CC' }]}>{returnedDistributions.length}</Text>
+          <Text style={[styles.statValue, { color: '#0D9488' }]}>{returnedDistributions.length}</Text>
           <Text style={styles.statLabel}>Đã trả</Text>
         </View>
       </View>
@@ -164,7 +164,7 @@ function DistributionCard({ distribution }: DistributionCardProps) {
     <View style={[styles.distributionCard, !isActive && styles.distributionCardInactive]}>
       <View style={styles.distributionHeader}>
         <View style={styles.workerInfo}>
-          <Ionicons name="person-circle" size={48} color="#0066CC" />
+          <Ionicons name="person-circle" size={48} color="#0D9488" />
           <View style={{ flex: 1 }}>
             <Text style={styles.workerName}>{distribution.workerName}</Text>
             <Text style={styles.workerId}>ID: {distribution.workerId}</Text>
@@ -211,9 +211,9 @@ function DistributionCard({ distribution }: DistributionCardProps) {
         {distribution.returnedAt && (
           <>
             <View style={styles.timeRow}>
-              <Ionicons name="log-in" size={14} color="#0066CC" />
+              <Ionicons name="log-in" size={14} color="#0D9488" />
               <Text style={styles.timeLabel}>Hoàn trả:</Text>
-              <Text style={[styles.timeValue, { color: '#0066CC' }]}>
+              <Text style={[styles.timeValue, { color: '#0D9488' }]}>
                 {new Date(distribution.returnedAt).toLocaleString('vi-VN')}
               </Text>
             </View>
@@ -232,7 +232,7 @@ function DistributionCard({ distribution }: DistributionCardProps) {
 
       {distribution.signature && (
         <View style={styles.signatureInfo}>
-          <Ionicons name="checkmark-done" size={16} color="#0066CC" />
+          <Ionicons name="checkmark-done" size={16} color="#0D9488" />
           <Text style={styles.signatureText}>Đã ký nhận</Text>
         </View>
       )}
@@ -377,7 +377,7 @@ function DistributePPEModal({ visible, projectId, onClose, onDistribute }: Distr
             />
 
             <View style={styles.infoBox}>
-              <Ionicons name="information-circle" size={20} color="#0066CC" />
+              <Ionicons name="information-circle" size={20} color="#0D9488" />
               <Text style={styles.infoBoxText}>
                 Người nhận sẽ chịu trách nhiệm bảo quản thiết bị và hoàn trả khi hết nhiệm vụ.
               </Text>
@@ -408,11 +408,11 @@ function DistributePPEModal({ visible, projectId, onClose, onDistribute }: Distr
 function getConditionColor(condition: PPECondition): string {
   switch (condition) {
     case PPECondition.NEW:
-      return '#0066CC';
+      return '#0D9488';
     case PPECondition.GOOD:
-      return '#0066CC';
+      return '#0D9488';
     case PPECondition.FAIR:
-      return '#0066CC';
+      return '#0D9488';
     case PPECondition.WORN:
       return '#000000';
     case PPECondition.DAMAGED:
@@ -476,7 +476,7 @@ const styles = StyleSheet.create({
     borderBottomColor: 'transparent',
   },
   filterTabActive: {
-    borderBottomColor: '#0066CC',
+    borderBottomColor: '#0D9488',
   },
   filterTabText: {
     fontSize: 13,
@@ -484,7 +484,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   filterTabTextActive: {
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: 'bold',
   },
   listContent: {
@@ -526,7 +526,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   activeBadge: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
@@ -627,7 +627,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   addButton: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
@@ -703,7 +703,7 @@ const styles = StyleSheet.create({
   infoBox: {
     flexDirection: 'row',
     gap: 10,
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     padding: 12,
     borderRadius: 8,
     marginTop: 16,
@@ -737,7 +737,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 14,
     borderRadius: 8,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     alignItems: 'center',
   },
   distributeButtonText: {

@@ -59,7 +59,7 @@ export default function IncidentsListScreen() {
             <TouchableOpacity
               onPress={() => router.push(`/safety/incidents/create?projectId=${projectId}`)}
             >
-              <Ionicons name="add-circle" size={28} color="#0066CC" style={{ marginRight: 8 }} />
+              <Ionicons name="add-circle" size={28} color="#0D9488" style={{ marginRight: 8 }} />
             </TouchableOpacity>
           ),
         }}
@@ -119,7 +119,7 @@ export default function IncidentsListScreen() {
         }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Ionicons name="shield-checkmark" size={64} color="#0066CC" />
+            <Ionicons name="shield-checkmark" size={64} color="#0D9488" />
             <Text style={styles.emptyText}>Không có sự cố nào</Text>
             <Text style={styles.emptyHint}>Môi trường làm việc an toàn</Text>
           </View>
@@ -237,9 +237,9 @@ function getSeverityColor(severity: IncidentSeverity): string {
     case IncidentSeverity.SERIOUS:
       return '#000000';
     case IncidentSeverity.MODERATE:
-      return '#0066CC';
+      return '#0D9488';
     case IncidentSeverity.MINOR:
-      return '#0066CC';
+      return '#0D9488';
     default:
       return '#999999';
   }
@@ -261,11 +261,11 @@ function getStatusColor(status: IncidentStatus): string {
     case IncidentStatus.REPORTED:
       return '#000000';
     case IncidentStatus.INVESTIGATING:
-      return '#0066CC';
+      return '#0D9488';
     case IncidentStatus.UNDER_REVIEW:
-      return '#0066CC';
+      return '#0D9488';
     case IncidentStatus.RESOLVED:
-      return '#0066CC';
+      return '#0D9488';
     case IncidentStatus.CLOSED:
       return '#999999';
     default:
@@ -320,7 +320,7 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   statValueWarning: {
-    color: '#0066CC',
+    color: '#0D9488',
   },
   statValueCritical: {
     color: '#000000',
@@ -348,7 +348,7 @@ const styles = StyleSheet.create({
     borderBottomColor: 'transparent',
   },
   filterTabActive: {
-    borderBottomColor: '#0066CC',
+    borderBottomColor: '#0D9488',
   },
   filterTabText: {
     fontSize: 11,
@@ -356,7 +356,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   filterTabTextActive: {
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: 'bold',
   },
   listContent: {

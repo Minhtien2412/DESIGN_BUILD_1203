@@ -1,10 +1,15 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { get } from "@/services/api";
 import { Ionicons } from "@expo/vector-icons";
+import * as Clipboard from "expo-clipboard";
+import * as Haptics from "expo-haptics";
 import { Stack, useRouter } from "expo-router";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
+    Alert,
     FlatList,
     Image,
+    RefreshControl,
     ScrollView,
     StyleSheet,
     Text,
@@ -79,12 +84,34 @@ export default function PromotionsScreen() {
   const cardBg = useThemeColor({}, "card");
   const router = useRouter();
   const [activeCategory, setActiveCategory] = useState("Tất cả");
+  const [refreshing, setRefreshing] = useState(false);
+  const [promoList, setPromoList] = useState(promotions);
+
+  const fetchPromotions = useCallback(async () => {
+    try {
+      const res = await get("/api/promotions");
+      if (res?.data) setPromoList(res.data);
+    } catch {
+      /* mock */
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchPromotions();
+  }, [fetchPromotions]);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchPromotions();
+    setRefreshing(false);
+  }, [fetchPromotions]);
 
   const formatPrice = (price: number) => price.toLocaleString("vi-VN") + "đ";
 
-  const handleCopyCode = (code: string) => {
-    // In real app, copy to clipboard
-    alert(`Đã sao chép mã: ${code}`);
+  const handleCopyCode = async (code: string) => {
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    await Clipboard.setStringAsync(code);
+    Alert.alert("Đã sao chép! ✅", `Mã: ${code}`);
   };
 
   const renderPromotion = ({ item }: { item: (typeof promotions)[0] }) => (
@@ -117,7 +144,7 @@ export default function PromotionsScreen() {
             style={styles.copyBtn}
             onPress={() => handleCopyCode(item.code)}
           >
-            <Ionicons name="copy-outline" size={16} color="#FF6B35" />
+            <Ionicons name="copy-outline" size={16} color="#14B8A6" />
             <Text style={styles.codeText}>{item.code}</Text>
           </TouchableOpacity>
         </View>
@@ -170,11 +197,18 @@ export default function PromotionsScreen() {
 
       {/* Promotions List */}
       <FlatList
-        data={promotions}
+        data={promoList}
         renderItem={renderPromotion}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#14B8A6"
+          />
+        }
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <Ionicons name="pricetag-outline" size={64} color="#ccc" />
@@ -187,38 +221,55 @@ export default function PromotionsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { flex: 1, backgroundColor: "#F8FAFB" },
   categoriesContainer: { maxHeight: 60 },
   categoriesContent: { paddingHorizontal: 16, paddingVertical: 12 },
   categoryChip: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 18,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#FFFFFF",
     marginRight: 8,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
   },
-  categoryChipActive: { backgroundColor: "#FF6B35" },
-  categoryText: { color: "#666", fontSize: 14 },
-  categoryTextActive: { color: "#fff", fontWeight: "500" },
+  categoryChipActive: { backgroundColor: "#0D9488", borderColor: "#0D9488" },
+  categoryText: { color: "#6B7280", fontSize: 14, fontWeight: "500" },
+  categoryTextActive: { color: "#fff", fontWeight: "600" },
   listContent: { padding: 16 },
-  promoCard: { borderRadius: 12, marginBottom: 16, overflow: "hidden" },
-  promoImage: { width: "100%", height: 120, backgroundColor: "#f0f0f0" },
+  promoCard: {
+    borderRadius: 20,
+    marginBottom: 16,
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  promoImage: { width: "100%", height: 120, backgroundColor: "#F3F4F6" },
   promoContent: { padding: 16 },
   discountBadge: {
     position: "absolute",
     top: -30,
     right: 16,
-    backgroundColor: "#FF6B35",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 4,
+    backgroundColor: "#0D9488",
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 12,
   },
-  discountText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
+  discountText: {
+    color: "#fff",
+    fontWeight: "800",
+    fontSize: 16,
+    letterSpacing: -0.3,
+  },
   promoTitle: {
     fontSize: 18,
-    fontWeight: "600",
+    fontWeight: "700",
     marginBottom: 6,
     marginTop: 8,
+    letterSpacing: -0.3,
   },
   promoDesc: { color: "#666", fontSize: 14, marginBottom: 8 },
   minOrder: { color: "#999", fontSize: 13, marginBottom: 12 },
@@ -233,22 +284,22 @@ const styles = StyleSheet.create({
   copyBtn: {
     flexDirection: "row",
     alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#FF6B35",
+    borderWidth: 1.5,
+    borderColor: "#0D9488",
     borderStyle: "dashed",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 4,
-    gap: 4,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 12,
+    gap: 6,
   },
-  codeText: { color: "#FF6B35", fontWeight: "600" },
+  codeText: { color: "#0D9488", fontWeight: "700" },
   progressContainer: {
     height: 4,
     backgroundColor: "#f0f0f0",
     borderRadius: 2,
     marginBottom: 4,
   },
-  progressBar: { height: "100%", backgroundColor: "#FF6B35", borderRadius: 2 },
+  progressBar: { height: "100%", backgroundColor: "#0D9488", borderRadius: 2 },
   usedText: { color: "#999", fontSize: 11 },
   emptyState: { alignItems: "center", paddingVertical: 60 },
   emptyText: { color: "#999", marginTop: 12 },

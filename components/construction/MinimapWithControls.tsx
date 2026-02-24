@@ -60,8 +60,8 @@ const COLORS = {
   notStarted: '#E5E7EB',
   delayed: '#E82A34',
   border: '#9CA3AF',
-  selected: '#3B82F6',
-  primary: '#3B82F6',
+  selected: '#0D9488',
+  primary: '#0D9488',
 };
 
 export default function MinimapWithControls({ floors, projectName, onAreaPress, isAdmin = false }: Props) {
@@ -156,7 +156,7 @@ export default function MinimapWithControls({ floors, projectName, onAreaPress, 
       id: 'add-floor',
       icon: 'layers',
       label: 'Thêm tầng',
-      color: '#0066CC',
+      color: '#0D9488',
       onPress: () => {
         setShowFABMenu(false);
         // Handle add floor
@@ -176,7 +176,7 @@ export default function MinimapWithControls({ floors, projectName, onAreaPress, 
       id: 'export',
       icon: 'download-outline',
       label: 'Xuất báo cáo',
-      color: '#0066CC',
+      color: '#0D9488',
       onPress: () => {
         setShowFABMenu(false);
         // Handle export

@@ -682,9 +682,9 @@ export function isMilestoneOverdue(milestone: Milestone): boolean {
 export function getTaskStatusColor(status: TaskStatus): string {
   const colors: Record<TaskStatus, string> = {
     TODO: '#94a3b8',
-    IN_PROGRESS: '#3b82f6',
-    REVIEW: '#0066CC',
-    COMPLETED: '#0066CC',
+    IN_PROGRESS: '#0D9488',
+    REVIEW: '#0D9488',
+    COMPLETED: '#0D9488',
     BLOCKED: '#000000',
   };
   
@@ -699,9 +699,9 @@ export function getTaskStatusColor(status: TaskStatus): string {
  */
 export function getTaskPriorityColor(priority: TaskPriority): string {
   const colors: Record<TaskPriority, string> = {
-    LOW: '#0066CC',
-    MEDIUM: '#0066CC',
-    HIGH: '#0066CC',
+    LOW: '#0D9488',
+    MEDIUM: '#0D9488',
+    HIGH: '#0D9488',
     URGENT: '#000000',
   };
   

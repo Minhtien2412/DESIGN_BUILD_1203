@@ -21,14 +21,14 @@ const PROJECT_ACTIONS: ProjectAction[] = [
     title: 'Timeline Thi Công',
     icon: 'git-network-outline',
     route: '/projects/[id]/construction-timeline',
-    color: '#3B82F6',
+    color: '#0D9488',
   },
   {
     id: 'payment',
     title: 'Tiến Độ Thanh Toán',
     icon: 'cash-outline',
     route: '/projects/[id]/payment-progress',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   {
     id: 'process',
@@ -42,7 +42,7 @@ const PROJECT_ACTIONS: ProjectAction[] = [
     title: 'Báo Giá Nhà Thầu',
     icon: 'document-text-outline',
     route: '/projects/quotation-list',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   {
     id: 'contractors',

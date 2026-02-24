@@ -23,7 +23,7 @@ import {
 
 // Theme colors
 const COLORS = {
-  primary: '#0066CC',
+  primary: '#0D9488',
   primaryDark: '#004499',
   primaryLight: '#FFF0ED',
   background: '#F5F5F5',
@@ -34,12 +34,12 @@ const COLORS = {
   border: '#E8E8E8',
   success: '#00C853',
   successLight: '#E8F5E9',
-  warning: '#0066CC',
-  warningLight: '#E8F4FF',
+  warning: '#0D9488',
+  warningLight: '#F0FDFA',
   error: '#000000',
   errorLight: '#FFEBEE',
-  info: '#0066CC',
-  infoLight: '#E8F4FF',
+  info: '#0D9488',
+  infoLight: '#F0FDFA',
 };
 
 // ============================================================================

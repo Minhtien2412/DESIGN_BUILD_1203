@@ -138,9 +138,9 @@ export const WORKER_TYPE_MAP: Record<number, WorkerType> = {
   3: WorkerType.VAT_LIEU,
   4: WorkerType.NHAN_CONG,
   5: WorkerType.THO_XAY,
-  6: WorkerType.THO_COFFA, // Thợ sắt
-  7: WorkerType.THO_COFFA, // Thợ coffa
-  8: WorkerType.VAT_LIEU, // Thợ cơ khí (use material)
+  6: WorkerType.THO_SAT,
+  7: WorkerType.THO_COFFA,
+  8: WorkerType.THO_HAN, // Thợ cơ khí
   9: WorkerType.THO_XAY, // Thợ tô tường (use mason)
   10: WorkerType.THO_DIEN_NUOC,
   11: WorkerType.BE_TONG,
@@ -156,10 +156,10 @@ export const WORKER_TYPE_MAP: Record<number, WorkerType> = {
   107: WorkerType.THO_CONG,
   108: WorkerType.THO_CAMERA,
   109: WorkerType.THO_DA, // Thợ ốp đá
-  110: WorkerType.THO_DIEN_NUOC, // Thợ điện
-  111: WorkerType.THO_LAM_CUA, // Thợ nội thất
+  110: WorkerType.THO_DIEN, // Thợ điện
+  111: WorkerType.THO_MOC, // Thợ nội thất
   112: WorkerType.THO_XAY, // Tổng hợp
-  113: WorkerType.THO_LAM_CUA, // Thợ mộc
-  114: WorkerType.THO_LAN_CAN, // Thợ nhôm kính
-  115: WorkerType.THO_CAMERA, // Thợ vệ sinh (use camera as placeholder)
+  113: WorkerType.THO_MOC, // Thợ mộc
+  114: WorkerType.THO_NHOM_KINH, // Thợ nhôm kính
+  115: WorkerType.THO_CAMERA, // Thợ vệ sinh
 };

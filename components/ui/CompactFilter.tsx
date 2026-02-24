@@ -251,7 +251,7 @@ export const CompactFilter: React.FC<CompactFilterProps> = ({
   onClear,
   variant = "dropdown",
   showActiveCount = true,
-  primaryColor = "#0066CC",
+  primaryColor = "#0D9488",
 }) => {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [modalFilter, setModalFilter] = useState<FilterConfig | null>(null);
@@ -440,7 +440,7 @@ export const QuickFilterBar: React.FC<{
   selected: string;
   onSelect: (value: string) => void;
   primaryColor?: string;
-}> = ({ options, selected, onSelect, primaryColor = "#0066CC" }) => {
+}> = ({ options, selected, onSelect, primaryColor = "#0D9488" }) => {
   return (
     <ScrollView
       horizontal
@@ -513,8 +513,8 @@ const styles = StyleSheet.create({
     maxWidth: 130,
   },
   dropdownBtnActive: {
-    backgroundColor: "#0066CC",
-    borderColor: "#0066CC",
+    backgroundColor: "#0D9488",
+    borderColor: "#0D9488",
   },
   dropdownBtnText: {
     fontSize: 12,
@@ -569,7 +569,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   dropdownItemActive: {
-    backgroundColor: "#E8F4FF",
+    backgroundColor: "#F0FDFA",
   },
   dropdownItemIcon: {
     width: 20,
@@ -581,7 +581,7 @@ const styles = StyleSheet.create({
   },
   dropdownItemTextActive: {
     fontWeight: "600",
-    color: "#0066CC",
+    color: "#0D9488",
   },
   dropdownItemCount: {
     fontSize: 12,
@@ -615,7 +615,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f5f5f5",
   },
   chipActive: {
-    backgroundColor: "#0066CC",
+    backgroundColor: "#0D9488",
   },
   chipText: {
     fontSize: 11,
@@ -673,7 +673,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f5f5f5",
   },
   quickChipActive: {
-    backgroundColor: "#0066CC",
+    backgroundColor: "#0D9488",
   },
   quickChipText: {
     fontSize: 12,

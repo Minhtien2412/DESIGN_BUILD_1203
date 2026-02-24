@@ -3,78 +3,92 @@
 // ============================================================================
 
 // DISABLE FONTFACEOBSERVER - Must be FIRST to prevent timeout errors
-if (typeof window !== 'undefined') {
-  window.FontFaceObserver = function(family, options) {
+if (typeof window !== "undefined") {
+  window.FontFaceObserver = function (family, options) {
     return {
-      load: function(text, timeout) {
+      load: function (text, timeout) {
         return Promise.resolve({ family });
       },
-      check: function() {
+      check: function () {
         return true;
-      }
+      },
     };
   };
-  Object.defineProperty(window, 'FontFaceObserver', {
+  Object.defineProperty(window, "FontFaceObserver", {
     value: window.FontFaceObserver,
     writable: false,
-    configurable: false
+    configurable: false,
   });
 }
 
 // Random values polyfill for crypto operations
-import 'react-native-get-random-values';
+import "react-native-get-random-values";
 
 // URL polyfill for URL parsing
-import 'react-native-url-polyfill/auto';
+import "react-native-url-polyfill/auto";
 
 // ============================================================================
 // EXPO ROUTER ENTRY POINT
 // ============================================================================
 
+// Suppress known React 19 + RN 0.81 dev-mode internal error
+import { LogBox } from "react-native";
+LogBox.ignoreLogs([
+  "Internal React error: Expected static flag was missing",
+  "[Layout children]",
+]);
+
 // Import Expo Router entry - this must come AFTER all polyfills
-import 'expo-router/entry';
+import "expo-router/entry";
 
 // ============================================================================
 // GLOBAL RUNTIME POLYFILLS - FIX "require is not defined"
 // ============================================================================
 
 // Fix global.require before any other code runs
-if (typeof global !== 'undefined') {
+if (typeof global !== "undefined") {
   // 1. Setup proper require function
-  const originalRequire = global.require || function() { return {}; };
-  
-  global.require = function(moduleName) {
+  const originalRequire =
+    global.require ||
+    function () {
+      return {};
+    };
+
+  global.require = function (moduleName) {
     try {
       // Try original require first (if available)
-      if (typeof originalRequire === 'function' && originalRequire !== global.require) {
+      if (
+        typeof originalRequire === "function" &&
+        originalRequire !== global.require
+      ) {
         return originalRequire(moduleName);
       }
-      
+
       // Try webpack require
-      if (typeof __webpack_require__ !== 'undefined') {
+      if (typeof __webpack_require__ !== "undefined") {
         return __webpack_require__(moduleName);
       }
-      
+
       // Fallback for unknown modules
-      console.warn('[Polyfill] Module not found:', moduleName);
+      console.warn("[Polyfill] Module not found:", moduleName);
       return {};
     } catch (e) {
-      console.warn('[Polyfill] Error requiring:', moduleName, e.message);
+      console.warn("[Polyfill] Error requiring:", moduleName, e.message);
       return {};
     }
   };
 
   // Make require writable and enumerable
-  Object.defineProperty(global, 'require', {
+  Object.defineProperty(global, "require", {
     value: global.require,
     writable: true,
     enumerable: true,
-    configurable: true
+    configurable: true,
   });
 
   // 2. Reanimated worklet runtime init
-  if (typeof global.__reanimatedWorkletInit === 'undefined') {
-    global.__reanimatedWorkletInit = function() {
+  if (typeof global.__reanimatedWorkletInit === "undefined") {
+    global.__reanimatedWorkletInit = function () {
       // Silent init - no errors
     };
   }
@@ -93,4 +107,3 @@ if (typeof global !== 'undefined') {
     global.process = { env: {} };
   }
 }
-

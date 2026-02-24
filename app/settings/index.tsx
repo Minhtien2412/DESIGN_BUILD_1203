@@ -441,7 +441,7 @@ export default function SettingsScreen() {
         {/* Notifications */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Ionicons name="notifications-outline" size={24} color="#0066CC" />
+            <Ionicons name="notifications-outline" size={24} color="#0D9488" />
             <Text style={styles.sectionTitle}>Thông báo</Text>
           </View>
 
@@ -483,7 +483,7 @@ export default function SettingsScreen() {
         {/* Privacy */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Ionicons name="shield-outline" size={24} color="#0066CC" />
+            <Ionicons name="shield-outline" size={24} color="#0D9488" />
             <Text style={styles.sectionTitle}>Quyền riêng tư</Text>
           </View>
 
@@ -643,7 +643,7 @@ export default function SettingsScreen() {
         {/* Save Indicator */}
         {saving && (
           <View style={styles.savingIndicator}>
-            <Ionicons name="checkmark-circle" size={16} color="#0066CC" />
+            <Ionicons name="checkmark-circle" size={16} color="#0D9488" />
             <Text style={styles.savingText}>Đã lưu</Text>
           </View>
         )}

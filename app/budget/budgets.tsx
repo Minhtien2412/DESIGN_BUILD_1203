@@ -1,17 +1,22 @@
-import { Container } from '@/components/ui/container';
-import { Colors } from '@/constants/theme';
-import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
-import { useState } from 'react';
+import { Container } from "@/components/ui/container";
+import { Colors } from "@/constants/theme";
+import budgetTrackingService, {
+    Budget as ApiBudget,
+    BudgetLine as ApiBudgetLine,
+} from "@/services/api/budget.service";
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
 import {
     ActivityIndicator,
+    RefreshControl,
     ScrollView,
     StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
     View,
-} from 'react-native';
+} from "react-native";
 
 interface Budget {
   id: number;
@@ -20,7 +25,7 @@ interface Budget {
   totalBudget: number;
   spent: number;
   remaining: number;
-  status: 'on-track' | 'warning' | 'over-budget';
+  status: "on-track" | "warning" | "over-budget";
   startDate: string;
   endDate: string;
   categories: {
@@ -30,62 +35,133 @@ interface Budget {
   }[];
 }
 
-export default function BudgetsScreen() {
-  const [loading, setLoading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+// Fallback mock data
+const MOCK_BUDGETS: Budget[] = [
+  {
+    id: 1,
+    name: "Ngân sách Q1 2025",
+    projectName: "Tòa nhà Sunrise Tower",
+    totalBudget: 5000000000,
+    spent: 2800000000,
+    remaining: 2200000000,
+    status: "on-track",
+    startDate: "2025-01-01",
+    endDate: "2025-03-31",
+    categories: [
+      { name: "Vật liệu", allocated: 2500000000, spent: 1400000000 },
+      { name: "Nhân công", allocated: 1500000000, spent: 900000000 },
+      { name: "Thiết bị", allocated: 800000000, spent: 400000000 },
+      { name: "Khác", allocated: 200000000, spent: 100000000 },
+    ],
+  },
+  {
+    id: 2,
+    name: "Ngân sách nội thất",
+    projectName: "Biệt thự Phú Mỹ Hưng",
+    totalBudget: 1200000000,
+    spent: 950000000,
+    remaining: 250000000,
+    status: "warning",
+    startDate: "2025-01-15",
+    endDate: "2025-02-28",
+    categories: [
+      { name: "Nội thất", allocated: 800000000, spent: 700000000 },
+      { name: "Thiết bị điện", allocated: 300000000, spent: 200000000 },
+      { name: "Khác", allocated: 100000000, spent: 50000000 },
+    ],
+  },
+  {
+    id: 3,
+    name: "Ngân sách móng",
+    projectName: "Chung cư The Manor",
+    totalBudget: 800000000,
+    spent: 850000000,
+    remaining: -50000000,
+    status: "over-budget",
+    startDate: "2024-12-01",
+    endDate: "2025-01-31",
+    categories: [
+      { name: "Bê tông", allocated: 400000000, spent: 450000000 },
+      { name: "Cốt thép", allocated: 300000000, spent: 320000000 },
+      { name: "Nhân công", allocated: 100000000, spent: 80000000 },
+    ],
+  },
+];
 
-  // Mock data
-  const budgets: Budget[] = [
-    {
-      id: 1,
-      name: 'Ngân sách Q1 2025',
-      projectName: 'Tòa nhà Sunrise Tower',
-      totalBudget: 5000000000,
-      spent: 2800000000,
-      remaining: 2200000000,
-      status: 'on-track',
-      startDate: '2025-01-01',
-      endDate: '2025-03-31',
-      categories: [
-        { name: 'Vật liệu', allocated: 2500000000, spent: 1400000000 },
-        { name: 'Nhân công', allocated: 1500000000, spent: 900000000 },
-        { name: 'Thiết bị', allocated: 800000000, spent: 400000000 },
-        { name: 'Khác', allocated: 200000000, spent: 100000000 },
-      ],
-    },
-    {
-      id: 2,
-      name: 'Ngân sách nội thất',
-      projectName: 'Biệt thự Phú Mỹ Hưng',
-      totalBudget: 1200000000,
-      spent: 950000000,
-      remaining: 250000000,
-      status: 'warning',
-      startDate: '2025-01-15',
-      endDate: '2025-02-28',
-      categories: [
-        { name: 'Nội thất', allocated: 800000000, spent: 700000000 },
-        { name: 'Thiết bị điện', allocated: 300000000, spent: 200000000 },
-        { name: 'Khác', allocated: 100000000, spent: 50000000 },
-      ],
-    },
-    {
-      id: 3,
-      name: 'Ngân sách móng',
-      projectName: 'Chung cư The Manor',
-      totalBudget: 800000000,
-      spent: 850000000,
-      remaining: -50000000,
-      status: 'over-budget',
-      startDate: '2024-12-01',
-      endDate: '2025-01-31',
-      categories: [
-        { name: 'Bê tông', allocated: 400000000, spent: 450000000 },
-        { name: 'Cốt thép', allocated: 300000000, spent: 320000000 },
-        { name: 'Nhân công', allocated: 100000000, spent: 80000000 },
-      ],
-    },
-  ];
+export default function BudgetsScreen() {
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [budgets, setBudgets] = useState<Budget[]>(MOCK_BUDGETS);
+
+  const mapApiBudgetStatus = (
+    b: ApiBudget,
+  ): "on-track" | "warning" | "over-budget" => {
+    const spentPercent =
+      b.totalBudget > 0 ? (b.totalSpent / b.totalBudget) * 100 : 0;
+    if (spentPercent > 100) return "over-budget";
+    if (spentPercent > 85) return "warning";
+    return "on-track";
+  };
+
+  const loadBudgets = useCallback(async () => {
+    try {
+      const response = await budgetTrackingService.getBudgets({
+        page: 1,
+        limit: 50,
+      });
+      const items = response?.data ?? (response as any)?.items ?? [];
+      if (Array.isArray(items) && items.length > 0) {
+        const mapped: Budget[] = items.map((b: ApiBudget) => ({
+          id: b.id,
+          name: b.projectName || `Ngân sách #${b.id}`,
+          projectName: b.projectName || `Dự án #${b.projectId}`,
+          totalBudget: b.totalBudget,
+          spent: b.totalSpent,
+          remaining: b.totalRemaining,
+          status: mapApiBudgetStatus(b),
+          startDate: b.startDate?.split("T")[0] || "",
+          endDate: b.endDate?.split("T")[0] || "",
+          categories: [],
+        }));
+        // Try to load budget lines for each budget
+        for (const budget of mapped) {
+          try {
+            const linesResp = await budgetTrackingService.getBudgetLines(
+              budget.id,
+            );
+            const lines: ApiBudgetLine[] =
+              (linesResp as any)?.data ?? linesResp ?? [];
+            if (Array.isArray(lines) && lines.length > 0) {
+              budget.categories = lines.map((l: ApiBudgetLine) => ({
+                name: l.description || l.category,
+                allocated: l.plannedAmount,
+                spent: l.actualAmount,
+              }));
+            }
+          } catch {
+            /* budget lines optional */
+          }
+        }
+        setBudgets(mapped);
+        console.log("[Budgets] Loaded", mapped.length, "budgets from API");
+      }
+    } catch (error) {
+      console.log("[Budgets] API error, using mock data:", error);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadBudgets();
+  }, [loadBudgets]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    loadBudgets();
+  }, [loadBudgets]);
 
   const formatCurrency = (amount: number) => {
     if (amount >= 1000000000) {
@@ -93,24 +169,32 @@ export default function BudgetsScreen() {
     } else if (amount >= 1000000) {
       return `${(amount / 1000000).toFixed(0)} triệu`;
     }
-    return amount.toLocaleString('vi-VN') + ' ₫';
+    return amount.toLocaleString("vi-VN") + " ₫";
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'on-track': return '#0066CC';
-      case 'warning': return '#0066CC';
-      case 'over-budget': return '#000000';
-      default: return '#94A3B8';
+      case "on-track":
+        return "#0D9488";
+      case "warning":
+        return "#F59E0B";
+      case "over-budget":
+        return "#EF4444";
+      default:
+        return "#94A3B8";
     }
   };
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case 'on-track': return 'Đúng kế hoạch';
-      case 'warning': return 'Cần chú ý';
-      case 'over-budget': return 'Vượt ngân sách';
-      default: return status;
+      case "on-track":
+        return "Đúng kế hoạch";
+      case "warning":
+        return "Cần chú ý";
+      case "over-budget":
+        return "Vượt ngân sách";
+      default:
+        return status;
     }
   };
 
@@ -119,9 +203,9 @@ export default function BudgetsScreen() {
   };
 
   const filteredBudgets = budgets.filter(
-    budget =>
+    (budget) =>
       budget.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      budget.projectName.toLowerCase().includes(searchQuery.toLowerCase())
+      budget.projectName.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   return (
@@ -129,7 +213,10 @@ export default function BudgetsScreen() {
       <View style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={styles.backButton}
+          >
             <Ionicons name="arrow-back" size={24} color="#333" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Quản lý ngân sách</Text>
@@ -140,21 +227,25 @@ export default function BudgetsScreen() {
 
         {/* Summary Cards */}
         <View style={styles.summaryContainer}>
-          <View style={[styles.summaryCard, { backgroundColor: '#EEF2FF' }]}>
+          <View style={[styles.summaryCard, { backgroundColor: "#EEF2FF" }]}>
             <Text style={styles.summaryLabel}>Tổng ngân sách</Text>
-            <Text style={[styles.summaryValue, { color: Colors.light.primary }]}>
-              {formatCurrency(budgets.reduce((sum, b) => sum + b.totalBudget, 0))}
+            <Text
+              style={[styles.summaryValue, { color: Colors.light.primary }]}
+            >
+              {formatCurrency(
+                budgets.reduce((sum, b) => sum + b.totalBudget, 0),
+              )}
             </Text>
           </View>
-          <View style={[styles.summaryCard, { backgroundColor: '#FEF3C7' }]}>
+          <View style={[styles.summaryCard, { backgroundColor: "#FEF3C7" }]}>
             <Text style={styles.summaryLabel}>Đã chi</Text>
-            <Text style={[styles.summaryValue, { color: '#0066CC' }]}>
+            <Text style={[styles.summaryValue, { color: "#0D9488" }]}>
               {formatCurrency(budgets.reduce((sum, b) => sum + b.spent, 0))}
             </Text>
           </View>
-          <View style={[styles.summaryCard, { backgroundColor: '#ECFDF5' }]}>
+          <View style={[styles.summaryCard, { backgroundColor: "#ECFDF5" }]}>
             <Text style={styles.summaryLabel}>Còn lại</Text>
-            <Text style={[styles.summaryValue, { color: '#0066CC' }]}>
+            <Text style={[styles.summaryValue, { color: "#0D9488" }]}>
               {formatCurrency(budgets.reduce((sum, b) => sum + b.remaining, 0))}
             </Text>
           </View>
@@ -162,7 +253,12 @@ export default function BudgetsScreen() {
 
         {/* Search */}
         <View style={styles.searchContainer}>
-          <Ionicons name="search" size={20} color="#94A3B8" style={styles.searchIcon} />
+          <Ionicons
+            name="search"
+            size={20}
+            color="#94A3B8"
+            style={styles.searchIcon}
+          />
           <TextInput
             style={styles.searchInput}
             placeholder="Tìm kiếm ngân sách..."
@@ -172,9 +268,23 @@ export default function BudgetsScreen() {
         </View>
 
         {/* Budget List */}
-        <ScrollView style={styles.listContainer} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          style={styles.listContainer}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor={Colors.light.primary}
+            />
+          }
+        >
           {loading ? (
-            <ActivityIndicator size="large" color={Colors.light.primary} style={styles.loader} />
+            <ActivityIndicator
+              size="large"
+              color={Colors.light.primary}
+              style={styles.loader}
+            />
           ) : (
             filteredBudgets.map((budget) => (
               <TouchableOpacity
@@ -187,9 +297,24 @@ export default function BudgetsScreen() {
                     <Text style={styles.budgetName}>{budget.name}</Text>
                     <Text style={styles.projectName}>{budget.projectName}</Text>
                   </View>
-                  <View style={[styles.statusBadge, { backgroundColor: `${getStatusColor(budget.status)}20` }]}>
-                    <View style={[styles.statusDot, { backgroundColor: getStatusColor(budget.status) }]} />
-                    <Text style={[styles.statusText, { color: getStatusColor(budget.status) }]}>
+                  <View
+                    style={[
+                      styles.statusBadge,
+                      { backgroundColor: `${getStatusColor(budget.status)}20` },
+                    ]}
+                  >
+                    <View
+                      style={[
+                        styles.statusDot,
+                        { backgroundColor: getStatusColor(budget.status) },
+                      ]}
+                    />
+                    <Text
+                      style={[
+                        styles.statusText,
+                        { color: getStatusColor(budget.status) },
+                      ]}
+                    >
                       {getStatusText(budget.status)}
                     </Text>
                   </View>
@@ -215,11 +340,13 @@ export default function BudgetsScreen() {
                 <View style={styles.budgetStats}>
                   <View style={styles.statItem}>
                     <Text style={styles.statLabel}>Ngân sách</Text>
-                    <Text style={styles.statValue}>{formatCurrency(budget.totalBudget)}</Text>
+                    <Text style={styles.statValue}>
+                      {formatCurrency(budget.totalBudget)}
+                    </Text>
                   </View>
                   <View style={styles.statItem}>
                     <Text style={styles.statLabel}>Đã chi</Text>
-                    <Text style={[styles.statValue, { color: '#0066CC' }]}>
+                    <Text style={[styles.statValue, { color: "#0D9488" }]}>
                       {formatCurrency(budget.spent)}
                     </Text>
                   </View>
@@ -228,7 +355,9 @@ export default function BudgetsScreen() {
                     <Text
                       style={[
                         styles.statValue,
-                        { color: budget.remaining >= 0 ? '#0066CC' : '#000000' },
+                        {
+                          color: budget.remaining >= 0 ? "#0D9488" : "#000000",
+                        },
                       ]}
                     >
                       {formatCurrency(budget.remaining)}
@@ -239,8 +368,8 @@ export default function BudgetsScreen() {
                 <View style={styles.dateRow}>
                   <Ionicons name="calendar-outline" size={14} color="#94A3B8" />
                   <Text style={styles.dateText}>
-                    {new Date(budget.startDate).toLocaleDateString('vi-VN')} -{' '}
-                    {new Date(budget.endDate).toLocaleDateString('vi-VN')}
+                    {new Date(budget.startDate).toLocaleDateString("vi-VN")} -{" "}
+                    {new Date(budget.endDate).toLocaleDateString("vi-VN")}
                   </Text>
                 </View>
               </TouchableOpacity>
@@ -257,30 +386,30 @@ export default function BudgetsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     padding: 16,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e5e5',
+    borderBottomColor: "#e5e5e5",
   },
   backButton: {
     padding: 8,
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
   },
   addButton: {
     padding: 8,
   },
   summaryContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     padding: 16,
     gap: 12,
   },
@@ -288,26 +417,26 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 12,
     borderRadius: 12,
-    alignItems: 'center',
+    alignItems: "center",
   },
   summaryLabel: {
     fontSize: 11,
-    color: '#666',
+    color: "#666",
     marginBottom: 4,
   },
   summaryValue: {
     fontSize: 14,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
     marginHorizontal: 16,
     borderRadius: 12,
     paddingHorizontal: 16,
     borderWidth: 1,
-    borderColor: '#e5e5e5',
+    borderColor: "#e5e5e5",
   },
   searchIcon: {
     marginRight: 8,
@@ -316,7 +445,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 12,
     fontSize: 15,
-    color: '#333',
+    color: "#333",
   },
   listContainer: {
     flex: 1,
@@ -327,35 +456,35 @@ const styles = StyleSheet.create({
     marginTop: 40,
   },
   budgetCard: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
   },
   budgetHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
     marginBottom: 12,
   },
   budgetName: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
   },
   projectName: {
     fontSize: 13,
-    color: '#666',
+    color: "#666",
     marginTop: 2,
   },
   statusBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
@@ -368,60 +497,60 @@ const styles = StyleSheet.create({
   },
   statusText: {
     fontSize: 11,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   progressContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 12,
     gap: 8,
   },
   progressBar: {
     flex: 1,
     height: 8,
-    backgroundColor: '#e5e5e5',
+    backgroundColor: "#e5e5e5",
     borderRadius: 4,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   progressFill: {
-    height: '100%',
+    height: "100%",
     borderRadius: 4,
   },
   progressText: {
     fontSize: 12,
-    fontWeight: '600',
-    color: '#666',
+    fontWeight: "600",
+    color: "#666",
     width: 36,
-    textAlign: 'right',
+    textAlign: "right",
   },
   budgetStats: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
+    borderTopColor: "#f0f0f0",
     marginBottom: 8,
   },
   statItem: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   statLabel: {
     fontSize: 11,
-    color: '#94A3B8',
+    color: "#94A3B8",
     marginBottom: 2,
   },
   statValue: {
     fontSize: 13,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
   },
   dateRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 4,
   },
   dateText: {
     fontSize: 12,
-    color: '#94A3B8',
+    color: "#94A3B8",
   },
 });

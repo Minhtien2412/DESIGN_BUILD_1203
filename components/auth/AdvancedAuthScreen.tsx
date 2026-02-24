@@ -623,7 +623,7 @@ export default function AdvancedAuthScreen() {
                             {forgotStep === 'reset' && (
                                 <>
                                     <View style={styles.forgotInfo}>
-                                        <MaterialCommunityIcons name="lock-open" size={48} color="#0066CC" />
+                                        <MaterialCommunityIcons name="lock-open" size={48} color="#0D9488" />
                                         <Text style={styles.forgotInfoText}>
                                             OTP ch�nh x�c! B�y gi? b?n c� th? d?t m?t kh?u m?i
                                         </Text>

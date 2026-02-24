@@ -34,6 +34,7 @@ import {
     View,
     ViewStyle,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // ============================================================================
 // TYPES
@@ -118,6 +119,27 @@ export const MessageComposerToolbar = memo(function MessageComposerToolbar({
   style,
   primaryColor = COLORS.primary,
 }: MessageComposerToolbarProps) {
+  // Safe area insets for bottom padding
+  const insets = useSafeAreaInsets();
+
+  // Track keyboard visibility for safe area
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const showSub = Keyboard.addListener(
+      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
+      () => setKeyboardVisible(true),
+    );
+    const hideSub = Keyboard.addListener(
+      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
+      () => setKeyboardVisible(false),
+    );
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
+
   // State
   const [text, setText] = useState("");
   const [inputHeight, setInputHeight] = useState(40);
@@ -411,7 +433,13 @@ export const MessageComposerToolbar = memo(function MessageComposerToolbar({
   };
 
   return (
-    <View style={[styles.container, style]}>
+    <View
+      style={[
+        styles.container,
+        { paddingBottom: keyboardVisible ? 4 : Math.max(insets.bottom, 8) },
+        style,
+      ]}
+    >
       {/* Reply Preview */}
       {replyTo && (
         <View style={styles.replyContainer}>
@@ -449,7 +477,7 @@ export const MessageComposerToolbar = memo(function MessageComposerToolbar({
             onPress={pickFromGallery}
           >
             <View
-              style={[styles.attachmentIcon, { backgroundColor: "#3B82F6" }]}
+              style={[styles.attachmentIcon, { backgroundColor: "#0D9488" }]}
             >
               <Ionicons name="images" size={24} color="#fff" />
             </View>

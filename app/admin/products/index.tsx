@@ -169,7 +169,7 @@ export default function AdminProductsScreen() {
         {item.status === ProductStatus.PENDING && (
           <>
             <TouchableOpacity
-              style={[styles.actionButton, { backgroundColor: "#0066CC" }]}
+              style={[styles.actionButton, { backgroundColor: "#0D9488" }]}
               onPress={() => handleUpdateStatus(item, "APPROVED")}
             >
               <Ionicons name="checkmark" size={20} color="#fff" />
@@ -221,7 +221,7 @@ export default function AdminProductsScreen() {
   if (loading && !productsData) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#0066CC" />
+        <ActivityIndicator size="large" color="#0D9488" />
         <Text style={styles.loadingText}>Đang tải sản phẩm...</Text>
       </View>
     );
@@ -236,7 +236,7 @@ export default function AdminProductsScreen() {
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Quản lý sản phẩm</Text>
         <TouchableOpacity onPress={() => router.push("/admin/products/create")}>
-          <Ionicons name="add-circle" size={28} color="#0066CC" />
+          <Ionicons name="add-circle" size={28} color="#0D9488" />
         </TouchableOpacity>
       </View>
 
@@ -317,7 +317,7 @@ export default function AdminProductsScreen() {
                 <Ionicons
                   name="checkmark-circle-outline"
                   size={36}
-                  color="#0066CC"
+                  color="#0D9488"
                 />
                 <Text style={styles.quickEmptyText}>
                   Không có sản phẩm chờ duyệt
@@ -498,7 +498,7 @@ const styles = StyleSheet.create({
   quickLink: {
     fontSize: 13,
     fontWeight: "700",
-    color: "#0066CC",
+    color: "#0D9488",
   },
   quickList: {
     paddingHorizontal: 16,
@@ -558,8 +558,8 @@ const styles = StyleSheet.create({
     borderColor: "#e0e0e0",
   },
   categoryChipActive: {
-    backgroundColor: "#0066CC",
-    borderColor: "#0066CC",
+    backgroundColor: "#0D9488",
+    borderColor: "#0D9488",
   },
   categoryChipText: {
     fontSize: 12,
@@ -582,7 +582,7 @@ const styles = StyleSheet.create({
   },
   statsNumber: {
     fontWeight: "700",
-    color: "#0066CC",
+    color: "#0D9488",
   },
   list: {
     padding: 16,
@@ -624,7 +624,7 @@ const styles = StyleSheet.create({
   productPrice: {
     fontSize: 14,
     fontWeight: "700",
-    color: "#0066CC",
+    color: "#0D9488",
     marginBottom: 8,
   },
   statusBadge: {

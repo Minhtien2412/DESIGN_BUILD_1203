@@ -92,7 +92,7 @@ export default function AnnouncementsScreen() {
       case 'URGENT':
         return '#000000';
       case 'HIGH':
-        return '#0066CC';
+        return '#0D9488';
       case 'NORMAL':
         return primary;
       case 'LOW':

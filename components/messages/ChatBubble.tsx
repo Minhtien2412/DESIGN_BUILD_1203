@@ -109,7 +109,7 @@ export default function ChatBubble({
               <Ionicons 
                 name="document-attach" 
                 size={24} 
-                color={isFromMe ? '#fff' : '#0066CC'} 
+                color={isFromMe ? '#fff' : '#0D9488'} 
               />
             </View>
             <View style={{ flex: 1, marginLeft: 12 }}>
@@ -140,7 +140,7 @@ export default function ChatBubble({
               <Ionicons 
                 name="play" 
                 size={20} 
-                color={isFromMe ? '#0066CC' : '#fff'} 
+                color={isFromMe ? '#0D9488' : '#fff'} 
               />
             </View>
             <View style={styles.audioWaveform}>
@@ -203,7 +203,7 @@ export default function ChatBubble({
             <Ionicons 
               name={isRead ? "checkmark-done" : "checkmark"} 
               size={12} 
-              color={isRead ? "#3b82f6" : type === 'text' ? "#fff" : "#999"}
+              color={isRead ? "#0D9488" : type === 'text' ? "#fff" : "#999"}
               style={{ marginLeft: 4 }}
             />
           )}
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 4,
   },
   messageBubbleRight: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     borderBottomRightRadius: 4,
   },
   bubbleGroupLeft: {

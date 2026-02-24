@@ -7,6 +7,15 @@
     "icon": "./assets/images/icon.png",
     "scheme": "appdesignbuild",
     "userInterfaceStyle": "automatic",
+    "androidStatusBar": {
+      "barStyle": "dark-content",
+      "backgroundColor": "#00000000",
+      "translucent": true
+    },
+    "androidNavigationBar": {
+      "visible": "sticky-immersive",
+      "backgroundColor": "#1a1a2e"
+    },
     "intentFilters": [
       {
         "action": "VIEW",
@@ -68,6 +77,7 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "package": "com.adminmarketingnx.APP_DESIGN_BUILD",
+      "softwareKeyboardLayoutMode": "pan",
       "permissions": [
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO",

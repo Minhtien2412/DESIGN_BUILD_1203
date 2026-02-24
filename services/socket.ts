@@ -209,6 +209,19 @@ class SocketManager {
       console.log("[Socket] ❌ Disconnected:", reason);
     });
 
+    // Refresh token before each reconnect attempt to avoid jwt expired errors
+    this.socket.on("reconnect_attempt", async () => {
+      try {
+        const freshToken = await getAccessToken();
+        if (freshToken && this.socket) {
+          (this.socket as any).auth = { token: freshToken };
+          console.log("[Socket] Token refreshed for reconnection");
+        }
+      } catch (err) {
+        console.warn("[Socket] Failed to refresh token for reconnection:", err);
+      }
+    });
+
     this.socket.on("connect_error", (error: Error) => {
       // Safely log error to prevent Babel construct.js crash
       try {

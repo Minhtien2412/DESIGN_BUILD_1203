@@ -129,7 +129,7 @@ const QUICK_ACTIONS: QuickAction[] = [
     id: "3",
     icon: "people",
     label: "Nhóm",
-    color: "#3B82F6",
+    color: "#0D9488",
     route: "/messages/groups",
   },
   {

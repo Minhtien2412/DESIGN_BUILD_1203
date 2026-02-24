@@ -48,12 +48,12 @@ export default function ChangeManagementScreen() {
   const getStatusColor = (status: ChangeRequestStatus): string => {
     const colors: Record<ChangeRequestStatus, string> = {
       DRAFT: '#999999',
-      SUBMITTED: '#0066CC',
-      UNDER_REVIEW: '#0066CC',
-      APPROVED: '#0066CC',
+      SUBMITTED: '#0D9488',
+      UNDER_REVIEW: '#0D9488',
+      APPROVED: '#0D9488',
       REJECTED: '#1A1A1A',
-      ON_HOLD: '#0066CC',
-      IMPLEMENTED: '#0066CC',
+      ON_HOLD: '#0D9488',
+      IMPLEMENTED: '#0D9488',
       CANCELLED: '#4A4A4A',
     };
     return colors[status] || '#999999';
@@ -75,8 +75,8 @@ export default function ChangeManagementScreen() {
 
   const getPriorityColor = (priority: ChangePriority): string => {
     const colors: Record<ChangePriority, string> = {
-      LOW: '#0066CC',
-      MEDIUM: '#0066CC',
+      LOW: '#0D9488',
+      MEDIUM: '#0D9488',
       HIGH: '#1A1A1A',
       URGENT: '#D32F2F',
       CRITICAL: '#B71C1C',
@@ -135,11 +135,11 @@ export default function ChangeManagementScreen() {
         showsHorizontalScrollIndicator={false}
         style={styles.statsContainer}
       >
-        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
+        <View style={[styles.statCard, { backgroundColor: '#F0FDFA' }]}>
           <Text style={styles.statValue}>{stats.total}</Text>
           <Text style={styles.statLabel}>Tổng yêu cầu</Text>
         </View>
-        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
+        <View style={[styles.statCard, { backgroundColor: '#F0FDFA' }]}>
           <Text style={styles.statValue}>{stats.pending}</Text>
           <Text style={styles.statLabel}>Chờ duyệt</Text>
         </View>
@@ -191,7 +191,7 @@ export default function ChangeManagementScreen() {
           ]}
           onPress={() => setStatusFilter('SUBMITTED' as ChangeRequestStatus)}
         >
-          <View style={[styles.statusDot, { backgroundColor: '#0066CC' }]} />
+          <View style={[styles.statusDot, { backgroundColor: '#0D9488' }]} />
           <Text
             style={[
               styles.filterChipText,
@@ -208,7 +208,7 @@ export default function ChangeManagementScreen() {
           ]}
           onPress={() => setStatusFilter('APPROVED' as ChangeRequestStatus)}
         >
-          <View style={[styles.statusDot, { backgroundColor: '#0066CC' }]} />
+          <View style={[styles.statusDot, { backgroundColor: '#0D9488' }]} />
           <Text
             style={[
               styles.filterChipText,
@@ -225,7 +225,7 @@ export default function ChangeManagementScreen() {
           ]}
           onPress={() => setStatusFilter('IMPLEMENTED' as ChangeRequestStatus)}
         >
-          <View style={[styles.statusDot, { backgroundColor: '#0066CC' }]} />
+          <View style={[styles.statusDot, { backgroundColor: '#0D9488' }]} />
           <Text
             style={[
               styles.filterChipText,

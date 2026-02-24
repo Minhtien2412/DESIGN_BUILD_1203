@@ -7,5 +7,7 @@
   "java.compile.nullAnalysis.mode": "automatic",
   "java.configuration.updateBuildConfiguration": "interactive",
   "chatgpt.openOnStartup": true,
-  "chatgpt.runCodexInWindowsSubsystemForLinux": true
+  "chatgpt.runCodexInWindowsSubsystemForLinux": true,
+  "github.copilot.chat.responsesApiReasoningEffort": "high",
+  "github.copilot.chat.virtualTools.threshold": 128
 }

@@ -97,8 +97,8 @@ export default function SecurityScreen() {
   const securityScore = calculateSecurityScore();
 
   const getScoreColor = (score: number) => {
-    if (score >= 80) return "#0066CC";
-    if (score >= 50) return "#0066CC";
+    if (score >= 80) return "#0D9488";
+    if (score >= 50) return "#0D9488";
     return "#000000";
   };
 
@@ -138,9 +138,9 @@ export default function SecurityScreen() {
   const getStrengthColor = (strength: PasswordStrength) => {
     switch (strength) {
       case "strong":
-        return "#0066CC";
+        return "#0D9488";
       case "medium":
-        return "#0066CC";
+        return "#0D9488";
       case "weak":
         return "#000000";
     }
@@ -598,7 +598,7 @@ export default function SecurityScreen() {
           {/* Security Settings */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Ionicons name="settings" size={24} color="#0066CC" />
+              <Ionicons name="settings" size={24} color="#0D9488" />
               <Text style={styles.sectionTitle}>Cài đặt bảo mật</Text>
             </View>
 
@@ -608,10 +608,10 @@ export default function SecurityScreen() {
                   <View
                     style={[
                       styles.settingIconContainer,
-                      { backgroundColor: "#E8F4FF" },
+                      { backgroundColor: "#F0FDFA" },
                     ]}
                   >
-                    <Ionicons name="finger-print" size={24} color="#3B82F6" />
+                    <Ionicons name="finger-print" size={24} color="#0D9488" />
                   </View>
                   <View style={styles.settingText}>
                     <Text style={styles.settingTitle}>Xác thực 2 bước</Text>
@@ -638,7 +638,7 @@ export default function SecurityScreen() {
                       { backgroundColor: "#FEF3C7" },
                     ]}
                   >
-                    <Ionicons name="notifications" size={24} color="#0066CC" />
+                    <Ionicons name="notifications" size={24} color="#0D9488" />
                   </View>
                   <View style={styles.settingText}>
                     <Text style={styles.settingTitle}>Thông báo đăng nhập</Text>
@@ -665,7 +665,7 @@ export default function SecurityScreen() {
                       { backgroundColor: "#D1FAE5" },
                     ]}
                   >
-                    <Ionicons name="scan" size={24} color="#0066CC" />
+                    <Ionicons name="scan" size={24} color="#0D9488" />
                   </View>
                   <View style={styles.settingText}>
                     <Text style={styles.settingTitle}>Sinh trắc học</Text>
@@ -687,7 +687,7 @@ export default function SecurityScreen() {
           {/* Active Sessions */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Ionicons name="phone-portrait" size={24} color="#0066CC" />
+              <Ionicons name="phone-portrait" size={24} color="#0D9488" />
               <Text style={styles.sectionTitle}>
                 Phiên đăng nhập ({sessions.length})
               </Text>
@@ -702,7 +702,7 @@ export default function SecurityScreen() {
                         styles.sessionIconContainer,
                         {
                           backgroundColor: session.current
-                            ? "#E8F4FF"
+                            ? "#F0FDFA"
                             : "#F3F4F6",
                         },
                       ]}
@@ -714,7 +714,7 @@ export default function SecurityScreen() {
                             : "desktop"
                         }
                         size={24}
-                        color={session.current ? "#3B82F6" : "#6B7280"}
+                        color={session.current ? "#0D9488" : "#6B7280"}
                       />
                     </View>
                     <View style={styles.sessionInfo}>
@@ -792,29 +792,29 @@ export default function SecurityScreen() {
           {/* Security Tips */}
           <View style={styles.tipsCard}>
             <View style={styles.tipsHeader}>
-              <Ionicons name="bulb" size={20} color="#0066CC" />
+              <Ionicons name="bulb" size={20} color="#0D9488" />
               <Text style={styles.tipsTitle}>Mẹo bảo mật</Text>
             </View>
             <View style={styles.tipItem}>
-              <Ionicons name="checkmark-circle" size={16} color="#0066CC" />
+              <Ionicons name="checkmark-circle" size={16} color="#0D9488" />
               <Text style={styles.tipText}>
                 Sử dụng mật khẩu mạnh với ít nhất 8 ký tự
               </Text>
             </View>
             <View style={styles.tipItem}>
-              <Ionicons name="checkmark-circle" size={16} color="#0066CC" />
+              <Ionicons name="checkmark-circle" size={16} color="#0D9488" />
               <Text style={styles.tipText}>
                 Bật xác thực 2 bước để tăng cường bảo mật
               </Text>
             </View>
             <View style={styles.tipItem}>
-              <Ionicons name="checkmark-circle" size={16} color="#0066CC" />
+              <Ionicons name="checkmark-circle" size={16} color="#0D9488" />
               <Text style={styles.tipText}>
                 Không chia sẻ mật khẩu với bất kỳ ai
               </Text>
             </View>
             <View style={styles.tipItem}>
-              <Ionicons name="checkmark-circle" size={16} color="#0066CC" />
+              <Ionicons name="checkmark-circle" size={16} color="#0D9488" />
               <Text style={styles.tipText}>
                 Đổi mật khẩu định kỳ mỗi 3-6 tháng
               </Text>
@@ -1069,7 +1069,7 @@ const styles = StyleSheet.create({
   currentBadge: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#E8F4FF",
+    backgroundColor: "#F0FDFA",
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 12,
@@ -1079,12 +1079,12 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: "#3B82F6",
+    backgroundColor: "#0D9488",
   },
   currentBadgeText: {
     fontSize: 11,
     fontWeight: "600",
-    color: "#1E40AF",
+    color: "#0F766E",
   },
   sessionMeta: {
     flexDirection: "row",

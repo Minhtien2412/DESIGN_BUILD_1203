@@ -351,13 +351,13 @@ export default function LandscapeChecklistScreen() {
   const getStatusColor = (status: InspectionStatus) => {
     switch (status) {
       case 'PASS':
-        return '#0066CC';
+        return '#0D9488';
       case 'FAIL':
         return '#000000';
       case 'NA':
         return '#999999';
       default:
-        return '#0066CC';
+        return '#0D9488';
     }
   };
 
@@ -387,7 +387,7 @@ export default function LandscapeChecklistScreen() {
           </Text>
           <View style={styles.statsRow}>
             <View style={styles.statItem}>
-              <View style={[styles.statDot, { backgroundColor: '#0066CC' }]} />
+              <View style={[styles.statDot, { backgroundColor: '#0D9488' }]} />
               <Text style={styles.statText}>Đạt: {passedCount}</Text>
             </View>
             <View style={styles.statItem}>
@@ -416,7 +416,7 @@ export default function LandscapeChecklistScreen() {
                 </View>
 
                 <View style={styles.specBox}>
-                  <Ionicons name="information-circle" size={16} color="#0066CC" />
+                  <Ionicons name="information-circle" size={16} color="#0D9488" />
                   <Text style={styles.specText}>{item.specification}</Text>
                 </View>
 
@@ -425,14 +425,14 @@ export default function LandscapeChecklistScreen() {
                     style={[
                       styles.statusButton,
                       item.status === InspectionStatus.PASS && styles.statusButtonActive,
-                      { borderColor: '#0066CC' },
+                      { borderColor: '#0D9488' },
                     ]}
                     onPress={() => handleStatusChange(item.index, InspectionStatus.PASS)}
                   >
                     <Text
                       style={[
                         styles.statusButtonText,
-                        item.status === InspectionStatus.PASS && { color: '#0066CC' },
+                        item.status === InspectionStatus.PASS && { color: '#0D9488' },
                       ]}
                     >
                       Đạt
@@ -479,7 +479,7 @@ export default function LandscapeChecklistScreen() {
                     style={styles.addPhotoButton}
                     onPress={() => handlePhotoAdd(item.index)}
                   >
-                    <Ionicons name="camera" size={20} color="#0066CC" />
+                    <Ionicons name="camera" size={20} color="#0D9488" />
                     <Text style={styles.addPhotoText}>
                       Thêm ảnh ({item.photos.length})
                     </Text>
@@ -546,7 +546,7 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     height: '100%',
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   progressText: {
     fontSize: 14,
@@ -582,7 +582,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     backgroundColor: '#fff',
     borderBottomWidth: 2,
-    borderBottomColor: '#0066CC',
+    borderBottomColor: '#0D9488',
   },
   itemCard: {
     backgroundColor: '#fff',
@@ -649,13 +649,13 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 12,
     borderWidth: 1,
-    borderColor: '#0066CC',
+    borderColor: '#0D9488',
     borderRadius: 6,
     borderStyle: 'dashed',
   },
   addPhotoText: {
     fontSize: 14,
-    color: '#0066CC',
+    color: '#0D9488',
     marginLeft: 8,
   },
   notesInput: {
@@ -679,7 +679,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 14,
     borderWidth: 1,
-    borderColor: '#0066CC',
+    borderColor: '#0D9488',
     borderRadius: 8,
     marginRight: 8,
     alignItems: 'center',
@@ -687,12 +687,12 @@ const styles = StyleSheet.create({
   draftButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   submitButton: {
     flex: 1,
     paddingVertical: 14,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     borderRadius: 8,
     marginLeft: 8,
     alignItems: 'center',

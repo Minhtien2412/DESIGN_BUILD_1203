@@ -125,7 +125,7 @@ export default function FoodDeliveryScreen() {
         
         <View style={styles.restaurantMeta}>
           <View style={styles.ratingContainer}>
-            <Ionicons name="star" size={14} color="#0080FF" />
+            <Ionicons name="star" size={14} color="#14B8A6" />
             <Text style={styles.ratingText}>
               {item.rating} ({item.reviews}+)
             </Text>
@@ -239,7 +239,7 @@ export default function FoodDeliveryScreen() {
       {/* Promo Banner */}
       <Animated.View style={[styles.promoBanner, { opacity: fadeAnim }]}>
         <View style={styles.promoContent}>
-          <Ionicons name="gift" size={32} color="#0080FF" />
+          <Ionicons name="gift" size={32} color="#14B8A6" />
           <View style={styles.promoInfo}>
             <Text style={styles.promoTitle}>Ưu đãi hôm nay</Text>
             <Text style={styles.promoSubtitle}>Giảm đến 50% cho đơn đầu tiên</Text>

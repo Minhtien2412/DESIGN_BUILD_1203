@@ -10,7 +10,6 @@ import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import {
     Alert,
-    SafeAreaView,
     Share,
     StatusBar,
     StyleSheet,
@@ -19,6 +18,7 @@ import {
     View,
     useColorScheme,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function QRCodeScreen() {
   const { user } = useAuth();
@@ -68,7 +68,7 @@ export default function QRCodeScreen() {
       {/* QR Card */}
       <View style={[styles.qrCard, { backgroundColor: colors.surface }]}>
         <LinearGradient
-          colors={["#3b82f6", "#1d4ed8"]}
+          colors={["#0D9488", "#0F766E"]}
           style={styles.avatarPlaceholder}
         >
           <Text style={styles.avatarText}>
@@ -88,7 +88,7 @@ export default function QRCodeScreen() {
         {/* QR Placeholder */}
         <View style={styles.qrContainer}>
           <View style={styles.qrPlaceholder}>
-            <Ionicons name="qr-code" size={180} color="#3b82f6" />
+            <Ionicons name="qr-code" size={180} color="#0D9488" />
           </View>
           <Text style={[styles.qrHint, { color: colors.textSecondary }]}>
             Quét mã để xem hồ sơ
@@ -102,7 +102,7 @@ export default function QRCodeScreen() {
           style={[styles.actionButton, { backgroundColor: colors.surface }]}
           onPress={handleShare}
         >
-          <Ionicons name="share-outline" size={22} color="#3b82f6" />
+          <Ionicons name="share-outline" size={22} color="#0D9488" />
           <Text style={[styles.actionText, { color: colors.text }]}>
             Chia sẻ
           </Text>
@@ -112,7 +112,7 @@ export default function QRCodeScreen() {
           style={[styles.actionButton, { backgroundColor: colors.surface }]}
           onPress={() => Alert.alert("Thông báo", "Đã lưu vào thư viện ảnh")}
         >
-          <Ionicons name="download-outline" size={22} color="#3b82f6" />
+          <Ionicons name="download-outline" size={22} color="#0D9488" />
           <Text style={[styles.actionText, { color: colors.text }]}>
             Lưu ảnh
           </Text>

@@ -44,7 +44,7 @@ export default function ReviewProjectScreen() {
           <Ionicons
             name={star <= value ? 'star' : 'star-outline'}
             size={size}
-            color={star <= value ? '#0066CC' : '#ccc'}
+            color={star <= value ? '#0D9488' : '#ccc'}
             style={{ marginHorizontal: 2 }}
           />
         </TouchableOpacity>
@@ -120,7 +120,7 @@ export default function ReviewProjectScreen() {
 
         {/* Tips */}
         <View style={styles.tipsCard}>
-          <Ionicons name="bulb-outline" size={20} color="#0066CC" />
+          <Ionicons name="bulb-outline" size={20} color="#0D9488" />
           <Text style={styles.tipsText}>
             Đánh giá chi tiết giúp nhà thầu cải thiện dịch vụ và hỗ trợ khách hàng khác lựa chọn tốt hơn.
           </Text>
@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
     borderTopColor: '#eee',
   },
   submitBtn: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',

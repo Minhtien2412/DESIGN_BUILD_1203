@@ -156,14 +156,14 @@ export default function ModerationScreen() {
         <StatCard
           label="Chờ duyệt"
           value={stats.pending}
-          color="#0066CC"
+          color="#0D9488"
           active={selectedFilter === ApprovalStatus.PENDING}
           onPress={() => setSelectedFilter(ApprovalStatus.PENDING)}
         />
         <StatCard
           label="AI đã duyệt"
           value={stats.aiApproved}
-          color="#0066CC"
+          color="#0D9488"
           active={selectedFilter === ApprovalStatus.AI_APPROVED}
           onPress={() => setSelectedFilter(ApprovalStatus.AI_APPROVED)}
         />
@@ -266,11 +266,11 @@ function SubmissionCard({
   const getStatusColor = (status: ApprovalStatus) => {
     switch (status) {
       case ApprovalStatus.AI_APPROVED:
-        return '#0066CC';
+        return '#0D9488';
       case ApprovalStatus.NEEDS_ADMIN_REVIEW:
         return '#000000';
       case ApprovalStatus.PENDING:
-        return '#0066CC';
+        return '#0D9488';
       default:
         return '#64748b';
     }
@@ -703,7 +703,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#000000',
   },
   approveButton: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   actionButtonText: {
     color: '#fff',

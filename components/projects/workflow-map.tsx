@@ -26,14 +26,14 @@ type WorkflowMapProps = {
 
 const STATUS_CONFIG = {
   completed: {
-    color: '#0066CC',
+    color: '#0D9488',
     icon: 'checkmark-circle',
     bg: '#E8F5E9',
   },
   active: {
-    color: '#0066CC',
+    color: '#0D9488',
     icon: 'radio-button-on',
-    bg: '#E8F4FF',
+    bg: '#F0FDFA',
   },
   pending: {
     color: '#999999',
@@ -185,11 +185,11 @@ function HorizontalWorkflowMap({ phases }: { phases: WorkflowPhase[] }) {
       {/* Legend */}
       <View style={styles.legend}>
         <View style={styles.legendItem}>
-          <View style={[styles.legendDot, { backgroundColor: '#0066CC' }]} />
+          <View style={[styles.legendDot, { backgroundColor: '#0D9488' }]} />
           <Text style={styles.legendText}>Hoàn thành</Text>
         </View>
         <View style={styles.legendItem}>
-          <View style={[styles.legendDot, { backgroundColor: '#0066CC' }]} />
+          <View style={[styles.legendDot, { backgroundColor: '#0D9488' }]} />
           <Text style={styles.legendText}>Đang thực hiện</Text>
         </View>
         <View style={styles.legendItem}>
@@ -373,7 +373,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   stationNameActive: {
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: '700',
   },
   progressContainer: {
@@ -429,13 +429,13 @@ const styles = StyleSheet.create({
   line: {
     width: 40,
     height: 4,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   arrow: {
     width: 0,
     height: 0,
     borderLeftWidth: 10,
-    borderLeftColor: '#0066CC',
+    borderLeftColor: '#0D9488',
     borderTopWidth: 6,
     borderTopColor: 'transparent',
     borderBottomWidth: 6,
@@ -494,7 +494,7 @@ const styles = StyleSheet.create({
     width: 3,
     flex: 1,
     minHeight: 80,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     marginTop: -4,
   },
   verticalContent: {
@@ -506,7 +506,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     borderLeftWidth: 3,
-    borderLeftColor: '#0066CC',
+    borderLeftColor: '#0D9488',
   },
   verticalHeader: {
     marginBottom: 12,
@@ -514,7 +514,7 @@ const styles = StyleSheet.create({
   verticalNumber: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#0066CC',
+    color: '#0D9488',
     textTransform: 'uppercase',
     marginBottom: 4,
   },

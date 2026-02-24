@@ -44,8 +44,8 @@ interface Task {
 
 const STATUS_CONFIG: Record<TaskStatus, { label: string; color: string; bg: string; progress: number }> = {
   pending: { label: 'Chưa bắt đầu', color: '#999999', bg: '#f0f0f0', progress: 0 },
-  in_progress: { label: 'Đang thực hiện', color: '#0066CC', bg: '#F0F8FF', progress: 0.5 },
-  done: { label: 'Hoàn thành', color: '#0066CC', bg: '#e8f5e9', progress: 1 },
+  in_progress: { label: 'Đang thực hiện', color: '#0D9488', bg: '#F0F8FF', progress: 0.5 },
+  done: { label: 'Hoàn thành', color: '#0D9488', bg: '#e8f5e9', progress: 1 },
   late: { label: 'Trễ tiến độ', color: '#000000', bg: '#F5F5F5', progress: 0.3 },
 };
 
@@ -750,7 +750,7 @@ const styles = StyleSheet.create({
   },
   columnProgressFill: {
     height: '100%',
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     borderRadius: 2,
   },
   columnTasks: {

@@ -45,7 +45,7 @@ const PermissionCard: React.FC<PermissionCardProps> = ({
   const getStatusColor = () => {
     switch (status) {
       case 'granted':
-        return '#0066CC';
+        return '#0D9488';
       case 'denied':
         return '#000000';
       default:
@@ -247,7 +247,7 @@ export default function PermissionRequestScreen() {
             </>
           ) : (
             <TouchableOpacity
-              style={[styles.continueButton, { backgroundColor: '#0066CC' }]}
+              style={[styles.continueButton, { backgroundColor: '#0D9488' }]}
               onPress={handleContinue}
               activeOpacity={0.7}
             >

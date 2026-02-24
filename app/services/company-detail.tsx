@@ -1,4 +1,4 @@
-import { useUnifiedMessaging } from "@/hooks/crm/useUnifiedMessaging";
+﻿import { useUnifiedMessaging } from "@/hooks/crm/useUnifiedMessaging";
 import {
     getCompanyById,
     type CompanyProfile,
@@ -23,10 +23,10 @@ const { width } = Dimensions.get("window");
 const CARD_WIDTH = (width - 48) / 2;
 
 const TABS = [
-  { id: "about", name: "Giới thiệu", icon: "information-circle-outline" },
-  { id: "services", name: "Dịch vụ", icon: "briefcase-outline" },
-  { id: "portfolio", name: "Dự án", icon: "images-outline" },
-  { id: "reviews", name: "Đánh giá", icon: "star-outline" },
+  { id: "about", name: "Giá»›i thiá»‡u", icon: "information-circle-outline" },
+  { id: "services", name: "Dá»‹ch vá»¥", icon: "briefcase-outline" },
+  { id: "portfolio", name: "Dá»± Ã¡n", icon: "images-outline" },
+  { id: "reviews", name: "ÄÃ¡nh giÃ¡", icon: "star-outline" },
 ];
 
 export default function CompanyDetailScreen() {
@@ -54,11 +54,11 @@ export default function CompanyDetailScreen() {
       if (response.success && response.data) {
         setCompany(response.data);
       } else {
-        setError(response.message || "Không thể tải thông tin công ty");
+        setError(response.message || "KhÃ´ng thá»ƒ táº£i thÃ´ng tin cÃ´ng ty");
       }
     } catch (err: any) {
       console.error("[CompanyDetail] Error:", err);
-      setError("Đã xảy ra lỗi khi tải thông tin công ty");
+      setError("ÄÃ£ xáº£y ra lá»—i khi táº£i thÃ´ng tin cÃ´ng ty");
     } finally {
       setLoading(false);
     }
@@ -135,7 +135,7 @@ export default function CompanyDetailScreen() {
                   : "star-outline"
             }
             size={16}
-            color="#0066CC"
+            color="#0D9488"
           />
         ))}
       </View>
@@ -146,8 +146,8 @@ export default function CompanyDetailScreen() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0066CC" />
-        <Text style={styles.loadingText}>Đang tải thông tin công ty...</Text>
+        <ActivityIndicator size="large" color="#0D9488" />
+        <Text style={styles.loadingText}>Äang táº£i thÃ´ng tin cÃ´ng ty...</Text>
       </View>
     );
   }
@@ -158,10 +158,10 @@ export default function CompanyDetailScreen() {
       <View style={styles.errorContainer}>
         <Ionicons name="alert-circle-outline" size={64} color="#F44336" />
         <Text style={styles.errorText}>
-          {error || "Không tìm thấy thông tin công ty"}
+          {error || "KhÃ´ng tÃ¬m tháº¥y thÃ´ng tin cÃ´ng ty"}
         </Text>
         <TouchableOpacity style={styles.retryButton} onPress={fetchCompanyData}>
-          <Text style={styles.retryButtonText}>Thử lại</Text>
+          <Text style={styles.retryButtonText}>Thá»­ láº¡i</Text>
         </TouchableOpacity>
       </View>
     );
@@ -171,17 +171,17 @@ export default function CompanyDetailScreen() {
     <View style={styles.tabContent}>
       {/* Description */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Về chúng tôi</Text>
+        <Text style={styles.sectionTitle}>Vá» chÃºng tÃ´i</Text>
         <Text style={styles.description}>{company.description}</Text>
       </View>
 
       {/* Specialties */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Chuyên môn</Text>
+        <Text style={styles.sectionTitle}>ChuyÃªn mÃ´n</Text>
         <View style={styles.specialtyGrid}>
           {company.specialties.map((specialty, idx) => (
             <View key={idx} style={styles.specialtyChip}>
-              <Ionicons name="checkmark-circle" size={16} color="#0066CC" />
+              <Ionicons name="checkmark-circle" size={16} color="#0D9488" />
               <Text style={styles.specialtyChipText}>{specialty}</Text>
             </View>
           ))}
@@ -190,7 +190,7 @@ export default function CompanyDetailScreen() {
 
       {/* Info */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Thông tin liên hệ</Text>
+        <Text style={styles.sectionTitle}>ThÃ´ng tin liÃªn há»‡</Text>
 
         <TouchableOpacity style={styles.infoRow} onPress={handleCall}>
           <Ionicons name="call-outline" size={20} color="#666" />
@@ -242,7 +242,7 @@ export default function CompanyDetailScreen() {
   const renderServicesTab = () => (
     <View style={styles.tabContent}>
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Bảng giá dịch vụ</Text>
+        <Text style={styles.sectionTitle}>Báº£ng giÃ¡ dá»‹ch vá»¥</Text>
         {company.services.map((service) => (
           <View key={service.id} style={styles.serviceCard}>
             <View style={styles.serviceInfo}>
@@ -255,9 +255,9 @@ export default function CompanyDetailScreen() {
               disabled={consultingServiceId === service.id}
             >
               {consultingServiceId === service.id ? (
-                <ActivityIndicator size="small" color="#0066CC" />
+                <ActivityIndicator size="small" color="#0D9488" />
               ) : (
-                <Text style={styles.serviceButtonText}>Tư vấn</Text>
+                <Text style={styles.serviceButtonText}>TÆ° váº¥n</Text>
               )}
             </TouchableOpacity>
           </View>
@@ -271,7 +271,7 @@ export default function CompanyDetailScreen() {
       {company.portfolio.length === 0 ? (
         <View style={styles.emptyState}>
           <Ionicons name="images-outline" size={48} color="#ccc" />
-          <Text style={styles.emptyStateText}>Chưa có dự án nào</Text>
+          <Text style={styles.emptyStateText}>ChÆ°a cÃ³ dá»± Ã¡n nÃ o</Text>
         </View>
       ) : (
         <View style={styles.portfolioGrid}>
@@ -310,11 +310,11 @@ export default function CompanyDetailScreen() {
         <View style={styles.ratingLeft}>
           <Text style={styles.ratingNumber}>{company.rating}</Text>
           {renderStars(company.rating)}
-          <Text style={styles.ratingCount}>{company.reviewCount} đánh giá</Text>
+          <Text style={styles.ratingCount}>{company.reviewCount} Ä‘Ã¡nh giÃ¡</Text>
         </View>
         <TouchableOpacity style={styles.writeReviewButton}>
-          <Ionicons name="create-outline" size={18} color="#0066CC" />
-          <Text style={styles.writeReviewText}>Viết đánh giá</Text>
+          <Ionicons name="create-outline" size={18} color="#0D9488" />
+          <Text style={styles.writeReviewText}>Viáº¿t Ä‘Ã¡nh giÃ¡</Text>
         </TouchableOpacity>
       </View>
 
@@ -322,7 +322,7 @@ export default function CompanyDetailScreen() {
       {company.reviews.length === 0 ? (
         <View style={styles.emptyState}>
           <Ionicons name="chatbubbles-outline" size={48} color="#ccc" />
-          <Text style={styles.emptyStateText}>Chưa có đánh giá nào</Text>
+          <Text style={styles.emptyStateText}>ChÆ°a cÃ³ Ä‘Ã¡nh giÃ¡ nÃ o</Text>
         </View>
       ) : (
         <View style={styles.section}>
@@ -354,7 +354,7 @@ export default function CompanyDetailScreen() {
       <Stack.Screen
         options={{
           title: company.name,
-          headerStyle: { backgroundColor: "#0066CC" },
+          headerStyle: { backgroundColor: "#0D9488" },
           headerTintColor: "#fff",
           headerTitleStyle: { fontWeight: "600" },
         }}
@@ -384,19 +384,19 @@ export default function CompanyDetailScreen() {
               <View style={styles.nameRow}>
                 <Text style={styles.companyName}>{company.name}</Text>
                 {company.verified && (
-                  <Ionicons name="checkmark-circle" size={18} color="#0066CC" />
+                  <Ionicons name="checkmark-circle" size={18} color="#0D9488" />
                 )}
               </View>
               <View style={styles.statsRow}>
                 <View style={styles.statItem}>
-                  <Ionicons name="star" size={16} color="#0066CC" />
+                  <Ionicons name="star" size={16} color="#0D9488" />
                   <Text style={styles.statText}>{company.rating}</Text>
                 </View>
                 <View style={styles.divider} />
                 <View style={styles.statItem}>
                   <Ionicons name="briefcase-outline" size={16} color="#666" />
                   <Text style={styles.statText}>
-                    {company.projectCount} dự án
+                    {company.projectCount} dá»± Ã¡n
                   </Text>
                 </View>
                 <View style={styles.divider} />
@@ -420,7 +420,7 @@ export default function CompanyDetailScreen() {
                   <Ionicons
                     name={tab.icon as any}
                     size={18}
-                    color={activeTab === tab.id ? "#0066CC" : "#999"}
+                    color={activeTab === tab.id ? "#0D9488" : "#999"}
                   />
                   <Text
                     style={[
@@ -450,8 +450,8 @@ export default function CompanyDetailScreen() {
             style={styles.actionButtonSecondary}
             onPress={handleCall}
           >
-            <Ionicons name="call" size={20} color="#0066CC" />
-            <Text style={styles.actionButtonSecondaryText}>Gọi điện</Text>
+            <Ionicons name="call" size={20} color="#0D9488" />
+            <Text style={styles.actionButtonSecondaryText}>Gá»i Ä‘iá»‡n</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.actionButtonPrimary}
@@ -463,7 +463,7 @@ export default function CompanyDetailScreen() {
             ) : (
               <>
                 <Ionicons name="chatbubble-ellipses" size={20} color="#fff" />
-                <Text style={styles.actionButtonPrimaryText}>Liên hệ ngay</Text>
+                <Text style={styles.actionButtonPrimaryText}>LiÃªn há»‡ ngay</Text>
               </>
             )}
           </TouchableOpacity>
@@ -504,7 +504,7 @@ const styles = StyleSheet.create({
   },
   retryButton: {
     marginTop: 16,
-    backgroundColor: "#0066CC",
+    backgroundColor: "#0D9488",
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
@@ -595,7 +595,7 @@ const styles = StyleSheet.create({
     borderBottomColor: "transparent",
   },
   tabActive: {
-    borderBottomColor: "#0066CC",
+    borderBottomColor: "#0D9488",
   },
   tabText: {
     fontSize: 14,
@@ -604,7 +604,7 @@ const styles = StyleSheet.create({
     marginLeft: 6,
   },
   tabTextActive: {
-    color: "#0066CC",
+    color: "#0D9488",
     fontWeight: "600",
   },
   tabContent: {
@@ -636,14 +636,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#fff5f0",
     borderWidth: 1,
-    borderColor: "#0066CC",
+    borderColor: "#0D9488",
     borderRadius: 20,
     paddingHorizontal: 12,
     paddingVertical: 6,
   },
   specialtyChipText: {
     fontSize: 13,
-    color: "#0066CC",
+    color: "#0D9488",
     fontWeight: "600",
     marginLeft: 6,
   },
@@ -680,12 +680,12 @@ const styles = StyleSheet.create({
   servicePrice: {
     fontSize: 14,
     fontWeight: "700",
-    color: "#0066CC",
+    color: "#0D9488",
   },
   serviceButton: {
     backgroundColor: "#fff5f0",
     borderWidth: 1,
-    borderColor: "#0066CC",
+    borderColor: "#0D9488",
     paddingHorizontal: 16,
     paddingVertical: 6,
     borderRadius: 6,
@@ -693,7 +693,7 @@ const styles = StyleSheet.create({
   serviceButtonText: {
     fontSize: 13,
     fontWeight: "600",
-    color: "#0066CC",
+    color: "#0D9488",
   },
   portfolioGrid: {
     flexDirection: "row",
@@ -750,7 +750,7 @@ const styles = StyleSheet.create({
   ratingNumber: {
     fontSize: 32,
     fontWeight: "700",
-    color: "#0066CC",
+    color: "#0D9488",
     marginBottom: 4,
   },
   starsRow: {
@@ -766,7 +766,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#fff5f0",
     borderWidth: 1,
-    borderColor: "#0066CC",
+    borderColor: "#0D9488",
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 8,
@@ -774,7 +774,7 @@ const styles = StyleSheet.create({
   writeReviewText: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#0066CC",
+    color: "#0D9488",
     marginLeft: 6,
   },
   reviewCard: {
@@ -836,14 +836,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "#fff",
     borderWidth: 1,
-    borderColor: "#0066CC",
+    borderColor: "#0D9488",
     paddingVertical: 12,
     borderRadius: 8,
   },
   actionButtonSecondaryText: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#0066CC",
+    color: "#0D9488",
     marginLeft: 6,
   },
   actionButtonPrimary: {
@@ -851,7 +851,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#0066CC",
+    backgroundColor: "#0D9488",
     paddingVertical: 12,
     borderRadius: 8,
   },

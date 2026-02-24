@@ -32,6 +32,19 @@ export default ({ config }: { config: any }) => ({
     // Enable New Architecture for Expo Go/dev build parity
     newArchEnabled: true,
 
+    // Android status bar: transparent + translucent so content draws under it
+    androidStatusBar: {
+      barStyle: "dark-content",
+      backgroundColor: "#00000000",
+      translucent: true,
+    },
+
+    // Android navigation bar styling
+    androidNavigationBar: {
+      visible: "sticky-immersive",
+      backgroundColor: "#1a1a2e",
+    },
+
     // Disable advanced Metro symbolication to prevent InternalBytecode.js ENOENT errors
     _internal: {
       isDebug: process.env.NODE_ENV === "development",
@@ -72,6 +85,7 @@ export default ({ config }: { config: any }) => ({
         monochromeImage: "./assets/images/android-icon-monochrome.png",
       },
       package: "com.adminmarketingnx.APP_DESIGN_BUILD",
+      softwareKeyboardLayoutMode: "pan",
 
       // Enhanced permissions for full functionality
       permissions: [

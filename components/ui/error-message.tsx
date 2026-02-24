@@ -51,7 +51,7 @@ function categorizeError(error: Error | ApiError | string | null): {
       title: 'No Internet Connection',
       message: 'Please check your network connection and try again',
       icon: 'cloud-offline',
-      color: '#0066CC',
+      color: '#0D9488',
     };
   }
 
@@ -62,7 +62,7 @@ function categorizeError(error: Error | ApiError | string | null): {
       title: 'Request Timed Out',
       message: 'The request took too long. Please try again',
       icon: 'time',
-      color: '#0066CC',
+      color: '#0D9488',
     };
   }
 
@@ -84,7 +84,7 @@ function categorizeError(error: Error | ApiError | string | null): {
         title: 'Not Found',
         message: 'The requested resource could not be found',
         icon: 'search',
-        color: '#0066CC',
+        color: '#0D9488',
       };
     }
 
@@ -104,7 +104,7 @@ function categorizeError(error: Error | ApiError | string | null): {
         title: 'Request Failed',
         message: error.message || 'Unable to complete your request',
         icon: 'warning',
-        color: '#0066CC',
+        color: '#0D9488',
       };
     }
   }

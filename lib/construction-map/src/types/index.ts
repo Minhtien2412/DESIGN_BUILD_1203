@@ -149,13 +149,13 @@ export const STATUS_CONFIG: Record<TaskStatus, StatusConfig> = {
     label: 'Chưa bắt đầu',
   },
   'in-progress': {
-    color: '#0066CC',
+    color: '#0D9488',
     fill: '#F0F8FF',
     progress: 0.5,
     label: 'Đang thực hiện',
   },
   done: {
-    color: '#0066CC',
+    color: '#0D9488',
     fill: '#e8f5e9',
     progress: 1,
     label: 'Hoàn thành',

@@ -10,6 +10,7 @@
  */
 
 import socketManager from "@/services/socket";
+import type { Socket } from "@/utils/socketIo";
 import {
     createContext,
     ReactNode,
@@ -19,8 +20,6 @@ import {
     useRef,
     useState,
 } from "react";
-import { Platform } from "react-native";
-import type { Socket } from "@/utils/socketIo";
 import { useAuth } from "./AuthContext";
 
 // ============================================================================
@@ -61,8 +60,8 @@ interface WebSocketProviderProps {
 
 export function WebSocketProvider({
   children,
-  autoConnect = false, // DISABLED: Prevent infinite loop until backend WebSocket is stable
-  reconnectOnAuthChange = false, // DISABLED: Prevent infinite loop
+  autoConnect = true, // ENABLED: Connect when user is authenticated
+  reconnectOnAuthChange = true, // ENABLED: Reconnect on auth changes
 }: WebSocketProviderProps) {
   const { user } = useAuth();
   const [socket, setSocket] = useState<Socket | null>(null);
@@ -82,12 +81,6 @@ export function WebSocketProvider({
   // ============================================================================
 
   const connect = useCallback(async () => {
-    // Skip WebSocket on web platform
-    if (Platform.OS === "web") {
-      console.log("[WebSocket] Disabled on web platform");
-      return;
-    }
-
     // Graceful fallback: Try to connect, but don't throw if backend not ready
     if (connected || connecting) {
       console.log("[WebSocket] Already connected or connecting");

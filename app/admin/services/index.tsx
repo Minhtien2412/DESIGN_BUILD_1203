@@ -23,8 +23,8 @@ import {
 
 const CATEGORIES = [
   { id: 'DESIGN', name: 'Thiết kế', icon: 'color-palette-outline', color: '#666666' },
-  { id: 'CONSTRUCTION', name: 'Thi công', icon: 'construct-outline', color: '#0066CC' },
-  { id: 'CONSULTING', name: 'Tư vấn', icon: 'bulb-outline', color: '#3B82F6' },
+  { id: 'CONSTRUCTION', name: 'Thi công', icon: 'construct-outline', color: '#0D9488' },
+  { id: 'CONSULTING', name: 'Tư vấn', icon: 'bulb-outline', color: '#0D9488' },
   { id: 'MAINTENANCE', name: 'Bảo trì', icon: 'construct', color: '#06B6D4' },
   { id: 'INSPECTION', name: 'Kiểm tra', icon: 'checkmark-circle-outline', color: '#666666' },
   { id: 'OTHER', name: 'Khác', icon: 'ellipsis-horizontal-circle-outline', color: '#6B7280' },
@@ -308,8 +308,8 @@ function ServiceCard({
         </View>
         <View style={styles.actions}>
           <Link href={`/admin/services/edit/${service.id}` as any} asChild>
-            <TouchableOpacity style={[styles.actionButton, { backgroundColor: '#E8F4FF' }]}>
-              <Ionicons name="create-outline" size={18} color="#3B82F6" />
+            <TouchableOpacity style={[styles.actionButton, { backgroundColor: '#F0FDFA' }]}>
+              <Ionicons name="create-outline" size={18} color="#0D9488" />
             </TouchableOpacity>
           </Link>
           <TouchableOpacity
@@ -452,7 +452,7 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   actions: {
     flexDirection: 'row',
@@ -476,7 +476,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   createButton: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,

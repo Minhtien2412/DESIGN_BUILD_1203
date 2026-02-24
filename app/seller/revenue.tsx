@@ -186,7 +186,7 @@ export default function SellerRevenueScreen() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#FF6B35" />
+        <ActivityIndicator size="large" color="#14B8A6" />
       </View>
     );
   }
@@ -198,13 +198,13 @@ export default function SellerRevenueScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={["#FF6B35"]}
+            colors={["#14B8A6"]}
           />
         }
       >
         {/* Main Revenue Card */}
         <LinearGradient
-          colors={["#FF6B35", "#FF8C5A", "#FFB088"]}
+          colors={["#14B8A6", "#FF8C5A", "#FFB088"]}
           style={styles.mainCard}
         >
           <Text style={styles.mainLabel}>Tổng doanh thu</Text>
@@ -245,7 +245,7 @@ export default function SellerRevenueScreen() {
         <View style={styles.quickStats}>
           <View style={styles.quickStatCard}>
             <View style={styles.quickStatHeader}>
-              <Ionicons name="today-outline" size={20} color="#FF6B35" />
+              <Ionicons name="today-outline" size={20} color="#14B8A6" />
               <Text style={styles.quickStatLabel}>Hôm nay</Text>
             </View>
             <Text style={styles.quickStatAmount}>
@@ -286,7 +286,7 @@ export default function SellerRevenueScreen() {
 
           <View style={styles.quickStatCard}>
             <View style={styles.quickStatHeader}>
-              <Ionicons name="calendar-outline" size={20} color="#3B82F6" />
+              <Ionicons name="calendar-outline" size={20} color="#0D9488" />
               <Text style={styles.quickStatLabel}>Tháng này</Text>
             </View>
             <Text style={styles.quickStatAmount}>
@@ -370,9 +370,9 @@ export default function SellerRevenueScreen() {
             </View>
             <View style={styles.orderStatCard}>
               <View
-                style={[styles.orderStatIcon, { backgroundColor: "#DBEAFE" }]}
+                style={[styles.orderStatIcon, { backgroundColor: "#CCFBF1" }]}
               >
-                <Ionicons name="receipt-outline" size={24} color="#3B82F6" />
+                <Ionicons name="receipt-outline" size={24} color="#0D9488" />
               </View>
               <Text style={styles.orderStatNumber}>{orderStats.total}</Text>
               <Text style={styles.orderStatLabel}>Tổng đơn</Text>
@@ -392,7 +392,7 @@ export default function SellerRevenueScreen() {
                     {
                       height:
                         maxRevenue > 0 ? (day.revenue / maxRevenue) * 120 : 0,
-                      backgroundColor: index === 3 ? "#FF6B35" : "#FFB088",
+                      backgroundColor: index === 3 ? "#14B8A6" : "#FFB088",
                     },
                   ]}
                 />
@@ -435,7 +435,7 @@ export default function SellerRevenueScreen() {
         <View style={styles.section}>
           <Pressable style={styles.withdrawButton}>
             <LinearGradient
-              colors={["#FF6B35", "#FF8C5A"]}
+              colors={["#14B8A6", "#FF8C5A"]}
               style={styles.withdrawGradient}
             >
               <Ionicons name="wallet-outline" size={24} color="#FFFFFF" />
@@ -495,7 +495,7 @@ const styles = StyleSheet.create({
     color: "rgba(255,255,255,0.9)",
   },
   activePeriodBtnText: {
-    color: "#FF6B35",
+    color: "#14B8A6",
     fontWeight: "600",
   },
   quickStats: {
@@ -551,7 +551,7 @@ const styles = StyleSheet.create({
   },
   seeAllText: {
     fontSize: 13,
-    color: "#FF6B35",
+    color: "#14B8A6",
   },
   orderStatsRow: {
     flexDirection: "row",
@@ -627,7 +627,7 @@ const styles = StyleSheet.create({
     lineHeight: 28,
     fontSize: 14,
     fontWeight: "600",
-    color: "#FF6B35",
+    color: "#14B8A6",
     marginRight: 12,
   },
   productInfo: {

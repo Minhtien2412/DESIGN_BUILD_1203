@@ -107,7 +107,7 @@ export default function SellerAnalyticsScreen() {
           visitors: 5234,
           percentage: 41.6,
           icon: "search",
-          color: "#3B82F6",
+          color: "#0D9488",
         },
         {
           name: "Link trực tiếp",
@@ -186,7 +186,7 @@ export default function SellerAnalyticsScreen() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#FF6B35" />
+        <ActivityIndicator size="large" color="#14B8A6" />
       </View>
     );
   }
@@ -198,7 +198,7 @@ export default function SellerAnalyticsScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={["#FF6B35"]}
+            colors={["#14B8A6"]}
           />
         }
       >
@@ -228,9 +228,9 @@ export default function SellerAnalyticsScreen() {
           <View style={styles.visitorGrid}>
             <View style={styles.visitorCard}>
               <View
-                style={[styles.visitorIcon, { backgroundColor: "#DBEAFE" }]}
+                style={[styles.visitorIcon, { backgroundColor: "#CCFBF1" }]}
               >
-                <Ionicons name="eye-outline" size={24} color="#3B82F6" />
+                <Ionicons name="eye-outline" size={24} color="#0D9488" />
               </View>
               <Text style={styles.visitorNumber}>
                 {formatNumber(visitors.total)}
@@ -276,7 +276,7 @@ export default function SellerAnalyticsScreen() {
           <Text style={styles.sectionTitle}>Phễu chuyển đổi</Text>
           <View style={styles.funnelContainer}>
             {[
-              { label: "Lượt xem", value: conversion.views, color: "#3B82F6" },
+              { label: "Lượt xem", value: conversion.views, color: "#0D9488" },
               {
                 label: "Thêm giỏ hàng",
                 value: conversion.addToCart,
@@ -346,7 +346,7 @@ export default function SellerAnalyticsScreen() {
                         maxVisitors > 0
                           ? (day.visitors / maxVisitors) * 100
                           : 0,
-                      backgroundColor: index === 4 ? "#FF6B35" : "#FFB088",
+                      backgroundColor: index === 4 ? "#14B8A6" : "#FFB088",
                     },
                   ]}
                 />
@@ -429,7 +429,7 @@ export default function SellerAnalyticsScreen() {
             style={styles.tipsGradient}
           >
             <View style={styles.tipsHeader}>
-              <Ionicons name="bulb-outline" size={24} color="#FF6B35" />
+              <Ionicons name="bulb-outline" size={24} color="#14B8A6" />
               <Text style={styles.tipsTitle}>Gợi ý cải thiện</Text>
             </View>
             <View style={styles.tipItem}>
@@ -482,7 +482,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   activePeriodBtn: {
-    backgroundColor: "#FF6B35",
+    backgroundColor: "#14B8A6",
   },
   periodBtnText: {
     fontSize: 14,
@@ -680,7 +680,7 @@ const styles = StyleSheet.create({
     lineHeight: 28,
     fontSize: 14,
     fontWeight: "600",
-    color: "#FF6B35",
+    color: "#14B8A6",
   },
   searchTermInfo: {
     flex: 1,

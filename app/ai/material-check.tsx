@@ -63,8 +63,8 @@ export default function MaterialCheckScreen() {
   };
 
   const getQualityColor = (quality: string) => {
-    if (quality.includes('Tốt') || quality.includes('Xuất sắc')) return '#0066CC';
-    if (quality.includes('Trung bình')) return '#0066CC';
+    if (quality.includes('Tốt') || quality.includes('Xuất sắc')) return '#0D9488';
+    if (quality.includes('Trung bình')) return '#0D9488';
     return '#000000';
   };
 
@@ -139,7 +139,7 @@ export default function MaterialCheckScreen() {
               <Ionicons
                 name={result.isCompliant ? 'checkmark-circle' : 'warning'}
                 size={24}
-                color={result.isCompliant ? '#0066CC' : '#0066CC'}
+                color={result.isCompliant ? '#0D9488' : '#0D9488'}
               />
               <Text style={styles.resultTitle}>
                 {result.isCompliant ? 'Đạt chuẩn' : 'Cần kiểm tra thêm'}
@@ -192,7 +192,7 @@ export default function MaterialCheckScreen() {
                 <Text style={styles.cardLabel}>Khuyến nghị</Text>
                 {result.recommendations.map((rec, index) => (
                   <View key={index} style={styles.recItem}>
-                    <Ionicons name="checkmark-circle" size={18} color="#0066CC" />
+                    <Ionicons name="checkmark-circle" size={18} color="#0D9488" />
                     <Text style={styles.recText}>{rec}</Text>
                   </View>
                 ))}
@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,

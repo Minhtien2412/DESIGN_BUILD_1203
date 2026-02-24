@@ -99,11 +99,11 @@ export default function QCInspectionsScreen() {
         <Ionicons
           name={inspection.overallResult === 'pass' ? 'checkmark-circle' : 'close-circle'}
           size={16}
-          color={inspection.overallResult === 'pass' ? '#0066CC' : '#000000'}
+          color={inspection.overallResult === 'pass' ? '#0D9488' : '#000000'}
         />
         <Text style={[
           styles.resultText,
-          { color: inspection.overallResult === 'pass' ? '#0066CC' : '#000000' }
+          { color: inspection.overallResult === 'pass' ? '#0D9488' : '#000000' }
         ]}>
           {inspection.overallResult === 'pass' ? 'Đạt' : 'Không đạt'}
         </Text>
@@ -135,7 +135,7 @@ export default function QCInspectionsScreen() {
           onPress={() => router.push(`/projects/${projectId}/qc/inspections/${inspection.id}`)}
         >
           <Text style={styles.viewButtonText}>Xem chi tiết</Text>
-          <Ionicons name="chevron-forward" size={16} color="#3b82f6" />
+          <Ionicons name="chevron-forward" size={16} color="#0D9488" />
         </TouchableOpacity>
       </View>
     );
@@ -169,19 +169,19 @@ export default function QCInspectionsScreen() {
               label="Tổng số"
               value={stats.totalInspections.toString()}
               icon="list"
-              gradientColors={['#3b82f6', '#0066CC']}
+              gradientColors={['#0D9488', '#0D9488']}
             />
             <MetricCard
               label="Hoàn thành"
               value={stats.completedInspections.toString()}
               icon="checkmark-done"
-              gradientColors={['#0066CC', '#0066CC']}
+              gradientColors={['#0D9488', '#0D9488']}
             />
             <MetricCard
               label="Tỷ lệ đạt"
               value={`${stats.passRate}%`}
               icon="trophy"
-              gradientColors={['#0066CC', '#d97706']}
+              gradientColors={['#0D9488', '#d97706']}
             />
             <MetricCard
               label="Lỗi nghiêm trọng"
@@ -195,14 +195,14 @@ export default function QCInspectionsScreen() {
         {/* Quick Actions */}
         <View style={styles.quickActions}>
           <TouchableOpacity
-            style={[styles.actionButton, { backgroundColor: '#3b82f6' }]}
+            style={[styles.actionButton, { backgroundColor: '#0D9488' }]}
             onPress={() => router.push(`/projects/${projectId}/qc/inspections/create`)}
           >
             <Ionicons name="add" size={20} color="#fff" />
             <Text style={styles.actionButtonText}>Tạo kiểm tra</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.actionButton, { backgroundColor: '#0066CC' }]}
+            style={[styles.actionButton, { backgroundColor: '#0D9488' }]}
             onPress={() => router.push(`/projects/${projectId}/qc/templates`)}
           >
             <Ionicons name="document-text" size={20} color="#fff" />
@@ -253,7 +253,7 @@ export default function QCInspectionsScreen() {
                 style={styles.createCTA}
                 onPress={() => router.push(`/projects/${projectId}/qc/inspections/create`)}
               >
-                <Ionicons name="add-circle" size={20} color="#3b82f6" />
+                <Ionicons name="add-circle" size={20} color="#0D9488" />
                 <Text style={styles.createCTAText}>Tạo kiểm tra mới</Text>
               </TouchableOpacity>
             </View>
@@ -341,8 +341,8 @@ const styles = StyleSheet.create({
     borderColor: '#e5e7eb',
   },
   filterChipActive: {
-    backgroundColor: '#3b82f6',
-    borderColor: '#3b82f6',
+    backgroundColor: '#0D9488',
+    borderColor: '#0D9488',
   },
   filterChipText: {
     fontSize: 14,
@@ -415,13 +415,13 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#3b82f6',
+    borderColor: '#0D9488',
     marginTop: 4,
   },
   viewButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#3b82f6',
+    color: '#0D9488',
   },
   emptyState: {
     alignItems: 'center',
@@ -441,12 +441,12 @@ const styles = StyleSheet.create({
     marginTop: 16,
     paddingVertical: 12,
     paddingHorizontal: 24,
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     borderRadius: 24,
   },
   createCTAText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#3b82f6',
+    color: '#0D9488',
   },
 });

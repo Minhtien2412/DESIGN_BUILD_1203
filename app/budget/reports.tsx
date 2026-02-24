@@ -74,7 +74,7 @@ const ReportCard = ({
       string,
       { color: string; icon: keyof typeof Ionicons.glyphMap; label: string }
     > = {
-      daily: { color: "#3b82f6", icon: "today", label: "Hàng ngày" },
+      daily: { color: "#0D9488", icon: "today", label: "Hàng ngày" },
       weekly: { color: "#8b5cf6", icon: "calendar", label: "Hàng tuần" },
       monthly: {
         color: "#10b981",
@@ -202,7 +202,7 @@ const ReportCard = ({
             <Ionicons
               name="wallet"
               size={16}
-              color={report.balance >= 0 ? "#3b82f6" : "#ef4444"}
+              color={report.balance >= 0 ? "#0D9488" : "#ef4444"}
             />
             <Text style={[styles.statLabel, { color: textColor + "60" }]}>
               Số dư
@@ -210,7 +210,7 @@ const ReportCard = ({
             <Text
               style={[
                 styles.statValue,
-                { color: report.balance >= 0 ? "#3b82f6" : "#ef4444" },
+                { color: report.balance >= 0 ? "#0D9488" : "#ef4444" },
               ]}
             >
               {formatCurrency(report.balance)}
@@ -427,8 +427,8 @@ export default function BudgetReportsScreen() {
             colors={
               netBalance >= 0
                 ? isDark
-                  ? ["#3b82f620", "#3b82f610"]
-                  : ["#eff6ff", "#f0f9ff"]
+                  ? ["#0D948820", "#0D948810"]
+                  : ["#F0FDFA", "#f0f9ff"]
                 : isDark
                   ? ["#ef444420", "#ef444410"]
                   : ["#fef2f2", "#fff5f5"]
@@ -439,7 +439,7 @@ export default function BudgetReportsScreen() {
               <Ionicons
                 name="wallet"
                 size={22}
-                color={netBalance >= 0 ? "#3b82f6" : "#ef4444"}
+                color={netBalance >= 0 ? "#0D9488" : "#ef4444"}
               />
             </View>
             <View style={styles.summaryTextWrap}>
@@ -447,7 +447,7 @@ export default function BudgetReportsScreen() {
               <Text
                 style={[
                   styles.summaryValueLarge,
-                  { color: netBalance >= 0 ? "#3b82f6" : "#ef4444" },
+                  { color: netBalance >= 0 ? "#0D9488" : "#ef4444" },
                 ]}
               >
                 {formatCurrency(netBalance)}

@@ -143,8 +143,8 @@ export default function ProjectFilesScreen() {
   const getFileColor = (type: string): string => {
     const colors: Record<string, string> = {
       pdf: '#ef4444',
-      doc: '#3b82f6',
-      docx: '#3b82f6',
+      doc: '#0D9488',
+      docx: '#0D9488',
       xls: '#22c55e',
       xlsx: '#22c55e',
       ppt: '#f59e0b',

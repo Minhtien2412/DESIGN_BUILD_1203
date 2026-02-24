@@ -156,7 +156,7 @@ export default function AdminDashboardEnhancedScreen() {
               title="Tổng người dùng"
               value={(dashboard as any)?.users?.total || 0}
               icon="people"
-              gradientColors={['#3B82F6', '#0066CC']}
+              gradientColors={['#0D9488', '#0D9488']}
               trend={{ value: '+12%', isPositive: true }}
               subtitle="So với tháng trước"
             />
@@ -171,14 +171,14 @@ export default function AdminDashboardEnhancedScreen() {
               title="Doanh thu"
               value={formatCurrency((dashboard as any)?.revenue?.total || 0)}
               icon="cash"
-              gradientColors={['#0066CC', '#0066CC']}
+              gradientColors={['#0D9488', '#0D9488']}
               trend={{ value: '+18%', isPositive: true }}
             />
             <StatisticCard
               title="Hoàn thành"
               value={`${(dashboard as any)?.projects?.completed || 0}/${(dashboard as any)?.projects?.total || 0}`}
               icon="checkmark-circle"
-              gradientColors={['#0066CC', '#D97706']}
+              gradientColors={['#0D9488', '#D97706']}
             />
           </View>
         </Section>
@@ -188,9 +188,9 @@ export default function AdminDashboardEnhancedScreen() {
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.quickActions}>
             <QuickAction icon="person-add" label="Thêm User" color={theme.primary} onPress={() => Alert.alert('Add User')} />
             <QuickAction icon="briefcase" label="Dự án mới" color="#666666" onPress={() => Alert.alert('New Project')} />
-            <QuickAction icon="document-text" label="Báo cáo" color="#0066CC" onPress={() => Alert.alert('Reports')} />
+            <QuickAction icon="document-text" label="Báo cáo" color="#0D9488" onPress={() => Alert.alert('Reports')} />
             <QuickAction icon="settings" label="Cài đặt" color="#6B7280" onPress={() => Alert.alert('Settings')} badge={3} />
-            <QuickAction icon="notifications" label="Thông báo" color="#0066CC" onPress={() => Alert.alert('Notifications')} badge={12} />
+            <QuickAction icon="notifications" label="Thông báo" color="#0D9488" onPress={() => Alert.alert('Notifications')} badge={12} />
           </ScrollView>
         </Section>
 

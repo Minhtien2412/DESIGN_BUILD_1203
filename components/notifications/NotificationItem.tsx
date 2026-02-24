@@ -64,7 +64,7 @@ export function NotificationItem({
     <SwipeableCard
       leftAction={{
         label: read ? '📭 Unread' : '📬 Read',
-        color: '#3B82F6',
+        color: '#0D9488',
         onPress: () => onMarkRead?.(id),
       }}
       rightAction={{

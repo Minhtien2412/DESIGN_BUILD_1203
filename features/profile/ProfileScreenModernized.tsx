@@ -129,8 +129,8 @@ export default function ProfileScreenModernized() {
       divider: isDarkMode ? "#334155" : MODERN_COLORS.divider,
       cardBg: isDarkMode ? "#1e293b" : "#ffffff",
       gradientStart: isDarkMode ? "#0f172a" : "#1a365d",
-      gradientMiddle: isDarkMode ? "#1e3a5f" : "#2563eb",
-      gradientEnd: isDarkMode ? "#1d4ed8" : "#3b82f6",
+      gradientMiddle: isDarkMode ? "#1e3a5f" : "#0D9488",
+      gradientEnd: isDarkMode ? "#0F766E" : "#0D9488",
     }),
     [isDarkMode]
   );
@@ -986,7 +986,7 @@ export default function ProfileScreenModernized() {
         <View style={styles.headerContainer}>
           {/* Gradient Background */}
           <LinearGradient
-            colors={["#1a365d", "#2563eb", "#3b82f6"]}
+            colors={["#1a365d", "#0D9488", "#0D9488"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.headerGradient}
@@ -1028,11 +1028,11 @@ export default function ProfileScreenModernized() {
                   >
                     <LinearGradient
                       colors={[
-                        "#3b82f6",
+                        "#0D9488",
                         "#8b5cf6",
                         "#ec4899",
                         "#f59e0b",
-                        "#3b82f6",
+                        "#0D9488",
                       ]}
                       start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 1 }}
@@ -1050,7 +1050,7 @@ export default function ProfileScreenModernized() {
                       />
                     ) : (
                       <LinearGradient
-                        colors={["#3b82f6", "#1d4ed8"]}
+                        colors={["#0D9488", "#0F766E"]}
                         style={styles.avatar}
                       >
                         <Text style={styles.avatarText}>
@@ -1100,7 +1100,7 @@ export default function ProfileScreenModernized() {
                       <Ionicons
                         name="shield-checkmark"
                         size={14}
-                        color="#3b82f6"
+                        color="#0D9488"
                       />
                       <Text style={styles.verifiedText}>Đã xác thực</Text>
                     </View>
@@ -1114,7 +1114,7 @@ export default function ProfileScreenModernized() {
                     <MaterialCommunityIcons
                       name="account-tie"
                       size={14}
-                      color="#3b82f6"
+                      color="#0D9488"
                     />
                     <Text style={styles.roleText}>{role}</Text>
                   </View>
@@ -1165,7 +1165,7 @@ export default function ProfileScreenModernized() {
                     </View>
                     <View style={styles.completionBarBg}>
                       <LinearGradient
-                        colors={["#3b82f6", "#8b5cf6"]}
+                        colors={["#0D9488", "#8b5cf6"]}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 0 }}
                         style={[
@@ -1194,7 +1194,7 @@ export default function ProfileScreenModernized() {
                     <Ionicons
                       name="share-social-outline"
                       size={18}
-                      color="#3b82f6"
+                      color="#0D9488"
                     />
                     <Text style={styles.shareProfileButtonText}>Chia sẻ</Text>
                   </TouchableOpacity>
@@ -1219,7 +1219,7 @@ export default function ProfileScreenModernized() {
                 "folder-outline",
                 userStats.totalProjects,
                 "Dự án",
-                "#3b82f6",
+                "#0D9488",
                 userStats.monthlyGrowth,
                 0
               )}
@@ -1646,7 +1646,7 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: "#3b82f6",
+    backgroundColor: "#0D9488",
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 2,
@@ -1659,7 +1659,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: "#3b82f6",
+    backgroundColor: "#0D9488",
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 3,
@@ -1692,7 +1692,7 @@ const styles = StyleSheet.create({
   verifiedText: {
     fontSize: 11,
     fontWeight: "600",
-    color: "#3b82f6",
+    color: "#0D9488",
   },
   userEmail: {
     fontSize: 14,
@@ -1717,7 +1717,7 @@ const styles = StyleSheet.create({
   roleText: {
     fontSize: 13,
     fontWeight: "600",
-    color: "#3b82f6",
+    color: "#0D9488",
   },
   userIdBadge: {
     flexDirection: "row",
@@ -1767,7 +1767,7 @@ const styles = StyleSheet.create({
   completionPercent: {
     fontSize: 12,
     fontWeight: "600",
-    color: "#3b82f6",
+    color: "#0D9488",
   },
   completionBarBg: {
     height: 6,
@@ -1790,7 +1790,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: 6,
-    backgroundColor: "#3b82f6",
+    backgroundColor: "#0D9488",
     paddingVertical: 12,
     borderRadius: 12,
     ...MODERN_SHADOWS.sm,
@@ -1813,7 +1813,7 @@ const styles = StyleSheet.create({
   shareProfileButtonText: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#3b82f6",
+    color: "#0D9488",
   },
 
   // ==================== STATS SECTION ====================

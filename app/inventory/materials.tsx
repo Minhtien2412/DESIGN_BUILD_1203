@@ -19,16 +19,16 @@ const CATEGORY_CONFIG: Record<
 > = {
   CEMENT: { label: 'Xi măng', icon: 'cube', color: '#666666' },
   STEEL: { label: 'Thép', icon: 'git-network', color: '#1A1A1A' },
-  SAND: { label: 'Cát', icon: 'water', color: '#0066CC' },
+  SAND: { label: 'Cát', icon: 'water', color: '#0D9488' },
   GRAVEL: { label: 'Đá', icon: 'shapes', color: '#999999' },
-  BRICK: { label: 'Gạch', icon: 'grid', color: '#0066CC' },
-  TILE: { label: 'Gạch lát', icon: 'apps', color: '#0066CC' },
-  PAINT: { label: 'Sơn', icon: 'color-palette', color: '#0066CC' },
-  WOOD: { label: 'Gỗ', icon: 'file-tray-stacked', color: '#0066CC' },
-  ELECTRICAL: { label: 'Điện', icon: 'flash', color: '#0066CC' },
-  PLUMBING: { label: 'Nước', icon: 'water-outline', color: '#0066CC' },
-  TOOLS: { label: 'Dụng cụ', icon: 'construct', color: '#0066CC' },
-  SAFETY_EQUIPMENT: { label: 'An toàn', icon: 'shield-checkmark', color: '#0066CC' },
+  BRICK: { label: 'Gạch', icon: 'grid', color: '#0D9488' },
+  TILE: { label: 'Gạch lát', icon: 'apps', color: '#0D9488' },
+  PAINT: { label: 'Sơn', icon: 'color-palette', color: '#0D9488' },
+  WOOD: { label: 'Gỗ', icon: 'file-tray-stacked', color: '#0D9488' },
+  ELECTRICAL: { label: 'Điện', icon: 'flash', color: '#0D9488' },
+  PLUMBING: { label: 'Nước', icon: 'water-outline', color: '#0D9488' },
+  TOOLS: { label: 'Dụng cụ', icon: 'construct', color: '#0D9488' },
+  SAFETY_EQUIPMENT: { label: 'An toàn', icon: 'shield-checkmark', color: '#0D9488' },
   OTHER: { label: 'Khác', icon: 'ellipsis-horizontal', color: '#999999' },
 };
 
@@ -252,15 +252,15 @@ export default function MaterialsScreen() {
                     </View>
                   )}
                   {status === StockStatus.LOW_STOCK && (
-                    <View style={[styles.statusBadge, { backgroundColor: '#E8F4FF' }]}>
-                      <Ionicons name="warning" size={12} color="#0066CC" />
-                      <Text style={[styles.statusText, { color: '#0066CC' }]}>Thấp</Text>
+                    <View style={[styles.statusBadge, { backgroundColor: '#F0FDFA' }]}>
+                      <Ionicons name="warning" size={12} color="#0D9488" />
+                      <Text style={[styles.statusText, { color: '#0D9488' }]}>Thấp</Text>
                     </View>
                   )}
                   {status === StockStatus.IN_STOCK && (
                     <View style={[styles.statusBadge, { backgroundColor: '#E8F5E9' }]}>
-                      <Ionicons name="checkmark-circle" size={12} color="#0066CC" />
-                      <Text style={[styles.statusText, { color: '#0066CC' }]}>Đủ</Text>
+                      <Ionicons name="checkmark-circle" size={12} color="#0D9488" />
+                      <Text style={[styles.statusText, { color: '#0D9488' }]}>Đủ</Text>
                     </View>
                   )}
                 </View>
@@ -278,8 +278,8 @@ export default function MaterialsScreen() {
                               material.currentStock === 0
                                 ? '#1A1A1A'
                                 : material.currentStock <= material.minStock
-                                ? '#0066CC'
-                                : '#0066CC',
+                                ? '#0D9488'
+                                : '#0D9488',
                           },
                         ]}
                       >
@@ -312,8 +312,8 @@ export default function MaterialsScreen() {
                             material.currentStock === 0
                               ? '#1A1A1A'
                               : material.currentStock <= material.minStock
-                              ? '#0066CC'
-                              : '#0066CC',
+                              ? '#0D9488'
+                              : '#0D9488',
                         },
                       ]}
                     />
@@ -355,8 +355,8 @@ export default function MaterialsScreen() {
                       router.push(`/inventory/material/${material.id}?projectId=${projectId}` as Href)
                     }
                   >
-                    <Ionicons name="eye-outline" size={14} color="#0066CC" />
-                    <Text style={[styles.actionButtonText, { color: '#0066CC' }]}>
+                    <Ionicons name="eye-outline" size={14} color="#0D9488" />
+                    <Text style={[styles.actionButtonText, { color: '#0D9488' }]}>
                       Chi tiết
                     </Text>
                   </TouchableOpacity>
@@ -434,14 +434,14 @@ const styles = StyleSheet.create({
     marginRight: 6,
   },
   filterChipActive: {
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
   },
   filterText: {
     fontSize: 12,
     color: '#666',
   },
   filterTextActive: {
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: '600',
   },
   scrollView: {
@@ -462,7 +462,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     paddingHorizontal: 20,
     paddingVertical: 10,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     borderRadius: 8,
   },
   emptyButtonText: {
@@ -595,7 +595,7 @@ const styles = StyleSheet.create({
   viewButton: {
     backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#0066CC',
+    borderColor: '#0D9488',
     flex: 1,
     justifyContent: 'center',
   },
@@ -616,7 +616,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 4,

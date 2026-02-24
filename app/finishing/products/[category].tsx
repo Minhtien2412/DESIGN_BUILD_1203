@@ -26,14 +26,14 @@ const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const PRODUCT_WIDTH = (SCREEN_WIDTH - 36) / 2;
 
 const COLORS = {
-  primary: "#0066CC",
+  primary: "#0D9488",
   background: "#F5F5F5",
   surface: "#FFFFFF",
   text: "#000000",
   textSecondary: "#757575",
   border: "#E0E0E0",
   star: "#FFCE3D",
-  error: "#EE4D2D",
+  error: "#EF4444",
   success: "#00BFA5",
 };
 
@@ -64,7 +64,7 @@ const CATEGORY_CONFIG: Record<
   },
   "lam-cua": {
     title: "Làm cửa",
-    color: "#0066CC",
+    color: "#0D9488",
     keywords: ["cửa", "nhôm", "kính", "sắt"],
   },
   "lan-can": {
@@ -79,7 +79,7 @@ const CATEGORY_CONFIG: Record<
   },
   "dien-nuoc": {
     title: "Điện nước",
-    color: "#0066CC",
+    color: "#0D9488",
     keywords: ["điện", "nước", "ống"],
   },
   camera: {
@@ -89,7 +89,7 @@ const CATEGORY_CONFIG: Record<
   },
   "tho-tong-hop": {
     title: "Thợ tổng hợp",
-    color: "#0080FF",
+    color: "#14B8A6",
     keywords: ["sửa chữa", "bảo trì"],
   },
 };

@@ -7,14 +7,15 @@
 // ============================================================================
 // PROFILE
 // ============================================================================
-// Use the Redesigned version (clean, proper BE integration)
+// Use Premium version (luxury glassmorphism, animated header, BE integration)
 export {
     default as ProfileScreen,
-    default as ProfileScreenRedesigned
-} from "./profile/ProfileScreenRedesigned";
+    default as ProfileScreenPremium
+} from "./profile/ProfileScreenPremium";
 // Keep older versions for backward compatibility
 export { default as ProfileScreenEuropean } from "./profile/ProfileScreenEuropean";
 export { default as ProfileScreenModernized } from "./profile/ProfileScreenModernized";
+export { default as ProfileScreenRedesigned } from "./profile/ProfileScreenRedesigned";
 
 // ============================================================================
 // PROJECTS

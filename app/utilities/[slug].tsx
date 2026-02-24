@@ -159,7 +159,7 @@ export default function UtilityDetailScreen() {
         <Section title="Ưu điểm nổi bật">
           {service.features.map((feature, index) => (
             <View key={index} style={styles.featureItem}>
-              <Ionicons name="checkmark-circle" size={20} color="#0066CC" />
+              <Ionicons name="checkmark-circle" size={20} color="#0D9488" />
               <Text style={styles.featureText}>{feature}</Text>
             </View>
           ))}
@@ -358,7 +358,7 @@ const styles = StyleSheet.create({
   categoryBadge: {
     paddingHorizontal: 16,
     paddingVertical: 6,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     borderRadius: 20,
   },
   categoryText: {
@@ -408,7 +408,7 @@ const styles = StyleSheet.create({
   pricingPrice: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#0066CC',
+    color: '#0D9488',
     marginLeft: 12,
   },
   pricingDescription: {
@@ -477,13 +477,13 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   ctaButton: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   callButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     paddingVertical: 14,
     borderRadius: 8,
     gap: 8,

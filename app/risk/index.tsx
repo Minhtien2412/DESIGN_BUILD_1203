@@ -99,9 +99,9 @@ export default function RiskRegisterScreen() {
       case 'HIGH':
         return '#000000';
       case 'MEDIUM':
-        return '#0066CC';
+        return '#0D9488';
       case 'LOW':
-        return '#0066CC';
+        return '#0D9488';
       default:
         return '#999999';
     }
@@ -125,17 +125,17 @@ export default function RiskRegisterScreen() {
   const getStatusColor = (status: RiskStatus) => {
     switch (status) {
       case 'IDENTIFIED':
-        return '#0066CC';
+        return '#0D9488';
       case 'ANALYZING':
-        return '#0066CC';
+        return '#0D9488';
       case 'PLANNING':
-        return '#0066CC';
+        return '#0D9488';
       case 'MONITORING':
-        return '#0066CC';
+        return '#0D9488';
       case 'MITIGATING':
-        return '#0066CC';
+        return '#0D9488';
       case 'RESOLVED':
-        return '#0066CC';
+        return '#0D9488';
       case 'OCCURRED':
         return '#000000';
       case 'CLOSED':
@@ -254,7 +254,7 @@ export default function RiskRegisterScreen() {
   if (loading && risks.length === 0) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#0066CC" />
+        <ActivityIndicator size="large" color="#0D9488" />
         <Text style={styles.loadingText}>Đang tải danh sách rủi ro...</Text>
       </View>
     );
@@ -272,12 +272,12 @@ export default function RiskRegisterScreen() {
           <Text style={[styles.statValue, { color: '#B71C1C' }]}>{stats.critical}</Text>
           <Text style={styles.statLabel}>Nghiêm trọng</Text>
         </View>
-        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
+        <View style={[styles.statCard, { backgroundColor: '#F0FDFA' }]}>
           <Text style={[styles.statValue, { color: '#000000' }]}>{stats.high}</Text>
           <Text style={styles.statLabel}>Cao</Text>
         </View>
         <View style={[styles.statCard, { backgroundColor: '#F0F8FF' }]}>
-          <Text style={[styles.statValue, { color: '#0066CC' }]}>{stats.medium}</Text>
+          <Text style={[styles.statValue, { color: '#0D9488' }]}>{stats.medium}</Text>
           <Text style={styles.statLabel}>Trung bình</Text>
         </View>
       </View>
@@ -317,7 +317,7 @@ export default function RiskRegisterScreen() {
             <Ionicons
               name={cat.icon as any}
               size={16}
-              color={selectedCategory === cat.value ? '#0066CC' : '#666'}
+              color={selectedCategory === cat.value ? '#0D9488' : '#666'}
             />
             <Text
               style={[
@@ -407,7 +407,7 @@ export default function RiskRegisterScreen() {
                     <Ionicons
                       name={cat.icon as any}
                       size={20}
-                      color={newRisk.category === cat.value ? '#0066CC' : '#666'}
+                      color={newRisk.category === cat.value ? '#0D9488' : '#666'}
                     />
                     <Text
                       style={[
@@ -533,16 +533,16 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   filterChipActive: {
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     borderBottomWidth: 2,
-    borderBottomColor: '#0066CC',
+    borderBottomColor: '#0D9488',
   },
   filterChipText: {
     fontSize: 13,
     color: '#666',
   },
   filterChipTextActive: {
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: '600',
   },
   levelFilterScroll: {
@@ -711,7 +711,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
@@ -731,7 +731,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   emptyButton: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
@@ -790,16 +790,16 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   categoryChipSelected: {
-    borderColor: '#0066CC',
+    borderColor: '#0D9488',
     borderWidth: 2,
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
   },
   categoryChipText: {
     fontSize: 13,
     color: '#666',
   },
   categoryChipTextSelected: {
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: '600',
   },
   input: {
@@ -831,7 +831,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
   },
   modalButtonPrimary: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   modalButtonTextSecondary: {
     fontSize: 14,

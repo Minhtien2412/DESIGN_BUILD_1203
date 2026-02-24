@@ -36,8 +36,8 @@ export default function PermissionsScreen() {
   const textMuted = useThemeColor({}, 'textMuted');
   const border = useThemeColor({}, 'border');
   const background = useThemeColor({}, 'background');
-  const success = '#0066CC';
-  const warning = '#0066CC';
+  const success = '#0D9488';
+  const warning = '#0D9488';
 
   const [permissions, setPermissions] = useState<Permission[]>([
     {

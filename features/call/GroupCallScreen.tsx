@@ -856,7 +856,7 @@ export default function GroupCallScreen() {
                       />
                       {item.isScreenSharing && (
                         <View style={styles.screenShareIndicator}>
-                          <Ionicons name="desktop" size={12} color="#3B82F6" />
+                          <Ionicons name="desktop" size={12} color="#0D9488" />
                           <Text style={styles.screenShareText}>
                             Đang chia sẻ
                           </Text>
@@ -1645,7 +1645,7 @@ const styles = StyleSheet.create({
   },
   screenShareText: {
     fontSize: 11,
-    color: "#3B82F6",
+    color: "#0D9488",
   },
   participantAction: {
     padding: MODERN_SPACING.xs,

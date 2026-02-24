@@ -194,7 +194,7 @@ export default function CallHistoryScreen() {
     if (!hasMoreHistory || callHistory.length === 0) return null;
     return (
       <View style={styles.loadingFooter}>
-        <ActivityIndicator size="small" color="#3b82f6" />
+        <ActivityIndicator size="small" color="#0D9488" />
         <Text style={styles.loadingText}>Đang tải thêm...</Text>
       </View>
     );
@@ -216,7 +216,7 @@ export default function CallHistoryScreen() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#3b82f6" />
+        <ActivityIndicator size="large" color="#0D9488" />
         <Text style={styles.loadingText}>Đang tải lịch sử cuộc gọi...</Text>
       </View>
     );
@@ -248,8 +248,8 @@ export default function CallHistoryScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={refreshHistory}
-            colors={["#3b82f6"]}
-            tintColor="#3b82f6"
+            colors={["#0D9488"]}
+            tintColor="#0D9488"
           />
         }
         onEndReached={loadMoreHistory}
@@ -304,10 +304,10 @@ const styles = StyleSheet.create({
     borderColor: "#fff",
   },
   videoBadge: {
-    backgroundColor: "#3b82f6",
+    backgroundColor: "#0D9488",
   },
   audioBadge: {
-    backgroundColor: "#0066CC",
+    backgroundColor: "#0D9488",
   },
   callInfo: {
     flex: 1,

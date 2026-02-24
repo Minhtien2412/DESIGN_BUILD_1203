@@ -87,7 +87,7 @@ export function ProtectedScreen({
 
     return (
       <ThemedView style={styles.container}>
-        <Ionicons name="shield-outline" size={64} color="#0066CC" />
+        <Ionicons name="shield-outline" size={64} color="#0D9488" />
         <ThemedText style={styles.title}>Không có quyền truy cập</ThemedText>
         <ThemedText style={styles.message}>
           Trang này chỉ dành cho:{'\n'}
@@ -141,7 +141,7 @@ export function ProtectedScreen({
   if (requireVerified && user && !user.companyVerified) {
     return (
       <ThemedView style={styles.container}>
-        <Ionicons name="shield-checkmark-outline" size={64} color="#0066CC" />
+        <Ionicons name="shield-checkmark-outline" size={64} color="#0D9488" />
         <ThemedText style={styles.title}>Cần xác minh tài khoản</ThemedText>
         <ThemedText style={styles.message}>
           Tài khoản của bạn cần được xác minh để truy cập tính năng này

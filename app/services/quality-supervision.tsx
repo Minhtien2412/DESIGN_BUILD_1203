@@ -20,7 +20,7 @@ const PACKAGES = [
     name: 'Cơ bản',
     price: '15.000.000₫',
     priceUnit: '/ dự án',
-    color: '#0066CC',
+    color: '#0D9488',
     popular: false,
     features: [
       { included: true, text: 'Giám sát 2 lần/tuần' },
@@ -58,7 +58,7 @@ const PACKAGES = [
     name: 'Cao cấp',
     price: '50.000.000₫',
     priceUnit: '/ dự án',
-    color: '#0066CC',
+    color: '#0D9488',
     popular: false,
     features: [
       { included: true, text: 'Giám sát toàn thời gian' },
@@ -107,7 +107,7 @@ const PackageCard: React.FC<PackageCardProps> = ({ package: pkg, onSelect }) => 
               <Ionicons
                 name={feature.included ? 'checkmark-circle' : 'close-circle'}
                 size={18}
-                color={feature.included ? '#0066CC' : '#e0e0e0'}
+                color={feature.included ? '#0D9488' : '#e0e0e0'}
               />
               <Text
                 style={[
@@ -236,7 +236,7 @@ export default function QualitySupervisionScreen() {
 
               <View style={styles.benefitItem}>
                 <View style={styles.benefitIcon}>
-                  <Ionicons name="cash" size={24} color="#0066CC" />
+                  <Ionicons name="cash" size={24} color="#0D9488" />
                 </View>
                 <View style={styles.benefitText}>
                   <Text style={styles.benefitTitle}>Tiết kiệm chi phí</Text>
@@ -248,7 +248,7 @@ export default function QualitySupervisionScreen() {
 
               <View style={styles.benefitItem}>
                 <View style={styles.benefitIcon}>
-                  <Ionicons name="document-text" size={24} color="#0066CC" />
+                  <Ionicons name="document-text" size={24} color="#0D9488" />
                 </View>
                 <View style={styles.benefitText}>
                   <Text style={styles.benefitTitle}>Báo cáo minh bạch</Text>
@@ -309,7 +309,7 @@ export default function QualitySupervisionScreen() {
                               : 'close-circle'
                           }
                           size={20}
-                          color={pkg.features[index].included ? '#0066CC' : '#e0e0e0'}
+                          color={pkg.features[index].included ? '#0D9488' : '#e0e0e0'}
                         />
                       </View>
                     ))}

@@ -256,7 +256,7 @@ export default function SellerProductsScreen() {
                   router.push(`/seller/edit-product?id=${item.id}` as Href)
                 }
               >
-                <Ionicons name="create-outline" size={18} color="#3B82F6" />
+                <Ionicons name="create-outline" size={18} color="#0D9488" />
               </Pressable>
               <Pressable
                 style={styles.actionBtn}
@@ -274,7 +274,7 @@ export default function SellerProductsScreen() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#FF6B35" />
+        <ActivityIndicator size="large" color="#14B8A6" />
       </View>
     );
   }
@@ -283,7 +283,7 @@ export default function SellerProductsScreen() {
     <SafeAreaView style={styles.container} edges={["bottom"]}>
       {/* Header Stats */}
       <LinearGradient
-        colors={["#FF6B35", "#FF8C5A"]}
+        colors={["#14B8A6", "#FF8C5A"]}
         style={styles.headerGradient}
       >
         <View style={styles.statsContainer}>
@@ -338,7 +338,7 @@ export default function SellerProductsScreen() {
               <Ionicons
                 name={item.icon as any}
                 size={16}
-                color={activeTab === item.key ? "#FF6B35" : "#6B7280"}
+                color={activeTab === item.key ? "#14B8A6" : "#6B7280"}
               />
               <Text
                 style={[
@@ -363,7 +363,7 @@ export default function SellerProductsScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={["#FF6B35"]}
+            colors={["#14B8A6"]}
           />
         }
         ListEmptyComponent={
@@ -388,7 +388,7 @@ export default function SellerProductsScreen() {
         onPress={() => router.push("/seller/add-product" as Href)}
       >
         <LinearGradient
-          colors={["#FF6B35", "#FF8C5A"]}
+          colors={["#14B8A6", "#FF8C5A"]}
           style={styles.fabGradient}
         >
           <Ionicons name="add" size={28} color="#FFFFFF" />
@@ -469,7 +469,7 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   activeTabText: {
-    color: "#FF6B35",
+    color: "#14B8A6",
     fontWeight: "600",
   },
   listContent: {
@@ -510,7 +510,7 @@ const styles = StyleSheet.create({
   productPrice: {
     fontSize: 15,
     fontWeight: "bold",
-    color: "#FF6B35",
+    color: "#14B8A6",
   },
   originalPrice: {
     fontSize: 12,
@@ -566,7 +566,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   addButton: {
-    backgroundColor: "#FF6B35",
+    backgroundColor: "#14B8A6",
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
@@ -581,7 +581,7 @@ const styles = StyleSheet.create({
     bottom: 24,
     borderRadius: 28,
     elevation: 4,
-    shadowColor: "#FF6B35",
+    shadowColor: "#14B8A6",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,

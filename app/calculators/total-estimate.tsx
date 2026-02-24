@@ -111,7 +111,7 @@ const PRESET_PACKAGES = [
     name: "Gói tiêu chuẩn",
     desc: "Cân bằng giá - chất lượng",
     icon: "⭐",
-    color: "#3b82f6",
+    color: "#0D9488",
   },
   {
     id: "premium",

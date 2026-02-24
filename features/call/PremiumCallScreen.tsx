@@ -74,7 +74,7 @@ const RINGTONE_OPTIONS: RingtoneOption[] = [
     name: "Cổ điển",
     file: "ringtone_classic.mp3",
     icon: "musical-notes",
-    color: "#3B82F6",
+    color: "#0D9488",
   },
   {
     id: "modern",

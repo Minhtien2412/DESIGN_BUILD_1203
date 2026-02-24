@@ -213,13 +213,13 @@ function getModuleIcon(module: PermissionModule): keyof typeof Ionicons.glyphMap
 
 function getActionColor(action: PermissionAction): string {
   const colorMap: Record<string, string> = {
-    [PermissionAction.VIEW]: '#3b82f6',
-    [PermissionAction.CREATE]: '#0066CC',
-    [PermissionAction.EDIT]: '#0066CC',
+    [PermissionAction.VIEW]: '#0D9488',
+    [PermissionAction.CREATE]: '#0D9488',
+    [PermissionAction.EDIT]: '#0D9488',
     [PermissionAction.DELETE]: '#000000',
     [PermissionAction.APPROVE]: '#666666',
     [PermissionAction.EXPORT]: '#06b6d4',
-    [PermissionAction.MANAGE]: '#0066CC',
+    [PermissionAction.MANAGE]: '#0D9488',
   };
 
   return colorMap[action] || '#6b7280';

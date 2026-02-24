@@ -183,7 +183,7 @@ export default function TimelineScreen() {
   if (loading) {
     return (
       <View style={[styles.loadingContainer, { backgroundColor }]}>
-        <ActivityIndicator size="large" color="#3B82F6" />
+        <ActivityIndicator size="large" color="#0D9488" />
         <Text style={[styles.loadingText, { color: textColor }]}>Đang tải timeline...</Text>
       </View>
     );
@@ -209,7 +209,7 @@ export default function TimelineScreen() {
       <View style={styles.header}>
         <Text style={[styles.headerTitle, { color: textColor }]}>Timeline Dự Án</Text>
         <TouchableOpacity style={styles.createButton} onPress={handleCreatePhase}>
-          <Ionicons name="add-circle" size={24} color="#3B82F6" />
+          <Ionicons name="add-circle" size={24} color="#0D9488" />
           <Text style={styles.createButtonText}>Tạo giai đoạn</Text>
         </TouchableOpacity>
       </View>
@@ -296,7 +296,7 @@ export default function TimelineScreen() {
               Chưa có giai đoạn nào
             </Text>
             <TouchableOpacity style={styles.createButton} onPress={handleCreatePhase}>
-              <Ionicons name="add-circle" size={20} color="#3B82F6" />
+              <Ionicons name="add-circle" size={20} color="#0D9488" />
               <Text style={styles.createButtonText}>Tạo giai đoạn đầu tiên</Text>
             </TouchableOpacity>
           </View>
@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   retryButton: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#0D9488',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
@@ -366,7 +366,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   createButtonText: {
-    color: '#3B82F6',
+    color: '#0D9488',
     fontSize: 14,
     fontWeight: '600',
   },
@@ -387,7 +387,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   filterTabActive: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#0D9488',
   },
   filterTabText: {
     fontSize: 14,

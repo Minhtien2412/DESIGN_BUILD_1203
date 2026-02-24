@@ -53,19 +53,19 @@ export default function SafetyDetailScreen() {
       case 'FATAL': return '#7f1d1d';
       case 'CRITICAL': return '#000000';
       case 'SERIOUS': return '#ea580c';
-      case 'MODERATE': return '#0066CC';
-      case 'MINOR': return '#3b82f6';
+      case 'MODERATE': return '#0D9488';
+      case 'MINOR': return '#0D9488';
       default: return textMutedColor;
     }
   };
 
   const getStatusColor = (status: IncidentStatus) => {
     switch (status) {
-      case 'RESOLVED': return '#0066CC';
-      case 'INVESTIGATING': return '#0066CC';
-      case 'UNDER_REVIEW': return '#3b82f6';
+      case 'RESOLVED': return '#0D9488';
+      case 'INVESTIGATING': return '#0D9488';
+      case 'UNDER_REVIEW': return '#0D9488';
       case 'REPORTED': return '#6b7280';
-      case 'CLOSED': return '#0066CC';
+      case 'CLOSED': return '#0D9488';
       default: return textMutedColor;
     }
   };
@@ -111,9 +111,9 @@ export default function SafetyDetailScreen() {
             </View>
           )}
           {incident.regulatoryReported && (
-            <View style={[styles.alertBanner, { backgroundColor: '#fef3c7', borderColor: '#0066CC', marginTop: 8 }]}>
-              <Ionicons name="alert-circle" size={16} color="#0066CC" />
-              <ThemedText style={{ color: '#0066CC', marginLeft: 8, fontWeight: '600' }}>
+            <View style={[styles.alertBanner, { backgroundColor: '#fef3c7', borderColor: '#0D9488', marginTop: 8 }]}>
+              <Ionicons name="alert-circle" size={16} color="#0D9488" />
+              <ThemedText style={{ color: '#0D9488', marginLeft: 8, fontWeight: '600' }}>
                 Reportable to Authority
               </ThemedText>
             </View>
@@ -357,8 +357,8 @@ export default function SafetyDetailScreen() {
                 {incident.correctiveActions.map((action, index) => (
                   <View key={index} style={[styles.actionCard, { backgroundColor: surfaceColor, borderColor }]}>
                     <View style={styles.actionHeader}>
-                      <View style={[styles.actionStatusBadge, { backgroundColor: '#3b82f620' }]}>  
-                        <ThemedText style={{ color: '#3b82f6', fontWeight: '600' }}>
+                      <View style={[styles.actionStatusBadge, { backgroundColor: '#0D948820' }]}>  
+                        <ThemedText style={{ color: '#0D9488', fontWeight: '600' }}>
                           Action #{index + 1}
                         </ThemedText>
                       </View>
@@ -386,8 +386,8 @@ export default function SafetyDetailScreen() {
                 {incident.preventiveMeasures.map((measure, index) => (
                   <View key={index} style={[styles.actionCard, { backgroundColor: surfaceColor, borderColor }]}>
                     <View style={styles.actionHeader}>
-                      <View style={[styles.actionStatusBadge, { backgroundColor: '#0066CC20' }]}>  
-                        <ThemedText style={{ color: '#0066CC', fontWeight: '600' }}>
+                      <View style={[styles.actionStatusBadge, { backgroundColor: '#0D948820' }]}>  
+                        <ThemedText style={{ color: '#0D9488', fontWeight: '600' }}>
                           Measure #{index + 1}
                         </ThemedText>
                       </View>

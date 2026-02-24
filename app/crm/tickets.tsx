@@ -113,7 +113,7 @@ export default function TicketsScreen() {
 
   const getStatusColor = (status: string): string => {
     const colors: Record<string, string> = {
-      open: '#3b82f6',
+      open: '#0D9488',
       in_progress: '#f59e0b',
       answered: '#22c55e',
       on_hold: '#8b5cf6',
@@ -136,7 +136,7 @@ export default function TicketsScreen() {
   const getPriorityColor = (priority: string): string => {
     const colors: Record<string, string> = {
       low: '#22c55e',
-      medium: '#3b82f6',
+      medium: '#0D9488',
       high: '#f59e0b',
       urgent: '#ef4444',
     };
@@ -261,7 +261,7 @@ export default function TicketsScreen() {
       {/* Stats Bar */}
       <View style={[styles.statsBar, { backgroundColor: cardBg, borderBottomColor: borderColor }]}>
         <View style={styles.statItem}>
-          <Text style={[styles.statValue, { color: '#3b82f6' }]}>{openCount}</Text>
+          <Text style={[styles.statValue, { color: '#0D9488' }]}>{openCount}</Text>
           <Text style={[styles.statLabel, { color: textColor }]}>Mở</Text>
         </View>
         <View style={styles.statItem}>

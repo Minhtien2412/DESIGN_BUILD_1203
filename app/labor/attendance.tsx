@@ -25,13 +25,13 @@ const STATUS_LABELS: Record<AttendanceStatus, string> = {
 };
 
 const STATUS_COLORS: Record<AttendanceStatus, string> = {
-  [AttendanceStatus.PRESENT]: '#0066CC',
+  [AttendanceStatus.PRESENT]: '#0D9488',
   [AttendanceStatus.ABSENT]: '#000000',
-  [AttendanceStatus.LATE]: '#0066CC',
-  [AttendanceStatus.HALF_DAY]: '#0066CC',
+  [AttendanceStatus.LATE]: '#0D9488',
+  [AttendanceStatus.HALF_DAY]: '#0D9488',
   [AttendanceStatus.ON_LEAVE]: '#999999',
   [AttendanceStatus.SICK_LEAVE]: '#000000',
-  [AttendanceStatus.EXCUSED]: '#0066CC',
+  [AttendanceStatus.EXCUSED]: '#0D9488',
 };
 
 const SHIFT_LABELS: Record<ShiftType, string> = {
@@ -100,9 +100,9 @@ export default function AttendanceScreen() {
       {/* Date Selector */}
       <View style={styles.dateSelector}>
         <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.dateButton}>
-          <Ionicons name="calendar-outline" size={20} color="#0066CC" />
+          <Ionicons name="calendar-outline" size={20} color="#0D9488" />
           <Text style={styles.dateText}>{selectedDate.toLocaleDateString('vi-VN')}</Text>
-          <Ionicons name="chevron-down-outline" size={20} color="#0066CC" />
+          <Ionicons name="chevron-down-outline" size={20} color="#0D9488" />
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -134,16 +134,16 @@ export default function AttendanceScreen() {
             <Text style={styles.summaryValue}>{attendances.length}</Text>
           </View>
           <View style={styles.summaryItem}>
-            <Text style={[styles.summaryLabel, { color: '#0066CC' }]}>Có mặt</Text>
-            <Text style={[styles.summaryValue, { color: '#0066CC' }]}>{presentCount}</Text>
+            <Text style={[styles.summaryLabel, { color: '#0D9488' }]}>Có mặt</Text>
+            <Text style={[styles.summaryValue, { color: '#0D9488' }]}>{presentCount}</Text>
           </View>
           <View style={styles.summaryItem}>
             <Text style={[styles.summaryLabel, { color: '#000000' }]}>Vắng</Text>
             <Text style={[styles.summaryValue, { color: '#000000' }]}>{absentCount}</Text>
           </View>
           <View style={styles.summaryItem}>
-            <Text style={[styles.summaryLabel, { color: '#0066CC' }]}>Trễ</Text>
-            <Text style={[styles.summaryValue, { color: '#0066CC' }]}>{lateCount}</Text>
+            <Text style={[styles.summaryLabel, { color: '#0D9488' }]}>Trễ</Text>
+            <Text style={[styles.summaryValue, { color: '#0D9488' }]}>{lateCount}</Text>
           </View>
         </View>
 
@@ -159,7 +159,7 @@ export default function AttendanceScreen() {
               {
                 width: `${attendanceRate}%`,
                 backgroundColor:
-                  attendanceRate >= 90 ? '#0066CC' : attendanceRate >= 75 ? '#0066CC' : '#000000',
+                  attendanceRate >= 90 ? '#0D9488' : attendanceRate >= 75 ? '#0D9488' : '#000000',
               },
             ]}
           />
@@ -189,7 +189,7 @@ export default function AttendanceScreen() {
               <View style={styles.header}>
                 <View style={styles.headerLeft}>
                   <View style={styles.avatar}>
-                    <Ionicons name="person" size={24} color="#0066CC" />
+                    <Ionicons name="person" size={24} color="#0D9488" />
                   </View>
                   <View style={styles.headerInfo}>
                     <Text style={styles.workerName}>
@@ -247,9 +247,9 @@ export default function AttendanceScreen() {
 
                 {attendance.overtimeHours !== undefined && attendance.overtimeHours > 0 && (
                   <View style={styles.timeRow}>
-                    <Ionicons name="alarm-outline" size={16} color="#0066CC" />
+                    <Ionicons name="alarm-outline" size={16} color="#0D9488" />
                     <Text style={styles.timeLabel}>Tăng ca:</Text>
-                    <Text style={[styles.timeValue, { color: '#0066CC' }]}>
+                    <Text style={[styles.timeValue, { color: '#0D9488' }]}>
                       {attendance.overtimeHours}h
                     </Text>
                   </View>
@@ -318,19 +318,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
     padding: 10,
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     borderRadius: 8,
   },
   dateText: {
     flex: 1,
     fontSize: 15,
     fontWeight: '600',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   todayButton: {
     paddingHorizontal: 16,
     paddingVertical: 10,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     borderRadius: 8,
   },
   todayButtonText: {
@@ -374,7 +374,7 @@ const styles = StyleSheet.create({
   rateValue: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   progressBar: {
     height: 6,
@@ -404,7 +404,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     paddingHorizontal: 20,
     paddingVertical: 10,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     borderRadius: 8,
   },
   emptyButtonText: {
@@ -433,7 +433,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -481,7 +481,7 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   notesSection: {
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     padding: 10,
     borderRadius: 6,
   },
@@ -516,7 +516,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 4,

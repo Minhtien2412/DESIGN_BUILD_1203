@@ -35,9 +35,9 @@ const COLORS = {
   textSecondary: '#666666',
   textTertiary: '#999999',
   border: '#E5E5E5',
-  success: '#0066CC',
+  success: '#0D9488',
   danger: '#000000',
-  warning: '#0066CC',
+  warning: '#0D9488',
 };
 
 // ==================== FILTER TABS ====================

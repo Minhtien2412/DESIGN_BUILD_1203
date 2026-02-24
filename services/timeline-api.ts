@@ -235,13 +235,13 @@ export function getPhaseStatusColor(status: Phase['status']): string {
     case 'NOT_STARTED':
       return '#9CA3AF'; // Gray
     case 'IN_PROGRESS':
-      return '#3B82F6'; // Blue
+      return '#0D9488'; // Blue
     case 'COMPLETED':
-      return '#0066CC'; // Green
+      return '#0D9488'; // Green
     case 'DELAYED':
       return '#000000'; // Red
     case 'ON_HOLD':
-      return '#0066CC'; // Orange
+      return '#0D9488'; // Orange
     default:
       return '#6B7280';
   }

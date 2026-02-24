@@ -47,7 +47,7 @@ const ProviderCard: React.FC<ProviderCardProps> = ({ provider, onBooking, onPres
           <Text style={styles.providerName}>{provider.name}</Text>
           
           <View style={styles.ratingRow}>
-            <Ionicons name="star" size={14} color="#0066CC" />
+            <Ionicons name="star" size={14} color="#0D9488" />
             <Text style={styles.ratingText}>{provider.rating}</Text>
             <Text style={styles.reviewsText}>({provider.reviewCount})</Text>
           </View>
@@ -74,13 +74,13 @@ const ProviderCard: React.FC<ProviderCardProps> = ({ provider, onBooking, onPres
       </View>
 
       <View style={styles.brandsRow}>
-        <Ionicons name="ribbon" size={16} color="#0066CC" />
+        <Ionicons name="ribbon" size={16} color="#0D9488" />
         <Text style={styles.brandsLabel}>Thương hiệu: </Text>
         <Text style={styles.brandsText}>{provider.verified ? 'Đã xác minh' : 'Uy tín'}</Text>
       </View>
 
       <View style={styles.deliveryRow}>
-        <Ionicons name="car" size={16} color="#0066CC" />
+        <Ionicons name="car" size={16} color="#0D9488" />
         <Text style={styles.deliveryText}>Giao hàng nhanh</Text>
       </View>
 
@@ -305,7 +305,7 @@ export default function VatLieuScreen() {
 
         {/* Info Banner */}
         <View style={styles.infoBanner}>
-          <Ionicons name="shield-checkmark" size={16} color="#0066CC" />
+          <Ionicons name="shield-checkmark" size={16} color="#0D9488" />
           <Text style={styles.infoBannerText}>
             Vật liệu chính hãng • Giá cạnh tranh • Giao hàng nhanh
           </Text>
@@ -335,7 +335,7 @@ export default function VatLieuScreen() {
                   <View style={styles.selectedProviderText}>
                     <Text style={styles.selectedProviderName}>{selectedProvider.name}</Text>
                     <View style={styles.selectedRating}>
-                      <Ionicons name="star" size={14} color="#0066CC" />
+                      <Ionicons name="star" size={14} color="#0D9488" />
                       <Text style={styles.selectedRatingText}>
                         {selectedProvider.rating} ({selectedProvider.reviewCount})
                       </Text>
@@ -480,18 +480,18 @@ const styles = StyleSheet.create({
   materialsSection: { marginBottom: 12 },
   materialsLabel: { fontSize: 12, fontWeight: '600', color: '#666', marginBottom: 6 },
   materialsTags: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
-  materialTag: { backgroundColor: '#E8F4FF', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
-  materialText: { fontSize: 11, fontWeight: '500', color: '#0066CC' },
+  materialTag: { backgroundColor: '#F0FDFA', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
+  materialText: { fontSize: 11, fontWeight: '500', color: '#0D9488' },
   brandsRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
   brandsLabel: { fontSize: 12, fontWeight: '600', color: '#666' },
   brandsText: { fontSize: 12, color: '#333', flex: 1 },
   deliveryRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12, backgroundColor: '#f1f8e9', padding: 8, borderRadius: 6 },
-  deliveryText: { fontSize: 12, color: '#0066CC', fontWeight: '600', flex: 1 },
+  deliveryText: { fontSize: 12, color: '#0D9488', fontWeight: '600', flex: 1 },
   statsSection: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', paddingVertical: 12, marginBottom: 12, borderTopWidth: 1, borderBottomWidth: 1, borderColor: '#f0f0f0' },
   statItem: { alignItems: 'center' },
   statValue: { fontSize: 15, fontWeight: '700', color: '#333', marginBottom: 4 },
-  available: { color: '#0066CC' },
-  busy: { color: '#0066CC' },
+  available: { color: '#0D9488' },
+  busy: { color: '#0D9488' },
   statLabel: { fontSize: 11, color: '#999' },
   statDivider: { width: 1, height: 40, backgroundColor: '#f0f0f0' },
   bookButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.light.primary, paddingVertical: 12, borderRadius: 8, gap: 6 },
@@ -499,7 +499,7 @@ const styles = StyleSheet.create({
   emptyState: { alignItems: 'center', justifyContent: 'center', paddingVertical: 60 },
   emptyText: { fontSize: 15, color: '#999', marginTop: 16 },
   infoBanner: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#f1f8e9', paddingHorizontal: 16, paddingVertical: 10, gap: 8 },
-  infoBannerText: { fontSize: 12, color: '#0066CC', flex: 1 },
+  infoBannerText: { fontSize: 12, color: '#0D9488', flex: 1 },
   bookingModalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
   bookingModalContent: { backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '90%' },
   bookingModalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: '#f0f0f0' },

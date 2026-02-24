@@ -153,7 +153,7 @@ export default function DocumentShareScreen() {
               onPress={() => setShowCreateModal(true)}
               style={styles.headerButton}
             >
-              <Ionicons name="add" size={28} color="#0066CC" />
+              <Ionicons name="add" size={28} color="#0D9488" />
             </TouchableOpacity>
           ),
         }}
@@ -170,7 +170,7 @@ export default function DocumentShareScreen() {
                   <Ionicons
                     name={item.sharedWith ? 'person' : 'link'}
                     size={20}
-                    color="#0066CC"
+                    color="#0D9488"
                   />
                   <Text style={[styles.shareTitle, { color: textColor }]}>
                     {item.sharedWithName || 'Liên kết công khai'}
@@ -193,19 +193,19 @@ export default function DocumentShareScreen() {
               <View style={styles.permissionsContainer}>
                 {item.permissions.canDownload && (
                   <View style={styles.permissionBadge}>
-                    <Ionicons name="cloud-download-outline" size={14} color="#0066CC" />
+                    <Ionicons name="cloud-download-outline" size={14} color="#0D9488" />
                     <Text style={styles.permissionText}>Tải xuống</Text>
                   </View>
                 )}
                 {item.permissions.canEdit && (
                   <View style={styles.permissionBadge}>
-                    <Ionicons name="create-outline" size={14} color="#0066CC" />
+                    <Ionicons name="create-outline" size={14} color="#0D9488" />
                     <Text style={styles.permissionText}>Chỉnh sửa</Text>
                   </View>
                 )}
                 {item.permissions.canShare && (
                   <View style={styles.permissionBadge}>
-                    <Ionicons name="share-social-outline" size={14} color="#0066CC" />
+                    <Ionicons name="share-social-outline" size={14} color="#0D9488" />
                     <Text style={styles.permissionText}>Chia sẻ</Text>
                   </View>
                 )}
@@ -214,7 +214,7 @@ export default function DocumentShareScreen() {
               {/* Expiry */}
               {item.expiresAt && (
                 <View style={styles.expiryContainer}>
-                  <Ionicons name="time-outline" size={16} color="#0066CC" />
+                  <Ionicons name="time-outline" size={16} color="#0D9488" />
                   <Text style={styles.expiryText}>
                     Hết hạn: {formatDate(item.expiresAt)}
                   </Text>
@@ -239,7 +239,7 @@ export default function DocumentShareScreen() {
                   style={styles.copyLinkButton}
                   onPress={() => handleCopyLink(item.shareUrl!)}
                 >
-                  <Ionicons name="copy-outline" size={18} color="#0066CC" />
+                  <Ionicons name="copy-outline" size={18} color="#0D9488" />
                   <Text style={styles.copyLinkText}>Sao chép liên kết</Text>
                 </TouchableOpacity>
               )}
@@ -285,7 +285,7 @@ export default function DocumentShareScreen() {
                       <Ionicons
                         name="person"
                         size={20}
-                        color={shareType === 'user' ? '#0066CC' : '#666'}
+                        color={shareType === 'user' ? '#0D9488' : '#666'}
                       />
                       <Text
                         style={[
@@ -307,7 +307,7 @@ export default function DocumentShareScreen() {
                       <Ionicons
                         name="link"
                         size={20}
-                        color={shareType === 'public' ? '#0066CC' : '#666'}
+                        color={shareType === 'public' ? '#0D9488' : '#666'}
                       />
                       <Text
                         style={[
@@ -383,7 +383,7 @@ export default function DocumentShareScreen() {
                     <Switch
                       value={canDownload}
                       onValueChange={setCanDownload}
-                      trackColor={{ false: '#ccc', true: '#0066CC' }}
+                      trackColor={{ false: '#ccc', true: '#0D9488' }}
                     />
                   </View>
                   <View style={styles.permissionRow}>
@@ -396,7 +396,7 @@ export default function DocumentShareScreen() {
                     <Switch
                       value={canEdit}
                       onValueChange={setCanEdit}
-                      trackColor={{ false: '#ccc', true: '#0066CC' }}
+                      trackColor={{ false: '#ccc', true: '#0D9488' }}
                     />
                   </View>
                   <View style={styles.permissionRow}>
@@ -409,7 +409,7 @@ export default function DocumentShareScreen() {
                     <Switch
                       value={canShare}
                       onValueChange={setCanShare}
-                      trackColor={{ false: '#ccc', true: '#0066CC' }}
+                      trackColor={{ false: '#ccc', true: '#0D9488' }}
                     />
                   </View>
                 </View>
@@ -423,7 +423,7 @@ export default function DocumentShareScreen() {
                     <Switch
                       value={hasExpiry}
                       onValueChange={setHasExpiry}
-                      trackColor={{ false: '#ccc', true: '#0066CC' }}
+                      trackColor={{ false: '#ccc', true: '#0D9488' }}
                     />
                   </View>
                   {hasExpiry && (
@@ -505,7 +505,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   emptyButton: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
@@ -576,12 +576,12 @@ const styles = StyleSheet.create({
     gap: 6,
     marginBottom: 12,
     padding: 8,
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     borderRadius: 6,
   },
   expiryText: {
     fontSize: 12,
-    color: '#0066CC',
+    color: '#0D9488',
   },
   statsContainer: {
     flexDirection: 'row',
@@ -606,13 +606,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
     padding: 12,
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     borderRadius: 8,
   },
   copyLinkText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   modalOverlay: {
     flex: 1,
@@ -663,15 +663,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   shareTypeButtonActive: {
-    borderColor: '#0066CC',
-    backgroundColor: '#E8F4FF',
+    borderColor: '#0D9488',
+    backgroundColor: '#F0FDFA',
   },
   shareTypeText: {
     fontSize: 13,
     color: '#666',
   },
   shareTypeTextActive: {
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: '600',
   },
   input: {
@@ -693,15 +693,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   accessLevelButtonActive: {
-    borderColor: '#0066CC',
-    backgroundColor: '#E8F4FF',
+    borderColor: '#0D9488',
+    backgroundColor: '#F0FDFA',
   },
   accessLevelText: {
     fontSize: 13,
     color: '#666',
   },
   accessLevelTextActive: {
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: '600',
   },
   permissionRow: {
@@ -760,7 +760,7 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   createButton: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   createButtonText: {
     fontSize: 16,

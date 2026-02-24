@@ -25,7 +25,7 @@ export default function CreateDefectScreen() {
 
   const severityOptions: { value: DefectSeverity; label: string; color: string }[] = [
     { value: DefectSeverity.CRITICAL, label: 'Nghiêm trọng', color: '#D32F2F' },
-    { value: DefectSeverity.MAJOR, label: 'Quan trọng', color: '#0066CC' },
+    { value: DefectSeverity.MAJOR, label: 'Quan trọng', color: '#0D9488' },
     { value: DefectSeverity.MINOR, label: 'Nhỏ', color: '#FBC02D' },
     { value: DefectSeverity.COSMETIC, label: 'Thẩm mỹ', color: '#689F38' },
   ];
@@ -221,14 +221,14 @@ export default function CreateDefectScreen() {
               </View>
             ))}
             <TouchableOpacity style={styles.addPhotoButton} onPress={handleAddPhoto}>
-              <Ionicons name="camera" size={32} color="#0066CC" />
+              <Ionicons name="camera" size={32} color="#0D9488" />
               <Text style={styles.addPhotoText}>Thêm ảnh</Text>
             </TouchableOpacity>
           </View>
         </View>
 
         <View style={styles.infoBox}>
-          <Ionicons name="information-circle" size={20} color="#0066CC" />
+          <Ionicons name="information-circle" size={20} color="#0D9488" />
           <Text style={styles.infoText}>
             Lỗi sẽ được gửi đến quản lý dự án để xử lý. Bạn sẽ nhận được thông báo khi
             có cập nhật về trạng thái lỗi.
@@ -349,22 +349,22 @@ const styles = StyleSheet.create({
   addPhotoButton: {
     width: 100,
     height: 100,
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     borderRadius: 8,
     borderWidth: 2,
-    borderColor: '#0066CC',
+    borderColor: '#0D9488',
     borderStyle: 'dashed',
     alignItems: 'center',
     justifyContent: 'center',
   },
   addPhotoText: {
     fontSize: 12,
-    color: '#0066CC',
+    color: '#0D9488',
     marginTop: 4,
   },
   infoBox: {
     flexDirection: 'row',
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     padding: 16,
     margin: 16,
     borderRadius: 8,

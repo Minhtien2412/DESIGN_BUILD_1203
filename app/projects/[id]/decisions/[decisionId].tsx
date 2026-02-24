@@ -268,7 +268,7 @@ export default function DecisionDetailScreen() {
 
   const getCategoryStyle = (category: string) => {
     const styles: Record<string, { bg: string; text: string; icon: string }> = {
-      DESIGN: { bg: '#E8F4FF', text: '#1E40AF', icon: 'color-palette' },
+      DESIGN: { bg: '#F0FDFA', text: '#0F766E', icon: 'color-palette' },
       TECHNICAL: { bg: '#FEF3C7', text: '#92400E', icon: 'construct' },
       BUDGET: { bg: '#D1FAE5', text: '#065F46', icon: 'cash' },
       SCHEDULE: { bg: '#FCE7F3', text: '#9F1239', icon: 'time' },
@@ -295,7 +295,7 @@ export default function DecisionDetailScreen() {
       UNDER_REVIEW: { bg: '#FEF3C7', text: '#92400E', icon: 'eye' },
       APPROVED: { bg: '#D1FAE5', text: '#065F46', icon: 'checkmark-circle' },
       REJECTED: { bg: '#FEE2E2', text: '#991B1B', icon: 'close-circle' },
-      IN_PROGRESS: { bg: '#E8F4FF', text: '#1E40AF', icon: 'play-circle' },
+      IN_PROGRESS: { bg: '#F0FDFA', text: '#0F766E', icon: 'play-circle' },
       IMPLEMENTED: { bg: '#D1FAE5', text: '#065F46', icon: 'checkmark-done-circle' },
     };
     return styles[status] || styles.PROPOSED;
@@ -306,7 +306,7 @@ export default function DecisionDetailScreen() {
       CRITICAL: { bg: '#FEE2E2', text: '#991B1B' },
       HIGH: { bg: '#FED7AA', text: '#9A3412' },
       MEDIUM: { bg: '#FEF3C7', text: '#92400E' },
-      LOW: { bg: '#E8F4FF', text: '#1E40AF' },
+      LOW: { bg: '#F0FDFA', text: '#0F766E' },
     };
     return styles[severity] || styles.MEDIUM;
   };
@@ -494,8 +494,8 @@ export default function DecisionDetailScreen() {
                 <View style={styles.prosConsContainer}>
                   <View style={styles.prosConsColumn}>
                     <View style={styles.prosConsHeader}>
-                      <Ionicons name="checkmark-circle" size={16} color="#0066CC" />
-                      <Text style={[styles.prosConsLabel, { color: '#0066CC' }]}>Ưu điểm</Text>
+                      <Ionicons name="checkmark-circle" size={16} color="#0D9488" />
+                      <Text style={[styles.prosConsLabel, { color: '#0D9488' }]}>Ưu điểm</Text>
                     </View>
                     {alt.pros.map((pro, i) => (
                       <Text key={i} style={[styles.prosConsItem, { color: text }]}>
@@ -517,7 +517,7 @@ export default function DecisionDetailScreen() {
                   </View>
                 </View>
 
-                <View style={[styles.reasonBox, { backgroundColor: '#FEF3C7', borderColor: '#0066CC' }]}>
+                <View style={[styles.reasonBox, { backgroundColor: '#FEF3C7', borderColor: '#0D9488' }]}>
                   <Ionicons name="warning" size={16} color="#92400E" />
                   <Text style={[styles.reasonText, { color: '#92400E' }]}>
                     Lý do không chọn: {alt.reason}
@@ -595,7 +595,7 @@ export default function DecisionDetailScreen() {
                   </View>
                   {risk.mitigation && (
                     <View style={styles.mitigationBox}>
-                      <Ionicons name="shield-checkmark" size={16} color="#0066CC" />
+                      <Ionicons name="shield-checkmark" size={16} color="#0D9488" />
                       <Text style={[styles.mitigationText, { color: text }]}>
                         {risk.mitigation}
                       </Text>
@@ -643,7 +643,7 @@ export default function DecisionDetailScreen() {
                           {
                             color:
                               decision.actualCost <= decision.estimatedCost
-                                ? '#0066CC'
+                                ? '#0D9488'
                                 : '#000000',
                           },
                         ]}
@@ -684,7 +684,7 @@ export default function DecisionDetailScreen() {
                           {
                             color:
                               decision.actualTime <= decision.estimatedTime
-                                ? '#0066CC'
+                                ? '#0D9488'
                                 : '#000000',
                           },
                         ]}

@@ -36,7 +36,7 @@ const mockActivities = [
     title: 'Task hoàn thành',
     description: 'Kiểm tra chất lượng bê tông',
     timestamp: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
-    color: '#0066CC',
+    color: '#0D9488',
   },
   {
     id: '2',
@@ -116,7 +116,7 @@ export default function EngineerDashboardEnhanced() {
     >
       {error && (
         <View style={styles.errorBanner}>
-          <Ionicons name="alert-circle" size={20} color="#0066CC" />
+          <Ionicons name="alert-circle" size={20} color="#0D9488" />
           <Text style={styles.errorText}>Server không khả dụng - Dùng dữ liệu demo</Text>
         </View>
       )}
@@ -142,7 +142,7 @@ export default function EngineerDashboardEnhanced() {
             title="Task đang làm"
             value={data.tasks.inProgress}
             icon="build"
-            gradientColors={['#3B82F6', '#0066CC']}
+            gradientColors={['#0D9488', '#0D9488']}
             trend={{ value: `${data.tasks.pending} chờ`, isPositive: false }}
             subtitle="Ưu tiên cao"
           />
@@ -160,7 +160,7 @@ export default function EngineerDashboardEnhanced() {
             title="Báo cáo"
             value={data.reports.submitted}
             icon="document-text"
-            gradientColors={['#0066CC', '#0066CC']}
+            gradientColors={['#0D9488', '#0D9488']}
             trend={{ value: `${data.reports.pending} chờ duyệt`, isPositive: false }}
             subtitle="Đã gửi"
           />
@@ -168,7 +168,7 @@ export default function EngineerDashboardEnhanced() {
             title="An toàn"
             value={`${data.safety.score}%`}
             icon="shield-checkmark"
-            gradientColors={['#0066CC', '#D97706']}
+            gradientColors={['#0D9488', '#D97706']}
             trend={{ value: `${data.safety.incidents} sự cố`, isPositive: true }}
             subtitle="Điểm tuân thủ"
           />
@@ -188,13 +188,13 @@ export default function EngineerDashboardEnhanced() {
           <QuickAction
             icon="camera"
             label="Chụp hiện trường"
-            color="#0066CC"
+            color="#0D9488"
             onPress={() => console.log('Camera')}
           />
           <QuickAction
             icon="document"
             label="Báo cáo"
-            color="#0066CC"
+            color="#0D9488"
             onPress={() => console.log('Report')}
           />
           <QuickAction
@@ -212,7 +212,7 @@ export default function EngineerDashboardEnhanced() {
         <SimpleChart
           data={weeklyTasks}
           title="Tasks hoàn thành trong tuần"
-          color="#3B82F6"
+          color="#0D9488"
         />
       </View>
 

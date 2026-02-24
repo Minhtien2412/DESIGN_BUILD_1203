@@ -259,7 +259,7 @@ export function CRMDataList({
 function getStatusColor(status: string): string {
   const colors: Record<string, string> = {
     'not_started': '#f59e0b', // Not Started - Amber
-    'in_progress': '#3b82f6', // In Progress - Blue  
+    'in_progress': '#0D9488', // In Progress - Blue  
     'on_hold': '#8b5cf6', // On Hold - Purple
     'cancelled': '#ef4444', // Cancelled - Red
     'finished': '#22c55e', // Finished - Green
@@ -283,7 +283,7 @@ function getInvoiceStatusColor(status: string): string {
 function getEstimateStatusColor(status: string): string {
   const colors: Record<string, string> = {
     'draft': '#8b5cf6', // Draft - Purple
-    'sent': '#3b82f6', // Sent - Blue
+    'sent': '#0D9488', // Sent - Blue
     'declined': '#f59e0b', // Declined - Amber
     'accepted': '#22c55e', // Accepted - Green
     'expired': '#ef4444', // Expired - Red
@@ -294,7 +294,7 @@ function getEstimateStatusColor(status: string): string {
 function getPriorityColor(priority: string): string {
   const colors: Record<string, string> = {
     'low': '#6b7280', // Low - Gray
-    'medium': '#3b82f6', // Medium - Blue
+    'medium': '#0D9488', // Medium - Blue
     'high': '#f59e0b', // High - Amber
     'urgent': '#ef4444', // Urgent - Red
   };

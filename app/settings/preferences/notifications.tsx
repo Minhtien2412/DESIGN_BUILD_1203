@@ -14,10 +14,10 @@ import {
 } from 'react-native';
 
 const NOTIFICATION_ICONS = {
-  order: { name: 'receipt', color: '#0066CC' },
+  order: { name: 'receipt', color: '#0D9488' },
   promotion: { name: 'gift', color: '#FFB800' },
   system: { name: 'information-circle', color: '#666666' },
-  chat: { name: 'chatbubble', color: '#0066CC' },
+  chat: { name: 'chatbubble', color: '#0D9488' },
 };
 
 export default function NotificationsScreen() {
@@ -217,7 +217,7 @@ export default function NotificationsScreen() {
       {unreadCount > 0 && (
         <View style={styles.actionsBar}>
           <TouchableOpacity style={styles.actionBtn} onPress={markAllAsRead}>
-            <Ionicons name="checkmark-done" size={18} color="#0066CC" />
+            <Ionicons name="checkmark-done" size={18} color="#0D9488" />
             <Text style={styles.actionBtnText}>Đánh dấu đã đọc tất cả</Text>
           </TouchableOpacity>
         </View>
@@ -239,7 +239,7 @@ export default function NotificationsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   header: {
     flexDirection: 'row',
@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
   headerBadgeText: {
     fontSize: 12,
     fontWeight: 'bold',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   headerBtn: {
     padding: 8,
@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   filterTabActive: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   filterText: {
     fontSize: 14,
@@ -319,7 +319,7 @@ const styles = StyleSheet.create({
   filterBadgeText: {
     fontSize: 11,
     fontWeight: 'bold',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   actionsBar: {
     backgroundColor: '#fff',
@@ -335,7 +335,7 @@ const styles = StyleSheet.create({
   },
   actionBtnText: {
     fontSize: 14,
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: '500',
   },
   listContent: {
@@ -379,7 +379,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   notificationBody: {
     fontSize: 14,

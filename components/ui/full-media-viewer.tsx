@@ -1152,7 +1152,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   editorSaveText: {
-    color: "#0066CC",
+    color: "#0D9488",
     fontSize: 16,
     fontWeight: "600",
   },

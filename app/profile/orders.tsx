@@ -127,8 +127,8 @@ const ORDER_STATUS_CONFIG = {
   },
   processing: {
     label: 'Đang xử lý',
-    color: '#3B82F6',
-    bg: '#3B82F620',
+    color: '#0D9488',
+    bg: '#0D948820',
     icon: 'settings-outline' as const,
   },
   shipping: {
@@ -139,8 +139,8 @@ const ORDER_STATUS_CONFIG = {
   },
   delivered: {
     label: 'Đã giao',
-    color: '#0066CC',
-    bg: '#0066CC20',
+    color: '#0D9488',
+    bg: '#0D948820',
     icon: 'checkmark-circle-outline' as const,
   },
   cancelled: {
@@ -417,7 +417,7 @@ export default function OrdersScreen() {
 
       {/* Gradient Header */}
       <LinearGradient
-        colors={['#0066CC', '#064E3B']}
+        colors={['#0D9488', '#064E3B']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.header}
@@ -457,7 +457,7 @@ export default function OrdersScreen() {
               activeOpacity={0.9}
             >
               <LinearGradient
-                colors={['#0066CC', '#D97706']}
+                colors={['#0D9488', '#D97706']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1.2, y: 1 }}
                 style={styles.promotionGradient}
@@ -485,8 +485,8 @@ export default function OrdersScreen() {
           {/* Stats Cards */}
           <View style={styles.statsContainer}>
             <View style={[styles.statCard, { backgroundColor: surface, borderColor: border }]}>
-              <View style={[styles.statIconContainer, { backgroundColor: '#3B82F610' }]}>
-                <Ionicons name="cart" size={24} color="#3B82F6" />
+              <View style={[styles.statIconContainer, { backgroundColor: '#0D948810' }]}>
+                <Ionicons name="cart" size={24} color="#0D9488" />
               </View>
               <Text style={[styles.statValue, { color: text }]}>{stats.total}</Text>
               <Text style={[styles.statLabel, { color: textMuted }]}>Tổng đơn</Text>
@@ -509,8 +509,8 @@ export default function OrdersScreen() {
             </View>
 
             <View style={[styles.statCard, { backgroundColor: surface, borderColor: border }]}>
-              <View style={[styles.statIconContainer, { backgroundColor: '#0066CC10' }]}>
-                <Ionicons name="checkmark-circle" size={24} color="#0066CC" />
+              <View style={[styles.statIconContainer, { backgroundColor: '#0D948810' }]}>
+                <Ionicons name="checkmark-circle" size={24} color="#0D9488" />
               </View>
               <Text style={[styles.statValue, { color: text }]}>{stats.delivered}</Text>
               <Text style={[styles.statLabel, { color: textMuted }]}>Hoàn thành</Text>
@@ -521,17 +521,17 @@ export default function OrdersScreen() {
           {stats.totalSpent > 0 && (
             <View style={[styles.totalSpentCard, { backgroundColor: surface, borderColor: border }]}>
               <View style={styles.totalSpentLeft}>
-                <Ionicons name="wallet" size={24} color="#0066CC" />
+                <Ionicons name="wallet" size={24} color="#0D9488" />
                 <View style={{ marginLeft: 12 }}>
                   <Text style={[styles.totalSpentLabel, { color: textMuted }]}>
                     Tổng chi tiêu
                   </Text>
-                  <Text style={[styles.totalSpentValue, { color: '#0066CC' }]}>
+                  <Text style={[styles.totalSpentValue, { color: '#0D9488' }]}>
                     {formatCurrency(stats.totalSpent)}
                   </Text>
                 </View>
               </View>
-              <Ionicons name="trending-up" size={28} color="#0066CC" />
+              <Ionicons name="trending-up" size={28} color="#0D9488" />
             </View>
           )}
         </Container>

@@ -24,10 +24,10 @@ const MILESTONE_SIZE = 80;
 
 const STATUS_COLORS = {
   'not-started': '#9ca3af',
-  'in-progress': '#3b82f6',
-  'completed': '#0066CC',
+  'in-progress': '#0D9488',
+  'completed': '#0D9488',
   'delayed': '#000000',
-  'blocked': '#0066CC'
+  'blocked': '#0D9488'
 };
 
 export default function WorkflowMapScreen() {
@@ -200,7 +200,7 @@ export default function WorkflowMapScreen() {
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Workflow Map</Text>
         <TouchableOpacity onPress={loadData} style={styles.refreshButton}>
-          <Ionicons name="refresh" size={24} color="#3b82f6" />
+          <Ionicons name="refresh" size={24} color="#0D9488" />
         </TouchableOpacity>
       </View>
 
@@ -212,11 +212,11 @@ export default function WorkflowMapScreen() {
             <Text style={styles.statLabel}>Tiến độ</Text>
           </View>
           <View style={styles.statItem}>
-            <Text style={[styles.statValue, { color: '#0066CC' }]}>{stats.completedNodes}</Text>
+            <Text style={[styles.statValue, { color: '#0D9488' }]}>{stats.completedNodes}</Text>
             <Text style={styles.statLabel}>Hoàn thành</Text>
           </View>
           <View style={styles.statItem}>
-            <Text style={[styles.statValue, { color: '#3b82f6' }]}>{stats.inProgressNodes}</Text>
+            <Text style={[styles.statValue, { color: '#0D9488' }]}>{stats.inProgressNodes}</Text>
             <Text style={styles.statLabel}>Đang làm</Text>
           </View>
           <View style={styles.statItem}>
@@ -284,19 +284,19 @@ export default function WorkflowMapScreen() {
           style={styles.zoomButton}
           onPress={() => setScale(Math.min(scale + 0.2, 2))}
         >
-          <Ionicons name="add" size={24} color="#3b82f6" />
+          <Ionicons name="add" size={24} color="#0D9488" />
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.zoomButton}
           onPress={() => setScale(Math.max(scale - 0.2, 0.5))}
         >
-          <Ionicons name="remove" size={24} color="#3b82f6" />
+          <Ionicons name="remove" size={24} color="#0D9488" />
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.zoomButton}
           onPress={() => setScale(1)}
         >
-          <Ionicons name="contract" size={20} color="#3b82f6" />
+          <Ionicons name="contract" size={20} color="#0D9488" />
         </TouchableOpacity>
       </View>
 
@@ -384,7 +384,7 @@ export default function WorkflowMapScreen() {
                       style={styles.modalActionButton}
                       onPress={handleCompleteNode}
                     >
-                      <Ionicons name="checkmark-circle" size={20} color="#0066CC" />
+                      <Ionicons name="checkmark-circle" size={20} color="#0D9488" />
                       <Text style={styles.modalActionText}>Hoàn thành</Text>
                     </TouchableOpacity>
                   )}
@@ -618,6 +618,6 @@ const styles = StyleSheet.create({
   modalActionText: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#0066CC'
+    color: '#0D9488'
   }
 });

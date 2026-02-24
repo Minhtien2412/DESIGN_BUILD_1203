@@ -71,23 +71,23 @@ export function ProductStatsCard({ stats, onViewAll, onManageStock }: ProductSta
       {/* Stats Grid */}
       <View style={styles.statsGrid}>
         {/* Total Products */}
-        <View style={[styles.statItem, { backgroundColor: '#3b82f6' + '15', borderColor: '#3b82f6' + '30' }]}>
+        <View style={[styles.statItem, { backgroundColor: '#0D9488' + '15', borderColor: '#0D9488' + '30' }]}>
           <View style={styles.statHeader}>
-            <Ionicons name="cube" size={20} color="#3b82f6" />
+            <Ionicons name="cube" size={20} color="#0D9488" />
             <ThemedText style={[styles.statLabel, { color: textMuted }]}>Tổng SP</ThemedText>
           </View>
-          <ThemedText type="title" style={[styles.statValue, { color: '#3b82f6' }]}>
+          <ThemedText type="title" style={[styles.statValue, { color: '#0D9488' }]}>
             {stats.totalProducts}
           </ThemedText>
         </View>
 
         {/* Active Products */}
-        <View style={[styles.statItem, { backgroundColor: '#0066CC' + '15', borderColor: '#0066CC' + '30' }]}>
+        <View style={[styles.statItem, { backgroundColor: '#0D9488' + '15', borderColor: '#0D9488' + '30' }]}>
           <View style={styles.statHeader}>
-            <Ionicons name="checkmark-circle" size={20} color="#0066CC" />
+            <Ionicons name="checkmark-circle" size={20} color="#0D9488" />
             <ThemedText style={[styles.statLabel, { color: textMuted }]}>Đang bán</ThemedText>
           </View>
-          <ThemedText type="title" style={[styles.statValue, { color: '#0066CC' }]}>
+          <ThemedText type="title" style={[styles.statValue, { color: '#0D9488' }]}>
             {stats.activeProducts}
           </ThemedText>
         </View>
@@ -105,12 +105,12 @@ export function ProductStatsCard({ stats, onViewAll, onManageStock }: ProductSta
 
         {/* Low Stock Warning */}
         {stats.lowStock !== undefined && stats.lowStock > 0 && (
-          <View style={[styles.statItem, { backgroundColor: '#0066CC' + '15', borderColor: '#0066CC' + '30' }]}>
+          <View style={[styles.statItem, { backgroundColor: '#0D9488' + '15', borderColor: '#0D9488' + '30' }]}>
             <View style={styles.statHeader}>
-              <Ionicons name="alert-circle" size={20} color="#0066CC" />
+              <Ionicons name="alert-circle" size={20} color="#0D9488" />
               <ThemedText style={[styles.statLabel, { color: textMuted }]}>Sắp hết</ThemedText>
             </View>
-            <ThemedText type="title" style={[styles.statValue, { color: '#0066CC' }]}>
+            <ThemedText type="title" style={[styles.statValue, { color: '#0D9488' }]}>
               {stats.lowStock}
             </ThemedText>
           </View>
@@ -137,7 +137,7 @@ export function ProductStatsCard({ stats, onViewAll, onManageStock }: ProductSta
       {stats.topSelling && (
         <View style={[styles.topSellingCard, { backgroundColor: border }]}>
           <View style={styles.topSellingHeader}>
-            <Ionicons name="trophy" size={20} color="#0066CC" />
+            <Ionicons name="trophy" size={20} color="#0D9488" />
             <ThemedText style={[styles.topSellingLabel, { color: text }]}>
               Sản phẩm bán chạy nhất
             </ThemedText>

@@ -60,7 +60,7 @@ function BudgetOverview({ totalBudget, totalSpent }: { totalBudget: number; tota
 
   const getProgressColor = () => {
     if (isOverBudget) return '#000000';
-    if (percentage > 80) return '#0066CC';
+    if (percentage > 80) return '#0D9488';
     return primary;
   };
 
@@ -74,7 +74,7 @@ function BudgetOverview({ totalBudget, totalSpent }: { totalBudget: number; tota
           </View>
           <View style={{ alignItems: 'flex-end' }}>
             <Text style={[TextVariants.caption, { color: textMuted }]}>Remaining</Text>
-            <Text style={[TextVariants.h2, { color: isOverBudget ? '#000000' : '#0066CC' }]}>
+            <Text style={[TextVariants.h2, { color: isOverBudget ? '#000000' : '#0D9488' }]}>
               ${Math.abs(remaining).toLocaleString()}
             </Text>
           </View>
@@ -249,7 +249,7 @@ function RecentTransactions({ transactions }: { transactions: CostItem[] }) {
                   <Ionicons
                     name={transaction.type === 'expense' ? 'arrow-down' : 'arrow-up'}
                     size={16}
-                    color={transaction.type === 'expense' ? '#000000' : '#0066CC'}
+                    color={transaction.type === 'expense' ? '#000000' : '#0D9488'}
                   />
                 </View>
                 <View style={{ flex: 1 }}>
@@ -265,7 +265,7 @@ function RecentTransactions({ transactions }: { transactions: CostItem[] }) {
                     style={[
                       TextVariants.body1,
                       {
-                        color: transaction.type === 'expense' ? '#000000' : '#0066CC',
+                        color: transaction.type === 'expense' ? '#000000' : '#0D9488',
                         fontWeight: '600',
                       },
                     ]}

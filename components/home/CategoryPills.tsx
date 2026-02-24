@@ -86,9 +86,9 @@ const styles = StyleSheet.create({
     borderColor: '#E0E0E0',
   },
   pillActive: {
-    backgroundColor: '#0066CC',
-    borderColor: '#0066CC',
-    shadowColor: '#0066CC',
+    backgroundColor: '#0D9488',
+    borderColor: '#0D9488',
+    shadowColor: '#0D9488',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,

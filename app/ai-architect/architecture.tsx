@@ -157,7 +157,7 @@ export default function ArchitectureDiagramScreen() {
             <View style={styles.resultHeader}>
               <Text style={styles.sectionTitle}>📐 Kết Quả</Text>
               <TouchableOpacity style={styles.copyButton} onPress={handleCopy}>
-                <Ionicons name="copy-outline" size={18} color="#03a9f4" />
+                <Ionicons name="copy-outline" size={18} color="#14B8A6" />
                 <Text style={styles.copyText}>Sao chép</Text>
               </TouchableOpacity>
             </View>
@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   templateCardSelected: {
-    borderColor: '#03a9f4',
+    borderColor: '#14B8A6',
     backgroundColor: 'rgba(3, 169, 244, 0.1)',
   },
   templateTitle: {
@@ -264,7 +264,7 @@ const styles = StyleSheet.create({
     borderColor: '#334155',
   },
   generateButton: {
-    backgroundColor: '#03a9f4',
+    backgroundColor: '#14B8A6',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   copyText: {
-    color: '#03a9f4',
+    color: '#14B8A6',
     fontSize: 14,
   },
   resultContainer: {
@@ -312,7 +312,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   linkText: {
-    color: '#03a9f4',
+    color: '#14B8A6',
   },
   guideCard: {
     backgroundColor: '#1e293b',

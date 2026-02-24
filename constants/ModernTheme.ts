@@ -9,8 +9,8 @@ export const ModernTheme = {
   colors: {
     // Primary Green (Sophisticated Emerald)
     primary: {
-      main: '#0066CC',        // Deep emerald green
-      light: '#0066CC',       // Bright emerald  
+      main: '#0D9488',        // Deep emerald green
+      light: '#0D9488',       // Bright emerald  
       dark: '#064E3B',        // Forest green
       contrast: '#FFFFFF',    // White text on green
     },
@@ -37,10 +37,10 @@ export const ModernTheme = {
     
     // Accent (minimal use)
     accent: {
-      success: '#0066CC',     // Green success
+      success: '#0D9488',     // Green success
       error: '#1A1A1A',       // Black for errors (minimalist)
-      warning: '#0066CC',     // Green warning
-      info: '#0066CC',        // Green info
+      warning: '#0D9488',     // Green warning
+      info: '#0D9488',        // Green info
     },
     
     // Text

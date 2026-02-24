@@ -21,7 +21,7 @@ export default function QuickGuideCard({ onPressGuide, onPressCreate }: QuickGui
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={['#0066CC', '#004499']}
+        colors={['#0D9488', '#004499']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.gradient}
@@ -58,8 +58,8 @@ export default function QuickGuideCard({ onPressGuide, onPressCreate }: QuickGui
             activeOpacity={0.8}
           >
             <View style={styles.actionButtonContent}>
-              <Ionicons name="book" size={18} color="#0066CC" />
-              <Text style={[styles.actionButtonText, { color: '#0066CC' }]}>Hướng dẫn</Text>
+              <Ionicons name="book" size={18} color="#0D9488" />
+              <Text style={[styles.actionButtonText, { color: '#0D9488' }]}>Hướng dẫn</Text>
             </View>
           </TouchableOpacity>
         </View>
@@ -67,15 +67,15 @@ export default function QuickGuideCard({ onPressGuide, onPressCreate }: QuickGui
         {/* Quick Tips Chips */}
         <View style={styles.tipsContainer}>
           <View style={styles.tipChip}>
-            <Ionicons name="checkmark-circle" size={14} color="#0066CC" />
+            <Ionicons name="checkmark-circle" size={14} color="#0D9488" />
             <Text style={styles.tipChipText}>Theo dõi tiến độ</Text>
           </View>
           <View style={styles.tipChip}>
-            <Ionicons name="wallet" size={14} color="#0066CC" />
+            <Ionicons name="wallet" size={14} color="#0D9488" />
             <Text style={styles.tipChipText}>Quản lý ngân sách</Text>
           </View>
           <View style={styles.tipChip}>
-            <Ionicons name="people" size={14} color="#3b82f6" />
+            <Ionicons name="people" size={14} color="#0D9488" />
             <Text style={styles.tipChipText}>Phân công team</Text>
           </View>
         </View>

@@ -399,7 +399,7 @@ export default function SteelCalculatorScreen() {
                   <Ionicons
                     name="add-circle"
                     size={20}
-                    color="#3b82f6"
+                    color="#0D9488"
                     style={styles.specAddIcon}
                   />
                 </TouchableOpacity>
@@ -508,7 +508,7 @@ export default function SteelCalculatorScreen() {
             onPress={handleCalculate}
           >
             <LinearGradient
-              colors={["#3b82f6", "#2563eb"]}
+              colors={["#0D9488", "#0D9488"]}
               style={styles.calculateGradient}
             >
               <Ionicons name="calculator" size={22} color="#fff" />
@@ -570,7 +570,7 @@ export default function SteelCalculatorScreen() {
               {/* Grand Total */}
               <View style={styles.grandTotalCard}>
                 <LinearGradient
-                  colors={["#3b82f6", "#2563eb"]}
+                  colors={["#0D9488", "#0D9488"]}
                   style={styles.grandTotalGradient}
                 >
                   <View style={styles.grandTotalRow}>
@@ -654,10 +654,10 @@ const styles = StyleSheet.create({
     borderColor: "transparent",
     ...MODERN_SHADOWS.sm,
   },
-  typeCardActive: { borderColor: "#3b82f6", backgroundColor: "#dbeafe" },
+  typeCardActive: { borderColor: "#0D9488", backgroundColor: "#CCFBF1" },
   typeIcon: { fontSize: 24, marginBottom: 6 },
   typeLabel: { fontSize: 14, fontWeight: "600", color: MODERN_COLORS.text },
-  typeLabelActive: { color: "#2563eb" },
+  typeLabelActive: { color: "#0D9488" },
   typeDesc: { fontSize: 10, color: MODERN_COLORS.textSecondary, marginTop: 4 },
 
   // Spec Grid
@@ -676,7 +676,7 @@ const styles = StyleSheet.create({
     color: MODERN_COLORS.textSecondary,
     marginTop: 2,
   },
-  specPrice: { fontSize: 10, color: "#3b82f6", marginTop: 2 },
+  specPrice: { fontSize: 10, color: "#0D9488", marginTop: 2 },
   specAddIcon: { position: "absolute", top: 4, right: 4 },
 
   // Entry Card
@@ -721,7 +721,7 @@ const styles = StyleSheet.create({
 
   // Summary
   summaryCard: {
-    backgroundColor: "#dbeafe",
+    backgroundColor: "#CCFBF1",
     borderRadius: MODERN_RADIUS.md,
     padding: MODERN_SPACING.md,
     marginBottom: MODERN_SPACING.md,
@@ -731,9 +731,9 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingVertical: 4,
   },
-  summaryLabel: { fontSize: 14, color: "#1e40af" },
-  summaryValue: { fontSize: 14, fontWeight: "600", color: "#1e40af" },
-  summaryTotal: { fontSize: 16, fontWeight: "700", color: "#2563eb" },
+  summaryLabel: { fontSize: 14, color: "#0F766E" },
+  summaryValue: { fontSize: 14, fontWeight: "600", color: "#0F766E" },
+  summaryTotal: { fontSize: 16, fontWeight: "700", color: "#0D9488" },
 
   // Calculate Button
   calculateBtn: {
@@ -762,7 +762,7 @@ const styles = StyleSheet.create({
   // Table
   tableHeader: {
     flexDirection: "row",
-    backgroundColor: "#dbeafe",
+    backgroundColor: "#CCFBF1",
     borderRadius: MODERN_RADIUS.sm,
     paddingVertical: 10,
     paddingHorizontal: MODERN_SPACING.sm,
@@ -772,7 +772,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 11,
     fontWeight: "600",
-    color: "#1e40af",
+    color: "#0F766E",
     textAlign: "center",
   },
   tableRow: {
@@ -808,7 +808,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 13,
     fontWeight: "700",
-    color: "#2563eb",
+    color: "#0D9488",
     textAlign: "center",
   },
 

@@ -130,7 +130,7 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
           </Text>
 
           <View style={styles.ratingRow}>
-            <Ionicons name="star" size={14} color="#0066CC" />
+            <Ionicons name="star" size={14} color="#0D9488" />
             <Text style={styles.ratingText}>{worker.rating}</Text>
             <Text style={styles.reviewsText}>({worker.reviews})</Text>
           </View>
@@ -167,7 +167,7 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
       {/* Team Size */}
       {worker.teamSize && (
         <View style={styles.teamRow}>
-          <Ionicons name="people" size={16} color="#0066CC" />
+          <Ionicons name="people" size={16} color="#0D9488" />
           <Text style={styles.teamText}>Đội {worker.teamSize} người</Text>
         </View>
       )}
@@ -420,7 +420,7 @@ export function CategoryWorkerList({
 
       {/* Info Banner */}
       <View style={styles.infoBanner}>
-        <Ionicons name="shield-checkmark" size={16} color="#0066CC" />
+        <Ionicons name="shield-checkmark" size={16} color="#0D9488" />
         <Text style={styles.infoBannerText}>
           {config.infoBannerText || 'Thi công chuyên nghiệp • Bảo hành công trình'}
         </Text>
@@ -450,7 +450,7 @@ export function CategoryWorkerList({
                   <View style={styles.selectedWorkerText}>
                     <Text style={styles.selectedWorkerName}>{selectedWorker.name}</Text>
                     <View style={styles.selectedRating}>
-                      <Ionicons name="star" size={14} color="#0066CC" />
+                      <Ionicons name="star" size={14} color="#0D9488" />
                       <Text style={styles.selectedRatingText}>
                         {selectedWorker.rating} ({selectedWorker.reviews})
                       </Text>
@@ -469,7 +469,7 @@ export function CategoryWorkerList({
                       style={styles.quickActionBtn}
                       onPress={() => router.push(`/messages/${selectedWorker.id}`)}
                     >
-                      <Ionicons name="chatbubble" size={20} color="#0066CC" />
+                      <Ionicons name="chatbubble" size={20} color="#0D9488" />
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -625,7 +625,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
     marginHorizontal: 4,
   },
-  filterChipActive: { backgroundColor: Colors.light.primary },
+  filterChipActive: { backgroundColor: '#1A237E' },
   filterChipText: { fontSize: 12, color: '#666', fontWeight: '500' },
   filterChipTextActive: { color: '#fff' },
 
@@ -646,17 +646,19 @@ const styles = StyleSheet.create({
   // Worker Card
   workerCard: {
     backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
+    borderRadius: 16,
+    padding: 18,
+    marginBottom: 14,
+    borderWidth: 1,
+    borderColor: '#F0F0F0',
     ...Platform.select({
       ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 4,
+        shadowColor: '#1A237E',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.08,
+        shadowRadius: 12,
       },
-      android: { elevation: 2 },
+      android: { elevation: 4 },
     }),
   },
   featuredBadge: {
@@ -674,9 +676,9 @@ const styles = StyleSheet.create({
   },
   featuredText: { fontSize: 10, fontWeight: '600', color: '#fff' },
   cardHeader: { flexDirection: 'row', marginBottom: 12 },
-  avatar: { width: 60, height: 60, borderRadius: 8, backgroundColor: '#f0f0f0' },
+  avatar: { width: 64, height: 64, borderRadius: 20, backgroundColor: '#f0f0f0', borderWidth: 2, borderColor: '#E8F0FE' },
   headerInfo: { flex: 1, marginLeft: 12 },
-  workerName: { fontSize: 15, fontWeight: '700', color: '#333', marginBottom: 6 },
+  workerName: { fontSize: 16, fontWeight: '800', color: '#1A1A2E', marginBottom: 6 },
   ratingRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 6, gap: 4 },
   ratingText: { fontSize: 13, fontWeight: '600', color: '#333' },
   reviewsText: { fontSize: 12, color: '#999' },
@@ -690,12 +692,14 @@ const styles = StyleSheet.create({
   specialtiesLabel: { fontSize: 12, fontWeight: '600', color: '#666', marginBottom: 6 },
   specialtiesTags: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   specialtyTag: {
-    backgroundColor: '#E8F4FF',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
+    backgroundColor: '#EEF2FF',
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#C7D2FE',
   },
-  specialtyText: { fontSize: 11, fontWeight: '500', color: '#0066CC' },
+  specialtyText: { fontSize: 11, fontWeight: '600', color: '#4338CA' },
 
   // Team
   teamRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12 },
@@ -714,14 +718,14 @@ const styles = StyleSheet.create({
   },
   statItem: { alignItems: 'center' },
   statValue: { fontSize: 15, fontWeight: '700', color: '#333', marginBottom: 4 },
-  available: { color: '#0066CC' },
-  busy: { color: '#0066CC' },
+  available: { color: '#0D9488' },
+  busy: { color: '#0D9488' },
   statLabel: { fontSize: 11, color: '#999' },
   statDivider: { width: 1, height: 40, backgroundColor: '#f0f0f0' },
 
   // Price & Actions
   priceRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  price: { fontSize: 18, fontWeight: '700', color: Colors.light.primary },
+  price: { fontSize: 20, fontWeight: '800', color: '#0D9488' },
   priceUnit: { fontSize: 12, color: '#999' },
   priceDay: { fontSize: 11, color: '#666', marginTop: 2 },
   actionButtons: { flexDirection: 'row', alignItems: 'center', gap: 8 },
@@ -736,7 +740,7 @@ const styles = StyleSheet.create({
   callButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 8,
@@ -744,12 +748,12 @@ const styles = StyleSheet.create({
   },
   callButtonText: { fontSize: 13, fontWeight: '600', color: '#fff' },
   bookButton: {
-    backgroundColor: Colors.light.primary,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 8,
+    backgroundColor: '#0D9488',
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    borderRadius: 12,
   },
-  bookButtonText: { fontSize: 13, fontWeight: '600', color: '#fff' },
+  bookButtonText: { fontSize: 13, fontWeight: '700', color: '#fff' },
 
   // Empty State
   emptyState: { alignItems: 'center', justifyContent: 'center', paddingVertical: 60 },
@@ -765,7 +769,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     gap: 8,
   },
-  infoBannerText: { fontSize: 12, color: '#0066CC', flex: 1 },
+  infoBannerText: { fontSize: 12, color: '#0D9488', flex: 1 },
 
   // Modal
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },

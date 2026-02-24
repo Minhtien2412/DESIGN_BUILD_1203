@@ -347,7 +347,7 @@ export default function FileUploadDemo() {
                     'document'
                   }
                   size={32}
-                  color="#0066CC"
+                  color="#0D9488"
                 />
               </View>
               <View style={styles.selectedFileInfo}>
@@ -421,7 +421,7 @@ export default function FileUploadDemo() {
                         'document'
                       }
                       size={24}
-                      color="#0066CC"
+                      color="#0D9488"
                     />
                   </View>
                   <View style={styles.fileCardInfo}>
@@ -442,7 +442,7 @@ export default function FileUploadDemo() {
                     <Text style={styles.linkText} numberOfLines={1}>
                       {file.downloadUrl}
                     </Text>
-                    <Ionicons name="copy-outline" size={18} color="#0066CC" />
+                    <Ionicons name="copy-outline" size={18} color="#0D9488" />
                   </TouchableOpacity>
                 </View>
 
@@ -531,7 +531,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#0066CC',
+    color: '#0D9488',
     marginBottom: 8,
   },
   subtitle: {
@@ -562,13 +562,13 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   imageButton: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#0D9488',
   },
   videoButton: {
     backgroundColor: '#666666',
   },
   documentButton: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   pickButtonText: {
     color: '#fff',
@@ -621,7 +621,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   uploadButton: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -647,7 +647,7 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   fileCard: {
     backgroundColor: '#fff',
@@ -708,7 +708,7 @@ const styles = StyleSheet.create({
   linkText: {
     flex: 1,
     fontSize: 13,
-    color: '#0066CC',
+    color: '#0D9488',
     fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
   },
   fileActions: {
@@ -726,10 +726,10 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   downloadActionButton: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   openActionButton: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#0D9488',
   },
   shareActionButton: {
     backgroundColor: '#666666',
@@ -742,7 +742,7 @@ const styles = StyleSheet.create({
   instructionCard: {
     backgroundColor: '#FFF9DB',
     borderLeftWidth: 4,
-    borderLeftColor: '#0066CC',
+    borderLeftColor: '#0D9488',
     padding: 16,
     borderRadius: 8,
   },

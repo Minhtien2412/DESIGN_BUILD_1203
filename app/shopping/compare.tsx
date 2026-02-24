@@ -149,7 +149,7 @@ export default function CompareScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   header: {
     flexDirection: 'row',
@@ -250,16 +250,16 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#0066CC',
+    borderColor: '#0D9488',
   },
   viewBtnText: {
-    color: '#0066CC',
+    color: '#0D9488',
     fontSize: 13,
     fontWeight: '600',
     textAlign: 'center',
   },
   addCartBtn: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     paddingVertical: 10,
     borderRadius: 8,
   },
@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   backButtonText: {
-    color: '#0066CC',
+    color: '#0D9488',
     fontSize: 15,
     fontWeight: '600',
   },

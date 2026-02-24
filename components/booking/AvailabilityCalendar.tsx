@@ -90,11 +90,11 @@ export function AvailabilityCalendar({
       
       let color = '#E5E7EB'; // Default gray
       if (hasBookedSlots && hasAvailableSlots) {
-        color = '#0066CC'; // Orange for partially booked
+        color = '#0D9488'; // Orange for partially booked
       } else if (hasBookedSlots) {
         color = '#000000'; // Red for fully booked
       } else if (hasAvailableSlots) {
-        color = '#0066CC'; // Green for available
+        color = '#0D9488'; // Green for available
       }
 
       markedDates[day.date] = {
@@ -263,7 +263,7 @@ export function AvailabilityCalendar({
                         backgroundColor: slot.isBooked
                           ? '#000000'
                           : slot.isAvailable
-                          ? '#0066CC'
+                          ? '#0D9488'
                           : '#9CA3AF',
                       },
                     ]}>
@@ -309,7 +309,7 @@ export function AvailabilityCalendar({
                       <TouchableOpacity
                         style={[
                           styles.toggleButton,
-                          { backgroundColor: slot.isAvailable ? '#000000' : '#0066CC' },
+                          { backgroundColor: slot.isAvailable ? '#000000' : '#0D9488' },
                         ]}
                         onPress={() => toggleSlotAvailability(slot.id)}
                       >
@@ -503,11 +503,11 @@ export function AvailabilityCalendar({
         </Text>
         <View style={styles.legend}>
           <View style={styles.legendItem}>
-            <View style={[styles.legendDot, { backgroundColor: '#0066CC' }]} />
+            <View style={[styles.legendDot, { backgroundColor: '#0D9488' }]} />
             <Text style={[styles.legendText, { color: textColor }]}>Trống</Text>
           </View>
           <View style={styles.legendItem}>
-            <View style={[styles.legendDot, { backgroundColor: '#0066CC' }]} />
+            <View style={[styles.legendDot, { backgroundColor: '#0D9488' }]} />
             <Text style={[styles.legendText, { color: textColor }]}>Một phần</Text>
           </View>
           <View style={styles.legendItem}>
@@ -548,7 +548,7 @@ export function AvailabilityCalendar({
           <Text style={[styles.statLabel, { color: textColor }]}>Ngày có lịch</Text>
         </View>
         <View style={[styles.statCard, { backgroundColor }]}>
-          <Text style={[styles.statNumber, { color: '#0066CC' }]}>
+          <Text style={[styles.statNumber, { color: '#0D9488' }]}>
             {availability.reduce((count, day) => 
               count + day.timeSlots.filter(slot => slot.isBooked).length, 0
             )}
@@ -556,7 +556,7 @@ export function AvailabilityCalendar({
           <Text style={[styles.statLabel, { color: textColor }]}>Lịch đã đặt</Text>
         </View>
         <View style={[styles.statCard, { backgroundColor }]}>
-          <Text style={[styles.statNumber, { color: '#0066CC' }]}>
+          <Text style={[styles.statNumber, { color: '#0D9488' }]}>
             {availability.reduce((count, day) => 
               count + day.timeSlots.filter(slot => slot.isAvailable && !slot.isBooked).length, 0
             )}

@@ -57,11 +57,11 @@ export default function QualityAssuranceDetailScreen() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'PASSED': return '#0066CC';
+      case 'PASSED': return '#0D9488';
       case 'FAILED': return '#000000';
-      case 'CONDITIONAL_PASS': return '#0066CC';
+      case 'CONDITIONAL_PASS': return '#0D9488';
       case 'COMPLETED': 
-      case 'IN_PROGRESS': return '#3b82f6';
+      case 'IN_PROGRESS': return '#0D9488';
       case 'SCHEDULED': return '#a855f7';
       case 'PENDING_RETEST': 
       case 'RESCHEDULED': return '#eab308';
@@ -74,8 +74,8 @@ export default function QualityAssuranceDetailScreen() {
     switch (severity) {
       case 'CRITICAL': return '#000000';
       case 'MAJOR': return '#ea580c';
-      case 'MINOR': return '#0066CC';
-      case 'COSMETIC': return '#3b82f6';
+      case 'MINOR': return '#0D9488';
+      case 'COSMETIC': return '#0D9488';
       default: return textMutedColor;
     }
   };
@@ -250,12 +250,12 @@ export default function QualityAssuranceDetailScreen() {
                             </ThemedText>
                             <View style={[
                               styles.measurementResult,
-                              { backgroundColor: measurement.result === 'PASS' ? '#0066CC20' : '#00000020' }
+                              { backgroundColor: measurement.result === 'PASS' ? '#0D948820' : '#00000020' }
                             ]}>
                               <ThemedText 
                                 type="default" 
                                 style={{ 
-                                  color: measurement.result === 'PASS' ? '#0066CC' : '#000000',
+                                  color: measurement.result === 'PASS' ? '#0D9488' : '#000000',
                                   fontWeight: '600'
                                 }}
                               >
@@ -298,7 +298,7 @@ export default function QualityAssuranceDetailScreen() {
                   </View>
                   <View style={styles.inspectionStats}>
                     <View style={styles.statItem}>
-                      <ThemedText type="title" style={{ color: '#0066CC' }}>
+                      <ThemedText type="title" style={{ color: '#0D9488' }}>
                         {inspection.passedItems || 0}
                       </ThemedText>
                       <ThemedText type="default" style={{ color: textMutedColor }}>Passed</ThemedText>
@@ -373,17 +373,17 @@ export default function QualityAssuranceDetailScreen() {
                     <View style={[
                       styles.checklistStatusBadge,
                       { 
-                        backgroundColor: item.status === 'PASS' ? '#0066CC20' : 
+                        backgroundColor: item.status === 'PASS' ? '#0D948820' : 
                                        item.status === 'FAIL' ? '#00000020' :
-                                       item.status === 'NA' ? '#6b728020' : '#0066CC20'
+                                       item.status === 'NA' ? '#6b728020' : '#0D948820'
                       }
                     ]}>
                       <ThemedText 
                         type="default" 
                         style={{ 
-                          color: item.status === 'PASS' ? '#0066CC' : 
+                          color: item.status === 'PASS' ? '#0D9488' : 
                                 item.status === 'FAIL' ? '#000000' :
-                                item.status === 'NA' ? '#6b7280' : '#0066CC',
+                                item.status === 'NA' ? '#6b7280' : '#0D9488',
                           fontWeight: '600'
                         }}
                       >

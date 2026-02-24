@@ -49,9 +49,9 @@ const getPriorityConfig = (priority: Task['priority']) => {
     case 'urgent':
       return { color: '#000000', label: 'Urgent', icon: 'flash' as const };
     case 'high':
-      return { color: '#0066CC', label: 'High', icon: 'arrow-up' as const };
+      return { color: '#0D9488', label: 'High', icon: 'arrow-up' as const };
     case 'medium':
-      return { color: '#3B82F6', label: 'Medium', icon: 'remove' as const };
+      return { color: '#0D9488', label: 'Medium', icon: 'remove' as const };
     case 'low':
       return { color: '#6B7280', label: 'Low', icon: 'arrow-down' as const };
   }
@@ -60,9 +60,9 @@ const getPriorityConfig = (priority: Task['priority']) => {
 const getStatusConfig = (status: Task['status']) => {
   switch (status) {
     case 'completed':
-      return { color: '#0066CC', label: 'Completed', variant: 'success' as const };
+      return { color: '#0D9488', label: 'Completed', variant: 'success' as const };
     case 'in-progress':
-      return { color: '#3B82F6', label: 'In Progress', variant: 'info' as const };
+      return { color: '#0D9488', label: 'In Progress', variant: 'info' as const };
     case 'blocked':
       return { color: '#000000', label: 'Blocked', variant: 'error' as const };
     case 'todo':
@@ -326,7 +326,7 @@ export default function TaskManagement({
                 styles.progressFill,
                 {
                   width: `${percentage}%`,
-                  backgroundColor: percentage === 100 ? '#0066CC' : '#3B82F6',
+                  backgroundColor: percentage === 100 ? '#0D9488' : '#0D9488',
                 },
               ]}
             />
@@ -430,7 +430,7 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     justifyContent: 'center',
     alignItems: 'center',
   },

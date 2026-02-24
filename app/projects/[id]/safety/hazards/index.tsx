@@ -15,8 +15,8 @@ import {
 } from 'react-native';
 
 const SEVERITY_COLORS = {
-  low: '#3b82f6',
-  medium: '#0066CC',
+  low: '#0D9488',
+  medium: '#0D9488',
   high: '#000000',
   critical: '#7f1d1d'
 };
@@ -29,9 +29,9 @@ const SEVERITY_LABELS = {
 };
 
 const STATUS_COLORS = {
-  identified: '#0066CC',
-  mitigating: '#3b82f6',
-  resolved: '#0066CC'
+  identified: '#0D9488',
+  mitigating: '#0D9488',
+  resolved: '#0D9488'
 };
 
 const STATUS_LABELS = {
@@ -134,7 +134,7 @@ export default function SafetyHazardsScreen() {
               label="Tổng nguy cơ"
               value={stats.totalHazards.toString()}
               icon="warning"
-              gradientColors={['#0066CC', '#d97706']}
+              gradientColors={['#0D9488', '#d97706']}
             />
             <MetricCard
               label="Nghiêm trọng"
@@ -146,7 +146,7 @@ export default function SafetyHazardsScreen() {
               label="Đã giải quyết"
               value={stats.resolvedHazards.toString()}
               icon="checkmark-circle"
-              gradientColors={['#0066CC', '#0066CC']}
+              gradientColors={['#0D9488', '#0D9488']}
             />
           </ScrollView>
         )}
@@ -254,7 +254,7 @@ export default function SafetyHazardsScreen() {
         <View style={styles.section}>
           {hazards.length === 0 ? (
             <View style={styles.emptyState}>
-              <Ionicons name="shield-checkmark-outline" size={64} color="#0066CC" />
+              <Ionicons name="shield-checkmark-outline" size={64} color="#0D9488" />
               <Text style={styles.emptyStateTitle}>Không có nguy cơ nào</Text>
               <Text style={styles.emptyStateText}>
                 Tuyệt vời! Không phát hiện nguy cơ an toàn nào
@@ -318,8 +318,8 @@ export default function SafetyHazardsScreen() {
                               hazard.riskRating >= 15
                                 ? '#000000'
                                 : hazard.riskRating >= 10
-                                ? '#0066CC'
-                                : '#3b82f6'
+                                ? '#0D9488'
+                                : '#0D9488'
                           }
                         ]}
                       >
@@ -388,7 +388,7 @@ export default function SafetyHazardsScreen() {
 
                   {hazard.status === 'resolved' && hazard.resolvedDate && (
                     <View style={styles.resolvedBox}>
-                      <Ionicons name="checkmark-circle" size={16} color="#0066CC" />
+                      <Ionicons name="checkmark-circle" size={16} color="#0D9488" />
                       <Text style={styles.resolvedText}>
                         Đã giải quyết - {new Date(hazard.resolvedDate).toLocaleDateString('vi-VN')}
                       </Text>
@@ -463,8 +463,8 @@ const styles = StyleSheet.create({
     gap: 6
   },
   filterChipActive: {
-    backgroundColor: '#3b82f6',
-    borderColor: '#3b82f6'
+    backgroundColor: '#0D9488',
+    borderColor: '#0D9488'
   },
   filterChipText: {
     fontSize: 14,
@@ -566,7 +566,7 @@ const styles = StyleSheet.create({
     color: '#6b7280'
   },
   mitigationBox: {
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     padding: 12,
     borderRadius: 8,
     marginBottom: 12
@@ -574,7 +574,7 @@ const styles = StyleSheet.create({
   mitigationTitle: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#1e40af',
+    color: '#0F766E',
     marginBottom: 6
   },
   mitigationText: {
@@ -593,7 +593,7 @@ const styles = StyleSheet.create({
   },
   resolveButton: {
     borderWidth: 1,
-    borderColor: '#0066CC',
+    borderColor: '#0D9488',
     borderRadius: 8,
     paddingVertical: 10,
     alignItems: 'center'
@@ -601,7 +601,7 @@ const styles = StyleSheet.create({
   resolveButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#0066CC'
+    color: '#0D9488'
   },
   resolvedBox: {
     flexDirection: 'row',
@@ -614,7 +614,7 @@ const styles = StyleSheet.create({
   resolvedText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#0066CC'
+    color: '#0D9488'
   },
   emptyState: {
     alignItems: 'center',

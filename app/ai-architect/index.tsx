@@ -60,7 +60,7 @@ export default function AIArchitectOverviewScreen() {
       title: 'Sơ Đồ Hệ Thống',
       description: 'Tạo sơ đồ kiến trúc từ mô tả text',
       icon: 'git-network',
-      color: '#03a9f4',
+      color: '#14B8A6',
       route: '/ai-architect/architecture',
     },
     {
@@ -123,7 +123,7 @@ export default function AIArchitectOverviewScreen() {
       >
         {/* Header */}
         <LinearGradient
-          colors={['#03a9f4', '#8e44ad']}
+          colors={['#14B8A6', '#8e44ad']}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.header}
@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   seeAllText: {
-    color: '#03a9f4',
+    color: '#14B8A6',
     fontSize: 14,
   },
   quickActionsScroll: {
@@ -424,7 +424,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   statValue: {
-    color: '#03a9f4',
+    color: '#14B8A6',
     fontSize: 28,
     fontWeight: 'bold',
   },

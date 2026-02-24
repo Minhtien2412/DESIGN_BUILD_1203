@@ -1,12 +1,20 @@
 /**
- * Payment Gateway Service
+ * Payment Gateway Service — callback verification only
+ * ⚠️ For new payment logic, use `services/paymentService.ts` (canonical).
+ * This file is used by `app/payment-callback.tsx` for verifyPayment().
+ *
  * Unified payment processing for MoMo, VNPay, and Stripe
  */
 
-import { Linking } from 'react-native';
-import { apiFetch } from '../api';
+import { Linking } from "react-native";
+import { apiFetch } from "../api";
 
-export type PaymentGateway = 'momo' | 'vnpay' | 'stripe' | 'cash' | 'bank-transfer';
+export type PaymentGateway =
+  | "momo"
+  | "vnpay"
+  | "stripe"
+  | "cash"
+  | "bank-transfer";
 
 export interface PaymentRequest {
   amount: number;
@@ -28,7 +36,7 @@ export interface PaymentResponse {
 
 export interface PaymentVerification {
   transactionId: string;
-  status: 'pending' | 'processing' | 'completed' | 'failed' | 'refunded';
+  status: "pending" | "processing" | "completed" | "failed" | "refunded";
   amount: number;
   gateway: PaymentGateway;
   paidAt?: string;
@@ -36,7 +44,7 @@ export interface PaymentVerification {
 }
 
 class PaymentService {
-  private stripePublishableKey: string = '';
+  private stripePublishableKey: string = "";
 
   /**
    * Initialize payment service
@@ -52,18 +60,18 @@ class PaymentService {
    */
   async processPayment(
     gateway: PaymentGateway,
-    request: PaymentRequest
+    request: PaymentRequest,
   ): Promise<PaymentResponse> {
     try {
       switch (gateway) {
-        case 'momo':
+        case "momo":
           return await this.processMoMoPayment(request);
-        case 'vnpay':
+        case "vnpay":
           return await this.processVNPayPayment(request);
-        case 'stripe':
+        case "stripe":
           return await this.processStripePayment(request);
-        case 'cash':
-        case 'bank-transfer':
+        case "cash":
+        case "bank-transfer":
           return this.processManualPayment(gateway, request);
         default:
           throw new Error(`Unsupported payment gateway: ${gateway}`);
@@ -72,7 +80,7 @@ class PaymentService {
       console.error(`Payment processing error (${gateway}):`, error);
       return {
         success: false,
-        error: error.message || 'Payment processing failed',
+        error: error.message || "Payment processing failed",
       };
     }
   }
@@ -80,15 +88,17 @@ class PaymentService {
   /**
    * Process MoMo payment
    */
-  private async processMoMoPayment(request: PaymentRequest): Promise<PaymentResponse> {
+  private async processMoMoPayment(
+    request: PaymentRequest,
+  ): Promise<PaymentResponse> {
     try {
-      const response = await apiFetch('/payments/momo/init', {
-        method: 'POST',
+      const response = await apiFetch("/payments/momo/init", {
+        method: "POST",
         body: JSON.stringify({
           amount: request.amount,
           orderId: request.orderId,
           description: request.description,
-          returnUrl: request.returnUrl || 'myapp://payment/callback',
+          returnUrl: request.returnUrl || "myapp://payment/callback",
           metadata: request.metadata,
         }),
       });
@@ -117,7 +127,7 @@ class PaymentService {
 
       return {
         success: false,
-        error: response.error || 'MoMo payment initialization failed',
+        error: response.error || "MoMo payment initialization failed",
       };
     } catch (error: any) {
       throw new Error(`MoMo payment error: ${error.message}`);
@@ -127,16 +137,18 @@ class PaymentService {
   /**
    * Process VNPay payment
    */
-  private async processVNPayPayment(request: PaymentRequest): Promise<PaymentResponse> {
+  private async processVNPayPayment(
+    request: PaymentRequest,
+  ): Promise<PaymentResponse> {
     try {
-      const response = await apiFetch('/payments/vnpay/init', {
-        method: 'POST',
+      const response = await apiFetch("/payments/vnpay/init", {
+        method: "POST",
         body: JSON.stringify({
           amount: request.amount,
           orderId: request.orderId,
           description: request.description,
-          returnUrl: request.returnUrl || 'myapp://payment/callback',
-          locale: 'vn',
+          returnUrl: request.returnUrl || "myapp://payment/callback",
+          locale: "vn",
           metadata: request.metadata,
         }),
       });
@@ -153,7 +165,7 @@ class PaymentService {
 
       return {
         success: false,
-        error: response.error || 'VNPay payment initialization failed',
+        error: response.error || "VNPay payment initialization failed",
       };
     } catch (error: any) {
       throw new Error(`VNPay payment error: ${error.message}`);
@@ -163,14 +175,16 @@ class PaymentService {
   /**
    * Process Stripe payment
    */
-  private async processStripePayment(request: PaymentRequest): Promise<PaymentResponse> {
+  private async processStripePayment(
+    request: PaymentRequest,
+  ): Promise<PaymentResponse> {
     try {
       // Create payment intent on backend
-      const response = await apiFetch('/payments/stripe/init', {
-        method: 'POST',
+      const response = await apiFetch("/payments/stripe/init", {
+        method: "POST",
         body: JSON.stringify({
           amount: request.amount,
-          currency: request.currency || 'vnd',
+          currency: request.currency || "vnd",
           description: request.description,
           orderId: request.orderId,
           metadata: request.metadata,
@@ -189,7 +203,7 @@ class PaymentService {
 
       return {
         success: false,
-        error: response.error || 'Stripe payment initialization failed',
+        error: response.error || "Stripe payment initialization failed",
       };
     } catch (error: any) {
       throw new Error(`Stripe payment error: ${error.message}`);
@@ -200,8 +214,8 @@ class PaymentService {
    * Process manual payment (cash/bank transfer)
    */
   private processManualPayment(
-    gateway: 'cash' | 'bank-transfer',
-    request: PaymentRequest
+    gateway: "cash" | "bank-transfer",
+    request: PaymentRequest,
   ): PaymentResponse {
     // Manual payments are recorded but not processed immediately
     return {
@@ -215,10 +229,12 @@ class PaymentService {
    */
   async verifyPayment(
     transactionId: string,
-    gateway: PaymentGateway
+    gateway: PaymentGateway,
   ): Promise<PaymentVerification> {
     try {
-      const response = await apiFetch(`/payments/${gateway}/verify/${transactionId}`);
+      const response = await apiFetch(
+        `/payments/${gateway}/verify/${transactionId}`,
+      );
 
       return {
         transactionId: response.transactionId,
@@ -230,7 +246,7 @@ class PaymentService {
     } catch (error: any) {
       return {
         transactionId,
-        status: 'failed',
+        status: "failed",
         amount: 0,
         gateway,
         error: error.message,
@@ -245,11 +261,11 @@ class PaymentService {
     transactionId: string,
     gateway: PaymentGateway,
     amount?: number,
-    reason?: string
+    reason?: string,
   ): Promise<{ success: boolean; refundId?: string; error?: string }> {
     try {
       const response = await apiFetch(`/payments/${gateway}/refund`, {
-        method: 'POST',
+        method: "POST",
         body: JSON.stringify({
           transactionId,
           amount,
@@ -273,18 +289,18 @@ class PaymentService {
    * Get payment methods for a region
    */
   getAvailablePaymentMethods(): PaymentGateway[] {
-    return ['momo', 'vnpay', 'stripe', 'cash', 'bank-transfer'];
+    return ["momo", "vnpay", "stripe", "cash", "bank-transfer"];
   }
 
   /**
    * Format amount for display
    */
-  formatAmount(amount: number, currency: string = 'VND'): string {
-    if (currency === 'VND') {
-      return `${amount.toLocaleString('vi-VN')}đ`;
+  formatAmount(amount: number, currency: string = "VND"): string {
+    if (currency === "VND") {
+      return `${amount.toLocaleString("vi-VN")}đ`;
     }
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
       currency,
     }).format(amount);
   }

@@ -23,7 +23,7 @@ const { width } = Dimensions.get("window");
 const CARD_WIDTH = (width - 36) / 2;
 
 const COLORS = {
-  primary: "#EE4D2D",
+  primary: "#0D9488",
   white: "#FFFFFF",
   bg: "#F5F5F5",
   text: "#212121",
@@ -204,7 +204,7 @@ export default function FlashSaleScreen() {
           {/* Progress Bar */}
           <View style={styles.progressContainer}>
             <LinearGradient
-              colors={["#FF6B35", "#EE4D2D"] as [string, string]}
+              colors={["#14B8A6", "#0D9488"] as [string, string]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={[
@@ -225,7 +225,7 @@ export default function FlashSaleScreen() {
     <View style={styles.container}>
       {/* Header */}
       <LinearGradient
-        colors={["#EE4D2D", "#FF6B35"] as [string, string]}
+        colors={["#0D9488", "#14B8A6"] as [string, string]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
         style={[styles.header, { paddingTop: insets.top }]}
@@ -244,7 +244,7 @@ export default function FlashSaleScreen() {
 
       {/* Countdown */}
       <LinearGradient
-        colors={["#FF6B35", "#EE4D2D"] as [string, string]}
+        colors={["#14B8A6", "#0D9488"] as [string, string]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
         style={styles.countdownRow}

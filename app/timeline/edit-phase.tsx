@@ -151,7 +151,7 @@ export default function EditPhaseScreen() {
     return (
       <SafeAreaView style={styles.container} edges={['top']}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#0066CC" />
+          <ActivityIndicator size="large" color="#0D9488" />
           <Text style={styles.loadingText}>Đang tải...</Text>
         </View>
       </SafeAreaView>
@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
   backBtn: { padding: 4 },
   headerTitle: { fontSize: 18, fontWeight: '700', color: '#000' },
   saveBtn: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 8,
@@ -318,7 +318,7 @@ const styles = StyleSheet.create({
   textArea: { minHeight: 100, textAlignVertical: 'top' },
   row: { flexDirection: 'row' },
   submitBtn: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',

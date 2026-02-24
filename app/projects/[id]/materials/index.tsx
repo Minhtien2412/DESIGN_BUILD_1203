@@ -99,7 +99,7 @@ export default function MaterialsListScreen() {
     return (
       <Container fullWidth>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#3b82f6" />
+          <ActivityIndicator size="large" color="#0D9488" />
           <Text style={styles.loadingText}>Đang tải vật liệu...</Text>
         </View>
       </Container>
@@ -124,7 +124,7 @@ export default function MaterialsListScreen() {
             style={styles.addButton}
             onPress={() => router.push(`/projects/${projectId}/materials/requests`)}
           >
-            <Ionicons name="clipboard-outline" size={24} color="#3b82f6" />
+            <Ionicons name="clipboard-outline" size={24} color="#0D9488" />
           </TouchableOpacity>
         </View>
 
@@ -160,7 +160,7 @@ export default function MaterialsListScreen() {
                 label="Tổng giá trị"
                 value={`${formatCurrency(stats.totalValue / 1000000)}M`}
                 subtitle="VNĐ"
-                gradientColors={['#3b82f6', '#0066CC']}
+                gradientColors={['#0D9488', '#0D9488']}
                 style={styles.statCard}
               />
               <MetricCard
@@ -177,7 +177,7 @@ export default function MaterialsListScreen() {
                 label="Yêu cầu chờ"
                 value={stats.pendingRequests}
                 subtitle="đơn hàng"
-                gradientColors={['#0066CC', '#d97706']}
+                gradientColors={['#0D9488', '#d97706']}
                 style={styles.statCard}
               />
               <MetricCard
@@ -185,7 +185,7 @@ export default function MaterialsListScreen() {
                 label="Giao dịch"
                 value={stats.recentTransactions}
                 subtitle="7 ngày qua"
-                gradientColors={['#0066CC', '#0066CC']}
+                gradientColors={['#0D9488', '#0D9488']}
                 style={styles.statCard}
               />
             </ScrollView>
@@ -259,11 +259,11 @@ export default function MaterialsListScreen() {
                     onPress={() => router.push(`/projects/${projectId}/materials/${material.id}`)}
                   >
                     <View style={styles.materialHeader}>
-                      <View style={[styles.materialIcon, { backgroundColor: status === 'low' ? '#fee2e2' : '#E8F4FF' }]}>
+                      <View style={[styles.materialIcon, { backgroundColor: status === 'low' ? '#fee2e2' : '#F0FDFA' }]}>
                         <Ionicons 
                           name={CATEGORY_ICONS[material.category]} 
                           size={24} 
-                          color={status === 'low' ? '#000000' : '#3b82f6'} 
+                          color={status === 'low' ? '#000000' : '#0D9488'} 
                         />
                       </View>
 
@@ -312,8 +312,8 @@ export default function MaterialsListScreen() {
                         status === 'low' 
                           ? ['#000000', '#000000'] 
                           : status === 'medium' 
-                          ? ['#0066CC', '#d97706'] 
-                          : ['#0066CC', '#0066CC']
+                          ? ['#0D9488', '#d97706'] 
+                          : ['#0D9488', '#0D9488']
                       }
                       style={styles.stockProgress}
                     />
@@ -417,7 +417,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   filterChipActive: {
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#0D9488',
   },
   filterText: {
     fontSize: 13,
@@ -469,7 +469,7 @@ const styles = StyleSheet.create({
   materialCategory: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#3b82f6',
+    color: '#0D9488',
   },
   metaSeparator: {
     fontSize: 12,

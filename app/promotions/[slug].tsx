@@ -47,7 +47,7 @@ const PROMOTIONS_DATA: Record<string, PromotionConfig> = {
     title: "Deal Đồng Giá 1K",
     subtitle: "Săn deal sốc mỗi ngày",
     banner: "https://picsum.photos/800/400?random=10",
-    color: "#FF5722",
+    color: "#0D9488",
     endDate: "2024-12-31",
     description:
       "Chương trình khuyến mãi đặc biệt với các sản phẩm chỉ từ 1.000đ. Số lượng có hạn, nhanh tay kẻo lỡ!",

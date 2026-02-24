@@ -233,9 +233,9 @@ const PaymentManager: React.FC<PaymentManagerProps> = ({
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed': return '#0066CC';
-      case 'processing': return '#3B82F6';
-      case 'pending': return '#0066CC';
+      case 'completed': return '#0D9488';
+      case 'processing': return '#0D9488';
+      case 'pending': return '#0D9488';
       case 'overdue': return '#000000';
       case 'scheduled': return '#6B7280';
       case 'cancelled': return '#9CA3AF';
@@ -245,9 +245,9 @@ const PaymentManager: React.FC<PaymentManagerProps> = ({
 
   const getApprovalStatusColor = (status: string) => {
     switch (status) {
-      case 'admin-approved': return '#0066CC';
-      case 'manager-approved': return '#3B82F6';
-      case 'pending': return '#0066CC';
+      case 'admin-approved': return '#0D9488';
+      case 'manager-approved': return '#0D9488';
+      case 'pending': return '#0D9488';
       case 'rejected': return '#000000';
       default: return '#6B7280';
     }
@@ -336,13 +336,13 @@ const PaymentManager: React.FC<PaymentManagerProps> = ({
               </View>
               <View style={styles.overviewItem}>
                 <Text style={styles.overviewLabel}>Total Paid</Text>
-                <Text style={[styles.overviewValue, { color: '#0066CC' }]}>
+                <Text style={[styles.overviewValue, { color: '#0D9488' }]}>
                   {formatCurrency(paymentSchedule.totalPaid)}
                 </Text>
               </View>
               <View style={styles.overviewItem}>
                 <Text style={styles.overviewLabel}>Pending</Text>
-                <Text style={[styles.overviewValue, { color: '#0066CC' }]}>
+                <Text style={[styles.overviewValue, { color: '#0D9488' }]}>
                   {formatCurrency(paymentSchedule.totalPending)}
                 </Text>
               </View>
@@ -363,7 +363,7 @@ const PaymentManager: React.FC<PaymentManagerProps> = ({
                     styles.progressFill,
                     { 
                       width: `${(paymentSchedule.totalPaid / paymentSchedule.totalBudget) * 100}%`,
-                      backgroundColor: '#0066CC'
+                      backgroundColor: '#0D9488'
                     }
                   ]} 
                 />
@@ -486,7 +486,7 @@ const PaymentManager: React.FC<PaymentManagerProps> = ({
               <Text style={styles.sectionTitle}>⚠️ Budget Variance</Text>
               <View style={styles.varianceCard}>
                 <Text style={[styles.varianceAmount, {
-                  color: paymentSchedule.budgetVariance > 0 ? '#000000' : '#0066CC'
+                  color: paymentSchedule.budgetVariance > 0 ? '#000000' : '#0D9488'
                 }]}>
                   {paymentSchedule.budgetVariance > 0 ? '+' : ''}
                   {formatCurrency(paymentSchedule.budgetVariance)}
@@ -739,7 +739,7 @@ const styles = StyleSheet.create({
     color: '#1f2937',
   },
   createButton: {
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#0D9488',
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
@@ -814,7 +814,7 @@ const styles = StyleSheet.create({
   budgetPercentage: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#0066CC',
+    color: '#0D9488',
     textAlign: 'right',
   },
   breakdownCard: {
@@ -849,7 +849,7 @@ const styles = StyleSheet.create({
   breakdownAmount: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#3b82f6',
+    color: '#0D9488',
   },
   paymentCard: {
     backgroundColor: '#fff',
@@ -896,7 +896,7 @@ const styles = StyleSheet.create({
   paymentAmount: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#0066CC',
+    color: '#0D9488',
     marginBottom: 12,
   },
   paymentDetails: {
@@ -929,7 +929,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   approveButton: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 12,
@@ -943,7 +943,7 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   processButton: {
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#0D9488',
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 12,
@@ -1035,8 +1035,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   pickerSelected: {
-    borderColor: '#3b82f6',
-    backgroundColor: '#3b82f6',
+    borderColor: '#0D9488',
+    backgroundColor: '#0D9488',
   },
   pickerText: {
     fontSize: 12,
@@ -1062,8 +1062,8 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   radioSelected: {
-    borderColor: '#3b82f6',
-    backgroundColor: '#3b82f6',
+    borderColor: '#0D9488',
+    backgroundColor: '#0D9488',
   },
   radioLabel: {
     fontSize: 14,
@@ -1079,7 +1079,7 @@ const styles = StyleSheet.create({
   paymentSummaryAmount: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#0066CC',
+    color: '#0D9488',
     marginBottom: 8,
   },
   paymentSummaryCategory: {
@@ -1118,7 +1118,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     marginLeft: 8,
     borderRadius: 8,
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#0D9488',
     alignItems: 'center',
   },
   submitButtonText: {

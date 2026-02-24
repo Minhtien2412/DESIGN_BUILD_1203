@@ -141,7 +141,7 @@ export default function StaffDetailScreen() {
           <Text style={[styles.profileRole, { color: colors.textMuted }]}>
             {staff.role?.name || 'N/A'}
           </Text>
-          <View style={[styles.profileStatus, { backgroundColor: isActive ? '#0066CC' : '#000000' }]}>
+          <View style={[styles.profileStatus, { backgroundColor: isActive ? '#0D9488' : '#000000' }]}>
             <Text style={styles.profileStatusText}>{isActive ? 'Active' : 'Inactive'}</Text>
           </View>
         </View>

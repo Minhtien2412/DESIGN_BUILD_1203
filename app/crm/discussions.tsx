@@ -164,7 +164,7 @@ export default function DiscussionsScreen() {
   };
 
   const getAvatarColor = (name: string): string => {
-    const colors = ['#3b82f6', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+    const colors = ['#0D9488', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
     const index = name.charCodeAt(0) % colors.length;
     return colors[index];
   };

@@ -43,8 +43,8 @@ const STATUS_COLORS: Record<
 > = {
   DRAFT: { bg: '#F3F4F6', text: '#6B7280', border: '#D1D5DB' },
   IN_REVIEW: { bg: '#FEF3C7', text: '#D97706', border: '#FCD34D' },
-  APPROVED: { bg: '#D1FAE5', text: '#0066CC', border: '#6EE7B7' },
-  ISSUED: { bg: '#E8F4FF', text: '#0066CC', border: '#0080FF' },
+  APPROVED: { bg: '#D1FAE5', text: '#0D9488', border: '#6EE7B7' },
+  ISSUED: { bg: '#F0FDFA', text: '#0D9488', border: '#14B8A6' },
   SUPERSEDED: { bg: '#E0E7FF', text: '#666666', border: '#C7D2FE' },
   ARCHIVED: { bg: '#F3F4F6', text: '#4B5563', border: '#D1D5DB' },
   VOID: { bg: '#FEE2E2', text: '#000000', border: '#FCA5A5' },
@@ -54,8 +54,8 @@ const ACCESS_LEVEL_COLORS: Record<
   AccessLevel,
   { bg: string; text: string }
 > = {
-  PUBLIC: { bg: '#D1FAE5', text: '#0066CC' },
-  INTERNAL: { bg: '#E8F4FF', text: '#0066CC' },
+  PUBLIC: { bg: '#D1FAE5', text: '#0D9488' },
+  INTERNAL: { bg: '#F0FDFA', text: '#0D9488' },
   CONFIDENTIAL: { bg: '#FEF3C7', text: '#D97706' },
   RESTRICTED: { bg: '#FED7AA', text: '#EA580C' },
   HIGHLY_CONFIDENTIAL: { bg: '#FEE2E2', text: '#000000' },
@@ -275,8 +275,8 @@ export default function DocumentControlListScreen() {
                       )}
                       {document.reviewRequired && document.reviews.length > 0 && (
                         <View style={styles.reviewBadge}>
-                          <Ionicons name="eye" size={12} color="#0066CC" />
-                          <Text style={[styles.reviewCount, { color: '#0066CC' }]}>
+                          <Ionicons name="eye" size={12} color="#0D9488" />
+                          <Text style={[styles.reviewCount, { color: '#0D9488' }]}>
                             {document.reviews.length}
                           </Text>
                         </View>
@@ -431,7 +431,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
   },
   reviewCount: {
     fontSize: 11,

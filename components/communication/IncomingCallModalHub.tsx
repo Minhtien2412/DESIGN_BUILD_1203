@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#000000',
   },
   acceptBtn: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   actionText: {
     color: '#fff',

@@ -25,7 +25,7 @@ const QC_FEATURES = [
     icon: "search",
     title: "Kiểm tra nghiệm thu",
     description: "Tạo và quản lý biên bản nghiệm thu",
-    color: "#3b82f6",
+    color: "#0D9488",
     route: "/qc-qa/inspections",
     count: 12,
   },
@@ -123,7 +123,7 @@ export default function QCQAScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor }]}>
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Header */}
-        <LinearGradient colors={["#0066CC", "#0080FF"]} style={styles.header}>
+        <LinearGradient colors={["#0D9488", "#14B8A6"]} style={styles.header}>
           <TouchableOpacity
             style={styles.backBtn}
             onPress={() => router.back()}
@@ -318,7 +318,7 @@ const styles = StyleSheet.create({
   },
   seeAll: {
     fontSize: 14,
-    color: "#3b82f6",
+    color: "#0D9488",
     fontWeight: "500",
   },
   featureCard: {

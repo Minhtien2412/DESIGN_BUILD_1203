@@ -62,10 +62,10 @@ export default function QualityAssuranceScreen() {
 
   const getTestStatusColor = (status: TestStatus) => {
     switch (status) {
-      case 'PASSED': return '#0066CC';
+      case 'PASSED': return '#0D9488';
       case 'FAILED': return '#000000';
-      case 'CONDITIONAL_PASS': return '#0066CC';
-      case 'IN_PROGRESS': return '#3b82f6';
+      case 'CONDITIONAL_PASS': return '#0D9488';
+      case 'IN_PROGRESS': return '#0D9488';
       case 'SCHEDULED': return '#a855f7';
       case 'PENDING_RETEST': return '#eab308';
       case 'CANCELLED': return '#6b7280';
@@ -75,10 +75,10 @@ export default function QualityAssuranceScreen() {
 
   const getInspectionStatusColor = (status: InspectionStatus) => {
     switch (status) {
-      case 'PASSED': return '#0066CC';
+      case 'PASSED': return '#0D9488';
       case 'FAILED': return '#000000';
-      case 'CONDITIONAL_PASS': return '#0066CC';
-      case 'COMPLETED': return '#3b82f6';
+      case 'CONDITIONAL_PASS': return '#0D9488';
+      case 'COMPLETED': return '#0D9488';
       case 'IN_PROGRESS': return '#666666';
       case 'SCHEDULED': return '#a855f7';
       case 'RESCHEDULED': return '#eab308';
@@ -113,7 +113,7 @@ export default function QualityAssuranceScreen() {
             </View>
             <View style={[styles.statCard, { backgroundColor: surfaceColor, borderColor }]}>
               <ThemedText type="default" style={styles.statLabel}>Pass Rate</ThemedText>
-              <ThemedText type="title" style={[styles.statValue, { color: '#0066CC' }]}>
+              <ThemedText type="title" style={[styles.statValue, { color: '#0D9488' }]}>
                 {summary?.qualityMetrics?.firstTimePassRate?.toFixed(0) || 0}%
               </ThemedText>
             </View>

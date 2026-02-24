@@ -78,7 +78,7 @@ export function CategoryInfoCard({
           )}
           {category.popularity && (
             <View style={styles.stat}>
-              <MaterialIcons name="local-fire-department" size={14} color="#0066CC" />
+              <MaterialIcons name="local-fire-department" size={14} color="#0D9488" />
               <Text style={styles.statText}>
                 {category.popularity}/5
               </Text>
@@ -104,7 +104,7 @@ export function CategoryInfoCard({
       {/* Price Range */}
       {!compact && category.priceRange && (
         <View style={styles.priceRange}>
-          <MaterialIcons name="attach-money" size={14} color="#0066CC" />
+          <MaterialIcons name="attach-money" size={14} color="#0D9488" />
           <Text style={styles.priceText}>
             {(category.priceRange.min / 1000000).toFixed(1)}tr - {(category.priceRange.max / 1000000).toFixed(0)}tr
           </Text>
@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
   },
   priceText: {
     fontSize: 13,
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: '600',
   },
   subcategories: {

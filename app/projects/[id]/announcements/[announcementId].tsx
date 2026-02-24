@@ -41,8 +41,8 @@ interface Announcement {
 
 const PRIORITY_CONFIG: Record<Priority, { label: string; color: string; icon: string }> = {
   URGENT: { label: 'Khẩn cấp', color: '#000000', icon: 'alert-circle' },
-  HIGH: { label: 'Cao', color: '#0066CC', icon: 'warning' },
-  NORMAL: { label: 'Bình thường', color: '#3B82F6', icon: 'information-circle' },
+  HIGH: { label: 'Cao', color: '#0D9488', icon: 'warning' },
+  NORMAL: { label: 'Bình thường', color: '#0D9488', icon: 'information-circle' },
   LOW: { label: 'Thấp', color: '#6B7280', icon: 'chatbubble' },
 };
 
@@ -289,7 +289,7 @@ export default function AnnouncementDetailScreen() {
                         {formatDate(receipt.readAt)}
                       </Text>
                     </View>
-                    <Ionicons name="checkmark-circle" size={20} color="#0066CC" />
+                    <Ionicons name="checkmark-circle" size={20} color="#0D9488" />
                   </View>
                 ))}
               </View>

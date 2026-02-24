@@ -26,8 +26,8 @@ const STATUS_COLORS: Record<
 > = {
   DRAFT: { bg: '#F3F4F6', text: '#6B7280', border: '#D1D5DB' },
   IN_REVIEW: { bg: '#FEF3C7', text: '#D97706', border: '#FCD34D' },
-  APPROVED: { bg: '#D1FAE5', text: '#0066CC', border: '#6EE7B7' },
-  ISSUED: { bg: '#E8F4FF', text: '#0066CC', border: '#0080FF' },
+  APPROVED: { bg: '#D1FAE5', text: '#0D9488', border: '#6EE7B7' },
+  ISSUED: { bg: '#F0FDFA', text: '#0D9488', border: '#14B8A6' },
   SUPERSEDED: { bg: '#E0E7FF', text: '#666666', border: '#C7D2FE' },
   ARCHIVED: { bg: '#F3F4F6', text: '#4B5563', border: '#D1D5DB' },
   VOID: { bg: '#FEE2E2', text: '#000000', border: '#FCA5A5' },
@@ -37,8 +37,8 @@ const ACCESS_LEVEL_COLORS: Record<
   AccessLevel,
   { bg: string; text: string }
 > = {
-  PUBLIC: { bg: '#D1FAE5', text: '#0066CC' },
-  INTERNAL: { bg: '#E8F4FF', text: '#0066CC' },
+  PUBLIC: { bg: '#D1FAE5', text: '#0D9488' },
+  INTERNAL: { bg: '#F0FDFA', text: '#0D9488' },
   CONFIDENTIAL: { bg: '#FEF3C7', text: '#D97706' },
   RESTRICTED: { bg: '#FED7AA', text: '#EA580C' },
   HIGHLY_CONFIDENTIAL: { bg: '#FEE2E2', text: '#000000' },
@@ -279,7 +279,7 @@ export default function DocumentControlDetailsScreen() {
             {document.approvedBy && (
               <Section title="Approved By">
                 <View style={[styles.personCard, { backgroundColor: surfaceColor, borderColor }]}>
-                  <Ionicons name="checkmark-circle" size={40} color="#0066CC" />
+                  <Ionicons name="checkmark-circle" size={40} color="#0D9488" />
                   <View style={styles.personInfo}>
                     <Text style={[styles.personName, { color: textColor }]}>
                       {document.approvedBy.name}
@@ -418,8 +418,8 @@ export default function DocumentControlDetailsScreen() {
                       </View>
                       {revision.approvedBy && (
                         <View style={styles.revisionApproval}>
-                          <Ionicons name="checkmark-circle" size={14} color="#0066CC" />
-                          <Text style={[styles.revisionApprovedText, { color: '#0066CC' }]}>
+                          <Ionicons name="checkmark-circle" size={14} color="#0D9488" />
+                          <Text style={[styles.revisionApprovedText, { color: '#0D9488' }]}>
                             Approved
                           </Text>
                         </View>
@@ -447,8 +447,8 @@ export default function DocumentControlDetailsScreen() {
                 {reviews.map((review) => {
                   const statusColors = {
                     PENDING: { bg: '#F3F4F6', text: '#6B7280' },
-                    IN_PROGRESS: { bg: '#E8F4FF', text: '#0066CC' },
-                    COMPLETED: { bg: '#D1FAE5', text: '#0066CC' },
+                    IN_PROGRESS: { bg: '#F0FDFA', text: '#0D9488' },
+                    COMPLETED: { bg: '#D1FAE5', text: '#0D9488' },
                     CANCELLED: { bg: '#FEE2E2', text: '#000000' },
                   };
                   const statusStyle = statusColors[review.status];
@@ -519,7 +519,7 @@ export default function DocumentControlDetailsScreen() {
                               {
                                 color:
                                   review.decision === 'APPROVE'
-                                    ? '#0066CC'
+                                    ? '#0D9488'
                                     : review.decision === 'REJECT'
                                     ? '#000000'
                                     : '#D97706',
@@ -563,10 +563,10 @@ export default function DocumentControlDetailsScreen() {
               <View style={styles.distributionsList}>
                 {distributions.map((distribution) => {
                   const statusColors = {
-                    SENT: { bg: '#E8F4FF', text: '#0066CC' },
+                    SENT: { bg: '#F0FDFA', text: '#0D9488' },
                     DELIVERED: { bg: '#FEF3C7', text: '#D97706' },
                     READ: { bg: '#E0E7FF', text: '#666666' },
-                    ACKNOWLEDGED: { bg: '#D1FAE5', text: '#0066CC' },
+                    ACKNOWLEDGED: { bg: '#D1FAE5', text: '#0D9488' },
                     FAILED: { bg: '#FEE2E2', text: '#000000' },
                   };
                   const statusStyle = statusColors[distribution.deliveryStatus];

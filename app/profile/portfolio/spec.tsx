@@ -106,7 +106,7 @@ export default function SpecScreen() {
         
         {loading ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#0066CC" />
+            <ActivityIndicator size="large" color="#0D9488" />
           </View>
         ) : (
           <ScrollView
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
   category: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#3B82F6',
+    color: '#0D9488',
   },
   specRow: {
     marginBottom: 8,
@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FEF3C7',
     borderRadius: 8,
     borderLeftWidth: 3,
-    borderLeftColor: '#0066CC',
+    borderLeftColor: '#0D9488',
   },
   noteText: {
     fontSize: 13,

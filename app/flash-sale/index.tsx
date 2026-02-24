@@ -27,14 +27,14 @@ const CARD_WIDTH = (width - 36) / 2;
 // COLORS
 // ============================================================================
 const COLORS = {
-  primary: "#EE4D2D",
-  primaryDark: "#D73211",
+  primary: "#0D9488",
+  primaryDark: "#0F766E",
   white: "#FFFFFF",
   bg: "#F5F5F5",
   text: "#212121",
   textLight: "#757575",
   border: "#E0E0E0",
-  orange: "#FF6B35",
+  orange: "#14B8A6",
   yellow: "#FFB800",
 };
 
@@ -324,7 +324,7 @@ const ProductCard = memo(
           {/* Progress Bar - Shopee Style */}
           <View style={styles.progressContainer}>
             <LinearGradient
-              colors={["#FF6B35", "#EE4D2D"] as [string, string]}
+              colors={["#14B8A6", "#0D9488"] as [string, string]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={[styles.progressBar, { width: `${progress}%` }]}
@@ -406,7 +406,7 @@ export default function FlashSaleScreen() {
 
       {/* Custom Header */}
       <LinearGradient
-        colors={["#EE4D2D", "#FF6B35"] as [string, string]}
+        colors={["#0D9488", "#14B8A6"] as [string, string]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
         style={[styles.header, { paddingTop: insets.top }]}
@@ -423,7 +423,7 @@ export default function FlashSaleScreen() {
 
       {/* Countdown Header */}
       <LinearGradient
-        colors={["#FF6B35", "#EE4D2D"] as [string, string]}
+        colors={["#14B8A6", "#0D9488"] as [string, string]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
         style={styles.countdownHeader}
@@ -678,7 +678,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 8,
     left: 8,
-    backgroundColor: "#EE4D2D",
+    backgroundColor: "#0D9488",
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 3,

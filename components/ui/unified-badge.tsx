@@ -50,8 +50,8 @@ export function Badge({
   // Type colors
   const typeColors = {
     default: '#000000', // Red
-    warning: '#0066CC', // Orange
-    success: '#0066CC', // Green
+    warning: '#0D9488', // Orange
+    success: '#0D9488', // Green
     dot: '#000000',
   };
 

@@ -142,7 +142,7 @@ interface RatingSummaryCardProps {
 
 export function RatingSummaryCard({
   summary,
-  primaryColor = "#FF6B35",
+  primaryColor = "#14B8A6",
   onSeeAll,
 }: RatingSummaryCardProps) {
   const totalReviews = Object.values(summary.distribution).reduce(
@@ -274,7 +274,7 @@ interface RatingItemProps {
 
 export function RatingItem({
   rating,
-  primaryColor = "#FF6B35",
+  primaryColor = "#14B8A6",
 }: RatingItemProps) {
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);

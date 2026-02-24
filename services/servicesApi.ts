@@ -349,10 +349,10 @@ export function getBookingStatusText(status: BookingStatus): string {
  */
 export function getBookingStatusColor(status: BookingStatus): string {
   const colorMap: Record<BookingStatus, string> = {
-    PENDING: '#0066CC',     // Orange
-    CONFIRMED: '#0066CC',   // Blue
+    PENDING: '#0D9488',     // Orange
+    CONFIRMED: '#0D9488',   // Blue
     IN_PROGRESS: '#999999', // Purple
-    COMPLETED: '#0066CC',   // Green
+    COMPLETED: '#0D9488',   // Green
     CANCELLED: '#000000',   // Red
   };
   return colorMap[status] || '#999999';

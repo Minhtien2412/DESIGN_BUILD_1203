@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#000000',
   },
   acceptButton: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   buttonPressed: {
     transform: [{ scale: 0.95 }],

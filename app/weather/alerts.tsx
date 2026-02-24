@@ -169,7 +169,7 @@ export default function WeatherAlertsScreen() {
         }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Ionicons name="checkmark-circle" size={64} color="#0066CC" />
+            <Ionicons name="checkmark-circle" size={64} color="#0D9488" />
             <Text style={styles.emptyText}>Không có cảnh báo nào</Text>
             <Text style={styles.emptyHint}>Hệ thống sẽ thông báo khi có cảnh báo mới</Text>
           </View>
@@ -220,7 +220,7 @@ function AlertCard({ alert, onAcknowledge, onDismiss }: AlertCardProps) {
       {/* Instruction */}
       {alert.instruction && (
         <View style={styles.instructionBox}>
-          <Ionicons name="information-circle" size={16} color="#0066CC" />
+          <Ionicons name="information-circle" size={16} color="#0D9488" />
           <Text style={styles.instructionText}>{alert.instruction}</Text>
         </View>
       )}
@@ -252,7 +252,7 @@ function AlertCard({ alert, onAcknowledge, onDismiss }: AlertCardProps) {
       {/* Acknowledged Info */}
       {alert.acknowledged && (
         <View style={styles.acknowledgedBox}>
-          <Ionicons name="checkmark-circle" size={16} color="#0066CC" />
+          <Ionicons name="checkmark-circle" size={16} color="#0D9488" />
           <Text style={styles.acknowledgedText}>
             Đã xác nhận bởi {alert.acknowledgedBy} -{' '}
             {alert.acknowledgedAt
@@ -289,11 +289,11 @@ function getSeverityColor(severity: WeatherAlertSeverity): string {
     case WeatherAlertSeverity.SEVERE:
       return '#000000';
     case WeatherAlertSeverity.MODERATE:
-      return '#0066CC';
+      return '#0D9488';
     case WeatherAlertSeverity.MINOR:
-      return '#0066CC';
+      return '#0D9488';
     case WeatherAlertSeverity.INFO:
-      return '#0066CC';
+      return '#0D9488';
     default:
       return '#999999';
   }
@@ -372,7 +372,7 @@ const styles = StyleSheet.create({
     borderBottomColor: 'transparent',
   },
   filterTabActive: {
-    borderBottomColor: '#0066CC',
+    borderBottomColor: '#0D9488',
   },
   filterTabText: {
     fontSize: 14,
@@ -380,7 +380,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   filterTabTextActive: {
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: 'bold',
   },
   listContent: {
@@ -446,7 +446,7 @@ const styles = StyleSheet.create({
   },
   instructionBox: {
     flexDirection: 'row',
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     padding: 12,
     borderRadius: 8,
     gap: 8,
@@ -506,7 +506,7 @@ const styles = StyleSheet.create({
   acknowledgeButton: {
     flex: 1,
     flexDirection: 'row',
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     paddingVertical: 10,
     paddingHorizontal: 16,
     borderRadius: 8,

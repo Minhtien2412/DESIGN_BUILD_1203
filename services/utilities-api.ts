@@ -159,7 +159,7 @@ export const utilitiesApi = {
    *   name: 'Tính toán vật liệu',
    *   type: 'CALCULATOR',
    *   icon: 'calculator-outline',
-   *   color: '#3B82F6',
+   *   color: '#0D9488',
    *   enabled: true,
    *   route: '/utilities/material-calculator'
    * });
@@ -271,10 +271,10 @@ export const getUtilityTypeIcon = (type: UtilityType): string => {
  */
 export const getUtilityTypeColor = (type: UtilityType): string => {
   const colors: Record<UtilityType, string> = {
-    CALCULATOR: '#3B82F6', // Blue
+    CALCULATOR: '#0D9488', // Blue
     AI: '#666666',         // Purple
     MEDIA: '#000000',      // Red
-    DOCUMENT: '#0066CC',   // Green
+    DOCUMENT: '#0D9488',   // Green
     OTHER: '#6B7280',      // Gray
   };
   return colors[type] || '#6B7280';
@@ -367,7 +367,7 @@ export const UTILITY_TEMPLATES: Partial<CreateUtilityDto>[] = [
     name: 'Tính toán vật liệu',
     type: 'CALCULATOR',
     icon: 'calculator-outline',
-    color: '#3B82F6',
+    color: '#0D9488',
     description: 'Tính toán lượng vật liệu cần thiết cho công trình',
     route: '/utilities/material-calculator',
   },
@@ -375,7 +375,7 @@ export const UTILITY_TEMPLATES: Partial<CreateUtilityDto>[] = [
     name: 'Dự toán chi phí',
     type: 'CALCULATOR',
     icon: 'cash-outline',
-    color: '#0066CC',
+    color: '#0D9488',
     description: 'Ước tính chi phí xây dựng theo diện tích',
     route: '/utilities/cost-estimator',
   },
@@ -407,7 +407,7 @@ export const UTILITY_TEMPLATES: Partial<CreateUtilityDto>[] = [
     name: 'Video hướng dẫn',
     type: 'MEDIA',
     icon: 'play-circle-outline',
-    color: '#0066CC',
+    color: '#0D9488',
     description: 'Thư viện video hướng dẫn thi công',
     route: '/videos',
   },
@@ -415,7 +415,7 @@ export const UTILITY_TEMPLATES: Partial<CreateUtilityDto>[] = [
     name: 'Thư viện bản vẽ mẫu',
     type: 'DOCUMENT',
     icon: 'document-text-outline',
-    color: '#0066CC',
+    color: '#0D9488',
     description: 'Bản vẽ kiến trúc, kết cấu mẫu',
     route: '/utilities/drawing-library',
   },

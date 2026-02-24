@@ -144,7 +144,7 @@ const RolePermissionManager: React.FC<RolePermissionManagerProps> = ({
                 style={[styles.actionButton, styles.editButton]}
                 onPress={() => setEditingRole(role)}
               >
-                <Ionicons name="pencil" size={16} color="#0066CC" />
+                <Ionicons name="pencil" size={16} color="#0D9488" />
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.actionButton, styles.deleteButton]}
@@ -176,7 +176,7 @@ const RolePermissionManager: React.FC<RolePermissionManagerProps> = ({
                     value={role.permissions.includes(permission)}
                     onValueChange={() => togglePermission(role, permission)}
                     disabled={!isAdmin}
-                    trackColor={{ false: '#E0E0E0', true: '#0066CC' }}
+                    trackColor={{ false: '#E0E0E0', true: '#0D9488' }}
                     thumbColor={role.permissions.includes(permission) ? '#FFFFFF' : '#FFFFFF'}
                   />
                 </View>
@@ -269,7 +269,7 @@ const RolePermissionManager: React.FC<RolePermissionManagerProps> = ({
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           {loading ? (
             <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color="#0066CC" />
+              <ActivityIndicator size="large" color="#0D9488" />
               <Text style={styles.loadingText}>Đang tải...</Text>
             </View>
           ) : (
@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
   addButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 8,
@@ -384,7 +384,7 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   editButton: {
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     borderRadius: 6,
   },
   deleteButton: {
@@ -408,7 +408,7 @@ const styles = StyleSheet.create({
   categoryTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#0066CC',
+    color: '#0D9488',
     marginBottom: 12,
   },
   permissionItem: {
@@ -483,7 +483,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   createButton: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     marginLeft: 8,
   },
   cancelButtonText: {

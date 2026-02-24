@@ -309,15 +309,15 @@ export function getCallIcon(call: Call, currentUserId: number): string {
 export function getCallStatusColor(status: CallStatus): string {
   switch (status) {
     case "active":
-      return "#0066CC"; // green
+      return "#0D9488"; // green
     case "ended":
       return "#666666"; // gray
     case "missed":
       return "#000000"; // red
     case "rejected":
-      return "#0066CC"; // orange
+      return "#0D9488"; // orange
     case "pending":
-      return "#0066CC"; // blue
+      return "#0D9488"; // blue
     default:
       return "#666666";
   }

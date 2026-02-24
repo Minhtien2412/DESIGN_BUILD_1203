@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   buttonActive: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#0D9488',
   },
   badge: {
     position: 'absolute',

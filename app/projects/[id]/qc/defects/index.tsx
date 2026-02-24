@@ -20,8 +20,8 @@ import {
 
 const SEVERITY_COLORS = {
   critical: "#000000",
-  major: "#0066CC",
-  minor: "#3b82f6",
+  major: "#0D9488",
+  minor: "#0D9488",
 };
 
 const SEVERITY_LABELS = {
@@ -214,7 +214,7 @@ export default function DefectsListScreen() {
             style={styles.resolveButton}
             onPress={() => handleResolve(defect)}
           >
-            <Ionicons name="checkmark-circle" size={18} color="#0066CC" />
+            <Ionicons name="checkmark-circle" size={18} color="#0D9488" />
             <Text style={styles.resolveButtonText}>Đánh dấu đã giải quyết</Text>
           </TouchableOpacity>
         )}
@@ -410,8 +410,8 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   filterChipActive: {
-    backgroundColor: "#3b82f6",
-    borderColor: "#3b82f6",
+    backgroundColor: "#0D9488",
+    borderColor: "#0D9488",
   },
   filterChipText: {
     fontSize: 14,
@@ -502,7 +502,7 @@ const styles = StyleSheet.create({
   },
   resolutionBy: {
     fontSize: 12,
-    color: "#0066CC",
+    color: "#0D9488",
     marginTop: 4,
   },
   resolveButton: {
@@ -513,12 +513,12 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#0066CC",
+    borderColor: "#0D9488",
   },
   resolveButtonText: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#0066CC",
+    color: "#0D9488",
   },
   emptyState: {
     alignItems: "center",

@@ -22,19 +22,19 @@ const RESPONSE_TYPE_OPTIONS: { value: ResponseType; label: string; color: string
   {
     value: ResponseType.ANSWER,
     label: 'Provide Answer',
-    color: '#0066CC',
+    color: '#0D9488',
     icon: 'chatbox-ellipses',
   },
   {
     value: ResponseType.CLARIFICATION_REQUEST,
     label: 'Request Clarification',
-    color: '#0066CC',
+    color: '#0D9488',
     icon: 'help-circle',
   },
   {
     value: ResponseType.SEE_ATTACHED,
     label: 'See Attached',
-    color: '#3B82F6',
+    color: '#0D9488',
     icon: 'attach',
   },
   {
@@ -59,7 +59,7 @@ export default function RFIDetailsScreen() {
   if (loading) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#3B82F6" />
+        <ActivityIndicator size="large" color="#0D9488" />
       </View>
     );
   }
@@ -119,12 +119,12 @@ export default function RFIDetailsScreen() {
                 {
                   backgroundColor:
                     rfi.status === 'ANSWERED'
-                      ? '#0066CC'
+                      ? '#0D9488'
                       : rfi.status === 'CLOSED'
-                      ? '#0066CC'
+                      ? '#0D9488'
                       : rfi.status === 'UNDER_REVIEW'
-                      ? '#0066CC'
-                      : '#3B82F6',
+                      ? '#0D9488'
+                      : '#0D9488',
                 },
               ]}
             >
@@ -139,10 +139,10 @@ export default function RFIDetailsScreen() {
                       rfi.priority === 'CRITICAL'
                         ? '#000000'
                         : rfi.priority === 'URGENT'
-                        ? '#0066CC'
+                        ? '#0D9488'
                         : rfi.priority === 'HIGH'
-                        ? '#0066CC'
-                        : '#0066CC',
+                        ? '#0D9488'
+                        : '#0D9488',
                   },
                 ]}
               >
@@ -362,7 +362,7 @@ export default function RFIDetailsScreen() {
                     ? '#FED7AA'
                     : rfi.impact.level === 'MODERATE'
                     ? '#FEF3C7'
-                    : '#E8F4FF',
+                    : '#F0FDFA',
               },
             ]}
           >
@@ -376,7 +376,7 @@ export default function RFIDetailsScreen() {
                   ? '#EA580C'
                   : rfi.impact.level === 'MODERATE'
                   ? '#D97706'
-                  : '#0066CC'
+                  : '#0D9488'
               }
             />
             <Text
@@ -390,7 +390,7 @@ export default function RFIDetailsScreen() {
                       ? '#EA580C'
                       : rfi.impact.level === 'MODERATE'
                       ? '#D97706'
-                      : '#0066CC',
+                      : '#0D9488',
                 },
               ]}
             >
@@ -401,7 +401,7 @@ export default function RFIDetailsScreen() {
           {rfi.impact.schedule.affectsSchedule && (
             <View style={styles.impactCard}>
               <View style={styles.impactCardHeader}>
-                <Ionicons name="calendar" size={18} color="#0066CC" />
+                <Ionicons name="calendar" size={18} color="#0D9488" />
                 <Text style={styles.impactCardTitle}>Schedule Impact</Text>
               </View>
               <View style={styles.impactCardBody}>
@@ -433,7 +433,7 @@ export default function RFIDetailsScreen() {
           {rfi.impact.cost.affectsCost && (
             <View style={styles.impactCard}>
               <View style={styles.impactCardHeader}>
-                <Ionicons name="cash" size={18} color="#0066CC" />
+                <Ionicons name="cash" size={18} color="#0D9488" />
                 <Text style={styles.impactCardTitle}>Cost Impact</Text>
               </View>
               <View style={styles.impactCardBody}>
@@ -453,7 +453,7 @@ export default function RFIDetailsScreen() {
                           rfi.impact.cost.costType === 'INCREASE'
                             ? '#000000'
                             : rfi.impact.cost.costType === 'DECREASE'
-                            ? '#0066CC'
+                            ? '#0D9488'
                             : '#6B7280',
                       },
                     ]}
@@ -495,7 +495,7 @@ export default function RFIDetailsScreen() {
                         ? '#D1FAE5'
                         : rfi.responseType === 'CLARIFICATION_REQUEST'
                         ? '#FEF3C7'
-                        : '#E8F4FF',
+                        : '#F0FDFA',
                   },
                 ]}
               >
@@ -505,10 +505,10 @@ export default function RFIDetailsScreen() {
                     {
                       color:
                         rfi.responseType === 'ANSWER'
-                          ? '#0066CC'
+                          ? '#0D9488'
                           : rfi.responseType === 'CLARIFICATION_REQUEST'
                           ? '#D97706'
-                          : '#0066CC',
+                          : '#0D9488',
                     },
                   ]}
                 >
@@ -578,7 +578,7 @@ export default function RFIDetailsScreen() {
                       {
                         backgroundColor:
                           attachment.category === 'QUESTION'
-                            ? '#E8F4FF'
+                            ? '#F0FDFA'
                             : attachment.category === 'RESPONSE'
                             ? '#D1FAE5'
                             : attachment.category === 'REFERENCE'
@@ -593,7 +593,7 @@ export default function RFIDetailsScreen() {
                         {
                           color:
                             attachment.category === 'QUESTION'
-                              ? '#1E40AF'
+                              ? '#0F766E'
                               : attachment.category === 'RESPONSE'
                               ? '#047857'
                               : attachment.category === 'REFERENCE'
@@ -612,7 +612,7 @@ export default function RFIDetailsScreen() {
                 </Text>
               </View>
               <TouchableOpacity style={styles.downloadButton}>
-                <Ionicons name="download-outline" size={20} color="#3B82F6" />
+                <Ionicons name="download-outline" size={20} color="#0D9488" />
               </TouchableOpacity>
             </View>
           ))}
@@ -653,7 +653,7 @@ export default function RFIDetailsScreen() {
         )}
 
         <TouchableOpacity style={styles.actionBtn}>
-          <Ionicons name="download" size={20} color="#3B82F6" />
+          <Ionicons name="download" size={20} color="#0D9488" />
           <Text style={styles.actionBtnText}>Download Package</Text>
         </TouchableOpacity>
       </View>
@@ -915,15 +915,15 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   questionBox: {
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     padding: 12,
     borderRadius: 8,
     borderLeftWidth: 4,
-    borderLeftColor: '#3B82F6',
+    borderLeftColor: '#0D9488',
   },
   questionText: {
     fontSize: 13,
-    color: '#1E40AF',
+    color: '#0F766E',
     lineHeight: 20,
   },
   infoBox: {
@@ -1039,7 +1039,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     borderLeftWidth: 4,
-    borderLeftColor: '#0066CC',
+    borderLeftColor: '#0D9488',
   },
   responseHeader: {
     flexDirection: 'row',
@@ -1059,7 +1059,7 @@ const styles = StyleSheet.create({
   },
   responseDate: {
     fontSize: 11,
-    color: '#0066CC',
+    color: '#0D9488',
   },
   responseAnswerTitle: {
     fontSize: 12,
@@ -1081,7 +1081,7 @@ const styles = StyleSheet.create({
   },
   responseBy: {
     fontSize: 11,
-    color: '#0066CC',
+    color: '#0D9488',
     fontStyle: 'italic',
   },
   attachmentCard: {
@@ -1139,13 +1139,13 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   actionBtnPrimary: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#0D9488',
   },
   actionBtnSuccess: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   actionBtnWarning: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   actionBtnText: {
     fontSize: 14,
@@ -1233,7 +1233,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 14,
     borderRadius: 12,
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#0D9488',
     alignItems: 'center',
   },
   modalBtnPrimaryText: {

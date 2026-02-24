@@ -58,7 +58,7 @@ const THEMES: ThemeConfig[] = [
 
 const ACCENT_COLORS = [
   { id: "green", name: "Xanh lá", color: "#10B981" },
-  { id: "blue", name: "Xanh dương", color: "#3B82F6" },
+  { id: "blue", name: "Xanh dương", color: "#0D9488" },
   { id: "purple", name: "Tím", color: "#8B5CF6" },
   { id: "pink", name: "Hồng", color: "#EC4899" },
   { id: "orange", name: "Cam", color: "#F97316" },

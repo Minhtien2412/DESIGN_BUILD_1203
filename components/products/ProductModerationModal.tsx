@@ -35,9 +35,9 @@ export function ProductModerationModal({
   const text = useThemeColor({}, 'text');
   const textMuted = useThemeColor({}, 'textMuted');
   const accent = useThemeColor({}, 'accent');
-  const success = '#0066CC';
+  const success = '#0D9488';
   const danger = '#000000';
-  const warning = '#0066CC';
+  const warning = '#0D9488';
 
   if (!product) return null;
 

@@ -104,13 +104,13 @@ export default function QualityMetricsScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Chỉ số Chất lượng Chính</Text>
           <View style={styles.kpiGrid}>
-            <View style={[styles.kpiCard, { borderLeftColor: '#0066CC' }]}>
-              <Ionicons name="speedometer" size={28} color="#0066CC" />
+            <View style={[styles.kpiCard, { borderLeftColor: '#0D9488' }]}>
+              <Ionicons name="speedometer" size={28} color="#0D9488" />
               <Text style={styles.kpiValue}>{firstTimePassRate.toFixed(1)}%</Text>
               <Text style={styles.kpiLabel}>Tỷ lệ Pass lần đầu</Text>
             </View>
-            <View style={[styles.kpiCard, { borderLeftColor: '#0066CC' }]}>
-              <Ionicons name="time" size={28} color="#0066CC" />
+            <View style={[styles.kpiCard, { borderLeftColor: '#0D9488' }]}>
+              <Ionicons name="time" size={28} color="#0D9488" />
               <Text style={styles.kpiValue}>{avgResolutionTime.toFixed(1)} ngày</Text>
               <Text style={styles.kpiLabel}>Thời gian xử lý TB</Text>
             </View>
@@ -119,8 +119,8 @@ export default function QualityMetricsScreen() {
               <Text style={styles.kpiValue}>{criticalRatio.toFixed(1)}%</Text>
               <Text style={styles.kpiLabel}>Tỷ lệ lỗi nghiêm trọng</Text>
             </View>
-            <View style={[styles.kpiCard, { borderLeftColor: '#0066CC' }]}>
-              <Ionicons name="checkmark-done" size={28} color="#0066CC" />
+            <View style={[styles.kpiCard, { borderLeftColor: '#0D9488' }]}>
+              <Ionicons name="checkmark-done" size={28} color="#0D9488" />
               <Text style={styles.kpiValue}>
                 {resolvedDefects}/{totalDefects}
               </Text>
@@ -144,7 +144,7 @@ export default function QualityMetricsScreen() {
                       {
                         height: barHeight,
                         backgroundColor:
-                          item.value > 10 ? '#000000' : item.value > 5 ? '#0066CC' : '#0066CC',
+                          item.value > 10 ? '#000000' : item.value > 5 ? '#0D9488' : '#0D9488',
                       },
                     ]}
                   />
@@ -171,7 +171,7 @@ export default function QualityMetricsScreen() {
               };
               const severityColors: Record<string, string> = {
                 CRITICAL: '#D32F2F',
-                MAJOR: '#0066CC',
+                MAJOR: '#0D9488',
                 MINOR: '#FBC02D',
                 COSMETIC: '#689F38',
               };
@@ -213,13 +213,13 @@ export default function QualityMetricsScreen() {
             </View>
             <View style={styles.completionDetails}>
               <View style={styles.completionRow}>
-                <View style={[styles.completionDot, { backgroundColor: '#0066CC' }]} />
+                <View style={[styles.completionDot, { backgroundColor: '#0D9488' }]} />
                 <Text style={styles.completionText}>
                   Đã duyệt: {checklists.filter((c) => c.status === 'APPROVED').length}
                 </Text>
               </View>
               <View style={styles.completionRow}>
-                <View style={[styles.completionDot, { backgroundColor: '#0066CC' }]} />
+                <View style={[styles.completionDot, { backgroundColor: '#0D9488' }]} />
                 <Text style={styles.completionText}>
                   Đang thực hiện: {checklists.filter((c) => c.status === 'IN_PROGRESS').length}
                 </Text>
@@ -238,7 +238,7 @@ export default function QualityMetricsScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Nhận xét & Khuyến nghị</Text>
           <View style={styles.insightBox}>
-            <Ionicons name="bulb" size={24} color="#0066CC" />
+            <Ionicons name="bulb" size={24} color="#0D9488" />
             <View style={styles.insightContent}>
               <Text style={styles.insightTitle}>Điểm nổi bật:</Text>
               <Text style={styles.insightText}>
@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   filterButtonActive: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   filterButtonText: {
     fontSize: 13,
@@ -417,12 +417,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 4,
-    borderColor: '#0066CC',
+    borderColor: '#0D9488',
   },
   completionPercentage: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   completionLabel: {
     fontSize: 11,
@@ -460,7 +460,7 @@ const styles = StyleSheet.create({
   insightTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#0066CC',
+    color: '#0D9488',
     marginBottom: 8,
   },
   insightText: {

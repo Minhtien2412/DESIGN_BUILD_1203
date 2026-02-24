@@ -37,10 +37,10 @@ const getActivityIcon = (type: string): keyof typeof Ionicons.glyphMap => {
 
 const getActivityColor = (type: string): string => {
   switch (type) {
-    case 'login': return '#0066CC';
+    case 'login': return '#0D9488';
     case 'logout': return '#6b7280';
-    case 'create': return '#3b82f6';
-    case 'update': return '#0066CC';
+    case 'create': return '#0D9488';
+    case 'update': return '#0D9488';
     case 'delete': return '#000000';
     case 'view': return '#666666';
     default: return '#64748b';

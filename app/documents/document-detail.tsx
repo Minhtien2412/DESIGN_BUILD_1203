@@ -106,8 +106,8 @@ export default function DocumentDetailScreen() {
 
   const statusColors: Record<DocumentStatus, string> = {
     DRAFT: '#999999',
-    UNDER_REVIEW: '#0066CC',
-    APPROVED: '#0066CC',
+    UNDER_REVIEW: '#0D9488',
+    APPROVED: '#0D9488',
     REJECTED: '#000000',
     SUPERSEDED: '#4A4A4A',
     ARCHIVED: '#757575',
@@ -173,7 +173,7 @@ export default function DocumentDetailScreen() {
               <Ionicons
                 name="cloud-download-outline"
                 size={24}
-                color="#0066CC"
+                color="#0D9488"
               />
             </TouchableOpacity>
           ),
@@ -187,7 +187,7 @@ export default function DocumentDetailScreen() {
               <Ionicons
                 name={fileTypeIcons[document.fileType] as any}
                 size={40}
-                color="#0066CC"
+                color="#0D9488"
               />
             </View>
             <View style={styles.fileInfo}>
@@ -305,7 +305,7 @@ export default function DocumentDetailScreen() {
             </Text>
             {document.status === 'APPROVED' && document.approvedBy && (
               <View style={styles.approvalInfo}>
-                <Ionicons name="checkmark-circle" size={20} color="#0066CC" />
+                <Ionicons name="checkmark-circle" size={20} color="#0D9488" />
                 <Text style={[styles.approvalText, { color: textColor }]}>
                   Đã duyệt bởi {document.approvedByName}
                 </Text>
@@ -393,7 +393,7 @@ export default function DocumentDetailScreen() {
               style={[styles.actionButton, { borderColor }]}
               onPress={handleShare}
             >
-              <Ionicons name="share-social-outline" size={24} color="#0066CC" />
+              <Ionicons name="share-social-outline" size={24} color="#0D9488" />
               <Text style={[styles.actionLabel, { color: textColor }]}>
                 Chia sẻ
               </Text>
@@ -402,7 +402,7 @@ export default function DocumentDetailScreen() {
               style={[styles.actionButton, { borderColor }]}
               onPress={handleCreateVersion}
             >
-              <Ionicons name="git-branch-outline" size={24} color="#0066CC" />
+              <Ionicons name="git-branch-outline" size={24} color="#0D9488" />
               <Text style={[styles.actionLabel, { color: textColor }]}>
                 Tạo phiên bản
               </Text>
@@ -493,7 +493,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -556,7 +556,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   metadataValueLink: {
-    color: '#0066CC',
+    color: '#0D9488',
   },
   tagsContainer: {
     flexDirection: 'row',
@@ -564,14 +564,14 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   tag: {
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
   },
   tagText: {
     fontSize: 12,
-    color: '#0066CC',
+    color: '#0D9488',
   },
   cardTitle: {
     fontSize: 16,
@@ -586,7 +586,7 @@ const styles = StyleSheet.create({
   },
   seeAllLink: {
     fontSize: 14,
-    color: '#0066CC',
+    color: '#0D9488',
   },
   approvalInfo: {
     flexDirection: 'row',
@@ -636,7 +636,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     marginTop: 6,
     marginRight: 12,
   },

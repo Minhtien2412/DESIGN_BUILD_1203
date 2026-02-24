@@ -35,12 +35,12 @@ const FILE_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
 
 const FILE_COLORS: Record<string, string> = {
   pdf: '#000000',
-  doc: '#3b82f6',
-  docx: '#3b82f6',
-  xls: '#0066CC',
-  xlsx: '#0066CC',
-  ppt: '#0066CC',
-  pptx: '#0066CC',
+  doc: '#0D9488',
+  docx: '#0D9488',
+  xls: '#0D9488',
+  xlsx: '#0D9488',
+  ppt: '#0D9488',
+  pptx: '#0D9488',
   image: '#666666',
   jpg: '#666666',
   jpeg: '#666666',

@@ -245,13 +245,13 @@ const styles = StyleSheet.create({
   filterStats: {
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     borderBottomWidth: 1,
     borderBottomColor: '#0080FF',
   },
   filterStatsText: {
     fontSize: 14,
-    color: '#1E40AF',
+    color: '#0F766E',
     fontWeight: '500',
   },
   taskList: {

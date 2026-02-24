@@ -17,15 +17,15 @@ const CATEGORY_CONFIG: Record<
   BudgetCategory,
   { label: string; icon: string; color: string }
 > = {
-  LABOR: { label: 'Nhân công', icon: 'people', color: '#0066CC' },
-  MATERIALS: { label: 'Vật liệu', icon: 'cube', color: '#0066CC' },
-  EQUIPMENT: { label: 'Thiết bị', icon: 'construct', color: '#0066CC' },
+  LABOR: { label: 'Nhân công', icon: 'people', color: '#0D9488' },
+  MATERIALS: { label: 'Vật liệu', icon: 'cube', color: '#0D9488' },
+  EQUIPMENT: { label: 'Thiết bị', icon: 'construct', color: '#0D9488' },
   SUBCONTRACTOR: { label: 'Thầu phụ', icon: 'business', color: '#999999' },
   PERMITS: { label: 'Giấy phép', icon: 'document-text', color: '#000000' },
-  UTILITIES: { label: 'Tiện ích', icon: 'flash', color: '#0080FF' },
+  UTILITIES: { label: 'Tiện ích', icon: 'flash', color: '#14B8A6' },
   INSURANCE: { label: 'Bảo hiểm', icon: 'shield-checkmark', color: '#666666' },
   OVERHEAD: { label: 'Chi phí chung', icon: 'ellipsis-horizontal', color: '#666666' },
-  CONTINGENCY: { label: 'Dự phòng', icon: 'warning', color: '#0066CC' },
+  CONTINGENCY: { label: 'Dự phòng', icon: 'warning', color: '#0D9488' },
   OTHER: { label: 'Khác', icon: 'apps', color: '#999999' },
 };
 
@@ -71,7 +71,7 @@ export default function BudgetDashboardScreen() {
           <View style={styles.summarySection}>
             <View style={styles.summaryRow}>
               <View style={[styles.summaryCard, styles.totalCard]}>
-                <Ionicons name="wallet" size={24} color="#0066CC" />
+                <Ionicons name="wallet" size={24} color="#0D9488" />
                 <Text style={styles.summaryLabel}>Tổng ngân sách</Text>
                 <Text style={styles.summaryValue}>
                   {formatCurrency(summary.totalBudget)}
@@ -92,9 +92,9 @@ export default function BudgetDashboardScreen() {
               </View>
 
               <View style={[styles.summaryCard, styles.halfCard]}>
-                <Ionicons name="cash" size={20} color="#0066CC" />
+                <Ionicons name="cash" size={20} color="#0D9488" />
                 <Text style={styles.summaryLabel}>Còn lại</Text>
-                <Text style={[styles.summaryValue, { fontSize: 18, color: '#0066CC' }]}>
+                <Text style={[styles.summaryValue, { fontSize: 18, color: '#0D9488' }]}>
                   {formatCurrency(summary.totalRemaining)}
                 </Text>
                 <Text style={styles.percentageText}>
@@ -121,8 +121,8 @@ export default function BudgetDashboardScreen() {
                         summary.percentageUsed > 90
                           ? '#000000'
                           : summary.percentageUsed > 75
-                          ? '#0066CC'
-                          : '#0066CC',
+                          ? '#0D9488'
+                          : '#0D9488',
                     },
                   ]}
                 />
@@ -140,8 +140,8 @@ export default function BudgetDashboardScreen() {
             )}
 
             {summary.nearLimitCategories.length > 0 && (
-              <View style={[styles.alertBox, { backgroundColor: '#E8F4FF' }]}>
-                <Ionicons name="warning" size={18} color="#0066CC" />
+              <View style={[styles.alertBox, { backgroundColor: '#F0FDFA' }]}>
+                <Ionicons name="warning" size={18} color="#0D9488" />
                 <Text style={[styles.alertText, { color: '#004499' }]}>
                   {summary.nearLimitCategories.length} hạng mục gần hết ngân sách
                 </Text>
@@ -194,9 +194,9 @@ export default function BudgetDashboardScreen() {
                         </View>
                       )}
                       {isNearLimit && (
-                        <View style={[styles.warningBadge, { backgroundColor: '#E8F4FF' }]}>
-                          <Ionicons name="warning" size={14} color="#0066CC" />
-                          <Text style={[styles.warningText, { color: '#0066CC' }]}>
+                        <View style={[styles.warningBadge, { backgroundColor: '#F0FDFA' }]}>
+                          <Ionicons name="warning" size={14} color="#0D9488" />
+                          <Text style={[styles.warningText, { color: '#0D9488' }]}>
                             {data.percentage.toFixed(0)}%
                           </Text>
                         </View>
@@ -218,7 +218,7 @@ export default function BudgetDashboardScreen() {
                           backgroundColor: isOverBudget
                             ? '#000000'
                             : isNearLimit
-                            ? '#0066CC'
+                            ? '#0D9488'
                             : config.color,
                         },
                       ]}
@@ -244,7 +244,7 @@ export default function BudgetDashboardScreen() {
               style={styles.actionCard}
               onPress={() => router.push('/budget/expenses')}
             >
-              <Ionicons name="receipt" size={28} color="#0066CC" />
+              <Ionicons name="receipt" size={28} color="#0D9488" />
               <Text style={styles.actionLabel}>Chi tiêu</Text>
             </TouchableOpacity>
 
@@ -252,7 +252,7 @@ export default function BudgetDashboardScreen() {
               style={styles.actionCard}
               onPress={() => router.push('/budget/invoices')}
             >
-              <Ionicons name="document-text" size={28} color="#0066CC" />
+              <Ionicons name="document-text" size={28} color="#0D9488" />
               <Text style={styles.actionLabel}>Hóa đơn</Text>
             </TouchableOpacity>
 
@@ -260,7 +260,7 @@ export default function BudgetDashboardScreen() {
               style={styles.actionCard}
               onPress={() => router.push('/budget/estimates' as any)}
             >
-              <Ionicons name="calculator" size={28} color="#0066CC" />
+              <Ionicons name="calculator" size={28} color="#0D9488" />
               <Text style={styles.actionLabel}>Ước tính</Text>
             </TouchableOpacity>
 
@@ -281,7 +281,7 @@ export default function BudgetDashboardScreen() {
             <TouchableOpacity
               onPress={() => router.push(`/budget/create-budget?projectId=${projectId}` as any)}
             >
-              <Ionicons name="add-circle" size={24} color="#0066CC" />
+              <Ionicons name="add-circle" size={24} color="#0D9488" />
             </TouchableOpacity>
           </View>
 
@@ -434,7 +434,7 @@ const styles = StyleSheet.create({
   },
   seeAllText: {
     fontSize: 14,
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: '500',
   },
   categoryCard: {

@@ -84,7 +84,7 @@ export const AnnouncementCard = memo(function AnnouncementCard({
   const importanceColors = {
     critical: "#EF4444",
     high: "#F59E0B",
-    medium: "#3B82F6",
+    medium: "#0D9488",
     low: "#6B7280",
   };
 
@@ -176,7 +176,7 @@ export const DevelopmentPlanCard = memo(function DevelopmentPlanCard({
 }: DevelopmentPlanCardProps) {
   const statusColors = {
     planned: "#6B7280",
-    in_progress: "#3B82F6",
+    in_progress: "#0D9488",
     completed: "#10B981",
     delayed: "#EF4444",
   };
@@ -195,7 +195,7 @@ export const DevelopmentPlanCard = memo(function DevelopmentPlanCard({
       activeOpacity={0.8}
     >
       <LinearGradient
-        colors={["#3B82F620", "#8B5CF620"]}
+        colors={["#0D948820", "#8B5CF620"]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.planGradient}
@@ -279,7 +279,7 @@ export const DevelopmentPlanCard = memo(function DevelopmentPlanCard({
                     milestone.status === "completed"
                       ? "#10B981"
                       : milestone.status === "in_progress"
-                        ? "#3B82F6"
+                        ? "#0D9488"
                         : COLORS.textTertiary
                   }
                 />

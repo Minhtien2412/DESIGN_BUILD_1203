@@ -292,7 +292,7 @@ export default function CreateInvoiceScreen() {
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Mục hàng hóa / dịch vụ</Text>
             <TouchableOpacity onPress={addItem}>
-              <Ionicons name="add-circle" size={24} color="#0066CC" />
+              <Ionicons name="add-circle" size={24} color="#0D9488" />
             </TouchableOpacity>
           </View>
 
@@ -538,7 +538,7 @@ const styles = StyleSheet.create({
   itemNumber: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   itemRow: {
     flexDirection: 'row',
@@ -618,7 +618,7 @@ const styles = StyleSheet.create({
     paddingTop: 12,
     marginTop: 8,
     borderTopWidth: 2,
-    borderTopColor: '#0066CC',
+    borderTopColor: '#0D9488',
   },
   totalLabel: {
     fontSize: 16,
@@ -628,7 +628,7 @@ const styles = StyleSheet.create({
   totalValue: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   footer: {
     flexDirection: 'row',
@@ -655,7 +655,7 @@ const styles = StyleSheet.create({
     flex: 2,
     paddingVertical: 14,
     borderRadius: 8,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     alignItems: 'center',
   },
   saveButtonDisabled: {

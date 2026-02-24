@@ -195,7 +195,7 @@ export function ActiveCallScreen() {
             <Ionicons
               name={isSpeakerOn ? 'volume-high' : 'volume-mute'}
               size={28}
-              color={isSpeakerOn ? '#0066CC' : '#FFFFFF'}
+              color={isSpeakerOn ? '#0D9488' : '#FFFFFF'}
             />
           </Pressable>
         </View>

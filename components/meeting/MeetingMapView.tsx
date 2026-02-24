@@ -72,7 +72,7 @@ export function MeetingMapView({
                 }
               ]}
             >
-              <Ionicons name="car" size={24} color="#3B82F6" />
+              <Ionicons name="car" size={24} color="#0D9488" />
               <Text style={styles.participantName} numberOfLines={1}>
                 {participant.name.split(' ')[0]}
               </Text>
@@ -101,7 +101,7 @@ export function MeetingMapView({
             <Text style={styles.legendText}>Điểm đến</Text>
           </View>
           <View style={styles.legendItem}>
-            <View style={[styles.legendDot, { backgroundColor: '#3B82F6' }]} />
+            <View style={[styles.legendDot, { backgroundColor: '#0D9488' }]} />
             <Text style={styles.legendText}>Đang di chuyển</Text>
           </View>
         </View>
@@ -176,14 +176,14 @@ const styles = StyleSheet.create({
   participantName: {
     fontSize: 10,
     fontWeight: '500',
-    color: '#3B82F6'
+    color: '#0D9488'
   },
   routeLine: {
     position: 'absolute',
     left: '25%',
     right: '35%',
     height: 3,
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#0D9488',
     opacity: 0.6,
     borderRadius: 2
   },

@@ -36,7 +36,7 @@ export default function CreateInspectionScreen() {
   const backgroundColor = useThemeColor({}, 'background');
   const textColor = useThemeColor({}, 'text');
   const cardColor = useThemeColor({}, 'card');
-  const primaryColor = '#0066CC';
+  const primaryColor = '#0D9488';
 
   const inspectionTypes: { value: InspectionType; label: string; icon: string }[] = [
     { value: 'initial', label: 'Initial', icon: 'play-circle-outline' },

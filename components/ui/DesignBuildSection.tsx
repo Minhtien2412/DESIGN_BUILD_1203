@@ -29,7 +29,7 @@ type Feature = {
 
 type Theme = {
   colors: {
-    primary: string;      // #0066CC
+    primary: string;      // #0D9488
     primaryAlt: string;   // #7FAB67
     surface: string;      // #FFFFFF
     background: string;   // #F7F7F7
@@ -46,7 +46,7 @@ type Theme = {
 
 const defaultTheme: Theme = {
   colors: {
-    primary: '#0066CC',
+    primary: '#0D9488',
     primaryAlt: '#7FAB67',
     surface: '#FFFFFF',
     background: '#F7F7F7',

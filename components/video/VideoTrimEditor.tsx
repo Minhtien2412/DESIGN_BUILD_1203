@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
   selectedBorder: {
     flex: 1,
     borderWidth: 2,
-    borderColor: "#FF6B35",
+    borderColor: "#14B8A6",
     borderRadius: 4,
   },
   handle: {
@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
     top: 0,
     bottom: 0,
     width: HANDLE_WIDTH,
-    backgroundColor: "#FF6B35",
+    backgroundColor: "#14B8A6",
     justifyContent: "center",
     alignItems: "center",
   },

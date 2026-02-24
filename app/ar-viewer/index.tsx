@@ -100,7 +100,7 @@ export default function ARViewerScreen() {
               style={[styles.modelContainer, { transform: [{ rotate: spin }] }]}
             >
               <View style={styles.modelPlaceholder}>
-                <Ionicons name="cube" size={80} color="#FF6B35" />
+                <Ionicons name="cube" size={80} color="#14B8A6" />
                 <Text style={styles.modelName}>{selectedProduct.name}</Text>
               </View>
             </Animated.View>
@@ -207,13 +207,13 @@ export default function ARViewerScreen() {
               <Ionicons
                 name="cube-outline"
                 size={28}
-                color={selectedProduct.id === product.id ? "#FF6B35" : "#999"}
+                color={selectedProduct.id === product.id ? "#14B8A6" : "#999"}
               />
             </View>
             <Text
               style={[
                 styles.thumbName,
-                selectedProduct.id === product.id && { color: "#FF6B35" },
+                selectedProduct.id === product.id && { color: "#14B8A6" },
               ]}
               numberOfLines={1}
             >
@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
   },
   arCrosshairLine: {
     position: "absolute",
-    backgroundColor: "#FF6B35",
+    backgroundColor: "#0D9488",
   },
   arCrosshairH: {
     width: 80,
@@ -310,13 +310,13 @@ const styles = StyleSheet.create({
     left: 16,
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FF6B35",
+    backgroundColor: "#0D9488",
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
     gap: 6,
   },
-  arBadgeText: { color: "#fff", fontSize: 12, fontWeight: "500" },
+  arBadgeText: { color: "#fff", fontSize: 12, fontWeight: "600" },
   arToggle: {
     position: "absolute",
     bottom: 20,
@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     gap: 8,
   },
-  arToggleActive: { backgroundColor: "#FF6B35" },
+  arToggleActive: { backgroundColor: "#0D9488" },
   arToggleText: { color: "#fff", fontWeight: "500" },
   productInfo: {
     padding: 16,
@@ -338,18 +338,18 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 24,
     marginTop: -20,
   },
-  productName: { fontSize: 20, fontWeight: "bold" },
+  productName: { fontSize: 20, fontWeight: "800", letterSpacing: -0.3 },
   variantsSection: { marginTop: 16 },
-  variantLabel: { color: "#666", fontSize: 13, marginBottom: 10 },
+  variantLabel: { color: "#6B7280", fontSize: 13, marginBottom: 10 },
   variantOptions: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   variantBtn: {
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#F3F4F6",
   },
-  variantBtnActive: { backgroundColor: "#FF6B35" },
-  variantBtnText: { color: "#666", fontSize: 13 },
+  variantBtnActive: { backgroundColor: "#0D9488" },
+  variantBtnText: { color: "#6B7280", fontSize: 13 },
   variantBtnTextActive: { color: "#fff" },
   gesturesGuide: {
     flexDirection: "row",
@@ -360,16 +360,16 @@ const styles = StyleSheet.create({
     borderTopColor: "#eee",
   },
   gestureItem: { alignItems: "center" },
-  gestureText: { color: "#666", fontSize: 11, marginTop: 4 },
+  gestureText: { color: "#6B7280", fontSize: 11, marginTop: 4 },
   productSelector: { maxHeight: 90, paddingHorizontal: 16 },
   productThumb: {
     alignItems: "center",
     marginRight: 16,
     padding: 8,
     borderRadius: 12,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#F3F4F6",
   },
-  productThumbActive: { borderWidth: 2, borderColor: "#FF6B35" },
+  productThumbActive: { borderWidth: 2, borderColor: "#0D9488" },
   thumbImage: {
     width: 50,
     height: 50,
@@ -377,7 +377,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  thumbName: { color: "#666", fontSize: 11, marginTop: 4, maxWidth: 70 },
+  thumbName: { color: "#6B7280", fontSize: 11, marginTop: 4, maxWidth: 70 },
   actionsBar: {
     flexDirection: "row",
     alignItems: "center",
@@ -387,8 +387,8 @@ const styles = StyleSheet.create({
   actionBtn: {
     width: 48,
     height: 48,
-    borderRadius: 12,
-    backgroundColor: "#f0f0f0",
+    borderRadius: 14,
+    backgroundColor: "#F3F4F6",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -397,10 +397,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#FF6B35",
+    backgroundColor: "#0D9488",
     paddingVertical: 14,
-    borderRadius: 12,
+    borderRadius: 16,
     gap: 8,
+    shadowColor: "#0D9488",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 3,
   },
-  addToCartText: { color: "#fff", fontSize: 16, fontWeight: "600" },
+  addToCartText: { color: "#fff", fontSize: 16, fontWeight: "700" },
 });

@@ -20,7 +20,7 @@ const sampleCategories: BudgetCategory[] = [
     name: 'Materials',
     budgeted: 50000,
     spent: 35000,
-    color: '#3B82F6',
+    color: '#0D9488',
     icon: 'cube-outline',
   },
   {
@@ -28,7 +28,7 @@ const sampleCategories: BudgetCategory[] = [
     name: 'Labor',
     budgeted: 80000,
     spent: 72000,
-    color: '#0066CC',
+    color: '#0D9488',
     icon: 'people-outline',
   },
   {
@@ -36,7 +36,7 @@ const sampleCategories: BudgetCategory[] = [
     name: 'Equipment',
     budgeted: 30000,
     spent: 28500,
-    color: '#0066CC',
+    color: '#0D9488',
     icon: 'build-outline',
   },
   {

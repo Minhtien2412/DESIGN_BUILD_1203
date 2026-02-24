@@ -122,7 +122,7 @@ export const ConstructionMapSetup: React.FC<ConstructionMapSetupProps> = ({
         return (
           <View style={styles.stepContent}>
             <View style={styles.welcomeIcon}>
-              <Ionicons name="map" size={64} color="#3B82F6" />
+              <Ionicons name="map" size={64} color="#0D9488" />
             </View>
             <Text style={styles.projectName}>{project.projectId}</Text>
             <Text style={styles.projectDescription}>
@@ -131,25 +131,25 @@ export const ConstructionMapSetup: React.FC<ConstructionMapSetupProps> = ({
 
             <View style={styles.featureList}>
               <View style={styles.featureItem}>
-                <Ionicons name="checkmark-circle" size={24} color="#0066CC" />
+                <Ionicons name="checkmark-circle" size={24} color="#0D9488" />
                 <Text style={styles.featureText}>
                   Kéo thả công việc trực quan
                 </Text>
               </View>
               <View style={styles.featureItem}>
-                <Ionicons name="checkmark-circle" size={24} color="#0066CC" />
+                <Ionicons name="checkmark-circle" size={24} color="#0D9488" />
                 <Text style={styles.featureText}>
                   Theo dõi tiến độ real-time
                 </Text>
               </View>
               <View style={styles.featureItem}>
-                <Ionicons name="checkmark-circle" size={24} color="#0066CC" />
+                <Ionicons name="checkmark-circle" size={24} color="#0D9488" />
                 <Text style={styles.featureText}>
                   Cộng tác nhóm dễ dàng
                 </Text>
               </View>
               <View style={styles.featureItem}>
-                <Ionicons name="checkmark-circle" size={24} color="#0066CC" />
+                <Ionicons name="checkmark-circle" size={24} color="#0D9488" />
                 <Text style={styles.featureText}>
                   Lọc và tìm kiếm thông minh
                 </Text>
@@ -313,7 +313,7 @@ export const ConstructionMapSetup: React.FC<ConstructionMapSetupProps> = ({
                 </Text>
                 {config.teamEmails.map((email) => (
                   <View key={email} style={styles.teamItem}>
-                    <Ionicons name="mail-outline" size={20} color="#3B82F6" />
+                    <Ionicons name="mail-outline" size={20} color="#0D9488" />
                     <Text style={styles.teamEmail}>{email}</Text>
                     <TouchableOpacity
                       onPress={() => handleRemoveTeamMember(email)}
@@ -331,7 +331,7 @@ export const ConstructionMapSetup: React.FC<ConstructionMapSetupProps> = ({
         return (
           <View style={styles.stepContent}>
             <View style={styles.successIcon}>
-              <Ionicons name="checkmark-circle" size={80} color="#0066CC" />
+              <Ionicons name="checkmark-circle" size={80} color="#0D9488" />
             </View>
             <Text style={styles.successTitle}>Sẵn sàng!</Text>
             <Text style={styles.successDescription}>
@@ -432,7 +432,7 @@ export const ConstructionMapSetup: React.FC<ConstructionMapSetupProps> = ({
         <View style={styles.footer}>
           {currentStep > 0 && (
             <TouchableOpacity style={styles.backButton} onPress={handleBack}>
-              <Ionicons name="arrow-back" size={20} color="#3B82F6" />
+              <Ionicons name="arrow-back" size={20} color="#0D9488" />
               <Text style={styles.backButtonText}>Quay lại</Text>
             </TouchableOpacity>
           )}
@@ -497,7 +497,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#E5E7EB',
   },
   progressDotActive: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#0D9488',
     width: 24,
   },
   scrollView: {
@@ -574,8 +574,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   gridSizeOptionActive: {
-    borderColor: '#3B82F6',
-    backgroundColor: '#E8F4FF',
+    borderColor: '#0D9488',
+    backgroundColor: '#F0FDFA',
   },
   gridSizeText: {
     fontSize: 16,
@@ -583,7 +583,7 @@ const styles = StyleSheet.create({
     color: '#6B7280',
   },
   gridSizeTextActive: {
-    color: '#3B82F6',
+    color: '#0D9488',
   },
   canvasSizeOptions: {
     gap: 12,
@@ -599,8 +599,8 @@ const styles = StyleSheet.create({
     borderColor: '#E5E7EB',
   },
   canvasSizeOptionActive: {
-    borderColor: '#3B82F6',
-    backgroundColor: '#E8F4FF',
+    borderColor: '#0D9488',
+    backgroundColor: '#F0FDFA',
   },
   canvasSizeLabel: {
     fontSize: 15,
@@ -642,7 +642,7 @@ const styles = StyleSheet.create({
     padding: 2,
   },
   toggleActive: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#0D9488',
   },
   toggleThumb: {
     width: 26,
@@ -671,7 +671,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 8,
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#0D9488',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -753,12 +753,12 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#3B82F6',
+    borderColor: '#0D9488',
   },
   backButtonText: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#3B82F6',
+    color: '#0D9488',
   },
   nextButton: {
     flex: 1,
@@ -767,7 +767,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
     paddingVertical: 14,
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#0D9488',
     borderRadius: 8,
   },
   nextButtonText: {

@@ -209,9 +209,9 @@ export default function WeatherDashboardScreen() {
       case 'severe':
         return '#EA580C';
       case 'moderate':
-        return '#0066CC';
+        return '#0D9488';
       case 'minor':
-        return '#0066CC';
+        return '#0D9488';
       default:
         return primary;
     }

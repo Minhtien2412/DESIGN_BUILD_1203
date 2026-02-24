@@ -1,24 +1,30 @@
 /**
  * Finishing Index Screen - Danh mục hoàn thiện
- * Lists all finishing categories with navigation to detail screens
- * Now includes featured products from real API
+ * Modern Shopee-inspired design with real API integration
+ * @updated 2026-02-05 - Modern redesign + fixed API integration
  */
 import { Colors } from "@/constants/theme";
+import { get } from "@/services/api";
 import type { Product } from "@/services/api/types";
 import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { Stack, router } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
     ActivityIndicator,
     Dimensions,
+    FlatList,
     Image,
     Platform,
+    RefreshControl,
     ScrollView,
+    StatusBar,
     StyleSheet,
     Text,
     TouchableOpacity,
     View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const PRODUCT_CARD_WIDTH = (SCREEN_WIDTH - 48) / 2.5;
@@ -81,7 +87,7 @@ const CATEGORIES: CategoryItem[] = [
     subtitle: "Cửa gỗ, nhôm kính, sắt...",
     icon: "enter-outline",
     route: "/finishing/lam-cua-new",
-    color: "#0066CC",
+    color: "#0D9488",
     image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400",
     workerCount: 178,
   },
@@ -111,7 +117,7 @@ const CATEGORIES: CategoryItem[] = [
     subtitle: "Điện, nước, điều hòa...",
     icon: "flash-outline",
     route: "/finishing/dien-nuoc",
-    color: "#0066CC",
+    color: "#0D9488",
     image: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=400",
     workerCount: 312,
   },
@@ -131,7 +137,7 @@ const CATEGORIES: CategoryItem[] = [
     subtitle: "Sửa chữa, bảo trì nhà...",
     icon: "construct-outline",
     route: "/finishing/tho-tong-hop-new",
-    color: "#0080FF",
+    color: "#14B8A6",
     image: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=400",
     workerCount: 245,
   },
@@ -234,30 +240,37 @@ const FeaturedProductCard: React.FC<{
 };
 
 export default function FinishingIndexScreen() {
+  const insets = useSafeAreaInsets();
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    loadFeaturedProducts();
-  }, []);
-
-  const loadFeaturedProducts = async () => {
+  const loadFeaturedProducts = useCallback(async () => {
     try {
       setLoadingProducts(true);
-      const response = await fetch(
-        "https://baotienweb.cloud/api/v1/products?limit=10&status=APPROVED",
-        { headers: { "X-API-Key": "nhaxinh-api-2025-secret-key" } },
-      );
-      if (response.ok) {
-        const data = await response.json();
-        setFeaturedProducts(data.data || []);
+      const data = await get<{ data: Product[] }>("/products", {
+        limit: 10,
+        status: "APPROVED",
+      });
+      if (data?.data) {
+        setFeaturedProducts(data.data);
       }
     } catch (error) {
       console.error("[Finishing] Failed to load products:", error);
     } finally {
       setLoadingProducts(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    loadFeaturedProducts();
+  }, [loadFeaturedProducts]);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await loadFeaturedProducts();
+    setRefreshing(false);
+  }, [loadFeaturedProducts]);
 
   const handleProductPress = (productId: number) => {
     router.push(`/finishing/product/${productId}?category=finishing`);
@@ -268,170 +281,330 @@ export default function FinishingIndexScreen() {
   };
 
   return (
-    <>
-      <Stack.Screen
-        options={{
-          title: "Hoàn thiện công trình",
-          headerStyle: { backgroundColor: Colors.light.primary },
-          headerTintColor: "#fff",
-          headerTitleStyle: { fontWeight: "600" },
-        }}
-      />
+    <View style={styles.container}>
+      <StatusBar barStyle="light-content" />
+      <Stack.Screen options={{ headerShown: false }} />
 
-      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-        {/* Header Banner */}
-        <View style={styles.banner}>
-          <View style={styles.bannerContent}>
-            <Text style={styles.bannerTitle}>Tìm thợ hoàn thiện</Text>
-            <Text style={styles.bannerSubtitle}>
-              Kết nối với hơn 2,000+ thợ chuyên nghiệp{"\n"}trong mọi lĩnh vực
-              hoàn thiện
-            </Text>
+      {/* Modern Gradient Header */}
+      <LinearGradient
+        colors={["#0F766E", "#115E59", "#0D9488"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={[styles.header, { paddingTop: insets.top + 8 }]}
+      >
+        <View style={styles.headerRow}>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={styles.headerBack}
+          >
+            <Ionicons name="arrow-back" size={24} color="#fff" />
+          </TouchableOpacity>
+          <View style={styles.headerCenter}>
+            <Text style={styles.headerTitle}>Hoàn thiện công trình</Text>
+            <Text style={styles.headerSubtitle}>2,000+ thợ chuyên nghiệp</Text>
           </View>
-          <View style={styles.bannerIcon}>
-            <Ionicons
-              name="construct"
-              size={48}
-              color="rgba(255,255,255,0.3)"
-            />
-          </View>
+          <TouchableOpacity
+            onPress={() => router.push("/search" as any)}
+            style={styles.headerSearch}
+          >
+            <Ionicons name="search" size={22} color="#fff" />
+          </TouchableOpacity>
         </View>
 
+        {/* Quick Stats */}
+        <View style={styles.statsRow}>
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>{CATEGORIES.length}</Text>
+            <Text style={styles.statLabel}>Danh mục</Text>
+          </View>
+          <View style={styles.statDivider} />
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>2,000+</Text>
+            <Text style={styles.statLabel}>Thợ tay nghề</Text>
+          </View>
+          <View style={styles.statDivider} />
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>4.8★</Text>
+            <Text style={styles.statLabel}>Đánh giá TB</Text>
+          </View>
+        </View>
+      </LinearGradient>
+
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={[Colors.light.primary]}
+          />
+        }
+      >
         {/* Featured Products Section */}
         <View style={styles.productsSection}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>🔥 Sản phẩm nổi bật</Text>
-            <TouchableOpacity onPress={handleViewAllProducts}>
+            <View style={styles.sectionTitleRow}>
+              <Ionicons name="flame" size={20} color="#0D9488" />
+              <Text style={styles.sectionTitle}>Sản phẩm nổi bật</Text>
+            </View>
+            <TouchableOpacity
+              onPress={handleViewAllProducts}
+              style={styles.seeAllBtn}
+            >
               <Text style={styles.seeAllText}>Xem tất cả</Text>
+              <Ionicons
+                name="chevron-forward"
+                size={16}
+                color={Colors.light.primary}
+              />
             </TouchableOpacity>
           </View>
 
           {loadingProducts ? (
             <View style={styles.loadingContainer}>
               <ActivityIndicator size="small" color={Colors.light.primary} />
-              <Text style={styles.loadingText}>Đang tải...</Text>
+              <Text style={styles.loadingText}>Đang tải sản phẩm...</Text>
             </View>
           ) : (
-            <ScrollView
+            <FlatList
+              data={featuredProducts}
               horizontal
               showsHorizontalScrollIndicator={false}
-              style={styles.productsScroll}
-            >
-              {featuredProducts.map((product) => (
+              contentContainerStyle={styles.productsScroll}
+              keyExtractor={(item) => String(item.id)}
+              renderItem={({ item }) => (
                 <FeaturedProductCard
-                  key={product.id}
-                  product={product}
-                  onPress={() => handleProductPress(product.id)}
+                  product={item}
+                  onPress={() => handleProductPress(item.id)}
                 />
-              ))}
-            </ScrollView>
+              )}
+              ListEmptyComponent={
+                <View style={styles.emptyProducts}>
+                  <Ionicons name="cube-outline" size={40} color="#ccc" />
+                  <Text style={styles.emptyText}>Chưa có sản phẩm</Text>
+                </View>
+              }
+            />
           )}
         </View>
 
-        {/* Categories Grid */}
-        <View style={styles.categoriesHeader}>
-          <Text style={styles.sectionTitle}>📦 Danh mục dịch vụ</Text>
-        </View>
-        <View style={styles.grid}>
-          {CATEGORIES.map((item) => (
-            <CategoryCard key={item.id} item={item} />
-          ))}
-        </View>
-
-        {/* Info Section */}
-        <View style={styles.infoSection}>
-          <View style={styles.infoItem}>
-            <View style={[styles.infoIcon, { backgroundColor: "#E8F4FF" }]}>
-              <Ionicons name="shield-checkmark" size={24} color="#1976d2" />
-            </View>
-            <View style={styles.infoText}>
-              <Text style={styles.infoTitle}>Thợ đã xác minh</Text>
-              <Text style={styles.infoDesc}>
-                100% thợ được kiểm tra năng lực
-              </Text>
+        {/* Categories Grid - Modern Cards */}
+        <View style={styles.categoriesSection}>
+          <View style={styles.sectionHeader}>
+            <View style={styles.sectionTitleRow}>
+              <Ionicons name="grid" size={20} color="#0F766E" />
+              <Text style={styles.sectionTitle}>Danh mục dịch vụ</Text>
             </View>
           </View>
-
-          <View style={styles.infoItem}>
-            <View style={[styles.infoIcon, { backgroundColor: "#e8f5e9" }]}>
-              <Ionicons name="cash" size={24} color="#0066CC" />
-            </View>
-            <View style={styles.infoText}>
-              <Text style={styles.infoTitle}>Giá cả minh bạch</Text>
-              <Text style={styles.infoDesc}>
-                Báo giá rõ ràng, không phát sinh
-              </Text>
-            </View>
-          </View>
-
-          <View style={styles.infoItem}>
-            <View style={[styles.infoIcon, { backgroundColor: "#E8F4FF" }]}>
-              <Ionicons name="ribbon" size={24} color="#0066CC" />
-            </View>
-            <View style={styles.infoText}>
-              <Text style={styles.infoTitle}>Bảo hành công trình</Text>
-              <Text style={styles.infoDesc}>
-                Cam kết bảo hành theo thỏa thuận
-              </Text>
-            </View>
+          <View style={styles.grid}>
+            {CATEGORIES.map((item) => (
+              <CategoryCard key={item.id} item={item} />
+            ))}
           </View>
         </View>
 
-        <View style={{ height: 30 }} />
+        {/* Trust Badges */}
+        <View style={styles.trustSection}>
+          <Text style={styles.trustTitle}>Tại sao chọn chúng tôi?</Text>
+          <View style={styles.trustGrid}>
+            <View style={styles.trustItem}>
+              <LinearGradient
+                colors={["#E3F2FD", "#BBDEFB"]}
+                style={styles.trustIcon}
+              >
+                <Ionicons name="shield-checkmark" size={28} color="#1565C0" />
+              </LinearGradient>
+              <Text style={styles.trustItemTitle}>Đã xác minh</Text>
+              <Text style={styles.trustItemDesc}>100% thợ kiểm tra</Text>
+            </View>
+            <View style={styles.trustItem}>
+              <LinearGradient
+                colors={["#E8F5E9", "#C8E6C9"]}
+                style={styles.trustIcon}
+              >
+                <Ionicons name="cash" size={28} color="#2E7D32" />
+              </LinearGradient>
+              <Text style={styles.trustItemTitle}>Giá minh bạch</Text>
+              <Text style={styles.trustItemDesc}>Không phát sinh</Text>
+            </View>
+            <View style={styles.trustItem}>
+              <LinearGradient
+                colors={["#FFF3E0", "#FFE0B2"]}
+                style={styles.trustIcon}
+              >
+                <Ionicons name="ribbon" size={28} color="#E65100" />
+              </LinearGradient>
+              <Text style={styles.trustItemTitle}>Bảo hành</Text>
+              <Text style={styles.trustItemDesc}>Cam kết rõ ràng</Text>
+            </View>
+          </View>
+        </View>
+
+        <View style={{ height: 40 }} />
       </ScrollView>
-    </>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#F8FAFB",
   },
 
-  // Banner
-  banner: {
-    backgroundColor: Colors.light.primary,
-    padding: 20,
+  // Header
+  header: {
+    paddingBottom: 20,
+    paddingHorizontal: 16,
+  },
+  headerRow: {
     flexDirection: "row",
     alignItems: "center",
+    marginBottom: 16,
   },
-  bannerContent: {
+  headerBack: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "rgba(255,255,255,0.15)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  headerCenter: {
     flex: 1,
+    marginLeft: 12,
   },
-  bannerTitle: {
-    fontSize: 22,
-    fontWeight: "700",
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: "800",
     color: "#fff",
-    marginBottom: 8,
   },
-  bannerSubtitle: {
-    fontSize: 13,
-    color: "rgba(255,255,255,0.9)",
-    lineHeight: 20,
+  headerSubtitle: {
+    fontSize: 12,
+    color: "rgba(255,255,255,0.8)",
+    marginTop: 2,
   },
-  bannerIcon: {
-    marginLeft: 16,
+  headerSearch: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "rgba(255,255,255,0.15)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  statsRow: {
+    flexDirection: "row",
+    backgroundColor: "rgba(255,255,255,0.12)",
+    borderRadius: 16,
+    paddingVertical: 14,
+    paddingHorizontal: 8,
+  },
+  statItem: {
+    flex: 1,
+    alignItems: "center",
+  },
+  statNumber: {
+    fontSize: 18,
+    fontWeight: "800",
+    color: "#fff",
+  },
+  statLabel: {
+    fontSize: 11,
+    color: "rgba(255,255,255,0.75)",
+    marginTop: 2,
+  },
+  statDivider: {
+    width: 1,
+    backgroundColor: "rgba(255,255,255,0.2)",
+    marginVertical: 4,
   },
 
-  // Grid
+  // Products Section
+  productsSection: {
+    backgroundColor: "#fff",
+    marginTop: -8,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    paddingTop: 20,
+    paddingBottom: 16,
+  },
+  sectionHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    marginBottom: 14,
+  },
+  sectionTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  sectionTitle: {
+    fontSize: 17,
+    fontWeight: "700",
+    color: "#1A1A2E",
+  },
+  seeAllBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 2,
+  },
+  seeAllText: {
+    fontSize: 13,
+    color: Colors.light.primary,
+    fontWeight: "600",
+  },
+  productsScroll: {
+    paddingLeft: 16,
+    paddingRight: 8,
+  },
+  loadingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 32,
+    gap: 8,
+  },
+  loadingText: {
+    fontSize: 13,
+    color: "#999",
+  },
+  emptyProducts: {
+    alignItems: "center",
+    paddingVertical: 32,
+    paddingHorizontal: 60,
+    gap: 8,
+  },
+  emptyText: {
+    fontSize: 13,
+    color: "#999",
+  },
+
+  // Categories Section
+  categoriesSection: {
+    backgroundColor: "#fff",
+    marginTop: 10,
+    paddingTop: 20,
+    paddingBottom: 8,
+  },
   grid: {
-    padding: 12,
+    paddingHorizontal: 12,
   },
   card: {
-    height: 100,
-    borderRadius: 12,
+    height: 110,
+    borderRadius: 16,
     marginBottom: 12,
     overflow: "hidden",
     ...Platform.select({
       ios: {
         shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.12,
+        shadowRadius: 8,
       },
       android: {
-        elevation: 3,
+        elevation: 4,
       },
     }),
   },
@@ -442,7 +615,7 @@ const styles = StyleSheet.create({
   },
   cardOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0,0,0,0.45)",
+    backgroundColor: "rgba(0,0,0,0.4)",
   },
   cardContent: {
     flex: 1,
@@ -451,19 +624,20 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   iconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 12,
+    width: 52,
+    height: 52,
+    borderRadius: 16,
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: "rgba(255,255,255,0.2)",
   },
   cardInfo: {
     flex: 1,
     marginLeft: 14,
   },
   cardTitle: {
-    fontSize: 17,
-    fontWeight: "700",
+    fontSize: 18,
+    fontWeight: "800",
     color: "#fff",
     marginBottom: 4,
   },
@@ -473,120 +647,101 @@ const styles = StyleSheet.create({
   },
   cardMeta: {
     alignItems: "flex-end",
+    gap: 6,
   },
   workerCount: {
     fontSize: 12,
-    color: "rgba(255,255,255,0.9)",
-    marginBottom: 4,
-    fontWeight: "600",
-  },
-
-  // Info Section
-  infoSection: {
-    backgroundColor: "#fff",
-    margin: 12,
-    marginTop: 8,
+    color: "#fff",
+    fontWeight: "700",
+    backgroundColor: "rgba(255,255,255,0.2)",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
     borderRadius: 12,
-    padding: 16,
-  },
-  infoItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 16,
-  },
-  infoIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  infoText: {
-    flex: 1,
-    marginLeft: 14,
-  },
-  infoTitle: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#333",
-    marginBottom: 2,
-  },
-  infoDesc: {
-    fontSize: 12,
-    color: "#666",
+    overflow: "hidden",
   },
 
-  // Products Section
-  productsSection: {
+  // Trust Section
+  trustSection: {
     backgroundColor: "#fff",
-    marginTop: 12,
-    paddingVertical: 16,
+    marginTop: 10,
+    padding: 20,
   },
-  sectionHeader: {
+  trustTitle: {
+    fontSize: 17,
+    fontWeight: "700",
+    color: "#1A1A2E",
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  trustGrid: {
     flexDirection: "row",
     justifyContent: "space-between",
+  },
+  trustItem: {
+    flex: 1,
     alignItems: "center",
-    paddingHorizontal: 16,
-    marginBottom: 12,
+    paddingHorizontal: 4,
   },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#333",
-  },
-  seeAllText: {
-    fontSize: 13,
-    color: Colors.light.primary,
-    fontWeight: "500",
-  },
-  productsScroll: {
-    paddingLeft: 16,
-  },
-  loadingContainer: {
-    flexDirection: "row",
+  trustIcon: {
+    width: 60,
+    height: 60,
+    borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 24,
+    marginBottom: 10,
   },
-  loadingText: {
-    marginLeft: 8,
+  trustItemTitle: {
     fontSize: 13,
-    color: "#666",
+    fontWeight: "700",
+    color: "#1A1A2E",
+    textAlign: "center",
+    marginBottom: 4,
   },
-  categoriesHeader: {
-    paddingHorizontal: 12,
-    paddingTop: 16,
-    paddingBottom: 8,
+  trustItemDesc: {
+    fontSize: 11,
+    color: "#6B7280",
+    textAlign: "center",
   },
 
   // Product Card
   productCard: {
     width: PRODUCT_CARD_WIDTH,
     backgroundColor: "#fff",
-    borderRadius: 8,
+    borderRadius: 16,
     marginRight: 12,
     overflow: "hidden",
     borderWidth: 1,
-    borderColor: "#f0f0f0",
+    borderColor: "#E5E7EB",
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.06,
+        shadowRadius: 6,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
   },
   productImage: {
     width: "100%",
     height: PRODUCT_CARD_WIDTH,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#F5F5F5",
   },
   productBadge: {
     position: "absolute",
     top: 8,
     left: 8,
-    backgroundColor: Colors.light.primary,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
+    backgroundColor: "#0D9488",
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
   },
   productBadgeText: {
     color: "#fff",
     fontSize: 10,
-    fontWeight: "600",
+    fontWeight: "700",
   },
   productContent: {
     padding: 10,
@@ -596,12 +751,12 @@ const styles = StyleSheet.create({
     color: "#333",
     lineHeight: 16,
     height: 32,
-    marginBottom: 4,
+    marginBottom: 6,
   },
   productPrice: {
-    fontSize: 14,
-    fontWeight: "bold",
-    color: "#EE4D2D",
+    fontSize: 15,
+    fontWeight: "800",
+    color: "#0D9488",
     marginBottom: 4,
   },
   productMeta: {

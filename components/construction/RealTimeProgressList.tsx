@@ -69,11 +69,11 @@ export interface RealTimeProgressListProps {
 // ============================================================================
 
 const COLORS = {
-  primary: "#EE4D2D",
+  primary: "#0D9488",
   success: "#00BFA5",
   warning: "#FFB800",
   error: "#EF4444",
-  info: "#3B82F6",
+  info: "#0D9488",
   text: "#000000",
   textSecondary: "#757575",
   textTertiary: "#BDBDBD",

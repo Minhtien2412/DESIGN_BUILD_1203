@@ -85,28 +85,28 @@ const PERMIT_TYPES = [
     title: 'Nhà ở riêng lẻ',
     description: 'Dưới 7 tầng, diện tích < 250m²',
     icon: 'home-outline',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   {
     id: 2,
     title: 'Nhà ở liên kế',
     description: 'Nhà phố, liền kề',
     icon: 'business-outline',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   {
     id: 3,
     title: 'Công trình lớn',
     description: 'Từ 7 tầng trở lên, công trình công cộng',
     icon: 'business',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   {
     id: 4,
     title: 'Sửa chữa, cải tạo',
     description: 'Thay đổi kết cấu, nâng tầng',
     icon: 'construct-outline',
-    color: '#0066CC',
+    color: '#0D9488',
   },
 ];
 
@@ -148,9 +148,9 @@ const TimelineStep: React.FC<TimelineStepProps> = ({ step, isLast }) => {
   const getStatusColor = () => {
     switch (step.status) {
       case 'completed':
-        return '#0066CC';
+        return '#0D9488';
       case 'active':
-        return '#0066CC';
+        return '#0D9488';
       case 'pending':
         return '#e0e0e0';
       default:
@@ -210,7 +210,7 @@ const TimelineStep: React.FC<TimelineStepProps> = ({ step, isLast }) => {
             <View style={styles.detailsList}>
               {step.details.map((detail: string, idx: number) => (
                 <View key={idx} style={styles.detailItem}>
-                  <Ionicons name="checkmark" size={16} color="#0066CC" />
+                  <Ionicons name="checkmark" size={16} color="#0D9488" />
                   <Text style={styles.detailText}>{detail}</Text>
                 </View>
               ))}
@@ -222,12 +222,12 @@ const TimelineStep: React.FC<TimelineStepProps> = ({ step, isLast }) => {
                 <Text style={styles.documentsTitle}>Tài liệu tham khảo:</Text>
                 {step.documents.map((doc: any, idx: number) => (
                   <TouchableOpacity key={idx} style={styles.documentItem}>
-                    <Ionicons name="document-text" size={20} color="#0066CC" />
+                    <Ionicons name="document-text" size={20} color="#0D9488" />
                     <View style={styles.documentInfo}>
                       <Text style={styles.documentName}>{doc.name}</Text>
                       <Text style={styles.documentSize}>{doc.size}</Text>
                     </View>
-                    <Ionicons name="download-outline" size={20} color="#0066CC" />
+                    <Ionicons name="download-outline" size={20} color="#0D9488" />
                   </TouchableOpacity>
                 ))}
               </View>
@@ -269,7 +269,7 @@ export default function PermitScreen() {
       <Stack.Screen
         options={{
           title: 'Xin phép xây dựng',
-          headerStyle: { backgroundColor: '#0066CC' },
+          headerStyle: { backgroundColor: '#0D9488' },
           headerTintColor: '#fff',
           headerTitleStyle: { fontWeight: '600' },
         }}
@@ -278,7 +278,7 @@ export default function PermitScreen() {
         {/* Header Info */}
         <View style={styles.headerCard}>
           <View style={styles.headerIconCircle}>
-            <Ionicons name="document-text" size={32} color="#0066CC" />
+            <Ionicons name="document-text" size={32} color="#0D9488" />
           </View>
           <Text style={styles.headerTitle}>Quy trình xin giấy phép xây dựng</Text>
           <Text style={styles.headerDescription}>
@@ -327,7 +327,7 @@ export default function PermitScreen() {
                 onPress={() => setExpandedFaq(expandedFaq === faq.id ? null : faq.id)}
               >
                 <View style={styles.faqQuestion}>
-                  <Ionicons name="help-circle" size={20} color="#0066CC" />
+                  <Ionicons name="help-circle" size={20} color="#0D9488" />
                   <Text style={styles.faqQuestionText}>{faq.question}</Text>
                   <Ionicons
                     name={expandedFaq === faq.id ? 'chevron-up' : 'chevron-down'}
@@ -607,7 +607,7 @@ const styles = StyleSheet.create({
   ctaButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     paddingHorizontal: 32,
     paddingVertical: 14,
     borderRadius: 8,

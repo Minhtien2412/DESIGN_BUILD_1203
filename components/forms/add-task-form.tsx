@@ -30,15 +30,15 @@ interface AddTaskFormProps {
 
 const PRIORITY_CONFIG = {
   urgent: { label: 'Cấp bách', color: '#000000', icon: 'flash' as const },
-  high: { label: 'Cao', color: '#0066CC', icon: 'arrow-up' as const },
-  medium: { label: 'Trung bình', color: '#3B82F6', icon: 'remove' as const },
+  high: { label: 'Cao', color: '#0D9488', icon: 'arrow-up' as const },
+  medium: { label: 'Trung bình', color: '#0D9488', icon: 'remove' as const },
   low: { label: 'Thấp', color: '#6B7280', icon: 'arrow-down' as const },
 };
 
 const STATUS_CONFIG = {
   todo: { label: 'Cần làm', color: '#6B7280' },
-  'in-progress': { label: 'Đang làm', color: '#3B82F6' },
-  completed: { label: 'Hoàn thành', color: '#0066CC' },
+  'in-progress': { label: 'Đang làm', color: '#0D9488' },
+  completed: { label: 'Hoàn thành', color: '#0D9488' },
   blocked: { label: 'Bị chặn', color: '#000000' },
 };
 

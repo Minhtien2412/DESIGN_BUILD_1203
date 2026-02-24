@@ -27,7 +27,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'Tin nhắn',
     icon: 'chatbubbles',
     route: '/messages',
-    color: '#3b82f6',
+    color: '#0D9488',
   },
   
   // === SHOPPING ===
@@ -36,7 +36,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'Sản phẩm',
     icon: 'cube',
     route: '/shopping',
-    color: '#0066CC',
+    color: '#0D9488',
     requiredPermission: Permission.VIEW_PRODUCTS,
   },
   {
@@ -77,7 +77,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'Nhân công',
     icon: 'people',
     route: '/labor',
-    color: '#0066CC',
+    color: '#0D9488',
     requiredRole: [UserRole.STAFF, UserRole.MANAGER, UserRole.ADMIN],
   },
   
@@ -119,7 +119,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'RFI',
     icon: 'help-circle-outline',
     route: '/rfi',
-    color: '#0066CC',
+    color: '#0D9488',
     requiredRole: [UserRole.STAFF, UserRole.MANAGER, UserRole.ADMIN],
   },
   {
@@ -151,7 +151,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'Sổ tay O&M',
     icon: 'book-outline',
     route: '/om-manuals',
-    color: '#0066CC',
+    color: '#0D9488',
     requiredRole: [UserRole.STAFF, UserRole.MANAGER, UserRole.ADMIN],
   },
   
@@ -161,7 +161,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'Báo cáo hàng ngày',
     icon: 'today-outline',
     route: '/daily-report',
-    color: '#3b82f6',
+    color: '#0D9488',
     requiredRole: [UserRole.STAFF, UserRole.MANAGER, UserRole.ADMIN],
   },
   {
@@ -177,7 +177,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'Mua sắm',
     icon: 'bag-handle-outline',
     route: '/procurement',
-    color: '#0066CC',
+    color: '#0D9488',
     requiredRole: [UserRole.MANAGER, UserRole.ADMIN],
   },
   {
@@ -211,7 +211,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'Nghiệm thu',
     icon: 'checkmark-done-circle-outline',
     route: '/commissioning',
-    color: '#0066CC',
+    color: '#0D9488',
     requiredRole: [UserRole.MANAGER, UserRole.ADMIN],
   },
   {
@@ -235,7 +235,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'Môi trường',
     icon: 'leaf-outline',
     route: '/environmental',
-    color: '#0066CC',
+    color: '#0D9488',
     requiredRole: [UserRole.STAFF, UserRole.MANAGER, UserRole.ADMIN],
   },
   
@@ -245,7 +245,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'QC/QA',
     icon: 'shield-checkmark-outline',
     route: '/quality-assurance',
-    color: '#0066CC',
+    color: '#0D9488',
     requiredRole: [UserRole.STAFF, UserRole.MANAGER, UserRole.ADMIN],
   },
   {
@@ -269,7 +269,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'Danh sách khuyết tật',
     icon: 'list-outline',
     route: '/punch-list',
-    color: '#0066CC',
+    color: '#0D9488',
     requiredRole: [UserRole.STAFF, UserRole.MANAGER, UserRole.ADMIN],
   },
   {
@@ -285,7 +285,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'Giai đoạn',
     icon: 'layers-outline',
     route: '/timeline/phases',
-    color: '#3b82f6',
+    color: '#0D9488',
     requiredRole: [UserRole.STAFF, UserRole.MANAGER, UserRole.ADMIN],
   },
   {
@@ -311,7 +311,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'Ngân sách',
     icon: 'wallet-outline',
     route: '/budget',
-    color: '#0066CC',
+    color: '#0D9488',
     requiredRole: [UserRole.MANAGER, UserRole.ADMIN],
   },
   {
@@ -327,7 +327,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'Hóa đơn',
     icon: 'receipt-outline',
     route: '/budget/invoices',
-    color: '#0066CC',
+    color: '#0D9488',
     requiredRole: [UserRole.MANAGER, UserRole.ADMIN],
   },
   {
@@ -633,7 +633,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'flex-start',
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#0D9488',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,

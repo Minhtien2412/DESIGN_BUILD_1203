@@ -7,18 +7,78 @@
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { Href, router } from "expo-router";
-import { memo, useEffect, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import {
-    Animated,
-    Dimensions,
-    Image,
-    Linking,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Animated,
+  Dimensions,
+  Easing,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
+
+// ============================================================================
+// ANIMATION HOOKS
+// ============================================================================
+
+/** Fade-in + slide-up entrance animation */
+const useEntranceAnim = (delay = 0) => {
+  const opacity = useRef(new Animated.Value(0)).current;
+  const translateY = useRef(new Animated.Value(24)).current;
+
+  useEffect(() => {
+    const anim = Animated.parallel([
+      Animated.timing(opacity, {
+        toValue: 1,
+        duration: 500,
+        delay,
+        useNativeDriver: true,
+        easing: Easing.out(Easing.cubic),
+      }),
+      Animated.timing(translateY, {
+        toValue: 0,
+        duration: 500,
+        delay,
+        useNativeDriver: true,
+        easing: Easing.out(Easing.cubic),
+      }),
+    ]);
+    anim.start();
+    return () => anim.stop();
+  }, [delay, opacity, translateY]);
+
+  return { opacity, transform: [{ translateY }] };
+};
+
+/** Animated number counter — counts from 0 to target */
+const useAnimatedCounter = (target: number, duration = 1200) => {
+  const [display, setDisplay] = useState(0);
+  const animRef = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (target <= 0) return;
+    animRef.setValue(0);
+    const listener = animRef.addListener(({ value }) => {
+      setDisplay(Math.round(value));
+    });
+    const anim = Animated.timing(animRef, {
+      toValue: target,
+      duration,
+      easing: Easing.out(Easing.quad),
+      useNativeDriver: false,
+    });
+    anim.start();
+    return () => {
+      anim.stop();
+      animRef.removeListener(listener);
+    };
+  }, [target, duration, animRef]);
+
+  return display;
+};
 
 const { width } = Dimensions.get("window");
 
@@ -26,18 +86,25 @@ const { width } = Dimensions.get("window");
 // COLORS
 // ============================================================================
 const COLORS = {
-  primary: "#7CB342",
-  secondary: "#43A047",
-  accent: "#FF6B6B",
+  primary: "#0D9488",
+  secondary: "#0284C7",
+  accent: "#F97316",
   white: "#FFFFFF",
-  bg: "#F8F9FA",
-  text: "#212121",
-  textLight: "#757575",
-  border: "#E0E0E0",
-  success: "#4CAF50",
-  warning: "#FF9800",
-  error: "#F44336",
-  info: "#2196F3",
+  bg: "#F0F4F8",
+  text: "#1E293B",
+  textLight: "#64748B",
+  border: "#CBD5E1",
+  success: "#10B981",
+  warning: "#F59E0B",
+  error: "#EF4444",
+  info: "#0EA5E9",
+};
+
+// ============================================================================
+// UTILITY FUNCTIONS
+// ============================================================================
+const formatPrice = (price: number) => {
+  return price.toLocaleString("vi-VN") + "đ";
 };
 
 // ============================================================================
@@ -63,30 +130,37 @@ const QUICK_ACTIONS: QuickAction[] = [
   {
     id: "chat",
     icon: "chatbubble-ellipses",
-    label: "Chat",
+    label: "Chat tư vấn",
     color: "#2196F3",
     route: "/chat",
   },
   {
-    id: "zalo",
-    icon: "logo-whatsapp",
-    label: "Zalo",
-    color: "#0068FF",
-    action: () => Linking.openURL("https://zalo.me/0123456789"),
+    id: "ai",
+    icon: "sparkles",
+    label: "AI Thiết kế",
+    color: "#7C3AED",
+    route: "/ai-design",
   },
   {
-    id: "video",
-    icon: "videocam",
-    label: "Video Call",
-    color: "#9C27B0",
-    route: "/meetings",
+    id: "workers",
+    icon: "construct",
+    label: "Tìm thợ",
+    color: "#EF6C00",
+    route: "/workers",
+  },
+  {
+    id: "calculator",
+    icon: "calculator",
+    label: "Dự toán",
+    color: "#00897B",
+    route: "/calculators",
   },
 ];
 
 export const QuickActionsSection = memo(() => {
   return (
     <View style={quickStyles.container}>
-      <Text style={quickStyles.title}>⚡ TRUY CẬP NHANH</Text>
+      <Text style={quickStyles.title}>TRUY CẬP NHANH</Text>
       <View style={quickStyles.grid}>
         {QUICK_ACTIONS.map((action) => (
           <TouchableOpacity
@@ -130,10 +204,13 @@ const quickStyles = StyleSheet.create({
   },
   grid: {
     flexDirection: "row",
+    flexWrap: "wrap",
     justifyContent: "space-around",
     backgroundColor: COLORS.white,
     borderRadius: 12,
-    paddingVertical: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    rowGap: 12,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -142,7 +219,7 @@ const quickStyles = StyleSheet.create({
   },
   item: {
     alignItems: "center",
-    flex: 1,
+    width: "33%",
   },
   iconContainer: {
     width: 48,
@@ -194,7 +271,7 @@ const DEAL_BANNERS: DealBanner[] = [
     id: 3,
     title: "TÌ DEAL NHƯ MƠ",
     subtitle: "NĂM MỚI NHƯ Ý",
-    colors: ["#EE4D2D", "#FF7043"],
+    colors: ["#0D9488", "#FF7043"],
     route: "/promotions/tet-deal",
     icon: "gift",
   },
@@ -313,7 +390,7 @@ const dealStyles = StyleSheet.create({
 });
 
 // ============================================================================
-// 2. FLASH SALE COUNTDOWN - SHOPEE STYLE
+// 2. FLASH SALE COUNTDOWN - SHOPEE STYLE (Now accepts real data)
 // ============================================================================
 interface FlashSaleItem {
   id: number;
@@ -329,17 +406,19 @@ interface FlashSaleItem {
   voucherText?: string;
   location?: string;
   deliveryDays?: string;
+  route?: string;
 }
 
-const FLASH_SALE_ITEMS: FlashSaleItem[] = [
+// Fallback items only used when no API data
+const FLASH_SALE_FALLBACK: FlashSaleItem[] = [
   {
     id: 1,
-    name: "Thiết bị bếp cao cấp inox 304",
-    image: "https://picsum.photos/120/120?random=20",
-    originalPrice: 5000000,
-    salePrice: 3500000,
-    sold: 45,
-    total: 100,
+    name: "Gạch AAC siêu nhẹ 60x20x10cm",
+    image: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=300",
+    originalPrice: 55000,
+    salePrice: 42000,
+    sold: 306,
+    total: 500,
     rating: 4.8,
     hasVoucher: true,
     voucherText: "2.2",
@@ -348,279 +427,258 @@ const FLASH_SALE_ITEMS: FlashSaleItem[] = [
   },
   {
     id: 2,
-    name: "Bồn cầu thông minh tự động",
-    image: "https://picsum.photos/120/120?random=21",
-    originalPrice: 8000000,
-    salePrice: 5600000,
-    sold: 78,
-    total: 100,
-    rating: 5.0,
+    name: "Sơn Dulux Inspire nội thất 5L",
+    image: "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=300",
+    originalPrice: 580000,
+    salePrice: 450000,
+    sold: 212,
+    total: 400,
+    rating: 4.9,
     isLive: true,
     location: "Hà Nội",
     deliveryDays: "4 Giờ",
   },
   {
     id: 3,
-    name: "Đèn LED trang trí nội thất",
-    image: "https://picsum.photos/120/120?random=22",
-    originalPrice: 1500000,
-    salePrice: 900000,
-    sold: 92,
-    total: 100,
-    rating: 4.9,
+    name: "Đèn LED âm trần 9W",
+    image: "https://images.unsplash.com/photo-1524484485831-a92ffc0de03f?w=300",
+    originalPrice: 120000,
+    salePrice: 85000,
+    sold: 255,
+    total: 350,
+    rating: 4.7,
     hasVoucher: true,
     voucherText: "XTRA",
-    location: "Đà Nẵng",
-  },
-  {
-    id: 4,
-    name: "Vòi sen cao cấp mạ chrome",
-    image: "https://picsum.photos/120/120?random=23",
-    originalPrice: 2000000,
-    salePrice: 1200000,
-    sold: 55,
-    total: 100,
-    rating: 4.7,
-    location: "TP. Hồ Chí Minh",
-  },
-  {
-    id: 5,
-    name: "Gạch lát nền vân đá marble",
-    image: "https://picsum.photos/120/120?random=24",
-    originalPrice: 350000,
-    salePrice: 237150,
-    sold: 4000,
-    total: 5000,
-    rating: 4.8,
-    isLive: true,
-    hasVoucher: true,
-    voucherText: "2.2",
     location: "Bình Dương",
-  },
-  {
-    id: 6,
-    name: "Sơn nội thất cao cấp 18L",
-    image: "https://picsum.photos/120/120?random=25",
-    originalPrice: 1800000,
-    salePrice: 1368000,
-    sold: 85,
-    total: 150,
-    rating: 4.6,
-    hasVoucher: true,
-    voucherText: "STYLE",
-    location: "Hà Nội",
-    deliveryDays: "3-5 ngày",
-  },
-  {
-    id: 7,
-    name: "Máy khoan Bosch chính hãng",
-    image: "https://picsum.photos/120/120?random=26",
-    originalPrice: 2500000,
-    salePrice: 1750000,
-    sold: 120,
-    total: 200,
-    rating: 4.9,
-    location: "TP. Hồ Chí Minh",
-  },
-  {
-    id: 8,
-    name: "Thước đo laser 50m chuyên dụng",
-    image: "https://picsum.photos/120/120?random=27",
-    originalPrice: 800000,
-    salePrice: 560000,
-    sold: 230,
-    total: 300,
-    rating: 4.5,
-    isLive: true,
-    location: "Đồng Nai",
   },
 ];
 
-export const FlashSaleSection = memo(() => {
-  const [timeLeft, setTimeLeft] = useState({
-    hours: 2,
-    minutes: 30,
-    seconds: 45,
-  });
+export const FlashSaleSection = memo(
+  ({ items }: { items?: FlashSaleItem[] }) => {
+    const displayItems =
+      items && items.length > 0 ? items : FLASH_SALE_FALLBACK;
+    const entrance = useEntranceAnim(100);
+    const pulseAnim = useRef(new Animated.Value(1)).current;
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        let { hours, minutes, seconds } = prev;
-        seconds--;
-        if (seconds < 0) {
-          seconds = 59;
-          minutes--;
-          if (minutes < 0) {
-            minutes = 59;
-            hours--;
-            if (hours < 0) {
-              hours = 23;
+    const [timeLeft, setTimeLeft] = useState({
+      hours: 2,
+      minutes: 30,
+      seconds: 45,
+    });
+
+    // Pulse the "FLASH SALE" title every 2 seconds
+    useEffect(() => {
+      const pulse = Animated.loop(
+        Animated.sequence([
+          Animated.timing(pulseAnim, {
+            toValue: 1.08,
+            duration: 600,
+            useNativeDriver: true,
+            easing: Easing.inOut(Easing.ease),
+          }),
+          Animated.timing(pulseAnim, {
+            toValue: 1,
+            duration: 600,
+            useNativeDriver: true,
+            easing: Easing.inOut(Easing.ease),
+          }),
+        ]),
+      );
+      pulse.start();
+      return () => pulse.stop();
+    }, [pulseAnim]);
+
+    useEffect(() => {
+      const timer = setInterval(() => {
+        setTimeLeft((prev) => {
+          let { hours, minutes, seconds } = prev;
+          seconds--;
+          if (seconds < 0) {
+            seconds = 59;
+            minutes--;
+            if (minutes < 0) {
               minutes = 59;
-              seconds = 59;
+              hours--;
+              if (hours < 0) {
+                hours = 23;
+                minutes = 59;
+                seconds = 59;
+              }
             }
           }
-        }
-        return { hours, minutes, seconds };
-      });
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
+          return { hours, minutes, seconds };
+        });
+      }, 1000);
+      return () => clearInterval(timer);
+    }, []);
 
-  const formatPrice = (price: number) => {
-    return price.toLocaleString("vi-VN") + "đ";
-  };
+    const TimeBox = ({ value, label }: { value: number; label: string }) => (
+      <View style={flashStyles.timeBox}>
+        <Text style={flashStyles.timeValue}>
+          {String(value).padStart(2, "0")}
+        </Text>
+        <Text style={flashStyles.timeLabel}>{label}</Text>
+      </View>
+    );
 
-  const TimeBox = ({ value, label }: { value: number; label: string }) => (
-    <View style={flashStyles.timeBox}>
-      <Text style={flashStyles.timeValue}>
-        {String(value).padStart(2, "0")}
-      </Text>
-      <Text style={flashStyles.timeLabel}>{label}</Text>
-    </View>
-  );
-
-  return (
-    <View style={flashStyles.container}>
-      <LinearGradient
-        colors={["#FF6B6B", "#FF8E53"]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
-        style={flashStyles.header}
-      >
-        <View style={flashStyles.headerLeft}>
-          <Text style={flashStyles.title}>🔥 FLASH SALE</Text>
-          <View style={flashStyles.countdown}>
-            <TimeBox value={timeLeft.hours} label="giờ" />
-            <Text style={flashStyles.separator}>:</Text>
-            <TimeBox value={timeLeft.minutes} label="phút" />
-            <Text style={flashStyles.separator}>:</Text>
-            <TimeBox value={timeLeft.seconds} label="giây" />
-          </View>
-        </View>
-        <TouchableOpacity onPress={() => router.push("/flash-sale" as Href)}>
-          <Text style={flashStyles.seeAll}>Xem tất cả →</Text>
-        </TouchableOpacity>
-      </LinearGradient>
-
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={flashStyles.itemsContainer}
-      >
-        {FLASH_SALE_ITEMS.map((item) => {
-          const discount = Math.round(
-            (1 - item.salePrice / item.originalPrice) * 100,
-          );
-          const progress = item.sold / item.total;
-          const soldDisplay =
-            item.sold >= 1000
-              ? `${(item.sold / 1000).toFixed(0)}k+`
-              : item.sold.toString();
-          return (
-            <TouchableOpacity
-              key={item.id}
-              style={flashStyles.item}
-              onPress={() => router.push(`/product/${item.id}` as Href)}
-              activeOpacity={0.8}
+    return (
+      <Animated.View style={[flashStyles.container, entrance]}>
+        <LinearGradient
+          colors={["#FF6B6B", "#FF8E53"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={flashStyles.header}
+        >
+          <View style={flashStyles.headerLeft}>
+            <Animated.Text
+              style={[flashStyles.title, { transform: [{ scale: pulseAnim }] }]}
             >
-              <View style={flashStyles.imageContainer}>
-                <Image source={{ uri: item.image }} style={flashStyles.image} />
-                {/* Discount badge */}
-                <View style={flashStyles.discountBadge}>
-                  <Text style={flashStyles.discountText}>-{discount}%</Text>
-                </View>
-                {/* Live badge */}
-                {item.isLive && (
-                  <View style={flashStyles.liveBadge}>
-                    <View style={flashStyles.liveDot} />
-                    <Text style={flashStyles.liveText}>LIVE</Text>
+              🔥 FLASH SALE
+            </Animated.Text>
+            <View style={flashStyles.countdown}>
+              <TimeBox value={timeLeft.hours} label="giờ" />
+              <Text style={flashStyles.separator}>:</Text>
+              <TimeBox value={timeLeft.minutes} label="phút" />
+              <Text style={flashStyles.separator}>:</Text>
+              <TimeBox value={timeLeft.seconds} label="giây" />
+            </View>
+          </View>
+          <TouchableOpacity onPress={() => router.push("/flash-sale" as Href)}>
+            <Text style={flashStyles.seeAll}>Xem tất cả →</Text>
+          </TouchableOpacity>
+        </LinearGradient>
+
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={flashStyles.itemsContainer}
+        >
+          {displayItems.map((item) => {
+            const discount = Math.round(
+              (1 - item.salePrice / item.originalPrice) * 100,
+            );
+            const progress = item.sold / item.total;
+            const soldDisplay =
+              item.sold >= 1000
+                ? `${(item.sold / 1000).toFixed(0)}k+`
+                : item.sold.toString();
+            return (
+              <TouchableOpacity
+                key={item.id}
+                style={flashStyles.item}
+                onPress={() =>
+                  router.push((item.route || `/product/${item.id}`) as Href)
+                }
+                activeOpacity={0.8}
+              >
+                <View style={flashStyles.imageContainer}>
+                  <Image
+                    source={{ uri: item.image }}
+                    style={flashStyles.image}
+                  />
+                  {/* Discount badge */}
+                  <View style={flashStyles.discountBadge}>
+                    <Text style={flashStyles.discountText}>-{discount}%</Text>
                   </View>
-                )}
-                {/* Voucher badge */}
-                {item.hasVoucher && item.voucherText && (
-                  <View style={flashStyles.voucherBadge}>
-                    <Text style={flashStyles.voucherText}>
-                      {item.voucherText}
-                    </Text>
-                    <Text style={flashStyles.voucherLabel}>VOUCHER</Text>
-                  </View>
-                )}
-              </View>
-
-              <Text style={flashStyles.itemName} numberOfLines={2}>
-                {item.name}
-              </Text>
-
-              {/* Rating */}
-              {item.rating && (
-                <View style={flashStyles.ratingContainer}>
-                  <Ionicons name="star" size={10} color="#FFB800" />
-                  <Text style={flashStyles.ratingText}>{item.rating}</Text>
-                </View>
-              )}
-
-              {/* Price section */}
-              <View style={flashStyles.priceContainer}>
-                <Text style={flashStyles.salePrice}>
-                  {formatPrice(item.salePrice)}
-                </Text>
-                <Ionicons name="pricetag-outline" size={12} color="#EE4D2D" />
-              </View>
-
-              {/* Sold count */}
-              <Text style={flashStyles.soldText}>Đã bán {soldDisplay}</Text>
-
-              {/* Delivery & Location */}
-              {(item.deliveryDays || item.location) && (
-                <View style={flashStyles.deliveryContainer}>
-                  {item.deliveryDays && (
-                    <View style={flashStyles.deliveryBadge}>
-                      <Ionicons name="car-outline" size={10} color="#26AA99" />
-                      <Text style={flashStyles.deliveryText}>
-                        {item.deliveryDays}
-                      </Text>
+                  {/* Live badge */}
+                  {item.isLive && (
+                    <View style={flashStyles.liveBadge}>
+                      <View style={flashStyles.liveDot} />
+                      <Text style={flashStyles.liveText}>LIVE</Text>
                     </View>
                   )}
-                  {item.location && (
-                    <View style={flashStyles.locationRow}>
-                      <Ionicons
-                        name="location-outline"
-                        size={10}
-                        color="#757575"
-                      />
-                      <Text style={flashStyles.locationText} numberOfLines={1}>
-                        {item.location}
+                  {/* Voucher badge */}
+                  {item.hasVoucher && item.voucherText && (
+                    <View style={flashStyles.voucherBadge}>
+                      <Text style={flashStyles.voucherText}>
+                        {item.voucherText}
                       </Text>
+                      <Text style={flashStyles.voucherLabel}>VOUCHER</Text>
                     </View>
                   )}
                 </View>
-              )}
 
-              {/* Progress bar */}
-              <View style={flashStyles.progressContainer}>
-                <LinearGradient
-                  colors={["#FF6B6B", "#EE4D2D"] as [string, string]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  style={[
-                    flashStyles.progressBar,
-                    { width: `${Math.min(progress * 100, 100)}%` },
-                  ]}
-                />
-                <Text style={flashStyles.progressText}>
-                  {progress >= 0.8
-                    ? "SẮP HẾT"
-                    : `${Math.round(progress * 100)}%`}
+                <Text style={flashStyles.itemName} numberOfLines={2}>
+                  {item.name}
                 </Text>
-              </View>
-            </TouchableOpacity>
-          );
-        })}
-      </ScrollView>
-    </View>
-  );
-});
+
+                {/* Rating */}
+                {item.rating && (
+                  <View style={flashStyles.ratingContainer}>
+                    <Ionicons name="star" size={10} color="#FFB800" />
+                    <Text style={flashStyles.ratingText}>{item.rating}</Text>
+                  </View>
+                )}
+
+                {/* Price section */}
+                <View style={flashStyles.priceContainer}>
+                  <Text style={flashStyles.salePrice}>
+                    {formatPrice(item.salePrice)}
+                  </Text>
+                  <Ionicons name="pricetag-outline" size={12} color="#0D9488" />
+                </View>
+
+                {/* Sold count */}
+                <Text style={flashStyles.soldText}>Đã bán {soldDisplay}</Text>
+
+                {/* Delivery & Location */}
+                {(item.deliveryDays || item.location) && (
+                  <View style={flashStyles.deliveryContainer}>
+                    {item.deliveryDays && (
+                      <View style={flashStyles.deliveryBadge}>
+                        <Ionicons
+                          name="car-outline"
+                          size={10}
+                          color="#26AA99"
+                        />
+                        <Text style={flashStyles.deliveryText}>
+                          {item.deliveryDays}
+                        </Text>
+                      </View>
+                    )}
+                    {item.location && (
+                      <View style={flashStyles.locationRow}>
+                        <Ionicons
+                          name="location-outline"
+                          size={10}
+                          color="#757575"
+                        />
+                        <Text
+                          style={flashStyles.locationText}
+                          numberOfLines={1}
+                        >
+                          {item.location}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                )}
+
+                {/* Progress bar */}
+                <View style={flashStyles.progressContainer}>
+                  <LinearGradient
+                    colors={["#FF6B6B", "#0D9488"] as [string, string]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={[
+                      flashStyles.progressBar,
+                      { width: `${Math.min(progress * 100, 100)}%` },
+                    ]}
+                  />
+                  <Text style={flashStyles.progressText}>
+                    {progress >= 0.8
+                      ? "SẮP HẾT"
+                      : `${Math.round(progress * 100)}%`}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+      </Animated.View>
+    );
+  },
+);
 
 const flashStyles = StyleSheet.create({
   container: {
@@ -709,7 +767,7 @@ const flashStyles = StyleSheet.create({
     position: "absolute",
     top: 0,
     right: 0,
-    backgroundColor: "#EE4D2D",
+    backgroundColor: "#0D9488",
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderBottomLeftRadius: 8,
@@ -723,7 +781,7 @@ const flashStyles = StyleSheet.create({
     position: "absolute",
     top: 8,
     left: 8,
-    backgroundColor: "#EE4D2D",
+    backgroundColor: "#0D9488",
     paddingHorizontal: 6,
     paddingVertical: 3,
     borderRadius: 4,
@@ -746,7 +804,7 @@ const flashStyles = StyleSheet.create({
     position: "absolute",
     bottom: 8,
     left: 8,
-    backgroundColor: "#EE4D2D",
+    backgroundColor: "#0D9488",
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 2,
@@ -798,7 +856,7 @@ const flashStyles = StyleSheet.create({
   salePrice: {
     fontSize: 15,
     fontWeight: "700",
-    color: "#EE4D2D",
+    color: "#0D9488",
   },
   originalPrice: {
     fontSize: 10,
@@ -931,7 +989,7 @@ export const LiveVideoSection = memo(() => {
             onPress={() => router.push("/live" as Href)}
           >
             <Text style={liveVideoStyles.sectionTitle}>XÂY DỰNG LIVE</Text>
-            <Ionicons name="chevron-forward" size={16} color="#EE4D2D" />
+            <Ionicons name="chevron-forward" size={16} color="#0D9488" />
           </TouchableOpacity>
           <ScrollView
             horizontal
@@ -972,7 +1030,7 @@ export const LiveVideoSection = memo(() => {
             onPress={() => router.push("/videos" as Href)}
           >
             <Text style={liveVideoStyles.sectionTitle}>XÂY DỰNG VIDEO</Text>
-            <Ionicons name="chevron-forward" size={16} color="#EE4D2D" />
+            <Ionicons name="chevron-forward" size={16} color="#0D9488" />
           </TouchableOpacity>
           <ScrollView
             horizontal
@@ -1031,7 +1089,7 @@ const liveVideoStyles = StyleSheet.create({
   sectionTitle: {
     fontSize: 13,
     fontWeight: "700",
-    color: "#EE4D2D",
+    color: "#0D9488",
     flex: 1,
   },
   scrollContent: {
@@ -1058,7 +1116,7 @@ const liveVideoStyles = StyleSheet.create({
     position: "absolute",
     top: 4,
     left: 4,
-    backgroundColor: "#EE4D2D",
+    backgroundColor: "#0D9488",
     paddingHorizontal: 5,
     paddingVertical: 2,
     borderRadius: 3,
@@ -1103,7 +1161,7 @@ const liveVideoStyles = StyleSheet.create({
 });
 
 // ============================================================================
-// 3. TOP RATED WORKERS
+// 3. TOP RATED WORKERS (Now accepts real API data)
 // ============================================================================
 interface TopWorker {
   id: number;
@@ -1114,108 +1172,133 @@ interface TopWorker {
   reviews: number;
   location: string;
   verified: boolean;
+  completedJobs?: number;
+  experience?: number;
+  dailyRate?: number;
 }
 
-const TOP_WORKERS: TopWorker[] = [
+const TOP_WORKERS_FALLBACK: TopWorker[] = [
   {
     id: 1,
-    name: "Nguyễn Văn A",
+    name: "Nguyễn Văn Hùng",
     avatar: "https://i.pravatar.cc/100?img=1",
     specialty: "Thợ xây",
-    rating: 4.9,
+    rating: 4.8,
     reviews: 156,
-    location: "Sài Gòn",
+    location: "TP.HCM",
     verified: true,
+    completedJobs: 45,
   },
   {
     id: 2,
-    name: "Trần Văn B",
+    name: "Trần Minh Đức",
     avatar: "https://i.pravatar.cc/100?img=2",
     specialty: "Thợ điện",
-    rating: 4.8,
+    rating: 4.9,
     reviews: 203,
-    location: "Hà Nội",
+    location: "TP.HCM",
     verified: true,
+    completedJobs: 67,
   },
   {
     id: 3,
-    name: "Lê Văn C",
+    name: "Lê Thị Mai",
     avatar: "https://i.pravatar.cc/100?img=3",
     specialty: "Thợ sơn",
-    rating: 4.8,
-    reviews: 89,
-    location: "Đà Nẵng",
-    verified: true,
-  },
-  {
-    id: 4,
-    name: "Phạm Văn D",
-    avatar: "https://i.pravatar.cc/100?img=4",
-    specialty: "Thợ nội thất",
     rating: 4.7,
-    reviews: 124,
-    location: "Sài Gòn",
-    verified: false,
+    reviews: 89,
+    location: "TP.HCM",
+    verified: true,
+    completedJobs: 38,
   },
 ];
 
-export const TopRatedWorkersSection = memo(() => {
-  return (
-    <View style={workerStyles.container}>
-      <View style={workerStyles.header}>
-        <Text style={workerStyles.title}>⭐ THỢ ĐÁNH GIÁ CAO</Text>
-        <TouchableOpacity
-          onPress={() => router.push("/workers?sort=rating" as Href)}
-        >
-          <Text style={workerStyles.seeAll}>XEM THÊM</Text>
-        </TouchableOpacity>
-      </View>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={workerStyles.list}
-      >
-        {TOP_WORKERS.map((worker) => (
+export const TopRatedWorkersSection = memo(
+  ({ workers }: { workers?: TopWorker[] }) => {
+    const displayWorkers =
+      workers && workers.length > 0 ? workers : TOP_WORKERS_FALLBACK;
+    const entrance = useEntranceAnim(150);
+
+    return (
+      <Animated.View style={[workerStyles.container, entrance]}>
+        <View style={workerStyles.header}>
+          <View style={workerStyles.headerLeft}>
+            <Text style={workerStyles.title}>THỢ ĐÁNH GIÁ CAO</Text>
+            <View style={workerStyles.countBadge}>
+              <Text style={workerStyles.countText}>
+                {displayWorkers.length}
+              </Text>
+            </View>
+          </View>
           <TouchableOpacity
-            key={worker.id}
-            style={workerStyles.card}
-            onPress={() => router.push(`/workers/${worker.id}` as Href)}
-            activeOpacity={0.8}
+            onPress={() => router.push("/workers?sort=rating" as Href)}
           >
-            <View style={workerStyles.avatarContainer}>
-              <Image
-                source={{ uri: worker.avatar }}
-                style={workerStyles.avatar}
-              />
-              {worker.verified && (
-                <View style={workerStyles.verifiedBadge}>
-                  <Ionicons name="checkmark-circle" size={16} color="#4CAF50" />
+            <Text style={workerStyles.seeAll}>XEM THÊM</Text>
+          </TouchableOpacity>
+        </View>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={workerStyles.list}
+        >
+          {displayWorkers.map((worker) => (
+            <TouchableOpacity
+              key={worker.id}
+              style={workerStyles.card}
+              onPress={() => router.push(`/workers/${worker.id}` as Href)}
+              activeOpacity={0.8}
+            >
+              <View style={workerStyles.avatarContainer}>
+                <Image
+                  source={{ uri: worker.avatar }}
+                  style={workerStyles.avatar}
+                />
+                {worker.verified && (
+                  <View style={workerStyles.verifiedBadge}>
+                    <Ionicons
+                      name="checkmark-circle"
+                      size={16}
+                      color="#4CAF50"
+                    />
+                  </View>
+                )}
+              </View>
+              <Text style={workerStyles.name} numberOfLines={1}>
+                {worker.name}
+              </Text>
+              <Text style={workerStyles.specialty}>{worker.specialty}</Text>
+              <View style={workerStyles.ratingRow}>
+                <Ionicons name="star" size={12} color="#FFB300" />
+                <Text style={workerStyles.rating}>{worker.rating}</Text>
+                <Text style={workerStyles.reviews}>({worker.reviews})</Text>
+              </View>
+              {worker.completedJobs != null && worker.completedJobs > 0 && (
+                <View style={workerStyles.jobsRow}>
+                  <Ionicons
+                    name="briefcase-outline"
+                    size={10}
+                    color="#4CAF50"
+                  />
+                  <Text style={workerStyles.jobsText}>
+                    {worker.completedJobs} dự án
+                  </Text>
                 </View>
               )}
-            </View>
-            <Text style={workerStyles.name} numberOfLines={1}>
-              {worker.name}
-            </Text>
-            <Text style={workerStyles.specialty}>{worker.specialty}</Text>
-            <View style={workerStyles.ratingRow}>
-              <Ionicons name="star" size={12} color="#FFB300" />
-              <Text style={workerStyles.rating}>{worker.rating}</Text>
-              <Text style={workerStyles.reviews}>({worker.reviews})</Text>
-            </View>
-            <View style={workerStyles.locationRow}>
-              <Ionicons
-                name="location-outline"
-                size={10}
-                color={COLORS.textLight}
-              />
-              <Text style={workerStyles.location}>{worker.location}</Text>
-            </View>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-    </View>
-  );
-});
+              <View style={workerStyles.locationRow}>
+                <Ionicons
+                  name="location-outline"
+                  size={10}
+                  color={COLORS.textLight}
+                />
+                <Text style={workerStyles.location}>{worker.location}</Text>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </Animated.View>
+    );
+  },
+);
 
 const workerStyles = StyleSheet.create({
   container: {
@@ -1227,6 +1310,22 @@ const workerStyles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 12,
+  },
+  headerLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  countBadge: {
+    backgroundColor: "#0D9488",
+    borderRadius: 10,
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+  },
+  countText: {
+    color: COLORS.white,
+    fontSize: 10,
+    fontWeight: "700",
   },
   title: {
     fontSize: 14,
@@ -1305,6 +1404,17 @@ const workerStyles = StyleSheet.create({
   location: {
     fontSize: 9,
     color: COLORS.textLight,
+  },
+  jobsRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3,
+    marginBottom: 3,
+  },
+  jobsText: {
+    fontSize: 9,
+    color: "#4CAF50",
+    fontWeight: "500",
   },
 });
 
@@ -1516,11 +1626,11 @@ const aiStyles = StyleSheet.create({
 });
 
 // ============================================================================
-// 6. PROMOTION BANNER SLIDER
+// 6. PROMOTION BANNER SLIDER - Local banners from assets/banner
 // ============================================================================
 interface PromoBanner {
   id: number;
-  image: string;
+  image: any;
   title: string;
   subtitle: string;
   colors: [string, string];
@@ -1530,57 +1640,56 @@ interface PromoBanner {
 const PROMO_BANNERS: PromoBanner[] = [
   {
     id: 1,
-    image: "https://picsum.photos/400/150?random=50",
-    title: "TIỆN ÍCH HOÀN THIỆN",
-    subtitle: "Thợ lát gạch • Thợ sơn • Thợ thạch cao • Nhôm kính",
-    colors: ["#1A237E", "#283593"],
-    route: "/finishing",
+    image: require("@/assets/banner/BANNER-1.jpg"),
+    title: "Xây Dựng Dễ Dàng, Nhanh Chóng",
+    subtitle: "Giảm ngay 15% dịch vụ đầu tiên",
+    colors: ["#2E7D32", "#43A047"],
+    route: "/services",
   },
   {
     id: 2,
-    image: "https://picsum.photos/400/150?random=51",
-    title: "TIỆN ÍCH XÂY DỰNG",
-    subtitle: "Phụ hồ • Thợ sắt • Thợ cốp pha • Thợ bê tông",
-    colors: ["#2E7D32", "#43A047"],
+    image: require("@/assets/banner/BANNER-2.jpeg"),
+    title: "Nhân Lực Xây Dựng",
+    subtitle: "Tìm thợ nhanh • Chất lượng • Uy tín",
+    colors: ["#1B5E20", "#388E3C"],
     route: "/workers",
   },
   {
     id: 3,
-    image: "https://picsum.photos/400/150?random=52",
-    title: "Giảm 15%",
-    subtitle: "Xây dựng dễ dàng, nhanh chóng với ứng dụng",
-    colors: ["#388E3C", "#66BB6A"],
-    route: "/promotions",
+    image: require("@/assets/banner/BANNER-3.jpeg"),
+    title: "Mua sắm trang thiết bị",
+    subtitle: "Đa dạng sản phẩm • Giá tốt mỗi ngày",
+    colors: ["#0D47A1", "#1565C0"],
+    route: "/shop",
   },
   {
     id: 4,
-    image: "https://picsum.photos/400/150?random=53",
-    title: "Giảm 10%",
-    subtitle: "Ứng dụng nhân lực xây dựng hàng đầu",
-    colors: ["#1B5E20", "#4CAF50"],
-    route: "/workers",
+    image: require("@/assets/banner/BANNER-4.jpeg"),
+    title: "Tiện ích thiết kế",
+    subtitle: "Kiến tạo không gian sống • Giảm đến 10%",
+    colors: ["#00695C", "#00897B"],
+    route: "/services/house-design",
   },
   {
     id: 5,
-    image: "https://picsum.photos/400/150?random=54",
-    title: "TIỆN ÍCH MUA SẮM",
-    subtitle: "Trang thiết bị • Đồ gia dụng • Thiết bị xây dựng",
-    colors: ["#004D40", "#00695C"],
-    route: "/equipment",
+    image: require("@/assets/banner/BANNER-5.jpeg"),
+    title: "Tiện ích hoàn thiện",
+    subtitle: "Trọn gói từ A-Z • Tư vấn & thiết kế 3D miễn phí",
+    colors: ["#1A237E", "#283593"],
+    route: "/finishing",
   },
   {
     id: 6,
-    image: "https://picsum.photos/400/150?random=55",
-    title: "TIỆN ÍCH THIẾT KẾ",
-    subtitle: "Kiến trúc sư • Thiết kế nội thất • Giám sát 10%",
-    colors: ["#00363A", "#00695C"],
-    route: "/design",
+    image: require("@/assets/banner/BANNER-6.jpeg"),
+    title: "Tiện ích xây dựng",
+    subtitle: "Hỗ trợ cho công ty xây dựng và nhà thầu",
+    colors: ["#33691E", "#558B2F"],
+    route: "/workers",
   },
 ];
 
 export const PromoBannerSlider = memo(() => {
   const [activeIndex, setActiveIndex] = useState(0);
-  const scrollViewRef = useState<ScrollView | null>(null);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -1602,28 +1711,33 @@ export const PromoBannerSlider = memo(() => {
           setActiveIndex(index);
         }}
       >
-        {PROMO_BANNERS.map((banner, index) => (
+        {PROMO_BANNERS.map((banner) => (
           <TouchableOpacity
             key={banner.id}
             onPress={() => router.push(banner.route as Href)}
-            activeOpacity={0.9}
+            activeOpacity={0.92}
           >
-            <LinearGradient
-              colors={banner.colors}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={promoStyles.banner}
-            >
-              <View style={promoStyles.textContainer}>
-                <Text style={promoStyles.title}>{banner.title}</Text>
-                <Text style={promoStyles.subtitle}>{banner.subtitle}</Text>
+            <View style={promoStyles.banner}>
+              <Image
+                source={banner.image}
+                style={promoStyles.bannerImage}
+                resizeMode="contain"
+              />
+              {/* Dark overlay gradient for text readability */}
+              <LinearGradient
+                colors={["rgba(0,0,0,0.45)", "transparent", "rgba(0,0,0,0.3)"]}
+                start={{ x: 0, y: 1 }}
+                end={{ x: 1, y: 0 }}
+                style={promoStyles.overlay}
+              />
+              {/* CTA badge */}
+              <View style={promoStyles.ctaContainer}>
                 <View style={promoStyles.ctaButton}>
-                  <Text style={promoStyles.ctaText}>Khám phá ngay</Text>
-                  <Ionicons name="arrow-forward" size={14} color="#FFF" />
+                  <Text style={promoStyles.ctaText}>Khám phá</Text>
+                  <Ionicons name="arrow-forward" size={12} color="#FFF" />
                 </View>
               </View>
-              <Image source={{ uri: banner.image }} style={promoStyles.image} />
-            </LinearGradient>
+            </View>
           </TouchableOpacity>
         ))}
       </ScrollView>
@@ -1649,206 +1763,195 @@ const promoStyles = StyleSheet.create({
   },
   banner: {
     width: width - 24,
-    height: 140,
+    height: 200,
     borderRadius: 16,
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 24,
     overflow: "hidden",
+    position: "relative",
     elevation: 4,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.18,
+    shadowRadius: 10,
+    backgroundColor: COLORS.bg,
   },
-  textContainer: {
-    flex: 1,
-    justifyContent: "center",
+  bannerImage: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 16,
   },
-  title: {
-    fontSize: 22,
-    fontWeight: "800",
-    color: COLORS.white,
-    textShadowColor: "rgba(0,0,0,0.3)",
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 2,
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 16,
   },
-  subtitle: {
-    fontSize: 14,
-    color: "rgba(255,255,255,0.95)",
-    marginTop: 6,
-    fontWeight: "500",
-    lineHeight: 20,
+  ctaContainer: {
+    position: "absolute",
+    bottom: 12,
+    left: 16,
   },
   ctaButton: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "rgba(255,255,255,0.25)",
+    backgroundColor: "rgba(0,0,0,0.45)",
     paddingHorizontal: 14,
-    paddingVertical: 8,
+    paddingVertical: 7,
     borderRadius: 20,
-    marginTop: 10,
-    alignSelf: "flex-start",
-    gap: 6,
+    gap: 5,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.25)",
   },
   ctaText: {
     fontSize: 12,
     fontWeight: "700",
     color: COLORS.white,
   },
-  image: {
-    width: 110,
-    height: 90,
-    borderRadius: 12,
-    opacity: 0.25,
-  },
   dots: {
     flexDirection: "row",
     justifyContent: "center",
-    marginTop: 12,
-    gap: 8,
+    marginTop: 10,
+    gap: 6,
   },
   dot: {
-    width: 8,
-    height: 8,
+    width: 7,
+    height: 7,
     borderRadius: 4,
     backgroundColor: COLORS.border,
   },
   dotActive: {
-    width: 24,
-    backgroundColor: COLORS.primary,
+    width: 22,
+    backgroundColor: "#2E7D32",
+    borderRadius: 4,
   },
 });
 
 // ============================================================================
-// 7. RECENT PROJECTS (Dự án gần đây)
+// 7. TRENDING PRODUCTS (Replaces old RecentProjects - now with real API data)
 // ============================================================================
-interface RecentProject {
+interface TrendingProduct {
   id: number;
   name: string;
   image: string;
-  progress: number;
-  status: "active" | "pending" | "completed";
-  lastUpdate: string;
+  price: number;
+  soldCount: number;
+  viewCount: number;
+  isNew: boolean;
+  isBestseller: boolean;
+  seller: string;
+  sellerId?: string;
+  route: string;
 }
 
-const RECENT_PROJECTS: RecentProject[] = [
-  {
-    id: 1,
-    name: "Nhà phố 3 tầng - Q7",
-    image: "https://picsum.photos/150/100?random=40",
-    progress: 75,
-    status: "active",
-    lastUpdate: "2 giờ trước",
-  },
-  {
-    id: 2,
-    name: "Biệt thự sân vườn",
-    image: "https://picsum.photos/150/100?random=41",
-    progress: 45,
-    status: "active",
-    lastUpdate: "1 ngày trước",
-  },
-  {
-    id: 3,
-    name: "Văn phòng công ty",
-    image: "https://picsum.photos/150/100?random=42",
-    progress: 100,
-    status: "completed",
-    lastUpdate: "3 ngày trước",
-  },
-];
+const formatCompactNumber = (n: number) => {
+  if (n >= 1000) return `${(n / 1000).toFixed(1)}k`;
+  return n.toString();
+};
 
-export const RecentProjectsSection = memo(() => {
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "active":
-        return COLORS.primary;
-      case "pending":
-        return COLORS.warning;
-      case "completed":
-        return COLORS.success;
-      default:
-        return COLORS.textLight;
-    }
-  };
+export const TrendingProductsSection = memo(
+  ({ products }: { products?: TrendingProduct[] }) => {
+    if (!products || products.length === 0) return null;
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "active":
-        return "Đang thi công";
-      case "pending":
-        return "Chờ xử lý";
-      case "completed":
-        return "Hoàn thành";
-      default:
-        return status;
-    }
-  };
+    const entrance = useEntranceAnim(200);
 
-  return (
-    <View style={projectStyles.container}>
-      <View style={projectStyles.header}>
-        <Text style={projectStyles.title}>📁 DỰ ÁN GẦN ĐÂY</Text>
-        <TouchableOpacity onPress={() => router.push("/projects" as Href)}>
-          <Text style={projectStyles.seeAll}>XEM TẤT CẢ</Text>
-        </TouchableOpacity>
-      </View>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={projectStyles.list}
-      >
-        {RECENT_PROJECTS.map((project) => (
-          <TouchableOpacity
-            key={project.id}
-            style={projectStyles.card}
-            onPress={() => router.push(`/projects/${project.id}` as Href)}
-            activeOpacity={0.8}
-          >
-            <Image
-              source={{ uri: project.image }}
-              style={projectStyles.image}
-            />
-            <View style={projectStyles.content}>
-              <Text style={projectStyles.name} numberOfLines={1}>
-                {project.name}
-              </Text>
-              <View style={projectStyles.statusRow}>
-                <View
-                  style={[
-                    projectStyles.statusDot,
-                    { backgroundColor: getStatusColor(project.status) },
-                  ]}
+    return (
+      <Animated.View style={[trendingStyles.container, entrance]}>
+        <View style={trendingStyles.header}>
+          <View style={trendingStyles.headerLeft}>
+            <Text style={trendingStyles.title}>🔥 SẢN PHẨM NỔI BẬT</Text>
+            <View style={trendingStyles.newBadge}>
+              <Text style={trendingStyles.newText}>MỚI</Text>
+            </View>
+          </View>
+          <TouchableOpacity onPress={() => router.push("/shop" as Href)}>
+            <Text style={trendingStyles.seeAll}>XEM TẤT CẢ</Text>
+          </TouchableOpacity>
+        </View>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={trendingStyles.list}
+        >
+          {products.map((product) => (
+            <TouchableOpacity
+              key={product.id}
+              style={trendingStyles.card}
+              onPress={() => router.push(product.route as Href)}
+              activeOpacity={0.8}
+            >
+              <View style={trendingStyles.imageWrap}>
+                <Image
+                  source={{ uri: product.image }}
+                  style={trendingStyles.image}
                 />
-                <Text style={projectStyles.statusText}>
-                  {getStatusText(project.status)}
+                {product.isNew && (
+                  <View style={trendingStyles.productBadge}>
+                    <Text style={trendingStyles.badgeText}>MỚI</Text>
+                  </View>
+                )}
+                {product.isBestseller && (
+                  <View
+                    style={[
+                      trendingStyles.productBadge,
+                      { backgroundColor: "#c4ee2d" },
+                    ]}
+                  >
+                    <Text style={trendingStyles.badgeText}>BÁN CHẠY</Text>
+                  </View>
+                )}
+              </View>
+              <View style={trendingStyles.content}>
+                <Text style={trendingStyles.name} numberOfLines={2}>
+                  {product.name}
+                </Text>
+                <Text style={trendingStyles.price}>
+                  {formatPrice(product.price)}
+                </Text>
+                <View style={trendingStyles.statsRow}>
+                  <View style={trendingStyles.stat}>
+                    <Ionicons
+                      name="eye-outline"
+                      size={10}
+                      color={COLORS.textLight}
+                    />
+                    <Text style={trendingStyles.statText}>
+                      {formatCompactNumber(product.viewCount)}
+                    </Text>
+                  </View>
+                  <View style={trendingStyles.stat}>
+                    <Ionicons name="cart-outline" size={10} color="#52d63d" />
+                    <Text
+                      style={[trendingStyles.statText, { color: "#4ce4b1" }]}
+                    >
+                      {formatCompactNumber(product.soldCount)}
+                    </Text>
+                  </View>
+                </View>
+                <Text style={trendingStyles.seller} numberOfLines={1}>
+                  <Text
+                    onPress={() =>
+                      product.sellerId &&
+                      router.push(`/profile/${product.sellerId}` as Href)
+                    }
+                    style={
+                      product.sellerId
+                        ? { textDecorationLine: "underline" as const }
+                        : undefined
+                    }
+                  >
+                    {product.seller}
+                  </Text>
                 </Text>
               </View>
-              <View style={projectStyles.progressContainer}>
-                <View
-                  style={[
-                    projectStyles.progressBar,
-                    {
-                      width: `${project.progress}%`,
-                      backgroundColor: getStatusColor(project.status),
-                    },
-                  ]}
-                />
-              </View>
-              <View style={projectStyles.footer}>
-                <Text style={projectStyles.progress}>{project.progress}%</Text>
-                <Text style={projectStyles.update}>{project.lastUpdate}</Text>
-              </View>
-            </View>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-    </View>
-  );
-});
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </Animated.View>
+    );
+  },
+);
 
-const projectStyles = StyleSheet.create({
+// Keep RecentProjectsSection as alias for backward compatibility
+export const RecentProjectsSection = memo(() => null);
+
+const trendingStyles = StyleSheet.create({
   container: {
     marginTop: 16,
     paddingHorizontal: 12,
@@ -1859,10 +1962,26 @@ const projectStyles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 12,
   },
+  headerLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
   title: {
     fontSize: 14,
     fontWeight: "700",
     color: COLORS.text,
+  },
+  newBadge: {
+    backgroundColor: "#0D9488",
+    borderRadius: 8,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+  newText: {
+    color: COLORS.white,
+    fontSize: 9,
+    fontWeight: "700",
   },
   seeAll: {
     fontSize: 12,
@@ -1870,69 +1989,195 @@ const projectStyles = StyleSheet.create({
     fontWeight: "600",
   },
   list: {
-    gap: 12,
+    gap: 10,
   },
   card: {
-    width: 200,
+    width: 160,
     backgroundColor: COLORS.white,
     borderRadius: 12,
     overflow: "hidden",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
+  },
+  imageWrap: {
+    position: "relative",
+  },
+  image: {
+    width: "100%",
+    height: 120,
+    backgroundColor: COLORS.border,
+  },
+  productBadge: {
+    position: "absolute",
+    top: 6,
+    left: 6,
+    backgroundColor: "#4CAF50",
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  badgeText: {
+    color: COLORS.white,
+    fontSize: 8,
+    fontWeight: "700",
+  },
+  content: {
+    padding: 10,
+  },
+  name: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: COLORS.text,
+    marginBottom: 4,
+    lineHeight: 16,
+  },
+  price: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: "#0D9488",
+    marginBottom: 4,
+  },
+  statsRow: {
+    flexDirection: "row",
+    gap: 10,
+    marginBottom: 4,
+  },
+  stat: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3,
+  },
+  statText: {
+    fontSize: 10,
+    color: COLORS.textLight,
+  },
+  seller: {
+    fontSize: 9,
+    color: COLORS.textLight,
+    fontStyle: "italic",
+  },
+});
+
+// ============================================================================
+// 8. STATS BAR - Live statistics from server
+// ============================================================================
+interface HomeStats {
+  totalProducts: number;
+  totalWorkers: number;
+  totalSold: number;
+  avgRating: number;
+}
+
+/** Animated stat counter item */
+const AnimatedStatItem = memo(
+  ({
+    icon,
+    target,
+    suffix,
+    label,
+    color,
+    delay,
+    isDecimal,
+  }: {
+    icon: keyof typeof Ionicons.glyphMap;
+    target: number;
+    suffix: string;
+    label: string;
+    color: string;
+    delay: number;
+    isDecimal?: boolean;
+  }) => {
+    const animTarget = isDecimal ? Math.round(target * 10) : target;
+    const count = useAnimatedCounter(animTarget, 1200);
+    const entrance = useEntranceAnim(delay);
+    const displayValue = isDecimal ? (count / 10).toFixed(1) : `${count}`;
+    return (
+      <Animated.View style={[statsStyles.item, entrance]}>
+        <Ionicons name={icon} size={18} color={color} />
+        <Text style={[statsStyles.value, { color }]}>
+          {displayValue}
+          {suffix}
+        </Text>
+        <Text style={statsStyles.label}>{label}</Text>
+      </Animated.View>
+    );
+  },
+);
+
+export const StatsBar = memo(({ stats }: { stats?: HomeStats }) => {
+  if (!stats || stats.totalProducts === 0) return null;
+
+  const entrance = useEntranceAnim(100);
+
+  return (
+    <Animated.View style={[statsStyles.container, entrance]}>
+      <AnimatedStatItem
+        icon="cube-outline"
+        target={stats.totalProducts}
+        suffix="+"
+        label="Sản phẩm"
+        color="#2196F3"
+        delay={200}
+      />
+      <AnimatedStatItem
+        icon="people-outline"
+        target={stats.totalWorkers}
+        suffix="+"
+        label="Thợ uy tín"
+        color="#4CAF50"
+        delay={350}
+      />
+      <AnimatedStatItem
+        icon="cart-outline"
+        target={stats.totalSold}
+        suffix="+"
+        label="Đã bán"
+        color="#0D9488"
+        delay={500}
+      />
+      <AnimatedStatItem
+        icon="star"
+        target={stats.avgRating}
+        suffix=""
+        label="Đánh giá"
+        color="#FFB300"
+        delay={650}
+        isDecimal
+      />
+    </Animated.View>
+  );
+});
+
+const statsStyles = StyleSheet.create({
+  container: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginHorizontal: 12,
+    marginTop: 12,
+    backgroundColor: COLORS.white,
+    borderRadius: 12,
+    paddingVertical: 14,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.08,
     shadowRadius: 4,
     elevation: 2,
   },
-  image: {
-    width: "100%",
-    height: 100,
-    backgroundColor: COLORS.border,
-  },
-  content: {
-    padding: 12,
-  },
-  name: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: COLORS.text,
-    marginBottom: 6,
-  },
-  statusRow: {
-    flexDirection: "row",
+  item: {
     alignItems: "center",
-    gap: 6,
-    marginBottom: 8,
+    flex: 1,
   },
-  statusDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+  value: {
+    fontSize: 15,
+    fontWeight: "800",
+    marginTop: 4,
   },
-  statusText: {
+  label: {
     fontSize: 10,
     color: COLORS.textLight,
-  },
-  progressContainer: {
-    height: 4,
-    backgroundColor: COLORS.border,
-    borderRadius: 2,
-    marginBottom: 8,
-  },
-  progressBar: {
-    height: "100%",
-    borderRadius: 2,
-  },
-  footer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  progress: {
-    fontSize: 11,
-    fontWeight: "600",
-    color: COLORS.primary,
-  },
-  update: {
-    fontSize: 10,
-    color: COLORS.textLight,
+    marginTop: 2,
   },
 });

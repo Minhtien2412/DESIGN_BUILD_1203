@@ -99,7 +99,7 @@ export function UploadProgressIndicator({
         )}
         {canRetry && onRetry && (
           <Pressable onPress={onRetry} style={styles.compactButton}>
-            <Ionicons name="refresh" size={18} color="#FF6B35" />
+            <Ionicons name="refresh" size={18} color="#14B8A6" />
           </Pressable>
         )}
       </View>
@@ -166,7 +166,7 @@ export function UploadProgressIndicator({
 
         {canRetry && onRetry && (
           <Pressable onPress={onRetry} style={styles.retryButton}>
-            <Ionicons name="refresh-circle" size={24} color="#FF6B35" />
+            <Ionicons name="refresh-circle" size={24} color="#14B8A6" />
             <Text style={styles.retryText}>Thử lại</Text>
           </Pressable>
         )}
@@ -299,7 +299,7 @@ const styles = StyleSheet.create({
   },
   retryText: {
     fontSize: 14,
-    color: "#FF6B35",
+    color: "#14B8A6",
   },
   // Compact styles
   compactContainer: {

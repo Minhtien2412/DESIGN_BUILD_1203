@@ -1,3 +1,8 @@
+/**
+ * @deprecated Use `app/orders/index.tsx` instead — this is the old hardcoded
+ * order list with no API integration. Kept for backward compatibility.
+ * The new screen at `/orders` fetches from the backend with fallback mocks.
+ */
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, useRouter } from "expo-router";
@@ -199,7 +204,7 @@ export default function OrderScreen() {
             <Text style={styles.totalLabel}>{item.items.length} sản phẩm</Text>
             <View style={styles.totalValue}>
               <Text style={styles.totalText}>Tổng: </Text>
-              <Text style={[styles.totalPrice, { color: "#FF6B35" }]}>
+              <Text style={[styles.totalPrice, { color: "#0D9488" }]}>
                 {formatPrice(item.total)}
               </Text>
             </View>
@@ -216,7 +221,7 @@ export default function OrderScreen() {
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  style={[styles.actionBtn, { backgroundColor: "#FF6B35" }]}
+                  style={[styles.actionBtn, { backgroundColor: "#0D9488" }]}
                 >
                   <Text style={{ color: "#fff", fontWeight: "500" }}>
                     Mua lại
@@ -299,14 +304,23 @@ export default function OrderScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { flex: 1, backgroundColor: "#F8FAFB" },
   tabsContainer: { paddingVertical: 4 },
   tab: { paddingVertical: 12, paddingHorizontal: 16 },
-  tabActive: { borderBottomWidth: 2, borderBottomColor: "#FF6B35" },
-  tabText: { color: "#666", fontSize: 14 },
-  tabTextActive: { color: "#FF6B35", fontWeight: "600" },
+  tabActive: { borderBottomWidth: 2, borderBottomColor: "#0D9488" },
+  tabText: { color: "#6B7280", fontSize: 14, fontWeight: "500" },
+  tabTextActive: { color: "#0D9488", fontWeight: "700" },
   listContent: { padding: 16 },
-  orderCard: { borderRadius: 12, marginBottom: 12, overflow: "hidden" },
+  orderCard: {
+    borderRadius: 16,
+    marginBottom: 12,
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
+  },
   orderHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -315,8 +329,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#eee",
   },
-  orderId: { fontSize: 16, fontWeight: "600" },
-  orderDate: { color: "#666", fontSize: 13, marginTop: 2 },
+  orderId: { fontSize: 16, fontWeight: "700", letterSpacing: -0.2 },
+  orderDate: { color: "#6B7280", fontSize: 13, marginTop: 2 },
   statusBadge: {
     flexDirection: "row",
     alignItems: "center",
@@ -330,18 +344,18 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     padding: 12,
     borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
+    borderBottomColor: "#F3F4F6",
   },
   productImage: {
     width: 60,
     height: 60,
-    borderRadius: 8,
-    backgroundColor: "#f0f0f0",
+    borderRadius: 14,
+    backgroundColor: "#F3F4F6",
   },
   productInfo: { flex: 1, marginLeft: 12 },
-  productName: { fontSize: 14, fontWeight: "500", marginBottom: 4 },
-  productQty: { color: "#666", fontSize: 13 },
-  productPrice: { color: "#FF6B35", fontWeight: "600" },
+  productName: { fontSize: 14, fontWeight: "600", marginBottom: 4 },
+  productQty: { color: "#6B7280", fontSize: 13 },
+  productPrice: { color: "#0D9488", fontWeight: "700" },
   orderFooter: { padding: 16 },
   totalRow: {
     flexDirection: "row",
@@ -349,12 +363,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 12,
   },
-  totalLabel: { color: "#666", fontSize: 13 },
+  totalLabel: { color: "#6B7280", fontSize: 13 },
   totalValue: { flexDirection: "row", alignItems: "center" },
   totalText: { color: "#666", fontSize: 14 },
-  totalPrice: { fontSize: 18, fontWeight: "bold" },
+  totalPrice: { fontSize: 18, fontWeight: "800", letterSpacing: -0.3 },
   actionBtns: { flexDirection: "row", justifyContent: "flex-end", gap: 8 },
-  actionBtn: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 6 },
+  actionBtn: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 12 },
   emptyState: { alignItems: "center", paddingVertical: 60 },
-  emptyText: { color: "#999", marginTop: 12 },
+  emptyText: { color: "#9CA3AF", marginTop: 12 },
 });

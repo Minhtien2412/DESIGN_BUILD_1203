@@ -56,7 +56,7 @@ const TEMPLATES: ProjectTemplate[] = [
     name: 'Biệt Thự Cao Cấp',
     description: 'Dự án xây dựng biệt thự từ 2-3 tầng với đầy đủ tiện nghi',
     icon: 'home',
-    color: '#0066CC',
+    color: '#0D9488',
     category: 'residential',
     estimatedDuration: 180,
     complexity: 'complex',
@@ -82,7 +82,7 @@ const TEMPLATES: ProjectTemplate[] = [
     name: 'Nhà Ở Đơn Giản',
     description: 'Nhà ở 1-2 tầng cho gia đình nhỏ',
     icon: 'business',
-    color: '#3B82F6',
+    color: '#0D9488',
     category: 'residential',
     estimatedDuration: 120,
     complexity: 'medium',
@@ -106,7 +106,7 @@ const TEMPLATES: ProjectTemplate[] = [
     name: 'Văn Phòng Thương Mại',
     description: 'Tòa nhà văn phòng 3-5 tầng',
     icon: 'briefcase',
-    color: '#0066CC',
+    color: '#0D9488',
     category: 'commercial',
     estimatedDuration: 240,
     complexity: 'complex',
@@ -205,9 +205,9 @@ export const ProjectTemplateSelector: React.FC<ProjectTemplateSelectorProps> = (
   const getComplexityColor = (complexity: string): string => {
     switch (complexity) {
       case 'simple':
-        return '#0066CC';
+        return '#0D9488';
       case 'medium':
-        return '#0066CC';
+        return '#0D9488';
       case 'complex':
         return '#000000';
       default:
@@ -319,21 +319,21 @@ export const ProjectTemplateSelector: React.FC<ProjectTemplateSelectorProps> = (
               {/* Stats */}
               <View style={styles.detailsStats}>
                 <View style={styles.detailsStat}>
-                  <Ionicons name="calendar-outline" size={20} color="#3B82F6" />
+                  <Ionicons name="calendar-outline" size={20} color="#0D9488" />
                   <Text style={styles.detailsStatLabel}>Thời gian dự kiến</Text>
                   <Text style={styles.detailsStatValue}>
                     {selectedTemplate?.estimatedDuration} ngày
                   </Text>
                 </View>
                 <View style={styles.detailsStat}>
-                  <Ionicons name="layers-outline" size={20} color="#0066CC" />
+                  <Ionicons name="layers-outline" size={20} color="#0D9488" />
                   <Text style={styles.detailsStatLabel}>Số giai đoạn</Text>
                   <Text style={styles.detailsStatValue}>
                     {selectedTemplate?.defaultStages.length || 0}
                   </Text>
                 </View>
                 <View style={styles.detailsStat}>
-                  <Ionicons name="list-outline" size={20} color="#0066CC" />
+                  <Ionicons name="list-outline" size={20} color="#0D9488" />
                   <Text style={styles.detailsStatLabel}>Công việc mẫu</Text>
                   <Text style={styles.detailsStatValue}>
                     {selectedTemplate?.defaultTasks.length || 0}
@@ -553,7 +553,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#0D9488',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -598,7 +598,7 @@ const styles = StyleSheet.create({
   confirmButton: {
     flex: 1,
     paddingVertical: 12,
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#0D9488',
     borderRadius: 8,
     alignItems: 'center',
   },

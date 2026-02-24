@@ -81,7 +81,7 @@ export default function ErrorDetectionScreen() {
 
         {item.recommendations && item.recommendations.length > 0 && (
           <View style={styles.recommendationPreview}>
-            <Ionicons name="bulb-outline" size={14} color="#0066CC" />
+            <Ionicons name="bulb-outline" size={14} color="#0D9488" />
             <Text style={styles.recommendationText} numberOfLines={1}>
               {item.recommendations[0]}
             </Text>
@@ -93,7 +93,7 @@ export default function ErrorDetectionScreen() {
 
   const renderEmpty = () => (
     <View style={styles.emptyContainer}>
-      <Ionicons name="checkmark-circle-outline" size={64} color="#0066CC" />
+      <Ionicons name="checkmark-circle-outline" size={64} color="#0D9488" />
       <Text style={[styles.emptyTitle, { color: textColor }]}>
         Không phát hiện lỗi
       </Text>
@@ -140,7 +140,7 @@ export default function ErrorDetectionScreen() {
                   (i) => i.severity === 'MEDIUM' || i.severity === 'LOW'
                 ).length
               }
-              color="#0066CC"
+              color="#0D9488"
             />
           </View>
         )}
@@ -215,7 +215,7 @@ export default function ErrorDetectionScreen() {
                             <Ionicons
                               name="bulb-outline"
                               size={16}
-                              color="#0066CC"
+                              color="#0D9488"
                             />
                             <Text
                               style={[
@@ -373,7 +373,7 @@ const styles = StyleSheet.create({
   recommendationText: {
     flex: 1,
     fontSize: 13,
-    color: '#0066CC',
+    color: '#0D9488',
   },
   modalContainer: {
     flex: 1,

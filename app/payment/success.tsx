@@ -3,30 +3,33 @@
  * Hiển thị khi thanh toán thành công
  */
 
-import ModernButton from '@/components/ui/modern-button';
-import { useThemeColor } from '@/hooks/use-theme-color';
-import { Ionicons } from '@expo/vector-icons';
-import { Stack, router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useRef } from 'react';
+import ModernButton from "@/components/ui/modern-button";
+import { useThemeColor } from "@/hooks/use-theme-color";
+import { Ionicons } from "@expo/vector-icons";
+import { Stack, router, useLocalSearchParams } from "expo-router";
+import { useEffect, useRef } from "react";
 import {
     Animated,
     Platform,
-    SafeAreaView,
     StatusBar,
     StyleSheet,
     Text,
     View,
-} from 'react-native';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function PaymentSuccessScreen() {
-  const params = useLocalSearchParams<{ orderId?: string; transactionId?: string }>();
-  
+  const params = useLocalSearchParams<{
+    orderId?: string;
+    transactionId?: string;
+  }>();
+
   // Theme
-  const backgroundColor = useThemeColor({}, 'background');
-  const textColor = useThemeColor({}, 'text');
-  const secondaryText = useThemeColor({}, 'tabIconDefault');
-  const successColor = '#10b981';
-  
+  const backgroundColor = useThemeColor({}, "background");
+  const textColor = useThemeColor({}, "text");
+  const secondaryText = useThemeColor({}, "tabIconDefault");
+  const successColor = "#10b981";
+
   // Animations
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -57,7 +60,7 @@ export default function PaymentSuccessScreen() {
 
     // Auto redirect after 5 seconds
     const timer = setTimeout(() => {
-      router.replace('/(tabs)');
+      router.replace("/(tabs)");
     }, 5000);
 
     return () => clearTimeout(timer);
@@ -135,7 +138,7 @@ export default function PaymentSuccessScreen() {
           <ModernButton
             variant="primary"
             size="large"
-            onPress={() => router.replace('/(tabs)')}
+            onPress={() => router.replace("/(tabs)")}
             icon="home-outline"
             iconPosition="left"
             fullWidth
@@ -146,7 +149,7 @@ export default function PaymentSuccessScreen() {
           <ModernButton
             variant="outline"
             size="large"
-            onPress={() => router.push('/order')}
+            onPress={() => router.push("/order")}
             icon="receipt-outline"
             iconPosition="left"
             fullWidth
@@ -163,50 +166,50 @@ export default function PaymentSuccessScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
   },
   content: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     paddingHorizontal: 24,
   },
   iconContainer: {
     width: 120,
     height: 120,
     borderRadius: 60,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: 32,
-    shadowColor: '#10b981',
+    shadowColor: "#10b981",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 12,
     elevation: 8,
   },
   messageContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 40,
   },
   title: {
     fontSize: 24,
-    fontWeight: '700',
+    fontWeight: "700",
     marginBottom: 12,
-    textAlign: 'center',
+    textAlign: "center",
   },
   subtitle: {
     fontSize: 15,
-    textAlign: 'center',
+    textAlign: "center",
     lineHeight: 22,
     paddingHorizontal: 20,
   },
   orderInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginTop: 16,
     paddingHorizontal: 20,
     paddingVertical: 12,
-    backgroundColor: '#f3f4f6',
+    backgroundColor: "#f3f4f6",
     borderRadius: 12,
   },
   orderLabel: {
@@ -215,10 +218,10 @@ const styles = StyleSheet.create({
   },
   orderValue: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   actions: {
-    width: '100%',
+    width: "100%",
     paddingHorizontal: 20,
   },
 });

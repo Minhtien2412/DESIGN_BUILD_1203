@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
   },
   statItemActive: {
     borderBottomWidth: 2,
-    borderBottomColor: '#3b82f6',
+    borderBottomColor: '#0D9488',
   },
   statValue: {
     fontSize: 18,

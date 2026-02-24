@@ -23,8 +23,8 @@ const COLORS = {
   text: '#1A1A1A',
   textSecondary: '#666666',
   primary: '#0068FF',
-  success: '#0066CC',
-  warning: '#0066CC',
+  success: '#0D9488',
+  warning: '#0D9488',
   error: '#000000',
   shadow: 'rgba(0, 0, 0, 0.15)',
 };

@@ -62,9 +62,9 @@ export default function BOQScreen() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'approved':
-        return '#0066CC';
+        return '#0D9488';
       case 'pending':
-        return '#0066CC';
+        return '#0D9488';
       case 'rejected':
         return '#000000';
       default:
@@ -157,7 +157,7 @@ export default function BOQScreen() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0066CC" />
+        <ActivityIndicator size="large" color="#0D9488" />
         <Text style={styles.loadingText}>Đang tải...</Text>
       </View>
     );
@@ -202,14 +202,14 @@ export default function BOQScreen() {
           
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>Đã duyệt:</Text>
-            <Text style={[styles.summaryValue, { color: '#0066CC' }]}>
+            <Text style={[styles.summaryValue, { color: '#0D9488' }]}>
               {formatCurrency(approvedAmount)}
             </Text>
           </View>
           
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>Chờ duyệt:</Text>
-            <Text style={[styles.summaryValue, { color: '#0066CC' }]}>
+            <Text style={[styles.summaryValue, { color: '#0D9488' }]}>
               {formatCurrency(pendingAmount)}
             </Text>
           </View>
@@ -267,7 +267,7 @@ export default function BOQScreen() {
             style={[styles.filterChip, statusFilter === 'approved' && styles.filterChipActive]}
             onPress={() => setStatusFilter('approved')}
           >
-            <Ionicons name="checkmark-circle" size={16} color={statusFilter === 'approved' ? '#FFFFFF' : '#0066CC'} />
+            <Ionicons name="checkmark-circle" size={16} color={statusFilter === 'approved' ? '#FFFFFF' : '#0D9488'} />
             <Text style={[styles.filterText, statusFilter === 'approved' && styles.filterTextActive]}>
               Đã duyệt
             </Text>
@@ -276,7 +276,7 @@ export default function BOQScreen() {
             style={[styles.filterChip, statusFilter === 'pending' && styles.filterChipActive]}
             onPress={() => setStatusFilter('pending')}
           >
-            <Ionicons name="time" size={16} color={statusFilter === 'pending' ? '#FFFFFF' : '#0066CC'} />
+            <Ionicons name="time" size={16} color={statusFilter === 'pending' ? '#FFFFFF' : '#0D9488'} />
             <Text style={[styles.filterText, statusFilter === 'pending' && styles.filterTextActive]}>
               Chờ duyệt
             </Text>
@@ -448,7 +448,7 @@ const styles = StyleSheet.create({
   progressPercent: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   progressBarBg: {
     height: 8,
@@ -458,7 +458,7 @@ const styles = StyleSheet.create({
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     borderRadius: 4,
   },
   searchContainer: {
@@ -559,7 +559,7 @@ const styles = StyleSheet.create({
   boqCode: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#3B82F6',
+    color: '#0D9488',
   },
   boqName: {
     fontSize: 16,
@@ -601,7 +601,7 @@ const styles = StyleSheet.create({
   totalValue: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#3B82F6',
+    color: '#0D9488',
   },
   actionButtons: {
     flexDirection: 'row',
@@ -618,7 +618,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   approveButton: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   rejectButton: {
     backgroundColor: '#000000',
@@ -629,7 +629,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   totalFooter: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#0D9488',
     marginHorizontal: 16,
     marginVertical: 16,
     padding: 20,

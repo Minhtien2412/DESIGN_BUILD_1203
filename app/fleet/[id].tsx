@@ -57,11 +57,11 @@ export default function FleetDetailScreen() {
 
   const getStatusColor = (status: VehicleStatus) => {
     switch (status) {
-      case 'ACTIVE': return '#0066CC';
+      case 'ACTIVE': return '#0D9488';
       case 'INACTIVE': return '#6b7280';
-      case 'IN_MAINTENANCE': return '#0066CC';
+      case 'IN_MAINTENANCE': return '#0D9488';
       case 'IN_REPAIR': return '#000000';
-      case 'RESERVED': return '#3b82f6';
+      case 'RESERVED': return '#0D9488';
       case 'OUT_OF_SERVICE': return '#000000';
       case 'RETIRED': return '#9ca3af';
       default: return textMutedColor;

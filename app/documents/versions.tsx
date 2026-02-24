@@ -116,7 +116,7 @@ export default function DocumentVersionsScreen() {
               <View style={styles.versionHeader}>
                 <View style={styles.versionInfo}>
                   <View style={styles.versionNumberContainer}>
-                    <Ionicons name="git-commit-outline" size={20} color="#0066CC" />
+                    <Ionicons name="git-commit-outline" size={20} color="#0D9488" />
                     <Text style={[styles.versionNumber, { color: textColor }]}>
                       Phiên bản {item.versionNumber}
                     </Text>
@@ -185,8 +185,8 @@ export default function DocumentVersionsScreen() {
                   onPress={() => handleDownload(item.id)}
                   disabled={downloading === item.id}
                 >
-                  <Ionicons name="cloud-download-outline" size={18} color="#0066CC" />
-                  <Text style={[styles.actionButtonTextSecondary, { color: '#0066CC' }]}>
+                  <Ionicons name="cloud-download-outline" size={18} color="#0D9488" />
+                  <Text style={[styles.actionButtonTextSecondary, { color: '#0D9488' }]}>
                     {downloading === item.id ? 'Đang tải...' : 'Tải xuống'}
                   </Text>
                 </TouchableOpacity>
@@ -262,18 +262,18 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   versionLabelBadge: {
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
   },
   versionLabelText: {
     fontSize: 11,
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: '600',
   },
   currentBadge: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
@@ -346,12 +346,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   restoreButton: {
-    backgroundColor: '#0066CC',
-    borderColor: '#0066CC',
+    backgroundColor: '#0D9488',
+    borderColor: '#0D9488',
   },
   downloadButton: {
     backgroundColor: '#fff',
-    borderColor: '#0066CC',
+    borderColor: '#0D9488',
   },
   compareButton: {
     backgroundColor: '#fff',

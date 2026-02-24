@@ -143,7 +143,7 @@ export function SellerProfileCard({
                 {seller.name}
               </ThemedText>
               {seller.isVerified && (
-                <Ionicons name="checkmark-circle" size={16} color="#0066CC" />
+                <Ionicons name="checkmark-circle" size={16} color="#0D9488" />
               )}
             </View>
             <ThemedText style={styles.compactSubtitle}>
@@ -157,7 +157,7 @@ export function SellerProfileCard({
         {showActions && (
           <View style={styles.compactActions}>
             <Pressable style={styles.chatButtonCompact} onPress={handleChat}>
-              <Ionicons name="chatbubble-outline" size={16} color="#EE4D2D" />
+              <Ionicons name="chatbubble-outline" size={16} color="#0D9488" />
               <ThemedText style={styles.chatButtonTextCompact}>Chat</ThemedText>
             </Pressable>
             <Pressable
@@ -232,9 +232,9 @@ export function SellerProfileCard({
           <Pressable
             style={styles.chatButton}
             onPress={handleChat}
-            android_ripple={{ color: "#EE4D2D20" }}
+            android_ripple={{ color: "#0D948820" }}
           >
-            <Ionicons name="chatbubble-outline" size={18} color="#EE4D2D" />
+            <Ionicons name="chatbubble-outline" size={18} color="#0D9488" />
             <ThemedText style={styles.chatButtonText}>Chat Ngay</ThemedText>
           </Pressable>
 
@@ -297,7 +297,7 @@ export function SellerProfileCard({
           <Ionicons
             name={isFollowing ? "checkmark" : "add"}
             size={18}
-            color={isFollowing ? "#EE4D2D" : "#FFFFFF"}
+            color={isFollowing ? "#0D9488" : "#FFFFFF"}
           />
           <ThemedText
             style={[
@@ -339,13 +339,13 @@ const styles = StyleSheet.create({
     height: 64,
     borderRadius: 32,
     borderWidth: 2,
-    borderColor: "#EE4D2D",
+    borderColor: "#0D9488",
   },
   avatarBadge: {
     position: "absolute",
     bottom: 0,
     right: 0,
-    backgroundColor: "#EE4D2D",
+    backgroundColor: "#0D9488",
     width: 20,
     height: 20,
     borderRadius: 10,
@@ -370,7 +370,7 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
   },
   mallBadge: {
-    backgroundColor: "#EE4D2D",
+    backgroundColor: "#0D9488",
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 2,
@@ -391,11 +391,11 @@ const styles = StyleSheet.create({
     color: "#666666",
   },
   ratingValue: {
-    color: "#EE4D2D",
+    color: "#0D9488",
     fontWeight: "600",
   },
   responseRate: {
-    color: "#EE4D2D",
+    color: "#0D9488",
     fontWeight: "600",
   },
 
@@ -414,11 +414,11 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 4,
     borderWidth: 1,
-    borderColor: "#EE4D2D",
+    borderColor: "#0D9488",
     backgroundColor: "#FFFFFF",
   },
   chatButtonText: {
-    color: "#EE4D2D",
+    color: "#0D9488",
     fontSize: 14,
     fontWeight: "600",
   },
@@ -430,7 +430,7 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingVertical: 10,
     borderRadius: 4,
-    backgroundColor: "#EE4D2D",
+    backgroundColor: "#0D9488",
   },
   viewShopButtonText: {
     color: "#FFFFFF",
@@ -454,7 +454,7 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 16,
     fontWeight: "700",
-    color: "#EE4D2D",
+    color: "#0D9488",
   },
   statLabel: {
     fontSize: 11,
@@ -476,7 +476,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
     paddingVertical: 10,
     borderRadius: 4,
-    backgroundColor: "#EE4D2D",
+    backgroundColor: "#0D9488",
   },
   followButtonText: {
     color: "#FFFFFF",
@@ -486,10 +486,10 @@ const styles = StyleSheet.create({
   followingButton: {
     backgroundColor: "#FFFFFF",
     borderWidth: 1,
-    borderColor: "#EE4D2D",
+    borderColor: "#0D9488",
   },
   followingButtonText: {
-    color: "#EE4D2D",
+    color: "#0D9488",
   },
 
   // Compact variant
@@ -508,7 +508,7 @@ const styles = StyleSheet.create({
     height: 48,
     borderRadius: 24,
     borderWidth: 1,
-    borderColor: "#EE4D2D",
+    borderColor: "#0D9488",
   },
   compactInfo: {
     flex: 1,
@@ -538,10 +538,10 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 4,
     borderWidth: 1,
-    borderColor: "#EE4D2D",
+    borderColor: "#0D9488",
   },
   chatButtonTextCompact: {
-    color: "#EE4D2D",
+    color: "#0D9488",
     fontSize: 13,
     fontWeight: "500",
   },
@@ -553,7 +553,7 @@ const styles = StyleSheet.create({
     gap: 4,
     paddingVertical: 8,
     borderRadius: 4,
-    backgroundColor: "#EE4D2D",
+    backgroundColor: "#0D9488",
   },
   viewShopButtonTextCompact: {
     color: "#FFFFFF",
@@ -585,7 +585,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   mallBadgeMini: {
-    backgroundColor: "#EE4D2D",
+    backgroundColor: "#0D9488",
     paddingHorizontal: 4,
     paddingVertical: 1,
     borderRadius: 2,
@@ -603,7 +603,7 @@ const styles = StyleSheet.create({
   },
   miniRating: {
     fontSize: 11,
-    color: "#EE4D2D",
+    color: "#0D9488",
   },
 });
 

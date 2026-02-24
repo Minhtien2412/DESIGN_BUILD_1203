@@ -44,7 +44,7 @@ const EXPORT_OPTIONS: ExportOption[] = [
     title: 'Tài Liệu Word',
     description: 'Xuất văn bản có thể chỉnh sửa',
     format: 'DOCX',
-    color: '#3b82f6',
+    color: '#0D9488',
   },
   {
     id: 'image',
@@ -236,7 +236,7 @@ In production, this would contain actual design data.`;
               <Text style={styles.quickActionText}>Thiết Kế</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.quickAction, { backgroundColor: '#03a9f4' }]}
+              style={[styles.quickAction, { backgroundColor: '#14B8A6' }]}
               onPress={() => router.push('/ai-architect/templates' as never)}
             >
               <Ionicons name="layers" size={24} color="#fff" />
@@ -295,7 +295,7 @@ In production, this would contain actual design data.`;
                       : 'folder-open'
                   }
                   size={20}
-                  color="#03a9f4"
+                  color="#14B8A6"
                 />
               </View>
               <View style={styles.recentInfo}>
@@ -315,7 +315,7 @@ In production, this would contain actual design data.`;
         <View style={styles.section}>
           <View style={styles.storageCard}>
             <View style={styles.storageHeader}>
-              <Ionicons name="cloud" size={24} color="#03a9f4" />
+              <Ionicons name="cloud" size={24} color="#14B8A6" />
               <Text style={styles.storageTitle}>Dung Lượng Lưu Trữ</Text>
             </View>
             <View style={styles.storageBar}>
@@ -485,7 +485,7 @@ const styles = StyleSheet.create({
   },
   storageUsed: {
     height: '100%',
-    backgroundColor: '#03a9f4',
+    backgroundColor: '#14B8A6',
     borderRadius: 4,
   },
   storageText: {

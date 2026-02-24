@@ -33,8 +33,8 @@ const ACTIVITY_ICONS: Record<Activity['type'], keyof typeof Ionicons.glyphMap> =
 const ACTIVITY_COLORS: Record<Activity['type'], string> = {
   user: Colors.light.primary,
   project: '#666666',
-  payment: '#0066CC',
-  task: '#0066CC',
+  payment: '#0D9488',
+  task: '#0D9488',
   system: '#6B7280',
 };
 

@@ -51,43 +51,43 @@ export default function CommissioningListScreen() {
       case 'PLANNED' as CommissioningStatus:
         return '#9CA3AF';
       case 'IN_PROGRESS' as CommissioningStatus:
-        return '#0080FF';
+        return '#14B8A6';
       case 'TESTING' as CommissioningStatus:
-        return '#0080FF';
+        return '#14B8A6';
       case 'COMPLETED' as CommissioningStatus:
-        return '#0066CC';
+        return '#0D9488';
       default:
         return '#6B7280';
     }
   };
 
   const getProgressColor = (progress: number) => {
-    if (progress >= 100) return '#0066CC';
-    if (progress >= 50) return '#0080FF';
-    return '#0080FF';
+    if (progress >= 100) return '#0D9488';
+    if (progress >= 50) return '#14B8A6';
+    return '#14B8A6';
   };
 
   const renderStats = () => (
     <View style={[styles.statsContainer, { backgroundColor: surfaceColor }]}>
       <View style={styles.statItem}>
-        <Ionicons name="list-outline" size={24} color="#0080FF" />
+        <Ionicons name="list-outline" size={24} color="#14B8A6" />
         <Text style={[styles.statValue, { color: textColor }]}>{plans.length}</Text>
         <Text style={[styles.statLabel, { color: textMutedColor }]}>Plans</Text>
       </View>
       <View style={styles.statItem}>
-        <Ionicons name="cube-outline" size={24} color="#0080FF" />
+        <Ionicons name="cube-outline" size={24} color="#14B8A6" />
         <Text style={[styles.statValue, { color: textColor }]}>{totalSystems}</Text>
         <Text style={[styles.statLabel, { color: textMutedColor }]}>Systems</Text>
       </View>
       <View style={styles.statItem}>
-        <Ionicons name="checkmark-circle-outline" size={24} color="#0066CC" />
+        <Ionicons name="checkmark-circle-outline" size={24} color="#0D9488" />
         <Text style={[styles.statValue, { color: textColor }]}>
           {totalSystems > 0 ? Math.round((completedSystems / totalSystems) * 100) : 0}%
         </Text>
         <Text style={[styles.statLabel, { color: textMutedColor }]}>Complete</Text>
       </View>
       <View style={styles.statItem}>
-        <Ionicons name="flask-outline" size={24} color="#0066CC" />
+        <Ionicons name="flask-outline" size={24} color="#0D9488" />
         <Text style={[styles.statValue, { color: textColor }]}>{totalTests}</Text>
         <Text style={[styles.statLabel, { color: textMutedColor }]}>Tests</Text>
       </View>
@@ -168,13 +168,13 @@ export default function CommissioningListScreen() {
             <Text style={[styles.statBoxLabel, { color: textMutedColor }]}>Systems</Text>
           </View>
           <View style={styles.statBox}>
-            <Text style={[styles.statBoxValue, { color: '#0080FF' }]}>
+            <Text style={[styles.statBoxValue, { color: '#14B8A6' }]}>
               {plan.totalTests || 0}
             </Text>
             <Text style={[styles.statBoxLabel, { color: textMutedColor }]}>Tests</Text>
           </View>
           <View style={styles.statBox}>
-            <Text style={[styles.statBoxValue, { color: '#0066CC' }]}>
+            <Text style={[styles.statBoxValue, { color: '#0D9488' }]}>
               {plan.passedTests || 0}
             </Text>
             <Text style={[styles.statBoxLabel, { color: textMutedColor }]}>Passed</Text>
@@ -215,8 +215,8 @@ export default function CommissioningListScreen() {
           </View>
           {plan.openDeficiencies > 0 && (
             <View style={styles.deficiencyBadge}>
-              <Ionicons name="warning-outline" size={14} color="#0080FF" />
-              <Text style={[styles.deficiencyText, { color: '#0080FF' }]}>
+              <Ionicons name="warning-outline" size={14} color="#14B8A6" />
+              <Text style={[styles.deficiencyText, { color: '#14B8A6' }]}>
                 {plan.openDeficiencies} deficiencies
               </Text>
             </View>

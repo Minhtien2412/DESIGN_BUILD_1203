@@ -40,7 +40,7 @@ export default function AboutScreen() {
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Logo & App Info */}
         <View style={styles.header}>
-          <View style={[styles.logoContainer, { backgroundColor: "#FF6B35" }]}>
+          <View style={[styles.logoContainer, { backgroundColor: "#0D9488" }]}>
             <Ionicons name="home" size={48} color="#fff" />
           </View>
           <Text style={[styles.appName, { color: textColor }]}>
@@ -62,12 +62,12 @@ export default function AboutScreen() {
           {features.map((feature, index) => (
             <View key={index} style={styles.featureItem}>
               <View
-                style={[styles.featureIcon, { backgroundColor: "#FF6B3520" }]}
+                style={[styles.featureIcon, { backgroundColor: "#14B8A620" }]}
               >
                 <Ionicons
                   name={feature.icon as any}
                   size={24}
-                  color="#FF6B35"
+                  color="#14B8A6"
                 />
               </View>
               <View style={styles.featureText}>
@@ -152,7 +152,7 @@ export default function AboutScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { flex: 1, backgroundColor: "#F8FAFB" },
   header: { alignItems: "center", paddingVertical: 32 },
   logoContainer: {
     width: 100,
@@ -162,27 +162,42 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 16,
   },
-  appName: { fontSize: 24, fontWeight: "bold", marginBottom: 4 },
+  appName: {
+    fontSize: 24,
+    fontWeight: "800",
+    marginBottom: 4,
+    letterSpacing: -0.5,
+  },
   version: { fontSize: 14, marginBottom: 8 },
   tagline: { fontSize: 14, textAlign: "center", paddingHorizontal: 32 },
   section: {
     margin: 16,
     marginTop: 0,
     padding: 16,
-    borderRadius: 12,
+    borderRadius: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
   },
-  sectionTitle: { fontSize: 18, fontWeight: "600", marginBottom: 16 },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    marginBottom: 16,
+    letterSpacing: -0.3,
+  },
   featureItem: { flexDirection: "row", alignItems: "center", marginBottom: 16 },
   featureIcon: {
     width: 48,
     height: 48,
-    borderRadius: 12,
+    borderRadius: 16,
     justifyContent: "center",
     alignItems: "center",
     marginRight: 12,
   },
   featureText: { flex: 1 },
-  featureTitle: { fontSize: 16, fontWeight: "500", marginBottom: 2 },
+  featureTitle: { fontSize: 16, fontWeight: "600", marginBottom: 2 },
   featureDesc: { fontSize: 13 },
   infoRow: { flexDirection: "row", alignItems: "center", marginBottom: 12 },
   infoText: { marginLeft: 12, fontSize: 14 },
@@ -196,7 +211,7 @@ const styles = StyleSheet.create({
   },
   copyright: {
     textAlign: "center",
-    color: "#999",
+    color: "#9CA3AF",
     fontSize: 12,
     paddingVertical: 24,
   },

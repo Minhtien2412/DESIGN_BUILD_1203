@@ -66,7 +66,7 @@ export function CoverFrameSelector({
         <Image source={{ uri: item }} style={styles.frameImage} />
         {isSelected && (
           <View style={styles.checkmark}>
-            <Ionicons name="checkmark-circle" size={24} color="#FF6B35" />
+            <Ionicons name="checkmark-circle" size={24} color="#14B8A6" />
           </View>
         )}
         <Text style={styles.frameTime}>{formatTime(index)}</Text>
@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
   },
   selectedFrame: {
     borderWidth: 3,
-    borderColor: "#FF6B35",
+    borderColor: "#14B8A6",
   },
   frameImage: {
     width: "100%",

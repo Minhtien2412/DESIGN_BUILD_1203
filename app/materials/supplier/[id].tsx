@@ -227,7 +227,7 @@ export default function SupplierDetailScreen() {
             )}
           </View>
           <View style={styles.ratingRow}>
-            <Ionicons name="star" size={16} color="#0066CC" />
+            <Ionicons name="star" size={16} color="#0D9488" />
             <Text style={styles.ratingText}>{supplier.rating}</Text>
           </View>
         </View>
@@ -291,7 +291,7 @@ export default function SupplierDetailScreen() {
               </Text>
               {material.popular && (
                 <View style={styles.popularBadge}>
-                  <Ionicons name="flame" size={12} color="#0066CC" />
+                  <Ionicons name="flame" size={12} color="#0D9488" />
                   <Text style={styles.popularText}>Bán chạy</Text>
                 </View>
               )}
@@ -556,7 +556,7 @@ const styles = StyleSheet.create({
   popularBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 4,
@@ -565,7 +565,7 @@ const styles = StyleSheet.create({
   popularText: {
     fontSize: 10,
     fontWeight: '600',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   materialDescription: {
     fontSize: 12,

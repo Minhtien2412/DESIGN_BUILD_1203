@@ -18,13 +18,13 @@ const STATUS_CONFIG: Record<
 > = {
   PENDING: {
     label: 'Chờ duyệt',
-    color: '#0066CC',
-    bgColor: '#E8F4FF',
+    color: '#0D9488',
+    bgColor: '#F0FDFA',
     icon: 'time',
   },
   APPROVED: {
     label: 'Đã duyệt',
-    color: '#0066CC',
+    color: '#0D9488',
     bgColor: '#E8F5E9',
     icon: 'checkmark-circle',
   },
@@ -36,8 +36,8 @@ const STATUS_CONFIG: Record<
   },
   PAID: {
     label: 'Đã thanh toán',
-    color: '#0066CC',
-    bgColor: '#E8F4FF',
+    color: '#0D9488',
+    bgColor: '#F0FDFA',
     icon: 'cash',
   },
 };
@@ -231,7 +231,7 @@ export default function ExpensesScreen() {
       {/* Info Card for Pending Expenses */}
       {filterStatus === 'PENDING' && statusCounts.PENDING > 0 && (
         <View style={styles.infoCard}>
-          <Ionicons name="information-circle" size={18} color="#0066CC" />
+          <Ionicons name="information-circle" size={18} color="#0D9488" />
           <Text style={styles.infoText}>
             Có {statusCounts.PENDING} chi tiêu đang chờ duyệt. Vui lòng xem xét và
             phê duyệt hoặc từ chối.
@@ -337,7 +337,7 @@ export default function ExpensesScreen() {
                 {/* Receipt */}
                 {expense.receiptUrl && (
                   <TouchableOpacity style={styles.receiptButton}>
-                    <Ionicons name="document-attach" size={16} color="#0066CC" />
+                    <Ionicons name="document-attach" size={16} color="#0D9488" />
                     <Text style={styles.receiptText}>Xem hóa đơn đính kèm</Text>
                   </TouchableOpacity>
                 )}
@@ -440,21 +440,21 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   filterChipActive: {
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
   },
   filterText: {
     fontSize: 13,
     color: '#666',
   },
   filterTextActive: {
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: '600',
   },
   infoCard: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     padding: 12,
     margin: 12,
     marginBottom: 0,
@@ -483,7 +483,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     paddingHorizontal: 20,
     paddingVertical: 10,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     borderRadius: 8,
   },
   emptyButtonText: {
@@ -564,7 +564,7 @@ const styles = StyleSheet.create({
   },
   receiptText: {
     fontSize: 13,
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: '500',
   },
   rejectionBox: {
@@ -603,7 +603,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   approveButton: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     flex: 1,
     justifyContent: 'center',
   },
@@ -630,7 +630,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 4,

@@ -113,7 +113,7 @@ export default function ClientDashboardEnhanced() {
     >
       {error && (
         <View style={styles.errorBanner}>
-          <Ionicons name="alert-circle" size={20} color="#0066CC" />
+          <Ionicons name="alert-circle" size={20} color="#0D9488" />
           <Text style={styles.errorText}>Server không khả dụng - Dùng dữ liệu demo</Text>
         </View>
       )}
@@ -139,7 +139,7 @@ export default function ClientDashboardEnhanced() {
             title="Dự án"
             value={data.projects.active}
             icon="briefcase"
-            gradientColors={['#3B82F6', '#0066CC']}
+            gradientColors={['#0D9488', '#0D9488']}
             trend={{ value: `${data.projects.planning} đang lên kế hoạch`, isPositive: true }}
             subtitle="Đang thực hiện"
           />
@@ -147,7 +147,7 @@ export default function ClientDashboardEnhanced() {
             title="Tiến độ"
             value={`${Math.round((data.milestones.completed / data.milestones.total) * 100)}%`}
             icon="trending-up"
-            gradientColors={['#0066CC', '#0066CC']}
+            gradientColors={['#0D9488', '#0D9488']}
             trend={{ value: `${data.milestones.completed}/${data.milestones.total}`, isPositive: true }}
             subtitle="Milestone"
           />
@@ -165,7 +165,7 @@ export default function ClientDashboardEnhanced() {
             title="Còn lại"
             value={`${(data.payments.pending / 1000000000).toFixed(1)}B`}
             icon="hourglass"
-            gradientColors={['#0066CC', '#D97706']}
+            gradientColors={['#0D9488', '#D97706']}
             trend={{ value: 'Theo kế hoạch', isPositive: true }}
             subtitle="VNĐ"
           />
@@ -185,7 +185,7 @@ export default function ClientDashboardEnhanced() {
           <QuickAction
             icon="card"
             label="Thanh toán"
-            color="#0066CC"
+            color="#0D9488"
             onPress={() => console.log('Payment')}
           />
           <QuickAction
@@ -197,7 +197,7 @@ export default function ClientDashboardEnhanced() {
           <QuickAction
             icon="help-circle"
             label="Hỗ trợ"
-            color="#0066CC"
+            color="#0D9488"
             badge={data.support.tickets}
             onPress={() => console.log('Support')}
           />
@@ -209,7 +209,7 @@ export default function ClientDashboardEnhanced() {
         <SimpleChart
           data={progressData}
           title="Tiến độ dự án theo tháng"
-          color="#0066CC"
+          color="#0D9488"
         />
       </View>
 
@@ -282,7 +282,7 @@ export default function ClientDashboardEnhanced() {
                 <Ionicons
                   name={payment.status === 'paid' ? 'checkmark-circle' : 'time'}
                   size={20}
-                  color={payment.status === 'paid' ? '#0066CC' : '#0066CC'}
+                  color={payment.status === 'paid' ? '#0D9488' : '#0D9488'}
                 />
               </View>
               <View style={styles.paymentContent}>
@@ -445,7 +445,7 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     borderRadius: 3,
   },
   progressText: {

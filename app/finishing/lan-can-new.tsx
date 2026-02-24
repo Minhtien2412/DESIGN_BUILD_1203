@@ -18,7 +18,7 @@ export default function LanCanNewScreen() {
       <Stack.Screen
         options={{
           title: config?.title || 'Thợ lan can',
-          headerStyle: { backgroundColor: '#0066CC' },
+          headerStyle: { backgroundColor: '#0D9488' },
           headerTintColor: '#fff',
         }}
       />

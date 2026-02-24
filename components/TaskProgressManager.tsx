@@ -204,15 +204,15 @@ const TaskProgressManager: React.FC<TaskProgressManagerProps> = ({
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed': return '#0066CC';
-      case 'in-progress': return '#3B82F6';
-      case 'pending': return '#0066CC';
+      case 'completed': return '#0D9488';
+      case 'in-progress': return '#0D9488';
+      case 'pending': return '#0D9488';
       case 'delayed': return '#000000';
       case 'submitted': return '#666666';
-      case 'under-review': return '#0066CC';
-      case 'approved': return '#0066CC';
+      case 'under-review': return '#0D9488';
+      case 'approved': return '#0D9488';
       case 'rejected': return '#000000';
-      case 'revision-required': return '#0066CC';
+      case 'revision-required': return '#0D9488';
       default: return '#6B7280';
     }
   };
@@ -221,8 +221,8 @@ const TaskProgressManager: React.FC<TaskProgressManagerProps> = ({
     switch (priority) {
       case 'critical': return '#000000';
       case 'high': return '#000000';
-      case 'medium': return '#0066CC';
-      case 'low': return '#0066CC';
+      case 'medium': return '#0D9488';
+      case 'low': return '#0D9488';
       default: return '#6B7280';
     }
   };
@@ -679,7 +679,7 @@ const styles = StyleSheet.create({
   submissionProgress: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#3b82f6',
+    color: '#0D9488',
   },
   submissionStatus: {
     fontSize: 10,
@@ -696,12 +696,12 @@ const styles = StyleSheet.create({
   },
   qualityScore: {
     fontSize: 10,
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: '500',
     marginTop: 2,
   },
   reviewButton: {
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#0D9488',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 4,
@@ -719,7 +719,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   actionButton: {
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#0D9488',
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
@@ -800,8 +800,8 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   radioSelected: {
-    borderColor: '#3b82f6',
-    backgroundColor: '#3b82f6',
+    borderColor: '#0D9488',
+    backgroundColor: '#0D9488',
   },
   radioLabel: {
     fontSize: 14,
@@ -810,7 +810,7 @@ const styles = StyleSheet.create({
   submissionModalInfo: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#3b82f6',
+    color: '#0D9488',
     marginBottom: 8,
   },
   submissionModalDescription: {
@@ -847,7 +847,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     marginLeft: 8,
     borderRadius: 8,
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#0D9488',
     alignItems: 'center',
   },
   submitButtonText: {

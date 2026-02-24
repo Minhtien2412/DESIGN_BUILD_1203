@@ -85,7 +85,7 @@ export function ParticipantCard({ participant, onPress, showRoute }: Participant
 
       {showRoute && participant.currentLocation && (
         <TouchableOpacity style={styles.routeButton} onPress={onPress}>
-          <Ionicons name="navigate" size={20} color="#3B82F6" />
+          <Ionicons name="navigate" size={20} color="#0D9488" />
         </TouchableOpacity>
       )}
     </TouchableOpacity>

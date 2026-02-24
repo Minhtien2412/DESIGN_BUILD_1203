@@ -286,7 +286,7 @@ function DefaultSplash({
   return (
     <View style={styles.splash}>
       <Text style={styles.appName}>ThietKeResort</Text>
-      <ActivityIndicator size="large" color="#3b82f6" style={styles.loader} />
+      <ActivityIndicator size="large" color="#0D9488" style={styles.loader} />
       <Text style={styles.task}>{task}</Text>
       <View style={styles.progressBar}>
         <View style={[styles.progressFill, { width: `${progress}%` }]} />
@@ -395,7 +395,7 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: "100%",
-    backgroundColor: "#3b82f6",
+    backgroundColor: "#0D9488",
     borderRadius: 2,
   },
 });

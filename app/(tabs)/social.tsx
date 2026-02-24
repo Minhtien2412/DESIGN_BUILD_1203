@@ -641,7 +641,7 @@ export default function SocialScreen() {
           </View>
           <View style={styles.sourceStatItem}>
             <View
-              style={[styles.sourceStatDot, { backgroundColor: "#3B82F6" }]}
+              style={[styles.sourceStatDot, { backgroundColor: "#0D9488" }]}
             />
             <Text style={styles.sourceStatLabel}>GNews: {sources.gnews}</Text>
           </View>

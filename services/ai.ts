@@ -303,9 +303,9 @@ export function formatAIResponse(content: string): string {
  * Calculate confidence level color
  */
 export function getConfidenceColor(confidence: number): string {
-  if (confidence >= 80) return '#0066CC'; // green
+  if (confidence >= 80) return '#0D9488'; // green
   if (confidence >= 60) return '#eab308'; // yellow
-  if (confidence >= 40) return '#0066CC'; // orange
+  if (confidence >= 40) return '#0D9488'; // orange
   return '#000000'; // red
 }
 
@@ -315,10 +315,10 @@ export function getConfidenceColor(confidence: number): string {
 export function getSeverityColor(severity: string): string {
   const colors: Record<string, string> = {
     CRITICAL: '#000000',
-    HIGH: '#0066CC',
+    HIGH: '#0D9488',
     MEDIUM: '#eab308',
-    LOW: '#0066CC',
-    INFO: '#3b82f6',
+    LOW: '#0D9488',
+    INFO: '#0D9488',
   };
   return colors[severity] || '#6b7280';
 }

@@ -31,9 +31,9 @@ export function TeamMembersList({
   const getStatusColor = (status?: string) => {
     switch (status) {
       case 'online':
-        return '#0066CC';
+        return '#0D9488';
       case 'busy':
-        return '#0066CC';
+        return '#0D9488';
       default:
         return '#9CA3AF';
     }

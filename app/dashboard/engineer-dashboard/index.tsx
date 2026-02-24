@@ -28,7 +28,7 @@ export default function EngineerDashboardScreen() {
   const backgroundColor = useThemeColor({}, "background");
   const textColor = useThemeColor({}, "text");
   const cardColor = useThemeColor({}, "card");
-  const primaryColor = "#0080FF";
+  const primaryColor = "#14B8A6";
 
   useEffect(() => {
     loadDashboard();

@@ -37,9 +37,9 @@ export default function CreateIncidentScreen() {
   const [newWitnessPhone, setNewWitnessPhone] = useState('');
 
   const severityOptions: { value: SeverityType; label: string; color: string }[] = [
-    { value: 'low', label: 'Thấp', color: '#0066CC' },
-    { value: 'medium', label: 'Trung bình', color: '#0080FF' },
-    { value: 'high', label: 'Cao', color: '#0066CC' },
+    { value: 'low', label: 'Thấp', color: '#0D9488' },
+    { value: 'medium', label: 'Trung bình', color: '#14B8A6' },
+    { value: 'high', label: 'Cao', color: '#0D9488' },
     { value: 'critical', label: 'Nghiêm trọng', color: '#000000' },
   ];
 

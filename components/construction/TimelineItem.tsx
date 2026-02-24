@@ -20,8 +20,8 @@ interface TimelineItemProps {
 }
 
 const STATUS_COLORS = {
-  completed: '#0066CC',
-  current: '#3b82f6',
+  completed: '#0D9488',
+  current: '#0D9488',
   pending: '#9ca3af',
   failed: '#000000',
 };

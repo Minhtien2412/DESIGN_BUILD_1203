@@ -157,7 +157,7 @@ export default function ConstructionMapCanvas({
   if (loading) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#0066CC" />
+        <ActivityIndicator size="large" color="#0D9488" />
         <Text style={styles.loadingText}>Loading construction map...</Text>
       </View>
     );
@@ -412,10 +412,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   fabTask: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#0D9488',
   },
   fabStage: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   fabText: {
     color: '#FFFFFF',

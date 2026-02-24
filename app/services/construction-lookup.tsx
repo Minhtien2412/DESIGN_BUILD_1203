@@ -409,7 +409,7 @@ export default function ConstructionLookupScreen() {
 
         {/* Info Banner */}
         <View style={styles.infoBanner}>
-          <Ionicons name="information-circle" size={20} color="#0066CC" />
+          <Ionicons name="information-circle" size={20} color="#0D9488" />
           <Text style={styles.infoBannerText}>
             {activeTab === "area"
               ? "Kết quả chỉ mang tính tham khảo, chưa thay thế hồ sơ thiết kế."
@@ -628,7 +628,7 @@ export default function ConstructionLookupScreen() {
 
         {/* Bottom Info */}
         <View style={styles.bottomInfo}>
-          <Ionicons name="alert-circle-outline" size={16} color="#0066CC" />
+          <Ionicons name="alert-circle-outline" size={16} color="#0D9488" />
           <Text style={styles.bottomInfoText}>
             Thông tin mang tính chất tham khảo. Liên hệ chuyên gia để được tư
             vấn chi tiết.
@@ -812,7 +812,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   infoBanner: {
-    backgroundColor: "#E8F4FF",
+    backgroundColor: "#F0FDFA",
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 16,
@@ -895,7 +895,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   unitBadge: {
-    backgroundColor: "#E8F4FF",
+    backgroundColor: "#F0FDFA",
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 4,
@@ -913,12 +913,12 @@ const styles = StyleSheet.create({
   subItemStandard: {
     fontSize: 13,
     fontWeight: "600",
-    color: "#0066CC",
+    color: "#0D9488",
     marginLeft: 6,
   },
   subItemRegion: {
     fontSize: 13,
-    color: "#0066CC",
+    color: "#0D9488",
     marginLeft: 6,
   },
   subItemDescription: {
@@ -1013,7 +1013,7 @@ const styles = StyleSheet.create({
   bottomInfoText: {
     flex: 1,
     fontSize: 11,
-    color: "#0066CC",
+    color: "#0D9488",
     marginLeft: 8,
     lineHeight: 16,
   },
@@ -1068,7 +1068,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   chipActive: {
-    backgroundColor: "#E8F4FF",
+    backgroundColor: "#F0FDFA",
     borderColor: "#90caf9",
   },
   chipText: {

@@ -10,10 +10,7 @@
 
 import { MODERN_COLORS, MODERN_SHADOWS } from "@/constants/modern-theme";
 import { useInvoices } from "@/hooks/usePerfexAPI";
-import {
-    InvoiceDetails,
-    perfexService
-} from "@/services/perfexService";
+import { InvoiceDetails, perfexService } from "@/services/perfexService";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -23,7 +20,6 @@ import {
     Alert,
     Dimensions,
     RefreshControl,
-    SafeAreaView,
     ScrollView,
     Share,
     StyleSheet,
@@ -31,6 +27,7 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const { width } = Dimensions.get("window");
 
@@ -41,8 +38,8 @@ const STATUS_CONFIG: Record<
 > = {
   "1": {
     label: "Chưa thanh toán",
-    color: "#3B82F6",
-    bgColor: "#EFF6FF",
+    color: "#0D9488",
+    bgColor: "#F0FDFA",
     icon: "alert-circle-outline",
   },
   "2": {

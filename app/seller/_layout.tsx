@@ -10,7 +10,7 @@ export default function SellerLayout() {
     <Stack
       screenOptions={{
         headerStyle: {
-          backgroundColor: "#FF6B35",
+          backgroundColor: "#14B8A6",
         },
         headerTintColor: "#FFFFFF",
         headerTitleStyle: {

@@ -129,7 +129,7 @@ const THUOC_522: Ruler = {
       name: "Thiên Tài",
       nameHan: "天財",
       type: "good",
-      color: "#3b82f6",
+      color: "#0D9488",
       meaning:
         "Luôn may mắn về tài lộc, năng tài đắc lợi, con cái nhờ vả hiếu thảo, gia đạo chí thọ an vui",
       rangeStart: 0.2,
@@ -280,7 +280,7 @@ const THUOC_429: Ruler = {
       name: "Nghĩa",
       nameHan: "義",
       type: "good",
-      color: "#3b82f6",
+      color: "#0D9488",
       meaning: "Đạt được điều hay lẽ phải",
       rangeStart: 0.162,
       rangeEnd: 0.214,
@@ -406,7 +406,7 @@ const THUOC_388: Ruler = {
       name: "Vượng",
       nameHan: "旺",
       type: "good",
-      color: "#3b82f6",
+      color: "#0D9488",
       meaning: "Hưng vượng, thịnh vượng",
       rangeStart: 0.0776,
       rangeEnd: 0.1164,
@@ -966,7 +966,7 @@ export default function LoBanRulerScreen() {
   const getRulerColor = useCallback((type: RulerType): [string, string] => {
     switch (type) {
       case "522":
-        return ["#3b82f6", "#2563eb"];
+        return ["#0D9488", "#0D9488"];
       case "429":
         return ["#8b5cf6", "#7c3aed"];
       case "388":
@@ -1629,7 +1629,7 @@ export default function LoBanRulerScreen() {
         <View style={styles.infoSection}>
           <Text style={styles.infoTitle}>💡 Hướng dẫn sử dụng</Text>
           <Text style={styles.infoText}>
-            <Text style={{ fontWeight: "600", color: "#3b82f6" }}>
+            <Text style={{ fontWeight: "600", color: "#0D9488" }}>
               Thước 52.2cm:
             </Text>{" "}
             Đo khoảng thông thủy (lọt lòng) như cửa chính, cửa sổ, giếng trời, ô

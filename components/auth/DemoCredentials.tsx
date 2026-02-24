@@ -27,7 +27,7 @@ export function DemoCredentials({ onFillCredentials }: DemoCredentialsProps) {
       email: 'user@example.com',
       password: 'User@123',
       role: 'User',
-      color: '#0066CC',
+      color: '#0D9488',
       icon: 'account' as const,
     },
   ];

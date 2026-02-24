@@ -1,24 +1,29 @@
-import { Container } from '@/components/ui/container';
-import { Colors } from '@/constants/theme';
-import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
-import { useState } from 'react';
+import { Container } from "@/components/ui/container";
+import { Colors } from "@/constants/theme";
+import budgetTrackingService, {
+    Budget as ApiBudget,
+    BudgetLine as ApiBudgetLine,
+} from "@/services/api/budget.service";
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
 import {
     ActivityIndicator,
+    RefreshControl,
     ScrollView,
     StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
     View,
-} from 'react-native';
+} from "react-native";
 
 interface Estimate {
   id: number;
   name: string;
   projectName: string;
   totalEstimate: number;
-  status: 'draft' | 'pending' | 'approved' | 'rejected';
+  status: "draft" | "pending" | "approved" | "rejected";
   createdAt: string;
   createdBy: string;
   categories: {
@@ -28,69 +33,136 @@ interface Estimate {
   }[];
 }
 
-export default function EstimatesScreen() {
-  const [loading, setLoading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterStatus, setFilterStatus] = useState<string>('all');
+// Fallback mock data
+const MOCK_ESTIMATES: Estimate[] = [
+  {
+    id: 1,
+    name: "Dự toán xây thô tầng 5-10",
+    projectName: "Tòa nhà Sunrise Tower",
+    totalEstimate: 2500000000,
+    status: "approved",
+    createdAt: "2025-01-10",
+    createdBy: "Nguyễn Văn A",
+    categories: [
+      { name: "Vật liệu xây dựng", amount: 1500000000, items: 25 },
+      { name: "Nhân công", amount: 700000000, items: 12 },
+      { name: "Thiết bị", amount: 300000000, items: 8 },
+    ],
+  },
+  {
+    id: 2,
+    name: "Dự toán hoàn thiện nội thất",
+    projectName: "Biệt thự Phú Mỹ Hưng",
+    totalEstimate: 800000000,
+    status: "pending",
+    createdAt: "2025-01-15",
+    createdBy: "Trần Thị B",
+    categories: [
+      { name: "Nội thất", amount: 500000000, items: 45 },
+      { name: "Đèn điện", amount: 150000000, items: 30 },
+      { name: "Sàn gỗ", amount: 150000000, items: 5 },
+    ],
+  },
+  {
+    id: 3,
+    name: "Dự toán M&E tầng hầm",
+    projectName: "Chung cư The Manor",
+    totalEstimate: 450000000,
+    status: "draft",
+    createdAt: "2025-01-18",
+    createdBy: "Lê Văn C",
+    categories: [
+      { name: "Điện", amount: 200000000, items: 15 },
+      { name: "Nước", amount: 150000000, items: 12 },
+      { name: "PCCC", amount: 100000000, items: 8 },
+    ],
+  },
+  {
+    id: 4,
+    name: "Dự toán sơn ngoại thất",
+    projectName: "Nhà phố Quận 2",
+    totalEstimate: 120000000,
+    status: "rejected",
+    createdAt: "2025-01-08",
+    createdBy: "Phạm Văn D",
+    categories: [
+      { name: "Sơn", amount: 80000000, items: 10 },
+      { name: "Nhân công", amount: 40000000, items: 3 },
+    ],
+  },
+];
 
-  // Mock data
-  const estimates: Estimate[] = [
-    {
-      id: 1,
-      name: 'Dự toán xây thô tầng 5-10',
-      projectName: 'Tòa nhà Sunrise Tower',
-      totalEstimate: 2500000000,
-      status: 'approved',
-      createdAt: '2025-01-10',
-      createdBy: 'Nguyễn Văn A',
-      categories: [
-        { name: 'Vật liệu xây dựng', amount: 1500000000, items: 25 },
-        { name: 'Nhân công', amount: 700000000, items: 12 },
-        { name: 'Thiết bị', amount: 300000000, items: 8 },
-      ],
-    },
-    {
-      id: 2,
-      name: 'Dự toán hoàn thiện nội thất',
-      projectName: 'Biệt thự Phú Mỹ Hưng',
-      totalEstimate: 800000000,
-      status: 'pending',
-      createdAt: '2025-01-15',
-      createdBy: 'Trần Thị B',
-      categories: [
-        { name: 'Nội thất', amount: 500000000, items: 45 },
-        { name: 'Đèn điện', amount: 150000000, items: 30 },
-        { name: 'Sàn gỗ', amount: 150000000, items: 5 },
-      ],
-    },
-    {
-      id: 3,
-      name: 'Dự toán M&E tầng hầm',
-      projectName: 'Chung cư The Manor',
-      totalEstimate: 450000000,
-      status: 'draft',
-      createdAt: '2025-01-18',
-      createdBy: 'Lê Văn C',
-      categories: [
-        { name: 'Điện', amount: 200000000, items: 15 },
-        { name: 'Nước', amount: 150000000, items: 12 },
-        { name: 'PCCC', amount: 100000000, items: 8 },
-      ],
-    },
-    {
-      id: 4,
-      name: 'Dự toán sơn ngoại thất',
-      projectName: 'Nhà phố Quận 2',
-      totalEstimate: 120000000,
-      status: 'rejected',
-      createdAt: '2025-01-08',
-      createdBy: 'Phạm Văn D',
-      categories: [
-        { name: 'Sơn', amount: 80000000, items: 10 },
-        { name: 'Nhân công', amount: 40000000, items: 3 },
-      ],
-    },
-  ];
+export default function EstimatesScreen() {
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [estimates, setEstimates] = useState<Estimate[]>(MOCK_ESTIMATES);
+
+  const mapBudgetStatus = (
+    b: ApiBudget,
+  ): "draft" | "pending" | "approved" | "rejected" => {
+    if (b.status === "ON_HOLD") return "draft";
+    if (b.status === "CLOSED") return "approved";
+    return "pending";
+  };
+
+  const loadEstimates = useCallback(async () => {
+    try {
+      const response = await budgetTrackingService.getBudgets({
+        page: 1,
+        limit: 50,
+      });
+      const items = response?.data ?? (response as any)?.items ?? [];
+      if (Array.isArray(items) && items.length > 0) {
+        const mapped: Estimate[] = [];
+        for (const b of items as ApiBudget[]) {
+          let categories: { name: string; amount: number; items: number }[] =
+            [];
+          try {
+            const linesResp = await budgetTrackingService.getBudgetLines(b.id);
+            const lines: ApiBudgetLine[] =
+              (linesResp as any)?.data ?? linesResp ?? [];
+            if (Array.isArray(lines) && lines.length > 0) {
+              categories = lines.map((l: ApiBudgetLine) => ({
+                name: l.description || l.category,
+                amount: l.plannedAmount,
+                items: 1,
+              }));
+            }
+          } catch {
+            /* optional */
+          }
+          mapped.push({
+            id: b.id,
+            name: b.projectName || `Dự toán #${b.id}`,
+            projectName: b.projectName || `Dự án #${b.projectId}`,
+            totalEstimate: b.totalBudget,
+            status: mapBudgetStatus(b),
+            createdAt: b.createdAt?.split("T")[0] || "",
+            createdBy: `User #${b.createdBy}`,
+            categories,
+          });
+        }
+        setEstimates(mapped);
+        console.log("[Estimates] Loaded", mapped.length, "from API");
+      }
+    } catch (error) {
+      console.log("[Estimates] API error, using mock data:", error);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadEstimates();
+  }, [loadEstimates]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    loadEstimates();
+  }, [loadEstimates]);
 
   const formatCurrency = (amount: number) => {
     if (amount >= 1000000000) {
@@ -98,51 +170,68 @@ export default function EstimatesScreen() {
     } else if (amount >= 1000000) {
       return `${(amount / 1000000).toFixed(0)} triệu`;
     }
-    return amount.toLocaleString('vi-VN') + ' ₫';
+    return amount.toLocaleString("vi-VN") + " ₫";
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'approved': return '#0066CC';
-      case 'pending': return '#0066CC';
-      case 'draft': return '#94A3B8';
-      case 'rejected': return '#000000';
-      default: return '#94A3B8';
+      case "approved":
+        return "#0D9488";
+      case "pending":
+        return "#0D9488";
+      case "draft":
+        return "#94A3B8";
+      case "rejected":
+        return "#EF4444";
+      default:
+        return "#94A3B8";
     }
   };
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case 'approved': return 'Đã duyệt';
-      case 'pending': return 'Chờ duyệt';
-      case 'draft': return 'Nháp';
-      case 'rejected': return 'Từ chối';
-      default: return status;
+      case "approved":
+        return "Đã duyệt";
+      case "pending":
+        return "Chờ duyệt";
+      case "draft":
+        return "Nháp";
+      case "rejected":
+        return "Từ chối";
+      default:
+        return status;
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'approved': return 'checkmark-circle';
-      case 'pending': return 'time';
-      case 'draft': return 'document';
-      case 'rejected': return 'close-circle';
-      default: return 'ellipse';
+      case "approved":
+        return "checkmark-circle";
+      case "pending":
+        return "time";
+      case "draft":
+        return "document";
+      case "rejected":
+        return "close-circle";
+      default:
+        return "ellipse";
     }
   };
 
-  const filteredEstimates = estimates.filter(estimate => {
-    const matchSearch = estimate.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                       estimate.projectName.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchStatus = filterStatus === 'all' || estimate.status === filterStatus;
+  const filteredEstimates = estimates.filter((estimate) => {
+    const matchSearch =
+      estimate.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      estimate.projectName.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchStatus =
+      filterStatus === "all" || estimate.status === filterStatus;
     return matchSearch && matchStatus;
   });
 
   const statusFilters = [
-    { key: 'all', label: 'Tất cả' },
-    { key: 'pending', label: 'Chờ duyệt' },
-    { key: 'approved', label: 'Đã duyệt' },
-    { key: 'draft', label: 'Nháp' },
+    { key: "all", label: "Tất cả" },
+    { key: "pending", label: "Chờ duyệt" },
+    { key: "approved", label: "Đã duyệt" },
+    { key: "draft", label: "Nháp" },
   ];
 
   return (
@@ -150,7 +239,10 @@ export default function EstimatesScreen() {
       <View style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={styles.backButton}
+          >
             <Ionicons name="arrow-back" size={24} color="#333" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Dự toán</Text>
@@ -166,14 +258,14 @@ export default function EstimatesScreen() {
             <Text style={styles.summaryLabel}>Tổng dự toán</Text>
           </View>
           <View style={styles.summaryCard}>
-            <Text style={[styles.summaryNumber, { color: '#0066CC' }]}>
-              {estimates.filter(e => e.status === 'pending').length}
+            <Text style={[styles.summaryNumber, { color: "#0D9488" }]}>
+              {estimates.filter((e) => e.status === "pending").length}
             </Text>
             <Text style={styles.summaryLabel}>Chờ duyệt</Text>
           </View>
           <View style={styles.summaryCard}>
-            <Text style={[styles.summaryNumber, { color: '#0066CC' }]}>
-              {estimates.filter(e => e.status === 'approved').length}
+            <Text style={[styles.summaryNumber, { color: "#0D9488" }]}>
+              {estimates.filter((e) => e.status === "approved").length}
             </Text>
             <Text style={styles.summaryLabel}>Đã duyệt</Text>
           </View>
@@ -181,7 +273,12 @@ export default function EstimatesScreen() {
 
         {/* Search */}
         <View style={styles.searchContainer}>
-          <Ionicons name="search" size={20} color="#94A3B8" style={styles.searchIcon} />
+          <Ionicons
+            name="search"
+            size={20}
+            color="#94A3B8"
+            style={styles.searchIcon}
+          />
           <TextInput
             style={styles.searchInput}
             placeholder="Tìm kiếm dự toán..."
@@ -219,9 +316,23 @@ export default function EstimatesScreen() {
         </ScrollView>
 
         {/* Estimates List */}
-        <ScrollView style={styles.listContainer} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          style={styles.listContainer}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor={Colors.light.primary}
+            />
+          }
+        >
           {loading ? (
-            <ActivityIndicator size="large" color={Colors.light.primary} style={styles.loader} />
+            <ActivityIndicator
+              size="large"
+              color={Colors.light.primary}
+              style={styles.loader}
+            />
           ) : (
             filteredEstimates.map((estimate) => (
               <TouchableOpacity
@@ -231,15 +342,37 @@ export default function EstimatesScreen() {
               >
                 <View style={styles.cardHeader}>
                   <View style={styles.cardTitleRow}>
-                    <Ionicons name="document-text" size={20} color={Colors.light.primary} />
+                    <Ionicons
+                      name="document-text"
+                      size={20}
+                      color={Colors.light.primary}
+                    />
                     <View style={styles.cardTitleContent}>
                       <Text style={styles.estimateName}>{estimate.name}</Text>
-                      <Text style={styles.projectName}>{estimate.projectName}</Text>
+                      <Text style={styles.projectName}>
+                        {estimate.projectName}
+                      </Text>
                     </View>
                   </View>
-                  <View style={[styles.statusBadge, { backgroundColor: `${getStatusColor(estimate.status)}15` }]}>
-                    <Ionicons name={getStatusIcon(estimate.status) as any} size={14} color={getStatusColor(estimate.status)} />
-                    <Text style={[styles.statusText, { color: getStatusColor(estimate.status) }]}>
+                  <View
+                    style={[
+                      styles.statusBadge,
+                      {
+                        backgroundColor: `${getStatusColor(estimate.status)}15`,
+                      },
+                    ]}
+                  >
+                    <Ionicons
+                      name={getStatusIcon(estimate.status) as any}
+                      size={14}
+                      color={getStatusColor(estimate.status)}
+                    />
+                    <Text
+                      style={[
+                        styles.statusText,
+                        { color: getStatusColor(estimate.status) },
+                      ]}
+                    >
                       {getStatusText(estimate.status)}
                     </Text>
                   </View>
@@ -247,14 +380,18 @@ export default function EstimatesScreen() {
 
                 <View style={styles.totalRow}>
                   <Text style={styles.totalLabel}>Tổng dự toán</Text>
-                  <Text style={styles.totalValue}>{formatCurrency(estimate.totalEstimate)}</Text>
+                  <Text style={styles.totalValue}>
+                    {formatCurrency(estimate.totalEstimate)}
+                  </Text>
                 </View>
 
                 <View style={styles.categoriesContainer}>
                   {estimate.categories.map((cat, index) => (
                     <View key={index} style={styles.categoryItem}>
                       <Text style={styles.categoryName}>{cat.name}</Text>
-                      <Text style={styles.categoryAmount}>{formatCurrency(cat.amount)}</Text>
+                      <Text style={styles.categoryAmount}>
+                        {formatCurrency(cat.amount)}
+                      </Text>
                       <Text style={styles.categoryItems}>{cat.items} mục</Text>
                     </View>
                   ))}
@@ -266,9 +403,13 @@ export default function EstimatesScreen() {
                     <Text style={styles.footerText}>{estimate.createdBy}</Text>
                   </View>
                   <View style={styles.footerInfo}>
-                    <Ionicons name="calendar-outline" size={14} color="#94A3B8" />
+                    <Ionicons
+                      name="calendar-outline"
+                      size={14}
+                      color="#94A3B8"
+                    />
                     <Text style={styles.footerText}>
-                      {new Date(estimate.createdAt).toLocaleDateString('vi-VN')}
+                      {new Date(estimate.createdAt).toLocaleDateString("vi-VN")}
                     </Text>
                   </View>
                 </View>
@@ -286,59 +427,59 @@ export default function EstimatesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     padding: 16,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e5e5',
+    borderBottomColor: "#e5e5e5",
   },
   backButton: {
     padding: 8,
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
   },
   addButton: {
     padding: 8,
   },
   summaryRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     padding: 16,
     gap: 12,
   },
   summaryCard: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     padding: 12,
     borderRadius: 12,
-    alignItems: 'center',
+    alignItems: "center",
   },
   summaryNumber: {
     fontSize: 24,
-    fontWeight: '700',
+    fontWeight: "700",
     color: Colors.light.primary,
   },
   summaryLabel: {
     fontSize: 12,
-    color: '#666',
+    color: "#666",
     marginTop: 4,
   },
   searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
     marginHorizontal: 16,
     borderRadius: 12,
     paddingHorizontal: 16,
     borderWidth: 1,
-    borderColor: '#e5e5e5',
+    borderColor: "#e5e5e5",
   },
   searchIcon: {
     marginRight: 8,
@@ -347,7 +488,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 12,
     fontSize: 15,
-    color: '#333',
+    color: "#333",
   },
   filterContainer: {
     marginTop: 12,
@@ -361,9 +502,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderWidth: 1,
-    borderColor: '#e5e5e5',
+    borderColor: "#e5e5e5",
     marginRight: 8,
   },
   filterTabActive: {
@@ -372,11 +513,11 @@ const styles = StyleSheet.create({
   },
   filterText: {
     fontSize: 13,
-    color: '#666',
-    fontWeight: '500',
+    color: "#666",
+    fontWeight: "500",
   },
   filterTextActive: {
-    color: '#fff',
+    color: "#fff",
   },
   listContainer: {
     flex: 1,
@@ -387,24 +528,24 @@ const styles = StyleSheet.create({
     marginTop: 40,
   },
   estimateCard: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
   },
   cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
     marginBottom: 12,
   },
   cardTitleRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     flex: 1,
     gap: 10,
   },
@@ -413,17 +554,17 @@ const styles = StyleSheet.create({
   },
   estimateName: {
     fontSize: 15,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
   },
   projectName: {
     fontSize: 13,
-    color: '#666',
+    color: "#666",
     marginTop: 2,
   },
   statusBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
@@ -431,25 +572,25 @@ const styles = StyleSheet.create({
   },
   statusText: {
     fontSize: 11,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   totalRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingVertical: 12,
     borderTopWidth: 1,
     borderBottomWidth: 1,
-    borderColor: '#f0f0f0',
+    borderColor: "#f0f0f0",
     marginBottom: 12,
   },
   totalLabel: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
   },
   totalValue: {
     fontSize: 18,
-    fontWeight: '700',
+    fontWeight: "700",
     color: Colors.light.primary,
   },
   categoriesContainer: {
@@ -457,42 +598,42 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   categoryItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   categoryName: {
     flex: 1,
     fontSize: 13,
-    color: '#444',
+    color: "#444",
   },
   categoryAmount: {
     fontSize: 13,
-    fontWeight: '500',
-    color: '#333',
+    fontWeight: "500",
+    color: "#333",
     width: 100,
-    textAlign: 'right',
+    textAlign: "right",
   },
   categoryItems: {
     fontSize: 12,
-    color: '#94A3B8',
+    color: "#94A3B8",
     width: 60,
-    textAlign: 'right',
+    textAlign: "right",
   },
   cardFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
+    borderTopColor: "#f0f0f0",
   },
   footerInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 4,
   },
   footerText: {
     fontSize: 12,
-    color: '#94A3B8',
+    color: "#94A3B8",
   },
 });

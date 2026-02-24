@@ -48,8 +48,8 @@ const STATUS_LABELS: Record<DocumentStatus, string> = {
 
 const STATUS_COLORS: Record<DocumentStatus, string> = {
   [DocumentStatus.DRAFT]: '#999999',
-  [DocumentStatus.UNDER_REVIEW]: '#0066CC',
-  [DocumentStatus.APPROVED]: '#0066CC',
+  [DocumentStatus.UNDER_REVIEW]: '#0D9488',
+  [DocumentStatus.APPROVED]: '#0D9488',
   [DocumentStatus.REJECTED]: '#000000',
   [DocumentStatus.SUPERSEDED]: '#4A4A4A',
   [DocumentStatus.ARCHIVED]: '#757575',
@@ -286,7 +286,7 @@ export default function DocumentsScreen() {
                     <Ionicons
                       name={getFileTypeIcon(doc.fileType)}
                       size={28}
-                      color="#0066CC"
+                      color="#0D9488"
                     />
                   </View>
                   <View style={styles.headerInfo}>
@@ -391,7 +391,7 @@ export default function DocumentsScreen() {
                     )
                   }
                 >
-                  <Ionicons name="eye-outline" size={18} color="#0066CC" />
+                  <Ionicons name="eye-outline" size={18} color="#0D9488" />
                   <Text style={styles.actionButtonText}>Xem</Text>
                 </TouchableOpacity>
 
@@ -401,7 +401,7 @@ export default function DocumentsScreen() {
                     router.push(`/documents/share?documentId=${doc.id}&projectId=${projectId}`)
                   }
                 >
-                  <Ionicons name="share-outline" size={18} color="#0066CC" />
+                  <Ionicons name="share-outline" size={18} color="#0D9488" />
                   <Text style={styles.actionButtonText}>Chia sẻ</Text>
                 </TouchableOpacity>
 
@@ -479,7 +479,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   filterChipActive: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   filterChipText: {
     fontSize: 13,
@@ -507,7 +507,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     paddingHorizontal: 20,
     paddingVertical: 10,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     borderRadius: 8,
   },
   emptyButtonText: {
@@ -536,7 +536,7 @@ const styles = StyleSheet.create({
     width: 52,
     height: 52,
     borderRadius: 26,
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -599,12 +599,12 @@ const styles = StyleSheet.create({
   tag: {
     paddingHorizontal: 8,
     paddingVertical: 3,
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     borderRadius: 4,
   },
   tagText: {
     fontSize: 11,
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: '500',
   },
   moreTagsText: {
@@ -647,7 +647,7 @@ const styles = StyleSheet.create({
   actionButtonText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   fab: {
     position: 'absolute',
@@ -656,7 +656,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 4,

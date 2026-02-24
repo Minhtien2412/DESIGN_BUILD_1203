@@ -29,7 +29,7 @@ const lightPalette: DesignPalette = {
   text: '#1F2612',
   textMuted: '#5E6B4A',
   accent: '#6A9330',
-  accentSoft: '#0066CC',
+  accentSoft: '#0D9488',
   accentFg: '#FFFFFF',
   icon: '#4D5A33',
   chipBackground: '#E6F1D6',

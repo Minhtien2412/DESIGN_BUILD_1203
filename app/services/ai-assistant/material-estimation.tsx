@@ -87,7 +87,7 @@ export default function MaterialEstimationScreen() {
               <Text style={styles.summaryLabel}>Loại vật liệu</Text>
             </View>
             <View style={styles.summaryItem}>
-              <Ionicons name="cash" size={32} color="#0066CC" />
+              <Ionicons name="cash" size={32} color="#0D9488" />
               <Text style={styles.summaryValue}>
                 {(totalCost / 1000000).toFixed(1)}M
               </Text>
@@ -97,7 +97,7 @@ export default function MaterialEstimationScreen() {
               <Ionicons
                 name="speedometer"
                 size={32}
-                color={(result.confidenceScore || 0.8) > 0.7 ? '#0066CC' : '#0066CC'}
+                color={(result.confidenceScore || 0.8) > 0.7 ? '#0D9488' : '#0D9488'}
               />
               <Text style={styles.summaryValue}>
                 {Math.round((result.confidenceScore || 0.8) * 100)}%
@@ -159,7 +159,7 @@ export default function MaterialEstimationScreen() {
                       style={[
                         styles.detailValue,
                         styles.priceValue,
-                        { color: '#0066CC' },
+                        { color: '#0D9488' },
                       ]}
                     >
                       {(
@@ -187,7 +187,7 @@ export default function MaterialEstimationScreen() {
         {result.notes && (
           <View style={styles.notesSection}>
             <View style={styles.notesHeader}>
-              <Ionicons name="information-circle" size={20} color="#0066CC" />
+              <Ionicons name="information-circle" size={20} color="#0D9488" />
               <Text style={styles.notesTitle}>Ghi chú</Text>
             </View>
             <Text style={[styles.notesText, { color: textColor }]}>
@@ -348,10 +348,10 @@ const styles = StyleSheet.create({
   notesSection: {
     margin: 16,
     padding: 16,
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     borderRadius: 12,
     borderLeftWidth: 4,
-    borderLeftColor: '#0066CC',
+    borderLeftColor: '#0D9488',
   },
   notesHeader: {
     flexDirection: 'row',
@@ -362,7 +362,7 @@ const styles = StyleSheet.create({
   notesTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   notesText: {
     fontSize: 14,

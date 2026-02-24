@@ -350,7 +350,7 @@ export default function ContactsScreen() {
     <View style={styles.container}>
       <StatusBar
         barStyle="light-content"
-        backgroundColor="#0068FF"
+        backgroundColor="#0D9488"
         translucent
       />
 

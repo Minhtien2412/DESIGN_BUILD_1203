@@ -24,19 +24,19 @@ const STATUS_CONFIG: Record<
   },
   SENT: {
     label: 'Đã gửi',
-    color: '#0066CC',
-    bgColor: '#E8F4FF',
+    color: '#0D9488',
+    bgColor: '#F0FDFA',
     icon: 'send',
   },
   VIEWED: {
     label: 'Đã xem',
-    color: '#0066CC',
-    bgColor: '#E8F4FF',
+    color: '#0D9488',
+    bgColor: '#F0FDFA',
     icon: 'eye',
   },
   PAID: {
     label: 'Đã thanh toán',
-    color: '#0066CC',
+    color: '#0D9488',
     bgColor: '#E8F5E9',
     icon: 'checkmark-circle',
   },
@@ -217,7 +217,7 @@ export default function InvoicesScreen() {
 
         <View style={styles.summaryCard}>
           <Text style={styles.summaryLabel}>Đã thu</Text>
-          <Text style={[styles.summaryValue, { color: '#0066CC' }]}>
+          <Text style={[styles.summaryValue, { color: '#0D9488' }]}>
             {formatCurrency(
               invoices.reduce((sum, inv) => sum + inv.paidAmount, 0)
             )}
@@ -386,8 +386,8 @@ export default function InvoicesScreen() {
                       router.push(`/budget/invoice/${invoice.id}?projectId=${projectId}` as Href);
                     }}
                   >
-                    <Ionicons name="eye-outline" size={14} color="#0066CC" />
-                    <Text style={[styles.actionButtonText, { color: '#0066CC' }]}>
+                    <Ionicons name="eye-outline" size={14} color="#0D9488" />
+                    <Text style={[styles.actionButtonText, { color: '#0D9488' }]}>
                       Chi tiết
                     </Text>
                   </TouchableOpacity>
@@ -450,14 +450,14 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   filterChipActive: {
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
   },
   filterText: {
     fontSize: 13,
     color: '#666',
   },
   filterTextActive: {
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: '600',
   },
   summaryRow: {
@@ -503,7 +503,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     paddingHorizontal: 20,
     paddingVertical: 10,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     borderRadius: 8,
   },
   emptyButtonText: {
@@ -570,7 +570,7 @@ const styles = StyleSheet.create({
   paidAmount: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   remainingAmount: {
     fontSize: 14,
@@ -613,19 +613,19 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   sendButton: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     flex: 1,
     justifyContent: 'center',
   },
   paymentButton: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     flex: 1,
     justifyContent: 'center',
   },
   viewButton: {
     backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#0066CC',
+    borderColor: '#0D9488',
     flex: 1,
     justifyContent: 'center',
   },
@@ -647,7 +647,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 4,

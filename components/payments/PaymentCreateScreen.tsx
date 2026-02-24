@@ -138,7 +138,7 @@ export default function PaymentCreateScreen() {
         {payment && (
           <View style={[styles.resultCard, styles.successCard]}>
             <View style={styles.resultHeader}>
-              <Ionicons name="checkmark-circle" size={32} color="#0066CC" />
+              <Ionicons name="checkmark-circle" size={32} color="#0D9488" />
               <Text style={styles.successTitle}>Tạo thành công!</Text>
             </View>
             
@@ -162,14 +162,14 @@ export default function PaymentCreateScreen() {
               
               <View style={styles.resultItem}>
                 <Text style={styles.resultLabel}>Trạng thái:</Text>
-                <View style={[styles.statusBadge, { backgroundColor: '#0066CC20' }]}>
-                  <Text style={[styles.statusText, { color: '#0066CC' }]}>{payment.status}</Text>
+                <View style={[styles.statusBadge, { backgroundColor: '#0D948820' }]}>
+                  <Text style={[styles.statusText, { color: '#0D9488' }]}>{payment.status}</Text>
                 </View>
               </View>
             </View>
             
             <TouchableOpacity 
-              style={[styles.resetButton, { backgroundColor: '#0066CC' }]} 
+              style={[styles.resetButton, { backgroundColor: '#0D9488' }]} 
               onPress={handleReset}
             >
               <Ionicons name="add-outline" size={20} color="white" />
@@ -358,7 +358,7 @@ const styles = StyleSheet.create({
   successTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   errorTitle: {
     fontSize: 18,

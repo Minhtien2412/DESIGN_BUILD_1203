@@ -72,7 +72,7 @@ export const mockBanners = [
     subtitle: "Giảm 20% thiết kế nội thất",
     image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800",
     route: "/promotions/january",
-    backgroundColor: "#FF6B35",
+    backgroundColor: "#14B8A6",
   },
   {
     id: "2",

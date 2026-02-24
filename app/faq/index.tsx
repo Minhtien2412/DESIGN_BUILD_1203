@@ -113,8 +113,8 @@ export default function FAQScreen() {
               )}
             >
               <View style={styles.categoryLeft}>
-                <View style={[styles.categoryIcon, { backgroundColor: '#FF6B3520' }]}>
-                  <Ionicons name={category.icon as any} size={24} color="#FF6B35" />
+                <View style={[styles.categoryIcon, { backgroundColor: '#14B8A620' }]}>
+                  <Ionicons name={category.icon as any} size={24} color="#14B8A6" />
                 </View>
                 <Text style={[styles.categoryTitle, { color: textColor }]}>{category.category}</Text>
               </View>
@@ -142,7 +142,7 @@ export default function FAQScreen() {
                       <Ionicons
                         name="help-circle-outline"
                         size={18}
-                        color="#FF6B35"
+                        color="#14B8A6"
                         style={{ marginRight: 8 }}
                       />
                       <Text style={[styles.questionText, { color: textColor }]}>{item.q}</Text>
@@ -165,7 +165,7 @@ export default function FAQScreen() {
         ))}
 
         {/* Still need help */}
-        <View style={[styles.helpCard, { backgroundColor: '#FF6B35' }]}>
+        <View style={[styles.helpCard, { backgroundColor: '#14B8A6' }]}>
           <Ionicons name="chatbubbles" size={32} color="#fff" />
           <Text style={styles.helpTitle}>Vẫn cần hỗ trợ?</Text>
           <Text style={styles.helpDesc}>Liên hệ đội ngũ CSKH của chúng tôi</Text>
@@ -211,5 +211,5 @@ const styles = StyleSheet.create({
   helpTitle: { color: '#fff', fontSize: 20, fontWeight: 'bold', marginTop: 12 },
   helpDesc: { color: '#fff', opacity: 0.9, marginTop: 4 },
   helpBtn: { marginTop: 16, backgroundColor: '#fff', paddingHorizontal: 32, paddingVertical: 12, borderRadius: 24 },
-  helpBtnText: { color: '#FF6B35', fontWeight: '600' },
+  helpBtnText: { color: '#14B8A6', fontWeight: '600' },
 });

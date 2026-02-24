@@ -96,17 +96,17 @@ const CATEGORY_INFO: Record<
   },
   [DocumentCategory.CONTRACT]: {
     icon: "document-text",
-    color: "#0066CC",
+    color: "#0D9488",
     label: "Hợp đồng",
   },
   [DocumentCategory.PERMIT]: {
     icon: "checkmark-circle",
-    color: "#0066CC",
+    color: "#0D9488",
     label: "Giấy phép",
   },
   [DocumentCategory.SPECIFICATION]: {
     icon: "list",
-    color: "#0066CC",
+    color: "#0D9488",
     label: "Đặc tả",
   },
   [DocumentCategory.REPORT]: {
@@ -116,17 +116,17 @@ const CATEGORY_INFO: Record<
   },
   [DocumentCategory.PHOTO]: {
     icon: "image",
-    color: "#0080FF",
+    color: "#14B8A6",
     label: "Hình ảnh",
   },
   [DocumentCategory.INVOICE]: {
     icon: "receipt",
-    color: "#0066CC",
+    color: "#0D9488",
     label: "Hóa đơn",
   },
   [DocumentCategory.SCHEDULE]: {
     icon: "calendar",
-    color: "#0066CC",
+    color: "#0D9488",
     label: "Lịch trình",
   },
   [DocumentCategory.SAFETY]: {
@@ -136,7 +136,7 @@ const CATEGORY_INFO: Record<
   },
   [DocumentCategory.QUALITY]: {
     icon: "star",
-    color: "#0066CC",
+    color: "#0D9488",
     label: "Chất lượng",
   },
   [DocumentCategory.MEETING]: {
@@ -151,12 +151,12 @@ const CATEGORY_INFO: Record<
   },
   [DocumentCategory.SUBMITTAL]: {
     icon: "send",
-    color: "#0066CC",
+    color: "#0D9488",
     label: "Đệ trình",
   },
   [DocumentCategory.WARRANTY]: {
     icon: "shield",
-    color: "#0066CC",
+    color: "#0D9488",
     label: "Bảo hành",
   },
   [DocumentCategory.MANUAL]: {
@@ -280,8 +280,8 @@ export default function DocumentDashboardScreen() {
         <RefreshControl
           refreshing={refreshing}
           onRefresh={handleRefresh}
-          colors={["#0066CC"]}
-          tintColor="#0066CC"
+          colors={["#0D9488"]}
+          tintColor="#0D9488"
         />
       }
     >
@@ -308,14 +308,14 @@ export default function DocumentDashboardScreen() {
       <View style={styles.section}>
         <View style={styles.summaryRow}>
           <TouchableOpacity
-            style={[styles.summaryCard, { backgroundColor: "#E8F4FF" }]}
+            style={[styles.summaryCard, { backgroundColor: "#F0FDFA" }]}
             onPress={() =>
               router.push(
                 `/documents/documents?projectId=${projectId || "all"}`,
               )
             }
           >
-            <Ionicons name="documents" size={28} color="#0066CC" />
+            <Ionicons name="documents" size={28} color="#0D9488" />
             <Text style={styles.summaryValue}>
               {summary?.totalDocuments || 0}
             </Text>
@@ -323,14 +323,14 @@ export default function DocumentDashboardScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.summaryCard, { backgroundColor: "#E8F4FF" }]}
+            style={[styles.summaryCard, { backgroundColor: "#F0FDFA" }]}
             onPress={() =>
               router.push(
                 `/documents/documents?projectId=${projectId || "all"}&sort=recent`,
               )
             }
           >
-            <Ionicons name="cloud-upload" size={28} color="#0066CC" />
+            <Ionicons name="cloud-upload" size={28} color="#0D9488" />
             <Text style={styles.summaryValue}>
               {summary?.recentUploads || 0}
             </Text>
@@ -382,8 +382,8 @@ export default function DocumentDashboardScreen() {
                       stats.percentUsed >= 90
                         ? "#000000"
                         : stats.percentUsed >= 75
-                          ? "#0066CC"
-                          : "#0066CC",
+                          ? "#0D9488"
+                          : "#0D9488",
                   },
                 ]}
               />
@@ -561,8 +561,8 @@ export default function DocumentDashboardScreen() {
               router.push(`/documents/upload?projectId=${projectId}` as Href)
             }
           >
-            <View style={[styles.actionIcon, { backgroundColor: "#E8F4FF" }]}>
-              <Ionicons name="cloud-upload" size={22} color="#0066CC" />
+            <View style={[styles.actionIcon, { backgroundColor: "#F0FDFA" }]}>
+              <Ionicons name="cloud-upload" size={22} color="#0D9488" />
             </View>
             <Text style={styles.actionLabel}>Tải lên tài liệu</Text>
             <Ionicons name="chevron-forward" size={20} color="#ccc" />
@@ -574,8 +574,8 @@ export default function DocumentDashboardScreen() {
               router.push(`/documents/create-folder?projectId=${projectId}`)
             }
           >
-            <View style={[styles.actionIcon, { backgroundColor: "#E8F4FF" }]}>
-              <Ionicons name="folder" size={22} color="#0066CC" />
+            <View style={[styles.actionIcon, { backgroundColor: "#F0FDFA" }]}>
+              <Ionicons name="folder" size={22} color="#0D9488" />
             </View>
             <Text style={styles.actionLabel}>Tạo thư mục</Text>
             <Ionicons name="chevron-forward" size={20} color="#ccc" />
@@ -602,7 +602,7 @@ export default function DocumentDashboardScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#F8FAFB",
   },
   loadingContainer: {
     flex: 1,
@@ -618,8 +618,8 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#f5f5f5",
-    borderRadius: 10,
+    backgroundColor: "#F3F4F6",
+    borderRadius: 14,
     paddingHorizontal: 12,
     paddingVertical: 10,
     gap: 10,
@@ -642,13 +642,14 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: "700",
     color: "#333",
     marginBottom: 12,
+    letterSpacing: -0.3,
   },
   seeAllText: {
     fontSize: 14,
-    color: "#0066CC",
+    color: "#0D9488",
     fontWeight: "500",
   },
   summaryRow: {
@@ -658,7 +659,7 @@ const styles = StyleSheet.create({
   summaryCard: {
     flex: 1,
     padding: 16,
-    borderRadius: 12,
+    borderRadius: 16,
     alignItems: "center",
     gap: 8,
   },
@@ -669,7 +670,7 @@ const styles = StyleSheet.create({
   },
   summaryLabel: {
     fontSize: 11,
-    color: "#666",
+    color: "#6B7280",
     textAlign: "center",
   },
   storageCard: {
@@ -693,7 +694,7 @@ const styles = StyleSheet.create({
   storagePercent: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#666",
+    color: "#6B7280",
   },
   progressBar: {
     height: 8,
@@ -707,7 +708,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 13,
-    color: "#999",
+    color: "#9CA3AF",
     textAlign: "center",
     paddingVertical: 20,
   },
@@ -718,7 +719,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 14,
-    color: "#999",
+    color: "#9CA3AF",
   },
   documentList: {
     gap: 12,
@@ -728,8 +729,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 12,
     padding: 12,
-    backgroundColor: "#f9f9f9",
-    borderRadius: 8,
+    backgroundColor: "#F9FAFB",
+    borderRadius: 14,
   },
   fileIcon: {
     width: 44,
@@ -754,16 +755,16 @@ const styles = StyleSheet.create({
   },
   metaText: {
     fontSize: 12,
-    color: "#666",
+    color: "#6B7280",
   },
   metaDot: {
     fontSize: 12,
-    color: "#999",
+    color: "#9CA3AF",
   },
   reviewBadge: {
     paddingHorizontal: 10,
     paddingVertical: 4,
-    backgroundColor: "#0066CC",
+    backgroundColor: "#0D9488",
     borderRadius: 12,
   },
   reviewBadgeText: {
@@ -781,8 +782,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 8,
     padding: 12,
-    backgroundColor: "#f9f9f9",
-    borderRadius: 8,
+    backgroundColor: "#F9FAFB",
+    borderRadius: 14,
   },
   categoryIcon: {
     width: 48,
@@ -799,7 +800,7 @@ const styles = StyleSheet.create({
   categoryCount: {
     fontSize: 12,
     fontWeight: "600",
-    color: "#666",
+    color: "#6B7280",
   },
   actionList: {
     gap: 12,

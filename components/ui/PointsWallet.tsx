@@ -31,7 +31,7 @@ interface PointsBalanceCardProps {
 
 export function PointsBalanceCard({
   balance,
-  primaryColor = "#FF6B35",
+  primaryColor = "#14B8A6",
   onConvert,
   onHistory,
 }: PointsBalanceCardProps) {
@@ -153,7 +153,7 @@ export function PointsConversionModal({
   onClose,
   onConvert,
   availablePoints,
-  primaryColor = "#FF6B35",
+  primaryColor = "#14B8A6",
 }: PointsConversionModalProps) {
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
@@ -296,7 +296,7 @@ interface TransactionItemProps {
 
 export function TransactionItem({
   transaction,
-  primaryColor = "#FF6B35",
+  primaryColor = "#14B8A6",
 }: TransactionItemProps) {
   const formatNumber = (num: number) => num.toLocaleString("vi-VN");
   const formatDate = (dateStr: string) => {
@@ -379,7 +379,7 @@ interface CreditScoreProps {
 
 export function CreditScoreIndicator({
   score,
-  primaryColor = "#FF6B35",
+  primaryColor = "#14B8A6",
 }: CreditScoreProps) {
   const percentage = (score / 1000) * 100;
 

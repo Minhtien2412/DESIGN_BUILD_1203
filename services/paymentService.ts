@@ -654,7 +654,7 @@ export async function createPayment(
       // Use WebBrowser for in-app browser experience
       const result = await WebBrowser.openBrowserAsync(paymentUrl, {
         showTitle: true,
-        toolbarColor: "#2563eb",
+        toolbarColor: "#0D9488",
         enableBarCollapsing: true,
       });
 

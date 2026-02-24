@@ -48,11 +48,11 @@ export default function ProjectSelector({
   const getStatusColor = (status?: string) => {
     switch (status) {
       case 'active':
-        return '#0066CC';
+        return '#0D9488';
       case 'completed':
         return '#6B7280';
       case 'paused':
-        return '#0066CC';
+        return '#0D9488';
       default:
         return Colors.light.primary;
     }
@@ -288,7 +288,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#F3F4F6',
   },
   selectedItem: {
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
   },
   projectInfo: {
     flex: 1,
@@ -358,7 +358,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 14,
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     borderRadius: 12,
     gap: 8,
   },

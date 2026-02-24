@@ -564,9 +564,9 @@ export function getProjectStatusName(status: string): string {
 export function getProjectStatusColor(status: string): string {
   const colorMap: Record<string, string> = {
     '1': '#6B7280', // gray
-    '2': '#0066CC', // green
-    '3': '#0066CC', // yellow
-    '4': '#3B82F6', // blue
+    '2': '#0D9488', // green
+    '3': '#0D9488', // yellow
+    '4': '#0D9488', // blue
     '5': '#000000', // red
   };
   return colorMap[status] || '#6B7280';

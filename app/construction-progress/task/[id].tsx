@@ -43,8 +43,8 @@ export default function TaskDetailScreen() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed': return '#0066CC';
-      case 'in_progress': return '#0066CC';
+      case 'completed': return '#0D9488';
+      case 'in_progress': return '#0D9488';
       case 'pending': return '#6b7280';
       default: return '#6b7280';
     }
@@ -125,7 +125,7 @@ export default function TaskDetailScreen() {
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Hình ảnh</Text>
             <TouchableOpacity style={styles.addPhotoBtn}>
-              <Ionicons name="camera" size={16} color="#0066CC" />
+              <Ionicons name="camera" size={16} color="#0D9488" />
               <Text style={styles.addPhotoText}>Thêm ảnh</Text>
             </TouchableOpacity>
           </View>
@@ -174,7 +174,7 @@ export default function TaskDetailScreen() {
       {/* Bottom Actions */}
       <View style={styles.bottomActions}>
         <TouchableOpacity style={styles.actionBtn}>
-          <Ionicons name="create-outline" size={20} color="#0066CC" />
+          <Ionicons name="create-outline" size={20} color="#0D9488" />
           <Text style={styles.actionBtnText}>Chỉnh sửa</Text>
         </TouchableOpacity>
         <TouchableOpacity style={[styles.actionBtn, styles.primaryBtn]}>
@@ -216,17 +216,17 @@ const styles = StyleSheet.create({
   statusText: { fontSize: 12, fontWeight: '600' },
   progressText: { fontSize: 16, fontWeight: '700', color: '#000' },
   progressBar: { height: 8, backgroundColor: '#e0e0e0', borderRadius: 4, overflow: 'hidden' },
-  progressFill: { height: '100%', backgroundColor: '#0066CC', borderRadius: 4 },
+  progressFill: { height: '100%', backgroundColor: '#0D9488', borderRadius: 4 },
   sectionTitle: { fontSize: 16, fontWeight: '700', color: '#000', marginBottom: 12 },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 },
   infoRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
   infoLabel: { fontSize: 14, color: '#666', marginLeft: 8, marginRight: 4 },
   infoValue: { fontSize: 14, fontWeight: '600', color: '#000' },
   addPhotoBtn: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  addPhotoText: { fontSize: 13, color: '#0066CC', fontWeight: '600' },
+  addPhotoText: { fontSize: 13, color: '#0D9488', fontWeight: '600' },
   photo: { width: 120, height: 90, borderRadius: 12, marginRight: 8 },
   commentItem: { flexDirection: 'row', marginBottom: 12 },
-  commentAvatar: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#0066CC', alignItems: 'center', justifyContent: 'center', marginRight: 10 },
+  commentAvatar: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#0D9488', alignItems: 'center', justifyContent: 'center', marginRight: 10 },
   commentAvatarText: { color: '#fff', fontWeight: '600', fontSize: 14 },
   commentContent: { flex: 1 },
   commentHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 },
@@ -235,9 +235,9 @@ const styles = StyleSheet.create({
   commentText: { fontSize: 13, color: '#333', lineHeight: 18 },
   addCommentRow: { flexDirection: 'row', alignItems: 'center', marginTop: 12 },
   commentInput: { flex: 1, backgroundColor: '#f5f5f5', borderRadius: 20, paddingHorizontal: 16, paddingVertical: 10, marginRight: 8 },
-  sendBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#0066CC', alignItems: 'center', justifyContent: 'center' },
+  sendBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#0D9488', alignItems: 'center', justifyContent: 'center' },
   bottomActions: { flexDirection: 'row', padding: 16, backgroundColor: '#fff', borderTopWidth: 1, borderTopColor: '#eee', gap: 12 },
-  actionBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 14, borderRadius: 12, borderWidth: 1, borderColor: '#0066CC', gap: 6 },
-  actionBtnText: { fontSize: 14, fontWeight: '600', color: '#0066CC' },
-  primaryBtn: { backgroundColor: '#0066CC', borderColor: '#0066CC' },
+  actionBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 14, borderRadius: 12, borderWidth: 1, borderColor: '#0D9488', gap: 6 },
+  actionBtnText: { fontSize: 14, fontWeight: '600', color: '#0D9488' },
+  primaryBtn: { backgroundColor: '#0D9488', borderColor: '#0D9488' },
 });

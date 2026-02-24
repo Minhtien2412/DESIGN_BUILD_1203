@@ -287,7 +287,7 @@ export default function MessagesScreen() {
     <>
       <StatusBar
         barStyle="light-content"
-        backgroundColor="#0068FF"
+        backgroundColor="#0D9488"
         translucent
       />
       <View style={styles.container}>

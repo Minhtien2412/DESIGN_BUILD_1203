@@ -64,8 +64,8 @@ export const OptimizedFlatList = memo(
         <RefreshControl
           refreshing={refreshing}
           onRefresh={onRefresh}
-          tintColor="#0066CC"
-          colors={["#0066CC"]}
+          tintColor="#0D9488"
+          colors={["#0D9488"]}
         />
       );
     }, [refreshing, onRefresh]);
@@ -208,6 +208,6 @@ const styles = StyleSheet.create({
   productPrice: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#0066CC",
+    color: "#0D9488",
   },
 });

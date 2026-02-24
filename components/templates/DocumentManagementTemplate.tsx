@@ -64,9 +64,9 @@ const ICON_MAP = {
 
 const COLOR_MAP = {
   pdf: "#000000",
-  doc: "#3B82F6",
-  image: "#0066CC",
-  folder: "#0066CC",
+  doc: "#0D9488",
+  image: "#0D9488",
+  folder: "#0D9488",
 };
 
 export default function DocumentManagementTemplate({
@@ -213,7 +213,7 @@ export default function DocumentManagementTemplate({
               style={styles.actionButton}
               onPress={() => onApprove?.(item.id)}
             >
-              <Ionicons name="checkmark" size={20} color="#0066CC" />
+              <Ionicons name="checkmark" size={20} color="#0D9488" />
             </Pressable>
             <Pressable
               style={styles.actionButton}
@@ -342,10 +342,10 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   statusApproved: {
-    backgroundColor: "#0066CC20",
+    backgroundColor: "#0D948820",
   },
   statusPending: {
-    backgroundColor: "#0066CC20",
+    backgroundColor: "#0D948820",
   },
   statusRejected: {
     backgroundColor: "#00000020",
@@ -355,10 +355,10 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   statusTextApproved: {
-    color: "#0066CC",
+    color: "#0D9488",
   },
   statusTextPending: {
-    color: "#0066CC",
+    color: "#0D9488",
   },
   statusTextRejected: {
     color: "#000000",

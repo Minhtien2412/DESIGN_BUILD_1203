@@ -128,7 +128,7 @@ export function SellerProductSection({
         {/* Action Buttons */}
         <View style={styles.actionButtons}>
           <Pressable style={styles.chatButton} onPress={handleChat}>
-            <Ionicons name="chatbubble-outline" size={16} color="#EE4D2D" />
+            <Ionicons name="chatbubble-outline" size={16} color="#0D9488" />
             <ThemedText style={styles.chatButtonText}>Chat</ThemedText>
           </Pressable>
           <Pressable style={styles.viewShopButton} onPress={handleViewShop}>
@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
     height: 56,
     borderRadius: 28,
     borderWidth: 2,
-    borderColor: "#EE4D2D",
+    borderColor: "#0D9488",
   },
   avatarPlaceholder: {
     backgroundColor: "#F5F5F5",
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
     width: 18,
     height: 18,
     borderRadius: 9,
-    backgroundColor: "#EE4D2D",
+    backgroundColor: "#0D9488",
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 2,
@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   mallBadge: {
-    backgroundColor: "#EE4D2D",
+    backgroundColor: "#0D9488",
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 2,
@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
   metaValue: {
     fontSize: 12,
     fontWeight: "600",
-    color: "#EE4D2D",
+    color: "#0D9488",
   },
   metaLabel: {
     fontSize: 11,
@@ -280,13 +280,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 4,
     borderWidth: 1,
-    borderColor: "#EE4D2D",
+    borderColor: "#0D9488",
     backgroundColor: "#FFFFFF",
   },
   chatButtonText: {
     fontSize: 12,
     fontWeight: "600",
-    color: "#EE4D2D",
+    color: "#0D9488",
   },
   viewShopButton: {
     flexDirection: "row",
@@ -296,7 +296,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 4,
-    backgroundColor: "#EE4D2D",
+    backgroundColor: "#0D9488",
   },
   viewShopButtonText: {
     fontSize: 12,
@@ -320,7 +320,7 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 13,
     fontWeight: "600",
-    color: "#EE4D2D",
+    color: "#0D9488",
   },
   statLabel: {
     fontSize: 10,

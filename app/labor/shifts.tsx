@@ -44,7 +44,7 @@ const { width } = Dimensions.get("window");
 // ============================================================================
 
 const COLORS = {
-  primary: "#0066CC",
+  primary: "#0D9488",
   success: "#00BFA5",
   warning: "#FFB800",
   error: "#EF4444",
@@ -67,7 +67,7 @@ const SHIFT_TYPE_CONFIG: Record<
   },
   [ShiftType.AFTERNOON]: {
     label: "Ca chiều",
-    color: "#FF6B35",
+    color: "#14B8A6",
     icon: "partly-sunny-outline",
   },
   [ShiftType.NIGHT]: {

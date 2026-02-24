@@ -3,13 +3,20 @@
  * Full-screen story viewer with swipe navigation
  */
 
-import type { StoryGroup } from '@/components/stories/stories-bar';
-import { StoryViewer } from '@/components/stories/stories-bar';
-import { viewStory } from '@/services/stories';
-import StoriesService from '@/services/storiesService';
-import { router, useLocalSearchParams } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import type { StoryGroup } from "@/components/stories/stories-bar";
+import { StoryViewer } from "@/components/stories/stories-bar";
+import { viewStory } from "@/services/stories";
+import StoriesService from "@/services/storiesService";
+import { router, useLocalSearchParams } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
+import {
+    ActivityIndicator,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function StoriesViewerScreen() {
   const { userId } = useLocalSearchParams<{ userId: string }>();
@@ -23,9 +30,9 @@ export default function StoriesViewerScreen() {
     try {
       setLoading(true);
       setError(null);
-      
+
       const groups = await StoriesService.getStories();
-      
+
       // Convert to StoryGroup format if needed
       const formattedGroups: StoryGroup[] = groups.map((g: any) => ({
         userId: g.userId,
@@ -44,9 +51,9 @@ export default function StoriesViewerScreen() {
           viewed: s.viewed,
         })),
       }));
-      
+
       setStoryGroups(formattedGroups);
-      
+
       // Find starting index
       if (userId) {
         const index = formattedGroups.findIndex((g) => g.userId === userId);
@@ -55,8 +62,8 @@ export default function StoriesViewerScreen() {
         }
       }
     } catch (err) {
-      console.error('Error fetching stories:', err);
-      setError('Không thể tải stories');
+      console.error("Error fetching stories:", err);
+      setError("Không thể tải stories");
     } finally {
       setLoading(false);
     }
@@ -119,7 +126,10 @@ export default function StoriesViewerScreen() {
           <TouchableOpacity style={styles.retryButton} onPress={fetchStories}>
             <Text style={styles.retryText}>Thử lại</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.closeButton} onPress={() => router.back()}>
+          <TouchableOpacity
+            style={styles.closeButton}
+            onPress={() => router.back()}
+          >
             <Text style={styles.closeText}>Đóng</Text>
           </TouchableOpacity>
         </View>
@@ -150,42 +160,42 @@ export default function StoriesViewerScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: "#000",
   },
   content: {
     flex: 1,
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   loadingText: {
-    color: '#FFF',
+    color: "#FFF",
     marginTop: 12,
     fontSize: 14,
   },
   errorText: {
-    color: '#FFF',
+    color: "#FFF",
     fontSize: 16,
     marginBottom: 16,
   },
   retryButton: {
     paddingHorizontal: 24,
     paddingVertical: 12,
-    backgroundColor: '#0066CC',
+    backgroundColor: "#0D9488",
     borderRadius: 8,
     marginBottom: 12,
   },
   retryText: {
-    color: '#FFF',
-    fontWeight: '600',
+    color: "#FFF",
+    fontWeight: "600",
   },
   closeButton: {
     paddingHorizontal: 24,
     paddingVertical: 12,
   },
   closeText: {
-    color: '#999',
+    color: "#999",
   },
 });

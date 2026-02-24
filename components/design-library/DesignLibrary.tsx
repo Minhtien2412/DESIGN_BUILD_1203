@@ -360,8 +360,8 @@ const AuthorBadge: React.FC<{ type: AuthorType; isVerified: boolean }> = ({
         };
       case "staff":
         return {
-          color: "#3B82F6",
-          bg: "#DBEAFE",
+          color: "#0D9488",
+          bg: "#CCFBF1",
           label: "Staff",
           icon: "briefcase",
         };

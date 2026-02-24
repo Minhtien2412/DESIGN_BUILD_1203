@@ -41,7 +41,7 @@ import {
 
 // Colors
 const COLORS = {
-  primary: "#2563eb",
+  primary: "#0D9488",
   secondary: "#64748b",
   success: "#22c55e",
   danger: "#ef4444",
@@ -60,10 +60,10 @@ const FILE_ICONS: Record<string, { icon: string; color: string }> = {
   video: { icon: "videocam", color: "#8b5cf6" },
   audio: { icon: "musical-notes", color: "#f59e0b" },
   "application/pdf": { icon: "document-text", color: "#ef4444" },
-  "application/msword": { icon: "document", color: "#2563eb" },
+  "application/msword": { icon: "document", color: "#0D9488" },
   "application/vnd.openxmlformats-officedocument": {
     icon: "document",
-    color: "#2563eb",
+    color: "#0D9488",
   },
   "application/vnd.ms-excel": { icon: "grid", color: "#22c55e" },
   "application/zip": { icon: "archive", color: "#f59e0b" },
@@ -663,9 +663,9 @@ export function FileManager({
               onPress={() => handleUpload("camera")}
             >
               <View
-                style={[styles.uploadMenuIcon, { backgroundColor: "#dbeafe" }]}
+                style={[styles.uploadMenuIcon, { backgroundColor: "#CCFBF1" }]}
               >
-                <Ionicons name="camera" size={24} color="#2563eb" />
+                <Ionicons name="camera" size={24} color="#0D9488" />
               </View>
               <View>
                 <Text style={styles.uploadMenuItemTitle}>Camera</Text>

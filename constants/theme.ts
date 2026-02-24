@@ -1,6 +1,6 @@
 /**
  * Modern Minimalist Design System
- * Blue - Black - White palette (Professional & Clean)
+ * Teal - Black - White palette (Professional & Clean)
  * Sophisticated, Simple, Timeless
  */
 
@@ -8,16 +8,16 @@ import { Platform } from "react-native";
 
 export const Colors = {
   light: {
-    // Primary colors (Professional Blue)
-    primary: "#0066CC", // Professional blue
+    // Primary colors (Professional Teal)
+    primary: "#0D9488", // Teal
     secondary: "#333333", // Charcoal gray
-    accent: "#0080FF", // Bright blue
+    accent: "#14B8A6", // Bright teal
 
     // Semantic colors
-    success: "#0066CC", // Blue
-    warning: "#0080FF", // Bright blue
-    error: "#000000", // Black
-    info: "#0066CC", // Professional blue
+    success: "#10B981", // Green
+    warning: "#F59E0B", // Amber
+    error: "#EF4444", // Red
+    info: "#0D9488", // Teal
 
     // Text colors (High contrast)
     text: "#000000", // Pure black
@@ -37,22 +37,22 @@ export const Colors = {
 
     // Tab bar
     tabIconDefault: "#666666", // Gray
-    tabIconSelected: "#0066CC", // Professional blue
+    tabIconSelected: "#0D9488", // Teal
 
     // Legacy compatibility
-    tint: "#0066CC", // Professional blue
+    tint: "#0D9488", // Teal
     icon: "#000000", // Pure black
-    danger: "#000000",
+    danger: "#EF4444",
     shadow: "rgba(0,0,0,0.08)", // Subtle shadow
     overlay: "rgba(0,0,0,0.85)",
-    chipBackground: "#F5F5F5",
-    chipText: "#333333",
-    accentSoft: "#E6F2FF", // Light blue tint
+    chipBackground: "#F0FDFA",
+    chipText: "#0D9488",
+    accentSoft: "#F0FDFA", // Light teal tint
 
     // Additional elements
-    gold: "#0066CC",
-    goldLight: "#E6F2FF",
-    goldDark: "#004C99",
+    gold: "#F59E0B",
+    goldLight: "#FFFBEB",
+    goldDark: "#B45309",
     marble: "#F5F5F5",
     charcoal: "#000000",
 
@@ -64,15 +64,15 @@ export const Colors = {
   },
   dark: {
     // Primary colors (dark mode)
-    primary: "#0080FF", // Bright blue
+    primary: "#14B8A6", // Bright teal
     secondary: "#999999", // Light gray
-    accent: "#0080FF", // Bright blue
+    accent: "#14B8A6", // Bright teal
 
     // Semantic colors
-    success: "#0080FF", // Bright blue
-    warning: "#0080FF", // Bright blue
-    error: "#E0E0E0", // Light gray
-    info: "#0080FF", // Bright blue
+    success: "#10B981", // Green
+    warning: "#F59E0B", // Amber
+    error: "#F87171", // Red
+    info: "#14B8A6", // Bright teal
 
     // Text colors (dark contrast)
     text: "#FFFFFF", // Pure white
@@ -92,22 +92,22 @@ export const Colors = {
 
     // Tab bar
     tabIconDefault: "#999999",
-    tabIconSelected: "#0080FF", // Bright blue
+    tabIconSelected: "#14B8A6", // Bright teal
 
     // Legacy compatibility
-    tint: "#0080FF",
+    tint: "#14B8A6",
     icon: "#FFFFFF",
-    danger: "#E0E0E0",
+    danger: "#F87171",
     shadow: "rgba(0,0,0,0.5)",
     overlay: "rgba(0,0,0,0.9)",
-    chipBackground: "#2A2A2A",
-    chipText: "#0080FF",
-    accentSoft: "#0D1F33",
+    chipBackground: "#1A2A2A",
+    chipText: "#14B8A6",
+    accentSoft: "#0D1F1D",
 
     // Additional elements
-    gold: "#0066CC",
-    goldLight: "#1A2A3A",
-    goldDark: "#0080FF",
+    gold: "#F59E0B",
+    goldLight: "#1A2A1A",
+    goldDark: "#14B8A6",
     marble: "#1A1A1A",
     charcoal: "#0A0A0A",
 
@@ -199,11 +199,11 @@ export const BORDER_RADIUS = {
 // Backward compatibility alias
 export const COLORS = {
   ...Colors.light,
-  errorLight: "#FFE6E6", // Light red background for errors
-  successLight: "#E6FFE6", // Light green background for success
-  warningLight: "#FFF5E6", // Light orange background for warnings
-  infoLight: "#E6F2FF", // Light blue background for info
-  primaryLight: "#E6F2FF", // Light primary background
+  errorLight: "#FEF2F2", // Light red background for errors
+  successLight: "#F0FDF4", // Light green background for success
+  warningLight: "#FFFBEB", // Light amber background for warnings
+  infoLight: "#F0FDFA", // Light teal background for info
+  primaryLight: "#F0FDFA", // Light primary background
   textTertiary: "#999999", // Tertiary text color
 };
 
@@ -252,11 +252,11 @@ export const TYPOGRAPHY = {
 // Extended colors with errorLight for backward compatibility
 export const ExtendedColors = {
   ...Colors.light,
-  errorLight: "#FFE6E6", // Light red background for errors
-  successLight: "#E6FFE6", // Light green background for success
-  warningLight: "#FFF5E6", // Light orange background for warnings
-  infoLight: "#E6F2FF", // Light blue background for info
-  primaryLight: "#E6F2FF", // Light primary background
+  errorLight: "#FEF2F2", // Light red background for errors
+  successLight: "#F0FDF4", // Light green background for success
+  warningLight: "#FFFBEB", // Light amber background for warnings
+  infoLight: "#F0FDFA", // Light teal background for info
+  primaryLight: "#F0FDFA", // Light primary background
   textTertiary: "#999999", // Tertiary text color
 };
 

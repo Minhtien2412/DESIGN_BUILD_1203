@@ -3,47 +3,47 @@
  * Hiển thị khi thanh toán đang chờ xử lý (chuyển khoản)
  */
 
-import ModernButton from '@/components/ui/modern-button';
-import { useThemeColor } from '@/hooks/use-theme-color';
-import { Ionicons } from '@expo/vector-icons';
-import { Stack, router, useLocalSearchParams } from 'expo-router';
+import ModernButton from "@/components/ui/modern-button";
+import { useThemeColor } from "@/hooks/use-theme-color";
+import { Ionicons } from "@expo/vector-icons";
+import { Stack, router, useLocalSearchParams } from "expo-router";
 import {
     Alert,
     Clipboard,
     Platform,
-    SafeAreaView,
     StatusBar,
     StyleSheet,
     Text,
     View,
-} from 'react-native';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 // Bank transfer info
 const BANK_INFO = {
-  bankName: 'Vietcombank',
-  accountNumber: '1234567890',
-  accountName: 'CONG TY TNHH XAY DUNG ABC',
-  branch: 'Hồ Chí Minh',
+  bankName: "Vietcombank",
+  accountNumber: "1234567890",
+  accountName: "CONG TY TNHH XAY DUNG ABC",
+  branch: "Hồ Chí Minh",
 };
 
 export default function PaymentPendingScreen() {
   const params = useLocalSearchParams<{ orderId?: string; amount?: string }>();
-  
+
   // Theme
-  const backgroundColor = useThemeColor({}, 'background');
-  const cardColor = useThemeColor({}, 'card');
-  const textColor = useThemeColor({}, 'text');
-  const secondaryText = useThemeColor({}, 'tabIconDefault');
-  const warningColor = '#f59e0b';
-  
+  const backgroundColor = useThemeColor({}, "background");
+  const cardColor = useThemeColor({}, "card");
+  const textColor = useThemeColor({}, "text");
+  const secondaryText = useThemeColor({}, "tabIconDefault");
+  const warningColor = "#f59e0b";
+
   const copyToClipboard = (text: string, label: string) => {
     Clipboard.setString(text);
-    Alert.alert('Đã sao chép', `${label} đã được sao chép vào clipboard`);
+    Alert.alert("Đã sao chép", `${label} đã được sao chép vào clipboard`);
   };
 
   const formatAmount = (amount: string | undefined) => {
-    if (!amount) return '0đ';
-    return parseInt(amount).toLocaleString('vi-VN') + 'đ';
+    if (!amount) return "0đ";
+    return parseInt(amount).toLocaleString("vi-VN") + "đ";
   };
 
   return (
@@ -78,7 +78,9 @@ export default function PaymentPendingScreen() {
 
           {/* Account Number */}
           <View style={styles.infoRow}>
-            <Text style={[styles.infoLabel, { color: secondaryText }]}>Số tài khoản:</Text>
+            <Text style={[styles.infoLabel, { color: secondaryText }]}>
+              Số tài khoản:
+            </Text>
             <View style={styles.infoValue}>
               <Text style={[styles.infoValueText, { color: textColor }]}>
                 {BANK_INFO.accountNumber}
@@ -87,7 +89,9 @@ export default function PaymentPendingScreen() {
                 name="copy-outline"
                 size={18}
                 color={secondaryText}
-                onPress={() => copyToClipboard(BANK_INFO.accountNumber, 'Số tài khoản')}
+                onPress={() =>
+                  copyToClipboard(BANK_INFO.accountNumber, "Số tài khoản")
+                }
                 style={styles.copyIcon}
               />
             </View>
@@ -95,7 +99,9 @@ export default function PaymentPendingScreen() {
 
           {/* Account Name */}
           <View style={styles.infoRow}>
-            <Text style={[styles.infoLabel, { color: secondaryText }]}>Tên tài khoản:</Text>
+            <Text style={[styles.infoLabel, { color: secondaryText }]}>
+              Tên tài khoản:
+            </Text>
             <Text style={[styles.infoValueText, { color: textColor }]}>
               {BANK_INFO.accountName}
             </Text>
@@ -103,7 +109,9 @@ export default function PaymentPendingScreen() {
 
           {/* Branch */}
           <View style={styles.infoRow}>
-            <Text style={[styles.infoLabel, { color: secondaryText }]}>Chi nhánh:</Text>
+            <Text style={[styles.infoLabel, { color: secondaryText }]}>
+              Chi nhánh:
+            </Text>
             <Text style={[styles.infoValueText, { color: textColor }]}>
               {BANK_INFO.branch}
             </Text>
@@ -112,7 +120,9 @@ export default function PaymentPendingScreen() {
           {/* Transfer Content */}
           {params.orderId && (
             <View style={styles.infoRow}>
-              <Text style={[styles.infoLabel, { color: secondaryText }]}>Nội dung CK:</Text>
+              <Text style={[styles.infoLabel, { color: secondaryText }]}>
+                Nội dung CK:
+              </Text>
               <View style={styles.infoValue}>
                 <Text style={[styles.infoValueText, { color: textColor }]}>
                   {params.orderId}
@@ -121,7 +131,9 @@ export default function PaymentPendingScreen() {
                   name="copy-outline"
                   size={18}
                   color={secondaryText}
-                  onPress={() => copyToClipboard(params.orderId || '', 'Nội dung CK')}
+                  onPress={() =>
+                    copyToClipboard(params.orderId || "", "Nội dung CK")
+                  }
                   style={styles.copyIcon}
                 />
               </View>
@@ -129,8 +141,10 @@ export default function PaymentPendingScreen() {
           )}
 
           {/* Amount */}
-          <View style={[styles.amountRow, { borderTopColor: '#e5e7eb' }]}>
-            <Text style={[styles.amountLabel, { color: textColor }]}>Số tiền:</Text>
+          <View style={[styles.amountRow, { borderTopColor: "#e5e7eb" }]}>
+            <Text style={[styles.amountLabel, { color: textColor }]}>
+              Số tiền:
+            </Text>
             <Text style={[styles.amountValue, { color: warningColor }]}>
               {formatAmount(params.amount)}
             </Text>
@@ -139,9 +153,14 @@ export default function PaymentPendingScreen() {
 
         {/* Note */}
         <View style={styles.noteContainer}>
-          <Ionicons name="information-circle-outline" size={20} color={secondaryText} />
+          <Ionicons
+            name="information-circle-outline"
+            size={20}
+            color={secondaryText}
+          />
           <Text style={[styles.noteText, { color: secondaryText }]}>
-            Đơn hàng sẽ được xác nhận sau khi chúng tôi nhận được thanh toán (thường trong vòng 24h làm việc)
+            Đơn hàng sẽ được xác nhận sau khi chúng tôi nhận được thanh toán
+            (thường trong vòng 24h làm việc)
           </Text>
         </View>
 
@@ -150,7 +169,7 @@ export default function PaymentPendingScreen() {
           <ModernButton
             variant="primary"
             size="large"
-            onPress={() => router.replace('/(tabs)')}
+            onPress={() => router.replace("/(tabs)")}
             icon="home-outline"
             iconPosition="left"
             fullWidth
@@ -161,7 +180,7 @@ export default function PaymentPendingScreen() {
           <ModernButton
             variant="outline"
             size="large"
-            onPress={() => router.push('/order')}
+            onPress={() => router.push("/order")}
             icon="receipt-outline"
             iconPosition="left"
             fullWidth
@@ -178,7 +197,7 @@ export default function PaymentPendingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
   },
   content: {
     flex: 1,
@@ -189,24 +208,24 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-    alignSelf: 'center',
+    justifyContent: "center",
+    alignItems: "center",
+    alignSelf: "center",
     marginBottom: 24,
   },
   messageContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 24,
   },
   title: {
     fontSize: 22,
-    fontWeight: '700',
+    fontWeight: "700",
     marginBottom: 8,
-    textAlign: 'center',
+    textAlign: "center",
   },
   subtitle: {
     fontSize: 14,
-    textAlign: 'center',
+    textAlign: "center",
     lineHeight: 20,
     paddingHorizontal: 20,
   },
@@ -214,65 +233,65 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 20,
     marginBottom: 16,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 8,
     elevation: 2,
   },
   bankHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 16,
     paddingBottom: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
+    borderBottomColor: "#e5e7eb",
   },
   bankName: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     marginLeft: 12,
   },
   infoRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingVertical: 10,
   },
   infoLabel: {
     fontSize: 14,
   },
   infoValue: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   infoValueText: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   copyIcon: {
     marginLeft: 8,
     padding: 4,
   },
   amountRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginTop: 16,
     paddingTop: 16,
     borderTopWidth: 1,
   },
   amountLabel: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   amountValue: {
     fontSize: 20,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   noteContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    alignItems: "flex-start",
     paddingHorizontal: 12,
     marginBottom: 24,
   },
@@ -283,7 +302,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   actions: {
-    marginTop: 'auto',
+    marginTop: "auto",
     paddingBottom: 20,
   },
 });

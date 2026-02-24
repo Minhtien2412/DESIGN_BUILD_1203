@@ -112,17 +112,17 @@ const HOME_MENU_ITEMS: HomeMenuItem[] = HOME_MENU_BASE.map((item) => ({ ...item,
 
 const ROLE_MENU_ITEMS: RoleMenuItem[] = [
   // Communications
-  { id: 'messages', title: 'Tin nhắn', icon: 'chatbubbles', route: '/messages', color: '#3b82f6' },
+  { id: 'messages', title: 'Tin nhắn', icon: 'chatbubbles', route: '/messages', color: '#0D9488' },
   
   // Shopping
-  { id: 'products', title: 'Sản phẩm', icon: 'cube', route: '/shopping', color: '#0066CC', requiredPermission: Permission.VIEW_PRODUCTS },
+  { id: 'products', title: 'Sản phẩm', icon: 'cube', route: '/shopping', color: '#0D9488', requiredPermission: Permission.VIEW_PRODUCTS },
   { id: 'cart', title: 'Giỏ hàng', icon: 'cart', route: '/cart', color: '#000000' },
   { id: 'quote', title: 'Yêu cầu báo giá', icon: 'document-text', route: '/quote-request', color: '#666666', requiredPermission: Permission.CREATE_QUOTE },
   
   // Construction (Staff+)
   { id: 'construction', title: 'Thi công', icon: 'hammer', route: '/construction', color: '#666666', requiredRole: [UserRole.STAFF, UserRole.MANAGER, UserRole.ADMIN] },
   { id: 'materials', title: 'Vật liệu', icon: 'layers', route: '/materials', color: '#14b8a6', requiredRole: [UserRole.STAFF, UserRole.MANAGER, UserRole.ADMIN] },
-  { id: 'labor', title: 'Nhân công', icon: 'people', route: '/labor', color: '#0066CC', requiredRole: [UserRole.STAFF, UserRole.MANAGER, UserRole.ADMIN] },
+  { id: 'labor', title: 'Nhân công', icon: 'people', route: '/labor', color: '#0D9488', requiredRole: [UserRole.STAFF, UserRole.MANAGER, UserRole.ADMIN] },
   
   // Reports
   { id: 'reports', title: 'Báo cáo', icon: 'bar-chart', route: '/reports', color: '#0ea5e9', requiredPermission: Permission.VIEW_REPORTS },
@@ -345,7 +345,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'flex-start',
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#0D9488',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,

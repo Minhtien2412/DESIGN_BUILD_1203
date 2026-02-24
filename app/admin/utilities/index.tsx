@@ -23,10 +23,10 @@ import {
 } from 'react-native';
 
 const UTILITY_TYPES = [
-  { id: 'CALCULATOR', name: 'Công cụ tính', icon: 'calculator', color: '#3B82F6' },
+  { id: 'CALCULATOR', name: 'Công cụ tính', icon: 'calculator', color: '#0D9488' },
   { id: 'AI', name: 'Trí tuệ nhân tạo', icon: 'sparkles', color: '#666666' },
   { id: 'MEDIA', name: 'Đa phương tiện', icon: 'film', color: '#000000' },
-  { id: 'DOCUMENT', name: 'Tài liệu', icon: 'document-text', color: '#0066CC' },
+  { id: 'DOCUMENT', name: 'Tài liệu', icon: 'document-text', color: '#0D9488' },
   { id: 'OTHER', name: 'Khác', icon: 'ellipsis-horizontal', color: '#6B7280' },
 ];
 
@@ -287,8 +287,8 @@ function UtilityCard({
         </View>
         <View style={styles.actions}>
           <Link href={`/admin/utilities/edit/${utility.id}` as any} asChild>
-            <TouchableOpacity style={[styles.actionButton, { backgroundColor: '#E8F4FF' }]}>
-              <Ionicons name="settings-outline" size={18} color="#3B82F6" />
+            <TouchableOpacity style={[styles.actionButton, { backgroundColor: '#F0FDFA' }]}>
+              <Ionicons name="settings-outline" size={18} color="#0D9488" />
             </TouchableOpacity>
           </Link>
           <TouchableOpacity

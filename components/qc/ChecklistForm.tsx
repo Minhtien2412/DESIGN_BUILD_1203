@@ -30,7 +30,7 @@ export default function ChecklistForm({
   onSaveDraft,
   submitLabel = 'Gửi duyệt',
   draftLabel = 'Lưu nháp',
-  color = '#0066CC',
+  color = '#0D9488',
 }: ChecklistFormProps) {
   const [items, setItems] = useState<ChecklistItemData[]>(initialItems);
 
@@ -109,7 +109,7 @@ export default function ChecklistForm({
               <Text style={styles.statLabel}>Đã kiểm tra</Text>
             </View>
             <View style={styles.statItem}>
-              <Text style={[styles.statValue, { color: '#0066CC' }]}>{passCount}</Text>
+              <Text style={[styles.statValue, { color: '#0D9488' }]}>{passCount}</Text>
               <Text style={styles.statLabel}>Đạt</Text>
             </View>
             <View style={styles.statItem}>

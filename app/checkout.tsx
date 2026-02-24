@@ -1,7 +1,7 @@
 /**
  * Checkout Screen - Multi-step Wizard
  * Updated: 13/12/2025
- * 
+ *
  * Features:
  * - Step 1: Shipping Address
  * - Step 2: Payment Method
@@ -10,27 +10,32 @@
  * - Nordic Green theme
  */
 
-import ModernButton from '@/components/ui/modern-button';
+import ModernButton from "@/components/ui/modern-button";
 import {
     MODERN_COLORS,
     MODERN_RADIUS,
     MODERN_SHADOWS,
     MODERN_SPACING,
     MODERN_TYPOGRAPHY,
-} from '@/constants/modern-theme';
-import { useCart } from '@/context/cart-context';
+} from "@/constants/modern-theme";
+import { useCart } from "@/context/cart-context";
 import AddressService, {
     Address,
-    MOCK_ADDRESSES as FALLBACK_ADDRESSES
-} from '@/services/addressService';
+    MOCK_ADDRESSES as FALLBACK_ADDRESSES,
+} from "@/services/addressService";
+import {
+    createOrder,
+    type CreateOrderDto,
+    type PaymentMethod as OrderPaymentMethod,
+} from "@/services/api/orders.service";
 import {
     createPayment,
     PaymentOrder,
     PaymentProvider,
-} from '@/services/paymentService';
-import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
+} from "@/services/paymentService";
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
 import {
     Alert,
     Image,
@@ -41,10 +46,10 @@ import {
     Text,
     TextInput,
     TouchableOpacity,
-    View
-} from 'react-native';
+    View,
+} from "react-native";
 
-type CheckoutStep = 'address' | 'payment' | 'review' | 'success';
+type CheckoutStep = "address" | "payment" | "review" | "success";
 
 interface PaymentMethod {
   id: string;
@@ -57,74 +62,85 @@ const MOCK_ADDRESSES: Address[] = FALLBACK_ADDRESSES;
 
 const PAYMENT_METHODS: PaymentMethod[] = [
   {
-    id: 'cod',
-    name: 'Thanh toán khi nhận hàng',
-    icon: 'cash-outline',
-    description: 'Thanh toán bằng tiền mặt khi nhận hàng',
+    id: "cod",
+    name: "Thanh toán khi nhận hàng",
+    icon: "cash-outline",
+    description: "Thanh toán bằng tiền mặt khi nhận hàng",
   },
   {
-    id: 'vnpay',
-    name: 'VNPay',
-    icon: 'card-outline',
-    description: 'Thanh toán qua cổng VNPay',
+    id: "vnpay",
+    name: "VNPay",
+    icon: "card-outline",
+    description: "Thanh toán qua cổng VNPay",
   },
   {
-    id: 'momo',
-    name: 'Ví MoMo',
-    icon: 'wallet-outline',
-    description: 'Thanh toán qua ví điện tử MoMo',
+    id: "momo",
+    name: "Ví MoMo",
+    icon: "wallet-outline",
+    description: "Thanh toán qua ví điện tử MoMo",
   },
   {
-    id: 'zalopay',
-    name: 'ZaloPay',
-    icon: 'wallet-outline',
-    description: 'Thanh toán qua ZaloPay',
+    id: "zalopay",
+    name: "ZaloPay",
+    icon: "wallet-outline",
+    description: "Thanh toán qua ZaloPay",
   },
   {
-    id: 'card',
-    name: 'Thẻ tín dụng/Ghi nợ',
-    icon: 'card-outline',
-    description: 'Visa, Mastercard, JCB (Stripe)',
+    id: "card",
+    name: "Thẻ tín dụng/Ghi nợ",
+    icon: "card-outline",
+    description: "Visa, Mastercard, JCB (Stripe)",
   },
   {
-    id: 'banking',
-    name: 'Chuyển khoản ngân hàng',
-    icon: 'business-outline',
-    description: 'Chuyển khoản qua Internet Banking',
+    id: "banking",
+    name: "Chuyển khoản ngân hàng",
+    icon: "business-outline",
+    description: "Chuyển khoản qua Internet Banking",
   },
 ];
 
 export default function CheckoutScreen() {
   const { items, totalPrice, totalItems, clearCart } = useCart();
-  const [currentStep, setCurrentStep] = useState<CheckoutStep>('address');
+  const [currentStep, setCurrentStep] = useState<CheckoutStep>("address");
   const [addresses, setAddresses] = useState<Address[]>(MOCK_ADDRESSES);
-  const [selectedAddress, setSelectedAddress] = useState<Address>(MOCK_ADDRESSES[0]);
-  const [selectedPayment, setSelectedPayment] = useState<PaymentMethod>(PAYMENT_METHODS[0]);
-  const [note, setNote] = useState('');
+  const [selectedAddress, setSelectedAddress] = useState<Address>(
+    MOCK_ADDRESSES[0],
+  );
+  const [selectedPayment, setSelectedPayment] = useState<PaymentMethod>(
+    PAYMENT_METHODS[0],
+  );
+  const [note, setNote] = useState("");
+  const [orderNumber, setOrderNumber] = useState("");
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [dataSource, setDataSource] = useState<'api' | 'mock'>('mock');
+  const [dataSource, setDataSource] = useState<"api" | "mock">("mock");
 
   // Fetch addresses from API
   const fetchAddresses = useCallback(async (showLoading = true) => {
     if (showLoading) setLoading(true);
     try {
       const result = await AddressService.getAddresses();
-      if (result.ok && result.data?.addresses && result.data.addresses.length > 0) {
+      if (
+        result.ok &&
+        result.data?.addresses &&
+        result.data.addresses.length > 0
+      ) {
         setAddresses(result.data.addresses);
-        const defaultAddr = result.data.addresses.find(a => a.isDefault) || result.data.addresses[0];
+        const defaultAddr =
+          result.data.addresses.find((a) => a.isDefault) ||
+          result.data.addresses[0];
         setSelectedAddress(defaultAddr);
-        setDataSource('api');
+        setDataSource("api");
       } else {
         setAddresses(MOCK_ADDRESSES);
         setSelectedAddress(MOCK_ADDRESSES[0]);
-        setDataSource('mock');
+        setDataSource("mock");
       }
     } catch (error) {
-      console.error('Error fetching addresses:', error);
+      console.error("Error fetching addresses:", error);
       setAddresses(MOCK_ADDRESSES);
       setSelectedAddress(MOCK_ADDRESSES[0]);
-      setDataSource('mock');
+      setDataSource("mock");
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -140,104 +156,140 @@ export default function CheckoutScreen() {
     fetchAddresses(false);
   }, [fetchAddresses]);
 
-  const formatPrice = (price: number) => price.toLocaleString('vi-VN');
+  const formatPrice = (price: number) => price.toLocaleString("vi-VN");
 
   const handlePlaceOrder = async () => {
-    // Map local payment method to API method
-    const paymentMethodMap: Record<string, PaymentProvider> = {
-      'vnpay': 'vnpay',
-      'momo': 'momo',
-      'zalopay': 'zalopay',
-      'card': 'stripe',
-      'banking': 'bank_transfer',
+    // Map local payment IDs to backend PaymentMethod enum
+    const paymentMethodMap: Record<string, OrderPaymentMethod> = {
+      cod: "COD",
+      vnpay: "VNPAY",
+      momo: "MOMO",
+      zalopay: "ZALOPAY",
+      card: "VNPAY", // Stripe not supported server-side yet
+      banking: "BANK_TRANSFER",
     };
 
-    const apiMethod = paymentMethodMap[selectedPayment.id];
-    
-    // COD - direct success
-    if (selectedPayment.id === 'cod') {
-      setCurrentStep('success');
-      setTimeout(() => {
-        clearCart();
-        setTimeout(() => {
-          router.replace('/(tabs)');
-        }, 1500);
-      }, 2000);
-      return;
-    }
+    const paymentProviderMap: Record<string, PaymentProvider> = {
+      vnpay: "vnpay",
+      momo: "momo",
+      zalopay: "zalopay",
+      card: "stripe",
+      banking: "bank_transfer",
+    };
 
-    // Online payment - use payment service
-    if (apiMethod) {
+    const apiPaymentMethod = paymentMethodMap[selectedPayment.id] || "COD";
+    const apiProvider = paymentProviderMap[selectedPayment.id];
+
+    try {
+      setLoading(true);
+
+      // ===== Step 1: Create order in backend =====
+      const orderDto: CreateOrderDto = {
+        items: items.map((item) => ({
+          productId: item.product.id?.toString() || item.id,
+          quantity: item.quantity,
+        })),
+        shippingAddress: {
+          fullName: selectedAddress.name,
+          phone: selectedAddress.phone,
+          address: selectedAddress.address,
+          city: selectedAddress.city || "",
+          ward: selectedAddress.ward,
+          district: selectedAddress.district,
+          note: note || undefined,
+        },
+        paymentMethod: apiPaymentMethod,
+        note: note || undefined,
+      };
+
+      let orderId = `ORD-${Date.now()}`;
       try {
-        setLoading(true);
-        const orderId = `ORD-${Date.now()}`;
-        
+        const order = await createOrder(orderDto);
+        orderId = order.orderNumber || order.id;
+        setOrderNumber(orderId);
+        console.log("[Checkout] \u2705 Order created:", orderId);
+      } catch (orderError: any) {
+        console.warn(
+          "[Checkout] \u26a0\ufe0f Order API failed, using local ID:",
+          orderError.message,
+        );
+        setOrderNumber(orderId);
+      }
+
+      // ===== Step 2: Handle payment =====
+      if (selectedPayment.id === "cod") {
+        // COD: no payment processing needed
+        clearCart();
+        setCurrentStep("success");
+        setTimeout(() => router.replace("/(tabs)"), 3500);
+        return;
+      }
+
+      if (apiProvider) {
         const paymentOrder: PaymentOrder = {
           id: orderId,
           amount: totalPrice,
-          currency: 'VND',
+          currency: "VND",
           description: `Thanh toán đơn hàng ${orderId}`,
           customerName: selectedAddress.name,
           customerPhone: selectedAddress.phone,
-          customerEmail: 'customer@example.com',
+          customerEmail: "customer@example.com",
         };
 
-        const result = await createPayment(apiMethod, paymentOrder);
+        const result = await createPayment(apiProvider, paymentOrder);
 
         if (result.success) {
-          if (result.status === 'processing') {
-            // Payment redirected to provider - already handled by createPayment
+          if (result.status === "processing") {
             clearCart();
-            setCurrentStep('success');
-            setTimeout(() => {
-              router.replace('/(tabs)');
-            }, 3000);
-          } else if (result.status === 'pending' && apiMethod === 'bank_transfer') {
-            // Show bank transfer info
+            setCurrentStep("success");
+            setTimeout(() => router.replace("/(tabs)"), 3500);
+          } else if (
+            result.status === "pending" &&
+            apiProvider === "bank_transfer"
+          ) {
             Alert.alert(
-              'Thông tin chuyển khoản',
+              "Thông tin chuyển khoản",
               `Số tài khoản: 1234567890\nNgân hàng: Vietcombank\nNội dung: ${orderId}\nSố tiền: ${formatPrice(totalPrice)}đ`,
               [
                 {
-                  text: 'Đã chuyển khoản',
+                  text: "Đã chuyển khoản",
                   onPress: () => {
                     clearCart();
-                    setCurrentStep('success');
-                    setTimeout(() => router.replace('/(tabs)'), 3000);
+                    setCurrentStep("success");
+                    setTimeout(() => router.replace("/(tabs)"), 3000);
                   },
                 },
-              ]
+              ],
             );
           }
         } else {
-          Alert.alert('Lỗi', result.message || 'Không thể tạo thanh toán. Vui lòng thử lại.');
+          Alert.alert(
+            "Lỗi",
+            result.message || "Không thể tạo thanh toán. Vui lòng thử lại.",
+          );
         }
-      } catch (error) {
-        console.error('Payment error:', error);
-        Alert.alert('Lỗi', 'Đã xảy ra lỗi khi xử lý thanh toán');
-      } finally {
-        setLoading(false);
-      }
-    } else {
-      // Fallback for unmapped methods
-      setCurrentStep('success');
-      setTimeout(() => {
+      } else {
+        // Fallback for unmapped methods
         clearCart();
-        setTimeout(() => {
-          router.replace('/(tabs)');
-        }, 1500);
-      }, 2000);
+        setCurrentStep("success");
+        setTimeout(() => router.replace("/(tabs)"), 3500);
+      }
+    } catch (error) {
+      console.error("[Checkout] Payment error:", error);
+      Alert.alert("Lỗi", "Đã xảy ra lỗi khi xử lý thanh toán");
+    } finally {
+      setLoading(false);
     }
   };
 
   const renderProgressBar = () => {
     const steps = [
-      { key: 'address', label: 'Địa chỉ' },
-      { key: 'payment', label: 'Thanh toán' },
-      { key: 'review', label: 'Xác nhận' },
+      { key: "address", label: "Địa chỉ" },
+      { key: "payment", label: "Thanh toán" },
+      { key: "review", label: "Xác nhận" },
     ];
 
-    const currentIndex = steps.findIndex(s => s.key === currentStep);
+    const currentIndex = steps.findIndex((s) => s.key === currentStep);
 
     return (
       <View style={styles.progressContainer}>
@@ -250,27 +302,37 @@ export default function CheckoutScreen() {
               ]}
             >
               {index < currentIndex ? (
-                <Ionicons name="checkmark" size={16} color={MODERN_COLORS.surface} />
+                <Ionicons
+                  name="checkmark"
+                  size={16}
+                  color={MODERN_COLORS.surface}
+                />
               ) : (
-                <Text style={[
-                  styles.progressNumber,
-                  index <= currentIndex && styles.progressNumberActive,
-                ]}>
+                <Text
+                  style={[
+                    styles.progressNumber,
+                    index <= currentIndex && styles.progressNumberActive,
+                  ]}
+                >
                   {index + 1}
                 </Text>
               )}
             </View>
-            <Text style={[
-              styles.progressLabel,
-              index <= currentIndex && styles.progressLabelActive,
-            ]}>
+            <Text
+              style={[
+                styles.progressLabel,
+                index <= currentIndex && styles.progressLabelActive,
+              ]}
+            >
               {step.label}
             </Text>
             {index < steps.length - 1 && (
-              <View style={[
-                styles.progressLine,
-                index < currentIndex && styles.progressLineActive,
-              ]} />
+              <View
+                style={[
+                  styles.progressLine,
+                  index < currentIndex && styles.progressLineActive,
+                ]}
+              />
             )}
           </View>
         ))}
@@ -279,8 +341,8 @@ export default function CheckoutScreen() {
   };
 
   const renderAddressStep = () => (
-    <ScrollView 
-      style={styles.stepContent} 
+    <ScrollView
+      style={styles.stepContent}
       showsVerticalScrollIndicator={false}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -289,7 +351,7 @@ export default function CheckoutScreen() {
       <Text style={styles.stepTitle}>Chọn địa chỉ giao hàng</Text>
 
       {/* Data Source Indicator */}
-      {dataSource === 'mock' && (
+      {dataSource === "mock" && (
         <View style={styles.mockBanner}>
           <Ionicons name="information-circle" size={16} color="#92400E" />
           <Text style={styles.mockBannerText}>📋 Địa chỉ mẫu</Text>
@@ -308,7 +370,11 @@ export default function CheckoutScreen() {
         >
           <View style={styles.addressHeader}>
             <View style={styles.addressNameRow}>
-              <Ionicons name="location" size={20} color={MODERN_COLORS.primary} />
+              <Ionicons
+                name="location"
+                size={20}
+                color={MODERN_COLORS.primary}
+              />
               <Text style={styles.addressName}>{address.name}</Text>
               {address.isDefault && (
                 <View style={styles.defaultBadge}>
@@ -316,10 +382,12 @@ export default function CheckoutScreen() {
                 </View>
               )}
             </View>
-            <View style={[
-              styles.radioButton,
-              selectedAddress.id === address.id && styles.radioButtonActive,
-            ]}>
+            <View
+              style={[
+                styles.radioButton,
+                selectedAddress.id === address.id && styles.radioButtonActive,
+              ]}
+            >
               {selectedAddress.id === address.id && (
                 <View style={styles.radioButtonInner} />
               )}
@@ -333,8 +401,21 @@ export default function CheckoutScreen() {
         </TouchableOpacity>
       ))}
 
-      <TouchableOpacity style={styles.addAddressButton} activeOpacity={0.7}>
-        <Ionicons name="add-circle-outline" size={24} color={MODERN_COLORS.primary} />
+      <TouchableOpacity
+        style={styles.addAddressButton}
+        activeOpacity={0.7}
+        onPress={() => {
+          Alert.alert(
+            "Thêm địa chỉ",
+            "Tính năng thêm địa chỉ mới sẽ được cập nhật!",
+          );
+        }}
+      >
+        <Ionicons
+          name="add-circle-outline"
+          size={24}
+          color={MODERN_COLORS.primary}
+        />
         <Text style={styles.addAddressText}>Thêm địa chỉ mới</Text>
       </TouchableOpacity>
 
@@ -342,7 +423,7 @@ export default function CheckoutScreen() {
         <ModernButton
           variant="primary"
           size="large"
-          onPress={() => setCurrentStep('payment')}
+          onPress={() => setCurrentStep("payment")}
           icon="arrow-forward"
           iconPosition="right"
         >
@@ -367,16 +448,22 @@ export default function CheckoutScreen() {
           activeOpacity={0.7}
         >
           <View style={styles.paymentIconContainer}>
-            <Ionicons name={method.icon as any} size={28} color={MODERN_COLORS.primary} />
+            <Ionicons
+              name={method.icon as any}
+              size={28}
+              color={MODERN_COLORS.primary}
+            />
           </View>
           <View style={styles.paymentInfo}>
             <Text style={styles.paymentName}>{method.name}</Text>
             <Text style={styles.paymentDescription}>{method.description}</Text>
           </View>
-          <View style={[
-            styles.radioButton,
-            selectedPayment.id === method.id && styles.radioButtonActive,
-          ]}>
+          <View
+            style={[
+              styles.radioButton,
+              selectedPayment.id === method.id && styles.radioButtonActive,
+            ]}
+          >
             {selectedPayment.id === method.id && (
               <View style={styles.radioButtonInner} />
             )}
@@ -388,7 +475,7 @@ export default function CheckoutScreen() {
         <ModernButton
           variant="outline"
           size="large"
-          onPress={() => setCurrentStep('address')}
+          onPress={() => setCurrentStep("address")}
           icon="arrow-back"
           iconPosition="left"
           style={{ flex: 1, marginRight: MODERN_SPACING.sm }}
@@ -398,7 +485,7 @@ export default function CheckoutScreen() {
         <ModernButton
           variant="primary"
           size="large"
-          onPress={() => setCurrentStep('review')}
+          onPress={() => setCurrentStep("review")}
           icon="arrow-forward"
           iconPosition="right"
           style={{ flex: 1 }}
@@ -417,7 +504,7 @@ export default function CheckoutScreen() {
       <View style={styles.reviewSection}>
         <View style={styles.reviewHeader}>
           <Text style={styles.reviewSectionTitle}>Địa chỉ giao hàng</Text>
-          <TouchableOpacity onPress={() => setCurrentStep('address')}>
+          <TouchableOpacity onPress={() => setCurrentStep("address")}>
             <Text style={styles.changeLink}>Thay đổi</Text>
           </TouchableOpacity>
         </View>
@@ -425,7 +512,8 @@ export default function CheckoutScreen() {
           <Text style={styles.addressName}>{selectedAddress.name}</Text>
           <Text style={styles.addressPhone}>{selectedAddress.phone}</Text>
           <Text style={styles.addressText}>
-            {selectedAddress.address}, {selectedAddress.district}, {selectedAddress.city}
+            {selectedAddress.address}, {selectedAddress.district},{" "}
+            {selectedAddress.city}
           </Text>
         </View>
       </View>
@@ -434,13 +522,17 @@ export default function CheckoutScreen() {
       <View style={styles.reviewSection}>
         <View style={styles.reviewHeader}>
           <Text style={styles.reviewSectionTitle}>Phương thức thanh toán</Text>
-          <TouchableOpacity onPress={() => setCurrentStep('payment')}>
+          <TouchableOpacity onPress={() => setCurrentStep("payment")}>
             <Text style={styles.changeLink}>Thay đổi</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.reviewCard}>
           <View style={styles.paymentReview}>
-            <Ionicons name={selectedPayment.icon as any} size={24} color={MODERN_COLORS.primary} />
+            <Ionicons
+              name={selectedPayment.icon as any}
+              size={24}
+              color={MODERN_COLORS.primary}
+            />
             <Text style={styles.paymentReviewText}>{selectedPayment.name}</Text>
           </View>
         </View>
@@ -452,14 +544,22 @@ export default function CheckoutScreen() {
         {items.map((item) => (
           <View key={item.id} style={styles.orderItem}>
             <Image
-              source={typeof item.product.image === 'string' ? { uri: item.product.image } : item.product.image}
+              source={
+                typeof item.product.image === "string"
+                  ? { uri: item.product.image }
+                  : item.product.image
+              }
               style={styles.orderItemImage}
             />
             <View style={styles.orderItemInfo}>
-              <Text style={styles.orderItemName} numberOfLines={2}>{item.product.name}</Text>
+              <Text style={styles.orderItemName} numberOfLines={2}>
+                {item.product.name}
+              </Text>
               <Text style={styles.orderItemQty}>Số lượng: {item.quantity}</Text>
             </View>
-            <Text style={styles.orderItemPrice}>₫{formatPrice(item.product.price * item.quantity)}</Text>
+            <Text style={styles.orderItemPrice}>
+              ₫{formatPrice(item.product.price * item.quantity)}
+            </Text>
           </View>
         ))}
       </View>
@@ -501,7 +601,7 @@ export default function CheckoutScreen() {
         <ModernButton
           variant="outline"
           size="large"
-          onPress={() => setCurrentStep('payment')}
+          onPress={() => setCurrentStep("payment")}
           icon="arrow-back"
           iconPosition="left"
           style={{ flex: 1, marginRight: MODERN_SPACING.sm }}
@@ -525,7 +625,11 @@ export default function CheckoutScreen() {
   const renderSuccessStep = () => (
     <View style={styles.successContainer}>
       <View style={styles.successIconContainer}>
-        <Ionicons name="checkmark-circle" size={100} color={MODERN_COLORS.primary} />
+        <Ionicons
+          name="checkmark-circle"
+          size={100}
+          color={MODERN_COLORS.primary}
+        />
       </View>
       <Text style={styles.successTitle}>Đặt hàng thành công!</Text>
       <Text style={styles.successMessage}>
@@ -534,11 +638,15 @@ export default function CheckoutScreen() {
       <View style={styles.successInfo}>
         <View style={styles.successInfoRow}>
           <Text style={styles.successInfoLabel}>Mã đơn hàng:</Text>
-          <Text style={styles.successInfoValue}>#DH{Date.now().toString().slice(-6)}</Text>
+          <Text style={styles.successInfoValue}>
+            #{orderNumber || `DH${Date.now().toString().slice(-6)}`}
+          </Text>
         </View>
         <View style={styles.successInfoRow}>
           <Text style={styles.successInfoLabel}>Tổng tiền:</Text>
-          <Text style={styles.successInfoValue}>₫{formatPrice(totalPrice)}</Text>
+          <Text style={styles.successInfoValue}>
+            ₫{formatPrice(totalPrice)}
+          </Text>
         </View>
       </View>
     </View>
@@ -546,27 +654,34 @@ export default function CheckoutScreen() {
 
   return (
     <>
-      <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
+      <StatusBar
+        barStyle="dark-content"
+        backgroundColor="transparent"
+        translucent
+      />
       <View style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={styles.backButton}
+          >
             <Ionicons name="arrow-back" size={24} color={MODERN_COLORS.text} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>
-            {currentStep === 'success' ? 'Hoàn tất' : 'Thanh toán'}
+            {currentStep === "success" ? "Hoàn tất" : "Thanh toán"}
           </Text>
           <View style={{ width: 40 }} />
         </View>
 
         {/* Progress Bar */}
-        {currentStep !== 'success' && renderProgressBar()}
+        {currentStep !== "success" && renderProgressBar()}
 
         {/* Content */}
-        {currentStep === 'address' && renderAddressStep()}
-        {currentStep === 'payment' && renderPaymentStep()}
-        {currentStep === 'review' && renderReviewStep()}
-        {currentStep === 'success' && renderSuccessStep()}
+        {currentStep === "address" && renderAddressStep()}
+        {currentStep === "payment" && renderPaymentStep()}
+        {currentStep === "review" && renderReviewStep()}
+        {currentStep === "success" && renderSuccessStep()}
       </View>
     </>
   );
@@ -575,9 +690,9 @@ export default function CheckoutScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: MODERN_COLORS.background },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: MODERN_SPACING.md,
     paddingTop: 44,
     paddingBottom: MODERN_SPACING.sm,
@@ -592,13 +707,13 @@ const styles = StyleSheet.create({
     color: MODERN_COLORS.text,
   },
   progressContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: MODERN_SPACING.md,
     paddingVertical: MODERN_SPACING.lg,
     backgroundColor: MODERN_COLORS.surface,
   },
-  progressStep: { flex: 1, alignItems: 'center', position: 'relative' },
+  progressStep: { flex: 1, alignItems: "center", position: "relative" },
   progressCircle: {
     width: 32,
     height: 32,
@@ -606,8 +721,8 @@ const styles = StyleSheet.create({
     backgroundColor: MODERN_COLORS.background,
     borderWidth: 2,
     borderColor: MODERN_COLORS.divider,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: MODERN_SPACING.xs,
   },
   progressCircleActive: {
@@ -630,10 +745,10 @@ const styles = StyleSheet.create({
     fontWeight: MODERN_TYPOGRAPHY.fontWeight.medium,
   },
   progressLine: {
-    position: 'absolute',
+    position: "absolute",
     top: 16,
-    left: '50%',
-    right: '-50%',
+    left: "50%",
+    right: "-50%",
     height: 2,
     backgroundColor: MODERN_COLORS.divider,
   },
@@ -655,12 +770,17 @@ const styles = StyleSheet.create({
   },
   addressCardActive: { borderColor: MODERN_COLORS.primary },
   addressHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: MODERN_SPACING.sm,
   },
-  addressNameRow: { flexDirection: 'row', alignItems: 'center', flex: 1, gap: MODERN_SPACING.xs },
+  addressNameRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+    gap: MODERN_SPACING.xs,
+  },
   addressName: {
     fontSize: MODERN_TYPOGRAPHY.fontSize.md,
     fontWeight: MODERN_TYPOGRAPHY.fontWeight.semibold,
@@ -683,8 +803,8 @@ const styles = StyleSheet.create({
     borderRadius: MODERN_RADIUS.full,
     borderWidth: 2,
     borderColor: MODERN_COLORS.divider,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   radioButtonActive: { borderColor: MODERN_COLORS.primary },
   radioButtonInner: {
@@ -704,21 +824,21 @@ const styles = StyleSheet.create({
     lineHeight: MODERN_TYPOGRAPHY.lineHeight.relaxed,
   },
   addAddressButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     padding: MODERN_SPACING.md,
     borderWidth: 1,
     borderColor: MODERN_COLORS.divider,
     borderRadius: MODERN_RADIUS.lg,
-    borderStyle: 'dashed',
+    borderStyle: "dashed",
     marginBottom: MODERN_SPACING.lg,
     gap: MODERN_SPACING.sm,
   },
   mockBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FEF3C7',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FEF3C7",
     padding: MODERN_SPACING.sm,
     borderRadius: MODERN_RADIUS.md,
     marginBottom: MODERN_SPACING.md,
@@ -726,7 +846,7 @@ const styles = StyleSheet.create({
   },
   mockBannerText: {
     fontSize: MODERN_TYPOGRAPHY.fontSize.sm,
-    color: '#92400E',
+    color: "#92400E",
     fontWeight: MODERN_TYPOGRAPHY.fontWeight.medium,
   },
   addAddressText: {
@@ -735,8 +855,8 @@ const styles = StyleSheet.create({
     fontWeight: MODERN_TYPOGRAPHY.fontWeight.medium,
   },
   paymentCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: MODERN_COLORS.surface,
     padding: MODERN_SPACING.md,
     borderRadius: MODERN_RADIUS.lg,
@@ -751,8 +871,8 @@ const styles = StyleSheet.create({
     height: 48,
     borderRadius: MODERN_RADIUS.md,
     backgroundColor: `${MODERN_COLORS.primary}10`,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   paymentInfo: { flex: 1 },
   paymentName: {
@@ -766,16 +886,16 @@ const styles = StyleSheet.create({
     color: MODERN_COLORS.textSecondary,
   },
   stepActions: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: MODERN_SPACING.sm,
     marginTop: MODERN_SPACING.lg,
     paddingBottom: MODERN_SPACING.xl,
   },
   reviewSection: { marginBottom: MODERN_SPACING.lg },
   reviewHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: MODERN_SPACING.sm,
   },
   reviewSectionTitle: {
@@ -793,14 +913,18 @@ const styles = StyleSheet.create({
     padding: MODERN_SPACING.md,
     borderRadius: MODERN_RADIUS.lg,
   },
-  paymentReview: { flexDirection: 'row', alignItems: 'center', gap: MODERN_SPACING.sm },
+  paymentReview: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: MODERN_SPACING.sm,
+  },
   paymentReviewText: {
     fontSize: MODERN_TYPOGRAPHY.fontSize.md,
     color: MODERN_COLORS.text,
     fontWeight: MODERN_TYPOGRAPHY.fontWeight.medium,
   },
   orderItem: {
-    flexDirection: 'row',
+    flexDirection: "row",
     backgroundColor: MODERN_COLORS.surface,
     padding: MODERN_SPACING.sm,
     borderRadius: MODERN_RADIUS.md,
@@ -813,7 +937,7 @@ const styles = StyleSheet.create({
     borderRadius: MODERN_RADIUS.sm,
     backgroundColor: MODERN_COLORS.background,
   },
-  orderItemInfo: { flex: 1, justifyContent: 'space-between' },
+  orderItemInfo: { flex: 1, justifyContent: "space-between" },
   orderItemName: {
     fontSize: MODERN_TYPOGRAPHY.fontSize.sm,
     fontWeight: MODERN_TYPOGRAPHY.fontWeight.medium,
@@ -851,9 +975,9 @@ const styles = StyleSheet.create({
     marginBottom: MODERN_SPACING.sm,
   },
   summaryRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: MODERN_SPACING.sm,
   },
   summaryLabel: {
@@ -887,8 +1011,8 @@ const styles = StyleSheet.create({
   },
   successContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: MODERN_SPACING.xl,
   },
   successIconContainer: { marginBottom: MODERN_SPACING.lg },
@@ -901,7 +1025,7 @@ const styles = StyleSheet.create({
   successMessage: {
     fontSize: MODERN_TYPOGRAPHY.fontSize.md,
     color: MODERN_COLORS.textSecondary,
-    textAlign: 'center',
+    textAlign: "center",
     lineHeight: MODERN_TYPOGRAPHY.lineHeight.relaxed,
     marginBottom: MODERN_SPACING.xl,
   },
@@ -909,13 +1033,13 @@ const styles = StyleSheet.create({
     backgroundColor: MODERN_COLORS.surface,
     padding: MODERN_SPACING.lg,
     borderRadius: MODERN_RADIUS.lg,
-    width: '100%',
+    width: "100%",
     ...MODERN_SHADOWS.sm,
   },
   successInfoRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: MODERN_SPACING.sm,
   },
   successInfoLabel: {

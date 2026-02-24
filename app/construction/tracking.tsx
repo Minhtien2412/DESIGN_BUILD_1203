@@ -264,7 +264,7 @@ export default function WorkerTrackingScreen() {
               <Text style={styles.workerName}>{worker.name}</Text>
               <Text style={styles.workerSpecialty}>{worker.specialty}</Text>
               <View style={styles.workerRating}>
-                <Ionicons name="star" size={14} color="#0066CC" />
+                <Ionicons name="star" size={14} color="#0D9488" />
                 <Text style={styles.ratingText}>{worker.rating}</Text>
               </View>
             </View>
@@ -536,7 +536,7 @@ const styles = StyleSheet.create({
   cancelButton: {
     backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#0066CC',
+    borderColor: '#0D9488',
     borderRadius: 8,
     padding: 16,
     alignItems: 'center',
@@ -544,7 +544,7 @@ const styles = StyleSheet.create({
   cancelButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   progressButton: {
     backgroundColor: '#E8F5E9',

@@ -185,7 +185,7 @@ function ChatItem({
       {/* Swipe actions (revealed) */}
       <View style={styles.swipeActionsContainer}>
         <Pressable 
-          style={[styles.swipeAction, { backgroundColor: '#3B82F6' }]}
+          style={[styles.swipeAction, { backgroundColor: '#0D9488' }]}
           onPress={onPin}
         >
           <Ionicons name={chat.isPinned ? 'close' : 'pin'} size={20} color="#fff" />

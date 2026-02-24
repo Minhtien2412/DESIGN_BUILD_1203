@@ -312,7 +312,7 @@ export default function DesignCalculatorScreen() {
       <Stack.Screen
         options={{
           title: 'Máy tính thiết kế',
-          headerStyle: { backgroundColor: '#0066CC' },
+          headerStyle: { backgroundColor: '#0D9488' },
           headerTintColor: '#fff',
           headerTitleStyle: { fontWeight: '600' },
         }}
@@ -320,7 +320,7 @@ export default function DesignCalculatorScreen() {
       <View style={styles.container}>
         {/* Hero */}
         <LinearGradient
-          colors={['#0066CC', '#3399FF']}
+          colors={['#0D9488', '#14B8A6']}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.hero}
@@ -347,7 +347,7 @@ export default function DesignCalculatorScreen() {
                   <Ionicons
                     name={calc.icon as any}
                     size={32}
-                    color={selectedCalculator === calc.id ? '#fff' : '#0066CC'}
+                    color={selectedCalculator === calc.id ? '#fff' : '#0D9488'}
                   />
                   <Text
                     style={[
@@ -901,8 +901,8 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   calculatorCardActive: {
-    backgroundColor: '#0066CC',
-    borderColor: '#0066CC',
+    backgroundColor: '#0D9488',
+    borderColor: '#0D9488',
   },
   calculatorName: {
     fontSize: 12,
@@ -927,7 +927,7 @@ const styles = StyleSheet.create({
   },
   roomChipActive: {
     backgroundColor: '#fff5f0',
-    borderColor: '#0066CC',
+    borderColor: '#0D9488',
   },
   roomChipText: {
     fontSize: 13,
@@ -935,7 +935,7 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   roomChipTextActive: {
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: '600',
   },
   roomAreaText: {
@@ -984,8 +984,8 @@ const styles = StyleSheet.create({
     borderColor: '#e8e8e8',
   },
   coatButtonActive: {
-    backgroundColor: '#0066CC',
-    borderColor: '#0066CC',
+    backgroundColor: '#0D9488',
+    borderColor: '#0D9488',
   },
   coatButtonText: {
     fontSize: 14,
@@ -1009,8 +1009,8 @@ const styles = StyleSheet.create({
     borderColor: '#e8e8e8',
   },
   sizeButtonActive: {
-    backgroundColor: '#0066CC',
-    borderColor: '#0066CC',
+    backgroundColor: '#0D9488',
+    borderColor: '#0D9488',
   },
   sizeButtonText: {
     fontSize: 13,
@@ -1039,13 +1039,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     marginHorizontal: 16,
     marginTop: 24,
     paddingVertical: 16,
     borderRadius: 12,
     gap: 8,
-    shadowColor: '#0066CC',
+    shadowColor: '#0D9488',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,

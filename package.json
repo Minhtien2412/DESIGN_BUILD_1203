@@ -56,6 +56,9 @@
     "@google/genai": "^1.35.0",
     "@gorhom/bottom-sheet": "^5.2.8",
     "@hookform/resolvers": "^5.2.2",
+    "@livekit/components-react": "^2.9.19",
+    "@livekit/react-native": "^2.9.6",
+    "@livekit/react-native-webrtc": "^137.0.2",
     "@nestjs/bull": "^11.0.4",
     "@nestjs/event-emitter": "^3.0.1",
     "@nestjs/schedule": "^6.1.0",
@@ -76,6 +79,7 @@
     "@types/crypto-js": "^4.2.2",
     "@types/multer": "^2.0.0",
     "axios": "^1.12.2",
+    "babel-plugin-module-resolver": "^5.0.2",
     "base64-arraybuffer": "^1.0.2",
     "bcryptjs": "^3.0.2",
     "bull": "^4.16.5",
@@ -155,8 +159,7 @@
     "react-native-worklets": "0.5.1",
     "socket.io-client": "^4.8.3",
     "zod": "^4.1.12",
-    "zustand": "^4.5.7",
-    "babel-plugin-module-resolver": "^5.0.2"
+    "zustand": "^4.5.7"
   },
   "devDependencies": {
     "@testing-library/jest-native": "^5.4.3",

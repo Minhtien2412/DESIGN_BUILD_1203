@@ -243,7 +243,7 @@ export default function ModernConstructionAuthScreen() {
                                     style={styles.demoButton}
                                     onPress={fillDemoAdmin}
                                 >
-                                    <MaterialCommunityIcons name="shield-crown" size={20} color="#0066CC" />
+                                    <MaterialCommunityIcons name="shield-crown" size={20} color="#0D9488" />
                                     <Text style={styles.demoText}>Demo Admin Login</Text>
                                 </TouchableOpacity>
                             </View>
@@ -377,7 +377,7 @@ export default function ModernConstructionAuthScreen() {
                                         <MaterialCommunityIcons 
                                             name={emailValidation.isValid ? 'check-circle' : 'alert-circle'} 
                                             size={16} 
-                                            color={emailValidation.isValid ? '#0066CC' : '#000000'} 
+                                            color={emailValidation.isValid ? '#0D9488' : '#000000'} 
                                         />
                                         <Text style={[styles.validationText, emailValidation.isValid ? styles.validationTextSuccess : styles.validationTextError]}>
                                             {emailValidation.message}
@@ -522,7 +522,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#f8f9fa',
         borderRadius: 8,
         borderLeftWidth: 3,
-        borderLeftColor: '#0066CC',
+        borderLeftColor: '#0D9488',
     },
     demoButton: {
         flexDirection: 'row',
@@ -533,12 +533,12 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         borderRadius: 6,
         borderWidth: 1,
-        borderColor: '#0066CC',
+        borderColor: '#0D9488',
     },
     demoText: {
         marginLeft: 8,
         fontSize: 14,
-        color: '#0066CC',
+        color: '#0D9488',
         fontWeight: '500',
     },
     demoTitle: {
@@ -589,8 +589,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     roleActive: {
-        backgroundColor: '#0066CC',
-        borderColor: '#0066CC',
+        backgroundColor: '#0D9488',
+        borderColor: '#0D9488',
     },
     roleText: {
         fontSize: 12,
@@ -625,7 +625,7 @@ const styles = StyleSheet.create({
         color: '#1a1a2e',
     },
     inputValid: {
-        borderColor: '#0066CC',
+        borderColor: '#0D9488',
         borderWidth: 1,
     },
     inputInvalid: {
@@ -661,11 +661,11 @@ const styles = StyleSheet.create({
         color: '#c62828',
     },
     submitButton: {
-        backgroundColor: '#0066CC',
+        backgroundColor: '#0D9488',
         paddingVertical: 16,
         borderRadius: 12,
         alignItems: 'center',
-        shadowColor: '#0066CC',
+        shadowColor: '#0D9488',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 8,

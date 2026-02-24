@@ -434,7 +434,7 @@ export default function ProductDetail() {
     return (
       <View style={styles.loadingContainer}>
         <Stack.Screen options={{ headerShown: false }} />
-        <ActivityIndicator size="large" color="#EE4D2D" />
+        <ActivityIndicator size="large" color="#0D9488" />
         <Text style={styles.loadingText}>Đang tải...</Text>
       </View>
     );
@@ -787,7 +787,7 @@ export default function ProductDetail() {
       {/* Bottom Actions */}
       <View style={[styles.bottomBar, { paddingBottom: insets.bottom + 10 }]}>
         <TouchableOpacity style={styles.bottomBtn} onPress={handleChatSeller}>
-          <Ionicons name="chatbubble-outline" size={22} color="#EE4D2D" />
+          <Ionicons name="chatbubble-outline" size={22} color="#0D9488" />
           <Text style={styles.bottomBtnText}>Chat</Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -797,7 +797,7 @@ export default function ProductDetail() {
           <Ionicons
             name={isFavorite(String(product.id)) ? "heart" : "heart-outline"}
             size={22}
-            color="#EE4D2D"
+            color="#0D9488"
           />
           <Text style={styles.bottomBtnText}>Yêu thích</Text>
         </TouchableOpacity>
@@ -840,7 +840,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     paddingHorizontal: 24,
     paddingVertical: 12,
-    backgroundColor: "#EE4D2D",
+    backgroundColor: "#0D9488",
     borderRadius: 8,
   },
   backButtonText: { color: "#fff", fontSize: 14, fontWeight: "600" },
@@ -872,7 +872,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 8,
     right: 0,
-    backgroundColor: "#EE4D2D",
+    backgroundColor: "#0D9488",
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderTopLeftRadius: 4,
@@ -899,7 +899,7 @@ const styles = StyleSheet.create({
   paginationText: { color: "#fff", fontSize: 12 },
   priceSection: { backgroundColor: "#fff", padding: 12 },
   priceRow: { flexDirection: "row", alignItems: "center" },
-  currentPrice: { fontSize: 24, fontWeight: "700", color: "#EE4D2D" },
+  currentPrice: { fontSize: 24, fontWeight: "700", color: "#0D9488" },
   originalPrice: {
     fontSize: 14,
     color: "#9CA3AF",
@@ -913,7 +913,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     marginLeft: 10,
   },
-  discountTextSmall: { color: "#EE4D2D", fontSize: 12, fontWeight: "600" },
+  discountTextSmall: { color: "#0D9488", fontSize: 12, fontWeight: "600" },
   freeShipBadge: { flexDirection: "row", alignItems: "center", marginTop: 8 },
   freeShipText: { color: "#00BFA5", fontSize: 12, marginLeft: 4 },
   nameSection: { backgroundColor: "#fff", padding: 12, marginTop: 8 },
@@ -942,10 +942,10 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 4,
     borderWidth: 1,
-    borderColor: "#EE4D2D",
+    borderColor: "#0D9488",
     marginRight: 8,
   },
-  voucherText: { color: "#EE4D2D", fontSize: 11 },
+  voucherText: { color: "#0D9488", fontSize: 11 },
   quantitySection: {
     backgroundColor: "#fff",
     padding: 12,
@@ -983,7 +983,7 @@ const styles = StyleSheet.create({
   sellerInfo: { flex: 1, marginLeft: 12 },
   sellerNameRow: { flexDirection: "row", alignItems: "center" },
   mallBadge: {
-    backgroundColor: "#EE4D2D",
+    backgroundColor: "#0D9488",
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 2,
@@ -996,10 +996,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderWidth: 1,
-    borderColor: "#EE4D2D",
+    borderColor: "#0D9488",
     borderRadius: 4,
   },
-  viewShopText: { color: "#EE4D2D", fontSize: 12, fontWeight: "600" },
+  viewShopText: { color: "#0D9488", fontSize: 12, fontWeight: "600" },
   sellerStats: {
     flexDirection: "row",
     marginTop: 16,
@@ -1008,7 +1008,7 @@ const styles = StyleSheet.create({
     borderTopColor: "#F3F4F6",
   },
   sellerStatItem: { flex: 1, alignItems: "center" },
-  sellerStatValue: { fontSize: 14, fontWeight: "600", color: "#EE4D2D" },
+  sellerStatValue: { fontSize: 14, fontWeight: "600", color: "#0D9488" },
   sellerStatLabel: { fontSize: 11, color: "#9CA3AF", marginTop: 2 },
   tabsContainer: {
     flexDirection: "row",
@@ -1022,9 +1022,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 2,
     borderBottomColor: "transparent",
   },
-  tabActive: { borderBottomColor: "#EE4D2D" },
+  tabActive: { borderBottomColor: "#0D9488" },
   tabText: { fontSize: 14, color: "#666" },
-  tabTextActive: { color: "#EE4D2D", fontWeight: "600" },
+  tabTextActive: { color: "#0D9488", fontWeight: "600" },
   detailsContent: { backgroundColor: "#fff", marginTop: 8, padding: 12 },
   sectionTitle: {
     fontSize: 14,
@@ -1060,7 +1060,7 @@ const styles = StyleSheet.create({
   relatedName: { fontSize: 12, color: "#222", marginTop: 8 },
   relatedPrice: {
     fontSize: 14,
-    color: "#EE4D2D",
+    color: "#0D9488",
     fontWeight: "600",
     marginTop: 4,
   },
@@ -1093,9 +1093,9 @@ const styles = StyleSheet.create({
   addToCartBtn: {
     backgroundColor: "#FFEEE8",
     borderWidth: 1,
-    borderColor: "#EE4D2D",
+    borderColor: "#0D9488",
   },
-  buyNowBtn: { backgroundColor: "#EE4D2D" },
-  actionBtnText: { color: "#EE4D2D", fontSize: 14, fontWeight: "600" },
+  buyNowBtn: { backgroundColor: "#0D9488" },
+  actionBtnText: { color: "#0D9488", fontSize: 14, fontWeight: "600" },
   actionBtnTextWhite: { color: "#fff", fontSize: 14, fontWeight: "600" },
 });

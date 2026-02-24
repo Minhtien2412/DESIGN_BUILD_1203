@@ -26,14 +26,14 @@ const { width } = Dimensions.get('window');
 const COLORS = {
   bg: '#F5F5F5',
   card: '#FFFFFF',
-  primary: '#0066CC',
-  accent: '#0066CC',
+  primary: '#0D9488',
+  accent: '#0D9488',
   text: '#222222',
   textSecondary: '#666666',
   textMuted: '#999999',
   border: '#E8E8E8',
-  success: '#0066CC',
-  warning: '#0066CC',
+  success: '#0D9488',
+  warning: '#0D9488',
   error: '#000000',
 };
 
@@ -72,7 +72,7 @@ const MODULE_CATEGORIES: ModuleCategory[] = [
     id: 'projects',
     title: '📁 Quản lý Dự án',
     icon: 'folder-open-outline',
-    color: '#0066CC',
+    color: '#0D9488',
     items: [
       { id: 'p1', label: 'Danh sách dự án', icon: 'list-outline', route: '/projects' },
       { id: 'p2', label: 'Tạo dự án mới', icon: 'add-circle-outline', route: '/projects/create', new: true },
@@ -90,7 +90,7 @@ const MODULE_CATEGORIES: ModuleCategory[] = [
     id: 'construction',
     title: '🏗️ Thi công Xây dựng',
     icon: 'construct-outline',
-    color: '#0066CC',
+    color: '#0D9488',
     items: [
       { id: 'c1', label: 'Tiến độ XD', icon: 'analytics-outline', route: '/construction/progress', hot: true },
       { id: 'c2', label: 'Bản đồ công trình', icon: 'map-outline', route: '/construction/map-view' },
@@ -108,7 +108,7 @@ const MODULE_CATEGORIES: ModuleCategory[] = [
     id: 'contracts',
     title: '📝 Hợp đồng & Báo giá',
     icon: 'document-attach-outline',
-    color: '#0066CC',
+    color: '#0D9488',
     items: [
       { id: 'ct1', label: 'Danh sách HĐ', icon: 'documents-outline', route: '/contracts' },
       { id: 'ct2', label: 'Tạo hợp đồng', icon: 'add-outline', route: '/contracts/create', new: true },
@@ -124,7 +124,7 @@ const MODULE_CATEGORIES: ModuleCategory[] = [
     id: 'quality',
     title: '✅ Kiểm tra Chất lượng',
     icon: 'checkmark-done-outline',
-    color: '#0080FF',
+    color: '#14B8A6',
     items: [
       { id: 'qa1', label: 'QC/QA Overview', icon: 'shield-checkmark-outline', route: '/quality-assurance' },
       { id: 'qa2', label: 'Checklists', icon: 'checkbox-outline', route: '/quality-assurance/checklists' },
@@ -196,7 +196,7 @@ const MODULE_CATEGORIES: ModuleCategory[] = [
     id: 'ai',
     title: '🛠️ Công cụ AI',
     icon: 'construct-outline',
-    color: '#0066CC',
+    color: '#0D9488',
     items: [
       { id: 'ai1', label: 'AI Assistant', icon: 'chatbubble-ellipses-outline', route: '/ai/assistant', hot: true },
       { id: 'ai2', label: 'Dự toán AI', icon: 'calculator-outline', route: '/ai/cost-estimator' },
@@ -248,7 +248,7 @@ const MODULE_CATEGORIES: ModuleCategory[] = [
     id: 'crm',
     title: '🏢 Perfex CRM',
     icon: 'business-outline',
-    color: '#0080FF',
+    color: '#14B8A6',
     items: [
       { id: 'crm1', label: 'CRM Home', icon: 'home-outline', route: '/crm' },
       { id: 'crm2', label: 'Khách hàng', icon: 'people-outline', route: '/crm/customers' },
@@ -314,7 +314,7 @@ const MODULE_CATEGORIES: ModuleCategory[] = [
     id: 'reports',
     title: '📊 Báo cáo & Phân tích',
     icon: 'bar-chart-outline',
-    color: '#0066CC',
+    color: '#0D9488',
     items: [
       { id: 'rp1', label: 'All Reports', icon: 'stats-chart-outline', route: '/reports' },
       { id: 'rp2', label: 'KPI Dashboard', icon: 'speedometer-outline', route: '/reports/kpi' },
@@ -401,7 +401,7 @@ const MODULE_CATEGORIES: ModuleCategory[] = [
     id: 'changes',
     title: '🔄 Quản lý Thay đổi',
     icon: 'swap-horizontal-outline',
-    color: '#0066CC',
+    color: '#0D9488',
     items: [
       { id: 'ch1', label: 'Change Orders', icon: 'swap-horizontal-outline', route: '/change-order' },
       { id: 'ch2', label: 'Change Management', icon: 'git-compare-outline', route: '/change-management' },

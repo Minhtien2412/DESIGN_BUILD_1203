@@ -320,7 +320,7 @@ Hãy tạo:
             <View style={styles.resultHeader}>
               <Text style={styles.sectionTitle}>📋 Kết Quả Thiết Kế</Text>
               <TouchableOpacity style={styles.copyButton}>
-                <Ionicons name="copy-outline" size={18} color="#03a9f4" />
+                <Ionicons name="copy-outline" size={18} color="#14B8A6" />
                 <Text style={styles.copyText}>Sao chép</Text>
               </TouchableOpacity>
             </View>
@@ -400,7 +400,7 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   typeCardSelected: {
-    borderColor: '#03a9f4',
+    borderColor: '#14B8A6',
     backgroundColor: 'rgba(3, 169, 244, 0.1)',
   },
   typeIcon: {
@@ -421,7 +421,7 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   styleCardSelected: {
-    borderColor: '#03a9f4',
+    borderColor: '#14B8A6',
   },
   styleImage: {
     width: '100%',
@@ -444,7 +444,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 6,
     right: 6,
-    backgroundColor: '#03a9f4',
+    backgroundColor: '#14B8A6',
     width: 20,
     height: 20,
     borderRadius: 10,
@@ -466,7 +466,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   featureChipSelected: {
-    backgroundColor: '#03a9f4',
+    backgroundColor: '#14B8A6',
   },
   featureIcon: {
     fontSize: 16,
@@ -570,7 +570,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   copyText: {
-    color: '#03a9f4',
+    color: '#14B8A6',
     fontSize: 14,
   },
   resultContainer: {
@@ -599,7 +599,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   actionButtonPrimary: {
-    backgroundColor: '#03a9f4',
+    backgroundColor: '#14B8A6',
   },
   actionButtonText: {
     color: '#fff',

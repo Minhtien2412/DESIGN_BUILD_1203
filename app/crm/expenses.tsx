@@ -199,8 +199,8 @@ export default function ExpensesScreen() {
             )}
             
             {item.invoiceid && (
-              <View style={[styles.badge, { backgroundColor: '#3b82f620' }]}>
-                <Text style={[styles.badgeText, { color: '#3b82f6' }]}>Invoiced</Text>
+              <View style={[styles.badge, { backgroundColor: '#0D948820' }]}>
+                <Text style={[styles.badgeText, { color: '#0D9488' }]}>Invoiced</Text>
               </View>
             )}
           </View>
@@ -251,7 +251,7 @@ export default function ExpensesScreen() {
           <View style={styles.statRow}>
             <View style={styles.statItem}>
               <Text style={[styles.statLabel, { color: textColor }]}>Invoiced</Text>
-              <Text style={[styles.statValue, { color: '#3b82f6' }]}>
+              <Text style={[styles.statValue, { color: '#0D9488' }]}>
                 {formatCurrency(getInvoicedExpenses())}
               </Text>
             </View>

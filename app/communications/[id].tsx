@@ -185,16 +185,16 @@ export default function ChatDetailScreen() {
           headerRight: () => (
             <View style={styles.headerButtons}>
               <TouchableOpacity style={styles.headerButton}>
-                <Ionicons name="call-outline" size={24} color="#3B82F6" />
+                <Ionicons name="call-outline" size={24} color="#0D9488" />
               </TouchableOpacity>
               <TouchableOpacity style={styles.headerButton}>
-                <Ionicons name="videocam-outline" size={24} color="#3B82F6" />
+                <Ionicons name="videocam-outline" size={24} color="#0D9488" />
               </TouchableOpacity>
               <TouchableOpacity style={styles.headerButton}>
                 <Ionicons
                   name="information-circle-outline"
                   size={24}
-                  color="#3B82F6"
+                  color="#0D9488"
                 />
               </TouchableOpacity>
             </View>
@@ -210,7 +210,7 @@ export default function ChatDetailScreen() {
         {/* Loading Indicator */}
         {isLoading && (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="small" color="#3B82F6" />
+            <ActivityIndicator size="small" color="#0D9488" />
           </View>
         )}
 
@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
     borderRadius: 18,
   },
   myMessageBubble: {
-    backgroundColor: "#3B82F6",
+    backgroundColor: "#0D9488",
     borderBottomRightRadius: 4,
   },
   otherMessageBubble: {
@@ -401,6 +401,6 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   sendButtonActive: {
-    backgroundColor: "#3B82F6",
+    backgroundColor: "#0D9488",
   },
 });

@@ -187,8 +187,8 @@ export default function AddExpenseForm({
                     styles.typeButton,
                     { borderColor: border, backgroundColor: chipBackground },
                     formData.type === "income" && {
-                      backgroundColor: "#0066CC",
-                      borderColor: "#0066CC",
+                      backgroundColor: "#0D9488",
+                      borderColor: "#0D9488",
                     },
                   ]}
                   onPress={() =>

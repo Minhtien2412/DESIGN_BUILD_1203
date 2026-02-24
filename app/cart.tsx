@@ -1,7 +1,7 @@
 /**
  * Cart Screen - Modern Design
  * Updated: 13/12/2025
- * 
+ *
  * Features:
  * - Nordic Green theme
  * - Modern item cards with images
@@ -10,92 +10,258 @@
  * - Empty state illustration
  */
 
-import ModernButton from '@/components/ui/modern-button';
+import ModernButton from "@/components/ui/modern-button";
 import {
     MODERN_COLORS,
     MODERN_RADIUS,
     MODERN_SHADOWS,
     MODERN_SPACING,
     MODERN_TYPOGRAPHY,
-} from '@/constants/modern-theme';
-import { useCart } from '@/context/cart-context';
-import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
-import { router } from 'expo-router';
+} from "@/constants/modern-theme";
+import { type CartItem, useCart } from "@/context/cart-context";
+import { useVoucher } from "@/context/voucher-context";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { router } from "expo-router";
+import { useRef } from "react";
 import {
     Alert,
+    Animated,
     Image,
+    PanResponder,
     ScrollView,
     StatusBar,
     StyleSheet,
     Text,
     TouchableOpacity,
     View,
-} from 'react-native';
+} from "react-native";
+
+const SWIPE_THRESHOLD = 80;
+
+/** Swipeable cart item — swipe left to reveal delete */
+function SwipeableCartItem({
+  item,
+  onRemove,
+  onIncrement,
+  onDecrement,
+  formatPrice,
+}: {
+  item: CartItem;
+  onRemove: () => void;
+  onIncrement: () => void;
+  onDecrement: () => void;
+  formatPrice: (n: number) => string;
+}) {
+  const translateX = useRef(new Animated.Value(0)).current;
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponder: (_, g) =>
+        Math.abs(g.dx) > 10 && Math.abs(g.dy) < 20,
+      onPanResponderMove: (_, g) => {
+        if (g.dx < 0) translateX.setValue(Math.max(g.dx, -120));
+      },
+      onPanResponderRelease: (_, g) => {
+        if (g.dx < -SWIPE_THRESHOLD) {
+          Animated.spring(translateX, {
+            toValue: -100,
+            useNativeDriver: true,
+          }).start();
+        } else {
+          Animated.spring(translateX, {
+            toValue: 0,
+            useNativeDriver: true,
+          }).start();
+        }
+      },
+    }),
+  ).current;
+
+  const handleDelete = () => {
+    Animated.timing(translateX, {
+      toValue: -500,
+      duration: 250,
+      useNativeDriver: true,
+    }).start(() => onRemove());
+  };
+
+  return (
+    <View style={styles.swipeContainer}>
+      {/* Background delete action */}
+      <View style={styles.deleteBackground}>
+        <TouchableOpacity style={styles.deleteAction} onPress={handleDelete}>
+          <Ionicons name="trash-outline" size={24} color="#fff" />
+          <Text style={styles.deleteText}>Xóa</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Foreground card */}
+      <Animated.View
+        style={[styles.cartItem, { transform: [{ translateX }] }]}
+        {...panResponder.panHandlers}
+      >
+        {/* Product Image */}
+        <View style={styles.itemImageContainer}>
+          <Image
+            source={
+              typeof item.product.image === "string"
+                ? { uri: item.product.image }
+                : item.product.image
+            }
+            style={styles.itemImage}
+            resizeMode="cover"
+          />
+        </View>
+
+        {/* Product Info */}
+        <View style={styles.itemInfo}>
+          <Text style={styles.itemName} numberOfLines={2}>
+            {item.product.name}
+          </Text>
+
+          {/* Variant badges (size / color) */}
+          {(item.selectedSize || item.selectedColor) && (
+            <View style={styles.variantRow}>
+              {item.selectedColor && (
+                <View style={styles.variantBadge}>
+                  <Text style={styles.variantText}>{item.selectedColor}</Text>
+                </View>
+              )}
+              {item.selectedSize && (
+                <View style={styles.variantBadge}>
+                  <Text style={styles.variantText}>{item.selectedSize}</Text>
+                </View>
+              )}
+            </View>
+          )}
+
+          <Text style={styles.itemPrice}>
+            ₫{formatPrice(item.product.price)}
+          </Text>
+
+          {/* Quantity Controls */}
+          <View style={styles.quantityRow}>
+            <View style={styles.quantityControls}>
+              <TouchableOpacity
+                style={[
+                  styles.quantityButton,
+                  item.quantity <= 1 && styles.quantityButtonDisabled,
+                ]}
+                onPress={onDecrement}
+                disabled={item.quantity <= 1}
+                activeOpacity={0.7}
+              >
+                <Ionicons
+                  name="remove"
+                  size={18}
+                  color={
+                    item.quantity <= 1
+                      ? MODERN_COLORS.textDisabled
+                      : MODERN_COLORS.text
+                  }
+                />
+              </TouchableOpacity>
+              <Text style={styles.quantityText}>{item.quantity}</Text>
+              <TouchableOpacity
+                style={styles.quantityButton}
+                onPress={onIncrement}
+                activeOpacity={0.7}
+              >
+                <Ionicons name="add" size={18} color={MODERN_COLORS.text} />
+              </TouchableOpacity>
+            </View>
+
+            <Text style={styles.itemTotal}>
+              ₫{formatPrice(item.product.price * item.quantity)}
+            </Text>
+          </View>
+        </View>
+      </Animated.View>
+    </View>
+  );
+}
 
 export default function CartScreen() {
-  const { items, totalPrice, totalItems, updateQuantity, removeFromCart, clearCart } = useCart();
-  
+  const {
+    items,
+    totalPrice,
+    totalItems,
+    updateQuantity,
+    removeFromCart,
+    clearCart,
+  } = useCart();
+  const { appliedVoucher, appliedFreeshipVoucher, getTotalDiscount } =
+    useVoucher();
+
   // Alias for template compatibility
   const totalQty = totalItems;
+  const voucherDiscount = getTotalDiscount();
+  const finalTotal = Math.max(0, totalPrice - voucherDiscount);
   const increment = (id: string) => {
-    const item = items.find(i => i.id === id);
+    const item = items.find((i) => i.id === id);
     if (item) updateQuantity(id, item.quantity + 1);
   };
   const decrement = (id: string) => {
-    const item = items.find(i => i.id === id);
+    const item = items.find((i) => i.id === id);
     if (item && item.quantity > 1) updateQuantity(id, item.quantity - 1);
   };
   const remove = (id: string) => removeFromCart(id);
   const clear = () => clearCart();
 
   const formatPrice = (price: number) => {
-    return price.toLocaleString('vi-VN');
+    return price.toLocaleString("vi-VN");
   };
 
   const handleCheckout = () => {
     if (items.length === 0) {
-      Alert.alert('Giỏ hàng trống', 'Vui lòng thêm sản phẩm vào giỏ hàng');
+      Alert.alert("Giỏ hàng trống", "Vui lòng thêm sản phẩm vào giỏ hàng");
       return;
     }
-    router.push('/checkout');
+    router.push("/checkout");
   };
 
   const handleClearCart = () => {
-    Alert.alert(
-      'Xóa giỏ hàng',
-      'Bạn có chắc muốn xóa tất cả sản phẩm?',
-      [
-        { text: 'Hủy', style: 'cancel' },
-        { text: 'Xóa', style: 'destructive', onPress: clear },
-      ]
-    );
+    Alert.alert("Xóa giỏ hàng", "Bạn có chắc muốn xóa tất cả sản phẩm?", [
+      { text: "Hủy", style: "cancel" },
+      { text: "Xóa", style: "destructive", onPress: clear },
+    ]);
   };
 
   const handleRemoveItem = (id: string, name: string) => {
-    Alert.alert(
-      'Xóa sản phẩm',
-      `Bạn muốn xóa "${name}" khỏi giỏ hàng?`,
-      [
-        { text: 'Hủy', style: 'cancel' },
-        { text: 'Xóa', style: 'destructive', onPress: () => remove(id) },
-      ]
-    );
+    Alert.alert("Xóa sản phẩm", `Bạn muốn xóa "${name}" khỏi giỏ hàng?`, [
+      { text: "Hủy", style: "cancel" },
+      { text: "Xóa", style: "destructive", onPress: () => remove(id) },
+    ]);
   };
 
   return (
     <>
-      <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
+      <StatusBar
+        barStyle="dark-content"
+        backgroundColor="transparent"
+        translucent
+      />
       <View style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={styles.backButton}
+          >
             <Ionicons name="arrow-back" size={24} color={MODERN_COLORS.text} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Giỏ hàng ({totalQty})</Text>
           {items.length > 0 && (
-            <TouchableOpacity onPress={handleClearCart} style={styles.clearButton}>
-              <Ionicons name="trash-outline" size={22} color={MODERN_COLORS.error} />
+            <TouchableOpacity
+              onPress={handleClearCart}
+              style={styles.clearButton}
+            >
+              <Ionicons
+                name="trash-outline"
+                size={22}
+                color={MODERN_COLORS.error}
+              />
             </TouchableOpacity>
           )}
         </View>
@@ -103,14 +269,20 @@ export default function CartScreen() {
         {items.length === 0 ? (
           <View style={styles.emptyContainer}>
             <View style={styles.emptyIconContainer}>
-              <Ionicons name="cart-outline" size={100} color={MODERN_COLORS.divider} />
+              <Ionicons
+                name="cart-outline"
+                size={100}
+                color={MODERN_COLORS.divider}
+              />
             </View>
             <Text style={styles.emptyTitle}>Giỏ hàng trống</Text>
-            <Text style={styles.emptyText}>Hãy thêm sản phẩm vào giỏ hàng của bạn</Text>
+            <Text style={styles.emptyText}>
+              Hãy thêm sản phẩm vào giỏ hàng của bạn
+            </Text>
             <ModernButton
               variant="primary"
               size="large"
-              onPress={() => router.push('/(tabs)')}
+              onPress={() => router.push("/(tabs)")}
               icon="storefront-outline"
               iconPosition="left"
               style={styles.shopButton}
@@ -120,74 +292,32 @@ export default function CartScreen() {
           </View>
         ) : (
           <>
-            <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+            <ScrollView
+              style={styles.content}
+              showsVerticalScrollIndicator={false}
+            >
               {items.map((item) => (
-                <View key={item.id} style={styles.cartItem}>
-                  {/* Product Image */}
-                  <View style={styles.itemImageContainer}>
-                    <Image
-                      source={typeof item.product.image === 'string' ? { uri: item.product.image } : item.product.image}
-                      style={styles.itemImage}
-                      resizeMode="cover"
-                    />
-                  </View>
-
-                  {/* Product Info */}
-                  <View style={styles.itemInfo}>
-                    <Text style={styles.itemName} numberOfLines={2}>
-                      {item.product.name}
-                    </Text>
-                    <Text style={styles.itemPrice}>₫{formatPrice(item.product.price)}</Text>
-
-                    {/* Quantity Controls */}
-                    <View style={styles.quantityRow}>
-                      <View style={styles.quantityControls}>
-                        <TouchableOpacity
-                          style={[styles.quantityButton, item.quantity <= 1 && styles.quantityButtonDisabled]}
-                          onPress={() => decrement(item.id)}
-                          disabled={item.quantity <= 1}
-                          activeOpacity={0.7}
-                        >
-                          <Ionicons
-                            name="remove"
-                            size={18}
-                            color={item.quantity <= 1 ? MODERN_COLORS.textDisabled : MODERN_COLORS.text}
-                          />
-                        </TouchableOpacity>
-                        <Text style={styles.quantityText}>{item.quantity}</Text>
-                        <TouchableOpacity
-                          style={styles.quantityButton}
-                          onPress={() => increment(item.id)}
-                          activeOpacity={0.7}
-                        >
-                          <Ionicons name="add" size={18} color={MODERN_COLORS.text} />
-                        </TouchableOpacity>
-                      </View>
-
-                      <Text style={styles.itemTotal}>
-                        ₫{formatPrice(item.product.price * item.quantity)}
-                      </Text>
-                    </View>
-                  </View>
-
-                  {/* Remove Button */}
-                  <TouchableOpacity
-                    style={styles.removeButton}
-                    onPress={() => handleRemoveItem(item.id, item.product.name)}
-                    activeOpacity={0.7}
-                  >
-                    <Ionicons name="close-circle" size={24} color={MODERN_COLORS.textSecondary} />
-                  </TouchableOpacity>
-                </View>
+                <SwipeableCartItem
+                  key={item.id}
+                  item={item}
+                  onRemove={() => remove(item.id)}
+                  onIncrement={() => increment(item.id)}
+                  onDecrement={() => decrement(item.id)}
+                  formatPrice={formatPrice}
+                />
               ))}
 
               {/* Summary Card */}
               <View style={styles.summaryCard}>
                 <Text style={styles.summaryTitle}>Tổng quan đơn hàng</Text>
-                
+
                 <View style={styles.summaryRow}>
-                  <Text style={styles.summaryLabel}>Tạm tính ({totalQty} sản phẩm)</Text>
-                  <Text style={styles.summaryValue}>₫{formatPrice(totalPrice)}</Text>
+                  <Text style={styles.summaryLabel}>
+                    Tạm tính ({totalQty} sản phẩm)
+                  </Text>
+                  <Text style={styles.summaryValue}>
+                    ₫{formatPrice(totalPrice)}
+                  </Text>
                 </View>
 
                 <View style={styles.summaryRow}>
@@ -195,17 +325,114 @@ export default function CartScreen() {
                   <Text style={styles.freeShipping}>Miễn phí</Text>
                 </View>
 
+                {/* Voucher discount row */}
+                {appliedVoucher && (
+                  <View style={styles.summaryRow}>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: 4,
+                      }}
+                    >
+                      <Ionicons name="pricetag" size={14} color="#0D9488" />
+                      <Text style={[styles.summaryLabel, { color: "#0D9488" }]}>
+                        Voucher
+                      </Text>
+                    </View>
+                    <Text
+                      style={{
+                        fontSize: 14,
+                        fontWeight: "600",
+                        color: "#0D9488",
+                      }}
+                    >
+                      -₫{formatPrice(appliedVoucher.discountAmount)}
+                    </Text>
+                  </View>
+                )}
+
+                {appliedFreeshipVoucher && (
+                  <View style={styles.summaryRow}>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: 4,
+                      }}
+                    >
+                      <Ionicons name="car" size={14} color="#3B82F6" />
+                      <Text style={[styles.summaryLabel, { color: "#3B82F6" }]}>
+                        Free Ship
+                      </Text>
+                    </View>
+                    <Text
+                      style={{
+                        fontSize: 14,
+                        fontWeight: "600",
+                        color: "#3B82F6",
+                      }}
+                    >
+                      -₫{formatPrice(appliedFreeshipVoucher.discountAmount)}
+                    </Text>
+                  </View>
+                )}
+
                 <View style={styles.divider} />
 
                 <View style={styles.summaryRow}>
                   <Text style={styles.totalLabel}>Tổng cộng</Text>
-                  <Text style={styles.totalValue}>₫{formatPrice(totalPrice)}</Text>
+                  <Text style={styles.totalValue}>
+                    ₫{formatPrice(finalTotal)}
+                  </Text>
                 </View>
+
+                {/* Voucher hint */}
+                {!appliedVoucher && totalPrice > 0 && (
+                  <TouchableOpacity
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 6,
+                      marginTop: 8,
+                      paddingVertical: 8,
+                      paddingHorizontal: 12,
+                      backgroundColor: "#F0FDFA",
+                      borderRadius: 8,
+                    }}
+                    onPress={() => router.push("/profile/vouchers")}
+                  >
+                    <Ionicons
+                      name="ticket-outline"
+                      size={16}
+                      color={MODERN_COLORS.primary}
+                    />
+                    <Text
+                      style={{
+                        flex: 1,
+                        fontSize: 13,
+                        color: "#0D9488",
+                        fontWeight: "500",
+                      }}
+                    >
+                      Chọn voucher để được giảm giá
+                    </Text>
+                    <Ionicons
+                      name="chevron-forward"
+                      size={14}
+                      color="#0D9488"
+                    />
+                  </TouchableOpacity>
+                )}
               </View>
 
               {/* Info Banner */}
               <View style={styles.infoBanner}>
-                <Ionicons name="shield-checkmark-outline" size={20} color={MODERN_COLORS.primary} />
+                <Ionicons
+                  name="shield-checkmark-outline"
+                  size={20}
+                  color={MODERN_COLORS.primary}
+                />
                 <Text style={styles.infoBannerText}>
                   Thanh toán an toàn • Giao hàng nhanh chóng
                 </Text>
@@ -217,13 +444,15 @@ export default function CartScreen() {
             {/* Checkout Bar */}
             <View style={styles.checkoutBar}>
               <LinearGradient
-                colors={['rgba(255,255,255,0)', 'rgba(255,255,255,1)']}
+                colors={["rgba(255,255,255,0)", "rgba(255,255,255,1)"]}
                 style={styles.checkoutGradient}
               />
               <View style={styles.checkoutContent}>
                 <View style={styles.totalSection}>
                   <Text style={styles.totalText}>Tổng cộng</Text>
-                  <Text style={styles.totalPrice}>₫{formatPrice(totalPrice)}</Text>
+                  <Text style={styles.totalPrice}>
+                    ₫{formatPrice(finalTotal)}
+                  </Text>
                 </View>
                 <ModernButton
                   variant="primary"
@@ -247,9 +476,9 @@ export default function CartScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: MODERN_COLORS.background },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: MODERN_SPACING.md,
     paddingTop: 44,
     paddingBottom: MODERN_SPACING.sm,
@@ -268,8 +497,8 @@ const styles = StyleSheet.create({
   clearButton: { padding: MODERN_SPACING.xs },
   emptyContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: MODERN_SPACING.xl,
   },
   emptyIconContainer: {
@@ -277,8 +506,8 @@ const styles = StyleSheet.create({
     height: 140,
     borderRadius: MODERN_RADIUS.full,
     backgroundColor: `${MODERN_COLORS.primary}05`,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: MODERN_SPACING.lg,
   },
   emptyTitle: {
@@ -291,32 +520,30 @@ const styles = StyleSheet.create({
     fontSize: MODERN_TYPOGRAPHY.fontSize.md,
     color: MODERN_COLORS.textSecondary,
     marginBottom: MODERN_SPACING.xl,
-    textAlign: 'center',
+    textAlign: "center",
   },
   shopButton: { minWidth: 200 },
   content: { flex: 1 },
   cartItem: {
-    flexDirection: 'row',
+    flexDirection: "row",
     backgroundColor: MODERN_COLORS.surface,
     padding: MODERN_SPACING.md,
-    marginHorizontal: MODERN_SPACING.sm,
-    marginTop: MODERN_SPACING.sm,
     borderRadius: MODERN_RADIUS.lg,
     ...MODERN_SHADOWS.sm,
-    position: 'relative',
+    position: "relative",
   },
   itemImageContainer: {
     width: 80,
     height: 80,
     borderRadius: MODERN_RADIUS.md,
     backgroundColor: MODERN_COLORS.background,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
-  itemImage: { width: '100%', height: '100%' },
+  itemImage: { width: "100%", height: "100%" },
   itemInfo: {
     flex: 1,
     marginLeft: MODERN_SPACING.md,
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
   },
   itemName: {
     fontSize: MODERN_TYPOGRAPHY.fontSize.md,
@@ -332,13 +559,13 @@ const styles = StyleSheet.create({
     marginBottom: MODERN_SPACING.xs,
   },
   quantityRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   quantityControls: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: MODERN_COLORS.background,
     borderRadius: MODERN_RADIUS.md,
     borderWidth: 1,
@@ -347,8 +574,8 @@ const styles = StyleSheet.create({
   quantityButton: {
     width: 32,
     height: 32,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   quantityButtonDisabled: { opacity: 0.4 },
   quantityText: {
@@ -356,7 +583,7 @@ const styles = StyleSheet.create({
     fontWeight: MODERN_TYPOGRAPHY.fontWeight.semibold,
     color: MODERN_COLORS.text,
     minWidth: 32,
-    textAlign: 'center',
+    textAlign: "center",
   },
   itemTotal: {
     fontSize: MODERN_TYPOGRAPHY.fontSize.md,
@@ -364,7 +591,7 @@ const styles = StyleSheet.create({
     color: MODERN_COLORS.text,
   },
   removeButton: {
-    position: 'absolute',
+    position: "absolute",
     top: MODERN_SPACING.sm,
     right: MODERN_SPACING.sm,
     padding: MODERN_SPACING.xxs,
@@ -384,9 +611,9 @@ const styles = StyleSheet.create({
     marginBottom: MODERN_SPACING.md,
   },
   summaryRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: MODERN_SPACING.sm,
   },
   summaryLabel: {
@@ -419,9 +646,9 @@ const styles = StyleSheet.create({
     color: MODERN_COLORS.primary,
   },
   infoBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     backgroundColor: `${MODERN_COLORS.primary}10`,
     marginHorizontal: MODERN_SPACING.sm,
     marginTop: MODERN_SPACING.md,
@@ -435,22 +662,22 @@ const styles = StyleSheet.create({
     fontWeight: MODERN_TYPOGRAPHY.fontWeight.medium,
   },
   checkoutBar: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
   },
   checkoutGradient: {
-    position: 'absolute',
+    position: "absolute",
     top: -20,
     left: 0,
     right: 0,
     height: 20,
   },
   checkoutContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: MODERN_SPACING.md,
     paddingHorizontal: MODERN_SPACING.md,
     paddingVertical: MODERN_SPACING.sm,
@@ -469,4 +696,55 @@ const styles = StyleSheet.create({
     color: MODERN_COLORS.primary,
   },
   checkoutButton: { flex: 1.2 },
+
+  // Swipe-to-delete styles
+  swipeContainer: {
+    marginHorizontal: MODERN_SPACING.sm,
+    marginTop: MODERN_SPACING.sm,
+    borderRadius: MODERN_RADIUS.lg,
+    overflow: "hidden",
+  },
+  deleteBackground: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    right: 0,
+    width: 100,
+    backgroundColor: MODERN_COLORS.error || "#EF4444",
+    justifyContent: "center",
+    alignItems: "center",
+    borderTopRightRadius: MODERN_RADIUS.lg,
+    borderBottomRightRadius: MODERN_RADIUS.lg,
+  },
+  deleteAction: {
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: MODERN_SPACING.md,
+  },
+  deleteText: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "600" as const,
+    marginTop: 4,
+  },
+
+  // Variant badge styles
+  variantRow: {
+    flexDirection: "row" as const,
+    gap: 6,
+    marginBottom: 4,
+  },
+  variantBadge: {
+    backgroundColor: `${MODERN_COLORS.primary}15`,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: `${MODERN_COLORS.primary}30`,
+  },
+  variantText: {
+    fontSize: 11,
+    color: MODERN_COLORS.primary,
+    fontWeight: "500" as const,
+  },
 });

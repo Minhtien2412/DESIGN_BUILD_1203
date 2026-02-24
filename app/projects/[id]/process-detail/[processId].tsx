@@ -54,7 +54,7 @@ export default function ProcessDetailScreen() {
   const getStepColor = (status: string) => {
     switch (status) {
       case 'completed':
-        return '#0066CC';
+        return '#0D9488';
       case 'active':
         return primaryColor;
       case 'pending':
@@ -80,7 +80,7 @@ export default function ProcessDetailScreen() {
                 const target = PROCESS_STEPS.find(s => s.id === targetId);
                 if (!target) return null;
                 
-                const color = step.status === 'completed' ? '#0066CC' : '#E0E0E0';
+                const color = step.status === 'completed' ? '#0D9488' : '#E0E0E0';
                 
                 return (
                   <Line
@@ -207,7 +207,7 @@ export default function ProcessDetailScreen() {
         {/* Legend */}
         <View style={styles.legendSection}>
           <View style={styles.legendItem}>
-            <View style={[styles.legendDot, { backgroundColor: '#0066CC' }]} />
+            <View style={[styles.legendDot, { backgroundColor: '#0D9488' }]} />
             <Text style={[styles.legendText, { color: textColor }]}>
               Đã hoàn thành
             </Text>

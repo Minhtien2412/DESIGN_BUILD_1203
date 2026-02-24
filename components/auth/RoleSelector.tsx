@@ -62,7 +62,7 @@ export function RoleSelector({ selectedRole, onRoleSelect, excludeRoles = ['admi
 
               {role.verificationRequired && (
                 <View style={styles.verificationBadge}>
-                  <Ionicons name="shield-checkmark" size={12} color="#0066CC" />
+                  <Ionicons name="shield-checkmark" size={12} color="#0D9488" />
                   <ThemedText style={styles.verificationText}>
                     Cần xác minh
                   </ThemedText>
@@ -71,7 +71,7 @@ export function RoleSelector({ selectedRole, onRoleSelect, excludeRoles = ['admi
 
               {isSelected && (
                 <View style={styles.checkmark}>
-                  <Ionicons name="checkmark-circle" size={24} color="#0066CC" />
+                  <Ionicons name="checkmark-circle" size={24} color="#0D9488" />
                 </View>
               )}
             </Pressable>
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   roleCardSelected: {
-    borderColor: '#0066CC',
+    borderColor: '#0D9488',
     backgroundColor: '#F0FDF4',
   },
   iconContainer: {
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
   },
   verificationText: {
     fontSize: 11,
-    color: '#0066CC',
+    color: '#0D9488',
     marginLeft: 4,
     fontWeight: '600',
   },

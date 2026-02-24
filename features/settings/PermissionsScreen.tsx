@@ -240,7 +240,7 @@ export default function PermissionsScreen() {
 
         {/* Info Box */}
         <View style={styles.infoBox}>
-          <Ionicons name="information-circle" size={20} color="#3b82f6" />
+          <Ionicons name="information-circle" size={20} color="#0D9488" />
           <Text style={styles.infoText}>
             Các quyền này giúp ứng dụng hoạt động đầy đủ tính năng. Bạn có thể
             thay đổi bất cứ lúc nào trong Cài đặt.
@@ -398,7 +398,7 @@ const styles = StyleSheet.create({
   infoText: {
     flex: 1,
     fontSize: 13,
-    color: "#1e40af",
+    color: "#0F766E",
     lineHeight: 20,
   },
   sectionTitle: {

@@ -299,7 +299,7 @@ export default function StoneWorkerScreen() {
 
               <View style={styles.statsRow}>
                 <View style={styles.statItem}>
-                  <Ionicons name="checkmark-circle-outline" size={16} color="#0066CC" />
+                  <Ionicons name="checkmark-circle-outline" size={16} color="#0D9488" />
                   <Text style={styles.statText}>{worker.completedProjects} công trình</Text>
                 </View>
                 <View
@@ -354,7 +354,7 @@ export default function StoneWorkerScreen() {
 
         {/* Info Banner */}
         <View style={styles.infoBanner}>
-          <Ionicons name="shield-checkmark" size={20} color="#0066CC" />
+          <Ionicons name="shield-checkmark" size={20} color="#0D9488" />
           <Text style={styles.infoBannerText}>
             Thi công chuyên nghiệp • Bảo hành công trình
           </Text>
@@ -658,14 +658,14 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   specialtyTag: {
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
   },
   specialtyText: {
     fontSize: 11,
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: '500',
   },
   teamSizeRow: {
@@ -705,17 +705,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#e8f5e9',
   },
   availabilityBusy: {
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
   },
   availabilityText: {
     fontSize: 11,
     fontWeight: '500',
   },
   availabilityTextAvailable: {
-    color: '#0066CC',
+    color: '#0D9488',
   },
   availabilityTextBusy: {
-    color: '#0066CC',
+    color: '#0D9488',
   },
   priceRow: {
     flexDirection: 'row',

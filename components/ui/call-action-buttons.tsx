@@ -196,11 +196,11 @@ export function CallStatusIndicator({
   size?: number;
 }) {
   const statusConfig = {
-    online: { color: '#0066CC', icon: null },
+    online: { color: '#0D9488', icon: null },
     busy: { color: '#1A1A1A', icon: 'do-not-disturb-on' },
-    away: { color: '#0066CC', icon: 'schedule' },
+    away: { color: '#0D9488', icon: 'schedule' },
     offline: { color: '#999999', icon: null },
-    'in-call': { color: '#0066CC', icon: 'call' },
+    'in-call': { color: '#0D9488', icon: 'call' },
   };
 
   const config = statusConfig[status];
@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   videoButton: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   voiceButton: {
     backgroundColor: '#34C759',
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
     fontSize: 9,
   },
   quickButton: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',

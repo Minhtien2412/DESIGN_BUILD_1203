@@ -1,35 +1,37 @@
 /**
  * Payment Callback Screen
  * Handles payment success/failure callbacks from gateways
+ * Syncs payment status back to order via API
  */
 
-import { useThemeColor } from '@/hooks/use-theme-color';
-import { paymentService } from '@/services/payments/paymentService';
-import { Ionicons } from '@expo/vector-icons';
-import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useThemeColor } from "@/hooks/use-theme-color";
+import { updatePaymentStatus } from "@/services/api/orders.service";
+import { paymentService } from "@/services/payments/paymentService";
+import { Ionicons } from "@expo/vector-icons";
+import { router, useLocalSearchParams } from "expo-router";
+import { useEffect, useState } from "react";
 import {
     ActivityIndicator,
     Pressable,
     StyleSheet,
     Text,
     View,
-} from 'react-native';
-import Animated, { FadeInUp } from 'react-native-reanimated';
-import { SafeAreaView } from 'react-native-safe-area-context';
+} from "react-native";
+import Animated, { FadeInUp } from "react-native-reanimated";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function PaymentCallbackScreen() {
   const params = useLocalSearchParams();
   const [verifying, setVerifying] = useState(true);
   const [paymentStatus, setPaymentStatus] = useState<
-    'success' | 'failed' | 'pending'
-  >('pending');
-  const [transactionId, setTransactionId] = useState('');
+    "success" | "failed" | "pending"
+  >("pending");
+  const [transactionId, setTransactionId] = useState("");
   const [amount, setAmount] = useState(0);
 
-  const backgroundColor = useThemeColor({}, 'background');
-  const textColor = useThemeColor({}, 'text');
-  const primaryColor = '#0066CC';
+  const backgroundColor = useThemeColor({}, "background");
+  const textColor = useThemeColor({}, "text");
+  const primaryColor = "#0D9488";
 
   useEffect(() => {
     verifyPayment();
@@ -39,9 +41,10 @@ export default function PaymentCallbackScreen() {
     try {
       const txId = params.transactionId as string;
       const gateway = params.gateway as any;
+      const ordId = params.orderId as string;
 
       if (!txId || !gateway) {
-        setPaymentStatus('failed');
+        setPaymentStatus("failed");
         setVerifying(false);
         return;
       }
@@ -51,16 +54,42 @@ export default function PaymentCallbackScreen() {
       setTransactionId(result.transactionId);
       setAmount(result.amount);
 
-      if (result.status === 'completed') {
-        setPaymentStatus('success');
-      } else if (result.status === 'failed') {
-        setPaymentStatus('failed');
+      if (result.status === "completed") {
+        setPaymentStatus("success");
+      } else if (result.status === "failed") {
+        setPaymentStatus("failed");
       } else {
-        setPaymentStatus('pending');
+        setPaymentStatus("pending");
+      }
+
+      // Sync payment status to order API
+      if (ordId) {
+        try {
+          const apiStatus =
+            result.status === "completed"
+              ? ("PAID" as const)
+              : result.status === "failed"
+                ? ("FAILED" as const)
+                : ("PENDING" as const);
+          await updatePaymentStatus(ordId, {
+            paymentStatus: apiStatus,
+            transactionId: result.transactionId,
+            gateway: gateway,
+          });
+          console.log(
+            "[PaymentCallback] ✅ Order payment status synced:",
+            apiStatus,
+          );
+        } catch (syncErr) {
+          console.warn(
+            "[PaymentCallback] ⚠️ Failed to sync order status:",
+            syncErr,
+          );
+        }
       }
     } catch (error) {
-      console.error('Payment verification error:', error);
-      setPaymentStatus('failed');
+      console.error("Payment verification error:", error);
+      setPaymentStatus("failed");
     } finally {
       setVerifying(false);
     }
@@ -70,7 +99,7 @@ export default function PaymentCallbackScreen() {
     if (params.returnTo) {
       router.push(params.returnTo as any);
     } else {
-      router.push('/');
+      router.push("/");
     }
   };
 
@@ -78,29 +107,34 @@ export default function PaymentCallbackScreen() {
     <View style={styles.statusContainer}>
       <ActivityIndicator size="large" color={primaryColor} />
       <Text style={[styles.statusTitle, { color: textColor }]}>
-        Verifying Payment...
+        Đang xác minh thanh toán...
       </Text>
-      <Text style={[styles.statusSubtitle, { color: '#999' }]}>
-        Please wait while we confirm your payment
+      <Text style={[styles.statusSubtitle, { color: "#999" }]}>
+        Vui lòng chờ trong khi chúng tôi xác nhận thanh toán
       </Text>
     </View>
   );
 
   const renderSuccess = () => (
-    <Animated.View entering={FadeInUp.springify()} style={styles.statusContainer}>
-      <View style={[styles.iconContainer, { backgroundColor: '#34C75920' }]}>
+    <Animated.View
+      entering={FadeInUp.springify()}
+      style={styles.statusContainer}
+    >
+      <View style={[styles.iconContainer, { backgroundColor: "#34C75920" }]}>
         <Ionicons name="checkmark-circle" size={64} color="#34C759" />
       </View>
       <Text style={[styles.statusTitle, { color: textColor }]}>
-        Payment Successful!
+        Thanh toán thành công!
       </Text>
-      <Text style={[styles.statusSubtitle, { color: '#999' }]}>
-        Your payment has been processed successfully
+      <Text style={[styles.statusSubtitle, { color: "#999" }]}>
+        Thanh toán của bạn đã được xử lý thành công
       </Text>
 
       {amount > 0 && (
         <View style={styles.amountContainer}>
-          <Text style={[styles.amountLabel, { color: '#999' }]}>Amount Paid</Text>
+          <Text style={[styles.amountLabel, { color: "#999" }]}>
+            Số tiền đã thanh toán
+          </Text>
           <Text style={[styles.amountValue, { color: textColor }]}>
             {paymentService.formatAmount(amount)}
           </Text>
@@ -109,13 +143,10 @@ export default function PaymentCallbackScreen() {
 
       {transactionId && (
         <View style={styles.transactionContainer}>
-          <Text style={[styles.transactionLabel, { color: '#999' }]}>
-            Transaction ID
+          <Text style={[styles.transactionLabel, { color: "#999" }]}>
+            Mã giao dịch
           </Text>
-          <Text
-            style={[styles.transactionId, { color: textColor }]}
-            selectable
-          >
+          <Text style={[styles.transactionId, { color: textColor }]} selectable>
             {transactionId}
           </Text>
         </View>
@@ -125,21 +156,24 @@ export default function PaymentCallbackScreen() {
         style={[styles.button, { backgroundColor: primaryColor }]}
         onPress={handleContinue}
       >
-        <Text style={styles.buttonText}>Continue</Text>
+        <Text style={styles.buttonText}>Tiếp tục</Text>
       </Pressable>
     </Animated.View>
   );
 
   const renderFailed = () => (
-    <Animated.View entering={FadeInUp.springify()} style={styles.statusContainer}>
-      <View style={[styles.iconContainer, { backgroundColor: '#FF3B3020' }]}>
+    <Animated.View
+      entering={FadeInUp.springify()}
+      style={styles.statusContainer}
+    >
+      <View style={[styles.iconContainer, { backgroundColor: "#FF3B3020" }]}>
         <Ionicons name="close-circle" size={64} color="#FF3B30" />
       </View>
       <Text style={[styles.statusTitle, { color: textColor }]}>
-        Payment Failed
+        Thanh toán thất bại
       </Text>
-      <Text style={[styles.statusSubtitle, { color: '#999' }]}>
-        Your payment could not be processed. Please try again.
+      <Text style={[styles.statusSubtitle, { color: "#999" }]}>
+        Thanh toán không thể xử lý. Vui lòng thử lại.
       </Text>
 
       <View style={styles.buttonGroup}>
@@ -152,7 +186,7 @@ export default function PaymentCallbackScreen() {
           onPress={handleContinue}
         >
           <Text style={[styles.buttonTextSecondary, { color: primaryColor }]}>
-            Go Back
+            Quay lại
           </Text>
         </Pressable>
 
@@ -160,7 +194,7 @@ export default function PaymentCallbackScreen() {
           style={[styles.button, { backgroundColor: primaryColor }]}
           onPress={() => router.back()}
         >
-          <Text style={styles.buttonText}>Try Again</Text>
+          <Text style={styles.buttonText}>Thử lại</Text>
         </Pressable>
       </View>
     </Animated.View>
@@ -169,11 +203,11 @@ export default function PaymentCallbackScreen() {
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor }]}
-      edges={['top', 'bottom']}
+      edges={["top", "bottom"]}
     >
       {verifying && renderVerifying()}
-      {!verifying && paymentStatus === 'success' && renderSuccess()}
-      {!verifying && paymentStatus === 'failed' && renderFailed()}
+      {!verifying && paymentStatus === "success" && renderSuccess()}
+      {!verifying && paymentStatus === "failed" && renderFailed()}
     </SafeAreaView>
   );
 }
@@ -181,12 +215,12 @@ export default function PaymentCallbackScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
   },
   statusContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     gap: 20,
     maxWidth: 400,
   },
@@ -194,76 +228,76 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     marginBottom: 8,
   },
   statusTitle: {
     fontSize: 24,
-    fontWeight: '700',
+    fontWeight: "700",
     letterSpacing: -0.5,
   },
   statusSubtitle: {
     fontSize: 15,
-    textAlign: 'center',
+    textAlign: "center",
     lineHeight: 22,
   },
   amountContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 16,
   },
   amountLabel: {
     fontSize: 13,
-    fontWeight: '500',
+    fontWeight: "500",
     marginBottom: 4,
   },
   amountValue: {
     fontSize: 32,
-    fontWeight: '700',
+    fontWeight: "700",
     letterSpacing: -1,
   },
   transactionContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 16,
     paddingHorizontal: 20,
     paddingVertical: 12,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: "#F5F5F5",
     borderRadius: 12,
   },
   transactionLabel: {
     fontSize: 12,
-    fontWeight: '500',
+    fontWeight: "500",
     marginBottom: 4,
   },
   transactionId: {
     fontSize: 13,
-    fontWeight: '600',
-    fontFamily: 'monospace',
+    fontWeight: "600",
+    fontFamily: "monospace",
   },
   button: {
-    width: '100%',
+    width: "100%",
     paddingVertical: 16,
     borderRadius: 12,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 24,
   },
   buttonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   buttonGroup: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 12,
-    width: '100%',
+    width: "100%",
     marginTop: 24,
   },
   buttonSecondary: {
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
     borderWidth: 2,
   },
   buttonTextSecondary: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });

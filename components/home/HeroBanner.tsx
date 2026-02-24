@@ -247,6 +247,6 @@ const styles = StyleSheet.create({
   },
   activeDot: {
     width: 24,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
 });

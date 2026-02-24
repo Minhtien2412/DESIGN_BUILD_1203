@@ -197,17 +197,36 @@ export default function MessageThreadScreen() {
     }
   }, [loading, conversationId]);
 
+  // WebSocket: Join chat room when conversation is loaded
+  useEffect(() => {
+    if (!socket || !connected || !conversationId) return;
+
+    // Join the chat room to receive real-time messages
+    socket.emit("joinRoom", { roomId: conversationId, userId: recipientId });
+    console.log("[Chat] Joined room:", conversationId);
+
+    return () => {
+      // Leave room when component unmounts
+      socket.emit("leaveRoom", { roomId: conversationId, userId: recipientId });
+    };
+  }, [socket, connected, conversationId, recipientId]);
+
   // WebSocket: Listen for new messages
   useEffect(() => {
     if (!socket || !connected) return;
 
     const handleNewMessage = (newMessage: Message) => {
-      if (newMessage.senderId === recipientId) {
+      // Refresh messages when receiving a new message for this conversation
+      if (
+        newMessage.senderId === recipientId ||
+        (newMessage as any).roomId === conversationId
+      ) {
+        refresh(); // Re-fetch from API to get correct data
         // Auto-scroll if at bottom
         if (isAtBottomRef.current) {
           setTimeout(() => {
             flatListRef.current?.scrollToEnd({ animated: true });
-          }, 100);
+          }, 200);
           setNewMessagesCount(0);
         } else {
           setNewMessagesCount((prev) => prev + 1);
@@ -215,12 +234,15 @@ export default function MessageThreadScreen() {
       }
     };
 
+    // Listen for both event names (backend emits 'newMessage')
+    socket.on("newMessage", handleNewMessage);
     socket.on("message:new", handleNewMessage);
 
     return () => {
+      socket.off("newMessage", handleNewMessage);
       socket.off("message:new", handleNewMessage);
     };
-  }, [recipientId, socket, connected]);
+  }, [recipientId, conversationId, socket, connected, refresh]);
 
   // Auto-scroll to bottom on initial load
   useEffect(() => {
@@ -325,17 +347,16 @@ export default function MessageThreadScreen() {
     [selectedMessageId, handleAddReaction],
   );
 
-  const handleSendMessage = async () => {
-    if ((!messageText.trim() && !pendingAttachment) || sending) return;
+  const handleSendMessage = async (directText?: string) => {
+    const text = (directText ?? messageText).trim();
+    if ((!text && !pendingAttachment) || sending) return;
 
-    const text = messageText.trim();
     setMessageText("");
     Keyboard.dismiss();
 
     try {
       // Send message with attachment if present
       if (pendingAttachment) {
-        // Send attachment as message content (backend should handle attachment type)
         const attachmentContent =
           pendingAttachment.type === "image"
             ? `[Image: ${pendingAttachment.url}]`
@@ -510,7 +531,7 @@ export default function MessageThreadScreen() {
                 <Ionicons
                   name={item.isRead ? "checkmark-done" : "checkmark"}
                   size={12}
-                  color={item.isRead ? "#3b82f6" : "#999"}
+                  color={item.isRead ? "#0D9488" : "#999"}
                   style={{ marginLeft: 4 }}
                 />
               )}
@@ -539,7 +560,7 @@ export default function MessageThreadScreen() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0068FF" />
+        <ActivityIndicator size="large" color="#0D9488" />
         <Text style={styles.loadingText}>Đang tải tin nhắn...</Text>
       </View>
     );
@@ -548,8 +569,8 @@ export default function MessageThreadScreen() {
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      keyboardVerticalOffset={Platform.OS === "ios" ? insets.top : 0}
     >
       {/* Chat Header - Zalo style */}
       <ChatHeader
@@ -621,8 +642,7 @@ export default function MessageThreadScreen() {
       {/* Message Composer Toolbar - với voice, image, video support */}
       <MessageComposerToolbar
         onSendText={(text) => {
-          setMessageText(text);
-          handleSendMessage();
+          handleSendMessage(text);
         }}
         onSendAttachment={(attachment: AttachmentData) => {
           setPendingAttachment({
@@ -635,15 +655,23 @@ export default function MessageThreadScreen() {
           handleSendMessage();
         }}
         onTypingStart={() => {
-          socket?.emit("typing:start", { recipientId, conversationId });
+          socket?.emit("typing", {
+            roomId: conversationId,
+            userId: recipientId,
+            isTyping: true,
+          });
         }}
         onTypingStop={() => {
-          socket?.emit("typing:stop", { recipientId, conversationId });
+          socket?.emit("typing", {
+            roomId: conversationId,
+            userId: recipientId,
+            isTyping: false,
+          });
         }}
         placeholder="Nhập tin nhắn..."
         sending={sending}
         disabled={sending}
-        primaryColor="#0068FF"
+        primaryColor="#0D9488"
       />
 
       {/* Reaction Picker Modal */}
@@ -771,7 +799,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "#0068FF", // Zalo blue send button
+    backgroundColor: "#0D9488", // Zalo blue send button
     justifyContent: "center",
     alignItems: "center",
     marginLeft: 8,
@@ -786,7 +814,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#E8ECF1",
   },
   loadingIndicator: {
-    color: "#0068FF", // Use in component
+    color: "#0D9488", // Use in component
   },
   loadingFooter: {
     paddingVertical: 20,
@@ -799,7 +827,7 @@ const styles = StyleSheet.create({
   },
   loadMoreText: {
     fontSize: 14,
-    color: "#0068FF", // Zalo blue
+    color: "#0D9488", // Zalo blue
     fontWeight: "500",
   },
   errorText: {
@@ -810,7 +838,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 80,
     alignSelf: "center",
-    backgroundColor: "#0068FF", // Zalo blue
+    backgroundColor: "#0D9488", // Zalo blue
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 16,

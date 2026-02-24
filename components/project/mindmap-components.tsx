@@ -50,7 +50,7 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 // Theme colors based on user mockup
 const COLORS = {
-  primary: '#0066CC',
+  primary: '#0D9488',
   primaryLight: '#3399FF',
   background: '#F5F5F5',
   surface: '#FFFFFF',
@@ -66,13 +66,13 @@ const COLORS = {
   nodeGreen: '#14B159',
   nodeGreenBadge: '#4AA14A',
   nodePurple: '#999999',
-  nodeBlue: '#0066CC',
+  nodeBlue: '#0D9488',
   nodeGray: '#999999',
   
   // Layer colors
-  progressLayer: '#0066CC',
-  contentLayer: '#0066CC',
-  todosLayer: '#0066CC',
+  progressLayer: '#0D9488',
+  contentLayer: '#0D9488',
+  todosLayer: '#0D9488',
 };
 
 // ==================== MINDMAP NODE COMPONENT ====================

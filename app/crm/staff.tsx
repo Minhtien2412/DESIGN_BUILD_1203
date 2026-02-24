@@ -144,7 +144,7 @@ export default function StaffScreen() {
     const colors: Record<string, string> = {
       "1": "#ef4444", // admin
       "2": "#8b5cf6", // manager
-      "3": "#3b82f6", // developer
+      "3": "#0D9488", // developer
       "4": "#ec4899", // designer
       "5": "#06b6d4", // support
     };
@@ -246,7 +246,7 @@ export default function StaffScreen() {
 
       <View style={styles.staffStats}>
         <View style={styles.statItem}>
-          <Ionicons name="mail-outline" size={16} color="#3b82f6" />
+          <Ionicons name="mail-outline" size={16} color="#0D9488" />
           <Text
             style={[styles.statValue, { color: textColor }]}
             numberOfLines={1}
@@ -302,7 +302,7 @@ export default function StaffScreen() {
         ]}
       >
         <View style={styles.statsItem}>
-          <Text style={[styles.statsValue, { color: "#3b82f6" }]}>
+          <Text style={[styles.statsValue, { color: "#0D9488" }]}>
             {staff.length}
           </Text>
           <Text style={[styles.statsLabel, { color: textColor }]}>Tổng</Text>
@@ -546,11 +546,11 @@ export default function StaffScreen() {
                     <View
                       style={[
                         styles.statsBox,
-                        { backgroundColor: "#3b82f615" },
+                        { backgroundColor: "#0D948815" },
                       ]}
                     >
                       <Text
-                        style={[styles.statsBoxValue, { color: "#3b82f6" }]}
+                        style={[styles.statsBoxValue, { color: "#0D9488" }]}
                       >
                         {formatLastActive(selectedStaff.last_login)}
                       </Text>
@@ -567,7 +567,7 @@ export default function StaffScreen() {
                   <TouchableOpacity
                     style={[
                       styles.actionButton,
-                      { backgroundColor: "#3b82f6" },
+                      { backgroundColor: "#0D9488" },
                     ]}
                   >
                     <Ionicons name="chatbubble" size={18} color="#fff" />

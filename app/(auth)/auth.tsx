@@ -15,8 +15,10 @@
 import { DEMO_USERS, DemoUser } from "@/constants/demoUsers";
 import { useAuth } from "@/context/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
+import Constants from "expo-constants";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
+import * as WebBrowser from "expo-web-browser";
 import { memo, useCallback, useState } from "react";
 import {
     ActivityIndicator,
@@ -297,7 +299,7 @@ const DemoUserPicker = memo(function DemoUserPicker({
   const roleColors: Record<string, string> = {
     CLIENT: "#10B981",
     ENGINEER: "#F59E0B",
-    CONTRACTOR: "#3B82F6",
+    CONTRACTOR: "#0D9488",
     ADMIN: "#EF4444",
   };
 
@@ -366,7 +368,12 @@ const DemoUserPicker = memo(function DemoUserPicker({
 // ============================================================================
 export default function ModernAuthScreen() {
   const router = useRouter();
-  const { signIn, signUp, loading: authLoading } = useAuth();
+  const {
+    signIn,
+    signUp,
+    signInWithGoogleAccessToken,
+    loading: authLoading,
+  } = useAuth();
 
   // State
   const [mode, setMode] = useState<AuthMode>("login");
@@ -467,9 +474,74 @@ export default function ModernAuthScreen() {
     }
   }, [mode, formData, validate, signIn, signUp, router]);
 
-  const handleSocialLogin = useCallback((provider: string) => {
-    Alert.alert("Thông báo", `Đăng nhập với ${provider} sẽ sớm được hỗ trợ!`);
-  }, []);
+  const handleSocialLogin = useCallback(
+    async (provider: string) => {
+      if (provider === "Google") {
+        try {
+          setLoading(true);
+          // Use expo-auth-session Google provider for web-based OAuth
+          const { makeRedirectUri } = await import("expo-auth-session");
+
+          const extras = Constants.expoConfig?.extra || {};
+          const clientId =
+            extras.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID ||
+            extras.EXPO_PUBLIC_GOOGLE_CLIENT_ID ||
+            "";
+
+          if (!clientId) {
+            Alert.alert(
+              "Cấu hình thiếu",
+              "Chưa thiết lập Google Client ID. Vui lòng liên hệ quản trị viên.",
+            );
+            return;
+          }
+
+          // Open Google OAuth in browser
+          const redirectUri = makeRedirectUri({
+            scheme: "appdesignbuild",
+            path: "redirect",
+          });
+
+          // Use WebBrowser-based auth
+          const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=${encodeURIComponent("openid email profile")}`;
+
+          const result = await WebBrowser.openAuthSessionAsync(
+            authUrl,
+            redirectUri,
+          );
+
+          if (result.type === "success" && result.url) {
+            // Extract access_token from URL fragment
+            const params = new URLSearchParams(result.url.split("#")[1]);
+            const accessToken = params.get("access_token");
+
+            if (accessToken) {
+              await signInWithGoogleAccessToken(accessToken);
+              router.replace("/(tabs)");
+            } else {
+              Alert.alert("Lỗi", "Không nhận được token từ Google.");
+            }
+          } else if (result.type === "cancel") {
+            // User cancelled - do nothing
+          }
+        } catch (error: any) {
+          console.error("[Auth] Google sign-in error:", error);
+          Alert.alert(
+            "Lỗi",
+            error?.message || "Đăng nhập Google thất bại. Vui lòng thử lại.",
+          );
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        Alert.alert(
+          "Thông báo",
+          `Đăng nhập với ${provider} sẽ sớm được hỗ trợ!`,
+        );
+      }
+    },
+    [signInWithGoogleAccessToken, router],
+  );
 
   const handleDemoUserSelect = useCallback((user: DemoUser) => {
     setFormData({

@@ -20,10 +20,10 @@ interface ServiceGridProps {
 }
 
 const defaultServices: ServiceItem[] = [
-  { id: '1', title: 'Thiết kế nhà', icon: 'home-outline', route: '/tk-nha', color: '#3b82f6' },
+  { id: '1', title: 'Thiết kế nhà', icon: 'home-outline', route: '/tk-nha', color: '#0D9488' },
   { id: '2', title: 'Nội thất', icon: 'bed-outline', route: '/tk-noi-that', color: '#666666' },
-  { id: '3', title: 'Biệt thự', icon: 'business-outline', route: '/biet-thu', color: '#0066CC' },
-  { id: '4', title: 'Khách sạn', icon: 'key-outline', route: '/khach-san', color: '#0066CC' },
+  { id: '3', title: 'Biệt thự', icon: 'business-outline', route: '/biet-thu', color: '#0D9488' },
+  { id: '4', title: 'Khách sạn', icon: 'key-outline', route: '/khach-san', color: '#0D9488' },
   { id: '5', title: 'Nhà phố', icon: 'storefront-outline', route: '/nha-pho', color: '#000000' },
   { id: '6', title: 'Văn phòng', icon: 'briefcase-outline', route: '/van-phong', color: '#666666' },
   { id: '7', title: 'Thư viện', icon: 'library-outline', route: '/thu-vien', color: '#06b6d4' },
@@ -48,7 +48,7 @@ export const ServiceGrid = memo(function ServiceGrid({
       style={styles.serviceItem}
       onPress={() => handleServicePress(item)}
     >
-      <View style={[styles.serviceIcon, { backgroundColor: item.color || '#3b82f6' }]}>
+      <View style={[styles.serviceIcon, { backgroundColor: item.color || '#0D9488' }]}>
         <Ionicons name={item.icon} size={24} color="#fff" />
       </View>
       <Text style={styles.serviceText} numberOfLines={2}>

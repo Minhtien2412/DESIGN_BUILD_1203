@@ -146,7 +146,7 @@ export default function ShopeeStyleDemo() {
       <Stack.Screen
         options={{
           title: "Shopee Style Demo",
-          headerStyle: { backgroundColor: "#EE4D2D" },
+          headerStyle: { backgroundColor: "#0D9488" },
           headerTintColor: "#FFFFFF",
         }}
       />
@@ -279,9 +279,9 @@ export default function ShopeeStyleDemo() {
           </ThemedText>
           <View style={styles.colorGrid}>
             <View style={styles.colorItem}>
-              <View style={[styles.colorBox, { backgroundColor: "#EE4D2D" }]} />
+              <View style={[styles.colorBox, { backgroundColor: "#0D9488" }]} />
               <ThemedText style={styles.colorName}>Primary</ThemedText>
-              <ThemedText style={styles.colorCode}>#EE4D2D</ThemedText>
+              <ThemedText style={styles.colorCode}>#0D9488</ThemedText>
             </View>
             <View style={styles.colorItem}>
               <View style={[styles.colorBox, { backgroundColor: "#FFAA00" }]} />

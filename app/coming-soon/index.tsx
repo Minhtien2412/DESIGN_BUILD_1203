@@ -11,7 +11,7 @@ const comingSoonFeatures = [
     title: 'AR Xem Phòng',
     description: 'Xem trước vật liệu ngay trong không gian thực tế của bạn',
     icon: 'cube-outline',
-    color: '#FF6B35',
+    color: '#14B8A6',
     progress: 75,
   },
   {
@@ -111,7 +111,7 @@ export default function ComingSoonScreen() {
         </View>
 
         {/* Newsletter */}
-        <View style={[styles.newsletterCard, { backgroundColor: '#FF6B35' }]}>
+        <View style={[styles.newsletterCard, { backgroundColor: '#14B8A6' }]}>
           <Ionicons name="mail-outline" size={32} color="#fff" />
           <Text style={styles.newsletterTitle}>Đăng ký nhận tin</Text>
           <Text style={styles.newsletterDesc}>
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     marginTop: 16,
   },
-  subscribeBtnText: { color: '#FF6B35', fontWeight: '600' },
+  subscribeBtnText: { color: '#14B8A6', fontWeight: '600' },
   feedbackCard: {
     margin: 16,
     marginTop: 0,
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
   feedbackTitle: { fontSize: 14, fontWeight: '600' },
   feedbackDesc: { color: '#666', fontSize: 12, marginTop: 2 },
   feedbackBtn: {
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#14B8A6',
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 20,

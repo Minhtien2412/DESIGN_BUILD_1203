@@ -646,7 +646,7 @@ const styles = StyleSheet.create({
   priceText: {
     fontSize: 14,
     fontWeight: "700",
-    color: "#0066CC",
+    color: "#0D9488",
   },
   emptyContainer: {
     flex: 1,
@@ -672,7 +672,7 @@ const styles = StyleSheet.create({
     marginBottom: MODERN_SPACING.lg,
   },
   backButton: {
-    backgroundColor: "#0066CC",
+    backgroundColor: "#0D9488",
     paddingHorizontal: MODERN_SPACING.xl,
     paddingVertical: MODERN_SPACING.md,
     borderRadius: MODERN_RADIUS.md,

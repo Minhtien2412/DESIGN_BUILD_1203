@@ -260,6 +260,43 @@ export async function confirmDelivery(orderId: string): Promise<Order> {
   }
 }
 
+/**
+ * Cập nhật trạng thái thanh toán sau khi callback
+ */
+export async function updatePaymentStatus(
+  orderId: string,
+  data: {
+    paymentStatus: PaymentStatus;
+    transactionId?: string;
+    gateway?: string;
+  },
+): Promise<Order> {
+  try {
+    console.log(
+      "[OrderService] Updating payment status:",
+      orderId,
+      data.paymentStatus,
+    );
+
+    const order = await apiFetch<Order>(
+      `${BASE_PATH}/${orderId}/payment-status`,
+      {
+        method: "PUT",
+        body: JSON.stringify(data),
+      },
+    );
+
+    console.log(
+      "[OrderService] ✅ Payment status updated:",
+      order.paymentStatus,
+    );
+    return order;
+  } catch (error: any) {
+    console.error("[OrderService] ❌ Failed to update payment status:", error);
+    throw new Error("Không thể cập nhật trạng thái thanh toán.");
+  }
+}
+
 // ==================== PAYMENT FUNCTIONS ====================
 
 /**
@@ -404,6 +441,7 @@ export default {
   cancelOrder,
   getOrderTracking,
   confirmDelivery,
+  updatePaymentStatus,
   initiateVNPayPayment,
   initiateMoMoPayment,
   checkPaymentStatus,

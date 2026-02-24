@@ -109,11 +109,11 @@ export default function ReportsListScreen() {
       case 'DRAFT':
         return '#999999';
       case 'GENERATING':
-        return '#0066CC';
+        return '#0D9488';
       case 'READY':
-        return '#0066CC';
+        return '#0D9488';
       case 'DELIVERED':
-        return '#0066CC';
+        return '#0D9488';
       case 'ARCHIVED':
         return '#757575';
       case 'FAILED':
@@ -198,7 +198,7 @@ export default function ReportsListScreen() {
         <View style={styles.formatsRow}>
           {item.formats.map((format: ReportFormat, index: number) => (
             <View key={index} style={styles.formatBadge}>
-              <Ionicons name="document-outline" size={12} color="#0066CC" />
+              <Ionicons name="document-outline" size={12} color="#0D9488" />
               <Text style={styles.formatText}>{format}</Text>
             </View>
           ))}
@@ -223,15 +223,15 @@ export default function ReportsListScreen() {
       {item.status === 'READY' && (
         <View style={styles.actionButtons}>
           <TouchableOpacity style={styles.actionButton}>
-            <Ionicons name="eye" size={18} color="#0066CC" />
+            <Ionicons name="eye" size={18} color="#0D9488" />
             <Text style={styles.actionButtonText}>Xem</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionButton}>
-            <Ionicons name="download" size={18} color="#0066CC" />
+            <Ionicons name="download" size={18} color="#0D9488" />
             <Text style={styles.actionButtonText}>Tải về</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionButton}>
-            <Ionicons name="send" size={18} color="#0066CC" />
+            <Ionicons name="send" size={18} color="#0D9488" />
             <Text style={styles.actionButtonText}>Gửi</Text>
           </TouchableOpacity>
         </View>
@@ -240,7 +240,7 @@ export default function ReportsListScreen() {
       {/* Generating indicator */}
       {item.status === 'GENERATING' && (
         <View style={styles.generatingRow}>
-          <ActivityIndicator size="small" color="#0066CC" />
+          <ActivityIndicator size="small" color="#0D9488" />
           <Text style={styles.generatingText}>Đang tạo báo cáo...</Text>
         </View>
       )}
@@ -258,7 +258,7 @@ export default function ReportsListScreen() {
   if (loading && reports.length === 0) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#0066CC" />
+        <ActivityIndicator size="large" color="#0D9488" />
         <Text style={styles.loadingText}>Đang tải báo cáo...</Text>
       </View>
     );
@@ -273,11 +273,11 @@ export default function ReportsListScreen() {
           <Text style={styles.statLabel}>Tổng</Text>
         </View>
         <View style={[styles.statCard, { backgroundColor: '#E8F5E9' }]}>
-          <Text style={[styles.statValue, { color: '#0066CC' }]}>{stats.ready}</Text>
+          <Text style={[styles.statValue, { color: '#0D9488' }]}>{stats.ready}</Text>
           <Text style={styles.statLabel}>Sẵn sàng</Text>
         </View>
-        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
-          <Text style={[styles.statValue, { color: '#0066CC' }]}>{stats.generating}</Text>
+        <View style={[styles.statCard, { backgroundColor: '#F0FDFA' }]}>
+          <Text style={[styles.statValue, { color: '#0D9488' }]}>{stats.generating}</Text>
           <Text style={styles.statLabel}>Đang tạo</Text>
         </View>
         <View style={[styles.statCard, { backgroundColor: '#F5F5F5' }]}>
@@ -321,7 +321,7 @@ export default function ReportsListScreen() {
             <Ionicons
               name={type.icon as any}
               size={16}
-              color={selectedType === type.value ? '#0066CC' : '#666'}
+              color={selectedType === type.value ? '#0D9488' : '#666'}
             />
             <Text
               style={[
@@ -384,7 +384,7 @@ export default function ReportsListScreen() {
                     <Ionicons
                       name={getTypeIcon(template.type) as any}
                       size={20}
-                      color={newReport.templateId === template.id ? '#0066CC' : '#666'}
+                      color={newReport.templateId === template.id ? '#0D9488' : '#666'}
                     />
                     <Text
                       style={[
@@ -554,16 +554,16 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   filterChipActive: {
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     borderBottomWidth: 2,
-    borderBottomColor: '#0066CC',
+    borderBottomColor: '#0D9488',
   },
   filterChipText: {
     fontSize: 13,
     color: '#666',
   },
   filterChipTextActive: {
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: '600',
   },
   listContent: {
@@ -654,12 +654,12 @@ const styles = StyleSheet.create({
     gap: 4,
     paddingHorizontal: 8,
     paddingVertical: 4,
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     borderRadius: 4,
   },
   formatText: {
     fontSize: 11,
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: '600',
   },
   footer: {
@@ -704,11 +704,11 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#E8F4FF',
+    borderTopColor: '#F0FDFA',
   },
   generatingText: {
     fontSize: 13,
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: '600',
   },
   errorRow: {
@@ -731,7 +731,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
@@ -751,7 +751,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   emptyButton: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
@@ -810,16 +810,16 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   templateChipSelected: {
-    borderColor: '#0066CC',
+    borderColor: '#0D9488',
     borderWidth: 2,
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
   },
   templateChipText: {
     fontSize: 13,
     color: '#666',
   },
   templateChipTextSelected: {
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: '600',
   },
   input: {
@@ -875,7 +875,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
   },
   modalButtonPrimary: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   modalButtonTextSecondary: {
     fontSize: 14,

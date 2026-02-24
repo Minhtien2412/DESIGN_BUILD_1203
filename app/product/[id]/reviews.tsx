@@ -284,7 +284,7 @@ export default function ReviewsScreen() {
                 style={styles.writeBtn}
                 onPress={() => setShowWriteReview(true)}
               >
-                <Ionicons name="create-outline" size={20} color="#0066CC" />
+                <Ionicons name="create-outline" size={20} color="#0D9488" />
                 <Text style={styles.writeBtnText}>Viết đánh giá của bạn</Text>
               </TouchableOpacity>
             )}
@@ -317,7 +317,7 @@ export default function ReviewsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   header: {
     flexDirection: 'row',
@@ -406,7 +406,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   filterChipActive: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   filterChipText: {
     fontSize: 13,
@@ -429,7 +429,7 @@ const styles = StyleSheet.create({
   writeBtnText: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   writeReview: {
     backgroundColor: '#fff',
@@ -485,7 +485,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 12,
     borderRadius: 8,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     alignItems: 'center',
   },
   submitBtnText: {
@@ -524,6 +524,6 @@ const styles = StyleSheet.create({
   },
   sortText: {
     fontSize: 13,
-    color: '#0066CC',
+    color: '#0D9488',
   },
 });

@@ -509,7 +509,7 @@ export class PerfexApiIntegration {
         endDate: '2026-01-15',
         progress: 100,
         status: 'completed',
-        color: '#0066CC',
+        color: '#0D9488',
         tasks: [
           { id: '1', name: 'Khởi công dự án', progress: 100, status: 'completed' },
           { id: '2', name: 'Khởi công dự án CT', progress: 100, status: 'completed' },
@@ -523,7 +523,7 @@ export class PerfexApiIntegration {
         endDate: '2026-02-01',
         progress: 100,
         status: 'completed',
-        color: '#0066CC',
+        color: '#0D9488',
         tasks: [
           { id: '3', name: 'Ép cọc', progress: 100, status: 'completed' },
           { id: '4', name: 'Ép cọc CT', progress: 100, status: 'completed' },
@@ -537,7 +537,7 @@ export class PerfexApiIntegration {
         endDate: '2026-02-20',
         progress: 100,
         status: 'completed',
-        color: '#0066CC',
+        color: '#0D9488',
         tasks: [
           { id: '5', name: 'Đào móng', progress: 100, status: 'completed' },
           { id: '6', name: 'Đào móng CT', progress: 100, status: 'completed' },
@@ -551,7 +551,7 @@ export class PerfexApiIntegration {
         endDate: '2026-03-10',
         progress: 80,
         status: 'in_progress',
-        color: '#0066CC',
+        color: '#0D9488',
         tasks: [
           { id: '7', name: 'Làm thép móng - giằng móng', progress: 80, status: 'in_progress' },
           { id: '8', name: 'Làm thép móng - giằng móng CT', progress: 80, status: 'in_progress' },

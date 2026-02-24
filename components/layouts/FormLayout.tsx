@@ -267,8 +267,8 @@ const styles = StyleSheet.create({
     borderColor: Colors.light.primary,
   },
   stepCircleCompleted: {
-    backgroundColor: "#0066CC",
-    borderColor: "#0066CC",
+    backgroundColor: "#0D9488",
+    borderColor: "#0D9488",
   },
   stepNumber: {
     fontSize: 14,
@@ -288,7 +288,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   stepLabelCompleted: {
-    color: "#0066CC",
+    color: "#0D9488",
   },
   stepLine: {
     position: "absolute",

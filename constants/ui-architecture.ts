@@ -67,8 +67,8 @@ export const COLOR_PALETTES = {
   guest: {
     primary: '#666666',
     secondary: '#B2BEC3',
-    accent: '#0066CC',
-    success: '#0066CC',
+    accent: '#0D9488',
+    success: '#0D9488',
     warning: '#666666',
     error: '#000000',
     background: '#F5F5F5',
@@ -76,15 +76,15 @@ export const COLOR_PALETTES = {
     text: '#2D3436',
     textSecondary: '#666666',
     border: '#DFE6E9',
-    gradient: ['#666666', '#0066CC'],
+    gradient: ['#666666', '#0D9488'],
   },
   
   // User - Shopee-style, warm and engaging
   user: {
-    primary: '#0066CC',
-    secondary: '#0066CC',
-    accent: '#0066CC',
-    success: '#0066CC',
+    primary: '#0D9488',
+    secondary: '#0D9488',
+    accent: '#0D9488',
+    success: '#0D9488',
     warning: '#666666',
     error: '#000000',
     background: '#F5F5F5',
@@ -92,15 +92,15 @@ export const COLOR_PALETTES = {
     text: '#2D3436',
     textSecondary: '#666666',
     border: '#E5E5E5',
-    gradient: ['#0066CC', '#0066CC'],
+    gradient: ['#0D9488', '#0D9488'],
   },
   
   // Employee - Professional, productivity-focused
   employee: {
-    primary: '#0080FF',
-    secondary: '#0066CC',
-    accent: '#0066CC',
-    success: '#0066CC',
+    primary: '#14B8A6',
+    secondary: '#0D9488',
+    accent: '#0D9488',
+    success: '#0D9488',
     warning: '#666666',
     error: '#000000',
     background: '#F0F4F8',
@@ -108,7 +108,7 @@ export const COLOR_PALETTES = {
     text: '#2D3436',
     textSecondary: '#666666',
     border: '#DFE6E9',
-    gradient: ['#0080FF', '#0066CC'],
+    gradient: ['#14B8A6', '#0D9488'],
   },
   
   // Admin - Powerful, authoritative
@@ -116,7 +116,7 @@ export const COLOR_PALETTES = {
     primary: '#6C5CE7',
     secondary: '#666666',
     accent: '#A29BFE',
-    success: '#0066CC',
+    success: '#0D9488',
     warning: '#666666',
     error: '#000000',
     background: '#F5F6FA',
@@ -227,7 +227,7 @@ export const COMPONENT_STYLES: Record<UserRole, {
   guest: {
     button: {
       primary: {
-        backgroundColor: '#0066CC',
+        backgroundColor: '#0D9488',
         textColor: '#FFFFFF',
         borderRadius: 8,
         height: 48,
@@ -235,8 +235,8 @@ export const COMPONENT_STYLES: Record<UserRole, {
       },
       secondary: {
         backgroundColor: 'transparent',
-        borderColor: '#0066CC',
-        textColor: '#0066CC',
+        borderColor: '#0D9488',
+        textColor: '#0D9488',
       },
     },
     card: {
@@ -259,7 +259,7 @@ export const COMPONENT_STYLES: Record<UserRole, {
   user: {
     button: {
       primary: {
-        backgroundColor: '#0066CC',
+        backgroundColor: '#0D9488',
         textColor: '#FFFFFF',
         borderRadius: 8,
         height: 48,
@@ -267,8 +267,8 @@ export const COMPONENT_STYLES: Record<UserRole, {
       },
       secondary: {
         backgroundColor: 'transparent',
-        borderColor: '#0066CC',
-        textColor: '#0066CC',
+        borderColor: '#0D9488',
+        textColor: '#0D9488',
       },
     },
     card: {
@@ -281,7 +281,7 @@ export const COMPONENT_STYLES: Record<UserRole, {
       borderColor: 'transparent',
     },
     header: {
-      backgroundColor: '#0066CC',
+      backgroundColor: '#0D9488',
       textColor: '#FFFFFF',
       iconColor: '#FFFFFF',
       statusBarStyle: 'light-content',
@@ -291,7 +291,7 @@ export const COMPONENT_STYLES: Record<UserRole, {
   employee: {
     button: {
       primary: {
-        backgroundColor: '#0080FF',
+        backgroundColor: '#14B8A6',
         textColor: '#FFFFFF',
         borderRadius: 10,
         height: 50,
@@ -299,21 +299,21 @@ export const COMPONENT_STYLES: Record<UserRole, {
       },
       secondary: {
         backgroundColor: 'transparent',
-        borderColor: '#0080FF',
-        textColor: '#0080FF',
+        borderColor: '#14B8A6',
+        textColor: '#14B8A6',
       },
     },
     card: {
       backgroundColor: '#FFFFFF',
       borderRadius: 12,
-      shadowColor: '#0080FF',
+      shadowColor: '#14B8A6',
       shadowOpacity: 0.1,
       elevation: 3,
       borderWidth: 1,
       borderColor: '#E8F5F4',
     },
     header: {
-      backgroundColor: '#0080FF',
+      backgroundColor: '#14B8A6',
       textColor: '#FFFFFF',
       iconColor: '#FFFFFF',
       statusBarStyle: 'light-content',

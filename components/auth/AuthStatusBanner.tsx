@@ -23,7 +23,7 @@ export function AuthStatusBanner() {
   if (isAuthenticated && user) {
     return (
       <View style={[styles.banner, styles.successBanner]}>
-        <MaterialCommunityIcons name="check-circle" size={16} color="#0066CC" />
+        <MaterialCommunityIcons name="check-circle" size={16} color="#0D9488" />
         <Text style={styles.successText}>
           �� dang nh?p: {user.name || user.email || 'Unknown'}
         </Text>
@@ -36,7 +36,7 @@ export function AuthStatusBanner() {
 
   return (
     <View style={[styles.banner, styles.infoBanner]}>
-      <MaterialCommunityIcons name="shield-check" size={16} color="#0066CC" />
+      <MaterialCommunityIcons name="shield-check" size={16} color="#0D9488" />
       <Text style={styles.infoText}>
         H? th?ng x�c th?c d� s?n s�ng
       </Text>
@@ -61,11 +61,11 @@ const styles = StyleSheet.create({
   },
   successBanner: {
     backgroundColor: '#e8f5e8',
-    borderColor: '#0066CC',
+    borderColor: '#0D9488',
   },
   infoBanner: {
-    backgroundColor: '#E8F4FF',
-    borderColor: '#0066CC',
+    backgroundColor: '#F0FDFA',
+    borderColor: '#0D9488',
   },
   loadingText: {
     fontSize: 14,
@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
   },
   successText: {
     fontSize: 14,
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: '600',
     marginLeft: 8,
   },
@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
   },
   infoText: {
     fontSize: 14,
-    color: '#0066CC',
+    color: '#0D9488',
     marginLeft: 8,
   },
 });

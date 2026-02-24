@@ -31,16 +31,16 @@ export default function ReportsScreen() {
   ];
 
   const budgetData = [
-    { label: 'Vật liệu', value: 2400, color: '#3b82f6' },
-    { label: 'Nhân công', value: 1800, color: '#0066CC' },
-    { label: 'Thiết bị', value: 1200, color: '#0066CC' },
+    { label: 'Vật liệu', value: 2400, color: '#0D9488' },
+    { label: 'Nhân công', value: 1800, color: '#0D9488' },
+    { label: 'Thiết bị', value: 1200, color: '#0D9488' },
     { label: 'Khác', value: 600, color: '#6b7280' },
   ];
 
   const categoryData = [
-    { label: 'Hoàn thành', value: 45, color: '#0066CC' },
-    { label: 'Đang làm', value: 30, color: '#3b82f6' },
-    { label: 'Chậm tiến độ', value: 15, color: '#0066CC' },
+    { label: 'Hoàn thành', value: 45, color: '#0D9488' },
+    { label: 'Đang làm', value: 30, color: '#0D9488' },
+    { label: 'Chậm tiến độ', value: 15, color: '#0D9488' },
     { label: 'Chưa bắt đầu', value: 10, color: '#9ca3af' },
   ];
 
@@ -69,7 +69,7 @@ export default function ReportsScreen() {
             <Text style={styles.subtitle}>Tổng quan & phân tích</Text>
           </View>
           <TouchableOpacity style={styles.exportButton}>
-            <Ionicons name="download-outline" size={20} color="#3b82f6" />
+            <Ionicons name="download-outline" size={20} color="#0D9488" />
           </TouchableOpacity>
         </View>
       </Section>
@@ -85,7 +85,7 @@ export default function ReportsScreen() {
               subtitle="Đúng kế hoạch"
               trend="up"
               trendValue="+5%"
-              gradientColors={['#0066CC', '#0066CC']}
+              gradientColors={['#0D9488', '#0D9488']}
               style={styles.metricCard}
             />
             <MetricCard
@@ -95,7 +95,7 @@ export default function ReportsScreen() {
               subtitle="VNĐ đã chi"
               trend="up"
               trendValue="+12%"
-              gradientColors={['#3b82f6', '#0066CC']}
+              gradientColors={['#0D9488', '#0D9488']}
               style={styles.metricCard}
             />
             <MetricCard
@@ -105,7 +105,7 @@ export default function ReportsScreen() {
               subtitle="người/ngày"
               trend="down"
               trendValue="-3%"
-              gradientColors={['#0066CC', '#d97706']}
+              gradientColors={['#0D9488', '#d97706']}
               style={styles.metricCard}
             />
             <MetricCard
@@ -133,8 +133,8 @@ export default function ReportsScreen() {
             <LineChart
               data={progressData}
               height={200}
-              lineColor="#0066CC"
-              gradientColors={['#0066CC', '#dcfce7']}
+              lineColor="#0D9488"
+              gradientColors={['#0D9488', '#dcfce7']}
             />
           </View>
         </Section>
@@ -185,7 +185,7 @@ export default function ReportsScreen() {
           </View>
           <View style={styles.chartCard}>
             <BarChart
-              data={workforceData.map(d => ({ ...d, color: '#3b82f6' }))}
+              data={workforceData.map(d => ({ ...d, color: '#0D9488' }))}
               height={200}
               showValues={true}
             />
@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 12,
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -288,7 +288,7 @@ const styles = StyleSheet.create({
   viewAll: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#3b82f6',
+    color: '#0D9488',
   },
   chartCard: {
     backgroundColor: '#fff',

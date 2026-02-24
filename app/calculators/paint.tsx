@@ -429,7 +429,7 @@ const styles = StyleSheet.create({
     color: '#D97706',
   },
   noteCard: {
-    backgroundColor: '#EFF6FF',
+    backgroundColor: '#F0FDFA',
     borderRadius: 12,
     padding: 16,
     marginTop: 16,
@@ -437,12 +437,12 @@ const styles = StyleSheet.create({
   noteTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#1E40AF',
+    color: '#0F766E',
     marginBottom: 8,
   },
   noteText: {
     fontSize: 13,
-    color: '#3B82F6',
+    color: '#0D9488',
     lineHeight: 20,
   },
 });

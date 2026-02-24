@@ -40,7 +40,7 @@ interface Note {
 
 const NOTE_COLORS = [
   '#fef3c7', // Yellow
-  '#dbeafe', // Blue
+  '#CCFBF1', // Blue
   '#dcfce7', // Green
   '#fce7f3', // Pink
   '#e9d5ff', // Purple
@@ -103,7 +103,7 @@ export default function NotesScreen() {
           id: '2',
           title: 'Vật liệu Biệt Thự Anh Tiến',
           content: 'Gạch: Granite cao cấp 80x80\nSơn: Dulux Weathershield\nCửa: Nhôm Xingfa\nMái: Ngói Hạ Long',
-          color: '#dbeafe',
+          color: '#CCFBF1',
           isPinned: false,
           createdAt: '2024-12-29',
           updatedAt: '2024-12-29',

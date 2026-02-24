@@ -309,7 +309,7 @@ export function VideoPlayer({
       {/* Loading Indicator */}
       {isLoading && (
         <View style={styles.loadingOverlay}>
-          <ActivityIndicator size="large" color="#0066CC" />
+          <ActivityIndicator size="large" color="#0D9488" />
         </View>
       )}
 
@@ -374,9 +374,9 @@ export function VideoPlayer({
                     value={currentTime}
                     onValueChange={handleSeek}
                     onSlidingComplete={handleSeekComplete}
-                    minimumTrackTintColor="#0066CC"
+                    minimumTrackTintColor="#0D9488"
                     maximumTrackTintColor="rgba(255,255,255,0.3)"
-                    thumbTintColor="#0066CC"
+                    thumbTintColor="#0D9488"
                   />
                 ) : (
                   <View style={styles.slider}>
@@ -391,7 +391,7 @@ export function VideoPlayer({
                           styles.progressFill,
                           {
                             width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%`,
-                            backgroundColor: "#0066CC",
+                            backgroundColor: "#0D9488",
                           },
                         ]}
                       />
@@ -608,7 +608,7 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: "100%",
-    backgroundColor: "#0066CC",
+    backgroundColor: "#0D9488",
   },
   titleOverlay: {
     position: "absolute",
@@ -670,7 +670,7 @@ const styles = StyleSheet.create({
   },
   volumeFill: {
     height: "100%",
-    backgroundColor: "#0066CC",
+    backgroundColor: "#0D9488",
   },
   volumeText: {
     color: "#fff",

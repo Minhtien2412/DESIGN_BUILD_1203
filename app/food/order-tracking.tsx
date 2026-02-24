@@ -269,7 +269,7 @@ export default function OrderTrackingScreen() {
             <View style={styles.driverInfo}>
               <Text style={styles.driverName}>{order.driverName}</Text>
               <View style={styles.driverRating}>
-                <Ionicons name="star" size={14} color="#0066CC" />
+                <Ionicons name="star" size={14} color="#0D9488" />
                 <Text style={styles.ratingText}>{order.driverRating}</Text>
               </View>
             </View>
@@ -651,7 +651,7 @@ const styles = StyleSheet.create({
   cancelButton: {
     backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#0066CC',
+    borderColor: '#0D9488',
     borderRadius: 8,
     padding: 16,
     alignItems: 'center',
@@ -659,7 +659,7 @@ const styles = StyleSheet.create({
   cancelButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   rateButton: {
     backgroundColor: '#00B14F',

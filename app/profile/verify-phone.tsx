@@ -3,44 +3,44 @@
  * Màn hình xác thực số điện thoại sử dụng OTP
  */
 
-import { OTPVerification } from '@/components/auth';
-import ModernButton from '@/components/ui/modern-button';
-import { useThemeColor } from '@/hooks/use-theme-color';
-import { Ionicons } from '@expo/vector-icons';
-import { Stack, router } from 'expo-router';
-import { useState } from 'react';
+import { OTPVerification } from "@/components/auth";
+import ModernButton from "@/components/ui/modern-button";
+import { useThemeColor } from "@/hooks/use-theme-color";
+import { Ionicons } from "@expo/vector-icons";
+import { Stack, router } from "expo-router";
+import { useState } from "react";
 import {
     Alert,
     KeyboardAvoidingView,
     Platform,
-    SafeAreaView,
     ScrollView,
     StatusBar,
     StyleSheet,
     Text,
     TextInput,
     View,
-} from 'react-native';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-type Step = 'phone' | 'otp';
+type Step = "phone" | "otp";
 
 export default function PhoneVerificationScreen() {
-  const [step, setStep] = useState<Step>('phone');
-  const [phone, setPhone] = useState('');
+  const [step, setStep] = useState<Step>("phone");
+  const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
-  
+
   // Theme
-  const backgroundColor = useThemeColor({}, 'background');
-  const cardColor = useThemeColor({}, 'card');
-  const textColor = useThemeColor({}, 'text');
-  const primaryColor = useThemeColor({}, 'tint');
-  const secondaryText = useThemeColor({}, 'tabIconDefault');
-  const errorColor = '#ef4444';
+  const backgroundColor = useThemeColor({}, "background");
+  const cardColor = useThemeColor({}, "card");
+  const textColor = useThemeColor({}, "text");
+  const primaryColor = useThemeColor({}, "tint");
+  const secondaryText = useThemeColor({}, "tabIconDefault");
+  const errorColor = "#ef4444";
 
   // Validate phone number (Vietnam format)
   const validatePhone = (value: string): boolean => {
     // Remove spaces and dashes
-    const cleaned = value.replace(/[\s-]/g, '');
+    const cleaned = value.replace(/[\s-]/g, "");
     // Vietnam phone: 10 digits starting with 0 or +84
     const vnPhoneRegex = /^(0|\+84)(3|5|7|8|9)[0-9]{8}$/;
     return vnPhoneRegex.test(cleaned);
@@ -49,18 +49,21 @@ export default function PhoneVerificationScreen() {
   // Handle send OTP
   const handleSendOTP = async () => {
     if (!validatePhone(phone)) {
-      Alert.alert('Lỗi', 'Vui lòng nhập số điện thoại hợp lệ (10 số, bắt đầu bằng 0)');
+      Alert.alert(
+        "Lỗi",
+        "Vui lòng nhập số điện thoại hợp lệ (10 số, bắt đầu bằng 0)",
+      );
       return;
     }
 
     setLoading(true);
-    
+
     // Simulate API call
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      setStep('otp');
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      setStep("otp");
     } catch (error) {
-      Alert.alert('Lỗi', 'Không thể gửi mã OTP. Vui lòng thử lại.');
+      Alert.alert("Lỗi", "Không thể gửi mã OTP. Vui lòng thử lại.");
     } finally {
       setLoading(false);
     }
@@ -69,32 +72,38 @@ export default function PhoneVerificationScreen() {
   // Handle OTP verified
   const handleOTPVerified = (code: string) => {
     Alert.alert(
-      'Xác thực thành công',
+      "Xác thực thành công",
       `Số điện thoại ${phone} đã được xác thực thành công!`,
       [
         {
-          text: 'OK',
+          text: "OK",
           onPress: () => router.back(),
         },
-      ]
+      ],
     );
   };
 
   // Handle OTP error
   const handleOTPError = (error: string) => {
-    Alert.alert('Lỗi', error);
+    Alert.alert("Lỗi", error);
   };
 
   // Render phone input step
   const renderPhoneStep = () => (
-    <ScrollView 
+    <ScrollView
       style={styles.scrollContent}
       showsVerticalScrollIndicator={false}
       keyboardShouldPersistTaps="handled"
     >
       {/* Icon */}
-      <View style={[styles.iconContainer, { backgroundColor: primaryColor + '15' }]}>
-        <Ionicons name="phone-portrait-outline" size={48} color={primaryColor} />
+      <View
+        style={[styles.iconContainer, { backgroundColor: primaryColor + "15" }]}
+      >
+        <Ionicons
+          name="phone-portrait-outline"
+          size={48}
+          color={primaryColor}
+        />
       </View>
 
       {/* Title */}
@@ -110,9 +119,16 @@ export default function PhoneVerificationScreen() {
         <Text style={[styles.inputLabel, { color: textColor }]}>
           Số điện thoại <Text style={{ color: errorColor }}>*</Text>
         </Text>
-        <View style={[styles.inputWrapper, { backgroundColor: cardColor, borderColor: '#e5e7eb' }]}>
+        <View
+          style={[
+            styles.inputWrapper,
+            { backgroundColor: cardColor, borderColor: "#e5e7eb" },
+          ]}
+        >
           <View style={styles.countryCode}>
-            <Text style={[styles.countryCodeText, { color: textColor }]}>+84</Text>
+            <Text style={[styles.countryCodeText, { color: textColor }]}>
+              +84
+            </Text>
           </View>
           <TextInput
             style={[styles.input, { color: textColor }]}
@@ -184,7 +200,7 @@ export default function PhoneVerificationScreen() {
       subtitle={`Mã OTP đã được gửi đến số điện thoại ${phone}`}
       onVerified={handleOTPVerified}
       onError={handleOTPError}
-      onBack={() => setStep('phone')}
+      onBack={() => setStep("phone")}
     />
   );
 
@@ -193,7 +209,7 @@ export default function PhoneVerificationScreen() {
       <StatusBar barStyle="dark-content" />
       <Stack.Screen
         options={{
-          title: 'Xác thực số điện thoại',
+          title: "Xác thực số điện thoại",
           headerShown: true,
           headerStyle: { backgroundColor },
           headerTitleStyle: styles.headerTitle,
@@ -202,9 +218,9 @@ export default function PhoneVerificationScreen() {
 
       <KeyboardAvoidingView
         style={styles.keyboardView}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        {step === 'phone' ? renderPhoneStep() : renderOTPStep()}
+        {step === "phone" ? renderPhoneStep() : renderOTPStep()}
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -213,7 +229,7 @@ export default function PhoneVerificationScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
   },
   keyboardView: {
     flex: 1,
@@ -225,26 +241,26 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   iconContainer: {
     width: 96,
     height: 96,
     borderRadius: 48,
-    justifyContent: 'center',
-    alignItems: 'center',
-    alignSelf: 'center',
+    justifyContent: "center",
+    alignItems: "center",
+    alignSelf: "center",
     marginBottom: 24,
   },
   title: {
     fontSize: 24,
-    fontWeight: '700',
-    textAlign: 'center',
+    fontWeight: "700",
+    textAlign: "center",
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 15,
-    textAlign: 'center',
+    textAlign: "center",
     lineHeight: 22,
     marginBottom: 32,
   },
@@ -253,26 +269,26 @@ const styles = StyleSheet.create({
   },
   inputLabel: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 8,
   },
   inputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     borderRadius: 12,
     borderWidth: 1,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   countryCode: {
     paddingHorizontal: 16,
     paddingVertical: 14,
     borderRightWidth: 1,
-    borderRightColor: '#e5e7eb',
-    backgroundColor: '#f9fafb',
+    borderRightColor: "#e5e7eb",
+    backgroundColor: "#f9fafb",
   },
   countryCodeText: {
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   input: {
     flex: 1,
@@ -290,12 +306,12 @@ const styles = StyleSheet.create({
   },
   benefitsTitle: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 12,
   },
   benefitItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 8,
     gap: 10,
   },

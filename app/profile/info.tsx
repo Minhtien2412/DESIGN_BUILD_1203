@@ -421,7 +421,7 @@ export default function ProfileInfoScreen() {
                 <Ionicons 
                   name={validFields.has('name') ? "checkmark-circle" : "person-outline"} 
                   size={20} 
-                  color={errors.name ? "#000000" : validFields.has('name') ? "#0066CC" : "#6B7280"} 
+                  color={errors.name ? "#000000" : validFields.has('name') ? "#0D9488" : "#6B7280"} 
                   style={styles.inputIcon} 
                 />
                 <TextInput
@@ -450,7 +450,7 @@ export default function ProfileInfoScreen() {
                 <Ionicons 
                   name={validFields.has('email') ? "checkmark-circle" : "mail-outline"} 
                   size={20} 
-                  color={errors.email ? "#000000" : validFields.has('email') ? "#0066CC" : "#6B7280"} 
+                  color={errors.email ? "#000000" : validFields.has('email') ? "#0D9488" : "#6B7280"} 
                   style={styles.inputIcon} 
                 />
                 <TextInput
@@ -478,7 +478,7 @@ export default function ProfileInfoScreen() {
                 <Ionicons 
                   name={validFields.has('phone') ? "checkmark-circle" : "call-outline"} 
                   size={20} 
-                  color={errors.phone ? "#000000" : validFields.has('phone') ? "#0066CC" : "#6B7280"} 
+                  color={errors.phone ? "#000000" : validFields.has('phone') ? "#0D9488" : "#6B7280"} 
                   style={styles.inputIcon} 
                 />
                 <TextInput
@@ -608,7 +608,7 @@ export default function ProfileInfoScreen() {
               ]}
             >
               <View style={styles.successCard}>
-                <Ionicons name="checkmark-circle" size={60} color="#0066CC" />
+                <Ionicons name="checkmark-circle" size={60} color="#0D9488" />
                 <Text style={styles.successText}>Đã lưu!</Text>
               </View>
             </Animated.View>
@@ -701,7 +701,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
   inputValid: {
-    borderColor: '#0066CC',
+    borderColor: '#0D9488',
     borderWidth: 2,
   },
   inputIcon: {
@@ -786,6 +786,6 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontSize: 24,
     fontWeight: '700',
-    color: '#0066CC',
+    color: '#0D9488',
   },
 });

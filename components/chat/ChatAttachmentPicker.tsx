@@ -80,7 +80,7 @@ const ATTACHMENT_OPTIONS = [
     id: "gallery",
     icon: "images" as const,
     label: "Thư viện",
-    color: "#3B82F6",
+    color: "#0D9488",
   },
   {
     id: "document",
@@ -352,7 +352,7 @@ export function ChatAttachmentPicker({
           {uploading ? (
             <ActivityIndicator size="small" color="#999" />
           ) : (
-            <Ionicons name="add-circle" size={28} color="#0066CC" />
+            <Ionicons name="add-circle" size={28} color="#0D9488" />
           )}
         </TouchableOpacity>
       )}
@@ -614,7 +614,7 @@ const styles = StyleSheet.create({
   },
   previewSendButton: {
     flex: 2,
-    backgroundColor: "#0066CC",
+    backgroundColor: "#0D9488",
     paddingVertical: 14,
     borderRadius: 12,
     flexDirection: "row",
@@ -642,7 +642,7 @@ const styles = StyleSheet.create({
     left: 0,
     top: 0,
     bottom: 0,
-    backgroundColor: "#0066CC",
+    backgroundColor: "#0D9488",
   },
   uploadProgressText: {
     fontSize: 14,

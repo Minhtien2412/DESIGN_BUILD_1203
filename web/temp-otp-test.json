@@ -1,9 +1,0 @@
-{
-  "data": {
-    "phone": "84912345678",
-    "channel": "sms",
-    "sender": "OTP Dev",
-    "template": "ea458d21-7337-452e-a0fa-7cc2554114f9",
-    "code_length": 6
-  }
-}

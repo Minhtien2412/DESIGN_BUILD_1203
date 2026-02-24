@@ -38,7 +38,7 @@ const FILE_TYPES = {
   },
   document: {
     icon: "document-text-outline",
-    color: "#3B82F6",
+    color: "#0D9488",
     label: "Tài liệu",
     extensions: ["pdf", "doc", "docx", "xls", "xlsx"],
   },
@@ -482,7 +482,7 @@ export default function FileUploadScreen() {
         style={[styles.headerContainer, { opacity: headerOpacity }]}
       >
         <LinearGradient
-          colors={isDark ? ["#1E3A5F", "#0F172A"] : ["#3B82F6", "#1D4ED8"]}
+          colors={isDark ? ["#134E4A", "#0F172A"] : ["#0D9488", "#0F766E"]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.headerGradient}
@@ -545,7 +545,7 @@ export default function FileUploadScreen() {
           >
             <View style={styles.dropZoneIconContainer}>
               <LinearGradient
-                colors={["#3B82F6", "#8B5CF6"]}
+                colors={["#0D9488", "#8B5CF6"]}
                 style={styles.dropZoneIconBg}
               >
                 <Ionicons
@@ -575,7 +575,7 @@ export default function FileUploadScreen() {
           <QuickActionButton
             icon="images"
             label="Thư viện"
-            color="#3B82F6"
+            color="#0D9488"
             onPress={() => handlePickImage(false)}
           />
           <QuickActionButton
@@ -654,7 +654,7 @@ export default function FileUploadScreen() {
           <View style={styles.featuresGrid}>
             {[
               { icon: "resize", label: "Tự động resize", color: "#10B981" },
-              { icon: "location", label: "GPS metadata", color: "#3B82F6" },
+              { icon: "location", label: "GPS metadata", color: "#0D9488" },
               { icon: "cloud-done", label: "Lưu trữ S3", color: "#8B5CF6" },
               {
                 icon: "shield-checkmark",
@@ -834,7 +834,7 @@ const styles = StyleSheet.create({
   },
   seeAllText: {
     fontSize: 14,
-    color: "#3B82F6",
+    color: "#0D9488",
     fontWeight: "500",
   },
   clearText: {

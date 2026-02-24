@@ -34,22 +34,22 @@ export default function WarrantyDetailScreen() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'ACTIVE':
-        return '#0066CC';
+        return '#0D9488';
       case 'EXPIRED':
         return '#6B7280';
       case 'CANCELLED':
         return '#000000';
       case 'PENDING':
       case 'UNDER_REVIEW':
-        return '#0066CC';
+        return '#0D9488';
       case 'APPROVED':
       case 'COMPLETED':
-        return '#0066CC';
+        return '#0D9488';
       case 'REJECTED':
         return '#000000';
       case 'SUBMITTED':
       case 'IN_PROGRESS':
-        return '#3B82F6';
+        return '#0D9488';
       default:
         return '#9CA3AF';
     }
@@ -62,11 +62,11 @@ export default function WarrantyDetailScreen() {
       case 'URGENT':
         return '#000000';
       case 'HIGH':
-        return '#0066CC';
+        return '#0D9488';
       case 'MEDIUM':
-        return '#3B82F6';
+        return '#0D9488';
       case 'LOW':
-        return '#0066CC';
+        return '#0D9488';
       default:
         return '#9CA3AF';
     }
@@ -76,8 +76,8 @@ export default function WarrantyDetailScreen() {
     if (remainingDays === undefined) return '#9CA3AF';
     if (remainingDays <= 0) return '#000000';
     if (remainingDays <= 30) return '#000000';
-    if (remainingDays <= 90) return '#0066CC';
-    return '#0066CC';
+    if (remainingDays <= 90) return '#0D9488';
+    return '#0D9488';
   };
 
   if (warrantyLoading) {

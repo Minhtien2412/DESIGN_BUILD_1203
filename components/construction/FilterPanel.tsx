@@ -205,11 +205,11 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
   const getStatusColor = (status: TaskStatus): string => {
     switch (status) {
       case "pending":
-        return "#0066CC";
+        return "#0D9488";
       case "in-progress":
-        return "#3B82F6";
+        return "#0D9488";
       case "completed":
-        return "#0066CC";
+        return "#0D9488";
       case "blocked":
         return "#000000";
       default:
@@ -221,9 +221,9 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
   const getPriorityColor = (priority: TaskPriority): string => {
     switch (priority) {
       case "low":
-        return "#0066CC";
+        return "#0D9488";
       case "medium":
-        return "#0066CC";
+        return "#0D9488";
       case "high":
         return "#000000";
       default:
@@ -457,7 +457,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                     <Ionicons
                       name="calendar-outline"
                       size={20}
-                      color="#3B82F6"
+                      color="#0D9488"
                     />
                   </TouchableOpacity>
                   {filters.startDateFrom && (
@@ -487,7 +487,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                     <Ionicons
                       name="calendar-outline"
                       size={20}
-                      color="#3B82F6"
+                      color="#0D9488"
                     />
                   </TouchableOpacity>
                   {filters.startDateTo && (
@@ -518,7 +518,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                   onValueChange={(value) =>
                     setFilters((prev) => ({ ...prev, onlyOverdue: value }))
                   }
-                  trackColor={{ false: "#D1D5DB", true: "#3B82F6" }}
+                  trackColor={{ false: "#D1D5DB", true: "#0D9488" }}
                 />
               </View>
               <View style={styles.toggleRow}>
@@ -530,7 +530,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                   onValueChange={(value) =>
                     setFilters((prev) => ({ ...prev, onlyUnassigned: value }))
                   }
-                  trackColor={{ false: "#D1D5DB", true: "#3B82F6" }}
+                  trackColor={{ false: "#D1D5DB", true: "#0D9488" }}
                 />
               </View>
             </View>
@@ -546,7 +546,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                         style={styles.presetButton}
                         onPress={() => handleLoadPreset(preset)}
                       >
-                        <Ionicons name="bookmark" size={16} color="#3B82F6" />
+                        <Ionicons name="bookmark" size={16} color="#0D9488" />
                         <Text style={styles.presetName}>{preset.name}</Text>
                       </TouchableOpacity>
                       {onDeletePreset && (
@@ -686,7 +686,7 @@ const styles = StyleSheet.create({
     color: "#111827",
   },
   activeCountBadge: {
-    backgroundColor: "#3B82F6",
+    backgroundColor: "#0D9488",
     borderRadius: 12,
     paddingHorizontal: 8,
     paddingVertical: 2,
@@ -740,7 +740,7 @@ const styles = StyleSheet.create({
     color: "#111827",
   },
   badge: {
-    backgroundColor: "#E8F4FF",
+    backgroundColor: "#F0FDFA",
     borderRadius: 10,
     paddingHorizontal: 6,
     paddingVertical: 2,
@@ -748,7 +748,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   badgeText: {
-    color: "#1E40AF",
+    color: "#0F766E",
     fontSize: 11,
     fontWeight: "600",
   },
@@ -803,8 +803,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   checkboxSelected: {
-    backgroundColor: "#3B82F6",
-    borderColor: "#3B82F6",
+    backgroundColor: "#0D9488",
+    borderColor: "#0D9488",
   },
   dateRangeContainer: {
     gap: 12,
@@ -906,7 +906,7 @@ const styles = StyleSheet.create({
   applyButton: {
     flex: 1,
     paddingVertical: 12,
-    backgroundColor: "#3B82F6",
+    backgroundColor: "#0D9488",
     borderRadius: 8,
     alignItems: "center",
   },
@@ -964,7 +964,7 @@ const styles = StyleSheet.create({
   presetSaveButton: {
     flex: 1,
     paddingVertical: 10,
-    backgroundColor: "#3B82F6",
+    backgroundColor: "#0D9488",
     borderRadius: 8,
     alignItems: "center",
   },

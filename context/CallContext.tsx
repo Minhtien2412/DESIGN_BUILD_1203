@@ -1,4 +1,5 @@
 import { apiFetch } from "@/services/api";
+import { getAccessToken as getFreshAccessToken } from "@/services/apiClient";
 import type { Socket } from "@/utils/socketIo";
 import { getSocketIo } from "@/utils/socketIo";
 import { getItem } from "@/utils/storage";
@@ -152,6 +153,24 @@ export function CallProvider({ children }: { children: React.ReactNode }) {
 
         socketRef.current = newSocket;
 
+        // Refresh token before each reconnect attempt to avoid jwt expired errors
+        newSocket.on("reconnect_attempt", async () => {
+          try {
+            const freshToken = await getFreshAccessToken();
+            if (freshToken && newSocket) {
+              (newSocket as any).auth = { token: freshToken };
+              console.log(
+                "📞 Call WebSocket: Token refreshed for reconnection",
+              );
+            }
+          } catch (err) {
+            console.warn(
+              "📞 Call WebSocket: Failed to refresh token for reconnection:",
+              err,
+            );
+          }
+        });
+
         newSocket.on("connect", () => {
           if (!isMounted) return;
           console.log("📞 Call WebSocket connected");
@@ -166,23 +185,37 @@ export function CallProvider({ children }: { children: React.ReactNode }) {
           setConnected(false);
         });
 
-        newSocket.on("connect_error", (error: any) => {
-          // Silently handle expected auth errors
+        newSocket.on("connect_error", async (error: any) => {
+          const errorMsg = error?.message || "";
+          // Handle token expiration: refresh and update auth for next reconnect
           if (
-            error?.message?.includes("Authentication") ||
-            error?.message?.includes("Invalid token")
+            errorMsg.includes("jwt expired") ||
+            errorMsg.includes("Invalid token") ||
+            errorMsg.includes("Authentication")
           ) {
             console.log(
-              "📞 Call WebSocket: Auth required (backend may not be configured)",
+              "📞 Call WebSocket: Token expired, refreshing for next reconnect...",
             );
+            try {
+              const freshToken = await getFreshAccessToken();
+              if (freshToken && newSocket) {
+                (newSocket as any).auth = { token: freshToken };
+                console.log(
+                  "📞 Call WebSocket: Token updated for reconnection",
+                );
+              }
+            } catch {
+              console.warn(
+                "📞 Call WebSocket: Token refresh failed on connect_error",
+              );
+            }
           } else {
             console.warn(
               "📞 Call WebSocket connection error:",
-              error?.message || "Connection failed",
+              errorMsg || "Connection failed",
             );
           }
           setConnected(false);
-          // Don't retry - will reconnect on next user login
         });
 
         newSocket.on("error", (error: any) => {

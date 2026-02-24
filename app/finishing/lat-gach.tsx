@@ -119,7 +119,7 @@ const WorkerCard: React.FC<WorkerCardProps> = ({ worker, onBooking }) => {
           <Text style={styles.workerName}>{worker.name}</Text>
           
           <View style={styles.ratingRow}>
-            <Ionicons name="star" size={14} color="#0066CC" />
+            <Ionicons name="star" size={14} color="#0D9488" />
             <Text style={styles.ratingText}>{worker.rating}</Text>
             <Text style={styles.reviewsText}>({worker.reviews})</Text>
           </View>
@@ -146,7 +146,7 @@ const WorkerCard: React.FC<WorkerCardProps> = ({ worker, onBooking }) => {
       </View>
 
       <View style={styles.teamRow}>
-        <Ionicons name="people" size={16} color="#0066CC" />
+        <Ionicons name="people" size={16} color="#0D9488" />
         <Text style={styles.teamText}>Đội {worker.teamSize} người</Text>
       </View>
 
@@ -343,7 +343,7 @@ export default function LatGachScreen() {
         </ScrollView>
 
         <View style={styles.infoBanner}>
-          <Ionicons name="shield-checkmark" size={16} color="#0066CC" />
+          <Ionicons name="shield-checkmark" size={16} color="#0D9488" />
           <Text style={styles.infoBannerText}>Thi công chuyên nghiệp • Bảo hành công trình</Text>
         </View>
       </View>
@@ -370,7 +370,7 @@ export default function LatGachScreen() {
                   <View style={styles.selectedWorkerText}>
                     <Text style={styles.selectedWorkerName}>{selectedWorker.name}</Text>
                     <View style={styles.selectedRating}>
-                      <Ionicons name="star" size={14} color="#0066CC" />
+                      <Ionicons name="star" size={14} color="#0D9488" />
                       <Text style={styles.selectedRatingText}>
                         {selectedWorker.rating} ({selectedWorker.reviews})
                       </Text>
@@ -512,15 +512,15 @@ const styles = StyleSheet.create({
   specialtiesSection: { marginBottom: 12 },
   specialtiesLabel: { fontSize: 12, fontWeight: '600', color: '#666', marginBottom: 6 },
   specialtiesTags: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
-  specialtyTag: { backgroundColor: '#E8F4FF', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
-  specialtyText: { fontSize: 11, fontWeight: '500', color: '#0066CC' },
+  specialtyTag: { backgroundColor: '#F0FDFA', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
+  specialtyText: { fontSize: 11, fontWeight: '500', color: '#0D9488' },
   teamRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12 },
   teamText: { fontSize: 12, color: '#666', flex: 1 },
   statsSection: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', paddingVertical: 12, marginBottom: 12, borderTopWidth: 1, borderBottomWidth: 1, borderColor: '#f0f0f0' },
   statItem: { alignItems: 'center' },
   statValue: { fontSize: 15, fontWeight: '700', color: '#333', marginBottom: 4 },
-  available: { color: '#0066CC' },
-  busy: { color: '#0066CC' },
+  available: { color: '#0D9488' },
+  busy: { color: '#0D9488' },
   statLabel: { fontSize: 11, color: '#999' },
   statDivider: { width: 1, height: 40, backgroundColor: '#f0f0f0' },
   priceRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
@@ -532,7 +532,7 @@ const styles = StyleSheet.create({
   emptyState: { alignItems: 'center', justifyContent: 'center', paddingVertical: 60 },
   emptyText: { fontSize: 15, color: '#999', marginTop: 16 },
   infoBanner: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#f1f8e9', paddingHorizontal: 16, paddingVertical: 10, gap: 8 },
-  infoBannerText: { fontSize: 12, color: '#0066CC', flex: 1 },
+  infoBannerText: { fontSize: 12, color: '#0D9488', flex: 1 },
   bookingModalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
   bookingModalContent: { backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '90%' },
   bookingModalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: '#f0f0f0' },

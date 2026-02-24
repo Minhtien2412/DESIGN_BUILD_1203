@@ -57,7 +57,7 @@ export const DEFAULT_RINGTONES: RingtoneOption[] = [
     isAI: false,
     duration: 30,
     icon: "notifications",
-    color: "#3B82F6",
+    color: "#0D9488",
   },
   {
     id: "modern_pulse",

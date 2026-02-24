@@ -1,7 +1,11 @@
 /**
- * Authentication API Client
+ * ⭐ CANONICAL Authentication API Client
  * Backend: https://baotienweb.cloud/api/v1/auth
  * Enhanced with OTP and Social Login support
+ *
+ * This is THE primary auth service for the app.
+ * Used by AuthContext.tsx (core auth provider).
+ * All other auth files (services/authApi.ts, services/auth.ts, etc.) are legacy/fallback.
  */
 
 import ENV from "../../config/env";
@@ -208,14 +212,18 @@ export interface VerifyOtpResponse {
 
 /**
  * Send OTP to phone number or email
- * Endpoint: POST /auth/send-otp
+ * Endpoint: POST /auth/otp/send
  */
 export async function sendOtp(dto: SendOtpDto): Promise<SendOtpResponse> {
   try {
     console.log("[authApi] Sending OTP to:", dto.value);
-    return await apiFetch<SendOtpResponse>("/auth/send-otp", {
+    return await apiFetch<SendOtpResponse>("/auth/otp/send", {
       method: "POST",
-      data: dto,
+      data: {
+        identifier: dto.value,
+        channel: dto.type === "phone" ? "SMS" : "EMAIL",
+        purpose: "LOGIN",
+      },
       headers: {
         "Content-Type": "application/json",
       },
@@ -228,14 +236,19 @@ export async function sendOtp(dto: SendOtpDto): Promise<SendOtpResponse> {
 
 /**
  * Verify OTP code
- * Endpoint: POST /auth/verify-otp
+ * Endpoint: POST /auth/otp/verify
  */
 export async function verifyOtp(dto: VerifyOtpDto): Promise<VerifyOtpResponse> {
   try {
     console.log("[authApi] Verifying OTP for:", dto.value);
-    return await apiFetch<VerifyOtpResponse>("/auth/verify-otp", {
+    return await apiFetch<VerifyOtpResponse>("/auth/otp/verify", {
       method: "POST",
-      data: dto,
+      data: {
+        identifier: dto.value,
+        otp: dto.otp,
+        channel: dto.type === "phone" ? "SMS" : "EMAIL",
+        purpose: "LOGIN",
+      },
       headers: {
         "Content-Type": "application/json",
       },
@@ -249,8 +262,8 @@ export async function verifyOtp(dto: VerifyOtpDto): Promise<VerifyOtpResponse> {
 // ==================== SOCIAL LOGIN TYPES ====================
 
 export interface SocialLoginDto {
-  provider: "google" | "facebook" | "apple";
-  token: string; // OAuth token from provider
+  provider: "GOOGLE" | "FACEBOOK" | "ZALO";
+  token: string; // OAuth id_token or access_token from provider
   userData?: {
     email?: string;
     name?: string;
@@ -259,15 +272,18 @@ export interface SocialLoginDto {
 }
 
 /**
- * Social login (Google, Facebook, Apple)
- * Endpoint: POST /auth/social-login
+ * Social login (Google, Facebook, Zalo)
+ * Endpoint: POST /auth/social/login
  */
 export async function socialLogin(dto: SocialLoginDto): Promise<AuthResponse> {
   try {
     console.log("[authApi] Social login via:", dto.provider);
-    return await apiFetch<AuthResponse>("/auth/social-login", {
+    return await apiFetch<AuthResponse>("/auth/social/login", {
       method: "POST",
-      data: dto,
+      data: {
+        provider: dto.provider,
+        token: dto.token,
+      },
       headers: {
         "Content-Type": "application/json",
       },

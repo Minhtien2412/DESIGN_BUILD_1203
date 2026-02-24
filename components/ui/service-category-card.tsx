@@ -17,17 +17,17 @@ interface ServiceCategoryCardProps {
 const CATEGORY_CONFIG = {
   construction: { 
     label: 'Thi công', 
-    color: '#3B82F6',
+    color: '#0D9488',
     icon: 'construct' as const
   },
   labor: { 
     label: 'Nhân công', 
-    color: '#0066CC',
+    color: '#0D9488',
     icon: 'people' as const
   },
   material: { 
     label: 'Vật tư', 
-    color: '#0066CC',
+    color: '#0D9488',
     icon: 'cube' as const
   },
   finishing: { 
@@ -122,7 +122,7 @@ export function ServiceCategoryCard({
         <View style={styles.features}>
           {service.features.slice(0, 3).map((feature, index) => (
             <View key={index} style={styles.featureItem}>
-              <Ionicons name="checkmark-circle" size={12} color="#0066CC" />
+              <Ionicons name="checkmark-circle" size={12} color="#0D9488" />
               <Text style={styles.featureText} numberOfLines={1}>
                 {feature}
               </Text>
@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
   },
   moreFeatures: {
     fontSize: 11,
-    color: '#3B82F6',
+    color: '#0D9488',
     fontWeight: '500',
     marginLeft: 18,
   },

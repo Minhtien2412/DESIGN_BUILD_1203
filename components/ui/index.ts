@@ -139,3 +139,9 @@ export {
 export { CRMDataList } from "./CRMDataList";
 export { SyncStatusBadge } from "./SyncStatusBadge";
 
+// ============================================
+// PROFILE & USER INTERACTION COMPONENTS
+// ============================================
+export { ProfilePreviewPopup } from "./ProfilePreviewPopup";
+export { TappableUser, type TappableUserProps } from "./TappableUser";
+

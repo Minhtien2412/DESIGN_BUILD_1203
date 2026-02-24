@@ -40,7 +40,7 @@ interface MindNode {
 }
 
 const NODE_COLORS = [
-  '#3b82f6', // blue
+  '#0D9488', // blue
   '#22c55e', // green
   '#f59e0b', // amber
   '#ef4444', // red
@@ -55,7 +55,7 @@ export default function MindMapScreen() {
   // Mind map với dữ liệu thực từ Perfex CRM
   // Projects: Nhà Anh Khương Q9, Biệt Thự 3 Tầng Anh Tiến Q7
   const [nodes, setNodes] = useState<MindNode[]>([
-    { id: '1', text: 'Dự án Thiết kế Resort', x: SCREEN_WIDTH / 2, y: 150, type: 'root', color: '#3b82f6' },
+    { id: '1', text: 'Dự án Thiết kế Resort', x: SCREEN_WIDTH / 2, y: 150, type: 'root', color: '#0D9488' },
     { id: '2', text: 'Nhà Anh Khương Q9', x: SCREEN_WIDTH / 2 - 150, y: 280, type: 'branch', color: '#22c55e', parentId: '1' },
     { id: '3', text: 'Biệt Thự Anh Tiến Q7', x: SCREEN_WIDTH / 2 + 150, y: 280, type: 'branch', color: '#f59e0b', parentId: '1' },
     { id: '4', text: 'Khảo sát đất', x: SCREEN_WIDTH / 2 - 220, y: 400, type: 'leaf', color: '#22c55e', parentId: '2' },
@@ -266,7 +266,7 @@ export default function MindMapScreen() {
       {/* Legend */}
       <View style={[styles.legend, { backgroundColor: cardBg }]}>
         <View style={styles.legendItem}>
-          <View style={[styles.legendDot, { backgroundColor: '#3b82f6' }]} />
+          <View style={[styles.legendDot, { backgroundColor: '#0D9488' }]} />
           <Text style={[styles.legendText, { color: textColor }]}>Gốc</Text>
         </View>
         <View style={styles.legendItem}>

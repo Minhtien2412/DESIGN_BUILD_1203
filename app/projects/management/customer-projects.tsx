@@ -48,8 +48,8 @@ const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 // Theme colors
 const COLORS = {
-  primary: "#0066CC",
-  primaryLight: "#3399FF",
+  primary: "#0D9488",
+  primaryLight: "#14B8A6",
   primaryDark: "#004499",
   background: "#F5F5F5",
   surface: "#FFFFFF",
@@ -58,22 +58,22 @@ const COLORS = {
   textMuted: "#999999",
   border: "#E0E0E0",
   success: "#14B159",
-  warning: "#0066CC",
+  warning: "#0D9488",
   error: "#E82A34",
-  info: "#0066CC",
+  info: "#0D9488",
 };
 
 // Project status config
 const PROJECT_STATUS = {
   DRAFT: { label: "Nháp", color: "#999999", bgColor: "#F5F5F5" },
-  PLANNING: { label: "Lên kế hoạch", color: "#0066CC", bgColor: "#E8F4FF" },
-  IN_PROGRESS: { label: "Đang thi công", color: "#0066CC", bgColor: "#E8F4FF" },
+  PLANNING: { label: "Lên kế hoạch", color: "#0D9488", bgColor: "#F0FDFA" },
+  IN_PROGRESS: { label: "Đang thi công", color: "#0D9488", bgColor: "#F0FDFA" },
   PENDING_REVIEW: {
     label: "Chờ nghiệm thu",
     color: "#999999",
     bgColor: "#F3E5F5",
   },
-  COMPLETED: { label: "Hoàn thành", color: "#0066CC", bgColor: "#E8F5E9" },
+  COMPLETED: { label: "Hoàn thành", color: "#0D9488", bgColor: "#E8F5E9" },
   ON_HOLD: { label: "Tạm dừng", color: "#000000", bgColor: "#F5F5F5" },
   CANCELLED: { label: "Đã hủy", color: "#757575", bgColor: "#EEEEEE" },
 };
@@ -1086,7 +1086,7 @@ const styles = StyleSheet.create({
   },
   statBadge: {
     alignItems: "center",
-    backgroundColor: "#E8F4FF",
+    backgroundColor: "#F0FDFA",
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 8,

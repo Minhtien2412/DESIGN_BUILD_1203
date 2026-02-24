@@ -165,7 +165,7 @@ export default function MessageInput({
           }}
           disabled={disabled}
         >
-          <Ionicons name="mic-outline" size={24} color={disabled ? '#ccc' : '#0066CC'} />
+          <Ionicons name="mic-outline" size={24} color={disabled ? '#ccc' : '#0D9488'} />
         </TouchableOpacity>
       )}
     </View>
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 8,

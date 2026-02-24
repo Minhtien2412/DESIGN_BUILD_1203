@@ -23,21 +23,21 @@ export default function AIWidget({ insights }: AIWidgetProps) {
       icon: 'camera-outline',
       label: 'Phân tích ảnh',
       route: '/ai/photo-analysis',
-      color: '#3B82F6',
+      color: '#0D9488',
     },
     {
       id: 2,
       icon: 'chatbubble-outline',
       label: 'Chat AI',
       route: '/ai/index',
-      color: '#0066CC',
+      color: '#0D9488',
     },
     {
       id: 3,
       icon: 'document-text-outline',
       label: 'Báo cáo',
       route: '/ai/generate-report',
-      color: '#0066CC',
+      color: '#0D9488',
     },
     {
       id: 4,
@@ -75,7 +75,7 @@ export default function AIWidget({ insights }: AIWidgetProps) {
         <View style={styles.insightsContainer}>
           <View style={styles.insightCard}>
             <View style={styles.insightIcon}>
-              <Ionicons name="trending-up" size={16} color="#0066CC" />
+              <Ionicons name="trending-up" size={16} color="#0D9488" />
             </View>
             <View style={styles.insightContent}>
               <Text style={styles.insightLabel}>Tiến độ hôm nay</Text>
@@ -87,7 +87,7 @@ export default function AIWidget({ insights }: AIWidgetProps) {
 
           <View style={styles.insightCard}>
             <View style={styles.insightIcon}>
-              <Ionicons name="checkmark-circle" size={16} color="#3B82F6" />
+              <Ionicons name="checkmark-circle" size={16} color="#0D9488" />
             </View>
             <View style={styles.insightContent}>
               <Text style={styles.insightLabel}>Công việc</Text>
@@ -99,7 +99,7 @@ export default function AIWidget({ insights }: AIWidgetProps) {
 
           <View style={styles.insightCard}>
             <View style={styles.insightIcon}>
-              <Ionicons name="bulb" size={16} color="#0066CC" />
+              <Ionicons name="bulb" size={16} color="#0D9488" />
             </View>
             <View style={styles.insightContent}>
               <Text style={styles.insightLabel}>Gợi ý AI</Text>
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     marginRight: 8,
   },
   statusText: {

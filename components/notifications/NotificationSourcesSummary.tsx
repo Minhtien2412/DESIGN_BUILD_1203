@@ -122,7 +122,7 @@ export function NotificationSourcesSummary({
     { id: 'messages', name: 'Tin nhắn', icon: 'chatbubbles', color: '#dc2626' },
     { id: 'missedCalls', name: 'Cuộc gọi nhỡ', icon: 'call', color: '#ea580c' },
     { id: 'notifications', name: 'Thông báo', icon: 'notifications', color: '#16a34a' },
-    { id: 'tasks', name: 'Công việc', icon: 'checkbox', color: '#2563eb' },
+    { id: 'tasks', name: 'Công việc', icon: 'checkbox', color: '#0D9488' },
     { id: 'tickets', name: 'Hỗ trợ', icon: 'ticket', color: '#7c3aed' },
     { id: 'projects', name: 'Dự án', icon: 'briefcase', color: '#0891b2' },
     { id: 'crm', name: 'CRM', icon: 'business', color: '#be185d' },
@@ -224,7 +224,7 @@ export function NotificationSourcesSummary({
             icon="checkbox"
             label="Công việc"
             value={badges.tasks}
-            color="#2563eb"
+            color="#0D9488"
           />
           <StatCard
             icon="briefcase"

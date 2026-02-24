@@ -131,7 +131,7 @@ export default function SiteMapScreen() {
                     >
                       <View style={styles.routeIcon}>
                         {route.icon ? (
-                          <Ionicons name={route.icon as any} size={20} color="#3b82f6" />
+                          <Ionicons name={route.icon as any} size={20} color="#0D9488" />
                         ) : (
                           <Ionicons name="link" size={20} color="#9ca3af" />
                         )}
@@ -144,7 +144,7 @@ export default function SiteMapScreen() {
                         )}
                         {route.requiresAuth && (
                           <View style={styles.badge}>
-                            <Ionicons name="lock-closed" size={10} color="#0066CC" />
+                            <Ionicons name="lock-closed" size={10} color="#0D9488" />
                             <Text style={styles.badgeText}>Yêu cầu đăng nhập</Text>
                           </View>
                         )}
@@ -177,7 +177,7 @@ export default function SiteMapScreen() {
                 >
                   <View style={styles.routeIcon}>
                     {route.icon ? (
-                      <Ionicons name={route.icon as any} size={20} color="#3b82f6" />
+                      <Ionicons name={route.icon as any} size={20} color="#0D9488" />
                     ) : (
                       <Ionicons name="link" size={20} color="#9ca3af" />
                     )}
@@ -190,7 +190,7 @@ export default function SiteMapScreen() {
                     )}
                     {route.requiresAuth && (
                       <View style={styles.badge}>
-                        <Ionicons name="lock-closed" size={10} color="#0066CC" />
+                        <Ionicons name="lock-closed" size={10} color="#0D9488" />
                         <Text style={styles.badgeText}>Yêu cầu đăng nhập</Text>
                       </View>
                     )}
@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   categoryChipActive: {
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#0D9488',
   },
   categoryText: {
     fontSize: 13,
@@ -354,7 +354,7 @@ const styles = StyleSheet.create({
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     borderRadius: 8,
   },
   routeInfo: {
@@ -390,7 +390,7 @@ const styles = StyleSheet.create({
   badgeText: {
     fontSize: 10,
     fontWeight: '600',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   emptyState: {
     alignItems: 'center',

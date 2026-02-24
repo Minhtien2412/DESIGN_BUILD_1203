@@ -74,14 +74,14 @@ const styles = StyleSheet.create({
   },
   pending: {
     backgroundColor: '#fef3c7',
-    borderColor: '#0066CC',
+    borderColor: '#0D9488',
   },
   pendingText: {
     color: '#92400e',
   },
   approved: {
     backgroundColor: '#d1fae5',
-    borderColor: '#0066CC',
+    borderColor: '#0D9488',
   },
   approvedText: {
     color: '#065f46',

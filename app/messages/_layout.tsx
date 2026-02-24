@@ -31,7 +31,7 @@ export default function MessagesLayout() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0068FF" />
+        <ActivityIndicator size="large" color="#0D9488" />
         <Text style={styles.loadingText}>Đang tải...</Text>
       </View>
     );
@@ -43,7 +43,7 @@ export default function MessagesLayout() {
       <View style={styles.authContainer}>
         <View style={styles.authContent}>
           <View style={styles.iconContainer}>
-            <Ionicons name="chatbubbles" size={80} color="#0068FF" />
+            <Ionicons name="chatbubbles" size={80} color="#0D9488" />
           </View>
           <Text style={styles.authTitle}>Đăng nhập để nhắn tin</Text>
           <Text style={styles.authSubtitle}>
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#0068FF",
+    backgroundColor: "#0D9488",
     paddingVertical: 14,
     paddingHorizontal: 32,
     borderRadius: 12,
@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   registerButtonText: {
-    color: "#0068FF",
+    color: "#0D9488",
     fontSize: 14,
     fontWeight: "500",
   },

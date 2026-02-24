@@ -19,7 +19,7 @@ export function ConstructionProgressCard({
   totalTasks = 0,
   completedTasks = 0,
 }: ConstructionProgressCardProps) {
-  const progressColor = progress < 40 ? '#000000' : progress < 80 ? '#0066CC' : '#0066CC';
+  const progressColor = progress < 40 ? '#000000' : progress < 80 ? '#0D9488' : '#0D9488';
   const progressBg = progress < 40 ? '#ffebee' : progress < 80 ? '#F0F8FF' : '#e8f5e9';
 
   const handlePress = () => {
@@ -61,11 +61,11 @@ export function ConstructionProgressCard({
 
       <View style={styles.footer}>
         <View style={styles.stat}>
-          <Ionicons name="checkbox" size={16} color="#0066CC" />
+          <Ionicons name="checkbox" size={16} color="#0D9488" />
           <Text style={styles.statText}>{completedTasks} hoàn thành</Text>
         </View>
         <View style={styles.stat}>
-          <Ionicons name="time" size={16} color="#0066CC" />
+          <Ionicons name="time" size={16} color="#0D9488" />
           <Text style={styles.statText}>{totalTasks - completedTasks} đang làm</Text>
         </View>
       </View>

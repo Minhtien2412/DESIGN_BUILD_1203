@@ -29,7 +29,7 @@ import {
 } from 'react-native';
 
 const { width } = Dimensions.get('window');
-const SHOPEE_ORANGE = '#0066CC';
+const SHOPEE_ORANGE = '#0D9488';
 const SHOPEE_ORANGE_LIGHT = '#FF6533';
 
 // Quick Action Cards for different roles
@@ -49,7 +49,7 @@ const QUICK_ACTIONS: QuickAction[] = [
     title: 'Khách hàng',
     subtitle: 'Quản lý khách hàng & dự án',
     icon: 'people',
-    color: '#0066CC',
+    color: '#0D9488',
     route: '/projects/customer-projects',
     roles: ['ADMIN', 'MANAGER'],
   },
@@ -67,7 +67,7 @@ const QUICK_ACTIONS: QuickAction[] = [
     title: 'Công trình của tôi',
     subtitle: 'Dự án được giao',
     icon: 'briefcase',
-    color: '#0066CC',
+    color: '#0D9488',
     route: '/projects/customer-projects?view=my-projects',
     roles: ['CONTRACTOR', 'WORKER', 'ENGINEER'],
   },
@@ -76,7 +76,7 @@ const QUICK_ACTIONS: QuickAction[] = [
     title: 'Việc cần làm',
     subtitle: 'Todo & Tasks được giao',
     icon: 'checkbox',
-    color: '#0066CC',
+    color: '#0D9488',
     route: '/projects/timeline-mindmap?tab=todos',
     roles: ['CONTRACTOR', 'WORKER', 'ENGINEER'],
   },
@@ -147,9 +147,9 @@ export default function ProjectsHubScreen() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'IN_PROGRESS': return SHOPEE_ORANGE;
-      case 'COMPLETED': return '#0066CC';
-      case 'PLANNING': return '#0066CC';
-      case 'ON_HOLD': return '#0066CC';
+      case 'COMPLETED': return '#0D9488';
+      case 'PLANNING': return '#0D9488';
+      case 'ON_HOLD': return '#0D9488';
       default: return '#999999';
     }
   };
@@ -196,7 +196,7 @@ export default function ProjectsHubScreen() {
 
       {/* Data Source Badge */}
       <View style={styles.dataSourceBadge}>
-        <View style={[styles.dataSourceDot, { backgroundColor: dataSource === 'crm' ? '#0066CC' : '#0066CC' }]} />
+        <View style={[styles.dataSourceDot, { backgroundColor: dataSource === 'crm' ? '#0D9488' : '#0D9488' }]} />
         <Text style={styles.dataSourceText}>
           {dataSource === 'crm' ? 'Live CRM' : 'Demo'}
         </Text>
@@ -215,12 +215,12 @@ export default function ProjectsHubScreen() {
           <Text style={styles.statLabel}>Tổng dự án</Text>
         </View>
         <View style={styles.statCard}>
-          <Ionicons name="play-circle" size={24} color="#0066CC" />
+          <Ionicons name="play-circle" size={24} color="#0D9488" />
           <Text style={styles.statValue}>{stats.activeProjects}</Text>
           <Text style={styles.statLabel}>Đang thực hiện</Text>
         </View>
         <View style={styles.statCard}>
-          <Ionicons name="checkbox" size={24} color="#0066CC" />
+          <Ionicons name="checkbox" size={24} color="#0D9488" />
           <Text style={styles.statValue}>{stats.pendingTodos}</Text>
           <Text style={styles.statLabel}>Việc cần làm</Text>
         </View>

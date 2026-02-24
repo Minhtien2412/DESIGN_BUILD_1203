@@ -38,11 +38,11 @@ const STATUS_FILTERS: { value: TestStatus | 'ALL'; label: string }[] = [
 
 const STATUS_COLORS: Record<TestStatus, string> = {
   PENDING: '#6B7280',
-  IN_PROGRESS: '#0066CC',
-  COMPLETED: '#3B82F6',
-  PASSED: '#0066CC',
+  IN_PROGRESS: '#0D9488',
+  COMPLETED: '#0D9488',
+  PASSED: '#0D9488',
   FAILED: '#000000',
-  RETEST_REQUIRED: '#0066CC',
+  RETEST_REQUIRED: '#0D9488',
   CANCELLED: '#9CA3AF',
 };
 
@@ -92,7 +92,7 @@ export default function TestsScreen() {
   if (loading && !tests.length) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#3B82F6" />
+        <ActivityIndicator size="large" color="#0D9488" />
       </View>
     );
   }
@@ -106,7 +106,7 @@ export default function TestsScreen() {
     <View style={styles.container}>
       {/* Stats Cards */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.statsContainer}>
-        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
+        <View style={[styles.statCard, { backgroundColor: '#F0FDFA' }]}>
           <Text style={styles.statValue}>{tests.length}</Text>
           <Text style={styles.statLabel}>Total Tests</Text>
         </View>
@@ -117,12 +117,12 @@ export default function TestsScreen() {
         </View>
 
         <View style={[styles.statCard, { backgroundColor: '#FEF3C7' }]}>
-          <Text style={[styles.statValue, { color: '#0066CC' }]}>{inProgressCount}</Text>
+          <Text style={[styles.statValue, { color: '#0D9488' }]}>{inProgressCount}</Text>
           <Text style={styles.statLabel}>In Progress</Text>
         </View>
 
         <View style={[styles.statCard, { backgroundColor: '#D1FAE5' }]}>
-          <Text style={[styles.statValue, { color: '#0066CC' }]}>{passedCount}</Text>
+          <Text style={[styles.statValue, { color: '#0D9488' }]}>{passedCount}</Text>
           <Text style={styles.statLabel}>Passed</Text>
         </View>
 
@@ -133,7 +133,7 @@ export default function TestsScreen() {
 
         {analytics && (
           <View style={[styles.statCard, { backgroundColor: '#F3F4F6' }]}>
-            <Text style={[styles.statValue, { color: '#0066CC' }]}>
+            <Text style={[styles.statValue, { color: '#0D9488' }]}>
               {analytics.summary.testPassRate.toFixed(1)}%
             </Text>
             <Text style={styles.statLabel}>Pass Rate</Text>
@@ -253,7 +253,7 @@ export default function TestsScreen() {
                         TEST_TYPES.find(t => t.value === test.type)?.icon as any || 'flask-outline'
                       }
                       size={12}
-                      color="#3B82F6"
+                      color="#0D9488"
                       style={{ marginRight: 4 }}
                     />
                     <Text style={styles.typeBadgeText}>{test.type.replace(/_/g, ' ')}</Text>
@@ -302,7 +302,7 @@ export default function TestsScreen() {
                       <Text
                         style={[
                           styles.passRateText,
-                          { color: test.result.passRate >= 80 ? '#0066CC' : '#000000' },
+                          { color: test.result.passRate >= 80 ? '#0D9488' : '#000000' },
                         ]}
                       >
                         {test.result.passRate.toFixed(0)}% Pass
@@ -312,7 +312,7 @@ export default function TestsScreen() {
 
                   {test.parameters.slice(0, 4).map((param, index) => {
                     const resultColor =
-                      param.result === 'PASS' ? '#0066CC' : param.result === 'FAIL' ? '#000000' : '#6B7280';
+                      param.result === 'PASS' ? '#0D9488' : param.result === 'FAIL' ? '#000000' : '#6B7280';
 
                     return (
                       <View key={index} style={styles.parameterItem}>
@@ -368,7 +368,7 @@ export default function TestsScreen() {
 
                   {test.result.recommendations && (
                     <View style={styles.recommendationsBox}>
-                      <Ionicons name="bulb-outline" size={14} color="#0066CC" />
+                      <Ionicons name="bulb-outline" size={14} color="#0D9488" />
                       <Text style={styles.recommendationsText}>
                         {test.result.recommendations}
                       </Text>
@@ -381,7 +381,7 @@ export default function TestsScreen() {
               {test.result?.certifiedBy && (
                 <View style={styles.certificationSection}>
                   <View style={styles.certificationRow}>
-                    <Ionicons name="ribbon-outline" size={14} color="#0066CC" />
+                    <Ionicons name="ribbon-outline" size={14} color="#0D9488" />
                     <Text style={styles.certificationText}>
                       Certificate #{test.result.certificateNumber}
                     </Text>
@@ -400,7 +400,7 @@ export default function TestsScreen() {
               {/* Retest Warning */}
               {test.result?.retestRequired && test.result.retestParameters && (
                 <View style={styles.retestWarning}>
-                  <Ionicons name="alert-circle" size={16} color="#0066CC" />
+                  <Ionicons name="alert-circle" size={16} color="#0D9488" />
                   <Text style={styles.retestWarningText}>
                     Retest required for {test.result.retestParameters.length} parameter(s)
                   </Text>
@@ -410,7 +410,7 @@ export default function TestsScreen() {
               {/* Actions */}
               <View style={styles.actions}>
                 <TouchableOpacity style={styles.actionButton}>
-                  <Ionicons name="eye-outline" size={18} color="#3B82F6" />
+                  <Ionicons name="eye-outline" size={18} color="#0D9488" />
                   <Text style={styles.actionButtonText}>View</Text>
                 </TouchableOpacity>
 
@@ -450,8 +450,8 @@ export default function TestsScreen() {
 
                 {test.certificateUrl && (
                   <TouchableOpacity style={styles.actionButton}>
-                    <Ionicons name="document-text-outline" size={18} color="#0066CC" />
-                    <Text style={[styles.actionButtonText, { color: '#0066CC' }]}>
+                    <Ionicons name="document-text-outline" size={18} color="#0D9488" />
+                    <Text style={[styles.actionButtonText, { color: '#0D9488' }]}>
                       Certificate
                     </Text>
                   </TouchableOpacity>
@@ -544,8 +544,8 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   filterChipActive: {
-    backgroundColor: '#3B82F6',
-    borderColor: '#3B82F6',
+    backgroundColor: '#0D9488',
+    borderColor: '#0D9488',
   },
   filterChipText: {
     fontSize: 13,
@@ -615,14 +615,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 8,
     paddingVertical: 4,
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     borderRadius: 6,
     alignSelf: 'flex-start',
   },
   typeBadgeText: {
     fontSize: 10,
     fontWeight: '600',
-    color: '#1D4ED8',
+    color: '#0F766E',
   },
   infoSection: {
     marginBottom: 12,
@@ -774,13 +774,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#F3F4F6',
   },
   actionButtonPrimary: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#0D9488',
   },
   actionButtonSuccess: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   actionButtonWarning: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   actionButtonText: {
     fontSize: 12,

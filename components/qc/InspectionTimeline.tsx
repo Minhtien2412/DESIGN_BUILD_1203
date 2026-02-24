@@ -21,27 +21,27 @@ interface InspectionTimelineProps {
 const EVENT_CONFIG = {
   created: {
     icon: 'add-circle',
-    color: '#0066CC',
-    bgColor: '#E8F4FF',
+    color: '#0D9488',
+    bgColor: '#F0FDFA',
   },
   status_change: {
     icon: 'swap-horizontal',
-    color: '#0066CC',
-    bgColor: '#E8F4FF',
+    color: '#0D9488',
+    bgColor: '#F0FDFA',
   },
   comment: {
     icon: 'chatbox',
-    color: '#0066CC',
+    color: '#0D9488',
     bgColor: '#F3E5F5',
   },
   photo: {
     icon: 'camera',
-    color: '#0066CC',
+    color: '#0D9488',
     bgColor: '#E0F7FA',
   },
   resolved: {
     icon: 'checkmark-circle',
-    color: '#0066CC',
+    color: '#0D9488',
     bgColor: '#E8F5E9',
   },
 };

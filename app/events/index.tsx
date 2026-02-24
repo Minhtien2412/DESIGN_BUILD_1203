@@ -1,11 +1,15 @@
 import { TappableImage } from "@/components/ui/full-media-viewer";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { get } from "@/services/api";
 import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 import { Stack, useRouter } from "expo-router";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
+    Alert,
     Dimensions,
     FlatList,
+    RefreshControl,
     ScrollView,
     StyleSheet,
     Text,
@@ -80,6 +84,57 @@ export default function EventsScreen() {
   const cardBg = useThemeColor({}, "card");
   const router = useRouter();
   const [activeCategory, setActiveCategory] = useState("all");
+  const [refreshing, setRefreshing] = useState(false);
+  const [eventList, setEventList] = useState(events);
+
+  const fetchEvents = useCallback(async () => {
+    try {
+      const res = await get("/api/events");
+      if (res?.data) setEventList(res.data);
+    } catch {
+      /* mock */
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchEvents();
+  }, [fetchEvents]);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchEvents();
+    setRefreshing(false);
+  }, [fetchEvents]);
+
+  const handleRegister = useCallback((event: (typeof events)[0]) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    if (event.isRegistered) {
+      Alert.alert("Hủy đăng ký", `Bạn muốn hủy đăng ký ${event.title}?`, [
+        { text: "Không" },
+        {
+          text: "Hủy",
+          style: "destructive",
+          onPress: () =>
+            setEventList((prev) =>
+              prev.map((e) =>
+                e.id === event.id
+                  ? { ...e, isRegistered: false, attendees: e.attendees - 1 }
+                  : e,
+              ),
+            ),
+        },
+      ]);
+    } else {
+      Alert.alert("Đăng ký thành công! 🎉", `Bạn đã đăng ký ${event.title}`);
+      setEventList((prev) =>
+        prev.map((e) =>
+          e.id === event.id
+            ? { ...e, isRegistered: true, attendees: e.attendees + 1 }
+            : e,
+        ),
+      );
+    }
+  }, []);
 
   const formatAttendees = (num: number) => {
     if (num >= 1000) return (num / 1000).toFixed(1) + "k";
@@ -95,7 +150,7 @@ export default function EventsScreen() {
           title={item.title}
           description={item.location}
         />
-        <View style={[styles.categoryBadge, { backgroundColor: "#FF6B35" }]}>
+        <View style={[styles.categoryBadge, { backgroundColor: "#0D9488" }]}>
           <Text style={styles.categoryBadgeText}>{item.category}</Text>
         </View>
         {item.isRegistered && (
@@ -116,11 +171,11 @@ export default function EventsScreen() {
 
         <View style={styles.eventInfo}>
           <View style={styles.infoRow}>
-            <Ionicons name="calendar-outline" size={14} color="#FF6B35" />
+            <Ionicons name="calendar-outline" size={14} color="#14B8A6" />
             <Text style={styles.infoText}>{item.date}</Text>
           </View>
           <View style={styles.infoRow}>
-            <Ionicons name="location-outline" size={14} color="#FF6B35" />
+            <Ionicons name="location-outline" size={14} color="#14B8A6" />
             <Text style={styles.infoText} numberOfLines={1}>
               {item.location}
             </Text>
@@ -151,6 +206,7 @@ export default function EventsScreen() {
             styles.registerBtn,
             item.isRegistered && styles.registerBtnDisabled,
           ]}
+          onPress={() => handleRegister(item)}
         >
           <Text style={styles.registerBtnText}>
             {item.isRegistered ? "Đã đăng ký" : "Đăng ký ngay"}
@@ -198,16 +254,23 @@ export default function EventsScreen() {
       </ScrollView>
 
       <FlatList
-        data={events}
+        data={eventList}
         renderItem={renderEvent}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContent}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#14B8A6"
+          />
+        }
         ListHeaderComponent={
           <View style={styles.headerInfo}>
-            <Ionicons name="calendar" size={20} color="#FF6B35" />
+            <Ionicons name="calendar" size={20} color="#14B8A6" />
             <Text style={[styles.headerText, { color: textColor }]}>
-              {events.length} sự kiện sắp diễn ra
+              {eventList.length} sự kiện sắp diễn ra
             </Text>
           </View>
         }
@@ -217,22 +280,24 @@ export default function EventsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { flex: 1, backgroundColor: "#F8FAFB" },
   categoriesContainer: { maxHeight: 54 },
   categoriesContent: { paddingHorizontal: 12, paddingVertical: 8 },
   categoryBtn: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 14,
+    paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#FFFFFF",
     marginRight: 8,
     gap: 6,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
   },
-  categoryBtnActive: { backgroundColor: "#FF6B35" },
-  categoryText: { color: "#666", fontSize: 13 },
-  categoryTextActive: { color: "#fff" },
+  categoryBtnActive: { backgroundColor: "#0D9488", borderColor: "#0D9488" },
+  categoryText: { color: "#6B7280", fontSize: 13, fontWeight: "500" },
+  categoryTextActive: { color: "#fff", fontWeight: "600" },
   listContent: { padding: 16 },
   headerInfo: {
     flexDirection: "row",
@@ -241,7 +306,16 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   headerText: { fontSize: 14 },
-  eventCard: { borderRadius: 16, overflow: "hidden", marginBottom: 16 },
+  eventCard: {
+    borderRadius: 20,
+    overflow: "hidden",
+    marginBottom: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
+  },
   imageContainer: { position: "relative" },
   eventImage: { width: "100%", height: 150, backgroundColor: "#f0f0f0" },
   categoryBadge: {
@@ -268,10 +342,11 @@ const styles = StyleSheet.create({
   registeredText: { color: "#fff", fontSize: 11 },
   eventContent: { padding: 16 },
   eventTitle: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: 17,
+    fontWeight: "700",
     marginBottom: 12,
     lineHeight: 22,
+    letterSpacing: -0.2,
   },
   eventInfo: { gap: 8, marginBottom: 12 },
   infoRow: { flexDirection: "row", alignItems: "center", gap: 8 },
@@ -283,15 +358,25 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   priceBox: {},
-  priceText: { color: "#FF6B35", fontSize: 16, fontWeight: "bold" },
+  priceText: {
+    color: "#0D9488",
+    fontSize: 18,
+    fontWeight: "800",
+    letterSpacing: -0.3,
+  },
   attendeesBox: { flexDirection: "row", alignItems: "center", gap: 4 },
   attendeesText: { color: "#666", fontSize: 13 },
   registerBtn: {
-    backgroundColor: "#FF6B35",
-    paddingVertical: 12,
-    borderRadius: 10,
+    backgroundColor: "#0D9488",
+    paddingVertical: 14,
+    borderRadius: 14,
     alignItems: "center",
+    shadowColor: "#0D9488",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 3,
   },
-  registerBtnDisabled: { backgroundColor: "#ccc" },
-  registerBtnText: { color: "#fff", fontSize: 14, fontWeight: "600" },
+  registerBtnDisabled: { backgroundColor: "#D1D5DB", shadowOpacity: 0 },
+  registerBtnText: { color: "#fff", fontSize: 15, fontWeight: "700" },
 });

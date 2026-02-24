@@ -374,7 +374,7 @@ async function sendViaEmail(request: SendOTPRequest): Promise<SendOTPResponse | 
           type: 'text/html',
           value: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-              <h2 style="color: #2563eb;">Xác thực tài khoản ThietKeResort</h2>
+              <h2 style="color: #0D9488;">Xác thực tài khoản ThietKeResort</h2>
               <p>Mã xác thực của bạn là:</p>
               <div style="background: #f3f4f6; padding: 20px; text-align: center; border-radius: 8px; margin: 20px 0;">
                 <span style="font-size: 32px; font-weight: bold; letter-spacing: 8px; color: #1f2937;">${otp}</span>

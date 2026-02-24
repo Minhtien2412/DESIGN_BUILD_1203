@@ -88,13 +88,13 @@ export const ProjectSelector: React.FC<ProjectSelectorProps> = ({
   const getStatusColor = (status?: string): string => {
     switch (status) {
       case "Planning":
-        return "#0066CC";
+        return "#0D9488";
       case "InProgress":
-        return "#3B82F6";
+        return "#0D9488";
       case "OnHold":
         return "#000000";
       case "Completed":
-        return "#0066CC";
+        return "#0D9488";
       case "Cancelled":
         return "#6B7280";
       default:
@@ -121,7 +121,7 @@ export const ProjectSelector: React.FC<ProjectSelectorProps> = ({
             </Text>
             {isSelected && (
               <View style={styles.selectedBadge}>
-                <Ionicons name="checkmark-circle" size={20} color="#0066CC" />
+                <Ionicons name="checkmark-circle" size={20} color="#0D9488" />
               </View>
             )}
           </View>
@@ -163,7 +163,7 @@ export const ProjectSelector: React.FC<ProjectSelectorProps> = ({
             <Ionicons
               name="checkmark-circle-outline"
               size={16}
-              color="#0066CC"
+              color="#0D9488"
             />
             <Text style={styles.statText}>
               {stats.completedTasks} hoàn thành
@@ -278,7 +278,7 @@ export const ProjectSelector: React.FC<ProjectSelectorProps> = ({
         >
           {loading ? (
             <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color="#3B82F6" />
+              <ActivityIndicator size="large" color="#0D9488" />
               <Text style={styles.loadingText}>Đang tải dự án...</Text>
             </View>
           ) : filteredProjects.length === 0 ? (
@@ -377,7 +377,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFF",
   },
   tabActive: {
-    backgroundColor: "#3B82F6",
+    backgroundColor: "#0D9488",
   },
   tabText: {
     fontSize: 14,
@@ -424,7 +424,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    backgroundColor: "#3B82F6",
+    backgroundColor: "#0D9488",
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 8,
@@ -451,7 +451,7 @@ const styles = StyleSheet.create({
   },
   projectCardSelected: {
     borderWidth: 2,
-    borderColor: "#0066CC",
+    borderColor: "#0D9488",
   },
   projectHeader: {
     flexDirection: "row",
@@ -519,7 +519,7 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: "100%",
-    backgroundColor: "#0066CC",
+    backgroundColor: "#0D9488",
     borderRadius: 3,
   },
   progressText: {
@@ -552,7 +552,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: "#3B82F6",
+    backgroundColor: "#0D9488",
     justifyContent: "center",
     alignItems: "center",
     shadowColor: "#000",

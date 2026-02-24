@@ -234,8 +234,8 @@ export const FILTER_PRESETS = {
       id: "in-use",
       label: "Đang dùng",
       icon: "construct" as const,
-      color: "#3B82F6",
-      gradient: ["#3B82F6", "#60A5FA"] as const,
+      color: "#0D9488",
+      gradient: ["#0D9488", "#2DD4BF"] as const,
     },
     {
       id: "maintenance",
@@ -301,8 +301,8 @@ export const FILTER_PRESETS = {
       id: "in-progress",
       label: "Đang thực hiện",
       icon: "play-circle" as const,
-      color: "#3B82F6",
-      gradient: ["#3B82F6", "#60A5FA"] as const,
+      color: "#0D9488",
+      gradient: ["#0D9488", "#2DD4BF"] as const,
     },
     {
       id: "completed",

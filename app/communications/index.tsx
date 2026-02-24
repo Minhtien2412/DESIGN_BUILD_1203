@@ -235,9 +235,9 @@ export default function CommunicationsScreen() {
       case "missed":
         return "#000000";
       case "completed":
-        return "#0066CC";
+        return "#0D9488";
       case "declined":
-        return "#0066CC";
+        return "#0D9488";
       case "failed":
         return "#000000";
       default:
@@ -400,7 +400,7 @@ export default function CommunicationsScreen() {
 
     return (
       <View style={styles.loadingFooter}>
-        <ActivityIndicator size="small" color="#0066CC" />
+        <ActivityIndicator size="small" color="#0D9488" />
       </View>
     );
   };
@@ -434,7 +434,7 @@ export default function CommunicationsScreen() {
           <Ionicons
             name="chatbubbles"
             size={20}
-            color={activeTab === "messages" ? "#0066CC" : "#999"}
+            color={activeTab === "messages" ? "#0D9488" : "#999"}
           />
           <Text
             style={[
@@ -453,7 +453,7 @@ export default function CommunicationsScreen() {
           <Ionicons
             name="call"
             size={20}
-            color={activeTab === "calls" ? "#0066CC" : "#999"}
+            color={activeTab === "calls" ? "#0D9488" : "#999"}
           />
           <Text
             style={[
@@ -469,7 +469,7 @@ export default function CommunicationsScreen() {
       {/* Content */}
       {isLoading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#0066CC" />
+          <ActivityIndicator size="large" color="#0D9488" />
           <Text style={styles.loadingText}>Đang tải...</Text>
         </View>
       ) : activeTab === "messages" ? (
@@ -486,8 +486,8 @@ export default function CommunicationsScreen() {
             <RefreshControl
               refreshing={isRefreshing}
               onRefresh={handleRefresh}
-              colors={["#0066CC"]}
-              tintColor="#0066CC"
+              colors={["#0D9488"]}
+              tintColor="#0D9488"
             />
           }
           onEndReached={handleLoadMore}
@@ -507,8 +507,8 @@ export default function CommunicationsScreen() {
             <RefreshControl
               refreshing={isRefreshing}
               onRefresh={handleRefresh}
-              colors={["#0066CC"]}
-              tintColor="#0066CC"
+              colors={["#0D9488"]}
+              tintColor="#0D9488"
             />
           }
           onEndReached={handleLoadMore}
@@ -562,7 +562,7 @@ const styles = StyleSheet.create({
   },
   activeTab: {
     borderBottomWidth: 2,
-    borderBottomColor: "#0066CC",
+    borderBottomColor: "#0D9488",
   },
   tabText: {
     fontSize: 15,
@@ -570,7 +570,7 @@ const styles = StyleSheet.create({
     color: "#999",
   },
   activeTabText: {
-    color: "#0066CC",
+    color: "#0D9488",
   },
   list: {
     paddingVertical: 8,
@@ -606,7 +606,7 @@ const styles = StyleSheet.create({
     width: 14,
     height: 14,
     borderRadius: 7,
-    backgroundColor: "#0066CC",
+    backgroundColor: "#0D9488",
     borderWidth: 2,
     borderColor: "#fff",
   },

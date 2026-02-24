@@ -355,7 +355,7 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   thumbnailActive: {
-    borderColor: '#0066CC',
+    borderColor: '#0D9488',
   },
   thumbnailImage: {
     width: '100%',
@@ -466,7 +466,7 @@ const styles = StyleSheet.create({
   },
   outlineButton: {
     borderWidth: 2,
-    borderColor: '#0066CC',
+    borderColor: '#0D9488',
     backgroundColor: 'transparent',
   },
   outlineButtonText: {

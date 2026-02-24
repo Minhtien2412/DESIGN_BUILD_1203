@@ -482,7 +482,7 @@ export async function setupNotificationChannels(): Promise<void> {
         importance: channel.importance,
         sound: channel.sound,
         vibrationPattern: [0, 250, 250, 250],
-        lightColor: '#0066CC',
+        lightColor: '#0D9488',
       });
     }
 

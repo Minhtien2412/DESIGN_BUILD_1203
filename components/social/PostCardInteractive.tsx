@@ -30,7 +30,7 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 // Reaction types - Facebook style
 const REACTIONS = [
-  { id: "like", icon: "👍", label: "Thích", color: "#0066CC" },
+  { id: "like", icon: "👍", label: "Thích", color: "#0D9488" },
   { id: "love", icon: "❤️", label: "Yêu thích", color: "#FF0000" },
   { id: "haha", icon: "😆", label: "Haha", color: "#FFC107" },
   { id: "wow", icon: "😮", label: "Wow", color: "#FFC107" },
@@ -217,7 +217,7 @@ export function PostCardInteractive({
               <Ionicons
                 name="checkmark-circle"
                 size={14}
-                color="#0066CC"
+                color="#0D9488"
                 style={styles.verifiedIcon}
               />
             )}
@@ -305,7 +305,7 @@ export function PostCardInteractive({
           <Text
             style={[
               styles.actionIcon,
-              liked && { color: currentReaction?.color || "#0066CC" },
+              liked && { color: currentReaction?.color || "#0D9488" },
             ]}
           >
             {currentReaction?.icon || "👍"}
@@ -313,7 +313,7 @@ export function PostCardInteractive({
           <Text
             style={[
               styles.actionText,
-              liked && { color: currentReaction?.color || "#0066CC" },
+              liked && { color: currentReaction?.color || "#0D9488" },
             ]}
           >
             {currentReaction?.label || "Thích"}

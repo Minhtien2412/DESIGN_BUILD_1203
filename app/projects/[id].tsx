@@ -16,9 +16,9 @@ import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const STATUS_COLORS = {
-  planning: '#0066CC',
-  active: '#3b82f6',
-  completed: '#0066CC',
+  planning: '#0D9488',
+  active: '#0D9488',
+  completed: '#0D9488',
   paused: '#000000',
 };
 

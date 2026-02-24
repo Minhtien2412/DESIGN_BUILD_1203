@@ -39,24 +39,24 @@ type DocumentManagerProps = {
 };
 
 const DOC_TYPE_CONFIG: Record<DocumentType, { label: string; icon: keyof typeof Ionicons.glyphMap; color: string }> = {
-  contract: { label: 'Hợp đồng', icon: 'document-text', color: '#0066CC' },
-  design: { label: 'Thiết kế', icon: 'color-palette', color: '#0066CC' },
-  report: { label: 'Báo cáo', icon: 'newspaper', color: '#0066CC' },
-  permit: { label: 'Giấy phép', icon: 'shield-checkmark', color: '#0066CC' },
+  contract: { label: 'Hợp đồng', icon: 'document-text', color: '#0D9488' },
+  design: { label: 'Thiết kế', icon: 'color-palette', color: '#0D9488' },
+  report: { label: 'Báo cáo', icon: 'newspaper', color: '#0D9488' },
+  permit: { label: 'Giấy phép', icon: 'shield-checkmark', color: '#0D9488' },
   invoice: { label: 'Hóa đơn', icon: 'receipt', color: '#000000' },
   other: { label: 'Khác', icon: 'document', color: '#757575' },
 };
 
 const FILE_ICONS: Record<string, { icon: keyof typeof Ionicons.glyphMap; color: string }> = {
   pdf: { icon: 'document-text', color: '#000000' },
-  doc: { icon: 'document', color: '#0066CC' },
-  docx: { icon: 'document', color: '#0066CC' },
-  xls: { icon: 'grid', color: '#0066CC' },
-  xlsx: { icon: 'grid', color: '#0066CC' },
-  jpg: { icon: 'image', color: '#0066CC' },
-  jpeg: { icon: 'image', color: '#0066CC' },
-  png: { icon: 'image', color: '#0066CC' },
-  dwg: { icon: 'construct', color: '#0066CC' },
+  doc: { icon: 'document', color: '#0D9488' },
+  docx: { icon: 'document', color: '#0D9488' },
+  xls: { icon: 'grid', color: '#0D9488' },
+  xlsx: { icon: 'grid', color: '#0D9488' },
+  jpg: { icon: 'image', color: '#0D9488' },
+  jpeg: { icon: 'image', color: '#0D9488' },
+  png: { icon: 'image', color: '#0D9488' },
+  dwg: { icon: 'construct', color: '#0D9488' },
   zip: { icon: 'archive', color: '#4A4A4A' },
   default: { icon: 'document-outline', color: '#757575' },
 };
@@ -240,7 +240,7 @@ export default function DocumentManager({
                       onDownload?.(doc);
                     }}
                   >
-                    <Ionicons name="download-outline" size={20} color="#0066CC" />
+                    <Ionicons name="download-outline" size={20} color="#0D9488" />
                   </TouchableOpacity>
 
                   {editable && (
@@ -282,7 +282,7 @@ export default function DocumentManager({
                 </View>
 
                 <View style={styles.previewContainer}>
-                  <Ionicons name="document-text-outline" size={80} color="#0066CC" />
+                  <Ionicons name="document-text-outline" size={80} color="#0D9488" />
                   <Text style={styles.previewText}>Xem trước tài liệu</Text>
                   <Text style={styles.previewSubtext}>
                     {formatFileSize(previewDoc.size)} • {getFileExtension(previewDoc.name).toUpperCase()}
@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 20,
@@ -364,7 +364,7 @@ const styles = StyleSheet.create({
   },
   filterTabActive: {
     backgroundColor: '#E8F5E9',
-    borderBottomColor: '#0066CC',
+    borderBottomColor: '#0D9488',
   },
   filterTabText: {
     fontSize: 14,
@@ -373,7 +373,7 @@ const styles = StyleSheet.create({
   },
   filterTabTextActive: {
     fontWeight: '700',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   documentsList: {
     gap: 0,
@@ -504,7 +504,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 10,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     paddingVertical: 16,
     borderRadius: 12,
   },

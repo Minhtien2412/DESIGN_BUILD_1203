@@ -65,7 +65,7 @@ export default function ToolsIndexScreen() {
             style={styles.backBtn}
             onPress={() => router.back()}
           >
-            <Ionicons name="arrow-back" size={24} color="#1E40AF" />
+            <Ionicons name="arrow-back" size={24} color="#0F766E" />
           </TouchableOpacity>
           <View>
             <Text style={styles.headerTitle}>🛠️ Công cụ hoàn thiện</Text>

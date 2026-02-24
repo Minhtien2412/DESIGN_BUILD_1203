@@ -12,7 +12,7 @@ interface ChecklistProgressProps {
 export default function ChecklistProgress({
   completed,
   total,
-  color = '#0066CC',
+  color = '#0D9488',
   height = 8,
   showPercentage = true,
   showLabel = false,

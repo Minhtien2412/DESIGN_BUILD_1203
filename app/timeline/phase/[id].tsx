@@ -61,8 +61,8 @@ export default function PhaseDetailScreen() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed': return '#0066CC';
-      case 'in_progress': return '#0066CC';
+      case 'completed': return '#0D9488';
+      case 'in_progress': return '#0D9488';
       case 'pending': return '#6b7280';
       default: return '#6b7280';
     }
@@ -163,7 +163,7 @@ export default function PhaseDetailScreen() {
             <Text style={styles.statLabel}>Hoàn thành</Text>
           </View>
           <View style={styles.statCard}>
-            <Text style={[styles.statValue, { color: '#0066CC' }]}>{phase.tasks?.filter(t => t.status === 'in_progress').length || 0}</Text>
+            <Text style={[styles.statValue, { color: '#0D9488' }]}>{phase.tasks?.filter(t => t.status === 'in_progress').length || 0}</Text>
             <Text style={styles.statLabel}>Đang làm</Text>
           </View>
           <View style={styles.statCard}>
@@ -177,7 +177,7 @@ export default function PhaseDetailScreen() {
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Công việc ({phase.tasks?.length || 0})</Text>
             <TouchableOpacity>
-              <Ionicons name="add-circle" size={24} color="#0066CC" />
+              <Ionicons name="add-circle" size={24} color="#0D9488" />
             </TouchableOpacity>
           </View>
           
@@ -238,10 +238,10 @@ const styles = StyleSheet.create({
   progressLabel: { fontSize: 13, color: '#666' },
   progressValue: { fontSize: 18, fontWeight: '700', color: '#000' },
   progressBar: { height: 10, backgroundColor: '#e0e0e0', borderRadius: 5, overflow: 'hidden' },
-  progressFill: { height: '100%', backgroundColor: '#0066CC', borderRadius: 5 },
+  progressFill: { height: '100%', backgroundColor: '#0D9488', borderRadius: 5 },
   statsRow: { flexDirection: 'row', gap: 12, marginBottom: 12 },
   statCard: { flex: 1, backgroundColor: '#fff', borderRadius: 12, padding: 16, alignItems: 'center' },
-  statValue: { fontSize: 24, fontWeight: '700', color: '#0066CC' },
+  statValue: { fontSize: 24, fontWeight: '700', color: '#0D9488' },
   statLabel: { fontSize: 12, color: '#666', marginTop: 4 },
   section: { backgroundColor: '#fff', borderRadius: 16, padding: 16, marginBottom: 12 },
   sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },

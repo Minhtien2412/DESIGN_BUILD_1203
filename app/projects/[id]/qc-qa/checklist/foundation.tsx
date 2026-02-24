@@ -294,13 +294,13 @@ export default function FoundationChecklistScreen() {
   const getStatusColor = (status: InspectionStatus) => {
     switch (status) {
       case InspectionStatus.PASS:
-        return '#0066CC';
+        return '#0D9488';
       case InspectionStatus.FAIL:
         return '#000000';
       case InspectionStatus.NA:
         return '#6b7280';
       default:
-        return '#0066CC';
+        return '#0D9488';
     }
   };
 
@@ -357,7 +357,7 @@ export default function FoundationChecklistScreen() {
           </View>
           <View style={styles.statsRow}>
             <View style={styles.statItem}>
-              <View style={[styles.statDot, { backgroundColor: '#0066CC' }]} />
+              <View style={[styles.statDot, { backgroundColor: '#0D9488' }]} />
               <Text style={styles.statLabel}>Đạt: {passedCount}</Text>
             </View>
             <View style={styles.statItem}>
@@ -391,7 +391,7 @@ export default function FoundationChecklistScreen() {
 
                 {/* Specification */}
                 <View style={styles.specBox}>
-                  <Ionicons name="information-circle" size={16} color="#3b82f6" />
+                  <Ionicons name="information-circle" size={16} color="#0D9488" />
                   <Text style={styles.specText}>{item.specification}</Text>
                 </View>
 
@@ -402,7 +402,7 @@ export default function FoundationChecklistScreen() {
                       styles.statusButton,
                       item.status === InspectionStatus.PASS &&
                         styles.statusButtonActive,
-                      { borderColor: '#0066CC' },
+                      { borderColor: '#0D9488' },
                     ]}
                     onPress={() =>
                       handleStatusChange(item.index, InspectionStatus.PASS)
@@ -414,7 +414,7 @@ export default function FoundationChecklistScreen() {
                       color={
                         item.status === InspectionStatus.PASS
                           ? '#fff'
-                          : '#0066CC'
+                          : '#0D9488'
                       }
                     />
                     <Text
@@ -422,7 +422,7 @@ export default function FoundationChecklistScreen() {
                         styles.statusButtonText,
                         item.status === InspectionStatus.PASS &&
                           styles.statusButtonTextActive,
-                        { color: item.status === InspectionStatus.PASS ? '#fff' : '#0066CC' },
+                        { color: item.status === InspectionStatus.PASS ? '#fff' : '#0D9488' },
                       ]}
                     >
                       Đạt
@@ -503,7 +503,7 @@ export default function FoundationChecklistScreen() {
                     style={styles.addPhotoButton}
                     onPress={() => handlePhotoAdd(item.index)}
                   >
-                    <Ionicons name="camera" size={20} color="#3b82f6" />
+                    <Ionicons name="camera" size={20} color="#0D9488" />
                     <Text style={styles.addPhotoText}>Thêm ảnh</Text>
                   </TouchableOpacity>
                 </View>
@@ -530,7 +530,7 @@ export default function FoundationChecklistScreen() {
             onPress={handleSaveDraft}
             disabled={loading}
           >
-            <Ionicons name="save-outline" size={20} color="#3b82f6" />
+            <Ionicons name="save-outline" size={20} color="#0D9488" />
             <Text style={styles.draftButtonText}>Lưu nháp</Text>
           </TouchableOpacity>
 
@@ -589,7 +589,7 @@ const styles = StyleSheet.create({
   progressPercentage: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#3b82f6',
+    color: '#0D9488',
   },
   progressBar: {
     height: 8,
@@ -600,7 +600,7 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#0D9488',
     borderRadius: 4,
   },
   statsRow: {
@@ -631,7 +631,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     paddingBottom: 8,
     borderBottomWidth: 2,
-    borderBottomColor: '#3b82f6',
+    borderBottomColor: '#0D9488',
   },
   itemCard: {
     backgroundColor: '#fff',
@@ -659,7 +659,7 @@ const styles = StyleSheet.create({
   specBox: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     padding: 10,
     borderRadius: 8,
     marginBottom: 12,
@@ -668,7 +668,7 @@ const styles = StyleSheet.create({
   specText: {
     flex: 1,
     fontSize: 13,
-    color: '#1e40af',
+    color: '#0F766E',
     lineHeight: 18,
   },
   statusButtons: {
@@ -687,7 +687,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   statusButtonActive: {
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#0D9488',
   },
   statusButtonText: {
     fontSize: 14,
@@ -715,7 +715,7 @@ const styles = StyleSheet.create({
   addPhotoText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#3b82f6',
+    color: '#0D9488',
   },
   notesInput: {
     borderWidth: 1,
@@ -739,15 +739,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 14,
     borderRadius: 10,
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     borderWidth: 1,
-    borderColor: '#3b82f6',
+    borderColor: '#0D9488',
     gap: 8,
   },
   draftButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#3b82f6',
+    color: '#0D9488',
   },
   submitButton: {
     flex: 1,
@@ -756,7 +756,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 14,
     borderRadius: 10,
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#0D9488',
     gap: 8,
   },
   submitButtonText: {

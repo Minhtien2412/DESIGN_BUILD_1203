@@ -101,7 +101,7 @@ export default function ProjectManagementScreen() {
   const getStatusColor = (status: string): string => {
     const colors: Record<string, string> = {
       not_started: '#f59e0b',
-      in_progress: '#3b82f6',
+      in_progress: '#0D9488',
       on_hold: '#8b5cf6',
       cancelled: '#ef4444',
       finished: '#22c55e',
@@ -142,7 +142,7 @@ export default function ProjectManagementScreen() {
           <Text style={[styles.statLabel, { color: textColor }]}>Total</Text>
         </View>
         <View style={styles.statItem}>
-          <Text style={[styles.statValue, { color: '#3b82f6' }]}>
+          <Text style={[styles.statValue, { color: '#0D9488' }]}>
             {projects.filter(p => p.status === 'in_progress').length}
           </Text>
           <Text style={[styles.statLabel, { color: textColor }]}>In Progress</Text>

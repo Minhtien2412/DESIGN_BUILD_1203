@@ -48,7 +48,7 @@ const SupplierCard: React.FC<SupplierCardProps> = ({ supplier, onBooking, onPres
           <Text style={styles.supplierName}>{supplier.name}</Text>
           
           <View style={styles.ratingRow}>
-            <Ionicons name="star" size={14} color="#0066CC" />
+            <Ionicons name="star" size={14} color="#0D9488" />
             <Text style={styles.ratingText}>{supplier.rating}</Text>
             <Text style={styles.reviewsText}>({supplier.reviewCount})</Text>
           </View>
@@ -76,17 +76,17 @@ const SupplierCard: React.FC<SupplierCardProps> = ({ supplier, onBooking, onPres
 
       <View style={styles.capacitySection}>
         <View style={styles.capacityItem}>
-          <Ionicons name="business" size={16} color="#0066CC" />
+          <Ionicons name="business" size={16} color="#0D9488" />
           <Text style={styles.capacityText}>Nhà cung cấp uy tín</Text>
         </View>
         <View style={styles.capacityItem}>
-          <Ionicons name="car" size={16} color="#0066CC" />
+          <Ionicons name="car" size={16} color="#0D9488" />
           <Text style={styles.capacityText}>Giao hàng nhanh</Text>
         </View>
       </View>
 
       <View style={styles.deliveryRow}>
-        <Ionicons name="timer" size={16} color="#0066CC" />
+        <Ionicons name="timer" size={16} color="#0D9488" />
         <Text style={styles.deliveryText}>{supplier.verified ? 'Đã xác minh' : 'Giao trong ngày'}</Text>
       </View>
 
@@ -271,7 +271,7 @@ export default function BeTongScreen() {
 
         {loading ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#0066CC" />
+            <ActivityIndicator size="large" color="#0D9488" />
             <Text style={styles.loadingText}>Đang tải danh sách...</Text>
           </View>
         ) : (
@@ -280,7 +280,7 @@ export default function BeTongScreen() {
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.listContainer}
             refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={refresh} colors={['#0066CC']} />
+              <RefreshControl refreshing={refreshing} onRefresh={refresh} colors={['#0D9488']} />
             }
           >
             {filteredSuppliers.map((supplier) => (
@@ -304,7 +304,7 @@ export default function BeTongScreen() {
         )}
 
         <View style={styles.infoBanner}>
-          <Ionicons name="shield-checkmark" size={16} color="#0066CC" />
+          <Ionicons name="shield-checkmark" size={16} color="#0D9488" />
           <Text style={styles.infoBannerText}>Chất lượng đạt chuẩn • Giao hàng đúng giờ</Text>
         </View>
       </View>
@@ -331,7 +331,7 @@ export default function BeTongScreen() {
                   <View style={styles.selectedSupplierText}>
                     <Text style={styles.selectedSupplierName}>{selectedSupplier.name}</Text>
                     <View style={styles.selectedRating}>
-                      <Ionicons name="star" size={14} color="#0066CC" />
+                      <Ionicons name="star" size={14} color="#0D9488" />
                       <Text style={styles.selectedRatingText}>
                         {selectedSupplier.rating} ({selectedSupplier.reviewCount})
                       </Text>
@@ -475,18 +475,18 @@ const styles = StyleSheet.create({
   gradesSection: { marginBottom: 12 },
   gradesLabel: { fontSize: 12, fontWeight: '600', color: '#666', marginBottom: 6 },
   gradesTags: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
-  gradeTag: { backgroundColor: '#E8F4FF', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
-  gradeText: { fontSize: 11, fontWeight: '500', color: '#0066CC' },
+  gradeTag: { backgroundColor: '#F0FDFA', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
+  gradeText: { fontSize: 11, fontWeight: '500', color: '#0D9488' },
   capacitySection: { flexDirection: 'row', gap: 12, marginBottom: 12 },
   capacityItem: { flexDirection: 'row', alignItems: 'center', gap: 6, flex: 1, backgroundColor: '#f5f5f5', padding: 8, borderRadius: 6 },
   capacityText: { fontSize: 11, color: '#666', fontWeight: '600' },
-  deliveryRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12, backgroundColor: '#E8F4FF', padding: 8, borderRadius: 6 },
-  deliveryText: { fontSize: 12, color: '#0066CC', fontWeight: '600', flex: 1 },
+  deliveryRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12, backgroundColor: '#F0FDFA', padding: 8, borderRadius: 6 },
+  deliveryText: { fontSize: 12, color: '#0D9488', fontWeight: '600', flex: 1 },
   statsSection: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', paddingVertical: 12, marginBottom: 12, borderTopWidth: 1, borderBottomWidth: 1, borderColor: '#f0f0f0' },
   statItem: { alignItems: 'center' },
   statValue: { fontSize: 15, fontWeight: '700', color: '#333', marginBottom: 4 },
-  available: { color: '#0066CC' },
-  busy: { color: '#0066CC' },
+  available: { color: '#0D9488' },
+  busy: { color: '#0D9488' },
   statLabel: { fontSize: 11, color: '#999' },
   statDivider: { width: 1, height: 40, backgroundColor: '#f0f0f0' },
   priceRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
@@ -498,7 +498,7 @@ const styles = StyleSheet.create({
   emptyState: { alignItems: 'center', justifyContent: 'center', paddingVertical: 60 },
   emptyText: { fontSize: 15, color: '#999', marginTop: 16 },
   infoBanner: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#f1f8e9', paddingHorizontal: 16, paddingVertical: 10, gap: 8 },
-  infoBannerText: { fontSize: 12, color: '#0066CC', flex: 1 },
+  infoBannerText: { fontSize: 12, color: '#0D9488', flex: 1 },
   bookingModalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
   bookingModalContent: { backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '90%' },
   bookingModalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: '#f0f0f0' },

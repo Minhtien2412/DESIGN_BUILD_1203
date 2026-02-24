@@ -273,8 +273,8 @@ export const getServiceStatusName = (status: ServiceStatus): string => {
 export const getServiceStatusColor = (status: ServiceStatus): string => {
   const colors: Record<ServiceStatus, string> = {
     DRAFT: '#6B7280',    // Gray
-    ACTIVE: '#0066CC',   // Green
-    INACTIVE: '#0066CC', // Orange
+    ACTIVE: '#0D9488',   // Green
+    INACTIVE: '#0D9488', // Orange
     ARCHIVED: '#000000', // Red
   };
   return colors[status] || '#6B7280';

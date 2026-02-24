@@ -934,7 +934,7 @@ const ReelItem = ({
           <Ionicons
             name={reel.saved ? "bookmark" : "bookmark-outline"}
             size={28}
-            color={reel.saved ? "#0066CC" : "#fff"}
+            color={reel.saved ? "#0D9488" : "#fff"}
           />
           <Text style={styles.actionCount}>{formatNumber(reel.saves)}</Text>
         </TouchableOpacity>
@@ -973,7 +973,7 @@ const ReelItem = ({
             <Ionicons
               name="checkmark-circle"
               size={16}
-              color="#3b82f6"
+              color="#0D9488"
               style={{ marginLeft: 4 }}
             />
           )}
@@ -1638,7 +1638,7 @@ export default function ReelsViewerScreen() {
           backgroundColor="transparent"
           translucent
         />
-        <ActivityIndicator size="large" color="#0066CC" />
+        <ActivityIndicator size="large" color="#0D9488" />
         <Text style={styles.loadingText}>Đang tải video...</Text>
         {dataSource === "server" && (
           <Text style={styles.serverSourceText}>📺 Từ Server Cache</Text>
@@ -1719,7 +1719,7 @@ export default function ReelsViewerScreen() {
             refreshing={isRefreshing}
             onRefresh={handleRefresh}
             tintColor="#fff"
-            colors={["#0066CC"]}
+            colors={["#0D9488"]}
           />
         }
         onEndReached={handleLoadMore}
@@ -1812,7 +1812,7 @@ export default function ReelsViewerScreen() {
               ListHeaderComponent={
                 isLoadingComments && comments.length === 0 ? (
                   <View style={styles.commentsLoading}>
-                    <ActivityIndicator size="small" color="#0066CC" />
+                    <ActivityIndicator size="small" color="#0D9488" />
                     <Text style={styles.commentsLoadingText}>
                       Đang tải bình luận...
                     </Text>
@@ -1839,7 +1839,7 @@ export default function ReelsViewerScreen() {
               ListFooterComponent={
                 isLoadingComments && comments.length > 0 ? (
                   <View style={styles.commentsLoadingMore}>
-                    <ActivityIndicator size="small" color="#0066CC" />
+                    <ActivityIndicator size="small" color="#0D9488" />
                   </View>
                 ) : null
               }
@@ -1922,12 +1922,12 @@ export default function ReelsViewerScreen() {
                 onPress={handleSendComment}
               >
                 {isSendingComment ? (
-                  <ActivityIndicator size="small" color="#0066CC" />
+                  <ActivityIndicator size="small" color="#0D9488" />
                 ) : (
                   <Ionicons
                     name="send"
                     size={20}
-                    color={commentText.trim() && user ? "#0066CC" : "#ccc"}
+                    color={commentText.trim() && user ? "#0D9488" : "#ccc"}
                   />
                 )}
               </TouchableOpacity>
@@ -2194,7 +2194,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   categoryChipActive: {
-    backgroundColor: "#0066CC",
+    backgroundColor: "#0D9488",
   },
   categoryChipText: {
     color: "rgba(255,255,255,0.8)",
@@ -2349,7 +2349,7 @@ const styles = StyleSheet.create({
   serverSourceText: {
     marginTop: 12,
     fontSize: 14,
-    color: "#0066CC",
+    color: "#0D9488",
     fontWeight: "500",
   },
   serverStatsOverlay: {
@@ -2377,7 +2377,7 @@ const styles = StyleSheet.create({
   resetButton: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#0066CC",
+    backgroundColor: "#0D9488",
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 12,

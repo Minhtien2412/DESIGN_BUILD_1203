@@ -17,8 +17,8 @@ const STATUS_CONFIG: Record<
   { label: string; color: string; icon: string }
 > = {
   PLANNED: { label: 'Kế hoạch', color: '#999999', icon: 'document-text-outline' },
-  ACTIVE: { label: 'Đang thực hiện', color: '#0066CC', icon: 'play-circle' },
-  COMPLETED: { label: 'Hoàn thành', color: '#0066CC', icon: 'checkmark-circle' },
+  ACTIVE: { label: 'Đang thực hiện', color: '#0D9488', icon: 'play-circle' },
+  COMPLETED: { label: 'Hoàn thành', color: '#0D9488', icon: 'checkmark-circle' },
   DELAYED: { label: 'Bị trễ', color: '#000000', icon: 'alert-circle' },
 };
 
@@ -204,7 +204,7 @@ export default function PhasesScreen() {
                             style={styles.viewButton}
                             onPress={() => router.push(`/timeline/phase/${phase.id}` as any)}
                           >
-                            <Ionicons name="eye-outline" size={18} color="#0066CC" />
+                            <Ionicons name="eye-outline" size={18} color="#0D9488" />
                             <Text style={styles.actionButtonText}>Xem chi tiết</Text>
                           </TouchableOpacity>
 
@@ -266,7 +266,7 @@ const styles = StyleSheet.create({
   createButton: {
     paddingHorizontal: 20,
     paddingVertical: 10,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     borderRadius: 8,
   },
   createButtonText: {
@@ -418,7 +418,7 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingVertical: 10,
     borderRadius: 6,
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
   },
   actionButton: {
     flex: 1,
@@ -428,7 +428,7 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingVertical: 10,
     borderRadius: 6,
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
   },
   deleteButton: {
     backgroundColor: '#F5F5F5',
@@ -436,7 +436,7 @@ const styles = StyleSheet.create({
   actionButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   fab: {
     position: 'absolute',
@@ -445,7 +445,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',

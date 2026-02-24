@@ -204,7 +204,7 @@ export default function IncomingCallOverlay({
               style={[styles.actionButton, styles.acceptButton]}
               onPress={handleAccept}
             >
-              <View style={[styles.buttonInner, { backgroundColor: '#0066CC' }]}>
+              <View style={[styles.buttonInner, { backgroundColor: '#0D9488' }]}>
                 <Ionicons name="call" size={32} color="#fff" />
               </View>
               <Text style={styles.actionText}>Trả lời</Text>

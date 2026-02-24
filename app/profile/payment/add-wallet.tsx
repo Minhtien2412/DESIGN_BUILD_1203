@@ -17,7 +17,7 @@ const WALLETS = [
   { id: 'momo', name: 'MoMo', color: '#A50064', icon: '💜' },
   { id: 'zalopay', name: 'ZaloPay', color: '#0068FF', icon: '💙' },
   { id: 'vnpay', name: 'VNPay', color: '#1A1F71', icon: '🔵' },
-  { id: 'shopeepay', name: 'ShopeePay', color: '#0066CC', icon: '🧡' },
+  { id: 'shopeepay', name: 'ShopeePay', color: '#0D9488', icon: '🧡' },
   { id: 'viettelpay', name: 'ViettelPay', color: '#E50019', icon: '❤️' },
   { id: 'applepay', name: 'Apple Pay', color: '#000000', icon: '🍎' },
   { id: 'googlepay', name: 'Google Pay', color: '#4285F4', icon: '🟢' },
@@ -205,11 +205,11 @@ export default function AddWalletScreen() {
               <Text style={styles.featuresTitle}>Tiện ích khi dùng {selectedWallet.name}</Text>
               <View style={styles.featuresList}>
                 <View style={styles.featureItem}>
-                  <Ionicons name="flash" size={20} color="#0066CC" />
+                  <Ionicons name="flash" size={20} color="#0D9488" />
                   <Text style={styles.featureText}>Thanh toán nhanh chóng</Text>
                 </View>
                 <View style={styles.featureItem}>
-                  <Ionicons name="shield-checkmark" size={20} color="#0066CC" />
+                  <Ionicons name="shield-checkmark" size={20} color="#0D9488" />
                   <Text style={styles.featureText}>Bảo mật cao với OTP</Text>
                 </View>
                 <View style={styles.featureItem}>

@@ -61,7 +61,7 @@ export default function EquipmentMaintenanceScreen() {
           title: 'Bảo trì thiết bị',
           headerRight: () => (
             <TouchableOpacity onPress={() => setModalVisible(true)}>
-              <Ionicons name="add-circle" size={28} color="#0066CC" style={{ marginRight: 8 }} />
+              <Ionicons name="add-circle" size={28} color="#0D9488" style={{ marginRight: 8 }} />
             </TouchableOpacity>
           ),
         }}
@@ -75,12 +75,12 @@ export default function EquipmentMaintenanceScreen() {
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statItem}>
-          <Text style={[styles.statValue, { color: '#0066CC' }]}>{scheduledCount}</Text>
+          <Text style={[styles.statValue, { color: '#0D9488' }]}>{scheduledCount}</Text>
           <Text style={styles.statLabel}>Đã lên lịch</Text>
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statItem}>
-          <Text style={[styles.statValue, { color: '#0066CC' }]}>{inProgressCount}</Text>
+          <Text style={[styles.statValue, { color: '#0D9488' }]}>{inProgressCount}</Text>
           <Text style={styles.statLabel}>Đang thực hiện</Text>
         </View>
         <View style={styles.statDivider} />
@@ -218,7 +218,7 @@ function MaintenanceCard({ record }: MaintenanceCardProps) {
         )}
         {record.downtimeHours && (
           <View style={styles.infoRow}>
-            <Ionicons name="time" size={14} color="#0066CC" />
+            <Ionicons name="time" size={14} color="#0D9488" />
             <Text style={styles.infoLabel}>Thời gian ngừng:</Text>
             <Text style={styles.infoValue}>{record.downtimeHours} giờ</Text>
           </View>
@@ -227,7 +227,7 @@ function MaintenanceCard({ record }: MaintenanceCardProps) {
 
       {record.completedAt && (
         <View style={styles.completedInfo}>
-          <Ionicons name="checkmark-circle" size={16} color="#0066CC" />
+          <Ionicons name="checkmark-circle" size={16} color="#0D9488" />
           <Text style={styles.completedText}>
             Hoàn thành: {new Date(record.completedAt).toLocaleDateString('vi-VN')}
           </Text>
@@ -399,11 +399,11 @@ function AddMaintenanceModal({ visible, equipmentId, onClose, onCreate }: AddMai
 function getStatusColor(status: MaintenanceStatus): string {
   switch (status) {
     case MaintenanceStatus.SCHEDULED:
-      return '#0066CC';
+      return '#0D9488';
     case MaintenanceStatus.IN_PROGRESS:
-      return '#0066CC';
+      return '#0D9488';
     case MaintenanceStatus.COMPLETED:
-      return '#0066CC';
+      return '#0D9488';
     case MaintenanceStatus.CANCELLED:
       return '#999999';
     case MaintenanceStatus.OVERDUE:
@@ -488,7 +488,7 @@ const styles = StyleSheet.create({
     borderBottomColor: 'transparent',
   },
   filterTabActive: {
-    borderBottomColor: '#0066CC',
+    borderBottomColor: '#0D9488',
   },
   filterTabText: {
     fontSize: 11,
@@ -496,7 +496,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   filterTabTextActive: {
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: 'bold',
   },
   listContent: {
@@ -545,7 +545,7 @@ const styles = StyleSheet.create({
   },
   typeLabel: {
     fontSize: 11,
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: '600',
   },
   statusBadge: {
@@ -592,7 +592,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   partsInfo: {
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     padding: 8,
     borderRadius: 6,
     marginTop: 8,
@@ -614,7 +614,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   addButton: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
@@ -688,8 +688,8 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   typeChipActive: {
-    backgroundColor: '#0066CC',
-    borderColor: '#0066CC',
+    backgroundColor: '#0D9488',
+    borderColor: '#0D9488',
   },
   typeChipText: {
     fontSize: 12,
@@ -737,7 +737,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 14,
     borderRadius: 8,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     alignItems: 'center',
   },
   createButtonText: {

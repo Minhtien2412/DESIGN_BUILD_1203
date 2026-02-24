@@ -40,17 +40,17 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const COLORS = {
-  primary: "#0068FF",
+  primary: "#0D9488",
   background: "#FFFFFF",
   surface: "#F5F5F5",
   text: "#1A1A1A",
   textSecondary: "#666666",
   textTertiary: "#999999",
   border: "#E5E5E5",
-  online: "#0066CC",
-  support: "#0066CC",
+  online: "#0D9488",
+  support: "#0D9488",
   staff: "#666666",
-  customer: "#0066CC",
+  customer: "#0D9488",
 };
 
 // Filter tabs

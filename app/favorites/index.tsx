@@ -1,10 +1,14 @@
 import { TappableImage } from "@/components/ui/full-media-viewer";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { get } from "@/services/api";
 import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 import { Stack, useRouter } from "expo-router";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
+    Alert,
     FlatList,
+    RefreshControl,
     StyleSheet,
     Text,
     TouchableOpacity,
@@ -76,11 +80,48 @@ export default function FavoritesScreen() {
   const cardBg = useThemeColor({}, "card");
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("Tất cả");
+  const [refreshing, setRefreshing] = useState(false);
+  const [items, setItems] = useState(favoriteItems);
+
+  const fetchFavorites = useCallback(async () => {
+    try {
+      const res = await get("/api/favorites");
+      if (res?.data) setItems(res.data);
+    } catch {
+      /* mock */
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchFavorites();
+  }, [fetchFavorites]);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchFavorites();
+    setRefreshing(false);
+  }, [fetchFavorites]);
+
+  const handleRemoveFavorite = useCallback((id: string) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    Alert.alert(
+      "Xóa yêu thích?",
+      "Bạn có chắc muốn bỏ khỏi danh sách yêu thích?",
+      [
+        { text: "Hủy" },
+        {
+          text: "Xóa",
+          style: "destructive",
+          onPress: () => setItems((prev) => prev.filter((i) => i.id !== id)),
+        },
+      ],
+    );
+  }, []);
 
   const filteredItems =
     activeTab === "Tất cả"
-      ? favoriteItems
-      : favoriteItems.filter((item) => {
+      ? items
+      : items.filter((item) => {
           if (activeTab === "Sản phẩm") return item.type === "product";
           if (activeTab === "Thợ") return item.type === "worker";
           if (activeTab === "Thiết kế") return item.type === "design";
@@ -99,7 +140,7 @@ export default function FavoritesScreen() {
         title={item.name}
       />
       <TouchableOpacity style={styles.heartBtn}>
-        <Ionicons name="heart" size={20} color="#FF6B35" />
+        <Ionicons name="heart" size={20} color="#14B8A6" />
       </TouchableOpacity>
 
       <View style={styles.itemContent}>
@@ -204,6 +245,13 @@ export default function FavoritesScreen() {
         contentContainerStyle={styles.listContent}
         columnWrapperStyle={styles.columnWrapper}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#14B8A6"
+          />
+        }
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <Ionicons name="heart-outline" size={64} color="#ccc" />
@@ -222,25 +270,31 @@ export default function FavoritesScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { flex: 1, backgroundColor: "#F8FAFB" },
   tabsContainer: {
     flexDirection: "row",
     paddingVertical: 4,
     paddingHorizontal: 16,
+    backgroundColor: "#FFFFFF",
   },
   tab: { flex: 1, paddingVertical: 12, alignItems: "center" },
-  tabActive: { borderBottomWidth: 2, borderBottomColor: "#FF6B35" },
-  tabText: { color: "#666", fontSize: 14 },
-  tabTextActive: { color: "#FF6B35", fontWeight: "600" },
+  tabActive: { borderBottomWidth: 2, borderBottomColor: "#0D9488" },
+  tabText: { color: "#6B7280", fontSize: 14, fontWeight: "500" },
+  tabTextActive: { color: "#0D9488", fontWeight: "700" },
   listContent: { padding: 8 },
   columnWrapper: { justifyContent: "space-between" },
   itemCard: {
     width: "48%",
-    borderRadius: 12,
+    borderRadius: 16,
     marginBottom: 12,
     overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
   },
-  itemImage: { width: "100%", height: 150, backgroundColor: "#f0f0f0" },
+  itemImage: { width: "100%", height: 160, backgroundColor: "#F3F4F6" },
   heartBtn: {
     position: "absolute",
     top: 8,
@@ -269,16 +323,22 @@ const styles = StyleSheet.create({
   typeBadgeText: { color: "#fff", fontSize: 10, fontWeight: "500" },
   itemName: {
     fontSize: 14,
-    fontWeight: "500",
+    fontWeight: "600",
     marginBottom: 6,
     lineHeight: 20,
+    letterSpacing: -0.2,
   },
   subText: { color: "#666", fontSize: 12, marginBottom: 4 },
   ratingRow: { flexDirection: "row", alignItems: "center", marginBottom: 6 },
   ratingText: { marginLeft: 4, fontSize: 12, fontWeight: "500", color: "#666" },
   soldText: { marginLeft: 8, fontSize: 11, color: "#999" },
   priceRow: { flexDirection: "row", alignItems: "center" },
-  price: { color: "#FF6B35", fontSize: 15, fontWeight: "bold" },
+  price: {
+    color: "#0D9488",
+    fontSize: 16,
+    fontWeight: "800",
+    letterSpacing: -0.3,
+  },
   originalPrice: {
     marginLeft: 6,
     color: "#999",
@@ -290,10 +350,15 @@ const styles = StyleSheet.create({
   emptyState: { alignItems: "center", paddingVertical: 60 },
   emptyText: { color: "#999", marginTop: 12, marginBottom: 16 },
   exploreBtn: {
-    backgroundColor: "#FF6B35",
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 8,
+    backgroundColor: "#0D9488",
+    paddingHorizontal: 28,
+    paddingVertical: 14,
+    borderRadius: 14,
+    shadowColor: "#0D9488",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 4,
   },
-  exploreBtnText: { color: "#fff", fontWeight: "600" },
+  exploreBtnText: { color: "#fff", fontWeight: "700", fontSize: 15 },
 });

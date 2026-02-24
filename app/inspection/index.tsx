@@ -38,26 +38,26 @@ const STATUS_FILTERS: { value: InspectionStatus | 'ALL'; label: string }[] = [
 ];
 
 const STATUS_COLORS: Record<InspectionStatus, string> = {
-  SCHEDULED: '#3B82F6',
-  IN_PROGRESS: '#0066CC',
-  PASSED: '#0066CC',
+  SCHEDULED: '#0D9488',
+  IN_PROGRESS: '#0D9488',
+  PASSED: '#0D9488',
   FAILED: '#000000',
-  CONDITIONAL_PASS: '#0066CC',
+  CONDITIONAL_PASS: '#0D9488',
   CANCELLED: '#6B7280',
   RESCHEDULED: '#666666',
   PENDING: '#9CA3AF',
-  PASS: '#0066CC',
+  PASS: '#0D9488',
   FAIL: '#000000',
   NA: '#6B7280',
-  COMPLETED: '#3B82F6',
-  APPROVED: '#0066CC',
+  COMPLETED: '#0D9488',
+  APPROVED: '#0D9488',
   REJECTED: '#000000',
 };
 
 const SEVERITY_COLORS = {
-  MINOR: '#0066CC',
-  MODERATE: '#0066CC',
-  MAJOR: '#0066CC',
+  MINOR: '#0D9488',
+  MODERATE: '#0D9488',
+  MAJOR: '#0D9488',
   CRITICAL: '#000000',
 };
 
@@ -107,7 +107,7 @@ export default function InspectionsScreen() {
   if (loading && !inspections.length) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#3B82F6" />
+        <ActivityIndicator size="large" color="#0D9488" />
       </View>
     );
   }
@@ -120,29 +120,29 @@ export default function InspectionsScreen() {
     <View style={styles.container}>
       {/* Stats Cards */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.statsContainer}>
-        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
+        <View style={[styles.statCard, { backgroundColor: '#F0FDFA' }]}>
           <Text style={styles.statValue}>{inspections.length}</Text>
           <Text style={styles.statLabel}>Total</Text>
         </View>
 
-        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
-          <Text style={[styles.statValue, { color: '#3B82F6' }]}>{scheduledCount}</Text>
+        <View style={[styles.statCard, { backgroundColor: '#F0FDFA' }]}>
+          <Text style={[styles.statValue, { color: '#0D9488' }]}>{scheduledCount}</Text>
           <Text style={styles.statLabel}>Scheduled</Text>
         </View>
 
         <View style={[styles.statCard, { backgroundColor: '#FEF3C7' }]}>
-          <Text style={[styles.statValue, { color: '#0066CC' }]}>{inProgressCount}</Text>
+          <Text style={[styles.statValue, { color: '#0D9488' }]}>{inProgressCount}</Text>
           <Text style={styles.statLabel}>In Progress</Text>
         </View>
 
         <View style={[styles.statCard, { backgroundColor: '#D1FAE5' }]}>
-          <Text style={[styles.statValue, { color: '#0066CC' }]}>{passedCount}</Text>
+          <Text style={[styles.statValue, { color: '#0D9488' }]}>{passedCount}</Text>
           <Text style={styles.statLabel}>Passed</Text>
         </View>
 
         {analytics && (
           <View style={[styles.statCard, { backgroundColor: '#F3F4F6' }]}>
-            <Text style={[styles.statValue, { color: '#0066CC' }]}>
+            <Text style={[styles.statValue, { color: '#0D9488' }]}>
               {analytics.summary.passRate.toFixed(1)}%
             </Text>
             <Text style={styles.statLabel}>Pass Rate</Text>
@@ -264,7 +264,7 @@ export default function InspectionsScreen() {
                         'list-outline'
                       }
                       size={12}
-                      color="#0066CC"
+                      color="#0D9488"
                       style={{ marginRight: 4 }}
                     />
                     <Text style={styles.typeBadgeText}>{inspection.type}</Text>
@@ -318,7 +318,7 @@ export default function InspectionsScreen() {
                     </View>
 
                     <View style={styles.resultItem}>
-                      <Text style={[styles.resultValue, { color: '#0066CC' }]}>
+                      <Text style={[styles.resultValue, { color: '#0D9488' }]}>
                         {inspection.result.passRate.toFixed(0)}%
                       </Text>
                       <Text style={styles.resultLabel}>Pass Rate</Text>
@@ -378,7 +378,7 @@ export default function InspectionsScreen() {
               {/* Actions */}
               <View style={styles.actions}>
                 <TouchableOpacity style={styles.actionButton}>
-                  <Ionicons name="eye-outline" size={18} color="#3B82F6" />
+                  <Ionicons name="eye-outline" size={18} color="#0D9488" />
                   <Text style={styles.actionButtonText}>View</Text>
                 </TouchableOpacity>
 
@@ -505,8 +505,8 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   filterChipActive: {
-    backgroundColor: '#3B82F6',
-    borderColor: '#3B82F6',
+    backgroundColor: '#0D9488',
+    borderColor: '#0D9488',
   },
   filterChipText: {
     fontSize: 13,
@@ -583,7 +583,7 @@ const styles = StyleSheet.create({
   typeBadgeText: {
     fontSize: 10,
     fontWeight: '600',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   infoSection: {
     marginBottom: 12,
@@ -614,7 +614,7 @@ const styles = StyleSheet.create({
   resultValue: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#0066CC',
+    color: '#0D9488',
     marginBottom: 2,
   },
   resultLabel: {
@@ -686,13 +686,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#F3F4F6',
   },
   actionButtonPrimary: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#0D9488',
   },
   actionButtonSuccess: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   actionButtonWarning: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   actionButtonText: {
     fontSize: 12,

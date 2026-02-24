@@ -76,6 +76,6 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     fontSize: 13,
     fontWeight: '500',
-    color: '#0066CC',
+    color: '#0D9488',
   },
 });

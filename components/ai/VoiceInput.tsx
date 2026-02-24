@@ -341,7 +341,7 @@ export function VoiceOutput({
   disabled = false,
   size = 20,
   color = "#666",
-  activeColor = "#3B82F6",
+  activeColor = "#0D9488",
 }: VoiceOutputProps) {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const support = isVoiceSupported();
@@ -509,7 +509,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: "#E8F4FF",
+    backgroundColor: "#F0FDFA",
     alignItems: "center",
     justifyContent: "center",
   },

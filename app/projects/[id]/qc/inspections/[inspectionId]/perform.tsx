@@ -202,7 +202,7 @@ export default function PerformInspectionScreen() {
             <View style={styles.statsRow}>
               <View style={styles.statItem}>
                 <Text style={styles.statValue}>{stats.pass}</Text>
-                <Text style={[styles.statLabel, { color: '#0066CC' }]}>Đạt</Text>
+                <Text style={[styles.statLabel, { color: '#0D9488' }]}>Đạt</Text>
               </View>
               <View style={styles.statItem}>
                 <Text style={styles.statValue}>{stats.fail}</Text>
@@ -210,10 +210,10 @@ export default function PerformInspectionScreen() {
               </View>
               <View style={styles.statItem}>
                 <Text style={styles.statValue}>{stats.pending}</Text>
-                <Text style={[styles.statLabel, { color: '#0066CC' }]}>Chưa kiểm tra</Text>
+                <Text style={[styles.statLabel, { color: '#0D9488' }]}>Chưa kiểm tra</Text>
               </View>
               <View style={styles.statItem}>
-                <Text style={[styles.statValue, { fontSize: 24, color: '#3b82f6' }]}>
+                <Text style={[styles.statValue, { fontSize: 24, color: '#0D9488' }]}>
                   {passRate}%
                 </Text>
                 <Text style={styles.statLabel}>Tỷ lệ đạt</Text>
@@ -221,7 +221,7 @@ export default function PerformInspectionScreen() {
             </View>
             <View style={styles.progressBar}>
               <View style={[styles.progressSegment, { 
-                backgroundColor: '#0066CC', 
+                backgroundColor: '#0D9488', 
                 width: `${(stats.pass / stats.total) * 100}%` 
               }]} />
               <View style={[styles.progressSegment, { 
@@ -229,7 +229,7 @@ export default function PerformInspectionScreen() {
                 width: `${(stats.fail / stats.total) * 100}%` 
               }]} />
               <View style={[styles.progressSegment, { 
-                backgroundColor: '#0066CC', 
+                backgroundColor: '#0D9488', 
                 width: `${(stats.pending / stats.total) * 100}%` 
               }]} />
             </View>

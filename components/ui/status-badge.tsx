@@ -25,25 +25,25 @@ const STATUS_CONFIG: Record<StatusType, {
   defaultLabel: string;
 }> = {
   pending: {
-    color: '#0066CC',
+    color: '#0D9488',
     bgColor: '#FEF3C7',
     icon: 'time-outline',
     defaultLabel: 'Chờ xử lý',
   },
   active: {
-    color: '#3B82F6',
-    bgColor: '#E8F4FF',
+    color: '#0D9488',
+    bgColor: '#F0FDFA',
     icon: 'play-circle-outline',
     defaultLabel: 'Đang thực hiện',
   },
   'in-progress': {
-    color: '#3B82F6',
-    bgColor: '#E8F4FF',
+    color: '#0D9488',
+    bgColor: '#F0FDFA',
     icon: 'sync-outline',
     defaultLabel: 'Đang tiến hành',
   },
   completed: {
-    color: '#0066CC',
+    color: '#0D9488',
     bgColor: '#D1FAE5',
     icon: 'checkmark-circle-outline',
     defaultLabel: 'Hoàn thành',
@@ -55,7 +55,7 @@ const STATUS_CONFIG: Record<StatusType, {
     defaultLabel: 'Đã hủy',
   },
   approved: {
-    color: '#0066CC',
+    color: '#0D9488',
     bgColor: '#D1FAE5',
     icon: 'checkmark-done-outline',
     defaultLabel: 'Đã duyệt',

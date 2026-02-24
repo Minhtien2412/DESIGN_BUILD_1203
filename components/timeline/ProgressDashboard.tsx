@@ -57,8 +57,8 @@ export function ProgressDashboard({ phases, projectName }: ProgressDashboardProp
 
         {/* Completed */}
         <View style={[styles.statCard, { backgroundColor, borderColor }]}>
-          <Ionicons name="checkmark-circle" size={24} color="#0066CC" />
-          <Text style={[styles.statValue, { color: '#0066CC' }]}>{completedPhases}</Text>
+          <Ionicons name="checkmark-circle" size={24} color="#0D9488" />
+          <Text style={[styles.statValue, { color: '#0D9488' }]}>{completedPhases}</Text>
           <Text style={[styles.statLabel, { color: textColor }]}>Hoàn thành</Text>
         </View>
 
@@ -83,7 +83,7 @@ export function ProgressDashboard({ phases, projectName }: ProgressDashboardProp
           <Text style={[styles.progressBarLabel, { color: textColor }]}>
             Tỷ lệ hoàn thành
           </Text>
-          <Text style={[styles.progressBarValue, { color: '#0066CC' }]}>
+          <Text style={[styles.progressBarValue, { color: '#0D9488' }]}>
             {completionRate}%
           </Text>
         </View>
@@ -91,7 +91,7 @@ export function ProgressDashboard({ phases, projectName }: ProgressDashboardProp
           <View
             style={[
               styles.progressBarFill,
-              { width: `${completionRate}%`, backgroundColor: '#0066CC' },
+              { width: `${completionRate}%`, backgroundColor: '#0D9488' },
             ]}
           />
         </View>
@@ -111,7 +111,7 @@ export function ProgressDashboard({ phases, projectName }: ProgressDashboardProp
                 styles.statusSegment,
                 {
                   width: `${(completedPhases / totalPhases) * 100}%`,
-                  backgroundColor: '#0066CC',
+                  backgroundColor: '#0D9488',
                 },
               ]}
             />
@@ -154,7 +154,7 @@ export function ProgressDashboard({ phases, projectName }: ProgressDashboardProp
         <View style={styles.legend}>
           {completedPhases > 0 && (
             <View style={styles.legendItem}>
-              <View style={[styles.legendDot, { backgroundColor: '#0066CC' }]} />
+              <View style={[styles.legendDot, { backgroundColor: '#0D9488' }]} />
               <Text style={[styles.legendText, { color: textColor }]}>
                 Hoàn thành ({completedPhases})
               </Text>

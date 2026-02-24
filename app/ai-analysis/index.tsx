@@ -58,7 +58,7 @@ const ANALYSIS_FEATURES: FeatureItem[] = [
     icon: "calculator",
     title: "Phân tích chi phí",
     description: "Dự toán, so sánh chi phí thực tế",
-    gradient: ["#3b82f6", "#60a5fa"] as const,
+    gradient: ["#0D9488", "#2DD4BF"] as const,
     route: "/ai-analysis/cost",
   },
   {
@@ -80,7 +80,7 @@ export default function AIAnalysisScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor }]}>
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Header */}
-        <LinearGradient colors={["#1e40af", "#3b82f6"]} style={styles.header}>
+        <LinearGradient colors={["#0F766E", "#0D9488"]} style={styles.header}>
           <TouchableOpacity
             style={styles.backBtn}
             onPress={() => router.back()}
@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
   statNumber: {
     fontSize: 24,
     fontWeight: "700",
-    color: "#3b82f6",
+    color: "#0D9488",
   },
   statLabel: {
     fontSize: 12,

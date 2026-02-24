@@ -174,7 +174,7 @@ export default function SalesScreen() {
     const colors: Record<string, string> = {
       paid: '#22c55e',
       unpaid: '#f59e0b',
-      partially_paid: '#3b82f6',
+      partially_paid: '#0D9488',
       overdue: '#ef4444',
       cancelled: '#6b7280',
     };
@@ -290,9 +290,9 @@ export default function SalesScreen() {
         {salesData && (
           <View style={styles.summarySection}>
             <View style={styles.summaryGrid}>
-              <View style={[styles.summaryCard, { backgroundColor: '#3b82f620' }]}>
-                <Ionicons name="wallet-outline" size={24} color="#3b82f6" />
-                <Text style={[styles.summaryValue, { color: '#3b82f6' }]}>
+              <View style={[styles.summaryCard, { backgroundColor: '#0D948820' }]}>
+                <Ionicons name="wallet-outline" size={24} color="#0D9488" />
+                <Text style={[styles.summaryValue, { color: '#0D9488' }]}>
                   {formatCurrency(salesData.totalRevenue)} ₫
                 </Text>
                 <Text style={[styles.summaryLabel, { color: textColor }]}>Tổng doanh số</Text>

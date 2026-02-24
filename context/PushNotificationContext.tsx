@@ -140,7 +140,7 @@ export function PushNotificationProvider({ children }: { children: ReactNode }) 
           name: 'default',
           importance: Notifications.AndroidImportance.MAX,
           vibrationPattern: [0, 250, 250, 250],
-          lightColor: '#FF6B35',
+          lightColor: '#14B8A6',
         });
       }
 

@@ -22,9 +22,9 @@ const STATUS_LABELS: Record<PayrollStatus, string> = {
 
 const STATUS_COLORS: Record<PayrollStatus, string> = {
   [PayrollStatus.DRAFT]: '#999999',
-  [PayrollStatus.PENDING_APPROVAL]: '#0066CC',
-  [PayrollStatus.APPROVED]: '#0066CC',
-  [PayrollStatus.PAID]: '#0066CC',
+  [PayrollStatus.PENDING_APPROVAL]: '#0D9488',
+  [PayrollStatus.APPROVED]: '#0D9488',
+  [PayrollStatus.PAID]: '#0D9488',
   [PayrollStatus.CANCELLED]: '#000000',
 };
 
@@ -166,7 +166,7 @@ export default function PayrollScreen() {
               <View style={styles.header}>
                 <View style={styles.headerLeft}>
                   <View style={styles.avatar}>
-                    <Ionicons name="person" size={24} color="#0066CC" />
+                    <Ionicons name="person" size={24} color="#0D9488" />
                   </View>
                   <View style={styles.headerInfo}>
                     <Text style={styles.workerName}>
@@ -212,9 +212,9 @@ export default function PayrollScreen() {
                   </View>
                   {payroll.overtimeHours > 0 && (
                     <View style={styles.hoursItem}>
-                      <Ionicons name="alarm-outline" size={16} color="#0066CC" />
+                      <Ionicons name="alarm-outline" size={16} color="#0D9488" />
                       <Text style={styles.hoursLabel}>Tăng ca:</Text>
-                      <Text style={[styles.hoursValue, { color: '#0066CC' }]}>
+                      <Text style={[styles.hoursValue, { color: '#0D9488' }]}>
                         {payroll.overtimeHours}h
                       </Text>
                     </View>
@@ -318,7 +318,7 @@ export default function PayrollScreen() {
               {payroll.status === PayrollStatus.PAID && (
                 <View style={styles.paymentInfo}>
                   <View style={styles.paymentRow}>
-                    <Ionicons name="card-outline" size={16} color="#0066CC" />
+                    <Ionicons name="card-outline" size={16} color="#0D9488" />
                     <Text style={styles.paymentText}>
                       {PAYMENT_METHOD_LABELS[payroll.paymentMethod!]}
                     </Text>
@@ -351,7 +351,7 @@ export default function PayrollScreen() {
                       handleApprove(payroll.id, payroll.worker?.fullName || 'N/A')
                     }
                   >
-                    <Ionicons name="checkmark-circle-outline" size={16} color="#0066CC" />
+                    <Ionicons name="checkmark-circle-outline" size={16} color="#0D9488" />
                     <Text style={styles.approveButtonText}>Duyệt</Text>
                   </TouchableOpacity>
                 </View>
@@ -365,7 +365,7 @@ export default function PayrollScreen() {
                       handleProcessPayment(payroll.id, payroll.worker?.fullName || 'N/A')
                     }
                   >
-                    <Ionicons name="card-outline" size={16} color="#0066CC" />
+                    <Ionicons name="card-outline" size={16} color="#0D9488" />
                     <Text style={styles.paymentButtonText}>Thanh toán</Text>
                   </TouchableOpacity>
                 </View>
@@ -414,7 +414,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   filterChipActive: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   filterChipText: {
     fontSize: 13,
@@ -442,7 +442,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     paddingHorizontal: 20,
     paddingVertical: 10,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     borderRadius: 8,
   },
   emptyButtonText: {
@@ -471,7 +471,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -580,13 +580,13 @@ const styles = StyleSheet.create({
   totalValue: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   netPaySection: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     padding: 12,
     borderRadius: 6,
   },
@@ -627,13 +627,13 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingVertical: 8,
     borderWidth: 1,
-    borderColor: '#0066CC',
+    borderColor: '#0D9488',
     borderRadius: 6,
   },
   approveButtonText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   paymentButton: {
     flex: 1,
@@ -643,13 +643,13 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingVertical: 8,
     borderWidth: 1,
-    borderColor: '#0066CC',
+    borderColor: '#0D9488',
     borderRadius: 6,
   },
   paymentButtonText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   fab: {
     position: 'absolute',
@@ -658,7 +658,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 4,

@@ -265,7 +265,7 @@ export default function SellerReviewsScreen() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#FF6B35" />
+        <ActivityIndicator size="large" color="#14B8A6" />
       </View>
     );
   }
@@ -277,13 +277,13 @@ export default function SellerReviewsScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={["#FF6B35"]}
+            colors={["#14B8A6"]}
           />
         }
       >
         {/* Stats Header */}
         <LinearGradient
-          colors={["#FF6B35", "#FF8C5A"]}
+          colors={["#14B8A6", "#FF8C5A"]}
           style={styles.statsHeader}
         >
           <View style={styles.mainRating}>
@@ -443,7 +443,7 @@ export default function SellerReviewsScreen() {
                 {review.reply ? (
                   <View style={styles.replyBox}>
                     <View style={styles.replyHeader}>
-                      <Ionicons name="arrow-undo" size={14} color="#FF6B35" />
+                      <Ionicons name="arrow-undo" size={14} color="#14B8A6" />
                       <Text style={styles.replyLabel}>Phản hồi của bạn</Text>
                     </View>
                     <Text style={styles.replyText}>{review.reply}</Text>
@@ -483,7 +483,7 @@ export default function SellerReviewsScreen() {
                     <Ionicons
                       name="chatbubble-outline"
                       size={16}
-                      color="#FF6B35"
+                      color="#14B8A6"
                     />
                     <Text style={styles.replyButtonText}>Trả lời</Text>
                   </Pressable>
@@ -608,8 +608,8 @@ const styles = StyleSheet.create({
     borderColor: "#E5E7EB",
   },
   activeFilterChip: {
-    backgroundColor: "#FF6B35",
-    borderColor: "#FF6B35",
+    backgroundColor: "#14B8A6",
+    borderColor: "#14B8A6",
   },
   filterChipText: {
     fontSize: 13,
@@ -728,7 +728,7 @@ const styles = StyleSheet.create({
   replyLabel: {
     fontSize: 12,
     fontWeight: "600",
-    color: "#FF6B35",
+    color: "#14B8A6",
     marginLeft: 6,
   },
   replyText: {
@@ -743,12 +743,12 @@ const styles = StyleSheet.create({
     marginTop: 12,
     paddingVertical: 8,
     borderWidth: 1,
-    borderColor: "#FF6B35",
+    borderColor: "#14B8A6",
     borderRadius: 8,
   },
   replyButtonText: {
     fontSize: 13,
-    color: "#FF6B35",
+    color: "#14B8A6",
     marginLeft: 6,
     fontWeight: "500",
   },
@@ -784,7 +784,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 6,
-    backgroundColor: "#FF6B35",
+    backgroundColor: "#14B8A6",
   },
   submitReplyText: {
     fontSize: 13,

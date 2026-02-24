@@ -64,7 +64,7 @@ const DEFAULT_PROGRESS_ITEMS: ProgressItem[] = [
     subtitle: '3/8 đợt đã thanh toán',
     progress: 37.5,
     icon: 'cash',
-    iconColor: '#0066CC',
+    iconColor: '#0D9488',
     backgroundColor: '#D1FAE5',
     route: '/construction/payment-progress',
     status: 'on-track',
@@ -111,7 +111,7 @@ export const ProgressSection: React.FC<ProgressSectionProps> = ({ items: propIte
               subtitle: getPhaseLabel(progress),
               progress: progress,
               icon: index === 0 ? 'construct' : 'cash',
-              iconColor: index === 0 ? '#666666' : '#0066CC',
+              iconColor: index === 0 ? '#666666' : '#0D9488',
               backgroundColor: index === 0 ? '#F3E8FF' : '#D1FAE5',
               route: `/projects/${project.id}`,
               status,
@@ -159,9 +159,9 @@ export const ProgressSection: React.FC<ProgressSectionProps> = ({ items: propIte
   const getStatusColor = (status: ProgressItem['status']) => {
     switch (status) {
       case 'on-track':
-        return '#0066CC';
+        return '#0D9488';
       case 'warning':
-        return '#0066CC';
+        return '#0D9488';
       case 'delayed':
         return '#000000';
     }
@@ -563,13 +563,13 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     marginRight: 6,
   },
   dataSourceText: {
     fontSize: 10,
     fontWeight: '600',
-    color: '#0066CC',
+    color: '#0D9488',
   },
 });
 

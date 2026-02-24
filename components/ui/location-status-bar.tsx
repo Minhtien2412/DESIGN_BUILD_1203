@@ -183,8 +183,8 @@ export function LocationStatusBar({
       {/* Live Indicator */}
       {isTracking && (
         <View style={styles.liveIndicator}>
-          <View style={[styles.liveDot, { backgroundColor: '#0066CC' }]} />
-          <Text style={[styles.liveText, { color: '#0066CC' }]}>LIVE</Text>
+          <View style={[styles.liveDot, { backgroundColor: '#0D9488' }]} />
+          <Text style={[styles.liveText, { color: '#0D9488' }]}>LIVE</Text>
         </View>
       )}
     </View>

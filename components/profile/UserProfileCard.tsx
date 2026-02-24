@@ -80,7 +80,7 @@ export function UserProfileCard({
               onPress={onMessagePress}
               style={({ pressed }) => [
                 styles.actionButton,
-                { backgroundColor: '#0066CC' },
+                { backgroundColor: '#0D9488' },
                 pressed && styles.buttonPressed,
               ]}
             >

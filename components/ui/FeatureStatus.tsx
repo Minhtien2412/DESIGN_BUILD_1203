@@ -36,23 +36,23 @@ export function FeatureStatusBanner({
       case 'available':
         return {
           bgColor: '#E8F5E9',
-          borderColor: '#0066CC',
+          borderColor: '#0D9488',
           iconName: 'checkmark-circle' as const,
-          iconColor: '#0066CC',
+          iconColor: '#0D9488',
         };
       case 'degraded':
         return {
-          bgColor: '#E8F4FF',
-          borderColor: '#0066CC',
+          bgColor: '#F0FDFA',
+          borderColor: '#0D9488',
           iconName: 'warning' as const,
-          iconColor: '#0066CC',
+          iconColor: '#0D9488',
         };
       case 'coming_soon':
         return {
-          bgColor: '#E8F4FF',
-          borderColor: '#0066CC',
+          bgColor: '#F0FDFA',
+          borderColor: '#0D9488',
           iconName: 'time' as const,
-          iconColor: '#0066CC',
+          iconColor: '#0D9488',
         };
       default:
         return {
@@ -118,7 +118,7 @@ export function OfflineIndicator({
     <TouchableOpacity
       style={[
         styles.offlineIndicator,
-        { backgroundColor: isConnected ? '#0066CC' : '#000000' },
+        { backgroundColor: isConnected ? '#0D9488' : '#000000' },
       ]}
       onPress={onPress}
     >
@@ -155,7 +155,7 @@ export function ComingSoonOverlay({ featureKey, children }: ComingSoonOverlayPro
       {children}
       <View style={styles.overlay}>
         <View style={styles.overlayContent}>
-          <Ionicons name="construct" size={48} color="#0066CC" />
+          <Ionicons name="construct" size={48} color="#0D9488" />
           <Text style={styles.overlayTitle}>Sắp ra mắt</Text>
           <Text style={styles.overlayMessage}>{message}</Text>
         </View>
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
   overlayTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#0066CC',
+    color: '#0D9488',
     marginTop: 16,
     marginBottom: 8,
   },

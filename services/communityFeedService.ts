@@ -4,21 +4,14 @@
  *
  * Aggregated service combining multiple data sources for community feed:
  * 1. Backend Database (Priority) - Announcements, News, Development Plans
- * 2. External APIs (Fallback) - GNews, Pexels Videos/Photos
+ * 2. Local Data - Construction videos/photos from data/videos.ts
+ * 3. External APIs (Fallback) - GNews
  *
  * @author ThietKeResort Team
  * @created 2025-01-15
  */
 
-import {
-    Announcement
-} from "./api/communication.service";
-import {
-    ExternalPhoto,
-    ExternalVideo,
-    getConstructionPhotos,
-    getConstructionVideos,
-} from "./externalContentService";
+import { Announcement } from "./api/communication.service";
 import { getConstructionNews, getRealEstateNews, NewsArticle } from "./newsApi";
 
 // ============================================
@@ -35,7 +28,7 @@ export type FeedItemType =
 export type FeedItemSource =
   | "backend" // From our database
   | "gnews" // From GNews API
-  | "pexels" // From Pexels API
+  | "local" // From local data (videos/photos)
   | "newsapi" // From NewsAPI
   | "mock"; // Fallback mock data
 
@@ -244,11 +237,21 @@ function transformNewsArticle(
   };
 }
 
-function transformVideo(video: ExternalVideo): VideoFeedItem {
+function transformVideo(video: {
+  id: string;
+  title: string;
+  description?: string;
+  thumbnail: string;
+  author?: string;
+  authorAvatarUrl?: string;
+  duration?: string;
+  views?: number;
+  createdAt?: string;
+}): VideoFeedItem {
   return {
     id: `video-${video.id}`,
     type: "video",
-    source: "pexels",
+    source: "local",
     priority: "normal",
     title: video.title || "Construction Video",
     description: video.description,
@@ -256,36 +259,40 @@ function transformVideo(video: ExternalVideo): VideoFeedItem {
     createdAt: video.createdAt || new Date().toISOString(),
     author: video.author
       ? {
-          name: video.author.name,
-          avatar: video.author.avatar,
+          name: video.author,
+          avatar: video.authorAvatarUrl,
         }
       : undefined,
-    videoUrl: video.videoUrl,
+    videoUrl: "", // local videos use YouTube player
     thumbnailUrl: video.thumbnail,
-    duration: video.duration,
+    duration: video.duration ? parseFloat(video.duration) : undefined,
     views: video.views,
     metadata: {},
   };
 }
 
-function transformPhoto(photo: ExternalPhoto): PhotoFeedItem {
+function transformLocalPhoto(photo: {
+  id: string;
+  title: string;
+  thumbnail: string;
+  author?: string;
+  description?: string;
+}): PhotoFeedItem {
   return {
     id: `photo-${photo.id}`,
     type: "photo",
-    source: "pexels",
+    source: "local",
     priority: "low",
-    title: photo.alt || "Construction Photo",
-    description: photo.alt,
+    title: photo.title || "Construction Photo",
+    description: photo.description,
     imageUrl: photo.thumbnail,
     createdAt: new Date().toISOString(),
-    author: photo.photographer
+    author: photo.author
       ? {
-          name: photo.photographer,
+          name: photo.author,
         }
       : undefined,
-    fullImageUrl: photo.url,
-    photographer: photo.photographer,
-    photographerUrl: photo.photographerUrl,
+    fullImageUrl: photo.thumbnail,
     tags: [],
   };
 }
@@ -463,35 +470,45 @@ async function fetchNews(
 }
 
 /**
- * Fetch videos from Pexels
+ * Fetch videos from local data
  */
 async function fetchVideos(
-  category?: string,
+  _category?: string,
   limit = 10,
 ): Promise<VideoFeedItem[]> {
   try {
-    // getConstructionVideos(page, perPage, category)
-    const videos = await getConstructionVideos(1, limit, "general");
-    return videos.slice(0, limit).map(transformVideo);
+    // Use local video data instead of Pexels
+    const { ALL_LOCAL_VIDEOS } = require("../data/videos");
+    const shuffled = [...ALL_LOCAL_VIDEOS].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, limit).map(transformVideo);
   } catch (error) {
-    console.error("[CommunityFeed] Error fetching videos:", error);
+    console.error("[CommunityFeed] Error fetching local videos:", error);
     return [];
   }
 }
 
 /**
- * Fetch photos from Pexels
+ * Fetch photos from local data
  */
 async function fetchPhotos(
-  category?: string,
+  _category?: string,
   limit = 10,
 ): Promise<PhotoFeedItem[]> {
   try {
-    // getConstructionPhotos(page, perPage, category)
-    const photos = await getConstructionPhotos(1, limit, "general");
-    return photos.slice(0, limit).map(transformPhoto);
+    // Use local video thumbnails as photo content
+    const { ALL_LOCAL_VIDEOS } = require("../data/videos");
+    const shuffled = [...ALL_LOCAL_VIDEOS].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, limit).map((v: any) =>
+      transformLocalPhoto({
+        id: v.id,
+        title: v.title,
+        thumbnail: v.thumbnail,
+        author: v.author,
+        description: v.description,
+      }),
+    );
   } catch (error) {
-    console.error("[CommunityFeed] Error fetching photos:", error);
+    console.error("[CommunityFeed] Error fetching local photos:", error);
     return [];
   }
 }
@@ -593,7 +610,7 @@ export async function getCommunityFeed(
     gnews: allItems.filter(
       (i) => i.source === "gnews" || i.source === "newsapi",
     ).length,
-    pexels: allItems.filter((i) => i.source === "pexels").length,
+    pexels: allItems.filter((i) => i.source === "local").length,
     other: allItems.filter((i) => i.source === "mock").length,
   };
 

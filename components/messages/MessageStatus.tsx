@@ -35,7 +35,7 @@ export function MessageStatus({ status, isRead, onRetry }: MessageStatusProps) {
       <Ionicons
         name={isRead ? 'checkmark-done' : 'checkmark'}
         size={14}
-        color={isRead ? '#3b82f6' : 'rgba(255, 255, 255, 0.6)'}
+        color={isRead ? '#0D9488' : 'rgba(255, 255, 255, 0.6)'}
       />
     </View>
   );

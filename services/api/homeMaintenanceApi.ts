@@ -98,7 +98,7 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
     id: '5',
     name: 'Mạng &\nWiFi',
     iconName: 'wifi-outline',
-    color: '#3b82f6', // blue-500
+    color: '#0D9488', // blue-500
     description: 'Cài đặt, sửa mạng internet, WiFi'
   },
   {
@@ -112,7 +112,7 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
     id: '7',
     name: 'Máy lọc\nNước',
     iconName: 'water-outline',
-    color: '#2563eb', // blue-600
+    color: '#0D9488', // blue-600
     description: 'Lắp đặt, bảo trì máy lọc nước'
   },
   {

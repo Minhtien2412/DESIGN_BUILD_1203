@@ -158,7 +158,7 @@ export default function DiaryEditScreen() {
     return (
       <Container fullWidth>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#3b82f6" />
+          <ActivityIndicator size="large" color="#0D9488" />
         </View>
       </Container>
     );
@@ -209,7 +209,7 @@ export default function DiaryEditScreen() {
                   <Ionicons
                     name={option.icon}
                     size={24}
-                    color={weather === option.value ? '#3b82f6' : '#9ca3af'}
+                    color={weather === option.value ? '#0D9488' : '#9ca3af'}
                   />
                   <Text
                     style={[
@@ -449,8 +449,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   weatherOptionActive: {
-    borderColor: '#3b82f6',
-    backgroundColor: '#E8F4FF',
+    borderColor: '#0D9488',
+    backgroundColor: '#F0FDFA',
   },
   weatherLabel: {
     fontSize: 12,
@@ -459,7 +459,7 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   weatherLabelActive: {
-    color: '#3b82f6',
+    color: '#0D9488',
   },
   totalBox: {
     flexDirection: 'row',

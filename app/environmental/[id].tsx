@@ -58,28 +58,28 @@ export default function EnvironmentalDetailScreen() {
 
   const getStatusColor = (status: string) => {
     const statusMap: Record<string, string> = {
-      COMPLIANT: '#0066CC',
+      COMPLIANT: '#0D9488',
       NON_COMPLIANT: '#000000',
-      REQUIRES_ACTION: '#0066CC',
-      COMPLETED: '#3b82f6',
+      REQUIRES_ACTION: '#0D9488',
+      COMPLETED: '#0D9488',
       IN_PROGRESS: '#666666',
       SCHEDULED: '#a855f7',
       OVERDUE: '#000000',
       GENERATED: '#6b7280',
-      STORED: '#3b82f6',
-      COLLECTED: '#0066CC',
+      STORED: '#0D9488',
+      COLLECTED: '#0D9488',
       IN_TRANSIT: '#666666',
-      DISPOSED: '#0066CC',
-      RECYCLED: '#0066CC',
+      DISPOSED: '#0D9488',
+      RECYCLED: '#0D9488',
     };
     return statusMap[status] || textMutedColor;
   };
 
   const getResultColor = (result?: 'PASS' | 'FAIL' | 'WARNING') => {
     switch (result) {
-      case 'PASS': return '#0066CC';
+      case 'PASS': return '#0D9488';
       case 'FAIL': return '#000000';
-      case 'WARNING': return '#0066CC';
+      case 'WARNING': return '#0D9488';
       default: return textMutedColor;
     }
   };
@@ -249,7 +249,7 @@ export default function EnvironmentalDetailScreen() {
                     {(record as any).exceedancePercentage !== undefined && (
                       <View style={styles.infoRow}>
                         <ThemedText variant="body" style={{ color: textMutedColor }}>Exceedance</ThemedText>
-                        <ThemedText variant="body" style={{ color: (record as any).exceedancePercentage > 0 ? '#000000' : '#0066CC' }}>
+                        <ThemedText variant="body" style={{ color: (record as any).exceedancePercentage > 0 ? '#000000' : '#0D9488' }}>
                           {(record as any).exceedancePercentage.toFixed(1)}%
                         </ThemedText>
                       </View>
@@ -447,7 +447,7 @@ export default function EnvironmentalDetailScreen() {
                   <View style={styles.measurementHeader}>
                     <ThemedText variant="body" style={{ fontWeight: '600' }}>{measurement.parameter}</ThemedText>
                     {measurement.compliant !== undefined && (
-                      <View style={[styles.smallBadge, { backgroundColor: measurement.compliant ? '#0066CC' : '#000000' }]}>
+                      <View style={[styles.smallBadge, { backgroundColor: measurement.compliant ? '#0D9488' : '#000000' }]}>
                         <ThemedText variant="caption" style={styles.badgeText}>
                           {measurement.compliant ? 'PASS' : 'FAIL'}
                         </ThemedText>

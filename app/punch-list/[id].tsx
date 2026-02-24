@@ -54,7 +54,7 @@ export default function PunchListDetailScreen() {
   const getStatusColor = (status: PunchListStatus): { bg: string; text: string } => {
     const colors: Record<PunchListStatus, { bg: string; text: string }> = {
       DRAFT: { bg: '#F3F4F6', text: '#374151' },
-      SUBMITTED: { bg: '#E8F4FF', text: '#1E40AF' },
+      SUBMITTED: { bg: '#F0FDFA', text: '#0F766E' },
       IN_PROGRESS: { bg: '#FEF3C7', text: '#92400E' },
       COMPLETED: { bg: '#D1FAE5', text: '#065F46' },
       CLOSED: { bg: '#E5E7EB', text: '#6B7280' },
@@ -64,7 +64,7 @@ export default function PunchListDetailScreen() {
 
   const getItemStatusColor = (status: PunchItemStatus): { bg: string; text: string } => {
     const colors: Record<PunchItemStatus, { bg: string; text: string }> = {
-      OPEN: { bg: '#E8F4FF', text: '#1E40AF' },
+      OPEN: { bg: '#F0FDFA', text: '#0F766E' },
       IN_PROGRESS: { bg: '#FEF3C7', text: '#92400E' },
       READY_FOR_REVIEW: { bg: '#E0E7FF', text: '#3730A3' },
       REJECTED: { bg: '#FEE2E2', text: '#991B1B' },
@@ -166,7 +166,7 @@ export default function PunchListDetailScreen() {
                       punchList.listType === 'FINAL'
                         ? '#FEE2E2'
                         : punchList.listType === 'SUBSTANTIAL_COMPLETION'
-                          ? '#E8F4FF'
+                          ? '#F0FDFA'
                           : '#FEF3C7',
                   },
                 ]}
@@ -179,7 +179,7 @@ export default function PunchListDetailScreen() {
                         punchList.listType === 'FINAL'
                           ? '#991B1B'
                           : punchList.listType === 'SUBSTANTIAL_COMPLETION'
-                            ? '#1E40AF'
+                            ? '#0F766E'
                             : '#92400E',
                     },
                   ]}
@@ -243,13 +243,13 @@ export default function PunchListDetailScreen() {
               </ThemedText>
             </View>
             <View style={[styles.statCard, { backgroundColor: cardBackground, borderColor }]}>
-              <ThemedText style={[styles.statValue, { color: '#3B82F6' }]}>
+              <ThemedText style={[styles.statValue, { color: '#0D9488' }]}>
                 {punchList.openItems}
               </ThemedText>
               <ThemedText style={[styles.statLabel, { color: secondaryText }]}>Open</ThemedText>
             </View>
             <View style={[styles.statCard, { backgroundColor: cardBackground, borderColor }]}>
-              <ThemedText style={[styles.statValue, { color: '#0066CC' }]}>
+              <ThemedText style={[styles.statValue, { color: '#0D9488' }]}>
                 {punchList.inProgressItems}
               </ThemedText>
               <ThemedText style={[styles.statLabel, { color: secondaryText }]}>
@@ -257,7 +257,7 @@ export default function PunchListDetailScreen() {
               </ThemedText>
             </View>
             <View style={[styles.statCard, { backgroundColor: cardBackground, borderColor }]}>
-              <ThemedText style={[styles.statValue, { color: '#0066CC' }]}>
+              <ThemedText style={[styles.statValue, { color: '#0D9488' }]}>
                 {punchList.completedItems}
               </ThemedText>
               <ThemedText style={[styles.statLabel, { color: secondaryText }]}>
@@ -275,10 +275,10 @@ export default function PunchListDetailScreen() {
                   width: `${punchList.completionRate}%`,
                   backgroundColor:
                     punchList.completionRate === 100
-                      ? '#0066CC'
+                      ? '#0D9488'
                       : punchList.completionRate >= 50
-                        ? '#3B82F6'
-                        : '#0066CC',
+                        ? '#0D9488'
+                        : '#0D9488',
                 },
               ]}
             />
@@ -412,10 +412,10 @@ export default function PunchListDetailScreen() {
                             width: `${item.percentComplete}%`,
                             backgroundColor:
                               item.percentComplete >= 75
-                                ? '#0066CC'
+                                ? '#0D9488'
                                 : item.percentComplete >= 50
-                                  ? '#3B82F6'
-                                  : '#0066CC',
+                                  ? '#0D9488'
+                                  : '#0D9488',
                           },
                         ]}
                       />
@@ -472,7 +472,7 @@ export default function PunchListDetailScreen() {
                   <TouchableOpacity
                     style={[
                       styles.resultButton,
-                      inspectionResult === 'PASS' && { backgroundColor: '#0066CC' },
+                      inspectionResult === 'PASS' && { backgroundColor: '#0D9488' },
                       { borderColor },
                     ]}
                     onPress={() => setInspectionResult('PASS')}

@@ -30,7 +30,7 @@ interface ChecklistItemProps {
 }
 
 const RESULT_OPTIONS: { value: InspectionResult; label: string; color: string; icon: string }[] = [
-  { value: 'PASS', label: 'Đạt', color: '#0066CC', icon: 'checkmark-circle' },
+  { value: 'PASS', label: 'Đạt', color: '#0D9488', icon: 'checkmark-circle' },
   { value: 'FAIL', label: 'Không đạt', color: '#1A1A1A', icon: 'close-circle' },
   { value: 'NA', label: 'N/A', color: '#999999', icon: 'remove-circle' },
 ];
@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   notesContainer: {
     marginTop: 12,

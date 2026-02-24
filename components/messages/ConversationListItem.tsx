@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
     color: '#999',
   },
   timeTextUnread: {
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: '600',
   },
   messageRow: {

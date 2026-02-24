@@ -281,7 +281,7 @@ function renderStatContent(props: StatCardProps, isGradient: boolean) {
               props.trend.direction === "up"
                 ? isGradient
                   ? "#fff"
-                  : "#0066CC"
+                  : "#0D9488"
                 : isGradient
                 ? "#fff"
                 : "#000000"
@@ -295,7 +295,7 @@ function renderStatContent(props: StatCardProps, isGradient: boolean) {
                   props.trend.direction === "up"
                     ? isGradient
                       ? "#fff"
-                      : "#0066CC"
+                      : "#0D9488"
                     : isGradient
                     ? "#fff"
                     : "#000000",

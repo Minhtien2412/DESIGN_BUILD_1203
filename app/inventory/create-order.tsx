@@ -252,7 +252,7 @@ export default function CreateOrderScreen() {
               Vật tư <Text style={styles.required}>*</Text>
             </Text>
             <TouchableOpacity style={styles.addButton} onPress={addItem}>
-              <Ionicons name="add-circle-outline" size={20} color="#0066CC" />
+              <Ionicons name="add-circle-outline" size={20} color="#0D9488" />
               <Text style={styles.addButtonText}>Thêm vật tư</Text>
             </TouchableOpacity>
           </View>
@@ -467,15 +467,15 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
   },
   supplierChipActive: {
-    backgroundColor: '#E8F4FF',
-    borderColor: '#0066CC',
+    backgroundColor: '#F0FDFA',
+    borderColor: '#0D9488',
   },
   supplierChipText: {
     fontSize: 14,
     color: '#666',
   },
   supplierChipTextActive: {
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: '600',
   },
   dateButton: {
@@ -499,7 +499,7 @@ const styles = StyleSheet.create({
   },
   addButtonText: {
     fontSize: 14,
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: '600',
   },
   itemCard: {
@@ -542,15 +542,15 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
   },
   materialChipActive: {
-    backgroundColor: '#E8F4FF',
-    borderColor: '#0066CC',
+    backgroundColor: '#F0FDFA',
+    borderColor: '#0D9488',
   },
   materialChipText: {
     fontSize: 13,
     color: '#666',
   },
   materialChipTextActive: {
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: '600',
   },
   row: {
@@ -592,7 +592,7 @@ const styles = StyleSheet.create({
   amountValue: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   calcRow: {
     flexDirection: 'row',
@@ -622,7 +622,7 @@ const styles = StyleSheet.create({
   totalValue: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   footer: {
     flexDirection: 'row',
@@ -649,7 +649,7 @@ const styles = StyleSheet.create({
     flex: 2,
     paddingVertical: 14,
     borderRadius: 8,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     alignItems: 'center',
   },
   saveButtonDisabled: {

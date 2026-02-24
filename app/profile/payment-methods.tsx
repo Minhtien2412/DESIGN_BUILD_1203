@@ -44,7 +44,7 @@ const PAYMENT_METHODS = [
     id: 'cod',
     name: 'Thanh toán khi nhận hàng (COD)',
     icon: 'cash-outline',
-    color: '#0066CC',
+    color: '#0D9488',
     enabled: true,
   },
   {
@@ -135,7 +135,7 @@ export default function PaymentMethodsScreen() {
           <Text style={styles.sectionTitle}>Ưu đãi thanh toán</Text>
           <View style={styles.benefitCard}>
             <View style={styles.benefitIcon}>
-              <Ionicons name="gift-outline" size={24} color="#0066CC" />
+              <Ionicons name="gift-outline" size={24} color="#0D9488" />
             </View>
             <View style={styles.benefitInfo}>
               <Text style={styles.benefitTitle}>Giảm 50K cho đơn đầu</Text>
@@ -159,7 +159,7 @@ export default function PaymentMethodsScreen() {
 
         {/* Security Info */}
         <View style={styles.securityInfo}>
-          <Ionicons name="shield-checkmark" size={20} color="#0066CC" />
+          <Ionicons name="shield-checkmark" size={20} color="#0D9488" />
           <Text style={styles.securityText}>
             Giao dịch được bảo mật với tiêu chuẩn PCI DSS
           </Text>
@@ -179,7 +179,7 @@ export default function PaymentMethodsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   header: {
     flexDirection: 'row',
@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
   },
   methodCardActive: {
     backgroundColor: '#FFF5F0',
-    borderColor: '#0066CC',
+    borderColor: '#0D9488',
   },
   methodCardDisabled: {
     opacity: 0.5,
@@ -263,13 +263,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   radioActive: {
-    borderColor: '#0066CC',
+    borderColor: '#0D9488',
   },
   radioDot: {
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   benefitCard: {
     flexDirection: 'row',
@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
   },
   securityText: {
     fontSize: 13,
-    color: '#0066CC',
+    color: '#0D9488',
   },
   footer: {
     backgroundColor: '#fff',
@@ -320,7 +320,7 @@ const styles = StyleSheet.create({
     borderTopColor: '#e0e0e0',
   },
   continueBtn: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',

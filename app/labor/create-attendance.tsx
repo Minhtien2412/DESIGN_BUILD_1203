@@ -16,13 +16,13 @@ import {
 } from 'react-native';
 
 const STATUS_OPTIONS = [
-  { value: AttendanceStatus.PRESENT, label: 'Có mặt', icon: 'checkmark-circle', color: '#0066CC' },
+  { value: AttendanceStatus.PRESENT, label: 'Có mặt', icon: 'checkmark-circle', color: '#0D9488' },
   { value: AttendanceStatus.ABSENT, label: 'Vắng', icon: 'close-circle', color: '#000000' },
-  { value: AttendanceStatus.LATE, label: 'Trễ', icon: 'time', color: '#0066CC' },
-  { value: AttendanceStatus.HALF_DAY, label: 'Nửa ngày', icon: 'remove-circle', color: '#0066CC' },
+  { value: AttendanceStatus.LATE, label: 'Trễ', icon: 'time', color: '#0D9488' },
+  { value: AttendanceStatus.HALF_DAY, label: 'Nửa ngày', icon: 'remove-circle', color: '#0D9488' },
   { value: AttendanceStatus.ON_LEAVE, label: 'Nghỉ phép', icon: 'calendar', color: '#999999' },
   { value: AttendanceStatus.SICK_LEAVE, label: 'Nghỉ ốm', icon: 'medkit', color: '#000000' },
-  { value: AttendanceStatus.EXCUSED, label: 'Có phép', icon: 'document-text', color: '#0066CC' },
+  { value: AttendanceStatus.EXCUSED, label: 'Có phép', icon: 'document-text', color: '#0D9488' },
 ];
 
 const SHIFT_OPTIONS = [
@@ -201,7 +201,7 @@ export default function CreateAttendanceScreen() {
                 <Ionicons
                   name={option.icon as any}
                   size={20}
-                  color={shiftType === option.value ? '#0066CC' : '#666'}
+                  color={shiftType === option.value ? '#0D9488' : '#666'}
                 />
                 <Text
                   style={[
@@ -358,8 +358,8 @@ const styles = StyleSheet.create({
     minWidth: 120,
   },
   workerChipActive: {
-    backgroundColor: '#E8F4FF',
-    borderColor: '#0066CC',
+    backgroundColor: '#F0FDFA',
+    borderColor: '#0D9488',
   },
   workerChipText: {
     fontSize: 14,
@@ -367,7 +367,7 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   workerChipTextActive: {
-    color: '#0066CC',
+    color: '#0D9488',
   },
   workerChipSubtext: {
     fontSize: 11,
@@ -414,15 +414,15 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
   },
   shiftChipActive: {
-    backgroundColor: '#E8F4FF',
-    borderColor: '#0066CC',
+    backgroundColor: '#F0FDFA',
+    borderColor: '#0D9488',
   },
   shiftChipText: {
     fontSize: 13,
     color: '#666',
   },
   shiftChipTextActive: {
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: '600',
   },
   field: {
@@ -486,7 +486,7 @@ const styles = StyleSheet.create({
     flex: 2,
     paddingVertical: 14,
     borderRadius: 8,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     alignItems: 'center',
   },
   saveButtonDisabled: {

@@ -350,7 +350,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   forgotPasswordText: {
-    color: '#0066CC',
+    color: '#0D9488',
     fontSize: 14,
     textDecorationLine: 'underline',
   },
@@ -382,7 +382,7 @@ const styles = StyleSheet.create({
   },
   registerLink: {
     fontSize: 16,
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: '600',
     marginLeft: 4,
     textDecorationLine: 'underline',
@@ -393,7 +393,7 @@ const styles = StyleSheet.create({
   },
   apiStatusText: {
     fontSize: 12,
-    color: '#0066CC',
+    color: '#0D9488',
     fontFamily: 'monospace',
   },
   loadingText: {

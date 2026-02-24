@@ -33,7 +33,7 @@ interface ReportSection {
 }
 
 const REPORT_SECTIONS: ReportSection[] = [
-  { id: 'overview', title: 'Tổng quan', icon: 'analytics', color: '#3b82f6' },
+  { id: 'overview', title: 'Tổng quan', icon: 'analytics', color: '#0D9488' },
   { id: 'tasks', title: 'Công việc', icon: 'checkbox', color: '#22c55e' },
   { id: 'time', title: 'Thời gian', icon: 'time', color: '#f59e0b' },
   { id: 'finance', title: 'Tài chính', icon: 'wallet', color: '#8b5cf6' },
@@ -143,7 +143,7 @@ export default function ReportsScreen() {
         <Text style={[styles.cardTitle, { color: textColor }]}>Trạng thái dự án</Text>
         <View style={styles.statsGrid}>
           <View style={styles.statBox}>
-            <Text style={[styles.statNumber, { color: '#3b82f6' }]}>{overviewData.totalProjects}</Text>
+            <Text style={[styles.statNumber, { color: '#0D9488' }]}>{overviewData.totalProjects}</Text>
             <Text style={[styles.statLabel, { color: textColor }]}>Tổng dự án</Text>
           </View>
           <View style={styles.statBox}>
@@ -208,7 +208,7 @@ export default function ReportsScreen() {
             <Text style={[styles.taskStatLabel, { color: textColor }]}>Hoàn thành</Text>
           </View>
           <View style={styles.taskStatItem}>
-            <Text style={[styles.taskStatNumber, { color: '#3b82f6' }]}>{taskData.inProgress}</Text>
+            <Text style={[styles.taskStatNumber, { color: '#0D9488' }]}>{taskData.inProgress}</Text>
             <Text style={[styles.taskStatLabel, { color: textColor }]}>Đang làm</Text>
           </View>
           <View style={styles.taskStatItem}>
@@ -255,7 +255,7 @@ export default function ReportsScreen() {
         <Text style={[styles.cardTitle, { color: textColor }]}>Tổng hợp thời gian</Text>
         <View style={styles.timeSummary}>
           <View style={styles.timeStat}>
-            <Ionicons name="time" size={32} color="#3b82f6" />
+            <Ionicons name="time" size={32} color="#0D9488" />
             <Text style={[styles.timeValue, { color: textColor }]}>{timeData.totalHours}h</Text>
             <Text style={[styles.timeLabel, { color: textColor }]}>Tổng giờ</Text>
           </View>
@@ -286,7 +286,7 @@ export default function ReportsScreen() {
                   styles.projectTimeProgress,
                   {
                     width: `${(project.hours / timeData.totalHours) * 100}%`,
-                    backgroundColor: ['#3b82f6', '#22c55e', '#f59e0b', '#8b5cf6', '#6b7280'][index],
+                    backgroundColor: ['#0D9488', '#22c55e', '#f59e0b', '#8b5cf6', '#6b7280'][index],
                   },
                 ]}
               />
@@ -359,7 +359,7 @@ export default function ReportsScreen() {
       {/* Monthly Revenue */}
       <View style={[styles.card, { backgroundColor: cardBg, borderColor }]}>
         <Text style={[styles.cardTitle, { color: textColor }]}>Doanh thu theo tuần</Text>
-        {renderBarChart(financeData.monthlyRevenue, '#3b82f6')}
+        {renderBarChart(financeData.monthlyRevenue, '#0D9488')}
       </View>
     </View>
   );

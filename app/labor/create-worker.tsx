@@ -274,7 +274,7 @@ export default function CreateWorkerScreen() {
                 <Ionicons
                   name={option.icon as any}
                   size={24}
-                  color={role === option.value ? '#0066CC' : '#666'}
+                  color={role === option.value ? '#0D9488' : '#666'}
                 />
                 <Text
                   style={[styles.roleLabel, role === option.value && styles.roleLabelActive]}
@@ -431,7 +431,7 @@ export default function CreateWorkerScreen() {
               onChangeText={setCustomSkill}
             />
             <TouchableOpacity style={styles.addSkillButton} onPress={addCustomSkill}>
-              <Ionicons name="add-circle-outline" size={24} color="#0066CC" />
+              <Ionicons name="add-circle-outline" size={24} color="#0D9488" />
             </TouchableOpacity>
           </View>
 
@@ -573,8 +573,8 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   roleCardActive: {
-    backgroundColor: '#E8F4FF',
-    borderColor: '#0066CC',
+    backgroundColor: '#F0FDFA',
+    borderColor: '#0D9488',
   },
   roleLabel: {
     fontSize: 12,
@@ -582,7 +582,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   roleLabelActive: {
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: '600',
   },
   skillsGrid: {
@@ -599,15 +599,15 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
   },
   skillChipActive: {
-    backgroundColor: '#E8F4FF',
-    borderColor: '#0066CC',
+    backgroundColor: '#F0FDFA',
+    borderColor: '#0D9488',
   },
   skillChipText: {
     fontSize: 13,
     color: '#666',
   },
   skillChipTextActive: {
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: '600',
   },
   customSkillRow: {
@@ -659,7 +659,7 @@ const styles = StyleSheet.create({
     flex: 2,
     paddingVertical: 14,
     borderRadius: 8,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     alignItems: 'center',
   },
   saveButtonDisabled: {

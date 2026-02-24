@@ -26,9 +26,9 @@ const STATUS_FILTERS: { value: DailyReportStatus | 'ALL'; label: string }[] = [
 
 const STATUS_COLORS: Record<DailyReportStatus, string> = {
   DRAFT: '#6B7280',
-  SUBMITTED: '#3B82F6',
-  UNDER_REVIEW: '#0066CC',
-  APPROVED: '#0066CC',
+  SUBMITTED: '#0D9488',
+  UNDER_REVIEW: '#0D9488',
+  APPROVED: '#0D9488',
   REJECTED: '#000000',
   REVISED: '#666666',
 };
@@ -46,14 +46,14 @@ const WEATHER_ICONS: Record<WeatherCondition, string> = {
 };
 
 const WEATHER_COLORS: Record<WeatherCondition, string> = {
-  CLEAR: '#0066CC',
-  PARTLY_CLOUDY: '#3B82F6',
+  CLEAR: '#0D9488',
+  PARTLY_CLOUDY: '#0D9488',
   CLOUDY: '#6B7280',
-  LIGHT_RAIN: '#3B82F6',
-  HEAVY_RAIN: '#1E40AF',
+  LIGHT_RAIN: '#0D9488',
+  HEAVY_RAIN: '#0F766E',
   STORM: '#666666',
   FOG: '#9CA3AF',
-  SNOW: '#60A5FA',
+  SNOW: '#2DD4BF',
   EXTREME_HEAT: '#000000',
 };
 
@@ -106,7 +106,7 @@ export default function DailyReportsScreen() {
   if (loading && !dailyReports.length) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#3B82F6" />
+        <ActivityIndicator size="large" color="#0D9488" />
       </View>
     );
   }
@@ -119,7 +119,7 @@ export default function DailyReportsScreen() {
     <View style={styles.container}>
       {/* Stats Cards */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.statsContainer}>
-        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
+        <View style={[styles.statCard, { backgroundColor: '#F0FDFA' }]}>
           <Text style={styles.statValue}>{dailyReports.length}</Text>
           <Text style={styles.statLabel}>Total Reports</Text>
         </View>
@@ -129,20 +129,20 @@ export default function DailyReportsScreen() {
           <Text style={styles.statLabel}>Draft</Text>
         </View>
 
-        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
-          <Text style={[styles.statValue, { color: '#3B82F6' }]}>{submittedCount}</Text>
+        <View style={[styles.statCard, { backgroundColor: '#F0FDFA' }]}>
+          <Text style={[styles.statValue, { color: '#0D9488' }]}>{submittedCount}</Text>
           <Text style={styles.statLabel}>Submitted</Text>
         </View>
 
         <View style={[styles.statCard, { backgroundColor: '#D1FAE5' }]}>
-          <Text style={[styles.statValue, { color: '#0066CC' }]}>{approvedCount}</Text>
+          <Text style={[styles.statValue, { color: '#0D9488' }]}>{approvedCount}</Text>
           <Text style={styles.statLabel}>Approved</Text>
         </View>
 
         {summary && (
           <>
             <View style={[styles.statCard, { backgroundColor: '#FEF3C7', minWidth: 120 }]}>
-              <Text style={[styles.statValue, { color: '#0066CC' }]}>
+              <Text style={[styles.statValue, { color: '#0D9488' }]}>
                 {summary.totalManpower.toLocaleString()}
               </Text>
               <Text style={styles.statLabel}>Total Manpower</Text>
@@ -253,7 +253,7 @@ export default function DailyReportsScreen() {
                   </View>
                   {report.weather.weatherImpact && (
                     <View style={styles.impactBadge}>
-                      <Ionicons name="warning" size={14} color="#0066CC" />
+                      <Ionicons name="warning" size={14} color="#0D9488" />
                       <Text style={styles.impactText}>Weather Impact</Text>
                     </View>
                   )}
@@ -261,7 +261,7 @@ export default function DailyReportsScreen() {
 
                 <View style={styles.statsGrid}>
                   <View style={styles.statItem}>
-                    <Ionicons name="people-outline" size={16} color="#3B82F6" />
+                    <Ionicons name="people-outline" size={16} color="#0D9488" />
                     <Text style={styles.statItemValue}>{report.totalManpower}</Text>
                     <Text style={styles.statItemLabel}>Workers</Text>
                   </View>
@@ -277,7 +277,7 @@ export default function DailyReportsScreen() {
                   <View style={styles.statDivider} />
 
                   <View style={styles.statItem}>
-                    <Ionicons name="shield-checkmark-outline" size={16} color="#0066CC" />
+                    <Ionicons name="shield-checkmark-outline" size={16} color="#0D9488" />
                     <Text style={styles.statItemValue}>
                       {report.safety.incidentCount === 0 ? '✓' : report.safety.incidentCount}
                     </Text>
@@ -287,7 +287,7 @@ export default function DailyReportsScreen() {
                   <View style={styles.statDivider} />
 
                   <View style={styles.statItem}>
-                    <Ionicons name="trending-up-outline" size={16} color="#0066CC" />
+                    <Ionicons name="trending-up-outline" size={16} color="#0D9488" />
                     <Text style={styles.statItemValue}>{report.overallProgressPercent}%</Text>
                     <Text style={styles.statItemLabel}>Progress</Text>
                   </View>
@@ -336,7 +336,7 @@ export default function DailyReportsScreen() {
                   )}
                   {report.delays.length > 0 && (
                     <View style={styles.alertItem}>
-                      <Ionicons name="time-outline" size={16} color="#0066CC" />
+                      <Ionicons name="time-outline" size={16} color="#0D9488" />
                       <Text style={styles.alertText}>{report.delays.length} Delay(s)</Text>
                     </View>
                   )}
@@ -359,7 +359,7 @@ export default function DailyReportsScreen() {
               {/* Actions */}
               <View style={styles.actions}>
                 <TouchableOpacity style={styles.actionButton}>
-                  <Ionicons name="eye-outline" size={18} color="#3B82F6" />
+                  <Ionicons name="eye-outline" size={18} color="#0D9488" />
                   <Text style={styles.actionButtonText}>View</Text>
                 </TouchableOpacity>
 
@@ -475,8 +475,8 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   filterChipActive: {
-    backgroundColor: '#3B82F6',
-    borderColor: '#3B82F6',
+    backgroundColor: '#0D9488',
+    borderColor: '#0D9488',
   },
   filterChipText: {
     fontSize: 13,
@@ -589,7 +589,7 @@ const styles = StyleSheet.create({
   impactText: {
     fontSize: 10,
     fontWeight: '600',
-    color: '#0066CC',
+    color: '#0D9488',
     marginLeft: 4,
   },
   statsGrid: {
@@ -654,7 +654,7 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#0D9488',
     marginRight: 6,
   },
   activityText: {
@@ -665,7 +665,7 @@ const styles = StyleSheet.create({
   activityProgress: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#0066CC',
+    color: '#0D9488',
     marginLeft: 6,
   },
   moreActivities: {
@@ -722,10 +722,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#F3F4F6',
   },
   actionButtonPrimary: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#0D9488',
   },
   actionButtonSuccess: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   actionButtonText: {
     fontSize: 12,

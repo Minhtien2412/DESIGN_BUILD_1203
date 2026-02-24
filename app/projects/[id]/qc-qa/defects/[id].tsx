@@ -48,11 +48,11 @@ export default function DefectDetailScreen() {
       case 'OPEN':
         return '#000000';
       case 'IN_PROGRESS':
-        return '#0066CC';
+        return '#0D9488';
       case 'RESOLVED':
-        return '#0066CC';
+        return '#0D9488';
       case 'VERIFIED':
-        return '#0066CC';
+        return '#0D9488';
       case 'CLOSED':
         return '#999999';
       default:
@@ -65,7 +65,7 @@ export default function DefectDetailScreen() {
       case 'CRITICAL':
         return '#D32F2F';
       case 'MAJOR':
-        return '#0066CC';
+        return '#0D9488';
       case 'MINOR':
         return '#FBC02D';
       case 'COSMETIC':
@@ -248,7 +248,7 @@ export default function DefectDetailScreen() {
         {defect.assignedTo && (
           <View style={styles.section}>
             <View style={styles.infoRow}>
-              <Ionicons name="person-circle" size={20} color="#0066CC" />
+              <Ionicons name="person-circle" size={20} color="#0D9488" />
               <View style={styles.infoContent}>
                 <Text style={styles.infoLabel}>Người phụ trách</Text>
                 <Text style={styles.infoValue}>{defect.assignedToName || defect.assignedTo}</Text>
@@ -548,7 +548,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     paddingVertical: 12,
     borderRadius: 8,
     gap: 8,

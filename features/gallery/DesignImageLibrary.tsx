@@ -150,7 +150,7 @@ export const DESIGN_CATEGORIES: DesignCategory[] = [
     label: "Biệt thự",
     labelEn: "Villa",
     icon: "business",
-    color: "#3b82f6",
+    color: "#0D9488",
     keywords: [
       "modern villa exterior",
       "luxury villa",
@@ -255,7 +255,7 @@ const COLOR_TONE_OPTIONS: {
 }[] = [
   { value: "all", label: "Tất cả", colors: ["#6366f1", "#ec4899", "#22c55e"] },
   { value: "warm", label: "Ấm", colors: ["#f59e0b", "#ef4444", "#f97316"] },
-  { value: "cool", label: "Lạnh", colors: ["#3b82f6", "#06b6d4", "#8b5cf6"] },
+  { value: "cool", label: "Lạnh", colors: ["#0D9488", "#06b6d4", "#8b5cf6"] },
   {
     value: "neutral",
     label: "Trung tính",

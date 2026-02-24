@@ -7,7 +7,7 @@
 export const ColorSystem = {
   // Primary Brand Colors (Professional Blue)
   primary: {
-    main: '#0066CC',      // Professional blue
+    main: '#0D9488',      // Professional blue
     light: '#3399FF',     // Light blue
     dark: '#004C99',      // Dark blue
     contrast: '#FFFFFF',   // Text trên primary
@@ -37,7 +37,7 @@ export const ColorSystem = {
 
   // Semantic Colors (Blue tones only)
   success: {
-    main: '#0066CC',
+    main: '#0D9488',
     light: '#3399FF',
     dark: '#004C99',
     bg: '#E6F2FF',
@@ -51,14 +51,14 @@ export const ColorSystem = {
   },
 
   warning: {
-    main: '#0080FF',
+    main: '#14B8A6',
     light: '#33A3FF',
-    dark: '#0066CC',
+    dark: '#0D9488',
     bg: '#E6F2FF',
   },
 
   info: {
-    main: '#0066CC',
+    main: '#0D9488',
     light: '#3399FF',
     dark: '#004C99',
     bg: '#E6F2FF',

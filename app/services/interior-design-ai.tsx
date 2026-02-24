@@ -46,7 +46,7 @@ interface RoomInfo {
 // ==================== DATA ====================
 
 const INTERIOR_STYLES = [
-  { id: 'modern', name: 'Hiện đại', icon: '🏢', color: '#3B82F6' },
+  { id: 'modern', name: 'Hiện đại', icon: '🏢', color: '#0D9488' },
   { id: 'classic', name: 'Cổ điển', icon: '🏛️', color: '#8B5A2B' },
   { id: 'minimalist', name: 'Tối giản', icon: '⬜', color: '#6B7280' },
   { id: 'scandinavian', name: 'Scandinavian', icon: '🌲', color: '#10B981' },
@@ -70,7 +70,7 @@ const ROOM_TYPES = [
 const COLOR_PALETTES = [
   { id: 'neutral', name: 'Trung tính', colors: ['#F5F5F4', '#D6D3D1', '#78716C', '#44403C'] },
   { id: 'warm', name: 'Ấm áp', colors: ['#FEF3C7', '#FBBF24', '#D97706', '#92400E'] },
-  { id: 'cool', name: 'Mát mẻ', colors: ['#E0F2FE', '#38BDF8', '#0284C7', '#075985'] },
+  { id: 'cool', name: 'Mát mẻ', colors: ['#E0F2FE', '#38BDF8', '#0D9488', '#075985'] },
   { id: 'earth', name: 'Đất', colors: ['#ECFCCB', '#84CC16', '#65A30D', '#3F6212'] },
   { id: 'luxury', name: 'Sang trọng', colors: ['#1E1E1E', '#4A3728', '#C49A6C', '#E5D5C5'] },
 ];

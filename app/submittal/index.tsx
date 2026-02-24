@@ -37,21 +37,21 @@ const STATUS_FILTERS: { value: SubmittalStatus | 'ALL'; label: string }[] = [
 
 const STATUS_COLORS: Record<SubmittalStatus, string> = {
   DRAFT: '#6B7280',
-  SUBMITTED: '#0080FF',
-  UNDER_REVIEW: '#0080FF',
-  APPROVED: '#0066CC',
-  APPROVED_AS_NOTED: '#0066CC',
-  REVISE_AND_RESUBMIT: '#0066CC',
+  SUBMITTED: '#14B8A6',
+  UNDER_REVIEW: '#14B8A6',
+  APPROVED: '#0D9488',
+  APPROVED_AS_NOTED: '#0D9488',
+  REVISE_AND_RESUBMIT: '#0D9488',
   REJECTED: '#000000',
   SUPERSEDED: '#9CA3AF',
   WITHDRAWN: '#6B7280',
 };
 
 const PRIORITY_COLORS: Record<SubmittalPriority, string> = {
-  LOW: '#0066CC',
-  MEDIUM: '#0080FF',
-  HIGH: '#0080FF',
-  URGENT: '#0066CC',
+  LOW: '#0D9488',
+  MEDIUM: '#14B8A6',
+  HIGH: '#14B8A6',
+  URGENT: '#0D9488',
   CRITICAL: '#000000',
 };
 
@@ -101,7 +101,7 @@ export default function SubmittalsScreen() {
   if (loading && !submittals.length) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#0080FF" />
+        <ActivityIndicator size="large" color="#14B8A6" />
       </View>
     );
   }
@@ -115,23 +115,23 @@ export default function SubmittalsScreen() {
     <View style={styles.container}>
       {/* Stats Cards */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.statsContainer}>
-        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
+        <View style={[styles.statCard, { backgroundColor: '#F0FDFA' }]}>
           <Text style={styles.statValue}>{submittals.length}</Text>
           <Text style={styles.statLabel}>Total</Text>
         </View>
 
-        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
-          <Text style={[styles.statValue, { color: '#0080FF' }]}>{submittedCount}</Text>
+        <View style={[styles.statCard, { backgroundColor: '#F0FDFA' }]}>
+          <Text style={[styles.statValue, { color: '#14B8A6' }]}>{submittedCount}</Text>
           <Text style={styles.statLabel}>Submitted</Text>
         </View>
 
         <View style={[styles.statCard, { backgroundColor: '#FEF3C7' }]}>
-          <Text style={[styles.statValue, { color: '#0080FF' }]}>{underReviewCount}</Text>
+          <Text style={[styles.statValue, { color: '#14B8A6' }]}>{underReviewCount}</Text>
           <Text style={styles.statLabel}>Under Review</Text>
         </View>
 
         <View style={[styles.statCard, { backgroundColor: '#D1FAE5' }]}>
-          <Text style={[styles.statValue, { color: '#0066CC' }]}>{approvedCount}</Text>
+          <Text style={[styles.statValue, { color: '#0D9488' }]}>{approvedCount}</Text>
           <Text style={styles.statLabel}>Approved</Text>
         </View>
 
@@ -264,7 +264,7 @@ export default function SubmittalsScreen() {
                   </Text>
 
                   <View style={styles.specBadge}>
-                    <Ionicons name="book-outline" size={12} color="#0066CC" style={{ marginRight: 4 }} />
+                    <Ionicons name="book-outline" size={12} color="#0D9488" style={{ marginRight: 4 }} />
                     <Text style={styles.specBadgeText}>{submittal.specSection}</Text>
                   </View>
                 </View>
@@ -303,7 +303,7 @@ export default function SubmittalsScreen() {
                       {daysToReview !== null && (
                         <Text
                           style={{
-                            color: daysToReview < 0 ? '#000000' : daysToReview < 3 ? '#0080FF' : '#6B7280',
+                            color: daysToReview < 0 ? '#000000' : daysToReview < 3 ? '#14B8A6' : '#6B7280',
                           }}
                         >
                           {' '}
@@ -333,9 +333,9 @@ export default function SubmittalsScreen() {
                             {
                               backgroundColor:
                                 reviewer.status === 'COMPLETED'
-                                  ? '#0066CC'
+                                  ? '#0D9488'
                                   : reviewer.status === 'IN_PROGRESS'
-                                  ? '#0080FF'
+                                  ? '#14B8A6'
                                   : reviewer.status === 'OVERDUE'
                                   ? '#000000'
                                   : '#6B7280',
@@ -367,7 +367,7 @@ export default function SubmittalsScreen() {
               {/* Actions */}
               <View style={styles.actions}>
                 <TouchableOpacity style={styles.actionButton}>
-                  <Ionicons name="eye-outline" size={18} color="#0080FF" />
+                  <Ionicons name="eye-outline" size={18} color="#14B8A6" />
                   <Text style={styles.actionButtonText}>View</Text>
                 </TouchableOpacity>
 
@@ -492,8 +492,8 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   filterChipActive: {
-    backgroundColor: '#0080FF',
-    borderColor: '#0080FF',
+    backgroundColor: '#14B8A6',
+    borderColor: '#14B8A6',
   },
   filterChipText: {
     fontSize: 13,
@@ -662,13 +662,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#F3F4F6',
   },
   actionButtonPrimary: {
-    backgroundColor: '#0080FF',
+    backgroundColor: '#14B8A6',
   },
   actionButtonSuccess: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   actionButtonWarning: {
-    backgroundColor: '#0080FF',
+    backgroundColor: '#14B8A6',
   },
   actionButtonText: {
     fontSize: 12,

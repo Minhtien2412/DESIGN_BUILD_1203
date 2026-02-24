@@ -127,7 +127,7 @@ export default function VideoCallExampleScreen() {
           joins the call.
         </Text>
         <View style={styles.notificationBadge}>
-          <Ionicons name="notifications" size={24} color="#0066CC" />
+          <Ionicons name="notifications" size={24} color="#0D9488" />
           {unreadCount > 0 && (
             <View style={styles.badge}>
               <Text style={styles.badgeText}>{unreadCount}</Text>
@@ -158,7 +158,7 @@ export default function VideoCallExampleScreen() {
                 // This is just for UI demonstration
               }}
             >
-              <Ionicons name="videocam" size={24} color="#0066CC" />
+              <Ionicons name="videocam" size={24} color="#0D9488" />
               <View style={styles.meetingInfo}>
                 <Text style={styles.meetingTitle}>{notification.title}</Text>
                 <Text style={styles.meetingBody}>{notification.body}</Text>
@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: -4,
     right: -4,
-    backgroundColor: "#0066CC",
+    backgroundColor: "#0D9488",
     borderRadius: 10,
     paddingHorizontal: 6,
     paddingVertical: 2,
@@ -288,7 +288,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFF9E6",
     borderRadius: 12,
     borderLeftWidth: 4,
-    borderLeftColor: "#0066CC",
+    borderLeftColor: "#0D9488",
   },
   notesTitle: {
     fontSize: 16,

@@ -164,7 +164,7 @@ useHideTabBar(true);`}
 
             {/* Bottom indicator */}
             <View style={styles.bottomIndicator}>
-              <Ionicons name="checkmark-circle" size={24} color="#0066CC" />
+              <Ionicons name="checkmark-circle" size={24} color="#0D9488" />
               <Text style={styles.bottomText}>
                 ✅ Content này không bị tab bar che!
               </Text>
@@ -370,7 +370,7 @@ const styles = StyleSheet.create({
   bottomText: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#0066CC',
+    color: '#0D9488',
     textAlign: 'center',
   },
   fixedBottom: {

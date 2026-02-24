@@ -16,12 +16,12 @@ import {
 } from 'react-native';
 
 const PHASE_COLORS = [
-  { value: '#0066CC', label: 'Xanh dương', icon: 'water' },
-  { value: '#0066CC', label: 'Xanh lá', icon: 'leaf' },
+  { value: '#0D9488', label: 'Xanh dương', icon: 'water' },
+  { value: '#0D9488', label: 'Xanh lá', icon: 'leaf' },
   { value: '#000000', label: 'Đỏ', icon: 'flame' },
-  { value: '#0066CC', label: 'Cam', icon: 'sunny' },
-  { value: '#0066CC', label: 'Tím', icon: 'flower' },
-  { value: '#0066CC', label: 'Hồng', icon: 'heart' },
+  { value: '#0D9488', label: 'Cam', icon: 'sunny' },
+  { value: '#0D9488', label: 'Tím', icon: 'flower' },
+  { value: '#0D9488', label: 'Hồng', icon: 'heart' },
   { value: '#4A4A4A', label: 'Xám', icon: 'settings' },
 ];
 
@@ -165,7 +165,7 @@ export default function CreatePhaseScreen() {
                 style={styles.dateButton}
                 onPress={() => setShowStartPicker(true)}
               >
-                <Ionicons name="calendar-outline" size={20} color="#0066CC" />
+                <Ionicons name="calendar-outline" size={20} color="#0D9488" />
                 <View style={styles.dateContent}>
                   <Text style={styles.dateLabel}>Bắt đầu</Text>
                   <Text style={styles.dateValue}>{formatDate(startDate)}</Text>
@@ -178,7 +178,7 @@ export default function CreatePhaseScreen() {
                 style={styles.dateButton}
                 onPress={() => setShowEndPicker(true)}
               >
-                <Ionicons name="calendar-outline" size={20} color="#0066CC" />
+                <Ionicons name="calendar-outline" size={20} color="#0D9488" />
                 <View style={styles.dateContent}>
                   <Text style={styles.dateLabel}>Kết thúc</Text>
                   <Text style={styles.dateValue}>{formatDate(endDate)}</Text>
@@ -235,7 +235,7 @@ export default function CreatePhaseScreen() {
                   <Ionicons 
                     name={iconItem.value as any} 
                     size={24} 
-                    color={selectedIcon === iconItem.value ? '#0066CC' : '#666'} 
+                    color={selectedIcon === iconItem.value ? '#0D9488' : '#666'} 
                   />
                   <Text style={[
                     styles.iconLabel,
@@ -389,7 +389,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     padding: 10,
     borderRadius: 6,
     marginTop: 8,
@@ -432,8 +432,8 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   iconOptionSelected: {
-    borderColor: '#0066CC',
-    backgroundColor: '#E8F4FF',
+    borderColor: '#0D9488',
+    backgroundColor: '#F0FDFA',
   },
   iconLabel: {
     fontSize: 11,
@@ -442,7 +442,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   iconLabelSelected: {
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: '600',
   },
   preview: {
@@ -475,7 +475,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 14,
     borderRadius: 8,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     alignItems: 'center',
   },
   saveButtonDisabled: {

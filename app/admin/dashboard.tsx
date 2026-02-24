@@ -31,9 +31,9 @@ function StatCard({ icon, title, value, color, onPress }: any) {
 
 function RecentProjectCard({ project, colors }: any) {
   const statusColors: any = {
-    planning: '#0066CC',
-    active: '#3b82f6',
-    completed: '#0066CC',
+    planning: '#0D9488',
+    active: '#0D9488',
+    completed: '#0D9488',
     paused: '#000000',
   };
 
@@ -200,21 +200,21 @@ export default function AdminDashboard() {
               icon="folder-outline"
               title="Tổng dự án"
               value={stats.total_projects}
-              color="#3b82f6"
+              color="#0D9488"
               onPress={() => router.push('/admin/projects' as Href)}
             />
             <StatCard
               icon="pulse-outline"
               title="Đang thực hiện"
               value={stats.active_projects}
-              color="#0066CC"
+              color="#0D9488"
               onPress={() => router.push('/admin/projects?status=active' as Href)}
             />
             <StatCard
               icon="people-outline"
               title="Nhân viên"
               value={stats.total_staff}
-              color="#0066CC"
+              color="#0D9488"
               onPress={() => router.push('/admin/staff')}
             />
             <StatCard

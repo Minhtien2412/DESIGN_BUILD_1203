@@ -110,7 +110,7 @@ export const CATEGORY_COLORS: Record<MaterialCategory, string> = {
   brick: "#ef4444",
   cement: "#6b7280",
   sand: "#f59e0b",
-  steel: "#3b82f6",
+  steel: "#0D9488",
   stone: "#8b5cf6",
   wood: "#a3a314",
   paint: "#ec4899",

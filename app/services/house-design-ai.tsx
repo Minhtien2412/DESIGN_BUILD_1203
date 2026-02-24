@@ -702,7 +702,7 @@ export default function HouseDesignAIScreen() {
         <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
           {/* Header */}
           <LinearGradient
-            colors={['#3B82F6', '#1D4ED8']}
+            colors={['#0D9488', '#0F766E']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.header}

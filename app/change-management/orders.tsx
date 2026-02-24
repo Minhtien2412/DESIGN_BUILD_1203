@@ -50,13 +50,13 @@ export default function ChangeOrdersScreen() {
       case 'DRAFT':
         return '#999999';
       case 'ISSUED':
-        return '#0066CC';
+        return '#0D9488';
       case 'ACCEPTED':
-        return '#0066CC';
+        return '#0D9488';
       case 'REJECTED':
         return '#1A1A1A';
       case 'EXECUTED':
-        return '#0066CC';
+        return '#0D9488';
       case 'CLOSED':
         return '#4A4A4A';
       default:
@@ -88,9 +88,9 @@ export default function ChangeOrdersScreen() {
       case 'NOT_STARTED':
         return '#999999';
       case 'IN_PROGRESS':
-        return '#0066CC';
+        return '#0D9488';
       case 'COMPLETED':
-        return '#0066CC';
+        return '#0D9488';
       default:
         return '#999999';
     }
@@ -127,7 +127,7 @@ export default function ChangeOrdersScreen() {
   if (loading) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#0066CC" />
+        <ActivityIndicator size="large" color="#0D9488" />
         <Text style={styles.loadingText}>Đang tải...</Text>
       </View>
     );
@@ -149,24 +149,24 @@ export default function ChangeOrdersScreen() {
     <View style={styles.container}>
       {/* Header Stats */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.statsContainer}>
-        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
+        <View style={[styles.statCard, { backgroundColor: '#F0FDFA' }]}>
           <Text style={styles.statValue}>{stats.total}</Text>
           <Text style={styles.statLabel}>Tổng lệnh</Text>
         </View>
-        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
-          <Text style={[styles.statValue, { color: '#0066CC' }]}>{stats.issued}</Text>
+        <View style={[styles.statCard, { backgroundColor: '#F0FDFA' }]}>
+          <Text style={[styles.statValue, { color: '#0D9488' }]}>{stats.issued}</Text>
           <Text style={styles.statLabel}>Đã phát hành</Text>
         </View>
         <View style={[styles.statCard, { backgroundColor: '#C8E6C9' }]}>
-          <Text style={[styles.statValue, { color: '#0066CC' }]}>{stats.accepted}</Text>
+          <Text style={[styles.statValue, { color: '#0D9488' }]}>{stats.accepted}</Text>
           <Text style={styles.statLabel}>Đã chấp nhận</Text>
         </View>
         <View style={[styles.statCard, { backgroundColor: '#B2EBF2' }]}>
-          <Text style={[styles.statValue, { color: '#0066CC' }]}>{stats.executed}</Text>
+          <Text style={[styles.statValue, { color: '#0D9488' }]}>{stats.executed}</Text>
           <Text style={styles.statLabel}>Đã thực hiện</Text>
         </View>
-        <View style={[styles.statCard, { backgroundColor: '#E8F4FF', minWidth: 150 }]}>
-          <Text style={[styles.statValue, { fontSize: 18, color: '#0066CC' }]}>
+        <View style={[styles.statCard, { backgroundColor: '#F0FDFA', minWidth: 150 }]}>
+          <Text style={[styles.statValue, { fontSize: 18, color: '#0D9488' }]}>
             {formatCurrency(stats.totalValue)}
           </Text>
           <Text style={styles.statLabel}>Tổng giá trị</Text>
@@ -308,7 +308,7 @@ export default function ChangeOrdersScreen() {
                 </View>
                 <View style={styles.financialRow}>
                   <Text style={styles.financialLabel}>Thay đổi:</Text>
-                  <Text style={[styles.financialValue, { color: '#0066CC', fontWeight: 'bold' }]}>
+                  <Text style={[styles.financialValue, { color: '#0D9488', fontWeight: 'bold' }]}>
                     +{formatCurrency(order.changeValue, order.currency)}
                   </Text>
                 </View>
@@ -374,14 +374,14 @@ export default function ChangeOrdersScreen() {
               {/* Actions */}
               <View style={styles.orderActions}>
                 <TouchableOpacity style={styles.actionButton}>
-                  <Ionicons name="eye-outline" size={18} color="#0066CC" />
+                  <Ionicons name="eye-outline" size={18} color="#0D9488" />
                   <Text style={styles.actionButtonText}>Xem</Text>
                 </TouchableOpacity>
                 {order.status === 'ISSUED' && (
                   <>
                     <TouchableOpacity style={styles.actionButton}>
-                      <Ionicons name="checkmark-circle-outline" size={18} color="#0066CC" />
-                      <Text style={[styles.actionButtonText, { color: '#0066CC' }]}>Chấp nhận</Text>
+                      <Ionicons name="checkmark-circle-outline" size={18} color="#0D9488" />
+                      <Text style={[styles.actionButtonText, { color: '#0D9488' }]}>Chấp nhận</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.actionButton}>
                       <Ionicons name="close-circle-outline" size={18} color="#1A1A1A" />
@@ -391,14 +391,14 @@ export default function ChangeOrdersScreen() {
                 )}
                 {order.status === 'ACCEPTED' && order.executionStatus === 'NOT_STARTED' && (
                   <TouchableOpacity style={styles.actionButton}>
-                    <Ionicons name="play-circle-outline" size={18} color="#0066CC" />
-                    <Text style={[styles.actionButtonText, { color: '#0066CC' }]}>Bắt đầu</Text>
+                    <Ionicons name="play-circle-outline" size={18} color="#0D9488" />
+                    <Text style={[styles.actionButtonText, { color: '#0D9488' }]}>Bắt đầu</Text>
                   </TouchableOpacity>
                 )}
                 {order.executionStatus === 'IN_PROGRESS' && (
                   <TouchableOpacity style={styles.actionButton}>
-                    <Ionicons name="checkmark-done-outline" size={18} color="#0066CC" />
-                    <Text style={[styles.actionButtonText, { color: '#0066CC' }]}>Hoàn thành</Text>
+                    <Ionicons name="checkmark-done-outline" size={18} color="#0D9488" />
+                    <Text style={[styles.actionButtonText, { color: '#0D9488' }]}>Hoàn thành</Text>
                   </TouchableOpacity>
                 )}
                 <TouchableOpacity style={styles.actionButton}>
@@ -446,7 +446,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     paddingHorizontal: 24,
     paddingVertical: 12,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     borderRadius: 8,
   },
   retryButtonText: {
@@ -514,8 +514,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
   },
   filterChipActive: {
-    backgroundColor: '#0066CC',
-    borderColor: '#0066CC',
+    backgroundColor: '#0D9488',
+    borderColor: '#0D9488',
   },
   filterChipText: {
     fontSize: 13,
@@ -617,7 +617,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   financialSection: {
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     borderRadius: 8,
     padding: 12,
     marginBottom: 12,
@@ -640,7 +640,7 @@ const styles = StyleSheet.create({
   scheduleSection: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     borderRadius: 8,
     padding: 12,
     marginBottom: 12,
@@ -704,12 +704,12 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     borderRadius: 4,
   },
   progressText: {
     fontSize: 12,
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: 'bold',
     textAlign: 'right',
   },
@@ -730,7 +730,7 @@ const styles = StyleSheet.create({
   actionButtonText: {
     marginLeft: 4,
     fontSize: 13,
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: '500',
   },
   fab: {
@@ -740,7 +740,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',

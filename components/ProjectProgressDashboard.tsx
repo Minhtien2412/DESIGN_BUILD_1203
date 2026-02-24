@@ -70,9 +70,9 @@ const ProjectProgressDashboard: React.FC<ProgressDashboardProps> = ({
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed': return '#0066CC';
-      case 'in-progress': return '#3B82F6';
-      case 'pending': return '#0066CC';
+      case 'completed': return '#0D9488';
+      case 'in-progress': return '#0D9488';
+      case 'pending': return '#0D9488';
       case 'delayed': return '#000000';
       case 'cancelled': return '#6B7280';
       default: return '#6B7280';
@@ -83,8 +83,8 @@ const ProjectProgressDashboard: React.FC<ProgressDashboardProps> = ({
     switch (severity) {
       case 'critical': return '#000000';
       case 'error': return '#000000';
-      case 'warning': return '#0066CC';
-      case 'info': return '#3B82F6';
+      case 'warning': return '#0D9488';
+      case 'info': return '#0D9488';
       default: return '#6B7280';
     }
   };
@@ -228,7 +228,7 @@ const ProjectProgressDashboard: React.FC<ProgressDashboardProps> = ({
                   <Text style={styles.paymentLabel}>Total Paid</Text>
                 </View>
                 <View style={styles.paymentStat}>
-                  <Text style={[styles.paymentAmount, { color: '#0066CC' }]}>
+                  <Text style={[styles.paymentAmount, { color: '#0D9488' }]}>
                     {formatCurrency(dashboard.paymentSchedule.totalPending)}
                   </Text>
                   <Text style={styles.paymentLabel}>Pending</Text>
@@ -249,7 +249,7 @@ const ProjectProgressDashboard: React.FC<ProgressDashboardProps> = ({
                       styles.progressFill,
                       { 
                         width: `${dashboard.progress.budgetUtilization}%`,
-                        backgroundColor: dashboard.progress.budgetUtilization > 100 ? '#000000' : '#0066CC'
+                        backgroundColor: dashboard.progress.budgetUtilization > 100 ? '#000000' : '#0D9488'
                       }
                     ]} 
                   />
@@ -503,7 +503,7 @@ const styles = StyleSheet.create({
   progressPercentage: {
     fontSize: 36,
     fontWeight: 'bold',
-    color: '#3b82f6',
+    color: '#0D9488',
   },
   progressLabel: {
     fontSize: 14,
@@ -519,7 +519,7 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#0D9488',
     borderRadius: 4,
   },
   taskSummary: {
@@ -569,7 +569,7 @@ const styles = StyleSheet.create({
   phaseProgress: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#3b82f6',
+    color: '#0D9488',
     textAlign: 'right',
     marginTop: 4,
   },
@@ -594,7 +594,7 @@ const styles = StyleSheet.create({
   paymentAmount: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#0066CC',
+    color: '#0D9488',
     textAlign: 'center',
   },
   paymentLabel: {
@@ -615,7 +615,7 @@ const styles = StyleSheet.create({
   budgetPercentage: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#3b82f6',
+    color: '#0D9488',
     textAlign: 'right',
     marginTop: 4,
   },
@@ -666,7 +666,7 @@ const styles = StyleSheet.create({
   completionText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#3b82f6',
+    color: '#0D9488',
     textAlign: 'right',
     marginTop: 4,
   },
@@ -699,7 +699,7 @@ const styles = StyleSheet.create({
   paymentItemAmount: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#0066CC',
+    color: '#0D9488',
     marginBottom: 4,
   },
   paymentDueDate: {
@@ -763,7 +763,7 @@ const styles = StyleSheet.create({
   kpiValue: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#3b82f6',
+    color: '#0D9488',
     marginBottom: 4,
   },
   kpiLabel: {
@@ -777,7 +777,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   actionButton: {
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#0D9488',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',

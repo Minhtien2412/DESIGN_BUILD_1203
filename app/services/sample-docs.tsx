@@ -123,11 +123,11 @@ const getFileIcon = (type: string) => {
     case 'PDF':
       return { name: 'document-text', color: '#000000' };
     case 'DOC':
-      return { name: 'document', color: '#0066CC' };
+      return { name: 'document', color: '#0D9488' };
     case 'DWG':
-      return { name: 'cube', color: '#0066CC' };
+      return { name: 'cube', color: '#0D9488' };
     case 'XLSX':
-      return { name: 'stats-chart', color: '#0066CC' };
+      return { name: 'stats-chart', color: '#0D9488' };
     default:
       return { name: 'document-outline', color: '#999' };
   }
@@ -181,7 +181,7 @@ export default function SampleDocsScreen() {
       <Stack.Screen
         options={{
           title: 'Hồ sơ mẫu',
-          headerStyle: { backgroundColor: '#0066CC' },
+          headerStyle: { backgroundColor: '#0D9488' },
           headerTintColor: '#fff',
           headerTitleStyle: { fontWeight: '600' },
         }}
@@ -388,7 +388,7 @@ export default function SampleDocsScreen() {
 
         {/* Bottom Info */}
         <View style={styles.bottomInfo}>
-          <Ionicons name="information-circle" size={16} color="#0066CC" />
+          <Ionicons name="information-circle" size={16} color="#0D9488" />
           <Text style={styles.bottomInfoText}>
             Tài liệu mang tính tham khảo. Vui lòng kiểm tra quy định mới nhất.
           </Text>
@@ -442,7 +442,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
   },
   filterChipActive: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   filterChipText: {
     fontSize: 13,
@@ -470,8 +470,8 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   fileTypeChipActive: {
-    backgroundColor: '#E8F4FF',
-    borderColor: '#0066CC',
+    backgroundColor: '#F0FDFA',
+    borderColor: '#0D9488',
   },
   fileTypeText: {
     fontSize: 11,
@@ -479,7 +479,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   fileTypeTextActive: {
-    color: '#0066CC',
+    color: '#0D9488',
   },
   sortButton: {
     width: 32,
@@ -533,7 +533,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 8,
     right: 8,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     borderRadius: 10,
     width: 20,
     height: 20,
@@ -617,7 +617,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     paddingVertical: 8,
     borderRadius: 6,
   },
@@ -639,7 +639,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   resetButton: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     paddingHorizontal: 24,
     paddingVertical: 10,
     borderRadius: 8,
@@ -652,7 +652,7 @@ const styles = StyleSheet.create({
   bottomInfo: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderTopWidth: 1,

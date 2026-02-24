@@ -11,7 +11,7 @@ const { width: SCREEN_WIDTH } = Dimensions.get("window");
 // Design tokens
 export const MODERN_COLORS = {
   // Primary
-  primary: "#0066CC",
+  primary: "#0D9488",
   primaryLight: "#E8F4FF",
   primaryDark: "#004C99",
 
@@ -53,7 +53,7 @@ export const MODERN_COLORS = {
   divider: "#E5E7EB",
 
   // Gradients (as arrays for LinearGradient)
-  gradientPrimary: ["#0066CC", "#004C99"],
+  gradientPrimary: ["#0D9488", "#004C99"],
   gradientAccent: ["#10B981", "#059669"],
   gradientWarm: ["#F59E0B", "#D97706"],
   gradientCool: ["#6366F1", "#4F46E5"],

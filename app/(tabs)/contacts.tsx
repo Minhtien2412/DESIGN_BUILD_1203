@@ -224,10 +224,10 @@ export default function ContactsScreen() {
           <Ionicons name="call" size={18} color="#22C55E" />
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.friendActionBtn, { backgroundColor: "#3B82F615" }]}
+          style={[styles.friendActionBtn, { backgroundColor: "#0D948815" }]}
           onPress={() => handleCallFriend(friend, "video")}
         >
-          <Ionicons name="videocam" size={18} color="#3B82F6" />
+          <Ionicons name="videocam" size={18} color="#0D9488" />
         </TouchableOpacity>
       </View>
     </View>
@@ -261,13 +261,13 @@ export default function ContactsScreen() {
             <View
               style={[
                 styles.connectionDot,
-                { backgroundColor: connected ? "#0066CC" : "#000000" },
+                { backgroundColor: connected ? "#0D9488" : "#000000" },
               ]}
             />
             <Text
               style={[
                 styles.connectionText,
-                { color: connected ? "#0066CC" : "#000000" },
+                { color: connected ? "#0D9488" : "#000000" },
               ]}
             >
               {connected ? "Online" : "Offline"}

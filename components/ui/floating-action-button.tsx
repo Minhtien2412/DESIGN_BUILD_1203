@@ -50,7 +50,7 @@ export default function FloatingActionButton({
       id: 'home',
       icon: 'home',
       label: 'Trang chủ',
-      color: '#3b82f6',
+      color: '#0D9488',
       action: () => {
         setShowMenu(false);
         router.push('/');
@@ -60,7 +60,7 @@ export default function FloatingActionButton({
       id: 'projects',
       icon: 'briefcase',
       label: 'Dự án',
-      color: '#0066CC',
+      color: '#0D9488',
       action: () => {
         setShowMenu(false);
         router.push('/projects');
@@ -70,7 +70,7 @@ export default function FloatingActionButton({
       id: 'notifications',
       icon: 'notifications',
       label: 'Thông báo',
-      color: '#0066CC',
+      color: '#0D9488',
       action: () => {
         setShowMenu(false);
         router.push('/notifications');
@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     borderRadius: 999,
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#0D9488',
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 3,
@@ -339,7 +339,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#0D9488',
     justifyContent: 'center',
     alignItems: 'center'
   },

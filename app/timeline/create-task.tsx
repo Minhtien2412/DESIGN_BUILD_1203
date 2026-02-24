@@ -17,16 +17,16 @@ import {
 
 const STATUS_OPTIONS: { value: TaskStatus; label: string; color: string }[] = [
   { value: TaskStatus.NOT_STARTED, label: 'Chưa bắt đầu', color: '#999999' },
-  { value: TaskStatus.IN_PROGRESS, label: 'Đang thực hiện', color: '#0066CC' },
-  { value: TaskStatus.ON_HOLD, label: 'Tạm dừng', color: '#0066CC' },
-  { value: TaskStatus.COMPLETED, label: 'Hoàn thành', color: '#0066CC' },
+  { value: TaskStatus.IN_PROGRESS, label: 'Đang thực hiện', color: '#0D9488' },
+  { value: TaskStatus.ON_HOLD, label: 'Tạm dừng', color: '#0D9488' },
+  { value: TaskStatus.COMPLETED, label: 'Hoàn thành', color: '#0D9488' },
   { value: TaskStatus.CANCELLED, label: 'Đã hủy', color: '#000000' },
 ];
 
 const PRIORITY_OPTIONS: { value: TaskPriority; label: string; color: string }[] = [
-  { value: TaskPriority.LOW, label: 'Thấp', color: '#0066CC' },
-  { value: TaskPriority.MEDIUM, label: 'Trung bình', color: '#0066CC' },
-  { value: TaskPriority.HIGH, label: 'Cao', color: '#0066CC' },
+  { value: TaskPriority.LOW, label: 'Thấp', color: '#0D9488' },
+  { value: TaskPriority.MEDIUM, label: 'Trung bình', color: '#0D9488' },
+  { value: TaskPriority.HIGH, label: 'Cao', color: '#0D9488' },
   { value: TaskPriority.CRITICAL, label: 'Khẩn cấp', color: '#000000' },
 ];
 
@@ -206,7 +206,7 @@ export default function CreateTaskScreen() {
                 style={styles.dateButton}
                 onPress={() => setShowStartPicker(true)}
               >
-                <Ionicons name="calendar-outline" size={18} color="#0066CC" />
+                <Ionicons name="calendar-outline" size={18} color="#0D9488" />
                 <View style={styles.dateContent}>
                   <Text style={styles.dateLabel}>Bắt đầu</Text>
                   <Text style={styles.dateValue}>{formatDate(startDate)}</Text>
@@ -219,7 +219,7 @@ export default function CreateTaskScreen() {
                 style={styles.dateButton}
                 onPress={() => setShowEndPicker(true)}
               >
-                <Ionicons name="calendar-outline" size={18} color="#0066CC" />
+                <Ionicons name="calendar-outline" size={18} color="#0D9488" />
                 <View style={styles.dateContent}>
                   <Text style={styles.dateLabel}>Kết thúc</Text>
                   <Text style={styles.dateValue}>{formatDate(endDate)}</Text>
@@ -291,7 +291,7 @@ export default function CreateTaskScreen() {
               <Ionicons
                 name="flag"
                 size={20}
-                color={isMilestone ? '#0066CC' : '#999'}
+                color={isMilestone ? '#0D9488' : '#999'}
               />
               <Text style={styles.toggleLabel}>Đánh dấu là cột mốc quan trọng</Text>
             </View>
@@ -414,8 +414,8 @@ const styles = StyleSheet.create({
     borderColor: '#e0e0e0',
   },
   phaseChipSelected: {
-    backgroundColor: '#E8F4FF',
-    borderColor: '#0066CC',
+    backgroundColor: '#F0FDFA',
+    borderColor: '#0D9488',
   },
   phaseIndicator: {
     width: 4,
@@ -427,7 +427,7 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   phaseChipTextSelected: {
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: '600',
   },
   dateRow: {
@@ -463,7 +463,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     padding: 8,
     borderRadius: 6,
     marginTop: 8,
@@ -527,7 +527,7 @@ const styles = StyleSheet.create({
     padding: 2,
   },
   toggleActive: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   toggleThumb: {
     width: 24,
@@ -563,7 +563,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 14,
     borderRadius: 8,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     alignItems: 'center',
   },
   saveButtonDisabled: {

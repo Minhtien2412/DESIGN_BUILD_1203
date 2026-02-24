@@ -33,7 +33,7 @@ export function BarChart({
       <View style={styles.barsContainer}>
         {data.map((item, index) => {
           const barHeight = (item.value / max) * (height - 40);
-          const color = item.color || '#3b82f6';
+          const color = item.color || '#0D9488';
 
           return (
             <View key={index} style={styles.barWrapper}>
@@ -76,8 +76,8 @@ interface LineChartProps {
 export function LineChart({
   data,
   height = 200,
-  lineColor = '#3b82f6',
-  gradientColors = ['#3b82f6', '#E8F4FF'],
+  lineColor = '#0D9488',
+  gradientColors = ['#0D9488', '#F0FDFA'],
   style,
 }: LineChartProps) {
   if (data.length === 0) return null;

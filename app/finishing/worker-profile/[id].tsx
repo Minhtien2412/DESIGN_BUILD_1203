@@ -1,722 +1,773 @@
-import { Colors } from '@/constants/theme';
-import { Ionicons } from '@expo/vector-icons';
-import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { useState } from 'react';
+/**
+ * Worker Profile - Hồ sơ thợ chi tiết
+ * Route: /finishing/worker-profile/[id]
+ * Data: API via workers.api.ts (getWorkerById, getWorkerReviews)
+ * @updated 2026-02-07
+ */
+
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { Href, Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
 import {
+    ActivityIndicator,
     Dimensions,
     Image,
     Linking,
+    RefreshControl,
     ScrollView,
     StyleSheet,
     Text,
     TouchableOpacity,
-    View,
-} from 'react-native';
+    View
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+import { useThemeColor } from "@/hooks/useThemeColor";
+import {
+    contactWorker,
+    formatDailyRate,
+    getAvailabilityColor,
+    getAvailabilityLabel,
+    getWorkerById,
+    getWorkerReviews,
+    getWorkerTypeLabel,
+    type Worker,
+    type WorkerReview,
+} from "@/services/workers.api";
 
-// Mock portfolio data
-const PORTFOLIO_PROJECTS = [
-  {
-    id: 1,
-    title: 'Biệt thự cao cấp Phú Mỹ Hưng',
-    image: 'https://picsum.photos/400/300?random=1',
-    area: '450m²',
-    type: 'Gạch ceramic cao cấp',
-    completedDate: '10/2024',
-    description: 'Lát gạch toàn bộ biệt thự 3 tầng, bao gồm phòng khách, phòng ngủ, bếp và sân vườn.',
-  },
-  {
-    id: 2,
-    title: 'Nhà phố hiện đại Quận 7',
-    image: 'https://picsum.photos/400/300?random=2',
-    area: '280m²',
-    type: 'Gạch granite',
-    completedDate: '09/2024',
-    description: 'Thi công lát gạch granite chống trơn cho sân thượng và ban công.',
-  },
-  {
-    id: 3,
-    title: 'Chung cư Vinhomes',
-    image: 'https://picsum.photos/400/300?random=3',
-    area: '120m²',
-    type: 'Gạch 3D phòng khách',
-    completedDate: '08/2024',
-    description: 'Lát gạch 3D tạo điểm nhấn cho phòng khách, ốp tường phòng tắm.',
-  },
-  {
-    id: 4,
-    title: 'Khách sạn mini 8 tầng',
-    image: 'https://picsum.photos/400/300?random=4',
-    area: '650m²',
-    type: 'Gạch ceramic + mosaic',
-    completedDate: '07/2024',
-    description: 'Thi công toàn bộ hệ thống lát gạch cho 15 phòng và khu vực chung.',
-  },
-];
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
-const CERTIFICATIONS = [
-  { id: 1, name: 'Chứng chỉ thi công gạch cao cấp', year: '2020' },
-  { id: 2, name: 'Huấn luyện an toàn lao động', year: '2021' },
-  { id: 3, name: 'Chứng nhận thi công gạch 3D', year: '2022' },
-];
+// ============================================================================
+// HELPERS
+// ============================================================================
+function formatDate(dateStr: string): string {
+  const d = new Date(dateStr);
+  return d.toLocaleDateString("vi-VN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+}
 
-const REVIEWS = [
-  {
-    id: 1,
-    author: 'Nguyễn Văn A',
-    avatar: 'https://i.pravatar.cc/100?img=8',
-    rating: 5,
-    date: '15/11/2024',
-    content: 'Đội thợ làm việc rất chuyên nghiệp, tỉ mỉ từng chi tiết. Lát gạch rất đẹp và chuẩn mực. Recommend!',
-    project: 'Biệt thự Phú Mỹ Hưng',
-  },
-  {
-    id: 2,
-    author: 'Trần Thị B',
-    avatar: 'https://i.pravatar.cc/100?img=20',
-    rating: 5,
-    date: '08/11/2024',
-    content: 'Giá cả hợp lý, tiến độ đúng hẹn. Anh Tuấn tư vấn nhiệt tình, giải đáp mọi thắc mắc.',
-    project: 'Nhà phố Quận 7',
-  },
-  {
-    id: 3,
-    author: 'Phạm Văn C',
-    avatar: 'https://i.pravatar.cc/100?img=33',
-    rating: 4,
-    date: '01/11/2024',
-    content: 'Tốt, làm việc nhanh. Có chút delay vì vật liệu nhưng đội đã khắc phục kịp thời.',
-    project: 'Chung cư Vinhomes',
-  },
-];
+function renderStars(rating: number) {
+  return (
+    <View style={styles.starsRow}>
+      {[1, 2, 3, 4, 5].map((star) => (
+        <Ionicons
+          key={star}
+          name={
+            star <= rating
+              ? "star"
+              : star - 0.5 <= rating
+                ? "star-half"
+                : "star-outline"
+          }
+          size={14}
+          color="#F59E0B"
+        />
+      ))}
+    </View>
+  );
+}
 
+// ============================================================================
+// REVIEW ITEM
+// ============================================================================
+function ReviewItem({ review }: { review: WorkerReview }) {
+  const textColor = useThemeColor({}, "text");
+  const mutedColor = useThemeColor({}, "icon");
+
+  return (
+    <View style={styles.reviewCard}>
+      <View style={styles.reviewHeader}>
+        <View style={styles.reviewAvatarBox}>
+          <Text style={styles.reviewAvatarText}>
+            {review.userName?.charAt(0)?.toUpperCase() || "?"}
+          </Text>
+        </View>
+        <View style={styles.reviewHeaderInfo}>
+          <Text style={[styles.reviewAuthor, { color: textColor }]}>
+            {review.userName}
+          </Text>
+          <View style={styles.reviewMeta}>
+            {renderStars(review.rating)}
+            <Text style={[styles.reviewDate, { color: mutedColor }]}>
+              {formatDate(review.createdAt)}
+            </Text>
+          </View>
+        </View>
+      </View>
+      {review.comment ? (
+        <Text style={[styles.reviewContent, { color: textColor }]}>
+          {review.comment}
+        </Text>
+      ) : null}
+      {review.images && review.images.length > 0 && (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.reviewImagesRow}
+        >
+          {review.images.map((img, i) => (
+            <Image key={i} source={{ uri: img }} style={styles.reviewImage} />
+          ))}
+        </ScrollView>
+      )}
+    </View>
+  );
+}
+
+// ============================================================================
+// MAIN SCREEN
+// ============================================================================
 export default function WorkerProfileScreen() {
   const params = useLocalSearchParams();
   const router = useRouter();
-  const workerId = params.id;
-  
-  const [activeTab, setActiveTab] = useState<'portfolio' | 'reviews' | 'info'>('portfolio');
+  const insets = useSafeAreaInsets();
+  const workerId = params.id as string;
 
-  // Mock worker data (in real app, fetch from API using workerId)
-  const worker = {
-    id: workerId,
-    name: 'Đội Lát Gạch Minh Tuấn',
-    avatar: 'https://i.pravatar.cc/200?img=17',
-    rating: 4.9,
-    reviews: 213,
-    location: 'TP.HCM',
-    experience: 18,
-    price: '180.000₫',
-    priceUnit: '/ m²',
-    specialties: ['Gạch ceramic', 'Gạch granite', 'Gạch 3D', 'Gạch mosaic'],
-    teamSize: 4,
-    completedProjects: 387,
-    availability: 'Sẵn sàng',
-    phone: '090 111 2222',
-    pricePerDay: '550.000₫/ngày',
-    bio: 'Với hơn 18 năm kinh nghiệm trong nghề lát gạch, đội của chúng tôi cam kết mang đến chất lượng thi công hoàn hảo nhất. Chuyên thi công các loại gạch cao cấp cho biệt thự, nhà phố, chung cư và các công trình thương mại.',
-    services: [
-      'Lát gạch phòng khách, phòng ngủ',
-      'Ốp gạch phòng tắm, bếp',
-      'Lát gạch sân vườn, ban công',
-      'Thi công gạch 3D, mosaic',
-      'Tu sửa, thay thế gạch cũ',
-    ],
-  };
+  const bg = useThemeColor({}, "background");
+  const textColor = useThemeColor({}, "text");
+  const mutedColor = useThemeColor({}, "icon");
+  const cardBg = useThemeColor({}, "background");
 
-  const handleCall = () => {
-    Linking.openURL(`tel:${worker.phone.replace(/\s/g, '')}`);
-  };
+  const [worker, setWorker] = useState<Worker | null>(null);
+  const [reviews, setReviews] = useState<WorkerReview[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [activeTab, setActiveTab] = useState<"info" | "reviews">("info");
+  const [error, setError] = useState<string | null>(null);
 
-  const handleMessage = () => {
-    // Navigate to chat or open SMS
-    Linking.openURL(`sms:${worker.phone.replace(/\s/g, '')}`);
-  };
+  const fetchData = useCallback(async () => {
+    try {
+      setError(null);
+      const [workerData, reviewsData] = await Promise.all([
+        getWorkerById(workerId),
+        getWorkerReviews(workerId).catch(() => ({
+          data: [],
+          meta: { total: 0 },
+        })),
+      ]);
+      setWorker(workerData);
+      setReviews(reviewsData.data);
+    } catch (err: any) {
+      console.warn("[WorkerProfile] Fetch error:", err);
+      setError("Không thể tải thông tin. Vui lòng thử lại.");
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, [workerId]);
 
-  const renderStars = (rating: number) => {
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchData();
+  }, [fetchData]);
+
+  const handleCall = useCallback(() => {
+    if (worker?.phone) {
+      Linking.openURL(`tel:${worker.phone.replace(/\s/g, "")}`);
+    }
+  }, [worker]);
+
+  const handleMessage = useCallback(async () => {
+    if (worker) {
+      try {
+        await contactWorker(worker.id, "Xin chào, tôi muốn tìm hiểu dịch vụ.");
+        router.push(`/chat/index` as Href);
+      } catch {
+        // Fallback to SMS
+        if (worker.phone) {
+          Linking.openURL(`sms:${worker.phone.replace(/\s/g, "")}`);
+        }
+      }
+    }
+  }, [worker, router]);
+
+  // Loading state
+  if (loading) {
     return (
-      <View style={styles.starsRow}>
-        {[1, 2, 3, 4, 5].map((star) => (
-          <Ionicons
-            key={star}
-            name={star <= rating ? 'star' : star - 0.5 <= rating ? 'star-half' : 'star-outline'}
-            size={16}
-            color="#0066CC"
-          />
-        ))}
+      <View
+        style={[
+          styles.container,
+          styles.centerContent,
+          { backgroundColor: bg },
+        ]}
+      >
+        <Stack.Screen options={{ headerShown: false }} />
+        <ActivityIndicator size="large" color="#0D9488" />
+        <Text style={[styles.loadingText, { color: mutedColor }]}>
+          Đang tải hồ sơ thợ...
+        </Text>
       </View>
     );
-  };
+  }
+
+  // Error state
+  if (error || !worker) {
+    return (
+      <View
+        style={[
+          styles.container,
+          styles.centerContent,
+          { backgroundColor: bg },
+        ]}
+      >
+        <Stack.Screen options={{ headerShown: false }} />
+        <Ionicons name="alert-circle-outline" size={48} color="#EF4444" />
+        <Text style={[styles.errorText, { color: textColor }]}>
+          {error || "Không tìm thấy thợ"}
+        </Text>
+        <TouchableOpacity style={styles.retryBtn} onPress={fetchData}>
+          <Text style={styles.retryBtnText}>Thử lại</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  const availColor = getAvailabilityColor(worker.availability);
+  const availLabel = getAvailabilityLabel(worker.availability);
 
   return (
     <>
-      <Stack.Screen
-        options={{
-          title: 'Hồ sơ thợ',
-          headerStyle: { backgroundColor: Colors.light.primary },
-          headerTintColor: '#fff',
-        }}
-      />
-      
-      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-        {/* Header Card */}
-        <View style={styles.headerCard}>
-          <View style={styles.headerTop}>
-            <Image source={{ uri: worker.avatar }} style={styles.largeAvatar} />
-            <View style={styles.headerInfo}>
-              <Text style={styles.workerName}>{worker.name}</Text>
-              <View style={styles.ratingRow}>
-                {renderStars(worker.rating)}
-                <Text style={styles.ratingText}>{worker.rating}</Text>
-                <Text style={styles.reviewCount}>({worker.reviews})</Text>
-              </View>
-              <View style={styles.locationRow}>
-                <Ionicons name="location" size={14} color="#999" />
-                <Text style={styles.locationText}>{worker.location}</Text>
-                <View style={styles.dot} />
-                <Ionicons name="time" size={14} color="#999" />
-                <Text style={styles.locationText}>{worker.experience} năm</Text>
-              </View>
-            </View>
-          </View>
+      <Stack.Screen options={{ headerShown: false }} />
 
-          {/* Specialties */}
-          <View style={styles.specialtiesSection}>
-            <Text style={styles.sectionLabel}>Chuyên môn:</Text>
-            <View style={styles.specialtiesWrap}>
-              {worker.specialties.map((spec, index) => (
-                <View key={index} style={styles.specialtyChip}>
-                  <Text style={styles.specialtyText}>{spec}</Text>
-                </View>
-              ))}
-            </View>
-          </View>
+      <View style={[styles.container, { backgroundColor: bg }]}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={["#0D9488"]}
+              tintColor="#0D9488"
+            />
+          }
+        >
+          {/* Hero Header */}
+          <LinearGradient
+            colors={["#0D9488", "#0F766E"]}
+            style={[styles.heroHeader, { paddingTop: insets.top + 8 }]}
+          >
+            {/* Back button */}
+            <TouchableOpacity
+              style={styles.backBtn}
+              onPress={() => router.back()}
+            >
+              <Ionicons name="arrow-back" size={24} color="#fff" />
+            </TouchableOpacity>
 
-          {/* Stats */}
-          <View style={styles.statsRow}>
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>{worker.completedProjects}+</Text>
-              <Text style={styles.statLabel}>Công trình</Text>
-            </View>
-            <View style={styles.divider} />
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>{worker.teamSize} người</Text>
-              <Text style={styles.statLabel}>Đội ngũ</Text>
-            </View>
-            <View style={styles.divider} />
-            <View style={styles.statItem}>
-              <Text style={[styles.statValue, { color: Colors.light.success, fontSize: 14 }]}>
-                {worker.availability}
+            <View style={styles.heroContent}>
+              {/* Avatar */}
+              <View style={styles.avatarContainer}>
+                {worker.avatar ? (
+                  <Image
+                    source={{ uri: worker.avatar }}
+                    style={styles.largeAvatar}
+                  />
+                ) : (
+                  <View style={[styles.largeAvatar, styles.avatarPlaceholder]}>
+                    <Ionicons name="person" size={40} color="#fff" />
+                  </View>
+                )}
+                {worker.verified && (
+                  <View style={styles.verifiedBadge}>
+                    <Ionicons
+                      name="checkmark-circle"
+                      size={22}
+                      color="#0D9488"
+                    />
+                  </View>
+                )}
+              </View>
+
+              {/* Name & rating */}
+              <Text style={styles.heroName}>{worker.name}</Text>
+              <Text style={styles.heroType}>
+                {getWorkerTypeLabel(worker.workerType)}
               </Text>
-              <Text style={styles.statLabel}>Tình trạng</Text>
+
+              <View style={styles.heroRating}>
+                {renderStars(worker.rating)}
+                <Text style={styles.heroRatingText}>
+                  {worker.rating.toFixed(1)}
+                </Text>
+                <Text style={styles.heroReviewCount}>
+                  ({worker.reviewCount} đánh giá)
+                </Text>
+              </View>
+
+              {/* Availability badge */}
+              <View
+                style={[
+                  styles.availBadge,
+                  { backgroundColor: availColor + "30" },
+                ]}
+              >
+                <View
+                  style={[styles.availDot, { backgroundColor: availColor }]}
+                />
+                <Text style={[styles.availText, { color: availColor }]}>
+                  {availLabel}
+                </Text>
+              </View>
             </View>
+
+            {/* Stats row */}
+            <View style={styles.heroStats}>
+              <View style={styles.heroStatItem}>
+                <Text style={styles.heroStatValue}>
+                  {worker.completedJobs}+
+                </Text>
+                <Text style={styles.heroStatLabel}>Công trình</Text>
+              </View>
+              <View style={styles.heroStatDivider} />
+              <View style={styles.heroStatItem}>
+                <Text style={styles.heroStatValue}>
+                  {worker.experience} năm
+                </Text>
+                <Text style={styles.heroStatLabel}>Kinh nghiệm</Text>
+              </View>
+              <View style={styles.heroStatDivider} />
+              <View style={styles.heroStatItem}>
+                <Text style={styles.heroStatValue}>
+                  {formatDailyRate(worker.dailyRate).replace("/ngày", "")}
+                </Text>
+                <Text style={styles.heroStatLabel}>/ ngày</Text>
+              </View>
+            </View>
+          </LinearGradient>
+
+          {/* Action buttons */}
+          <View style={[styles.actionRow, { backgroundColor: cardBg }]}>
+            <TouchableOpacity style={styles.callBtn} onPress={handleCall}>
+              <Ionicons name="call" size={20} color="#fff" />
+              <Text style={styles.callBtnText}>Gọi ngay</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.messageBtn} onPress={handleMessage}>
+              <Ionicons name="chatbubbles" size={20} color="#0D9488" />
+              <Text style={styles.messageBtnText}>Nhắn tin</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.bookBtn}
+              onPress={() => router.push(`/worker-bookings/index` as Href)}
+            >
+              <Ionicons name="calendar" size={20} color="#0D9488" />
+            </TouchableOpacity>
           </View>
 
-          {/* Bio */}
-          <View style={styles.bioSection}>
-            <Text style={styles.bioText}>{worker.bio}</Text>
+          {/* Tab Switcher */}
+          <View style={[styles.tabRow, { backgroundColor: cardBg }]}>
+            <TouchableOpacity
+              style={[styles.tab, activeTab === "info" && styles.tabActive]}
+              onPress={() => setActiveTab("info")}
+            >
+              <Text
+                style={[
+                  styles.tabText,
+                  activeTab === "info" && styles.tabTextActive,
+                ]}
+              >
+                Thông tin
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.tab, activeTab === "reviews" && styles.tabActive]}
+              onPress={() => setActiveTab("reviews")}
+            >
+              <Text
+                style={[
+                  styles.tabText,
+                  activeTab === "reviews" && styles.tabTextActive,
+                ]}
+              >
+                Đánh giá ({reviews.length})
+              </Text>
+            </TouchableOpacity>
           </View>
 
-          {/* Price & Actions */}
-          <View style={styles.priceActionRow}>
-            <View>
-              <Text style={styles.priceValue}>{worker.price}</Text>
-              <Text style={styles.priceUnit}>{worker.priceUnit}</Text>
-              <Text style={styles.priceAlt}>hoặc {worker.pricePerDay}</Text>
-            </View>
-            <View style={styles.actionButtons}>
-              <TouchableOpacity style={styles.callButton} onPress={handleCall}>
-                <Ionicons name="call" size={20} color="#fff" />
-                <Text style={styles.callButtonText}>Gọi ngay</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.messageButton} onPress={handleMessage}>
-                <Ionicons name="chatbubbles" size={20} color={Colors.light.primary} />
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
+          {/* Tab Content */}
+          {activeTab === "info" ? (
+            <View style={styles.infoContent}>
+              {/* Bio */}
+              {worker.bio ? (
+                <View style={[styles.infoCard, { backgroundColor: cardBg }]}>
+                  <Text style={[styles.infoCardTitle, { color: textColor }]}>
+                    Giới thiệu
+                  </Text>
+                  <Text style={[styles.bioText, { color: mutedColor }]}>
+                    {worker.bio}
+                  </Text>
+                </View>
+              ) : null}
 
-        {/* Tabs */}
-        <View style={styles.tabsContainer}>
-          <TouchableOpacity
-            style={[styles.tab, activeTab === 'portfolio' && styles.tabActive]}
-            onPress={() => setActiveTab('portfolio')}
-          >
-            <Text style={[styles.tabText, activeTab === 'portfolio' && styles.tabTextActive]}>
-              Công trình ({PORTFOLIO_PROJECTS.length})
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.tab, activeTab === 'reviews' && styles.tabActive]}
-            onPress={() => setActiveTab('reviews')}
-          >
-            <Text style={[styles.tabText, activeTab === 'reviews' && styles.tabTextActive]}>
-              Đánh giá ({REVIEWS.length})
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.tab, activeTab === 'info' && styles.tabActive]}
-            onPress={() => setActiveTab('info')}
-          >
-            <Text style={[styles.tabText, activeTab === 'info' && styles.tabTextActive]}>
-              Thông tin
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Tab Content */}
-        <View style={styles.tabContent}>
-          {activeTab === 'portfolio' && (
-            <View>
-              {PORTFOLIO_PROJECTS.map((project) => (
-                <TouchableOpacity 
-                  key={project.id} 
-                  style={styles.projectCard}
-                  onPress={() => router.push(`/finishing/project-detail/${project.id}`)}
-                  activeOpacity={0.7}
-                >
-                  <Image source={{ uri: project.image }} style={styles.projectImage} />
-                  <View style={styles.projectInfo}>
-                    <Text style={styles.projectTitle}>{project.title}</Text>
-                    <View style={styles.projectMeta}>
-                      <Ionicons name="resize" size={14} color="#666" />
-                      <Text style={styles.projectMetaText}>{project.area}</Text>
-                      <View style={styles.dot} />
-                      <Ionicons name="calendar" size={14} color="#666" />
-                      <Text style={styles.projectMetaText}>{project.completedDate}</Text>
-                    </View>
-                    <View style={styles.projectTypeTag}>
-                      <Text style={styles.projectTypeText}>{project.type}</Text>
-                    </View>
-                    <Text style={styles.projectDesc}>{project.description}</Text>
-                  </View>
-                </TouchableOpacity>
-              ))}
-            </View>
-          )}
-
-          {activeTab === 'reviews' && (
-            <View>
-              {REVIEWS.map((review) => (
-                <View key={review.id} style={styles.reviewCard}>
-                  <View style={styles.reviewHeader}>
-                    <Image source={{ uri: review.avatar }} style={styles.reviewAvatar} />
-                    <View style={styles.reviewHeaderInfo}>
-                      <Text style={styles.reviewAuthor}>{review.author}</Text>
-                      <View style={styles.reviewMeta}>
-                        {renderStars(review.rating)}
-                        <Text style={styles.reviewDate}>{review.date}</Text>
+              {/* Skills */}
+              {worker.skills?.length > 0 && (
+                <View style={[styles.infoCard, { backgroundColor: cardBg }]}>
+                  <Text style={[styles.infoCardTitle, { color: textColor }]}>
+                    Kỹ năng chuyên môn
+                  </Text>
+                  <View style={styles.skillsWrap}>
+                    {worker.skills.map((skill, i) => (
+                      <View key={i} style={styles.skillChip}>
+                        <Ionicons
+                          name="checkmark-circle"
+                          size={14}
+                          color="#0D9488"
+                        />
+                        <Text style={styles.skillText}>{skill}</Text>
                       </View>
-                    </View>
-                  </View>
-                  <Text style={styles.reviewContent}>{review.content}</Text>
-                  <View style={styles.reviewProject}>
-                    <Ionicons name="briefcase-outline" size={12} color="#999" />
-                    <Text style={styles.reviewProjectText}>{review.project}</Text>
+                    ))}
                   </View>
                 </View>
-              ))}
+              )}
+
+              {/* Details */}
+              <View style={[styles.infoCard, { backgroundColor: cardBg }]}>
+                <Text style={[styles.infoCardTitle, { color: textColor }]}>
+                  Chi tiết
+                </Text>
+                <DetailRow
+                  icon="location"
+                  label="Khu vực"
+                  value={
+                    worker.district
+                      ? `${worker.district}, ${worker.location}`
+                      : worker.location
+                  }
+                />
+                <DetailRow
+                  icon="cash"
+                  label="Giá ngày công"
+                  value={formatDailyRate(worker.dailyRate)}
+                  valueColor="#0D9488"
+                />
+                <DetailRow
+                  icon="construct"
+                  label="Có thiết bị"
+                  value={worker.hasEquipment ? "Có" : "Không"}
+                />
+                <DetailRow
+                  icon="call"
+                  label="Điện thoại"
+                  value={worker.phone}
+                />
+                {worker.featured && (
+                  <DetailRow
+                    icon="star"
+                    label="Trạng thái"
+                    value="⭐ Thợ nổi bật"
+                    valueColor="#F59E0B"
+                  />
+                )}
+              </View>
+            </View>
+          ) : (
+            <View style={styles.reviewsContent}>
+              {reviews.length === 0 ? (
+                <View style={styles.emptyReviews}>
+                  <Ionicons
+                    name="chatbubble-outline"
+                    size={48}
+                    color="#CBD5E1"
+                  />
+                  <Text style={[styles.emptyText, { color: mutedColor }]}>
+                    Chưa có đánh giá nào
+                  </Text>
+                </View>
+              ) : (
+                reviews.map((review) => (
+                  <ReviewItem key={review.id} review={review} />
+                ))
+              )}
             </View>
           )}
 
-          {activeTab === 'info' && (
-            <View>
-              {/* Services */}
-              <View style={styles.infoSection}>
-                <Text style={styles.infoSectionTitle}>Dịch vụ cung cấp</Text>
-                {worker.services.map((service, index) => (
-                  <View key={index} style={styles.serviceItem}>
-                    <Ionicons name="checkmark-circle" size={18} color={Colors.light.success} />
-                    <Text style={styles.serviceText}>{service}</Text>
-                  </View>
-                ))}
-              </View>
-
-              {/* Certifications */}
-              <View style={styles.infoSection}>
-                <Text style={styles.infoSectionTitle}>Chứng chỉ & Đào tạo</Text>
-                {CERTIFICATIONS.map((cert) => (
-                  <View key={cert.id} style={styles.certItem}>
-                    <Ionicons name="ribbon" size={18} color={Colors.light.primary} />
-                    <View style={styles.certInfo}>
-                      <Text style={styles.certName}>{cert.name}</Text>
-                      <Text style={styles.certYear}>Năm {cert.year}</Text>
-                    </View>
-                  </View>
-                ))}
-              </View>
-
-              {/* Contact Info */}
-              <View style={styles.infoSection}>
-                <Text style={styles.infoSectionTitle}>Liên hệ</Text>
-                <View style={styles.contactItem}>
-                  <Ionicons name="call" size={18} color="#666" />
-                  <Text style={styles.contactText}>{worker.phone}</Text>
-                </View>
-                <View style={styles.contactItem}>
-                  <Ionicons name="location" size={18} color="#666" />
-                  <Text style={styles.contactText}>Khu vực: {worker.location}</Text>
-                </View>
-              </View>
-            </View>
-          )}
-        </View>
-      </ScrollView>
+          <View style={{ height: 100 }} />
+        </ScrollView>
+      </View>
     </>
   );
 }
 
+// ============================================================================
+// DETAIL ROW Helper
+// ============================================================================
+function DetailRow({
+  icon,
+  label,
+  value,
+  valueColor,
+}: {
+  icon: string;
+  label: string;
+  value: string;
+  valueColor?: string;
+}) {
+  const mutedColor = useThemeColor({}, "icon");
+  const textColor = useThemeColor({}, "text");
+
+  return (
+    <View style={styles.detailRow}>
+      <Ionicons name={icon as any} size={18} color={mutedColor} />
+      <Text style={[styles.detailLabel, { color: mutedColor }]}>{label}</Text>
+      <Text style={[styles.detailValue, { color: valueColor || textColor }]}>
+        {value}
+      </Text>
+    </View>
+  );
+}
+
+// ============================================================================
+// STYLES
+// ============================================================================
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
+  container: { flex: 1 },
+  centerContent: {
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 12,
   },
-  headerCard: {
-    backgroundColor: '#fff',
-    padding: 16,
+  loadingText: { fontSize: 14, marginTop: 8 },
+  errorText: { fontSize: 15, fontWeight: "500", marginTop: 8 },
+  retryBtn: {
+    backgroundColor: "#0D9488",
+    paddingHorizontal: 24,
+    paddingVertical: 10,
+    borderRadius: 8,
+    marginTop: 8,
+  },
+  retryBtnText: { color: "#fff", fontSize: 14, fontWeight: "600" },
+  // Hero
+  heroHeader: { paddingHorizontal: 16, paddingBottom: 20 },
+  backBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
     marginBottom: 8,
   },
-  headerTop: {
-    flexDirection: 'row',
-    marginBottom: 16,
-  },
+  heroContent: { alignItems: "center" },
+  avatarContainer: { position: "relative", marginBottom: 12 },
   largeAvatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: '#e0e0e0',
+    width: 88,
+    height: 88,
+    borderRadius: 44,
+    borderWidth: 3,
+    borderColor: "rgba(255,255,255,0.4)",
   },
-  headerInfo: {
-    flex: 1,
-    marginLeft: 16,
+  avatarPlaceholder: {
+    backgroundColor: "rgba(255,255,255,0.2)",
+    alignItems: "center",
+    justifyContent: "center",
   },
-  workerName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 6,
-  },
-  ratingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 6,
-  },
-  starsRow: {
-    flexDirection: 'row',
-    marginRight: 4,
-  },
-  ratingText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
-    marginLeft: 4,
-  },
-  reviewCount: {
-    fontSize: 12,
-    color: '#999',
-    marginLeft: 2,
-  },
-  locationRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  locationText: {
-    fontSize: 12,
-    color: '#999',
-    marginLeft: 4,
-  },
-  dot: {
-    width: 3,
-    height: 3,
-    borderRadius: 1.5,
-    backgroundColor: '#ccc',
-    marginHorizontal: 8,
-  },
-  specialtiesSection: {
-    marginBottom: 16,
-  },
-  sectionLabel: {
-    fontSize: 13,
-    color: '#666',
-    fontWeight: '600',
-    marginBottom: 8,
-  },
-  specialtiesWrap: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  specialtyChip: {
-    backgroundColor: '#e8f5e9',
+  verifiedBadge: {
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    backgroundColor: "#fff",
     borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+    padding: 1,
   },
-  specialtyText: {
-    fontSize: 11,
-    color: '#2e7d32',
-    fontWeight: '500',
-  },
-  statsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-around',
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-    borderColor: '#f0f0f0',
-    paddingVertical: 12,
-    marginBottom: 16,
-  },
-  statItem: {
-    alignItems: 'center',
-  },
-  statValue: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 4,
-  },
-  statLabel: {
-    fontSize: 11,
-    color: '#999',
-  },
-  divider: {
-    width: 1,
-    height: 30,
-    backgroundColor: '#e0e0e0',
-  },
-  bioSection: {
-    marginBottom: 16,
-  },
-  bioText: {
-    fontSize: 13,
-    color: '#666',
-    lineHeight: 20,
-  },
-  priceActionRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  priceValue: {
+  heroName: {
     fontSize: 20,
-    fontWeight: 'bold',
-    color: Colors.light.primary,
+    fontWeight: "700",
+    color: "#fff",
+    letterSpacing: -0.3,
   },
-  priceUnit: {
-    fontSize: 12,
-    color: '#999',
-  },
-  priceAlt: {
-    fontSize: 11,
-    color: '#666',
-    marginTop: 4,
-  },
-  actionButtons: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  callButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    backgroundColor: Colors.light.success,
-    borderRadius: 8,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-  },
-  callButtonText: {
-    color: '#fff',
+  heroType: {
     fontSize: 14,
-    fontWeight: '600',
+    color: "rgba(255,255,255,0.8)",
+    marginTop: 2,
   },
-  messageButton: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#fff',
-    borderWidth: 1.5,
-    borderColor: Colors.light.primary,
-    borderRadius: 8,
-    paddingVertical: 10,
+  heroRating: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginTop: 8,
+  },
+  starsRow: { flexDirection: "row", gap: 1 },
+  heroRatingText: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: "#fff",
+  },
+  heroReviewCount: {
+    fontSize: 12,
+    color: "rgba(255,255,255,0.7)",
+  },
+  availBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
     paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: 16,
+    marginTop: 10,
   },
-  tabsContainer: {
-    flexDirection: 'row',
-    backgroundColor: '#fff',
+  availDot: { width: 8, height: 8, borderRadius: 4 },
+  availText: { fontSize: 12, fontWeight: "600" },
+  heroStats: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(255,255,255,0.15)",
+    borderRadius: 12,
+    paddingVertical: 12,
+    marginTop: 16,
+  },
+  heroStatItem: { alignItems: "center", flex: 1 },
+  heroStatValue: { fontSize: 16, fontWeight: "700", color: "#fff" },
+  heroStatLabel: {
+    fontSize: 11,
+    color: "rgba(255,255,255,0.75)",
+    marginTop: 2,
+  },
+  heroStatDivider: {
+    width: 1,
+    height: 28,
+    backgroundColor: "rgba(255,255,255,0.2)",
+  },
+  // Actions
+  actionRow: {
+    flexDirection: "row",
+    padding: 12,
+    gap: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: "rgba(0,0,0,0.06)",
+  },
+  callBtn: {
+    flex: 2,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    backgroundColor: "#0D9488",
+    borderRadius: 10,
+    paddingVertical: 12,
+  },
+  callBtnText: { color: "#fff", fontSize: 14, fontWeight: "600" },
+  messageBtn: {
+    flex: 2,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    backgroundColor: "rgba(13,148,136,0.1)",
+    borderRadius: 10,
+    paddingVertical: 12,
+  },
+  messageBtnText: { color: "#0D9488", fontSize: 14, fontWeight: "600" },
+  bookBtn: {
+    width: 48,
+    height: 48,
+    borderRadius: 10,
+    backgroundColor: "rgba(59,130,246,0.1)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  // Tabs
+  tabRow: {
+    flexDirection: "row",
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(0,0,0,0.06)",
   },
   tab: {
     flex: 1,
     paddingVertical: 14,
-    alignItems: 'center',
-  },
-  tabActive: {
+    alignItems: "center",
     borderBottomWidth: 2,
-    borderBottomColor: Colors.light.primary,
+    borderBottomColor: "transparent",
   },
-  tabText: {
-    fontSize: 13,
-    color: '#999',
-    fontWeight: '500',
+  tabActive: { borderBottomColor: "#0D9488" },
+  tabText: { fontSize: 14, fontWeight: "500", color: "#94A3B8" },
+  tabTextActive: { color: "#0D9488", fontWeight: "600" },
+  // Info content
+  infoContent: { padding: 12, gap: 12 },
+  infoCard: {
+    borderRadius: 14,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: "rgba(0,0,0,0.06)",
   },
-  tabTextActive: {
-    color: Colors.light.primary,
-    fontWeight: '600',
-  },
-  tabContent: {
-    padding: 12,
-  },
-  projectCard: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    marginBottom: 12,
-    overflow: 'hidden',
-  },
-  projectImage: {
-    width: '100%',
-    height: 200,
-    backgroundColor: '#e0e0e0',
-  },
-  projectInfo: {
-    padding: 12,
-  },
-  projectTitle: {
+  infoCardTitle: {
     fontSize: 15,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 6,
-  },
-  projectMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  projectMetaText: {
-    fontSize: 12,
-    color: '#666',
-    marginLeft: 4,
-  },
-  projectTypeTag: {
-    alignSelf: 'flex-start',
-    backgroundColor: '#E8F4FF',
-    borderRadius: 6,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    marginBottom: 8,
-  },
-  projectTypeText: {
-    fontSize: 11,
-    color: '#1976d2',
-    fontWeight: '500',
-  },
-  projectDesc: {
-    fontSize: 12,
-    color: '#666',
-    lineHeight: 18,
-  },
-  reviewCard: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 12,
+    fontWeight: "700",
     marginBottom: 12,
   },
-  reviewHeader: {
-    flexDirection: 'row',
-    marginBottom: 10,
+  bioText: { fontSize: 13, lineHeight: 20 },
+  skillsWrap: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
+  skillChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    backgroundColor: "rgba(13,148,136,0.08)",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 8,
   },
-  reviewAvatar: {
+  skillText: { fontSize: 12, color: "#0D9488", fontWeight: "500" },
+  detailRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(0,0,0,0.04)",
+  },
+  detailLabel: { flex: 1, fontSize: 13 },
+  detailValue: { fontSize: 13, fontWeight: "600" },
+  // Reviews
+  reviewsContent: { padding: 12, gap: 10 },
+  reviewCard: {
+    borderRadius: 14,
+    padding: 14,
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "rgba(0,0,0,0.06)",
+  },
+  reviewHeader: { flexDirection: "row", marginBottom: 10 },
+  reviewAvatarBox: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#e0e0e0',
+    backgroundColor: "#0D9488",
+    alignItems: "center",
+    justifyContent: "center",
   },
-  reviewHeaderInfo: {
-    flex: 1,
-    marginLeft: 10,
+  reviewAvatarText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "700",
   },
-  reviewAuthor: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 4,
-  },
+  reviewHeaderInfo: { flex: 1, marginLeft: 10 },
+  reviewAuthor: { fontSize: 14, fontWeight: "600" },
   reviewMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginTop: 2,
+  },
+  reviewDate: { fontSize: 11 },
+  reviewContent: { fontSize: 13, lineHeight: 19 },
+  reviewImagesRow: { marginTop: 8 },
+  reviewImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+    marginRight: 8,
+    backgroundColor: "#E2E8F0",
+  },
+  emptyReviews: {
+    alignItems: "center",
+    paddingVertical: 40,
     gap: 8,
   },
-  reviewDate: {
-    fontSize: 11,
-    color: '#999',
-  },
-  reviewContent: {
-    fontSize: 13,
-    color: '#666',
-    lineHeight: 19,
-    marginBottom: 8,
-  },
-  reviewProject: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  reviewProjectText: {
-    fontSize: 11,
-    color: '#999',
-    fontStyle: 'italic',
-  },
-  infoSection: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-  },
-  infoSectionTitle: {
-    fontSize: 15,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 12,
-  },
-  serviceItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginBottom: 10,
-  },
-  serviceText: {
-    flex: 1,
-    fontSize: 13,
-    color: '#666',
-  },
-  certItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginBottom: 12,
-  },
-  certInfo: {
-    flex: 1,
-  },
-  certName: {
-    fontSize: 13,
-    color: '#333',
-    fontWeight: '500',
-    marginBottom: 2,
-  },
-  certYear: {
-    fontSize: 11,
-    color: '#999',
-  },
-  contactItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginBottom: 10,
-  },
-  contactText: {
-    fontSize: 13,
-    color: '#666',
-  },
+  emptyText: { fontSize: 14 },
 });

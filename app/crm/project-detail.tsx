@@ -92,12 +92,12 @@ export default function ProjectDetailScreen() {
   const getStatusColor = (status: string): string => {
     const colors: Record<string, string> = {
       '1': '#f59e0b', // Chưa bắt đầu
-      '2': '#3b82f6', // Đang thực hiện
+      '2': '#0D9488', // Đang thực hiện
       '3': '#8b5cf6', // Tạm dừng
       '4': '#22c55e', // Hoàn thành
       '5': '#ef4444', // Đã hủy
       'not_started': '#f59e0b',
-      'in_progress': '#3b82f6',
+      'in_progress': '#0D9488',
       'on_hold': '#8b5cf6',
       'finished': '#22c55e',
       'cancelled': '#ef4444',
@@ -224,7 +224,7 @@ export default function ProjectDetailScreen() {
           style={[styles.statCard, { backgroundColor: cardBg, borderColor }]}
           onPress={() => setActiveTab('tasks')}
         >
-          <Ionicons name="checkbox-outline" size={28} color="#3b82f6" />
+          <Ionicons name="checkbox-outline" size={28} color="#0D9488" />
           <Text style={[styles.statValue, { color: textColor }]}>{tasks.length}</Text>
           <Text style={[styles.statLabel, { color: textColor }]}>Tasks</Text>
         </TouchableOpacity>
@@ -262,11 +262,11 @@ export default function ProjectDetailScreen() {
         <Text style={[styles.cardTitle, { color: textColor }]}>Truy cập nhanh</Text>
         <View style={styles.quickActions}>
           <TouchableOpacity
-            style={[styles.quickAction, { backgroundColor: '#3b82f620' }]}
+            style={[styles.quickAction, { backgroundColor: '#0D948820' }]}
             onPress={() => navigateToScreen('gantt-chart')}
           >
-            <Ionicons name="bar-chart-outline" size={24} color="#3b82f6" />
-            <Text style={[styles.quickActionText, { color: '#3b82f6' }]}>Gantt Chart</Text>
+            <Ionicons name="bar-chart-outline" size={24} color="#0D9488" />
+            <Text style={[styles.quickActionText, { color: '#0D9488' }]}>Gantt Chart</Text>
           </TouchableOpacity>
           
           <TouchableOpacity
@@ -401,7 +401,7 @@ export default function ProjectDetailScreen() {
   const getPriorityColor = (priority: string): string => {
     const colors: Record<string, string> = {
       low: '#22c55e',
-      medium: '#3b82f6',
+      medium: '#0D9488',
       high: '#f59e0b',
       urgent: '#ef4444',
     };
@@ -411,7 +411,7 @@ export default function ProjectDetailScreen() {
   const getTaskStatusColor = (status: string): string => {
     const colors: Record<string, string> = {
       not_started: '#6b7280',
-      in_progress: '#3b82f6',
+      in_progress: '#0D9488',
       testing: '#8b5cf6',
       awaiting_feedback: '#f59e0b',
       complete: '#22c55e',

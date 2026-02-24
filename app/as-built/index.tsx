@@ -38,8 +38,8 @@ const STATUS_COLORS: Record<
 > = {
   DRAFT: { bg: '#F3F4F6', text: '#6B7280', border: '#D1D5DB' },
   IN_REVIEW: { bg: '#FEF3C7', text: '#D97706', border: '#FCD34D' },
-  APPROVED: { bg: '#D1FAE5', text: '#0066CC', border: '#6EE7B7' },
-  ISSUED: { bg: '#E8F4FF', text: '#0066CC', border: '#0080FF' },
+  APPROVED: { bg: '#D1FAE5', text: '#0D9488', border: '#6EE7B7' },
+  ISSUED: { bg: '#F0FDFA', text: '#0D9488', border: '#14B8A6' },
   SUPERSEDED: { bg: '#E0E7FF', text: '#666666', border: '#C7D2FE' },
   ARCHIVED: { bg: '#F3F4F6', text: '#4B5563', border: '#D1D5DB' },
 };

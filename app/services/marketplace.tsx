@@ -498,12 +498,12 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   statusText: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   statusTextInactive: {
     fontSize: 11,

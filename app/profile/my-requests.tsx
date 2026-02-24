@@ -41,8 +41,8 @@ const STATUS_CONFIG: Record<
   },
   reviewing: {
     label: "Đang xem xét",
-    color: "#3b82f6",
-    bgColor: "#dbeafe",
+    color: "#0D9488",
+    bgColor: "#CCFBF1",
     icon: "eye-outline",
   },
   quoted: {

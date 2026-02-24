@@ -1,4 +1,6 @@
 /**
+ * @deprecated Use `services/api/authApi.ts` instead — this file is superseded.
+ *
  * Unified Authentication Service
  *
  * Hợp nhất tất cả auth logic với endpoints nhất quán
@@ -780,7 +782,7 @@ class AuthService {
    * Endpoint: POST /auth/forgot-password
    */
   async forgotPassword(
-    email: string
+    email: string,
   ): Promise<{ success: boolean; message: string }> {
     try {
       console.log("[AuthService] Request password reset for:", email);
@@ -790,7 +792,7 @@ class AuthService {
         {
           method: "POST",
           data: { email },
-        }
+        },
       );
 
       return {
@@ -813,7 +815,7 @@ class AuthService {
    */
   async resetPassword(
     token: string,
-    newPassword: string
+    newPassword: string,
   ): Promise<{ success: boolean; message: string }> {
     try {
       console.log("[AuthService] Reset password with token");
@@ -823,7 +825,7 @@ class AuthService {
         {
           method: "POST",
           data: { token, newPassword },
-        }
+        },
       );
 
       return {

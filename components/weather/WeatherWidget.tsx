@@ -333,7 +333,7 @@ export function WeatherWidget({
                   </Text>
                   {hour.precipitation > 0 && (
                     <View style={styles.precipRow}>
-                      <Ionicons name="water" size={10} color="#3b82f6" />
+                      <Ionicons name="water" size={10} color="#0D9488" />
                       <Text style={styles.precipText}>{Math.round(hour.precipitation)}%</Text>
                     </View>
                   )}
@@ -361,7 +361,7 @@ export function WeatherWidget({
                   <Image source={{ uri: day.icon }} style={styles.dailyIcon} />
                   {day.precipitation > 0 && (
                     <View style={styles.dailyPrecip}>
-                      <Ionicons name="water" size={12} color="#3b82f6" />
+                      <Ionicons name="water" size={12} color="#0D9488" />
                       <Text style={styles.dailyPrecipText}>{Math.round(day.precipitation)}%</Text>
                     </View>
                   )}
@@ -571,7 +571,7 @@ const styles = StyleSheet.create({
   },
   precipText: {
     fontSize: 10,
-    color: '#3b82f6',
+    color: '#0D9488',
   },
   
   // Daily
@@ -606,7 +606,7 @@ const styles = StyleSheet.create({
   },
   dailyPrecipText: {
     fontSize: 11,
-    color: '#3b82f6',
+    color: '#0D9488',
   },
   dailyTemps: {
     flex: 1,

@@ -185,7 +185,7 @@ export default function ConsultantScreen() {
         {isTyping && (
           <View style={styles.typingContainer}>
             <View style={styles.typingBubble}>
-              <ActivityIndicator size="small" color="#03a9f4" />
+              <ActivityIndicator size="small" color="#14B8A6" />
               <Text style={styles.typingText}>AI đang trả lời...</Text>
             </View>
           </View>
@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   userContent: {
-    backgroundColor: '#03a9f4',
+    backgroundColor: '#14B8A6',
     borderBottomRightRadius: 4,
   },
   aiContent: {
@@ -386,7 +386,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   quickQuestionText: {
-    color: '#03a9f4',
+    color: '#14B8A6',
     fontSize: 12,
   },
   inputContainer: {
@@ -408,7 +408,7 @@ const styles = StyleSheet.create({
     maxHeight: 100,
   },
   sendButton: {
-    backgroundColor: '#03a9f4',
+    backgroundColor: '#14B8A6',
     width: 44,
     height: 44,
     borderRadius: 22,

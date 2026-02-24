@@ -105,7 +105,7 @@ export default function CreateRequestScreen() {
               style={styles.selectButton}
               onPress={() => setShowMaterialPicker(true)}
             >
-              <Ionicons name="add-circle-outline" size={20} color="#3b82f6" />
+              <Ionicons name="add-circle-outline" size={20} color="#0D9488" />
               <Text style={styles.selectButtonText}>Chọn vật liệu</Text>
             </TouchableOpacity>
           )}
@@ -170,8 +170,8 @@ export default function CreateRequestScreen() {
           <Text style={styles.sectionTitle}>Mức độ khẩn cấp</Text>
           <View style={styles.urgencyButtons}>
             {[
-              { value: 'low', label: 'Thấp', color: '#0066CC' },
-              { value: 'medium', label: 'Trung bình', color: '#0066CC' },
+              { value: 'low', label: 'Thấp', color: '#0D9488' },
+              { value: 'medium', label: 'Trung bình', color: '#0D9488' },
               { value: 'high', label: 'Cao', color: '#000000' },
             ].map(({ value, label, color }) => (
               <TouchableOpacity
@@ -271,15 +271,15 @@ const styles = StyleSheet.create({
   selectButtonText: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#3b82f6',
+    color: '#0D9488',
   },
   selectedMaterial: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     borderWidth: 2,
-    borderColor: '#3b82f6',
+    borderColor: '#0D9488',
     borderRadius: 12,
     padding: 16,
   },

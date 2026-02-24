@@ -37,7 +37,7 @@ const { width } = Dimensions.get('window');
 
 const CONSTRUCTION_LEVELS = [
   { id: 'basic', name: 'Cơ bản', price: '4.5-5.5', unit: 'triệu/m²', icon: '🏠', color: '#10B981' },
-  { id: 'standard', name: 'Tiêu chuẩn', price: '5.5-7', unit: 'triệu/m²', icon: '🏡', color: '#3B82F6' },
+  { id: 'standard', name: 'Tiêu chuẩn', price: '5.5-7', unit: 'triệu/m²', icon: '🏡', color: '#0D9488' },
   { id: 'premium', name: 'Cao cấp', price: '7-10', unit: 'triệu/m²', icon: '🏰', color: '#8B5CF6' },
   { id: 'luxury', name: 'Siêu cao cấp', price: '10-15+', unit: 'triệu/m²', icon: '🏯', color: '#F59E0B' },
 ];

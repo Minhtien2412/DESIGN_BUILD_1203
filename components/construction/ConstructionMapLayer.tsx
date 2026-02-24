@@ -102,9 +102,9 @@ const StageMarker: React.FC<{
         {
           left: stage.x,
           top: stage.y,
-          backgroundColor: stage.color || '#3B82F6',
+          backgroundColor: stage.color || '#0D9488',
           borderWidth: isSelected ? 3 : 1,
-          borderColor: isSelected ? '#1E40AF' : 'rgba(255,255,255,0.5)',
+          borderColor: isSelected ? '#0F766E' : 'rgba(255,255,255,0.5)',
         },
       ]}
     >

@@ -239,7 +239,7 @@ export default function VideoDiscoveryScreen() {
       <Stack.Screen
         options={{
           title: "Khám phá Video",
-          headerStyle: { backgroundColor: "#FF5722" },
+          headerStyle: { backgroundColor: "#0D9488" },
           headerTintColor: "#FFFFFF",
           headerRight: () => (
             <View style={styles.headerActions}>
@@ -324,7 +324,7 @@ export default function VideoDiscoveryScreen() {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={onRefresh}
-              colors={["#FF5722"]}
+              colors={["#0D9488"]}
             />
           }
           contentContainerStyle={styles.listContent}
@@ -379,7 +379,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   categoryChipActive: {
-    backgroundColor: "#FF5722",
+    backgroundColor: "#0D9488",
   },
   categoryText: {
     fontSize: 13,
@@ -394,7 +394,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     borderRadius: 12,
     overflow: "hidden",
-    backgroundColor: "#FF5722",
+    backgroundColor: "#0D9488",
   },
   featuredGradient: {
     flexDirection: "row",

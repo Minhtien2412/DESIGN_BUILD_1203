@@ -404,7 +404,7 @@ export default function StoryViewerScreen() {
             <View style={styles.userNameRow}>
               <Text style={styles.userName}>{currentUser.userName}</Text>
               {currentUser.verified && (
-                <Ionicons name="checkmark-circle" size={14} color="#3b82f6" style={{ marginLeft: 4 }} />
+                <Ionicons name="checkmark-circle" size={14} color="#0D9488" style={{ marginLeft: 4 }} />
               )}
             </View>
             <Text style={styles.storyTime}>{currentStory.time}</Text>

@@ -361,7 +361,7 @@ export default function ProfileScreenRedesigned() {
         <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} />
         <View style={styles.guestContainer}>
           <LinearGradient
-            colors={["#3b82f6", "#1d4ed8"]}
+            colors={["#0D9488", "#0F766E"]}
             style={styles.guestAvatar}
           >
             <Ionicons name="person" size={60} color="#fff" />
@@ -455,7 +455,7 @@ export default function ProfileScreenRedesigned() {
       >
         {/* Header with Gradient */}
         <LinearGradient
-          colors={["#1a365d", "#2563eb", "#3b82f6"]}
+          colors={["#1a365d", "#0D9488", "#0D9488"]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.header}
@@ -489,7 +489,7 @@ export default function ProfileScreenRedesigned() {
               />
             ) : (
               <LinearGradient
-                colors={["#3b82f6", "#1d4ed8"]}
+                colors={["#0D9488", "#0F766E"]}
                 style={styles.avatar}
               >
                 <Text style={styles.avatarText}>
@@ -586,7 +586,7 @@ export default function ProfileScreenRedesigned() {
               ]}
             >
               <LinearGradient
-                colors={["#3b82f6", "#8b5cf6"]}
+                colors={["#0D9488", "#8b5cf6"]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
                 style={[
@@ -600,7 +600,7 @@ export default function ProfileScreenRedesigned() {
               onPress={() => router.push("/profile/edit")}
             >
               <Text style={styles.completionButtonText}>Hoàn thiện ngay</Text>
-              <Ionicons name="arrow-forward" size={16} color="#3b82f6" />
+              <Ionicons name="arrow-forward" size={16} color="#0D9488" />
             </TouchableOpacity>
           </View>
         )}
@@ -683,7 +683,7 @@ export default function ProfileScreenRedesigned() {
                     <Ionicons
                       name={item.icon as any}
                       size={20}
-                      color="#3b82f6"
+                      color="#0D9488"
                     />
                   </View>
                   <View>
@@ -778,7 +778,7 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   loginButton: {
-    backgroundColor: "#3b82f6",
+    backgroundColor: "#0D9488",
     paddingVertical: 14,
     paddingHorizontal: 48,
     borderRadius: 12,
@@ -848,7 +848,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: "#3b82f6",
+    backgroundColor: "#0D9488",
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 3,
@@ -962,7 +962,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   completionButtonText: {
-    color: "#3b82f6",
+    color: "#0D9488",
     fontSize: 14,
     fontWeight: "600",
     marginRight: 4,

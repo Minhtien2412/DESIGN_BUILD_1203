@@ -53,12 +53,12 @@ function StatCard({ icon, label, value, color, trend }: StatCardProps) {
             <Ionicons
               name={trend.direction === 'up' ? 'trending-up' : 'trending-down'}
               size={12}
-              color={trend.direction === 'up' ? '#0066CC' : '#000000'}
+              color={trend.direction === 'up' ? '#0D9488' : '#000000'}
             />
             <Text
               style={[
                 styles.trendText,
-                { color: trend.direction === 'up' ? '#0066CC' : '#000000' },
+                { color: trend.direction === 'up' ? '#0D9488' : '#000000' },
               ]}
             >
               {trend.percentage}%
@@ -137,7 +137,7 @@ export function PaymentDashboard({
           icon="cash"
           label="Doanh thu"
           value={formatVND(revenue)}
-          color="#0066CC"
+          color="#0D9488"
           trend={{ direction: 'up', percentage: 12 }}
         />
         <StatCard
@@ -150,13 +150,13 @@ export function PaymentDashboard({
           icon="hourglass"
           label="Chờ thanh toán"
           value={formatVND(pending)}
-          color="#0066CC"
+          color="#0D9488"
         />
         <StatCard
           icon="stats-chart"
           label="Lợi nhuận"
           value={formatVND(netProfit)}
-          color={netProfit >= 0 ? '#0066CC' : '#000000'}
+          color={netProfit >= 0 ? '#0D9488' : '#000000'}
           trend={netProfit >= 0 ? { direction: 'up', percentage: 8 } : undefined}
         />
       </View>
@@ -193,7 +193,7 @@ export function PaymentDashboard({
                 styles.statusSegment,
                 {
                   width: `${completedPercentage}%`,
-                  backgroundColor: '#0066CC',
+                  backgroundColor: '#0D9488',
                 },
               ]}
             />
@@ -204,7 +204,7 @@ export function PaymentDashboard({
                 styles.statusSegment,
                 {
                   width: `${pendingPercentage}%`,
-                  backgroundColor: '#0066CC',
+                  backgroundColor: '#0D9488',
                 },
               ]}
             />
@@ -236,13 +236,13 @@ export function PaymentDashboard({
         {/* Legend */}
         <View style={styles.legend}>
           <View style={styles.legendItem}>
-            <View style={[styles.legendDot, { backgroundColor: '#0066CC' }]} />
+            <View style={[styles.legendDot, { backgroundColor: '#0D9488' }]} />
             <Text style={styles.legendText}>
               Hoàn thành ({completedCount})
             </Text>
           </View>
           <View style={styles.legendItem}>
-            <View style={[styles.legendDot, { backgroundColor: '#0066CC' }]} />
+            <View style={[styles.legendDot, { backgroundColor: '#0D9488' }]} />
             <Text style={styles.legendText}>
               Chờ xử lý ({pendingCount})
             </Text>
@@ -431,7 +431,7 @@ const styles = StyleSheet.create({
   completionPercentage: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   completionBarContainer: {
     height: 8,
@@ -442,7 +442,7 @@ const styles = StyleSheet.create({
   },
   completionBarFill: {
     height: '100%',
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     borderRadius: 4,
   },
   completionInfo: {

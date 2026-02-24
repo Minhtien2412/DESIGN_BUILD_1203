@@ -31,8 +31,8 @@ const STATUS_LABELS: Record<LeaveStatus, string> = {
 };
 
 const STATUS_COLORS: Record<LeaveStatus, string> = {
-  [LeaveStatus.PENDING]: '#0066CC',
-  [LeaveStatus.APPROVED]: '#0066CC',
+  [LeaveStatus.PENDING]: '#0D9488',
+  [LeaveStatus.APPROVED]: '#0D9488',
   [LeaveStatus.REJECTED]: '#000000',
   [LeaveStatus.CANCELLED]: '#999999',
 };
@@ -184,7 +184,7 @@ export default function LeaveRequestsScreen() {
               <View style={styles.header}>
                 <View style={styles.headerLeft}>
                   <View style={styles.avatar}>
-                    <Ionicons name="person" size={24} color="#0066CC" />
+                    <Ionicons name="person" size={24} color="#0D9488" />
                   </View>
                   <View style={styles.headerInfo}>
                     <Text style={styles.workerName}>
@@ -255,7 +255,7 @@ export default function LeaveRequestsScreen() {
                       handleApprove(request.id, request.worker?.fullName || 'N/A')
                     }
                   >
-                    <Ionicons name="checkmark-circle-outline" size={16} color="#0066CC" />
+                    <Ionicons name="checkmark-circle-outline" size={16} color="#0D9488" />
                     <Text style={styles.approveButtonText}>Duyệt</Text>
                   </TouchableOpacity>
 
@@ -329,7 +329,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   filterChipActive: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   filterChipText: {
     fontSize: 13,
@@ -357,7 +357,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     paddingHorizontal: 20,
     paddingVertical: 10,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     borderRadius: 8,
   },
   emptyButtonText: {
@@ -386,7 +386,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -471,13 +471,13 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingVertical: 8,
     borderWidth: 1,
-    borderColor: '#0066CC',
+    borderColor: '#0D9488',
     borderRadius: 6,
   },
   approveButtonText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   rejectButton: {
     flex: 1,
@@ -518,7 +518,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 4,

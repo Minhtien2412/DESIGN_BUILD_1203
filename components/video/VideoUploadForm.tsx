@@ -197,7 +197,7 @@ export function VideoUploadForm({
               autoCapitalize="none"
             />
             <Pressable onPress={handleHashtagSubmit} style={styles.addButton}>
-              <Ionicons name="add-circle" size={24} color="#FF6B35" />
+              <Ionicons name="add-circle" size={24} color="#14B8A6" />
             </Pressable>
           </View>
 
@@ -228,7 +228,7 @@ export function VideoUploadForm({
                   onPress={() => addHashtag(tag)}
                 >
                   <Text style={styles.suggestedText}>#{tag}</Text>
-                  <Ionicons name="add" size={14} color="#FF6B35" />
+                  <Ionicons name="add" size={14} color="#14B8A6" />
                 </Pressable>
               )
             )}
@@ -251,7 +251,7 @@ export function VideoUploadForm({
                 <Ionicons
                   name={option.icon as any}
                   size={20}
-                  color={visibility === option.value ? "#FF6B35" : "#999"}
+                  color={visibility === option.value ? "#14B8A6" : "#999"}
                 />
                 <Text
                   style={[
@@ -282,7 +282,7 @@ export function VideoUploadForm({
                 setAllowComments(v);
                 notifyChange({ allowComments: v });
               }}
-              trackColor={{ false: "#333", true: "#FF6B35" }}
+              trackColor={{ false: "#333", true: "#14B8A6" }}
               thumbColor="#FFF"
             />
           </View>
@@ -298,7 +298,7 @@ export function VideoUploadForm({
                 setAllowDuet(v);
                 notifyChange({ allowDuet: v });
               }}
-              trackColor={{ false: "#333", true: "#FF6B35" }}
+              trackColor={{ false: "#333", true: "#14B8A6" }}
               thumbColor="#FFF"
             />
           </View>
@@ -314,7 +314,7 @@ export function VideoUploadForm({
                 setAllowStitch(v);
                 notifyChange({ allowStitch: v });
               }}
-              trackColor={{ false: "#333", true: "#FF6B35" }}
+              trackColor={{ false: "#333", true: "#14B8A6" }}
               thumbColor="#FFF"
             />
           </View>
@@ -383,7 +383,7 @@ const styles = StyleSheet.create({
   },
   hashPrefix: {
     fontSize: 18,
-    color: "#FF6B35",
+    color: "#14B8A6",
     fontWeight: "600",
   },
   hashtagInput: {
@@ -411,7 +411,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   hashtagText: {
-    color: "#FF6B35",
+    color: "#14B8A6",
     fontSize: 14,
   },
   suggestedTitle: {
@@ -452,14 +452,14 @@ const styles = StyleSheet.create({
     borderColor: "transparent",
   },
   visibilitySelected: {
-    borderColor: "#FF6B35",
+    borderColor: "#14B8A6",
   },
   visibilityText: {
     color: "#999",
     fontSize: 12,
   },
   visibilityTextSelected: {
-    color: "#FF6B35",
+    color: "#14B8A6",
     fontWeight: "600",
   },
   settingRow: {
@@ -484,7 +484,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
-    backgroundColor: "#FF6B35",
+    backgroundColor: "#14B8A6",
     margin: 16,
     padding: 16,
     borderRadius: 12,

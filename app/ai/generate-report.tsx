@@ -50,9 +50,9 @@ export default function GenerateReportScreen() {
 
   const getProgressColor = (progress: number | undefined) => {
     const p = progress ?? 0;
-    if (p >= 80) return '#0066CC';
-    if (p >= 50) return '#3B82F6';
-    return '#0066CC';
+    if (p >= 80) return '#0D9488';
+    if (p >= 50) return '#0D9488';
+    return '#0D9488';
   };
 
   return (
@@ -175,7 +175,7 @@ export default function GenerateReportScreen() {
             {report.highlights && report.highlights.length > 0 && (
               <View style={styles.card}>
                 <View style={styles.cardHeader}>
-                  <Ionicons name="star" size={20} color="#0066CC" />
+                  <Ionicons name="star" size={20} color="#0D9488" />
                   <Text style={styles.cardTitle}>Điểm nổi bật</Text>
                 </View>
                 {report.highlights.map((highlight: string, index: number) => (
@@ -207,7 +207,7 @@ export default function GenerateReportScreen() {
             {report.nextSteps && report.nextSteps.length > 0 && (
               <View style={styles.card}>
                 <View style={styles.cardHeader}>
-                  <Ionicons name="footsteps" size={20} color="#0066CC" />
+                  <Ionicons name="footsteps" size={20} color="#0D9488" />
                   <Text style={styles.cardTitle}>Bước tiếp theo</Text>
                 </View>
                 {report.nextSteps.map((step: string, index: number) => (
@@ -230,7 +230,7 @@ export default function GenerateReportScreen() {
                 </View>
                 {report.recommendations.map((rec: string, index: number) => (
                   <View key={index} style={styles.recItem}>
-                    <Ionicons name="checkmark-circle" size={18} color="#0066CC" />
+                    <Ionicons name="checkmark-circle" size={18} color="#0D9488" />
                     <Text style={styles.recText}>{rec}</Text>
                   </View>
                 ))}
@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
@@ -430,7 +430,7 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     marginTop: 6,
   },
   highlightText: {
@@ -461,7 +461,7 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     alignItems: 'center',
     justifyContent: 'center',
   },

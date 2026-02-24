@@ -75,11 +75,11 @@ export default function ProjectProgressTracker({ projectId, onUpdatePress }: Pro
   const getHealthStatusColor = (status: string) => {
     switch (status) {
       case 'on-track':
-        return '#0066CC';
+        return '#0D9488';
       case 'at-risk':
-        return '#0066CC';
+        return '#0D9488';
       case 'delayed':
-        return '#0066CC';
+        return '#0D9488';
       case 'overdue':
         return '#000000';
       default:
@@ -124,9 +124,9 @@ export default function ProjectProgressTracker({ projectId, onUpdatePress }: Pro
 
   const getProgressColor = (percentage: number) => {
     if (percentage < 30) return '#000000';
-    if (percentage < 60) return '#0066CC';
-    if (percentage < 90) return '#0066CC';
-    return '#0066CC';
+    if (percentage < 60) return '#0D9488';
+    if (percentage < 90) return '#0D9488';
+    return '#0D9488';
   };
 
   if (loading) {
@@ -236,8 +236,8 @@ export default function ProjectProgressTracker({ projectId, onUpdatePress }: Pro
 
         <View style={styles.statsGrid}>
           <View style={styles.statItem}>
-            <View style={[styles.statIcon, { backgroundColor: '#0066CC' + '20' }]}>
-              <Ionicons name="checkmark-done" size={24} color="#0066CC" />
+            <View style={[styles.statIcon, { backgroundColor: '#0D9488' + '20' }]}>
+              <Ionicons name="checkmark-done" size={24} color="#0D9488" />
             </View>
             <Text style={[styles.statValue, { color: colors.text }]}>
               {statistics.completed_tasks}
@@ -248,8 +248,8 @@ export default function ProjectProgressTracker({ projectId, onUpdatePress }: Pro
           </View>
 
           <View style={styles.statItem}>
-            <View style={[styles.statIcon, { backgroundColor: '#0066CC' + '20' }]}>
-              <Ionicons name="play-circle" size={24} color="#0066CC" />
+            <View style={[styles.statIcon, { backgroundColor: '#0D9488' + '20' }]}>
+              <Ionicons name="play-circle" size={24} color="#0D9488" />
             </View>
             <Text style={[styles.statValue, { color: colors.text }]}>
               {statistics.in_progress_tasks}
@@ -260,8 +260,8 @@ export default function ProjectProgressTracker({ projectId, onUpdatePress }: Pro
           </View>
 
           <View style={styles.statItem}>
-            <View style={[styles.statIcon, { backgroundColor: '#0066CC' + '20' }]}>
-              <Ionicons name="time" size={24} color="#0066CC" />
+            <View style={[styles.statIcon, { backgroundColor: '#0D9488' + '20' }]}>
+              <Ionicons name="time" size={24} color="#0D9488" />
             </View>
             <Text style={[styles.statValue, { color: colors.text }]}>
               {statistics.pending_tasks}
@@ -324,9 +324,9 @@ export default function ProjectProgressTracker({ projectId, onUpdatePress }: Pro
                     {
                       backgroundColor:
                         milestone.status === 'completed'
-                          ? '#0066CC'
+                          ? '#0D9488'
                           : milestone.status === 'in_progress'
-                          ? '#0066CC'
+                          ? '#0D9488'
                           : colors.border,
                     },
                   ]}

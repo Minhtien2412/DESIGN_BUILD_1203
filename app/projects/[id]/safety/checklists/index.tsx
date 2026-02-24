@@ -15,8 +15,8 @@ import {
 } from 'react-native';
 
 const STATUS_COLORS = {
-  pending: '#0066CC',
-  completed: '#0066CC',
+  pending: '#0D9488',
+  completed: '#0D9488',
   failed: '#000000'
 };
 
@@ -101,19 +101,19 @@ export default function SafetyChecklistsScreen() {
               label="Hoàn thành"
               value={stats.checklistsCompleted.toString()}
               icon="checkmark-circle"
-              gradientColors={['#0066CC', '#0066CC']}
+              gradientColors={['#0D9488', '#0D9488']}
             />
             <MetricCard
               label="Chờ kiểm tra"
               value={stats.checklistsPending.toString()}
               icon="time"
-              gradientColors={['#0066CC', '#d97706']}
+              gradientColors={['#0D9488', '#d97706']}
             />
             <MetricCard
               label="Tuân thủ PPE"
               value={`${stats.avgPPECompliance}%`}
               icon="shield-checkmark"
-              gradientColors={['#3b82f6', '#0066CC']}
+              gradientColors={['#0D9488', '#0D9488']}
             />
             <MetricCard
               label="Họp An toàn"
@@ -184,7 +184,7 @@ export default function SafetyChecklistsScreen() {
                         <View style={styles.progressContainer}>
                           <View style={styles.statsRow}>
                             <View style={styles.statItem}>
-                              <Text style={[styles.statValue, { color: '#0066CC' }]}>
+                              <Text style={[styles.statValue, { color: '#0D9488' }]}>
                                 {passCount}
                               </Text>
                               <Text style={styles.statLabel}>Đạt</Text>
@@ -198,14 +198,14 @@ export default function SafetyChecklistsScreen() {
                             </View>
 
                             <View style={styles.statItem}>
-                              <Text style={[styles.statValue, { color: '#0066CC' }]}>
+                              <Text style={[styles.statValue, { color: '#0D9488' }]}>
                                 {pendingCount}
                               </Text>
                               <Text style={styles.statLabel}>Chờ</Text>
                             </View>
 
                             <View style={[styles.statItem, styles.statItemLarge]}>
-                              <Text style={[styles.statValueLarge, { color: '#3b82f6' }]}>
+                              <Text style={[styles.statValueLarge, { color: '#0D9488' }]}>
                                 {passRate}%
                               </Text>
                               <Text style={styles.statLabel}>Tỷ lệ đạt</Text>
@@ -219,7 +219,7 @@ export default function SafetyChecklistsScreen() {
                                 style={[
                                   styles.progressSegment,
                                   {
-                                    backgroundColor: '#0066CC',
+                                    backgroundColor: '#0D9488',
                                     width: `${(passCount / totalCount) * 100}%`
                                   }
                                 ]}
@@ -241,7 +241,7 @@ export default function SafetyChecklistsScreen() {
                                 style={[
                                   styles.progressSegment,
                                   {
-                                    backgroundColor: '#0066CC',
+                                    backgroundColor: '#0D9488',
                                     width: `${(pendingCount / totalCount) * 100}%`
                                   }
                                 ]}
@@ -255,19 +255,19 @@ export default function SafetyChecklistsScreen() {
                           <Text style={styles.ppeTitle}>Tuân thủ PPE</Text>
                           <View style={styles.ppeGrid}>
                             <View style={styles.ppeItem}>
-                              <Ionicons name="person" size={16} color="#3b82f6" />
+                              <Ionicons name="person" size={16} color="#0D9488" />
                               <Text style={styles.ppeLabel}>Mũ: {checklist.ppeCompliance.helmet}%</Text>
                             </View>
                             <View style={styles.ppeItem}>
-                              <Ionicons name="shirt" size={16} color="#3b82f6" />
+                              <Ionicons name="shirt" size={16} color="#0D9488" />
                               <Text style={styles.ppeLabel}>Áo: {checklist.ppeCompliance.safetyVest}%</Text>
                             </View>
                             <View style={styles.ppeItem}>
-                              <Ionicons name="footsteps" size={16} color="#3b82f6" />
+                              <Ionicons name="footsteps" size={16} color="#0D9488" />
                               <Text style={styles.ppeLabel}>Giày: {checklist.ppeCompliance.boots}%</Text>
                             </View>
                             <View style={styles.ppeItem}>
-                              <Ionicons name="hand-left" size={16} color="#3b82f6" />
+                              <Ionicons name="hand-left" size={16} color="#0D9488" />
                               <Text style={styles.ppeLabel}>Găng: {checklist.ppeCompliance.gloves}%</Text>
                             </View>
                           </View>
@@ -295,7 +295,7 @@ export default function SafetyChecklistsScreen() {
                       <Text style={styles.viewButtonText}>
                         {checklist.status === 'pending' ? 'Thực hiện kiểm tra' : 'Xem chi tiết'}
                       </Text>
-                      <Ionicons name="chevron-forward" size={16} color="#3b82f6" />
+                      <Ionicons name="chevron-forward" size={16} color="#0D9488" />
                     </TouchableOpacity>
                   </View>
                 );
@@ -352,7 +352,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     paddingVertical: 14,
     paddingHorizontal: 20,
     borderRadius: 12,
@@ -454,7 +454,7 @@ const styles = StyleSheet.create({
   ppeTitle: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#1e40af',
+    color: '#0F766E',
     marginBottom: 8
   },
   ppeGrid: {
@@ -471,7 +471,7 @@ const styles = StyleSheet.create({
   },
   ppeLabel: {
     fontSize: 12,
-    color: '#1e40af'
+    color: '#0F766E'
   },
   ppeOverall: {
     flexDirection: 'row',
@@ -479,17 +479,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingTop: 8,
     borderTopWidth: 1,
-    borderTopColor: '#bfdbfe'
+    borderTopColor: '#99F6E4'
   },
   ppeOverallLabel: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#1e40af'
+    color: '#0F766E'
   },
   ppeOverallValue: {
     fontSize: 18,
     fontWeight: '800',
-    color: '#1e40af'
+    color: '#0F766E'
   },
   notesBox: {
     backgroundColor: '#fffbeb',
@@ -518,7 +518,7 @@ const styles = StyleSheet.create({
   viewButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#3b82f6'
+    color: '#0D9488'
   },
   emptyState: {
     alignItems: 'center',

@@ -36,20 +36,20 @@ const TYPE_FILTERS: { value: ResourceType | 'ALL'; label: string; icon: string }
 
 const STATUS_COLORS: Record<AllocationStatus, string> = {
   PLANNED: '#6B7280',
-  REQUESTED: '#0080FF',
-  APPROVED: '#0066CC',
-  ALLOCATED: '#0080FF',
-  IN_USE: '#0066CC',
-  COMPLETED: '#0066CC',
+  REQUESTED: '#14B8A6',
+  APPROVED: '#0D9488',
+  ALLOCATED: '#14B8A6',
+  IN_USE: '#0D9488',
+  COMPLETED: '#0D9488',
   CANCELLED: '#000000',
   RELEASED: '#9CA3AF',
 };
 
 const PRIORITY_COLORS: Record<ResourcePriority, string> = {
-  LOW: '#0066CC',
-  MEDIUM: '#0080FF',
-  HIGH: '#0080FF',
-  URGENT: '#0066CC',
+  LOW: '#0D9488',
+  MEDIUM: '#14B8A6',
+  HIGH: '#14B8A6',
+  URGENT: '#0D9488',
   CRITICAL: '#000000',
 };
 
@@ -99,7 +99,7 @@ export default function AllocationsScreen() {
   if (loading && !allocations.length) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#0080FF" />
+        <ActivityIndicator size="large" color="#14B8A6" />
       </View>
     );
   }
@@ -113,29 +113,29 @@ export default function AllocationsScreen() {
     <View style={styles.container}>
       {/* Stats Cards */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.statsContainer}>
-        <View style={[styles.statCard, { backgroundColor: '#E8F4FF' }]}>
+        <View style={[styles.statCard, { backgroundColor: '#F0FDFA' }]}>
           <Text style={styles.statValue}>{allocations.length}</Text>
           <Text style={styles.statLabel}>Total</Text>
         </View>
 
         <View style={[styles.statCard, { backgroundColor: '#F3E8FF' }]}>
-          <Text style={[styles.statValue, { color: '#0066CC' }]}>{approvedCount}</Text>
+          <Text style={[styles.statValue, { color: '#0D9488' }]}>{approvedCount}</Text>
           <Text style={styles.statLabel}>Approved</Text>
         </View>
 
         <View style={[styles.statCard, { backgroundColor: '#FEF3C7' }]}>
-          <Text style={[styles.statValue, { color: '#0080FF' }]}>{allocatedCount}</Text>
+          <Text style={[styles.statValue, { color: '#14B8A6' }]}>{allocatedCount}</Text>
           <Text style={styles.statLabel}>Allocated</Text>
         </View>
 
         <View style={[styles.statCard, { backgroundColor: '#D1FAE5' }]}>
-          <Text style={[styles.statValue, { color: '#0066CC' }]}>{inUseCount}</Text>
+          <Text style={[styles.statValue, { color: '#0D9488' }]}>{inUseCount}</Text>
           <Text style={styles.statLabel}>In Use</Text>
         </View>
 
         {analytics && (
           <View style={[styles.statCard, { backgroundColor: '#F3F4F6' }]}>
-            <Text style={[styles.statValue, { color: '#0066CC' }]}>
+            <Text style={[styles.statValue, { color: '#0D9488' }]}>
               {analytics.summary.utilizationRate.toFixed(0)}%
             </Text>
             <Text style={styles.statLabel}>Utilization</Text>
@@ -261,7 +261,7 @@ export default function AllocationsScreen() {
                         TYPE_FILTERS.find(t => t.value === allocation.resourceType)?.icon as any
                       }
                       size={12}
-                      color="#0080FF"
+                      color="#14B8A6"
                       style={{ marginRight: 4 }}
                     />
                     <Text style={styles.typeBadgeText}>{allocation.resourceType}</Text>
@@ -329,7 +329,7 @@ export default function AllocationsScreen() {
                           color:
                             allocation.actualCost > allocation.estimatedCost
                               ? '#000000'
-                              : '#0066CC',
+                              : '#0D9488',
                         },
                       ]}
                     >
@@ -353,7 +353,7 @@ export default function AllocationsScreen() {
               {/* Actions */}
               <View style={styles.actions}>
                 <TouchableOpacity style={styles.actionButton}>
-                  <Ionicons name="eye-outline" size={18} color="#0080FF" />
+                  <Ionicons name="eye-outline" size={18} color="#14B8A6" />
                   <Text style={styles.actionButtonText}>View</Text>
                 </TouchableOpacity>
 
@@ -480,8 +480,8 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   filterChipActive: {
-    backgroundColor: '#0080FF',
-    borderColor: '#0080FF',
+    backgroundColor: '#14B8A6',
+    borderColor: '#14B8A6',
   },
   filterChipText: {
     fontSize: 13,
@@ -565,14 +565,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 8,
     paddingVertical: 4,
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     borderRadius: 6,
     alignSelf: 'flex-start',
   },
   typeBadgeText: {
     fontSize: 10,
     fontWeight: '600',
-    color: '#1D4ED8',
+    color: '#0F766E',
   },
   infoSection: {
     marginBottom: 12,
@@ -638,13 +638,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#F3F4F6',
   },
   actionButtonPrimary: {
-    backgroundColor: '#0080FF',
+    backgroundColor: '#14B8A6',
   },
   actionButtonSuccess: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   actionButtonWarning: {
-    backgroundColor: '#0080FF',
+    backgroundColor: '#14B8A6',
   },
   actionButtonText: {
     fontSize: 12,

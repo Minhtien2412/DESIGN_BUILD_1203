@@ -29,7 +29,7 @@ export function MeetingTrackingCard() {
     >
       <View style={styles.header}>
         <View style={styles.iconContainer}>
-          <Ionicons name="navigate-circle" size={32} color="#3B82F6" />
+          <Ionicons name="navigate-circle" size={32} color="#0D9488" />
         </View>
         <View style={styles.headerContent}>
           <Text style={[styles.title, { color: textColor }]}>
@@ -80,7 +80,7 @@ export function MeetingTrackingCard() {
           </Text>
         </View>
         <View style={styles.featureItem}>
-          <Ionicons name="map" size={14} color="#3B82F6" />
+          <Ionicons name="map" size={14} color="#0D9488" />
           <Text style={[styles.featureText, { color: mutedColor }]}>
             Hiển thị lộ trình trên bản đồ
           </Text>

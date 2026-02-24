@@ -51,11 +51,11 @@ export default function ProjectAIAnalysisScreen() {
   const getReportTypeColor = (type: string) => {
     switch (type) {
       case 'PROGRESS':
-        return '#3b82f6';
+        return '#0D9488';
       case 'QUALITY':
-        return '#0066CC';
+        return '#0D9488';
       case 'SAFETY':
-        return '#0066CC';
+        return '#0D9488';
       default:
         return '#6b7280';
     }
@@ -90,7 +90,7 @@ export default function ProjectAIAnalysisScreen() {
           <Text style={styles.sectionTitle}>Hành động nhanh</Text>
           <View style={styles.quickActionsGrid}>
             <TouchableOpacity
-              style={[styles.quickActionCard, { backgroundColor: '#3b82f6' }]}
+              style={[styles.quickActionCard, { backgroundColor: '#0D9488' }]}
               onPress={handleQuickAnalyze}
             >
               <Ionicons name="camera-outline" size={32} color="#fff" />
@@ -101,7 +101,7 @@ export default function ProjectAIAnalysisScreen() {
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.quickActionCard, { backgroundColor: '#0066CC' }]}
+              style={[styles.quickActionCard, { backgroundColor: '#0D9488' }]}
               onPress={handleChatWithAI}
             >
               <Ionicons name="chatbubbles-outline" size={32} color="#fff" />
@@ -112,7 +112,7 @@ export default function ProjectAIAnalysisScreen() {
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.quickActionCard, { backgroundColor: '#0066CC' }]}
+              style={[styles.quickActionCard, { backgroundColor: '#0D9488' }]}
               onPress={handleErrorDetection}
             >
               <Ionicons name="warning-outline" size={32} color="#fff" />
@@ -140,7 +140,7 @@ export default function ProjectAIAnalysisScreen() {
           <Text style={styles.sectionTitle}>Thông tin AI</Text>
           <View style={styles.insightsCard}>
             <View style={styles.insightsHeader}>
-              <Ionicons name="bulb" size={24} color="#0066CC" />
+              <Ionicons name="bulb" size={24} color="#0D9488" />
               <Text style={styles.insightsTitle}>
                 Phân tích từ GPT-4 Vision
               </Text>
@@ -258,7 +258,7 @@ export default function ProjectAIAnalysisScreen() {
                   </Text>
                 )}
                 <View style={styles.reportFooter}>
-                  <Ionicons name="chevron-forward" size={20} color="#3b82f6" />
+                  <Ionicons name="chevron-forward" size={20} color="#0D9488" />
                 </View>
               </TouchableOpacity>
             ))}
@@ -269,31 +269,31 @@ export default function ProjectAIAnalysisScreen() {
           <Text style={styles.sectionTitle}>Tính năng AI</Text>
           <View style={styles.featuresList}>
             <View style={styles.featureItem}>
-              <Ionicons name="checkmark-circle" size={20} color="#0066CC" />
+              <Ionicons name="checkmark-circle" size={20} color="#0D9488" />
               <Text style={styles.featureText}>
                 Phân tích tiến độ công trình tự động
               </Text>
             </View>
             <View style={styles.featureItem}>
-              <Ionicons name="checkmark-circle" size={20} color="#0066CC" />
+              <Ionicons name="checkmark-circle" size={20} color="#0D9488" />
               <Text style={styles.featureText}>
                 Phát hiện lỗi thi công qua ảnh
               </Text>
             </View>
             <View style={styles.featureItem}>
-              <Ionicons name="checkmark-circle" size={20} color="#0066CC" />
+              <Ionicons name="checkmark-circle" size={20} color="#0D9488" />
               <Text style={styles.featureText}>
                 Ước tính vật liệu cần thiết
               </Text>
             </View>
             <View style={styles.featureItem}>
-              <Ionicons name="checkmark-circle" size={20} color="#0066CC" />
+              <Ionicons name="checkmark-circle" size={20} color="#0D9488" />
               <Text style={styles.featureText}>
                 Tư vấn giải pháp kỹ thuật
               </Text>
             </View>
             <View style={styles.featureItem}>
-              <Ionicons name="checkmark-circle" size={20} color="#0066CC" />
+              <Ionicons name="checkmark-circle" size={20} color="#0D9488" />
               <Text style={styles.featureText}>
                 Đánh giá chất lượng công trình
               </Text>
@@ -341,7 +341,7 @@ const styles = StyleSheet.create({
   },
   viewAllButton: {
     fontSize: 14,
-    color: '#3b82f6',
+    color: '#0D9488',
     fontWeight: '600',
   },
   quickActionsGrid: {
@@ -433,7 +433,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     paddingHorizontal: 20,
     paddingVertical: 10,
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#0D9488',
     borderRadius: 8,
   },
   retryButtonText: {

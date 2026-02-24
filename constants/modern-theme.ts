@@ -1,7 +1,7 @@
 /**
  * Modern Theme - Minimalist Blue + Black + White
  * Updated: 01/05/2026
- * 
+ *
  * Usage:
  * import { MODERN_COLORS } from '@/constants/modern-theme';
  * backgroundColor: MODERN_COLORS.primary
@@ -10,74 +10,74 @@
 /**
  * Modern Dimensions
  */
-import { Dimensions } from 'react-native';
+import { Dimensions } from "react-native";
 
 export const MODERN_COLORS = {
-  // Primary - Professional Blue (Sophisticated)
-  primary: '#0066CC',
-  primaryLight: '#0080FF',
-  primaryDark: '#004C99',
-  primaryBg: '#E6F2FF',
-  
+  // Primary - Professional Teal
+  primary: "#0D9488",
+  primaryLight: "#14B8A6",
+  primaryDark: "#0F766E",
+  primaryBg: "#F0FDFA",
+
   // Secondary - Charcoal Gray (Minimalist)
-  secondary: '#333333',
-  secondaryLight: '#666666',
-  secondaryDark: '#000000',
-  secondaryBg: '#F5F5F5',
-  
-  // Gradients (Subtle, Modern)
-  gradientPrimary: ['#0080FF', '#0066CC'],  // Blue gradient
-  gradientSecondary: ['#333333', '#000000'], // Charcoal gradient
-  gradientPurple: ['#0066CC', '#004C99'],   // Deep blue (no purple)
-  gradientBlue: ['#0080FF', '#0066CC'],     // Use blue instead
-  
-  // E-commerce Special (Blue Theme)
-  flashSale: '#0066CC',    // Professional blue for hot items
-  discount: '#0080FF',     // Bright blue for discounts
-  new: '#0080FF',         // Bright blue for new items
-  favorite: '#0080FF',     // Bright blue for wishlist
-  
+  secondary: "#333333",
+  secondaryLight: "#666666",
+  secondaryDark: "#000000",
+  secondaryBg: "#F5F5F5",
+
+  // Gradients (Teal-based)
+  gradientPrimary: ["#14B8A6", "#0D9488"], // Teal gradient
+  gradientSecondary: ["#333333", "#000000"], // Charcoal gradient
+  gradientPurple: ["#0D9488", "#0F766E"], // Deep teal
+  gradientBlue: ["#14B8A6", "#0D9488"], // Teal gradient
+
+  // E-commerce Special (Teal Theme)
+  flashSale: "#0D9488", // Teal for hot items
+  discount: "#14B8A6", // Bright teal for discounts
+  new: "#14B8A6", // Bright teal for new items
+  favorite: "#14B8A6", // Bright teal for wishlist
+
   // Neutrals - Clean Minimalist
-  background: '#FFFFFF',   // Pure white background
-  surface: '#FFFFFF',      // Pure white cards
-  surfaceHover: '#F5F5F5', // Off-white hover
-  border: '#E0E0E0',       // Light gray borders
-  divider: '#E0E0E0',      // Light gray dividers
-  
+  background: "#FFFFFF", // Pure white background
+  surface: "#FFFFFF", // Pure white cards
+  surfaceHover: "#F5F5F5", // Off-white hover
+  border: "#E0E0E0", // Light gray borders
+  divider: "#E0E0E0", // Light gray dividers
+
   // Gray Scale
-  gray50: '#FAFAFA',
-  gray100: '#F5F5F5',
-  gray200: '#E0E0E0',
-  gray300: '#CCCCCC',
-  gray400: '#999999',
-  gray500: '#666666',
-  gray600: '#4D4D4D',
-  gray700: '#333333',
-  gray800: '#1A1A1A',
-  gray900: '#0D0D0D',
-  
-  // Orange Scale (replaced with blue)
-  orange50: '#E6F2FF',
-  orange500: '#0080FF',
-  
+  gray50: "#FAFAFA",
+  gray100: "#F5F5F5",
+  gray200: "#E0E0E0",
+  gray300: "#CCCCCC",
+  gray400: "#999999",
+  gray500: "#666666",
+  gray600: "#4D4D4D",
+  gray700: "#333333",
+  gray800: "#1A1A1A",
+  gray900: "#0D0D0D",
+
+  // Accent Scale (teal tints)
+  orange50: "#F0FDFA",
+  orange500: "#14B8A6",
+
   // Text (High Contrast)
-  text: '#000000',         // Pure black primary text
-  textSecondary: '#333333', // Charcoal secondary text
-  textTertiary: '#666666',  // Gray tertiary text
-  textDisabled: '#999999',  // Light gray disabled
-  textOnPrimary: '#FFFFFF', // White on blue
-  
-  // Semantic Colors (Minimalist - use blacks/blues)
-  success: '#0066CC',
-  warning: '#0080FF',      // Use bright blue instead of orange
-  danger: '#000000',       // Use black instead of red (minimalist)
-  info: '#0066CC',         // Use professional blue
-  error: '#000000',        // Use black for errors (minimalist)
-  
+  text: "#000000", // Pure black primary text
+  textSecondary: "#333333", // Charcoal secondary text
+  textTertiary: "#666666", // Gray tertiary text
+  textDisabled: "#999999", // Light gray disabled
+  textOnPrimary: "#FFFFFF", // White on teal
+
+  // Semantic Colors
+  success: "#10B981",
+  warning: "#F59E0B",
+  danger: "#EF4444",
+  info: "#0D9488",
+  error: "#EF4444",
+
   // Overlays (Darker for sophistication)
-  overlay: 'rgba(0, 0, 0, 0.85)',
-  overlayLight: 'rgba(0, 0, 0, 0.3)',
-  overlayDark: 'rgba(0, 0, 0, 0.95)',
+  overlay: "rgba(0, 0, 0, 0.85)",
+  overlayLight: "rgba(0, 0, 0, 0.3)",
+  overlayDark: "rgba(0, 0, 0, 0.95)",
 } as const;
 
 /**
@@ -85,42 +85,42 @@ export const MODERN_COLORS = {
  */
 export const MODERN_SHADOWS = {
   none: {
-    shadowColor: 'transparent',
+    shadowColor: "transparent",
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0,
     shadowRadius: 0,
     elevation: 0,
   },
   xs: {
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.03,
     shadowRadius: 1,
     elevation: 1,
   },
   sm: {
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 1,
   },
   md: {
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 4,
     elevation: 2,
   },
   lg: {
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.12,
     shadowRadius: 8,
     elevation: 4,
   },
   xl: {
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.16,
     shadowRadius: 12,
@@ -171,23 +171,23 @@ export const MODERN_TYPOGRAPHY = {
   },
   // Font Weights
   fontWeight: {
-    regular: '400' as const,
-    medium: '500' as const,
-    semibold: '600' as const,
-    bold: '700' as const,
+    regular: "400" as const,
+    medium: "500" as const,
+    semibold: "600" as const,
+    bold: "700" as const,
   },
   // Line Heights (absolute values for React Native)
   // React Native requires absolute pixel values, not multipliers
   lineHeight: {
-    tight: 16,    // ~1.2x for small text
-    normal: 20,   // ~1.5x for body text (sm=12, md=14)
-    relaxed: 24,  // ~1.75x for larger text
+    tight: 16, // ~1.2x for small text
+    normal: 20, // ~1.5x for body text (sm=12, md=14)
+    relaxed: 24, // ~1.75x for larger text
   },
 } as const;
 
 /**
  * Helper function to create gradient background style
- * 
+ *
  * Usage:
  * import { LinearGradient } from 'expo-linear-gradient';
  * <LinearGradient colors={MODERN_COLORS.gradientPrimary} ...>
@@ -197,15 +197,16 @@ export const createGradient = (colors: readonly string[]) => ({
   start: { x: 0, y: 0 },
   end: { x: 1, y: 1 },
 });
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 export const MODERN_DIMENSIONS = {
   screenWidth: SCREEN_WIDTH,
   screenHeight: SCREEN_HEIGHT,
-  
+
   // Product Grid (2 columns)
-  productCardWidth: (SCREEN_WIDTH - (MODERN_SPACING.md * 2) - MODERN_SPACING.xs) / 2,
-  
+  productCardWidth:
+    (SCREEN_WIDTH - MODERN_SPACING.md * 2 - MODERN_SPACING.xs) / 2,
+
   // Common Heights
   headerHeight: 56,
   tabBarHeight: 60,

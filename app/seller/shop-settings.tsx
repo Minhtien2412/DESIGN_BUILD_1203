@@ -178,7 +178,7 @@ export default function ShopSettingsScreen() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#FF6B35" />
+        <ActivityIndicator size="large" color="#14B8A6" />
       </View>
     );
   }
@@ -199,7 +199,7 @@ export default function ShopSettingsScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={["#FF6B35"]}
+            colors={["#14B8A6"]}
           />
         }
       >
@@ -262,7 +262,7 @@ export default function ShopSettingsScreen() {
             <Ionicons
               name={editMode ? "close" : "create-outline"}
               size={20}
-              color={editMode ? "#FFFFFF" : "#FF6B35"}
+              color={editMode ? "#FFFFFF" : "#14B8A6"}
             />
             <Text
               style={[
@@ -390,7 +390,7 @@ export default function ShopSettingsScreen() {
               value={shop.isActive}
               onValueChange={(value) => handleToggle("isActive", value)}
               trackColor={{ false: "#D1D5DB", true: "#FFB088" }}
-              thumbColor={shop.isActive ? "#FF6B35" : "#9CA3AF"}
+              thumbColor={shop.isActive ? "#14B8A6" : "#9CA3AF"}
             />
           </View>
 
@@ -405,7 +405,7 @@ export default function ShopSettingsScreen() {
               value={shop.autoReply}
               onValueChange={(value) => handleToggle("autoReply", value)}
               trackColor={{ false: "#D1D5DB", true: "#FFB088" }}
-              thumbColor={shop.autoReply ? "#FF6B35" : "#9CA3AF"}
+              thumbColor={shop.autoReply ? "#14B8A6" : "#9CA3AF"}
             />
           </View>
 
@@ -591,7 +591,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 0,
     right: 0,
-    backgroundColor: "#FF6B35",
+    backgroundColor: "#14B8A6",
     borderRadius: 12,
     width: 24,
     height: 24,
@@ -618,15 +618,15 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: "#FF6B35",
+    borderColor: "#14B8A6",
   },
   editToggleBtnActive: {
-    backgroundColor: "#FF6B35",
-    borderColor: "#FF6B35",
+    backgroundColor: "#14B8A6",
+    borderColor: "#14B8A6",
   },
   editToggleText: {
     fontSize: 13,
-    color: "#FF6B35",
+    color: "#14B8A6",
     marginLeft: 6,
     fontWeight: "500",
   },
@@ -751,7 +751,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#FF6B35",
+    backgroundColor: "#14B8A6",
     borderRadius: 12,
     paddingVertical: 16,
   },

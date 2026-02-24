@@ -96,7 +96,7 @@ export default function MaterialsCatalogScreen() {
       <Stack.Screen
         options={{
           title: 'Catalog Vật Liệu',
-          headerStyle: { backgroundColor: '#0066CC' },
+          headerStyle: { backgroundColor: '#0D9488' },
           headerTintColor: '#fff',
           headerTitleStyle: { fontWeight: '600' },
         }}
@@ -104,7 +104,7 @@ export default function MaterialsCatalogScreen() {
       <View style={styles.container}>
         {/* Hero Section */}
         <LinearGradient
-          colors={['#0066CC', '#3399FF']}
+          colors={['#0D9488', '#14B8A6']}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.hero}
@@ -141,7 +141,7 @@ export default function MaterialsCatalogScreen() {
 
         {loading && !materials.length ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#0066CC" />
+            <ActivityIndicator size="large" color="#0D9488" />
             <Text style={styles.loadingText}>Đang tải vật liệu...</Text>
           </View>
         ) : (
@@ -204,7 +204,7 @@ export default function MaterialsCatalogScreen() {
                 <Ionicons
                   name={option.icon as any}
                   size={14}
-                  color={sortBy === option.id ? '#fff' : '#0066CC'}
+                  color={sortBy === option.id ? '#fff' : '#0D9488'}
                 />
                 <Text
                   style={[
@@ -349,7 +349,7 @@ export default function MaterialsCatalogScreen() {
                           setShowARPreview(true);
                         }}
                       >
-                        <Ionicons name="cube" size={20} color="#0066CC" />
+                        <Ionicons name="cube" size={20} color="#0D9488" />
                         <Text style={styles.arButtonText}>Xem AR</Text>
                       </TouchableOpacity>
                     )}
@@ -496,7 +496,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   categoryChipActive: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   categoryText: {
     fontSize: 13,
@@ -527,16 +527,16 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#0066CC',
+    borderColor: '#0D9488',
     gap: 4,
   },
   sortChipActive: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   sortText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   sortTextActive: {
     color: '#fff',
@@ -609,7 +609,7 @@ const styles = StyleSheet.create({
   brandText: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#0066CC',
+    color: '#0D9488',
     marginBottom: 4,
   },
   materialName: {
@@ -642,14 +642,14 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   unit: {
     fontSize: 11,
     color: '#999',
   },
   addButton: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     width: 32,
     height: 32,
     borderRadius: 16,
@@ -699,7 +699,7 @@ const styles = StyleSheet.create({
   modalBrandText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   modalRating: {
     flexDirection: 'row',
@@ -757,7 +757,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#fff5f0',
     borderWidth: 1,
-    borderColor: '#0066CC',
+    borderColor: '#0D9488',
     paddingVertical: 12,
     borderRadius: 8,
     gap: 6,
@@ -765,7 +765,7 @@ const styles = StyleSheet.create({
   arButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   contactButton: {
     flex: 1,
@@ -793,7 +793,7 @@ const styles = StyleSheet.create({
   modalPrice: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   modalUnit: {
     fontSize: 13,
@@ -802,7 +802,7 @@ const styles = StyleSheet.create({
   addToCartButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 24,

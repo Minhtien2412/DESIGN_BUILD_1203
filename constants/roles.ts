@@ -25,7 +25,7 @@ export const MARKETPLACE_ROLES: Record<UserType, MarketplaceRole> = {
       'So sánh giá',
     ],
     icon: 'person-outline',
-    color: '#3B82F6',
+    color: '#0D9488',
     verificationRequired: false,
   },
 
@@ -45,7 +45,7 @@ export const MARKETPLACE_ROLES: Record<UserType, MarketplaceRole> = {
       'Xem thống kê bán hàng',
     ],
     icon: 'hammer-outline',
-    color: '#0066CC',
+    color: '#0D9488',
     verificationRequired: true,
   },
 
@@ -85,7 +85,7 @@ export const MARKETPLACE_ROLES: Record<UserType, MarketplaceRole> = {
       'Compliance và giấy phép',
     ],
     icon: 'construct-outline',
-    color: '#0066CC',
+    color: '#0D9488',
     verificationRequired: true,
   },
 
@@ -405,13 +405,13 @@ export const ROLE_BADGES: Record<UserType, {
   buyer: {
     text: 'Khách hàng',
     bgColor: '#E8F4FF',
-    textColor: '#3B82F6',
+    textColor: '#0D9488',
     icon: 'person-outline',
   },
   seller: {
     text: 'Thợ',
     bgColor: '#F0FDF4',
-    textColor: '#0066CC',
+    textColor: '#0D9488',
     icon: 'hammer-outline',
   },
   company: {
@@ -423,7 +423,7 @@ export const ROLE_BADGES: Record<UserType, {
   contractor: {
     text: 'Nhà thầu',
     bgColor: '#FFFBEB',
-    textColor: '#0066CC',
+    textColor: '#0D9488',
     icon: 'construct-outline',
   },
   architect: {

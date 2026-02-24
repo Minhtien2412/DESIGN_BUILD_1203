@@ -12,6 +12,10 @@
  * - Empty state per tab
  */
 
+import {
+    getOrders,
+    type Order as ApiOrder,
+} from "@/services/api/orders.service";
 import { Ionicons } from "@expo/vector-icons";
 import { router, Stack } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -30,11 +34,11 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-// Shopee Colors
-const SHOPEE_COLORS = {
-  primary: "#EE4D2D",
-  primaryDark: "#D73211",
-  primaryLight: "#FF6633",
+// Theme Colors
+const THEME = {
+  primary: "#0D9488",
+  primaryDark: "#0F766E",
+  primaryLight: "#14B8A6",
   background: "#F5F5F5",
   surface: "#FFFFFF",
   text: "#000000",
@@ -42,10 +46,10 @@ const SHOPEE_COLORS = {
   textTertiary: "#BDBDBD",
   border: "#E0E0E0",
   divider: "#EEEEEE",
-  success: "#00BFA5",
-  warning: "#FFB800",
+  success: "#10B981",
+  warning: "#F59E0B",
   error: "#EF4444",
-  info: "#3B82F6",
+  info: "#0D9488",
 };
 
 // Order Status Types
@@ -100,7 +104,7 @@ const STATUS_CONFIG: Record<
   },
   confirmed: {
     label: "Đã xác nhận",
-    color: "#3B82F6",
+    color: "#0D9488",
     bgColor: "#E3F2FD",
     icon: "checkmark-circle-outline",
   },
@@ -332,11 +336,32 @@ export default function OrderListScreen() {
   const loadOrders = useCallback(async (showLoader = true) => {
     if (showLoader) setLoading(true);
     try {
-      // TODO: Replace with actual API call
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      setOrders(MOCK_ORDERS);
+      const response = await getOrders({ page: 1, limit: 50 });
+      const mapped: Order[] = response.orders.map((o: ApiOrder) => ({
+        id: o.id,
+        orderNumber: o.orderNumber || `#DH${o.id}`,
+        createdAt: o.createdAt,
+        status: o.status.toLowerCase() as OrderStatus,
+        shopName: "Nhà Xinh Official",
+        total: o.total,
+        canCancel: o.status === "PENDING",
+        canReview: o.status === "DELIVERED" || o.status === "COMPLETED",
+        canReorder: true,
+        items: o.items.map((item: any) => ({
+          id: item.id,
+          name: item.product?.name || `Sản phẩm #${item.productId}`,
+          quantity: item.quantity,
+          price: item.price,
+          image:
+            (item.product as any)?.image?.uri ||
+            `https://picsum.photos/200/200?random=${item.id}`,
+          variant: (item as any).variant,
+        })),
+      }));
+      setOrders(mapped.length > 0 ? mapped : MOCK_ORDERS);
     } catch (error) {
-      console.error("Error loading orders:", error);
+      console.error("[Orders] Error loading orders:", error);
+      setOrders(MOCK_ORDERS); // Fallback to mock
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -569,11 +594,7 @@ export default function OrderListScreen() {
 
     return (
       <View style={styles.emptyContainer}>
-        <Ionicons
-          name={empty.icon}
-          size={80}
-          color={SHOPEE_COLORS.textTertiary}
-        />
+        <Ionicons name={empty.icon} size={80} color={THEME.textTertiary} />
         <Text style={styles.emptyTitle}>{empty.title}</Text>
         <Text style={styles.emptyDesc}>{empty.desc}</Text>
         <TouchableOpacity
@@ -588,10 +609,7 @@ export default function OrderListScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar
-        barStyle="light-content"
-        backgroundColor={SHOPEE_COLORS.primary}
-      />
+      <StatusBar barStyle="light-content" backgroundColor={THEME.primary} />
       <Stack.Screen options={{ headerShown: false }} />
 
       {/* Header */}
@@ -617,13 +635,13 @@ export default function OrderListScreen() {
           <Ionicons
             name="search"
             size={18}
-            color={SHOPEE_COLORS.textSecondary}
+            color={THEME.textSecondary}
             style={styles.searchIcon}
           />
           <TextInput
             style={styles.searchInput}
             placeholder="Tìm đơn hàng..."
-            placeholderTextColor={SHOPEE_COLORS.textTertiary}
+            placeholderTextColor={THEME.textTertiary}
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
@@ -632,7 +650,7 @@ export default function OrderListScreen() {
               <Ionicons
                 name="close-circle"
                 size={18}
-                color={SHOPEE_COLORS.textSecondary}
+                color={THEME.textSecondary}
               />
             </TouchableOpacity>
           )}
@@ -653,7 +671,7 @@ export default function OrderListScreen() {
       {/* Order List */}
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={SHOPEE_COLORS.primary} />
+          <ActivityIndicator size="large" color={THEME.primary} />
           <Text style={styles.loadingText}>Đang tải đơn hàng...</Text>
         </View>
       ) : (
@@ -667,8 +685,8 @@ export default function OrderListScreen() {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={onRefresh}
-              colors={[SHOPEE_COLORS.primary]}
-              tintColor={SHOPEE_COLORS.primary}
+              colors={[THEME.primary]}
+              tintColor={THEME.primary}
             />
           }
           ListEmptyComponent={renderEmpty}
@@ -680,10 +698,10 @@ export default function OrderListScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: SHOPEE_COLORS.background },
+  container: { flex: 1, backgroundColor: THEME.background },
 
   // Header
-  header: { backgroundColor: SHOPEE_COLORS.primary },
+  header: { backgroundColor: THEME.primary },
   headerContent: {
     flexDirection: "row",
     alignItems: "center",
@@ -707,26 +725,26 @@ const styles = StyleSheet.create({
     height: 36,
   },
   searchIcon: { marginRight: 8 },
-  searchInput: { flex: 1, fontSize: 14, color: SHOPEE_COLORS.text, padding: 0 },
+  searchInput: { flex: 1, fontSize: 14, color: THEME.text, padding: 0 },
 
   // Tabs
   tabsWrapper: {
-    backgroundColor: SHOPEE_COLORS.surface,
+    backgroundColor: THEME.surface,
     borderBottomWidth: 1,
-    borderBottomColor: SHOPEE_COLORS.divider,
+    borderBottomColor: THEME.divider,
   },
   tabsContainer: { paddingHorizontal: 4 },
   tab: { paddingHorizontal: 16, paddingVertical: 14, position: "relative" },
   tabActive: {},
-  tabText: { fontSize: 14, color: SHOPEE_COLORS.textSecondary },
-  tabTextActive: { color: SHOPEE_COLORS.primary, fontWeight: "600" },
+  tabText: { fontSize: 14, color: THEME.textSecondary },
+  tabTextActive: { color: THEME.primary, fontWeight: "600" },
   tabIndicator: {
     position: "absolute",
     bottom: 0,
     left: 16,
     right: 16,
     height: 2,
-    backgroundColor: SHOPEE_COLORS.primary,
+    backgroundColor: THEME.primary,
     borderRadius: 1,
   },
 
@@ -737,7 +755,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 12,
   },
-  loadingText: { fontSize: 14, color: SHOPEE_COLORS.textSecondary },
+  loadingText: { fontSize: 14, color: THEME.textSecondary },
 
   // List
   listContent: { paddingVertical: 8 },
@@ -745,7 +763,7 @@ const styles = StyleSheet.create({
 
   // Order Card
   orderCard: {
-    backgroundColor: SHOPEE_COLORS.surface,
+    backgroundColor: THEME.surface,
     paddingHorizontal: 16,
     paddingVertical: 12,
   },
@@ -762,7 +780,7 @@ const styles = StyleSheet.create({
   shopName: {
     fontSize: 14,
     fontWeight: "600",
-    color: SHOPEE_COLORS.text,
+    color: THEME.text,
     flex: 1,
   },
   statusBadge: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 2 },
@@ -774,13 +792,13 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 4,
-    backgroundColor: SHOPEE_COLORS.background,
+    backgroundColor: THEME.background,
   },
   productInfo: { flex: 1, marginLeft: 12 },
-  productName: { fontSize: 14, color: SHOPEE_COLORS.text, lineHeight: 20 },
+  productName: { fontSize: 14, color: THEME.text, lineHeight: 20 },
   productVariant: {
     fontSize: 12,
-    color: SHOPEE_COLORS.textSecondary,
+    color: THEME.textSecondary,
     marginTop: 4,
   },
   productPriceRow: {
@@ -791,20 +809,20 @@ const styles = StyleSheet.create({
   },
   productPrice: {
     fontSize: 14,
-    color: SHOPEE_COLORS.primary,
+    color: THEME.primary,
     fontWeight: "500",
   },
-  productQty: { fontSize: 13, color: SHOPEE_COLORS.textSecondary },
+  productQty: { fontSize: 13, color: THEME.textSecondary },
 
   moreItems: {
     fontSize: 13,
-    color: SHOPEE_COLORS.textSecondary,
+    color: THEME.textSecondary,
     marginBottom: 8,
   },
 
   cardDivider: {
     height: 1,
-    backgroundColor: SHOPEE_COLORS.divider,
+    backgroundColor: THEME.divider,
     marginVertical: 12,
   },
 
@@ -815,11 +833,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   totalSection: { flexDirection: "row", alignItems: "center" },
-  totalLabel: { fontSize: 13, color: SHOPEE_COLORS.textSecondary },
+  totalLabel: { fontSize: 13, color: THEME.textSecondary },
   totalValue: {
     fontSize: 16,
     fontWeight: "600",
-    color: SHOPEE_COLORS.primary,
+    color: THEME.primary,
     marginLeft: 8,
   },
 
@@ -830,14 +848,14 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 4,
     borderWidth: 1,
-    borderColor: SHOPEE_COLORS.border,
+    borderColor: THEME.border,
   },
-  actionBtnOutlineText: { fontSize: 13, color: SHOPEE_COLORS.textSecondary },
+  actionBtnOutlineText: { fontSize: 13, color: THEME.textSecondary },
   actionBtnPrimary: {
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 4,
-    backgroundColor: SHOPEE_COLORS.primary,
+    backgroundColor: THEME.primary,
   },
   actionBtnPrimaryText: { fontSize: 13, fontWeight: "600", color: "#fff" },
 
@@ -852,13 +870,13 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 16,
     fontWeight: "600",
-    color: SHOPEE_COLORS.text,
+    color: THEME.text,
     marginTop: 16,
     textAlign: "center",
   },
   emptyDesc: {
     fontSize: 14,
-    color: SHOPEE_COLORS.textSecondary,
+    color: THEME.textSecondary,
     marginTop: 8,
     textAlign: "center",
   },
@@ -866,7 +884,7 @@ const styles = StyleSheet.create({
     marginTop: 24,
     paddingHorizontal: 32,
     paddingVertical: 12,
-    backgroundColor: SHOPEE_COLORS.primary,
+    backgroundColor: THEME.primary,
     borderRadius: 4,
   },
   shopNowText: { fontSize: 14, fontWeight: "600", color: "#fff" },

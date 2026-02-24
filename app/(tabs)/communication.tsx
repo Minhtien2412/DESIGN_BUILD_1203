@@ -364,7 +364,7 @@ export default function CommunicationHubScreen() {
         {
           icon: "radio",
           label: "Livestream",
-          color: "#FF5722",
+          color: "#0D9488",
           onPress: () => router.push("/livestream"),
         },
       ].map((action, index) => (

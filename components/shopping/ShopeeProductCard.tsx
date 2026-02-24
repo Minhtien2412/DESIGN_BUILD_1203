@@ -165,7 +165,7 @@ export function ShopeeProductCard({
           <Ionicons
             name={isFavorite ? "heart" : "heart-outline"}
             size={18}
-            color={isFavorite ? "#EE4D2D" : "#FFFFFF"}
+            color={isFavorite ? "#0D9488" : "#FFFFFF"}
           />
         </Pressable>
 
@@ -432,7 +432,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 0,
     right: 0,
-    backgroundColor: "#EE4D2D",
+    backgroundColor: "#0D9488",
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderBottomLeftRadius: 8,
@@ -479,7 +479,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: "#EE4D2D",
+    backgroundColor: "#0D9488",
     paddingVertical: 4,
     flexDirection: "row",
     alignItems: "center",
@@ -531,7 +531,7 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   mallMini: {
-    backgroundColor: "#EE4D2D",
+    backgroundColor: "#0D9488",
     paddingHorizontal: 4,
     paddingVertical: 1,
     borderRadius: 2,
@@ -569,14 +569,14 @@ const styles = StyleSheet.create({
   voucherBadge: {
     backgroundColor: "#FFF0F0",
     borderWidth: 1,
-    borderColor: "#EE4D2D",
+    borderColor: "#0D9488",
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 2,
     alignSelf: "flex-start",
   },
   voucherText: {
-    color: "#EE4D2D",
+    color: "#0D9488",
     fontSize: 9,
     fontWeight: "600",
   },
@@ -608,7 +608,7 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 15,
     fontWeight: "700",
-    color: "#EE4D2D",
+    color: "#0D9488",
   },
   originalPrice: {
     fontSize: 11,

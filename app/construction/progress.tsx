@@ -1,8 +1,12 @@
-import { ConstructionProgressService } from '@/services/featureServiceWrapper';
-import photoTimelineService, { PhotoCategory, PhotoPhase } from '@/services/api/photo-timeline.service';
-import { Ionicons } from '@expo/vector-icons';
-import { Href, router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
+import photoTimelineService, {
+    PhotoCategory,
+    PhotoPhase,
+} from "@/services/api/photo-timeline.service";
+import { ConstructionProgressService } from "@/services/featureServiceWrapper";
+import { Ionicons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
+import { Href, router, useLocalSearchParams } from "expo-router";
+import { useEffect, useRef, useState } from "react";
 import {
     Alert,
     Animated,
@@ -14,10 +18,9 @@ import {
     Text,
     TouchableOpacity,
     View,
-} from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
+} from "react-native";
 
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get("window");
 
 interface Milestone {
   id: string;
@@ -25,7 +28,7 @@ interface Milestone {
   description: string;
   percentage: number;
   amount: number;
-  status: 'pending' | 'in-progress' | 'completed' | 'paid';
+  status: "pending" | "in-progress" | "completed" | "paid";
   startDate?: string;
   endDate?: string;
   completionDate?: string;
@@ -54,75 +57,75 @@ interface Project {
 
 // Mock data
 const MOCK_PROJECT: Project = {
-  id: 'proj-001',
-  title: 'Xây Nhà 3 Tầng',
-  address: '123 Nguyễn Văn Linh, Quận 7, TP.HCM',
-  startDate: '2025-10-01',
-  estimatedEndDate: '2025-12-31',
+  id: "proj-001",
+  title: "Xây Nhà 3 Tầng",
+  address: "123 Nguyễn Văn Linh, Quận 7, TP.HCM",
+  startDate: "2025-10-01",
+  estimatedEndDate: "2025-12-31",
   totalAmount: 450000000,
   paidAmount: 135000000,
-  workerName: 'Nguyễn Văn A',
-  workerPhone: '0901234567',
-  workerAvatar: 'https://i.pravatar.cc/150?img=12',
+  workerName: "Nguyễn Văn A",
+  workerPhone: "0901234567",
+  workerAvatar: "https://i.pravatar.cc/150?img=12",
 };
 
 const MOCK_MILESTONES: Milestone[] = [
   {
-    id: 'm1',
-    title: 'Giai đoạn 1: Móng và Kết cấu',
-    description: 'Đào móng, đổ bê tông móng, cột tầng 1',
+    id: "m1",
+    title: "Giai đoạn 1: Móng và Kết cấu",
+    description: "Đào móng, đổ bê tông móng, cột tầng 1",
     percentage: 30,
     amount: 135000000,
-    status: 'paid',
-    startDate: '2025-10-01',
-    endDate: '2025-10-20',
-    completionDate: '2025-10-18',
+    status: "paid",
+    startDate: "2025-10-01",
+    endDate: "2025-10-20",
+    completionDate: "2025-10-18",
     photos: [
-      'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=300',
-      'https://images.unsplash.com/photo-1590642916589-592bca10dfbf?w=300',
-      'https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=300',
+      "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=300",
+      "https://images.unsplash.com/photo-1590642916589-592bca10dfbf?w=300",
+      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=300",
     ],
   },
   {
-    id: 'm2',
-    title: 'Giai đoạn 2: Tường và Mái',
-    description: 'Xây tường tầng 1-3, đổ sàn, lợp mái',
+    id: "m2",
+    title: "Giai đoạn 2: Tường và Mái",
+    description: "Xây tường tầng 1-3, đổ sàn, lợp mái",
     percentage: 40,
     amount: 180000000,
-    status: 'in-progress',
-    startDate: '2025-10-21',
-    endDate: '2025-11-25',
+    status: "in-progress",
+    startDate: "2025-10-21",
+    endDate: "2025-11-25",
     photos: [
-      'https://images.unsplash.com/photo-1513467535987-fd81bc7d62f8?w=300',
-      'https://images.unsplash.com/photo-1592595896551-12b371d546d5?w=300',
+      "https://images.unsplash.com/photo-1513467535987-fd81bc7d62f8?w=300",
+      "https://images.unsplash.com/photo-1592595896551-12b371d546d5?w=300",
     ],
   },
   {
-    id: 'm3',
-    title: 'Giai đoạn 3: Hoàn thiện',
-    description: 'Lắp điện nước, sơn, lát gạch, hoàn thiện',
+    id: "m3",
+    title: "Giai đoạn 3: Hoàn thiện",
+    description: "Lắp điện nước, sơn, lát gạch, hoàn thiện",
     percentage: 30,
     amount: 135000000,
-    status: 'pending',
-    startDate: '2025-11-26',
-    endDate: '2025-12-31',
+    status: "pending",
+    startDate: "2025-11-26",
+    endDate: "2025-12-31",
     photos: [],
   },
 ];
 
 export default function ConstructionProgressScreen() {
   const { id } = useLocalSearchParams<{ id?: string }>();
-  const projectId = id || '1'; // Default to project 1 for testing
-  
+  const projectId = id || "1"; // Default to project 1 for testing
+
   const [project, setProject] = useState<Project>(MOCK_PROJECT);
   const [milestones, setMilestones] = useState<Milestone[]>(MOCK_MILESTONES);
   const [loading, setLoading] = useState(true);
-  const [dataSource, setDataSource] = useState<'api' | 'mock'>('mock');
+  const [dataSource, setDataSource] = useState<"api" | "mock">("mock");
   const [galleryVisible, setGalleryVisible] = useState(false);
   const [galleryPhotos, setGalleryPhotos] = useState<string[]>([]);
   const [galleryIndex, setGalleryIndex] = useState(0);
   const [uploading, setUploading] = useState(false);
-  
+
   const scrollY = useRef(new Animated.Value(0)).current;
 
   // Load real data from API
@@ -136,84 +139,104 @@ export default function ConstructionProgressScreen() {
       const result = await ConstructionProgressService.getByProject(projectId);
       if (result.success && result.data) {
         const apiData = result.data;
-        
+
         // Transform API data to Project format
         setProject({
           id: String(apiData.projectId),
           title: apiData.name || MOCK_PROJECT.title,
           address: apiData.description || MOCK_PROJECT.address,
-          startDate: apiData.timeline?.startDate?.split('T')[0] || MOCK_PROJECT.startDate,
-          estimatedEndDate: apiData.timeline?.endDate?.split('T')[0] || MOCK_PROJECT.estimatedEndDate,
+          startDate:
+            apiData.timeline?.startDate?.split("T")[0] ||
+            MOCK_PROJECT.startDate,
+          estimatedEndDate:
+            apiData.timeline?.endDate?.split("T")[0] ||
+            MOCK_PROJECT.estimatedEndDate,
           totalAmount: apiData.budget?.totalAmount || MOCK_PROJECT.totalAmount,
           paidAmount: apiData.budget?.paidAmount || MOCK_PROJECT.paidAmount,
-          workerName: apiData.engineer?.name || apiData.client?.name || MOCK_PROJECT.workerName,
+          workerName:
+            apiData.engineer?.name ||
+            apiData.client?.name ||
+            MOCK_PROJECT.workerName,
           workerPhone: MOCK_PROJECT.workerPhone,
           workerAvatar: MOCK_PROJECT.workerAvatar,
         });
 
         // Transform milestones if available
         if (apiData.milestones && Array.isArray(apiData.milestones)) {
-          const transformedMilestones: Milestone[] = apiData.milestones.map((m: any, idx: number) => ({
-            id: `m${idx + 1}`,
-            title: m.name || `Giai đoạn ${idx + 1}`,
-            description: m.description || '',
-            percentage: m.progress || 0,
-            amount: 0,
-            status: m.completed ? 'completed' : (m.progress > 0 ? 'in-progress' : 'pending'),
-            photos: [],
-          }));
+          const transformedMilestones: Milestone[] = apiData.milestones.map(
+            (m: any, idx: number) => ({
+              id: `m${idx + 1}`,
+              title: m.name || `Giai đoạn ${idx + 1}`,
+              description: m.description || "",
+              percentage: m.progress || 0,
+              amount: 0,
+              status: m.completed
+                ? "completed"
+                : m.progress > 0
+                  ? "in-progress"
+                  : "pending",
+              photos: [],
+            }),
+          );
           if (transformedMilestones.length > 0) {
             setMilestones(transformedMilestones);
           }
         }
-        
-        setDataSource(result.source === 'api' ? 'api' : 'mock');
-        console.log('[Progress] Loaded from:', result.source);
+
+        setDataSource(result.source === "api" ? "api" : "mock");
+        console.log("[Progress] Loaded from:", result.source);
       }
     } catch (error) {
-      console.error('[Progress] Error:', error);
-      setDataSource('mock');
+      console.error("[Progress] Error:", error);
+      setDataSource("mock");
     } finally {
       setLoading(false);
     }
   };
 
   const completedPercentage = (project.paidAmount / project.totalAmount) * 100;
-  
+
   const headerOpacity = scrollY.interpolate({
     inputRange: [0, 100],
     outputRange: [0, 1],
-    extrapolate: 'clamp',
+    extrapolate: "clamp",
   });
 
-  const mapMilestoneToPhotoMeta = (milestone: Milestone): { category: PhotoCategory; phase: PhotoPhase } => {
+  const mapMilestoneToPhotoMeta = (
+    milestone: Milestone,
+  ): { category: PhotoCategory; phase: PhotoPhase } => {
     const title = milestone.title.toLowerCase();
-    if (title.includes('móng') || title.includes('foundation')) return { category: 'FOUNDATION', phase: 'FOUNDATION' };
-    if (title.includes('kết cấu') || title.includes('structure')) return { category: 'STRUCTURE', phase: 'STRUCTURE' };
-    if (title.includes('mái') || title.includes('roof')) return { category: 'ROOFING', phase: 'ENCLOSURE' };
-    if (title.includes('nội thất') || title.includes('interior')) return { category: 'INTERIOR', phase: 'INTERIOR' };
-    if (title.includes('hoàn thiện') || title.includes('finishing')) return { category: 'FINISHING', phase: 'FINISHING' };
-    return { category: 'OVERALL', phase: 'STRUCTURE' };
+    if (title.includes("móng") || title.includes("foundation"))
+      return { category: "FOUNDATION", phase: "FOUNDATION" };
+    if (title.includes("kết cấu") || title.includes("structure"))
+      return { category: "STRUCTURE", phase: "STRUCTURE" };
+    if (title.includes("mái") || title.includes("roof"))
+      return { category: "ROOFING", phase: "ENCLOSURE" };
+    if (title.includes("nội thất") || title.includes("interior"))
+      return { category: "INTERIOR", phase: "INTERIOR" };
+    if (title.includes("hoàn thiện") || title.includes("finishing"))
+      return { category: "FINISHING", phase: "FINISHING" };
+    return { category: "OVERALL", phase: "STRUCTURE" };
   };
 
   const handlePayment = (milestone: Milestone) => {
-    if (milestone.status === 'completed') {
+    if (milestone.status === "completed") {
       Alert.alert(
-        'Xác nhận thanh toán',
-        `Thanh toán ${milestone.amount.toLocaleString('vi-VN')}đ cho ${milestone.title}?`,
+        "Xác nhận thanh toán",
+        `Thanh toán ${milestone.amount.toLocaleString("vi-VN")}đ cho ${milestone.title}?`,
         [
-          { text: 'Hủy', style: 'cancel' },
+          { text: "Hủy", style: "cancel" },
           {
-            text: 'Thanh toán',
+            text: "Thanh toán",
             onPress: () => {
               // Navigate to payment screen
-              router.push('/checkout/payment' as Href);
+              router.push("/checkout/payment" as Href);
             },
           },
-        ]
+        ],
       );
     } else {
-      Alert.alert('Chưa thể thanh toán', 'Giai đoạn này chưa hoàn thành');
+      Alert.alert("Chưa thể thanh toán", "Giai đoạn này chưa hoàn thành");
     }
   };
 
@@ -221,8 +244,11 @@ export default function ConstructionProgressScreen() {
     if (uploading) return;
 
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (permission.status !== 'granted') {
-      Alert.alert('Thiếu quyền', 'Vui lòng cấp quyền truy cập thư viện ảnh để tải lên.');
+    if (permission.status !== "granted") {
+      Alert.alert(
+        "Thiếu quyền",
+        "Vui lòng cấp quyền truy cập thư viện ảnh để tải lên.",
+      );
       return;
     }
 
@@ -235,11 +261,11 @@ export default function ConstructionProgressScreen() {
 
     const asset = result.assets[0];
     const fileName = asset.fileName || `progress_${Date.now()}.jpg`;
-    const mimeType = asset.mimeType || 'image/jpeg';
+    const mimeType = asset.mimeType || "image/jpeg";
     const projectIdNumber = Number(projectId);
 
     if (!projectIdNumber || Number.isNaN(projectIdNumber)) {
-      Alert.alert('Lỗi', 'Không xác định được dự án để tải ảnh.');
+      Alert.alert("Lỗi", "Không xác định được dự án để tải ảnh.");
       return;
     }
 
@@ -250,7 +276,7 @@ export default function ConstructionProgressScreen() {
         projectId: projectIdNumber,
         category,
         phase,
-        location: project.address || 'Công trình',
+        location: project.address || "Công trình",
         description: milestone.title,
         file: {
           uri: asset.uri,
@@ -265,15 +291,13 @@ export default function ConstructionProgressScreen() {
 
       setMilestones((prev) =>
         prev.map((m) =>
-          m.id === milestone.id
-            ? { ...m, photos: [photoUrl, ...m.photos] }
-            : m
-        )
+          m.id === milestone.id ? { ...m, photos: [photoUrl, ...m.photos] } : m,
+        ),
       );
-      Alert.alert('Thành công', 'Đã tải ảnh tiến độ.');
+      Alert.alert("Thành công", "Đã tải ảnh tiến độ.");
     } catch (error) {
-      console.error('[Progress] Upload photo error:', error);
-      Alert.alert('Lỗi', 'Không thể tải ảnh. Vui lòng thử lại.');
+      console.error("[Progress] Upload photo error:", error);
+      Alert.alert("Lỗi", "Không thể tải ảnh. Vui lòng thử lại.");
     } finally {
       setUploading(false);
     }
@@ -286,18 +310,23 @@ export default function ConstructionProgressScreen() {
   };
 
   const handleCallWorker = () => {
-    Alert.alert('Gọi điện', `Gọi cho ${project.workerName}: ${project.workerPhone}`);
+    Alert.alert(
+      "Gọi điện",
+      `Gọi cho ${project.workerName}: ${project.workerPhone}`,
+    );
   };
 
   const handleChatWorker = () => {
-    router.push('/messages');
+    router.push("/messages");
   };
 
   const renderHeader = () => (
     <View style={styles.fixedHeader}>
-      <Animated.View style={[styles.headerBackground, { opacity: headerOpacity }]} />
+      <Animated.View
+        style={[styles.headerBackground, { opacity: headerOpacity }]}
+      />
       <View style={styles.headerContent}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.headerButton}
           onPress={() => router.back()}
         >
@@ -306,9 +335,9 @@ export default function ConstructionProgressScreen() {
         <Animated.Text style={[styles.headerTitle, { opacity: headerOpacity }]}>
           Tiến Độ Thi Công
         </Animated.Text>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.headerButton}
-          onPress={() => Alert.alert('Lịch sử', 'Xem lịch sử thanh toán')}
+          onPress={() => Alert.alert("Lịch sử", "Xem lịch sử thanh toán")}
         >
           <Ionicons name="receipt-outline" size={24} color="#000" />
         </TouchableOpacity>
@@ -338,22 +367,24 @@ export default function ConstructionProgressScreen() {
       <View style={styles.progressSection}>
         <View style={styles.progressHeader}>
           <Text style={styles.progressLabel}>Tiến độ thanh toán</Text>
-          <Text style={styles.progressPercent}>{completedPercentage.toFixed(0)}%</Text>
+          <Text style={styles.progressPercent}>
+            {completedPercentage.toFixed(0)}%
+          </Text>
         </View>
         <View style={styles.progressBarBg}>
-          <Animated.View 
+          <Animated.View
             style={[
               styles.progressBarFill,
-              { width: `${completedPercentage}%` }
-            ]} 
+              { width: `${completedPercentage}%` },
+            ]}
           />
         </View>
         <View style={styles.progressAmounts}>
           <Text style={styles.paidAmount}>
-            Đã thanh toán: {project.paidAmount.toLocaleString('vi-VN')}đ
+            Đã thanh toán: {project.paidAmount.toLocaleString("vi-VN")}đ
           </Text>
           <Text style={styles.totalAmount}>
-            Tổng: {project.totalAmount.toLocaleString('vi-VN')}đ
+            Tổng: {project.totalAmount.toLocaleString("vi-VN")}đ
           </Text>
         </View>
       </View>
@@ -361,9 +392,9 @@ export default function ConstructionProgressScreen() {
       {/* Worker Info */}
       <View style={styles.workerSection}>
         <View style={styles.workerInfo}>
-          <Image 
-            source={{ uri: project.workerAvatar }} 
-            style={styles.workerAvatar} 
+          <Image
+            source={{ uri: project.workerAvatar }}
+            style={styles.workerAvatar}
           />
           <View style={styles.workerDetails}>
             <Text style={styles.workerName}>{project.workerName}</Text>
@@ -371,13 +402,13 @@ export default function ConstructionProgressScreen() {
           </View>
         </View>
         <View style={styles.workerActions}>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.workerActionButton}
             onPress={handleCallWorker}
           >
             <Ionicons name="call" size={20} color="#00B14F" />
           </TouchableOpacity>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.workerActionButton}
             onPress={handleChatWorker}
           >
@@ -391,10 +422,30 @@ export default function ConstructionProgressScreen() {
   const renderMilestone = (milestone: Milestone, index: number) => {
     const isLast = index === milestones.length - 1;
     const statusConfig = {
-      pending: { icon: 'ellipse-outline', color: '#999', bg: '#f5f5f5', label: 'Chưa bắt đầu' },
-      'in-progress': { icon: 'sync', color: '#0066CC', bg: '#E8F4FF', label: 'Đang thực hiện' },
-      completed: { icon: 'checkmark-circle', color: '#0066CC', bg: '#E8F5E9', label: 'Hoàn thành' },
-      paid: { icon: 'checkmark-circle', color: '#00B14F', bg: '#E8F5E9', label: 'Đã thanh toán' },
+      pending: {
+        icon: "ellipse-outline",
+        color: "#999",
+        bg: "#f5f5f5",
+        label: "Chưa bắt đầu",
+      },
+      "in-progress": {
+        icon: "sync",
+        color: "#0D9488",
+        bg: "#F0FDFA",
+        label: "Đang thực hiện",
+      },
+      completed: {
+        icon: "checkmark-circle",
+        color: "#0D9488",
+        bg: "#E8F5E9",
+        label: "Hoàn thành",
+      },
+      paid: {
+        icon: "checkmark-circle",
+        color: "#00B14F",
+        bg: "#E8F5E9",
+        label: "Đã thanh toán",
+      },
     };
 
     const config = statusConfig[milestone.status];
@@ -413,14 +464,23 @@ export default function ConstructionProgressScreen() {
         <View style={styles.milestoneCard}>
           <View style={styles.milestoneHeader}>
             <Text style={styles.milestoneTitle}>{milestone.title}</Text>
-            <View style={[styles.milestoneStatusBadge, { backgroundColor: config.bg }]}>
-              <Text style={[styles.milestoneStatusText, { color: config.color }]}>
+            <View
+              style={[
+                styles.milestoneStatusBadge,
+                { backgroundColor: config.bg },
+              ]}
+            >
+              <Text
+                style={[styles.milestoneStatusText, { color: config.color }]}
+              >
                 {config.label}
               </Text>
             </View>
           </View>
 
-          <Text style={styles.milestoneDescription}>{milestone.description}</Text>
+          <Text style={styles.milestoneDescription}>
+            {milestone.description}
+          </Text>
 
           {/* Dates */}
           {milestone.startDate && (
@@ -434,7 +494,7 @@ export default function ConstructionProgressScreen() {
 
           {milestone.completionDate && (
             <View style={styles.milestoneCompletionDate}>
-              <Ionicons name="checkmark-circle" size={14} color="#0066CC" />
+              <Ionicons name="checkmark-circle" size={14} color="#0D9488" />
               <Text style={styles.completionDateText}>
                 Hoàn thành: {milestone.completionDate}
               </Text>
@@ -446,7 +506,7 @@ export default function ConstructionProgressScreen() {
             <View style={styles.amountRow}>
               <Text style={styles.percentageText}>{milestone.percentage}%</Text>
               <Text style={styles.amountText}>
-                {milestone.amount.toLocaleString('vi-VN')}đ
+                {milestone.amount.toLocaleString("vi-VN")}đ
               </Text>
             </View>
           </View>
@@ -457,21 +517,24 @@ export default function ConstructionProgressScreen() {
               <Text style={styles.photosLabel}>
                 Hình ảnh tiến độ ({milestone.photos.length})
               </Text>
-              <ScrollView 
-                horizontal 
+              <ScrollView
+                horizontal
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.photosList}
               >
                 {milestone.photos.map((photo, idx) => (
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     key={idx}
                     onPress={() => handleViewPhotos(milestone, idx)}
                   >
-                    <Image source={{ uri: photo }} style={styles.photoThumbnail} />
+                    <Image
+                      source={{ uri: photo }}
+                      style={styles.photoThumbnail}
+                    />
                   </TouchableOpacity>
                 ))}
-                {milestone.status === 'in-progress' && (
-                  <TouchableOpacity 
+                {milestone.status === "in-progress" && (
+                  <TouchableOpacity
                     style={styles.uploadPhotoButton}
                     onPress={() => handleUploadPhoto(milestone)}
                   >
@@ -485,18 +548,23 @@ export default function ConstructionProgressScreen() {
 
           {/* Actions */}
           <View style={styles.milestoneActions}>
-            {milestone.status === 'in-progress' && milestone.photos.length === 0 && (
-              <TouchableOpacity 
-                style={styles.uploadButton}
-                onPress={() => handleUploadPhoto(milestone)}
-              >
-                <Ionicons name="cloud-upload-outline" size={18} color="#00B14F" />
-                <Text style={styles.uploadButtonText}>Tải ảnh tiến độ</Text>
-              </TouchableOpacity>
-            )}
-            
-            {milestone.status === 'completed' && (
-              <TouchableOpacity 
+            {milestone.status === "in-progress" &&
+              milestone.photos.length === 0 && (
+                <TouchableOpacity
+                  style={styles.uploadButton}
+                  onPress={() => handleUploadPhoto(milestone)}
+                >
+                  <Ionicons
+                    name="cloud-upload-outline"
+                    size={18}
+                    color="#00B14F"
+                  />
+                  <Text style={styles.uploadButtonText}>Tải ảnh tiến độ</Text>
+                </TouchableOpacity>
+              )}
+
+            {milestone.status === "completed" && (
+              <TouchableOpacity
                 style={styles.payButton}
                 onPress={() => handlePayment(milestone)}
               >
@@ -505,7 +573,7 @@ export default function ConstructionProgressScreen() {
               </TouchableOpacity>
             )}
 
-            {milestone.status === 'paid' && (
+            {milestone.status === "paid" && (
               <View style={styles.paidIndicator}>
                 <Ionicons name="checkmark-circle" size={18} color="#00B14F" />
                 <Text style={styles.paidText}>Đã thanh toán</Text>
@@ -529,7 +597,10 @@ export default function ConstructionProgressScreen() {
       >
         <View style={styles.galleryBackdrop}>
           <View style={styles.galleryHeader}>
-            <TouchableOpacity onPress={() => setGalleryVisible(false)} style={styles.galleryClose}>
+            <TouchableOpacity
+              onPress={() => setGalleryVisible(false)}
+              style={styles.galleryClose}
+            >
               <Ionicons name="close" size={26} color="#fff" />
             </TouchableOpacity>
             <Text style={styles.galleryTitle}>
@@ -542,7 +613,9 @@ export default function ConstructionProgressScreen() {
             showsHorizontalScrollIndicator={false}
             contentOffset={{ x: galleryIndex * width, y: 0 }}
             onMomentumScrollEnd={(e) => {
-              const nextIndex = Math.round(e.nativeEvent.contentOffset.x / width);
+              const nextIndex = Math.round(
+                e.nativeEvent.contentOffset.x / width,
+              );
               setGalleryIndex(nextIndex);
             }}
           >
@@ -554,22 +627,24 @@ export default function ConstructionProgressScreen() {
           </ScrollView>
         </View>
       </Modal>
-      
+
       <Animated.ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: false }
+          { useNativeDriver: false },
         )}
         scrollEventThrottle={16}
       >
         <View style={styles.content}>
           {renderProjectInfo()}
-          
+
           <View style={styles.milestonesSection}>
             <Text style={styles.sectionTitle}>Tiến độ thi công</Text>
-            {milestones.map((milestone, index) => renderMilestone(milestone, index))}
+            {milestones.map((milestone, index) =>
+              renderMilestone(milestone, index),
+            )}
           </View>
         </View>
       </Animated.ScrollView>
@@ -580,7 +655,7 @@ export default function ConstructionProgressScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
   },
   scrollView: {
     flex: 1,
@@ -590,7 +665,7 @@ const styles = StyleSheet.create({
     paddingBottom: 32,
   },
   fixedHeader: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 0,
     right: 0,
@@ -600,14 +675,14 @@ const styles = StyleSheet.create({
   },
   headerBackground: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: "#eee",
   },
   headerContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 16,
     height: 44,
   },
@@ -615,10 +690,10 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.9)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
+    backgroundColor: "rgba(255,255,255,0.9)",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -626,15 +701,15 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: '700',
-    color: '#000',
+    fontWeight: "700",
+    color: "#000",
   },
   projectCard: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     margin: 16,
     borderRadius: 16,
     padding: 16,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -644,24 +719,24 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     paddingBottom: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: "#f0f0f0",
   },
   projectTitleRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 8,
   },
   projectTitle: {
     fontSize: 18,
-    fontWeight: '700',
-    color: '#000',
+    fontWeight: "700",
+    color: "#000",
     flex: 1,
   },
   statusBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#E8F4FF',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F0FDFA",
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
@@ -671,78 +746,78 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#0066CC',
+    backgroundColor: "#0D9488",
   },
   statusText: {
     fontSize: 11,
-    fontWeight: '600',
-    color: '#0066CC',
+    fontWeight: "600",
+    color: "#0D9488",
   },
   projectMetaRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 4,
   },
   projectAddress: {
     fontSize: 13,
-    color: '#666',
+    color: "#666",
     flex: 1,
   },
   progressSection: {
     marginBottom: 16,
     paddingBottom: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: "#f0f0f0",
   },
   progressHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 8,
   },
   progressLabel: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
   },
   progressPercent: {
     fontSize: 16,
-    fontWeight: '700',
-    color: '#00B14F',
+    fontWeight: "700",
+    color: "#00B14F",
   },
   progressBarBg: {
     height: 8,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: "#f0f0f0",
     borderRadius: 4,
-    overflow: 'hidden',
+    overflow: "hidden",
     marginBottom: 8,
   },
   progressBarFill: {
-    height: '100%',
-    backgroundColor: '#00B14F',
+    height: "100%",
+    backgroundColor: "#00B14F",
     borderRadius: 4,
   },
   progressAmounts: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   paidAmount: {
     fontSize: 12,
-    fontWeight: '600',
-    color: '#00B14F',
+    fontWeight: "600",
+    color: "#00B14F",
   },
   totalAmount: {
     fontSize: 12,
-    color: '#666',
+    color: "#666",
   },
   workerSection: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   workerInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 12,
     flex: 1,
   },
@@ -750,87 +825,87 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: "#f0f0f0",
   },
   workerDetails: {
     flex: 1,
   },
   workerName: {
     fontSize: 15,
-    fontWeight: '600',
-    color: '#000',
+    fontWeight: "600",
+    color: "#000",
   },
   workerRole: {
     fontSize: 12,
-    color: '#666',
+    color: "#666",
     marginTop: 2,
   },
   workerActions: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 8,
   },
   workerActionButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#E8F5E9',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#E8F5E9",
+    justifyContent: "center",
+    alignItems: "center",
   },
   milestonesSection: {
     marginHorizontal: 16,
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '700',
-    color: '#000',
+    fontWeight: "700",
+    color: "#000",
     marginBottom: 16,
   },
   milestoneContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: 16,
   },
   timeline: {
     width: 40,
-    alignItems: 'center',
+    alignItems: "center",
   },
   timelineDot: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: 8,
   },
   timelineLine: {
     flex: 1,
     width: 2,
-    backgroundColor: '#e0e0e0',
+    backgroundColor: "#e0e0e0",
     minHeight: 60,
   },
   milestoneCard: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 12,
     padding: 16,
     marginLeft: 12,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
   },
   milestoneHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
     marginBottom: 8,
     gap: 8,
   },
   milestoneTitle: {
     fontSize: 15,
-    fontWeight: '700',
-    color: '#000',
+    fontWeight: "700",
+    color: "#000",
     flex: 1,
   },
   milestoneStatusBadge: {
@@ -840,63 +915,63 @@ const styles = StyleSheet.create({
   },
   milestoneStatusText: {
     fontSize: 11,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   milestoneDescription: {
     fontSize: 13,
-    color: '#666',
+    color: "#666",
     marginBottom: 12,
     lineHeight: 18,
   },
   milestoneMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6,
     marginBottom: 8,
   },
   milestoneMetaText: {
     fontSize: 12,
-    color: '#666',
+    color: "#666",
   },
   milestoneCompletionDate: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6,
     marginBottom: 12,
   },
   completionDateText: {
     fontSize: 12,
-    color: '#0066CC',
-    fontWeight: '600',
+    color: "#0D9488",
+    fontWeight: "600",
   },
   milestoneAmount: {
-    backgroundColor: '#f8f8f8',
+    backgroundColor: "#f8f8f8",
     padding: 12,
     borderRadius: 8,
     marginBottom: 12,
   },
   amountRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   percentageText: {
     fontSize: 14,
-    fontWeight: '700',
-    color: '#00B14F',
+    fontWeight: "700",
+    color: "#00B14F",
   },
   amountText: {
     fontSize: 16,
-    fontWeight: '700',
-    color: '#FF3B30',
+    fontWeight: "700",
+    color: "#FF3B30",
   },
   photosSection: {
     marginBottom: 12,
   },
   photosLabel: {
     fontSize: 13,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
     marginBottom: 8,
   },
   photosList: {
@@ -906,54 +981,54 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 8,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: "#f0f0f0",
   },
   uploadPhotoButton: {
     width: 80,
     height: 80,
     borderRadius: 8,
     borderWidth: 2,
-    borderColor: '#00B14F',
-    borderStyle: 'dashed',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#E8F5E9',
+    borderColor: "#00B14F",
+    borderStyle: "dashed",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#E8F5E9",
   },
   uploadPhotoText: {
     fontSize: 10,
-    color: '#00B14F',
-    fontWeight: '600',
+    color: "#00B14F",
+    fontWeight: "600",
     marginTop: 4,
   },
   milestoneActions: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 8,
   },
   uploadButton: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#E8F5E9',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#E8F5E9",
     paddingVertical: 12,
     borderRadius: 8,
     gap: 6,
   },
   uploadButtonText: {
     fontSize: 13,
-    fontWeight: '600',
-    color: '#00B14F',
+    fontWeight: "600",
+    color: "#00B14F",
   },
   payButton: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#00B14F',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#00B14F",
     paddingVertical: 12,
     borderRadius: 8,
     gap: 6,
-    shadowColor: '#00B14F',
+    shadowColor: "#00B14F",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
@@ -961,36 +1036,36 @@ const styles = StyleSheet.create({
   },
   payButtonText: {
     fontSize: 14,
-    fontWeight: '700',
-    color: '#fff',
+    fontWeight: "700",
+    color: "#fff",
   },
   paidIndicator: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#E8F5E9',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#E8F5E9",
     paddingVertical: 12,
     borderRadius: 8,
     gap: 6,
   },
   paidText: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#00B14F',
+    fontWeight: "600",
+    color: "#00B14F",
   },
   galleryBackdrop: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.92)',
-    justifyContent: 'center',
+    backgroundColor: "rgba(0,0,0,0.92)",
+    justifyContent: "center",
   },
   galleryHeader: {
-    position: 'absolute',
+    position: "absolute",
     top: 40,
     left: 16,
     right: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     zIndex: 2,
   },
   galleryClose: {
@@ -998,19 +1073,19 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   galleryTitle: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   gallerySlide: {
     width,
     height,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   galleryImage: {
     width,
     height: height * 0.7,
-    resizeMode: 'contain',
+    resizeMode: "contain",
   },
 });

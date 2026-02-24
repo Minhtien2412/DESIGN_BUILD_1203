@@ -185,7 +185,7 @@ export default function CreateLiveStreamScreen() {
 
         {/* Info Card */}
         <View style={[styles.infoCard, { backgroundColor: surfaceColor }]}>
-          <Ionicons name="information-circle" size={24} color="#3B82F6" />
+          <Ionicons name="information-circle" size={24} color="#0D9488" />
           <View style={styles.infoContent}>
             <Text style={[styles.infoTitle, { color: textColor }]}>
               Before you start

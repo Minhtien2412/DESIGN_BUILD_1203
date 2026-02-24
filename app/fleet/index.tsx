@@ -61,7 +61,7 @@ const STATUS_COLORS: Record<VehicleStatus, string> = {
   INACTIVE: "#6b7280",
   IN_MAINTENANCE: "#f59e0b",
   IN_REPAIR: "#ef4444",
-  RESERVED: "#3b82f6",
+  RESERVED: "#0D9488",
   OUT_OF_SERVICE: "#ef4444",
   RETIRED: "#9ca3af",
 };
@@ -268,7 +268,7 @@ const VehicleCard = ({
             <Text style={styles.maintenanceText}>
               Bảo trì:{" "}
               {new Date(vehicle.nextMaintenanceDate).toLocaleDateString(
-                "vi-VN"
+                "vi-VN",
               )}
             </Text>
           </View>
@@ -276,6 +276,168 @@ const VehicleCard = ({
       </TouchableOpacity>
     </Animated.View>
   );
+};
+
+const MOCK_MAINTENANCE = [
+  {
+    id: "mt-1",
+    vehicleNumber: "51C-123.45",
+    service: "Thay dầu máy + lọc dầu",
+    status: "COMPLETED" as const,
+    date: "2025-01-15",
+    cost: 2500000,
+    mechanic: "Garage Minh Phát",
+  },
+  {
+    id: "mt-2",
+    vehicleNumber: "51C-678.90",
+    service: "Thay lốp trước (4 chiếc)",
+    status: "IN_PROGRESS" as const,
+    date: "2025-01-14",
+    cost: 12000000,
+    mechanic: "Garage Hoàng Long",
+  },
+  {
+    id: "mt-3",
+    vehicleNumber: "51C-111.22",
+    service: "Bảo dưỡng định kỳ 50.000km",
+    status: "SCHEDULED" as const,
+    date: "2025-01-20",
+    cost: 5500000,
+    mechanic: "Toyota Service",
+  },
+  {
+    id: "mt-4",
+    vehicleNumber: "51C-333.44",
+    service: "Sửa hệ thống phanh",
+    status: "COMPLETED" as const,
+    date: "2025-01-10",
+    cost: 3800000,
+    mechanic: "Garage Minh Phát",
+  },
+  {
+    id: "mt-5",
+    vehicleNumber: "51C-555.66",
+    service: "Kiểm tra hệ thống điện",
+    status: "SCHEDULED" as const,
+    date: "2025-01-22",
+    cost: 1200000,
+    mechanic: "Bosch Car Service",
+  },
+];
+
+const MOCK_FUEL_LOGS = [
+  {
+    id: "fl-1",
+    vehicleNumber: "51C-123.45",
+    liters: 65,
+    cost: 1625000,
+    station: "Petrolimex Q7",
+    date: "2025-01-15",
+    odometer: 45230,
+  },
+  {
+    id: "fl-2",
+    vehicleNumber: "51C-678.90",
+    liters: 120,
+    cost: 3000000,
+    station: "Shell Nguyễn Hữu Thọ",
+    date: "2025-01-14",
+    odometer: 78450,
+  },
+  {
+    id: "fl-3",
+    vehicleNumber: "51C-111.22",
+    liters: 45,
+    cost: 1125000,
+    station: "PV Oil Trường Chinh",
+    date: "2025-01-13",
+    odometer: 32100,
+  },
+  {
+    id: "fl-4",
+    vehicleNumber: "51C-333.44",
+    liters: 80,
+    cost: 2000000,
+    station: "Petrolimex Q2",
+    date: "2025-01-12",
+    odometer: 56780,
+  },
+  {
+    id: "fl-5",
+    vehicleNumber: "51C-555.66",
+    liters: 55,
+    cost: 1375000,
+    station: "Shell Xa lộ Hà Nội",
+    date: "2025-01-11",
+    odometer: 23450,
+  },
+];
+
+const MOCK_TRIPS = [
+  {
+    id: "tr-1",
+    vehicleNumber: "51C-123.45",
+    driver: "Nguyễn Văn Hùng",
+    from: "Văn phòng Q1",
+    to: "Công trường Thủ Đức",
+    distance: 18.5,
+    date: "2025-01-15",
+    duration: "45 phút",
+  },
+  {
+    id: "tr-2",
+    vehicleNumber: "51C-678.90",
+    driver: "Trần Quốc Bảo",
+    from: "Kho vật tư Bình Chánh",
+    to: "Dự án Q9",
+    distance: 32.0,
+    date: "2025-01-15",
+    duration: "1h 15ph",
+  },
+  {
+    id: "tr-3",
+    vehicleNumber: "51C-111.22",
+    driver: "Lê Minh Tuấn",
+    from: "Văn phòng Q1",
+    to: "Công trường Q7",
+    distance: 12.3,
+    date: "2025-01-14",
+    duration: "30 phút",
+  },
+  {
+    id: "tr-4",
+    vehicleNumber: "51C-333.44",
+    driver: "Phạm Anh Dũng",
+    from: "Nhà máy BT Long An",
+    to: "Dự án Nhà Bè",
+    distance: 45.0,
+    date: "2025-01-14",
+    duration: "1h 30ph",
+  },
+  {
+    id: "tr-5",
+    vehicleNumber: "51C-555.66",
+    driver: "Võ Hoàng Nam",
+    from: "Văn phòng Q1",
+    to: "Đại lý VLXD Q12",
+    distance: 22.7,
+    date: "2025-01-13",
+    duration: "55 phút",
+  },
+];
+
+const getMtStatusColor = (s: string) => {
+  switch (s) {
+    case "COMPLETED":
+      return "#10b981";
+    case "IN_PROGRESS":
+      return "#f59e0b";
+    case "SCHEDULED":
+      return "#0D9488";
+    default:
+      return "#6b7280";
+  }
 };
 
 export default function FleetScreen() {
@@ -289,7 +451,7 @@ export default function FleetScreen() {
 
   const [selectedTab, setSelectedTab] = useState<TabType>("vehicles");
   const [statusFilter, setStatusFilter] = useState<VehicleStatus | "ALL">(
-    "ALL"
+    "ALL",
   );
 
   const { summary } = useFleetSummary();
@@ -306,7 +468,7 @@ export default function FleetScreen() {
   }, []);
 
   const filteredVehicles = vehicles.filter(
-    (v) => statusFilter === "ALL" || v.status === statusFilter
+    (v) => statusFilter === "ALL" || v.status === statusFilter,
   );
 
   const handleTabPress = (tab: TabType) => {
@@ -337,7 +499,7 @@ export default function FleetScreen() {
 
   const renderEmptyState = (
     icon: keyof typeof Ionicons.glyphMap,
-    message: string
+    message: string,
   ) => (
     <View
       style={[
@@ -423,7 +585,7 @@ export default function FleetScreen() {
           <StatCard
             title="Hiệu suất"
             value={`${summary?.utilizationRate?.toFixed(0) || 0}%`}
-            color="#3b82f6"
+            color="#0D9488"
             icon="trending-up"
             index={3}
           />
@@ -572,8 +734,172 @@ export default function FleetScreen() {
         )}
 
         {/* Maintenance Tab */}
-        {selectedTab === "maintenance" &&
-          renderEmptyState("build-outline", "Bảo trì sắp ra mắt")}
+        {selectedTab === "maintenance" && (
+          <>
+            <View
+              style={[
+                styles.summaryCard,
+                { backgroundColor: surfaceColor, borderColor },
+              ]}
+            >
+              <View style={styles.summaryRow}>
+                <View style={styles.summaryItem}>
+                  <Ionicons name="build" size={20} color="#f59e0b" />
+                  <Text style={[styles.summaryValue, { color: textColor }]}>
+                    {
+                      MOCK_MAINTENANCE.filter((m) => m.status === "SCHEDULED")
+                        .length
+                    }
+                  </Text>
+                  <Text
+                    style={[styles.summaryLabel, { color: textColor + "60" }]}
+                  >
+                    Đã lên lịch
+                  </Text>
+                </View>
+                <View style={styles.summaryDivider} />
+                <View style={styles.summaryItem}>
+                  <Ionicons name="hourglass" size={20} color="#0D9488" />
+                  <Text style={[styles.summaryValue, { color: textColor }]}>
+                    {
+                      MOCK_MAINTENANCE.filter((m) => m.status === "IN_PROGRESS")
+                        .length
+                    }
+                  </Text>
+                  <Text
+                    style={[styles.summaryLabel, { color: textColor + "60" }]}
+                  >
+                    Đang thực hiện
+                  </Text>
+                </View>
+                <View style={styles.summaryDivider} />
+                <View style={styles.summaryItem}>
+                  <Ionicons name="checkmark-circle" size={20} color="#10b981" />
+                  <Text style={[styles.summaryValue, { color: textColor }]}>
+                    {
+                      MOCK_MAINTENANCE.filter((m) => m.status === "COMPLETED")
+                        .length
+                    }
+                  </Text>
+                  <Text
+                    style={[styles.summaryLabel, { color: textColor + "60" }]}
+                  >
+                    Hoàn tất
+                  </Text>
+                </View>
+              </View>
+            </View>
+            <View style={styles.vehiclesList}>
+              {MOCK_MAINTENANCE.map((item) => (
+                <TouchableOpacity
+                  key={item.id}
+                  style={[
+                    styles.vehicleCard,
+                    { backgroundColor: surfaceColor, borderColor },
+                  ]}
+                  activeOpacity={0.7}
+                >
+                  <View style={styles.vehicleHeader}>
+                    <View style={styles.vehicleIconWrap}>
+                      <LinearGradient
+                        colors={[
+                          getMtStatusColor(item.status) + "20",
+                          getMtStatusColor(item.status) + "10",
+                        ]}
+                        style={styles.vehicleIconGradient}
+                      >
+                        <Ionicons
+                          name="build"
+                          size={24}
+                          color={getMtStatusColor(item.status)}
+                        />
+                      </LinearGradient>
+                    </View>
+                    <View style={styles.vehicleInfo}>
+                      <Text
+                        style={[styles.vehicleNumber, { color: textColor }]}
+                      >
+                        {item.vehicleNumber}
+                      </Text>
+                      <Text
+                        style={[
+                          styles.vehicleMake,
+                          { color: textColor + "60" },
+                        ]}
+                      >
+                        {item.service}
+                      </Text>
+                    </View>
+                    <View
+                      style={[
+                        styles.statusBadge,
+                        {
+                          backgroundColor: getMtStatusColor(item.status) + "15",
+                        },
+                      ]}
+                    >
+                      <View
+                        style={[
+                          styles.statusDot,
+                          { backgroundColor: getMtStatusColor(item.status) },
+                        ]}
+                      />
+                      <Text
+                        style={[
+                          styles.statusText,
+                          { color: getMtStatusColor(item.status) },
+                        ]}
+                      >
+                        {item.status}
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={[styles.vehicleStats, { borderColor }]}>
+                    <View style={styles.vehicleStat}>
+                      <Ionicons
+                        name="calendar-outline"
+                        size={16}
+                        color={textColor + "60"}
+                      />
+                      <Text
+                        style={[styles.vehicleStatValue, { color: textColor }]}
+                      >
+                        {item.date}
+                      </Text>
+                    </View>
+                    <View style={styles.vehicleStatDivider} />
+                    <View style={styles.vehicleStat}>
+                      <Ionicons
+                        name="cash-outline"
+                        size={16}
+                        color={textColor + "60"}
+                      />
+                      <Text
+                        style={[styles.vehicleStatValue, { color: textColor }]}
+                      >
+                        {(item.cost / 1000000).toFixed(1)}M đ
+                      </Text>
+                    </View>
+                    <View style={styles.vehicleStatDivider} />
+                    <View style={styles.vehicleStat}>
+                      <Ionicons
+                        name="location-outline"
+                        size={16}
+                        color={textColor + "60"}
+                      />
+                      <Text
+                        style={[styles.vehicleStatValue, { color: textColor }]}
+                        numberOfLines={1}
+                      >
+                        {item.mechanic}
+                      </Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </>
+        )}
 
         {/* Fuel Tab */}
         {selectedTab === "fuel" && (
@@ -611,7 +937,7 @@ export default function FleetScreen() {
                 </View>
                 <View style={styles.summaryDivider} />
                 <View style={styles.summaryItem}>
-                  <Ionicons name="speedometer" size={20} color="#3b82f6" />
+                  <Ionicons name="speedometer" size={20} color="#0D9488" />
                   <Text style={[styles.summaryValue, { color: textColor }]}>
                     {summary?.averageFuelEfficiency?.toFixed(1) || 0}
                   </Text>
@@ -623,7 +949,87 @@ export default function FleetScreen() {
                 </View>
               </View>
             </View>
-            {renderEmptyState("flame-outline", "Nhật ký nhiên liệu sắp ra mắt")}
+            <View style={styles.vehiclesList}>
+              {MOCK_FUEL_LOGS.map((item) => (
+                <TouchableOpacity
+                  key={item.id}
+                  style={[
+                    styles.vehicleCard,
+                    { backgroundColor: surfaceColor, borderColor },
+                  ]}
+                  activeOpacity={0.7}
+                >
+                  <View style={styles.vehicleHeader}>
+                    <View style={styles.vehicleIconWrap}>
+                      <LinearGradient
+                        colors={["#f59e0b20", "#f59e0b10"]}
+                        style={styles.vehicleIconGradient}
+                      >
+                        <Ionicons name="flame" size={24} color="#f59e0b" />
+                      </LinearGradient>
+                    </View>
+                    <View style={styles.vehicleInfo}>
+                      <Text
+                        style={[styles.vehicleNumber, { color: textColor }]}
+                      >
+                        {item.vehicleNumber}
+                      </Text>
+                      <Text
+                        style={[
+                          styles.vehicleMake,
+                          { color: textColor + "60" },
+                        ]}
+                      >
+                        {item.station}
+                      </Text>
+                    </View>
+                    <View style={{ alignItems: "flex-end" }}>
+                      <Text
+                        style={[styles.vehicleNumber, { color: "#f59e0b" }]}
+                      >
+                        {item.liters}L
+                      </Text>
+                      <Text
+                        style={{
+                          color: textColor + "60",
+                          fontSize: 12,
+                          marginTop: 2,
+                        }}
+                      >
+                        {(item.cost / 1000).toFixed(0)}K đ
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={[styles.vehicleStats, { borderColor }]}>
+                    <View style={styles.vehicleStat}>
+                      <Ionicons
+                        name="calendar-outline"
+                        size={16}
+                        color={textColor + "60"}
+                      />
+                      <Text
+                        style={[styles.vehicleStatValue, { color: textColor }]}
+                      >
+                        {item.date}
+                      </Text>
+                    </View>
+                    <View style={styles.vehicleStatDivider} />
+                    <View style={styles.vehicleStat}>
+                      <Ionicons
+                        name="speedometer-outline"
+                        size={16}
+                        color={textColor + "60"}
+                      />
+                      <Text
+                        style={[styles.vehicleStatValue, { color: textColor }]}
+                      >
+                        {item.odometer.toLocaleString()} km
+                      </Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
           </>
         )}
 
@@ -663,10 +1069,106 @@ export default function FleetScreen() {
                 </View>
               </View>
             </View>
-            {renderEmptyState(
-              "navigate-outline",
-              "Lịch sử chuyến đi sắp ra mắt"
-            )}
+            <View style={styles.vehiclesList}>
+              {MOCK_TRIPS.map((item) => (
+                <TouchableOpacity
+                  key={item.id}
+                  style={[
+                    styles.vehicleCard,
+                    { backgroundColor: surfaceColor, borderColor },
+                  ]}
+                  activeOpacity={0.7}
+                >
+                  <View style={styles.vehicleHeader}>
+                    <View style={styles.vehicleIconWrap}>
+                      <LinearGradient
+                        colors={["#6366f120", "#6366f110"]}
+                        style={styles.vehicleIconGradient}
+                      >
+                        <Ionicons name="navigate" size={24} color="#6366f1" />
+                      </LinearGradient>
+                    </View>
+                    <View style={styles.vehicleInfo}>
+                      <Text
+                        style={[styles.vehicleNumber, { color: textColor }]}
+                      >
+                        {item.vehicleNumber}
+                      </Text>
+                      <Text
+                        style={[
+                          styles.vehicleMake,
+                          { color: textColor + "60" },
+                        ]}
+                      >
+                        {item.driver}
+                      </Text>
+                    </View>
+                    <View style={{ alignItems: "flex-end" }}>
+                      <Text
+                        style={[styles.vehicleNumber, { color: "#6366f1" }]}
+                      >
+                        {item.distance} km
+                      </Text>
+                      <Text
+                        style={{
+                          color: textColor + "60",
+                          fontSize: 12,
+                          marginTop: 2,
+                        }}
+                      >
+                        {item.duration}
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={[styles.vehicleStats, { borderColor }]}>
+                    <View style={[styles.vehicleStat, { flex: 2 }]}>
+                      <Ionicons name="location" size={14} color="#10b981" />
+                      <Text
+                        style={[styles.vehicleStatValue, { color: textColor }]}
+                        numberOfLines={1}
+                      >
+                        {item.from}
+                      </Text>
+                    </View>
+                    <Ionicons
+                      name="arrow-forward"
+                      size={14}
+                      color={textColor + "40"}
+                    />
+                    <View style={[styles.vehicleStat, { flex: 2 }]}>
+                      <Ionicons name="flag" size={14} color="#ef4444" />
+                      <Text
+                        style={[styles.vehicleStatValue, { color: textColor }]}
+                        numberOfLines={1}
+                      >
+                        {item.to}
+                      </Text>
+                    </View>
+                  </View>
+                  <View
+                    style={[
+                      styles.maintenanceAlert,
+                      { backgroundColor: "#6366f110" },
+                    ]}
+                  >
+                    <Ionicons
+                      name="calendar-outline"
+                      size={14}
+                      color="#6366f1"
+                    />
+                    <Text
+                      style={{
+                        fontSize: 12,
+                        fontWeight: "500",
+                        color: "#6366f1",
+                      }}
+                    >
+                      {item.date}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
           </>
         )}
 

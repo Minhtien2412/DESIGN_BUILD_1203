@@ -188,7 +188,7 @@ export default function AddCardScreen() {
 
           {/* Security Info */}
           <View style={styles.securityInfo}>
-            <Ionicons name="shield-checkmark" size={20} color="#0066CC" />
+            <Ionicons name="shield-checkmark" size={20} color="#0D9488" />
             <Text style={styles.securityText}>
               Thông tin thẻ của bạn được mã hóa và bảo mật theo tiêu chuẩn PCI DSS
             </Text>

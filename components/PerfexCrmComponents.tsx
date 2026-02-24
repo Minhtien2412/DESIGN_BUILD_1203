@@ -55,7 +55,7 @@ export function SyncStatusBanner() {
       <View style={styles.syncInfo}>
         {isSyncing ? (
           <>
-            <ActivityIndicator size="small" color="#3B82F6" />
+            <ActivityIndicator size="small" color="#0D9488" />
             <Text style={styles.syncText}>Đang đồng bộ... {syncProgress}%</Text>
           </>
         ) : lastError ? (
@@ -65,7 +65,7 @@ export function SyncStatusBanner() {
           </>
         ) : (
           <>
-            <Ionicons name="checkmark-circle" size={16} color="#0066CC" />
+            <Ionicons name="checkmark-circle" size={16} color="#0D9488" />
             <Text style={styles.syncText}>Đồng bộ: {formatLastSync()}</Text>
           </>
         )}
@@ -79,7 +79,7 @@ export function SyncStatusBanner() {
         <Ionicons 
           name="refresh" 
           size={18} 
-          color={isSyncing ? '#9CA3AF' : '#3B82F6'} 
+          color={isSyncing ? '#9CA3AF' : '#0D9488'} 
         />
       </TouchableOpacity>
     </View>
@@ -94,7 +94,7 @@ export function DashboardCards() {
   if (isLoading && !dashboard) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#3B82F6" />
+        <ActivityIndicator size="large" color="#0D9488" />
       </View>
     );
   }
@@ -117,19 +117,19 @@ export function DashboardCards() {
         icon="people"
         title="Khách hàng"
         value={dashboard?.totalCustomers || 0}
-        color="#3B82F6"
+        color="#0D9488"
       />
       <DashboardCard
         icon="folder"
         title="Dự án"
         value={dashboard?.totalProjects || 0}
-        color="#0066CC"
+        color="#0D9488"
       />
       <DashboardCard
         icon="play-circle"
         title="Đang thực hiện"
         value={dashboard?.activeProjects || 0}
-        color="#0066CC"
+        color="#0D9488"
       />
       <DashboardCard
         icon="cash"
@@ -226,7 +226,7 @@ export function ProjectList({ customerId, onProjectPress, showHeader = true }: P
   if (isLoading && !projects.length) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#3B82F6" />
+        <ActivityIndicator size="large" color="#0D9488" />
       </View>
     );
   }
@@ -237,7 +237,7 @@ export function ProjectList({ customerId, onProjectPress, showHeader = true }: P
         <View style={styles.listHeader}>
           <Text style={styles.listTitle}>Dự án ({displayProjects.length})</Text>
           <TouchableOpacity onPress={handleRefresh}>
-            <Ionicons name="refresh" size={20} color="#3B82F6" />
+            <Ionicons name="refresh" size={20} color="#0D9488" />
           </TouchableOpacity>
         </View>
       )}
@@ -309,7 +309,7 @@ export function CustomerList({ onCustomerPress, showHeader = true }: CustomerLis
   if (isLoading && !customers.length) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#3B82F6" />
+        <ActivityIndicator size="large" color="#0D9488" />
       </View>
     );
   }
@@ -320,7 +320,7 @@ export function CustomerList({ onCustomerPress, showHeader = true }: CustomerLis
         <View style={styles.listHeader}>
           <Text style={styles.listTitle}>Khách hàng ({customers.length})</Text>
           <TouchableOpacity onPress={handleRefresh}>
-            <Ionicons name="refresh" size={20} color="#3B82F6" />
+            <Ionicons name="refresh" size={20} color="#0D9488" />
           </TouchableOpacity>
         </View>
       )}
@@ -400,7 +400,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     paddingHorizontal: 20,
     paddingVertical: 10,
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#0D9488',
     borderRadius: 8,
   },
   retryText: {
@@ -548,7 +548,7 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     height: 4,
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#0D9488',
     borderRadius: 2,
     minWidth: 40,
   },
@@ -574,7 +574,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#0D9488',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,

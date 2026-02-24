@@ -110,12 +110,12 @@ export default function SellerDashboardScreen() {
             <ThemedText style={styles.sectionTitle}>Thống kê</ThemedText>
             {loading ? (
               <View style={styles.loadingContainer}>
-                <ActivityIndicator size="small" color="#0066CC" />
+                <ActivityIndicator size="small" color="#0D9488" />
               </View>
             ) : (
               <View style={styles.statsGrid}>
                 <View style={styles.statCard}>
-                  <Ionicons name="cube-outline" size={32} color="#0066CC" />
+                  <Ionicons name="cube-outline" size={32} color="#0D9488" />
                   <ThemedText style={styles.statValue}>
                     {stats?.productsCount || 0}
                   </ThemedText>
@@ -123,7 +123,7 @@ export default function SellerDashboardScreen() {
                 </View>
 
                 <View style={styles.statCard}>
-                  <Ionicons name="cart-outline" size={32} color="#3B82F6" />
+                  <Ionicons name="cart-outline" size={32} color="#0D9488" />
                   <ThemedText style={styles.statValue}>
                     {stats?.ordersCount || 0}
                   </ThemedText>
@@ -131,7 +131,7 @@ export default function SellerDashboardScreen() {
                 </View>
 
                 <View style={styles.statCard}>
-                  <Ionicons name="star-outline" size={32} color="#0066CC" />
+                  <Ionicons name="star-outline" size={32} color="#0D9488" />
                   <ThemedText style={styles.statValue}>
                     {stats?.rating?.toFixed(1) || "0.0"}
                   </ThemedText>
@@ -160,9 +160,9 @@ export default function SellerDashboardScreen() {
                 onPress={() => router.push("/products/create" as Href)}
               >
                 <View
-                  style={[styles.actionIcon, { backgroundColor: "#0066CC15" }]}
+                  style={[styles.actionIcon, { backgroundColor: "#0D948815" }]}
                 >
-                  <Ionicons name="add-circle" size={24} color="#0066CC" />
+                  <Ionicons name="add-circle" size={24} color="#0D9488" />
                 </View>
                 <View style={styles.actionContent}>
                   <ThemedText style={styles.actionTitle}>
@@ -183,9 +183,9 @@ export default function SellerDashboardScreen() {
                 onPress={() => router.push("/orders" as Href)}
               >
                 <View
-                  style={[styles.actionIcon, { backgroundColor: "#3B82F615" }]}
+                  style={[styles.actionIcon, { backgroundColor: "#0D948815" }]}
                 >
-                  <Ionicons name="list" size={24} color="#3B82F6" />
+                  <Ionicons name="list" size={24} color="#0D9488" />
                 </View>
                 <View style={styles.actionContent}>
                   <ThemedText style={styles.actionTitle}>

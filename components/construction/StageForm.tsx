@@ -94,14 +94,14 @@ const validateStageForm = (data: StageFormData): ValidationErrors => {
 // ============================================
 
 const STAGE_COLORS = [
-  { value: '#3B82F6', label: 'Xanh dương' },
-  { value: '#0066CC', label: 'Xanh lá' },
-  { value: '#0066CC', label: 'Vàng' },
+  { value: '#0D9488', label: 'Xanh dương' },
+  { value: '#0D9488', label: 'Xanh lá' },
+  { value: '#0D9488', label: 'Vàng' },
   { value: '#000000', label: 'Đỏ' },
   { value: '#666666', label: 'Tím' },
   { value: '#666666', label: 'Hồng' },
   { value: '#14B8A6', label: 'Xanh ngọc' },
-  { value: '#0066CC', label: 'Cam' },
+  { value: '#0D9488', label: 'Cam' },
   { value: '#666666', label: 'Indigo' },
   { value: '#6B7280', label: 'Xám' },
 ];
@@ -127,7 +127,7 @@ export const StageForm: React.FC<StageFormProps> = ({
     order: existingStages.length,
     startDate: '',
     endDate: '',
-    color: '#3B82F6',
+    color: '#0D9488',
   });
 
   // UI state
@@ -139,8 +139,8 @@ export const StageForm: React.FC<StageFormProps> = ({
   // Status options
   const statusOptions: { value: Stage['status']; label: string; color: string }[] = [
     { value: 'pending', label: 'Chờ xử lý', color: '#9CA3AF' },
-    { value: 'active', label: 'Đang thực hiện', color: '#3B82F6' },
-    { value: 'completed', label: 'Hoàn thành', color: '#0066CC' },
+    { value: 'active', label: 'Đang thực hiện', color: '#0D9488' },
+    { value: 'completed', label: 'Hoàn thành', color: '#0D9488' },
     { value: 'cancelled', label: 'Đã hủy', color: '#000000' },
   ];
 
@@ -155,7 +155,7 @@ export const StageForm: React.FC<StageFormProps> = ({
         order: stage.order ?? existingStages.length,
         startDate: stage.startDate || '',
         endDate: stage.endDate || '',
-        color: stage.color || '#3B82F6',
+        color: stage.color || '#0D9488',
         x: stage.x,
         y: stage.y,
       });
@@ -169,7 +169,7 @@ export const StageForm: React.FC<StageFormProps> = ({
         order: existingStages.length,
         startDate: '',
         endDate: '',
-        color: '#3B82F6',
+        color: '#0D9488',
       });
     }
     setErrors({});
@@ -638,7 +638,7 @@ const styles = StyleSheet.create({
   durationValue: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#3B82F6',
+    color: '#0D9488',
   },
   footer: {
     flexDirection: 'row',
@@ -666,7 +666,7 @@ const styles = StyleSheet.create({
     color: '#374151',
   },
   submitButton: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#0D9488',
   },
   submitButtonText: {
     fontSize: 16,

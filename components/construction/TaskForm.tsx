@@ -123,15 +123,15 @@ export const TaskForm: React.FC<TaskFormProps> = ({
   // Status options
   const statusOptions: { value: Task['status']; label: string; color: string }[] = [
     { value: 'pending', label: 'Chờ xử lý', color: '#9CA3AF' },
-    { value: 'in-progress', label: 'Đang thực hiện', color: '#3B82F6' },
-    { value: 'completed', label: 'Hoàn thành', color: '#0066CC' },
+    { value: 'in-progress', label: 'Đang thực hiện', color: '#0D9488' },
+    { value: 'completed', label: 'Hoàn thành', color: '#0D9488' },
     { value: 'blocked', label: 'Bị chặn', color: '#000000' },
   ];
 
   // Priority options
   const priorityOptions: { value: Task['priority']; label: string; color: string }[] = [
-    { value: 'low', label: 'Thấp', color: '#0066CC' },
-    { value: 'medium', label: 'Trung bình', color: '#0066CC' },
+    { value: 'low', label: 'Thấp', color: '#0D9488' },
+    { value: 'medium', label: 'Trung bình', color: '#0D9488' },
     { value: 'high', label: 'Cao', color: '#000000' },
   ];
 
@@ -613,7 +613,7 @@ const styles = StyleSheet.create({
     color: '#374151',
   },
   submitButton: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#0D9488',
   },
   submitButtonText: {
     fontSize: 16,

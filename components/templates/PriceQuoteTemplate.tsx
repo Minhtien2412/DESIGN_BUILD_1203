@@ -409,7 +409,7 @@ const styles = {
     alignItems: 'center' as const,
     padding: 12,
     marginHorizontal: 16,
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     borderRadius: 8,
   },
   noteText: {

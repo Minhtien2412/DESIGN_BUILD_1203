@@ -455,8 +455,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   checkboxChecked: {
-    backgroundColor: '#0066CC',
-    borderColor: '#0066CC',
+    backgroundColor: '#0D9488',
+    borderColor: '#0D9488',
   },
   checkboxText: {
     color: '#fff',
@@ -470,7 +470,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   termsLink: {
-    color: '#0066CC',
+    color: '#0D9488',
     textDecorationLine: 'underline',
   },
   registerButton: {
@@ -490,7 +490,7 @@ const styles = StyleSheet.create({
   },
   loginLink: {
     fontSize: 16,
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: '600',
     marginLeft: 4,
     textDecorationLine: 'underline',
@@ -501,7 +501,7 @@ const styles = StyleSheet.create({
   },
   apiStatusText: {
     fontSize: 12,
-    color: '#0066CC',
+    color: '#0D9488',
     fontFamily: 'monospace',
   },
   loadingText: {

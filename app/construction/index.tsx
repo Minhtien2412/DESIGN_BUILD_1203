@@ -1,6 +1,6 @@
 /**
  * Construction Services Hub Screen
- * Menu dịch vụ thi công - category style
+ * Menu dá»‹ch vá»¥ thi cÃ´ng - category style
  * @updated 2025-12-25
  */
 
@@ -28,18 +28,18 @@ const COLORS = {
   text: '#0F172A',
   textSecondary: '#64748B',
   textMuted: '#94A3B8',
-  accent: '#0066CC',
-  success: '#0066CC',
-  warning: '#0066CC',
+  accent: '#0D9488',
+  success: '#0D9488',
+  warning: '#0D9488',
   border: '#E2E8F0',
 };
 
-// Dịch vụ thi công chính
+// Dá»‹ch vá»¥ thi cÃ´ng chÃ­nh
 const CONSTRUCTION_SERVICES = [
   {
     id: 'project-info',
-    label: 'Thông tin công trình',
-    desc: 'Chi tiết dự án, ngân sách',
+    label: 'ThÃ´ng tin cÃ´ng trÃ¬nh',
+    desc: 'Chi tiáº¿t dá»± Ã¡n, ngÃ¢n sÃ¡ch',
     icon: 'information-circle-outline',
     route: '/construction/project-info',
     color: '#8B5CF6',
@@ -47,24 +47,24 @@ const CONSTRUCTION_SERVICES = [
   },
   {
     id: 'progress',
-    label: 'Tiến độ thi công',
-    desc: 'Theo dõi tiến độ công trình',
+    label: 'Tiáº¿n Ä‘á»™ thi cÃ´ng',
+    desc: 'Theo dÃµi tiáº¿n Ä‘á»™ cÃ´ng trÃ¬nh',
     icon: 'analytics-outline',
     route: '/construction/progress',
-    color: '#3B82F6',
+    color: '#0D9488',
     badge: 'Hot',
   },
   {
     id: 'tracking',
-    label: 'Theo dõi công trình',
+    label: 'Theo dÃµi cÃ´ng trÃ¬nh',
     desc: 'Real-time tracking',
     icon: 'location-outline',
     route: '/construction/tracking',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   {
     id: 'villa',
-    label: 'Tiến độ biệt thự',
+    label: 'Tiáº¿n Ä‘á»™ biá»‡t thá»±',
     desc: 'Villa progress tracking',
     icon: 'home-outline',
     route: '/construction/villa-progress',
@@ -72,15 +72,15 @@ const CONSTRUCTION_SERVICES = [
   },
   {
     id: 'board',
-    label: 'Board tiến độ',
+    label: 'Board tiáº¿n Ä‘á»™',
     desc: 'Kanban style board',
     icon: 'grid-outline',
     route: '/construction/progress-board',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   {
     id: 'concrete',
-    label: 'Lịch đổ bê tông',
+    label: 'Lá»‹ch Ä‘á»• bÃª tÃ´ng',
     desc: 'Concrete schedule',
     icon: 'calendar-outline',
     route: '/construction/concrete-schedule-map',
@@ -88,7 +88,7 @@ const CONSTRUCTION_SERVICES = [
   },
   {
     id: 'map-view',
-    label: 'Bản đồ công trình',
+    label: 'Báº£n Ä‘á»“ cÃ´ng trÃ¬nh',
     desc: 'Map view',
     icon: 'map-outline',
     route: '/construction/map-view',
@@ -96,7 +96,7 @@ const CONSTRUCTION_SERVICES = [
   },
   {
     id: 'payment',
-    label: 'Thanh toán tiến độ',
+    label: 'Thanh toÃ¡n tiáº¿n Ä‘á»™',
     desc: 'Payment progress',
     icon: 'card-outline',
     route: '/construction/payment-progress',
@@ -104,7 +104,7 @@ const CONSTRUCTION_SERVICES = [
   },
   {
     id: 'booking',
-    label: 'Đặt lịch thi công',
+    label: 'Äáº·t lá»‹ch thi cÃ´ng',
     desc: 'Book construction',
     icon: 'calendar-number-outline',
     route: '/construction/booking',
@@ -112,24 +112,24 @@ const CONSTRUCTION_SERVICES = [
   },
 ];
 
-// Dịch vụ thuê mướn
+// Dá»‹ch vá»¥ thuÃª mÆ°á»›n
 const HIRING_SERVICES = [
-  { id: 'ep-coc', label: 'Ép cọc', icon: '⚡', route: '/utilities/ep-coc', price: 'Từ 50K/m' },
-  { id: 'dao-dat', label: 'Đào đất', icon: '🚜', route: '/utilities/dao-dat', price: 'Từ 80K/m³' },
-  { id: 'be-tong', label: 'Bê tông', icon: '🏗️', route: '/utilities/be-tong', price: 'Từ 1.2M/m³' },
-  { id: 'vat-lieu', label: 'Vật liệu', icon: '📦', route: '/utilities/vat-lieu', price: 'Liên hệ' },
-  { id: 'tho-xay', label: 'Thợ xây', icon: '👷', route: '/utilities/tho-xay', price: 'Từ 400K/ngày' },
-  { id: 'dien-nuoc', label: 'Điện nước', icon: '💡', route: '/utilities/tho-dien-nuoc', price: 'Từ 350K/ngày' },
-  { id: 'coffa', label: 'Cốp pha', icon: '🔧', route: '/utilities/tho-coffa', price: 'Từ 500K/ngày' },
-  { id: 'design', label: 'Thiết kế', icon: '✏️', route: '/utilities/design-team', price: 'Từ 50K/m²' },
+  { id: 'ep-coc', label: 'Ã‰p cá»c', icon: 'âš¡', route: '/utilities/ep-coc', price: 'Tá»« 50K/m' },
+  { id: 'dao-dat', label: 'ÄÃ o Ä‘áº¥t', icon: 'ðŸšœ', route: '/utilities/dao-dat', price: 'Tá»« 80K/mÂ³' },
+  { id: 'be-tong', label: 'BÃª tÃ´ng', icon: 'ðŸ—ï¸', route: '/utilities/be-tong', price: 'Tá»« 1.2M/mÂ³' },
+  { id: 'vat-lieu', label: 'Váº­t liá»‡u', icon: 'ðŸ“¦', route: '/utilities/vat-lieu', price: 'LiÃªn há»‡' },
+  { id: 'tho-xay', label: 'Thá»£ xÃ¢y', icon: 'ðŸ‘·', route: '/utilities/tho-xay', price: 'Tá»« 400K/ngÃ y' },
+  { id: 'dien-nuoc', label: 'Äiá»‡n nÆ°á»›c', icon: 'ðŸ’¡', route: '/utilities/tho-dien-nuoc', price: 'Tá»« 350K/ngÃ y' },
+  { id: 'coffa', label: 'Cá»‘p pha', icon: 'ðŸ”§', route: '/utilities/tho-coffa', price: 'Tá»« 500K/ngÃ y' },
+  { id: 'design', label: 'Thiáº¿t káº¿', icon: 'âœï¸', route: '/utilities/design-team', price: 'Tá»« 50K/mÂ²' },
 ];
 
-// Liên kết nhanh
+// LiÃªn káº¿t nhanh
 const QUICK_LINKS = [
-  { id: 'materials', label: 'Vật liệu', icon: 'cube-outline', route: '/materials/index', color: '#666666' },
-  { id: 'equipment', label: 'Thiết bị', icon: 'hardware-chip-outline', route: '/equipment/index', color: '#3B82F6' },
-  { id: 'safety', label: 'An toàn', icon: 'shield-checkmark-outline', route: '/safety/index', color: '#000000' },
-  { id: 'quality', label: 'QC/QA', icon: 'checkmark-circle-outline', route: '/quality-assurance/index', color: '#0066CC' },
+  { id: 'materials', label: 'Váº­t liá»‡u', icon: 'cube-outline', route: '/materials/index', color: '#666666' },
+  { id: 'equipment', label: 'Thiáº¿t bá»‹', icon: 'hardware-chip-outline', route: '/equipment/index', color: '#0D9488' },
+  { id: 'safety', label: 'An toÃ n', icon: 'shield-checkmark-outline', route: '/safety/index', color: '#000000' },
+  { id: 'quality', label: 'QC/QA', icon: 'checkmark-circle-outline', route: '/quality-assurance/index', color: '#0D9488' },
 ];
 
 export default function ConstructionMenuScreen() {
@@ -150,7 +150,7 @@ export default function ConstructionMenuScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
           <Ionicons name="arrow-back" size={24} color={COLORS.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Dịch vụ thi công</Text>
+        <Text style={styles.headerTitle}>Dá»‹ch vá»¥ thi cÃ´ng</Text>
         <TouchableOpacity
           style={styles.moreBtn}
           onPress={() => router.push('/construction-progress' as any)}
@@ -171,17 +171,17 @@ export default function ConstructionMenuScreen() {
           activeOpacity={0.9}
         >
           <LinearGradient
-            colors={['#0066CC', '#0066CC']}
+            colors={['#0D9488', '#0D9488']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.heroGradient}
           >
             <View style={styles.heroContent}>
               <View style={styles.heroLeft}>
-                <Text style={styles.heroTitle}>Tư vấn miễn phí</Text>
-                <Text style={styles.heroSubtitle}>Hỗ trợ thiết kế & báo giá 24/7</Text>
+                <Text style={styles.heroTitle}>TÆ° váº¥n miá»…n phÃ­</Text>
+                <Text style={styles.heroSubtitle}>Há»— trá»£ thiáº¿t káº¿ & bÃ¡o giÃ¡ 24/7</Text>
                 <View style={styles.heroBtn}>
-                  <Text style={styles.heroBtnText}>Liên hệ ngay</Text>
+                  <Text style={styles.heroBtnText}>LiÃªn há»‡ ngay</Text>
                 </View>
               </View>
               <Ionicons name="construct" size={64} color="rgba(255,255,255,0.3)" />
@@ -211,9 +211,9 @@ export default function ConstructionMenuScreen() {
         {/* Construction Services Grid */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Quản lý thi công</Text>
+            <Text style={styles.sectionTitle}>Quáº£n lÃ½ thi cÃ´ng</Text>
             <TouchableOpacity onPress={() => router.push('/construction/progress' as any)}>
-              <Text style={styles.seeAll}>Xem tất cả</Text>
+              <Text style={styles.seeAll}>Xem táº¥t cáº£</Text>
             </TouchableOpacity>
           </View>
           <View style={styles.servicesGrid}>
@@ -244,9 +244,9 @@ export default function ConstructionMenuScreen() {
         {/* Hiring Services */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Thuê dịch vụ</Text>
+            <Text style={styles.sectionTitle}>ThuÃª dá»‹ch vá»¥</Text>
             <TouchableOpacity onPress={() => router.push('/utilities/index' as any)}>
-              <Text style={styles.seeAll}>Xem tất cả</Text>
+              <Text style={styles.seeAll}>Xem táº¥t cáº£</Text>
             </TouchableOpacity>
           </View>
           <View style={styles.hiringGrid}>
@@ -277,7 +277,7 @@ export default function ConstructionMenuScreen() {
           activeOpacity={0.9}
         >
           <LinearGradient
-            colors={['#0066CC', '#3399FF']}
+            colors={['#0D9488', '#14B8A6']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.ctaGradient}
@@ -285,12 +285,12 @@ export default function ConstructionMenuScreen() {
             <View style={styles.ctaContent}>
               <Ionicons name="home" size={32} color="#fff" />
               <View style={styles.ctaText}>
-                <Text style={styles.ctaTitle}>Thiết kế nhà</Text>
-                <Text style={styles.ctaSubtitle}>Miễn phí tư vấn thiết kế</Text>
+                <Text style={styles.ctaTitle}>Thiáº¿t káº¿ nhÃ </Text>
+                <Text style={styles.ctaSubtitle}>Miá»…n phÃ­ tÆ° váº¥n thiáº¿t káº¿</Text>
               </View>
             </View>
             <View style={styles.ctaBtn}>
-              <Text style={styles.ctaBtnText}>Bắt đầu</Text>
+              <Text style={styles.ctaBtnText}>Báº¯t Ä‘áº§u</Text>
             </View>
           </LinearGradient>
         </TouchableOpacity>
@@ -348,7 +348,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     ...Platform.select({
       ios: {
-        shadowColor: '#0066CC',
+        shadowColor: '#0D9488',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.2,
         shadowRadius: 8,
@@ -391,7 +391,7 @@ const styles = StyleSheet.create({
   heroBtnText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   quickLinksSection: {
     marginBottom: 24,
@@ -528,7 +528,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     ...Platform.select({
       ios: {
-        shadowColor: '#0066CC',
+        shadowColor: '#0D9488',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.2,
         shadowRadius: 8,

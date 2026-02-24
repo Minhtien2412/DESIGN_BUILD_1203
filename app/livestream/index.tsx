@@ -1,10 +1,15 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { get } from "@/services/api";
 import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 import { Stack, useRouter } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
 import {
+    Alert,
     Dimensions,
     FlatList,
     Image,
+    RefreshControl,
     ScrollView,
     StyleSheet,
     Text,
@@ -80,7 +85,7 @@ const upcomingStreams = [
 ];
 
 const categories = [
-  { id: "1", name: "Hướng dẫn", icon: "play-circle-outline", color: "#FF6B35" },
+  { id: "1", name: "Hướng dẫn", icon: "play-circle-outline", color: "#14B8A6" },
   { id: "2", name: "Bán hàng", icon: "cart-outline", color: "#F44336" },
   { id: "3", name: "Review", icon: "star-outline", color: "#4CAF50" },
   { id: "4", name: "Q&A", icon: "help-circle-outline", color: "#2196F3" },
@@ -91,6 +96,34 @@ export default function LivestreamScreen() {
   const textColor = useThemeColor({}, "text");
   const cardBg = useThemeColor({}, "card");
   const router = useRouter();
+  const [refreshing, setRefreshing] = useState(false);
+  const [streams, setStreams] = useState(livestreams);
+  const [upcoming, setUpcoming] = useState(upcomingStreams);
+
+  const fetchStreams = useCallback(async () => {
+    try {
+      const res = await get("/api/livestreams");
+      if (res?.data?.live) setStreams(res.data.live);
+      if (res?.data?.upcoming) setUpcoming(res.data.upcoming);
+    } catch {
+      /* mock */
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchStreams();
+  }, [fetchStreams]);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchStreams();
+    setRefreshing(false);
+  }, [fetchStreams]);
+
+  const handleJoinStream = useCallback((stream: (typeof livestreams)[0]) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    Alert.alert("Xem livestream", `Đang kết nối tới ${stream.host.name}...`);
+  }, []);
 
   const formatViewers = (num: number) => {
     if (num >= 1000) return (num / 1000).toFixed(1) + "k";
@@ -98,7 +131,10 @@ export default function LivestreamScreen() {
   };
 
   const renderLivestream = ({ item }: { item: (typeof livestreams)[0] }) => (
-    <TouchableOpacity style={styles.livestreamCard}>
+    <TouchableOpacity
+      style={styles.livestreamCard}
+      onPress={() => handleJoinStream(item)}
+    >
       <View style={styles.thumbnailContainer}>
         <Image source={{ uri: item.thumbnail }} style={styles.thumbnail} />
         {item.isLive && (
@@ -141,7 +177,16 @@ export default function LivestreamScreen() {
     <View style={[styles.container, { backgroundColor }]}>
       <Stack.Screen options={{ title: "Livestream", headerShown: true }} />
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#14B8A6"
+          />
+        }
+      >
         {/* Categories */}
         <ScrollView
           horizontal
@@ -206,7 +251,7 @@ export default function LivestreamScreen() {
           {upcomingStreams.map((stream) => (
             <View key={stream.id} style={styles.upcomingItem}>
               <View style={styles.upcomingIcon}>
-                <Ionicons name="videocam-outline" size={24} color="#FF6B35" />
+                <Ionicons name="videocam-outline" size={24} color="#14B8A6" />
               </View>
               <View style={styles.upcomingInfo}>
                 <Text style={[styles.upcomingTitle, { color: textColor }]}>
@@ -233,7 +278,7 @@ export default function LivestreamScreen() {
                 <Ionicons
                   name="notifications-outline"
                   size={20}
-                  color="#FF6B35"
+                  color="#14B8A6"
                 />
               </TouchableOpacity>
             </View>
@@ -242,10 +287,10 @@ export default function LivestreamScreen() {
 
         {/* Start Streaming CTA */}
         <TouchableOpacity
-          style={[styles.startStreamCard, { backgroundColor: "#FF6B35" }]}
+          style={[styles.startStreamCard, { backgroundColor: "#0D9488" }]}
         >
           <View style={styles.startStreamIcon}>
-            <Ionicons name="videocam" size={32} color="#FF6B35" />
+            <Ionicons name="videocam" size={32} color="#14B8A6" />
           </View>
           <View style={styles.startStreamContent}>
             <Text style={styles.startStreamTitle}>Bắt đầu phát sóng</Text>
@@ -261,7 +306,7 @@ export default function LivestreamScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { flex: 1, backgroundColor: "#F8FAFB" },
   categoriesContent: { padding: 16, gap: 10 },
   categoryItem: {
     flexDirection: "row",
@@ -281,8 +326,8 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   sectionTitleRow: { flexDirection: "row", alignItems: "center", gap: 8 },
-  sectionTitle: { fontSize: 18, fontWeight: "600" },
-  viewAll: { color: "#FF6B35", fontSize: 14 },
+  sectionTitle: { fontSize: 18, fontWeight: "700", letterSpacing: -0.3 },
+  viewAll: { color: "#0D9488", fontSize: 14, fontWeight: "500" },
   liveDotLarge: {
     width: 10,
     height: 10,
@@ -295,8 +340,8 @@ const styles = StyleSheet.create({
   thumbnail: {
     width: "100%",
     height: 160,
-    borderRadius: 12,
-    backgroundColor: "#f0f0f0",
+    borderRadius: 16,
+    backgroundColor: "#F3F4F6",
   },
   liveBadge: {
     position: "absolute",
@@ -307,7 +352,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#F44336",
     paddingHorizontal: 8,
     paddingVertical: 4,
-    borderRadius: 4,
+    borderRadius: 10,
     gap: 4,
   },
   liveDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: "#fff" },
@@ -340,13 +385,13 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#F3F4F6",
   },
   livestreamDetails: { flex: 1, marginLeft: 10 },
-  livestreamTitle: { fontSize: 14, fontWeight: "500", lineHeight: 18 },
+  livestreamTitle: { fontSize: 14, fontWeight: "600", lineHeight: 18 },
   hostRow: { flexDirection: "row", alignItems: "center", marginTop: 4 },
-  hostName: { color: "#666", fontSize: 12 },
-  categoryLabel: { color: "#999", fontSize: 12 },
+  hostName: { color: "#6B7280", fontSize: 12 },
+  categoryLabel: { color: "#9CA3AF", fontSize: 12 },
   upcomingItem: {
     flexDirection: "row",
     alignItems: "center",
@@ -357,21 +402,21 @@ const styles = StyleSheet.create({
   upcomingIcon: {
     width: 48,
     height: 48,
-    borderRadius: 12,
-    backgroundColor: "#FF6B3520",
+    borderRadius: 16,
+    backgroundColor: "#0D948820",
     justifyContent: "center",
     alignItems: "center",
   },
   upcomingInfo: { flex: 1, marginLeft: 12 },
-  upcomingTitle: { fontSize: 14, fontWeight: "500" },
-  upcomingHost: { color: "#666", fontSize: 12, marginTop: 2 },
+  upcomingTitle: { fontSize: 14, fontWeight: "600" },
+  upcomingHost: { color: "#6B7280", fontSize: 12, marginTop: 2 },
   upcomingMeta: { flexDirection: "row", alignItems: "center", marginTop: 4 },
-  upcomingTime: { color: "#999", fontSize: 11, marginLeft: 4 },
+  upcomingTime: { color: "#9CA3AF", fontSize: 11, marginLeft: 4 },
   notifyBtn: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "#FF6B3510",
+    backgroundColor: "#0D948815",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -391,6 +436,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   startStreamContent: { flex: 1, marginLeft: 16 },
-  startStreamTitle: { color: "#fff", fontSize: 18, fontWeight: "bold" },
+  startStreamTitle: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "800",
+    letterSpacing: -0.3,
+  },
   startStreamDesc: { color: "#fff", opacity: 0.9, marginTop: 4 },
 });

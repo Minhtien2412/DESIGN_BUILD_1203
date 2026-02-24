@@ -212,8 +212,8 @@ export function AttachmentPicker({
                 style={[styles.menuItem, { borderBottomColor: border }]}
                 onPress={pickImage}
               >
-                <View style={[styles.iconContainer, { backgroundColor: '#0066CC' + '15' }]}>
-                  <Ionicons name="image" size={24} color="#0066CC" />
+                <View style={[styles.iconContainer, { backgroundColor: '#0D9488' + '15' }]}>
+                  <Ionicons name="image" size={24} color="#0D9488" />
                 </View>
                 <View style={styles.menuItemContent}>
                   <Text style={[styles.menuItemTitle, { color: text }]}>
@@ -230,8 +230,8 @@ export function AttachmentPicker({
                 style={[styles.menuItem]}
                 onPress={pickDocument}
               >
-                <View style={[styles.iconContainer, { backgroundColor: '#0066CC' + '15' }]}>
-                  <Ionicons name="document-text" size={24} color="#0066CC" />
+                <View style={[styles.iconContainer, { backgroundColor: '#0D9488' + '15' }]}>
+                  <Ionicons name="document-text" size={24} color="#0D9488" />
                 </View>
                 <View style={styles.menuItemContent}>
                   <Text style={[styles.menuItemTitle, { color: text }]}>

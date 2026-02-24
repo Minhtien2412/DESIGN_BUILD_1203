@@ -87,7 +87,7 @@ const DEFAULT_BADGE_COUNTS: BadgeCounts = {
     projects: 0,
   },
   sources: [
-    { id: 'crm', name: 'CRM', count: 0, icon: 'business', color: '#2563eb', lastUpdated: '' },
+    { id: 'crm', name: 'CRM', count: 0, icon: 'business', color: '#0D9488', lastUpdated: '' },
     { id: 'app', name: 'Ứng dụng', count: 0, icon: 'notifications', color: '#16a34a', lastUpdated: '' },
     { id: 'chat', name: 'Tin nhắn', count: 0, icon: 'chatbubbles', color: '#dc2626', lastUpdated: '' },
     { id: 'tasks', name: 'Công việc', count: 0, icon: 'checkbox', color: '#ea580c', lastUpdated: '' },
@@ -212,7 +212,7 @@ export function NotificationBadgeProvider({ children }: { children: React.ReactN
           projects: crmCounts.projects,
         },
         sources: [
-          { id: 'crm', name: 'CRM', count: crmCounts.crm, icon: 'business', color: '#2563eb', lastUpdated: now },
+          { id: 'crm', name: 'CRM', count: crmCounts.crm, icon: 'business', color: '#0D9488', lastUpdated: now },
           { id: 'app', name: 'Ứng dụng', count: appCount, icon: 'notifications', color: '#16a34a', lastUpdated: now },
           { id: 'chat', name: 'Tin nhắn', count: chatCount, icon: 'chatbubbles', color: '#dc2626', lastUpdated: now },
           { id: 'tasks', name: 'Công việc', count: crmCounts.tasks, icon: 'checkbox', color: '#ea580c', lastUpdated: now },

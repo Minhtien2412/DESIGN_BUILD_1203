@@ -181,7 +181,7 @@ export default function ShortVideosScreen() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0066CC" />
+        <ActivityIndicator size="large" color="#0D9488" />
         <Text style={styles.loadingText}>Đang tải video...</Text>
       </View>
     );
@@ -208,7 +208,7 @@ export default function ShortVideosScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor="#0066CC"
+            tintColor="#0D9488"
           />
         }
         ListEmptyComponent={

@@ -3,28 +3,27 @@
  * Displays list of projects with construction map access
  */
 
-import React, { useState, useEffect } from 'react';
+import { Container } from "@/components/ui/container";
+import { useThemeColor } from "@/hooks/use-theme-color";
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import { useEffect, useState } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  TextInput,
-  ActivityIndicator,
-  RefreshControl,
-} from 'react-native';
-import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import { Container } from '@/components/ui/container';
-import { useThemeColor } from '@/hooks/use-theme-color';
-import { constructionMapApi } from '@/services/api/constructionMapApi';
+    ActivityIndicator,
+    FlatList,
+    RefreshControl,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
+} from "react-native";
 
 interface Project {
   id: string;
   name: string;
   description?: string;
-  status: 'planning' | 'active' | 'on-hold' | 'completed';
+  status: "planning" | "active" | "on-hold" | "completed";
   progress: number;
   taskCount: number;
   stageCount: number;
@@ -33,16 +32,16 @@ interface Project {
 }
 
 export default function ConstructionMapIndexScreen() {
-  const backgroundColor = useThemeColor({}, 'background');
-  const textColor = useThemeColor({}, 'text');
-  const borderColor = useThemeColor({}, 'border');
+  const backgroundColor = useThemeColor({}, "background");
+  const textColor = useThemeColor({}, "text");
+  const borderColor = useThemeColor({}, "border");
 
   const [projects, setProjects] = useState<Project[]>([]);
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterStatus, setFilterStatus] = useState<string>("all");
 
   // Load projects
   useEffect(() => {
@@ -57,54 +56,82 @@ export default function ConstructionMapIndexScreen() {
   const loadProjects = async () => {
     try {
       setLoading(true);
-      // TODO: Replace with actual API call to get all projects
-      // For now, mock data
+      // Try API first
+      const response = await projectService.list({ page: 1, limit: 50 });
+      const items: ApiProject[] = response?.data ?? [];
+      if (Array.isArray(items) && items.length > 0) {
+        const mapped: Project[] = items.map((p: ApiProject) => ({
+          id: String(p.id),
+          name: p.name,
+          description: p.description || "",
+          status:
+            p.status === "IN_PROGRESS"
+              ? ("active" as const)
+              : p.status === "COMPLETED"
+                ? ("completed" as const)
+                : p.status === "ON_HOLD"
+                  ? ("on-hold" as const)
+                  : ("planning" as const),
+          progress: p.progress || 0,
+          taskCount: 0,
+          stageCount: 0,
+          lastUpdated: p.updatedAt || new Date().toISOString(),
+        }));
+        setProjects(mapped);
+        console.log("[ConstructionMapIndex] Loaded", mapped.length, "from API");
+        return;
+      }
+    } catch (apiError) {
+      console.log("[ConstructionMapIndex] API error, using mock:", apiError);
+    }
+    // Fallback to mock
+    try {
       const mockProjects: Project[] = [
         {
-          id: 'villa-001',
-          name: 'Villa Luxury Resort',
-          description: 'Biệt thự cao cấp 5 sao tại Phú Quốc',
-          status: 'active',
+          id: "villa-001",
+          name: "Villa Luxury Resort",
+          description: "Biệt thự cao cấp 5 sao tại Phú Quốc",
+          status: "active",
           progress: 65,
           taskCount: 45,
           stageCount: 8,
           lastUpdated: new Date().toISOString(),
         },
         {
-          id: 'hotel-002',
-          name: 'Khách sạn Seaside',
-          description: 'Khách sạn 20 tầng view biển',
-          status: 'active',
+          id: "hotel-002",
+          name: "Khách sạn Seaside",
+          description: "Khách sạn 20 tầng view biển",
+          status: "active",
           progress: 40,
           taskCount: 78,
           stageCount: 12,
           lastUpdated: new Date(Date.now() - 86400000).toISOString(),
         },
         {
-          id: 'resort-003',
-          name: 'Khu nghỉ dưỡng Paradise',
-          description: 'Resort 4 sao với 50 căn villa',
-          status: 'planning',
+          id: "resort-003",
+          name: "Khu nghỉ dưỡng Paradise",
+          description: "Resort 4 sao với 50 căn villa",
+          status: "planning",
           progress: 15,
           taskCount: 32,
           stageCount: 6,
           lastUpdated: new Date(Date.now() - 172800000).toISOString(),
         },
         {
-          id: 'building-004',
-          name: 'Tòa nhà văn phòng Central',
-          description: 'Văn phòng hạng A 15 tầng',
-          status: 'on-hold',
+          id: "building-004",
+          name: "Tòa nhà văn phòng Central",
+          description: "Văn phòng hạng A 15 tầng",
+          status: "on-hold",
           progress: 55,
           taskCount: 60,
           stageCount: 10,
           lastUpdated: new Date(Date.now() - 604800000).toISOString(),
         },
         {
-          id: 'villa-005',
-          name: 'Biệt thự Ocean View',
-          description: 'Biệt thự đơn lập view biển',
-          status: 'completed',
+          id: "villa-005",
+          name: "Biệt thự Ocean View",
+          description: "Biệt thự đơn lập view biển",
+          status: "completed",
           progress: 100,
           taskCount: 38,
           stageCount: 7,
@@ -113,7 +140,7 @@ export default function ConstructionMapIndexScreen() {
       ];
       setProjects(mockProjects);
     } catch (error) {
-      console.error('[ConstructionMapIndex] Load error:', error);
+      console.error("[ConstructionMapIndex] Load error:", error);
     } finally {
       setLoading(false);
     }
@@ -129,7 +156,7 @@ export default function ConstructionMapIndexScreen() {
     let filtered = [...projects];
 
     // Filter by status
-    if (filterStatus !== 'all') {
+    if (filterStatus !== "all") {
       filtered = filtered.filter((p) => p.status === filterStatus);
     }
 
@@ -139,38 +166,38 @@ export default function ConstructionMapIndexScreen() {
       filtered = filtered.filter(
         (p) =>
           p.name.toLowerCase().includes(query) ||
-          p.description?.toLowerCase().includes(query)
+          p.description?.toLowerCase().includes(query),
       );
     }
 
     setFilteredProjects(filtered);
   };
 
-  const getStatusColor = (status: Project['status']) => {
+  const getStatusColor = (status: Project["status"]) => {
     switch (status) {
-      case 'active':
-        return '#0066CC';
-      case 'completed':
-        return '#0066CC';
-      case 'on-hold':
-        return '#0066CC';
-      case 'planning':
-        return '#999999';
+      case "active":
+        return "#0D9488";
+      case "completed":
+        return "#10B981";
+      case "on-hold":
+        return "#F59E0B";
+      case "planning":
+        return "#94A3B8";
       default:
-        return '#999999';
+        return "#94A3B8";
     }
   };
 
-  const getStatusLabel = (status: Project['status']) => {
+  const getStatusLabel = (status: Project["status"]) => {
     switch (status) {
-      case 'active':
-        return 'Đang thi công';
-      case 'completed':
-        return 'Hoàn thành';
-      case 'on-hold':
-        return 'Tạm dừng';
-      case 'planning':
-        return 'Lên kế hoạch';
+      case "active":
+        return "Đang thi công";
+      case "completed":
+        return "Hoàn thành";
+      case "on-hold":
+        return "Tạm dừng";
+      case "planning":
+        return "Lên kế hoạch";
       default:
         return status;
     }
@@ -182,11 +209,15 @@ export default function ConstructionMapIndexScreen() {
     const diffTime = Math.abs(now.getTime() - date.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-    if (diffDays === 0) return 'Hôm nay';
-    if (diffDays === 1) return 'Hôm qua';
+    if (diffDays === 0) return "Hôm nay";
+    if (diffDays === 1) return "Hôm qua";
     if (diffDays < 7) return `${diffDays} ngày trước`;
     if (diffDays < 30) return `${Math.floor(diffDays / 7)} tuần trước`;
-    return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    return date.toLocaleDateString("vi-VN", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
   };
 
   const handleProjectPress = (projectId: string) => {
@@ -202,10 +233,18 @@ export default function ConstructionMapIndexScreen() {
       {/* Header */}
       <View style={styles.cardHeader}>
         <View style={styles.cardTitle}>
-          <Text style={[styles.projectName, { color: textColor }]} numberOfLines={1}>
+          <Text
+            style={[styles.projectName, { color: textColor }]}
+            numberOfLines={1}
+          >
             {item.name}
           </Text>
-          <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) }]}>
+          <View
+            style={[
+              styles.statusBadge,
+              { backgroundColor: getStatusColor(item.status) },
+            ]}
+          >
             <Text style={styles.statusText}>{getStatusLabel(item.status)}</Text>
           </View>
         </View>
@@ -222,7 +261,12 @@ export default function ConstructionMapIndexScreen() {
       <View style={styles.progressSection}>
         <View style={styles.progressHeader}>
           <Text style={styles.progressLabel}>Tiến độ</Text>
-          <Text style={[styles.progressPercent, { color: getStatusColor(item.status) }]}>
+          <Text
+            style={[
+              styles.progressPercent,
+              { color: getStatusColor(item.status) },
+            ]}
+          >
             {item.progress}%
           </Text>
         </View>
@@ -230,7 +274,10 @@ export default function ConstructionMapIndexScreen() {
           <View
             style={[
               styles.progressFill,
-              { width: `${item.progress}%`, backgroundColor: getStatusColor(item.status) },
+              {
+                width: `${item.progress}%`,
+                backgroundColor: getStatusColor(item.status),
+              },
             ]}
           />
         </View>
@@ -254,9 +301,9 @@ export default function ConstructionMapIndexScreen() {
 
       {/* Open Button */}
       <View style={styles.cardFooter}>
-        <Ionicons name="map-outline" size={18} color="#0066CC" />
+        <Ionicons name="map-outline" size={18} color="#0D9488" />
         <Text style={styles.openText}>Xem bản đồ thi công</Text>
-        <Ionicons name="chevron-forward" size={18} color="#0066CC" />
+        <Ionicons name="chevron-forward" size={18} color="#0D9488" />
       </View>
     </TouchableOpacity>
   );
@@ -264,7 +311,9 @@ export default function ConstructionMapIndexScreen() {
   const renderHeader = () => (
     <View style={styles.header}>
       <Text style={[styles.title, { color: textColor }]}>Bản đồ Thi công</Text>
-      <Text style={styles.subtitle}>Quản lý tiến độ trực quan với Construction Map</Text>
+      <Text style={styles.subtitle}>
+        Quản lý tiến độ trực quan với Construction Map
+      </Text>
 
       {/* Search */}
       <View style={[styles.searchContainer, { borderColor }]}>
@@ -277,7 +326,7 @@ export default function ConstructionMapIndexScreen() {
           onChangeText={setSearchQuery}
         />
         {searchQuery.length > 0 && (
-          <TouchableOpacity onPress={() => setSearchQuery('')}>
+          <TouchableOpacity onPress={() => setSearchQuery("")}>
             <Ionicons name="close-circle" size={20} color="#999" />
           </TouchableOpacity>
         )}
@@ -285,13 +334,15 @@ export default function ConstructionMapIndexScreen() {
 
       {/* Filter Tabs */}
       <View style={styles.filterTabs}>
-        {['all', 'active', 'planning', 'on-hold', 'completed'].map((status) => (
+        {["all", "active", "planning", "on-hold", "completed"].map((status) => (
           <TouchableOpacity
             key={status}
             style={[
               styles.filterTab,
               filterStatus === status && styles.filterTabActive,
-              filterStatus === status && { borderColor: getStatusColor(status as any) },
+              filterStatus === status && {
+                borderColor: getStatusColor(status as any),
+              },
             ]}
             onPress={() => setFilterStatus(status)}
           >
@@ -299,12 +350,14 @@ export default function ConstructionMapIndexScreen() {
               style={[
                 styles.filterTabText,
                 filterStatus === status && styles.filterTabTextActive,
-                filterStatus === status && { color: getStatusColor(status as any) },
+                filterStatus === status && {
+                  color: getStatusColor(status as any),
+                },
               ]}
             >
-              {status === 'all'
-                ? 'Tất cả'
-                : getStatusLabel(status as Project['status'])}
+              {status === "all"
+                ? "Tất cả"
+                : getStatusLabel(status as Project["status"])}
             </Text>
           </TouchableOpacity>
         ))}
@@ -324,8 +377,8 @@ export default function ConstructionMapIndexScreen() {
       <Text style={styles.emptyText}>Không tìm thấy dự án nào</Text>
       <Text style={styles.emptySubtext}>
         {searchQuery
-          ? 'Thử tìm kiếm với từ khóa khác'
-          : 'Chưa có dự án với Construction Map'}
+          ? "Thử tìm kiếm với từ khóa khác"
+          : "Chưa có dự án với Construction Map"}
       </Text>
     </View>
   );
@@ -334,7 +387,7 @@ export default function ConstructionMapIndexScreen() {
     return (
       <Container>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#0066CC" />
+          <ActivityIndicator size="large" color="#0D9488" />
           <Text style={styles.loadingText}>Đang tải dự án...</Text>
         </View>
       </Container>
@@ -354,8 +407,8 @@ export default function ConstructionMapIndexScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={['#0066CC']}
-            tintColor="#0066CC"
+            colors={["#0D9488"]}
+            tintColor="#0D9488"
           />
         }
       />
@@ -366,13 +419,13 @@ export default function ConstructionMapIndexScreen() {
 const styles = StyleSheet.create({
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   loadingText: {
     marginTop: 16,
     fontSize: 16,
-    color: '#666',
+    color: "#666",
   },
   listContainer: {
     padding: 16,
@@ -382,18 +435,18 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
     marginBottom: 16,
   },
   searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f5f5f5",
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 10,
@@ -406,7 +459,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   filterTabs: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: 12,
     gap: 8,
   },
@@ -415,33 +468,33 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#e0e0e0',
-    backgroundColor: '#fff',
+    borderColor: "#e0e0e0",
+    backgroundColor: "#fff",
   },
   filterTabActive: {
-    backgroundColor: '#f0f8ff',
+    backgroundColor: "#f0f8ff",
     borderWidth: 2,
   },
   filterTabText: {
     fontSize: 12,
-    color: '#666',
-    fontWeight: '500',
+    color: "#666",
+    fontWeight: "500",
   },
   filterTabTextActive: {
-    fontWeight: '600',
+    fontWeight: "600",
   },
   resultsCount: {
     fontSize: 13,
-    color: '#999',
+    color: "#999",
     marginTop: 4,
   },
   projectCard: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
     borderWidth: 1,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -451,14 +504,14 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   cardTitle: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   projectName: {
     flex: 1,
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     marginRight: 8,
   },
   statusBadge: {
@@ -468,12 +521,12 @@ const styles = StyleSheet.create({
   },
   statusText: {
     fontSize: 11,
-    fontWeight: '600',
-    color: '#fff',
+    fontWeight: "600",
+    color: "#fff",
   },
   projectDescription: {
     fontSize: 13,
-    color: '#666',
+    color: "#666",
     marginBottom: 12,
     lineHeight: 18,
   },
@@ -481,69 +534,69 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   progressHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginBottom: 6,
   },
   progressLabel: {
     fontSize: 12,
-    color: '#999',
+    color: "#999",
   },
   progressPercent: {
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   progressBar: {
     height: 6,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: "#f0f0f0",
     borderRadius: 3,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   progressFill: {
-    height: '100%',
+    height: "100%",
     borderRadius: 3,
   },
   statsRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: 12,
     gap: 16,
   },
   statItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 4,
   },
   statText: {
     fontSize: 12,
-    color: '#666',
+    color: "#666",
   },
   cardFooter: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
+    borderTopColor: "#f0f0f0",
   },
   openText: {
     flex: 1,
     marginLeft: 6,
     fontSize: 14,
-    fontWeight: '500',
-    color: '#0066CC',
+    fontWeight: "500",
+    color: "#0D9488",
   },
   emptyContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     paddingVertical: 60,
   },
   emptyText: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#999',
+    fontWeight: "600",
+    color: "#999",
     marginTop: 16,
   },
   emptySubtext: {
     fontSize: 13,
-    color: '#ccc',
+    color: "#ccc",
     marginTop: 8,
   },
 });

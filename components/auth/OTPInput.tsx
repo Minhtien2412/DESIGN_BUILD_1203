@@ -62,7 +62,7 @@ export default function OTPInput({
   autoFocus = true,
   containerStyle,
   inputStyle,
-  primaryColor = '#0066CC',
+  primaryColor = '#0D9488',
   errorColor = '#D32F2F',
   textColor = '#222222',
   backgroundColor = '#F5F5F5',

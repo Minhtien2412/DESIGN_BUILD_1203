@@ -108,7 +108,7 @@ export default function WorkerBookingsScreen() {
         </View>
 
         <View style={styles.cardFooter}>
-          <Text style={[styles.price, { color: '#FF6B35' }]}>{item.price}</Text>
+          <Text style={[styles.price, { color: '#14B8A6' }]}>{item.price}</Text>
           <View style={styles.actionBtns}>
             {item.status === 'pending' && (
               <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#FFEBEE' }]}>
@@ -149,7 +149,7 @@ export default function WorkerBookingsScreen() {
             style={styles.newBookingBtn}
             onPress={() => router.push('/workers' as any)}
           >
-            <Ionicons name="add-circle" size={24} color="#FF6B35" />
+            <Ionicons name="add-circle" size={24} color="#14B8A6" />
             <Text style={styles.newBookingText}>Đặt lịch thợ mới</Text>
           </TouchableOpacity>
         }
@@ -174,12 +174,12 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     marginBottom: 16,
     borderWidth: 2,
-    borderColor: '#FF6B35',
+    borderColor: '#14B8A6',
     borderStyle: 'dashed',
     borderRadius: 12,
     gap: 8,
   },
-  newBookingText: { color: '#FF6B35', fontWeight: '600', fontSize: 16 },
+  newBookingText: { color: '#14B8A6', fontWeight: '600', fontSize: 16 },
   bookingCard: { borderRadius: 12, padding: 16, marginBottom: 12 },
   cardHeader: {
     flexDirection: 'row',

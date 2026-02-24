@@ -251,7 +251,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ECFDF5',
   },
   statusInProgress: {
-    backgroundColor: '#DBEAFE',
+    backgroundColor: '#CCFBF1',
   },
   statusText: {
     fontSize: 9,
@@ -263,7 +263,7 @@ const styles = StyleSheet.create({
     color: '#047857',
   },
   statusTextInProgress: {
-    color: '#1D4ED8',
+    color: '#0F766E',
   },
   progressPercent: {
     fontSize: 24,

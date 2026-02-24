@@ -121,7 +121,7 @@ function getTypeColor(type: string): string {
   const colors: Record<string, string> = {
     announcement: "#F59E0B",
     development_plan: "#10B981",
-    news: "#3B82F6",
+    news: "#0D9488",
     video: "#EF4444",
     photo: "#8B5CF6",
     post: "#6366F1",
@@ -133,7 +133,7 @@ function getImportanceColor(importance: string): string {
   const colors: Record<string, string> = {
     critical: "#DC2626",
     high: "#F59E0B",
-    medium: "#3B82F6",
+    medium: "#0D9488",
     low: "#6B7280",
   };
   return colors[importance] || COLORS.textSecondary;
@@ -291,7 +291,7 @@ function getSourceName(source: string): string {
 function getSourceColor(source: string): string {
   const colors: Record<string, string> = {
     backend: "#10B981",
-    gnews: "#3B82F6",
+    gnews: "#0D9488",
     pexels: "#8B5CF6",
     newsapi: "#F59E0B",
     mock: "#6B7280",
@@ -493,7 +493,7 @@ const ContentSection = memo(
 function getStatusColor(status: string): string {
   const colors: Record<string, string> = {
     planned: "#6B7280",
-    in_progress: "#3B82F6",
+    in_progress: "#0D9488",
     completed: "#10B981",
     delayed: "#EF4444",
   };

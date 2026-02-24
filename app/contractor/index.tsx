@@ -25,7 +25,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 // COLORS
 // ============================================================================
 const COLORS = {
-  primary: "#FF6B35",
+  primary: "#14B8A6",
   primaryLight: "#FFF0EB",
   success: "#4CAF50",
   text: "#212121",

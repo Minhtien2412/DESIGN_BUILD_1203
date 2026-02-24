@@ -32,7 +32,7 @@ const { width: SCREEN_WIDTH } = Dimensions.get("window");
 // MEP Systems
 const MEP_SYSTEMS = [
   { id: "electrical", icon: "⚡", label: "Điện", color: "#f59e0b" },
-  { id: "plumbing", icon: "💧", label: "Nước", color: "#3b82f6" },
+  { id: "plumbing", icon: "💧", label: "Nước", color: "#0D9488" },
   { id: "hvac", icon: "❄️", label: "Điều hòa", color: "#06b6d4" },
   { id: "fire", icon: "🔥", label: "PCCC", color: "#ef4444" },
 ];

@@ -379,7 +379,7 @@ export function useDashboardData(): UseDashboardDataReturn {
                 time: formatTimeAgo(i.datecreated),
                 read: false,
                 icon: "receipt",
-                color: i.status === 4 ? "#000000" : "#0066CC",
+                color: i.status === 4 ? "#000000" : "#0D9488",
               });
             });
 

@@ -80,8 +80,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  video: { backgroundColor: '#0066CC' },
-  voice: { backgroundColor: '#0066CC' },
+  video: { backgroundColor: '#0D9488' },
+  voice: { backgroundColor: '#0D9488' },
   title: { color: '#fff', fontWeight: '600', fontSize: 14 },
   subtitle: { color: '#cbd5e1', fontSize: 12 },
   hangup: {

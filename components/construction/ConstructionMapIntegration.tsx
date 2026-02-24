@@ -282,7 +282,7 @@ export const ConstructionMapIntegration: React.FC<ConstructionMapIntegrationProp
           style={styles.projectButton}
           onPress={handleSwitchProject}
         >
-          <Ionicons name="folder" size={20} color="#3B82F6" />
+          <Ionicons name="folder" size={20} color="#0D9488" />
           <Text style={styles.projectName} numberOfLines={1}>
             {currentProjectId || 'Đang tải...'}
           </Text>
@@ -402,18 +402,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 10,
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     borderTopWidth: 1,
     borderTopColor: '#0080FF',
   },
   filterInfoText: {
     fontSize: 13,
-    color: '#1E40AF',
+    color: '#0F766E',
     fontWeight: '500',
   },
   clearFiltersText: {
     fontSize: 13,
-    color: '#3B82F6',
+    color: '#0D9488',
     fontWeight: '600',
   },
   emptyContainer: {
@@ -439,7 +439,7 @@ const styles = StyleSheet.create({
   emptyButton: {
     paddingVertical: 12,
     paddingHorizontal: 24,
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#0D9488',
     borderRadius: 8,
   },
   emptyButtonText: {

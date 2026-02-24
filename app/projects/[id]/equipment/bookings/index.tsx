@@ -175,7 +175,7 @@ export default function EquipmentBookingsScreen() {
           onPress={() => router.push(`/projects/${projectId}/equipment/bookings/create`)}
           style={styles.createButton}
         >
-          <Ionicons name="add" size={24} color="#3b82f6" />
+          <Ionicons name="add" size={24} color="#0D9488" />
         </TouchableOpacity>
       </View>
 
@@ -222,7 +222,7 @@ export default function EquipmentBookingsScreen() {
                 style={styles.createCTA}
                 onPress={() => router.push(`/projects/${projectId}/equipment/bookings/create`)}
               >
-                <Ionicons name="add-circle" size={20} color="#3b82f6" />
+                <Ionicons name="add-circle" size={20} color="#0D9488" />
                 <Text style={styles.createCTAText}>Tạo yêu cầu mới</Text>
               </TouchableOpacity>
             </View>
@@ -282,8 +282,8 @@ const styles = StyleSheet.create({
     borderColor: '#e5e7eb',
   },
   filterChipActive: {
-    backgroundColor: '#3b82f6',
-    borderColor: '#3b82f6',
+    backgroundColor: '#0D9488',
+    borderColor: '#0D9488',
   },
   filterChipText: {
     fontSize: 14,
@@ -333,7 +333,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9fafb',
     borderRadius: 8,
     borderLeftWidth: 3,
-    borderLeftColor: '#3b82f6',
+    borderLeftColor: '#0D9488',
   },
   notesLabel: {
     fontSize: 12,
@@ -361,7 +361,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   approveButton: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   cancelButton: {
     backgroundColor: '#000000',
@@ -389,12 +389,12 @@ const styles = StyleSheet.create({
     marginTop: 16,
     paddingVertical: 12,
     paddingHorizontal: 24,
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     borderRadius: 24,
   },
   createCTAText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#3b82f6',
+    color: '#0D9488',
   },
 });

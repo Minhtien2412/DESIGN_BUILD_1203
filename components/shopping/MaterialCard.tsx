@@ -89,7 +89,7 @@ export function MaterialCard({
         {/* Rating */}
         {material.rating !== undefined && (
           <View style={styles.ratingContainer}>
-            <Ionicons name="star" size={14} color="#0066CC" />
+            <Ionicons name="star" size={14} color="#0D9488" />
             <Text style={styles.ratingText}>{material.rating.toFixed(1)}</Text>
             {material.reviews !== undefined && (
               <Text style={styles.reviewsText}>({material.reviews})</Text>

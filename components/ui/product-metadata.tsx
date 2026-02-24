@@ -43,7 +43,7 @@ export function ProductMetadata({
         )}
         {product.freeShipping && (
           <View style={[styles.badge, styles.shippingBadge]}>
-            <Ionicons name="car-outline" size={10} color="#0066CC" />
+            <Ionicons name="car-outline" size={10} color="#0D9488" />
             <Text style={styles.shippingText}>Freeship</Text>
           </View>
         )}
@@ -101,7 +101,7 @@ export function ProductMetadata({
         <View style={[styles.additionalInfo, isVertical && styles.additionalInfoVertical]}>
           {product.warranty && (
             <View style={styles.infoItem}>
-              <Ionicons name="shield-checkmark-outline" size={12} color="#0066CC" />
+              <Ionicons name="shield-checkmark-outline" size={12} color="#0D9488" />
               <Text style={styles.infoText}>BH: {product.warranty}</Text>
             </View>
           )}
@@ -161,12 +161,12 @@ const styles = StyleSheet.create({
     color: '#D97706',
   },
   newBadge: {
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
   },
   newText: {
     fontSize: 9,
     fontWeight: '600',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   flashSaleBadge: {
     backgroundColor: '#000000',
@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
   shippingText: {
     fontSize: 9,
     fontWeight: '600',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   stats: {
     flexDirection: 'row',

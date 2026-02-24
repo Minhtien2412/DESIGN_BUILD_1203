@@ -28,7 +28,7 @@ interface Document {
 
 const DOCUMENT_TYPES = {
   pdf: { icon: 'document-text', color: '#000000' },
-  image: { icon: 'image', color: '#0066CC' },
+  image: { icon: 'image', color: '#0D9488' },
   dwg: { icon: 'cube', color: '#007AFF' },
   doc: { icon: 'document', color: '#007AFF' },
   xls: { icon: 'grid', color: '#34C759' },
@@ -251,7 +251,7 @@ export default function ProjectDocumentsScreen() {
       {/* Document Stats */}
       <View style={styles.statsContainer}>
         <View style={styles.statCard}>
-          <Ionicons name="documents" size={24} color="#0066CC" />
+          <Ionicons name="documents" size={24} color="#0D9488" />
           <Text style={styles.statValue}>{documents.length}</Text>
           <Text style={styles.statLabel}>Tổng tài liệu</Text>
         </View>
@@ -300,7 +300,7 @@ export default function ProjectDocumentsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   header: {
     flexDirection: 'row',
@@ -343,7 +343,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f0f0f0',
   },
   categoryChipActive: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
   },
   categoryText: {
     fontSize: 14,
@@ -364,7 +364,7 @@ const styles = StyleSheet.create({
   categoryBadgeText: {
     fontSize: 12,
     fontWeight: 'bold',
-    color: '#0066CC',
+    color: '#0D9488',
   },
   statsContainer: {
     flexDirection: 'row',

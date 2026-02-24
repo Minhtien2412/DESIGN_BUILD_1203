@@ -336,7 +336,7 @@ export default function CreatePayrollScreen() {
 
           <View style={[styles.calculatedRow, styles.totalRow]}>
             <Text style={styles.totalLabel}>Tổng thu nhập:</Text>
-            <Text style={[styles.totalValue, { color: '#0066CC' }]}>
+            <Text style={[styles.totalValue, { color: '#0D9488' }]}>
               {formatCurrency(pay.grossPay)}
             </Text>
           </View>
@@ -427,7 +427,7 @@ export default function CreatePayrollScreen() {
                 <Ionicons
                   name={option.icon}
                   size={20}
-                  color={paymentMethod === option.value ? '#0066CC' : '#666'}
+                  color={paymentMethod === option.value ? '#0D9488' : '#666'}
                 />
                 <Text
                   style={[
@@ -513,9 +513,9 @@ const styles = StyleSheet.create({
     minWidth: 120,
   },
   workerChipActive: {
-    backgroundColor: '#E8F4FF',
+    backgroundColor: '#F0FDFA',
     borderWidth: 1,
-    borderColor: '#0066CC',
+    borderColor: '#0D9488',
   },
   workerChipName: {
     fontSize: 14,
@@ -524,24 +524,24 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   workerChipNameActive: {
-    color: '#0066CC',
+    color: '#0D9488',
   },
   workerChipId: {
     fontSize: 11,
     color: '#666',
   },
   workerChipIdActive: {
-    color: '#0066CC',
+    color: '#0D9488',
   },
   rateInfo: {
     marginTop: 6,
     paddingTop: 6,
     borderTopWidth: 1,
-    borderTopColor: '#E8F4FF',
+    borderTopColor: '#F0FDFA',
   },
   rateText: {
     fontSize: 11,
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: '600',
   },
   dateRow: {
@@ -628,7 +628,7 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 12,
     borderTopWidth: 3,
-    borderTopColor: '#0066CC',
+    borderTopColor: '#0D9488',
   },
   netPayLabel: {
     fontSize: 17,
@@ -657,8 +657,8 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   methodChipActive: {
-    backgroundColor: '#E8F4FF',
-    borderColor: '#0066CC',
+    backgroundColor: '#F0FDFA',
+    borderColor: '#0D9488',
   },
   methodLabel: {
     fontSize: 13,
@@ -666,7 +666,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   methodLabelActive: {
-    color: '#0066CC',
+    color: '#0D9488',
     fontWeight: '600',
   },
   notesInput: {
@@ -702,7 +702,7 @@ const styles = StyleSheet.create({
   saveButton: {
     flex: 1,
     paddingVertical: 12,
-    backgroundColor: '#0066CC',
+    backgroundColor: '#0D9488',
     borderRadius: 6,
     alignItems: 'center',
   },
