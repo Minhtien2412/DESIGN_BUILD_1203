@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tìm thợ – Vua Thợ</title>
+    <script src="JS/workerService.js"></script>
+    <script src="JS/bookingService.js"></script>
+    <link rel="stylesheet" href="CSS/vuatho.css">
+</head>
+
+<body>
+    <!-- Notification -->
+    <section id="message" class="message"></section>
+
+    <!-- Navbar -->
+    <nav class="nav-bar">
+        <div class="container">
+            <a href="home.html" class="nav-logo">
+                <div>
+                    <div class="nav-logo-text">👑 Vua Thợ</div>
+                    <div class="nav-logo-sub">Đặt thợ uy tín – Nhanh chóng</div>
+                </div>
+            </a>
+            <div class="nav-links">
+                <a href="home.html">Trang chủ</a>
+                <a href="workers.html" class="active nav-hide-mobile">Tìm thợ</a>
+                <a href="bookings.html">
+                    Đơn của tôi
+                    <span id="nav-booking-count" class="nav-booking-count" style="display:none">0</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <h1 class="page-header-title" id="page-title">Tất cả thợ</h1>
+            <div class="page-header-breadcrumb">
+                <a href="home.html">Trang chủ</a> / <span id="breadcrumb-current">Tìm thợ</span>
+            </div>
+        </div>
+    </div>
+
+    <main>
+        <div class="container">
+            <div class="workers-layout">
+                <!-- Sidebar -->
+                <aside class="workers-sidebar">
+                    <div class="sidebar-card">
+                        <div class="sidebar-card-title">Danh mục dịch vụ</div>
+                        <div id="sidebar-categories"></div>
+                    </div>
+                    <div class="sidebar-card">
+                        <div class="sidebar-card-title">Mức giá / giờ</div>
+                        <div class="filter-group">
+                            <label><input type="checkbox" class="filter-price" value="0-100000" onchange="applyFilters()"> Dưới 100.000đ</label>
+                            <label><input type="checkbox" class="filter-price" value="100000-200000" onchange="applyFilters()"> 100.000 – 200.000đ</label>
+                            <label><input type="checkbox" class="filter-price" value="200000-999999" onchange="applyFilters()"> Trên 200.000đ</label>
+                        </div>
+                    </div>
+                    <div class="sidebar-card">
+                        <div class="sidebar-card-title">Đánh giá</div>
+                        <div class="filter-group">
+                            <label><input type="checkbox" class="filter-rating" value="5" onchange="applyFilters()"> ★★★★★ (5.0)</label>
+                            <label><input type="checkbox" class="filter-rating" value="4.5" onchange="applyFilters()"> ★★★★½ (4.5+)</label>
+                            <label><input type="checkbox" class="filter-rating" value="4" onchange="applyFilters()"> ★★★★☆ (4.0+)</label>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- Main content -->
+                <div class="workers-main">
+                    <div class="workers-toolbar">
+                        <div class="workers-toolbar-count">
+                            Tìm thấy <strong id="worker-count">0</strong> thợ
+                        </div>
+                        <select id="sort-select" onchange="applyFilters()">
+                            <option value="rating">Đánh giá cao nhất</option>
+                            <option value="price-asc">Giá thấp đến cao</option>
+                            <option value="price-desc">Giá cao đến thấp</option>
+                            <option value="jobs">Nhiều việc nhất</option>
+                        </select>
+                    </div>
+                    <div id="workers-container"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-bottom">
+                © 2024 Vua Thợ. Bảo lưu mọi quyền.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        var currentCategorySlug = null;
+        var currentSearchQuery  = null;
+
+        function getQueryParam(name) {
+            var params = new URLSearchParams(window.location.search);
+            return params.get(name);
+        }
+
+        function updateBookingBadge() {
+            var count = BookingService().count();
+            var badge = document.getElementById('nav-booking-count');
+            if (count > 0) {
+                badge.textContent = count;
+                badge.style.display = 'inline-flex';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        function renderSidebarCategories() {
+            var categories = WorkerService().getCategories();
+            var html = '<div class="filter-group">';
+            html += '<label><input type="radio" name="cat" value="" ' + (!currentCategorySlug ? 'checked' : '') + ' onchange="changeCategory(\'\')"> Tất cả</label>';
+            for (var i = 0; i < categories.length; i++) {
+                var cat = categories[i];
+                var checked = currentCategorySlug === cat.slug ? 'checked' : '';
+                html += '<label><input type="radio" name="cat" value="' + cat.slug + '" ' + checked + ' onchange="changeCategory(\'' + cat.slug + '\')">';
+                html += ' ' + cat.icon + ' ' + cat.name + '</label>';
+            }
+            html += '</div>';
+            document.getElementById('sidebar-categories').innerHTML = html;
+        }
+
+        function changeCategory(slug) {
+            currentCategorySlug = slug || null;
+            var url = 'workers.html';
+            if (slug) url += '?category=' + slug;
+            window.history.replaceState({}, '', url);
+            updatePageHeader();
+            applyFilters();
+        }
+
+        function updatePageHeader() {
+            var titleEl  = document.getElementById('page-title');
+            var breadEl  = document.getElementById('breadcrumb-current');
+            if (currentCategorySlug) {
+                var cat = WorkerService().getCategoryBySlug(currentCategorySlug);
+                if (cat) {
+                    titleEl.textContent = cat.icon + ' ' + cat.name;
+                    breadEl.textContent = cat.name;
+                    return;
+                }
+            }
+            if (currentSearchQuery) {
+                titleEl.textContent = 'Kết quả: "' + currentSearchQuery + '"';
+                breadEl.textContent = 'Tìm kiếm';
+                return;
+            }
+            titleEl.textContent = 'Tất cả thợ';
+            breadEl.textContent = 'Tìm thợ';
+        }
+
+        function applyFilters() {
+            var workers = currentCategorySlug
+                ? WorkerService().getByCategory(currentCategorySlug)
+                : WorkerService().getAll();
+
+            // Search filter
+            if (currentSearchQuery) {
+                var q = currentSearchQuery.toLowerCase();
+                var filtered = [];
+                for (var i = 0; i < workers.length; i++) {
+                    var w = workers[i];
+                    if (w.name.toLowerCase().indexOf(q) >= 0
+                        || w.skill.toLowerCase().indexOf(q) >= 0
+                        || w.tags.join(' ').toLowerCase().indexOf(q) >= 0) {
+                        filtered.push(w);
+                    }
+                }
+                workers = filtered;
+            }
+
+            // Price filters
+            var priceChecks = document.querySelectorAll('.filter-price:checked');
+            if (priceChecks.length > 0) {
+                var priceFiltered = [];
+                for (var i = 0; i < workers.length; i++) {
+                    for (var j = 0; j < priceChecks.length; j++) {
+                        var range = priceChecks[j].value.split('-');
+                        var min = parseInt(range[0]);
+                        var max = parseInt(range[1]);
+                        if (workers[i].pricePerHour >= min && workers[i].pricePerHour <= max) {
+                            priceFiltered.push(workers[i]);
+                            break;
+                        }
+                    }
+                }
+                workers = priceFiltered;
+            }
+
+            // Rating filters
+            var ratingChecks = document.querySelectorAll('.filter-rating:checked');
+            if (ratingChecks.length > 0) {
+                var ratingFiltered = [];
+                var minRating = Infinity;
+                for (var i = 0; i < ratingChecks.length; i++) {
+                    var r = parseFloat(ratingChecks[i].value);
+                    if (r < minRating) minRating = r;
+                }
+                for (var i = 0; i < workers.length; i++) {
+                    if (workers[i].rating >= minRating) ratingFiltered.push(workers[i]);
+                }
+                workers = ratingFiltered;
+            }
+
+            // Sort
+            var sortVal = document.getElementById('sort-select').value;
+            if (sortVal === 'rating') {
+                workers.sort(function(a, b) { return b.rating - a.rating; });
+            } else if (sortVal === 'price-asc') {
+                workers.sort(function(a, b) { return a.pricePerHour - b.pricePerHour; });
+            } else if (sortVal === 'price-desc') {
+                workers.sort(function(a, b) { return b.pricePerHour - a.pricePerHour; });
+            } else if (sortVal === 'jobs') {
+                workers.sort(function(a, b) { return b.jobsDone - a.jobsDone; });
+            }
+
+            document.getElementById('worker-count').textContent = workers.length;
+            document.getElementById('workers-container').innerHTML = WorkerService().toWorkerCardsHtml(workers);
+        }
+
+        function bookWorker(workerId) {
+            window.location.href = 'booking.html?worker=' + workerId;
+        }
+
+        // Init
+        currentCategorySlug = getQueryParam('category');
+        currentSearchQuery  = getQueryParam('search');
+
+        updateBookingBadge();
+        renderSidebarCategories();
+        updatePageHeader();
+        applyFilters();
+    </script>
+</body>
+
+</html>

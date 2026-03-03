@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vua Thợ – Nền tảng đặt thợ uy tín #1 Việt Nam</title>
+    <script src="JS/workerService.js"></script>
+    <script src="JS/bookingService.js"></script>
+    <link rel="stylesheet" href="CSS/vuatho.css">
+</head>
+
+<body>
+    <!-- Notification -->
+    <section id="message" class="message"></section>
+
+    <!-- Navbar -->
+    <nav class="nav-bar">
+        <div class="container">
+            <a href="home.html" class="nav-logo">
+                <div>
+                    <div class="nav-logo-text">👑 Vua Thợ</div>
+                    <div class="nav-logo-sub">Đặt thợ uy tín – Nhanh chóng</div>
+                </div>
+            </a>
+            <div class="nav-links">
+                <a href="home.html" class="active">Trang chủ</a>
+                <a href="workers.html" class="nav-hide-mobile">Tìm thợ</a>
+                <a href="bookings.html">
+                    Đơn của tôi
+                    <span id="nav-booking-count" class="nav-booking-count" style="display:none">0</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="container">
+            <h1 class="hero-title">Đặt thợ chuyên nghiệp<br>chỉ trong 60 giây</h1>
+            <p class="hero-subtitle">Hơn 500 thợ lành nghề đã xác minh – Bảo hành công việc – Thanh toán an toàn</p>
+            <div class="hero-search">
+                <input type="text" id="search-input" placeholder="Bạn cần thợ gì? (điện, nước, sơn, dọn dẹp...)">
+                <button onclick="doSearch()">🔍 Tìm</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Service Categories -->
+    <main>
+        <div class="container">
+            <!-- Categories -->
+            <section class="section">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">Danh mục dịch vụ</h2>
+                        <p class="section-subtitle">Chọn loại dịch vụ bạn cần</p>
+                    </div>
+                    <a href="workers.html">Xem tất cả →</a>
+                </div>
+                <div id="categories-container"></div>
+            </section>
+
+            <!-- Featured Workers -->
+            <section class="section">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">Thợ nổi bật</h2>
+                        <p class="section-subtitle">Được đánh giá cao nhất tuần này</p>
+                    </div>
+                    <a href="workers.html">Xem thêm →</a>
+                </div>
+                <div id="workers-container"></div>
+            </section>
+
+            <!-- Why Us -->
+            <section class="why-us" style="border-radius:12px;margin-bottom:40px;">
+                <div style="text-align:center;margin-bottom:10px;">
+                    <h2 class="section-title">Tại sao chọn Vua Thợ?</h2>
+                    <p class="section-subtitle">Cam kết chất lượng – An toàn – Minh bạch</p>
+                </div>
+                <div class="why-us-items">
+                    <div class="why-us-item">
+                        <div class="why-us-icon">✅</div>
+                        <div class="why-us-title">Thợ đã xác minh</div>
+                        <div class="why-us-desc">100% thợ được kiểm tra lý lịch, chứng chỉ nghề và trải qua phỏng vấn trực tiếp</div>
+                    </div>
+                    <div class="why-us-item">
+                        <div class="why-us-icon">⚡</div>
+                        <div class="why-us-title">Đặt nhanh trong 60 giây</div>
+                        <div class="why-us-desc">Chọn dịch vụ, điền thông tin, xác nhận – thợ đến nhà trong vòng 2 giờ</div>
+                    </div>
+                    <div class="why-us-item">
+                        <div class="why-us-icon">🛡️</div>
+                        <div class="why-us-title">Bảo hành công việc</div>
+                        <div class="why-us-desc">Mọi công việc đều được bảo hành 30 ngày. Không hài lòng, làm lại miễn phí</div>
+                    </div>
+                    <div class="why-us-item">
+                        <div class="why-us-icon">💳</div>
+                        <div class="why-us-title">Thanh toán an toàn</div>
+                        <div class="why-us-desc">Giá minh bạch, thanh toán sau khi hoàn thành, hỗ trợ nhiều phương thức</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-brand">👑 Vua Thợ</div>
+                    <p class="footer-desc">Nền tảng kết nối thợ thủ công uy tín hàng đầu Việt Nam. Đặt thợ dễ dàng, nhanh chóng và an toàn.</p>
+                </div>
+                <div class="footer-col">
+                    <div class="footer-col-title">Dịch vụ</div>
+                    <ul>
+                        <li><a href="workers.html?category=sua-dien">Sửa điện</a></li>
+                        <li><a href="workers.html?category=sua-ong-nuoc">Sửa ống nước</a></li>
+                        <li><a href="workers.html?category=don-dep-nha">Dọn dẹp nhà</a></li>
+                        <li><a href="workers.html?category=son-nha">Sơn nhà</a></li>
+                        <li><a href="workers.html?category=sua-dieu-hoa">Sửa điều hòa</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <div class="footer-col-title">Hỗ trợ</div>
+                    <ul>
+                        <li><a href="#">Trung tâm trợ giúp</a></li>
+                        <li><a href="#">Chính sách bảo hành</a></li>
+                        <li><a href="#">Điều khoản dịch vụ</a></li>
+                        <li><a href="#">Chính sách bảo mật</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <div class="footer-col-title">Liên hệ</div>
+                    <ul>
+                        <li><a href="#">📞 1800 6789</a></li>
+                        <li><a href="#">✉️ hotro@vuatho.vn</a></li>
+                        <li><a href="#">🕐 8:00 – 22:00 hàng ngày</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                © 2024 Vua Thợ. Bảo lưu mọi quyền.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Update booking badge
+        function updateBookingBadge() {
+            var count = BookingService().count();
+            var badge = document.getElementById('nav-booking-count');
+            if (count > 0) {
+                badge.textContent = count;
+                badge.style.display = 'inline-flex';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        // Display categories
+        function displayCategories() {
+            var categories = WorkerService().getCategories();
+            var html = WorkerService().toCategoryHtmlItems(categories);
+            document.getElementById('categories-container').innerHTML = html;
+        }
+
+        // Display featured workers (top-rated)
+        function displayFeaturedWorkers() {
+            var workers = WorkerService().getAll();
+            // Sort by rating desc, take top 4
+            workers.sort(function(a, b) { return b.rating - a.rating; });
+            var featured = workers.slice(0, 4);
+            var html = WorkerService().toWorkerCardsHtml(featured);
+            document.getElementById('workers-container').innerHTML = html;
+        }
+
+        function bookWorker(workerId) {
+            window.location.href = 'booking.html?worker=' + workerId;
+        }
+
+        function doSearch() {
+            var query = document.getElementById('search-input').value.trim();
+            if (query) {
+                window.location.href = 'workers.html?search=' + encodeURIComponent(query);
+            } else {
+                window.location.href = 'workers.html';
+            }
+        }
+
+        document.getElementById('search-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') doSearch();
+        });
+
+        // Init
+        displayCategories();
+        displayFeaturedWorkers();
+        updateBookingBadge();
+    </script>
+</body>
+
+</html>

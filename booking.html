@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đặt lịch thợ – Vua Thợ</title>
+    <script src="JS/workerService.js"></script>
+    <script src="JS/bookingService.js"></script>
+    <link rel="stylesheet" href="CSS/vuatho.css">
+</head>
+
+<body>
+    <!-- Notification -->
+    <section id="message" class="message"></section>
+
+    <!-- Navbar -->
+    <nav class="nav-bar">
+        <div class="container">
+            <a href="home.html" class="nav-logo">
+                <div>
+                    <div class="nav-logo-text">👑 Vua Thợ</div>
+                    <div class="nav-logo-sub">Đặt thợ uy tín – Nhanh chóng</div>
+                </div>
+            </a>
+            <div class="nav-links">
+                <a href="home.html">Trang chủ</a>
+                <a href="workers.html" class="nav-hide-mobile">Tìm thợ</a>
+                <a href="bookings.html">
+                    Đơn của tôi
+                    <span id="nav-booking-count" class="nav-booking-count" style="display:none">0</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <h1 class="page-header-title">Đặt lịch thợ</h1>
+            <div class="page-header-breadcrumb">
+                <a href="home.html">Trang chủ</a> / <a href="workers.html">Tìm thợ</a> / Đặt lịch
+            </div>
+        </div>
+    </div>
+
+    <main>
+        <div class="container">
+            <div id="error-container"></div>
+            <div class="booking-layout" id="booking-layout" style="display:none">
+                <!-- Booking form -->
+                <div class="booking-form-wrap">
+                    <div class="card">
+                        <div class="card-title">📋 Thông tin đặt lịch</div>
+                        <form id="booking-form" onsubmit="submitBooking(event)">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="customer-name">Họ và tên *</label>
+                                    <input type="text" id="customer-name" placeholder="Nguyễn Văn A" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="customer-phone">Số điện thoại *</label>
+                                    <input type="tel" id="customer-phone" placeholder="0912 345 678" required
+                                        pattern="[0-9]{9,11}">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="customer-address">Địa chỉ *</label>
+                                <input type="text" id="customer-address" placeholder="Số nhà, đường, phường/xã, quận/huyện, TP" required>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="service-date">Ngày làm việc *</label>
+                                    <input type="date" id="service-date" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="service-time">Giờ bắt đầu *</label>
+                                    <select id="service-time" required>
+                                        <option value="">-- Chọn giờ --</option>
+                                        <option value="07:00">07:00</option>
+                                        <option value="08:00">08:00</option>
+                                        <option value="09:00">09:00</option>
+                                        <option value="10:00">10:00</option>
+                                        <option value="11:00">11:00</option>
+                                        <option value="13:00">13:00</option>
+                                        <option value="14:00">14:00</option>
+                                        <option value="15:00">15:00</option>
+                                        <option value="16:00">16:00</option>
+                                        <option value="17:00">17:00</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="service-hours">Số giờ dự kiến *</label>
+                                    <select id="service-hours" onchange="updateSummaryTotal()" required>
+                                        <option value="1">1 giờ</option>
+                                        <option value="2" selected>2 giờ</option>
+                                        <option value="3">3 giờ</option>
+                                        <option value="4">4 giờ</option>
+                                        <option value="6">6 giờ</option>
+                                        <option value="8">8 giờ (cả ngày)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="customer-note">Ghi chú thêm</label>
+                                <textarea id="customer-note" placeholder="Mô tả chi tiết công việc bạn cần, vật liệu cần chuẩn bị, yêu cầu đặc biệt..."></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width:100%;font-size:16px;padding:14px;">
+                                ✅ Xác nhận đặt lịch
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Booking summary -->
+                <div class="booking-summary">
+                    <div class="card">
+                        <div class="card-title">🛠 Thông tin thợ</div>
+                        <div class="summary-worker" id="summary-worker"></div>
+                        <div class="summary-row">
+                            <span>Đơn giá</span>
+                            <strong id="summary-price-per-hour">–</strong>
+                        </div>
+                        <div class="summary-row">
+                            <span>Số giờ</span>
+                            <strong id="summary-hours">2 giờ</strong>
+                        </div>
+                        <div class="summary-total">
+                            <span>Tổng cộng</span>
+                            <span id="summary-total">–</span>
+                        </div>
+                        <p style="font-size:11px;color:#aaa;margin-top:12px;line-height:1.5;">
+                            * Giá cuối cùng có thể thay đổi tuỳ thực tế công việc. Thanh toán sau khi hoàn thành.
+                        </p>
+                    </div>
+                    <div class="card" style="background-color:#fff3ec;">
+                        <div style="font-size:13px;color:#555;line-height:1.8;">
+                            <div>✅ Thợ đã xác minh</div>
+                            <div>🛡️ Bảo hành 30 ngày</div>
+                            <div>💳 Thanh toán sau khi xong</div>
+                            <div>📞 Hỗ trợ 24/7: 1800 6789</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-bottom">
+                © 2024 Vua Thợ. Bảo lưu mọi quyền.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        var selectedWorker = null;
+
+        function getQueryParam(name) {
+            var params = new URLSearchParams(window.location.search);
+            return params.get(name);
+        }
+
+        function updateBookingBadge() {
+            var count = BookingService().count();
+            var badge = document.getElementById('nav-booking-count');
+            if (count > 0) {
+                badge.textContent = count;
+                badge.style.display = 'inline-flex';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        function formatPrice(price) {
+            return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + 'đ';
+        }
+
+        function renderWorkerSummary(worker) {
+            var html = '';
+            html += '<img src="' + worker.avatar + '" alt="' + worker.name + '">';
+            html += '<div>';
+            html += '  <div class="summary-worker-name">' + worker.name + '</div>';
+            html += '  <div class="summary-worker-skill">' + worker.skill + '</div>';
+            html += '  <div style="font-size:12px;color:#aaa;margin-top:3px;">⭐ ' + worker.rating + ' | 📍 ' + worker.location + '</div>';
+            html += '</div>';
+            document.getElementById('summary-worker').innerHTML = html;
+            document.getElementById('summary-price-per-hour').textContent = formatPrice(worker.pricePerHour) + ' / giờ';
+        }
+
+        function updateSummaryTotal() {
+            if (!selectedWorker) return;
+            var hours = parseInt(document.getElementById('service-hours').value) || 2;
+            document.getElementById('summary-hours').textContent = hours + ' giờ';
+            document.getElementById('summary-total').textContent = formatPrice(selectedWorker.pricePerHour * hours);
+        }
+
+        function showMessage(text, isError) {
+            var node = document.getElementById('message');
+            node.style.display = 'block';
+            node.style.borderColor = isError ? '#e53935' : '#F26522';
+            node.style.color       = isError ? '#e53935' : '#F26522';
+            node.style.backgroundColor = isError ? '#fff0f0' : '#fff7f4';
+            node.innerHTML = text;
+            setTimeout(function() { node.style.display = 'none'; }, 3000);
+        }
+
+        function submitBooking(e) {
+            e.preventDefault();
+            if (!selectedWorker) return;
+
+            var name    = document.getElementById('customer-name').value.trim();
+            var phone   = document.getElementById('customer-phone').value.trim();
+            var address = document.getElementById('customer-address').value.trim();
+            var date    = document.getElementById('service-date').value;
+            var time    = document.getElementById('service-time').value;
+            var hours   = parseInt(document.getElementById('service-hours').value);
+            var note    = document.getElementById('customer-note').value.trim();
+
+            if (!name || !phone || !address || !date || !time) {
+                showMessage('⚠️ Vui lòng điền đầy đủ thông tin bắt buộc!', true);
+                return;
+            }
+
+            var customer = {
+                name: name,
+                phone: phone,
+                address: address,
+                serviceDate: date,
+                serviceTime: time,
+                hours: hours,
+                note: note
+            };
+
+            var booking = BookingService().create(selectedWorker, customer);
+            BookingService().save(booking);
+
+            showMessage('🎉 Đặt lịch thành công! Chúng tôi sẽ liên hệ xác nhận sớm nhất.', false);
+            updateBookingBadge();
+
+            // Redirect to bookings after 2s
+            setTimeout(function() {
+                window.location.href = 'bookings.html';
+            }, 2000);
+        }
+
+        // Set min date to today
+        function setMinDate() {
+            var today = new Date().toISOString().split('T')[0];
+            document.getElementById('service-date').min = today;
+            document.getElementById('service-date').value = today;
+        }
+
+        // Init
+        var workerId = getQueryParam('worker');
+        if (workerId) {
+            selectedWorker = WorkerService().getById(parseInt(workerId));
+        }
+
+        if (!selectedWorker) {
+            document.getElementById('error-container').innerHTML =
+                '<div class="empty-state" style="margin-top:60px;">'
+                + '<div class="empty-state-icon">⚠️</div>'
+                + '<div class="empty-state-text">Không tìm thấy thông tin thợ. Vui lòng chọn lại.</div>'
+                + '<a href="workers.html" class="btn btn-primary">Quay lại tìm thợ</a>'
+                + '</div>';
+        } else {
+            document.getElementById('booking-layout').style.display = 'flex';
+            renderWorkerSummary(selectedWorker);
+            updateSummaryTotal();
+            setMinDate();
+        }
+
+        updateBookingBadge();
+    </script>
+</body>
+
+</html>
