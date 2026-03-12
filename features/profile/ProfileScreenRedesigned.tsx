@@ -83,13 +83,13 @@ const MENU_SECTIONS: Record<string, MenuSection> = {
       id: "notifications",
       icon: "notifications-outline",
       title: "Thông báo",
-      route: "/notifications",
+      route: "/(tabs)/notifications",
     },
     {
       id: "privacy",
       icon: "lock-closed-outline",
       title: "Quyền riêng tư",
-      route: "/profile/privacy",
+      route: "/profile/settings",
     },
   ],
   features: [
@@ -103,13 +103,13 @@ const MENU_SECTIONS: Record<string, MenuSection> = {
       id: "tasks",
       icon: "checkbox-outline",
       title: "Công việc",
-      route: "/tasks",
+      route: "/scheduled-tasks",
     },
     {
       id: "favorites",
       icon: "heart-outline",
       title: "Đã lưu",
-      route: "/favorites",
+      route: "/profile/favorites",
     },
     {
       id: "history",
@@ -129,7 +129,7 @@ const MENU_SECTIONS: Record<string, MenuSection> = {
       id: "feedback",
       icon: "chatbox-ellipses-outline",
       title: "Góp ý",
-      route: "/feedback",
+      route: "/customer-support",
     },
     {
       id: "about",
@@ -155,7 +155,7 @@ const QUICK_ACTIONS = [
     icon: "chatbubbles",
     label: "Tin nhắn",
     color: "#0068FF",
-    route: "/messages",
+    route: "/chat",
   },
   {
     id: "calls",
@@ -169,7 +169,7 @@ const QUICK_ACTIONS = [
     icon: "people",
     label: "Danh bạ",
     color: "#8b5cf6",
-    route: "/contacts",
+    route: "/(tabs)/contacts",
   },
   {
     id: "settings",

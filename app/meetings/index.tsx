@@ -89,7 +89,7 @@ export default function MeetingsIndexScreen() {
       setCreatingInstant(true);
       const response = await createInstantMeeting();
       // Navigate to meeting room
-      router.push(`/meetings/${response.meeting.meetingCode}`);
+      router.push(`/meetings/join/${response.meeting.meetingCode}`);
     } catch {
       Alert.alert("Lỗi", "Không thể tạo cuộc họp.");
     } finally {
@@ -100,7 +100,7 @@ export default function MeetingsIndexScreen() {
   const handleJoinMeeting = () => router.push("/meetings/join");
   const handleScheduleMeeting = () => router.push("/meetings/create");
   const handleMeetingPress = (m: ScheduledMeeting) =>
-    router.push(`/meetings/${m.meetingCode}`);
+    router.push(`/meetings/join/${m.meetingCode}`);
   const handleVideoRoom = () => router.push("/meetings/room");
 
   const handleShareMeeting = async (m: ScheduledMeeting) => {

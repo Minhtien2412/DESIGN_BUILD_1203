@@ -63,6 +63,8 @@ export interface RegisterDto {
     longitude: number;
     address?: string;
   };
+  faceEmbedding?: number[];
+  faceImageUrl?: string;
 }
 
 export interface AuthResponse {
@@ -77,21 +79,32 @@ export interface RefreshTokenResponse {
 
 // ==================== API METHODS ====================
 
+export interface FaceVerificationRequired {
+  requireFaceVerification: true;
+  userId: number;
+  reason: string;
+}
+
 /**
  * Login with email and password
  * Endpoint: POST /auth/login
- * Returns JWT tokens and user info
+ * Returns JWT tokens and user info, or face verification requirement
  */
-export async function login(dto: LoginDto): Promise<AuthResponse> {
+export async function login(
+  dto: LoginDto,
+): Promise<AuthResponse | FaceVerificationRequired> {
   try {
     console.log("[authApi] Attempting login with:", { email: dto.email });
-    return await apiFetch<AuthResponse>("/auth/login", {
-      method: "POST",
-      data: dto,
-      headers: {
-        "Content-Type": "application/json",
+    return await apiFetch<AuthResponse | FaceVerificationRequired>(
+      "/auth/login",
+      {
+        method: "POST",
+        data: dto,
+        headers: {
+          "Content-Type": "application/json",
+        },
       },
-    });
+    );
   } catch (error) {
     console.error("[authApi] login error:", error);
     throw error;
@@ -180,6 +193,19 @@ export async function getCurrentUser(): Promise<User> {
   }
 }
 
+/**
+ * Logout — revoke server session and refresh token
+ * Endpoint: POST /auth/logout
+ */
+export async function logout(): Promise<void> {
+  try {
+    await apiFetch("/auth/logout", { method: "POST" });
+  } catch (error) {
+    // Best-effort: don't block client-side cleanup if server call fails
+    console.warn("[authApi] logout error (non-blocking):", error);
+  }
+}
+
 // ==================== OTP TYPES ====================
 
 export interface SendOtpDto {
@@ -199,6 +225,7 @@ export interface VerifyOtpDto {
   type: "phone" | "email";
   value: string;
   code: string;
+  otp?: string;
   purpose: "register" | "reset-password" | "verify-phone" | "verify-email";
 }
 
@@ -262,27 +289,34 @@ export async function verifyOtp(dto: VerifyOtpDto): Promise<VerifyOtpResponse> {
 // ==================== SOCIAL LOGIN TYPES ====================
 
 export interface SocialLoginDto {
-  provider: "GOOGLE" | "FACEBOOK" | "ZALO";
+  provider: "GOOGLE" | "FACEBOOK" | "ZALO" | "APPLE";
   token: string; // OAuth id_token or access_token from provider
   userData?: {
     email?: string;
     name?: string;
     avatar?: string;
+    picture?: string;
   };
 }
 
 /**
- * Social login (Google, Facebook, Zalo)
- * Endpoint: POST /auth/social/login
+ * Social login (Google, Facebook, Apple, Zalo)
+ * Endpoint: POST /auth/social
  */
-export async function socialLogin(dto: SocialLoginDto): Promise<AuthResponse> {
+export async function socialLogin(
+  provider: string,
+  data: { token: string; email?: string; name?: string; picture?: string },
+): Promise<AuthResponse> {
   try {
-    console.log("[authApi] Social login via:", dto.provider);
-    return await apiFetch<AuthResponse>("/auth/social/login", {
+    console.log("[authApi] Social login via:", provider);
+    return await apiFetch<AuthResponse>("/auth/social", {
       method: "POST",
       data: {
-        provider: dto.provider,
-        token: dto.token,
+        provider: provider.toUpperCase(),
+        token: data.token,
+        email: data.email || "",
+        name: data.name || "",
+        picture: data.picture || "",
       },
       headers: {
         "Content-Type": "application/json",

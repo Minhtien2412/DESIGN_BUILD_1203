@@ -20,11 +20,20 @@ const BASE_PATH = "/products";
 
 // Configuration
 const CONFIG = {
-  MAX_RETRIES: 3,
+  MAX_RETRIES: 2,
   RETRY_DELAY_BASE: 1000, // ms
-  ENABLE_MOCK_FALLBACK: false, // Set to true để dùng mock data khi API fail
+  ENABLE_MOCK_FALLBACK: true, // Dùng local data khi API fail (CORS/offline)
   CACHE_TTL: 5 * 60 * 1000, // 5 minutes
 };
+
+// Map frontend sort values to backend-accepted values: createdAt, price, name, rating, sales
+const SORT_BY_MAP: Record<string, string> = {
+  newest: "createdAt",
+  popular: "sales",
+};
+function mapSortBy(sortBy: string): string {
+  return SORT_BY_MAP[sortBy] || sortBy;
+}
 
 // ==================== TYPES ====================
 
@@ -51,7 +60,14 @@ export interface ProductFilters {
 export interface ProductQueryParams extends ProductFilters {
   page?: number;
   limit?: number;
-  sortBy?: "price" | "rating" | "newest" | "popular";
+  sortBy?:
+    | "price"
+    | "rating"
+    | "newest"
+    | "popular"
+    | "createdAt"
+    | "name"
+    | "sales";
   sortOrder?: "asc" | "desc";
 }
 
@@ -114,7 +130,7 @@ export async function getProducts(
       queryParams.append("flashSale", params.flashSale.toString());
     if (params.rating !== undefined)
       queryParams.append("rating", params.rating.toString());
-    if (params.sortBy) queryParams.append("sortBy", params.sortBy);
+    if (params.sortBy) queryParams.append("sortBy", mapSortBy(params.sortBy));
     if (params.sortOrder) queryParams.append("sortOrder", params.sortOrder);
 
     const queryString = queryParams.toString();
@@ -127,7 +143,6 @@ export async function getProducts(
     // API returns { data: [...], meta: {...} }
     const products = Array.isArray(response) ? response : response?.data || [];
     const meta = response?.meta || {};
-
     console.log(
       "[ProductsService] ✅ Products loaded from database:",
       products.length,
@@ -196,7 +211,7 @@ export async function getProductsBySeller(
 
     if (params.page) queryParams.append("page", params.page.toString());
     if (params.limit) queryParams.append("limit", params.limit.toString());
-    if (params.sortBy) queryParams.append("sortBy", params.sortBy);
+    if (params.sortBy) queryParams.append("sortBy", mapSortBy(params.sortBy));
     if (params.sortOrder) queryParams.append("sortOrder", params.sortOrder);
 
     const url = `${BASE_PATH}?${queryParams.toString()}`;
@@ -451,3 +466,4 @@ function getProductsFromLocalData(
 // ==================== EXPORTS ====================
 
 export { PRODUCTS as LOCAL_PRODUCTS };
+

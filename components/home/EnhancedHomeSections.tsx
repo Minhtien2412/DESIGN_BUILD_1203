@@ -9,15 +9,15 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Href, router } from "expo-router";
 import { memo, useEffect, useRef, useState } from "react";
 import {
-  Animated,
-  Dimensions,
-  Easing,
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    Animated,
+    Dimensions,
+    Easing,
+    Image,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 // ============================================================================
@@ -543,7 +543,9 @@ export const FlashSaleSection = memo(
               <TimeBox value={timeLeft.seconds} label="giây" />
             </View>
           </View>
-          <TouchableOpacity onPress={() => router.push("/flash-sale" as Href)}>
+          <TouchableOpacity
+            onPress={() => router.push("/shopping/flash-sale" as Href)}
+          >
             <Text style={flashStyles.seeAll}>Xem tất cả →</Text>
           </TouchableOpacity>
         </LinearGradient>

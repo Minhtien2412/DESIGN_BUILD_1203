@@ -1,27 +1,22 @@
 /**
- * Projects Index Page - Danh sách dự án
+ * Projects Index — Danh sách dự án
  * Route: /projects
+ * Migrated to DS layout templates
  */
 
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { Href, router, Stack } from "expo-router";
-import { useMemo, useState } from "react";
-import {
-    FlatList,
-    Pressable,
-    RefreshControl,
-    StyleSheet,
-    View
-} from "react-native";
+import { DSChip } from "@/components/ds";
+import { DSListScreen } from "@/components/ds/layouts";
+import { useDS } from "@/hooks/useDS";
+import { Ionicons } from "@expo/vector-icons";
+import { Href, router } from "expo-router";
+import { useCallback, useMemo, useState } from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { ThemedText } from "@/components/themed-text";
-import { useThemeColor } from "@/hooks/useThemeColor";
-
+// ── Types ──────────────────────────────────────────────────────────────
 interface Project {
   id: string;
   name: string;
   description: string;
-  image?: string;
   status: "planning" | "in_progress" | "completed" | "on_hold";
   progress: number;
   budget: number;
@@ -31,6 +26,30 @@ interface Project {
   location: string;
   manager: string;
 }
+
+// ── Data ───────────────────────────────────────────────────────────────
+const STATUS_CONFIG = {
+  planning: {
+    label: "Lập kế hoạch",
+    color: "#FF9800",
+    icon: "clipboard-outline" as const,
+  },
+  in_progress: {
+    label: "Đang thi công",
+    color: "#2196F3",
+    icon: "construct-outline" as const,
+  },
+  completed: {
+    label: "Hoàn thành",
+    color: "#4CAF50",
+    icon: "checkmark-circle-outline" as const,
+  },
+  on_hold: {
+    label: "Tạm dừng",
+    color: "#F44336",
+    icon: "pause-circle-outline" as const,
+  },
+};
 
 const MOCK_PROJECTS: Project[] = [
   {
@@ -85,39 +104,20 @@ const MOCK_PROJECTS: Project[] = [
   },
 ];
 
-const STATUS_CONFIG = {
-  planning: {
-    label: "Lập kế hoạch",
-    color: "#FF9800",
-    icon: "clipboard-outline",
-  },
-  in_progress: {
-    label: "Đang thi công",
-    color: "#2196F3",
-    icon: "construct-outline",
-  },
-  completed: {
-    label: "Hoàn thành",
-    color: "#4CAF50",
-    icon: "checkmark-circle-outline",
-  },
-  on_hold: {
-    label: "Tạm dừng",
-    color: "#F44336",
-    icon: "pause-circle-outline",
-  },
-};
+const FILTERS = [
+  { key: "all", label: "Tất cả" },
+  { key: "in_progress", label: "Đang làm" },
+  { key: "completed", label: "Hoàn thành" },
+] as const;
 
+// ── Helpers ────────────────────────────────────────────────────────────
 function formatCurrency(amount: number): string {
-  if (amount >= 1000000000) {
-    return `${(amount / 1000000000).toFixed(1)} tỷ`;
-  }
-  if (amount >= 1000000) {
-    return `${(amount / 1000000).toFixed(0)} triệu`;
-  }
+  if (amount >= 1e9) return `${(amount / 1e9).toFixed(1)} tỷ`;
+  if (amount >= 1e6) return `${(amount / 1e6).toFixed(0)} triệu`;
   return amount.toLocaleString("vi-VN");
 }
 
+// ── ProjectCard ────────────────────────────────────────────────────────
 function ProjectCard({
   project,
   onPress,
@@ -125,326 +125,306 @@ function ProjectCard({
   project: Project;
   onPress: () => void;
 }) {
-  const statusConfig = STATUS_CONFIG[project.status];
-  const budgetPercent = (project.spent / project.budget) * 100;
+  const { colors, spacing, radius, shadow } = useDS();
+  const cfg = STATUS_CONFIG[project.status];
+  const budgetPct = (project.spent / project.budget) * 100;
 
   return (
-    <Pressable style={styles.projectCard} onPress={onPress}>
-      {/* Header */}
-      <View style={styles.cardHeader}>
+    <Pressable
+      style={[
+        st.card,
+        shadow.sm,
+        {
+          backgroundColor: colors.bgSurface,
+          borderRadius: radius.lg,
+          marginHorizontal: spacing.md,
+          marginBottom: spacing.sm,
+        },
+      ]}
+      onPress={onPress}
+    >
+      {/* Status + more */}
+      <View style={st.cardHeader}>
         <View
           style={[
-            styles.statusBadge,
-            { backgroundColor: statusConfig.color + "20" },
+            st.statusBadge,
+            { backgroundColor: cfg.color + "20", borderRadius: radius.full },
           ]}
         >
-          <Ionicons
-            name={statusConfig.icon as any}
-            size={14}
-            color={statusConfig.color}
-          />
-          <ThemedText
-            style={[styles.statusText, { color: statusConfig.color }]}
-          >
-            {statusConfig.label}
-          </ThemedText>
+          <Ionicons name={cfg.icon} size={14} color={cfg.color} />
+          <Text style={[st.statusText, { color: cfg.color }]}>{cfg.label}</Text>
         </View>
-        <Pressable style={styles.moreButton}>
-          <Ionicons name="ellipsis-vertical" size={18} color="#888" />
+        <Pressable hitSlop={8}>
+          <Ionicons
+            name="ellipsis-vertical"
+            size={18}
+            color={colors.textTertiary}
+          />
         </Pressable>
       </View>
 
-      {/* Project Info */}
-      <ThemedText style={styles.projectName} numberOfLines={1}>
+      {/* Title & desc */}
+      <Text style={[st.projectName, { color: colors.text }]} numberOfLines={1}>
         {project.name}
-      </ThemedText>
-      <ThemedText style={styles.projectDesc} numberOfLines={2}>
+      </Text>
+      <Text
+        style={[st.projectDesc, { color: colors.textSecondary }]}
+        numberOfLines={2}
+      >
         {project.description}
-      </ThemedText>
+      </Text>
 
       {/* Location */}
-      <View style={styles.locationRow}>
-        <Ionicons name="location-outline" size={14} color="#888" />
-        <ThemedText style={styles.locationText}>{project.location}</ThemedText>
+      <View style={st.row}>
+        <Ionicons
+          name="location-outline"
+          size={14}
+          color={colors.textTertiary}
+        />
+        <Text style={[st.locText, { color: colors.textTertiary }]}>
+          {project.location}
+        </Text>
       </View>
 
-      {/* Progress Bar */}
-      <View style={styles.progressSection}>
-        <View style={styles.progressHeader}>
-          <ThemedText style={styles.progressLabel}>Tiến độ</ThemedText>
-          <ThemedText style={styles.progressPercent}>
+      {/* Progress */}
+      <View style={{ marginTop: spacing.sm }}>
+        <View style={st.spaceBetween}>
+          <Text style={[st.label, { color: colors.textSecondary }]}>
+            Tiến độ
+          </Text>
+          <Text style={[st.pctText, { color: colors.text }]}>
             {project.progress}%
-          </ThemedText>
+          </Text>
         </View>
-        <View style={styles.progressBar}>
+        <View
+          style={[
+            st.progressBar,
+            { backgroundColor: colors.bgMuted, borderRadius: radius.xs },
+          ]}
+        >
           <View
             style={[
-              styles.progressFill,
+              st.progressFill,
               {
                 width: `${project.progress}%`,
-                backgroundColor: statusConfig.color,
+                backgroundColor: cfg.color,
+                borderRadius: radius.xs,
               },
             ]}
           />
         </View>
       </View>
 
-      {/* Budget Info */}
-      <View style={styles.budgetSection}>
-        <View style={styles.budgetItem}>
-          <ThemedText style={styles.budgetLabel}>Ngân sách</ThemedText>
-          <ThemedText style={styles.budgetValue}>
+      {/* Budget */}
+      <View
+        style={[
+          st.budgetRow,
+          {
+            borderTopColor: colors.divider,
+            marginTop: spacing.sm,
+            paddingTop: spacing.sm,
+          },
+        ]}
+      >
+        <View style={st.budgetItem}>
+          <Text style={[st.label, { color: colors.textTertiary }]}>
+            Ngân sách
+          </Text>
+          <Text style={[st.budgetVal, { color: colors.text }]}>
             {formatCurrency(project.budget)}
-          </ThemedText>
+          </Text>
         </View>
-        <View style={styles.budgetDivider} />
-        <View style={styles.budgetItem}>
-          <ThemedText style={styles.budgetLabel}>Đã chi</ThemedText>
-          <ThemedText
+        <View style={[st.budgetDiv, { backgroundColor: colors.divider }]} />
+        <View style={st.budgetItem}>
+          <Text style={[st.label, { color: colors.textTertiary }]}>Đã chi</Text>
+          <Text
             style={[
-              styles.budgetValue,
-              budgetPercent > 90 && styles.budgetWarning,
+              st.budgetVal,
+              { color: budgetPct > 90 ? colors.error : colors.text },
             ]}
           >
             {formatCurrency(project.spent)}
-          </ThemedText>
+          </Text>
         </View>
       </View>
 
       {/* Footer */}
-      <View style={styles.cardFooter}>
-        <View style={styles.managerInfo}>
-          <Ionicons name="person-circle-outline" size={16} color="#888" />
-          <ThemedText style={styles.managerName}>{project.manager}</ThemedText>
+      <View style={[st.cardFooter, { borderTopColor: colors.divider }]}>
+        <View style={st.row}>
+          <Ionicons
+            name="person-circle-outline"
+            size={16}
+            color={colors.textTertiary}
+          />
+          <Text style={[st.managerName, { color: colors.textSecondary }]}>
+            {project.manager}
+          </Text>
         </View>
-        <ThemedText style={styles.dateText}>
+        <Text style={[st.dateText, { color: colors.textTertiary }]}>
           {new Date(project.startDate).toLocaleDateString("vi-VN")}
-        </ThemedText>
+        </Text>
       </View>
     </Pressable>
   );
 }
 
+// ── Main Screen ────────────────────────────────────────────────────────
 export default function ProjectsIndexScreen() {
+  const { colors, spacing } = useDS();
+  const [filter, setFilter] = useState<string>("all");
   const [refreshing, setRefreshing] = useState(false);
-  const [filter, setFilter] = useState<"all" | "in_progress" | "completed">(
-    "all",
-  );
-  const backgroundColor = useThemeColor({}, "background");
 
   const filteredProjects = useMemo(() => {
     if (filter === "all") return MOCK_PROJECTS;
     return MOCK_PROJECTS.filter((p) => p.status === filter);
   }, [filter]);
 
-  const stats = useMemo(() => {
-    return {
+  const stats = useMemo(
+    () => ({
       total: MOCK_PROJECTS.length,
       inProgress: MOCK_PROJECTS.filter((p) => p.status === "in_progress")
         .length,
       completed: MOCK_PROJECTS.filter((p) => p.status === "completed").length,
-    };
-  }, []);
+    }),
+    [],
+  );
 
-  const onRefresh = () => {
+  const onRefresh = useCallback(() => {
     setRefreshing(true);
     setTimeout(() => setRefreshing(false), 1000);
-  };
+  }, []);
 
-  return (
-    <>
-      <Stack.Screen
-        options={{
-          title: "Dự án",
-          headerStyle: { backgroundColor: "#2196F3" },
-          headerTintColor: "#FFFFFF",
-          headerRight: () => (
-            <View style={styles.headerActions}>
-              <Pressable
-                style={styles.headerButton}
-                onPress={() => router.push("/projects/management" as Href)}
-              >
-                <Ionicons name="settings-outline" size={22} color="#FFFFFF" />
-              </Pressable>
-              <Pressable
-                style={styles.headerButton}
-                onPress={() => router.push("/projects/create" as Href)}
-              >
-                <Ionicons name="add" size={26} color="#FFFFFF" />
-              </Pressable>
-            </View>
-          ),
-        }}
+  const renderItem = useCallback(
+    ({ item }: { item: Project }) => (
+      <ProjectCard
+        project={item}
+        onPress={() => router.push(`/projects/${item.id}` as Href)}
       />
+    ),
+    [],
+  );
 
-      <View style={[styles.container, { backgroundColor }]}>
-        {/* Stats Overview */}
-        <View style={styles.statsContainer}>
-          <View style={styles.statItem}>
-            <ThemedText style={styles.statNumber}>{stats.total}</ThemedText>
-            <ThemedText style={styles.statLabel}>Tổng dự án</ThemedText>
+  const ListHeader = useMemo(
+    () => (
+      <View>
+        {/* Stats Row */}
+        <View
+          style={[
+            st.statsRow,
+            {
+              backgroundColor: colors.bgSurface,
+              borderBottomColor: colors.divider,
+            },
+          ]}
+        >
+          <View style={st.stat}>
+            <Text
+              style={{ fontSize: 20, fontWeight: "700", color: colors.text }}
+            >
+              {stats.total}
+            </Text>
+            <Text
+              style={{
+                fontSize: 12,
+                color: colors.textSecondary,
+                marginTop: 2,
+              }}
+            >
+              Tổng
+            </Text>
           </View>
-          <View style={[styles.statItem, styles.statItemBorder]}>
-            <ThemedText style={[styles.statNumber, { color: "#2196F3" }]}>
+          <View style={st.stat}>
+            <Text
+              style={{ fontSize: 20, fontWeight: "700", color: colors.info }}
+            >
               {stats.inProgress}
-            </ThemedText>
-            <ThemedText style={styles.statLabel}>Đang thực hiện</ThemedText>
+            </Text>
+            <Text
+              style={{
+                fontSize: 12,
+                color: colors.textSecondary,
+                marginTop: 2,
+              }}
+            >
+              Đang làm
+            </Text>
           </View>
-          <View style={styles.statItem}>
-            <ThemedText style={[styles.statNumber, { color: "#4CAF50" }]}>
+          <View style={st.stat}>
+            <Text
+              style={{ fontSize: 20, fontWeight: "700", color: colors.success }}
+            >
               {stats.completed}
-            </ThemedText>
-            <ThemedText style={styles.statLabel}>Hoàn thành</ThemedText>
+            </Text>
+            <Text
+              style={{
+                fontSize: 12,
+                color: colors.textSecondary,
+                marginTop: 2,
+              }}
+            >
+              Hoàn thành
+            </Text>
           </View>
         </View>
-
-        {/* Filter Tabs */}
-        <View style={styles.filterTabs}>
-          {(["all", "in_progress", "completed"] as const).map((f) => (
-            <Pressable
-              key={f}
-              style={[styles.filterTab, filter === f && styles.filterTabActive]}
-              onPress={() => setFilter(f)}
-            >
-              <ThemedText
-                style={[
-                  styles.filterText,
-                  filter === f && styles.filterTextActive,
-                ]}
-              >
-                {f === "all"
-                  ? "Tất cả"
-                  : f === "in_progress"
-                    ? "Đang làm"
-                    : "Hoàn thành"}
-              </ThemedText>
-            </Pressable>
+        {/* Filters */}
+        <View
+          style={[
+            st.filterRow,
+            {
+              paddingHorizontal: spacing.md,
+              paddingVertical: spacing.sm,
+              gap: spacing.xs,
+            },
+          ]}
+        >
+          {FILTERS.map((f) => (
+            <DSChip
+              key={f.key}
+              label={f.label}
+              selected={filter === f.key}
+              onPress={() => setFilter(f.key)}
+            />
           ))}
         </View>
-
-        {/* Project List */}
-        <FlatList
-          data={filteredProjects}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <ProjectCard
-              project={item}
-              onPress={() => router.push(`/projects/${item.id}` as Href)}
-            />
-          )}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              colors={["#2196F3"]}
-            />
-          }
-          contentContainerStyle={styles.listContent}
-          showsVerticalScrollIndicator={false}
-          ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <MaterialCommunityIcons
-                name="folder-open-outline"
-                size={64}
-                color="#CCCCCC"
-              />
-              <ThemedText style={styles.emptyText}>
-                Chưa có dự án nào
-              </ThemedText>
-              <Pressable
-                style={styles.createButton}
-                onPress={() => router.push("/projects/create" as Href)}
-              >
-                <Ionicons name="add" size={20} color="#FFFFFF" />
-                <ThemedText style={styles.createButtonText}>
-                  Tạo dự án mới
-                </ThemedText>
-              </Pressable>
-            </View>
-          }
-        />
       </View>
-    </>
+    ),
+    [filter, stats, colors, spacing],
+  );
+
+  return (
+    <DSListScreen<Project>
+      title="Dự án"
+      subtitle={`${stats.total} dự án`}
+      gradientHeader
+      data={filteredProjects}
+      renderItem={renderItem}
+      keyExtractor={(item) => item.id}
+      refreshing={refreshing}
+      onRefresh={onRefresh}
+      ListHeaderComponent={ListHeader}
+      emptyIcon="folder-open-outline"
+      emptyTitle="Chưa có dự án nào"
+      emptyMessage="Nhấn + để tạo dự án mới"
+      fab={{
+        icon: "add",
+        onPress: () => router.push("/projects/create" as Href),
+      }}
+      headerRight={
+        <Pressable
+          onPress={() => router.push("/projects/management" as Href)}
+          hitSlop={8}
+          style={{ padding: 8 }}
+        >
+          <Ionicons name="settings-outline" size={22} color="#FFF" />
+        </Pressable>
+      }
+    />
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  headerActions: {
-    flexDirection: "row",
-    gap: 8,
-  },
-  headerButton: {
-    padding: 8,
-  },
-  statsContainer: {
-    flexDirection: "row",
-    backgroundColor: "#FFFFFF",
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#E0E0E0",
-  },
-  statItem: {
-    flex: 1,
-    alignItems: "center",
-  },
-  statItemBorder: {
-    borderLeftWidth: 1,
-    borderRightWidth: 1,
-    borderColor: "#E0E0E0",
-  },
-  statNumber: {
-    fontSize: 24,
-    fontWeight: "700",
-    color: "#212121",
-  },
-  statLabel: {
-    fontSize: 12,
-    color: "#757575",
-    marginTop: 4,
-  },
-  filterTabs: {
-    flexDirection: "row",
-    backgroundColor: "#FFFFFF",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    gap: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: "#E0E0E0",
-  },
-  filterTab: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: "#F5F5F5",
-  },
-  filterTabActive: {
-    backgroundColor: "#2196F3",
-  },
-  filterText: {
-    fontSize: 13,
-    color: "#757575",
-  },
-  filterTextActive: {
-    color: "#FFFFFF",
-    fontWeight: "600",
-  },
-  listContent: {
-    padding: 16,
-    gap: 16,
-  },
-  projectCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 12,
-    padding: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
-  },
+// ── Styles ─────────────────────────────────────────────────────────────
+const st = StyleSheet.create({
+  card: { padding: 16 },
   cardHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -457,137 +437,42 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingHorizontal: 10,
     paddingVertical: 4,
-    borderRadius: 12,
   },
-  statusText: {
-    fontSize: 12,
-    fontWeight: "500",
-  },
-  moreButton: {
-    padding: 4,
-  },
-  projectName: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#212121",
-    marginBottom: 6,
-  },
-  projectDesc: {
-    fontSize: 13,
-    color: "#757575",
-    lineHeight: 18,
-    marginBottom: 8,
-  },
-  locationRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    marginBottom: 16,
-  },
-  locationText: {
-    fontSize: 12,
-    color: "#888888",
-  },
-  progressSection: {
-    marginBottom: 16,
-  },
-  progressHeader: {
+  statusText: { fontSize: 12, fontWeight: "500" },
+  projectName: { fontSize: 16, fontWeight: "700", marginBottom: 4 },
+  projectDesc: { fontSize: 13, lineHeight: 18, marginBottom: 8 },
+  row: { flexDirection: "row", alignItems: "center", gap: 4 },
+  locText: { fontSize: 12 },
+  spaceBetween: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 6,
   },
-  progressLabel: {
-    fontSize: 12,
-    color: "#757575",
-  },
-  progressPercent: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: "#212121",
-  },
-  progressBar: {
-    height: 6,
-    backgroundColor: "#E0E0E0",
-    borderRadius: 3,
-    overflow: "hidden",
-  },
-  progressFill: {
-    height: "100%",
-    borderRadius: 3,
-  },
-  budgetSection: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 12,
-    borderTopWidth: 1,
-    borderTopColor: "#F0F0F0",
-    marginBottom: 12,
-  },
-  budgetItem: {
-    flex: 1,
-  },
-  budgetDivider: {
-    width: 1,
-    height: 30,
-    backgroundColor: "#E0E0E0",
-    marginHorizontal: 16,
-  },
-  budgetLabel: {
-    fontSize: 11,
-    color: "#999999",
-    marginBottom: 2,
-  },
-  budgetValue: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#212121",
-  },
-  budgetWarning: {
-    color: "#F44336",
-  },
+  label: { fontSize: 11 },
+  pctText: { fontSize: 12, fontWeight: "600" },
+  progressBar: { height: 6, overflow: "hidden" },
+  progressFill: { height: "100%" },
+  budgetRow: { flexDirection: "row", alignItems: "center", borderTopWidth: 1 },
+  budgetItem: { flex: 1 },
+  budgetDiv: { width: 1, height: 30, marginHorizontal: 16 },
+  budgetVal: { fontSize: 14, fontWeight: "600", marginTop: 2 },
   cardFooter: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     borderTopWidth: 1,
-    borderTopColor: "#F0F0F0",
     paddingTop: 12,
+    marginTop: 12,
   },
-  managerInfo: {
-    flexDirection: "row",
+  managerName: { fontSize: 12 },
+  dateText: { fontSize: 11 },
+  statsRow: { flexDirection: "row", borderBottomWidth: 1, paddingVertical: 12 },
+  stat: {
+    flex: 1,
     alignItems: "center",
-    gap: 6,
+    borderWidth: 0,
+    shadowOpacity: 0,
+    elevation: 0,
   },
-  managerName: {
-    fontSize: 12,
-    color: "#757575",
-  },
-  dateText: {
-    fontSize: 11,
-    color: "#999999",
-  },
-  emptyContainer: {
-    alignItems: "center",
-    paddingVertical: 60,
-    gap: 12,
-  },
-  emptyText: {
-    fontSize: 14,
-    color: "#888888",
-  },
-  createButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    backgroundColor: "#2196F3",
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 8,
-    marginTop: 8,
-  },
-  createButtonText: {
-    color: "#FFFFFF",
-    fontSize: 14,
-    fontWeight: "600",
-  },
+  filterRow: { flexDirection: "row", flexWrap: "wrap" },
 });

@@ -1,10 +1,12 @@
 /**
- * Quick Action Bottom Sheet - Shopee Style
- * Opens from center tab with quick actions: Call, Messages, Live, plus utilities
+ * Quick Action Bottom Sheet - Clean Balanced Design
+ * Opens from center FAB with quick actions: Call, Messages, Live, plus utilities
+ * @redesigned 2026-03-03
  */
-import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
-import { useEffect, useRef } from 'react';
+import { useI18n } from "@/services/i18nService";
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import { useEffect, useRef } from "react";
 import {
     Animated,
     Dimensions,
@@ -15,9 +17,9 @@ import {
     Text,
     TouchableOpacity,
     View,
-} from 'react-native';
+} from "react-native";
 
-const { height: SCREEN_HEIGHT } = Dimensions.get('window');
+const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 interface QuickActionSheetProps {
   visible: boolean;
@@ -26,25 +28,85 @@ interface QuickActionSheetProps {
 }
 
 // Primary communication actions
-const PRIMARY_ACTIONS = [
-  { id: 'call', label: 'Gọi điện', icon: 'call', color: '#0D9488', bgColor: '#DCFCE7' },
-  { id: 'messages', label: 'Nhắn tin', icon: 'chatbubbles', color: '#0D9488', bgColor: '#F0FDFA' },
-  { id: 'live', label: 'Livestream', icon: 'videocam', color: '#000000', bgColor: '#FEE2E2' },
-  { id: 'contacts', label: 'Danh bạ', icon: 'people', color: '#666666', bgColor: '#EDE9FE' },
+const PRIMARY_ACTION_KEYS = [
+  {
+    id: "call",
+    labelKey: "quickAction.call",
+    icon: "call",
+    color: "#0D9488",
+    bgColor: "#F0FDFA",
+  },
+  {
+    id: "messages",
+    labelKey: "quickAction.messages",
+    icon: "chatbubbles",
+    color: "#0D9488",
+    bgColor: "#F0FDFA",
+  },
+  {
+    id: "live",
+    labelKey: "quickAction.livestream",
+    icon: "videocam",
+    color: "#EF4444",
+    bgColor: "#FEF2F2",
+  },
+  {
+    id: "contacts",
+    labelKey: "quickAction.contacts",
+    icon: "people",
+    color: "#6B7280",
+    bgColor: "#F9FAFB",
+  },
 ];
 
 // Secondary utility actions
-const SECONDARY_ACTIONS = [
-  { id: 'cost-estimator', label: 'Dự toán', icon: 'calculator', color: '#1976D2', bgColor: '#F0FDFA' },
-  { id: 'store-locator', label: 'Cửa hàng', icon: 'location', color: '#43A047', bgColor: '#E8F5E9' },
-  { id: 'schedule', label: 'Lịch hẹn', icon: 'calendar', color: '#0D9488', bgColor: '#F0FDFA' },
-  { id: 'quote-request', label: 'Báo giá', icon: 'document-text', color: '#0D9488', bgColor: '#E8F5E9' },
+const SECONDARY_ACTION_KEYS = [
+  {
+    id: "projects",
+    labelKey: "quickAction.projects",
+    icon: "briefcase",
+    color: "#0D9488",
+    bgColor: "#F0FDFA",
+  },
+  {
+    id: "cost-estimator",
+    labelKey: "quickAction.costEstimator",
+    icon: "calculator",
+    color: "#0D9488",
+    bgColor: "#F0FDFA",
+  },
+  {
+    id: "store-locator",
+    labelKey: "quickAction.storeLocator",
+    icon: "location",
+    color: "#0D9488",
+    bgColor: "#F0FDFA",
+  },
+  {
+    id: "schedule",
+    labelKey: "quickAction.schedule",
+    icon: "calendar",
+    color: "#0D9488",
+    bgColor: "#F0FDFA",
+  },
+  {
+    id: "quote-request",
+    labelKey: "quickAction.quoteRequest",
+    icon: "document-text",
+    color: "#0D9488",
+    bgColor: "#F0FDFA",
+  },
 ];
 
-export function QuickActionSheet({ visible, onClose, onActionPress }: QuickActionSheetProps) {
+export function QuickActionSheet({
+  visible,
+  onClose,
+  onActionPress,
+}: QuickActionSheetProps) {
   const backdropOpacity = useRef(new Animated.Value(0)).current;
   const sheetTranslateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
   const scaleAnim = useRef(new Animated.Value(0.9)).current;
+  const { t } = useI18n();
 
   useEffect(() => {
     if (visible) {
@@ -92,39 +154,42 @@ export function QuickActionSheet({ visible, onClose, onActionPress }: QuickActio
 
   const handleActionPress = (actionId: string) => {
     onClose();
-    
+
     // Handle navigation based on action
     switch (actionId) {
-      case 'call':
-        router.push('/call/history');
+      case "call":
+        router.push("/call/history");
         break;
-      case 'messages':
-        router.push('/messages');
+      case "messages":
+        router.push("/messages");
         break;
-      case 'live':
-        router.push('/live');
+      case "live":
+        router.push("/live");
         break;
-      case 'contacts':
-        router.push('/communication');
+      case "contacts":
+        router.push("/communication");
         break;
-      case 'cost-estimator':
-        router.push('/utilities/cost-estimator');
+      case "projects":
+        router.push("/(tabs)/projects");
         break;
-      case 'store-locator':
-        router.push('/utilities/store-locator');
+      case "cost-estimator":
+        router.push("/utilities/cost-estimator");
         break;
-      case 'schedule':
-        router.push('/utilities/schedule');
+      case "store-locator":
+        router.push("/utilities/store-locator");
         break;
-      case 'quote-request':
-        router.push('/utilities/quote-request');
+      case "schedule":
+        router.push("/utilities/schedule");
+        break;
+      case "quote-request":
+        router.push("/utilities/quote-request");
         break;
       default:
         onActionPress?.(actionId);
     }
   };
 
-  const renderActionButton = (action: typeof PRIMARY_ACTIONS[0]) => (
+  const renderActionButton = (action: (typeof PRIMARY_ACTION_KEYS)[0]) => (
     <TouchableOpacity
       key={action.id}
       style={styles.actionButton}
@@ -134,7 +199,7 @@ export function QuickActionSheet({ visible, onClose, onActionPress }: QuickActio
       <View style={[styles.actionIcon, { backgroundColor: action.bgColor }]}>
         <Ionicons name={action.icon as any} size={28} color={action.color} />
       </View>
-      <Text style={styles.actionLabel}>{action.label}</Text>
+      <Text style={styles.actionLabel}>{t(action.labelKey)}</Text>
     </TouchableOpacity>
   );
 
@@ -164,7 +229,10 @@ export function QuickActionSheet({ visible, onClose, onActionPress }: QuickActio
           style={[
             styles.sheet,
             {
-              transform: [{ translateY: sheetTranslateY }, { scale: scaleAnim }],
+              transform: [
+                { translateY: sheetTranslateY },
+                { scale: scaleAnim },
+              ],
             },
           ]}
         >
@@ -173,15 +241,19 @@ export function QuickActionSheet({ visible, onClose, onActionPress }: QuickActio
 
           <ScrollView showsVerticalScrollIndicator={false}>
             {/* Primary Actions - Communication */}
-            <Text style={styles.sectionTitle}>Liên lạc</Text>
+            <Text style={styles.sectionTitle}>
+              {t("quickAction.communication")}
+            </Text>
             <View style={styles.actionsGrid}>
-              {PRIMARY_ACTIONS.map(renderActionButton)}
+              {PRIMARY_ACTION_KEYS.map(renderActionButton)}
             </View>
 
             {/* Secondary Actions - Utilities */}
-            <Text style={styles.sectionTitle}>Tiện ích</Text>
+            <Text style={styles.sectionTitle}>
+              {t("quickAction.utilities")}
+            </Text>
             <View style={styles.actionsGrid}>
-              {SECONDARY_ACTIONS.map(renderActionButton)}
+              {SECONDARY_ACTION_KEYS.map(renderActionButton)}
             </View>
           </ScrollView>
 
@@ -191,7 +263,7 @@ export function QuickActionSheet({ visible, onClose, onActionPress }: QuickActio
             activeOpacity={0.7}
             onPress={onClose}
           >
-            <Text style={styles.closeButtonText}>Đóng</Text>
+            <Text style={styles.closeButtonText}>{t("common.close")}</Text>
           </TouchableOpacity>
         </Animated.View>
       </View>
@@ -202,77 +274,79 @@ export function QuickActionSheet({ visible, onClose, onActionPress }: QuickActio
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'flex-end',
+    justifyContent: "flex-end",
   },
   backdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: "rgba(0, 0, 0, 0.4)",
   },
   sheet: {
-    backgroundColor: '#fff',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    backgroundColor: "#FFFFFF",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
     paddingTop: 12,
-    paddingBottom: 32,
+    paddingBottom: 28,
     paddingHorizontal: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
+    elevation: 6,
   },
   handle: {
-    width: 40,
+    width: 36,
     height: 4,
-    backgroundColor: '#e0e0e0',
+    backgroundColor: "#E5E7EB",
     borderRadius: 2,
-    alignSelf: 'center',
-    marginBottom: 16,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#1a1a1a',
-    marginBottom: 12,
-    letterSpacing: -0.3,
-  },
-  actionsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    alignSelf: "center",
     marginBottom: 20,
   },
-  actionButton: {
-    width: '48%',
-    alignItems: 'center',
-    paddingVertical: 20,
-    backgroundColor: '#fafafa',
-    borderRadius: 16,
+  sectionTitle: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: "#1F2937",
     marginBottom: 12,
+    letterSpacing: -0.2,
+  },
+  actionsGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    marginBottom: 16,
+  },
+  actionButton: {
+    width: "48%",
+    alignItems: "center",
+    paddingVertical: 18,
+    backgroundColor: "#FAFAFA",
+    borderRadius: 14,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: "#F3F4F6",
   },
   actionIcon: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 12,
+    width: 56,
+    height: 56,
+    borderRadius: 16,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 10,
   },
   actionLabel: {
     fontSize: 13,
-    fontWeight: '600',
-    color: '#333',
-    letterSpacing: -0.2,
+    fontWeight: "600",
+    color: "#374151",
+    letterSpacing: -0.1,
   },
   closeButton: {
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#F3F4F6",
     paddingVertical: 14,
     borderRadius: 12,
-    alignItems: 'center',
+    alignItems: "center",
   },
   closeButtonText: {
     fontSize: 15,
-    fontWeight: '600',
-    color: '#666',
+    fontWeight: "600",
+    color: "#6B7280",
   },
 });

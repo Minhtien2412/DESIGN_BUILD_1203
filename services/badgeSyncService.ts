@@ -4,8 +4,7 @@
  *
  * Đồng bộ badge count thời gian thực từ nhiều nguồn:
  * 1. WebSocket events (messages, calls, notifications)
- * 2. Local SQLite database (chatLocalDB - Zalo-style)
- * 3. REST API polling (fallback)
+ * 2. REST API polling (chat rooms, notifications, calls)
  *
  * Đảm bảo số lượng badge chính xác và cập nhật real-time.
  *
@@ -20,11 +19,6 @@ import Constants from "expo-constants";
 import { Platform } from "react-native";
 import { getAccessToken } from "./apiClient";
 import { chatAPIService } from "./chatAPIService";
-import {
-    getDB,
-    getTotalUnreadCount as getLocalUnreadCount,
-    initChatDB,
-} from "./chatLocalDB";
 
 // Lazy import expo-notifications to avoid crash in Expo Go SDK 53+
 let Notifications: typeof import("expo-notifications") | null = null;
@@ -137,16 +131,10 @@ class BadgeSyncService {
     this.userId = userId;
 
     try {
-      // 1. Initialize local database
-      await initChatDB();
-
-      // 2. Get initial counts from local DB
-      await this.syncFromLocal();
-
-      // 3. Connect WebSocket for real-time updates
+      // 1. Connect WebSocket for real-time updates
       await this.connectWebSockets();
 
-      // 4. Full sync from API to ensure accuracy
+      // 2. Full sync from API to ensure accuracy
       await this.fullSyncFromAPI();
 
       this.isInitialized = true;
@@ -222,24 +210,13 @@ class BadgeSyncService {
    */
   async markConversationRead(conversationId: string): Promise<void> {
     try {
-      // Update local DB
-      const db = await getDB();
-      if (!db) {
-        console.warn("[BadgeSync] Database not available");
-        return;
-      }
-      await db.runAsync(
-        `UPDATE conversations SET unread_count = 0 WHERE id = ?`,
-        [conversationId],
-      );
-
-      // Recalculate from local
-      await this.syncFromLocal();
-
-      // Notify server
+      // Notify server via WebSocket
       if (this.chatSocket?.connected) {
         this.chatSocket.emit("markRead", { conversationId });
       }
+
+      // Re-sync counts from API
+      await this.fullSyncFromAPI();
     } catch (error) {
       console.error("[BadgeSync] Error marking conversation read:", error);
     }
@@ -272,7 +249,7 @@ class BadgeSyncService {
     this.syncInProgress = true;
 
     try {
-      await Promise.all([this.syncFromLocal(), this.fullSyncFromAPI()]);
+      await this.fullSyncFromAPI();
 
       this.lastSyncTime = Date.now();
     } finally {
@@ -484,20 +461,6 @@ class BadgeSyncService {
   // ============================================
   // DATA SYNC
   // ============================================
-
-  /**
-   * Sync counts from local SQLite database
-   */
-  private async syncFromLocal(): Promise<void> {
-    try {
-      const localUnread = await getLocalUnreadCount();
-      console.log("[BadgeSync] Local unread count:", localUnread);
-
-      this.updateCounts({ messages: localUnread }, "local");
-    } catch (error) {
-      console.error("[BadgeSync] Error syncing from local:", error);
-    }
-  }
 
   /**
    * Full sync from REST API

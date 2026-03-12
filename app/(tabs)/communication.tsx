@@ -1,14 +1,15 @@
 /**
  * Communication Hub Tab - Zalo Style
- * Unified tab with Messages, Calls, and Contacts
+ * Unified tab with Messages, Calls, and Meetings
  */
 
 import Avatar from "@/components/ui/avatar";
 import { useAuth } from "@/context/AuthContext";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { get } from "@/services/api";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import {
     ActivityIndicator,
@@ -61,10 +62,11 @@ interface CallRecord {
   isOutgoing: boolean;
 }
 
-type TabKey = "messages" | "calls" | "contacts";
+type TabKey = "messages" | "calls" | "meetings";
 
 export default function CommunicationHubScreen() {
   const router = useRouter();
+  const { tab } = useLocalSearchParams<{ tab?: string | string[] }>();
   const insets = useSafeAreaInsets();
   const { user, accessToken } = useAuth();
 
@@ -102,47 +104,29 @@ export default function CommunicationHubScreen() {
 
     try {
       // Fetch conversations
-      const convRes = await fetch(
-        "https://baotienweb.cloud/api/v1/conversations",
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "X-API-Key": "thietke-resort-api-key-2024",
-          },
-        },
+      const convData = await get<{ items?: Conversation[] }>(
+        "/api/v1/conversations",
       );
-
-      if (convRes.ok) {
-        const data = await convRes.json();
-        setConversations(data.items || []);
-      }
+      setConversations(convData.items || []);
 
       // Fetch call history
-      const callRes = await fetch(
-        "https://baotienweb.cloud/api/v1/call/history",
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "X-API-Key": "thietke-resort-api-key-2024",
-          },
-        },
+      const callData = await get<{ value?: any[] } | any[]>(
+        "/api/v1/call/history",
       );
-
-      if (callRes.ok) {
-        const data = await callRes.json();
-        const callList = data.value || data || [];
-        // Transform to simplified format
-        setCalls(
-          callList.map((c: any) => ({
-            id: c.id,
-            type: c.type,
-            status: c.status,
-            createdAt: c.createdAt,
-            otherUser: c.callerId === user?.id ? c.callee : c.caller,
-            isOutgoing: c.callerId === user?.id,
-          })),
-        );
-      }
+      const callList = Array.isArray(callData)
+        ? callData
+        : (callData as any).value || [];
+      // Transform to simplified format
+      setCalls(
+        callList.map((c: any) => ({
+          id: c.id,
+          type: c.type,
+          status: c.status,
+          createdAt: c.createdAt,
+          otherUser: c.callerId === user?.id ? c.callee : c.caller,
+          isOutgoing: c.callerId === user?.id,
+        })),
+      );
     } catch (error) {
       console.error("[CommunicationHub] Fetch error:", error);
     } finally {
@@ -159,7 +143,7 @@ export default function CommunicationHubScreen() {
   const handleTabChange = (tab: TabKey) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setActiveTab(tab);
-    const tabIndex = ["messages", "calls", "contacts"].indexOf(tab);
+    const tabIndex = ["messages", "calls", "meetings"].indexOf(tab);
     tabIndicatorX.value = withSpring(tabIndex * (width / 3));
   };
 
@@ -174,6 +158,22 @@ export default function CommunicationHubScreen() {
     height: searchHeight.value,
     opacity: searchHeight.value / 50,
   }));
+
+  // Support deep-linking from notifications/shortcuts: /(tabs)/communication?tab=messages|calls|meetings
+  useEffect(() => {
+    const tabValue = Array.isArray(tab) ? tab[0] : tab;
+    if (
+      tabValue !== "messages" &&
+      tabValue !== "calls" &&
+      tabValue !== "meetings"
+    ) {
+      return;
+    }
+
+    setActiveTab(tabValue);
+    const tabIndex = ["messages", "calls", "meetings"].indexOf(tabValue);
+    tabIndicatorX.value = withSpring(tabIndex * (width / 3));
+  }, [tab, tabIndicatorX]);
 
   // Format time
   const formatTime = (dateStr: string) => {
@@ -357,15 +357,15 @@ export default function CommunicationHubScreen() {
         },
         {
           icon: "videocam",
-          label: "Video call",
+          label: "Tạo họp",
           color: "#9C27B0",
-          onPress: () => router.push("/meeting" as any),
+          onPress: () => router.push("/meetings/create" as any),
         },
         {
-          icon: "radio",
-          label: "Livestream",
-          color: "#0D9488",
-          onPress: () => router.push("/livestream"),
+          icon: "notifications",
+          label: "Thông báo",
+          color: "#F59E0B",
+          onPress: () => router.push("/(tabs)/notifications" as any),
         },
       ].map((action, index) => (
         <TouchableOpacity
@@ -393,22 +393,31 @@ export default function CommunicationHubScreen() {
     </View>
   );
 
-  // Render contacts placeholder
-  const renderContacts = () => (
+  // Render meetings section
+  const renderMeetings = () => (
     <View style={styles.emptyContainer}>
-      <Ionicons name="people-outline" size={64} color={textMuted} />
-      <Text style={[styles.emptyTitle, { color: text }]}>Danh bạ</Text>
+      <Ionicons name="videocam-outline" size={64} color={textMuted} />
+      <Text style={[styles.emptyTitle, { color: text }]}>Cuộc họp</Text>
       <Text style={[styles.emptySubtitle, { color: textMuted }]}>
-        Đồng bộ danh bạ để tìm bạn bè
+        Quản lý và tham gia phòng họp nhanh chóng
       </Text>
       <TouchableOpacity
         style={[styles.syncButton, { backgroundColor: primary }]}
-        onPress={() =>
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
-        }
+        onPress={() => router.push("/meetings" as any)}
       >
-        <Ionicons name="sync" size={18} color="#fff" />
-        <Text style={styles.syncButtonText}>Đồng bộ danh bạ</Text>
+        <Ionicons name="videocam" size={18} color="#fff" />
+        <Text style={styles.syncButtonText}>Mở danh sách cuộc họp</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[
+          styles.syncButton,
+          { backgroundColor: "#7C3AED", marginTop: 12 },
+        ]}
+        onPress={() => router.push("/meetings/create" as any)}
+      >
+        <Ionicons name="add-circle" size={18} color="#fff" />
+        <Text style={styles.syncButtonText}>Tạo cuộc họp mới</Text>
       </TouchableOpacity>
     </View>
   );
@@ -461,6 +470,8 @@ export default function CommunicationHubScreen() {
           <View style={styles.searchContainer}>
             <Ionicons name="search" size={18} color={textMuted} />
             <TextInput
+              nativeID="communication-search"
+              accessibilityLabel="Tìm kiếm"
               style={[styles.searchInput, { color: text }]}
               placeholder="Tìm kiếm..."
               placeholderTextColor={textMuted}
@@ -475,7 +486,7 @@ export default function CommunicationHubScreen() {
           {[
             { key: "messages", label: "Tin nhắn", icon: "chatbubble" },
             { key: "calls", label: "Cuộc gọi", icon: "call" },
-            { key: "contacts", label: "Danh bạ", icon: "people" },
+            { key: "meetings", label: "Cuộc họp", icon: "videocam" },
           ].map((tab) => (
             <Pressable
               key={tab.key}
@@ -564,7 +575,7 @@ export default function CommunicationHubScreen() {
               />
             ))}
 
-          {activeTab === "contacts" && renderContacts()}
+          {activeTab === "meetings" && renderMeetings()}
         </ScrollView>
       )}
 
@@ -578,7 +589,7 @@ export default function CommunicationHubScreen() {
           } else if (activeTab === "calls") {
             router.push("/call/contacts" as any);
           } else {
-            router.push("/contacts" as any);
+            router.push("/meetings/create" as any);
           }
         }}
       >
@@ -588,7 +599,7 @@ export default function CommunicationHubScreen() {
               ? "create"
               : activeTab === "calls"
                 ? "call"
-                : "person-add"
+                : "videocam"
           }
           size={24}
           color="#fff"

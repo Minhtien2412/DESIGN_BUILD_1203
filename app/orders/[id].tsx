@@ -12,6 +12,7 @@
  * - Pull to refresh
  */
 
+import { OrderTrackingModal } from "@/components/modals/OrderTrackingModal";
 import { Container } from "@/components/ui/container";
 import ModernButton from "@/components/ui/modern-button";
 import {
@@ -23,7 +24,7 @@ import {
 import { useThemeColor } from "@/hooks/use-theme-color";
 import {
     cancelOrder as apiCancelOrder,
-    getOrderById
+    getOrderById,
 } from "@/services/api/orders.service";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -190,6 +191,7 @@ export default function OrderDetailScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [cancelling, setCancelling] = useState(false);
+  const [showTracking, setShowTracking] = useState(false);
 
   // Load order detail
   const loadOrder = useCallback(
@@ -372,9 +374,7 @@ export default function OrderDetailScreen() {
   };
 
   const handleTrackShipping = () => {
-    if (order?.trackingNumber) {
-      Alert.alert("Mã vận đơn", order.trackingNumber);
-    }
+    setShowTracking(true);
   };
 
   const formatCurrency = (amount: number) => {
@@ -692,11 +692,32 @@ export default function OrderDetailScreen() {
             )}
 
             {order.status === "delivered" && (
+              <>
+                <ModernButton
+                  onPress={handleReorder}
+                  style={styles.reorderButton}
+                >
+                  Đặt lại đơn hàng
+                </ModernButton>
+                <ModernButton
+                  onPress={() => router.push(`/orders/${order.id}/refund`)}
+                  variant="outline"
+                  icon="return-down-back-outline"
+                  style={styles.refundButton}
+                >
+                  Yêu cầu hoàn tiền
+                </ModernButton>
+              </>
+            )}
+
+            {order.status === "completed" && (
               <ModernButton
-                onPress={handleReorder}
-                style={styles.reorderButton}
+                onPress={() => router.push(`/orders/${order.id}/refund`)}
+                variant="outline"
+                icon="return-down-back-outline"
+                style={styles.refundButton}
               >
-                Đặt lại đơn hàng
+                Yêu cầu hoàn tiền / Khiếu nại
               </ModernButton>
             )}
 
@@ -729,6 +750,13 @@ export default function OrderDetailScreen() {
 
           <View style={{ height: 40 }} />
         </ScrollView>
+
+        {/* Order Tracking Modal */}
+        <OrderTrackingModal
+          visible={showTracking}
+          orderId={order.id}
+          onClose={() => setShowTracking(false)}
+        />
       </View>
     </>
   );
@@ -1054,6 +1082,9 @@ const styles = StyleSheet.create({
     borderColor: "#EF4444",
   },
   reorderButton: {},
+  refundButton: {
+    borderColor: "#F59E0B",
+  },
   supportButton: {},
   orderInfoFooter: {
     alignItems: "center",

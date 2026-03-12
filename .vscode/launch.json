@@ -2,6 +2,7 @@
     // Expo/React Native debug configs for design-build
     "version": "0.2.0",
     "configurations": [
+        
         {
             "name": "Expo Start (npx)",
             "type": "node",

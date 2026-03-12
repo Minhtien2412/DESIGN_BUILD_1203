@@ -19,6 +19,7 @@ import {
     useCallback,
     useContext,
     useEffect,
+    useRef,
     useState,
 } from "react";
 
@@ -99,13 +100,17 @@ export function BookingProvider({ children }: { children: ReactNode }) {
     return () => cancelAnimationFrame(frameId);
   }, []);
 
-  // Persist to storage on change
+  // Persist to storage on change (including empty array to clear storage)
+  const didInitRef = useRef(false);
   useEffect(() => {
-    if (activeBookings.length > 0) {
-      setItem(BOOKINGS_KEY, JSON.stringify(activeBookings)).catch((err) =>
-        console.error("[BookingContext] Failed to persist:", err),
-      );
+    // Skip the first render to avoid overwriting before load completes
+    if (!didInitRef.current) {
+      didInitRef.current = true;
+      return;
     }
+    setItem(BOOKINGS_KEY, JSON.stringify(activeBookings)).catch((err) =>
+      console.error("[BookingContext] Failed to persist:", err),
+    );
   }, [activeBookings]);
 
   // Refresh from API
@@ -203,31 +208,28 @@ export function BookingProvider({ children }: { children: ReactNode }) {
     [],
   );
 
-  // Cancel booking
-  const cancelActiveBooking = useCallback(
-    async (bookingId: string) => {
-      const booking = activeBookings.find((b) => b.id === bookingId);
-
-      // Cancel via API if synced
-      if (booking?.apiBookingId) {
-        try {
-          await cancelBooking(booking.apiBookingId);
-          console.log("[BookingContext] ✅ Booking cancelled via API");
-        } catch (error) {
-          console.warn("[BookingContext] ⚠️ API cancel failed:", error);
-        }
-      }
-
-      setActiveBookings((prev) =>
-        prev.map((b) =>
-          b.id === bookingId
-            ? { ...b, status: "CANCELLED" as BookingStatus }
-            : b,
-        ),
+  // Cancel booking (no stale closure – uses functional update)
+  const cancelActiveBooking = useCallback(async (bookingId: string) => {
+    // Read current bookings via ref-less approach: optimistic update first
+    let apiId: number | undefined;
+    setActiveBookings((prev) => {
+      const target = prev.find((b) => b.id === bookingId);
+      apiId = target?.apiBookingId;
+      return prev.map((b) =>
+        b.id === bookingId ? { ...b, status: "CANCELLED" as BookingStatus } : b,
       );
-    },
-    [activeBookings],
-  );
+    });
+
+    // Cancel via API if synced
+    if (apiId) {
+      try {
+        await cancelBooking(apiId);
+        console.log("[BookingContext] ✅ Booking cancelled via API");
+      } catch (error) {
+        console.warn("[BookingContext] ⚠️ API cancel failed:", error);
+      }
+    }
+  }, []);
 
   // Get booking by ID
   const getBookingById = useCallback(
@@ -242,17 +244,12 @@ export function BookingProvider({ children }: { children: ReactNode }) {
     [activeBookings],
   );
 
-  // Clear completed/cancelled bookings
+  // Clear completed/cancelled bookings (storage is synced via useEffect)
   const clearCompletedBookings = useCallback(async () => {
     setActiveBookings((prev) =>
       prev.filter((b) => b.status !== "COMPLETED" && b.status !== "CANCELLED"),
     );
-    // Also update storage
-    const remaining = activeBookings.filter(
-      (b) => b.status !== "COMPLETED" && b.status !== "CANCELLED",
-    );
-    await setItem(BOOKINGS_KEY, JSON.stringify(remaining));
-  }, [activeBookings]);
+  }, []);
 
   const totalActive = activeBookings.filter(
     (b) => b.status !== "COMPLETED" && b.status !== "CANCELLED",

@@ -1,5 +1,6 @@
 // React Native WebRTC Wrapper for Expo
 // Safely handles missing native module (Expo Go limitation)
+// Uses @livekit/react-native-webrtc for dev/production builds
 import React from "react";
 import { Platform, View } from "react-native";
 
@@ -10,12 +11,13 @@ let hasNativeModule = false;
 // Only load WebRTC on native platforms (iOS/Android)
 if (Platform.OS !== "web") {
   try {
-    // WebRTC packages have been removed to avoid build conflicts
-    // TODO: Re-add @livekit/react-native-webrtc when needed for video call feature
-    console.warn("[WebRTC] Video call packages disabled to reduce build size");
+    // Attempt to load @livekit/react-native-webrtc (requires dev build, not Expo Go)
+    WebRTCModule = require("@livekit/react-native-webrtc");
+    hasNativeModule = true;
+    console.log("[WebRTC] ✅ LiveKit react-native-webrtc loaded successfully");
   } catch (error) {
     console.warn(
-      "[WebRTC] Native module not available - WebRTC features disabled",
+      "[WebRTC] Native module not available - running in fallback mode",
     );
     console.warn(
       "[WebRTC] To use WebRTC, create a development build: npx expo run:android",

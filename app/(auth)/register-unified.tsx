@@ -14,11 +14,14 @@
 
 import { useAuth } from "@/context/AuthContext";
 import { UserRole } from "@/services/auth/authService";
+import { useI18n } from "@/services/i18nService";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Location from "expo-location";
 import { useRouter } from "expo-router";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
     ActivityIndicator,
     Alert,
@@ -75,47 +78,47 @@ interface FormData {
   } | null;
 }
 
-const ROLE_OPTIONS: {
+const ROLE_OPTION_KEYS: {
   value: UserRole;
-  label: string;
+  labelKey: string;
   icon: string;
-  description: string;
+  descKey: string;
 }[] = [
   {
     value: "CLIENT",
-    label: "Khách hàng",
+    labelKey: "register.roleClient",
     icon: "person",
-    description: "Tìm kiếm dịch vụ xây dựng",
+    descKey: "register.roleClientDesc",
   },
   {
     value: "CONTRACTOR",
-    label: "Nhà thầu",
+    labelKey: "register.roleContractor",
     icon: "construct",
-    description: "Cung cấp dịch vụ thi công",
+    descKey: "register.roleContractorDesc",
   },
   {
     value: "ARCHITECT",
-    label: "Kiến trúc sư",
+    labelKey: "register.roleArchitect",
     icon: "grid",
-    description: "Thiết kế kiến trúc",
+    descKey: "register.roleArchitectDesc",
   },
   {
     value: "DESIGNER",
-    label: "Nhà thiết kế",
+    labelKey: "register.roleDesigner",
     icon: "color-palette",
-    description: "Thiết kế nội thất",
+    descKey: "register.roleDesignerDesc",
   },
   {
     value: "SUPPLIER",
-    label: "Nhà cung cấp",
+    labelKey: "register.roleSupplier",
     icon: "cube",
-    description: "Cung cấp vật liệu",
+    descKey: "register.roleSupplierDesc",
   },
   {
     value: "ENGINEER",
-    label: "Kỹ sư",
+    labelKey: "register.roleEngineer",
     icon: "hardware-chip",
-    description: "Tư vấn kỹ thuật",
+    descKey: "register.roleEngineerDesc",
   },
 ];
 
@@ -174,6 +177,7 @@ export default function UnifiedRegisterScreen() {
     loading: authLoading,
     isAuthenticated,
   } = useAuth();
+  const { t } = useI18n();
 
   // State
   const [registerMode, setRegisterMode] = useState<RegisterMode>("email");
@@ -196,6 +200,8 @@ export default function UnifiedRegisterScreen() {
   const [otpTimer, setOtpTimer] = useState(0);
   const [locationLoading, setLocationLoading] = useState(false);
   const [showRoleSelector, setShowRoleSelector] = useState(false);
+  const [faceEmbedding, setFaceEmbedding] = useState<number[] | null>(null);
+  const [faceVerified, setFaceVerified] = useState(false);
 
   // Animations
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -225,6 +231,33 @@ export default function UnifiedRegisterScreen() {
     }
   }, [isAuthenticated]);
 
+  // Check for face verification result when screen regains focus
+  useFocusEffect(
+    useCallback(() => {
+      const checkFaceResult = async () => {
+        try {
+          const result = await AsyncStorage.getItem(
+            "@face_verification_result",
+          );
+          if (result) {
+            const { embedding, verified } = JSON.parse(result);
+            if (verified && embedding) {
+              setFaceEmbedding(embedding);
+              setFaceVerified(true);
+            }
+            await AsyncStorage.removeItem("@face_verification_result");
+          }
+        } catch (err) {
+          console.warn(
+            "[Register] Failed to read face verification result:",
+            err,
+          );
+        }
+      };
+      checkFaceResult();
+    }, []),
+  );
+
   useEffect(() => {
     let interval: ReturnType<typeof setInterval> | undefined;
     if (otpTimer > 0) {
@@ -250,30 +283,30 @@ export default function UnifiedRegisterScreen() {
     const newErrors: Record<string, string> = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = "Vui lòng nhập họ tên";
+      newErrors.name = t("register.errName");
     }
 
     if (registerMode === "email") {
       if (!formData.email.trim()) {
-        newErrors.email = "Vui lòng nhập email";
+        newErrors.email = t("register.errEmail");
       } else if (!validateEmail(formData.email)) {
-        newErrors.email = "Email không hợp lệ";
+        newErrors.email = t("register.errEmailInvalid");
       }
 
       if (!formData.password) {
-        newErrors.password = "Vui lòng nhập mật khẩu";
+        newErrors.password = t("register.errPassword");
       } else if (formData.password.length < 6) {
-        newErrors.password = "Mật khẩu phải có ít nhất 6 ký tự";
+        newErrors.password = t("register.errPasswordMin");
       }
 
       if (formData.password !== formData.confirmPassword) {
-        newErrors.confirmPassword = "Mật khẩu không khớp";
+        newErrors.confirmPassword = t("register.errPasswordMismatch");
       }
     } else {
       if (!formData.phone.trim()) {
-        newErrors.phone = "Vui lòng nhập số điện thoại";
+        newErrors.phone = t("register.errPhone");
       } else if (!isPhoneNumber(formData.phone)) {
-        newErrors.phone = "Số điện thoại không hợp lệ";
+        newErrors.phone = t("register.errPhoneInvalid");
       }
     }
 
@@ -317,7 +350,7 @@ export default function UnifiedRegisterScreen() {
 
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
-        Alert.alert("Lỗi", "Không có quyền truy cập vị trí");
+        Alert.alert(t("common.error"), t("register.errLocationDenied"));
         return;
       }
 
@@ -341,12 +374,12 @@ export default function UnifiedRegisterScreen() {
         location: {
           latitude: location.coords.latitude,
           longitude: location.coords.longitude,
-          address: addressString || "Không xác định",
+          address: addressString || t("register.locationUnknown"),
         },
       }));
     } catch (error) {
       console.error("[Register] Get location error:", error);
-      Alert.alert("Lỗi", "Không thể lấy vị trí. Vui lòng thử lại.");
+      Alert.alert(t("common.error"), t("register.errLocationFailed"));
     } finally {
       setLocationLoading(false);
     }
@@ -357,6 +390,15 @@ export default function UnifiedRegisterScreen() {
   const handleEmailRegister = async () => {
     if (!validateForm()) {
       triggerShake();
+      return;
+    }
+
+    // Require face verification before registration
+    if (!faceVerified || !faceEmbedding) {
+      router.push({
+        pathname: "/(auth)/face-verification",
+        params: { email: formData.email },
+      } as any);
       return;
     }
 
@@ -372,12 +414,13 @@ export default function UnifiedRegisterScreen() {
         formData.role,
         formData.phone || undefined,
         formData.location || undefined,
+        faceEmbedding,
       );
       // Navigation handled by isAuthenticated effect
     } catch (error: any) {
       console.error("[Register] Email register failed:", error);
       setErrors({
-        general: error.message || "Đăng ký thất bại. Vui lòng thử lại.",
+        general: error.message || t("register.errRegisterFailed"),
       });
       triggerShake();
     } finally {
@@ -387,13 +430,13 @@ export default function UnifiedRegisterScreen() {
 
   const handleSendOTP = async () => {
     if (!formData.phone.trim() || !isPhoneNumber(formData.phone)) {
-      setErrors({ phone: "Vui lòng nhập số điện thoại hợp lệ" });
+      setErrors({ phone: t("register.errPhoneValid") });
       triggerShake();
       return;
     }
 
     if (!formData.name.trim()) {
-      setErrors({ name: "Vui lòng nhập họ tên" });
+      setErrors({ name: t("register.errName") });
       triggerShake();
       return;
     }
@@ -415,7 +458,7 @@ export default function UnifiedRegisterScreen() {
       }
     } catch (error: any) {
       console.error("[Register] Send OTP failed:", error);
-      setErrors({ general: error.message || "Không thể gửi OTP" });
+      setErrors({ general: error.message || t("register.errOtpSendFailed") });
       triggerShake();
     } finally {
       setLoading(false);
@@ -424,7 +467,7 @@ export default function UnifiedRegisterScreen() {
 
   const handleVerifyOTP = async () => {
     if (formData.otp.length < 6) {
-      setErrors({ otp: "Vui lòng nhập đủ 6 số" });
+      setErrors({ otp: t("register.errOtpLength") });
       triggerShake();
       return;
     }
@@ -447,12 +490,12 @@ export default function UnifiedRegisterScreen() {
         }
         // Navigation handled by isAuthenticated effect
       } else {
-        setErrors({ otp: result.message || "Mã OTP không đúng" });
+        setErrors({ otp: result.message || t("register.errOtpWrong") });
         triggerShake();
       }
     } catch (error: any) {
       console.error("[Register] Verify OTP failed:", error);
-      setErrors({ otp: error.message || "Xác thực OTP thất bại" });
+      setErrors({ otp: error.message || t("register.errOtpVerifyFailed") });
       triggerShake();
     } finally {
       setLoading(false);
@@ -497,7 +540,7 @@ export default function UnifiedRegisterScreen() {
         <Ionicons name="person-outline" size={20} color={COLORS.textMuted} />
         <TextInput
           style={styles.input}
-          placeholder="Họ và tên"
+          placeholder={t("register.fullName")}
           placeholderTextColor={COLORS.textMuted}
           value={formData.name}
           onChangeText={(text) => {
@@ -537,7 +580,7 @@ export default function UnifiedRegisterScreen() {
         />
         <TextInput
           style={styles.input}
-          placeholder="Mật khẩu"
+          placeholder={t("register.password")}
           placeholderTextColor={COLORS.textMuted}
           value={formData.password}
           onChangeText={(text) => {
@@ -567,7 +610,7 @@ export default function UnifiedRegisterScreen() {
         />
         <TextInput
           style={styles.input}
-          placeholder="Xác nhận mật khẩu"
+          placeholder={t("register.confirmPassword")}
           placeholderTextColor={COLORS.textMuted}
           value={formData.confirmPassword}
           onChangeText={(text) => {
@@ -597,8 +640,12 @@ export default function UnifiedRegisterScreen() {
       >
         <Ionicons name="briefcase-outline" size={20} color={COLORS.textMuted} />
         <Text style={styles.roleSelectorText}>
-          {ROLE_OPTIONS.find((r) => r.value === formData.role)?.label ||
-            "Chọn vai trò"}
+          {ROLE_OPTION_KEYS.find((r) => r.value === formData.role)
+            ? t(
+                ROLE_OPTION_KEYS.find((r) => r.value === formData.role)!
+                  .labelKey,
+              )
+            : t("register.selectRole")}
         </Text>
         <Ionicons
           name={showRoleSelector ? "chevron-up" : "chevron-down"}
@@ -609,7 +656,7 @@ export default function UnifiedRegisterScreen() {
 
       {showRoleSelector && (
         <View style={styles.roleOptions}>
-          {ROLE_OPTIONS.map((role) => (
+          {ROLE_OPTION_KEYS.map((role) => (
             <TouchableOpacity
               key={role.value}
               style={[
@@ -638,9 +685,9 @@ export default function UnifiedRegisterScreen() {
                       styles.roleOptionLabelSelected,
                   ]}
                 >
-                  {role.label}
+                  {t(role.labelKey)}
                 </Text>
-                <Text style={styles.roleOptionDesc}>{role.description}</Text>
+                <Text style={styles.roleOptionDesc}>{t(role.descKey)}</Text>
               </View>
               {formData.role === role.value && (
                 <Ionicons
@@ -668,7 +715,43 @@ export default function UnifiedRegisterScreen() {
         <Text style={styles.locationButtonText}>
           {formData.location
             ? formData.location.address
-            : "Thêm vị trí (tuỳ chọn)"}
+            : t("register.addLocation")}
+        </Text>
+      </TouchableOpacity>
+
+      {/* Face Verification */}
+      <TouchableOpacity
+        style={[
+          styles.locationButton,
+          faceVerified && {
+            borderColor: COLORS.success,
+            backgroundColor: "#ECFDF5",
+          },
+        ]}
+        onPress={() => {
+          if (!faceVerified) {
+            router.push({
+              pathname: "/(auth)/face-verification",
+              params: { email: formData.email },
+            } as any);
+          }
+        }}
+        disabled={faceVerified}
+      >
+        <Ionicons
+          name={faceVerified ? "checkmark-circle" : "scan-outline"}
+          size={20}
+          color={faceVerified ? COLORS.success : COLORS.primary}
+        />
+        <Text
+          style={[
+            styles.locationButtonText,
+            faceVerified && { color: COLORS.success },
+          ]}
+        >
+          {faceVerified
+            ? "Đã xác minh khuôn mặt ✓"
+            : "Xác minh khuôn mặt (bắt buộc)"}
         </Text>
       </TouchableOpacity>
 
@@ -684,7 +767,7 @@ export default function UnifiedRegisterScreen() {
         {loading || authLoading ? (
           <ActivityIndicator color="#fff" />
         ) : (
-          <Text style={styles.primaryButtonText}>Đăng ký</Text>
+          <Text style={styles.primaryButtonText}>{t("register.register")}</Text>
         )}
       </TouchableOpacity>
     </Animated.View>
@@ -697,7 +780,7 @@ export default function UnifiedRegisterScreen() {
         <Ionicons name="person-outline" size={20} color={COLORS.textMuted} />
         <TextInput
           style={styles.input}
-          placeholder="Họ và tên"
+          placeholder={t("register.fullName")}
           placeholderTextColor={COLORS.textMuted}
           value={formData.name}
           onChangeText={(text) => {
@@ -714,7 +797,7 @@ export default function UnifiedRegisterScreen() {
         <Text style={styles.phonePrefix}>+84</Text>
         <TextInput
           style={styles.input}
-          placeholder="Số điện thoại"
+          placeholder={t("register.phoneNumber")}
           placeholderTextColor={COLORS.textMuted}
           value={formData.phone}
           onChangeText={(text) => {
@@ -742,7 +825,7 @@ export default function UnifiedRegisterScreen() {
         {loading || authLoading ? (
           <ActivityIndicator color="#fff" />
         ) : (
-          <Text style={styles.primaryButtonText}>Gửi mã OTP</Text>
+          <Text style={styles.primaryButtonText}>{t("register.sendOtp")}</Text>
         )}
       </TouchableOpacity>
     </Animated.View>
@@ -752,12 +835,12 @@ export default function UnifiedRegisterScreen() {
     <Animated.View style={{ opacity: fadeAnim }}>
       <TouchableOpacity onPress={handleBackToInput} style={styles.backButton}>
         <Ionicons name="arrow-back" size={24} color={COLORS.primary} />
-        <Text style={styles.backButtonText}>Quay lại</Text>
+        <Text style={styles.backButtonText}>{t("register.goBack")}</Text>
       </TouchableOpacity>
 
-      <Text style={styles.otpTitle}>Nhập mã OTP</Text>
+      <Text style={styles.otpTitle}>{t("register.enterOtp")}</Text>
       <Text style={styles.otpSubtitle}>
-        Mã xác thực đã được gửi đến số {"\n"}
+        {t("register.otpSentTo")} {"\n"}
         <Text style={{ fontWeight: "600" }}>+84 {formData.phone}</Text>
       </Text>
 
@@ -773,12 +856,12 @@ export default function UnifiedRegisterScreen() {
       <View style={styles.resendContainer}>
         {otpTimer > 0 ? (
           <Text style={styles.timerText}>
-            Gửi lại mã sau {Math.floor(otpTimer / 60)}:
+            {t("register.resendAfter")} {Math.floor(otpTimer / 60)}:
             {(otpTimer % 60).toString().padStart(2, "0")}
           </Text>
         ) : (
           <TouchableOpacity onPress={handleResendOTP}>
-            <Text style={styles.resendText}>Gửi lại mã OTP</Text>
+            <Text style={styles.resendText}>{t("register.resendOtp")}</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -795,7 +878,9 @@ export default function UnifiedRegisterScreen() {
         {loading || authLoading ? (
           <ActivityIndicator color="#fff" />
         ) : (
-          <Text style={styles.primaryButtonText}>Xác nhận đăng ký</Text>
+          <Text style={styles.primaryButtonText}>
+            {t("register.confirmRegister")}
+          </Text>
         )}
       </TouchableOpacity>
     </Animated.View>
@@ -829,10 +914,8 @@ export default function UnifiedRegisterScreen() {
                   color={COLORS.primary}
                 />
               </View>
-              <Text style={styles.appName}>Đăng ký tài khoản</Text>
-              <Text style={styles.tagline}>
-                Tham gia cộng đồng DESIGN BUILD
-              </Text>
+              <Text style={styles.appName}>{t("register.title")}</Text>
+              <Text style={styles.tagline}>{t("register.tagline")}</Text>
             </View>
 
             {/* Error Message */}
@@ -895,7 +978,7 @@ export default function UnifiedRegisterScreen() {
                         registerMode === "phone" && styles.modeTabTextActive,
                       ]}
                     >
-                      Số điện thoại
+                      {t("register.phoneTab")}
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -906,11 +989,13 @@ export default function UnifiedRegisterScreen() {
 
                 {/* Login Link */}
                 <View style={styles.loginContainer}>
-                  <Text style={styles.loginText}>Đã có tài khoản? </Text>
+                  <Text style={styles.loginText}>
+                    {t("register.hasAccount")}
+                  </Text>
                   <TouchableOpacity
                     onPress={() => router.push("/(auth)/login-unified" as any)}
                   >
-                    <Text style={styles.loginLink}>Đăng nhập</Text>
+                    <Text style={styles.loginLink}>{t("register.login")}</Text>
                   </TouchableOpacity>
                 </View>
               </>

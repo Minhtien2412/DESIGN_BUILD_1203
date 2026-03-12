@@ -354,7 +354,7 @@ const ProfileHeader = memo<{
             <View style={styles.headerActions}>
               <TouchableOpacity
                 style={styles.headerIconBtn}
-                onPress={() => router.push("/notifications")}
+                onPress={() => router.push("/(tabs)/notifications")}
               >
                 <Ionicons
                   name="notifications-outline"
@@ -708,14 +708,14 @@ const QuickActions = memo<{
       icon: "people",
       label: "Danh bạ",
       gradient: ["#8B5CF6", "#7C3AED"],
-      route: "/messages",
+      route: "/chat",
       badge: 0,
     },
     {
       icon: "notifications",
       label: "Thông báo",
       gradient: ["#F59E0B", "#D97706"],
-      route: "/notifications",
+      route: "/(tabs)/notifications",
       badge: badges.notifications,
     },
   ];
@@ -1195,13 +1195,13 @@ export default function ProfileScreenEuropean() {
       icon: "key-outline",
       title: "Đổi mật khẩu",
       subtitle: "Bảo mật tài khoản",
-      route: "/profile/change-password",
+      route: "/profile/security",
     },
     {
       icon: "finger-print-outline",
       title: "Đăng nhập sinh trắc học",
       subtitle: "Face ID / Vân tay",
-      route: "/profile/biometric",
+      route: "/profile/security",
       color: COLORS.info,
     },
   ];
@@ -1219,7 +1219,7 @@ export default function ProfileScreenEuropean() {
       icon: "heart-outline",
       title: "Yêu thích",
       subtitle: `${userStats.savedItems} mục đã lưu`,
-      route: "/favorites",
+      route: "/profile/favorites",
       color: COLORS.danger,
     },
     {
@@ -1235,14 +1235,14 @@ export default function ProfileScreenEuropean() {
       icon: "people-outline",
       title: "Đồng bộ danh bạ",
       subtitle: "Tìm bạn bè trên ứng dụng",
-      route: "/profile/contact-sync",
+      route: "/profile/settings",
       color: COLORS.info,
     },
     {
       icon: "color-palette-outline",
       title: "Giao diện",
       subtitle: "Sáng / Tối / Tự động",
-      route: "/profile/appearance",
+      route: "/profile/settings",
     },
     {
       icon: "language-outline",
@@ -1254,7 +1254,7 @@ export default function ProfileScreenEuropean() {
       icon: "shield-checkmark-outline",
       title: "Quyền riêng tư",
       subtitle: "Quản lý dữ liệu",
-      route: "/profile/privacy",
+      route: "/profile/settings",
     },
   ];
 

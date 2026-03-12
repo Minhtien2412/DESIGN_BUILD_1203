@@ -1,8 +1,9 @@
-import { useThemeColor } from '@/hooks/use-theme-color';
-import { apiFetch } from '@/services/api';
-import { Ionicons } from '@expo/vector-icons';
-import * as ImagePicker from 'expo-image-picker';
-import { useRef, useState } from 'react';
+import { useThemeColor } from "@/hooks/use-theme-color";
+import { apiFetch } from "@/services/api";
+import { useI18n } from "@/services/i18nService";
+import { Ionicons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
+import { useRef, useState } from "react";
 import {
     Alert,
     Image,
@@ -14,23 +15,23 @@ import {
     TextInput,
     TouchableOpacity,
     View,
-} from 'react-native';
+} from "react-native";
 
 interface OnboardingData {
   // Step 1: Basic Info
   fullName: string;
   phone: string;
-  
+
   // Step 2: Location & Role
   address: string;
   city: string;
   country: string;
-  userRole: 'client' | 'contractor' | 'admin';
-  
+  userRole: "client" | "contractor" | "admin";
+
   // Step 3: Profile Details
   bio: string;
   avatar: string | null;
-  
+
   // Step 4: Preferences (for contractors)
   skills: string[];
   experience: string;
@@ -43,47 +44,68 @@ interface OnboardingWizardProps {
   initialData?: Partial<OnboardingData>;
 }
 
-const ROLES = [
-  { key: 'client', label: 'Khách hàng', description: 'Tôi cần thuê dịch vụ thiết kế/xây dựng', icon: 'person-outline' },
-  { key: 'contractor', label: 'Nhà thầu', description: 'Tôi cung cấp dịch vụ thiết kế/xây dựng', icon: 'construct-outline' },
+const ROLE_KEYS = [
+  {
+    key: "client",
+    labelKey: "onboarding.roleCustomer",
+    descKey: "onboarding.roleCustomerDesc",
+    icon: "person-outline",
+  },
+  {
+    key: "contractor",
+    labelKey: "onboarding.roleContractor",
+    descKey: "onboarding.roleContractorDesc",
+    icon: "construct-outline",
+  },
 ] as const;
 
-const SKILL_OPTIONS = [
-  'Thiết kế kiến trúc', 'Thiết kế nội thất', 'Xây dựng nhà ở',
-  'Xây dựng thương mại', 'Điện nước', 'Cảnh quan',
-  'Thi công hoàn thiện', 'Giám sát công trình', 'Tư vấn kỹ thuật'
+const SKILL_OPTION_KEYS = [
+  "onboarding.skillArchDesign",
+  "onboarding.skillInteriorDesign",
+  "onboarding.skillResidential",
+  "onboarding.skillCommercial",
+  "onboarding.skillMEP",
+  "onboarding.skillLandscape",
+  "onboarding.skillFinishing",
+  "onboarding.skillSupervision",
+  "onboarding.skillConsulting",
 ];
 
-export function OnboardingWizard({ onComplete, onSkip, initialData }: OnboardingWizardProps) {
+export function OnboardingWizard({
+  onComplete,
+  onSkip,
+  initialData,
+}: OnboardingWizardProps) {
+  const { t } = useI18n();
   const [currentStep, setCurrentStep] = useState(1);
   const [data, setData] = useState<OnboardingData>({
-    fullName: '',
-    phone: '',
-    address: '',
-    city: '',
-    country: 'Vietnam',
-    userRole: 'client',
-    bio: '',
+    fullName: "",
+    phone: "",
+    address: "",
+    city: "",
+    country: "Vietnam",
+    userRole: "client",
+    bio: "",
     avatar: null,
     skills: [],
-    experience: '',
+    experience: "",
     ...initialData,
   });
 
   const scrollViewRef = useRef<ScrollView>(null);
-  const backgroundColor = useThemeColor({}, 'background');
-  const textColor = useThemeColor({}, 'text');
-  const primaryColor = useThemeColor({}, 'tint');
+  const backgroundColor = useThemeColor({}, "background");
+  const textColor = useThemeColor({}, "text");
+  const primaryColor = useThemeColor({}, "tint");
 
-  const totalSteps = data.userRole === 'contractor' ? 4 : 3;
+  const totalSteps = data.userRole === "contractor" ? 4 : 3;
 
   const updateData = (updates: Partial<OnboardingData>) => {
-    setData(prev => ({ ...prev, ...updates }));
+    setData((prev) => ({ ...prev, ...updates }));
   };
 
   const nextStep = () => {
     if (currentStep < totalSteps) {
-      setCurrentStep(prev => prev + 1);
+      setCurrentStep((prev) => prev + 1);
       scrollViewRef.current?.scrollTo({ y: 0, animated: true });
     } else {
       handleComplete();
@@ -92,7 +114,7 @@ export function OnboardingWizard({ onComplete, onSkip, initialData }: Onboarding
 
   const prevStep = () => {
     if (currentStep > 1) {
-      setCurrentStep(prev => prev - 1);
+      setCurrentStep((prev) => prev - 1);
       scrollViewRef.current?.scrollTo({ y: 0, animated: true });
     }
   };
@@ -100,7 +122,9 @@ export function OnboardingWizard({ onComplete, onSkip, initialData }: Onboarding
   const validateStep = (): boolean => {
     switch (currentStep) {
       case 1:
-        return data.fullName.trim().length >= 2 && data.phone.trim().length >= 10;
+        return (
+          data.fullName.trim().length >= 2 && data.phone.trim().length >= 10
+        );
       case 2:
         return data.address.trim().length >= 5 && data.city.trim().length >= 2;
       case 3:
@@ -115,23 +139,27 @@ export function OnboardingWizard({ onComplete, onSkip, initialData }: Onboarding
   const handleComplete = async () => {
     try {
       // Save profile data to backend
-      await apiFetch('/auth/complete-profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      await apiFetch("/auth/complete-profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
 
       onComplete(data);
     } catch (error) {
-      Alert.alert('Lỗi', 'Không thể hoàn thành thiết lập. Vui lòng thử lại.');
+      Alert.alert(t("common.error"), t("onboarding.errSetup"));
     }
   };
 
   const pickImage = async () => {
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+
     if (!permissionResult.granted) {
-      Alert.alert('Cần cấp quyền', 'Vui lòng cấp quyền truy cập thư viện ảnh để chọn ảnh đại diện.');
+      Alert.alert(
+        t("onboarding.permissionNeeded"),
+        t("onboarding.permissionDesc"),
+      );
       return;
     }
 
@@ -149,7 +177,7 @@ export function OnboardingWizard({ onComplete, onSkip, initialData }: Onboarding
 
   const toggleSkill = (skill: string) => {
     const skills = data.skills.includes(skill)
-      ? data.skills.filter(s => s !== skill)
+      ? data.skills.filter((s) => s !== skill)
       : [...data.skills, skill];
     updateData({ skills });
   };
@@ -157,34 +185,38 @@ export function OnboardingWizard({ onComplete, onSkip, initialData }: Onboarding
   const renderProgressBar = () => (
     <View style={styles.progressContainer}>
       <View style={styles.progressBar}>
-        <View 
+        <View
           style={[
             styles.progressFill,
-            { 
+            {
               width: `${(currentStep / totalSteps) * 100}%`,
-              backgroundColor: primaryColor
-            }
+              backgroundColor: primaryColor,
+            },
           ]}
         />
       </View>
       <Text style={[styles.progressText, { color: textColor }]}>
-        Bước {currentStep} / {totalSteps}
+        {t("onboarding.stepProgress")
+          .replace("{current}", String(currentStep))
+          .replace("{total}", String(totalSteps))}
       </Text>
     </View>
   );
 
   const renderStep1 = () => (
     <View style={styles.stepContainer}>
-      <Text style={[styles.stepTitle, { color: textColor }]}>Thông tin cơ bản</Text>
+      <Text style={[styles.stepTitle, { color: textColor }]}>
+        {t("onboarding.step1Title")}
+      </Text>
       <Text style={[styles.stepSubtitle, { color: textColor }]}>
-        Cho chúng tôi biết về bạn
+        {t("onboarding.step1Subtitle")}
       </Text>
 
       <View style={styles.inputContainer}>
         <Ionicons name="person-outline" size={20} color="#666" />
         <TextInput
           style={[styles.input, { color: textColor }]}
-          placeholder="Họ và tên *"
+          placeholder={t("onboarding.fullNameReq")}
           value={data.fullName}
           onChangeText={(text) => updateData({ fullName: text })}
         />
@@ -194,7 +226,7 @@ export function OnboardingWizard({ onComplete, onSkip, initialData }: Onboarding
         <Ionicons name="call-outline" size={20} color="#666" />
         <TextInput
           style={[styles.input, { color: textColor }]}
-          placeholder="Số điện thoại *"
+          placeholder={t("onboarding.phoneReq")}
           value={data.phone}
           onChangeText={(text) => updateData({ phone: text })}
           keyboardType="phone-pad"
@@ -205,34 +237,56 @@ export function OnboardingWizard({ onComplete, onSkip, initialData }: Onboarding
 
   const renderStep2 = () => (
     <View style={styles.stepContainer}>
-      <Text style={[styles.stepTitle, { color: textColor }]}>Vai trò và địa chỉ</Text>
+      <Text style={[styles.stepTitle, { color: textColor }]}>
+        {t("onboarding.step2Title")}
+      </Text>
       <Text style={[styles.stepSubtitle, { color: textColor }]}>
-        Bạn là ai và đang ở đâu?
+        {t("onboarding.step2Subtitle")}
       </Text>
 
-      <Text style={[styles.sectionTitle, { color: textColor }]}>Vai trò của bạn:</Text>
-      {ROLES.map((role) => (
+      <Text style={[styles.sectionTitle, { color: textColor }]}>
+        {t("onboarding.yourRole")}
+      </Text>
+      {ROLE_KEYS.map((role) => (
         <TouchableOpacity
           key={role.key}
           style={[
             styles.roleOption,
-            data.userRole === role.key && { borderColor: primaryColor, backgroundColor: `${primaryColor}15` }
+            data.userRole === role.key && {
+              borderColor: primaryColor,
+              backgroundColor: `${primaryColor}15`,
+            },
           ]}
           onPress={() => updateData({ userRole: role.key })}
         >
-          <Ionicons name={role.icon as any} size={24} color={data.userRole === role.key ? primaryColor : '#666'} />
+          <Ionicons
+            name={role.icon as any}
+            size={24}
+            color={data.userRole === role.key ? primaryColor : "#666"}
+          />
           <View style={styles.roleText}>
-            <Text style={[styles.roleLabel, { color: data.userRole === role.key ? primaryColor : textColor }]}>
-              {role.label}
+            <Text
+              style={[
+                styles.roleLabel,
+                {
+                  color: data.userRole === role.key ? primaryColor : textColor,
+                },
+              ]}
+            >
+              {t(role.labelKey)}
             </Text>
             <Text style={[styles.roleDescription, { color: textColor }]}>
-              {role.description}
+              {t(role.descKey)}
             </Text>
           </View>
-          <Ionicons 
-            name={data.userRole === role.key ? 'radio-button-on' : 'radio-button-off'} 
-            size={20} 
-            color={data.userRole === role.key ? primaryColor : '#666'} 
+          <Ionicons
+            name={
+              data.userRole === role.key
+                ? "radio-button-on"
+                : "radio-button-off"
+            }
+            size={20}
+            color={data.userRole === role.key ? primaryColor : "#666"}
           />
         </TouchableOpacity>
       ))}
@@ -241,7 +295,7 @@ export function OnboardingWizard({ onComplete, onSkip, initialData }: Onboarding
         <Ionicons name="location-outline" size={20} color="#666" />
         <TextInput
           style={[styles.input, { color: textColor }]}
-          placeholder="Địa chỉ *"
+          placeholder={t("onboarding.addressReq")}
           value={data.address}
           onChangeText={(text) => updateData({ address: text })}
           multiline
@@ -253,7 +307,7 @@ export function OnboardingWizard({ onComplete, onSkip, initialData }: Onboarding
           <Ionicons name="business-outline" size={20} color="#666" />
           <TextInput
             style={[styles.input, { color: textColor }]}
-            placeholder="Thành phố *"
+            placeholder={t("onboarding.cityReq")}
             value={data.city}
             onChangeText={(text) => updateData({ city: text })}
           />
@@ -262,7 +316,7 @@ export function OnboardingWizard({ onComplete, onSkip, initialData }: Onboarding
           <Ionicons name="flag-outline" size={20} color="#666" />
           <TextInput
             style={[styles.input, { color: textColor }]}
-            placeholder="Quốc gia"
+            placeholder={t("onboarding.country")}
             value={data.country}
             onChangeText={(text) => updateData({ country: text })}
           />
@@ -273,9 +327,11 @@ export function OnboardingWizard({ onComplete, onSkip, initialData }: Onboarding
 
   const renderStep3 = () => (
     <View style={styles.stepContainer}>
-      <Text style={[styles.stepTitle, { color: textColor }]}>Hồ sơ cá nhân</Text>
+      <Text style={[styles.stepTitle, { color: textColor }]}>
+        {t("onboarding.step3Title")}
+      </Text>
       <Text style={[styles.stepSubtitle, { color: textColor }]}>
-        Tạo ấn tượng tốt với hồ sơ của bạn
+        {t("onboarding.step3Subtitle")}
       </Text>
 
       <View style={styles.avatarSection}>
@@ -283,13 +339,15 @@ export function OnboardingWizard({ onComplete, onSkip, initialData }: Onboarding
           {data.avatar ? (
             <Image source={{ uri: data.avatar }} style={styles.avatar} />
           ) : (
-            <View style={[styles.avatarPlaceholder, { borderColor: primaryColor }]}>
+            <View
+              style={[styles.avatarPlaceholder, { borderColor: primaryColor }]}
+            >
               <Ionicons name="camera-outline" size={32} color={primaryColor} />
             </View>
           )}
         </TouchableOpacity>
         <Text style={[styles.avatarText, { color: textColor }]}>
-          Thêm ảnh đại diện
+          {t("onboarding.addAvatar")}
         </Text>
       </View>
 
@@ -297,7 +355,7 @@ export function OnboardingWizard({ onComplete, onSkip, initialData }: Onboarding
         <Ionicons name="document-text-outline" size={20} color="#666" />
         <TextInput
           style={[styles.input, styles.textArea, { color: textColor }]}
-          placeholder="Giới thiệu về bản thân (tối thiểu 10 ký tự) *"
+          placeholder={t("onboarding.bioReq")}
           value={data.bio}
           onChangeText={(text) => updateData({ bio: text })}
           multiline
@@ -310,27 +368,35 @@ export function OnboardingWizard({ onComplete, onSkip, initialData }: Onboarding
 
   const renderStep4 = () => (
     <View style={styles.stepContainer}>
-      <Text style={[styles.stepTitle, { color: textColor }]}>Kỹ năng chuyên môn</Text>
+      <Text style={[styles.stepTitle, { color: textColor }]}>
+        {t("onboarding.step4Title")}
+      </Text>
       <Text style={[styles.stepSubtitle, { color: textColor }]}>
-        Cho khách hàng biết bạn giỏi về gì
+        {t("onboarding.step4Subtitle")}
       </Text>
 
-      <Text style={[styles.sectionTitle, { color: textColor }]}>Chọn kỹ năng:</Text>
+      <Text style={[styles.sectionTitle, { color: textColor }]}>
+        {t("onboarding.selectSkills")}
+      </Text>
       <View style={styles.skillsContainer}>
-        {SKILL_OPTIONS.map((skill) => (
+        {SKILL_OPTION_KEYS.map((skillKey) => (
           <TouchableOpacity
-            key={skill}
+            key={skillKey}
             style={[
               styles.skillChip,
-              data.skills.includes(skill) && { backgroundColor: primaryColor }
+              data.skills.includes(skillKey) && {
+                backgroundColor: primaryColor,
+              },
             ]}
-            onPress={() => toggleSkill(skill)}
+            onPress={() => toggleSkill(skillKey)}
           >
-            <Text style={[
-              styles.skillText,
-              data.skills.includes(skill) && { color: 'white' }
-            ]}>
-              {skill}
+            <Text
+              style={[
+                styles.skillText,
+                data.skills.includes(skillKey) && { color: "white" },
+              ]}
+            >
+              {t(skillKey)}
             </Text>
           </TouchableOpacity>
         ))}
@@ -340,7 +406,7 @@ export function OnboardingWizard({ onComplete, onSkip, initialData }: Onboarding
         <Ionicons name="time-outline" size={20} color="#666" />
         <TextInput
           style={[styles.input, { color: textColor }]}
-          placeholder="Kinh nghiệm (VD: 5 năm trong lĩnh vực thiết kế) *"
+          placeholder={t("onboarding.experienceReq")}
           value={data.experience}
           onChangeText={(text) => updateData({ experience: text })}
           multiline
@@ -351,9 +417,11 @@ export function OnboardingWizard({ onComplete, onSkip, initialData }: Onboarding
         <Ionicons name="cash-outline" size={20} color="#666" />
         <TextInput
           style={[styles.input, { color: textColor }]}
-          placeholder="Giá dịch vụ theo giờ (VND)"
-          value={data.hourlyRate?.toString() || ''}
-          onChangeText={(text) => updateData({ hourlyRate: parseInt(text) || undefined })}
+          placeholder={t("onboarding.hourlyRate")}
+          value={data.hourlyRate?.toString() || ""}
+          onChangeText={(text) =>
+            updateData({ hourlyRate: parseInt(text) || undefined })
+          }
           keyboardType="numeric"
         />
       </View>
@@ -361,13 +429,17 @@ export function OnboardingWizard({ onComplete, onSkip, initialData }: Onboarding
   );
 
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       style={[styles.container, { backgroundColor }]}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       {renderProgressBar()}
 
-      <ScrollView ref={scrollViewRef} style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        ref={scrollViewRef}
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+      >
         {currentStep === 1 && renderStep1()}
         {currentStep === 2 && renderStep2()}
         {currentStep === 3 && renderStep3()}
@@ -376,14 +448,24 @@ export function OnboardingWizard({ onComplete, onSkip, initialData }: Onboarding
 
       <View style={styles.buttonContainer}>
         {currentStep > 1 && (
-          <TouchableOpacity style={[styles.button, styles.secondaryButton]} onPress={prevStep}>
-            <Text style={[styles.buttonText, { color: primaryColor }]}>Quay lại</Text>
+          <TouchableOpacity
+            style={[styles.button, styles.secondaryButton]}
+            onPress={prevStep}
+          >
+            <Text style={[styles.buttonText, { color: primaryColor }]}>
+              {t("onboarding.back")}
+            </Text>
           </TouchableOpacity>
         )}
-        
+
         {onSkip && currentStep === 1 && (
-          <TouchableOpacity style={[styles.button, styles.secondaryButton]} onPress={onSkip}>
-            <Text style={[styles.buttonText, { color: textColor }]}>Bỏ qua</Text>
+          <TouchableOpacity
+            style={[styles.button, styles.secondaryButton]}
+            onPress={onSkip}
+          >
+            <Text style={[styles.buttonText, { color: textColor }]}>
+              {t("onboarding.skip")}
+            </Text>
           </TouchableOpacity>
         )}
 
@@ -392,13 +474,15 @@ export function OnboardingWizard({ onComplete, onSkip, initialData }: Onboarding
             styles.button,
             styles.primaryButton,
             { backgroundColor: primaryColor },
-            !validateStep() && styles.disabledButton
+            !validateStep() && styles.disabledButton,
           ]}
           onPress={nextStep}
           disabled={!validateStep()}
         >
           <Text style={styles.primaryButtonText}>
-            {currentStep === totalSteps ? 'Hoàn thành' : 'Tiếp theo'}
+            {currentStep === totalSteps
+              ? t("onboarding.complete")
+              : t("onboarding.next")}
           </Text>
         </TouchableOpacity>
       </View>
@@ -416,17 +500,17 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     height: 4,
-    backgroundColor: '#E5E7EB',
+    backgroundColor: "#E5E7EB",
     borderRadius: 2,
     marginBottom: 8,
   },
   progressFill: {
-    height: '100%',
+    height: "100%",
     borderRadius: 2,
   },
   progressText: {
     fontSize: 14,
-    textAlign: 'center',
+    textAlign: "center",
     opacity: 0.7,
   },
   scrollView: {
@@ -437,7 +521,7 @@ const styles = StyleSheet.create({
   },
   stepTitle: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 8,
   },
   stepSubtitle: {
@@ -448,20 +532,20 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 16,
     marginTop: 8,
   },
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: "#E5E7EB",
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 12,
     marginBottom: 16,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: "#F9FAFB",
   },
   input: {
     flex: 1,
@@ -472,18 +556,18 @@ const styles = StyleSheet.create({
     minHeight: 80,
   },
   inputRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   roleOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: "#E5E7EB",
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: "#F9FAFB",
   },
   roleText: {
     flex: 1,
@@ -491,7 +575,7 @@ const styles = StyleSheet.create({
   },
   roleLabel: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 4,
   },
   roleDescription: {
@@ -499,7 +583,7 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   avatarSection: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 24,
   },
   avatarButton: {
@@ -515,34 +599,34 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 50,
     borderWidth: 2,
-    borderStyle: 'dashed',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F9FAFB',
+    borderStyle: "dashed",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#F9FAFB",
   },
   avatarText: {
     fontSize: 14,
     opacity: 0.7,
   },
   skillsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     marginBottom: 16,
   },
   skillChip: {
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: "#F3F4F6",
     marginRight: 8,
     marginBottom: 8,
   },
   skillText: {
     fontSize: 14,
-    color: '#374151',
+    color: "#374151",
   },
   buttonContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     paddingHorizontal: 20,
     paddingVertical: 16,
     gap: 12,
@@ -551,12 +635,12 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 16,
     borderRadius: 12,
-    alignItems: 'center',
+    alignItems: "center",
   },
   secondaryButton: {
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: "#E5E7EB",
   },
   primaryButton: {
     // backgroundColor set dynamically
@@ -566,11 +650,11 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   primaryButtonText: {
-    color: 'white',
+    color: "white",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });

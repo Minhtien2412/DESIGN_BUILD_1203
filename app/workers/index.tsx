@@ -7,6 +7,7 @@
 import { ChipFilter, FilterModal, SortBar } from "@/components/ui/ModernFilter";
 import { LOCATIONS, useWorkerStats } from "@/hooks/useWorkerStats";
 import { useWorkersAPI } from "@/hooks/useWorkersAPI";
+import { useI18n } from "@/services/i18nService";
 import { Worker } from "@/services/workers.api";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -53,53 +54,57 @@ const COLORS = {
 // ============================================================================
 // FILTER OPTIONS - Gọn gàng hơn
 // ============================================================================
-const SPECIALTIES = [
-  { id: "dien", label: "Thợ điện", icon: "flash-outline" },
-  { id: "nuoc", label: "Thợ nước", icon: "water-outline" },
-  { id: "son", label: "Thợ sơn", icon: "color-palette-outline" },
-  { id: "moc", label: "Thợ mộc", icon: "construct-outline" },
-  { id: "xay", label: "Thợ xây", icon: "cube-outline" },
-  { id: "han", label: "Thợ hàn", icon: "flame-outline" },
-  { id: "gach", label: "Lát gạch", icon: "apps-outline" },
-  { id: "thach-cao", label: "Thạch cao", icon: "layers-outline" },
-  { id: "camera", label: "Camera", icon: "videocam-outline" },
-  { id: "ep-coc", label: "Ép cọc", icon: "arrow-down-outline" },
-  { id: "dao-dat", label: "Đào đất", icon: "construct-outline" },
-  { id: "nhan-cong", label: "Nhân công", icon: "people-outline" },
+const SPECIALTY_KEYS = [
+  { id: "dien", labelKey: "workerList.electrician", icon: "flash-outline" },
+  { id: "nuoc", labelKey: "workerList.plumber", icon: "water-outline" },
+  { id: "son", labelKey: "workerList.painter", icon: "color-palette-outline" },
+  { id: "moc", labelKey: "workerList.carpenter", icon: "construct-outline" },
+  { id: "xay", labelKey: "workerList.mason", icon: "cube-outline" },
+  { id: "han", labelKey: "workerList.welder", icon: "flame-outline" },
+  { id: "gach", labelKey: "workerList.tiler", icon: "apps-outline" },
+  { id: "thach-cao", labelKey: "workerList.drywall", icon: "layers-outline" },
+  { id: "camera", labelKey: "workerList.camera", icon: "videocam-outline" },
+  { id: "ep-coc", labelKey: "workerList.piling", icon: "arrow-down-outline" },
+  {
+    id: "dao-dat",
+    labelKey: "workerList.excavation",
+    icon: "construct-outline",
+  },
+  { id: "nhan-cong", labelKey: "workerList.labor", icon: "people-outline" },
 ];
 
-const SORT_OPTIONS = [
-  { id: "nearest", label: "Gần nhất" },
-  { id: "rating", label: "Đánh giá cao" },
-  { id: "price-low", label: "Giá thấp" },
-  { id: "price-high", label: "Giá cao" },
+const SORT_OPTION_KEYS = [
+  { id: "nearest", labelKey: "workerList.sortNearest" },
+  { id: "rating", labelKey: "workerList.sortRating" },
+  { id: "price-low", labelKey: "workerList.sortPriceLow" },
+  { id: "price-high", labelKey: "workerList.sortPriceHigh" },
 ];
 
-const FILTER_CONFIG = [
+const FILTER_CONFIG_KEYS = [
   {
     id: "availability",
-    label: "Tình trạng",
+    labelKey: "workerList.status",
     options: [
-      { id: "available", label: "Sẵn sàng" },
-      { id: "online", label: "Đang online" },
+      { id: "available", labelKey: "workerList.available" },
+      { id: "online", labelKey: "workerList.online" },
     ],
   },
   {
     id: "experience",
-    label: "Kinh nghiệm",
+    labelKey: "workerList.experience",
     options: [
-      { id: "1-3", label: "1-3 năm" },
-      { id: "3-5", label: "3-5 năm" },
-      { id: "5+", label: "5+ năm" },
+      { id: "1-3", labelKey: "workerList.exp1to3" },
+      { id: "3-5", labelKey: "workerList.exp3to5" },
+      { id: "5+", labelKey: "workerList.exp5plus" },
     ],
   },
   {
     id: "price",
-    label: "Mức giá",
+    labelKey: "workerList.priceRange",
     options: [
-      { id: "low", label: "< 200K" },
-      { id: "medium", label: "200-300K" },
-      { id: "high", label: "> 300K" },
+      { id: "low", labelKey: "workerList.priceLow" },
+      { id: "medium", labelKey: "workerList.priceMid" },
+      { id: "high", labelKey: "workerList.priceHigh" },
     ],
   },
 ];
@@ -183,102 +188,116 @@ interface WorkerCardProps {
   onBook: () => void;
 }
 
-const WorkerCard = ({ worker, onPress, onCall, onBook }: WorkerCardProps) => (
-  <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.9}>
-    {/* Header */}
-    <View style={styles.cardHeader}>
-      <View style={styles.avatarWrapper}>
-        <Image source={{ uri: worker.avatar }} style={styles.avatar} />
-        {worker.isOnline && <View style={styles.onlineDot} />}
-      </View>
+const WorkerCard = ({ worker, onPress, onCall, onBook }: WorkerCardProps) => {
+  const { t } = useI18n();
+  return (
+    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.9}>
+      {/* Header */}
+      <View style={styles.cardHeader}>
+        <View style={styles.avatarWrapper}>
+          <Image source={{ uri: worker.avatar }} style={styles.avatar} />
+          {worker.isOnline && <View style={styles.onlineDot} />}
+        </View>
 
-      <View style={styles.cardInfo}>
-        <View style={styles.nameRow}>
-          <Text style={styles.workerName} numberOfLines={1}>
-            {worker.name}
+        <View style={styles.cardInfo}>
+          <View style={styles.nameRow}>
+            <Text style={styles.workerName} numberOfLines={1}>
+              {worker.name}
+            </Text>
+            {worker.verified && (
+              <Ionicons
+                name="checkmark-circle"
+                size={16}
+                color={COLORS.primary}
+              />
+            )}
+          </View>
+          <Text style={styles.workerSpecialty}>
+            {worker.specialty} •{" "}
+            {t("workerList.yearsExp").replace("{n}", String(worker.experience))}
           </Text>
-          {worker.verified && (
-            <Ionicons
-              name="checkmark-circle"
-              size={16}
-              color={COLORS.primary}
-            />
-          )}
+          <View style={styles.ratingRow}>
+            <Ionicons name="star" size={14} color={COLORS.star} />
+            <Text style={styles.rating}>{worker.rating}</Text>
+            <Text style={styles.reviews}>({worker.reviews})</Text>
+            <Text style={styles.jobs}>
+              •{" "}
+              {t("workerList.jobs").replace(
+                "{n}",
+                String(worker.completedJobs),
+              )}
+            </Text>
+          </View>
         </View>
-        <Text style={styles.workerSpecialty}>
-          {worker.specialty} • {worker.experience} năm
-        </Text>
-        <View style={styles.ratingRow}>
-          <Ionicons name="star" size={14} color={COLORS.star} />
-          <Text style={styles.rating}>{worker.rating}</Text>
-          <Text style={styles.reviews}>({worker.reviews})</Text>
-          <Text style={styles.jobs}>• {worker.completedJobs} việc</Text>
-        </View>
-      </View>
 
-      <View
-        style={[
-          styles.statusBadge,
-          worker.available ? styles.statusAvailable : styles.statusBusy,
-        ]}
-      >
-        <Text
+        <View
           style={[
-            styles.statusText,
-            { color: worker.available ? COLORS.success : COLORS.danger },
+            styles.statusBadge,
+            worker.available ? styles.statusAvailable : styles.statusBusy,
           ]}
         >
-          {worker.available ? "Sẵn sàng" : "Bận"}
-        </Text>
-      </View>
-    </View>
-
-    {/* Footer */}
-    <View style={styles.cardFooter}>
-      <View style={styles.locationRow}>
-        <Ionicons
-          name="location-outline"
-          size={14}
-          color={COLORS.textSecondary}
-        />
-        <Text style={styles.location} numberOfLines={1}>
-          {worker.location}
-        </Text>
+          <Text
+            style={[
+              styles.statusText,
+              { color: worker.available ? COLORS.success : COLORS.danger },
+            ]}
+          >
+            {worker.available
+              ? t("workerList.available")
+              : t("workerList.busy")}
+          </Text>
+        </View>
       </View>
 
-      <View style={styles.priceRow}>
-        <Text style={styles.price}>
-          {worker.price.toLocaleString("vi-VN")}đ
-        </Text>
-        <Text style={styles.priceUnit}>/giờ</Text>
-      </View>
-    </View>
+      {/* Footer */}
+      <View style={styles.cardFooter}>
+        <View style={styles.locationRow}>
+          <Ionicons
+            name="location-outline"
+            size={14}
+            color={COLORS.textSecondary}
+          />
+          <Text style={styles.location} numberOfLines={1}>
+            {worker.location}
+          </Text>
+        </View>
 
-    {/* Actions */}
-    <View style={styles.cardActions}>
-      <TouchableOpacity
-        style={styles.callBtn}
-        onPress={onCall}
-        disabled={!worker.available}
-      >
-        <Ionicons
-          name="call-outline"
-          size={18}
-          color={worker.available ? COLORS.primary : COLORS.textSecondary}
-        />
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={[styles.bookBtn, !worker.available && styles.bookBtnDisabled]}
-        onPress={onBook}
-        disabled={!worker.available}
-      >
-        <Text style={styles.bookBtnText}>
-          {worker.available ? "Đặt ngay" : "Không khả dụng"}
-        </Text>
-      </TouchableOpacity>
-    </View>
-  </TouchableOpacity>
-);
+        <View style={styles.priceRow}>
+          <Text style={styles.price}>
+            {worker.price.toLocaleString("vi-VN")}đ
+          </Text>
+          <Text style={styles.priceUnit}>{t("workerList.perHour")}</Text>
+        </View>
+      </View>
+
+      {/* Actions */}
+      <View style={styles.cardActions}>
+        <TouchableOpacity
+          style={styles.callBtn}
+          onPress={onCall}
+          disabled={!worker.available}
+        >
+          <Ionicons
+            name="call-outline"
+            size={18}
+            color={worker.available ? COLORS.primary : COLORS.textSecondary}
+          />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.bookBtn, !worker.available && styles.bookBtnDisabled]}
+          onPress={onBook}
+          disabled={!worker.available}
+        >
+          <Text style={styles.bookBtnText}>
+            {worker.available
+              ? t("workerList.bookNow")
+              : t("workerList.unavailable")}
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </TouchableOpacity>
+  );
+};
 
 // ============================================================================
 // MAIN SCREEN
@@ -286,9 +305,29 @@ const WorkerCard = ({ worker, onPress, onCall, onBook }: WorkerCardProps) => (
 export default function WorkersScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const { t } = useI18n();
   const { specialty: specialtyParam } = useLocalSearchParams<{
     specialty?: string;
   }>();
+
+  // Translate static arrays for filter components
+  const SPECIALTIES = useMemo(
+    () => SPECIALTY_KEYS.map((s) => ({ ...s, label: t(s.labelKey) })),
+    [t],
+  );
+  const SORT_OPTIONS = useMemo(
+    () => SORT_OPTION_KEYS.map((s) => ({ ...s, label: t(s.labelKey) })),
+    [t],
+  );
+  const FILTER_CONFIG = useMemo(
+    () =>
+      FILTER_CONFIG_KEYS.map((f) => ({
+        ...f,
+        label: t(f.labelKey),
+        options: f.options.map((o) => ({ ...o, label: t(o.labelKey) })),
+      })),
+    [t],
+  );
 
   // States
   const [searchQuery, setSearchQuery] = useState("");
@@ -316,7 +355,7 @@ export default function WorkersScreen() {
   // Set specialty from URL
   useEffect(() => {
     if (specialtyParam) {
-      const exists = SPECIALTIES.some((s) => s.id === specialtyParam);
+      const exists = SPECIALTY_KEYS.some((s) => s.id === specialtyParam);
       if (exists) setSelectedSpecialty(specialtyParam);
     }
   }, [specialtyParam]);
@@ -324,7 +363,9 @@ export default function WorkersScreen() {
   // Filter workers
   const filteredWorkers = useMemo(() => {
     let workers =
-      apiWorkers.length > 0 ? apiWorkers.map(normalizeWorker) : MOCK_WORKERS;
+      apiWorkers.length > 0
+        ? apiWorkers.map((w) => normalizeWorker(w, t))
+        : MOCK_WORKERS;
 
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
@@ -355,7 +396,14 @@ export default function WorkersScreen() {
     }
 
     return workers;
-  }, [apiWorkers, searchQuery, selectedSpecialty, selectedSort, filterValues]);
+  }, [
+    apiWorkers,
+    searchQuery,
+    selectedSpecialty,
+    selectedSort,
+    filterValues,
+    t,
+  ]);
 
   // Stats
   const totalWorkers = filteredWorkers.length;
@@ -400,7 +448,7 @@ export default function WorkersScreen() {
           >
             <Ionicons name="arrow-back" size={24} color={COLORS.white} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Tìm thợ</Text>
+          <Text style={styles.headerTitle}>{t("workerList.findWorker")}</Text>
           <TouchableOpacity
             style={styles.locationBtn}
             onPress={() => setShowLocationModal(true)}
@@ -415,7 +463,7 @@ export default function WorkersScreen() {
           <Ionicons name="search" size={20} color={COLORS.textSecondary} />
           <TextInput
             style={styles.searchInput}
-            placeholder="Tìm theo tên, chuyên môn..."
+            placeholder={t("workerList.searchPlaceholder")}
             placeholderTextColor={COLORS.textSecondary}
             value={searchQuery}
             onChangeText={setSearchQuery}
@@ -464,7 +512,7 @@ export default function WorkersScreen() {
       {loading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={COLORS.primary} />
-          <Text style={styles.loadingText}>Đang tìm thợ...</Text>
+          <Text style={styles.loadingText}>{t("workerList.searching")}</Text>
         </View>
       ) : (
         <FlatList
@@ -492,9 +540,11 @@ export default function WorkersScreen() {
           ListEmptyComponent={
             <View style={styles.emptyState}>
               <Ionicons name="search-outline" size={64} color={COLORS.border} />
-              <Text style={styles.emptyTitle}>Không tìm thấy thợ</Text>
+              <Text style={styles.emptyTitle}>
+                {t("workerList.noWorkersFound")}
+              </Text>
               <Text style={styles.emptyText}>
-                Thử thay đổi bộ lọc hoặc từ khóa khác
+                {t("workerList.tryOtherFilters")}
               </Text>
             </View>
           }
@@ -526,7 +576,9 @@ export default function WorkersScreen() {
         >
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Chọn khu vực</Text>
+              <Text style={styles.modalTitle}>
+                {t("workerList.selectArea")}
+              </Text>
               <TouchableOpacity onPress={() => setShowLocationModal(false)}>
                 <Ionicons name="close" size={24} color={COLORS.text} />
               </TouchableOpacity>
@@ -570,36 +622,40 @@ export default function WorkersScreen() {
   );
 }
 
-// Helper to normalize API worker
-function normalizeWorker(w: Worker) {
-  const labels: Record<string, string> = {
-    EP_COC: "Ép cọc",
-    DAO_DAT: "Đào đất",
-    THO_XAY: "Thợ xây",
-    THO_DIEN: "Thợ điện",
-    THO_NUOC: "Thợ nước",
-    THO_SON: "Thợ sơn",
-    THO_MOC: "Thợ mộc",
-    THO_HAN: "Thợ hàn",
-    THO_GACH: "Thợ lát gạch",
-    THO_THACH_CAO: "Thợ thạch cao",
-    THO_CAMERA: "Thợ camera",
-    THO_SAT: "Thợ sắt",
-    THO_COFFA: "Thợ coffa",
-    NHAN_CONG: "Nhân công",
-    THO_LAM_CUA: "Thợ làm cửa",
-    THO_LAN_CAN: "Thợ lan can",
-    VAT_LIEU: "Vật liệu",
-    THO_DIEN_NUOC: "Thợ điện nước",
-    THO_NHOM_KINH: "Thợ nhôm kính",
-    KY_SU: "Kỹ sư",
-    GIAM_SAT: "Giám sát",
-  };
+// Helper to normalize API worker - uses translation keys
+const WORKER_TYPE_LABEL_KEYS: Record<string, string> = {
+  EP_COC: "workerList.piling",
+  DAO_DAT: "workerList.excavation",
+  THO_XAY: "workerList.mason",
+  THO_DIEN: "workerList.electrician",
+  THO_NUOC: "workerList.plumber",
+  THO_SON: "workerList.painter",
+  THO_MOC: "workerList.carpenter",
+  THO_HAN: "workerList.welder",
+  THO_GACH: "workerList.tiledFloor",
+  THO_THACH_CAO: "workerList.drywallWorker",
+  THO_CAMERA: "workerList.cameraWorker",
+  THO_SAT: "workerList.ironWorker",
+  THO_COFFA: "workerList.formworker",
+  NHAN_CONG: "workerList.labor",
+  THO_LAM_CUA: "workerList.doorMaker",
+  THO_LAN_CAN: "workerList.railingWorker",
+  VAT_LIEU: "workerList.materials",
+  THO_DIEN_NUOC: "workerList.plumberElectrician",
+  THO_NHOM_KINH: "workerList.glassWorker",
+  KY_SU: "workerList.engineer",
+  GIAM_SAT: "workerList.supervisor",
+};
+
+function normalizeWorker(w: Worker, t?: (key: string) => string) {
+  const translate = t || ((k: string) => k);
   const sid = w.workerType.toLowerCase().replace(/_/g, "-");
   return {
     id: w.id,
     name: w.name,
-    specialty: labels[w.workerType] || w.workerType.replace(/_/g, " "),
+    specialty: WORKER_TYPE_LABEL_KEYS[w.workerType]
+      ? translate(WORKER_TYPE_LABEL_KEYS[w.workerType])
+      : w.workerType.replace(/_/g, " "),
     specialtyId: sid,
     rating: w.rating || 4.5,
     reviews: w.reviewCount || 0,

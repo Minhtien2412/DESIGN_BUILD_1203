@@ -32,7 +32,7 @@ import {
     Text,
     TextInput,
     TouchableOpacity,
-    View
+    View,
 } from "react-native";
 
 // ============================================================================
@@ -313,6 +313,8 @@ export default function MessageSearchScreen() {
           <Ionicons name="search" size={18} color={colors.textSecondary} />
           <TextInput
             ref={inputRef}
+            nativeID="chat-message-search"
+            accessibilityLabel="Tìm kiếm tin nhắn"
             style={[styles.searchInput, { color: colors.text }]}
             placeholder="Tìm kiếm tin nhắn..."
             placeholderTextColor={colors.textSecondary}

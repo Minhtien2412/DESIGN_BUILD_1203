@@ -1,7 +1,10 @@
 import { CustomTabBar } from "@/components/navigation/custom-tab-bar";
+import { useI18n } from "@/services/i18nService";
 import { Tabs } from "expo-router";
 
 export default function TabsLayout() {
+  const { t } = useI18n();
+
   return (
     <Tabs
       tabBar={(props) => <CustomTabBar {...props} />}
@@ -9,6 +12,7 @@ export default function TabsLayout() {
         headerShown: false,
       }}
     >
+      {/* ══════ VISIBLE TABS (Vua Tho style) ══════ */}
       <Tabs.Screen
         name="index"
         options={{
@@ -16,120 +20,128 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="shop"
+        name="activity"
         options={{
-          title: "Cửa hàng",
+          title: "Hoạt động",
         }}
       />
       <Tabs.Screen
-        name="social"
+        name="communication"
         options={{
-          title: "Cộng đồng",
-        }}
-      />
-      <Tabs.Screen
-        name="home-construction"
-        options={{
-          href: null, // Hidden - moved to social
-          title: "Home XD",
-        }}
-      />
-      <Tabs.Screen
-        name="projects"
-        options={{
-          title: "Dự án",
-        }}
-      />
-      <Tabs.Screen
-        name="live"
-        options={{
-          title: "Trực tiếp",
-        }}
-      />
-      <Tabs.Screen
-        name="notifications"
-        options={{
-          href: null, // Hidden - notifications chỉ hiển thị ở header
-          title: "Thông báo",
+          title: "Liên lạc",
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
-          title: "Cá nhân",
+          title: "Tài khoản",
+        }}
+      />
+
+      {/* ══════ HIDDEN TABS (accessible via navigation) ══════ */}
+      <Tabs.Screen
+        name="shop"
+        options={{
+          href: null,
+          title: t("nav.shop"),
+        }}
+      />
+      <Tabs.Screen
+        name="social"
+        options={{
+          href: null,
+          title: t("nav.community"),
+        }}
+      />
+      <Tabs.Screen
+        name="projects"
+        options={{
+          href: null,
+          title: t("nav.projects"),
+        }}
+      />
+      <Tabs.Screen
+        name="home-construction"
+        options={{
+          href: null,
+          title: "Home XD",
+        }}
+      />
+      <Tabs.Screen
+        name="live"
+        options={{
+          href: null,
+          title: t("nav.live"),
         }}
       />
       <Tabs.Screen
         name="news"
         options={{
-          href: null, // Hidden - accessible from home quick actions
-          title: "Tin tức",
+          href: null,
+          title: t("nav.news"),
         }}
       />
       <Tabs.Screen
         name="menu"
         options={{
-          // Ẩn tab "Tiện ích" theo yêu cầu, vẫn có thể mở từ nút nhanh
           href: null,
-          title: "Tiện ích",
+          title: t("nav.menu"),
         }}
       />
-
-      {/* Hidden utility tabs */}
       <Tabs.Screen
         name="call-test"
         options={{
           href: null,
-          title: "Thử nghiệm cuộc gọi",
+          title: t("nav.calls"),
         }}
       />
       <Tabs.Screen
         name="contacts"
         options={{
           href: null,
-          title: "Liên hệ",
+          title: t("nav.contacts"),
         }}
       />
       <Tabs.Screen
         name="test-crm"
         options={{
           href: null,
-          title: "Quản lý khách hàng",
+          title: "CRM",
         }}
       />
       <Tabs.Screen
         name="progress"
         options={{
           href: null,
-          title: "Tiến độ",
+          title: t("nav.projects"),
         }}
       />
       <Tabs.Screen
         name="ai-assistant"
         options={{
           href: null,
-          title: "Trợ lý AI",
+          title: "AI Assistant",
         }}
       />
       <Tabs.Screen
         name="api-status"
         options={{
           href: null,
-          title: "Trạng thái hệ thống",
+          title: "API Status",
         }}
       />
       <Tabs.Screen
         name="messages"
         options={{
           href: null,
-          title: "Tin nhắn",
+          title: t("nav.messages"),
         }}
       />
       <Tabs.Screen
-        name="communication"
+        name="notifications"
         options={{
-          href: null, // Hidden - accessible from quick actions
-          title: "Liên lạc",
+          href: null,
+          title: "Thông báo",
         }}
       />
     </Tabs>

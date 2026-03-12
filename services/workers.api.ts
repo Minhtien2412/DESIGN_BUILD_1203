@@ -113,6 +113,8 @@ export interface CreateWorkerReviewDto {
   comment?: string;
   projectId?: string;
   images?: string[];
+  /** Quick-review badge tags (e.g. "on-time", "clean", "professional") */
+  tags?: string[];
 }
 
 export interface PaginatedResponse<T> {

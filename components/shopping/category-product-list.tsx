@@ -3,12 +3,12 @@
  * Reusable product list for any category with API integration
  */
 
-import { ImagePlaceholder } from '@/components/ui/image-placeholder';
-import { productService } from '@/services/api/product.service';
-import { ProductStatus, type Product } from '@/services/api/types';
-import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
-import React, { useCallback, useEffect, useState } from 'react';
+import { ImagePlaceholder } from "@/components/ui/image-placeholder";
+import { productService } from "@/services/api/product.service";
+import { ProductStatus, type Product } from "@/services/api/types";
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import React, { useCallback, useEffect, useState } from "react";
 import {
     ActivityIndicator,
     FlatList,
@@ -19,9 +19,9 @@ import {
     TextInput,
     TouchableOpacity,
     View,
-} from 'react-native';
+} from "react-native";
 
-type SortOption = 'newest' | 'price-low' | 'price-high' | 'popular';
+type SortOption = "newest" | "price-low" | "price-high" | "popular";
 
 interface CategoryProductListProps {
   category: string;
@@ -38,32 +38,39 @@ export const CategoryProductList: React.FC<CategoryProductListProps> = ({
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [search, setSearch] = useState('');
-  const [sortBy, setSortBy] = useState<SortOption>('newest');
+  const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState<SortOption>("newest");
   const [showRelated, setShowRelated] = useState(false);
 
   const loadProducts = async () => {
     try {
-      console.log(`[CategoryProductList] Loading products for category: ${category}`);
+      console.log(
+        `[CategoryProductList] Loading products for category: ${category}`,
+      );
       const response = await productService.getProducts({
         category,
         status: ProductStatus.APPROVED,
         search: search || undefined,
         limit: 100,
       });
-      
+
       let items = response.data;
       console.log(`[CategoryProductList] Loaded ${items.length} products`);
 
       // Client-side sorting
-      if (sortBy === 'price-low') items.sort((a, b) => a.price - b.price);
-      else if (sortBy === 'price-high') items.sort((a, b) => b.price - a.price);
-      else if (sortBy === 'popular') items.sort((a, b) => b.soldCount - a.soldCount);
-      else items.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      if (sortBy === "price-low") items.sort((a, b) => a.price - b.price);
+      else if (sortBy === "price-high") items.sort((a, b) => b.price - a.price);
+      else if (sortBy === "popular")
+        items.sort((a, b) => b.soldCount - a.soldCount);
+      else
+        items.sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+        );
 
       setProducts(items);
     } catch (error) {
-      console.error('[CategoryProductList] Load products failed:', error);
+      console.error("[CategoryProductList] Load products failed:", error);
       setProducts([]);
     } finally {
       setLoading(false);
@@ -92,10 +99,13 @@ export const CategoryProductList: React.FC<CategoryProductListProps> = ({
         status: ProductStatus.APPROVED,
         limit: 20,
       });
-      const filtered = response.data.filter(p => p.category !== category);
+      const filtered = response.data.filter((p) => p.category !== category);
       setRelatedProducts(filtered.slice(0, 10));
     } catch (error) {
-      console.error('[CategoryProductList] Load related products failed:', error);
+      console.error(
+        "[CategoryProductList] Load related products failed:",
+        error,
+      );
     }
   };
 
@@ -112,7 +122,16 @@ export const CategoryProductList: React.FC<CategoryProductListProps> = ({
       onPress={() => router.push(`/product/${item.id}`)}
     >
       <ImagePlaceholder
-        source={item.images[0] ? { uri: item.images[0] } : undefined}
+        source={
+          item.images[0]
+            ? {
+                uri:
+                  typeof item.images[0] === "string"
+                    ? item.images[0]
+                    : item.images[0].url,
+              }
+            : undefined
+        }
         fallbackText={item.name}
         size={160}
         style={styles.productImage}
@@ -122,7 +141,7 @@ export const CategoryProductList: React.FC<CategoryProductListProps> = ({
           {item.name}
         </Text>
         <Text style={styles.productPrice}>
-          {item.price.toLocaleString('vi-VN')}đ
+          {item.price.toLocaleString("vi-VN")}đ
         </Text>
         <View style={styles.productMeta}>
           <Text style={styles.metaText}>Đã bán {item.soldCount}</Text>
@@ -132,7 +151,7 @@ export const CategoryProductList: React.FC<CategoryProductListProps> = ({
             </View>
           )}
           {item.isNew && (
-            <View style={[styles.badge, { backgroundColor: '#0D9488' }]}>
+            <View style={[styles.badge, { backgroundColor: "#0D9488" }]}>
               <Text style={styles.badgeText}>Mới</Text>
             </View>
           )}
@@ -154,7 +173,10 @@ export const CategoryProductList: React.FC<CategoryProductListProps> = ({
     <View style={styles.container}>
       {/* Header with Back Button */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={styles.backButton}
+        >
           <Ionicons name="arrow-back" size={24} color="#333" />
         </TouchableOpacity>
         <View style={styles.headerContent}>
@@ -166,7 +188,12 @@ export const CategoryProductList: React.FC<CategoryProductListProps> = ({
 
       {/* Search Bar */}
       <View style={styles.searchContainer}>
-        <Ionicons name="search" size={20} color="#999" style={styles.searchIcon} />
+        <Ionicons
+          name="search"
+          size={20}
+          color="#999"
+          style={styles.searchIcon}
+        />
         <TextInput
           style={styles.searchInput}
           placeholder={`Tìm kiếm ${title.toLowerCase()}...`}
@@ -177,7 +204,12 @@ export const CategoryProductList: React.FC<CategoryProductListProps> = ({
           returnKeyType="search"
         />
         {search.length > 0 && (
-          <TouchableOpacity onPress={() => { setSearch(''); handleSearch(); }}>
+          <TouchableOpacity
+            onPress={() => {
+              setSearch("");
+              handleSearch();
+            }}
+          >
             <Ionicons name="close-circle" size={20} color="#999" />
           </TouchableOpacity>
         )}
@@ -189,10 +221,26 @@ export const CategoryProductList: React.FC<CategoryProductListProps> = ({
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           <View style={styles.sortOptions}>
             {[
-              { key: 'newest' as SortOption, label: 'Mới nhất', icon: 'time-outline' },
-              { key: 'popular' as SortOption, label: 'Bán chạy', icon: 'trending-up-outline' },
-              { key: 'price-low' as SortOption, label: 'Giá thấp', icon: 'arrow-down-outline' },
-              { key: 'price-high' as SortOption, label: 'Giá cao', icon: 'arrow-up-outline' },
+              {
+                key: "newest" as SortOption,
+                label: "Mới nhất",
+                icon: "time-outline",
+              },
+              {
+                key: "popular" as SortOption,
+                label: "Bán chạy",
+                icon: "trending-up-outline",
+              },
+              {
+                key: "price-low" as SortOption,
+                label: "Giá thấp",
+                icon: "arrow-down-outline",
+              },
+              {
+                key: "price-high" as SortOption,
+                label: "Giá cao",
+                icon: "arrow-up-outline",
+              },
             ].map((option) => (
               <TouchableOpacity
                 key={option.key}
@@ -205,7 +253,7 @@ export const CategoryProductList: React.FC<CategoryProductListProps> = ({
                 <Ionicons
                   name={option.icon as any}
                   size={11}
-                  color={sortBy === option.key ? '#fff' : '#666'}
+                  color={sortBy === option.key ? "#fff" : "#666"}
                   style={{ marginRight: 3 }}
                 />
                 <Text
@@ -225,7 +273,8 @@ export const CategoryProductList: React.FC<CategoryProductListProps> = ({
       {/* Product Count */}
       <View style={styles.countContainer}>
         <Text style={styles.countText}>
-          <Ionicons name="cube-outline" size={16} color="#666" /> {products.length} sản phẩm
+          <Ionicons name="cube-outline" size={16} color="#666" />{" "}
+          {products.length} sản phẩm
         </Text>
       </View>
 
@@ -241,7 +290,7 @@ export const CategoryProductList: React.FC<CategoryProductListProps> = ({
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={['#00B14F']}
+            colors={["#00B14F"]}
             tintColor="#00B14F"
           />
         }
@@ -249,12 +298,17 @@ export const CategoryProductList: React.FC<CategoryProductListProps> = ({
           <View style={styles.emptyContainer}>
             <Ionicons name="cube-outline" size={64} color="#ccc" />
             <Text style={styles.emptyText}>
-              {search ? 'Không tìm thấy sản phẩm phù hợp' : 'Chưa có sản phẩm nào'}
+              {search
+                ? "Không tìm thấy sản phẩm phù hợp"
+                : "Chưa có sản phẩm nào"}
             </Text>
             {search && (
               <TouchableOpacity
                 style={styles.clearSearchButton}
-                onPress={() => { setSearch(''); handleSearch(); }}
+                onPress={() => {
+                  setSearch("");
+                  handleSearch();
+                }}
               >
                 <Text style={styles.clearSearchText}>Xóa bộ lọc</Text>
               </TouchableOpacity>
@@ -303,7 +357,16 @@ export const CategoryProductList: React.FC<CategoryProductListProps> = ({
                       onPress={() => router.push(`/product/${item.id}`)}
                     >
                       <ImagePlaceholder
-                        source={item.images[0] ? { uri: item.images[0] } : undefined}
+                        source={
+                          item.images[0]
+                            ? {
+                                uri:
+                                  typeof item.images[0] === "string"
+                                    ? item.images[0]
+                                    : item.images[0].url,
+                              }
+                            : undefined
+                        }
                         fallbackText={item.name}
                         size={100}
                         style={styles.relatedImage}
@@ -313,7 +376,7 @@ export const CategoryProductList: React.FC<CategoryProductListProps> = ({
                           {item.name}
                         </Text>
                         <Text style={styles.relatedPrice}>
-                          {item.price.toLocaleString('vi-VN')}đ
+                          {item.price.toLocaleString("vi-VN")}đ
                         </Text>
                         <Text style={styles.relatedMeta}>
                           Đã bán {item.soldCount}
@@ -340,7 +403,9 @@ export const CategoryProductList: React.FC<CategoryProductListProps> = ({
 
               {/* Footer info */}
               <View style={styles.footerInfo}>
-                <Text style={styles.footerInfoText}>Shopee - Nền tảng mua sắm #1</Text>
+                <Text style={styles.footerInfoText}>
+                  Shopee - Nền tảng mua sắm #1
+                </Text>
                 <Text style={styles.footerInfoSubtext}>
                   Giao hàng nhanh • Đảm bảo chất lượng • Hoàn tiền 100%
                 </Text>
@@ -356,28 +421,28 @@ export const CategoryProductList: React.FC<CategoryProductListProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
   },
   centerContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f5f5f5",
   },
   loadingText: {
     marginTop: 12,
     fontSize: 14,
-    color: '#666',
+    color: "#666",
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 12,
     paddingVertical: 10,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: "#eee",
   },
   backButton: {
     padding: 4,
@@ -388,18 +453,18 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
   },
   headerDesc: {
     fontSize: 11,
-    color: '#888',
+    color: "#888",
     marginTop: 1,
   },
   searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f5f5f5",
     margin: 8,
     marginBottom: 6,
     paddingHorizontal: 10,
@@ -413,60 +478,60 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 13,
-    color: '#333',
+    color: "#333",
   },
   sortContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     paddingHorizontal: 8,
     paddingVertical: 6,
     marginBottom: 0,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: "#eee",
   },
   sortLabel: {
     fontSize: 10,
-    color: '#888',
+    color: "#888",
     marginBottom: 4,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   sortOptions: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 4,
   },
   sortButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#ddd',
-    backgroundColor: '#fff',
+    borderColor: "#ddd",
+    backgroundColor: "#fff",
   },
   sortButtonActive: {
-    backgroundColor: '#00B14F',
-    borderColor: '#00B14F',
+    backgroundColor: "#00B14F",
+    borderColor: "#00B14F",
   },
   sortButtonText: {
     fontSize: 10,
-    color: '#666',
-    fontWeight: '500',
+    color: "#666",
+    fontWeight: "500",
   },
   sortButtonTextActive: {
-    color: '#fff',
-    fontWeight: '600',
+    color: "#fff",
+    fontWeight: "600",
   },
   countContainer: {
     paddingHorizontal: 8,
     paddingVertical: 6,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderBottomWidth: 1,
-    borderBottomColor: '#f5f5f5',
+    borderBottomColor: "#f5f5f5",
   },
   countText: {
     fontSize: 12,
-    color: '#888',
-    fontWeight: '500',
+    color: "#888",
+    fontWeight: "500",
   },
   listContent: {
     padding: 4,
@@ -477,14 +542,14 @@ const styles = StyleSheet.create({
   },
   productCard: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 2,
-    overflow: 'hidden',
+    overflow: "hidden",
     borderWidth: 1,
-    borderColor: '#f0f0f0',
+    borderColor: "#f0f0f0",
   },
   productImage: {
-    width: '100%',
+    width: "100%",
     height: 180,
     borderTopLeftRadius: 2,
     borderTopRightRadius: 2,
@@ -494,140 +559,140 @@ const styles = StyleSheet.create({
   },
   productName: {
     fontSize: 13,
-    fontWeight: '400',
-    color: '#333',
+    fontWeight: "400",
+    color: "#333",
     marginBottom: 4,
     height: 36,
     lineHeight: 18,
   },
   productPrice: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#0D9488',
+    fontWeight: "600",
+    color: "#0D9488",
     marginBottom: 4,
   },
   productMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    flexWrap: "wrap",
     gap: 2,
   },
   metaText: {
     fontSize: 11,
-    color: '#bbb',
+    color: "#bbb",
   },
   badge: {
-    backgroundColor: '#0D9488',
+    backgroundColor: "#0D9488",
     paddingHorizontal: 4,
     paddingVertical: 2,
     borderRadius: 2,
   },
   badgeText: {
     fontSize: 9,
-    color: '#fff',
-    fontWeight: '600',
+    color: "#fff",
+    fontWeight: "600",
   },
   emptyContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     paddingVertical: 60,
     paddingHorizontal: 40,
   },
   emptyText: {
     marginTop: 16,
     fontSize: 15,
-    color: '#999',
-    textAlign: 'center',
+    color: "#999",
+    textAlign: "center",
   },
   clearSearchButton: {
     marginTop: 16,
     paddingHorizontal: 20,
     paddingVertical: 10,
-    backgroundColor: '#00B14F',
+    backgroundColor: "#00B14F",
     borderRadius: 8,
   },
   clearSearchText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   footerContainer: {
     marginTop: 12,
   },
   endSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     paddingVertical: 16,
     paddingHorizontal: 16,
   },
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: '#e0e0e0',
+    backgroundColor: "#e0e0e0",
   },
   endText: {
     fontSize: 11,
-    color: '#999',
+    color: "#999",
     marginHorizontal: 12,
   },
   relatedSection: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     padding: 12,
     marginBottom: 8,
     borderTopWidth: 4,
-    borderTopColor: '#f5f5f5',
+    borderTopColor: "#f5f5f5",
   },
   relatedHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6,
     marginBottom: 4,
   },
   relatedTitle: {
     fontSize: 15,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
   },
   relatedSubtitle: {
     fontSize: 11,
-    color: '#888',
+    color: "#888",
   },
   showMoreButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#fff',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#fff",
     paddingVertical: 12,
     marginHorizontal: 4,
     marginBottom: 8,
     borderRadius: 4,
     borderWidth: 1,
-    borderColor: '#0D9488',
+    borderColor: "#0D9488",
     gap: 6,
   },
   showMoreText: {
     fontSize: 13,
-    color: '#0D9488',
-    fontWeight: '600',
+    color: "#0D9488",
+    fontWeight: "600",
   },
   relatedGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 4,
     paddingHorizontal: 4,
   },
   relatedCard: {
-    width: '49%',
-    backgroundColor: '#fff',
+    width: "49%",
+    backgroundColor: "#fff",
     borderRadius: 2,
     borderWidth: 1,
-    borderColor: '#f0f0f0',
+    borderColor: "#f0f0f0",
     marginBottom: 4,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   relatedImage: {
-    width: '100%',
+    width: "100%",
     height: 180,
   },
   relatedInfo: {
@@ -635,58 +700,58 @@ const styles = StyleSheet.create({
   },
   relatedName: {
     fontSize: 13,
-    fontWeight: '400',
-    color: '#333',
+    fontWeight: "400",
+    color: "#333",
     marginBottom: 4,
     height: 36,
     lineHeight: 18,
   },
   relatedPrice: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#0D9488',
+    fontWeight: "600",
+    color: "#0D9488",
     marginBottom: 2,
   },
   relatedMeta: {
     fontSize: 11,
-    color: '#bbb',
+    color: "#bbb",
   },
   backToTopButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#fff',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#fff",
     paddingVertical: 10,
     marginHorizontal: 4,
     marginTop: 8,
     marginBottom: 12,
     borderRadius: 4,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     gap: 6,
   },
   backToTopText: {
     fontSize: 12,
-    color: '#666',
-    fontWeight: '500',
+    color: "#666",
+    fontWeight: "500",
   },
   footerInfo: {
-    backgroundColor: '#f9f9f9',
+    backgroundColor: "#f9f9f9",
     paddingVertical: 20,
     paddingHorizontal: 16,
-    alignItems: 'center',
+    alignItems: "center",
     borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
+    borderTopColor: "#e0e0e0",
   },
   footerInfoText: {
     fontSize: 13,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
     marginBottom: 4,
   },
   footerInfoSubtext: {
     fontSize: 11,
-    color: '#888',
-    textAlign: 'center',
+    color: "#888",
+    textAlign: "center",
   },
 });

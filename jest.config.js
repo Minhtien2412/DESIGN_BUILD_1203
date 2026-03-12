@@ -52,6 +52,8 @@ module.exports = {
     "/web/",
     "/backups/",
     "/BE-baotienweb.cloud/",
+    // E2E tests require Detox or running backend - run separately
+    "__tests__/e2e/",
   ],
   cacheDirectory: "<rootDir>/.jest-cache",
   verbose: true,

@@ -4,6 +4,7 @@
  * Backend: https://baotienweb.cloud/api/v1/companies
  */
 
+import { COMPANY_ENDPOINTS } from "@/constants/api-endpoints";
 import { apiFetch } from "./api";
 
 // ============================================================================
@@ -96,6 +97,13 @@ export interface CompanyDetailResponse {
   success: boolean;
   data: CompanyProfile;
   message?: string;
+  /** true when data comes from local mock instead of API */
+  offline?: boolean;
+}
+
+export interface CompanyListResponseExt extends CompanyListResponse {
+  /** true when data comes from local mock instead of API */
+  offline?: boolean;
 }
 
 // ============================================================================
@@ -316,18 +324,17 @@ export async function getCompanyById(
 ): Promise<CompanyDetailResponse> {
   try {
     const response = await apiFetch<CompanyDetailResponse>(
-      `/companies/${companyId}`,
+      COMPANY_ENDPOINTS.DETAIL(String(companyId)),
     );
     return response;
   } catch (error: any) {
     console.error("[CompanyService] Error fetching company by ID:", error);
-    // Return mock data for development
+    // Return mock data as offline fallback
     const mockCompany = MOCK_COMPANIES[String(companyId)];
     if (mockCompany) {
-      return { success: true, data: mockCompany };
+      return { success: true, data: mockCompany, offline: true };
     }
-    // Default to first mock company
-    return { success: true, data: MOCK_COMPANIES["1"] };
+    return { success: true, data: MOCK_COMPANIES["1"], offline: true };
   }
 }
 
@@ -339,19 +346,19 @@ export async function getCompanyBySlug(
 ): Promise<CompanyDetailResponse> {
   try {
     const response = await apiFetch<CompanyDetailResponse>(
-      `/companies/slug/${slug}`,
+      COMPANY_ENDPOINTS.BY_SLUG(slug),
     );
     return response;
   } catch (error: any) {
     console.error("[CompanyService] Error fetching company by slug:", error);
-    // Find in mock data by slug
+    // Find in mock data by slug — offline fallback
     const mockCompany = Object.values(MOCK_COMPANIES).find(
       (c) => c.slug === slug,
     );
     if (mockCompany) {
-      return { success: true, data: mockCompany };
+      return { success: true, data: mockCompany, offline: true };
     }
-    return { success: true, data: MOCK_COMPANIES["1"] };
+    return { success: true, data: MOCK_COMPANIES["1"], offline: true };
   }
 }
 
@@ -364,7 +371,7 @@ export async function getCompanies(params?: {
   type?: string;
   location?: string;
   search?: string;
-}): Promise<CompanyListResponse> {
+}): Promise<CompanyListResponseExt> {
   try {
     const queryParams = new URLSearchParams();
     if (params?.page) queryParams.append("page", String(params.page));
@@ -373,13 +380,13 @@ export async function getCompanies(params?: {
     if (params?.location) queryParams.append("location", params.location);
     if (params?.search) queryParams.append("search", params.search);
 
-    const response = await apiFetch<CompanyListResponse>(
-      `/companies?${queryParams}`,
+    const response = await apiFetch<CompanyListResponseExt>(
+      `${COMPANY_ENDPOINTS.LIST}?${queryParams}`,
     );
     return response;
   } catch (error: any) {
     console.error("[CompanyService] Error fetching companies:", error);
-    // Return mock list
+    // Return mock list — offline fallback
     const mockList: CompanyListItem[] = Object.values(MOCK_COMPANIES).map(
       (c) => ({
         id: c.id,
@@ -395,6 +402,7 @@ export async function getCompanies(params?: {
     return {
       data: mockList,
       meta: { total: mockList.length, page: 1, limit: 10, totalPages: 1 },
+      offline: true,
     };
   }
 }
@@ -407,7 +415,7 @@ export async function getDesignCompanies(params?: {
   limit?: number;
   location?: string;
   search?: string;
-}): Promise<CompanyListResponse> {
+}): Promise<CompanyListResponseExt> {
   return getCompanies({
     ...params,
     type: "design",
@@ -422,7 +430,7 @@ export async function getConstructionCompanies(params?: {
   limit?: number;
   location?: string;
   search?: string;
-}): Promise<CompanyListResponse> {
+}): Promise<CompanyListResponseExt> {
   return getCompanies({
     ...params,
     type: "construction",
@@ -437,7 +445,7 @@ export async function getInteriorCompanies(params?: {
   limit?: number;
   location?: string;
   search?: string;
-}): Promise<CompanyListResponse> {
+}): Promise<CompanyListResponseExt> {
   return getCompanies({
     ...params,
     type: "design",

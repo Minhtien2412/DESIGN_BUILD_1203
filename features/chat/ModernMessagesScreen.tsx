@@ -13,7 +13,8 @@ import {
     MODERN_TYPOGRAPHY,
 } from "@/constants/modern-theme";
 import { useMessages } from "@/hooks/useMessages";
-import { chatApi, ChatRoom } from "@/services/api/chatApi";
+import type { Conversation as CanonicalConversation } from "@/services/api/conversations.service";
+import * as conversationsApi from "@/services/api/conversations.service";
 import type { Conversation } from "@/services/api/messagesApi";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
@@ -41,7 +42,7 @@ import {
     Text,
     TextInput,
     TouchableOpacity,
-    View
+    View,
 } from "react-native";
 
 // ==================== API STATUS TYPES ====================
@@ -495,7 +496,7 @@ export default function ModernMessagesScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [apiStatus, setApiStatus] = useState<ApiStatus>("checking");
-  const [chatRooms, setChatRooms] = useState<ChatRoom[]>([]);
+  const [chatRooms, setChatRooms] = useState<CanonicalConversation[]>([]);
 
   const scrollY = useRef(new Animated.Value(0)).current;
   const searchInputRef = useRef<TextInput>(null);
@@ -505,13 +506,13 @@ export default function ModernMessagesScreen() {
     setApiStatus("checking");
     try {
       console.log("[ModernMessages] Checking Chat API connection...");
-      const rooms = await chatApi.getRooms();
+      const response = await conversationsApi.getConversations({ limit: 50 });
       console.log(
         "[ModernMessages] Chat API response:",
-        rooms?.length || 0,
+        response.items?.length || 0,
         "rooms",
       );
-      setChatRooms(rooms || []);
+      setChatRooms(response.items || []);
       setApiStatus("online");
     } catch (err) {
       console.error("[ModernMessages] Chat API error:", err);

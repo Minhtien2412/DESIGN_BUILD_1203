@@ -5,6 +5,7 @@ import {
     calculateExpiryTimestamp,
     clearTokens,
     getAccessToken,
+    getRefreshToken as getStoredRefreshToken,
     saveTokens,
 } from "@/services/token.service";
 import { UserType } from "@/types/auth";
@@ -120,6 +121,7 @@ interface AuthContextType extends AuthState {
     role?: string,
     phone?: string,
     location?: { latitude: number; longitude: number; address?: string },
+    faceEmbedding?: number[],
   ) => Promise<void>;
   // 2FA Authentication
   twoFARegisterSendOtp: (email: string) => Promise<TwoFASendOtpResult>;
@@ -253,14 +255,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    // Defer loadSession to avoid blocking startup
-    // Use requestAnimationFrame to let UI render first
-    const frameId = requestAnimationFrame(() => {
-      loadSession();
-    });
-
-    // Setup logout callback and token persistor for api.ts (deferred)
-    const timeoutId = setTimeout(async () => {
+    // Setup logout callback and token persistor FIRST, then load session
+    // This ensures the refresh flow has all callbacks ready before any API call
+    const setupAndLoad = async () => {
       const { setLogoutCallback, setTokenPersistor } =
         await import("../services/api");
 
@@ -286,11 +283,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           });
         }
       });
-    }, 500);
+
+      // Now load session with callbacks ready
+      await loadSession();
+    };
+
+    // Defer to avoid blocking startup, but use requestAnimationFrame
+    const frameId = requestAnimationFrame(() => {
+      setupAndLoad();
+    });
 
     return () => {
       cancelAnimationFrame(frameId);
-      clearTimeout(timeoutId);
     };
   }, []);
 
@@ -316,11 +320,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       // Set tokens in api.ts for automatic refresh
-      const { setToken, setRefreshToken, getRefreshToken } =
-        await import("../services/api");
+      const { setToken, setRefreshToken } = await import("../services/api");
       setToken(token);
-      const refresh = await getRefreshToken();
-      if (refresh) setRefreshToken(refresh);
+      const refresh = await getStoredRefreshToken();
+      if (refresh) {
+        setRefreshToken(refresh);
+        console.log("[Auth] ✅ Refresh token loaded from storage");
+      } else {
+        console.warn(
+          "[Auth] ⚠️ No refresh token in storage - token refresh will not work",
+        );
+      }
 
       // Try to get current user profile from backend
       try {
@@ -369,28 +379,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       const response = await authApi.login({ email, password });
 
+      // Check if face verification is required (suspicious login)
+      if (
+        "requireFaceVerification" in response &&
+        response.requireFaceVerification
+      ) {
+        setState((prev) => ({ ...prev, loading: false }));
+        throw Object.assign(
+          new Error(response.reason || "Yêu cầu xác minh khuôn mặt"),
+          { requireFaceVerification: true, userId: response.userId },
+        );
+      }
+
+      // Normal login flow — response has tokens
+      const authResponse =
+        response as import("../services/api/authApi").AuthResponse;
+
       // Store tokens securely using token service
       // Use 30 days for persistent login (will auto-refresh if needed)
       const expiresAt = calculateExpiryTimestamp("30d");
       await saveTokens({
-        accessToken: response.accessToken,
-        refreshToken: response.refreshToken,
+        accessToken: authResponse.accessToken,
+        refreshToken: authResponse.refreshToken,
         expiresAt,
       });
 
       // Set tokens in api.ts for automatic refresh
       const { setToken, setRefreshToken } = await import("../services/api");
-      setToken(response.accessToken);
-      setRefreshToken(response.refreshToken);
+      setToken(authResponse.accessToken);
+      setRefreshToken(authResponse.refreshToken);
 
-      const user = mapUser(response.user);
+      const user = mapUser(authResponse.user);
 
       console.log("[AuthContext] Sign in successful");
       setState({
         user,
         loading: false,
         isAuthenticated: true,
-        accessToken: response.accessToken,
+        accessToken: authResponse.accessToken,
       });
 
       // Đồng bộ với Perfex CRM sau khi đăng nhập thành công (async, không block)
@@ -423,8 +449,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Return user and tokens for biometric setup
       return {
         user,
-        accessToken: response.accessToken,
-        refreshToken: response.refreshToken,
+        accessToken: authResponse.accessToken,
+        refreshToken: authResponse.refreshToken,
       };
     } catch (error) {
       console.error("[AuthContext] Sign in failed:", error);
@@ -486,10 +512,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     role?: string,
     phone?: string,
     location?: { latitude: number; longitude: number; address?: string },
+    faceEmbedding?: number[],
   ) => {
     try {
       setState((prev) => ({ ...prev, loading: true }));
-      console.log("[AuthContext] Signing up with:", { role, phone, location });
+      console.log("[AuthContext] Signing up with:", {
+        role,
+        phone,
+        location,
+        hasFace: !!faceEmbedding,
+      });
 
       // Backend now accepts phone & location during registration
       const response = await authApi.register({
@@ -499,6 +531,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         phone,
         location,
         role: role as any, // Send role to backend (must match Prisma Role enum)
+        ...(faceEmbedding ? { faceEmbedding } : {}),
       });
 
       // Store tokens securely using token service
@@ -546,6 +579,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       // Get current user phone before clearing
       const currentPhone = state.user?.phone;
+
+      // 0. Revoke server session (before clearing local tokens)
+      try {
+        const { logout } = await import("../services/api/authApi");
+        await logout();
+      } catch (_) {
+        // Best-effort — don't block logout if server unreachable
+      }
 
       // 1. Clear authentication tokens using token service
       await clearTokens();
@@ -682,8 +723,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setState((prev) => ({ ...prev, loading: true }));
 
       // Send Google ID token to backend via unified social login endpoint
-      const response = await socialLogin({
-        provider: "GOOGLE",
+      const response = await socialLogin("GOOGLE", {
         token: credential,
       });
 
@@ -718,8 +758,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setState((prev) => ({ ...prev, loading: true }));
 
       // Send Google access token to backend via unified social login endpoint
-      const response = await socialLogin({
-        provider: "GOOGLE",
+      const response = await socialLogin("GOOGLE", {
         token: accessToken,
       });
 

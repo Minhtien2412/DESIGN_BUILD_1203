@@ -12,9 +12,9 @@ import { getCurrentLiveStreams, LiveStream } from "@/services/liveStream";
 // Video playback with expo-video
 import { Ionicons } from "@expo/vector-icons";
 import { useEvent } from "expo";
-import { VideoView, useVideoPlayer } from "expo-video";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
+import { useVideoPlayer, VideoView } from "expo-video";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
     ActivityIndicator,
@@ -518,6 +518,8 @@ export default function LiveStreamsScreen() {
           style={[styles.bottomInput, { paddingBottom: insets.bottom + 10 }]}
         >
           <TextInput
+            nativeID="live-comment"
+            accessibilityLabel="Bình luận"
             style={styles.commentInput}
             placeholder="Bình luận..."
             placeholderTextColor="rgba(255,255,255,0.6)"

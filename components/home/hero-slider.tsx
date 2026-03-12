@@ -1,6 +1,15 @@
-import { Colors } from '@/constants/theme';
-import React, { useMemo, useRef, useState } from 'react';
-import { Animated, Dimensions, NativeScrollEvent, NativeSyntheticEvent, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Colors } from "@/constants/theme";
+import React, { useMemo, useRef, useState } from "react";
+import {
+  Animated,
+  Dimensions,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export type BannerImage = { id: string; source: any; onPress?: () => void };
 
@@ -12,7 +21,7 @@ interface HeroSliderProps {
   rounded?: number;
 }
 
-const { width: SCREEN_W } = Dimensions.get('window');
+const { width: SCREEN_W } = Dimensions.get("window");
 const SLIDER_WIDTH = SCREEN_W - 32; // Account for padding
 
 export const HeroSlider: React.FC<HeroSliderProps> = ({
@@ -48,11 +57,20 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({
           setIndex(newIndex);
         }
       },
-    }
+    },
   );
 
-  const containerStyle = useMemo(() => [styles.container, { height }], [height]);
-  const imageStyle = useMemo(() => [styles.image, { height, borderRadius: rounded, width: SLIDER_WIDTH }], [height, rounded]);
+  const containerStyle = useMemo(
+    () => [styles.container, { height }],
+    [height],
+  );
+  const imageStyle = useMemo(
+    () => [
+      styles.image,
+      { height, borderRadius: rounded, width: SLIDER_WIDTH },
+    ],
+    [height, rounded],
+  );
 
   return (
     <View style={containerStyle}>
@@ -65,18 +83,26 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({
         scrollEventThrottle={16}
         snapToInterval={SLIDER_WIDTH}
         decelerationRate="fast"
-        contentContainerStyle={{ alignItems: 'center' }}
+        contentContainerStyle={{ alignItems: "center" }}
       >
         {images.map((img, i) => {
-          const inputRange = [(i - 1) * SLIDER_WIDTH, i * SLIDER_WIDTH, (i + 1) * SLIDER_WIDTH];
+          const inputRange = [
+            (i - 1) * SLIDER_WIDTH,
+            i * SLIDER_WIDTH,
+            (i + 1) * SLIDER_WIDTH,
+          ];
           const scale = scrollX.interpolate({
             inputRange,
             outputRange: [0.95, 1, 0.95],
-            extrapolate: 'clamp',
+            extrapolate: "clamp",
           });
 
           return (
-            <TouchableOpacity key={img.id} activeOpacity={0.9} onPress={img.onPress}>
+            <TouchableOpacity
+              key={img.id}
+              activeOpacity={0.9}
+              onPress={img.onPress}
+            >
               <Animated.Image
                 source={img.source}
                 style={[imageStyle as any, { transform: [{ scale }] }]}
@@ -91,11 +117,15 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({
       {total > 1 && (
         <View style={styles.dots}>
           {images.map((img, i) => {
-            const inputRange = [(i - 1) * SLIDER_WIDTH, i * SLIDER_WIDTH, (i + 1) * SLIDER_WIDTH];
+            const inputRange = [
+              (i - 1) * SLIDER_WIDTH,
+              i * SLIDER_WIDTH,
+              (i + 1) * SLIDER_WIDTH,
+            ];
             const dotWidth = scrollX.interpolate({
               inputRange,
               outputRange: [6, 16, 6],
-              extrapolate: 'clamp',
+              extrapolate: "clamp",
             });
 
             return (
@@ -105,7 +135,10 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({
                   styles.dot,
                   {
                     width: dotWidth,
-                    backgroundColor: i === index ? Colors.light.primary : 'rgba(255,255,255,0.6)',
+                    backgroundColor:
+                      i === index
+                        ? Colors.light.primary
+                        : "rgba(255,255,255,0.6)",
                   },
                 ]}
               />
@@ -119,19 +152,19 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%',
+    width: "100%",
     marginBottom: 16,
   },
   image: {
     width: SLIDER_WIDTH,
   },
   dots: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 12,
     left: 0,
     right: 0,
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
     gap: 5,
   },
   dot: {

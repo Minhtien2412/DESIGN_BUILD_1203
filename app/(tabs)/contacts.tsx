@@ -134,7 +134,7 @@ export default function ContactsScreen() {
     : matchedFriends;
 
   const handleOpenCommunicationHub = () => {
-    router.push("/communication");
+    router.push("/(tabs)/communication" as any);
   };
 
   // Navigate to chat with matched friend
@@ -279,6 +279,8 @@ export default function ContactsScreen() {
         <View style={[styles.searchBar, { backgroundColor: cardBg }]}>
           <Ionicons name="search" size={20} color={textColor + "50"} />
           <TextInput
+            nativeID="contacts-search"
+            accessibilityLabel="Tìm kiếm liên hệ"
             style={[styles.searchInput, { color: textColor }]}
             placeholder="Tìm kiếm liên hệ..."
             placeholderTextColor={textColor + "50"}

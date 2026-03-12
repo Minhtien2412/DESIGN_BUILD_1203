@@ -1,0 +1,75 @@
+﻿app/admin/products/index.tsx(127,9): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: ImageProps): Image', gave the following error.
+    Type '{ uri: ProductImage; }' is not assignable to type 'ImageSourcePropType | undefined'.
+      Types of property 'uri' are incompatible.
+        Type 'ProductImage' is not assignable to type 'string'.
+  Overload 2 of 2, '(props: ImageProps, context: any): Image', gave the following error.
+    Type '{ uri: ProductImage; }' is not assignable to type 'ImageSourcePropType | undefined'.
+      Types of property 'uri' are incompatible.
+        Type 'ProductImage' is not assignable to type 'string'.
+app/call/[userId].tsx(79,24): error TS2554: Expected 1 arguments, but got 0.
+app/call/[userId].tsx(80,26): error TS2554: Expected 1 arguments, but got 0.
+app/call/[userId].tsx(290,9): error TS2322: Type 'CallStatus' is not assignable to type 'CallStatus | undefined'.
+  Type '"checking"' is not assignable to type 'CallStatus | undefined'.
+app/call/index.tsx(75,35): error TS2367: This comparison appears to be unintentional because the types '"ended" | "active" | "rejected" | "pending"' and '"no_answer"' have no overlap.
+app/call/index.tsx(88,35): error TS2367: This comparison appears to be unintentional because the types '"ended" | "active" | "rejected" | "pending"' and '"no_answer"' have no overlap.
+app/call/index.tsx(103,48): error TS2367: This comparison appears to be unintentional because the types '"ended" | "active" | "rejected" | "pending"' and '"no_answer"' have no overlap.
+app/call/index.tsx(109,35): error TS2339: Property 'participant' does not exist on type 'UnifiedCall'.
+app/call/index.tsx(115,15): error TS2339: Property 'participant' does not exist on type 'UnifiedCall'.
+app/call/index.tsx(117,33): error TS2339: Property 'participant' does not exist on type 'UnifiedCall'.
+app/call/index.tsx(138,17): error TS2339: Property 'participant' does not exist on type 'UnifiedCall'.
+app/call/index.tsx(170,39): error TS2339: Property 'participant' does not exist on type 'UnifiedCall'.
+app/call/index.tsx(243,41): error TS2367: This comparison appears to be unintentional because the types '"ended" | "active" | "rejected" | "pending"' and '"no_answer"' have no overlap.
+app/call/index.tsx(252,52): error TS2367: This comparison appears to be unintentional because the types '"ended" | "active" | "rejected" | "pending"' and '"no_answer"' have no overlap.
+app/checkout.tsx(197,33): error TS2339: Property 'ward' does not exist on type 'Address'.
+app/construction/map/index.tsx(60,30): error TS2304: Cannot find name 'projectService'.
+app/construction/map/index.tsx(61,20): error TS2552: Cannot find name 'ApiProject'. Did you mean 'Project'?
+app/construction/map/index.tsx(63,49): error TS2552: Cannot find name 'ApiProject'. Did you mean 'Project'?
+app/construction/project-info.tsx(142,25): error TS2304: Cannot find name 'ApiProject'.
+app/construction/project-info.tsx(142,44): error TS2304: Cannot find name 'projectService'.
+app/messages/[userId].tsx(53,5): error TS2739: Type '{ id: number; name: string; }' is missing the following properties from type '{ id: number; name: string; email: string; role: "CLIENT" | "ENGINEER" | "ADMIN"; }': email, role
+app/messages/[userId].tsx(61,5): error TS2739: Type '{ id: number; name: string; }' is missing the following properties from type '{ id: number; name: string; email: string; role: "CLIENT" | "ENGINEER" | "ADMIN"; }': email, role
+app/messages/[userId].tsx(69,5): error TS2739: Type '{ id: number; name: string; }' is missing the following properties from type '{ id: number; name: string; email: string; role: "CLIENT" | "ENGINEER" | "ADMIN"; }': email, role
+app/messages/[userId].tsx(77,5): error TS2739: Type '{ id: number; name: string; }' is missing the following properties from type '{ id: number; name: string; email: string; role: "CLIENT" | "ENGINEER" | "ADMIN"; }': email, role
+app/messages/[userId].tsx(85,5): error TS2739: Type '{ id: number; name: string; }' is missing the following properties from type '{ id: number; name: string; email: string; role: "CLIENT" | "ENGINEER" | "ADMIN"; }': email, role
+app/messages/[userId].tsx(648,32): error TS2352: Conversion of type '{ uri: string; type: "video" | "image" | "file"; name: string; size: number | undefined; mimeType: string | undefined; }' to type 'UploadedAttachment' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Property 'url' is missing in type '{ uri: string; type: "video" | "image" | "file"; name: string; size: number | undefined; mimeType: string | undefined; }' but required in type 'UploadedAttachment'.
+app/profile/my-products.tsx(219,9): error TS2353: Object literal may only specify known properties, and 'status' does not exist in type 'UpdateProductDto'.
+app/profile/my-products.tsx(249,9): error TS2353: Object literal may only specify known properties, and 'status' does not exist in type 'UpdateProductDto'.
+app/profile/products/edit.tsx(161,17): error TS2345: Argument of type 'ProductImage[]' is not assignable to parameter of type 'SetStateAction<string[]>'.
+  Type 'ProductImage[]' is not assignable to type 'string[]'.
+    Type 'ProductImage' is not assignable to type 'string'.
+app/quote-request.tsx(27,50): error TS2304: Cannot find name 'ProjectType'.
+app/quote-request.tsx(41,32): error TS2304: Cannot find name 'ProjectType'.
+app/quote-request.tsx(73,31): error TS2304: Cannot find name 'CreateQuoteRequestInput'.
+app/quote-request.tsx(75,37): error TS2304: Cannot find name 'ProjectType'.
+app/quote-request.tsx(85,28): error TS2304: Cannot find name 'createQuoteRequest'.
+app/shopping/products-catalog.tsx(431,5): error TS2322: Type 'ProductImage' is not assignable to type 'string'.
+app/shopping/products-catalog.tsx(449,31): error TS2339: Property 'compareAtPrice' does not exist on type 'Product'.
+app/shopping/products-catalog.tsx(451,18): error TS2339: Property 'compareAtPrice' does not exist on type 'Product'.
+app/shopping/products-catalog.tsx(451,66): error TS2339: Property 'compareAtPrice' does not exist on type 'Product'.
+app/shopping/products-catalog.tsx(452,57): error TS2339: Property 'compareAtPrice' does not exist on type 'Product'.
+app/shopping/products-catalog.tsx(454,5): error TS2322: Type 'ProductImage' is not assignable to type 'string'.
+app/shopping/products-catalog.tsx(457,5): error TS2322: Type 'ProductImage[]' is not assignable to type 'string[]'.
+  Type 'ProductImage' is not assignable to type 'string'.
+app/shopping/products-catalog.tsx(468,26): error TS2339: Property 'location' does not exist on type '{ id: number; name: string; email: string; }'.
+app/shopping/products-catalog.tsx(475,31): error TS2339: Property 'avatar' does not exist on type '{ id: number; name: string; email: string; }'.
+app/shopping/products-catalog.tsx(477,41): error TS2339: Property 'isVerified' does not exist on type '{ id: number; name: string; email: string; }'.
+app/shopping/products-catalog.tsx(478,11): error TS2322: Type '{ id: string; name: string; avatar: any; isOfficial: any; rating: any; responseRate: any; productCount: any; followerCount: any; } | { id: string; name: string; avatar: string; isOfficial: false; rating: number; }' is not assignable to type 'ProductSeller | undefined'.
+  Object literal may only specify known properties, and 'rating' does not exist in type 'ProductSeller'.
+components/examples/VideoCallExample.tsx(29,105): error TS2304: Cannot find name 'Href'.
+components/shopping/category-product-list.tsx(115,9): error TS2322: Type '{ uri: ProductImage; }' is not assignable to type 'ImageSourcePropType | undefined'.
+  Types of property 'uri' are incompatible.
+    Type 'ProductImage' is not assignable to type 'string'.
+components/shopping/category-product-list.tsx(306,25): error TS2322: Type '{ uri: ProductImage; }' is not assignable to type 'ImageSourcePropType | undefined'.
+  Types of property 'uri' are incompatible.
+    Type 'ProductImage' is not assignable to type 'string'.
+components/shopping/index.ts(9,5): error TS2724: '"./SellerProfileCard"' has no exported member named 'SellerProfileCardProps'. Did you mean 'SellerProfileCard'?
+components/shopping/index.ts(20,10): error TS2305: Module '"./category-product-list"' has no exported member 'default'.
+components/shopping/index.ts(26,10): error TS2305: Module '"./CategoryFilter"' has no exported member 'default'.
+components/shopping/index.ts(27,10): error TS2305: Module '"./SortFilter"' has no exported member 'default'.
+components/shopping/index.ts(34,10): error TS2305: Module '"./EquipmentCard"' has no exported member 'default'.
+components/shopping/index.ts(35,10): error TS2305: Module '"./MaterialCard"' has no exported member 'default'.
+hooks/useSmartPhone.ts(69,17): error TS2339: Property 'id' does not exist on type 'Contact'.
+services/api/authApi.ts(248,18): error TS2339: Property 'otp' does not exist on type 'VerifyOtpDto'.
+utils/devicePermissions.ts(162,21): error TS2694: Namespace '"C:/tien/New folder/APP_DESIGN_BUILD05.12.2025/node_modules/expo-contacts/build/index"' has no exported member 'ContactField'.

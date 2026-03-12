@@ -5,6 +5,7 @@
 
 import ModernButton from "@/components/ui/modern-button";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { DEFAULT_BANK } from "@/services/vietqr";
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, router, useLocalSearchParams } from "expo-router";
 import {
@@ -14,16 +15,16 @@ import {
     StatusBar,
     StyleSheet,
     Text,
-    View,
+    View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-// Bank transfer info
+// Bank transfer info from VietQR service
 const BANK_INFO = {
-  bankName: "Vietcombank",
-  accountNumber: "1234567890",
-  accountName: "CONG TY TNHH XAY DUNG ABC",
-  branch: "Hồ Chí Minh",
+  bankName: `${DEFAULT_BANK.bankCode} - ${DEFAULT_BANK.bankName}`,
+  accountNumber: DEFAULT_BANK.accountNumber,
+  accountName: DEFAULT_BANK.accountName,
+  branch: "Napas 247",
 };
 
 export default function PaymentPendingScreen() {
@@ -169,10 +170,26 @@ export default function PaymentPendingScreen() {
           <ModernButton
             variant="primary"
             size="large"
+            onPress={() =>
+              router.push(
+                `/payment/bank-transfer?amount=${params.amount || "0"}&orderId=${params.orderId || ""}&type=order` as any,
+              )
+            }
+            icon="qr-code-outline"
+            iconPosition="left"
+            fullWidth
+          >
+            Xem mã QR chuyển khoản (VietQR)
+          </ModernButton>
+
+          <ModernButton
+            variant="outline"
+            size="large"
             onPress={() => router.replace("/(tabs)")}
             icon="home-outline"
             iconPosition="left"
             fullWidth
+            style={{ marginTop: 12 }}
           >
             Về trang chủ
           </ModernButton>
@@ -180,7 +197,7 @@ export default function PaymentPendingScreen() {
           <ModernButton
             variant="outline"
             size="large"
-            onPress={() => router.push("/order")}
+            onPress={() => router.push("/orders")}
             icon="receipt-outline"
             iconPosition="left"
             fullWidth

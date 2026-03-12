@@ -17,6 +17,7 @@
 import { CallHeader } from "@/components/navigation/CallHeader";
 import Avatar from "@/components/ui/avatar";
 import { canReceiveCalls, getUserById, type DemoUser } from "@/data/demoUsers";
+import { get } from "@/services/api";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -39,7 +40,7 @@ import {
 const { width, height } = Dimensions.get("window");
 
 type CallTypeParam = "audio" | "video" | "voice";
-type CallStatus =
+type LocalCallStatus =
   | "checking"
   | "offline"
   | "ringing"
@@ -47,6 +48,18 @@ type CallStatus =
   | "busy"
   | "connected"
   | "ended";
+
+/** Shape returned by GET /api/v1/users/:id or /api/users/:id */
+interface ApiUser {
+  id: number;
+  name: string;
+  email?: string;
+  avatar?: string | null;
+  avatarThumbnail?: string | null;
+  role?: string;
+  phone?: string | null;
+  isActive?: boolean;
+}
 
 // Timeout constants
 const RING_TIMEOUT = 30000; // 30 giây đổ chuông
@@ -57,10 +70,14 @@ export default function CallScreen() {
     userId,
     type: callType,
     isIncoming,
+    callerName: paramCallerName,
+    callerAvatar: paramCallerAvatar,
   } = useLocalSearchParams<{
     userId: string;
     type: CallTypeParam;
     isIncoming?: string;
+    callerName?: string;
+    callerAvatar?: string;
   }>();
   const router = useRouter();
 
@@ -68,20 +85,51 @@ export default function CallScreen() {
   const normalizedCallType =
     callType === "voice" ? "audio" : callType || "audio";
 
-  const [status, setStatus] = useState<CallStatus>("checking");
+  const [status, setStatus] = useState<LocalCallStatus>("checking");
   const [duration, setDuration] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
   const [isSpeaker, setIsSpeaker] = useState(false);
   const [isVideoOn, setIsVideoOn] = useState(normalizedCallType === "video");
   const [ringTime, setRingTime] = useState(0);
 
-  // Refs for timers
-  const ringTimerRef = useRef<NodeJS.Timeout>();
-  const ringCounterRef = useRef<NodeJS.Timeout>();
+  // Real user data from API
+  const [apiUser, setApiUser] = useState<ApiUser | null>(null);
 
-  // Get user info
-  const userInfo: DemoUser | undefined = getUserById(Number(userId));
-  const callerName = userInfo?.name || `Người dùng ${userId}`;
+  // Refs for timers
+  const ringTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const ringCounterRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Fallback to demo user
+  const demoUser: DemoUser | undefined = getUserById(Number(userId));
+
+  // Resolve display info: params → API → demo → fallback
+  const callerName =
+    paramCallerName ||
+    apiUser?.name ||
+    demoUser?.name ||
+    `Người dùng ${userId}`;
+  const callerAvatar =
+    paramCallerAvatar || apiUser?.avatar || apiUser?.avatarThumbnail || null;
+  const callerTitle = demoUser?.title || apiUser?.role || undefined;
+
+  // Fetch real user profile from API
+  useEffect(() => {
+    if (!userId) return;
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const data = await get<ApiUser>(`/api/users/${userId}`);
+        if (!cancelled && data?.id) setApiUser(data);
+      } catch {
+        // API unavailable – will fall back to demo/params
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [userId]);
 
   // Gửi notification khi có cuộc gọi đến
   useEffect(() => {
@@ -104,23 +152,31 @@ export default function CallScreen() {
     if (isIncoming === "true") return; // Bỏ qua nếu là cuộc gọi đến
 
     const checkUserStatus = async () => {
-      // Kiểm tra xem người dùng có online không
-      const callCheck = canReceiveCalls(Number(userId));
-
       await new Promise((resolve) => setTimeout(resolve, CHECK_TIMEOUT));
 
-      if (!callCheck.canCall) {
-        // Người dùng offline hoặc bận
-        if (callCheck.reason?.includes("offline")) {
-          setStatus("offline");
+      // Try real API first for user online status
+      let isUserOnline = false;
+      try {
+        const onlineData = await get<{ isOnline?: boolean; status?: string }>(
+          `/api/v1/users/${userId}/status`,
+        );
+        isUserOnline = onlineData?.isOnline ?? onlineData?.status === "online";
+      } catch {
+        // API unavailable – fall back to demo data
+        const callCheck = canReceiveCalls(Number(userId));
+        if (callCheck.canCall) {
+          isUserOnline = true;
         } else if (
           callCheck.reason?.includes("bận") ||
           callCheck.reason?.includes("cuộc gọi khác")
         ) {
           setStatus("busy");
-        } else {
-          setStatus("offline");
+          return;
         }
+      }
+
+      if (!isUserOnline) {
+        setStatus("offline");
       } else {
         // Bắt đầu đổ chuông
         setStatus("ringing");
@@ -236,16 +292,27 @@ export default function CallScreen() {
     setStatus("checking");
     setRingTime(0);
 
-    // Kiểm tra lại trạng thái
-    setTimeout(() => {
-      const callCheck = canReceiveCalls(Number(userId));
-      if (!callCheck.canCall) {
+    // Kiểm tra lại trạng thái qua API → demo fallback
+    (async () => {
+      await new Promise((resolve) => setTimeout(resolve, CHECK_TIMEOUT));
+
+      let canCall = false;
+      try {
+        const onlineData = await get<{ isOnline?: boolean; status?: string }>(
+          `/api/v1/users/${userId}/status`,
+        );
+        canCall = onlineData?.isOnline ?? onlineData?.status === "online";
+      } catch {
+        canCall = canReceiveCalls(Number(userId)).canCall;
+      }
+
+      if (!canCall) {
         setStatus("offline");
       } else {
         setStatus("ringing");
         startRinging();
       }
-    }, CHECK_TIMEOUT);
+    })();
   }, [userId, startRinging]);
 
   const handleEndCall = () => {
@@ -285,9 +352,18 @@ export default function CallScreen() {
       {/* Call Header */}
       <CallHeader
         callerName={callerName}
-        userId={userId}
+        avatar={callerAvatar || undefined}
+        userId={callerAvatar ? userId : undefined}
         callType={normalizedCallType === "video" ? "video" : "voice"}
-        status={status}
+        status={
+          status === "connected"
+            ? "connected"
+            : status === "ended"
+              ? "ended"
+              : status === "ringing"
+                ? "ringing"
+                : "calling"
+        }
         duration={duration}
         onBackPress={() => router.back()}
       />
@@ -319,8 +395,8 @@ export default function CallScreen() {
         <View style={[styles.audioView, getBackgroundStyle()]}>
           <View style={styles.avatarContainer}>
             <Avatar
-              avatar={userInfo?.avatar || null}
-              userId={userId || "0"}
+              avatar={callerAvatar || undefined}
+              userId={callerAvatar ? userId : undefined}
               name={callerName}
               pixelSize={140}
               showBadge={false}
@@ -328,9 +404,7 @@ export default function CallScreen() {
           </View>
 
           <Text style={styles.callerName}>{callerName}</Text>
-          {userInfo?.title && (
-            <Text style={styles.userTitle}>{userInfo.title}</Text>
-          )}
+          {callerTitle && <Text style={styles.userTitle}>{callerTitle}</Text>}
 
           {/* Status Messages */}
           {status === "checking" && (

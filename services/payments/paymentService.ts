@@ -1,9 +1,9 @@
 /**
- * Payment Gateway Service — callback verification only
- * ⚠️ For new payment logic, use `services/paymentService.ts` (canonical).
+ * Payment Gateway Service — callback verification & legacy process
+ * For new payment logic, prefer `services/paymentService.ts` + createPaymentViaAPI().
  * This file is used by `app/payment-callback.tsx` for verifyPayment().
  *
- * Unified payment processing for MoMo, VNPay, and Stripe
+ * API paths standardized to /v1/payment/<gateway>/* routes.
  */
 
 import { Linking } from "react-native";
@@ -13,6 +13,7 @@ export type PaymentGateway =
   | "momo"
   | "vnpay"
   | "stripe"
+  | "acb"
   | "cash"
   | "bank-transfer";
 
@@ -70,6 +71,8 @@ class PaymentService {
           return await this.processVNPayPayment(request);
         case "stripe":
           return await this.processStripePayment(request);
+        case "acb":
+          return await this.processAcbPayment(request);
         case "cash":
         case "bank-transfer":
           return this.processManualPayment(gateway, request);
@@ -92,7 +95,7 @@ class PaymentService {
     request: PaymentRequest,
   ): Promise<PaymentResponse> {
     try {
-      const response = await apiFetch("/payments/momo/init", {
+      const response = await apiFetch("/v1/payment/momo/init", {
         method: "POST",
         body: JSON.stringify({
           amount: request.amount,
@@ -141,7 +144,7 @@ class PaymentService {
     request: PaymentRequest,
   ): Promise<PaymentResponse> {
     try {
-      const response = await apiFetch("/payments/vnpay/init", {
+      const response = await apiFetch("/v1/payment/vnpay/init", {
         method: "POST",
         body: JSON.stringify({
           amount: request.amount,
@@ -180,7 +183,7 @@ class PaymentService {
   ): Promise<PaymentResponse> {
     try {
       // Create payment intent on backend
-      const response = await apiFetch("/payments/stripe/init", {
+      const response = await apiFetch("/v1/payment/stripe/intent", {
         method: "POST",
         body: JSON.stringify({
           amount: request.amount,
@@ -211,6 +214,53 @@ class PaymentService {
   }
 
   /**
+   * Process ACB ONE Connect payment
+   */
+  private async processAcbPayment(
+    request: PaymentRequest,
+  ): Promise<PaymentResponse> {
+    try {
+      const response = await apiFetch("/v1/payment/acb/init", {
+        method: "POST",
+        body: JSON.stringify({
+          amount: request.amount,
+          orderId: request.orderId,
+          description: request.description,
+          returnUrl: request.returnUrl || "myapp://payment/callback",
+          metadata: request.metadata,
+        }),
+      });
+
+      if (
+        response.gateway === "ACB" &&
+        (response.paymentUrl || response.qrCodeUrl)
+      ) {
+        // Try payment URL first, then QR code
+        if (response.paymentUrl) {
+          const canOpen = await Linking.canOpenURL(response.paymentUrl);
+          if (canOpen) {
+            await Linking.openURL(response.paymentUrl);
+          }
+        }
+
+        return {
+          success: true,
+          paymentUrl: response.paymentUrl,
+          transactionId: response.transactionId,
+          qrCode: response.qrCodeUrl,
+        };
+      }
+
+      return {
+        success: false,
+        error: response.message || "ACB payment initialization failed",
+      };
+    } catch (error: any) {
+      throw new Error(`ACB payment error: ${error.message}`);
+    }
+  }
+
+  /**
    * Process manual payment (cash/bank transfer)
    */
   private processManualPayment(
@@ -233,7 +283,7 @@ class PaymentService {
   ): Promise<PaymentVerification> {
     try {
       const response = await apiFetch(
-        `/payments/${gateway}/verify/${transactionId}`,
+        `/v1/payment/${gateway}/verify/${transactionId}`,
       );
 
       return {
@@ -264,7 +314,7 @@ class PaymentService {
     reason?: string,
   ): Promise<{ success: boolean; refundId?: string; error?: string }> {
     try {
-      const response = await apiFetch(`/payments/${gateway}/refund`, {
+      const response = await apiFetch(`/v1/payment/${gateway}/refund`, {
         method: "POST",
         body: JSON.stringify({
           transactionId,
@@ -289,7 +339,7 @@ class PaymentService {
    * Get payment methods for a region
    */
   getAvailablePaymentMethods(): PaymentGateway[] {
-    return ["momo", "vnpay", "stripe", "cash", "bank-transfer"];
+    return ["momo", "vnpay", "stripe", "acb", "cash", "bank-transfer"];
   }
 
   /**

@@ -12,18 +12,18 @@
  * @updated 2025-01-20
  */
 
-import { YouTubePlayer } from "@/components/media/YouTubePlayer";
+import { VideoPlayerModal } from "@/components/media/VideoPlayerModal";
 import {
     DEMO_CONSTRUCTION_VIDEOS,
     VIDEO_CATEGORIES,
-    getVideosByCategory,
     type VideoCategory,
-    type VideoItem,
+    type VideoItem
 } from "@/data/videos";
+import { getServerFeed } from "@/services/reelsService";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { router } from "expo-router";
-import { memo, useCallback, useMemo, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import {
     Dimensions,
     FlatList,
@@ -131,7 +131,7 @@ const CategoryFolder = memo(
         )}
       </TouchableOpacity>
     );
-  }
+  },
 );
 
 // ============================================
@@ -400,13 +400,70 @@ export default function DemoVideosScreen() {
   const [viewMode, setViewMode] = useState<ViewMode>("feed");
   const [selectedVideo, setSelectedVideo] = useState<VideoItem | null>(null);
   const [playerVisible, setPlayerVisible] = useState(false);
+  const [serverVideos, setServerVideos] = useState<VideoItem[]>([]);
+  const [loadingServer, setLoadingServer] = useState(true);
 
-  // Prepare categories with counts
+  // Fetch videos from server API (pipeline: server → cache → stream)
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        setLoadingServer(true);
+        const response = await getServerFeed(20);
+        if (!cancelled && response?.reels?.length) {
+          const mapped: VideoItem[] = response.reels.map((reel: any) => ({
+            id: `server-${reel.id}`,
+            title: reel.title || "Video xây dựng",
+            url: reel.videoUrl || reel.video_url || "",
+            thumbnail: reel.thumbnail || reel.image || "",
+            author: reel.author || reel.user?.name || "Design Build Team",
+            authorAvatarUrl:
+              reel.user?.url ||
+              "https://ui-avatars.com/api/?name=DB&background=6366f1&color=fff",
+            likes: reel.likes || 0,
+            comments: reel.comments || 0,
+            shares: reel.shares || 0,
+            views: reel.views || 0,
+            duration: reel.duration
+              ? `${Math.floor(reel.duration / 60)}:${String(reel.duration % 60).padStart(2, "0")}`
+              : "0:30",
+            category: "construction" as VideoCategory,
+            hashtags: reel.tags || ["xâydựng", "video"],
+            type: "demo" as const,
+            description: reel.description || "",
+            createdAt: reel.createdAt || new Date().toISOString(),
+          }));
+          setServerVideos(mapped);
+        }
+      } catch (err) {
+        console.log("[DemoVideos] Server fetch failed, using local data:", err);
+      } finally {
+        if (!cancelled) setLoadingServer(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Merge server videos with local data, server videos first
+  const allVideos = useMemo(() => {
+    const combined = [...serverVideos, ...DEMO_CONSTRUCTION_VIDEOS];
+    // De-duplicate by id
+    const seen = new Set<string>();
+    return combined.filter((v) => {
+      if (seen.has(v.id)) return false;
+      seen.add(v.id);
+      return true;
+    });
+  }, [serverVideos]);
+
+  // Prepare categories with counts (includes server videos)
   const categoriesWithCounts = useMemo(() => {
     const cats = Object.entries(VIDEO_CATEGORIES).map(([key, value]) => ({
       key: key as VideoCategory,
       ...value,
-      count: getVideosByCategory(key as VideoCategory).length,
+      count: allVideos.filter((v) => v.category === key).length,
     }));
     return [
       {
@@ -414,16 +471,16 @@ export default function DemoVideosScreen() {
         label: "Tất cả",
         icon: "play-circle",
         color: "#6366f1",
-        count: DEMO_CONSTRUCTION_VIDEOS.length,
+        count: allVideos.length,
       },
       ...cats,
     ];
-  }, []);
+  }, [allVideos]);
 
   const filteredVideos = useMemo(() => {
-    if (selectedCategory === "all") return DEMO_CONSTRUCTION_VIDEOS;
-    return getVideosByCategory(selectedCategory);
-  }, [selectedCategory]);
+    if (selectedCategory === "all") return allVideos;
+    return allVideos.filter((v) => v.category === selectedCategory);
+  }, [selectedCategory, allVideos]);
 
   const handlePlayVideo = useCallback((video: VideoItem) => {
     setSelectedVideo(video);
@@ -587,12 +644,13 @@ export default function DemoVideosScreen() {
       {/* Content */}
       {renderContent()}
 
-      {/* YouTube Player - Xem video trong app */}
+      {/* Video Player - Xem video trong app */}
       {selectedVideo && (
-        <YouTubePlayer
+        <VideoPlayerModal
           visible={playerVisible}
           url={typeof selectedVideo.url === "string" ? selectedVideo.url : ""}
           title={selectedVideo.title}
+          poster={selectedVideo.thumbnail}
           onClose={handleClosePlayer}
         />
       )}

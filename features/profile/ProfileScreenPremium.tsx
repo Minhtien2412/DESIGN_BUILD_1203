@@ -6,6 +6,7 @@
  */
 
 import { useAuth } from "@/features/auth";
+import { useI18n } from "@/services/i18nService";
 import profileService, {
     getProfileCompletion,
     getRoleDisplayName,
@@ -31,7 +32,7 @@ import {
     Text,
     TouchableOpacity,
     useColorScheme,
-    View
+    View,
 } from "react-native";
 
 const { width: SW } = Dimensions.get("window");
@@ -159,10 +160,12 @@ interface MenuItem {
   title: string;
   subtitle?: string;
   route?: string;
-  action?: string; // action identifier
+  action?: string;
   badge?: number;
   color: string;
   bgColor: string;
+  titleKey?: string;
+  subtitleKey?: string;
 }
 
 interface MenuSection {
@@ -170,12 +173,14 @@ interface MenuSection {
   title: string;
   icon: keyof typeof Ionicons.glyphMap;
   items: MenuItem[];
+  titleKey?: string;
 }
 
 const MENU_SECTIONS: MenuSection[] = [
   {
     id: "account",
     title: "Tài khoản",
+    titleKey: "profileMenu.account",
     icon: "person-circle-outline",
     items: [
       {
@@ -183,6 +188,8 @@ const MENU_SECTIONS: MenuSection[] = [
         icon: "create-outline",
         title: "Chỉnh sửa hồ sơ",
         subtitle: "Tên, ảnh, thông tin cá nhân",
+        titleKey: "profileMenu.editProfile",
+        subtitleKey: "profileMenu.editProfileDesc",
         route: "/profile/edit",
         color: T.primary,
         bgColor: T.primaryLight,
@@ -192,6 +199,8 @@ const MENU_SECTIONS: MenuSection[] = [
         icon: "shield-checkmark-outline",
         title: "Bảo mật & Quyền riêng tư",
         subtitle: "Mật khẩu, 2FA, quyền truy cập",
+        titleKey: "profileMenu.securityPrivacy",
+        subtitleKey: "profileMenu.securityPrivacyDesc",
         route: "/profile/security",
         color: T.accent,
         bgColor: T.accentLight,
@@ -201,6 +210,7 @@ const MENU_SECTIONS: MenuSection[] = [
         icon: "location-outline",
         title: "Địa chỉ",
         subtitle: "Quản lý địa chỉ giao hàng",
+        titleKey: "checkout.shippingAddress",
         route: "/profile/addresses",
         color: T.success,
         bgColor: T.successLight,
@@ -210,6 +220,8 @@ const MENU_SECTIONS: MenuSection[] = [
         icon: "card-outline",
         title: "Thanh toán",
         subtitle: "Ví, thẻ, lịch sử thanh toán",
+        titleKey: "profileMenu.paymentAddresses",
+        subtitleKey: "profileMenu.paymentAddressesDesc",
         route: "/profile/payment",
         color: T.warning,
         bgColor: T.warningLight,
@@ -219,13 +231,15 @@ const MENU_SECTIONS: MenuSection[] = [
   {
     id: "workspace",
     title: "Công việc",
+    titleKey: "profileMenu.businessTools",
     icon: "briefcase-outline",
     items: [
       {
         id: "projects",
         icon: "folder-open-outline",
         title: "Dự án của tôi",
-        route: "/projects",
+        titleKey: "profileMenu.myProjects",
+        route: "/(tabs)/projects",
         color: T.primary,
         bgColor: T.primaryLight,
       },
@@ -233,7 +247,8 @@ const MENU_SECTIONS: MenuSection[] = [
         id: "tasks",
         icon: "checkbox-outline",
         title: "Công việc & Tiến độ",
-        route: "/tasks",
+        titleKey: "profileMenu.schedule",
+        route: "/scheduled-tasks",
         color: T.cyan,
         bgColor: T.cyanLight,
       },
@@ -241,7 +256,8 @@ const MENU_SECTIONS: MenuSection[] = [
         id: "orders",
         icon: "receipt-outline",
         title: "Đơn hàng",
-        route: "/orders",
+        titleKey: "profileMenu.myOrders",
+        route: "/profile/orders",
         color: T.warning,
         bgColor: T.warningLight,
       },
@@ -249,6 +265,7 @@ const MENU_SECTIONS: MenuSection[] = [
         id: "contracts",
         icon: "document-text-outline",
         title: "Hợp đồng",
+        titleKey: "profileMenu.vouchers",
         route: "/contracts",
         color: T.accent,
         bgColor: T.accentLight,
@@ -258,13 +275,15 @@ const MENU_SECTIONS: MenuSection[] = [
   {
     id: "engagement",
     title: "Cá nhân",
+    titleKey: "nav.profile",
     icon: "heart-outline",
     items: [
       {
         id: "favorites",
         icon: "heart-outline",
         title: "Đã lưu",
-        route: "/favorites",
+        titleKey: "nav.favorites",
+        route: "/profile/favorites",
         color: T.danger,
         bgColor: T.dangerLight,
       },
@@ -272,6 +291,7 @@ const MENU_SECTIONS: MenuSection[] = [
         id: "history",
         icon: "time-outline",
         title: "Lịch sử xem",
+        titleKey: "projects.activityHistory",
         route: "/profile/history",
         color: T.textSec,
         bgColor: "#F1F5F9",
@@ -298,12 +318,14 @@ const MENU_SECTIONS: MenuSection[] = [
   {
     id: "support",
     title: "Hỗ trợ",
+    titleKey: "profileMenu.supportAbout",
     icon: "help-circle-outline",
     items: [
       {
         id: "help",
         icon: "chatbubble-ellipses-outline",
         title: "Trợ giúp & Chat hỗ trợ",
+        titleKey: "profileMenu.helpCenter",
         route: "/customer-support",
         color: T.primary,
         bgColor: T.primaryLight,
@@ -312,7 +334,7 @@ const MENU_SECTIONS: MenuSection[] = [
         id: "feedback",
         icon: "megaphone-outline",
         title: "Góp ý & Phản hồi",
-        route: "/feedback",
+        route: "/customer-support",
         color: T.success,
         bgColor: T.successLight,
       },
@@ -320,6 +342,7 @@ const MENU_SECTIONS: MenuSection[] = [
         id: "about",
         icon: "information-circle-outline",
         title: "Về ứng dụng",
+        titleKey: "profileMenu.aboutApp",
         route: "/about",
         color: T.textSec,
         bgColor: "#F1F5F9",
@@ -328,6 +351,7 @@ const MENU_SECTIONS: MenuSection[] = [
         id: "terms",
         icon: "document-outline",
         title: "Điều khoản dịch vụ",
+        titleKey: "checkout.termsOfService",
         route: "/terms",
         color: T.textSec,
         bgColor: "#F1F5F9",
@@ -336,19 +360,19 @@ const MENU_SECTIONS: MenuSection[] = [
   },
 ];
 
-const QUICK_ACTIONS = [
+const QUICK_ACTION_KEYS = [
   {
     id: "messages",
     icon: "chatbubbles" as const,
-    label: "Tin nhắn",
+    labelKey: "nav.messages",
     color: "#0D9488",
     bgColor: "#CCFBF1",
-    route: "/messages",
+    route: "/(tabs)/messages",
   },
   {
     id: "calls",
     icon: "call" as const,
-    label: "Cuộc gọi",
+    labelKey: "nav.calls",
     color: "#10B981",
     bgColor: "#D1FAE5",
     route: "/call/history",
@@ -356,15 +380,15 @@ const QUICK_ACTIONS = [
   {
     id: "contacts",
     icon: "people" as const,
-    label: "Danh bạ",
+    labelKey: "nav.contacts",
     color: "#8B5CF6",
     bgColor: "#F5F3FF",
-    route: "/contacts",
+    route: "/(tabs)/contacts",
   },
   {
     id: "calendar",
     icon: "calendar" as const,
-    label: "Lịch hẹn",
+    labelKey: "profileMenu.schedule",
     color: "#F59E0B",
     bgColor: "#FEF3C7",
     route: "/booking",
@@ -372,7 +396,7 @@ const QUICK_ACTIONS = [
   {
     id: "ai",
     icon: "sparkles" as const,
-    label: "AI Trợ lý",
+    labelKey: "quickAction.costEstimator",
     color: "#EC4899",
     bgColor: "#FCE7F3",
     route: "/ai-hub",
@@ -380,7 +404,7 @@ const QUICK_ACTIONS = [
   {
     id: "settings",
     icon: "settings" as const,
-    label: "Cài đặt",
+    labelKey: "nav.settings",
     color: "#64748B",
     bgColor: "#F1F5F9",
     route: "/profile/settings",
@@ -545,6 +569,7 @@ const statStyles = StyleSheet.create({
 // ============================================================================
 export default function ProfileScreenPremium() {
   const { user, signOut, isAuthenticated, updateAvatar } = useAuth();
+  const { t } = useI18n();
   const scheme = useColorScheme();
   const isDark = scheme === "dark";
 
@@ -936,9 +961,11 @@ export default function ProfileScreenPremium() {
 
         {/* ==================== QUICK ACTIONS ==================== */}
         <View style={[s.qaCard, { backgroundColor: c.surface }]}>
-          <Text style={[s.qaTitle, { color: c.text }]}>Truy cập nhanh</Text>
+          <Text style={[s.qaTitle, { color: c.text }]}>
+            {t("home.quickContact")}
+          </Text>
           <View style={s.qaGrid}>
-            {QUICK_ACTIONS.map((a) => (
+            {QUICK_ACTION_KEYS.map((a) => (
               <TouchableOpacity
                 key={a.id}
                 style={s.qaItem}
@@ -955,7 +982,9 @@ export default function ProfileScreenPremium() {
                     </View>
                   )}
                 </View>
-                <Text style={[s.qaLabel, { color: c.text }]}>{a.label}</Text>
+                <Text style={[s.qaLabel, { color: c.text }]}>
+                  {t(a.labelKey)}
+                </Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -970,7 +999,7 @@ export default function ProfileScreenPremium() {
             <View style={s.menuHeader}>
               <Ionicons name={section.icon} size={16} color={T.primary} />
               <Text style={[s.menuHeaderText, { color: c.text }]}>
-                {section.title}
+                {section.titleKey ? t(section.titleKey) : section.title}
               </Text>
             </View>
             {section.items.map((item, idx) => (
@@ -993,11 +1022,11 @@ export default function ProfileScreenPremium() {
                 </View>
                 <View style={s.menuContent}>
                   <Text style={[s.menuTitle, { color: c.text }]}>
-                    {item.title}
+                    {item.titleKey ? t(item.titleKey) : item.title}
                   </Text>
-                  {item.subtitle && (
+                  {(item.subtitleKey || item.subtitle) && (
                     <Text style={[s.menuSub, { color: c.textSec }]}>
-                      {item.subtitle}
+                      {item.subtitleKey ? t(item.subtitleKey) : item.subtitle}
                     </Text>
                   )}
                 </View>
@@ -1014,7 +1043,7 @@ export default function ProfileScreenPremium() {
           activeOpacity={0.7}
         >
           <Ionicons name="log-out-outline" size={20} color={T.danger} />
-          <Text style={s.signOutText}>Đăng xuất</Text>
+          <Text style={s.signOutText}>{t("auth.logout")}</Text>
         </TouchableOpacity>
 
         {/* Version */}

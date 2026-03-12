@@ -1,16 +1,16 @@
 /**
  * Notification Navigator Service
  * ==============================
- * 
- * Xử lý deep linking từ thông báo để điều hướng đến 
+ *
+ * Xử lý deep linking từ thông báo để điều hướng đến
  * đúng nơi xảy ra sự kiện.
- * 
+ *
  * @author ThietKeResort Team
  * @created 2026-01-12
  */
 
-import { router } from 'expo-router';
-import { Alert } from 'react-native';
+import { router } from "expo-router";
+import { Alert } from "react-native";
 
 // ==================== TYPES ====================
 
@@ -44,6 +44,8 @@ export interface NavigationResult {
   error?: string;
 }
 
+type CommunicationTab = "messages" | "calls" | "meetings";
+
 // ==================== ROUTE MAPPINGS ====================
 
 /**
@@ -51,66 +53,66 @@ export interface NavigationResult {
  */
 const ROUTE_MAP: Record<string, string> = {
   // Tasks & Projects
-  'task': '/projects/[id]/tasks',
-  'project': '/projects/[id]',
-  'project_update': '/projects/[id]',
-  
+  task: "/projects/[id]/tasks",
+  project: "/projects/[id]",
+  project_update: "/projects/[id]",
+
   // Support
-  'ticket': '/support/[id]',
-  'ticket_reply': '/support/[id]',
-  
+  ticket: "/support/[id]",
+  ticket_reply: "/support/[id]",
+
   // Messaging
-  'message': '/chat/[chatId]',
-  'chat': '/chat/[chatId]',
-  'new_message': '/chat/[chatId]',
-  
+  message: "/chat/[chatId]",
+  chat: "/chat/[chatId]",
+  new_message: "/chat/[chatId]",
+
   // Meetings & Calls
-  'meeting': '/meet/[meetingId]/room',
-  'call': '/call',
-  'video_call': '/call',
-  
+  meeting: "/meet/[meetingId]/room",
+  call: "/call",
+  video_call: "/call",
+
   // Orders & Payments
-  'order': '/order/[id]',
-  'order_status': '/order/[id]',
-  'payment': '/order/[id]',
-  'invoice': '/invoices/[id]',
-  
+  order: "/order/[id]",
+  order_status: "/order/[id]",
+  payment: "/order/[id]",
+  invoice: "/invoices/[id]",
+
   // Products
-  'product': '/product/[id]',
-  'product_update': '/product/[id]',
-  'flash_sale': '/flash-sale',
-  'promotion': '/promotions',
-  
+  product: "/product/[id]",
+  product_update: "/product/[id]",
+  flash_sale: "/flash-sale",
+  promotion: "/promotions",
+
   // User & Social
-  'friend_request': '/profile/[userId]',
-  'follow': '/profile/[userId]',
-  'like': '/social',
-  'comment': '/social',
-  
+  friend_request: "/profile/[userId]",
+  follow: "/profile/[userId]",
+  like: "/social",
+  comment: "/social",
+
   // System
-  'system': '/notifications',
-  'info': '/notifications',
-  'warning': '/notifications',
-  'error': '/notifications',
-  
+  system: "/notifications",
+  info: "/notifications",
+  warning: "/notifications",
+  error: "/notifications",
+
   // Construction Specific
-  'construction': '/construction/[id]',
-  'construction_progress': '/construction-progress/[id]',
-  'quality_report': '/quality-assurance/[id]',
-  'inspection': '/inspection/[id]',
-  'material_delivery': '/materials/[id]',
-  'worker_schedule': '/worker-schedule',
-  'daily_report': '/daily-report/[id]',
-  
+  construction: "/construction/[id]",
+  construction_progress: "/construction-progress/[id]",
+  quality_report: "/quality-assurance/[id]",
+  inspection: "/inspection/[id]",
+  material_delivery: "/materials/[id]",
+  worker_schedule: "/worker-schedule",
+  daily_report: "/daily-report/[id]",
+
   // Documents
-  'document': '/documents/[id]',
-  'contract': '/contracts/[id]',
-  'quotation': '/quote-request',
-  
+  document: "/documents/[id]",
+  contract: "/contracts/[id]",
+  quotation: "/quote-request",
+
   // Events
-  'event': '/events/[id]',
-  'reminder': '/notifications',
-  'deadline': '/scheduled-tasks',
+  event: "/events/[id]",
+  reminder: "/notifications",
+  deadline: "/scheduled-tasks",
 };
 
 // ==================== MAIN NAVIGATOR ====================
@@ -120,12 +122,18 @@ const ROUTE_MAP: Record<string, string> = {
  * @param data Notification data containing type and related IDs
  * @returns NavigationResult indicating success/failure
  */
-export function navigateToNotification(data: NotificationData): NavigationResult {
+export function navigateToNotification(
+  data: NotificationData,
+): NavigationResult {
   if (!data) {
-    return { success: false, destination: '', error: 'No notification data provided' };
+    return {
+      success: false,
+      destination: "",
+      error: "No notification data provided",
+    };
   }
 
-  console.log('[NotificationNavigator] Processing:', data);
+  console.log("[NotificationNavigator] Processing:", data);
 
   try {
     // Priority 1: Direct route specified
@@ -135,18 +143,31 @@ export function navigateToNotification(data: NotificationData): NavigationResult
     }
 
     // Priority 2: Related type + ID
-    const type = (data.type || data.relatedType || '').toLowerCase();
+    const type = (data.type || data.relatedType || "").toLowerCase();
     const id = data.relatedId || extractId(data);
+
+    // Priority 2.5: Unified communication hub routing
+    // Keep UX consistent by always entering communication first
+    // for MESSAGE/CALL/MEETING notifications.
+    const communicationTab = mapTypeToCommunicationTab(type);
+    if (communicationTab) {
+      const destination = `/(tabs)/communication?tab=${communicationTab}`;
+      router.push({
+        pathname: "/(tabs)/communication",
+        params: { tab: communicationTab },
+      } as any);
+      return { success: true, destination };
+    }
 
     if (!type) {
       // Default to notifications screen
-      router.push('/notifications');
-      return { success: true, destination: '/notifications' };
+      router.push("/notifications");
+      return { success: true, destination: "/notifications" };
     }
 
     // Get route template
     const routeTemplate = ROUTE_MAP[type];
-    
+
     if (routeTemplate && id) {
       const destination = buildRoute(routeTemplate, type, id, data);
       router.push(destination as any);
@@ -157,17 +178,30 @@ export function navigateToNotification(data: NotificationData): NavigationResult
     const fallbackRoute = getFallbackRoute(type);
     router.push(fallbackRoute as any);
     return { success: true, destination: fallbackRoute };
-
   } catch (error) {
-    console.error('[NotificationNavigator] Navigation error:', error);
+    console.error("[NotificationNavigator] Navigation error:", error);
     // Fallback to notifications
-    router.push('/notifications');
-    return { 
-      success: false, 
-      destination: '/notifications', 
-      error: error instanceof Error ? error.message : 'Unknown error' 
+    router.push("/notifications");
+    return {
+      success: false,
+      destination: "/notifications",
+      error: error instanceof Error ? error.message : "Unknown error",
     };
   }
+}
+
+function mapTypeToCommunicationTab(type: string): CommunicationTab | null {
+  if (!type) return null;
+
+  const messageTypes = ["message", "chat", "new_message"];
+  const callTypes = ["call", "video_call"];
+  const meetingTypes = ["meeting"];
+
+  if (messageTypes.includes(type)) return "messages";
+  if (callTypes.includes(type)) return "calls";
+  if (meetingTypes.includes(type)) return "meetings";
+
+  return null;
 }
 
 /**
@@ -176,18 +210,18 @@ export function navigateToNotification(data: NotificationData): NavigationResult
  * @param showDetails Whether to show additional details alert
  */
 export async function navigateAndShowEvent(
-  data: NotificationData, 
-  showDetails: boolean = false
+  data: NotificationData,
+  showDetails: boolean = false,
 ): Promise<NavigationResult> {
   const result = navigateToNotification(data);
-  
+
   if (showDetails && result.success) {
     // Small delay to allow navigation to complete
     setTimeout(() => {
       showEventDetails(data);
     }, 500);
   }
-  
+
   return result;
 }
 
@@ -195,26 +229,24 @@ export async function navigateAndShowEvent(
  * Show event details in an alert (for quick preview)
  */
 export function showEventDetails(data: NotificationData): void {
-  const type = (data.type || data.relatedType || 'Thông báo').toUpperCase();
-  const id = data.relatedId || extractId(data) || 'N/A';
-  
+  const type = (data.type || data.relatedType || "Thông báo").toUpperCase();
+  const id = data.relatedId || extractId(data) || "N/A";
+
   const messages: string[] = [];
-  
+
   if (data.taskId) messages.push(`Task ID: ${data.taskId}`);
   if (data.projectId) messages.push(`Project ID: ${data.projectId}`);
   if (data.orderId) messages.push(`Order ID: ${data.orderId}`);
   if (data.meetingId) messages.push(`Meeting ID: ${data.meetingId}`);
   if (data.ticketId) messages.push(`Ticket ID: ${data.ticketId}`);
-  
+
   if (messages.length === 0) {
     messages.push(`ID: ${id}`);
   }
 
-  Alert.alert(
-    `📍 Chi tiết sự kiện`,
-    `Loại: ${type}\n${messages.join('\n')}`,
-    [{ text: 'Đóng', style: 'cancel' }]
-  );
+  Alert.alert(`📍 Chi tiết sự kiện`, `Loại: ${type}\n${messages.join("\n")}`, [
+    { text: "Đóng", style: "cancel" },
+  ]);
 }
 
 // ==================== HELPERS ====================
@@ -245,27 +277,27 @@ function extractId(data: NotificationData): string | null {
  * Build route with parameters
  */
 function buildRoute(
-  template: string, 
-  type: string, 
-  id: string, 
-  data: NotificationData
+  template: string,
+  type: string,
+  id: string,
+  data: NotificationData,
 ): string {
   let route = template;
-  
+
   // Replace common placeholders
-  route = route.replace('[id]', id);
-  route = route.replace('[chatId]', data.chatId || id);
-  route = route.replace('[meetingId]', data.meetingId || id);
-  route = route.replace('[userId]', data.userId || id);
-  
+  route = route.replace("[id]", id);
+  route = route.replace("[chatId]", data.chatId || id);
+  route = route.replace("[meetingId]", data.meetingId || id);
+  route = route.replace("[userId]", data.userId || id);
+
   // Handle special cases
-  if (type === 'call' || type === 'video_call') {
+  if (type === "call" || type === "video_call") {
     if (data.roomId) {
       route = `/call?roomId=${data.roomId}`;
     }
   }
-  
-  if (type === 'message' && data.messageId) {
+
+  if (type === "message" && data.messageId) {
     route += `?messageId=${data.messageId}`;
   }
 
@@ -277,24 +309,24 @@ function buildRoute(
  */
 function getFallbackRoute(type: string): string {
   const category = getTypeCategory(type);
-  
+
   switch (category) {
-    case 'task':
-      return '/(tabs)/projects';
-    case 'message':
-      return '/chat';
-    case 'order':
-      return '/order';
-    case 'meeting':
-      return '/meet';
-    case 'construction':
-      return '/construction';
-    case 'document':
-      return '/documents';
-    case 'social':
-      return '/social';
+    case "task":
+      return "/(tabs)/projects";
+    case "message":
+      return "/chat";
+    case "order":
+      return "/order";
+    case "meeting":
+      return "/meet";
+    case "construction":
+      return "/construction";
+    case "document":
+      return "/documents";
+    case "social":
+      return "/social";
     default:
-      return '/notifications';
+      return "/notifications";
   }
 }
 
@@ -302,23 +334,29 @@ function getFallbackRoute(type: string): string {
  * Categorize notification type
  */
 function getTypeCategory(type: string): string {
-  const taskTypes = ['task', 'project', 'project_update', 'deadline'];
-  const messageTypes = ['message', 'chat', 'new_message'];
-  const orderTypes = ['order', 'order_status', 'payment', 'invoice'];
-  const meetingTypes = ['meeting', 'call', 'video_call', 'event'];
-  const constructionTypes = ['construction', 'construction_progress', 'quality_report', 'inspection', 'daily_report'];
-  const documentTypes = ['document', 'contract', 'quotation'];
-  const socialTypes = ['friend_request', 'follow', 'like', 'comment'];
-  
-  if (taskTypes.includes(type)) return 'task';
-  if (messageTypes.includes(type)) return 'message';
-  if (orderTypes.includes(type)) return 'order';
-  if (meetingTypes.includes(type)) return 'meeting';
-  if (constructionTypes.includes(type)) return 'construction';
-  if (documentTypes.includes(type)) return 'document';
-  if (socialTypes.includes(type)) return 'social';
-  
-  return 'system';
+  const taskTypes = ["task", "project", "project_update", "deadline"];
+  const messageTypes = ["message", "chat", "new_message"];
+  const orderTypes = ["order", "order_status", "payment", "invoice"];
+  const meetingTypes = ["meeting", "call", "video_call", "event"];
+  const constructionTypes = [
+    "construction",
+    "construction_progress",
+    "quality_report",
+    "inspection",
+    "daily_report",
+  ];
+  const documentTypes = ["document", "contract", "quotation"];
+  const socialTypes = ["friend_request", "follow", "like", "comment"];
+
+  if (taskTypes.includes(type)) return "task";
+  if (messageTypes.includes(type)) return "message";
+  if (orderTypes.includes(type)) return "order";
+  if (meetingTypes.includes(type)) return "meeting";
+  if (constructionTypes.includes(type)) return "construction";
+  if (documentTypes.includes(type)) return "document";
+  if (socialTypes.includes(type)) return "social";
+
+  return "system";
 }
 
 // ==================== INTEGRATION HELPERS ====================
@@ -328,7 +366,8 @@ function getTypeCategory(type: string): string {
  * Use this in notification response listeners
  */
 export function handleNotificationTap(response: any): NavigationResult {
-  const data = response?.notification?.request?.content?.data as NotificationData;
+  const data = response?.notification?.request?.content
+    ?.data as NotificationData;
   return navigateToNotification(data || {});
 }
 
@@ -349,34 +388,37 @@ export function handleNotificationItemPress(notification: {
     relatedId: notification.relatedId,
     ...notification.data,
   };
-  
+
   return navigateToNotification(data);
 }
 
 /**
  * Get icon for notification type
  */
-export function getNotificationIcon(type: string): { name: string; color: string } {
+export function getNotificationIcon(type: string): {
+  name: string;
+  color: string;
+} {
   const iconMap: Record<string, { name: string; color: string }> = {
-    task: { name: 'checkmark-circle-outline', color: '#22C55E' },
-    project: { name: 'folder-outline', color: '#F59E0B' },
-    ticket: { name: 'help-buoy-outline', color: '#EF4444' },
-    message: { name: 'chatbubble-outline', color: '#0D9488' },
-    chat: { name: 'chatbubbles-outline', color: '#0D9488' },
-    order: { name: 'cart-outline', color: '#8B5CF6' },
-    payment: { name: 'card-outline', color: '#10B981' },
-    meeting: { name: 'videocam-outline', color: '#EC4899' },
-    call: { name: 'call-outline', color: '#14B8A6' },
-    construction: { name: 'construct-outline', color: '#F97316' },
-    document: { name: 'document-text-outline', color: '#6366F1' },
-    system: { name: 'notifications-outline', color: '#64748B' },
-    info: { name: 'information-circle-outline', color: '#0D9488' },
-    warning: { name: 'warning-outline', color: '#F59E0B' },
-    error: { name: 'alert-circle-outline', color: '#EF4444' },
-    success: { name: 'checkmark-done-outline', color: '#22C55E' },
+    task: { name: "checkmark-circle-outline", color: "#22C55E" },
+    project: { name: "folder-outline", color: "#F59E0B" },
+    ticket: { name: "help-buoy-outline", color: "#EF4444" },
+    message: { name: "chatbubble-outline", color: "#0D9488" },
+    chat: { name: "chatbubbles-outline", color: "#0D9488" },
+    order: { name: "cart-outline", color: "#8B5CF6" },
+    payment: { name: "card-outline", color: "#10B981" },
+    meeting: { name: "videocam-outline", color: "#EC4899" },
+    call: { name: "call-outline", color: "#14B8A6" },
+    construction: { name: "construct-outline", color: "#F97316" },
+    document: { name: "document-text-outline", color: "#6366F1" },
+    system: { name: "notifications-outline", color: "#64748B" },
+    info: { name: "information-circle-outline", color: "#0D9488" },
+    warning: { name: "warning-outline", color: "#F59E0B" },
+    error: { name: "alert-circle-outline", color: "#EF4444" },
+    success: { name: "checkmark-done-outline", color: "#22C55E" },
   };
-  
-  const normalizedType = type?.toLowerCase() || 'system';
+
+  const normalizedType = type?.toLowerCase() || "system";
   return iconMap[normalizedType] || iconMap.system;
 }
 

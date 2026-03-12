@@ -4,6 +4,10 @@
  * Categories: AC cleaning, plumbing, electrical, painting, etc.
  */
 
+import {
+    CATEGORY_TO_WORKER_TYPE,
+    SERVICE_CATEGORIES
+} from "@/data/service-categories";
 import { getWorkers, type Worker } from "@/services/workers.api";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -26,112 +30,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 // ============================================================================
-// SERVICE CATEGORIES
+// SERVICE CATEGORIES — imported from @/data/service-categories
 // ============================================================================
-const SERVICE_CATEGORIES = [
-  {
-    id: "ac-cleaning",
-    label: "Vệ sinh máy lạnh",
-    icon: "air-conditioner" as const,
-    priceRange: "120,000 - 200,000đ",
-    color: "#2196F3",
-  },
-  {
-    id: "ac-repair",
-    label: "Sửa máy lạnh",
-    icon: "wrench" as const,
-    priceRange: "200,000 - 500,000đ",
-    color: "#FF9800",
-  },
-  {
-    id: "electrical",
-    label: "Thợ điện",
-    icon: "flash" as const,
-    priceRange: "100,000 - 300,000đ",
-    color: "#FFC107",
-  },
-  {
-    id: "plumbing",
-    label: "Thợ nước",
-    icon: "water-pump" as const,
-    priceRange: "150,000 - 400,000đ",
-    color: "#03A9F4",
-  },
-  {
-    id: "painting",
-    label: "Thợ sơn",
-    icon: "format-paint" as const,
-    priceRange: "200,000 - 600,000đ",
-    color: "#E91E63",
-  },
-  {
-    id: "cleaning",
-    label: "Vệ sinh nhà",
-    icon: "broom" as const,
-    priceRange: "200,000 - 500,000đ",
-    color: "#4CAF50",
-  },
-  {
-    id: "locksmith",
-    label: "Thợ khoá",
-    icon: "key-variant" as const,
-    priceRange: "100,000 - 300,000đ",
-    color: "#795548",
-  },
-  {
-    id: "appliance",
-    label: "Sửa đồ gia dụng",
-    icon: "washing-machine" as const,
-    priceRange: "150,000 - 500,000đ",
-    color: "#607D8B",
-  },
-  {
-    id: "carpentry",
-    label: "Thợ mộc",
-    icon: "hammer" as const,
-    priceRange: "200,000 - 800,000đ",
-    color: "#8D6E63",
-  },
-  {
-    id: "welding",
-    label: "Thợ hàn",
-    icon: "fire" as const,
-    priceRange: "200,000 - 600,000đ",
-    color: "#FF5722",
-  },
-  {
-    id: "camera",
-    label: "Lắp camera",
-    icon: "cctv" as const,
-    priceRange: "300,000 - 1,000,000đ",
-    color: "#9C27B0",
-  },
-  {
-    id: "pest-control",
-    label: "Diệt côn trùng",
-    icon: "bug" as const,
-    priceRange: "200,000 - 500,000đ",
-    color: "#F44336",
-  },
-];
-
-// ============================================================================
-// MAP CATEGORY → WorkerType for API filtering
-// ============================================================================
-const CATEGORY_TO_WORKER_TYPE: Record<string, string> = {
-  "ac-cleaning": "THO_DIEN",
-  "ac-repair": "THO_DIEN",
-  electrical: "THO_DIEN",
-  plumbing: "THO_NUOC",
-  painting: "THO_SON",
-  cleaning: "NHAN_CONG",
-  locksmith: "THO_SAT",
-  appliance: "THO_DIEN",
-  carpentry: "THO_MOC",
-  welding: "THO_HAN",
-  camera: "THO_CAMERA",
-  "pest-control": "NHAN_CONG",
-};
 
 // ============================================================================
 // WORKER VIEW MODEL (unified shape for UI)
@@ -398,8 +298,16 @@ export default function ServiceBookingScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Map Area (Placeholder) */}
-      <View style={s.mapContainer}>
+      {/* Map Area - Tap to open full worker map */}
+      <TouchableOpacity
+        style={s.mapContainer}
+        onPress={() =>
+          router.push(
+            `/service-booking/worker-map?category=${selectedCategory.id}` as Href,
+          )
+        }
+        activeOpacity={0.85}
+      >
         <Image
           source={{
             uri: "https://maps.googleapis.com/maps/api/staticmap?center=10.8,106.65&zoom=15&size=600x300&maptype=roadmap&key=placeholder",
@@ -413,6 +321,10 @@ export default function ServiceBookingScreen() {
             style={s.mapGradient}
           />
         </View>
+        <View style={s.mapCTA}>
+          <Ionicons name="map" size={18} color="#fff" />
+          <Text style={s.mapCTAText}>Tìm thợ trên bản đồ</Text>
+        </View>
         <TouchableOpacity style={s.locationButton}>
           <MaterialCommunityIcons
             name="crosshairs-gps"
@@ -420,7 +332,7 @@ export default function ServiceBookingScreen() {
             color="#FFC107"
           />
         </TouchableOpacity>
-      </View>
+      </TouchableOpacity>
 
       <ScrollView style={s.scrollContent} showsVerticalScrollIndicator={false}>
         {/* Category Icons Row */}
@@ -439,7 +351,7 @@ export default function ServiceBookingScreen() {
               ]}
               onPress={() => setSelectedCategory(cat)}
             >
-              <MaterialCommunityIcons
+              <Ionicons
                 name={cat.icon as any}
                 size={20}
                 color={selectedCategory.id === cat.id ? "#fff" : cat.color}
@@ -606,6 +518,28 @@ const s = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
     shadowRadius: 4,
+  },
+  mapCTA: {
+    position: "absolute",
+    bottom: 16,
+    left: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FF6B00",
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    gap: 6,
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+  mapCTAText: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#fff",
   },
 
   // Category Scroll

@@ -14,6 +14,7 @@ import {
     searchProducts,
     type ProductQueryParams,
 } from "@/services/api/products.service";
+import { useI18n } from "@/services/i18nService";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
@@ -42,74 +43,74 @@ const PRODUCT_CARD_WIDTH = (width - 48) / 2;
 // ============================================================================
 // Categories - Construction industry focused
 // ============================================================================
-const CATEGORIES = [
+const CATEGORY_KEYS = [
   {
     id: "materials",
-    name: "Vật liệu XD",
+    nameKey: "shop.buildingMaterials",
     icon: "cube-outline" as const,
     color: "#0D9488",
   },
   {
     id: "interior",
-    name: "Nội thất",
+    nameKey: "shop.furniture",
     icon: "bed-outline" as const,
     color: "#F59E0B",
   },
   {
     id: "sanitary",
-    name: "Thiết bị VS",
+    nameKey: "shop.bathroom",
     icon: "water-outline" as const,
     color: "#3B82F6",
   },
   {
     id: "lighting",
-    name: "Đèn chiếu sáng",
+    nameKey: "shop.lighting",
     icon: "bulb-outline" as const,
     color: "#8B5CF6",
   },
   {
     id: "furniture",
-    name: "Đồ nội thất",
+    nameKey: "shop.homeFurniture",
     icon: "color-palette-outline" as const,
     color: "#EC4899",
   },
   {
     id: "construction",
-    name: "Thi công",
+    nameKey: "shop.construction",
     icon: "construct-outline" as const,
     color: "#EF4444",
   },
   {
     id: "consultation",
-    name: "Tư vấn TK",
+    nameKey: "shop.designConsult",
     icon: "document-text-outline" as const,
     color: "#06B6D4",
   },
   {
     id: "villa",
-    name: "Biệt thự",
+    nameKey: "shop.villa",
     icon: "home-outline" as const,
     color: "#10B981",
   },
   {
     id: "architecture",
-    name: "Kiến trúc",
+    nameKey: "shop.architecture",
     icon: "business-outline" as const,
     color: "#F97316",
   },
   {
     id: "more",
-    name: "Xem thêm",
+    nameKey: "shop.seeMore",
     icon: "ellipsis-horizontal-outline" as const,
     color: "#6B7280",
   },
 ];
 
 // Quick action shortcuts
-const QUICK_ACTIONS = [
+const QUICK_ACTION_KEYS = [
   {
     id: "flash",
-    label: "Flash Sale",
+    labelKey: "Flash Sale",
     icon: "flash" as const,
     bgColor: "#FEE2E2",
     iconColor: "#EF4444",
@@ -117,7 +118,7 @@ const QUICK_ACTIONS = [
   },
   {
     id: "voucher",
-    label: "Voucher",
+    labelKey: "Voucher",
     icon: "ticket-outline" as const,
     bgColor: "#DBEAFE",
     iconColor: "#3B82F6",
@@ -125,7 +126,7 @@ const QUICK_ACTIONS = [
   },
   {
     id: "new",
-    label: "Hàng mới",
+    labelKey: "shop.newArrivals",
     icon: "sparkles-outline" as const,
     bgColor: "#D1FAE5",
     iconColor: "#10B981",
@@ -133,7 +134,7 @@ const QUICK_ACTIONS = [
   },
   {
     id: "brand",
-    label: "Thương hiệu",
+    labelKey: "Thương hiệu",
     icon: "ribbon-outline" as const,
     bgColor: "#FEF3C7",
     iconColor: "#F59E0B",
@@ -142,44 +143,44 @@ const QUICK_ACTIONS = [
 ];
 
 // Promo banners
-const BANNERS = [
+const BANNER_KEYS = [
   {
     id: "1",
     image:
       "https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=600",
-    title: "Giảm đến 50%",
-    subtitle: "Vật liệu xây dựng chính hãng",
+    titleKey: "shop.discount50",
+    subtitleKey: "shop.genuineMaterials",
     gradient: ["#0D9488", "#14B8A6"] as const,
   },
   {
     id: "2",
     image:
       "https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=600",
-    title: "Freeship mọi đơn",
-    subtitle: "Áp dụng toàn quốc T6-CN",
+    titleKey: "shop.freeShipAll",
+    subtitleKey: "shop.freeShipNationwide",
     gradient: ["#7C3AED", "#A78BFA"] as const,
   },
   {
     id: "3",
     image:
       "https://images.pexels.com/photos/3935333/pexels-photo-3935333.jpeg?auto=compress&cs=tinysrgb&w=600",
-    title: "Combo tiết kiệm",
-    subtitle: "Điện - nước - nội thất",
+    titleKey: "shop.comboSave",
+    subtitleKey: "shop.comboDesc",
     gradient: ["#EA580C", "#FB923C"] as const,
   },
 ];
 
 // Sort options
-const SORT_OPTIONS: {
-  label: string;
+const SORT_OPTION_KEYS: {
+  labelKey: string;
   value: ProductQueryParams["sortBy"];
   order: "asc" | "desc";
 }[] = [
-  { label: "Phổ biến", value: "popular", order: "desc" },
-  { label: "Mới nhất", value: "newest", order: "desc" },
-  { label: "Bán chạy", value: "popular", order: "desc" },
-  { label: "Giá ↑", value: "price", order: "asc" },
-  { label: "Giá ↓", value: "price", order: "desc" },
+  { labelKey: "shop.popular", value: "popular", order: "desc" },
+  { labelKey: "shop.newest", value: "newest", order: "desc" },
+  { labelKey: "shop.bestSeller", value: "popular", order: "desc" },
+  { labelKey: "shop.priceAsc", value: "price", order: "asc" },
+  { labelKey: "shop.priceDesc", value: "price", order: "desc" },
 ];
 
 // ============================================================================
@@ -241,6 +242,7 @@ function ProductCard({
   cardBg: string;
   textColor: string;
 }) {
+  const { t } = useI18n();
   const imageUri =
     typeof product.image === "string"
       ? product.image
@@ -324,7 +326,10 @@ function ProductCard({
             </View>
           )}
           <Text style={styles.soldText}>
-            Đã bán {product.sold ?? product.soldCount ?? 0}
+            {t("shop.sold").replace(
+              "{count}",
+              String(product.sold ?? product.soldCount ?? 0),
+            )}
           </Text>
         </View>
 
@@ -353,6 +358,7 @@ export default function ShopScreen() {
   );
   const router = useRouter();
   const { totalItems } = useCart();
+  const { t } = useI18n();
 
   // URL params
   const { category: paramCategory, type: paramType } = useLocalSearchParams<{
@@ -442,7 +448,7 @@ export default function ShopScreen() {
       else setLoadingMore(true);
 
       try {
-        const sort = SORT_OPTIONS[selectedSort];
+        const sort = SORT_OPTION_KEYS[selectedSort];
         const params: ProductQueryParams = {
           page,
           limit: PAGE_SIZE,
@@ -547,7 +553,7 @@ export default function ShopScreen() {
   // Banner auto-scroll
   useEffect(() => {
     const timer = setInterval(() => {
-      const next = (activeBanner + 1) % BANNERS.length;
+      const next = (activeBanner + 1) % BANNER_KEYS.length;
       bannerRef.current?.scrollTo({ x: next * (width - 32), animated: true });
       setActiveBanner(next);
     }, 4000);
@@ -617,7 +623,7 @@ export default function ShopScreen() {
           <Ionicons name="search" size={18} color="#999" />
           <TextInput
             style={styles.searchInput}
-            placeholder="Tìm sản phẩm xây dựng, nội thất..."
+            placeholder={t("shop.searchPlaceholder")}
             placeholderTextColor="#999"
             value={searchQuery}
             onChangeText={setSearchQuery}
@@ -662,8 +668,10 @@ export default function ShopScreen() {
         <View style={[styles.searchResultHeader, { backgroundColor: cardBg }]}>
           <Text style={[styles.searchResultText, { color: textColor }]}>
             {searchLoading
-              ? "Đang tìm kiếm..."
-              : `${searchResults.length} kết quả cho "${searchQuery}"`}
+              ? t("shop.searching")
+              : t("shop.searchResults")
+                  .replace("{count}", String(searchResults.length))
+                  .replace("{query}", searchQuery)}
           </Text>
         </View>
       )}
@@ -681,7 +689,7 @@ export default function ShopScreen() {
               onMomentumScrollEnd={handleBannerScroll}
               style={styles.bannerScroll}
             >
-              {BANNERS.map((banner) => (
+              {BANNER_KEYS.map((banner) => (
                 <TouchableOpacity
                   key={banner.id}
                   style={styles.bannerItem}
@@ -695,15 +703,17 @@ export default function ShopScreen() {
                     colors={["transparent", "rgba(0,0,0,0.7)"]}
                     style={styles.bannerOverlay}
                   >
-                    <Text style={styles.bannerTitle}>{banner.title}</Text>
-                    <Text style={styles.bannerSubtitle}>{banner.subtitle}</Text>
+                    <Text style={styles.bannerTitle}>{t(banner.titleKey)}</Text>
+                    <Text style={styles.bannerSubtitle}>
+                      {t(banner.subtitleKey)}
+                    </Text>
                   </LinearGradient>
                 </TouchableOpacity>
               ))}
             </ScrollView>
             {/* Dots */}
             <View style={styles.dotsRow}>
-              {BANNERS.map((_, i) => (
+              {BANNER_KEYS.map((_, i) => (
                 <View
                   key={i}
                   style={[styles.dot, activeBanner === i && styles.dotActive]}
@@ -714,7 +724,7 @@ export default function ShopScreen() {
 
           {/* Quick Actions */}
           <View style={[styles.quickActionsRow, { backgroundColor: cardBg }]}>
-            {QUICK_ACTIONS.map((action) => (
+            {QUICK_ACTION_KEYS.map((action) => (
               <TouchableOpacity
                 key={action.id}
                 style={styles.quickAction}
@@ -733,7 +743,7 @@ export default function ShopScreen() {
                   />
                 </View>
                 <Text style={[styles.quickActionText, { color: subtextColor }]}>
-                  {action.label}
+                  {t(action.labelKey) || action.labelKey}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -742,10 +752,10 @@ export default function ShopScreen() {
           {/* Categories */}
           <View style={[styles.section, { backgroundColor: cardBg }]}>
             <Text style={[styles.sectionTitle, { color: textColor }]}>
-              Danh mục
+              {t("shop.categories")}
             </Text>
             <View style={styles.categoriesGrid}>
-              {CATEGORIES.map((cat) => {
+              {CATEGORY_KEYS.map((cat) => {
                 const isActive = selectedCategory === cat.id;
                 return (
                   <TouchableOpacity
@@ -777,7 +787,7 @@ export default function ShopScreen() {
                       ]}
                       numberOfLines={1}
                     >
-                      {cat.name}
+                      {t(cat.nameKey)}
                     </Text>
                   </TouchableOpacity>
                 );
@@ -801,7 +811,7 @@ export default function ShopScreen() {
               <TouchableOpacity
                 onPress={() => router.push("/shopping/flash-sale" as any)}
               >
-                <Text style={styles.flashSaleMore}>Xem tất cả ›</Text>
+                <Text style={styles.flashSaleMore}>{t("shop.viewAll")}</Text>
               </TouchableOpacity>
             </LinearGradient>
 
@@ -849,7 +859,10 @@ export default function ShopScreen() {
                           ]}
                         />
                         <Text style={styles.flashSoldText}>
-                          Đã bán {product.sold ?? product.soldCount ?? 0}
+                          {t("shop.sold").replace(
+                            "{count}",
+                            String(product.sold ?? product.soldCount ?? 0),
+                          )}
                         </Text>
                       </View>
                     </TouchableOpacity>
@@ -863,12 +876,12 @@ export default function ShopScreen() {
           <View style={[styles.section, { backgroundColor: cardBg }]}>
             <View style={styles.sectionHeader}>
               <Text style={[styles.sectionTitle, { color: textColor }]}>
-                🔥 Sản phẩm nổi bật
+                🔥 {t("shop.featuredProducts")}
               </Text>
               <TouchableOpacity
                 onPress={() => router.push("/shopping/products-catalog" as any)}
               >
-                <Text style={styles.viewAllText}>Xem tất cả ›</Text>
+                <Text style={styles.viewAllText}>{t("shop.viewAll")}</Text>
               </TouchableOpacity>
             </View>
 
@@ -912,7 +925,11 @@ export default function ShopScreen() {
                           {product.rating?.toFixed(1) ?? "5.0"}
                         </Text>
                         <Text style={styles.featuredSold}>
-                          | Đã bán {product.sold ?? product.soldCount ?? 0}
+                          |{" "}
+                          {t("shop.sold").replace(
+                            "{count}",
+                            String(product.sold ?? product.soldCount ?? 0),
+                          )}
                         </Text>
                       </View>
                     </TouchableOpacity>
@@ -925,7 +942,7 @@ export default function ShopScreen() {
           {/* Sort bar */}
           <View style={[styles.sortBar, { backgroundColor: cardBg }]}>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {SORT_OPTIONS.map((opt, i) => (
+              {SORT_OPTION_KEYS.map((opt, i) => (
                 <TouchableOpacity
                   key={i}
                   style={[
@@ -940,7 +957,7 @@ export default function ShopScreen() {
                       selectedSort === i && styles.sortChipTextActive,
                     ]}
                   >
-                    {opt.label}
+                    {t(opt.labelKey)}
                   </Text>
                 </TouchableOpacity>
               ))}
@@ -951,7 +968,12 @@ export default function ShopScreen() {
           {selectedCategory && selectedCategory !== "more" && (
             <View style={styles.filterPill}>
               <Text style={styles.filterPillText}>
-                {CATEGORIES.find((c) => c.id === selectedCategory)?.name}
+                {CATEGORY_KEYS.find((c) => c.id === selectedCategory)?.nameKey
+                  ? t(
+                      CATEGORY_KEYS.find((c) => c.id === selectedCategory)!
+                        .nameKey,
+                    )
+                  : selectedCategory}
               </Text>
               <TouchableOpacity onPress={() => setSelectedCategory(null)}>
                 <Ionicons name="close-circle" size={16} color="#0D9488" />
@@ -963,7 +985,7 @@ export default function ShopScreen() {
           <View style={styles.suggestHeader}>
             <View style={styles.suggestLine} />
             <Text style={[styles.suggestTitle, { color: textColor }]}>
-              GỢI Ý HÔM NAY
+              {t("shop.suggestToday")}
             </Text>
             <View style={styles.suggestLine} />
           </View>
@@ -985,7 +1007,7 @@ export default function ShopScreen() {
       return (
         <View style={styles.footerLoading}>
           <ActivityIndicator size="small" color="#0D9488" />
-          <Text style={styles.footerText}>Đang tải sản phẩm...</Text>
+          <Text style={styles.footerText}>{t("shop.loadingProducts")}</Text>
         </View>
       );
     }
@@ -1000,7 +1022,7 @@ export default function ShopScreen() {
       return (
         <View style={styles.footerEnd}>
           <View style={styles.footerEndLine} />
-          <Text style={styles.footerEndText}>Bạn đã xem hết sản phẩm</Text>
+          <Text style={styles.footerEndText}>{t("shop.noMoreProducts")}</Text>
           <View style={styles.footerEndLine} />
         </View>
       );
@@ -1009,11 +1031,11 @@ export default function ShopScreen() {
       return (
         <View style={styles.emptyState}>
           <Ionicons name="search-outline" size={48} color="#ccc" />
-          <Text style={styles.emptyTitle}>Không tìm thấy sản phẩm</Text>
+          <Text style={styles.emptyTitle}>{t("shop.noProductsFound")}</Text>
           <Text style={styles.emptySubtitle}>
             {searchActive
-              ? "Thử từ khóa khác hoặc bỏ bộ lọc"
-              : "Chưa có sản phẩm trong danh mục này"}
+              ? t("shop.tryOtherKeywords")
+              : t("shop.noCategoryProducts")}
           </Text>
           <TouchableOpacity
             style={styles.emptyBtn}
@@ -1023,7 +1045,7 @@ export default function ShopScreen() {
               setSearchQuery("");
             }}
           >
-            <Text style={styles.emptyBtnText}>Xem tất cả sản phẩm</Text>
+            <Text style={styles.emptyBtnText}>{t("shop.viewAllProducts")}</Text>
           </TouchableOpacity>
         </View>
       );
@@ -1034,7 +1056,7 @@ export default function ShopScreen() {
   // ========== MAIN RENDER ==========
   return (
     <View style={[styles.container, { backgroundColor }]}>
-      <Stack.Screen options={{ title: "Cửa hàng", headerShown: false }} />
+      <Stack.Screen options={{ title: t("shop.store"), headerShown: false }} />
 
       <FlatList
         data={displayProducts}

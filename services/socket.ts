@@ -290,7 +290,7 @@ class SocketManager {
       throw new Error("Socket not connected");
     }
     console.log("[Socket] Joining chat:", projectId);
-    this.socket.emit("join:chat", { projectId });
+    this.socket.emit("joinRoom", { projectId });
   }
 
   /**
@@ -299,7 +299,7 @@ class SocketManager {
   leaveChat(projectId: string) {
     if (!this.socket) return;
     console.log("[Socket] Leaving chat:", projectId);
-    this.socket.emit("leave:chat", { projectId });
+    this.socket.emit("leaveRoom", { projectId });
   }
 
   /**
@@ -314,7 +314,7 @@ class SocketManager {
       throw new Error("Socket not connected");
     }
     console.log("[Socket] Sending message to:", projectId);
-    this.socket.emit("message:send", { projectId, content, type });
+    this.socket.emit("sendMessage", { projectId, content, type });
   }
 
   /**
@@ -322,7 +322,7 @@ class SocketManager {
    */
   onNewMessage(callback: (message: ChatMessage) => void) {
     if (!this.socket) return;
-    this.socket.on("message:new", callback);
+    this.socket.on("newMessage", callback);
   }
 
   /**
@@ -331,9 +331,9 @@ class SocketManager {
   offNewMessage(callback?: (message: ChatMessage) => void) {
     if (!this.socket) return;
     if (callback) {
-      this.socket.off("message:new", callback);
+      this.socket.off("newMessage", callback);
     } else {
-      this.socket.off("message:new");
+      this.socket.off("newMessage");
     }
   }
 
@@ -342,7 +342,7 @@ class SocketManager {
    */
   startTyping(projectId: string) {
     if (!this.socket) return;
-    this.socket.emit("typing:start", { projectId });
+    this.socket.emit("typing", { projectId, isTyping: true });
   }
 
   /**
@@ -350,7 +350,7 @@ class SocketManager {
    */
   stopTyping(projectId: string) {
     if (!this.socket) return;
-    this.socket.emit("typing:stop", { projectId });
+    this.socket.emit("typing", { projectId, isTyping: false });
   }
 
   /**
@@ -358,7 +358,7 @@ class SocketManager {
    */
   onTyping(callback: (data: TypingIndicator) => void) {
     if (!this.socket) return;
-    this.socket.on("typing:user", callback);
+    this.socket.on("userTyping", callback);
   }
 
   /**
@@ -367,9 +367,168 @@ class SocketManager {
   offTyping(callback?: (data: TypingIndicator) => void) {
     if (!this.socket) return;
     if (callback) {
-      this.socket.off("typing:user", callback);
+      this.socket.off("userTyping", callback);
     } else {
-      this.socket.off("typing:user");
+      this.socket.off("userTyping");
+    }
+  }
+
+  /**
+   * Mark messages as read in a room
+   */
+  markAsRead(projectId: string, messageIds?: string[]) {
+    if (!this.socket) return;
+    console.log("[Socket] Marking messages as read in:", projectId);
+    this.socket.emit("markAsRead", { projectId, messageIds });
+  }
+
+  /**
+   * Listen for message read receipts
+   */
+  onMessageRead(
+    callback: (data: {
+      projectId: string;
+      userId: string;
+      messageIds?: string[];
+    }) => void,
+  ) {
+    if (!this.socket) return;
+    this.socket.on("messageRead", callback);
+  }
+
+  /**
+   * Remove message read listener
+   */
+  offMessageRead(
+    callback?: (data: {
+      projectId: string;
+      userId: string;
+      messageIds?: string[];
+    }) => void,
+  ) {
+    if (!this.socket) return;
+    if (callback) {
+      this.socket.off("messageRead", callback);
+    } else {
+      this.socket.off("messageRead");
+    }
+  }
+
+  /**
+   * Get online users in a room
+   */
+  getOnlineUsers(projectId: string) {
+    if (!this.socket) return;
+    this.socket.emit("getOnlineUsers", { projectId });
+  }
+
+  /**
+   * Listen for user online status changes
+   */
+  onUserOnline(callback: (data: { userId: string; fullName: string }) => void) {
+    if (!this.socket) return;
+    this.socket.on("userOnline", callback);
+  }
+
+  /**
+   * Remove user online listener
+   */
+  offUserOnline(
+    callback?: (data: { userId: string; fullName: string }) => void,
+  ) {
+    if (!this.socket) return;
+    if (callback) {
+      this.socket.off("userOnline", callback);
+    } else {
+      this.socket.off("userOnline");
+    }
+  }
+
+  /**
+   * Listen for user offline status changes
+   */
+  onUserOffline(
+    callback: (data: { userId: string; fullName: string }) => void,
+  ) {
+    if (!this.socket) return;
+    this.socket.on("userOffline", callback);
+  }
+
+  /**
+   * Remove user offline listener
+   */
+  offUserOffline(
+    callback?: (data: { userId: string; fullName: string }) => void,
+  ) {
+    if (!this.socket) return;
+    if (callback) {
+      this.socket.off("userOffline", callback);
+    } else {
+      this.socket.off("userOffline");
+    }
+  }
+
+  /**
+   * Listen for user joined room events
+   */
+  onUserJoined(
+    callback: (data: {
+      userId: string;
+      fullName: string;
+      projectId: string;
+    }) => void,
+  ) {
+    if (!this.socket) return;
+    this.socket.on("userJoined", callback);
+  }
+
+  /**
+   * Remove user joined listener
+   */
+  offUserJoined(
+    callback?: (data: {
+      userId: string;
+      fullName: string;
+      projectId: string;
+    }) => void,
+  ) {
+    if (!this.socket) return;
+    if (callback) {
+      this.socket.off("userJoined", callback);
+    } else {
+      this.socket.off("userJoined");
+    }
+  }
+
+  /**
+   * Listen for user left room events
+   */
+  onUserLeft(
+    callback: (data: {
+      userId: string;
+      fullName: string;
+      projectId: string;
+    }) => void,
+  ) {
+    if (!this.socket) return;
+    this.socket.on("userLeft", callback);
+  }
+
+  /**
+   * Remove user left listener
+   */
+  offUserLeft(
+    callback?: (data: {
+      userId: string;
+      fullName: string;
+      projectId: string;
+    }) => void,
+  ) {
+    if (!this.socket) return;
+    if (callback) {
+      this.socket.off("userLeft", callback);
+    } else {
+      this.socket.off("userLeft");
     }
   }
 

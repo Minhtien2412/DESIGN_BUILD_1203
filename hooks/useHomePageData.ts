@@ -1,8 +1,12 @@
 /**
  * useHomePageData - Comprehensive data hook for Home Screen
- * Fetches products, workers, categories, promotions from BE
- * Provides all data needed for modern home page sections
+ * Fetches pre-computed data from dedicated BE endpoints:
+ *   /home/products/flash-sale, /home/products/trending,
+ *   /home/products/bestsellers, /home/products/new-arrivals,
+ *   /home/workers/top-rated, /home/stats
+ * Also fetches raw products, workers, categories for other sections
  * @created 2026-02-06
+ * @updated 2026-03-03 — Use server-side computed endpoints
  */
 
 import { get } from "@/services/api";
@@ -182,22 +186,44 @@ const WORKER_TYPE_DISPLAY: Record<string, string> = {
   THO_OP_DA: "Thợ ốp đá",
 };
 
-const VOUCHER_LABELS = ["2.2", "XTRA", "STYLE", "FREESHIP"];
+// ============================================================================
+// API Response wrapper
+// ============================================================================
 
-// Stable random based on seed
-const stableRandom = (seed: number, index: number) => {
-  const x = Math.sin(seed * 9301 + index * 49297) * 49297;
-  return x - Math.floor(x);
-};
+interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+}
 
 // ============================================================================
 // Hook
 // ============================================================================
 
 export function useHomePageData() {
+  // Raw data (for other sections that still need full lists)
   const [products, setProducts] = useState<ServerProduct[]>([]);
   const [workers, setWorkers] = useState<ServerWorker[]>([]);
   const [categories, setCategories] = useState<CategoryItem[]>([]);
+
+  // Pre-computed data from dedicated endpoints
+  const [flashSaleProducts, setFlashSaleProducts] = useState<FlashSaleItem[]>(
+    [],
+  );
+  const [topRatedWorkers, setTopRatedWorkers] = useState<TopWorkerItem[]>([]);
+  const [trendingProducts, setTrendingProducts] = useState<
+    TrendingProductItem[]
+  >([]);
+  const [bestsellers, setBestsellers] = useState<BestsellerItem[]>([]);
+  const [newArrivals, setNewArrivals] = useState<NewArrivalItem[]>([]);
+  const [stats, setStats] = useState<HomeStats>({
+    totalProducts: 0,
+    totalWorkers: 0,
+    totalSold: 0,
+    avgRating: 4.7,
+    activeDeals: 0,
+    categoriesCount: 0,
+  });
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const fetchedRef = useRef(false);
@@ -207,14 +233,64 @@ export function useHomePageData() {
       setLoading(true);
       setError(null);
 
-      const [productsRes, workersRes, categoriesRes] = await Promise.allSettled(
-        [
-          get<{ data: ServerProduct[] }>("/products?limit=50"),
-          get<{ data: ServerWorker[] }>("/workers?limit=30"),
-          get<CategoryItem[]>("/products/categories"),
-        ],
-      );
+      // Fetch all data in parallel — dedicated endpoints + raw lists
+      const [
+        flashSaleRes,
+        trendingRes,
+        bestsellersRes,
+        newArrivalsRes,
+        topWorkersRes,
+        statsRes,
+        productsRes,
+        workersRes,
+        categoriesRes,
+      ] = await Promise.allSettled([
+        get<ApiResponse<FlashSaleItem[]>>("/home/products/flash-sale?limit=10"),
+        get<ApiResponse<TrendingProductItem[]>>(
+          "/home/products/trending?limit=10",
+        ),
+        get<ApiResponse<BestsellerItem[]>>(
+          "/home/products/bestsellers?limit=6",
+        ),
+        get<ApiResponse<NewArrivalItem[]>>(
+          "/home/products/new-arrivals?limit=6",
+        ),
+        get<ApiResponse<TopWorkerItem[]>>("/home/workers/top-rated?limit=8"),
+        get<ApiResponse<HomeStats>>("/home/stats"),
+        get<{ data: ServerProduct[] }>("/products?limit=50"),
+        get<{ data: ServerWorker[] }>("/workers?limit=30"),
+        get<CategoryItem[]>("/products/categories"),
+      ]);
 
+      // Dedicated endpoints (server-computed)
+      if (flashSaleRes.status === "fulfilled") {
+        const d = flashSaleRes.value?.data;
+        setFlashSaleProducts(Array.isArray(d) ? d : []);
+      }
+      if (trendingRes.status === "fulfilled") {
+        const d = trendingRes.value?.data;
+        setTrendingProducts(Array.isArray(d) ? d : []);
+      }
+      if (bestsellersRes.status === "fulfilled") {
+        const d = bestsellersRes.value?.data;
+        setBestsellers(Array.isArray(d) ? d : []);
+      }
+      if (newArrivalsRes.status === "fulfilled") {
+        const d = newArrivalsRes.value?.data;
+        setNewArrivals(Array.isArray(d) ? d : []);
+      }
+      if (topWorkersRes.status === "fulfilled") {
+        const d = topWorkersRes.value?.data;
+        setTopRatedWorkers(Array.isArray(d) ? d : []);
+      }
+      if (statsRes.status === "fulfilled") {
+        const d = statsRes.value?.data;
+        if (d && typeof d === "object" && !Array.isArray(d)) {
+          setStats(d);
+        }
+      }
+
+      // Raw lists (for WorkerGrid, other sections)
       if (productsRes.status === "fulfilled" && productsRes.value?.data) {
         setProducts(
           Array.isArray(productsRes.value.data) ? productsRes.value.data : [],
@@ -246,123 +322,8 @@ export function useHomePageData() {
     }
   }, [fetchData]);
 
-  // ======================== Flash Sale ========================
-  const flashSaleProducts: FlashSaleItem[] = products
-    .filter((p) => p.status === "APPROVED" && p.images.length > 0)
-    .sort((a, b) => b.soldCount - a.soldCount)
-    .slice(0, 10)
-    .map((p) => {
-      const price = Number(p.price);
-      const r = stableRandom(p.id, 1);
-      const discount = Math.floor(r * 20 + 15);
-      const originalPrice = Math.round(price / (1 - discount / 100));
-      return {
-        id: p.id,
-        name: p.name,
-        image: p.images.find((i) => i.isPrimary)?.url || p.images[0]?.url || "",
-        originalPrice,
-        salePrice: price,
-        sold: p.soldCount,
-        total: Math.max(
-          p.soldCount + 50 + Math.floor(stableRandom(p.id, 2) * 100),
-          p.soldCount * 2,
-        ),
-        rating: Math.round((4.5 + stableRandom(p.id, 3) * 0.5) * 10) / 10,
-        isLive: stableRandom(p.id, 4) > 0.7,
-        hasVoucher: stableRandom(p.id, 5) > 0.5,
-        voucherText: VOUCHER_LABELS[Math.floor(stableRandom(p.id, 6) * 4)],
-        location: p.seller?.name || "TP. Hồ Chí Minh",
-        deliveryDays: stableRandom(p.id, 7) > 0.3 ? "3-5 ngày" : "4 Giờ",
-        route: `/product/${p.id}`,
-      };
-    });
-
-  // ======================== Top Workers ========================
-  const topRatedWorkers: TopWorkerItem[] = workers
-    .filter((w) => w.status === "APPROVED" && w.rating >= 4.0)
-    .sort((a, b) => b.rating - a.rating || b.reviewCount - a.reviewCount)
-    .slice(0, 8)
-    .map((w) => ({
-      id: Number(w.id),
-      name: w.name,
-      avatar: w.avatar,
-      specialty: WORKER_TYPE_DISPLAY[w.workerType] || w.workerType,
-      rating: w.rating,
-      reviews: w.reviewCount,
-      location:
-        w.location?.replace("Quan ", "Q.").replace(", TP.HCM", "") || "TP.HCM",
-      verified: w.verified,
-      completedJobs: w.completedJobs,
-      experience: w.experience,
-      dailyRate: w.dailyRate,
-    }));
-
-  // ======================== Trending Products ========================
-  const trendingProducts: TrendingProductItem[] = products
-    .filter((p) => p.status === "APPROVED" && p.images.length > 0)
-    .sort((a, b) => b.viewCount - a.viewCount)
-    .slice(0, 10)
-    .map((p) => ({
-      id: p.id,
-      name: p.name,
-      image: p.images.find((i) => i.isPrimary)?.url || p.images[0]?.url || "",
-      price: Number(p.price),
-      soldCount: p.soldCount,
-      viewCount: p.viewCount,
-      isNew: p.isNew,
-      isBestseller: p.isBestseller,
-      seller: p.seller?.name || "Bảo Tiên Web",
-      sellerId: p.seller?.id ? String(p.seller.id) : undefined,
-      route: `/product/${p.id}`,
-    }));
-
-  // ======================== Bestsellers ========================
-  const bestsellers: BestsellerItem[] = products
-    .filter(
-      (p) => p.status === "APPROVED" && p.isBestseller && p.images.length > 0,
-    )
-    .sort((a, b) => b.soldCount - a.soldCount)
-    .slice(0, 6)
-    .map((p) => ({
-      id: p.id,
-      name: p.name,
-      image: p.images.find((i) => i.isPrimary)?.url || p.images[0]?.url || "",
-      price: Number(p.price),
-      soldCount: p.soldCount,
-      rating: Math.round((4.5 + stableRandom(p.id, 3) * 0.5) * 10) / 10,
-      seller: p.seller?.name || "Bảo Tiên Web",
-      sellerId: p.seller?.id ? String(p.seller.id) : undefined,
-      route: `/product/${p.id}`,
-    }));
-
-  // ======================== New Arrivals ========================
-  const newArrivals: NewArrivalItem[] = products
-    .filter((p) => p.status === "APPROVED" && p.isNew && p.images.length > 0)
-    .sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-    )
-    .slice(0, 6)
-    .map((p) => {
-      const now = new Date();
-      const created = new Date(p.createdAt);
-      const daysNew = Math.max(
-        1,
-        Math.floor((now.getTime() - created.getTime()) / (1000 * 60 * 60 * 24)),
-      );
-      return {
-        id: p.id,
-        name: p.name,
-        image: p.images.find((i) => i.isPrimary)?.url || p.images[0]?.url || "",
-        price: Number(p.price),
-        daysNew,
-        seller: p.seller?.name || "Bảo Tiên Web",
-        sellerId: p.seller?.id ? String(p.seller.id) : undefined,
-        route: `/product/${p.id}`,
-      };
-    });
-
   // ======================== Workers by Type ========================
+  // Still derived client-side from raw workers list
   const workersByType: WorkerByType[] = Object.entries(
     workers
       .filter((w) => w.status === "APPROVED")
@@ -401,27 +362,12 @@ export function useHomePageData() {
     }))
     .sort((a, b) => b.count - a.count);
 
-  // ======================== Stats ========================
-  const stats: HomeStats = {
-    totalProducts: products.length,
-    totalWorkers: workers.length,
-    totalSold: products.reduce((sum, p) => sum + p.soldCount, 0),
-    avgRating:
-      workers.length > 0
-        ? +(
-            workers.reduce((sum, w) => sum + w.rating, 0) / workers.length
-          ).toFixed(1)
-        : 4.7,
-    activeDeals: flashSaleProducts.length,
-    categoriesCount: categories.length,
-  };
-
   return {
     // Raw
     rawProducts: products,
     rawWorkers: workers,
     categories,
-    // Derived
+    // Server-computed sections
     flashSaleProducts,
     topRatedWorkers,
     trendingProducts,

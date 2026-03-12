@@ -243,6 +243,21 @@ export async function apiFetch<T = any>(
       ? normalizedPath
       : `${API_PREFIX}${normalizedPath}`;
   const url = isAbsolute ? path : `${API}${prefixedPath}`;
+
+  // Dev-mode guard: detect double-prefix or full URL passed as path
+  if (__DEV__) {
+    if (/\/api\/v1\/api\/v1/.test(url)) {
+      console.warn(
+        `[API] Double prefix detected in URL: ${url}\n  Original path: "${path}"\n  Callers should use relative paths like "/projects" not "/api/v1/projects"`,
+      );
+    }
+    if (!isAbsolute && /^https?:/i.test(path)) {
+      console.warn(
+        `[API] Absolute URL passed as path: "${path}"\n  Use relative paths instead.`,
+      );
+    }
+  }
+
   const isForm =
     (options as any).data instanceof FormData ||
     (options as any).body instanceof FormData;

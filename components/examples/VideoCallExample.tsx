@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { useNotifications } from "@/context/NotificationsContext";
 import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { type Href, router } from "expo-router";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function VideoCallExampleScreen() {

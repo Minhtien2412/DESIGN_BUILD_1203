@@ -72,7 +72,7 @@ function getCallIcon(call: UnifiedCall): {
   color: string;
   bg: string;
 } {
-  if (call.status === "missed" || call.status === "no_answer") {
+  if (call.status === "missed" || call.status === "rejected") {
     return { name: "call", color: "#EF4444", bg: "#FEE2E2" };
   }
   if (call.type === "video") {
@@ -85,7 +85,7 @@ function getCallIcon(call: UnifiedCall): {
 }
 
 function getStatusLabel(call: UnifiedCall): string {
-  if (call.status === "missed" || call.status === "no_answer")
+  if (call.status === "missed" || call.status === "rejected")
     return "Cuộc gọi nhỡ";
   if (call.type === "video") return "Video call";
   if (call.isOutgoing) return "Gọi đi";
@@ -100,21 +100,21 @@ const CallItem = memo<{ call: UnifiedCall }>(({ call }) => {
   const mutedColor = useThemeColor({}, "icon");
   const cardBg = useThemeColor({}, "background");
   const icon = getCallIcon(call);
-  const isMissed = call.status === "missed" || call.status === "no_answer";
+  const isMissed = call.status === "missed" || call.status === "rejected";
 
   return (
     <Pressable
       style={[styles.callItem, { backgroundColor: cardBg }]}
       onPress={() =>
-        router.push(`/call/${call.participant?.id || call.id}` as Href)
+        router.push(`/call/${call.otherUser?.id || call.id}` as Href)
       }
       android_ripple={{ color: "rgba(0,0,0,0.06)" }}
     >
       {/* Avatar / Icon */}
       <View style={[styles.avatarBox, { backgroundColor: icon.bg }]}>
-        {call.participant?.avatar ? (
+        {call.otherUser?.avatar ? (
           <Image
-            source={{ uri: call.participant.avatar }}
+            source={{ uri: call.otherUser.avatar }}
             style={styles.avatarImage}
           />
         ) : (
@@ -135,7 +135,7 @@ const CallItem = memo<{ call: UnifiedCall }>(({ call }) => {
           style={[styles.callName, { color: isMissed ? "#EF4444" : textColor }]}
           numberOfLines={1}
         >
-          {call.participant?.name || "Không xác định"}
+          {call.otherUser?.name || "Không xác định"}
         </Text>
         <View style={styles.callMeta}>
           <Ionicons
@@ -167,7 +167,7 @@ const CallItem = memo<{ call: UnifiedCall }>(({ call }) => {
         <Pressable
           style={styles.callActionBtn}
           onPress={() =>
-            router.push(`/call/${call.participant?.id || call.id}` as Href)
+            router.push(`/call/${call.otherUser?.id || call.id}` as Href)
           }
           hitSlop={8}
         >
@@ -240,7 +240,7 @@ export default function CallIndexScreen() {
     if (filter === "all") return calls;
     if (filter === "missed")
       return calls.filter(
-        (c) => c.status === "missed" || c.status === "no_answer",
+        (c) => c.status === "missed" || c.status === "rejected",
       );
     if (filter === "incoming") return calls.filter((c) => !c.isOutgoing);
     if (filter === "outgoing") return calls.filter((c) => c.isOutgoing);
@@ -249,7 +249,7 @@ export default function CallIndexScreen() {
 
   const missedCount = useMemo(
     () =>
-      calls.filter((c) => c.status === "missed" || c.status === "no_answer")
+      calls.filter((c) => c.status === "missed" || c.status === "rejected")
         .length,
     [calls],
   );

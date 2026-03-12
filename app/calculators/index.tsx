@@ -1,10 +1,21 @@
-/**
- * Dự toán xây dựng — Project Hub
- * ================================
- * Grand, modern estimation dashboard with project-based workflow.
- * Minimal icons, focus on data density and easy project management.
+﻿/**
+ * Dự toán xây dựng — Project Hub (DS-Migrated)
+ * Route: /calculators
  */
 
+import { useDS } from "@/hooks/useDS";
+import {
+    BUILDING_TYPE_META,
+    type EstimateProject,
+    GRADE_META,
+    type ProjectStatus,
+    deleteProject,
+    duplicateProject,
+    formatDate,
+    formatVND,
+    getAllProjects,
+    seqLabel,
+} from "@/services/constructionEstimateEngine";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
@@ -25,60 +36,171 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import {
-    BUILDING_TYPE_META,
-    type EstimateProject,
-    GRADE_META,
-    type ProjectStatus,
-    deleteProject,
-    duplicateProject,
-    formatDate,
-    formatVND,
-    getAllProjects,
-    seqLabel,
-} from "@/services/constructionEstimateEngine";
-
-// ─── Palette ───────────────────────────────────────────────────────
-const C = {
-  bg: "#F3F4F6",
-  card: "#FFFFFF",
-  primary: "#0D9488",
-  primaryDark: "#0F766E",
-  primaryLight: "#CCFBF1",
-  accent: "#0D9488",
-  warn: "#F59E0B",
-  danger: "#EF4444",
-  text: "#111827",
-  textSec: "#6B7280",
-  textTer: "#9CA3AF",
-  border: "#E5E7EB",
-  badgeDraft: "#FEF3C7",
-  badgeActive: "#CCFBF1",
-  badgeDone: "#D1FAE5",
-  badgeArchived: "#F3F4F6",
-} as const;
-
+// ── Meta ───────────────────────────────────────────────────────────────
 const STATUS_LABEL: Record<ProjectStatus, string> = {
   draft: "Nháp",
   "in-progress": "Đang thực hiện",
   completed: "Hoàn thành",
   archived: "Lưu trữ",
 };
-const STATUS_COLOR: Record<ProjectStatus, string> = {
-  draft: C.warn,
-  "in-progress": C.accent,
-  completed: C.primary,
-  archived: C.textTer,
-};
-const STATUS_BG: Record<ProjectStatus, string> = {
-  draft: C.badgeDraft,
-  "in-progress": C.badgeActive,
-  completed: C.badgeDone,
-  archived: C.badgeArchived,
-};
+const STATUS_ALL = [
+  "all",
+  "draft",
+  "in-progress",
+  "completed",
+  "archived",
+] as const;
 
-// ─── Component ─────────────────────────────────────────────────────
+const FEATURES = [
+  {
+    icon: "flash-outline" as const,
+    label: "Dự toán nhanh",
+    color: "#F59E0B",
+    route: "/calculators/quick-estimate",
+  },
+  {
+    icon: "albums-outline" as const,
+    label: "Mẫu dự toán",
+    color: "#8B5CF6",
+    route: "/calculators/templates",
+  },
+  {
+    icon: "list-outline" as const,
+    label: "Bảng vật tư",
+    color: "#0D9488",
+    route: "/calculators/material-list",
+  },
+  {
+    icon: "calendar-outline" as const,
+    label: "Lịch thanh toán",
+    color: "#EC4899",
+    route: "/calculators/payment-schedule",
+  },
+  {
+    icon: "git-compare-outline" as const,
+    label: "So sánh",
+    color: "#10B981",
+    route: "/calculators/compare",
+  },
+] as const;
+
+// ── ProjectCard ────────────────────────────────────────────────────────
+function ProjectCard({
+  item,
+  onOpen,
+  onLong,
+  colors,
+  radius,
+}: {
+  item: EstimateProject;
+  onOpen: () => void;
+  onLong: () => void;
+  colors: any;
+  radius: any;
+}) {
+  const bt = BUILDING_TYPE_META[item.buildingType];
+  const gr = GRADE_META[item.grade];
+  const total = item.lastResult?.grandTotal;
+  const perM2 = item.lastResult?.perM2;
+  const statusColor =
+    item.status === "draft"
+      ? "#F59E0B"
+      : item.status === "in-progress"
+        ? "#0D9488"
+        : item.status === "completed"
+          ? "#10B981"
+          : colors.textTertiary;
+  const statusBg = statusColor + "18";
+
+  return (
+    <Pressable
+      style={({ pressed }) => [
+        st.card,
+        {
+          backgroundColor: colors.bgSurface,
+          borderColor: colors.border,
+          borderRadius: radius.xl,
+        },
+        pressed && { opacity: 0.92, transform: [{ scale: 0.99 }] },
+      ]}
+      onPress={onOpen}
+      onLongPress={onLong}
+      android_ripple={{ color: colors.primary + "15" }}
+    >
+      <View style={st.cardTop}>
+        <Text style={[st.seq, { color: colors.primary }]}>
+          {seqLabel(item.seq)}
+        </Text>
+        <View
+          style={[
+            st.badge,
+            { backgroundColor: statusBg, borderRadius: radius.full },
+          ]}
+        >
+          <View style={[st.dot, { backgroundColor: statusColor }]} />
+          <Text style={[st.badgeText, { color: statusColor }]}>
+            {STATUS_LABEL[item.status]}
+          </Text>
+        </View>
+      </View>
+      <Text style={[st.cardName, { color: colors.text }]} numberOfLines={2}>
+        {item.name}
+      </Text>
+      <View style={st.metaRow}>
+        <Text style={[st.meta, { color: colors.textSecondary }]}>
+          {bt.label}
+        </Text>
+        <View style={[st.metaDot, { backgroundColor: colors.border }]} />
+        <Text style={[st.meta, { color: colors.textSecondary }]}>
+          {gr.label}
+        </Text>
+        <View style={[st.metaDot, { backgroundColor: colors.border }]} />
+        <Text style={[st.meta, { color: colors.textSecondary }]}>
+          {item.floors.length} tầng
+        </Text>
+        <View style={[st.metaDot, { backgroundColor: colors.border }]} />
+        <Text style={[st.meta, { color: colors.textSecondary }]}>
+          {item.landArea} m²
+        </Text>
+      </View>
+      {(item.clientName || item.address) && (
+        <Text
+          style={[st.cardSub, { color: colors.textTertiary }]}
+          numberOfLines={1}
+        >
+          {[item.clientName, item.address].filter(Boolean).join(" · ")}
+        </Text>
+      )}
+      <View style={[st.cardBottom, { borderTopColor: colors.divider }]}>
+        <View>
+          {total ? (
+            <>
+              <Text style={[st.total, { color: colors.primary }]}>
+                {formatVND(total)}
+              </Text>
+              {perM2 ? (
+                <Text style={[st.perM2, { color: colors.textSecondary }]}>
+                  {formatVND(perM2)}/m²
+                </Text>
+              ) : null}
+            </>
+          ) : (
+            <Text style={[st.noCost, { color: colors.textTertiary }]}>
+              Chưa tính toán
+            </Text>
+          )}
+        </View>
+        <Text style={[st.date, { color: colors.textTertiary }]}>
+          {formatDate(item.updatedAt)}
+        </Text>
+      </View>
+    </Pressable>
+  );
+}
+
+// ── Main ───────────────────────────────────────────────────────────────
 export default function EstimateHub() {
+  const { colors, spacing, radius, shadow, isDark } = useDS();
   const insets = useSafeAreaInsets();
   const [projects, setProjects] = useState<EstimateProject[]>([]);
   const [loading, setLoading] = useState(true);
@@ -88,11 +210,9 @@ export default function EstimateHub() {
     "all",
   );
 
-  // ── Load ─────────────────
   const load = useCallback(async () => {
     try {
-      const list = await getAllProjects();
-      setProjects(list);
+      setProjects(await getAllProjects());
     } catch {
       /* noop */
     } finally {
@@ -107,7 +227,6 @@ export default function EstimateHub() {
     }, [load]),
   );
 
-  // ── Filter & Search ──────
   const filtered = useMemo(() => {
     let list = projects;
     if (filterStatus !== "all")
@@ -125,333 +244,259 @@ export default function EstimateHub() {
     return list;
   }, [projects, filterStatus, search]);
 
-  // ── Stats ────────────────
-  const stats = useMemo(() => {
-    const total = projects.length;
-    const active = projects.filter((p) => p.status === "in-progress").length;
-    const completed = projects.filter((p) => p.status === "completed").length;
-    const totalValue = projects.reduce(
-      (s, p) => s + (p.lastResult?.grandTotal || 0),
-      0,
-    );
-    return { total, active, completed, totalValue };
-  }, [projects]);
+  const stats = useMemo(
+    () => ({
+      total: projects.length,
+      active: projects.filter((p) => p.status === "in-progress").length,
+      completed: projects.filter((p) => p.status === "completed").length,
+      totalValue: projects.reduce(
+        (s, p) => s + (p.lastResult?.grandTotal || 0),
+        0,
+      ),
+    }),
+    [projects],
+  );
 
-  // ── Actions ──────────────
-  const onNewProject = () => {
+  const go = (route: string) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    router.push(route as any);
+  };
+  const openProject = (id: string) =>
+    go(`/calculators/project-estimate?id=${id}`);
+  const newProject = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     router.push("/calculators/project-estimate" as any);
-  };
-
-  const onOpenProject = (id: string) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    router.push(`/calculators/project-estimate?id=${id}` as any);
-  };
-
-  const onDuplicate = async (p: EstimateProject) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    await duplicateProject(p.id);
-    load();
-  };
-
-  const onDelete = (p: EstimateProject) => {
-    Alert.alert(
-      "Xóa dự toán",
-      `Xóa "${p.name}"? Hành động này không thể hoàn tác.`,
-      [
-        { text: "Hủy", style: "cancel" },
-        {
-          text: "Xóa",
-          style: "destructive",
-          onPress: async () => {
-            await deleteProject(p.id);
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-            load();
-          },
-        },
-      ],
-    );
   };
 
   const onLongPress = (p: EstimateProject) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     Alert.alert(seqLabel(p.seq), p.name, [
-      { text: "Mở", onPress: () => onOpenProject(p.id) },
-      { text: "Nhân bản", onPress: () => onDuplicate(p) },
-      { text: "Xóa", style: "destructive", onPress: () => onDelete(p) },
+      { text: "Mở", onPress: () => openProject(p.id) },
+      {
+        text: "Nhân bản",
+        onPress: async () => {
+          await duplicateProject(p.id);
+          load();
+        },
+      },
+      {
+        text: "Xóa",
+        style: "destructive",
+        onPress: () =>
+          Alert.alert("Xóa dự toán", `Xóa "${p.name}"?`, [
+            { text: "Hủy", style: "cancel" },
+            {
+              text: "Xóa",
+              style: "destructive",
+              onPress: async () => {
+                await deleteProject(p.id);
+                Haptics.notificationAsync(
+                  Haptics.NotificationFeedbackType.Success,
+                );
+                load();
+              },
+            },
+          ]),
+      },
       { text: "Đóng", style: "cancel" },
     ]);
   };
 
-  // ── Render helpers ───────
-  const renderStatCard = (label: string, value: string, color: string) => (
-    <View style={[styles.statCard, { borderLeftColor: color }]} key={label}>
-      <Text style={styles.statValue}>{value}</Text>
-      <Text style={styles.statLabel}>{label}</Text>
-    </View>
-  );
-
-  const renderProject = ({ item }: { item: EstimateProject }) => {
-    const bt = BUILDING_TYPE_META[item.buildingType];
-    const gr = GRADE_META[item.grade];
-    const total = item.lastResult?.grandTotal;
-    const perM2 = item.lastResult?.perM2;
-
-    return (
-      <Pressable
-        style={({ pressed }) => [
-          styles.projectCard,
-          pressed && styles.cardPressed,
-        ]}
-        onPress={() => onOpenProject(item.id)}
-        onLongPress={() => onLongPress(item)}
-        android_ripple={{ color: C.primaryLight }}
-      >
-        {/* Top: seq + status */}
-        <View style={styles.cardTopRow}>
-          <Text style={styles.seqText}>{seqLabel(item.seq)}</Text>
-          <View
-            style={[
-              styles.statusBadge,
-              { backgroundColor: STATUS_BG[item.status] },
-            ]}
-          >
-            <View
-              style={[
-                styles.statusDot,
-                { backgroundColor: STATUS_COLOR[item.status] },
-              ]}
-            />
-            <Text
-              style={[styles.statusText, { color: STATUS_COLOR[item.status] }]}
-            >
-              {STATUS_LABEL[item.status]}
-            </Text>
-          </View>
-        </View>
-
-        {/* Name */}
-        <Text style={styles.cardName} numberOfLines={2}>
-          {item.name}
-        </Text>
-
-        {/* Meta row */}
-        <View style={styles.cardMetaRow}>
-          <Text style={styles.cardMeta}>{bt.label}</Text>
-          <View style={styles.metaDot} />
-          <Text style={styles.cardMeta}>{gr.label}</Text>
-          <View style={styles.metaDot} />
-          <Text style={styles.cardMeta}>{item.floors.length} tầng</Text>
-          <View style={styles.metaDot} />
-          <Text style={styles.cardMeta}>{item.landArea} m²</Text>
-        </View>
-
-        {/* Client + address */}
-        {(item.clientName || item.address) && (
-          <Text style={styles.cardSub} numberOfLines={1}>
-            {[item.clientName, item.address].filter(Boolean).join(" · ")}
-          </Text>
-        )}
-
-        {/* Bottom: cost + date */}
-        <View style={styles.cardBottom}>
-          <View>
-            {total ? (
-              <>
-                <Text style={styles.cardTotal}>{formatVND(total)}</Text>
-                {perM2 ? (
-                  <Text style={styles.cardPerM2}>{formatVND(perM2)}/m²</Text>
-                ) : null}
-              </>
-            ) : (
-              <Text style={styles.cardNoCost}>Chưa tính toán</Text>
-            )}
-          </View>
-          <Text style={styles.cardDate}>{formatDate(item.updatedAt)}</Text>
-        </View>
-      </Pressable>
-    );
-  };
-
-  // ── Empty state ──────────
-  const EmptyState = () => (
-    <View style={styles.emptyWrap}>
-      <Ionicons name="document-text-outline" size={56} color={C.textTer} />
-      <Text style={styles.emptyTitle}>
-        {search ? "Không tìm thấy dự toán" : "Chưa có dự toán nào"}
-      </Text>
-      <Text style={styles.emptyDesc}>
-        {search
-          ? "Thử thay đổi từ khóa tìm kiếm"
-          : "Tạo dự toán đầu tiên để bắt đầu tính toán chi phí xây dựng chi tiết"}
-      </Text>
-      {!search && (
-        <Pressable style={styles.emptyBtn} onPress={onNewProject}>
-          <Text style={styles.emptyBtnText}>Tạo dự toán mới</Text>
-        </Pressable>
-      )}
-    </View>
-  );
-
-  // ── Main render ──────────
-  if (loading) {
+  if (loading)
     return (
       <View
         style={[
-          styles.container,
+          st.screen,
           {
+            backgroundColor: colors.bg,
             paddingTop: insets.top,
             justifyContent: "center",
             alignItems: "center",
           },
         ]}
       >
-        <ActivityIndicator size="large" color={C.primary} />
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
-  }
+
+  const StatCard = ({
+    label,
+    value,
+    accent,
+  }: {
+    label: string;
+    value: string;
+    accent: string;
+  }) => (
+    <View style={[st.statCard, { borderLeftColor: accent }]}>
+      <Text style={st.statVal}>{value}</Text>
+      <Text style={st.statLbl}>{label}</Text>
+    </View>
+  );
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View
+      style={[
+        st.screen,
+        { backgroundColor: colors.bg, paddingTop: insets.top },
+      ]}
+    >
       <StatusBar barStyle="light-content" />
 
-      {/* ── Header ── */}
+      {/* Header */}
       <LinearGradient
-        colors={[C.primaryDark, C.primary]}
+        colors={isDark ? ["#0f4f4a", "#0D9488"] : ["#0F766E", "#0D9488"]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
-        style={styles.header}
+        style={st.header}
       >
-        <View style={styles.headerRow}>
+        <View style={st.headerRow}>
           <Pressable onPress={() => router.back()} hitSlop={12}>
             <Ionicons name="chevron-back" size={24} color="#fff" />
           </Pressable>
           <View style={{ flex: 1, marginLeft: 12 }}>
-            <Text style={styles.headerTitle}>Dự toán xây dựng</Text>
-            <Text style={styles.headerSub}>Quản lý & tính toán chi phí</Text>
+            <Text style={st.headerTitle}>Dự toán xây dựng</Text>
+            <Text style={st.headerSub}>Quản lý & tính toán chi phí</Text>
           </View>
-          <Pressable style={styles.newBtn} onPress={onNewProject}>
-            <Ionicons name="add" size={22} color={C.primary} />
-            <Text style={styles.newBtnText}>Tạo mới</Text>
+          <Pressable style={st.newBtn} onPress={newProject}>
+            <Ionicons name="add" size={22} color="#0D9488" />
+            <Text style={st.newBtnText}>Tạo mới</Text>
           </Pressable>
         </View>
-
-        {/* Stats */}
-        <View style={styles.statsRow}>
-          {renderStatCard("Tổng dự toán", String(stats.total), "#fff")}
-          {renderStatCard("Đang thực hiện", String(stats.active), C.warn)}
-          {renderStatCard("Hoàn thành", String(stats.completed), "#10B981")}
-          {renderStatCard(
-            "Tổng giá trị",
-            formatVND(stats.totalValue),
-            C.accent,
-          )}
+        <View style={st.statsRow}>
+          <StatCard
+            label="Tổng dự toán"
+            value={String(stats.total)}
+            accent="#fff"
+          />
+          <StatCard
+            label="Đang thực hiện"
+            value={String(stats.active)}
+            accent="#F59E0B"
+          />
+          <StatCard
+            label="Hoàn thành"
+            value={String(stats.completed)}
+            accent="#10B981"
+          />
+          <StatCard
+            label="Tổng giá trị"
+            value={formatVND(stats.totalValue)}
+            accent="#0D9488"
+          />
         </View>
       </LinearGradient>
 
-      {/* ── Feature Cards ── */}
-      <View style={styles.featureRow}>
+      {/* Features */}
+      <View
+        style={[
+          st.featureRow,
+          {
+            backgroundColor: colors.bgSurface,
+            borderBottomColor: colors.border,
+          },
+        ]}
+      >
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.featureScroll}
+          contentContainerStyle={{ paddingHorizontal: spacing.lg, gap: 10 }}
         >
-          {(
-            [
-              {
-                icon: "flash-outline" as const,
-                label: "Dự toán nhanh",
-                color: "#F59E0B",
-                route: "/calculators/quick-estimate",
-              },
-              {
-                icon: "albums-outline" as const,
-                label: "Mẫu dự toán",
-                color: "#8B5CF6",
-                route: "/calculators/templates",
-              },
-              {
-                icon: "list-outline" as const,
-                label: "Bảng vật tư",
-                color: "#0D9488",
-                route: "/calculators/material-list",
-              },
-              {
-                icon: "calendar-outline" as const,
-                label: "Lịch thanh toán",
-                color: "#EC4899",
-                route: "/calculators/payment-schedule",
-              },
-              {
-                icon: "git-compare-outline" as const,
-                label: "So sánh",
-                color: "#10B981",
-                route: "/calculators/compare",
-              },
-            ] as const
-          ).map((f) => (
+          {FEATURES.map((f) => (
             <Pressable
               key={f.route}
-              style={styles.featureCard}
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                router.push(f.route as any);
-              }}
+              style={{ alignItems: "center", width: 72 }}
+              onPress={() => go(f.route)}
             >
               <View
                 style={[
-                  styles.featureIcon,
-                  { backgroundColor: f.color + "18" },
+                  st.featureIcon,
+                  { backgroundColor: f.color + "18", borderRadius: radius.lg },
                 ]}
               >
                 <Ionicons name={f.icon} size={20} color={f.color} />
               </View>
-              <Text style={styles.featureLabel}>{f.label}</Text>
+              <Text style={[st.featureLabel, { color: colors.textSecondary }]}>
+                {f.label}
+              </Text>
             </Pressable>
           ))}
         </ScrollView>
       </View>
 
-      {/* ── Search + Filter ── */}
-      <View style={styles.filterBar}>
-        <View style={styles.searchBox}>
-          <Ionicons name="search" size={18} color={C.textTer} />
+      {/* Search + Filter */}
+      <View
+        style={[
+          st.filterBar,
+          {
+            backgroundColor: colors.bgSurface,
+            borderBottomColor: colors.border,
+          },
+        ]}
+      >
+        <View
+          style={[
+            st.searchBox,
+            { backgroundColor: colors.bgMuted, borderRadius: radius.md },
+          ]}
+        >
+          <Ionicons name="search" size={18} color={colors.textTertiary} />
           <TextInput
-            style={styles.searchInput}
+            style={[st.searchInput, { color: colors.text }]}
             placeholder="Tìm theo tên, khách hàng, mã..."
-            placeholderTextColor={C.textTer}
+            placeholderTextColor={colors.textTertiary}
             value={search}
             onChangeText={setSearch}
             returnKeyType="search"
           />
           {search.length > 0 && (
             <Pressable onPress={() => setSearch("")} hitSlop={8}>
-              <Ionicons name="close-circle" size={18} color={C.textTer} />
+              <Ionicons
+                name="close-circle"
+                size={18}
+                color={colors.textTertiary}
+              />
             </Pressable>
           )}
         </View>
-
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.filterChips}
+          contentContainerStyle={{
+            paddingHorizontal: spacing.lg,
+            paddingTop: 10,
+            paddingBottom: 6,
+            gap: 8,
+          }}
         >
-          {(
-            ["all", "draft", "in-progress", "completed", "archived"] as const
-          ).map((st) => {
-            const active = filterStatus === st;
-            const label = st === "all" ? "Tất cả" : STATUS_LABEL[st];
+          {STATUS_ALL.map((s) => {
+            const active = filterStatus === s;
+            const label = s === "all" ? "Tất cả" : STATUS_LABEL[s];
             return (
               <Pressable
-                key={st}
+                key={s}
                 onPress={() => {
                   Haptics.selectionAsync();
-                  setFilterStatus(st);
+                  setFilterStatus(s);
                 }}
-                style={[styles.chip, active && styles.chipActive]}
+                style={[
+                  st.chip,
+                  {
+                    backgroundColor: active
+                      ? colors.primary + "15"
+                      : colors.bgMuted,
+                    borderRadius: radius.full,
+                  },
+                ]}
               >
                 <Text
-                  style={[styles.chipText, active && styles.chipTextActive]}
+                  style={[
+                    st.chipText,
+                    {
+                      color: active ? colors.primary : colors.textSecondary,
+                      fontWeight: active ? "600" : "500",
+                    },
+                  ]}
                 >
                   {label}
                 </Text>
@@ -461,16 +506,54 @@ export default function EstimateHub() {
         </ScrollView>
       </View>
 
-      {/* ── Project List ── */}
+      {/* List */}
       <FlatList
         data={filtered}
         keyExtractor={(p) => p.id}
-        renderItem={renderProject}
+        renderItem={({ item }) => (
+          <ProjectCard
+            item={item}
+            onOpen={() => openProject(item.id)}
+            onLong={() => onLongPress(item)}
+            colors={colors}
+            radius={radius}
+          />
+        )}
         contentContainerStyle={[
-          styles.listContent,
+          st.listContent,
           filtered.length === 0 && { flex: 1 },
         ]}
-        ListEmptyComponent={EmptyState}
+        ListEmptyComponent={
+          <View style={st.emptyWrap}>
+            <Ionicons
+              name="document-text-outline"
+              size={56}
+              color={colors.textTertiary}
+            />
+            <Text style={[st.emptyTitle, { color: colors.text }]}>
+              {search ? "Không tìm thấy dự toán" : "Chưa có dự toán nào"}
+            </Text>
+            <Text style={[st.emptyDesc, { color: colors.textSecondary }]}>
+              {search
+                ? "Thử thay đổi từ khóa tìm kiếm"
+                : "Tạo dự toán đầu tiên để bắt đầu tính toán chi phí xây dựng chi tiết"}
+            </Text>
+            {!search && (
+              <Pressable
+                style={[
+                  st.emptyBtn,
+                  {
+                    backgroundColor: colors.primary,
+                    borderRadius: radius.full,
+                  },
+                ]}
+                onPress={newProject}
+              >
+                <Text style={st.emptyBtnText}>Tạo dự toán mới</Text>
+              </Pressable>
+            )}
+          </View>
+        }
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -478,7 +561,7 @@ export default function EstimateHub() {
               setRefreshing(true);
               load();
             }}
-            colors={[C.primary]}
+            colors={[colors.primary]}
           />
         }
         showsVerticalScrollIndicator={false}
@@ -487,13 +570,9 @@ export default function EstimateHub() {
   );
 }
 
-// ============================================================================
-// STYLES
-// ============================================================================
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: C.bg },
-
-  // Header
+// ── Styles ─────────────────────────────────────────────────────────────
+const st = StyleSheet.create({
+  screen: { flex: 1 },
   header: { paddingHorizontal: 16, paddingTop: 12, paddingBottom: 16 },
   headerRow: { flexDirection: "row", alignItems: "center" },
   headerTitle: { fontSize: 20, fontWeight: "700", color: "#fff" },
@@ -507,9 +586,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     gap: 4,
   },
-  newBtnText: { fontSize: 13, fontWeight: "600", color: C.primary },
-
-  // Stats
+  newBtnText: { fontSize: 13, fontWeight: "600", color: "#0D9488" },
   statsRow: { flexDirection: "row", marginTop: 14, gap: 8 },
   statCard: {
     flex: 1,
@@ -519,133 +596,63 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderLeftWidth: 3,
   },
-  statValue: { fontSize: 16, fontWeight: "700", color: "#fff" },
-  statLabel: { fontSize: 10, color: "rgba(255,255,255,0.75)", marginTop: 2 },
-
-  // Feature cards
-  featureRow: {
-    backgroundColor: "#fff",
-    paddingTop: 10,
-    paddingBottom: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: C.border,
-  },
-  featureScroll: {
-    paddingHorizontal: 16,
-    gap: 10,
-  },
-  featureCard: {
-    alignItems: "center",
-    width: 72,
-  },
+  statVal: { fontSize: 16, fontWeight: "700", color: "#fff" },
+  statLbl: { fontSize: 10, color: "rgba(255,255,255,0.75)", marginTop: 2 },
+  featureRow: { paddingVertical: 10, borderBottomWidth: 1 },
   featureIcon: {
     width: 44,
     height: 44,
-    borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 4,
   },
-  featureLabel: {
-    fontSize: 10,
-    fontWeight: "600",
-    color: C.textSec,
-    textAlign: "center",
-  },
-
-  // Filter
-  filterBar: {
-    backgroundColor: "#fff",
-    paddingTop: 10,
-    paddingBottom: 6,
-    borderBottomWidth: 1,
-    borderBottomColor: C.border,
-  },
+  featureLabel: { fontSize: 10, fontWeight: "600", textAlign: "center" },
+  filterBar: { paddingTop: 10, paddingBottom: 6, borderBottomWidth: 1 },
   searchBox: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: C.bg,
     marginHorizontal: 16,
-    borderRadius: 10,
     paddingHorizontal: 12,
     height: 40,
     gap: 8,
   },
-  searchInput: { flex: 1, fontSize: 14, color: C.text },
-  filterChips: {
-    paddingHorizontal: 16,
-    paddingTop: 10,
-    paddingBottom: 6,
-    gap: 8,
-  },
-  chip: {
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderRadius: 16,
-    backgroundColor: C.bg,
-  },
-  chipActive: { backgroundColor: C.primaryLight },
-  chipText: { fontSize: 12, fontWeight: "500", color: C.textSec },
-  chipTextActive: { color: C.primary, fontWeight: "600" },
-
-  // List
+  searchInput: { flex: 1, fontSize: 14 },
+  chip: { paddingHorizontal: 14, paddingVertical: 6 },
+  chipText: { fontSize: 12 },
   listContent: { padding: 16, gap: 12, paddingBottom: 100 },
-
   // Card
-  projectCard: {
-    backgroundColor: C.card,
-    borderRadius: 14,
-    padding: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  cardPressed: { opacity: 0.92, transform: [{ scale: 0.99 }] },
-  cardTopRow: {
+  card: { padding: 16, borderWidth: 1 },
+  cardTop: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 6,
   },
-  seqText: {
-    fontSize: 11,
-    fontWeight: "700",
-    color: C.primary,
-    letterSpacing: 0.5,
-  },
-  statusBadge: {
+  seq: { fontSize: 11, fontWeight: "700", letterSpacing: 0.5 },
+  badge: {
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 10,
     paddingVertical: 3,
-    borderRadius: 12,
     gap: 5,
   },
-  statusDot: { width: 6, height: 6, borderRadius: 3 },
-  statusText: { fontSize: 11, fontWeight: "600" },
+  dot: { width: 6, height: 6, borderRadius: 3 },
+  badgeText: { fontSize: 11, fontWeight: "600" },
   cardName: {
     fontSize: 16,
     fontWeight: "700",
-    color: C.text,
     marginBottom: 6,
     lineHeight: 22,
   },
-  cardMetaRow: {
+  metaRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
     marginBottom: 4,
   },
-  cardMeta: { fontSize: 12, color: C.textSec },
-  metaDot: {
-    width: 3,
-    height: 3,
-    borderRadius: 1.5,
-    backgroundColor: C.border,
-  },
-  cardSub: { fontSize: 12, color: C.textTer, marginTop: 2, marginBottom: 4 },
+  meta: { fontSize: 12 },
+  metaDot: { width: 3, height: 3, borderRadius: 1.5 },
+  cardSub: { fontSize: 12, marginTop: 2, marginBottom: 4 },
   cardBottom: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -653,13 +660,11 @@ const styles = StyleSheet.create({
     marginTop: 10,
     paddingTop: 10,
     borderTopWidth: 1,
-    borderTopColor: C.border,
   },
-  cardTotal: { fontSize: 18, fontWeight: "800", color: C.primary },
-  cardPerM2: { fontSize: 11, color: C.textSec, marginTop: 1 },
-  cardNoCost: { fontSize: 13, color: C.textTer, fontStyle: "italic" },
-  cardDate: { fontSize: 11, color: C.textTer },
-
+  total: { fontSize: 18, fontWeight: "800" },
+  perM2: { fontSize: 11, marginTop: 1 },
+  noCost: { fontSize: 13, fontStyle: "italic" },
+  date: { fontSize: 11 },
   // Empty
   emptyWrap: {
     flex: 1,
@@ -670,23 +675,15 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 17,
     fontWeight: "700",
-    color: C.text,
     marginTop: 16,
     textAlign: "center",
   },
   emptyDesc: {
     fontSize: 13,
-    color: C.textSec,
     marginTop: 8,
     textAlign: "center",
     lineHeight: 19,
   },
-  emptyBtn: {
-    marginTop: 20,
-    backgroundColor: C.primary,
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 24,
-  },
+  emptyBtn: { marginTop: 20, paddingHorizontal: 24, paddingVertical: 12 },
   emptyBtnText: { fontSize: 14, fontWeight: "600", color: "#fff" },
 });

@@ -5,19 +5,23 @@
  */
 
 import { ChipFilter, FilterModal, SortBar } from "@/components/ui/ModernFilter";
+import OfflineDataBanner from "@/components/ui/OfflineDataBanner";
+import { CONTRACTOR_ENDPOINTS } from "@/constants/api-endpoints";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { apiFetch } from "@/services/api";
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, useRouter } from "expo-router";
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  FlatList,
-  Image,
-  RefreshControl,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    FlatList,
+    Image,
+    RefreshControl,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -39,7 +43,8 @@ const COLORS = {
 // ============================================================================
 // DATA
 // ============================================================================
-const CONTRACTORS = [
+// Offline fallback data — used when API is unreachable
+const FALLBACK_CONTRACTORS = [
   {
     id: "1",
     name: "Công ty TNHH Xây dựng An Phát",
@@ -152,7 +157,7 @@ const FILTER_CONFIG = [
 // CONTRACTOR CARD
 // ============================================================================
 interface ContractorCardProps {
-  item: typeof CONTRACTORS[0];
+  item: (typeof CONTRACTORS)[0];
   onPress: () => void;
   onContact: () => void;
 }
@@ -172,7 +177,9 @@ const ContractorCard = ({ item, onPress, onContact }: ContractorCardProps) => (
       <Image source={{ uri: item.avatar }} style={styles.avatar} />
       <View style={styles.cardInfo}>
         <View style={styles.nameRow}>
-          <Text style={styles.name} numberOfLines={1}>{item.name}</Text>
+          <Text style={styles.name} numberOfLines={1}>
+            {item.name}
+          </Text>
           {item.verified && (
             <Ionicons name="checkmark-circle" size={16} color="#2196F3" />
           )}
@@ -183,7 +190,11 @@ const ContractorCard = ({ item, onPress, onContact }: ContractorCardProps) => (
           <Text style={styles.reviews}>({item.reviews})</Text>
         </View>
         <View style={styles.locationRow}>
-          <Ionicons name="location-outline" size={12} color={COLORS.textSecondary} />
+          <Ionicons
+            name="location-outline"
+            size={12}
+            color={COLORS.textSecondary}
+          />
           <Text style={styles.location}>{item.location}</Text>
         </View>
       </View>
@@ -247,10 +258,44 @@ export default function ContractorScreen() {
   const [filterValues, setFilterValues] = useState<Record<string, string>>({});
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [contractors, setContractors] = useState(FALLBACK_CONTRACTORS);
+  const [isOffline, setIsOffline] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch contractors from real API
+  const fetchContractors = useCallback(async () => {
+    try {
+      const response = await apiFetch<{ data: typeof FALLBACK_CONTRACTORS }>(
+        CONTRACTOR_ENDPOINTS.LIST,
+      );
+      if (
+        response?.data &&
+        Array.isArray(response.data) &&
+        response.data.length > 0
+      ) {
+        setContractors(response.data);
+        setIsOffline(false);
+      } else {
+        // API returned empty — use fallback
+        setContractors(FALLBACK_CONTRACTORS);
+        setIsOffline(true);
+      }
+    } catch (error) {
+      console.warn("[Contractor] API unavailable, using offline data:", error);
+      setContractors(FALLBACK_CONTRACTORS);
+      setIsOffline(true);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchContractors();
+  }, [fetchContractors]);
 
   // Filter contractors
   const filteredContractors = useMemo(() => {
-    let results = [...CONTRACTORS];
+    let results = [...contractors];
 
     // Search
     if (searchQuery.trim()) {
@@ -258,7 +303,7 @@ export default function ContractorScreen() {
       results = results.filter(
         (c) =>
           c.name.toLowerCase().includes(q) ||
-          c.specialties.some((s) => s.toLowerCase().includes(q))
+          c.specialties.some((s) => s.toLowerCase().includes(q)),
       );
     }
 
@@ -281,7 +326,7 @@ export default function ContractorScreen() {
     }
 
     return results;
-  }, [searchQuery, activeFilter, selectedSort, filterValues]);
+  }, [searchQuery, activeFilter, selectedSort, filterValues, contractors]);
 
   const activeFilterCount =
     Object.values(filterValues).filter((v) => v && v !== "all").length +
@@ -289,8 +334,7 @@ export default function ContractorScreen() {
 
   const handleRefresh = async () => {
     setRefreshing(true);
-    // Simulate refresh
-    await new Promise((r) => setTimeout(r, 1000));
+    await fetchContractors();
     setRefreshing(false);
   };
 
@@ -312,6 +356,16 @@ export default function ContractorScreen() {
         }}
       />
 
+      {/* Offline Banner */}
+      <OfflineDataBanner visible={isOffline} onRetry={fetchContractors} />
+
+      {/* Loading State */}
+      {loading && (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={COLORS.primary} />
+        </View>
+      )}
+
       {/* Search Bar */}
       <View style={[styles.searchContainer, { backgroundColor: cardBg }]}>
         <Ionicons name="search" size={20} color={COLORS.textSecondary} />
@@ -324,7 +378,11 @@ export default function ContractorScreen() {
         />
         {searchQuery.length > 0 && (
           <TouchableOpacity onPress={() => setSearchQuery("")}>
-            <Ionicons name="close-circle" size={18} color={COLORS.textSecondary} />
+            <Ionicons
+              name="close-circle"
+              size={18}
+              color={COLORS.textSecondary}
+            />
           </TouchableOpacity>
         )}
         <View style={styles.searchDivider} />
@@ -416,6 +474,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
+  },
+  loadingContainer: {
+    padding: 40,
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   // Search

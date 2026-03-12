@@ -1,13 +1,16 @@
 /**
  * Language Settings Screen
- * Allow user to change app language
+ * Allow user to change app language — 13 languages
  * @created 04/02/2026
  */
 
 import { BorderRadius, Spacing } from "@/constants/spacing";
-import { useLanguage } from "@/context/LanguageContext";
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { SupportedLanguage } from "@/lib/i18n";
+import {
+    SUPPORTED_LANGUAGES,
+    type SupportedLanguage,
+    useI18n,
+} from "@/services/i18nService";
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, useRouter } from "expo-router";
 import { useCallback } from "react";
@@ -21,7 +24,8 @@ import {
 
 export default function LanguageSettingsScreen() {
   const router = useRouter();
-  const { language, setLanguage, availableLanguages, t } = useLanguage();
+  const { language, setLanguage, t } = useI18n();
+  const availableLanguages = SUPPORTED_LANGUAGES;
 
   const backgroundColor = useThemeColor({}, "background");
   const cardColor = useThemeColor({}, "card");
@@ -76,6 +80,7 @@ export default function LanguageSettingsScreen() {
               onPress={() => handleLanguageSelect(lang.code)}
               activeOpacity={0.7}
             >
+              <Text style={{ fontSize: 24, marginRight: 10 }}>{lang.flag}</Text>
               <View style={styles.languageInfo}>
                 <Text style={[styles.languageName, { color: textColor }]}>
                   {lang.nativeName}

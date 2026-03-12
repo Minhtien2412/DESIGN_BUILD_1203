@@ -9,5 +9,31 @@
   "chatgpt.openOnStartup": true,
   "chatgpt.runCodexInWindowsSubsystemForLinux": true,
   "github.copilot.chat.responsesApiReasoningEffort": "high",
-  "github.copilot.chat.virtualTools.threshold": 128
+  "github.copilot.chat.virtualTools.threshold": 128,
+  "github.copilot.chat.notebook.followCellExecution.enabled": true,
+  "github.copilot.chat.notebook.enhancedNextEditSuggestions.enabled": true,
+  "github.copilot.chat.newWorkspace.useContext7": true,
+  "github.copilot.chat.nesFetcher": "node-fetch",
+  "github.copilot.chat.languageContext.typescript.enabled": true,
+  "github.copilot.chat.languageContext.typescript.includeDocumentation": true,
+  "github.copilot.chat.languageContext.inline.typescript.enabled": true,
+  "github.copilot.chat.languageContext.fix.typescript.enabled": true,
+  "github.copilot.chat.githubMcpServer.readonly": true,
+  "github.copilot.chat.githubMcpServer.enabled": true,
+  "github.copilot.chat.githubMcpServer.lockdown": true,
+  "github.copilot.chat.generateTests.codeLens": true,
+  "github.copilot.chat.copilotMemory.enabled": true,
+  "github.copilot.chat.completionsFetcher": "node-fetch",
+  "github.copilot.chat.codesearch.enabled": true,
+  "github.copilot.chat.anthropic.tools.websearch.enabled": true,
+  "github.copilot.chat.alternateGeminiModelFPrompt.enabled": true,
+  "github.copilot.chat.alternateGptPrompt.enabled": true,
+  "github.copilot.chat.anthropic.contextEditing.enabled": true,
+  "github.copilot.chat.agent.autoFix": true,
+  "github.copilot.chat.claudeAgent.allowDangerouslySkipPermissions": true,
+  "chat.mcp.serverSampling": {
+    "APP_DESIGN_BUILD05.12.2025/.cursor/mcp.json: RadonAi": {
+      "allowedModels": []
+    }
+  }
 }

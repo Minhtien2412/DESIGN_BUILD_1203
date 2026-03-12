@@ -4,6 +4,7 @@
  * Shows seller's other products
  */
 import { useCart } from "@/context/cart-context";
+import { get } from "@/services/api";
 import { productService } from "@/services/api/product.service";
 import type { Product } from "@/services/api/types";
 import { Ionicons } from "@expo/vector-icons";
@@ -112,14 +113,10 @@ export default function FinishingProductDetailScreen() {
 
         // Fetch full seller data if available
         try {
-          const response = await fetch(
-            `https://baotienweb.cloud/api/v1/users/${productData.seller.id}`,
-            {
-              headers: { "X-API-Key": "nhaxinh-api-2025-secret-key" },
-            },
+          const userData = await get<{ avatar?: string; phone?: string }>(
+            `/users/${productData.seller.id}`,
           );
-          if (response.ok) {
-            const userData = await response.json();
+          if (userData) {
             sellerInfo.avatar = userData.avatar || sellerInfo.avatar;
             sellerInfo.phone = userData.phone;
           }
@@ -131,14 +128,11 @@ export default function FinishingProductDetailScreen() {
 
         // Fetch seller's other products
         try {
-          const productsResponse = await fetch(
-            `https://baotienweb.cloud/api/v1/products?createdBy=${productData.seller.id}&limit=10`,
-            {
-              headers: { "X-API-Key": "nhaxinh-api-2025-secret-key" },
-            },
-          );
-          if (productsResponse.ok) {
-            const productsData = await productsResponse.json();
+          const productsData = await get<{
+            data: Product[];
+            meta?: { total: number };
+          }>(`/products?createdBy=${productData.seller.id}&limit=10`);
+          if (productsData) {
             const otherProducts = (productsData.data || []).filter(
               (p: Product) => p.id !== productId,
             );

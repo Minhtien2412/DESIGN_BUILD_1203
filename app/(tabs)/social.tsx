@@ -1,22 +1,11 @@
 /**
- * Facebook-Style Community Feed Screen
- * ======================================
- *
- * Infinite scroll feed combining content from multiple sources
- * with Facebook-like UI/UX for seamless browsing experience.
- *
- * Features:
- * - Infinite scroll with FlatList
- * - Stories carousel at top
- * - Create post section
- * - Pull-to-refresh
- * - Multi-source content aggregation
- * - Smooth animations
- *
- * @author ThietKeResort Team
- * @created 2025-01-20
+ * Social Tab (Community Feed) - Redesigned with DS
+ * Facebook-style community feed using unified design system
+ * Same functionality, cleaner code, consistent theme
  */
-
+import { DSColors } from "@/constants/ds";
+import { useDS } from "@/hooks/useDS";
+import { useI18n } from "@/services/i18nService";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { Image } from "expo-image";
@@ -48,7 +37,6 @@ import Animated, {
     useSharedValue,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
 import {
     CreatePostCard,
     FacebookFeedCard,
@@ -67,31 +55,9 @@ import {
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
-// ============================================
-// Theme Constants
-// ============================================
-const COLORS = {
-  background: "#F0F2F5",
-  surface: "#FFFFFF",
-  primary: "#1877F2",
-  text: "#1C1E21",
-  textSecondary: "#65676B",
-  textTertiary: "#8A8D91",
-  border: "#E4E6EB",
-  divider: "#CED0D4",
-};
-
-const SPACING = {
-  xs: 4,
-  sm: 8,
-  md: 12,
-  lg: 16,
-  xl: 20,
-};
-
-// ============================================
-// Filter Tabs
-// ============================================
+// ═══════════════════════════════════════════════════════════════════════
+// FILTER TABS CONFIG
+// ═══════════════════════════════════════════════════════════════════════
 interface FilterTab {
   id: FeedItemType | "all";
   label: string;
@@ -99,49 +65,66 @@ interface FilterTab {
 }
 
 const FILTER_TABS: FilterTab[] = [
-  { id: "all", label: "Tất cả", icon: "apps" },
-  { id: "development_plan", label: "Kế hoạch", icon: "flag" },
-  { id: "announcement", label: "Thông báo", icon: "megaphone" },
-  { id: "news", label: "Tin tức", icon: "newspaper" },
-  { id: "video", label: "Video", icon: "videocam" },
-  { id: "photo", label: "Ảnh", icon: "images" },
+  { id: "all", label: "social.all", icon: "apps" },
+  { id: "development_plan", label: "social.plans", icon: "flag" },
+  { id: "announcement", label: "social.announcements", icon: "megaphone" },
+  { id: "news", label: "social.news", icon: "newspaper" },
+  { id: "video", label: "social.videos", icon: "videocam" },
+  { id: "photo", label: "social.photos", icon: "images" },
 ];
 
-// ============================================
-// Header Component
-// ============================================
-interface HeaderProps {
+// ═══════════════════════════════════════════════════════════════════════
+// HEADER (animated)
+// ═══════════════════════════════════════════════════════════════════════
+function Header({
+  scrollY,
+  onSearchPress,
+  onMessagesPress,
+  colors,
+}: {
   scrollY: SharedValue<number>;
   onSearchPress: () => void;
   onMessagesPress: () => void;
-}
-
-function Header({ scrollY, onSearchPress, onMessagesPress }: HeaderProps) {
+  colors: DSColors;
+}) {
   const insets = useSafeAreaInsets();
+  const { t } = useI18n();
 
-  const headerAnimatedStyle = useAnimatedStyle(() => {
+  const animStyle = useAnimatedStyle(() => {
     const opacity = interpolate(scrollY.value, [0, 50], [0, 1], "clamp");
     return {
-      backgroundColor: `rgba(255, 255, 255, ${opacity})`,
-      borderBottomColor: `rgba(206, 208, 212, ${opacity})`,
+      backgroundColor: `rgba(255,255,255,${opacity})`,
+      borderBottomColor: `rgba(206,208,212,${opacity})`,
     };
   });
 
   return (
     <Animated.View
-      style={[styles.header, { paddingTop: insets.top }, headerAnimatedStyle]}
+      style={[
+        s.header,
+        { paddingTop: insets.top, borderBottomWidth: 1 },
+        animStyle,
+      ]}
     >
-      <View style={styles.headerContent}>
-        <Text style={styles.headerTitle}>Cộng đồng</Text>
-        <View style={styles.headerActions}>
-          <TouchableOpacity style={styles.headerBtn} onPress={onSearchPress}>
-            <Ionicons name="search" size={22} color={COLORS.text} />
+      <View style={[s.headerContent, { backgroundColor: colors.bgSurface }]}>
+        <Text style={[s.headerTitle, { color: colors.primary }]}>
+          {t("social.title")}
+        </Text>
+        <View style={s.headerActions}>
+          <TouchableOpacity
+            style={[s.headerBtn, { backgroundColor: colors.bgMuted }]}
+            onPress={onSearchPress}
+          >
+            <Ionicons name="search" size={22} color={colors.text} />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.headerBtn} onPress={onMessagesPress}>
+          <TouchableOpacity
+            style={[s.headerBtn, { backgroundColor: colors.bgMuted }]}
+            onPress={onMessagesPress}
+          >
             <Ionicons
               name="chatbubble-ellipses"
               size={22}
-              color={COLORS.text}
+              color={colors.text}
             />
           </TouchableOpacity>
         </View>
@@ -150,65 +133,82 @@ function Header({ scrollY, onSearchPress, onMessagesPress }: HeaderProps) {
   );
 }
 
-// ============================================
-// Stories Section
-// ============================================
-interface StoriesSectionProps {
-  items: CommunityFeedItem[];
-  onStoryPress: (item: CommunityFeedItem) => void;
-  onCreateStory: () => void;
-}
-
+// ═══════════════════════════════════════════════════════════════════════
+// STORIES SECTION
+// ═══════════════════════════════════════════════════════════════════════
 function StoriesSection({
   items,
   onStoryPress,
   onCreateStory,
-}: StoriesSectionProps) {
+  colors,
+}: {
+  items: CommunityFeedItem[];
+  onStoryPress: (item: CommunityFeedItem) => void;
+  onCreateStory: () => void;
+  colors: DSColors;
+}) {
   const { user } = useAuth();
-
-  // Get items with images for stories
-  const storyItems = useMemo(() => {
-    return items.filter((item) => item.imageUrl).slice(0, 10);
-  }, [items]);
+  const storyItems = useMemo(
+    () => items.filter((item) => item.imageUrl).slice(0, 10),
+    [items],
+  );
 
   if (storyItems.length === 0) return null;
 
   return (
     <Animated.View
       entering={FadeInDown.duration(400)}
-      style={styles.storiesContainer}
+      style={[s.storiesContainer, { backgroundColor: colors.bgSurface }]}
     >
       <FlatList
         data={storyItems}
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.storiesList}
+        contentContainerStyle={s.storiesList}
         keyExtractor={(item) => `story-${item.id}`}
         ListHeaderComponent={
           <TouchableOpacity
-            style={styles.createStoryCard}
+            style={[
+              s.createStoryCard,
+              { backgroundColor: colors.bgMuted, borderColor: colors.border },
+            ]}
             onPress={onCreateStory}
           >
-            <View style={styles.createStoryImageContainer}>
+            <View style={s.createStoryImageContainer}>
               {user?.avatar ? (
                 <Image
                   source={{ uri: user.avatar }}
-                  style={styles.createStoryUserImage}
+                  style={s.createStoryUserImage}
                 />
               ) : (
-                <View style={styles.createStoryPlaceholder}>
+                <View
+                  style={[
+                    s.createStoryPlaceholder,
+                    { backgroundColor: colors.border },
+                  ]}
+                >
                   <Ionicons
                     name="person"
                     size={32}
-                    color={COLORS.textSecondary}
+                    color={colors.textSecondary}
                   />
                 </View>
               )}
-              <View style={styles.createStoryPlusBtn}>
+              <View
+                style={[
+                  s.createStoryPlusBtn,
+                  {
+                    backgroundColor: colors.primary,
+                    borderColor: colors.bgSurface,
+                  },
+                ]}
+              >
                 <Ionicons name="add" size={18} color="white" />
               </View>
             </View>
-            <Text style={styles.createStoryText}>Tạo tin</Text>
+            <Text style={[s.createStoryText, { color: colors.text }]}>
+              Tạo tin
+            </Text>
           </TouchableOpacity>
         }
         renderItem={({ item, index }) => (
@@ -223,61 +223,68 @@ function StoriesSection({
   );
 }
 
-// ============================================
-// Filter Chips
-// ============================================
-interface FilterChipsProps {
-  activeFilter: FeedItemType | "all";
-  onFilterChange: (filter: FeedItemType | "all") => void;
-  counts: Record<string, number>;
-}
-
+// ═══════════════════════════════════════════════════════════════════════
+// FILTER CHIPS
+// ═══════════════════════════════════════════════════════════════════════
 function FilterChips({
   activeFilter,
   onFilterChange,
   counts,
-}: FilterChipsProps) {
+  colors,
+}: {
+  activeFilter: FeedItemType | "all";
+  onFilterChange: (filter: FeedItemType | "all") => void;
+  counts: Record<string, number>;
+  colors: DSColors;
+}) {
+  const { t } = useI18n();
   return (
-    <View style={styles.filterChipsContainer}>
+    <View style={[s.filterContainer, { backgroundColor: colors.bgSurface }]}>
       <FlatList
         data={FILTER_TABS}
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.filterChipsList}
+        contentContainerStyle={s.filterList}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => {
           const isActive = activeFilter === item.id;
           const count = counts[item.id] || 0;
-
           return (
             <TouchableOpacity
-              style={[styles.filterChip, isActive && styles.filterChipActive]}
+              style={[
+                s.filterChip,
+                { backgroundColor: isActive ? colors.primary : colors.bgMuted },
+              ]}
               onPress={() => onFilterChange(item.id)}
             >
               <Ionicons
                 name={item.icon}
                 size={16}
-                color={isActive ? "white" : COLORS.text}
+                color={isActive ? "white" : colors.text}
               />
               <Text
                 style={[
-                  styles.filterChipText,
-                  isActive && styles.filterChipTextActive,
+                  s.filterChipText,
+                  { color: isActive ? "white" : colors.text },
                 ]}
               >
-                {item.label}
+                {t(item.label)}
               </Text>
               {count > 0 && item.id !== "all" && (
                 <View
                   style={[
-                    styles.filterChipBadge,
-                    isActive && styles.filterChipBadgeActive,
+                    s.filterBadge,
+                    {
+                      backgroundColor: isActive
+                        ? "rgba(255,255,255,0.3)"
+                        : colors.border,
+                    },
                   ]}
                 >
                   <Text
                     style={[
-                      styles.filterChipBadgeText,
-                      isActive && styles.filterChipBadgeTextActive,
+                      s.filterBadgeText,
+                      { color: isActive ? "white" : colors.text },
                     ]}
                   >
                     {count > 99 ? "99+" : count}
@@ -292,27 +299,30 @@ function FilterChips({
   );
 }
 
-// ============================================
-// Search Modal
-// ============================================
-interface SearchModalProps {
+// ═══════════════════════════════════════════════════════════════════════
+// SEARCH MODAL
+// ═══════════════════════════════════════════════════════════════════════
+function SearchModal({
+  visible,
+  onClose,
+  onSearch,
+  colors,
+}: {
   visible: boolean;
   onClose: () => void;
   onSearch: (query: string) => void;
-}
-
-function SearchModal({ visible, onClose, onSearch }: SearchModalProps) {
-  const [searchText, setSearchText] = useState("");
+  colors: DSColors;
+}) {
+  const [text, setText] = useState("");
   const insets = useSafeAreaInsets();
+  const { t } = useI18n();
 
   const handleSearch = () => {
-    if (searchText.trim()) {
-      onSearch(searchText.trim());
+    if (text.trim()) {
+      onSearch(text.trim());
       onClose();
     }
   };
-
-  const handleClear = () => setSearchText("");
 
   return (
     <Modal
@@ -321,46 +331,56 @@ function SearchModal({ visible, onClose, onSearch }: SearchModalProps) {
       transparent
       onRequestClose={onClose}
     >
-      <View style={[styles.searchModalContainer, { paddingTop: insets.top }]}>
-        <View style={styles.searchModalHeader}>
-          <TouchableOpacity onPress={onClose} style={styles.searchBackBtn}>
-            <Ionicons name="arrow-back" size={24} color={COLORS.text} />
+      <View
+        style={[
+          s.searchModalWrap,
+          { paddingTop: insets.top, backgroundColor: colors.bgSurface },
+        ]}
+      >
+        <View
+          style={[s.searchModalHeader, { borderBottomColor: colors.border }]}
+        >
+          <TouchableOpacity onPress={onClose} style={s.searchBackBtn}>
+            <Ionicons name="arrow-back" size={24} color={colors.text} />
           </TouchableOpacity>
-
-          <View style={styles.searchInputContainer}>
-            <Ionicons name="search" size={20} color={COLORS.textSecondary} />
+          <View
+            style={[s.searchInputWrap, { backgroundColor: colors.bgMuted }]}
+          >
+            <Ionicons name="search" size={20} color={colors.textSecondary} />
             <TextInput
-              style={styles.searchInput}
-              placeholder="Tìm kiếm trong cộng đồng..."
-              placeholderTextColor={COLORS.textTertiary}
-              value={searchText}
-              onChangeText={setSearchText}
+              nativeID="social-search"
+              accessibilityLabel={t("social.searchPlaceholder")}
+              style={[s.searchInput, { color: colors.text }]}
+              placeholder={t("social.searchPlaceholder") + "..."}
+              placeholderTextColor={colors.textTertiary}
+              value={text}
+              onChangeText={setText}
               onSubmitEditing={handleSearch}
               autoFocus
               returnKeyType="search"
             />
-            {searchText.length > 0 && (
-              <TouchableOpacity onPress={handleClear}>
+            {text.length > 0 && (
+              <TouchableOpacity onPress={() => setText("")}>
                 <Ionicons
                   name="close-circle"
                   size={20}
-                  color={COLORS.textSecondary}
+                  color={colors.textSecondary}
                 />
               </TouchableOpacity>
             )}
           </View>
         </View>
-
-        {/* Search Suggestions */}
-        <View style={styles.searchSuggestions}>
-          <Text style={styles.searchSuggestionsTitle}>Tìm kiếm gần đây</Text>
+        <View style={{ padding: 16 }}>
+          <Text style={[s.suggestTitle, { color: colors.textSecondary }]}>
+            Tìm kiếm gần đây
+          </Text>
           {["Tin tức xây dựng", "Kế hoạch phát triển", "Thông báo mới"].map(
             (suggestion, i) => (
               <TouchableOpacity
                 key={i}
-                style={styles.searchSuggestionItem}
+                style={s.suggestItem}
                 onPress={() => {
-                  setSearchText(suggestion);
+                  setText(suggestion);
                   onSearch(suggestion);
                   onClose();
                 }}
@@ -368,9 +388,11 @@ function SearchModal({ visible, onClose, onSearch }: SearchModalProps) {
                 <Ionicons
                   name="time-outline"
                   size={20}
-                  color={COLORS.textSecondary}
+                  color={colors.textSecondary}
                 />
-                <Text style={styles.searchSuggestionText}>{suggestion}</Text>
+                <Text style={[s.suggestText, { color: colors.text }]}>
+                  {suggestion}
+                </Text>
               </TouchableOpacity>
             ),
           )}
@@ -380,33 +402,39 @@ function SearchModal({ visible, onClose, onSearch }: SearchModalProps) {
   );
 }
 
-// ============================================
-// Loading / Empty / Error States
-// ============================================
-function LoadingFooter() {
+// ═══════════════════════════════════════════════════════════════════════
+// STATUS COMPONENTS
+// ═══════════════════════════════════════════════════════════════════════
+function LoadingFooter({ colors }: { colors: DSColors }) {
+  const { t } = useI18n();
   return (
-    <View style={styles.loadingFooter}>
-      <ActivityIndicator size="small" color={COLORS.primary} />
-      <Text style={styles.loadingFooterText}>Đang tải thêm...</Text>
+    <View style={s.loadingFooter}>
+      <ActivityIndicator size="small" color={colors.primary} />
+      <Text style={[s.loadingFooterText, { color: colors.textSecondary }]}>
+        {t("common.loading")}
+      </Text>
     </View>
   );
 }
 
-function EmptyState({ filter }: { filter: string }) {
-  const message =
-    filter === "all"
-      ? "Chưa có nội dung nào trong cộng đồng"
-      : `Chưa có ${FILTER_TABS.find((t) => t.id === filter)?.label.toLowerCase() || "nội dung"} nào`;
+function EmptyState({ filter, colors }: { filter: string; colors: DSColors }) {
+  const { t } = useI18n();
+  const label =
+    filter === "all" ? t("social.emptyFeed") : t("social.emptyFeed");
 
   return (
-    <View style={styles.emptyState}>
+    <View style={s.emptyState}>
       <Ionicons
         name="newspaper-outline"
         size={64}
-        color={COLORS.textTertiary}
+        color={colors.textTertiary}
       />
-      <Text style={styles.emptyStateTitle}>Không có nội dung</Text>
-      <Text style={styles.emptyStateText}>{message}</Text>
+      <Text style={[s.emptyTitle, { color: colors.text }]}>
+        {t("common.noData")}
+      </Text>
+      <Text style={[s.emptySubtitle, { color: colors.textSecondary }]}>
+        {label}
+      </Text>
     </View>
   );
 }
@@ -414,29 +442,37 @@ function EmptyState({ filter }: { filter: string }) {
 function ErrorState({
   message,
   onRetry,
+  colors,
 }: {
   message: string;
   onRetry: () => void;
+  colors: DSColors;
 }) {
   return (
-    <View style={styles.errorState}>
-      <Ionicons name="alert-circle-outline" size={64} color="#EF4444" />
-      <Text style={styles.errorStateTitle}>Có lỗi xảy ra</Text>
-      <Text style={styles.errorStateText}>{message}</Text>
-      <TouchableOpacity style={styles.retryButton} onPress={onRetry}>
+    <View style={s.emptyState}>
+      <Ionicons name="alert-circle-outline" size={64} color={colors.error} />
+      <Text style={[s.emptyTitle, { color: colors.text }]}>Có lỗi xảy ra</Text>
+      <Text style={[s.emptySubtitle, { color: colors.textSecondary }]}>
+        {message}
+      </Text>
+      <TouchableOpacity
+        style={[s.retryBtn, { backgroundColor: colors.primary }]}
+        onPress={onRetry}
+      >
         <Ionicons name="refresh" size={18} color="white" />
-        <Text style={styles.retryButtonText}>Thử lại</Text>
+        <Text style={s.retryText}>Thử lại</Text>
       </TouchableOpacity>
     </View>
   );
 }
 
-// ============================================
-// Main Screen Component
-// ============================================
+// ═══════════════════════════════════════════════════════════════════════
+// MAIN SCREEN
+// ═══════════════════════════════════════════════════════════════════════
 export default function SocialScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { colors, isDark } = useDS();
   const { user } = useAuth();
   const mediaViewer = useFullMediaViewer();
 
@@ -446,11 +482,10 @@ export default function SocialScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [visibleItems, setVisibleItems] = useState<Set<string>>(new Set());
 
-  // Animation
   const scrollY = useSharedValue(0);
   const flatListRef = useRef<FlatList>(null);
 
-  // Use community feed hook
+  // Community feed
   const {
     items,
     isLoading,
@@ -462,46 +497,42 @@ export default function SocialScreen() {
     refresh,
     loadMore,
     search,
-  } = useCommunityFeed({
-    pageSize: 30,
-    autoRefresh: false,
-  });
+  } = useCommunityFeed({ pageSize: 30, autoRefresh: false });
 
-  // Filter items based on active filter and search
+  // Filtered items
   const filteredItems = useMemo(() => {
     let result = items;
-
-    // Apply type filter
     if (activeFilter !== "all") {
       result = result.filter((item) => item.type === activeFilter);
     }
-
-    // Apply search filter
     if (searchQuery) {
-      const query = searchQuery.toLowerCase();
+      const q = searchQuery.toLowerCase();
       result = result.filter(
         (item) =>
-          item.title.toLowerCase().includes(query) ||
-          item.description?.toLowerCase().includes(query),
+          item.title.toLowerCase().includes(q) ||
+          item.description?.toLowerCase().includes(q),
       );
     }
-
     return result;
   }, [items, activeFilter, searchQuery]);
 
-  // Count items by type
   const typeCounts = useMemo(() => {
-    const counts: Record<string, number> = { all: items.length };
+    const c: Record<string, number> = { all: items.length };
     items.forEach((item) => {
-      counts[item.type] = (counts[item.type] || 0) + 1;
+      c[item.type] = (c[item.type] || 0) + 1;
     });
-    return counts;
+    return c;
   }, [items]);
 
-  // Handlers
+  const allVideoItems = useMemo(
+    () => filteredItems.filter((item) => item.type === "video"),
+    [filteredItems],
+  );
+
+  // ── Handlers ──────────────────────────────────────────
   const handleScroll = useCallback(
-    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-      scrollY.value = event.nativeEvent.contentOffset.y;
+    (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+      scrollY.value = e.nativeEvent.contentOffset.y;
     },
     [],
   );
@@ -512,14 +543,11 @@ export default function SocialScreen() {
   }, [refresh]);
 
   const handleLoadMore = useCallback(() => {
-    if (!isLoadingMore && hasMore) {
-      loadMore();
-    }
+    if (!isLoadingMore && hasMore) loadMore();
   }, [isLoadingMore, hasMore, loadMore]);
 
   const handleFilterChange = useCallback((filter: FeedItemType | "all") => {
     setActiveFilter(filter);
-    // Scroll to top when filter changes
     flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
   }, []);
 
@@ -534,13 +562,10 @@ export default function SocialScreen() {
   const handleStoryPress = useCallback(
     (item: CommunityFeedItem) => {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-
-      // For video/photo, open MediaViewer directly (Facebook style)
       if (item.type === "video" || item.type === "photo") {
         const videoItem = item.type === "video" ? (item as any) : null;
         const mediaUrl =
           videoItem?.videoUrl || videoItem?.thumbnailUrl || item.imageUrl;
-
         if (mediaUrl) {
           const mediaFile: MediaFile = {
             id: item.id,
@@ -551,7 +576,6 @@ export default function SocialScreen() {
             thumbnail: item.imageUrl || videoItem?.thumbnailUrl,
             createdAt: item.createdAt,
           };
-
           mediaViewer.open([mediaFile], 0, {
             allowDelete: false,
             allowEdit: false,
@@ -563,94 +587,70 @@ export default function SocialScreen() {
           return;
         }
       }
-
-      // Navigate for other types
-      switch (item.type) {
-        case "news":
-          if ((item as any).url) {
-            router.push(
-              `/webview?url=${encodeURIComponent((item as any).url)}` as any,
-            );
-          }
-          break;
-        default:
-          break;
+      if (item.type === "news" && (item as any).url) {
+        router.push(
+          `/webview?url=${encodeURIComponent((item as any).url)}` as any,
+        );
       }
     },
     [router, mediaViewer],
   );
 
   const handleCreatePost = useCallback(() => {
-    router.push("/community/create-post" as any);
+    router.push("/social/create-post" as any);
   }, [router]);
 
   const handleCreateStory = useCallback(() => {
-    // Navigate to create story screen
     console.log("Create story");
   }, []);
 
-  // Viewability config for video auto-play
+  // Viewability
   const viewabilityConfig = useRef({
-    itemVisiblePercentThreshold: 50, // Item is "visible" when 50% is shown
-    minimumViewTime: 250, // Minimum time visible before triggering
+    itemVisiblePercentThreshold: 50,
+    minimumViewTime: 250,
   }).current;
 
-  // Handle viewable items changed for video auto-play
   const onViewableItemsChanged = useRef(
-    ({ viewableItems }: { viewableItems: ViewToken[] }) => {
-      const newVisibleSet = new Set<string>();
-      viewableItems.forEach((viewToken) => {
-        if (viewToken.isViewable && viewToken.item) {
-          newVisibleSet.add(viewToken.item.id);
-        }
+    ({ viewableItems: vi }: { viewableItems: ViewToken[] }) => {
+      const newSet = new Set<string>();
+      vi.forEach((vt) => {
+        if (vt.isViewable && vt.item) newSet.add(vt.item.id);
       });
-      setVisibleItems(newVisibleSet);
+      setVisibleItems(newSet);
     },
   ).current;
 
-  // Render Header Component (stories + create post + filters)
+  // ── List Header ───────────────────────────────────────
   const renderListHeader = useCallback(() => {
     return (
       <View>
-        {/* Stories */}
         <StoriesSection
           items={items}
           onStoryPress={handleStoryPress}
           onCreateStory={handleCreateStory}
+          colors={colors}
         />
-
-        {/* Create Post */}
         <CreatePostCard userAvatar={user?.avatar} onPress={handleCreatePost} />
-
-        {/* Filter Chips */}
         <FilterChips
           activeFilter={activeFilter}
           onFilterChange={handleFilterChange}
           counts={typeCounts}
+          colors={colors}
         />
-
-        {/* Source Stats (mini) */}
-        <View style={styles.sourceStatsBar}>
-          <View style={styles.sourceStatItem}>
-            <View
-              style={[styles.sourceStatDot, { backgroundColor: "#10B981" }]}
-            />
-            <Text style={styles.sourceStatLabel}>
-              Backend: {sources.backend}
-            </Text>
-          </View>
-          <View style={styles.sourceStatItem}>
-            <View
-              style={[styles.sourceStatDot, { backgroundColor: "#0D9488" }]}
-            />
-            <Text style={styles.sourceStatLabel}>GNews: {sources.gnews}</Text>
-          </View>
-          <View style={styles.sourceStatItem}>
-            <View
-              style={[styles.sourceStatDot, { backgroundColor: "#8B5CF6" }]}
-            />
-            <Text style={styles.sourceStatLabel}>Pexels: {sources.pexels}</Text>
-          </View>
+        {/* Source stats */}
+        <View style={[s.sourceBar, { backgroundColor: colors.bgSurface }]}>
+          {[
+            { label: `Backend: ${sources.backend}`, color: colors.success },
+            { label: `GNews: ${sources.gnews}`, color: colors.primary },
+            { label: `Pexels: ${sources.pexels}`, color: colors.info },
+          ].map((src) => (
+            <View key={src.label} style={s.sourceItem}>
+              <View style={[s.sourceDot, { backgroundColor: src.color }]} />
+              <Text style={[s.sourceLabel, { color: colors.textSecondary }]}>
+                {src.label}
+              </Text>
+            </View>
+          ))}
         </View>
       </View>
     );
@@ -660,22 +660,17 @@ export default function SocialScreen() {
     typeCounts,
     sources,
     user,
+    colors,
     handleStoryPress,
     handleCreateStory,
     handleCreatePost,
     handleFilterChange,
   ]);
 
-  // Get all video items for vertical video feed navigation
-  const allVideoItems = useMemo(() => {
-    return filteredItems.filter((item) => item.type === "video");
-  }, [filteredItems]);
-
-  // Render Item with visibility tracking for video auto-play
+  // ── Render Feed Item ──────────────────────────────────
   const renderItem = useCallback(
     ({ item, index }: { item: CommunityFeedItem; index: number }) => {
       const isVisible = visibleItems.has(item.id);
-      // Find video index if this is a video item
       const videoIndex =
         item.type === "video"
           ? allVideoItems.findIndex((v) => v.id === item.id)
@@ -693,55 +688,59 @@ export default function SocialScreen() {
     [visibleItems, allVideoItems],
   );
 
-  // Render Footer
-  const renderListFooter = useCallback(() => {
-    if (isLoadingMore) {
-      return <LoadingFooter />;
-    }
+  const renderFooter = useCallback(() => {
+    if (isLoadingMore) return <LoadingFooter colors={colors} />;
     if (!hasMore && filteredItems.length > 0) {
       return (
-        <View style={styles.endOfFeed}>
-          <Text style={styles.endOfFeedText}>Bạn đã xem hết nội dung 🎉</Text>
+        <View style={s.endFeed}>
+          <Text style={[s.endFeedText, { color: colors.textSecondary }]}>
+            Bạn đã xem hết nội dung 🎉
+          </Text>
         </View>
       );
     }
     return null;
-  }, [isLoadingMore, hasMore, filteredItems.length]);
+  }, [isLoadingMore, hasMore, filteredItems.length, colors]);
 
-  // Key extractor
-  const keyExtractor = useCallback(
-    (item: CommunityFeedItem) => `feed-${item.id}-${item.type}`,
-    [],
-  );
-
+  // ── Render ────────────────────────────────────────────
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      <StatusBar barStyle="dark-content" backgroundColor={COLORS.surface} />
-
-      {/* Header */}
+    <View
+      style={[
+        s.container,
+        { backgroundColor: colors.bg, paddingTop: insets.top },
+      ]}
+    >
+      <StatusBar
+        barStyle={isDark ? "light-content" : "dark-content"}
+        backgroundColor={colors.bgSurface}
+      />
       <Header
         scrollY={scrollY}
         onSearchPress={() => setSearchModalVisible(true)}
-        onMessagesPress={() => router.push("/messages" as any)}
+        onMessagesPress={() => router.push("/chat" as any)}
+        colors={colors}
       />
 
-      {/* Main Content */}
       {isLoading && !isRefreshing ? (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={COLORS.primary} />
-          <Text style={styles.loadingText}>Đang tải nội dung...</Text>
+        <View style={s.centerWrap}>
+          <ActivityIndicator size="large" color={colors.primary} />
+          <Text style={[s.loadingText, { color: colors.textSecondary }]}>
+            Đang tải nội dung...
+          </Text>
         </View>
       ) : error ? (
-        <ErrorState message={error} onRetry={handleRefresh} />
+        <ErrorState message={error} onRetry={handleRefresh} colors={colors} />
       ) : (
         <FlatList
           ref={flatListRef}
           data={filteredItems}
           renderItem={renderItem}
-          keyExtractor={keyExtractor}
+          keyExtractor={(item) => `feed-${item.id}-${item.type}`}
           ListHeaderComponent={renderListHeader}
-          ListFooterComponent={renderListFooter}
-          ListEmptyComponent={<EmptyState filter={activeFilter} />}
+          ListFooterComponent={renderFooter}
+          ListEmptyComponent={
+            <EmptyState filter={activeFilter} colors={colors} />
+          }
           onScroll={handleScroll}
           scrollEventThrottle={16}
           onEndReached={handleLoadMore}
@@ -750,40 +749,38 @@ export default function SocialScreen() {
             <RefreshControl
               refreshing={isRefreshing}
               onRefresh={handleRefresh}
-              colors={[COLORS.primary]}
-              tintColor={COLORS.primary}
+              colors={[colors.primary]}
+              tintColor={colors.primary}
             />
           }
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.feedList}
+          contentContainerStyle={s.feedList}
           removeClippedSubviews={Platform.OS === "android"}
           maxToRenderPerBatch={10}
           windowSize={10}
           initialNumToRender={5}
-          // Video auto-play viewability tracking
           viewabilityConfig={viewabilityConfig}
           onViewableItemsChanged={onViewableItemsChanged}
         />
       )}
 
-      {/* Search Modal */}
       <SearchModal
         visible={searchModalVisible}
         onClose={() => setSearchModalVisible(false)}
         onSearch={handleSearch}
+        colors={colors}
       />
     </View>
   );
 }
 
-// ============================================
-// Styles
-// ============================================
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
+// ═══════════════════════════════════════════════════════════════════════
+// STYLES (layout-only, colors injected via DS)
+// ═══════════════════════════════════════════════════════════════════════
+const s = StyleSheet.create({
+  container: { flex: 1 },
+  centerWrap: { flex: 1, justifyContent: "center", alignItems: "center" },
+  loadingText: { marginTop: 12, fontSize: 14 },
 
   // Header
   header: {
@@ -792,58 +789,37 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 100,
-    borderBottomWidth: 1,
-    borderBottomColor: "transparent",
   },
   headerContent: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.sm,
-    backgroundColor: COLORS.surface,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
   },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: COLORS.primary,
-  },
-  headerActions: {
-    flexDirection: "row",
-    gap: SPACING.xs,
-  },
+  headerTitle: { fontSize: 24, fontWeight: "bold" },
+  headerActions: { flexDirection: "row", gap: 4 },
   headerBtn: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: COLORS.background,
     justifyContent: "center",
     alignItems: "center",
   },
 
-  // Feed List
-  feedList: {
-    paddingTop: 56, // Header height
-  },
+  // Feed
+  feedList: { paddingTop: 56 },
 
   // Stories
-  storiesContainer: {
-    backgroundColor: COLORS.surface,
-    paddingVertical: SPACING.md,
-    marginBottom: SPACING.sm,
-  },
-  storiesList: {
-    paddingHorizontal: SPACING.md,
-  },
+  storiesContainer: { paddingVertical: 12, marginBottom: 8 },
+  storiesList: { paddingHorizontal: 12 },
   createStoryCard: {
     width: 110,
     height: 180,
-    marginRight: SPACING.sm,
+    marginRight: 8,
     borderRadius: 12,
     overflow: "hidden",
-    backgroundColor: COLORS.background,
     borderWidth: 1,
-    borderColor: COLORS.border,
   },
   createStoryImageContainer: {
     flex: 1,
@@ -851,16 +827,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     position: "relative",
   },
-  createStoryUserImage: {
-    width: 80,
-    height: 120,
-    borderRadius: 8,
-  },
+  createStoryUserImage: { width: 80, height: 120, borderRadius: 8 },
   createStoryPlaceholder: {
     width: 80,
     height: 120,
     borderRadius: 8,
-    backgroundColor: COLORS.border,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -870,235 +841,110 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: COLORS.primary,
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 3,
-    borderColor: COLORS.surface,
   },
   createStoryText: {
     textAlign: "center",
     fontSize: 12,
     fontWeight: "500",
-    color: COLORS.text,
-    paddingVertical: SPACING.sm,
+    paddingVertical: 8,
   },
 
-  // Filter Chips
-  filterChipsContainer: {
-    backgroundColor: COLORS.surface,
-    paddingVertical: SPACING.sm,
-    marginBottom: SPACING.sm,
-  },
-  filterChipsList: {
-    paddingHorizontal: SPACING.md,
-    gap: SPACING.sm,
-  },
+  // Filters
+  filterContainer: { paddingVertical: 8, marginBottom: 8 },
+  filterList: { paddingHorizontal: 12, gap: 8 },
   filterChip: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.sm,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: COLORS.background,
     gap: 6,
-    marginRight: SPACING.sm,
+    marginRight: 8,
   },
-  filterChipActive: {
-    backgroundColor: COLORS.primary,
-  },
-  filterChipText: {
-    fontSize: 13,
-    fontWeight: "500",
-    color: COLORS.text,
-  },
-  filterChipTextActive: {
-    color: "white",
-  },
-  filterChipBadge: {
+  filterChipText: { fontSize: 13, fontWeight: "500" },
+  filterBadge: {
     minWidth: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: COLORS.border,
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 6,
   },
-  filterChipBadgeActive: {
-    backgroundColor: "rgba(255,255,255,0.3)",
-  },
-  filterChipBadgeText: {
-    fontSize: 11,
-    fontWeight: "600",
-    color: COLORS.text,
-  },
-  filterChipBadgeTextActive: {
-    color: "white",
-  },
+  filterBadgeText: { fontSize: 11, fontWeight: "600" },
 
-  // Source Stats Bar
-  sourceStatsBar: {
+  // Source stats
+  sourceBar: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    gap: SPACING.lg,
-    paddingVertical: SPACING.sm,
-    backgroundColor: COLORS.surface,
-    marginBottom: SPACING.sm,
+    gap: 16,
+    paddingVertical: 8,
+    marginBottom: 8,
   },
-  sourceStatItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-  },
-  sourceStatDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-  sourceStatLabel: {
-    fontSize: 11,
-    color: COLORS.textSecondary,
-  },
+  sourceItem: { flexDirection: "row", alignItems: "center", gap: 4 },
+  sourceDot: { width: 8, height: 8, borderRadius: 4 },
+  sourceLabel: { fontSize: 11 },
 
   // Search Modal
-  searchModalContainer: {
-    flex: 1,
-    backgroundColor: COLORS.surface,
-  },
+  searchModalWrap: { flex: 1 },
   searchModalHeader: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.sm,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
   },
-  searchBackBtn: {
-    padding: SPACING.sm,
-    marginRight: SPACING.sm,
-  },
-  searchInputContainer: {
+  searchBackBtn: { padding: 8, marginRight: 8 },
+  searchInputWrap: {
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: COLORS.background,
     borderRadius: 20,
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.sm,
-    gap: SPACING.sm,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    gap: 8,
   },
-  searchInput: {
-    flex: 1,
-    fontSize: 15,
-    color: COLORS.text,
-  },
-  searchSuggestions: {
-    padding: SPACING.lg,
-  },
-  searchSuggestionsTitle: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: COLORS.textSecondary,
-    marginBottom: SPACING.md,
-  },
-  searchSuggestionItem: {
+  searchInput: { flex: 1, fontSize: 15 },
+  suggestTitle: { fontSize: 14, fontWeight: "600", marginBottom: 12 },
+  suggestItem: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: SPACING.md,
-    gap: SPACING.md,
+    paddingVertical: 12,
+    gap: 12,
   },
-  searchSuggestionText: {
-    fontSize: 15,
-    color: COLORS.text,
-  },
+  suggestText: { fontSize: 15 },
 
-  // Loading States
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  loadingText: {
-    marginTop: SPACING.md,
-    fontSize: 14,
-    color: COLORS.textSecondary,
-  },
+  // States
   loadingFooter: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    paddingVertical: SPACING.xl,
-    gap: SPACING.sm,
+    paddingVertical: 20,
+    gap: 8,
   },
-  loadingFooterText: {
-    fontSize: 13,
-    color: COLORS.textSecondary,
-  },
-
-  // Empty State
+  loadingFooterText: { fontSize: 13 },
   emptyState: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     paddingVertical: 100,
-    paddingHorizontal: SPACING.xl,
+    paddingHorizontal: 20,
   },
-  emptyStateTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: COLORS.text,
-    marginTop: SPACING.lg,
-  },
-  emptyStateText: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    textAlign: "center",
-    marginTop: SPACING.sm,
-  },
-
-  // Error State
-  errorState: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: SPACING.xl,
-  },
-  errorStateTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: COLORS.text,
-    marginTop: SPACING.lg,
-  },
-  errorStateText: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    textAlign: "center",
-    marginTop: SPACING.sm,
-  },
-  retryButton: {
+  emptyTitle: { fontSize: 18, fontWeight: "600", marginTop: 16 },
+  emptySubtitle: { fontSize: 14, textAlign: "center", marginTop: 8 },
+  retryBtn: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: COLORS.primary,
-    paddingHorizontal: SPACING.xl,
-    paddingVertical: SPACING.md,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
     borderRadius: 8,
-    marginTop: SPACING.lg,
-    gap: SPACING.sm,
+    marginTop: 16,
+    gap: 8,
   },
-  retryButtonText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "white",
-  },
-
-  // End of Feed
-  endOfFeed: {
-    paddingVertical: SPACING.xl,
-    alignItems: "center",
-  },
-  endOfFeedText: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-  },
+  retryText: { fontSize: 14, fontWeight: "600", color: "white" },
+  endFeed: { paddingVertical: 20, alignItems: "center" },
+  endFeedText: { fontSize: 14 },
 });

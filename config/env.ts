@@ -101,14 +101,12 @@ export const ENV: EnvConfig = {
   ENABLE_SOCIAL_FACEBOOK:
     (extra.EXPO_PUBLIC_ENABLE_SOCIAL_FACEBOOK ?? "1") !== "0",
   GOOGLE_CLIENT_ID:
-    extra.EXPO_PUBLIC_GOOGLE_CLIENT_ID ||
-    "702679918765-ikhpcev251dh2ndd5cpqkqearkmips34.apps.googleusercontent.com",
+    extra.EXPO_PUBLIC_GOOGLE_CLIENT_ID || "",
   GOOGLE_WEB_CLIENT_ID:
     extra.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID ||
     extra.EXPO_PUBLIC_GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET:
-    extra.EXPO_PUBLIC_GOOGLE_CLIENT_SECRET ||
-    "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",
+    extra.EXPO_PUBLIC_GOOGLE_CLIENT_SECRET || "",
   GOOGLE_ANDROID_CLIENT_ID: extra.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
   GOOGLE_IOS_CLIENT_ID: extra.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
   BACKOFF_BASE_MS: parseInt(extra.EXPO_PUBLIC_BACKOFF_BASE_MS || "500", 10),
@@ -149,11 +147,13 @@ export const ENV: EnvConfig = {
 
   // LiveKit Configuration (Video Calls/Meetings/Livestreams)
   // Get credentials from: https://cloud.livekit.io
-  // LIVEKIT_URL: extra.EXPO_PUBLIC_LIVEKIT_URL || process.env.LIVEKIT_URL,
-  // LIVEKIT_API_KEY:
-  //   extra.EXPO_PUBLIC_LIVEKIT_API_KEY || process.env.LIVEKIT_API_KEY,
-  // LIVEKIT_API_SECRET:
-  //   extra.EXPO_PUBLIC_LIVEKIT_API_SECRET || process.env.LIVEKIT_API_SECRET,
+  LIVEKIT_URL: extra.EXPO_PUBLIC_LIVEKIT_URL || process.env.LIVEKIT_URL || "",
+  LIVEKIT_API_KEY:
+    extra.EXPO_PUBLIC_LIVEKIT_API_KEY || process.env.LIVEKIT_API_KEY || "",
+  LIVEKIT_API_SECRET:
+    extra.EXPO_PUBLIC_LIVEKIT_API_SECRET ||
+    process.env.LIVEKIT_API_SECRET ||
+    "",
 
   // Agora Configuration (Backup video platform)
   AGORA_APP_ID: extra.EXPO_PUBLIC_AGORA_APP_ID || process.env.AGORA_APP_ID,
@@ -220,14 +220,14 @@ console.log(
   ENV.ENABLE_SOCIAL_GOOGLE,
   ENV.ENABLE_SOCIAL_FACEBOOK,
 );
-// console.log(
-//   "[ENV] LIVEKIT_URL:",
-//   ENV.LIVEKIT_URL ? "✅ Configured" : "❌ NOT SET",
-// );
-// console.log(
-//   "[ENV] LIVEKIT_API_KEY:",
-//   ENV.LIVEKIT_API_KEY ? "✅ Configured" : "❌ NOT SET",
-// );
+console.log(
+  "[ENV] LIVEKIT_URL:",
+  ENV.LIVEKIT_URL ? "✅ Configured" : "❌ NOT SET",
+);
+console.log(
+  "[ENV] LIVEKIT_API_KEY:",
+  ENV.LIVEKIT_API_KEY ? "✅ Configured" : "❌ NOT SET",
+);
 
 // Validate critical values
 if (!ENV.API_KEY) {

@@ -3,25 +3,25 @@
  * Sử dụng chatAPIService + ChatListEnhanced component
  */
 
-import { ChatListEnhanced } from '@/components/chat';
-import { Loader } from '@/components/ui/loader';
-import { useAuth } from '@/context/AuthContext';
-import { useThemeColor } from '@/hooks/use-theme-color';
-import { chatAPIService } from '@/services/chatAPIService';
-import type { ChatRoom } from '@/services/ChatService';
-import { Ionicons } from '@expo/vector-icons';
-import * as Haptics from 'expo-haptics';
-import { useFocusEffect, useRouter } from 'expo-router';
-import { useCallback, useState } from 'react';
+import { ChatListEnhanced } from "@/components/chat";
+import { Loader } from "@/components/ui/loader";
+import { useAuth } from "@/context/AuthContext";
+import { useThemeColor } from "@/hooks/use-theme-color";
+import { chatAPIService } from "@/services/chatAPIService";
+import type { ChatRoom } from "@/services/ChatService";
+import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
+import { useFocusEffect, useRouter } from "expo-router";
+import { useCallback, useState } from "react";
 import {
     Alert,
     Pressable,
     StyleSheet,
     Text,
     TextInput,
-    View
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+    View,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function ChatListScreen() {
   const router = useRouter();
@@ -29,38 +29,38 @@ export default function ChatListScreen() {
   const { user } = useAuth();
 
   // Theme colors
-  const primary = useThemeColor({}, 'primary');
-  const background = useThemeColor({}, 'background');
-  const surface = useThemeColor({}, 'surface');
-  const text = useThemeColor({}, 'text');
-  const textMuted = useThemeColor({}, 'textMuted');
-  const border = useThemeColor({}, 'border');
+  const primary = useThemeColor({}, "primary");
+  const background = useThemeColor({}, "background");
+  const surface = useThemeColor({}, "surface");
+  const text = useThemeColor({}, "text");
+  const textMuted = useThemeColor({}, "textMuted");
+  const border = useThemeColor({}, "border");
 
   // State
   const [chatRooms, setChatRooms] = useState<ChatRoom[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   // Current user ID
-  const currentUserId = user?.id?.toString() || '';
+  const currentUserId = user?.id?.toString() || "";
 
   // Load chat rooms from API
   const loadChatRooms = useCallback(async (showRefresh = false) => {
     try {
       if (showRefresh) setIsRefreshing(true);
       else setIsLoading(true);
-      
+
       setError(null);
 
       const rooms = await chatAPIService.getChatRooms();
       setChatRooms(rooms);
-      
-      console.log('[ChatList] Loaded', rooms.length, 'chat rooms');
+
+      console.log("[ChatList] Loaded", rooms.length, "chat rooms");
     } catch (err) {
-      console.error('[ChatList] Load error:', err);
-      setError('Không thể tải danh sách chat. Vui lòng thử lại.');
+      console.error("[ChatList] Load error:", err);
+      setError("Không thể tải danh sách chat. Vui lòng thử lại.");
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
@@ -71,99 +71,107 @@ export default function ChatListScreen() {
   useFocusEffect(
     useCallback(() => {
       loadChatRooms();
-    }, [loadChatRooms])
+    }, [loadChatRooms]),
   );
 
   // Filter chats by search query
-  const filteredRooms = chatRooms.filter(room => 
-    room.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    room.lastMessage?.content?.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredRooms = chatRooms.filter(
+    (room) =>
+      room.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      room.lastMessage?.content
+        ?.toLowerCase()
+        .includes(searchQuery.toLowerCase()),
   );
 
   // Handlers
   const handleChatPress = (room: ChatRoom) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     router.push({
-      pathname: '/chat/[chatId]',
-      params: { 
+      pathname: "/chat/[chatId]",
+      params: {
         chatId: room.id,
-        chatName: room.name || 'Chat',
+        chatName: room.name || "Chat",
       },
     });
   };
 
   const handleChatLongPress = (room: ChatRoom) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-    
-    Alert.alert(
-      room.name || 'Chat',
-      'Chọn hành động',
-      [
-        { text: 'Ghim', onPress: () => handlePinChat(room) },
-        { text: 'Tắt thông báo', onPress: () => handleMuteChat(room) },
-        { text: 'Xóa', onPress: () => handleDeleteChat(room), style: 'destructive' },
-        { text: 'Hủy', style: 'cancel' },
-      ]
-    );
+
+    Alert.alert(room.name || "Chat", "Chọn hành động", [
+      { text: "Ghim", onPress: () => handlePinChat(room) },
+      { text: "Tắt thông báo", onPress: () => handleMuteChat(room) },
+      {
+        text: "Xóa",
+        onPress: () => handleDeleteChat(room),
+        style: "destructive",
+      },
+      { text: "Hủy", style: "cancel" },
+    ]);
   };
 
   const handlePinChat = (room: ChatRoom) => {
-    setChatRooms(prev => 
-      prev.map(r => r.id === room.id ? { ...r, isPinned: !r.isPinned } : r)
+    setChatRooms((prev) =>
+      prev.map((r) => (r.id === room.id ? { ...r, isPinned: !r.isPinned } : r)),
     );
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   };
 
   const handleMuteChat = (room: ChatRoom) => {
-    setChatRooms(prev => 
-      prev.map(r => r.id === room.id ? { ...r, isMuted: !r.isMuted } : r)
+    setChatRooms((prev) =>
+      prev.map((r) => (r.id === room.id ? { ...r, isMuted: !r.isMuted } : r)),
     );
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   };
 
   const handleDeleteChat = (room: ChatRoom) => {
     Alert.alert(
-      'Xóa cuộc trò chuyện',
+      "Xóa cuộc trò chuyện",
       `Bạn có chắc muốn xóa cuộc trò chuyện với "${room.name}"?`,
       [
-        { text: 'Hủy', style: 'cancel' },
-        { 
-          text: 'Xóa', 
-          style: 'destructive',
+        { text: "Hủy", style: "cancel" },
+        {
+          text: "Xóa",
+          style: "destructive",
           onPress: () => {
-            setChatRooms(prev => prev.filter(r => r.id !== room.id));
+            setChatRooms((prev) => prev.filter((r) => r.id !== room.id));
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-          }
+          },
         },
-      ]
+      ],
     );
   };
 
   // Callbacks with chatId string
   const handlePinChatById = (chatId: string) => {
-    const room = chatRooms.find(r => r.id === chatId);
+    const room = chatRooms.find((r) => r.id === chatId);
     if (room) handlePinChat(room);
   };
 
   const handleMuteChatById = (chatId: string) => {
-    const room = chatRooms.find(r => r.id === chatId);
+    const room = chatRooms.find((r) => r.id === chatId);
     if (room) handleMuteChat(room);
   };
 
   const handleDeleteChatById = (chatId: string) => {
-    const room = chatRooms.find(r => r.id === chatId);
+    const room = chatRooms.find((r) => r.id === chatId);
     if (room) handleDeleteChat(room);
   };
 
   const handleNewChat = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     // TODO: Navigate to new chat / contact selection screen
-    Alert.alert('Tạo chat mới', 'Tính năng đang được phát triển');
+    Alert.alert("Tạo chat mới", "Tính năng đang được phát triển");
   };
 
   // Render header
   const renderHeader = () => (
-    <View style={[styles.header, { backgroundColor: primary, paddingTop: insets.top }]}>
+    <View
+      style={[
+        styles.header,
+        { backgroundColor: primary, paddingTop: insets.top },
+      ]}
+    >
       <Text style={styles.headerTitle}>Tin nhắn</Text>
       <Pressable style={styles.headerAction} onPress={handleNewChat}>
         <Ionicons name="create-outline" size={24} color="#fff" />
@@ -174,9 +182,16 @@ export default function ChatListScreen() {
   // Render search bar
   const renderSearchBar = () => (
     <View style={[styles.searchContainer, { backgroundColor: background }]}>
-      <View style={[styles.searchBar, { backgroundColor: surface, borderColor: border }]}>
+      <View
+        style={[
+          styles.searchBar,
+          { backgroundColor: surface, borderColor: border },
+        ]}
+      >
         <Ionicons name="search" size={20} color={textMuted} />
         <TextInput
+          nativeID="chat-search"
+          accessibilityLabel="Tìm kiếm"
           style={[styles.searchInput, { color: text }]}
           placeholder="Tìm kiếm..."
           placeholderTextColor={textMuted}
@@ -184,7 +199,7 @@ export default function ChatListScreen() {
           onChangeText={setSearchQuery}
         />
         {searchQuery.length > 0 && (
-          <Pressable onPress={() => setSearchQuery('')}>
+          <Pressable onPress={() => setSearchQuery("")}>
             <Ionicons name="close-circle" size={20} color={textMuted} />
           </Pressable>
         )}
@@ -200,9 +215,9 @@ export default function ChatListScreen() {
         Chưa có cuộc trò chuyện nào
       </Text>
       <Text style={[styles.emptyText, { color: textMuted }]}>
-        Bắt đầu cuộc trò chuyện mới bằng cách{'\n'}nhấn nút + ở góc trên phải
+        Bắt đầu cuộc trò chuyện mới bằng cách{"\n"}nhấn nút + ở góc trên phải
       </Text>
-      <Pressable 
+      <Pressable
         style={[styles.emptyButton, { backgroundColor: primary }]}
         onPress={handleNewChat}
       >
@@ -217,7 +232,7 @@ export default function ChatListScreen() {
     <View style={styles.errorContainer}>
       <Ionicons name="warning-outline" size={48} color="#F59E0B" />
       <Text style={[styles.errorText, { color: text }]}>{error}</Text>
-      <Pressable 
+      <Pressable
         style={[styles.retryButton, { borderColor: primary }]}
         onPress={() => loadChatRooms()}
       >
@@ -272,16 +287,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 16,
     paddingBottom: 12,
   },
   headerTitle: {
     fontSize: 24,
-    fontWeight: '700',
-    color: '#fff',
+    fontWeight: "700",
+    color: "#fff",
   },
   headerAction: {
     padding: 8,
@@ -291,8 +306,8 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   searchBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     borderWidth: 1,
     borderRadius: 24,
     paddingHorizontal: 16,
@@ -305,8 +320,8 @@ const styles = StyleSheet.create({
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   loadingText: {
     marginTop: 12,
@@ -314,24 +329,24 @@ const styles = StyleSheet.create({
   },
   emptyContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 32,
   },
   emptyTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     marginTop: 16,
   },
   emptyText: {
     fontSize: 14,
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: 8,
     lineHeight: 22,
   },
   emptyButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 24,
@@ -339,19 +354,19 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   emptyButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   errorContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 32,
   },
   errorText: {
     fontSize: 14,
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: 16,
     marginBottom: 24,
   },
@@ -363,6 +378,6 @@ const styles = StyleSheet.create({
   },
   retryText: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });

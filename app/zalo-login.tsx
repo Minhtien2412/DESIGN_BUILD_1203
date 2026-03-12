@@ -16,30 +16,31 @@ import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Alert,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 // Services
 import { useAuth } from "@/context/AuthContext";
+import { useI18n } from "@/services/i18nService";
 import { calculateExpiryTimestamp, saveTokens } from "@/services/token.service";
 import {
-  zaloMiniAppAuth,
-  ZaloMiniAppLoginResult,
+    zaloMiniAppAuth,
+    ZaloMiniAppLoginResult,
 } from "@/services/zaloMiniAppAuthService";
 import {
-  isValidVietnamesePhone,
-  maskPhone,
-  zaloOTPAuth,
+    isValidVietnamesePhone,
+    maskPhone,
+    zaloOTPAuth,
 } from "@/services/zaloOTPAuthService";
 
 // ==================== COLORS ====================
@@ -66,6 +67,7 @@ const COLORS = {
 export default function ZaloLoginScreen() {
   const router = useRouter();
   const { signInWithPhone, refreshUser } = useAuth();
+  const { t } = useI18n();
 
   // State
   const [isInMiniApp, setIsInMiniApp] = useState(false);
@@ -119,17 +121,19 @@ export default function ZaloLoginScreen() {
         }
 
         Alert.alert(
-          result.isNewUser ? "🎉 Chào mừng!" : "👋 Xin chào!",
           result.isNewUser
-            ? `Tài khoản ${result.user?.name} đã được tạo thành công!`
-            : `Chào mừng ${result.user?.name} quay trở lại!`,
+            ? `🎉 ${t("zaloLogin.welcomeNew")}`
+            : `👋 ${t("zaloLogin.welcomeBack")}`,
+          result.isNewUser
+            ? `${result.user?.name} - ${t("zaloLogin.accountCreated")}`
+            : `${result.user?.name} - ${t("zaloLogin.loginSuccess")}`,
           [{ text: "OK", onPress: () => router.replace("/(tabs)") }],
         );
       } else {
-        setError(result.message || "Đăng nhập thất bại");
+        setError(result.message || t("zaloLogin.errLoginFailed"));
       }
     } catch (err: any) {
-      setError(err.message || "Đã có lỗi xảy ra");
+      setError(err.message || t("zaloLogin.errGeneric"));
     } finally {
       setIsLoading(false);
     }
@@ -140,7 +144,7 @@ export default function ZaloLoginScreen() {
    */
   const handleSendOTP = async () => {
     if (!isValidVietnamesePhone(phone)) {
-      setError("Vui lòng nhập số điện thoại Việt Nam hợp lệ");
+      setError(t("zaloLogin.errPhoneInvalid"));
       return;
     }
 
@@ -154,12 +158,12 @@ export default function ZaloLoginScreen() {
         setOtpSent(true);
         setStep("verify");
         setCountdown(60);
-        Alert.alert("Đã gửi OTP", result.message);
+        Alert.alert(t("zaloLogin.otpSentAlert"), result.message);
       } else {
         setError(result.message);
       }
     } catch (err: any) {
-      setError(err.message || "Không thể gửi OTP");
+      setError(err.message || t("zaloLogin.errOtpSendFailed"));
     } finally {
       setIsLoading(false);
     }
@@ -179,12 +183,12 @@ export default function ZaloLoginScreen() {
 
       if (result.success) {
         setCountdown(60);
-        Alert.alert("Đã gửi lại OTP", result.message);
+        Alert.alert(t("zaloLogin.otpResentAlert"), result.message);
       } else {
         setError(result.message);
       }
     } catch (err: any) {
-      setError(err.message || "Không thể gửi lại OTP");
+      setError(err.message || t("zaloLogin.errOtpResendFailed"));
     } finally {
       setIsLoading(false);
     }
@@ -195,7 +199,7 @@ export default function ZaloLoginScreen() {
    */
   const handleVerifyOTP = async () => {
     if (otp.length !== 6) {
-      setError("Vui lòng nhập mã OTP 6 số");
+      setError(t("zaloLogin.errOtp6"));
       return;
     }
 
@@ -217,17 +221,19 @@ export default function ZaloLoginScreen() {
         }
 
         Alert.alert(
-          result.isNewUser ? "🎉 Chào mừng!" : "👋 Xin chào!",
           result.isNewUser
-            ? "Tài khoản đã được tạo thành công!"
-            : "Đăng nhập thành công!",
+            ? `🎉 ${t("zaloLogin.welcomeNew")}`
+            : `👋 ${t("zaloLogin.welcomeBack")}`,
+          result.isNewUser
+            ? t("zaloLogin.accountCreated")
+            : t("zaloLogin.loginSuccess"),
           [{ text: "OK", onPress: () => router.replace("/(tabs)") }],
         );
       } else {
         setError(result.message);
       }
     } catch (err: any) {
-      setError(err.message || "Xác thực thất bại");
+      setError(err.message || t("zaloLogin.errVerifyFailed"));
     } finally {
       setIsLoading(false);
     }
@@ -273,10 +279,10 @@ export default function ZaloLoginScreen() {
 
             <Text style={styles.headerTitle}>
               {step === "initial"
-                ? "Đăng nhập"
+                ? t("zaloLogin.login")
                 : step === "otp"
-                  ? "Nhập số điện thoại"
-                  : "Xác thực OTP"}
+                  ? t("zaloLogin.enterPhone")
+                  : t("zaloLogin.verifyOtp")}
             </Text>
 
             <View style={styles.placeholder} />
@@ -293,17 +299,20 @@ export default function ZaloLoginScreen() {
             </View>
             <Text style={styles.welcomeText}>
               {step === "initial"
-                ? "Chào mừng bạn!"
+                ? t("zaloLogin.welcome")
                 : step === "otp"
-                  ? "Nhập số điện thoại"
-                  : `Nhập mã OTP gửi đến ${maskPhone(phone)}`}
+                  ? t("zaloLogin.enterPhone")
+                  : t("zaloLogin.otpSentTo").replace(
+                      "{phone}",
+                      maskPhone(phone),
+                    )}
             </Text>
             <Text style={styles.subText}>
               {step === "initial"
-                ? "Đăng nhập để trải nghiệm đầy đủ tính năng"
+                ? t("zaloLogin.loginSubtext")
                 : step === "otp"
-                  ? "Chúng tôi sẽ gửi mã xác thực đến số điện thoại của bạn"
-                  : "Mã có hiệu lực trong 5 phút"}
+                  ? t("zaloLogin.phoneSubtext")
+                  : t("zaloLogin.otpSubtext")}
             </Text>
           </View>
 
@@ -333,7 +342,7 @@ export default function ZaloLoginScreen() {
                       <>
                         <Text style={styles.zaloIcon}>Z</Text>
                         <Text style={styles.zaloButtonText}>
-                          Đăng nhập với Zalo
+                          {t("zaloLogin.loginWithZalo")}
                         </Text>
                       </>
                     )}
@@ -345,7 +354,7 @@ export default function ZaloLoginScreen() {
               {isInMiniApp && (
                 <View style={styles.divider}>
                   <View style={styles.dividerLine} />
-                  <Text style={styles.dividerText}>hoặc</Text>
+                  <Text style={styles.dividerText}>{t("zaloLogin.or")}</Text>
                   <View style={styles.dividerLine} />
                 </View>
               )}
@@ -362,7 +371,7 @@ export default function ZaloLoginScreen() {
                   color={COLORS.text}
                 />
                 <Text style={styles.otpButtonText}>
-                  Đăng nhập bằng số điện thoại
+                  {t("zaloLogin.loginWithPhone")}
                 </Text>
               </TouchableOpacity>
 
@@ -371,9 +380,7 @@ export default function ZaloLoginScreen() {
                 style={styles.skipButton}
                 onPress={() => router.replace("/(tabs)")}
               >
-                <Text style={styles.skipText}>
-                  Bỏ qua, tiếp tục với chế độ khách
-                </Text>
+                <Text style={styles.skipText}>{t("zaloLogin.skipGuest")}</Text>
               </TouchableOpacity>
             </View>
           )}
@@ -415,7 +422,9 @@ export default function ZaloLoginScreen() {
                 {isLoading ? (
                   <ActivityIndicator color="#fff" />
                 ) : (
-                  <Text style={styles.primaryButtonText}>Gửi mã OTP</Text>
+                  <Text style={styles.primaryButtonText}>
+                    {t("zaloLogin.sendOtp")}
+                  </Text>
                 )}
               </TouchableOpacity>
             </View>
@@ -457,8 +466,11 @@ export default function ZaloLoginScreen() {
                   ]}
                 >
                   {countdown > 0
-                    ? `Gửi lại sau ${countdown}s`
-                    : "Gửi lại mã OTP"}
+                    ? t("zaloLogin.resendAfter").replace(
+                        "{seconds}",
+                        String(countdown),
+                      )
+                    : t("zaloLogin.resendOtp")}
                 </Text>
               </TouchableOpacity>
 
@@ -474,7 +486,9 @@ export default function ZaloLoginScreen() {
                 {isLoading ? (
                   <ActivityIndicator color="#fff" />
                 ) : (
-                  <Text style={styles.primaryButtonText}>Xác nhận</Text>
+                  <Text style={styles.primaryButtonText}>
+                    {t("zaloLogin.confirm")}
+                  </Text>
                 )}
               </TouchableOpacity>
             </View>
@@ -483,9 +497,12 @@ export default function ZaloLoginScreen() {
           {/* Footer */}
           <View style={styles.footer}>
             <Text style={styles.footerText}>
-              Bằng việc đăng nhập, bạn đồng ý với{" "}
-              <Text style={styles.linkText}>Điều khoản sử dụng</Text> và{" "}
-              <Text style={styles.linkText}>Chính sách bảo mật</Text>
+              {t("zaloLogin.termsFooter")}{" "}
+              <Text style={styles.linkText}>{t("zaloLogin.termsOfUse")}</Text>{" "}
+              {t("zaloLogin.and")}{" "}
+              <Text style={styles.linkText}>
+                {t("zaloLogin.privacyPolicy")}
+              </Text>
             </Text>
 
             {/* Debug info */}

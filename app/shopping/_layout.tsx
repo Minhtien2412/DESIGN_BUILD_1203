@@ -21,12 +21,6 @@ export default function ShoppingLayout() {
         name="flash-sale"
         options={{ title: "Flash Sale", headerShown: false }}
       />
-      <Stack.Screen name="promotions" options={{ title: "Khuyến Mãi" }} />
-      <Stack.Screen name="categories" options={{ title: "Danh Mục" }} />
-      <Stack.Screen name="brands" options={{ title: "Thương Hiệu" }} />
-      <Stack.Screen name="new-arrivals" options={{ title: "Hàng Mới Về" }} />
-      <Stack.Screen name="best-sellers" options={{ title: "Bán Chạy" }} />
-      <Stack.Screen name="deals" options={{ title: "Ưu Đãi Hấp Dẫn" }} />
     </Stack>
   );
 }

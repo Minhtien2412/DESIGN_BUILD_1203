@@ -240,7 +240,7 @@ export default function ViewHistoryScreen() {
   }, []);
 
   const filteredHistory = history.filter(
-    (item) => filter === "all" || item.type === filter
+    (item) => filter === "all" || item.type === filter,
   );
 
   // Group by date
@@ -292,7 +292,7 @@ export default function ViewHistoryScreen() {
             clearHistory();
           },
         },
-      ]
+      ],
     );
   };
 
@@ -301,9 +301,9 @@ export default function ViewHistoryScreen() {
     if (item.type === "product") {
       router.push(`/product/${item.id}` as Href);
     } else if (item.type === "service") {
-      router.push(`/service/${item.id}` as Href);
+      router.push(`/services/detail/${item.id}` as Href);
     } else if (item.type === "worker") {
-      router.push(`/worker/${item.id}` as Href);
+      router.push(`/workers/${item.id}` as Href);
     }
   };
 

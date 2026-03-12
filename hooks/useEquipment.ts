@@ -3,7 +3,7 @@
  * React hooks for equipment state management
  */
 
-import * as equipmentService from '@/services/equipment';
+import * as equipmentService from "@/services/equipment";
 import type {
     CreateEquipmentParams,
     CreateInspectionParams,
@@ -20,8 +20,8 @@ import type {
     UpdateMaintenanceRecordParams,
     UpdateUsageLogParams,
     UsageLog,
-} from '@/types/equipment';
-import { useCallback, useEffect, useState } from 'react';
+} from "@/types/equipment";
+import { useCallback, useEffect, useState } from "react";
 
 // Equipment Hook
 export function useEquipment(params: GetEquipmentParams) {
@@ -34,13 +34,21 @@ export function useEquipment(params: GetEquipmentParams) {
       setLoading(true);
       setError(null);
       const data = await equipmentService.getEquipment(params);
-      setEquipment(data);
+      setEquipment(Array.isArray(data) ? data : []);
     } catch (err) {
       setError(err as Error);
     } finally {
       setLoading(false);
     }
-  }, [params.projectId, params.status, params.type, params.condition, params.ownershipType, params.assignedTo, params.search]);
+  }, [
+    params.projectId,
+    params.status,
+    params.type,
+    params.condition,
+    params.ownershipType,
+    params.assignedTo,
+    params.search,
+  ]);
 
   useEffect(() => {
     fetchEquipment();
@@ -54,7 +62,9 @@ export function useEquipment(params: GetEquipmentParams) {
 
   const update = async (updateParams: UpdateEquipmentParams) => {
     const updated = await equipmentService.updateEquipment(updateParams);
-    setEquipment((prev) => prev.map((e) => (e.id === updated.id ? updated : e)));
+    setEquipment((prev) =>
+      prev.map((e) => (e.id === updated.id ? updated : e)),
+    );
     return updated;
   };
 
@@ -68,16 +78,18 @@ export function useEquipment(params: GetEquipmentParams) {
     assignedTo: string,
     projectId: string,
     location?: string,
-    expectedReturnDate?: string
+    expectedReturnDate?: string,
   ) => {
     const updated = await equipmentService.assignEquipment(
       equipmentId,
       assignedTo,
       projectId,
       location,
-      expectedReturnDate
+      expectedReturnDate,
     );
-    setEquipment((prev) => prev.map((e) => (e.id === updated.id ? updated : e)));
+    setEquipment((prev) =>
+      prev.map((e) => (e.id === updated.id ? updated : e)),
+    );
     return updated;
   };
 
@@ -85,16 +97,33 @@ export function useEquipment(params: GetEquipmentParams) {
     equipmentId: string,
     condition: string,
     meterReading?: number,
-    notes?: string
+    notes?: string,
   ) => {
-    const updated = await equipmentService.returnEquipment(equipmentId, condition, meterReading, notes);
-    setEquipment((prev) => prev.map((e) => (e.id === updated.id ? updated : e)));
+    const updated = await equipmentService.returnEquipment(
+      equipmentId,
+      condition,
+      meterReading,
+      notes,
+    );
+    setEquipment((prev) =>
+      prev.map((e) => (e.id === updated.id ? updated : e)),
+    );
     return updated;
   };
 
-  const transfer = async (equipmentId: string, newAssignee: string, newLocation?: string) => {
-    const updated = await equipmentService.transferEquipment(equipmentId, newAssignee, newLocation);
-    setEquipment((prev) => prev.map((e) => (e.id === updated.id ? updated : e)));
+  const transfer = async (
+    equipmentId: string,
+    newAssignee: string,
+    newLocation?: string,
+  ) => {
+    const updated = await equipmentService.transferEquipment(
+      equipmentId,
+      newAssignee,
+      newLocation,
+    );
+    setEquipment((prev) =>
+      prev.map((e) => (e.id === updated.id ? updated : e)),
+    );
     return updated;
   };
 
@@ -156,20 +185,28 @@ export function useMaintenanceRecords(params: GetMaintenanceRecordsParams) {
     } finally {
       setLoading(false);
     }
-  }, [params.equipmentId, params.type, params.status, params.fromDate, params.toDate]);
+  }, [
+    params.equipmentId,
+    params.type,
+    params.status,
+    params.fromDate,
+    params.toDate,
+  ]);
 
   useEffect(() => {
     fetchRecords();
   }, [fetchRecords]);
 
   const create = async (createParams: CreateMaintenanceRecordParams) => {
-    const newRecord = await equipmentService.createMaintenanceRecord(createParams);
+    const newRecord =
+      await equipmentService.createMaintenanceRecord(createParams);
     setRecords((prev) => [newRecord, ...prev]);
     return newRecord;
   };
 
   const update = async (updateParams: UpdateMaintenanceRecordParams) => {
-    const updated = await equipmentService.updateMaintenanceRecord(updateParams);
+    const updated =
+      await equipmentService.updateMaintenanceRecord(updateParams);
     setRecords((prev) => prev.map((r) => (r.id === updated.id ? updated : r)));
     return updated;
   };
@@ -182,22 +219,31 @@ export function useMaintenanceRecords(params: GetMaintenanceRecordsParams) {
   const complete = async (
     id: string,
     workPerformed: string,
-    partsReplaced?: MaintenanceRecord['partsReplaced'],
+    partsReplaced?: MaintenanceRecord["partsReplaced"],
     totalCost?: number,
-    nextMaintenanceDate?: string
+    nextMaintenanceDate?: string,
   ) => {
     const updated = await equipmentService.completeMaintenanceRecord(
       id,
       workPerformed,
       partsReplaced,
       totalCost,
-      nextMaintenanceDate
+      nextMaintenanceDate,
     );
     setRecords((prev) => prev.map((r) => (r.id === updated.id ? updated : r)));
     return updated;
   };
 
-  return { records, loading, error, refetch: fetchRecords, create, update, remove, complete };
+  return {
+    records,
+    loading,
+    error,
+    refetch: fetchRecords,
+    create,
+    update,
+    remove,
+    complete,
+  };
 }
 
 // Single Maintenance Record Hook
@@ -303,7 +349,9 @@ export function useInspections(equipmentId: string) {
 
   const update = async (id: string, data: Partial<EquipmentInspection>) => {
     const updated = await equipmentService.updateInspection(id, data);
-    setInspections((prev) => prev.map((i) => (i.id === updated.id ? updated : i)));
+    setInspections((prev) =>
+      prev.map((i) => (i.id === updated.id ? updated : i)),
+    );
     return updated;
   };
 
@@ -312,12 +360,22 @@ export function useInspections(equipmentId: string) {
     setInspections((prev) => prev.filter((i) => i.id !== id));
   };
 
-  return { inspections, loading, error, refetch: fetchInspections, create, update, remove };
+  return {
+    inspections,
+    loading,
+    error,
+    refetch: fetchInspections,
+    create,
+    update,
+    remove,
+  };
 }
 
 // Single Inspection Hook
 export function useInspection(id: string) {
-  const [inspection, setInspection] = useState<EquipmentInspection | null>(null);
+  const [inspection, setInspection] = useState<EquipmentInspection | null>(
+    null,
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 

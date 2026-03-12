@@ -132,7 +132,7 @@ export default function ProfileScreenModernized() {
       gradientMiddle: isDarkMode ? "#1e3a5f" : "#0D9488",
       gradientEnd: isDarkMode ? "#0F766E" : "#0D9488",
     }),
-    [isDarkMode]
+    [isDarkMode],
   );
 
   // Fetch user stats from API
@@ -195,7 +195,7 @@ export default function ProfileScreenModernized() {
           delay: index * 100,
           easing: Easing.out(Easing.cubic),
           useNativeDriver: true,
-        })
+        }),
       );
       Animated.stagger(100, statsStagger).start();
 
@@ -209,7 +209,7 @@ export default function ProfileScreenModernized() {
             delay: 300 + index * 80,
             easing: Easing.out(Easing.back(1.2)),
             useNativeDriver: true,
-          })
+          }),
         );
       Animated.stagger(80, quickStagger).start();
     };
@@ -228,7 +228,7 @@ export default function ProfileScreenModernized() {
         toValue: 1,
         duration: 8000,
         useNativeDriver: true,
-      })
+      }),
     );
     rotateAnimation.start();
     return () => rotateAnimation.stop();
@@ -269,7 +269,7 @@ export default function ProfileScreenModernized() {
         delay: index * 100,
         easing: Easing.out(Easing.cubic),
         useNativeDriver: true,
-      })
+      }),
     );
     Animated.stagger(100, statsStagger).start();
 
@@ -293,7 +293,7 @@ export default function ProfileScreenModernized() {
       console.log("[Profile] Privacy settings:", settings);
       Alert.alert(
         "Quyền riêng tư",
-        "Tính năng quản lý quyền riêng tư đang phát triển"
+        "Tính năng quản lý quyền riêng tư đang phát triển",
       );
     } catch (error: any) {
       console.error("[Profile] Privacy error:", error);
@@ -307,7 +307,7 @@ export default function ProfileScreenModernized() {
       console.log("[Profile] Usage analytics:", analytics);
       Alert.alert(
         "Thống kê sử dụng",
-        `Dự án: ${analytics.projectCount || 0}\nHoạt động: ${analytics.activityCount || 0}\nThời gian: ${analytics.totalHours || 0}h`
+        `Dự án: ${analytics.projectCount || 0}\nHoạt động: ${analytics.activityCount || 0}\nThời gian: ${analytics.totalHours || 0}h`,
       );
     } catch (error: any) {
       console.error("[Profile] Analytics error:", error);
@@ -337,7 +337,7 @@ export default function ProfileScreenModernized() {
           } else if (buttonIndex === 3) {
             await deleteCurrentAvatar();
           }
-        }
+        },
       );
     } else {
       Alert.alert("Thay đổi ảnh đại diện", "Chọn phương thức", [
@@ -362,7 +362,7 @@ export default function ProfileScreenModernized() {
         "camera",
         { maxSizeMB: 2, compressQuality: 0.8 },
         (progress: AvatarUploadProgress) =>
-          setUploadProgress(progress.percentage)
+          setUploadProgress(progress.percentage),
       );
 
       if (result.success && result.url) {
@@ -390,7 +390,7 @@ export default function ProfileScreenModernized() {
         "gallery",
         { maxSizeMB: 2, compressQuality: 0.8 },
         (progress: AvatarUploadProgress) =>
-          setUploadProgress(progress.percentage)
+          setUploadProgress(progress.percentage),
       );
 
       if (result.success && result.url) {
@@ -435,7 +435,7 @@ export default function ProfileScreenModernized() {
             }
           },
         },
-      ]
+      ],
     );
   };
 
@@ -460,7 +460,7 @@ export default function ProfileScreenModernized() {
             }
           },
         },
-      ]
+      ],
     );
   };
 
@@ -596,7 +596,7 @@ export default function ProfileScreenModernized() {
             duration: 1000,
             useNativeDriver: true,
           }),
-        ])
+        ]),
       );
       shimmer.start();
       return () => shimmer.stop();
@@ -677,7 +677,7 @@ export default function ProfileScreenModernized() {
     label: string,
     color: string,
     growth?: number,
-    index: number = 0
+    index: number = 0,
   ) => {
     const animValue = statsAnimations[index] || new Animated.Value(1);
 
@@ -767,7 +767,7 @@ export default function ProfileScreenModernized() {
       icon: "people",
       label: "Danh bạ",
       color: "#8b5cf6",
-      route: "/messages",
+      route: "/chat",
     },
     {
       id: "4",
@@ -826,7 +826,7 @@ export default function ProfileScreenModernized() {
     subtitle?: string,
     onPress?: () => void,
     itemColor: string = colors.text,
-    badge?: string
+    badge?: string,
   ) => (
     <TouchableOpacity
       style={[styles.menuItem, { borderBottomColor: colors.divider }]}
@@ -878,7 +878,7 @@ export default function ProfileScreenModernized() {
     icon: string,
     value: string,
     label: string,
-    color: string
+    color: string,
   ) => (
     <View style={[styles.statCard, { backgroundColor: colors.cardBg }]}>
       <View
@@ -898,7 +898,7 @@ export default function ProfileScreenModernized() {
     title: string,
     subtitle?: string,
     onPress?: () => void,
-    color: string = colors.text
+    color: string = colors.text,
   ) => (
     <TouchableOpacity
       style={[styles.menuItem, { borderBottomColor: colors.divider }]}
@@ -969,7 +969,7 @@ export default function ProfileScreenModernized() {
         showsVerticalScrollIndicator={false}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: false }
+          { useNativeDriver: false },
         )}
         scrollEventThrottle={16}
         refreshControl={
@@ -1221,7 +1221,7 @@ export default function ProfileScreenModernized() {
                 "Dự án",
                 "#0D9488",
                 userStats.monthlyGrowth,
-                0
+                0,
               )}
               {renderEnhancedStatCard(
                 "checkmark-done-outline",
@@ -1229,7 +1229,7 @@ export default function ProfileScreenModernized() {
                 "Hoàn thành",
                 "#10b981",
                 undefined,
-                1
+                1,
               )}
               {renderEnhancedStatCard(
                 "time-outline",
@@ -1237,7 +1237,7 @@ export default function ProfileScreenModernized() {
                 "Đang làm",
                 "#f59e0b",
                 undefined,
-                2
+                2,
               )}
             </View>
           </View>
@@ -1269,7 +1269,7 @@ export default function ProfileScreenModernized() {
               ]}
             >
               {quickActions.map((action, index) =>
-                renderEnhancedQuickAction(action, index)
+                renderEnhancedQuickAction(action, index),
               )}
             </View>
           </Animated.View>
@@ -1284,7 +1284,7 @@ export default function ProfileScreenModernized() {
               "Thông tin cá nhân",
               "Cập nhật thông tin của bạn",
               handleEditAccount,
-              colors.text
+              colors.text,
             )}
             {renderAnimatedMenuItem(
               "phone-portrait-outline",
@@ -1292,14 +1292,14 @@ export default function ProfileScreenModernized() {
               user?.phone ? "Đã xác thực" : "Chưa xác thực",
               () => router.push("/profile/verify-phone"),
               user?.phone ? MODERN_COLORS.success : MODERN_COLORS.primary,
-              user?.phone ? "✓" : undefined
+              user?.phone ? "✓" : undefined,
             )}
             {renderAnimatedMenuItem(
               "lock-closed-outline",
               "Đổi mật khẩu",
               "Bảo mật tài khoản",
               undefined,
-              colors.text
+              colors.text,
             )}
             {renderAnimatedMenuItem(
               "notifications-outline",
@@ -1307,16 +1307,16 @@ export default function ProfileScreenModernized() {
               "Quản lý thông báo",
               undefined,
               colors.text,
-              "3"
+              "3",
             )}
             {renderAnimatedMenuItem(
               "trash-outline",
               "Xóa tài khoản",
               "Xóa vĩnh viễn tài khoản",
               handleDeleteAccount,
-              MODERN_COLORS.danger
+              MODERN_COLORS.danger,
             )}
-          </>
+          </>,
         )}
 
         {renderSection(
@@ -1328,23 +1328,23 @@ export default function ProfileScreenModernized() {
               `${userStats.totalProjects} dự án đang quản lý`,
               undefined,
               colors.text,
-              String(userStats.totalProjects)
+              String(userStats.totalProjects),
             )}
             {renderAnimatedMenuItem(
               "star-outline",
               "Dự án yêu thích",
               `${userStats.savedItems} dự án`,
               undefined,
-              colors.text
+              colors.text,
             )}
             {renderAnimatedMenuItem(
               "time-outline",
               "Lịch sử hoạt động",
               "Xem hoạt động gần đây",
               handleUsageAnalytics,
-              colors.text
+              colors.text,
             )}
-          </>
+          </>,
         )}
 
         {renderSection(
@@ -1355,16 +1355,16 @@ export default function ProfileScreenModernized() {
               "Upload & Download Test",
               "Test upload file/video và get link",
               () => router.push("/profile/file-upload-demo"),
-              MODERN_COLORS.primary
+              MODERN_COLORS.primary,
             )}
             {renderAnimatedMenuItem(
               "folder-outline",
               "File Manager",
               "Quản lý file đã upload",
               undefined,
-              colors.text
+              colors.text,
             )}
-          </>
+          </>,
         )}
 
         {renderSection(
@@ -1375,9 +1375,9 @@ export default function ProfileScreenModernized() {
               "Test CRM Sync",
               "Test Perfex CRM data integration",
               () => router.push("/(tabs)/test-crm"),
-              MODERN_COLORS.success
+              MODERN_COLORS.success,
             )}
-          </>
+          </>,
         )}
 
         {renderSection(
@@ -1388,23 +1388,23 @@ export default function ProfileScreenModernized() {
               "Ngôn ngữ",
               "Tiếng Việt",
               undefined,
-              colors.text
+              colors.text,
             )}
             {renderAnimatedMenuItem(
               "moon-outline",
               "Giao diện tối",
               isDarkMode ? "Bật" : "Tắt",
               undefined,
-              colors.text
+              colors.text,
             )}
             {renderAnimatedMenuItem(
               "shield-checkmark-outline",
               "Quyền riêng tư",
               "Quản lý quyền riêng tư",
               handlePrivacySettings,
-              colors.text
+              colors.text,
             )}
-          </>
+          </>,
         )}
 
         {renderSection(
@@ -1413,19 +1413,19 @@ export default function ProfileScreenModernized() {
             {renderMenuItem(
               "help-circle-outline",
               "Trung tâm trợ giúp",
-              "Câu hỏi thường gặp"
+              "Câu hỏi thường gặp",
             )}
             {renderMenuItem(
               "chatbubble-outline",
               "Liên hệ hỗ trợ",
-              "Gửi phản hồi"
+              "Gửi phản hồi",
             )}
             {renderMenuItem(
               "document-text-outline",
               "Điều khoản dịch vụ",
-              "Chính sách & điều khoản"
+              "Chính sách & điều khoản",
             )}
-          </>
+          </>,
         )}
 
         {/* Sign Out Button */}

@@ -434,6 +434,110 @@ export function formatPrice(price: number): string {
   }).format(price);
 }
 
+// ==================== REFUND / COMPLAINT ====================
+
+export type RefundReasonType =
+  | "DAMAGED"
+  | "WRONG_ITEM"
+  | "NOT_RECEIVED"
+  | "QUALITY"
+  | "OTHER";
+
+export type RefundStatus =
+  | "PENDING"
+  | "APPROVED"
+  | "REJECTED"
+  | "PROCESSING"
+  | "COMPLETED";
+
+export interface RefundRequest {
+  id: number;
+  orderId: number;
+  userId: number;
+  reason: string;
+  reasonType: RefundReasonType;
+  evidenceUrls: string[];
+  amount: number;
+  status: RefundStatus;
+  adminNote?: string;
+  createdAt: string;
+  resolvedAt?: string;
+  order?: {
+    id: number;
+    orderNumber: string;
+    total: number;
+    status: OrderStatus;
+  };
+}
+
+export const REFUND_REASON_LABELS: Record<RefundReasonType, string> = {
+  DAMAGED: "Sản phẩm bị hư hỏng",
+  WRONG_ITEM: "Giao sai sản phẩm",
+  NOT_RECEIVED: "Không nhận được hàng",
+  QUALITY: "Chất lượng không đạt",
+  OTHER: "Lý do khác",
+};
+
+export const REFUND_STATUS_LABELS: Record<RefundStatus, string> = {
+  PENDING: "Đang chờ xử lý",
+  APPROVED: "Đã duyệt",
+  REJECTED: "Bị từ chối",
+  PROCESSING: "Đang xử lý hoàn tiền",
+  COMPLETED: "Hoàn tiền thành công",
+};
+
+/**
+ * Gửi yêu cầu hoàn tiền
+ */
+export async function requestRefund(
+  orderId: number,
+  data: {
+    reason: string;
+    reasonType: RefundReasonType;
+    evidenceUrls?: string[];
+    amount?: number;
+  },
+): Promise<{ success: boolean; data: RefundRequest; message: string }> {
+  return apiFetch(`/orders/${orderId}/refund`, {
+    method: "POST",
+    data,
+  }) as any;
+}
+
+/**
+ * Xem trạng thái hoàn tiền của đơn hàng
+ */
+export async function getOrderRefunds(
+  orderId: number,
+): Promise<{ success: boolean; data: RefundRequest[] }> {
+  return apiFetch(`/orders/${orderId}/refund`) as any;
+}
+
+/**
+ * Lấy tất cả yêu cầu hoàn tiền của tôi
+ */
+export async function getMyRefunds(
+  page = 1,
+  limit = 20,
+): Promise<{
+  success: boolean;
+  data: RefundRequest[];
+  meta: { total: number; page: number; limit: number; totalPages: number };
+}> {
+  return apiFetch(`/orders/my/refunds?page=${page}&limit=${limit}`) as any;
+}
+
+export function getRefundStatusColor(status: RefundStatus): string {
+  const colors: Record<RefundStatus, string> = {
+    PENDING: "#F59E0B",
+    APPROVED: "#10B981",
+    REJECTED: "#EF4444",
+    PROCESSING: "#3B82F6",
+    COMPLETED: "#10B981",
+  };
+  return colors[status] || "#757575";
+}
+
 export default {
   createOrder,
   getOrders,
@@ -449,4 +553,8 @@ export default {
   getOrderStatusColor,
   getPaymentMethodLabel,
   formatPrice,
+  requestRefund,
+  getOrderRefunds,
+  getMyRefunds,
+  getRefundStatusColor,
 };

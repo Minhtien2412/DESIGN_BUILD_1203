@@ -159,7 +159,7 @@ export async function checkContactsPermission(): Promise<PermissionStatus> {
 export async function getDeviceContacts(options?: {
   pageSize?: number;
   pageOffset?: number;
-  fields?: Contacts.ContactField[];
+  fields?: Contacts.FieldType[];
 }): Promise<Contacts.Contact[]> {
   try {
     const hasPermission = await checkContactsPermission();

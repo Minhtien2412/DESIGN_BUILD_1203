@@ -1,10 +1,10 @@
 /**
  * Unified Chat Service
  * =====================
- * Service adapter chuyển đổi dữ liệu từ chatApi (backend)
+ * Service adapter chuyển đổi dữ liệu từ conversations.service (canonical)
  * sang format của useUnifiedMessaging (UI)
  *
- * Backend API: https://baotienweb.cloud/api/v1/chat
+ * Backend API: https://baotienweb.cloud/api/v1/conversations
  *
  * @author AI Assistant
  * @date 12/01/2026
@@ -15,7 +15,8 @@ import type {
     UnifiedMessage,
 } from "@/hooks/crm/useUnifiedMessaging";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as chatApi from "./api/chatApi";
+import type { Conversation, Message } from "./api/conversations.service";
+import * as conversationsApi from "./api/conversations.service";
 
 const CACHE_KEY_CONVERSATIONS = "@chat_conversations";
 const CACHE_KEY_MESSAGES = "@chat_messages_";
@@ -23,70 +24,95 @@ const CACHE_KEY_MESSAGES = "@chat_messages_";
 // ==================== CONVERTERS ====================
 
 /**
- * Convert ChatRoom from API -> UnifiedConversation for UI
+ * Convert Conversation from canonical API -> UnifiedConversation for UI
  */
 export function convertRoomToConversation(
-  room: chatApi.ChatRoom,
+  conv: Conversation,
 ): UnifiedConversation {
   return {
-    id: room.id.toString(),
-    type: room.isGroup ? "group" : "direct",
-    name: room.name,
-    avatar: undefined, // TODO: Add avatar from room or first member
-    participants: room.members.map((m) => ({
-      id: m.user.id,
-      name: m.user.name,
-      email: m.user.email,
-      avatar: undefined,
-      role: m.user.role,
-      onlineStatus: "offline" as const, // TODO: Get from WebSocket presence
-      lastSeen: undefined,
-    })),
-    lastMessage: room.lastMessage
-      ? convertChatMessage(room.lastMessage)
+    id: conv.id,
+    type: conv.type === "DIRECT" ? "direct" : "group",
+    name:
+      conv.title ||
+      conv.participants
+        ?.map((p) => p.user?.name)
+        .filter(Boolean)
+        .join(", ") ||
+      "Chat",
+    avatar: conv.avatarUrl,
+    participants:
+      conv.participants?.map((p) => ({
+        id: p.userId,
+        name: p.user?.name || p.nickname || "",
+        email: "",
+        avatar: p.user?.avatar,
+        role: p.role === "ADMIN" || p.role === "OWNER" ? "admin" : "member",
+        onlineStatus: "offline" as const,
+        lastSeen: undefined,
+      })) || [],
+    lastMessage: conv.lastMessagePreview
+      ? ({
+          id: conv.lastMessageId || "",
+          conversationId: conv.id,
+          senderId: 0,
+          content: conv.lastMessagePreview,
+          type: "text",
+          deliveryStatus: "delivered" as const,
+          isRead: false,
+          createdAt: conv.lastMessageAt || conv.updatedAt,
+          updatedAt: conv.lastMessageAt || conv.updatedAt,
+        } as UnifiedMessage)
       : undefined,
-    unreadCount: room.unreadCount,
-    isPinned: false, // TODO: Get from user settings API
-    isMuted: false, // TODO: Get from user settings API
+    unreadCount: conv.unreadCount || 0,
+    isPinned: conv.participants?.[0]?.isPinned || false,
+    isMuted: conv.participants?.[0]?.isMuted || false,
     isBlocked: false,
-    isOnline: false, // TODO: Get from WebSocket presence
+    isOnline: false,
     typingUsers: [],
-    createdAt: room.createdAt,
-    updatedAt: room.updatedAt,
+    createdAt: conv.createdAt,
+    updatedAt: conv.updatedAt,
   };
 }
 
 /**
- * Convert ChatMessage from API -> UnifiedMessage for UI
+ * Convert Message from canonical API -> UnifiedMessage for UI
  */
-export function convertChatMessage(msg: chatApi.ChatMessage): UnifiedMessage {
+export function convertChatMessage(msg: Message): UnifiedMessage {
   return {
-    id: msg.id.toString(),
-    conversationId: msg.roomId.toString(),
+    id: msg.id,
+    conversationId: msg.conversationId,
     senderId: msg.senderId,
-    sender: {
-      id: msg.sender.id,
-      name: msg.sender.name,
-      email: msg.sender.email,
-      avatar: undefined,
-      onlineStatus: "offline" as const,
-    },
-    type: msg.type === "system" ? "text" : msg.type,
+    sender: msg.sender
+      ? {
+          id: msg.sender.id,
+          name: msg.sender.name,
+          avatar: msg.sender.avatar,
+          onlineStatus: "offline" as const,
+        }
+      : undefined,
+    type:
+      msg.type === "SYSTEM"
+        ? "text"
+        : (msg.type?.toLowerCase() as any) || "text",
     content: msg.content,
-    // Media
     mediaUrl: msg.attachments?.[0]?.url,
     fileName: msg.attachments?.[0]?.name,
     fileSize: msg.attachments?.[0]?.size,
-    thumbnail: undefined,
-    // Status
-    deliveryStatus: msg.isRead ? "read" : "delivered",
-    isRead: msg.isRead,
+    thumbnail: msg.thumbnailUrl,
+    deliveryStatus: msg.isDeleted ? "failed" : "delivered",
+    isRead: false,
     readBy: [],
-    reactions: [],
-    // Timestamps
+    reactions:
+      msg.reactions?.map((r) => ({
+        emoji: r.emoji,
+        userId: r.userId,
+        userName: r.user?.name || "",
+      })) || [],
     createdAt: msg.createdAt,
     updatedAt: msg.updatedAt,
-    replyTo: undefined,
+    replyTo: msg.replyToMessage
+      ? convertChatMessage(msg.replyToMessage)
+      : undefined,
   };
 }
 
@@ -98,8 +124,8 @@ export function convertChatMessage(msg: chatApi.ChatMessage): UnifiedMessage {
  */
 export async function getConversations(): Promise<UnifiedConversation[]> {
   try {
-    const rooms = await chatApi.getRooms();
-    const conversations = rooms.map(convertRoomToConversation);
+    const response = await conversationsApi.getConversations({ limit: 50 });
+    const conversations = response.items.map(convertRoomToConversation);
 
     // Cache for offline
     await AsyncStorage.setItem(
@@ -128,17 +154,19 @@ export async function getConversations(): Promise<UnifiedConversation[]> {
 
 /**
  * Fetch messages for a conversation
- * @param conversationId - Conversation ID (room ID)
- * @param params - Query params (limit, offset, before)
+ * @param conversationId - Conversation UUID
+ * @param params - Query params (limit, cursor)
  */
 export async function getMessages(
   conversationId: string,
-  params?: chatApi.MessageQueryParams,
+  params?: { limit?: number; cursor?: string },
 ): Promise<UnifiedMessage[]> {
   try {
-    const roomId = parseInt(conversationId, 10);
-    const messages = await chatApi.getRoomMessages(roomId, params);
-    const unified = messages.map(convertChatMessage);
+    const response = await conversationsApi.getMessages(conversationId, {
+      limit: params?.limit,
+      cursor: params?.cursor,
+    });
+    const unified = response.items.map(convertChatMessage);
 
     // Cache messages
     const cacheKey = `${CACHE_KEY_MESSAGES}${conversationId}`;
@@ -170,7 +198,7 @@ export async function getMessages(
 
 /**
  * Send a message to a conversation
- * @param conversationId - Conversation ID (room ID)
+ * @param conversationId - Conversation UUID
  * @param content - Message text content
  * @param attachments - Optional attachment URLs
  */
@@ -180,11 +208,16 @@ export async function sendMessage(
   attachments?: string[],
 ): Promise<UnifiedMessage> {
   try {
-    const roomId = parseInt(conversationId, 10);
-    const message = await chatApi.sendMessage({
-      roomId,
+    const attachmentDtos = attachments?.map((url) => ({
+      type: "file" as const,
+      url,
+    }));
+
+    const message = await conversationsApi.sendMessage(conversationId, {
+      clientMessageId: conversationsApi.generateClientMessageId(),
       content,
-      attachments,
+      type: "TEXT",
+      attachments: attachmentDtos,
     });
 
     return convertChatMessage(message);
@@ -196,12 +229,10 @@ export async function sendMessage(
 
 /**
  * Mark conversation as read
- * Clears unread count for the room
  */
 export async function markAsRead(conversationId: string): Promise<void> {
   try {
-    const roomId = parseInt(conversationId, 10);
-    await chatApi.markAsRead(roomId);
+    await conversationsApi.markAsRead(conversationId);
   } catch (error) {
     console.error("[UnifiedChatService] Error marking as read:", error);
     throw error;
@@ -212,7 +243,7 @@ export async function markAsRead(conversationId: string): Promise<void> {
  * Create a new conversation/room
  * @param name - Room name
  * @param memberIds - Array of user IDs to add
- * @param projectId - Optional project ID
+ * @param projectId - Optional project ID (unused by canonical API)
  * @param isGroup - Whether it's a group chat
  */
 export async function createConversation(
@@ -222,14 +253,16 @@ export async function createConversation(
   isGroup?: boolean,
 ): Promise<UnifiedConversation> {
   try {
-    const room = await chatApi.createRoom({
-      name,
-      memberIds,
-      projectId,
-      isGroup,
-    });
-
-    return convertRoomToConversation(room);
+    let conv: Conversation;
+    if (!isGroup && memberIds.length === 1) {
+      conv = await conversationsApi.createOrGetDirectConversation(memberIds[0]);
+    } else {
+      conv = await conversationsApi.createGroupConversation({
+        title: name,
+        participantIds: memberIds,
+      });
+    }
+    return convertRoomToConversation(conv);
   } catch (error) {
     console.error("[UnifiedChatService] Error creating conversation:", error);
     throw error;
@@ -244,12 +277,7 @@ export async function addMembersToConversation(
   memberIds: number[],
 ): Promise<void> {
   try {
-    // TODO: Implement addMembers API endpoint
-    console.warn(
-      "[UnifiedChatService] addMembersToConversation not implemented yet",
-    );
-    // const roomId = parseInt(conversationId, 10);
-    // await chatApi.addMembers(roomId, memberIds);
+    await conversationsApi.addParticipants(conversationId, memberIds);
   } catch (error) {
     console.error("[UnifiedChatService] Error adding members:", error);
     throw error;
@@ -264,12 +292,7 @@ export async function removeMemberFromConversation(
   memberId: number,
 ): Promise<void> {
   try {
-    // TODO: Implement removeMember API endpoint
-    console.warn(
-      "[UnifiedChatService] removeMemberFromConversation not implemented yet",
-    );
-    // const roomId = parseInt(conversationId, 10);
-    // await chatApi.removeMember(roomId, memberId);
+    await conversationsApi.removeParticipant(conversationId, memberId);
   } catch (error) {
     console.error("[UnifiedChatService] Error removing member:", error);
     throw error;

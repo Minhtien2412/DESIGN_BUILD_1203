@@ -126,7 +126,7 @@ export default function AdminProductsScreen() {
       <Image
         source={{
           uri:
-            item.images?.[0] ||
+            item.images?.[0]?.url ||
             "https://images.unsplash.com/photo-1615971677499-5467cbab01c0?w=80&q=80",
         }}
         style={styles.productImage}

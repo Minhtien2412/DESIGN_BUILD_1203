@@ -1,8 +1,9 @@
 /**
  * Demo Users - Real users created on baotienweb.cloud server
- * Password for all users: Test@123456
+ * Password for all users: Demo@123
  *
  * Use these credentials to test the app with real API data
+ * @updated 2026-03-03
  */
 
 export interface DemoUser {
@@ -10,51 +11,53 @@ export interface DemoUser {
   email: string;
   password: string;
   name: string;
-  role: "CLIENT" | "ENGINEER" | "CONTRACTOR" | "ADMIN";
+  role: "CLIENT" | "STAFF" | "CONTRACTOR" | "ADMIN" | "DESIGNER";
   phone?: string;
   avatar?: string;
 }
 
 export const DEMO_USERS: DemoUser[] = [
   {
-    id: 8,
-    email: "testuser1@baotienweb.cloud",
-    password: "Test@123456",
-    name: "Test User",
-    role: "CLIENT",
-    phone: "0901234567",
+    id: 3,
+    email: "admin@baotienweb.cloud",
+    password: "Demo@123",
+    name: "Admin BaoTien",
+    role: "ADMIN",
   },
   {
-    id: 13,
-    email: "demo.user3@baotienweb.cloud",
-    password: "Test@123456",
-    name: "Tran Minh Duc",
-    role: "ENGINEER",
-    phone: "0912345678",
+    id: 4,
+    email: "manager@baotienweb.cloud",
+    password: "Demo@123",
+    name: "Nguyễn Văn Manager",
+    role: "STAFF",
   },
   {
-    id: 15,
-    email: "demo.contractor@baotienweb.cloud",
-    password: "Test@123456",
-    name: "Le Van Hung",
+    id: 5,
+    email: "worker@baotienweb.cloud",
+    password: "Demo@123",
+    name: "Trần Thợ Xây",
     role: "CONTRACTOR",
-    phone: "0923456789",
   },
   {
-    id: 16,
-    email: "demo.client1@baotienweb.cloud",
-    password: "Test@123456",
-    name: "Nguyen Thi Mai",
+    id: 6,
+    email: "customer@baotienweb.cloud",
+    password: "Demo@123",
+    name: "Lê Khách Hàng",
     role: "CLIENT",
-    phone: "0934567890",
   },
   {
-    id: 17,
-    email: "demo.client2@baotienweb.cloud",
-    password: "Test@123456",
-    name: "Hoang Van Son",
+    id: 7,
+    email: "designer@baotienweb.cloud",
+    password: "Demo@123",
+    name: "Phạm Thiết Kế",
+    role: "DESIGNER",
+  },
+  {
+    id: 8,
+    email: "demo@baotienweb.cloud",
+    password: "Demo@123",
+    name: "Demo User",
     role: "CLIENT",
-    phone: "0945678901",
   },
 ];
 
@@ -74,4 +77,4 @@ export const getDemoUserById = (id: number): DemoUser | undefined => {
 };
 
 // All passwords are the same for demo
-export const DEMO_PASSWORD = "Test@123456";
+export const DEMO_PASSWORD = "Demo@123";

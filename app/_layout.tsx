@@ -19,11 +19,13 @@ import { CartProvider } from "@/context/cart-context";
 import { CommunicationHubProvider } from "@/context/CommunicationHubContext";
 import { FavoritesProvider } from "@/context/FavoritesContext";
 import { MeetingProvider } from "@/context/MeetingContext";
+import { NotificationControllerProvider } from "@/context/NotificationControllerContext";
 import { PerfexAuthProvider } from "@/context/PerfexAuthContext";
 import { PermissionProvider } from "@/context/PermissionContext";
 import { ProfileProvider } from "@/context/ProfileContext";
 import { ProgressWebSocketProvider } from "@/context/ProgressWebSocketContext";
 import { ProjectDataProvider } from "@/context/project-data-context";
+import { RoleProvider, useRole } from "@/context/RoleContext";
 import { UnifiedBadgeProvider } from "@/context/UnifiedBadgeContext";
 import { UnifiedNotificationProvider } from "@/context/UnifiedNotificationContext";
 import { UtilitiesProvider } from "@/context/UtilitiesContext";
@@ -61,6 +63,43 @@ Sentry.init({
   // uncomment the line below to enable Spotlight (https://spotlightjs.com)
   // spotlight: __DEV__,
 });
+
+function RoleNavigator() {
+  const { role, roleLoaded } = useRole();
+  const pathname = usePathname();
+  const router = useRouter();
+  const hasRedirected = useRef(false);
+
+  useEffect(() => {
+    if (!roleLoaded) return;
+
+    // If no role selected and not already on role-select screen
+    if (!role && !pathname.startsWith("/role-select")) {
+      if (!hasRedirected.current) {
+        hasRedirected.current = true;
+        requestAnimationFrame(() => {
+          router.replace("/role-select");
+        });
+      }
+      return;
+    }
+
+    // If role selected and still on role-select, navigate away
+    if (role && pathname.startsWith("/role-select")) {
+      hasRedirected.current = false;
+      requestAnimationFrame(() => {
+        router.replace("/(tabs)");
+      });
+      return;
+    }
+
+    if (!pathname.startsWith("/role-select")) {
+      hasRedirected.current = false;
+    }
+  }, [role, roleLoaded, pathname]);
+
+  return null;
+}
 
 function AuthNavigator() {
   const { isAuthenticated, loading } = useAuth();
@@ -130,114 +169,126 @@ export default Sentry.wrap(function RootLayout() {
         <I18nProvider>
           {/* PHASE 1: Essential UI providers - load immediately */}
           <FullMediaViewerProvider>
-            <PermissionProvider>
-              <AuthProvider>
-                <PerfexAuthProvider>
-                  <CartProvider>
-                    <VoucherProvider>
-                      {/* Deferred Provider Wrapper manages loading phases */}
-                      <DeferredProviderWrapper>
-                        {/* PHASE 2: Deferred providers - load after UI ready */}
-                        <LazyProvider waitForPhase={1}>
-                          <FavoritesProvider>
-                            <ViewHistoryProvider>
-                              <BookingProvider>
-                                <UtilitiesProvider>
-                                  <ProjectDataProvider>
-                                    <ProfileProvider>
-                                      {/* PHASE 3: Communication providers - load last */}
-                                      <LazyProvider waitForPhase={2}>
-                                        <MeetingProvider>
-                                          <CallProvider>
-                                            <CommunicationHubProvider>
-                                              <WebSocketProvider>
-                                                <ProgressWebSocketProvider>
-                                                  <VideoInteractionsProvider>
-                                                    <UnifiedNotificationProvider>
-                                                      <UnifiedBadgeProvider>
-                                                        {/* Community UI providers */}
-                                                        <VerticalVideoFeedProvider>
-                                                          <CommentsSheetProvider>
-                                                            <ShareSheetProvider>
-                                                              <MoreOptionsProvider>
-                                                                {/* Global overlays */}
-                                                                <OfflineIndicator />
-                                                                <LazyProvider
-                                                                  waitForPhase={
-                                                                    2
-                                                                  }
-                                                                >
-                                                                  <IncomingCallModal />
-                                                                </LazyProvider>
-                                                                <NotificationToast />
-                                                                <AuthNavigator />
-                                                                {/* Main navigation */}
-                                                                <Stack
-                                                                  screenOptions={{
-                                                                    headerShown: false,
-                                                                  }}
-                                                                  initialRouteName="(tabs)"
-                                                                >
-                                                                  <Stack.Screen
-                                                                    name="(tabs)"
-                                                                    options={{
-                                                                      headerShown: false,
-                                                                    }}
-                                                                  />
-                                                                  <Stack.Screen
-                                                                    name="(auth)"
-                                                                    options={{
-                                                                      headerShown: false,
-                                                                    }}
-                                                                  />
-                                                                  <Stack.Screen
-                                                                    name="crm"
-                                                                    options={{
-                                                                      headerShown: false,
-                                                                    }}
-                                                                  />
-                                                                  <Stack.Screen
-                                                                    name="communications"
-                                                                    options={{
-                                                                      headerShown: false,
-                                                                    }}
-                                                                  />
-                                                                  <Stack.Screen
-                                                                    name="call/active"
-                                                                    options={{
-                                                                      headerShown: false,
-                                                                      presentation:
-                                                                        "fullScreenModal",
-                                                                    }}
-                                                                  />
-                                                                </Stack>
-                                                                <Toast />
-                                                              </MoreOptionsProvider>
-                                                            </ShareSheetProvider>
-                                                          </CommentsSheetProvider>
-                                                        </VerticalVideoFeedProvider>
-                                                      </UnifiedBadgeProvider>
-                                                    </UnifiedNotificationProvider>
-                                                  </VideoInteractionsProvider>
-                                                </ProgressWebSocketProvider>
-                                              </WebSocketProvider>
-                                            </CommunicationHubProvider>
-                                          </CallProvider>
-                                        </MeetingProvider>
-                                      </LazyProvider>
-                                    </ProfileProvider>
-                                  </ProjectDataProvider>
-                                </UtilitiesProvider>
-                              </BookingProvider>
-                            </ViewHistoryProvider>
-                          </FavoritesProvider>
-                        </LazyProvider>
-                      </DeferredProviderWrapper>
-                    </VoucherProvider>
-                  </CartProvider>
-                </PerfexAuthProvider>
-              </AuthProvider>
-            </PermissionProvider>
+            <RoleProvider>
+              <PermissionProvider>
+                <AuthProvider>
+                  <PerfexAuthProvider>
+                    <CartProvider>
+                      <VoucherProvider>
+                        {/* Deferred Provider Wrapper manages loading phases */}
+                        <DeferredProviderWrapper>
+                          {/* PHASE 2: Deferred providers - load after UI ready */}
+                          <LazyProvider waitForPhase={1}>
+                            <FavoritesProvider>
+                              <ViewHistoryProvider>
+                                <BookingProvider>
+                                  <UtilitiesProvider>
+                                    <ProjectDataProvider>
+                                      <ProfileProvider>
+                                        {/* PHASE 3: Communication providers - load last */}
+                                        <LazyProvider waitForPhase={2}>
+                                          <MeetingProvider>
+                                            <CallProvider>
+                                              <CommunicationHubProvider>
+                                                <WebSocketProvider>
+                                                  <ProgressWebSocketProvider>
+                                                    <VideoInteractionsProvider>
+                                                      <UnifiedNotificationProvider>
+                                                        <NotificationControllerProvider>
+                                                          <UnifiedBadgeProvider>
+                                                            {/* Community UI providers */}
+                                                            <VerticalVideoFeedProvider>
+                                                              <CommentsSheetProvider>
+                                                                <ShareSheetProvider>
+                                                                  <MoreOptionsProvider>
+                                                                    {/* Global overlays */}
+                                                                    <OfflineIndicator />
+                                                                    <LazyProvider
+                                                                      waitForPhase={
+                                                                        2
+                                                                      }
+                                                                    >
+                                                                      <IncomingCallModal />
+                                                                    </LazyProvider>
+                                                                    <NotificationToast />
+                                                                    <AuthNavigator />
+                                                                    {/* Main navigation */}
+                                                                    <Stack
+                                                                      screenOptions={{
+                                                                        headerShown: false,
+                                                                      }}
+                                                                      initialRouteName="(tabs)"
+                                                                    >
+                                                                      <Stack.Screen
+                                                                        name="(tabs)"
+                                                                        options={{
+                                                                          headerShown: false,
+                                                                        }}
+                                                                      />
+                                                                      <Stack.Screen
+                                                                        name="role-select"
+                                                                        options={{
+                                                                          headerShown: false,
+                                                                          animation:
+                                                                            "fade",
+                                                                        }}
+                                                                      />
+                                                                      <Stack.Screen
+                                                                        name="(auth)"
+                                                                        options={{
+                                                                          headerShown: false,
+                                                                        }}
+                                                                      />
+                                                                      <Stack.Screen
+                                                                        name="crm"
+                                                                        options={{
+                                                                          headerShown: false,
+                                                                        }}
+                                                                      />
+                                                                      <Stack.Screen
+                                                                        name="communications"
+                                                                        options={{
+                                                                          headerShown: false,
+                                                                        }}
+                                                                      />
+                                                                      <Stack.Screen
+                                                                        name="call/active"
+                                                                        options={{
+                                                                          headerShown: false,
+                                                                          presentation:
+                                                                            "fullScreenModal",
+                                                                        }}
+                                                                      />
+                                                                    </Stack>
+                                                                    <Toast />
+                                                                  </MoreOptionsProvider>
+                                                                </ShareSheetProvider>
+                                                              </CommentsSheetProvider>
+                                                            </VerticalVideoFeedProvider>
+                                                          </UnifiedBadgeProvider>
+                                                        </NotificationControllerProvider>
+                                                      </UnifiedNotificationProvider>
+                                                    </VideoInteractionsProvider>
+                                                  </ProgressWebSocketProvider>
+                                                </WebSocketProvider>
+                                              </CommunicationHubProvider>
+                                            </CallProvider>
+                                          </MeetingProvider>
+                                        </LazyProvider>
+                                      </ProfileProvider>
+                                    </ProjectDataProvider>
+                                  </UtilitiesProvider>
+                                </BookingProvider>
+                              </ViewHistoryProvider>
+                            </FavoritesProvider>
+                          </LazyProvider>
+                        </DeferredProviderWrapper>
+                      </VoucherProvider>
+                    </CartProvider>
+                  </PerfexAuthProvider>
+                </AuthProvider>
+              </PermissionProvider>
+            </RoleProvider>
           </FullMediaViewerProvider>
         </I18nProvider>
       </FormErrorBoundary>

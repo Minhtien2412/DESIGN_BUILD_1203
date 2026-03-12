@@ -34,7 +34,7 @@ const discoverSections = [
     subtitle: "Giảm đến 50%",
     image:
       "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=400&h=200&q=80",
-    route: "/flash-sale",
+    route: "/shopping/flash-sale",
   },
   {
     id: "3",
@@ -52,7 +52,7 @@ const quickLinks = [
   { icon: "cart-outline", label: "Mua sắm", route: "/categories" },
   { icon: "people-outline", label: "Tìm thợ", route: "/workers" },
   { icon: "pricetags-outline", label: "Khuyến mãi", route: "/promotions" },
-  { icon: "cube-outline", label: "So sánh", route: "/compare" },
+  { icon: "cube-outline", label: "So sánh", route: "/shopping/compare" },
   { icon: "location-outline", label: "Gần tôi", route: "/nearby" },
   { icon: "newspaper-outline", label: "Tin tức", route: "/news" },
 ];

@@ -21,7 +21,20 @@ export interface LocaleInfo {
   groupingSeparator: string;
 }
 
-export type SupportedLanguage = "vi" | "en" | "zh" | "ja" | "ko";
+export type SupportedLanguage =
+  | "vi"
+  | "en"
+  | "zh"
+  | "ja"
+  | "ko"
+  | "th"
+  | "fr"
+  | "es"
+  | "de"
+  | "pt"
+  | "ru"
+  | "ar"
+  | "hi";
 
 export interface TranslationMap {
   [key: string]: {

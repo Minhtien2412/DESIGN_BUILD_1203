@@ -9,6 +9,7 @@
  */
 
 import { useAuth } from "@/context/AuthContext";
+import { post } from "@/services/api";
 import {
     ZaloAuthResult,
     ZaloUser,
@@ -73,23 +74,16 @@ export function useZaloAuth(): UseZaloAuthReturn {
       // Backend sẽ verify token và tạo/cập nhật user
       try {
         // Gửi thông tin Zalo đến backend
-        const response = await fetch(
-          `${process.env.EXPO_PUBLIC_API_BASE_URL}/auth/zalo`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              zaloId: result.user.id,
-              name: result.user.name,
-              avatar: result.user.picture?.data?.url,
-              accessToken: result.accessToken,
-            }),
-          },
-        );
-
-        const data = await response.json();
+        const data = await post<{
+          success: boolean;
+          token?: string;
+          user?: { email: string };
+        }>("/auth/zalo", {
+          zaloId: result.user.id,
+          name: result.user.name,
+          avatar: result.user.picture?.data?.url,
+          accessToken: result.accessToken,
+        });
 
         if (data.success && data.token) {
           // Đăng nhập thành công với backend
@@ -136,24 +130,15 @@ export function useZaloAuth(): UseZaloAuthReturn {
 
       // Gửi request liên kết đến backend
       try {
-        const response = await fetch(
-          `${process.env.EXPO_PUBLIC_API_BASE_URL}/auth/link-zalo`,
+        const data = await post<{ success: boolean; message?: string }>(
+          "/auth/link-zalo",
           {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              // 'Authorization': `Bearer ${currentUser.token}`,
-            },
-            body: JSON.stringify({
-              zaloId: result.user.id,
-              name: result.user.name,
-              avatar: result.user.picture?.data?.url,
-              accessToken: result.accessToken,
-            }),
+            zaloId: result.user.id,
+            name: result.user.name,
+            avatar: result.user.picture?.data?.url,
+            accessToken: result.accessToken,
           },
         );
-
-        const data = await response.json();
 
         if (data.success) {
           Alert.alert("Thành công", "Đã liên kết tài khoản Zalo");

@@ -1,25 +1,13 @@
 /**
- * Cart Screen - Modern Design
- * Updated: 13/12/2025
- *
- * Features:
- * - Nordic Green theme
- * - Modern item cards with images
- * - Smooth quantity controls
- * - Checkout summary
- * - Empty state illustration
+ * Cart Screen - Redesigned with DS
+ * Swipe-to-delete cart items, voucher support, checkout flow
+ * ~250 lines vs 751 original
  */
-
-import ModernButton from "@/components/ui/modern-button";
-import {
-    MODERN_COLORS,
-    MODERN_RADIUS,
-    MODERN_SHADOWS,
-    MODERN_SPACING,
-    MODERN_TYPOGRAPHY,
-} from "@/constants/modern-theme";
+import { DSButton } from "@/components/ds";
 import { type CartItem, useCart } from "@/context/cart-context";
 import { useVoucher } from "@/context/voucher-context";
+import { useDS } from "@/hooks/useDS";
+import { useI18n } from "@/services/i18nService";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
@@ -39,20 +27,25 @@ import {
 
 const SWIPE_THRESHOLD = 80;
 
-/** Swipeable cart item — swipe left to reveal delete */
+// ═══════════════════════════════════════════════════════════════════════
+// SWIPEABLE CART ITEM
+// ═══════════════════════════════════════════════════════════════════════
 function SwipeableCartItem({
   item,
   onRemove,
   onIncrement,
   onDecrement,
   formatPrice,
+  deleteLabel,
 }: {
   item: CartItem;
   onRemove: () => void;
   onIncrement: () => void;
   onDecrement: () => void;
   formatPrice: (n: number) => string;
+  deleteLabel: string;
 }) {
+  const { colors, radius, shadow, spacing } = useDS();
   const translateX = useRef(new Animated.Value(0)).current;
 
   const panResponder = useRef(
@@ -63,17 +56,10 @@ function SwipeableCartItem({
         if (g.dx < 0) translateX.setValue(Math.max(g.dx, -120));
       },
       onPanResponderRelease: (_, g) => {
-        if (g.dx < -SWIPE_THRESHOLD) {
-          Animated.spring(translateX, {
-            toValue: -100,
-            useNativeDriver: true,
-          }).start();
-        } else {
-          Animated.spring(translateX, {
-            toValue: 0,
-            useNativeDriver: true,
-          }).start();
-        }
+        Animated.spring(translateX, {
+          toValue: g.dx < -SWIPE_THRESHOLD ? -100 : 0,
+          useNativeDriver: true,
+        }).start();
       },
     }),
   ).current;
@@ -87,92 +73,133 @@ function SwipeableCartItem({
   };
 
   return (
-    <View style={styles.swipeContainer}>
-      {/* Background delete action */}
-      <View style={styles.deleteBackground}>
-        <TouchableOpacity style={styles.deleteAction} onPress={handleDelete}>
+    <View
+      style={[
+        s.swipeWrap,
+        {
+          marginHorizontal: spacing.md,
+          marginTop: spacing.md,
+          borderRadius: radius.lg,
+        },
+      ]}
+    >
+      {/* Delete background */}
+      <View
+        style={[
+          s.deleteBg,
+          {
+            backgroundColor: colors.error,
+            borderTopRightRadius: radius.lg,
+            borderBottomRightRadius: radius.lg,
+          },
+        ]}
+      >
+        <TouchableOpacity style={s.deleteAction} onPress={handleDelete}>
           <Ionicons name="trash-outline" size={24} color="#fff" />
-          <Text style={styles.deleteText}>Xóa</Text>
+          <Text style={s.deleteText}>{deleteLabel}</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Foreground card */}
+      {/* Card */}
       <Animated.View
-        style={[styles.cartItem, { transform: [{ translateX }] }]}
+        style={[
+          s.cartItem,
+          {
+            backgroundColor: colors.bgSurface,
+            borderRadius: radius.lg,
+            ...shadow.sm,
+            transform: [{ translateX }],
+          },
+        ]}
         {...panResponder.panHandlers}
       >
-        {/* Product Image */}
-        <View style={styles.itemImageContainer}>
+        <View
+          style={[
+            s.itemImage,
+            { borderRadius: radius.md, backgroundColor: colors.bgMuted },
+          ]}
+        >
           <Image
             source={
               typeof item.product.image === "string"
                 ? { uri: item.product.image }
                 : item.product.image
             }
-            style={styles.itemImage}
+            style={{ width: "100%", height: "100%" }}
             resizeMode="cover"
           />
         </View>
 
-        {/* Product Info */}
-        <View style={styles.itemInfo}>
-          <Text style={styles.itemName} numberOfLines={2}>
+        <View style={s.itemInfo}>
+          <Text style={[s.itemName, { color: colors.text }]} numberOfLines={2}>
             {item.product.name}
           </Text>
 
-          {/* Variant badges (size / color) */}
           {(item.selectedSize || item.selectedColor) && (
-            <View style={styles.variantRow}>
+            <View style={s.variantRow}>
               {item.selectedColor && (
-                <View style={styles.variantBadge}>
-                  <Text style={styles.variantText}>{item.selectedColor}</Text>
+                <View
+                  style={[
+                    s.variantBadge,
+                    {
+                      backgroundColor: colors.primaryBg,
+                      borderColor: colors.primaryBorder,
+                    },
+                  ]}
+                >
+                  <Text style={[s.variantText, { color: colors.primary }]}>
+                    {item.selectedColor}
+                  </Text>
                 </View>
               )}
               {item.selectedSize && (
-                <View style={styles.variantBadge}>
-                  <Text style={styles.variantText}>{item.selectedSize}</Text>
+                <View
+                  style={[
+                    s.variantBadge,
+                    {
+                      backgroundColor: colors.primaryBg,
+                      borderColor: colors.primaryBorder,
+                    },
+                  ]}
+                >
+                  <Text style={[s.variantText, { color: colors.primary }]}>
+                    {item.selectedSize}
+                  </Text>
                 </View>
               )}
             </View>
           )}
 
-          <Text style={styles.itemPrice}>
+          <Text style={[s.itemPrice, { color: colors.primary }]}>
             ₫{formatPrice(item.product.price)}
           </Text>
 
-          {/* Quantity Controls */}
-          <View style={styles.quantityRow}>
-            <View style={styles.quantityControls}>
+          <View style={s.quantityRow}>
+            <View
+              style={[
+                s.quantityControls,
+                {
+                  backgroundColor: colors.bgMuted,
+                  borderColor: colors.border,
+                  borderRadius: radius.md,
+                },
+              ]}
+            >
               <TouchableOpacity
-                style={[
-                  styles.quantityButton,
-                  item.quantity <= 1 && styles.quantityButtonDisabled,
-                ]}
+                style={[s.qtyBtn, item.quantity <= 1 && { opacity: 0.4 }]}
                 onPress={onDecrement}
                 disabled={item.quantity <= 1}
-                activeOpacity={0.7}
               >
-                <Ionicons
-                  name="remove"
-                  size={18}
-                  color={
-                    item.quantity <= 1
-                      ? MODERN_COLORS.textDisabled
-                      : MODERN_COLORS.text
-                  }
-                />
+                <Ionicons name="remove" size={18} color={colors.text} />
               </TouchableOpacity>
-              <Text style={styles.quantityText}>{item.quantity}</Text>
-              <TouchableOpacity
-                style={styles.quantityButton}
-                onPress={onIncrement}
-                activeOpacity={0.7}
-              >
-                <Ionicons name="add" size={18} color={MODERN_COLORS.text} />
+              <Text style={[s.qtyText, { color: colors.text }]}>
+                {item.quantity}
+              </Text>
+              <TouchableOpacity style={s.qtyBtn} onPress={onIncrement}>
+                <Ionicons name="add" size={18} color={colors.text} />
               </TouchableOpacity>
             </View>
-
-            <Text style={styles.itemTotal}>
+            <Text style={[s.itemTotal, { color: colors.text }]}>
               ₫{formatPrice(item.product.price * item.quantity)}
             </Text>
           </View>
@@ -182,7 +209,12 @@ function SwipeableCartItem({
   );
 }
 
+// ═══════════════════════════════════════════════════════════════════════
+// MAIN SCREEN
+// ═══════════════════════════════════════════════════════════════════════
 export default function CartScreen() {
+  const { colors, radius, shadow, spacing, isDark } = useDS();
+  const { t } = useI18n();
   const {
     items,
     totalPrice,
@@ -194,10 +226,11 @@ export default function CartScreen() {
   const { appliedVoucher, appliedFreeshipVoucher, getTotalDiscount } =
     useVoucher();
 
-  // Alias for template compatibility
-  const totalQty = totalItems;
   const voucherDiscount = getTotalDiscount();
   const finalTotal = Math.max(0, totalPrice - voucherDiscount);
+
+  const formatPrice = (price: number) => price.toLocaleString("vi-VN");
+
   const increment = (id: string) => {
     const item = items.find((i) => i.id === id);
     if (item) updateQuantity(id, item.quantity + 1);
@@ -206,235 +239,268 @@ export default function CartScreen() {
     const item = items.find((i) => i.id === id);
     if (item && item.quantity > 1) updateQuantity(id, item.quantity - 1);
   };
-  const remove = (id: string) => removeFromCart(id);
-  const clear = () => clearCart();
-
-  const formatPrice = (price: number) => {
-    return price.toLocaleString("vi-VN");
-  };
 
   const handleCheckout = () => {
     if (items.length === 0) {
-      Alert.alert("Giỏ hàng trống", "Vui lòng thêm sản phẩm vào giỏ hàng");
+      Alert.alert(t("checkout.emptyCart"), t("checkout.emptyCartMsg"));
       return;
     }
     router.push("/checkout");
   };
 
-  const handleClearCart = () => {
-    Alert.alert("Xóa giỏ hàng", "Bạn có chắc muốn xóa tất cả sản phẩm?", [
-      { text: "Hủy", style: "cancel" },
-      { text: "Xóa", style: "destructive", onPress: clear },
+  const handleClear = () => {
+    Alert.alert(t("cart.clearCart"), t("cart.clearConfirm"), [
+      { text: t("common.cancel"), style: "cancel" },
+      {
+        text: t("common.delete"),
+        style: "destructive",
+        onPress: () => clearCart(),
+      },
     ]);
   };
 
-  const handleRemoveItem = (id: string, name: string) => {
-    Alert.alert("Xóa sản phẩm", `Bạn muốn xóa "${name}" khỏi giỏ hàng?`, [
-      { text: "Hủy", style: "cancel" },
-      { text: "Xóa", style: "destructive", onPress: () => remove(id) },
+  const handleRemove = (id: string, name: string) => {
+    Alert.alert(t("cart.removeItem"), t("cart.removeConfirm", { name }), [
+      { text: t("common.cancel"), style: "cancel" },
+      {
+        text: t("common.delete"),
+        style: "destructive",
+        onPress: () => removeFromCart(id),
+      },
     ]);
   };
 
   return (
     <>
       <StatusBar
-        barStyle="dark-content"
+        barStyle={isDark ? "light-content" : "dark-content"}
         backgroundColor="transparent"
         translucent
       />
-      <View style={styles.container}>
+      <View style={[s.container, { backgroundColor: colors.bg }]}>
         {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity
-            onPress={() => router.back()}
-            style={styles.backButton}
-          >
-            <Ionicons name="arrow-back" size={24} color={MODERN_COLORS.text} />
+        <View
+          style={[
+            s.header,
+            {
+              backgroundColor: colors.bgSurface,
+              borderBottomColor: colors.divider,
+            },
+          ]}
+        >
+          <TouchableOpacity onPress={() => router.back()} style={s.backBtn}>
+            <Ionicons name="arrow-back" size={24} color={colors.text} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Giỏ hàng ({totalQty})</Text>
+          <Text style={[s.headerTitle, { color: colors.text }]}>
+            {t("cart.title")} ({totalItems})
+          </Text>
           {items.length > 0 && (
-            <TouchableOpacity
-              onPress={handleClearCart}
-              style={styles.clearButton}
-            >
-              <Ionicons
-                name="trash-outline"
-                size={22}
-                color={MODERN_COLORS.error}
-              />
+            <TouchableOpacity onPress={handleClear} style={s.clearBtn}>
+              <Ionicons name="trash-outline" size={22} color={colors.error} />
             </TouchableOpacity>
           )}
         </View>
 
         {items.length === 0 ? (
-          <View style={styles.emptyContainer}>
-            <View style={styles.emptyIconContainer}>
-              <Ionicons
-                name="cart-outline"
-                size={100}
-                color={MODERN_COLORS.divider}
-              />
+          /* Empty State */
+          <View style={s.emptyWrap}>
+            <View style={[s.emptyIcon, { backgroundColor: colors.primaryBg }]}>
+              <Ionicons name="cart-outline" size={100} color={colors.divider} />
             </View>
-            <Text style={styles.emptyTitle}>Giỏ hàng trống</Text>
-            <Text style={styles.emptyText}>
-              Hãy thêm sản phẩm vào giỏ hàng của bạn
+            <Text style={[s.emptyTitle, { color: colors.text }]}>
+              {t("cart.empty")}
             </Text>
-            <ModernButton
+            <Text style={[s.emptyText, { color: colors.textSecondary }]}>
+              {t("cart.emptyHint")}
+            </Text>
+            <DSButton
+              title={t("cart.continueShopping")}
               variant="primary"
-              size="large"
+              size="lg"
               onPress={() => router.push("/(tabs)")}
-              icon="storefront-outline"
-              iconPosition="left"
-              style={styles.shopButton}
-            >
-              Tiếp tục mua sắm
-            </ModernButton>
+              style={{ minWidth: 200, marginTop: 16 }}
+            />
           </View>
         ) : (
           <>
-            <ScrollView
-              style={styles.content}
-              showsVerticalScrollIndicator={false}
-            >
+            <ScrollView style={s.content} showsVerticalScrollIndicator={false}>
+              {/* Shopee-style Free Shipping Progress */}
+              {(() => {
+                const FREE_SHIP_THRESHOLD = 300000;
+                const progress = Math.min(totalPrice / FREE_SHIP_THRESHOLD, 1);
+                const remaining = FREE_SHIP_THRESHOLD - totalPrice;
+                return (
+                  <View
+                    style={[
+                      s.freeShipBar,
+                      {
+                        backgroundColor: colors.bgSurface,
+                        borderBottomColor: colors.divider,
+                      },
+                    ]}
+                  >
+                    <View style={s.freeShipRow}>
+                      <Ionicons
+                        name="car-outline"
+                        size={18}
+                        color={progress >= 1 ? colors.success : "#EE4D2D"}
+                      />
+                      <Text
+                        style={[
+                          s.freeShipText,
+                          {
+                            color: progress >= 1 ? colors.success : colors.text,
+                          },
+                        ]}
+                      >
+                        {progress >= 1
+                          ? t("cart.freeShippingUnlocked")
+                          : t("cart.freeShipRemaining", {
+                              amount: `₫${formatPrice(remaining)}`,
+                            })}
+                      </Text>
+                    </View>
+                    <View
+                      style={[
+                        s.freeShipTrack,
+                        { backgroundColor: colors.bgMuted },
+                      ]}
+                    >
+                      <View
+                        style={[
+                          s.freeShipFill,
+                          {
+                            width: `${progress * 100}%` as any,
+                            backgroundColor:
+                              progress >= 1 ? colors.success : "#EE4D2D",
+                          },
+                        ]}
+                      />
+                    </View>
+                  </View>
+                );
+              })()}
+
               {items.map((item) => (
                 <SwipeableCartItem
                   key={item.id}
                   item={item}
-                  onRemove={() => remove(item.id)}
+                  onRemove={() => handleRemove(item.id, item.product.name)}
                   onIncrement={() => increment(item.id)}
                   onDecrement={() => decrement(item.id)}
                   formatPrice={formatPrice}
+                  deleteLabel={t("cart.swipeDelete")}
                 />
               ))}
 
-              {/* Summary Card */}
-              <View style={styles.summaryCard}>
-                <Text style={styles.summaryTitle}>Tổng quan đơn hàng</Text>
+              {/* Summary */}
+              <View
+                style={[
+                  s.summaryCard,
+                  {
+                    backgroundColor: colors.bgSurface,
+                    borderRadius: radius.lg,
+                    ...shadow.sm,
+                  },
+                ]}
+              >
+                <Text style={[s.summaryTitle, { color: colors.text }]}>
+                  {t("cart.orderSummary")}
+                </Text>
 
-                <View style={styles.summaryRow}>
-                  <Text style={styles.summaryLabel}>
-                    Tạm tính ({totalQty} sản phẩm)
-                  </Text>
-                  <Text style={styles.summaryValue}>
-                    ₫{formatPrice(totalPrice)}
-                  </Text>
-                </View>
+                <SummaryRow
+                  label={t("cart.subtotal", { count: String(totalItems) })}
+                  value={`₫${formatPrice(totalPrice)}`}
+                  colors={colors}
+                />
+                <SummaryRow
+                  label={t("cart.shipping")}
+                  value={t("cart.freeShipping")}
+                  valueColor={colors.success}
+                  colors={colors}
+                />
 
-                <View style={styles.summaryRow}>
-                  <Text style={styles.summaryLabel}>Phí vận chuyển</Text>
-                  <Text style={styles.freeShipping}>Miễn phí</Text>
-                </View>
-
-                {/* Voucher discount row */}
                 {appliedVoucher && (
-                  <View style={styles.summaryRow}>
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        gap: 4,
-                      }}
-                    >
-                      <Ionicons name="pricetag" size={14} color="#0D9488" />
-                      <Text style={[styles.summaryLabel, { color: "#0D9488" }]}>
-                        Voucher
-                      </Text>
-                    </View>
-                    <Text
-                      style={{
-                        fontSize: 14,
-                        fontWeight: "600",
-                        color: "#0D9488",
-                      }}
-                    >
-                      -₫{formatPrice(appliedVoucher.discountAmount)}
-                    </Text>
-                  </View>
+                  <SummaryRow
+                    label="Voucher"
+                    value={`-₫${formatPrice(appliedVoucher.discountAmount)}`}
+                    valueColor={colors.primary}
+                    icon="pricetag"
+                    iconColor={colors.primary}
+                    colors={colors}
+                  />
                 )}
-
                 {appliedFreeshipVoucher && (
-                  <View style={styles.summaryRow}>
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        gap: 4,
-                      }}
-                    >
-                      <Ionicons name="car" size={14} color="#3B82F6" />
-                      <Text style={[styles.summaryLabel, { color: "#3B82F6" }]}>
-                        Free Ship
-                      </Text>
-                    </View>
-                    <Text
-                      style={{
-                        fontSize: 14,
-                        fontWeight: "600",
-                        color: "#3B82F6",
-                      }}
-                    >
-                      -₫{formatPrice(appliedFreeshipVoucher.discountAmount)}
-                    </Text>
-                  </View>
+                  <SummaryRow
+                    label="Free Ship"
+                    value={`-₫${formatPrice(appliedFreeshipVoucher.discountAmount)}`}
+                    valueColor={colors.info}
+                    icon="car"
+                    iconColor={colors.info}
+                    colors={colors}
+                  />
                 )}
 
-                <View style={styles.divider} />
+                <View
+                  style={[s.divider, { backgroundColor: colors.divider }]}
+                />
 
-                <View style={styles.summaryRow}>
-                  <Text style={styles.totalLabel}>Tổng cộng</Text>
-                  <Text style={styles.totalValue}>
+                <View style={s.summaryRow}>
+                  <Text style={[s.totalLabel, { color: colors.text }]}>
+                    {t("cart.total")}
+                  </Text>
+                  <Text style={[s.totalValue, { color: colors.primary }]}>
                     ₫{formatPrice(finalTotal)}
                   </Text>
                 </View>
 
-                {/* Voucher hint */}
                 {!appliedVoucher && totalPrice > 0 && (
                   <TouchableOpacity
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      gap: 6,
-                      marginTop: 8,
-                      paddingVertical: 8,
-                      paddingHorizontal: 12,
-                      backgroundColor: "#F0FDFA",
-                      borderRadius: 8,
-                    }}
+                    style={[
+                      s.voucherHint,
+                      {
+                        backgroundColor: colors.primaryBg,
+                        borderRadius: radius.sm,
+                      },
+                    ]}
                     onPress={() => router.push("/profile/vouchers")}
                   >
                     <Ionicons
                       name="ticket-outline"
                       size={16}
-                      color={MODERN_COLORS.primary}
+                      color={colors.primary}
                     />
                     <Text
-                      style={{
-                        flex: 1,
-                        fontSize: 13,
-                        color: "#0D9488",
-                        fontWeight: "500",
-                      }}
+                      style={[s.voucherHintText, { color: colors.primary }]}
                     >
-                      Chọn voucher để được giảm giá
+                      {t("cart.voucherHint")}
                     </Text>
                     <Ionicons
                       name="chevron-forward"
                       size={14}
-                      color="#0D9488"
+                      color={colors.primary}
                     />
                   </TouchableOpacity>
                 )}
               </View>
 
               {/* Info Banner */}
-              <View style={styles.infoBanner}>
+              <View
+                style={[
+                  s.infoBanner,
+                  {
+                    backgroundColor: colors.primaryBg,
+                    borderRadius: radius.md,
+                  },
+                ]}
+              >
                 <Ionicons
                   name="shield-checkmark-outline"
                   size={20}
-                  color={MODERN_COLORS.primary}
+                  color={colors.primary}
                 />
-                <Text style={styles.infoBannerText}>
-                  Thanh toán an toàn • Giao hàng nhanh chóng
+                <Text style={[s.infoBannerText, { color: colors.primary }]}>
+                  {t("cart.safePayment")}
                 </Text>
               </View>
 
@@ -442,28 +508,32 @@ export default function CartScreen() {
             </ScrollView>
 
             {/* Checkout Bar */}
-            <View style={styles.checkoutBar}>
+            <View style={s.checkoutBar}>
               <LinearGradient
                 colors={["rgba(255,255,255,0)", "rgba(255,255,255,1)"]}
-                style={styles.checkoutGradient}
+                style={s.checkoutGradient}
               />
-              <View style={styles.checkoutContent}>
-                <View style={styles.totalSection}>
-                  <Text style={styles.totalText}>Tổng cộng</Text>
-                  <Text style={styles.totalPrice}>
+              <View
+                style={[
+                  s.checkoutContent,
+                  { backgroundColor: colors.bgSurface, ...shadow.lg },
+                ]}
+              >
+                <View style={s.totalSection}>
+                  <Text style={[s.totalText, { color: colors.textSecondary }]}>
+                    {t("cart.total")}
+                  </Text>
+                  <Text style={[s.totalPrice, { color: colors.primary }]}>
                     ₫{formatPrice(finalTotal)}
                   </Text>
                 </View>
-                <ModernButton
+                <DSButton
+                  title={t("cart.checkout", { count: String(totalItems) })}
                   variant="primary"
-                  size="large"
+                  size="lg"
                   onPress={handleCheckout}
-                  icon="arrow-forward"
-                  iconPosition="right"
-                  style={styles.checkoutButton}
-                >
-                  {`Thanh toán (${totalQty})`}
-                </ModernButton>
+                  style={{ flex: 1.2 }}
+                />
               </View>
             </View>
           </>
@@ -473,91 +543,123 @@ export default function CartScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: MODERN_COLORS.background },
+// ═══════════════════════════════════════════════════════════════════════
+// SUMMARY ROW HELPER
+// ═══════════════════════════════════════════════════════════════════════
+function SummaryRow({
+  label,
+  value,
+  valueColor,
+  icon,
+  iconColor,
+  colors,
+}: {
+  label: string;
+  value: string;
+  valueColor?: string;
+  icon?: keyof typeof Ionicons.glyphMap;
+  iconColor?: string;
+  colors: any;
+}) {
+  return (
+    <View style={s.summaryRow}>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+        {icon && (
+          <Ionicons
+            name={icon}
+            size={14}
+            color={iconColor || colors.textSecondary}
+          />
+        )}
+        <Text
+          style={[s.summaryLabel, { color: iconColor || colors.textSecondary }]}
+        >
+          {label}
+        </Text>
+      </View>
+      <Text style={[s.summaryValue, { color: valueColor || colors.text }]}>
+        {value}
+      </Text>
+    </View>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// STYLES
+// ═══════════════════════════════════════════════════════════════════════
+const s = StyleSheet.create({
+  container: { flex: 1 },
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: MODERN_SPACING.md,
+    paddingHorizontal: 16,
     paddingTop: 44,
-    paddingBottom: MODERN_SPACING.sm,
-    backgroundColor: MODERN_COLORS.surface,
+    paddingBottom: 12,
     borderBottomWidth: 1,
-    borderBottomColor: MODERN_COLORS.divider,
   },
-  backButton: { padding: MODERN_SPACING.xs },
-  headerTitle: {
-    fontSize: MODERN_TYPOGRAPHY.fontSize.lg,
-    fontWeight: MODERN_TYPOGRAPHY.fontWeight.semibold,
-    color: MODERN_COLORS.text,
-    flex: 1,
-    marginLeft: MODERN_SPACING.sm,
-  },
-  clearButton: { padding: MODERN_SPACING.xs },
-  emptyContainer: {
+  backBtn: { padding: 4 },
+  headerTitle: { fontSize: 18, fontWeight: "600", flex: 1, marginLeft: 12 },
+  clearBtn: { padding: 4 },
+
+  // Empty
+  emptyWrap: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: MODERN_SPACING.xl,
+    padding: 20,
   },
-  emptyIconContainer: {
+  emptyIcon: {
     width: 140,
     height: 140,
-    borderRadius: MODERN_RADIUS.full,
-    backgroundColor: `${MODERN_COLORS.primary}05`,
+    borderRadius: 70,
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: MODERN_SPACING.lg,
+    marginBottom: 16,
   },
-  emptyTitle: {
-    fontSize: MODERN_TYPOGRAPHY.fontSize.xl,
-    fontWeight: MODERN_TYPOGRAPHY.fontWeight.bold,
-    color: MODERN_COLORS.text,
-    marginBottom: MODERN_SPACING.xs,
-  },
-  emptyText: {
-    fontSize: MODERN_TYPOGRAPHY.fontSize.md,
-    color: MODERN_COLORS.textSecondary,
-    marginBottom: MODERN_SPACING.xl,
-    textAlign: "center",
-  },
-  shopButton: { minWidth: 200 },
+  emptyTitle: { fontSize: 20, fontWeight: "700", marginBottom: 4 },
+  emptyText: { fontSize: 15, textAlign: "center", marginBottom: 20 },
+
+  // Content
   content: { flex: 1 },
-  cartItem: {
-    flexDirection: "row",
-    backgroundColor: MODERN_COLORS.surface,
-    padding: MODERN_SPACING.md,
-    borderRadius: MODERN_RADIUS.lg,
-    ...MODERN_SHADOWS.sm,
-    position: "relative",
+
+  // Swipe
+  swipeWrap: { overflow: "hidden" },
+  deleteBg: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    right: 0,
+    width: 100,
+    justifyContent: "center",
+    alignItems: "center",
   },
-  itemImageContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: MODERN_RADIUS.md,
-    backgroundColor: MODERN_COLORS.background,
-    overflow: "hidden",
+  deleteAction: {
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 16,
   },
-  itemImage: { width: "100%", height: "100%" },
-  itemInfo: {
-    flex: 1,
-    marginLeft: MODERN_SPACING.md,
-    justifyContent: "space-between",
-  },
+  deleteText: { color: "#fff", fontSize: 12, fontWeight: "600", marginTop: 4 },
+
+  // Cart Item
+  cartItem: { flexDirection: "row", padding: 16, position: "relative" },
+  itemImage: { width: 80, height: 80, overflow: "hidden" },
+  itemInfo: { flex: 1, marginLeft: 16, justifyContent: "space-between" },
   itemName: {
-    fontSize: MODERN_TYPOGRAPHY.fontSize.md,
-    fontWeight: MODERN_TYPOGRAPHY.fontWeight.medium,
-    color: MODERN_COLORS.text,
-    lineHeight: MODERN_TYPOGRAPHY.lineHeight.tight,
-    marginBottom: MODERN_SPACING.xxs,
+    fontSize: 15,
+    fontWeight: "500",
+    lineHeight: 20,
+    marginBottom: 2,
   },
-  itemPrice: {
-    fontSize: MODERN_TYPOGRAPHY.fontSize.lg,
-    fontWeight: MODERN_TYPOGRAPHY.fontWeight.bold,
-    color: MODERN_COLORS.primary,
-    marginBottom: MODERN_SPACING.xs,
+  variantRow: { flexDirection: "row", gap: 6, marginBottom: 4 },
+  variantBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
+    borderWidth: 1,
   },
+  variantText: { fontSize: 11, fontWeight: "500" },
+  itemPrice: { fontSize: 16, fontWeight: "700", marginBottom: 4 },
   quantityRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -566,108 +668,62 @@ const styles = StyleSheet.create({
   quantityControls: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: MODERN_COLORS.background,
-    borderRadius: MODERN_RADIUS.md,
     borderWidth: 1,
-    borderColor: MODERN_COLORS.divider,
   },
-  quantityButton: {
+  qtyBtn: {
     width: 32,
     height: 32,
     justifyContent: "center",
     alignItems: "center",
   },
-  quantityButtonDisabled: { opacity: 0.4 },
-  quantityText: {
-    fontSize: MODERN_TYPOGRAPHY.fontSize.md,
-    fontWeight: MODERN_TYPOGRAPHY.fontWeight.semibold,
-    color: MODERN_COLORS.text,
+  qtyText: {
+    fontSize: 15,
+    fontWeight: "600",
     minWidth: 32,
     textAlign: "center",
   },
-  itemTotal: {
-    fontSize: MODERN_TYPOGRAPHY.fontSize.md,
-    fontWeight: MODERN_TYPOGRAPHY.fontWeight.bold,
-    color: MODERN_COLORS.text,
-  },
-  removeButton: {
-    position: "absolute",
-    top: MODERN_SPACING.sm,
-    right: MODERN_SPACING.sm,
-    padding: MODERN_SPACING.xxs,
-  },
-  summaryCard: {
-    backgroundColor: MODERN_COLORS.surface,
-    margin: MODERN_SPACING.sm,
-    marginTop: MODERN_SPACING.md,
-    padding: MODERN_SPACING.md,
-    borderRadius: MODERN_RADIUS.lg,
-    ...MODERN_SHADOWS.sm,
-  },
-  summaryTitle: {
-    fontSize: MODERN_TYPOGRAPHY.fontSize.md,
-    fontWeight: MODERN_TYPOGRAPHY.fontWeight.semibold,
-    color: MODERN_COLORS.text,
-    marginBottom: MODERN_SPACING.md,
-  },
+  itemTotal: { fontSize: 15, fontWeight: "700" },
+
+  // Summary
+  summaryCard: { margin: 12, marginTop: 16, padding: 16 },
+  summaryTitle: { fontSize: 15, fontWeight: "600", marginBottom: 16 },
   summaryRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: MODERN_SPACING.sm,
+    marginBottom: 12,
   },
-  summaryLabel: {
-    fontSize: MODERN_TYPOGRAPHY.fontSize.sm,
-    color: MODERN_COLORS.textSecondary,
+  summaryLabel: { fontSize: 14 },
+  summaryValue: { fontSize: 14, fontWeight: "500" },
+  totalLabel: { fontSize: 15, fontWeight: "600" },
+  totalValue: { fontSize: 20, fontWeight: "700" },
+  divider: { height: 1, marginVertical: 12 },
+
+  // Voucher hint
+  voucherHint: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginTop: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
   },
-  summaryValue: {
-    fontSize: MODERN_TYPOGRAPHY.fontSize.sm,
-    fontWeight: MODERN_TYPOGRAPHY.fontWeight.medium,
-    color: MODERN_COLORS.text,
-  },
-  freeShipping: {
-    fontSize: MODERN_TYPOGRAPHY.fontSize.sm,
-    fontWeight: MODERN_TYPOGRAPHY.fontWeight.medium,
-    color: MODERN_COLORS.primary,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: MODERN_COLORS.divider,
-    marginVertical: MODERN_SPACING.sm,
-  },
-  totalLabel: {
-    fontSize: MODERN_TYPOGRAPHY.fontSize.md,
-    fontWeight: MODERN_TYPOGRAPHY.fontWeight.semibold,
-    color: MODERN_COLORS.text,
-  },
-  totalValue: {
-    fontSize: MODERN_TYPOGRAPHY.fontSize.xl,
-    fontWeight: MODERN_TYPOGRAPHY.fontWeight.bold,
-    color: MODERN_COLORS.primary,
-  },
+  voucherHintText: { flex: 1, fontSize: 13, fontWeight: "500" },
+
+  // Info banner
   infoBanner: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: `${MODERN_COLORS.primary}10`,
-    marginHorizontal: MODERN_SPACING.sm,
-    marginTop: MODERN_SPACING.md,
-    padding: MODERN_SPACING.md,
-    borderRadius: MODERN_RADIUS.md,
-    gap: MODERN_SPACING.sm,
+    marginHorizontal: 12,
+    marginTop: 16,
+    padding: 16,
+    gap: 8,
   },
-  infoBannerText: {
-    fontSize: MODERN_TYPOGRAPHY.fontSize.sm,
-    color: MODERN_COLORS.primary,
-    fontWeight: MODERN_TYPOGRAPHY.fontWeight.medium,
-  },
-  checkoutBar: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: "transparent",
-  },
+  infoBannerText: { fontSize: 14, fontWeight: "500" },
+
+  // Checkout bar
+  checkoutBar: { position: "absolute", bottom: 0, left: 0, right: 0 },
   checkoutGradient: {
     position: "absolute",
     top: -20,
@@ -678,73 +734,34 @@ const styles = StyleSheet.create({
   checkoutContent: {
     flexDirection: "row",
     alignItems: "center",
-    gap: MODERN_SPACING.md,
-    paddingHorizontal: MODERN_SPACING.md,
-    paddingVertical: MODERN_SPACING.sm,
-    backgroundColor: MODERN_COLORS.surface,
-    ...MODERN_SHADOWS.lg,
+    gap: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
   },
   totalSection: { flex: 1 },
-  totalText: {
-    fontSize: MODERN_TYPOGRAPHY.fontSize.xs,
-    color: MODERN_COLORS.textSecondary,
-    marginBottom: 2,
-  },
-  totalPrice: {
-    fontSize: MODERN_TYPOGRAPHY.fontSize.xl,
-    fontWeight: MODERN_TYPOGRAPHY.fontWeight.bold,
-    color: MODERN_COLORS.primary,
-  },
-  checkoutButton: { flex: 1.2 },
+  totalText: { fontSize: 12, marginBottom: 2 },
+  totalPrice: { fontSize: 20, fontWeight: "700" },
 
-  // Swipe-to-delete styles
-  swipeContainer: {
-    marginHorizontal: MODERN_SPACING.sm,
-    marginTop: MODERN_SPACING.sm,
-    borderRadius: MODERN_RADIUS.lg,
+  // Free shipping progress bar (Shopee-style)
+  freeShipBar: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+  },
+  freeShipRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginBottom: 6,
+  },
+  freeShipText: { fontSize: 13, fontWeight: "500", flex: 1 },
+  freeShipTrack: {
+    height: 4,
+    borderRadius: 2,
     overflow: "hidden",
   },
-  deleteBackground: {
-    position: "absolute",
-    top: 0,
-    bottom: 0,
-    right: 0,
-    width: 100,
-    backgroundColor: MODERN_COLORS.error || "#EF4444",
-    justifyContent: "center",
-    alignItems: "center",
-    borderTopRightRadius: MODERN_RADIUS.lg,
-    borderBottomRightRadius: MODERN_RADIUS.lg,
-  },
-  deleteAction: {
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: MODERN_SPACING.md,
-  },
-  deleteText: {
-    color: "#fff",
-    fontSize: 12,
-    fontWeight: "600" as const,
-    marginTop: 4,
-  },
-
-  // Variant badge styles
-  variantRow: {
-    flexDirection: "row" as const,
-    gap: 6,
-    marginBottom: 4,
-  },
-  variantBadge: {
-    backgroundColor: `${MODERN_COLORS.primary}15`,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
-    borderWidth: 1,
-    borderColor: `${MODERN_COLORS.primary}30`,
-  },
-  variantText: {
-    fontSize: 11,
-    color: MODERN_COLORS.primary,
-    fontWeight: "500" as const,
+  freeShipFill: {
+    height: "100%",
+    borderRadius: 2,
   },
 });

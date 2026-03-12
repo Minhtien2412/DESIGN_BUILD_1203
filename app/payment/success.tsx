@@ -149,7 +149,7 @@ export default function PaymentSuccessScreen() {
           <ModernButton
             variant="outline"
             size="large"
-            onPress={() => router.push("/order")}
+            onPress={() => router.push("/orders")}
             icon="receipt-outline"
             iconPosition="left"
             fullWidth

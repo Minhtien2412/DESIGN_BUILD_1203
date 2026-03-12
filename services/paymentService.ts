@@ -1,18 +1,27 @@
 /**
- * Payment Service
- * ===============
+ * Payment Service (Canonical)
+ * ============================
  *
- * Service xử lý thanh toán với VNPay, MoMo, ZaloPay, Stripe.
+ * Service xử lý thanh toán với VNPay, MoMo, ZaloPay, Stripe, ACB.
  * Hỗ trợ cả sandbox và production environments.
+ *
+ * Flow chuẩn:
+ *  1) Frontend gọi createPaymentViaAPI() → Backend /v1/payment/init (unified)
+ *  2) Backend tạo URL/QR → Frontend mở WebBrowser hoặc hiển thị QR
+ *  3) Callback → payment-callback.tsx → verifyPayment
+ *
+ * Legacy: createPayment() build URL client-side (VNPay, MoMo, ZaloPay)
  *
  * @author ThietKeResort Team
  * @created 2025-01-12
+ * @updated 2025-06-12 - Added ACB, unified backend API support
  */
 
 import CryptoJS from "crypto-js";
 import * as WebBrowser from "expo-web-browser";
 import { Platform } from "react-native";
 import { PAYMENT_CONFIG, isServiceConfigured } from "../config/externalApis";
+import { get, post } from "./api";
 
 // ============================================
 // Types
@@ -22,7 +31,25 @@ export type PaymentProvider =
   | "momo"
   | "zalopay"
   | "stripe"
-  | "bank_transfer";
+  | "bank_transfer"
+  | "acb";
+
+/** Gateway enum matching backend UnifiedPaymentGateway */
+export type UnifiedGateway =
+  | "VNPAY"
+  | "ACB"
+  | "MOMO"
+  | "STRIPE"
+  | "BANK_TRANSFER";
+
+const PROVIDER_TO_GATEWAY: Record<PaymentProvider, UnifiedGateway> = {
+  vnpay: "VNPAY",
+  momo: "MOMO",
+  zalopay: "VNPAY", // ZaloPay routes through VNPay gateway on backend or handled separately
+  stripe: "STRIPE",
+  bank_transfer: "BANK_TRANSFER",
+  acb: "ACB",
+};
 
 export type PaymentStatus =
   | "pending"
@@ -82,7 +109,7 @@ function generateTransactionId(prefix: string = "TXN"): string {
  */
 export function formatCurrency(
   amount: number,
-  currency: string = "VND"
+  currency: string = "VND",
 ): string {
   if (currency === "VND") {
     return new Intl.NumberFormat("vi-VN", {
@@ -238,7 +265,7 @@ async function createMoMoPayment(
     items?: MoMoItem[];
     userInfo?: MoMoUserInfo;
     deliveryInfo?: MoMoDeliveryInfo;
-  }
+  },
 ): Promise<MoMoPaymentResponse | null> {
   const config = PAYMENT_CONFIG.momo;
 
@@ -252,7 +279,7 @@ async function createMoMoPayment(
     const orderId = order.id || generateTransactionId("ORD");
     const requestType = "captureWallet";
     const extraData = order.metadata
-      ? Buffer.from(JSON.stringify(order.metadata)).toString("base64")
+      ? btoa(unescape(encodeURIComponent(JSON.stringify(order.metadata))))
       : "";
     const redirectUrl = "thietkeresort://payment/momo/callback";
     const ipnUrl = "https://api.baotienweb.cloud/payment/momo/ipn";
@@ -273,7 +300,7 @@ async function createMoMoPayment(
 
     const signature = CryptoJS.HmacSHA256(
       rawSignature,
-      config.secretKey
+      config.secretKey,
     ).toString();
 
     const requestBody: Record<string, any> = {
@@ -337,11 +364,137 @@ async function createMoMoPayment(
     console.error(
       "[MoMo] Payment failed:",
       data.message,
-      `(Code: ${data.resultCode})`
+      `(Code: ${data.resultCode})`,
     );
     return data; // Return full response even on error for handling
   } catch (error) {
     console.error("[MoMo] Request error:", error);
+    return null;
+  }
+}
+
+/**
+ * Create MoMo Quick Pay v2 payment (payWithMethod)
+ * Supports one-click payment after user has linked payment method
+ * Ref: https://developers.momo.vn/v3/vi/docs/payment/api/quick-pay-v2/
+ */
+async function createMoMoQuickPay(
+  order: PaymentOrder,
+  options?: {
+    items?: MoMoItem[];
+    userInfo?: MoMoUserInfo;
+    deliveryInfo?: MoMoDeliveryInfo;
+    paymentCode?: string; // For POS QR quick pay
+  },
+): Promise<MoMoPaymentResponse | null> {
+  const config = PAYMENT_CONFIG.momo;
+
+  if (!config.partnerCode || !config.accessKey || !config.secretKey) {
+    console.error("[MoMo QuickPay] Missing credentials");
+    return null;
+  }
+
+  try {
+    const requestId = generateTransactionId("QP");
+    const orderId = order.id || generateTransactionId("ORD");
+    const requestType = "payWithMethod";
+    const extraData = order.metadata
+      ? btoa(unescape(encodeURIComponent(JSON.stringify(order.metadata))))
+      : "";
+    const redirectUrl = "thietkeresort://payment/momo/callback";
+    const ipnUrl = "https://api.baotienweb.cloud/payment/momo/ipn";
+
+    // Build signature string (sorted a-z as per MoMo docs)
+    const rawSignature = [
+      `accessKey=${config.accessKey}`,
+      `amount=${order.amount}`,
+      `extraData=${extraData}`,
+      `ipnUrl=${ipnUrl}`,
+      `orderId=${orderId}`,
+      `orderInfo=${order.description}`,
+      `partnerCode=${config.partnerCode}`,
+      `redirectUrl=${redirectUrl}`,
+      `requestId=${requestId}`,
+      `requestType=${requestType}`,
+    ].join("&");
+
+    const signature = CryptoJS.HmacSHA256(
+      rawSignature,
+      config.secretKey,
+    ).toString();
+
+    const requestBody: Record<string, any> = {
+      partnerCode: config.partnerCode,
+      partnerName: "Bảo Tiến Web",
+      storeId: "BaoTienStore",
+      requestId,
+      amount: order.amount,
+      orderId,
+      orderInfo: order.description,
+      redirectUrl,
+      ipnUrl,
+      lang: "vi",
+      extraData,
+      requestType,
+      signature,
+      autoCapture: true,
+    };
+
+    // Add optional items
+    if (options?.items && options.items.length > 0) {
+      requestBody.items = options.items.slice(0, 50);
+    }
+
+    // Add optional user info
+    if (options?.userInfo) {
+      requestBody.userInfo = options.userInfo;
+    }
+
+    // Add optional delivery info
+    if (options?.deliveryInfo) {
+      requestBody.deliveryInfo = options.deliveryInfo;
+    }
+
+    // Add payment code for POS QR pay
+    if (options?.paymentCode) {
+      requestBody.paymentCode = options.paymentCode;
+    }
+
+    console.log("[MoMo QuickPay] Creating payment:", {
+      orderId,
+      amount: order.amount,
+      requestType,
+      endpoint: `${config.endpoint}/create`,
+    });
+
+    const response = await fetch(`${config.endpoint}/create`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(requestBody),
+    });
+
+    const data: MoMoPaymentResponse = await response.json();
+
+    console.log("[MoMo QuickPay] Response:", {
+      resultCode: data.resultCode,
+      message: data.message,
+      orderId: data.orderId,
+    });
+
+    if (data.resultCode === 0) {
+      return data;
+    }
+
+    console.error(
+      "[MoMo QuickPay] Payment failed:",
+      data.message,
+      `(Code: ${data.resultCode})`,
+    );
+    return data;
+  } catch (error) {
+    console.error("[MoMo QuickPay] Request error:", error);
     return null;
   }
 }
@@ -387,7 +540,7 @@ function verifyMoMoSignature(params: {
 
   const expectedSignature = CryptoJS.HmacSHA256(
     rawSignature,
-    config.secretKey
+    config.secretKey,
   ).toString();
 
   return params.signature === expectedSignature;
@@ -398,7 +551,7 @@ function verifyMoMoSignature(params: {
  */
 async function checkMoMoPaymentStatus(
   orderId: string,
-  requestId?: string
+  requestId?: string,
 ): Promise<MoMoPaymentResponse | null> {
   const config = PAYMENT_CONFIG.momo;
 
@@ -417,7 +570,7 @@ async function checkMoMoPaymentStatus(
 
     const signature = CryptoJS.HmacSHA256(
       rawSignature,
-      config.secretKey
+      config.secretKey,
     ).toString();
 
     const response = await fetch(`${config.endpoint}/query`, {
@@ -445,7 +598,7 @@ async function checkMoMoPaymentStatus(
 // ZaloPay Implementation
 // ============================================
 async function createZaloPayPayment(
-  order: PaymentOrder
+  order: PaymentOrder,
 ): Promise<string | null> {
   const config = PAYMENT_CONFIG.zalopay;
 
@@ -518,6 +671,245 @@ async function createZaloPayPayment(
 }
 
 // ============================================
+// Unified Backend API Payment (RECOMMENDED)
+// ============================================
+
+/**
+ * Response from unified /v1/payment/init endpoint
+ */
+export interface UnifiedPaymentResponse {
+  transactionId: string;
+  orderId: string;
+  amount: number;
+  status: string;
+  gateway: UnifiedGateway;
+  paymentUrl?: string;
+  qrCodeUrl?: string;
+  message?: string;
+}
+
+/**
+ * Create payment via backend unified API (RECOMMENDED FLOW)
+ * Secrets stay on server. Works for VNPay, ACB, Stripe.
+ */
+export async function createPaymentViaAPI(
+  provider: PaymentProvider,
+  order: PaymentOrder,
+): Promise<PaymentResult> {
+  const orderId = order.id || generateTransactionId("ORD");
+  const gateway = PROVIDER_TO_GATEWAY[provider];
+
+  // Bank transfer handled locally (no backend call needed)
+  if (provider === "bank_transfer") {
+    return {
+      success: true,
+      orderId,
+      provider,
+      status: "pending",
+      amount: order.amount,
+      message: "Vui lòng chuyển khoản theo thông tin bên dưới",
+      rawResponse: getBankTransferInfo(orderId, order.amount),
+    };
+  }
+
+  // MoMo: now routes through backend API (secrets stay on server)
+  if (provider === "momo") {
+    try {
+      const response: UnifiedPaymentResponse = await post("/v1/payment/init", {
+        gateway: "MOMO" as UnifiedGateway,
+        amount: order.amount,
+        orderId,
+        description: order.description,
+        returnUrl: `thietkeresort://payment/callback?gateway=momo&orderId=${orderId}`,
+        notifyUrl: undefined,
+        projectId: order.metadata?.projectId,
+      });
+
+      if (!response.paymentUrl && !response.qrCodeUrl) {
+        return {
+          success: false,
+          orderId,
+          provider,
+          status: "failed" as PaymentStatus,
+          amount: order.amount,
+          message: response.message || "Không thể tạo thanh toán MoMo",
+        };
+      }
+
+      // Open MoMo payment URL
+      const url = response.paymentUrl || response.qrCodeUrl;
+      if (url) {
+        if (Platform.OS === "web") {
+          window.location.href = url;
+        } else {
+          const result = await WebBrowser.openBrowserAsync(url, {
+            showTitle: true,
+            toolbarColor: "#A50064",
+            enableBarCollapsing: true,
+          });
+          if (result.type === "cancel") {
+            return {
+              success: false,
+              transactionId: response.transactionId,
+              orderId,
+              provider,
+              status: "cancelled" as PaymentStatus,
+              amount: order.amount,
+              message: "Bạn đã hủy thanh toán",
+            };
+          }
+        }
+      }
+
+      return {
+        success: true,
+        transactionId: response.transactionId,
+        orderId,
+        provider,
+        status: "processing" as PaymentStatus,
+        amount: order.amount,
+        message: response.message || "Đang xử lý thanh toán MoMo...",
+        rawResponse: response,
+      };
+    } catch (error: any) {
+      console.error("[PaymentService] MoMo API error:", error);
+      return {
+        success: false,
+        orderId,
+        provider,
+        status: "failed" as PaymentStatus,
+        amount: order.amount,
+        message: error.message || "Có lỗi xảy ra khi thanh toán MoMo",
+      };
+    }
+  }
+
+  // ZaloPay: still uses client-side flow (no backend service yet)
+  if (provider === "zalopay") {
+    return createPayment(provider, order);
+  }
+
+  try {
+    const response: UnifiedPaymentResponse = await post("/v1/payment/init", {
+      gateway,
+      amount: order.amount,
+      orderId,
+      description: order.description,
+      returnUrl: `thietkeresort://payment/callback?gateway=${provider}&orderId=${orderId}`,
+      notifyUrl: undefined,
+      projectId: order.metadata?.projectId,
+    });
+
+    if (!response.paymentUrl && !response.qrCodeUrl) {
+      return {
+        success: false,
+        orderId,
+        provider,
+        status: "failed",
+        amount: order.amount,
+        message: response.message || "Không thể tạo thanh toán",
+      };
+    }
+
+    // Open payment URL for VNPay/ACB
+    const url = response.paymentUrl || response.qrCodeUrl;
+    if (url && provider !== "stripe") {
+      if (Platform.OS === "web") {
+        window.location.href = url;
+      } else {
+        const result = await WebBrowser.openBrowserAsync(url, {
+          showTitle: true,
+          toolbarColor: "#0D9488",
+          enableBarCollapsing: true,
+        });
+
+        if (result.type === "cancel") {
+          return {
+            success: false,
+            transactionId: response.transactionId,
+            orderId,
+            provider,
+            status: "cancelled",
+            amount: order.amount,
+            message: "Bạn đã hủy thanh toán",
+          };
+        }
+      }
+    }
+
+    return {
+      success: true,
+      transactionId: response.transactionId,
+      orderId,
+      provider,
+      status: "processing",
+      amount: order.amount,
+      message: response.message || "Đang xử lý thanh toán...",
+      rawResponse: response,
+    };
+  } catch (error: any) {
+    console.error(`[PaymentService] API payment error (${provider}):`, error);
+    return {
+      success: false,
+      orderId,
+      provider,
+      status: "failed",
+      amount: order.amount,
+      message: error.message || "Có lỗi xảy ra khi thanh toán",
+    };
+  }
+}
+
+/**
+ * Query VNPay transaction status via backend
+ */
+export async function queryVnpayTransaction(
+  orderId: string,
+  transDate: string,
+): Promise<any> {
+  return post("/v1/payment/vnpay/query", { orderId, transDate });
+}
+
+/**
+ * Request VNPay refund via backend
+ */
+export async function refundVnpayTransaction(params: {
+  orderId: string;
+  amount: number;
+  transactionNo: string;
+  transDate: string;
+  transactionType?: "02" | "03";
+}): Promise<any> {
+  return post("/v1/payment/vnpay/refund", params);
+}
+
+/**
+ * Query MoMo transaction status via backend
+ */
+export async function queryMomoTransaction(orderId: string): Promise<any> {
+  return post("/v1/payment/momo/query", { orderId });
+}
+
+/**
+ * Request MoMo refund via backend
+ */
+export async function refundMomoTransaction(params: {
+  orderId: string;
+  amount: number;
+  transId: number;
+  description?: string;
+}): Promise<any> {
+  return post("/v1/payment/momo/refund", params);
+}
+
+/**
+ * Get VNPay supported banks
+ */
+export async function getVnpayBanks(): Promise<any[]> {
+  return get("/v1/payment/vnpay/banks");
+}
+
+// ============================================
 // Main Payment Functions
 // ============================================
 
@@ -562,6 +954,15 @@ export function getAvailablePaymentMethods(): PaymentMethod[] {
       minAmount: 10000,
     },
     {
+      id: "acb",
+      name: "ACB ONE Connect",
+      icon: "business-outline",
+      description: "Thanh toán qua ACB Online / QR",
+      enabled: true,
+      minAmount: 10000,
+      maxAmount: 500000000,
+    },
+    {
       id: "bank_transfer",
       name: "Chuyển khoản",
       icon: "business-outline",
@@ -578,7 +979,7 @@ export function getAvailablePaymentMethods(): PaymentMethod[] {
  */
 export async function createPayment(
   provider: PaymentProvider,
-  order: PaymentOrder
+  order: PaymentOrder,
 ): Promise<PaymentResult> {
   const orderId = order.id || generateTransactionId("ORD");
 
@@ -697,7 +1098,7 @@ export async function createPayment(
  */
 export function processPaymentCallback(
   provider: PaymentProvider,
-  params: Record<string, string>
+  params: Record<string, string>,
 ): PaymentResult {
   switch (provider) {
     case "vnpay": {
@@ -854,7 +1255,7 @@ function getBankTransferInfo(orderId: string, amount: number) {
  */
 export async function checkPaymentStatus(
   provider: PaymentProvider,
-  orderId: string
+  orderId: string,
 ): Promise<PaymentResult> {
   // Handle MoMo status check
   if (provider === "momo") {
@@ -895,11 +1296,19 @@ export { checkMoMoPaymentStatus, createMoMoPayment, verifyMoMoSignature };
 export default {
   getAvailablePaymentMethods,
   createPayment,
+  createPaymentViaAPI,
   processPaymentCallback,
   checkPaymentStatus,
   formatCurrency,
-  // MoMo specific
+  // Backend API helpers
+  queryVnpayTransaction,
+  refundVnpayTransaction,
+  getVnpayBanks,
+  queryMomoTransaction,
+  refundMomoTransaction,
+  // MoMo specific (legacy client-side)
   createMoMoPayment,
+  createMoMoQuickPay,
   checkMoMoPaymentStatus,
   verifyMoMoSignature,
 };

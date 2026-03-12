@@ -243,6 +243,7 @@ function transformVideo(video: {
   description?: string;
   thumbnail: string;
   author?: string;
+  authorId?: string;
   authorAvatarUrl?: string;
   duration?: string;
   views?: number;
@@ -259,6 +260,7 @@ function transformVideo(video: {
     createdAt: video.createdAt || new Date().toISOString(),
     author: video.author
       ? {
+          id: video.authorId || "design-build-team",
           name: video.author,
           avatar: video.authorAvatarUrl,
         }
@@ -276,6 +278,7 @@ function transformLocalPhoto(photo: {
   title: string;
   thumbnail: string;
   author?: string;
+  authorId?: string;
   description?: string;
 }): PhotoFeedItem {
   return {
@@ -289,6 +292,7 @@ function transformLocalPhoto(photo: {
     createdAt: new Date().toISOString(),
     author: photo.author
       ? {
+          id: photo.authorId || "design-build-team",
           name: photo.author,
         }
       : undefined,

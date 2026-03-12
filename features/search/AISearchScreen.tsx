@@ -875,7 +875,7 @@ export default function AISearchScreen() {
             {/* Unified Search Button */}
             <TouchableOpacity
               style={styles.unifiedSearchBtn}
-              onPress={() => router.push("/unified-search")}
+              onPress={() => router.push("/search")}
             >
               <Ionicons name="apps" size={18} color={MODERN_COLORS.primary} />
             </TouchableOpacity>

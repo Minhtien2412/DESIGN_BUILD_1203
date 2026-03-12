@@ -1,4 +1,5 @@
-﻿import { useUnifiedMessaging } from "@/hooks/crm/useUnifiedMessaging";
+﻿import OfflineDataBanner from "@/components/ui/OfflineDataBanner";
+import { useUnifiedMessaging } from "@/hooks/crm/useUnifiedMessaging";
 import {
     getCompanyById,
     type CompanyProfile,
@@ -23,10 +24,10 @@ const { width } = Dimensions.get("window");
 const CARD_WIDTH = (width - 48) / 2;
 
 const TABS = [
-  { id: "about", name: "Giá»›i thiá»‡u", icon: "information-circle-outline" },
-  { id: "services", name: "Dá»‹ch vá»¥", icon: "briefcase-outline" },
-  { id: "portfolio", name: "Dá»± Ã¡n", icon: "images-outline" },
-  { id: "reviews", name: "ÄÃ¡nh giÃ¡", icon: "star-outline" },
+  { id: "about", name: "Giới thiệu", icon: "information-circle-outline" },
+  { id: "services", name: "Dịch vụ", icon: "briefcase-outline" },
+  { id: "portfolio", name: "Dự án", icon: "images-outline" },
+  { id: "reviews", name: "Đánh giá", icon: "star-outline" },
 ];
 
 export default function CompanyDetailScreen() {
@@ -34,12 +35,13 @@ export default function CompanyDetailScreen() {
   const [activeTab, setActiveTab] = useState("about");
   const [isConsulting, setIsConsulting] = useState(false);
   const [consultingServiceId, setConsultingServiceId] = useState<number | null>(
-    null
+    null,
   );
   const [company, setCompany] = useState<CompanyProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [isOffline, setIsOffline] = useState(false);
 
   const { getOrCreateConversation } = useUnifiedMessaging();
 
@@ -53,12 +55,13 @@ export default function CompanyDetailScreen() {
 
       if (response.success && response.data) {
         setCompany(response.data);
+        setIsOffline(response.offline === true);
       } else {
-        setError(response.message || "KhÃ´ng thá»ƒ táº£i thÃ´ng tin cÃ´ng ty");
+        setError(response.message || "Không thể tải thông tin công ty");
       }
     } catch (err: any) {
       console.error("[CompanyDetail] Error:", err);
-      setError("ÄÃ£ xáº£y ra lá»—i khi táº£i thÃ´ng tin cÃ´ng ty");
+      setError("Đã xảy ra lỗi khi tải thông tin công ty");
     } finally {
       setLoading(false);
     }
@@ -111,7 +114,7 @@ export default function CompanyDetailScreen() {
           : "DESIGN_COMPANY",
       });
       router.push(
-        `/messages/chat/${conversationId}` as `/messages/chat/${string}`
+        `/messages/chat/${conversationId}` as `/messages/chat/${string}`,
       );
     } catch (error) {
       console.error("Error creating conversation:", error);
@@ -147,7 +150,7 @@ export default function CompanyDetailScreen() {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#0D9488" />
-        <Text style={styles.loadingText}>Äang táº£i thÃ´ng tin cÃ´ng ty...</Text>
+        <Text style={styles.loadingText}>Đang tải thông tin công ty...</Text>
       </View>
     );
   }
@@ -158,10 +161,10 @@ export default function CompanyDetailScreen() {
       <View style={styles.errorContainer}>
         <Ionicons name="alert-circle-outline" size={64} color="#F44336" />
         <Text style={styles.errorText}>
-          {error || "KhÃ´ng tÃ¬m tháº¥y thÃ´ng tin cÃ´ng ty"}
+          {error || "Không tìm thấy thông tin công ty"}
         </Text>
         <TouchableOpacity style={styles.retryButton} onPress={fetchCompanyData}>
-          <Text style={styles.retryButtonText}>Thá»­ láº¡i</Text>
+          <Text style={styles.retryButtonText}>Thử lại</Text>
         </TouchableOpacity>
       </View>
     );
@@ -171,13 +174,13 @@ export default function CompanyDetailScreen() {
     <View style={styles.tabContent}>
       {/* Description */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Vá» chÃºng tÃ´i</Text>
+        <Text style={styles.sectionTitle}>Về chúng tôi</Text>
         <Text style={styles.description}>{company.description}</Text>
       </View>
 
       {/* Specialties */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>ChuyÃªn mÃ´n</Text>
+        <Text style={styles.sectionTitle}>Chuyên môn</Text>
         <View style={styles.specialtyGrid}>
           {company.specialties.map((specialty, idx) => (
             <View key={idx} style={styles.specialtyChip}>
@@ -190,7 +193,7 @@ export default function CompanyDetailScreen() {
 
       {/* Info */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>ThÃ´ng tin liÃªn há»‡</Text>
+        <Text style={styles.sectionTitle}>Thông tin liên hệ</Text>
 
         <TouchableOpacity style={styles.infoRow} onPress={handleCall}>
           <Ionicons name="call-outline" size={20} color="#666" />
@@ -242,7 +245,7 @@ export default function CompanyDetailScreen() {
   const renderServicesTab = () => (
     <View style={styles.tabContent}>
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Báº£ng giÃ¡ dá»‹ch vá»¥</Text>
+        <Text style={styles.sectionTitle}>Bảng giá dịch vụ</Text>
         {company.services.map((service) => (
           <View key={service.id} style={styles.serviceCard}>
             <View style={styles.serviceInfo}>
@@ -257,7 +260,7 @@ export default function CompanyDetailScreen() {
               {consultingServiceId === service.id ? (
                 <ActivityIndicator size="small" color="#0D9488" />
               ) : (
-                <Text style={styles.serviceButtonText}>TÆ° váº¥n</Text>
+                <Text style={styles.serviceButtonText}>Tư vấn</Text>
               )}
             </TouchableOpacity>
           </View>
@@ -271,7 +274,7 @@ export default function CompanyDetailScreen() {
       {company.portfolio.length === 0 ? (
         <View style={styles.emptyState}>
           <Ionicons name="images-outline" size={48} color="#ccc" />
-          <Text style={styles.emptyStateText}>ChÆ°a cÃ³ dá»± Ã¡n nÃ o</Text>
+          <Text style={styles.emptyStateText}>Chưa có dự án nào</Text>
         </View>
       ) : (
         <View style={styles.portfolioGrid}>
@@ -310,11 +313,11 @@ export default function CompanyDetailScreen() {
         <View style={styles.ratingLeft}>
           <Text style={styles.ratingNumber}>{company.rating}</Text>
           {renderStars(company.rating)}
-          <Text style={styles.ratingCount}>{company.reviewCount} Ä‘Ã¡nh giÃ¡</Text>
+          <Text style={styles.ratingCount}>{company.reviewCount} đánh giá</Text>
         </View>
         <TouchableOpacity style={styles.writeReviewButton}>
           <Ionicons name="create-outline" size={18} color="#0D9488" />
-          <Text style={styles.writeReviewText}>Viáº¿t Ä‘Ã¡nh giÃ¡</Text>
+          <Text style={styles.writeReviewText}>Viết đánh giá</Text>
         </TouchableOpacity>
       </View>
 
@@ -322,7 +325,7 @@ export default function CompanyDetailScreen() {
       {company.reviews.length === 0 ? (
         <View style={styles.emptyState}>
           <Ionicons name="chatbubbles-outline" size={48} color="#ccc" />
-          <Text style={styles.emptyStateText}>ChÆ°a cÃ³ Ä‘Ã¡nh giÃ¡ nÃ o</Text>
+          <Text style={styles.emptyStateText}>Chưa có đánh giá nào</Text>
         </View>
       ) : (
         <View style={styles.section}>
@@ -360,6 +363,9 @@ export default function CompanyDetailScreen() {
         }}
       />
       <View style={styles.container}>
+        {/* Offline Banner */}
+        <OfflineDataBanner visible={isOffline} onRetry={fetchCompanyData} />
+
         <ScrollView
           showsVerticalScrollIndicator={false}
           refreshControl={
@@ -396,7 +402,7 @@ export default function CompanyDetailScreen() {
                 <View style={styles.statItem}>
                   <Ionicons name="briefcase-outline" size={16} color="#666" />
                   <Text style={styles.statText}>
-                    {company.projectCount} dá»± Ã¡n
+                    {company.projectCount} dự án
                   </Text>
                 </View>
                 <View style={styles.divider} />
@@ -451,7 +457,7 @@ export default function CompanyDetailScreen() {
             onPress={handleCall}
           >
             <Ionicons name="call" size={20} color="#0D9488" />
-            <Text style={styles.actionButtonSecondaryText}>Gá»i Ä‘iá»‡n</Text>
+            <Text style={styles.actionButtonSecondaryText}>Gọi điện</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.actionButtonPrimary}
@@ -463,7 +469,7 @@ export default function CompanyDetailScreen() {
             ) : (
               <>
                 <Ionicons name="chatbubble-ellipses" size={20} color="#fff" />
-                <Text style={styles.actionButtonPrimaryText}>LiÃªn há»‡ ngay</Text>
+                <Text style={styles.actionButtonPrimaryText}>Liên hệ ngay</Text>
               </>
             )}
           </TouchableOpacity>

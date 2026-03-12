@@ -215,8 +215,8 @@ export default function MyProductsScreen() {
 
   const handleApprove = async (productId: string) => {
     try {
-      await productService.updateProduct(Number(productId), {
-        status: ProductStatus.APPROVED,
+      await productService.updateStatus(Number(productId), {
+        status: "APPROVED",
       });
       // Update local state
       setApiProducts((prev) =>
@@ -245,8 +245,8 @@ export default function MyProductsScreen() {
 
   const handleReject = async (productId: string, reason: string) => {
     try {
-      await productService.updateProduct(Number(productId), {
-        status: ProductStatus.REJECTED,
+      await productService.updateStatus(Number(productId), {
+        status: "REJECTED",
         rejectionReason: reason,
       });
       // Update local state

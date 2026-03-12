@@ -1,4 +1,5 @@
 import { Colors } from "@/constants/theme";
+import { useI18n } from "@/services/i18nService";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useCallback, useMemo, useState } from "react";
 import {
@@ -78,9 +79,10 @@ interface UniversalListProps<T> {
 }
 
 export function UniversalList<T>({ config }: UniversalListProps<T>) {
+  const { t } = useI18n();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSort, setSelectedSort] = useState(
-    config.sortOptions?.[0]?.value || ""
+    config.sortOptions?.[0]?.value || "",
   );
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -92,7 +94,7 @@ export function UniversalList<T>({ config }: UniversalListProps<T>) {
 
     if (config.filterFunction) {
       return config.data.filter((item) =>
-        config.filterFunction!(item, searchQuery)
+        config.filterFunction!(item, searchQuery),
       );
     }
 
@@ -102,7 +104,7 @@ export function UniversalList<T>({ config }: UniversalListProps<T>) {
       return Object.values(item as any).some(
         (value) =>
           typeof value === "string" &&
-          value.toLowerCase().includes(searchLower)
+          value.toLowerCase().includes(searchLower),
       );
     });
   }, [config.data, searchQuery, config.searchable, config.filterFunction]);
@@ -113,7 +115,9 @@ export function UniversalList<T>({ config }: UniversalListProps<T>) {
       return filteredData;
     }
 
-    const sortOption = config.sortOptions.find((opt) => opt.value === selectedSort);
+    const sortOption = config.sortOptions.find(
+      (opt) => opt.value === selectedSort,
+    );
     if (!sortOption) {
       return filteredData;
     }
@@ -222,13 +226,16 @@ export function UniversalList<T>({ config }: UniversalListProps<T>) {
           color="#D1D5DB"
         />
         <Text style={styles.emptyTitle}>
-          {config.emptyTitle || "Không có dữ liệu"}
+          {config.emptyTitle || t("universalList.noData")}
         </Text>
         <Text style={styles.emptyMessage}>
           {config.emptyMessage ||
             (searchQuery
-              ? `Không tìm thấy kết quả cho "${searchQuery}"`
-              : "Chưa có mục nào")}
+              ? t("universalList.noSearchResults").replace(
+                  "{query}",
+                  searchQuery,
+                )
+              : t("universalList.noItems"))}
         </Text>
         {config.emptyAction && (
           <TouchableOpacity
@@ -251,7 +258,7 @@ export function UniversalList<T>({ config }: UniversalListProps<T>) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={Colors.light.primary} />
-        <Text style={styles.loadingText}>Đang tải...</Text>
+        <Text style={styles.loadingText}>{t("universalList.loading")}</Text>
       </View>
     );
   };
@@ -271,20 +278,21 @@ export function UniversalList<T>({ config }: UniversalListProps<T>) {
   const renderListFooter = () => {
     return (
       <>
-        {config.paginated &&
-          paginatedData.length < sortedData.length && (
-            <TouchableOpacity
-              style={styles.loadMoreButton}
-              onPress={handleLoadMore}
-            >
-              <Text style={styles.loadMoreText}>Xem thêm</Text>
-              <Ionicons
-                name="chevron-down"
-                size={16}
-                color={Colors.light.primary}
-              />
-            </TouchableOpacity>
-          )}
+        {config.paginated && paginatedData.length < sortedData.length && (
+          <TouchableOpacity
+            style={styles.loadMoreButton}
+            onPress={handleLoadMore}
+          >
+            <Text style={styles.loadMoreText}>
+              {t("universalList.loadMore")}
+            </Text>
+            <Ionicons
+              name="chevron-down"
+              size={16}
+              color={Colors.light.primary}
+            />
+          </TouchableOpacity>
+        )}
         {config.ListFooterComponent}
       </>
     );

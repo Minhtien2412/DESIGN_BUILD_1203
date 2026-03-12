@@ -1,5 +1,4 @@
-import config, { API_ENDPOINTS, ERROR_MESSAGES, getApiUrl } from '@/config/construction-map.config';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from "react";
 
 // Types matching backend
 export interface Task {
@@ -8,7 +7,7 @@ export interface Task {
   stageId: string;
   label: string;
   description?: string;
-  status: 'pending' | 'in-progress' | 'done' | 'late';
+  status: "pending" | "in-progress" | "done" | "late";
   progress: number;
   x: number;
   y: number;
@@ -30,7 +29,7 @@ export interface Stage {
   number: string;
   label: string;
   description?: string;
-  status: 'upcoming' | 'active' | 'completed';
+  status: "upcoming" | "active" | "completed";
   x: number;
   y: number;
   startDate?: string;
@@ -43,7 +42,7 @@ export interface Link {
   projectId: string;
   sourceId: string;
   targetId: string;
-  type: 'dependency' | 'stage-task';
+  type: "dependency" | "stage-task";
   style?: {
     color?: string;
     width?: number;
@@ -85,22 +84,15 @@ export function useConstructionMapAPI(projectId: string) {
   // Fetch full project data
   const fetchProject = useCallback(async () => {
     if (!projectId) return;
-    
+
     try {
       setLoading(true);
       setError(null);
-      
-      const response = await fetch(getApiUrl(API_ENDPOINTS.getProject(projectId)), {
-        signal: AbortSignal.timeout(config.api.timeout),
-      });
-      if (!response.ok) {
-        throw new Error(`Failed to fetch project: ${response.statusText}`);
-      }
-      
-      const projectData = await response.json();
+
+      const projectData = await get(`/construction-map/${projectId}`);
       setData(projectData);
     } catch (err) {
-      setError(err instanceof Error ? err : new Error('Unknown error'));
+      setError(err instanceof Error ? err : new Error("Unknown error"));
     } finally {
       setLoading(false);
     }
@@ -114,222 +106,182 @@ export function useConstructionMapAPI(projectId: string) {
   // Get progress statistics
   const getProgress = useCallback(async (): Promise<ProgressData | null> => {
     try {
-      const response = await fetch(getApiUrl(API_ENDPOINTS.getProgress(projectId)), {
-        signal: AbortSignal.timeout(config.api.timeout),
-      });
-      if (!response.ok) throw new Error(ERROR_MESSAGES.SERVER_ERROR);
-      return await response.json();
+      return await get(`/construction-map/${projectId}/progress`);
     } catch (err) {
-      console.error('Error fetching progress:', err);
+      console.error("Error fetching progress:", err);
       return null;
     }
   }, [projectId]);
 
   // Create new task
-  const createTask = useCallback(async (taskData: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => {
-    try {
-      const response = await fetch(getApiUrl(API_ENDPOINTS.createTask), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(taskData),
-        signal: AbortSignal.timeout(config.api.timeout),
-      });
-      
-      if (!response.ok) throw new Error('Failed to create task');
-      
-      const newTask = await response.json();
-      
-      // Optimistically update local state
-      setData(prev => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          tasks: [...prev.tasks, newTask],
-        };
-      });
-      
-      return newTask;
-    } catch (err) {
-      console.error('Error creating task:', err);
-      throw err;
-    }
-  }, []);
+  const createTask = useCallback(
+    async (taskData: Omit<Task, "id" | "createdAt" | "updatedAt">) => {
+      try {
+        const newTask = await post("/construction-map/tasks", taskData);
+
+        // Optimistically update local state
+        setData((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            tasks: [...prev.tasks, newTask],
+          };
+        });
+
+        return newTask;
+      } catch (err) {
+        console.error("Error creating task:", err);
+        throw err;
+      }
+    },
+    [],
+  );
 
   // Update task position (for drag & drop)
-  const updateTaskPosition = useCallback(async (taskId: string, x: number, y: number) => {
-    try {
-      const response = await fetch(getApiUrl(API_ENDPOINTS.updateTaskPosition(taskId)), {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ x, y }),
-        signal: AbortSignal.timeout(config.api.timeout),
-      });
-      
-      if (!response.ok) throw new Error('Failed to update task position');
-      
-      const updatedTask = await response.json();
-      
-      // Optimistically update local state
-      setData(prev => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          tasks: prev.tasks.map(task => 
-            task.id === taskId ? { ...task, x, y } : task
-          ),
-        };
-      });
-      
-      return updatedTask;
-    } catch (err) {
-      console.error('Error updating task position:', err);
-      throw err;
-    }
-  }, []);
+  const updateTaskPosition = useCallback(
+    async (taskId: string, x: number, y: number) => {
+      try {
+        const updatedTask = await patch(
+          `/construction-map/tasks/${taskId}/position`,
+          { x, y },
+        );
+
+        // Optimistically update local state
+        setData((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            tasks: prev.tasks.map((task) =>
+              task.id === taskId ? { ...task, x, y } : task,
+            ),
+          };
+        });
+
+        return updatedTask;
+      } catch (err) {
+        console.error("Error updating task position:", err);
+        throw err;
+      }
+    },
+    [],
+  );
 
   // Update task status
-  const updateTaskStatus = useCallback(async (taskId: string, status: Task['status']) => {
-    try {
-      const response = await fetch(getApiUrl(API_ENDPOINTS.updateTaskStatus(taskId)), {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status }),
-        signal: AbortSignal.timeout(config.api.timeout),
-      });
-      
-      if (!response.ok) throw new Error('Failed to update task status');
-      
-      const updatedTask = await response.json();
-      
-      setData(prev => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          tasks: prev.tasks.map(task => 
-            task.id === taskId ? { ...task, status } : task
-          ),
-        };
-      });
-      
-      return updatedTask;
-    } catch (err) {
-      console.error('Error updating task status:', err);
-      throw err;
-    }
-  }, []);
+  const updateTaskStatus = useCallback(
+    async (taskId: string, status: Task["status"]) => {
+      try {
+        const updatedTask = await patch(
+          `/construction-map/tasks/${taskId}/status`,
+          { status },
+        );
+
+        setData((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            tasks: prev.tasks.map((task) =>
+              task.id === taskId ? { ...task, status } : task,
+            ),
+          };
+        });
+
+        return updatedTask;
+      } catch (err) {
+        console.error("Error updating task status:", err);
+        throw err;
+      }
+    },
+    [],
+  );
 
   // Update full task
-  const updateTask = useCallback(async (taskId: string, updates: Partial<Task>) => {
-    try {
-      const response = await fetch(getApiUrl(API_ENDPOINTS.updateTask(taskId)), {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updates),
-        signal: AbortSignal.timeout(config.api.timeout),
-      });
-      
-      if (!response.ok) throw new Error('Failed to update task');
-      
-      const updatedTask = await response.json();
-      
-      setData(prev => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          tasks: prev.tasks.map(task => 
-            task.id === taskId ? { ...task, ...updates } : task
-          ),
-        };
-      });
-      
-      return updatedTask;
-    } catch (err) {
-      console.error('Error updating task:', err);
-      throw err;
-    }
-  }, []);
+  const updateTask = useCallback(
+    async (taskId: string, updates: Partial<Task>) => {
+      try {
+        const updatedTask = await put(
+          `/construction-map/tasks/${taskId}`,
+          updates,
+        );
+
+        setData((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            tasks: prev.tasks.map((task) =>
+              task.id === taskId ? { ...task, ...updates } : task,
+            ),
+          };
+        });
+
+        return updatedTask;
+      } catch (err) {
+        console.error("Error updating task:", err);
+        throw err;
+      }
+    },
+    [],
+  );
 
   // Delete task
   const deleteTask = useCallback(async (taskId: string) => {
     try {
-      const response = await fetch(getApiUrl(API_ENDPOINTS.deleteTask(taskId)), {
-        method: 'DELETE',
-        signal: AbortSignal.timeout(config.api.timeout),
-      });
-      
-      if (!response.ok) throw new Error('Failed to delete task');
-      
-      setData(prev => {
+      await del(`/construction-map/tasks/${taskId}`);
+
+      setData((prev) => {
         if (!prev) return prev;
         return {
           ...prev,
-          tasks: prev.tasks.filter(task => task.id !== taskId),
+          tasks: prev.tasks.filter((task) => task.id !== taskId),
         };
       });
     } catch (err) {
-      console.error('Error deleting task:', err);
+      console.error("Error deleting task:", err);
       throw err;
     }
   }, []);
 
   // Create stage
-  const createStage = useCallback(async (stageData: Omit<Stage, 'id' | 'tasks'>) => {
-    try {
-      const response = await fetch(getApiUrl(API_ENDPOINTS.createStage), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(stageData),
-        signal: AbortSignal.timeout(config.api.timeout),
-      });
-      
-      if (!response.ok) throw new Error('Failed to create stage');
-      
-      const newStage = await response.json();
-      
-      setData(prev => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          stages: [...prev.stages, newStage],
-        };
-      });
-      
-      return newStage;
-    } catch (err) {
-      console.error('Error creating stage:', err);
-      throw err;
-    }
-  }, []);
+  const createStage = useCallback(
+    async (stageData: Omit<Stage, "id" | "tasks">) => {
+      try {
+        const newStage = await post("/construction-map/stages", stageData);
+
+        setData((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            stages: [...prev.stages, newStage],
+          };
+        });
+
+        return newStage;
+      } catch (err) {
+        console.error("Error creating stage:", err);
+        throw err;
+      }
+    },
+    [],
+  );
 
   // Save map state (zoom, pan, selections)
-  const saveMapState = useCallback(async (state: Omit<MapState, 'projectId' | 'version' | 'lastModified'>) => {
-    try {
-      const response = await fetch(getApiUrl(API_ENDPOINTS.saveMapState(projectId)), {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(state),
-        signal: AbortSignal.timeout(config.api.timeout),
-      });
-      
-      if (!response.ok) throw new Error('Failed to save map state');
-      
-      return await response.json();
-    } catch (err) {
-      console.error('Error saving map state:', err);
-      throw err;
-    }
-  }, [projectId]);
+  const saveMapState = useCallback(
+    async (state: Omit<MapState, "projectId" | "version" | "lastModified">) => {
+      try {
+        return await put(`/construction-map/${projectId}/state`, state);
+      } catch (err) {
+        console.error("Error saving map state:", err);
+        throw err;
+      }
+    },
+    [projectId],
+  );
 
   // Load map state
   const loadMapState = useCallback(async (): Promise<MapState | null> => {
     try {
-      const response = await fetch(getApiUrl(API_ENDPOINTS.getMapState(projectId)), {
-        signal: AbortSignal.timeout(config.api.timeout),
-      });
-      if (!response.ok) throw new Error(ERROR_MESSAGES.NOT_FOUND);
-      return await response.json();
+      return await get(`/construction-map/${projectId}/state`);
     } catch (err) {
-      console.error('Error loading map state:', err);
+      console.error("Error loading map state:", err);
       return null;
     }
   }, [projectId]);
@@ -339,7 +291,7 @@ export function useConstructionMapAPI(projectId: string) {
     data,
     loading,
     error,
-    
+
     // Actions
     refresh: fetchProject,
     getProgress,

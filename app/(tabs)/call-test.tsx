@@ -68,6 +68,8 @@ export default function CallTestScreen() {
               ID người dùng muốn gọi:
             </Text>
             <TextInput
+              nativeID="call-test-user-id"
+              accessibilityLabel="ID người dùng muốn gọi"
               style={[
                 styles.input,
                 {

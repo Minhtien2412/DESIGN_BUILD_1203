@@ -315,7 +315,7 @@ class PresignedUploadServiceClass {
     const response = await post<PresignResponse>("/api/v1/upload/presign", {
       filename: request.filename,
       contentType: request.contentType,
-      fileSize: request.fileSize,
+      size: request.fileSize,
       checksum: request.checksum,
       checksumAlgorithm: request.checksumAlgorithm,
       context: request.context,
@@ -427,7 +427,7 @@ class PresignedUploadServiceClass {
     request: CompleteUploadRequest,
   ): Promise<CompleteUploadResponse> {
     const response = await post<CompleteUploadResponse>(
-      "/api/v1/upload/complete",
+      "/api/v1/upload/presign/complete",
       request,
     );
 

@@ -429,7 +429,7 @@ export default function ProductsCatalogScreen() {
     brand: apiProduct.seller?.name || "Unknown",
     price: apiProduct.price,
     image:
-      apiProduct.images[0] ||
+      apiProduct.images[0]?.url ||
       "https://images.unsplash.com/photo-1615971677499-5467cbab01c0?w=280&q=80",
     rating: 4.5, // Default rating (can be enhanced later)
     sold: apiProduct.soldCount,
@@ -446,15 +446,18 @@ export default function ProductsCatalogScreen() {
     id: apiProduct.id.toString(),
     name: apiProduct.name,
     price: apiProduct.price,
-    originalPrice: apiProduct.compareAtPrice || undefined,
+    originalPrice: (apiProduct as any).compareAtPrice || undefined,
     discount:
-      apiProduct.compareAtPrice && apiProduct.price < apiProduct.compareAtPrice
-        ? Math.round((1 - apiProduct.price / apiProduct.compareAtPrice) * 100)
+      (apiProduct as any).compareAtPrice &&
+      apiProduct.price < (apiProduct as any).compareAtPrice
+        ? Math.round(
+            (1 - apiProduct.price / (apiProduct as any).compareAtPrice) * 100,
+          )
         : undefined,
     image:
-      apiProduct.images[0] ||
+      apiProduct.images[0]?.url ||
       "https://images.unsplash.com/photo-1615971677499-5467cbab01c0?w=280&q=80",
-    images: apiProduct.images,
+    images: apiProduct.images.map((img) => img.url),
     rating: (apiProduct as any).rating || 4.5,
     soldCount: apiProduct.soldCount || 0,
     isNew: apiProduct.isNew,
@@ -465,16 +468,16 @@ export default function ProductsCatalogScreen() {
     category: apiProduct.category,
     location:
       (apiProduct as any).location ||
-      apiProduct.seller?.location ||
+      (apiProduct.seller as any)?.location ||
       "TP. Hồ Chí Minh",
     seller: apiProduct.seller
       ? {
           id: apiProduct.seller.id.toString(),
           name: apiProduct.seller.name || "Người bán",
           avatar:
-            apiProduct.seller.avatar ||
+            (apiProduct.seller as any).avatar ||
             `https://ui-avatars.com/api/?name=${encodeURIComponent(apiProduct.seller.name || "S")}&size=48&background=FF6B35&color=fff`,
-          isOfficial: apiProduct.seller.isVerified || false,
+          isOfficial: (apiProduct.seller as any).isVerified || false,
           rating: (apiProduct.seller as any).rating || 4.5,
           responseRate: (apiProduct.seller as any).responseRate,
           productCount: (apiProduct.seller as any).productCount,

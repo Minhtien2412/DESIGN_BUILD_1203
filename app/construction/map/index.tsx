@@ -5,6 +5,8 @@
 
 import { Container } from "@/components/ui/container";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { projectService } from "@/services/api/project.service";
+import type { Project as ApiProject } from "@/services/api/types";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";

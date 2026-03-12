@@ -11,7 +11,20 @@ import { I18nManager } from "react-native";
 // Types
 // ============================================================================
 
-export type SupportedLanguage = "vi" | "en";
+export type SupportedLanguage =
+  | "vi"
+  | "en"
+  | "zh"
+  | "ja"
+  | "ko"
+  | "th"
+  | "fr"
+  | "es"
+  | "de"
+  | "pt"
+  | "ru"
+  | "ar"
+  | "hi";
 
 export interface TranslationStrings {
   // Common
@@ -752,7 +765,10 @@ export const en: TranslationStrings = {
 
 const LANGUAGE_STORAGE_KEY = "@app_language";
 
-const translations: Record<SupportedLanguage, TranslationStrings> = {
+const translations: Partial<Record<SupportedLanguage, TranslationStrings>> & {
+  vi: TranslationStrings;
+  en: TranslationStrings;
+} = {
   vi,
   en,
 };
@@ -765,8 +781,25 @@ let currentLanguage: SupportedLanguage = "vi";
 export async function initializeLanguage(): Promise<SupportedLanguage> {
   try {
     const stored = await AsyncStorage.getItem(LANGUAGE_STORAGE_KEY);
-    if (stored && (stored === "vi" || stored === "en")) {
-      currentLanguage = stored;
+    if (
+      stored &&
+      [
+        "vi",
+        "en",
+        "zh",
+        "ja",
+        "ko",
+        "th",
+        "fr",
+        "es",
+        "de",
+        "pt",
+        "ru",
+        "ar",
+        "hi",
+      ].includes(stored)
+    ) {
+      currentLanguage = stored as SupportedLanguage;
     }
   } catch (error) {
     console.warn("Failed to load language from storage:", error);
@@ -797,7 +830,7 @@ export async function setLanguage(lang: SupportedLanguage): Promise<void> {
  * Get translation strings for current language
  */
 export function getTranslations(): TranslationStrings {
-  return translations[currentLanguage];
+  return translations[currentLanguage] ?? translations.vi;
 }
 
 /**
@@ -805,7 +838,7 @@ export function getTranslations(): TranslationStrings {
  */
 export function t(keyPath: string): string {
   const keys = keyPath.split(".");
-  let result: any = translations[currentLanguage];
+  let result: any = translations[currentLanguage] ?? translations.vi;
 
   for (const key of keys) {
     if (result && typeof result === "object" && key in result) {
@@ -844,6 +877,17 @@ export function getAvailableLanguages(): Array<{
   return [
     { code: "vi", name: "Vietnamese", nativeName: "Tiếng Việt" },
     { code: "en", name: "English", nativeName: "English" },
+    { code: "zh", name: "Chinese", nativeName: "中文" },
+    { code: "ja", name: "Japanese", nativeName: "日本語" },
+    { code: "ko", name: "Korean", nativeName: "한국어" },
+    { code: "th", name: "Thai", nativeName: "ภาษาไทย" },
+    { code: "fr", name: "French", nativeName: "Français" },
+    { code: "es", name: "Spanish", nativeName: "Español" },
+    { code: "de", name: "German", nativeName: "Deutsch" },
+    { code: "pt", name: "Portuguese", nativeName: "Português" },
+    { code: "ru", name: "Russian", nativeName: "Русский" },
+    { code: "ar", name: "Arabic", nativeName: "العربية" },
+    { code: "hi", name: "Hindi", nativeName: "हिन्दी" },
   ];
 }
 

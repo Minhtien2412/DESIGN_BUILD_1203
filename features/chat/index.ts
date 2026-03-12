@@ -2,16 +2,15 @@
 export { default as ChatListItem } from "@/components/chat/ChatListItem";
 export { default as InputBar } from "@/components/chat/InputBar";
 export { default as MessageBubble } from "@/components/chat/MessageBubble";
-// Export chat service types (use explicit names to avoid conflicts)
+// Export canonical conversation service types
 export {
-    chatService,
-    type ChatMessage,
-    type ChatRoom,
-    type CreateRoomDto,
-    type MessagesResponse,
-    type RoomMember
-} from "@/services/api/chat.service";
-// Export messages API
+    getConversations,
+    getMessages,
+    sendMessage, type Message as ChatMessage, type Conversation as ChatRoom, type CreateGroupConversationDto as CreateRoomDto,
+    type MessageListResponse as MessagesResponse,
+    type ConversationParticipant as RoomMember
+} from "@/services/api/conversations.service";
+// Export messages API (legacy — callers should migrate to conversations.service)
 export { default as messagesApi } from "@/services/api/messagesApi";
 // Export screens
 export { default as GroupChatScreen } from "./GroupChatScreen";

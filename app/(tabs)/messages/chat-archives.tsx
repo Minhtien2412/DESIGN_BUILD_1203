@@ -79,7 +79,7 @@ const ArchiveItem: React.FC<ArchiveItemProps> = ({
       activeOpacity={0.7}
     >
       <View style={styles.archiveIcon}>
-        <Ionicons name="archive-outline" size={24} color="#007AFF" />
+        <Ionicons name="archive-outline" size={18} color="#007AFF" />
       </View>
 
       <View style={styles.archiveInfo}>
@@ -110,7 +110,7 @@ const ArchiveItem: React.FC<ArchiveItemProps> = ({
       </View>
 
       <TouchableOpacity style={styles.deleteBtn} onPress={handleDelete}>
-        <Ionicons name="trash-outline" size={20} color="#FF3B30" />
+        <Ionicons name="trash-outline" size={16} color="#FF3B30" />
       </TouchableOpacity>
     </TouchableOpacity>
   );
@@ -245,7 +245,7 @@ export default function ChatArchiveScreen() {
             <ActivityIndicator size="small" color="#fff" />
           ) : (
             <>
-              <Ionicons name="cloud-download-outline" size={18} color="#fff" />
+              <Ionicons name="cloud-download-outline" size={14} color="#fff" />
               <Text style={styles.actionBtnText}>Đồng bộ</Text>
             </>
           )}
@@ -255,15 +255,17 @@ export default function ChatArchiveScreen() {
           style={[styles.actionBtn, { backgroundColor: "#FF9500" }]}
           onPress={handleCleanup}
         >
-          <Ionicons name="trash-bin-outline" size={18} color="#fff" />
+          <Ionicons name="trash-bin-outline" size={14} color="#fff" />
           <Text style={styles.actionBtnText}>Dọn dẹp</Text>
         </TouchableOpacity>
       </View>
 
       {/* Search */}
       <View style={[styles.searchContainer, { backgroundColor: bgColor }]}>
-        <Ionicons name="search" size={20} color={mutedColor} />
+        <Ionicons name="search" size={16} color={mutedColor} />
         <TextInput
+          nativeID="chat-archives-search"
+          accessibilityLabel="Tìm kiếm trong archives"
           style={[styles.searchInput, { color: textColor }]}
           placeholder="Tìm kiếm trong archives..."
           placeholderTextColor={mutedColor}
@@ -272,7 +274,7 @@ export default function ChatArchiveScreen() {
         />
         {searchQuery.length > 0 && (
           <TouchableOpacity onPress={() => setSearchQuery("")}>
-            <Ionicons name="close-circle" size={20} color={mutedColor} />
+            <Ionicons name="close-circle" size={16} color={mutedColor} />
           </TouchableOpacity>
         )}
       </View>
@@ -282,7 +284,7 @@ export default function ChatArchiveScreen() {
   // Render empty state
   const renderEmpty = () => (
     <View style={styles.emptyContainer}>
-      <Ionicons name="archive-outline" size={64} color={mutedColor} />
+      <Ionicons name="archive-outline" size={44} color={mutedColor} />
       <Text style={[styles.emptyTitle, { color: textColor }]}>
         Chưa có Archive
       </Text>
@@ -305,7 +307,7 @@ export default function ChatArchiveScreen() {
           title: "Lịch sử Chat",
           headerRight: () => (
             <TouchableOpacity onPress={handleRefresh}>
-              <Ionicons name="refresh" size={24} color="#007AFF" />
+              <Ionicons name="refresh" size={20} color="#007AFF" />
             </TouchableOpacity>
           ),
         }}
@@ -355,7 +357,7 @@ const styles = StyleSheet.create({
   },
   listContent: {
     flexGrow: 1,
-    padding: 16,
+    padding: 12,
   },
   loadingContainer: {
     flex: 1,
@@ -369,111 +371,111 @@ const styles = StyleSheet.create({
 
   // Header
   header: {
-    marginBottom: 16,
+    marginBottom: 10,
   },
   statsCard: {
     flexDirection: "row",
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 8,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 3,
+    elevation: 2,
   },
   statItem: {
     flex: 1,
     alignItems: "center",
   },
   statValue: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: "bold",
-    marginBottom: 4,
+    marginBottom: 2,
   },
   statLabel: {
-    fontSize: 12,
+    fontSize: 10,
   },
   statDivider: {
     width: 1,
     backgroundColor: "#E5E5E5",
   },
   infoText: {
-    fontSize: 13,
-    lineHeight: 18,
-    marginBottom: 12,
+    fontSize: 11,
+    lineHeight: 16,
+    marginBottom: 8,
   },
   actionButtons: {
     flexDirection: "row",
-    gap: 12,
-    marginBottom: 12,
+    gap: 8,
+    marginBottom: 8,
   },
   actionBtn: {
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    padding: 12,
+    padding: 8,
     borderRadius: 8,
-    gap: 6,
+    gap: 4,
   },
   actionBtnText: {
     color: "#fff",
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: "600",
   },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    borderRadius: 10,
-    padding: 10,
-    gap: 8,
+    borderRadius: 8,
+    padding: 8,
+    gap: 6,
   },
   searchInput: {
     flex: 1,
-    fontSize: 15,
+    fontSize: 13,
   },
 
   // Archive item
   archiveItem: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 12,
-    borderRadius: 10,
+    padding: 10,
+    borderRadius: 8,
   },
   archiveIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: "#F0FDFA",
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 12,
+    marginRight: 10,
   },
   archiveInfo: {
     flex: 1,
   },
   archiveName: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "600",
-    marginBottom: 2,
+    marginBottom: 1,
   },
   archiveDate: {
-    fontSize: 13,
-    marginBottom: 4,
+    fontSize: 11,
+    marginBottom: 3,
   },
   archiveStats: {
     flexDirection: "row",
-    gap: 12,
+    gap: 8,
   },
   archiveStat: {
-    fontSize: 12,
+    fontSize: 10,
   },
   deleteBtn: {
-    padding: 8,
+    padding: 6,
   },
   separator: {
-    height: 8,
+    height: 6,
   },
 
   // Empty state
@@ -481,28 +483,28 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    paddingVertical: 60,
+    paddingVertical: 40,
   },
   emptyTitle: {
-    fontSize: 18,
+    fontSize: 15,
     fontWeight: "600",
-    marginTop: 16,
-    marginBottom: 8,
+    marginTop: 12,
+    marginBottom: 6,
   },
   emptyText: {
-    fontSize: 14,
+    fontSize: 12,
     textAlign: "center",
-    marginBottom: 20,
-    paddingHorizontal: 40,
+    marginBottom: 14,
+    paddingHorizontal: 32,
   },
   emptyBtn: {
-    paddingHorizontal: 24,
-    paddingVertical: 12,
+    paddingHorizontal: 18,
+    paddingVertical: 9,
     borderRadius: 8,
   },
   emptyBtnText: {
     color: "#fff",
-    fontSize: 15,
+    fontSize: 13,
     fontWeight: "600",
   },
 });

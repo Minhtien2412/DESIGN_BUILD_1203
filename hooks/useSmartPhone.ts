@@ -12,7 +12,7 @@ import {
     requestContactsPermission,
     searchContacts,
     sendEmail,
-    sendSMS
+    sendSMS,
 } from "@/utils/devicePermissions";
 import * as Contacts from "expo-contacts";
 import { useCallback, useState } from "react";
@@ -66,7 +66,7 @@ export interface UseCommunicationResult {
 
 function transformContact(contact: Contacts.Contact): DeviceContact {
   return {
-    id: contact.id || "",
+    id: (contact as any).id || "",
     name:
       contact.name ||
       `${contact.firstName || ""} ${contact.lastName || ""}`.trim() ||

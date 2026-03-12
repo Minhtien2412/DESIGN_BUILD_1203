@@ -32,10 +32,10 @@ export default ({ config }: { config: any }) => ({
     // Enable New Architecture for Expo Go/dev build parity
     newArchEnabled: true,
 
-    // Android status bar: transparent + translucent so content draws under it
+    // Android status bar: match splash backgroundColor to avoid flash on launch
     androidStatusBar: {
       barStyle: "dark-content",
-      backgroundColor: "#00000000",
+      backgroundColor: "#ffffff",
       translucent: true,
     },
 

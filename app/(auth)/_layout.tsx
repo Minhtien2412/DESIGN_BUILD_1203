@@ -7,19 +7,21 @@
  * - otp-verify: OTP verification (for phone auth)
  */
 
+import { useI18n } from "@/services/i18nService";
 import { Stack } from "expo-router";
 
 export default function AuthLayout() {
+  const { t } = useI18n();
   return (
     <Stack
       screenOptions={{
         headerShown: false,
         animation: "slide_from_right",
-        contentStyle: { backgroundColor: "#0F0F23" },
+        contentStyle: { backgroundColor: "#0B0B1A" },
       }}
     >
       {/* Modern combined auth screen */}
-      <Stack.Screen name="auth" options={{ title: "Đăng nhập" }} />
+      <Stack.Screen name="auth" options={{ title: t("auth.login") }} />
 
       {/* Supporting screens */}
       <Stack.Screen name="forgot-password" />

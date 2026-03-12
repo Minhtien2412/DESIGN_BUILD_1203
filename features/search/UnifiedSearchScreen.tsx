@@ -7,6 +7,7 @@
 import { Product } from "@/data/products";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { CompanyListItem } from "@/services/company.service";
+import { useI18n } from "@/services/i18nService";
 import {
     LOCATIONS,
     PARTNER_TYPES,
@@ -63,17 +64,17 @@ const COLORS = {
 // ============================================================================
 // ENTITY TAB CONFIG
 // ============================================================================
-const ENTITY_TABS: {
+const ENTITY_TAB_KEYS: {
   id: SearchEntityType | "all";
-  label: string;
+  labelKey: string;
   icon: string;
 }[] = [
-  { id: "all", label: "Tất cả", icon: "apps" },
-  { id: "product", label: "Sản phẩm", icon: "cube" },
-  { id: "worker", label: "Thợ", icon: "construct" },
-  { id: "company", label: "Công ty", icon: "business" },
-  { id: "partner", label: "Đối tác", icon: "people" },
-  { id: "user", label: "Người dùng", icon: "person" },
+  { id: "all", labelKey: "search.all", icon: "apps" },
+  { id: "product", labelKey: "search.products", icon: "cube" },
+  { id: "worker", labelKey: "search.workers", icon: "construct" },
+  { id: "company", labelKey: "search.companies", icon: "business" },
+  { id: "partner", labelKey: "search.partners", icon: "people" },
+  { id: "user", labelKey: "search.users", icon: "person" },
 ];
 
 // ============================================================================
@@ -97,6 +98,7 @@ function FilterModal({
   const [localFilters, setLocalFilters] = useState<Partial<SearchFilters>>({});
   const textColor = useThemeColor({}, "text");
   const cardBg = useThemeColor({}, "card");
+  const { t } = useI18n();
 
   useEffect(() => {
     setLocalFilters({
@@ -128,7 +130,7 @@ function FilterModal({
         <View style={[styles.modalContent, { backgroundColor: cardBg }]}>
           <View style={styles.modalHeader}>
             <Text style={[styles.modalTitle, { color: textColor }]}>
-              Bộ lọc tìm kiếm
+              {t("search.filterTitle")}
             </Text>
             <TouchableOpacity onPress={onClose}>
               <Ionicons name="close" size={24} color={textColor} />
@@ -139,7 +141,7 @@ function FilterModal({
             {/* Location Filter */}
             <View style={styles.filterSection}>
               <Text style={[styles.filterLabel, { color: textColor }]}>
-                Khu vực
+                {t("search.area")}
               </Text>
               <View style={styles.filterOptions}>
                 {LOCATIONS.map((loc) => (
@@ -174,7 +176,7 @@ function FilterModal({
             {entityType !== "all" && (
               <View style={styles.filterSection}>
                 <Text style={[styles.filterLabel, { color: textColor }]}>
-                  Danh mục
+                  {t("search.category")}
                 </Text>
                 <View style={styles.filterOptions}>
                   {getCategories().map((cat) => (
@@ -210,7 +212,7 @@ function FilterModal({
             {/* Rating Filter */}
             <View style={styles.filterSection}>
               <Text style={[styles.filterLabel, { color: textColor }]}>
-                Đánh giá tối thiểu
+                {t("search.minRating")}
               </Text>
               <View style={styles.filterOptions}>
                 {[0, 3, 3.5, 4, 4.5].map((rating) => (
@@ -244,7 +246,7 @@ function FilterModal({
                           styles.filterChipTextActive,
                       ]}
                     >
-                      {rating === 0 ? "Tất cả" : `${rating}+`}
+                      {rating === 0 ? t("search.all") : `${rating}+`}
                     </Text>
                   </TouchableOpacity>
                 ))}
@@ -254,7 +256,7 @@ function FilterModal({
             {/* Verified Filter */}
             <View style={styles.filterSection}>
               <Text style={[styles.filterLabel, { color: textColor }]}>
-                Xác thực
+                {t("search.verified")}
               </Text>
               <View style={styles.filterOptions}>
                 <TouchableOpacity
@@ -274,7 +276,7 @@ function FilterModal({
                         styles.filterChipTextActive,
                     ]}
                   >
-                    Tất cả
+                    {t("search.all")}
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -302,7 +304,7 @@ function FilterModal({
                         styles.filterChipTextActive,
                     ]}
                   >
-                    Đã xác thực
+                    {t("search.verifiedYes")}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -315,7 +317,7 @@ function FilterModal({
               style={styles.resetBtn}
               onPress={() => setLocalFilters({})}
             >
-              <Text style={styles.resetBtnText}>Đặt lại</Text>
+              <Text style={styles.resetBtnText}>{t("search.reset")}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.applyBtn}
@@ -324,7 +326,7 @@ function FilterModal({
                 onClose();
               }}
             >
-              <Text style={styles.applyBtnText}>Áp dụng</Text>
+              <Text style={styles.applyBtnText}>{t("search.apply")}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -372,6 +374,7 @@ function ProductCard({
 }
 
 function WorkerCard({ item, onPress }: { item: Worker; onPress: () => void }) {
+  const { t } = useI18n();
   return (
     <TouchableOpacity style={styles.workerCard} onPress={onPress}>
       <Image
@@ -407,7 +410,7 @@ function WorkerCard({ item, onPress }: { item: Worker; onPress: () => void }) {
       </View>
       {item.availability === "available" && (
         <View style={styles.availableBadge}>
-          <Text style={styles.availableText}>Sẵn sàng</Text>
+          <Text style={styles.availableText}>{t("search.ready")}</Text>
         </View>
       )}
     </TouchableOpacity>
@@ -470,15 +473,16 @@ function PartnerCard({
   item: PartnerProfile;
   onPress: () => void;
 }) {
+  const { t } = useI18n();
   const getTypeLabel = (type: string) => {
-    const types: Record<string, string> = {
-      contractor: "Nhà thầu",
-      supplier: "Nhà cung cấp",
-      architect: "Kiến trúc sư",
-      designer: "Nhà thiết kế",
-      investor: "Đầu tư",
+    const typeKeyMap: Record<string, string> = {
+      contractor: "search.contractor",
+      supplier: "search.supplier",
+      architect: "search.architect",
+      designer: "search.designer",
+      investor: "search.investor",
     };
-    return types[type] || type;
+    return typeKeyMap[type] ? t(typeKeyMap[type]) : type;
   };
 
   return (
@@ -533,15 +537,16 @@ function UserCard({
   item: UserProfile;
   onPress: () => void;
 }) {
+  const { t } = useI18n();
   const getRoleLabel = (role: string) => {
-    const roles: Record<string, string> = {
-      customer: "Khách hàng",
-      seller: "Người bán",
-      contractor: "Nhà thầu",
-      worker: "Thợ",
-      admin: "Quản trị",
+    const roleKeyMap: Record<string, string> = {
+      customer: "search.customer",
+      seller: "search.seller",
+      contractor: "search.contractor",
+      worker: "search.worker",
+      admin: "search.admin",
     };
-    return roles[role] || role;
+    return roleKeyMap[role] ? t(roleKeyMap[role]) : role;
   };
 
   return (
@@ -601,6 +606,7 @@ export default function UnifiedSearchScreen() {
   const backgroundColor = useThemeColor({}, "background");
   const textColor = useThemeColor({}, "text");
   const cardBg = useThemeColor({}, "card");
+  const { t } = useI18n();
   const params = useLocalSearchParams<{ q?: string; type?: string }>();
 
   // State
@@ -757,7 +763,7 @@ export default function UnifiedSearchScreen() {
       return (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={COLORS.primary} />
-          <Text style={styles.loadingText}>Đang tìm kiếm...</Text>
+          <Text style={styles.loadingText}>{t("search.searching")}</Text>
         </View>
       );
     }
@@ -769,11 +775,9 @@ export default function UnifiedSearchScreen() {
         <View style={styles.emptyContainer}>
           <Ionicons name="search-outline" size={64} color={COLORS.border} />
           <Text style={[styles.emptyText, { color: textColor }]}>
-            Không tìm thấy kết quả
+            {t("search.noResults")}
           </Text>
-          <Text style={styles.emptySubtext}>
-            Thử thay đổi từ khóa hoặc bộ lọc
-          </Text>
+          <Text style={styles.emptySubtext}>{t("search.noResultsHint")}</Text>
         </View>
       );
     }
@@ -796,11 +800,11 @@ export default function UnifiedSearchScreen() {
             <View style={styles.sectionContainer}>
               <View style={styles.sectionHeader}>
                 <Text style={[styles.sectionTitle, { color: textColor }]}>
-                  <Ionicons name="cube" size={18} color={COLORS.primary} /> Sản
-                  phẩm
+                  <Ionicons name="cube" size={18} color={COLORS.primary} />{" "}
+                  {t("search.products")}
                 </Text>
                 <Text style={styles.sectionCount}>
-                  {totalCounts.products} kết quả
+                  {totalCounts.products} {t("search.results")}
                 </Text>
               </View>
               <FlatList
@@ -826,10 +830,10 @@ export default function UnifiedSearchScreen() {
               <View style={styles.sectionHeader}>
                 <Text style={[styles.sectionTitle, { color: textColor }]}>
                   <Ionicons name="construct" size={18} color={COLORS.primary} />{" "}
-                  Thợ
+                  {t("search.workers")}
                 </Text>
                 <Text style={styles.sectionCount}>
-                  {totalCounts.workers} kết quả
+                  {totalCounts.workers} {t("search.results")}
                 </Text>
               </View>
               {workers.map((item) => (
@@ -849,10 +853,10 @@ export default function UnifiedSearchScreen() {
               <View style={styles.sectionHeader}>
                 <Text style={[styles.sectionTitle, { color: textColor }]}>
                   <Ionicons name="business" size={18} color={COLORS.primary} />{" "}
-                  Công ty
+                  {t("search.companies")}
                 </Text>
                 <Text style={styles.sectionCount}>
-                  {totalCounts.companies} kết quả
+                  {totalCounts.companies} {t("search.results")}
                 </Text>
               </View>
               {companies.map((item) => (
@@ -872,10 +876,10 @@ export default function UnifiedSearchScreen() {
               <View style={styles.sectionHeader}>
                 <Text style={[styles.sectionTitle, { color: textColor }]}>
                   <Ionicons name="people" size={18} color={COLORS.primary} />{" "}
-                  Đối tác
+                  {t("search.partners")}
                 </Text>
                 <Text style={styles.sectionCount}>
-                  {totalCounts.partners} kết quả
+                  {totalCounts.partners} {t("search.results")}
                 </Text>
               </View>
               {partners.map((item) => (
@@ -894,10 +898,10 @@ export default function UnifiedSearchScreen() {
             <View style={styles.sectionHeader}>
               <Text style={[styles.sectionTitle, { color: textColor }]}>
                 <Ionicons name="person" size={18} color={COLORS.primary} />{" "}
-                Người dùng
+                {t("search.users")}
               </Text>
               <Text style={styles.sectionCount}>
-                {totalCounts.users} kết quả
+                {totalCounts.users} {t("search.results")}
               </Text>
             </View>
             {users.map((item) => (
@@ -933,7 +937,7 @@ export default function UnifiedSearchScreen() {
           >
             <Ionicons name="arrow-back" size={24} color={COLORS.white} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Tìm kiếm thống nhất</Text>
+          <Text style={styles.headerTitle}>{t("search.unifiedSearch")}</Text>
           <View style={{ width: 40 }} />
         </View>
 
@@ -943,7 +947,7 @@ export default function UnifiedSearchScreen() {
             <Ionicons name="search" size={20} color={COLORS.textSecondary} />
             <TextInput
               style={styles.searchInput}
-              placeholder="Tìm sản phẩm, thợ, công ty, đối tác..."
+              placeholder={t("search.placeholder")}
               placeholderTextColor={COLORS.textSecondary}
               value={query}
               onChangeText={setQuery}
@@ -976,7 +980,7 @@ export default function UnifiedSearchScreen() {
         style={[styles.tabsContainer, { backgroundColor: cardBg }]}
         contentContainerStyle={styles.tabsContent}
       >
-        {ENTITY_TABS.map((tab) => (
+        {ENTITY_TAB_KEYS.map((tab) => (
           <TouchableOpacity
             key={tab.id}
             style={[styles.tab, activeTab === tab.id && styles.tabActive]}
@@ -995,7 +999,7 @@ export default function UnifiedSearchScreen() {
                 activeTab === tab.id && styles.tabTextActive,
               ]}
             >
-              {tab.label}
+              {t(tab.labelKey)}
             </Text>
             {renderTabBadge(getTabCount(tab.id))}
           </TouchableOpacity>

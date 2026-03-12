@@ -446,7 +446,7 @@ class VideoUploadServiceClass {
       "/api/v1/upload/presign",
       {
         contentType: config.video.mimeType,
-        fileSize: config.video.fileSize,
+        size: config.video.fileSize,
         filename: config.video.filename,
       },
     );
@@ -520,7 +520,7 @@ class VideoUploadServiceClass {
     config: UploadConfig,
   ): Promise<{ videoUrl: string; thumbnailUrl: string }> {
     const response = await post<{ videoUrl: string; thumbnailUrl: string }>(
-      "/api/v1/upload/complete",
+      "/api/v1/upload/presign/complete",
       {
         uploadId: serverUploadId,
         caption: formatCaption(config.caption, config.hashtags),

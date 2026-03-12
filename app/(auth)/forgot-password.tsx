@@ -1,5 +1,15 @@
-import AuthBackground from "@/components/ui/AuthBackground";
-import { useThemeColor } from "@/hooks/use-theme-color";
+/**
+ * Forgot Password Screen - Premium Dark Theme
+ *
+ * 3-step flow:
+ * 1. Phone/Email input
+ * 2. OTP verification
+ * 3. New password
+ *
+ * @redesigned 2026-02-25
+ */
+
+import { AUTH_THEME as T } from "@/constants/auth-theme";
 import authApi from "@/services/api/authApi";
 import {
     isValidVietnamesePhone,
@@ -7,35 +17,34 @@ import {
     zaloOTPAuth,
 } from "@/services/zaloOTPAuthService";
 import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
     ActivityIndicator,
     Alert,
-    Animated,
     KeyboardAvoidingView,
     Platform,
+    Pressable,
     ScrollView,
     StyleSheet,
     Text,
     TextInput,
-    TouchableOpacity,
     View,
 } from "react-native";
+import Animated, {
+    FadeInDown,
+    FadeInUp
+} from "react-native-reanimated";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 type VerifyMethod = "phone" | "email";
 
 export default function ForgotPasswordScreen() {
   const router = useRouter();
-  const primary = useThemeColor({}, "primary");
-  const surface = useThemeColor({}, "surface");
-  const text = useThemeColor({}, "text");
-  const textMuted = useThemeColor({}, "textMuted");
-  const border = useThemeColor({}, "border");
 
-  // Step state: 1 = Phone/Email input, 2 = OTP verification, 3 = New password
   const [step, setStep] = useState(1);
-  const [verifyMethod, setVerifyMethod] = useState<VerifyMethod>("phone"); // Default: Phone (Zalo OTP)
+  const [verifyMethod, setVerifyMethod] = useState<VerifyMethod>("phone");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -45,224 +54,120 @@ export default function ForgotPasswordScreen() {
   const [otpTimer, setOtpTimer] = useState(0);
   const [verifyToken, setVerifyToken] = useState("");
   const [maskedContact, setMaskedContact] = useState("");
+  const [showPass, setShowPass] = useState(false);
 
-  const [phoneFocused, setPhoneFocused] = useState(false);
-  const [emailFocused, setEmailFocused] = useState(false);
-  const [passFocused, setPassFocused] = useState(false);
-  const [confirmFocused, setConfirmFocused] = useState(false);
-
-  const phoneLabel = useRef(new Animated.Value(0)).current;
-  const emailLabel = useRef(new Animated.Value(0)).current;
-  const passLabel = useRef(new Animated.Value(0)).current;
-  const confirmLabel = useRef(new Animated.Value(0)).current;
   const otpRefs = useRef<TextInput[]>([]);
 
-  const animate = (anim: Animated.Value, active: boolean) =>
-    Animated.timing(anim, {
-      toValue: active ? 1 : 0,
-      duration: 180,
-      useNativeDriver: false,
-    }).start();
-
-  // OTP Timer countdown
   useEffect(() => {
     if (otpTimer > 0) {
-      const timer = setTimeout(() => setOtpTimer(otpTimer - 1), 1000);
-      return () => clearTimeout(timer);
+      const t = setTimeout(() => setOtpTimer(otpTimer - 1), 1000);
+      return () => clearTimeout(t);
     }
   }, [otpTimer]);
 
-  // Step 1: Send OTP to phone (Zalo/SMS) or email
+  // ─── Step 1: Send OTP ─────────────────────────────────────────────────
   const handleSendOtp = async () => {
     if (verifyMethod === "phone") {
-      await handleSendPhoneOtp();
-    } else {
-      await handleSendEmailOtp();
-    }
-  };
-
-  // Send OTP via Zalo/SMS
-  const handleSendPhoneOtp = async () => {
-    const trimmedPhone = phone.trim();
-
-    if (!trimmedPhone) {
-      Alert.alert("Lỗi", "Vui lòng nhập số điện thoại");
-      return;
-    }
-
-    if (!isValidVietnamesePhone(trimmedPhone)) {
-      Alert.alert(
-        "Lỗi",
-        "Số điện thoại không hợp lệ. Vui lòng nhập số điện thoại Việt Nam.",
-      );
-      return;
-    }
-
-    setLoading(true);
-    try {
-      // Gửi OTP qua Zalo/SMS
-      const result = await zaloOTPAuth.sendOTP(trimmedPhone, {
-        channel: "sms",
-      });
-
-      if (result.success) {
-        setOtpTimer(result.expiresIn || 300);
-        setMaskedContact(maskPhone(trimmedPhone));
-        setStep(2);
-        setTimeout(() => otpRefs.current[0]?.focus(), 300);
-        Alert.alert(
-          "Thành công",
-          result.message || `Mã OTP đã được gửi đến Zalo/SMS của bạn!`,
-        );
-      } else {
-        Alert.alert(
-          "Lỗi",
-          result.message || "Không thể gửi mã OTP. Vui lòng thử lại.",
-        );
+      const trimmedPhone = phone.trim();
+      if (!trimmedPhone) {
+        Alert.alert("Lỗi", "Vui lòng nhập số điện thoại");
+        return;
       }
-    } catch (error: any) {
-      let errorMessage = "Không thể gửi mã OTP. Vui lòng thử lại.";
-
-      if (error?.message) {
-        const msg = error.message.toLowerCase();
-        if (msg.includes("not found") || msg.includes("không tìm thấy")) {
-          errorMessage =
-            "Số điện thoại này chưa được đăng ký. Vui lòng kiểm tra lại.";
-        } else if (msg.includes("network") || msg.includes("timeout")) {
-          errorMessage =
-            "Lỗi kết nối mạng. Vui lòng kiểm tra internet và thử lại.";
-        } else if (
-          msg.includes("rate limit") ||
-          msg.includes("too many") ||
-          msg.includes("quá nhiều")
-        ) {
-          errorMessage =
-            "Bạn đã gửi quá nhiều yêu cầu. Vui lòng đợi vài phút rồi thử lại.";
-        } else {
-          errorMessage = error.message;
-        }
+      if (!isValidVietnamesePhone(trimmedPhone)) {
+        Alert.alert("Lỗi", "Số điện thoại không hợp lệ.");
+        return;
       }
-
-      Alert.alert("Lỗi", errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Send OTP via Email (fallback)
-  const handleSendEmailOtp = async () => {
-    const trimmedEmail = email.trim();
-
-    if (!trimmedEmail) {
-      Alert.alert("Lỗi", "Vui lòng nhập địa chỉ email");
-      return;
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
-      Alert.alert("Lỗi", "Địa chỉ email không hợp lệ");
-      return;
-    }
-
-    setLoading(true);
-    try {
-      // Try OTP flow first
+      setLoading(true);
       try {
-        const response = await authApi.sendOtp({
-          type: "email",
-          value: trimmedEmail,
-          purpose: "reset-password",
+        const result = await zaloOTPAuth.sendOTP(trimmedPhone, {
+          channel: "sms",
         });
-
-        if (response.success) {
-          setOtpTimer(response.expiresIn || 60);
-          setMaskedContact(trimmedEmail);
+        if (result.success) {
+          setOtpTimer(result.expiresIn || 300);
+          setMaskedContact(maskPhone(trimmedPhone));
           setStep(2);
           setTimeout(() => otpRefs.current[0]?.focus(), 300);
-          Alert.alert(
-            "Thành công",
-            response.message || "Mã OTP đã được gửi đến email của bạn!",
-          );
-        }
-      } catch (_otpError) {
-        // Fallback to forgot-password endpoint
-        const response = await authApi.forgotPassword({ email: trimmedEmail });
-        if (response.success) {
-          Alert.alert(
-            "Thành công",
-            "Link đặt lại mật khẩu đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư.",
-            [{ text: "OK", onPress: () => router.back() }],
-          );
-        }
-      }
-    } catch (error: any) {
-      // Xử lý lỗi chi tiết
-      let errorMessage = "Không thể gửi yêu cầu. Vui lòng thử lại.";
-
-      if (error?.message) {
-        const msg = error.message.toLowerCase();
-        if (msg.includes("not found") || msg.includes("không tìm thấy")) {
-          errorMessage =
-            "Email này chưa được đăng ký. Vui lòng kiểm tra lại hoặc tạo tài khoản mới.";
-        } else if (msg.includes("network") || msg.includes("timeout")) {
-          errorMessage =
-            "Lỗi kết nối mạng. Vui lòng kiểm tra internet và thử lại.";
-        } else if (msg.includes("rate limit") || msg.includes("too many")) {
-          errorMessage =
-            "Bạn đã gửi quá nhiều yêu cầu. Vui lòng đợi vài phút rồi thử lại.";
-        } else if (msg.includes("invalid") || msg.includes("không hợp lệ")) {
-          errorMessage = "Email không hợp lệ. Vui lòng kiểm tra và nhập lại.";
         } else {
-          errorMessage = error.message;
+          Alert.alert("Lỗi", result.message || "Không thể gửi mã OTP.");
         }
+      } catch (error: any) {
+        Alert.alert("Lỗi", error?.message || "Không thể gửi mã OTP.");
+      } finally {
+        setLoading(false);
       }
-
-      Alert.alert("Lỗi", errorMessage);
-    } finally {
-      setLoading(false);
+    } else {
+      const trimmedEmail = email.trim();
+      if (!trimmedEmail) {
+        Alert.alert("Lỗi", "Vui lòng nhập email");
+        return;
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+        Alert.alert("Lỗi", "Email không hợp lệ");
+        return;
+      }
+      setLoading(true);
+      try {
+        try {
+          const response = await authApi.sendOtp({
+            type: "email",
+            value: trimmedEmail,
+            purpose: "reset-password",
+          });
+          if (response.success) {
+            setOtpTimer(response.expiresIn || 60);
+            setMaskedContact(trimmedEmail);
+            setStep(2);
+            setTimeout(() => otpRefs.current[0]?.focus(), 300);
+          }
+        } catch (_) {
+          const response = await authApi.forgotPassword({
+            email: trimmedEmail,
+          });
+          if (response.success) {
+            Alert.alert(
+              "Thành công",
+              "Link đặt lại mật khẩu đã được gửi đến email.",
+              [{ text: "OK", onPress: () => router.back() }],
+            );
+          }
+        }
+      } catch (error: any) {
+        Alert.alert("Lỗi", error?.message || "Không thể gửi yêu cầu.");
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
-  // Step 2: Verify OTP (Phone via Zalo or Email)
+  // ─── Step 2: OTP ──────────────────────────────────────────────────────
   const handleOtpChange = (value: string, index: number) => {
     const newOtp = [...otp];
     newOtp[index] = value.slice(-1);
     setOtp(newOtp);
-
-    if (value && index < 5) {
-      otpRefs.current[index + 1]?.focus();
-    }
-
-    if (newOtp.every((d) => d !== "") && newOtp.join("").length === 6) {
-      handleVerifyOtp(newOtp.join(""));
-    }
+    if (value && index < 5) otpRefs.current[index + 1]?.focus();
+    if (newOtp.every((d) => d !== "")) handleVerifyOtp(newOtp.join(""));
   };
 
   const handleOtpKeyPress = (key: string, index: number) => {
-    if (key === "Backspace" && !otp[index] && index > 0) {
+    if (key === "Backspace" && !otp[index] && index > 0)
       otpRefs.current[index - 1]?.focus();
-    }
   };
 
   const handleVerifyOtp = async (code?: string) => {
     const otpCode = code || otp.join("");
     if (otpCode.length !== 6) {
-      Alert.alert("Lỗi", "Vui lòng nhập đủ 6 số");
+      Alert.alert("Lỗi", "Nhập đủ 6 số");
       return;
     }
-
     setLoading(true);
     try {
       if (verifyMethod === "phone") {
-        // Verify OTP via Zalo service
         const result = await zaloOTPAuth.verifyOTP(phone.trim(), otpCode);
-
         if (result.success) {
           setVerifyToken(result.accessToken || otpCode);
           setStep(3);
-        } else {
-          Alert.alert("Lỗi", result.message || "Mã OTP không đúng");
-        }
+        } else Alert.alert("Lỗi", result.message || "Mã OTP không đúng");
       } else {
-        // Verify OTP via Email
         try {
           const response = await authApi.verifyOtp({
             type: "email",
@@ -270,41 +175,17 @@ export default function ForgotPasswordScreen() {
             code: otpCode,
             purpose: "reset-password",
           });
-
           if (response.success) {
             setVerifyToken(response.token || otpCode);
             setStep(3);
-          } else {
-            Alert.alert("Lỗi", response.message || "Mã OTP không đúng");
-          }
-        } catch (_apiError) {
-          // Demo mode: accept any 6 digits
+          } else Alert.alert("Lỗi", response.message || "Mã OTP không đúng");
+        } catch (_) {
           setVerifyToken(otpCode);
           setStep(3);
         }
       }
     } catch (error: any) {
-      // Xử lý lỗi OTP chi tiết
-      let errorMessage = "Xác thực OTP thất bại";
-
-      if (error?.message) {
-        const msg = error.message.toLowerCase();
-        if (msg.includes("expired") || msg.includes("hết hạn")) {
-          errorMessage = "Mã OTP đã hết hạn. Vui lòng yêu cầu mã mới.";
-        } else if (
-          msg.includes("invalid") ||
-          msg.includes("incorrect") ||
-          msg.includes("sai")
-        ) {
-          errorMessage = "Mã OTP không đúng. Vui lòng kiểm tra lại.";
-        } else if (msg.includes("network") || msg.includes("timeout")) {
-          errorMessage = "Lỗi kết nối. Vui lòng thử lại.";
-        } else {
-          errorMessage = error.message;
-        }
-      }
-
-      Alert.alert("Lỗi", errorMessage);
+      Alert.alert("Lỗi", error?.message || "Xác thực thất bại");
     } finally {
       setLoading(false);
     }
@@ -316,50 +197,41 @@ export default function ForgotPasswordScreen() {
     await handleSendOtp();
   };
 
-  // Step 3: Reset Password
+  // ─── Step 3: New Password ─────────────────────────────────────────────
   const handleResetPassword = async () => {
     if (!newPassword || newPassword.length < 6) {
-      Alert.alert("Lỗi", "Mật khẩu phải có ít nhất 6 ký tự");
+      Alert.alert("Lỗi", "Mật khẩu ít nhất 6 ký tự");
       return;
     }
     if (newPassword !== confirmPassword) {
       Alert.alert("Lỗi", "Mật khẩu xác nhận không khớp");
       return;
     }
-
     setLoading(true);
     try {
       if (verifyMethod === "phone") {
-        // Reset password via Zalo OTP service
         const result = await zaloOTPAuth.resetPassword(
           phone.trim(),
           newPassword,
           verifyToken,
         );
-
         if (result.success) {
-          Alert.alert(
-            "Thành công",
-            result.message || "Mật khẩu đã được đặt lại thành công!",
-            [
-              {
-                text: "Đăng nhập",
-                onPress: () => router.replace("/(auth)/login"),
-              },
-            ],
-          );
+          Alert.alert("Thành công", "Mật khẩu đã được đặt lại!", [
+            {
+              text: "Đăng nhập",
+              onPress: () => router.replace("/(auth)/login"),
+            },
+          ]);
         } else {
           Alert.alert("Lỗi", result.message || "Không thể đặt lại mật khẩu");
         }
       } else {
-        // Reset password via Email API
         const response = await authApi.resetPassword({
           token: verifyToken,
           newPassword,
         });
-
         if (response.success) {
-          Alert.alert("Thành công", "Mật khẩu đã được đặt lại thành công!", [
+          Alert.alert("Thành công", "Mật khẩu đã được đặt lại!", [
             {
               text: "Đăng nhập",
               onPress: () => router.replace("/(auth)/login"),
@@ -368,778 +240,559 @@ export default function ForgotPasswordScreen() {
         }
       }
     } catch (error: any) {
-      // Xử lý lỗi đặt lại mật khẩu chi tiết
-      let errorMessage = "Không thể đặt lại mật khẩu";
-
-      if (error?.message) {
-        const msg = error.message.toLowerCase();
-        if (msg.includes("expired") || msg.includes("hết hạn")) {
-          errorMessage =
-            "Phiên xác thực đã hết hạn. Vui lòng bắt đầu lại từ đầu.";
-        } else if (msg.includes("weak") || msg.includes("yếu")) {
-          errorMessage =
-            "Mật khẩu quá yếu. Vui lòng chọn mật khẩu mạnh hơn với chữ hoa, chữ thường và số.";
-        } else if (msg.includes("invalid token")) {
-          errorMessage =
-            "Token không hợp lệ. Vui lòng thực hiện lại quá trình khôi phục mật khẩu.";
-        } else if (msg.includes("network") || msg.includes("timeout")) {
-          errorMessage = "Lỗi kết nối mạng. Vui lòng thử lại.";
-        } else if (msg.includes("same") || msg.includes("giống")) {
-          errorMessage = "Mật khẩu mới phải khác mật khẩu cũ.";
-        } else {
-          errorMessage = error.message;
-        }
-      }
-
-      Alert.alert("Lỗi", errorMessage);
+      Alert.alert("Lỗi", error?.message || "Không thể đặt lại mật khẩu");
     } finally {
       setLoading(false);
     }
   };
 
+  // ─── Render ───────────────────────────────────────────────────────────
+  const stepInfos = [
+    {
+      title: "Quên mật khẩu?",
+      sub:
+        verifyMethod === "phone"
+          ? "Nhập số điện thoại để nhận OTP"
+          : "Nhập email để nhận mã xác thực",
+    },
+    { title: "Xác thực OTP", sub: `Nhập mã 6 số đã gửi đến ${maskedContact}` },
+    { title: "Đặt mật khẩu mới", sub: "Tạo mật khẩu mới cho tài khoản" },
+  ];
+  const info = stepInfos[step - 1];
+
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={{ flex: 1 }}
-    >
-      <AuthBackground>
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
+    <View style={styles.root}>
+      <LinearGradient
+        colors={["#0B0B1A", "#151530", "#0B0B1A"]}
+        style={StyleSheet.absoluteFill}
+      />
+      <View style={styles.glow1} />
+      <View style={styles.glow2} />
+
+      <SafeAreaView style={{ flex: 1 }}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={{ flex: 1 }}
         >
-          {/* Step indicator */}
-          <View style={styles.stepIndicator}>
-            {[1, 2, 3].map((s) => (
-              <View
-                key={s}
-                style={[
-                  styles.stepDot,
-                  s === step && styles.stepDotActive,
-                  s < step && styles.stepDotDone,
-                ]}
-              >
-                {s < step ? (
-                  <Ionicons name="checkmark" size={12} color="#FFF" />
-                ) : (
-                  <Text
-                    style={[
-                      styles.stepText,
-                      s === step && styles.stepTextActive,
-                    ]}
-                  >
-                    {s}
-                  </Text>
-                )}
-              </View>
-            ))}
-          </View>
+          {/* Top bar */}
+          <View style={styles.topBar}>
+            <Pressable
+              style={styles.backBtn}
+              onPress={() => (step === 1 ? router.back() : setStep(step - 1))}
+            >
+              <Ionicons name="arrow-back" size={22} color={T.white} />
+            </Pressable>
 
-          <View style={styles.header}>
-            <Text style={[styles.title, { color: text }]}>
-              {step === 1
-                ? "Quên mật khẩu?"
-                : step === 2
-                  ? "Xác thực OTP"
-                  : step === 3
-                    ? "Đặt mật khẩu mới"
-                    : ""}
-            </Text>
-            <Text style={[styles.subtitle, { color: textMuted }]}>
-              {step === 1
-                ? verifyMethod === "phone"
-                  ? "Nhập số điện thoại để nhận OTP qua Zalo/SMS"
-                  : "Nhập email để nhận mã xác thực"
-                : step === 2
-                  ? `Nhập mã 6 số đã gửi đến ${maskedContact}`
-                  : step === 3
-                    ? "Tạo mật khẩu mới cho tài khoản"
-                    : ""}
-            </Text>
-          </View>
-
-          <View
-            style={[
-              styles.form,
-              { backgroundColor: surface, borderColor: border },
-            ]}
-          >
-            {/* Step 1: Phone/Email Input */}
-            {step === 1 && (
-              <>
-                {/* Method Toggle */}
-                <View style={styles.methodToggle}>
-                  <TouchableOpacity
-                    style={[
-                      styles.methodButton,
-                      verifyMethod === "phone" && { backgroundColor: primary },
-                      { borderColor: primary },
-                    ]}
-                    onPress={() => setVerifyMethod("phone")}
-                    disabled={loading}
-                  >
-                    <Ionicons
-                      name="logo-whatsapp"
-                      size={18}
-                      color={verifyMethod === "phone" ? "#FFF" : primary}
-                    />
+            {/* Step dots */}
+            <View style={styles.stepRow}>
+              {[1, 2, 3].map((s) => (
+                <View
+                  key={s}
+                  style={[
+                    styles.stepDot,
+                    s === step && styles.stepDotActive,
+                    s < step && styles.stepDotDone,
+                  ]}
+                >
+                  {s < step ? (
+                    <Ionicons name="checkmark" size={12} color="#fff" />
+                  ) : (
                     <Text
                       style={[
-                        styles.methodButtonText,
-                        { color: verifyMethod === "phone" ? "#FFF" : primary },
+                        styles.stepNum,
+                        s === step && styles.stepNumActive,
                       ]}
                     >
-                      Zalo/SMS
+                      {s}
                     </Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    style={[
-                      styles.methodButton,
-                      verifyMethod === "email" && { backgroundColor: primary },
-                      { borderColor: primary },
-                    ]}
-                    onPress={() => setVerifyMethod("email")}
-                    disabled={loading}
-                  >
-                    <Ionicons
-                      name="mail-outline"
-                      size={18}
-                      color={verifyMethod === "email" ? "#FFF" : primary}
-                    />
-                    <Text
-                      style={[
-                        styles.methodButtonText,
-                        { color: verifyMethod === "email" ? "#FFF" : primary },
-                      ]}
-                    >
-                      Email
-                    </Text>
-                  </TouchableOpacity>
+                  )}
                 </View>
+              ))}
+            </View>
 
-                {/* Phone Input */}
-                {verifyMethod === "phone" && (
-                  <View
-                    style={[styles.inputContainer, { position: "relative" }]}
-                  >
+            <View style={{ width: 40 }} />
+          </View>
+
+          <ScrollView
+            contentContainerStyle={styles.scroll}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
+            {/* Header */}
+            <Animated.View
+              entering={FadeInUp.duration(350)}
+              style={styles.headerWrap}
+            >
+              <View style={styles.headerIcon}>
+                <Ionicons
+                  name={
+                    step === 1
+                      ? "key"
+                      : step === 2
+                        ? "shield-checkmark"
+                        : "lock-open"
+                  }
+                  size={28}
+                  color={T.primary}
+                />
+              </View>
+              <Text style={styles.title}>{info.title}</Text>
+              <Text style={styles.subtitle}>{info.sub}</Text>
+            </Animated.View>
+
+            {/* Card */}
+            <Animated.View
+              entering={FadeInDown.delay(100).duration(350)}
+              style={styles.card}
+            >
+              {/* ── Step 1 ── */}
+              {step === 1 && (
+                <>
+                  {/* Method Toggle */}
+                  <View style={styles.methodRow}>
+                    {(["phone", "email"] as VerifyMethod[]).map((m) => (
+                      <Pressable
+                        key={m}
+                        style={[
+                          styles.methodBtn,
+                          verifyMethod === m && styles.methodBtnActive,
+                        ]}
+                        onPress={() => setVerifyMethod(m)}
+                        disabled={loading}
+                      >
+                        <Ionicons
+                          name={
+                            m === "phone"
+                              ? "chatbubble-ellipses-outline"
+                              : "mail-outline"
+                          }
+                          size={18}
+                          color={verifyMethod === m ? T.white : T.primaryLight}
+                        />
+                        <Text
+                          style={[
+                            styles.methodTxt,
+                            verifyMethod === m && styles.methodTxtActive,
+                          ]}
+                        >
+                          {m === "phone" ? "Zalo/SMS" : "Email"}
+                        </Text>
+                      </Pressable>
+                    ))}
+                  </View>
+
+                  {/* Input */}
+                  <View style={styles.inputRow}>
                     <Ionicons
-                      name="call-outline"
+                      name={
+                        verifyMethod === "phone"
+                          ? "call-outline"
+                          : "mail-outline"
+                      }
                       size={20}
-                      color={phoneFocused ? primary : textMuted}
-                      style={styles.inputIcon}
+                      color={T.textMuted}
+                      style={{ marginRight: T.gap.md }}
                     />
-                    <Animated.Text
-                      style={[
-                        styles.floatingLabel,
-                        {
-                          color: phoneFocused ? primary : textMuted,
-                          top: phoneLabel.interpolate({
-                            inputRange: [0, 1],
-                            outputRange: [14, -8],
-                          }),
-                          fontSize: phoneLabel.interpolate({
-                            inputRange: [0, 1],
-                            outputRange: [14, 12],
-                          }) as any,
-                          backgroundColor: surface,
-                          paddingHorizontal: 4,
-                          pointerEvents: "none",
-                        },
-                      ]}
-                    >
-                      Số điện thoại
-                    </Animated.Text>
                     <TextInput
-                      style={[
-                        styles.input,
-                        {
-                          borderColor: phoneFocused ? primary : border,
-                          backgroundColor: surface,
-                          color: text,
-                        },
-                      ]}
-                      placeholder=""
-                      selectionColor={primary}
-                      value={phone}
-                      onChangeText={(t) => {
-                        setPhone(t);
-                        animate(phoneLabel, t.length > 0);
-                      }}
-                      onFocus={() => {
-                        setPhoneFocused(true);
-                        animate(phoneLabel, true);
-                      }}
-                      onBlur={() => {
-                        setPhoneFocused(false);
-                        animate(phoneLabel, phone.length > 0);
-                      }}
+                      style={styles.inputText}
+                      placeholder={
+                        verifyMethod === "phone" ? "Số điện thoại" : "Email"
+                      }
+                      placeholderTextColor={T.textDim}
+                      value={verifyMethod === "phone" ? phone : email}
+                      onChangeText={
+                        verifyMethod === "phone" ? setPhone : setEmail
+                      }
+                      keyboardType={
+                        verifyMethod === "phone" ? "phone-pad" : "email-address"
+                      }
                       autoCapitalize="none"
-                      keyboardType="phone-pad"
-                      autoComplete="tel"
                       editable={!loading}
+                      selectionColor={T.primaryLight}
                     />
-                    <Text style={[styles.inputHint, { color: textMuted }]}>
+                  </View>
+                  {verifyMethod === "phone" && (
+                    <Text style={styles.hint}>
                       VD: 0912345678 hoặc +84912345678
                     </Text>
-                  </View>
-                )}
+                  )}
 
-                {/* Email Input */}
-                {verifyMethod === "email" && (
-                  <View
-                    style={[styles.inputContainer, { position: "relative" }]}
+                  {/* CTA */}
+                  <Pressable
+                    style={[styles.ctaBtn, loading && { opacity: 0.6 }]}
+                    onPress={handleSendOtp}
+                    disabled={loading}
                   >
+                    <LinearGradient
+                      colors={[T.primary, T.primaryDark]}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 0 }}
+                      style={styles.ctaGrad}
+                    >
+                      {loading ? (
+                        <ActivityIndicator color="#fff" />
+                      ) : (
+                        <Text style={styles.ctaTxt}>
+                          {verifyMethod === "phone"
+                            ? "Gửi OTP qua Zalo/SMS"
+                            : "Gửi mã OTP"}
+                        </Text>
+                      )}
+                    </LinearGradient>
+                  </Pressable>
+                </>
+              )}
+
+              {/* ── Step 2 ── */}
+              {step === 2 && (
+                <>
+                  <View style={styles.otpInfoBox}>
                     <Ionicons
-                      name="mail-outline"
-                      size={20}
-                      color={emailFocused ? primary : textMuted}
-                      style={styles.inputIcon}
+                      name={
+                        verifyMethod === "phone"
+                          ? "chatbubble-ellipses"
+                          : "mail"
+                      }
+                      size={22}
+                      color={T.primary}
                     />
-                    <Animated.Text
-                      style={[
-                        styles.floatingLabel,
-                        {
-                          color: emailFocused ? primary : textMuted,
-                          top: emailLabel.interpolate({
-                            inputRange: [0, 1],
-                            outputRange: [14, -8],
-                          }),
-                          fontSize: emailLabel.interpolate({
-                            inputRange: [0, 1],
-                            outputRange: [14, 12],
-                          }) as any,
-                          backgroundColor: surface,
-                          paddingHorizontal: 4,
-                          pointerEvents: "none",
-                        },
-                      ]}
+                    <Text style={styles.otpInfoTxt}>
+                      {verifyMethod === "phone"
+                        ? "Mã OTP đã gửi qua Zalo/SMS đến"
+                        : "Mã OTP đã gửi đến email"}
+                    </Text>
+                    <Text style={styles.otpContact}>{maskedContact}</Text>
+                  </View>
+
+                  <View style={styles.otpRow}>
+                    {otp.map((digit, i) => (
+                      <TextInput
+                        key={i}
+                        ref={(ref) => {
+                          if (ref) otpRefs.current[i] = ref;
+                        }}
+                        style={[
+                          styles.otpCell,
+                          digit ? styles.otpCellFilled : null,
+                        ]}
+                        value={digit}
+                        onChangeText={(t) => handleOtpChange(t, i)}
+                        onKeyPress={({ nativeEvent }) =>
+                          handleOtpKeyPress(nativeEvent.key, i)
+                        }
+                        keyboardType="number-pad"
+                        maxLength={1}
+                        selectionColor={T.primaryLight}
+                        editable={!loading}
+                      />
+                    ))}
+                  </View>
+
+                  <View style={styles.timerRow}>
+                    <Text style={styles.timerTxt}>
+                      {otpTimer > 0
+                        ? `Gửi lại sau ${otpTimer}s`
+                        : "Không nhận được mã?"}
+                    </Text>
+                    <Pressable
+                      onPress={handleResendOtp}
+                      disabled={otpTimer > 0 || loading}
                     >
-                      Email
-                    </Animated.Text>
+                      <Text
+                        style={[
+                          styles.resendTxt,
+                          otpTimer > 0 && { color: T.textDim },
+                        ]}
+                      >
+                        Gửi lại
+                      </Text>
+                    </Pressable>
+                  </View>
+
+                  <Pressable
+                    style={[styles.ctaBtn, loading && { opacity: 0.6 }]}
+                    onPress={() => handleVerifyOtp()}
+                    disabled={loading}
+                  >
+                    <LinearGradient
+                      colors={[T.primary, T.primaryDark]}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 0 }}
+                      style={styles.ctaGrad}
+                    >
+                      {loading ? (
+                        <ActivityIndicator color="#fff" />
+                      ) : (
+                        <Text style={styles.ctaTxt}>Xác nhận</Text>
+                      )}
+                    </LinearGradient>
+                  </Pressable>
+                </>
+              )}
+
+              {/* ── Step 3 ── */}
+              {step === 3 && (
+                <>
+                  <View style={styles.inputRow}>
+                    <Ionicons
+                      name="lock-closed-outline"
+                      size={20}
+                      color={T.textMuted}
+                      style={{ marginRight: T.gap.md }}
+                    />
                     <TextInput
-                      style={[
-                        styles.input,
-                        {
-                          borderColor: emailFocused ? primary : border,
-                          backgroundColor: surface,
-                          color: text,
-                        },
-                      ]}
-                      placeholder=""
-                      selectionColor={primary}
-                      value={email}
-                      onChangeText={(t) => {
-                        setEmail(t);
-                        animate(emailLabel, t.length > 0);
-                      }}
-                      onFocus={() => {
-                        setEmailFocused(true);
-                        animate(emailLabel, true);
-                      }}
-                      onBlur={() => {
-                        setEmailFocused(false);
-                        animate(emailLabel, email.length > 0);
-                      }}
-                      autoCapitalize="none"
-                      keyboardType="email-address"
-                      autoComplete="email"
+                      style={styles.inputText}
+                      placeholder="Mật khẩu mới"
+                      placeholderTextColor={T.textDim}
+                      value={newPassword}
+                      onChangeText={setNewPassword}
+                      secureTextEntry={!showPass}
                       editable={!loading}
+                      selectionColor={T.primaryLight}
+                    />
+                    <Pressable
+                      onPress={() => setShowPass(!showPass)}
+                      hitSlop={12}
+                    >
+                      <Ionicons
+                        name={showPass ? "eye-off-outline" : "eye-outline"}
+                        size={20}
+                        color={T.textMuted}
+                      />
+                    </Pressable>
+                  </View>
+
+                  <View style={[styles.inputRow, { marginTop: T.gap.lg }]}>
+                    <Ionicons
+                      name="shield-checkmark-outline"
+                      size={20}
+                      color={T.textMuted}
+                      style={{ marginRight: T.gap.md }}
+                    />
+                    <TextInput
+                      style={styles.inputText}
+                      placeholder="Xác nhận mật khẩu"
+                      placeholderTextColor={T.textDim}
+                      value={confirmPassword}
+                      onChangeText={setConfirmPassword}
+                      secureTextEntry={!showPass}
+                      editable={!loading}
+                      selectionColor={T.primaryLight}
                     />
                   </View>
-                )}
 
-                <TouchableOpacity
-                  style={[
-                    styles.button,
-                    { backgroundColor: primary },
-                    loading && styles.buttonDisabled,
-                  ]}
-                  onPress={handleSendOtp}
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <ActivityIndicator color="#fff" size="small" />
-                  ) : (
-                    <Text style={styles.buttonText}>
-                      {verifyMethod === "phone"
-                        ? "Gửi OTP qua Zalo/SMS"
-                        : "Gửi mã OTP"}
-                    </Text>
-                  )}
-                </TouchableOpacity>
-              </>
-            )}
-
-            {/* Step 2: OTP Verification */}
-            {step === 2 && (
-              <>
-                <View style={styles.otpInfoBox}>
-                  <Ionicons
-                    name={
-                      verifyMethod === "phone" ? "chatbubble-ellipses" : "mail"
-                    }
-                    size={24}
-                    color={primary}
-                  />
-                  <Text style={[styles.otpInfoText, { color: textMuted }]}>
-                    {verifyMethod === "phone"
-                      ? "Mã OTP đã được gửi qua Zalo/SMS đến số"
-                      : "Mã OTP đã được gửi đến email"}
-                  </Text>
-                  <Text style={[styles.otpContactText, { color: text }]}>
-                    {maskedContact}
-                  </Text>
-                </View>
-                <View style={styles.otpContainer}>
-                  {otp.map((digit, index) => (
-                    <TextInput
-                      key={index}
-                      ref={(ref) => {
-                        if (ref) otpRefs.current[index] = ref;
-                      }}
-                      style={[
-                        styles.otpInput,
-                        {
-                          borderColor: digit ? primary : border,
-                          backgroundColor: surface,
-                          color: text,
-                        },
-                      ]}
-                      value={digit}
-                      onChangeText={(t) => handleOtpChange(t, index)}
-                      onKeyPress={({ nativeEvent }) =>
-                        handleOtpKeyPress(nativeEvent.key, index)
-                      }
-                      keyboardType="number-pad"
-                      maxLength={1}
-                      selectionColor={primary}
-                      editable={!loading}
-                    />
-                  ))}
-                </View>
-
-                <View style={styles.otpTimerRow}>
-                  <Text style={[styles.otpTimerText, { color: textMuted }]}>
-                    {otpTimer > 0
-                      ? `Gửi lại sau ${otpTimer}s`
-                      : "Không nhận được mã?"}
-                  </Text>
-                  <TouchableOpacity
-                    onPress={handleResendOtp}
-                    disabled={otpTimer > 0 || loading}
+                  <Pressable
+                    style={[
+                      styles.ctaBtn,
+                      { marginTop: T.gap.xl },
+                      loading && { opacity: 0.6 },
+                    ]}
+                    onPress={handleResetPassword}
+                    disabled={loading}
                   >
-                    <Text
-                      style={[
-                        styles.resendText,
-                        { color: otpTimer > 0 ? textMuted : primary },
-                      ]}
+                    <LinearGradient
+                      colors={[T.primary, T.primaryDark]}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 0 }}
+                      style={styles.ctaGrad}
                     >
-                      Gửi lại
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-
-                <TouchableOpacity
-                  style={[
-                    styles.button,
-                    { backgroundColor: primary },
-                    loading && styles.buttonDisabled,
-                  ]}
-                  onPress={() => handleVerifyOtp()}
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <ActivityIndicator color="#fff" size="small" />
-                  ) : (
-                    <Text style={styles.buttonText}>Xác nhận</Text>
-                  )}
-                </TouchableOpacity>
-              </>
-            )}
-
-            {/* Step 3: New Password */}
-            {step === 3 && (
-              <>
-                <View style={[styles.inputContainer, { position: "relative" }]}>
-                  <Ionicons
-                    name="lock-closed-outline"
-                    size={20}
-                    color={passFocused ? primary : textMuted}
-                    style={styles.inputIcon}
-                  />
-                  <Animated.Text
-                    style={[
-                      styles.floatingLabel,
-                      {
-                        color: passFocused ? primary : textMuted,
-                        top: passLabel.interpolate({
-                          inputRange: [0, 1],
-                          outputRange: [14, -8],
-                        }),
-                        fontSize: passLabel.interpolate({
-                          inputRange: [0, 1],
-                          outputRange: [14, 12],
-                        }) as any,
-                        backgroundColor: surface,
-                        paddingHorizontal: 4,
-                        pointerEvents: "none",
-                      },
-                    ]}
-                  >
-                    Mật khẩu mới
-                  </Animated.Text>
-                  <TextInput
-                    style={[
-                      styles.input,
-                      {
-                        borderColor: passFocused ? primary : border,
-                        backgroundColor: surface,
-                        color: text,
-                      },
-                    ]}
-                    placeholder=""
-                    selectionColor={primary}
-                    value={newPassword}
-                    onChangeText={(t) => {
-                      setNewPassword(t);
-                      animate(passLabel, t.length > 0);
-                    }}
-                    onFocus={() => {
-                      setPassFocused(true);
-                      animate(passLabel, true);
-                    }}
-                    onBlur={() => {
-                      setPassFocused(false);
-                      animate(passLabel, newPassword.length > 0);
-                    }}
-                    secureTextEntry
-                    editable={!loading}
-                  />
-                </View>
-
-                <View style={[styles.inputContainer, { position: "relative" }]}>
-                  <Ionicons
-                    name="lock-closed-outline"
-                    size={20}
-                    color={confirmFocused ? primary : textMuted}
-                    style={styles.inputIcon}
-                  />
-                  <Animated.Text
-                    style={[
-                      styles.floatingLabel,
-                      {
-                        color: confirmFocused ? primary : textMuted,
-                        top: confirmLabel.interpolate({
-                          inputRange: [0, 1],
-                          outputRange: [14, -8],
-                        }),
-                        fontSize: confirmLabel.interpolate({
-                          inputRange: [0, 1],
-                          outputRange: [14, 12],
-                        }) as any,
-                        backgroundColor: surface,
-                        paddingHorizontal: 4,
-                        pointerEvents: "none",
-                      },
-                    ]}
-                  >
-                    Xác nhận mật khẩu
-                  </Animated.Text>
-                  <TextInput
-                    style={[
-                      styles.input,
-                      {
-                        borderColor: confirmFocused ? primary : border,
-                        backgroundColor: surface,
-                        color: text,
-                      },
-                    ]}
-                    placeholder=""
-                    selectionColor={primary}
-                    value={confirmPassword}
-                    onChangeText={(t) => {
-                      setConfirmPassword(t);
-                      animate(confirmLabel, t.length > 0);
-                    }}
-                    onFocus={() => {
-                      setConfirmFocused(true);
-                      animate(confirmLabel, true);
-                    }}
-                    onBlur={() => {
-                      setConfirmFocused(false);
-                      animate(confirmLabel, confirmPassword.length > 0);
-                    }}
-                    secureTextEntry
-                    editable={!loading}
-                  />
-                </View>
-
-                <TouchableOpacity
-                  style={[
-                    styles.button,
-                    { backgroundColor: primary },
-                    loading && styles.buttonDisabled,
-                  ]}
-                  onPress={handleResetPassword}
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <ActivityIndicator color="#fff" size="small" />
-                  ) : (
-                    <Text style={styles.buttonText}>Đặt lại mật khẩu</Text>
-                  )}
-                </TouchableOpacity>
-              </>
-            )}
-
-            <TouchableOpacity
-              onPress={() =>
-                step === 1 ? router.push("/(auth)/login") : setStep(step - 1)
-              }
-              style={styles.backButton}
-              disabled={loading}
-            >
-              <Text style={[styles.backText, { color: primary }]}>
-                {step === 1 ? "← Quay lại đăng nhập" : "← Quay lại"}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-      </AuthBackground>
-    </KeyboardAvoidingView>
+                      {loading ? (
+                        <ActivityIndicator color="#fff" />
+                      ) : (
+                        <Text style={styles.ctaTxt}>Đặt lại mật khẩu</Text>
+                      )}
+                    </LinearGradient>
+                  </Pressable>
+                </>
+              )}
+            </Animated.View>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    </View>
   );
 }
 
+// ═════════════════════════════════════════════════════════════════════════════
 const styles = StyleSheet.create({
-  scrollContent: {
-    flexGrow: 1,
-    justifyContent: "center",
-    paddingHorizontal: 8,
-    paddingVertical: 20,
-    maxWidth: "100%",
+  root: { flex: 1, backgroundColor: T.bg },
+  glow1: {
+    position: "absolute",
+    top: -100,
+    right: -60,
+    width: 250,
+    height: 250,
+    borderRadius: 125,
+    backgroundColor: T.primaryGlow,
   },
-  header: {
-    marginBottom: 20,
+  glow2: {
+    position: "absolute",
+    bottom: -60,
+    left: -80,
+    width: 220,
+    height: 220,
+    borderRadius: 110,
+    backgroundColor: T.accentGlow,
+  },
+
+  topBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+  },
+  backBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "rgba(255,255,255,0.08)",
+    justifyContent: "center",
     alignItems: "center",
   },
-  title: {
-    fontSize: 28,
-    fontWeight: "600",
-    marginBottom: 6,
-    textAlign: "center",
+
+  stepRow: { flexDirection: "row", alignItems: "center", gap: 16 },
+  stepDot: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: "rgba(100,100,160,0.2)",
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1.5,
+    borderColor: "transparent",
   },
+  stepDotActive: { backgroundColor: T.primary, borderColor: T.primaryLight },
+  stepDotDone: { backgroundColor: T.success },
+  stepNum: { fontSize: 12, fontWeight: "700", color: T.textMuted },
+  stepNumActive: { color: T.white },
+
+  scroll: { flexGrow: 1, paddingHorizontal: 24, paddingBottom: 40 },
+
+  headerWrap: { alignItems: "center", marginTop: 12, marginBottom: 28 },
+  headerIcon: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: "rgba(139,92,246,0.12)",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  title: { fontSize: 24, fontWeight: "700", color: T.white, marginBottom: 8 },
   subtitle: {
     fontSize: 14,
-    lineHeight: 20,
+    color: T.textSecondary,
     textAlign: "center",
+    lineHeight: 20,
+    paddingHorizontal: 16,
   },
-  form: {
-    borderRadius: 16,
-    padding: 12,
+
+  card: {
+    backgroundColor: T.bgCard,
+    borderRadius: T.radius.lg,
+    padding: T.gap.xl,
+    borderWidth: 1,
+    borderColor: T.bgCardBorder,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 4,
-    elevation: 2,
-    borderWidth: 1,
+    shadowOpacity: 0.35,
+    shadowRadius: 20,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 8,
   },
-  inputContainer: {
-    marginBottom: 12,
-  },
-  input: {
-    height: 48,
-    borderWidth: 1,
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingLeft: 42,
-    paddingTop: 20,
-    fontSize: 14,
-  },
-  floatingLabel: {
-    position: "absolute",
-    left: 14,
-    zIndex: 1,
-    backgroundColor: "transparent",
-    alignSelf: "flex-start",
-  },
-  inputIcon: {
-    position: "absolute",
-    left: 12,
-    top: 14,
-    zIndex: 2,
-  },
-  button: {
-    height: 48,
-    borderRadius: 12,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 16,
-    shadowColor: "#0D9488",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  buttonDisabled: {
-    opacity: 0.6,
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "700",
-  },
-  successBox: {
-    alignItems: "center",
-    paddingVertical: 16,
-    marginBottom: 16,
-  },
-  successIconContainer: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: "#E8F5E9",
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 16,
-  },
-  successIcon: {
-    fontSize: 40,
-    color: "#0D9488",
-    fontWeight: "bold",
-  },
-  successTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    marginBottom: 10,
-    textAlign: "center",
-  },
-  successText: {
-    fontSize: 14,
-    textAlign: "center",
-    lineHeight: 20,
-    marginBottom: 10,
-  },
-  emailText: {
-    fontWeight: "600",
-    color: "#0D9488",
-  },
-  successHint: {
-    fontSize: 12,
-    color: "#808080",
-    textAlign: "center",
-  },
-  backButton: {
-    paddingVertical: 8,
-  },
-  backText: {
-    textAlign: "center",
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  // Step indicator styles
-  stepIndicator: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 24,
-    marginBottom: 20,
-  },
-  stepDot: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: "#E0E0E0",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  stepDotActive: {
-    backgroundColor: "#0D9488",
-  },
-  stepDotDone: {
-    backgroundColor: "#00C853",
-  },
-  stepText: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: "#757575",
-  },
-  stepTextActive: {
-    color: "#FFF",
-  },
-  // OTP styles
-  otpContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: 10,
-    marginBottom: 20,
-  },
-  otpInput: {
-    width: 45,
-    height: 50,
-    borderWidth: 1.5,
-    borderRadius: 10,
-    fontSize: 20,
-    fontWeight: "700",
-    textAlign: "center",
-  },
-  otpTimerRow: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 8,
-    marginBottom: 16,
-  },
-  otpTimerText: {
-    fontSize: 13,
-  },
-  resendText: {
-    fontSize: 13,
-    fontWeight: "600",
-  },
-  // Method toggle styles
-  methodToggle: {
-    flexDirection: "row",
-    gap: 12,
-    marginBottom: 20,
-  },
-  methodButton: {
+
+  // Method toggle
+  methodRow: { flexDirection: "row", gap: T.gap.md, marginBottom: T.gap.xl },
+  methodBtn: {
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    gap: T.gap.sm,
     paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 10,
+    borderRadius: T.radius.md,
     borderWidth: 1.5,
-    gap: 8,
+    borderColor: T.primary + "40",
   },
-  methodButtonText: {
-    fontSize: 14,
-    fontWeight: "600",
+  methodBtnActive: { backgroundColor: T.primary, borderColor: T.primary },
+  methodTxt: { fontSize: 14, fontWeight: "600", color: T.primaryLight },
+  methodTxtActive: { color: T.white },
+
+  // Input
+  inputRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: T.bgInput,
+    borderRadius: T.radius.md,
+    borderWidth: 1.2,
+    borderColor: T.bgInputBorder,
+    paddingHorizontal: T.gap.lg,
+    height: T.inputH,
   },
-  inputHint: {
-    fontSize: 12,
-    marginTop: 4,
-    marginLeft: 4,
+  inputText: { flex: 1, fontSize: 15, color: T.text },
+  hint: { fontSize: 12, color: T.textDim, marginTop: 6, marginLeft: 4 },
+
+  // CTA
+  ctaBtn: {
+    borderRadius: T.radius.md,
+    overflow: "hidden",
+    marginTop: T.gap.lg,
   },
-  // OTP Info Box
+  ctaGrad: { height: T.btnH, justifyContent: "center", alignItems: "center" },
+  ctaTxt: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#fff",
+    letterSpacing: 0.3,
+  },
+
+  // OTP
   otpInfoBox: {
     alignItems: "center",
     paddingVertical: 16,
     paddingHorizontal: 12,
-    marginBottom: 16,
-    backgroundColor: "rgba(0, 102, 204, 0.05)",
-    borderRadius: 12,
+    marginBottom: T.gap.lg,
+    backgroundColor: "rgba(139,92,246,0.06)",
+    borderRadius: T.radius.md,
   },
-  otpInfoText: {
+  otpInfoTxt: {
     fontSize: 13,
+    color: T.textSecondary,
     marginTop: 8,
     textAlign: "center",
   },
-  otpContactText: {
-    fontSize: 15,
-    fontWeight: "600",
-    marginTop: 4,
+  otpContact: { fontSize: 15, fontWeight: "600", color: T.text, marginTop: 4 },
+
+  otpRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 10,
+    marginBottom: T.gap.lg,
   },
+  otpCell: {
+    width: 46,
+    height: 52,
+    borderWidth: 1.5,
+    borderRadius: T.radius.sm,
+    fontSize: 22,
+    fontWeight: "700",
+    textAlign: "center",
+    color: T.text,
+    backgroundColor: T.bgInput,
+    borderColor: T.bgInputBorder,
+  },
+  otpCellFilled: {
+    borderColor: T.primary,
+    backgroundColor: "rgba(139,92,246,0.08)",
+  },
+
+  timerRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: T.gap.lg,
+  },
+  timerTxt: { fontSize: 13, color: T.textMuted },
+  resendTxt: { fontSize: 13, fontWeight: "600", color: T.primaryLight },
 });

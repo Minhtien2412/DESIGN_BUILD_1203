@@ -1,17 +1,17 @@
 /**
- * Modern Auth Screen - Beautiful Login/Register
+ * Modern Auth Screen - Premium Login/Register
  *
  * Features:
+ * - Glassmorphism card with dark premium theme
  * - Animated tab switch between Login/Register
- * - Social login buttons
+ * - Social login (Google, Facebook)
  * - Password strength indicator
- * - Modern minimal UI design
- * - Optimized performance
  * - Demo user quick select (DEV only)
  *
- * @created 2026-01-27
+ * @redesigned 2026-02-25
  */
 
+import { AUTH_THEME as T } from "@/constants/auth-theme";
 import { DEMO_USERS, DemoUser } from "@/constants/demoUsers";
 import { useAuth } from "@/context/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
@@ -26,6 +26,7 @@ import {
     Dimensions,
     Keyboard,
     KeyboardAvoidingView,
+    Modal,
     Platform,
     Pressable,
     ScrollView,
@@ -45,61 +46,8 @@ import Animated, {
 } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const { width } = Dimensions.get("window");
+const { width: SCREEN_W } = Dimensions.get("window");
 
-// ============================================================================
-// THEME
-// ============================================================================
-const THEME = {
-  colors: {
-    // Primary gradient
-    primary: "#7C3AED",
-    primaryLight: "#A78BFA",
-    primaryDark: "#5B21B6",
-
-    // Accent
-    accent: "#06B6D4",
-    accentLight: "#67E8F9",
-
-    // Backgrounds
-    bg: "#0F0F23",
-    bgCard: "#1A1A2E",
-    bgInput: "#16213E",
-
-    // Text
-    text: "#FFFFFF",
-    textSecondary: "#94A3B8",
-    textMuted: "#64748B",
-
-    // States
-    error: "#EF4444",
-    success: "#10B981",
-    warning: "#F59E0B",
-
-    // Borders
-    border: "#334155",
-    borderFocus: "#7C3AED",
-  },
-  spacing: {
-    xs: 4,
-    sm: 8,
-    md: 12,
-    lg: 16,
-    xl: 24,
-    xxl: 32,
-  },
-  radius: {
-    sm: 8,
-    md: 12,
-    lg: 16,
-    xl: 24,
-    full: 9999,
-  },
-};
-
-// ============================================================================
-// TYPES
-// ============================================================================
 type AuthMode = "login" | "register";
 
 interface FormData {
@@ -108,19 +56,15 @@ interface FormData {
   password: string;
   confirmPassword: string;
 }
-
 interface FormErrors {
   name?: string;
   email?: string;
   password?: string;
   confirmPassword?: string;
+  general?: string;
 }
 
-// ============================================================================
-// COMPONENTS
-// ============================================================================
-
-// Animated Input Component
+// ─── AnimatedInput ───────────────────────────────────────────────────────────
 const AnimatedInput = memo(function AnimatedInput({
   icon,
   placeholder,
@@ -133,11 +77,12 @@ const AnimatedInput = memo(function AnimatedInput({
   disabled,
   showPasswordToggle,
   onTogglePassword,
+  delay = 0,
 }: {
   icon: keyof typeof Ionicons.glyphMap;
   placeholder: string;
   value: string;
-  onChangeText: (text: string) => void;
+  onChangeText: (t: string) => void;
   secureTextEntry?: boolean;
   keyboardType?: "default" | "email-address";
   autoCapitalize?: "none" | "words";
@@ -145,30 +90,32 @@ const AnimatedInput = memo(function AnimatedInput({
   disabled?: boolean;
   showPasswordToggle?: boolean;
   onTogglePassword?: () => void;
+  delay?: number;
 }) {
   const [focused, setFocused] = useState(false);
 
   return (
     <Animated.View
-      entering={FadeInDown.delay(100).springify()}
-      style={styles.inputContainer}
+      entering={FadeInDown.delay(delay).duration(350)}
+      style={styles.inputOuter}
     >
       <View
         style={[
-          styles.inputWrapper,
-          focused && styles.inputFocused,
-          error && styles.inputError,
+          styles.inputRow,
+          focused && styles.inputRowFocused,
+          error ? styles.inputRowError : null,
         ]}
       >
         <Ionicons
           name={icon}
           size={20}
-          color={focused ? THEME.colors.primary : THEME.colors.textMuted}
+          color={error ? T.error : focused ? T.primary : T.textMuted}
+          style={{ marginRight: T.gap.md }}
         />
         <TextInput
-          style={styles.input}
+          style={styles.inputText}
           placeholder={placeholder}
-          placeholderTextColor={THEME.colors.textMuted}
+          placeholderTextColor={T.textDim}
           value={value}
           onChangeText={onChangeText}
           secureTextEntry={secureTextEntry}
@@ -178,22 +125,23 @@ const AnimatedInput = memo(function AnimatedInput({
           editable={!disabled}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
+          selectionColor={T.primaryLight}
         />
         {showPasswordToggle && (
-          <Pressable onPress={onTogglePassword} hitSlop={10}>
+          <Pressable onPress={onTogglePassword} hitSlop={12}>
             <Ionicons
               name={secureTextEntry ? "eye-outline" : "eye-off-outline"}
               size={20}
-              color={THEME.colors.textMuted}
+              color={T.textMuted}
             />
           </Pressable>
         )}
       </View>
       {error && (
         <Animated.Text
-          entering={FadeIn.duration(200)}
-          exiting={FadeOut.duration(200)}
-          style={styles.errorText}
+          entering={FadeIn.duration(150)}
+          exiting={FadeOut.duration(150)}
+          style={styles.errorMsg}
         >
           {error}
         </Animated.Text>
@@ -202,30 +150,24 @@ const AnimatedInput = memo(function AnimatedInput({
   );
 });
 
-// Password Strength Indicator
+// ─── PasswordStrength ────────────────────────────────────────────────────────
 const PasswordStrength = memo(function PasswordStrength({
   password,
 }: {
   password: string;
 }) {
   const getStrength = useCallback(() => {
-    if (!password)
-      return { level: 0, label: "", color: THEME.colors.textMuted };
-
+    if (!password) return { level: 0, label: "", color: T.textMuted };
     let score = 0;
     if (password.length >= 8) score++;
     if (/[A-Z]/.test(password)) score++;
     if (/[a-z]/.test(password)) score++;
     if (/[0-9]/.test(password)) score++;
     if (/[^A-Za-z0-9]/.test(password)) score++;
-
-    if (score <= 2)
-      return { level: 1, label: "Yếu", color: THEME.colors.error };
-    if (score <= 3)
-      return { level: 2, label: "Trung bình", color: THEME.colors.warning };
-    if (score <= 4)
-      return { level: 3, label: "Mạnh", color: THEME.colors.accent };
-    return { level: 4, label: "Rất mạnh", color: THEME.colors.success };
+    if (score <= 2) return { level: 1, label: "Yếu", color: T.error };
+    if (score <= 3) return { level: 2, label: "Trung bình", color: T.warning };
+    if (score <= 4) return { level: 3, label: "Mạnh", color: T.accent };
+    return { level: 4, label: "Rất mạnh", color: T.success };
   }, [password]);
 
   const strength = getStrength();
@@ -235,7 +177,7 @@ const PasswordStrength = memo(function PasswordStrength({
     <Animated.View
       entering={FadeIn.duration(200)}
       exiting={FadeOut.duration(200)}
-      style={styles.strengthContainer}
+      style={styles.strengthRow}
     >
       <View style={styles.strengthBars}>
         {[1, 2, 3, 4].map((i) => (
@@ -245,7 +187,9 @@ const PasswordStrength = memo(function PasswordStrength({
               styles.strengthBar,
               {
                 backgroundColor:
-                  i <= strength.level ? strength.color : THEME.colors.border,
+                  i <= strength.level
+                    ? strength.color
+                    : "rgba(100,100,160,0.2)",
               },
             ]}
           />
@@ -258,7 +202,7 @@ const PasswordStrength = memo(function PasswordStrength({
   );
 });
 
-// Social Login Button
+// ─── SocialButton ────────────────────────────────────────────────────────────
 const SocialButton = memo(function SocialButton({
   icon,
   label,
@@ -273,27 +217,26 @@ const SocialButton = memo(function SocialButton({
   return (
     <Pressable
       style={({ pressed }) => [
-        styles.socialButton,
-        pressed && styles.socialButtonPressed,
+        styles.socialBtn,
+        pressed && { opacity: 0.7, transform: [{ scale: 0.97 }] },
       ]}
       onPress={onPress}
     >
-      <Ionicons name={icon} size={22} color={color} />
-      <Text style={styles.socialButtonText}>{label}</Text>
+      <Ionicons name={icon} size={20} color={color} />
+      <Text style={styles.socialBtnTxt}>{label}</Text>
     </Pressable>
   );
 });
 
-// Demo User Picker (DEV only)
+// ─── DemoUserPicker ──────────────────────────────────────────────────────────
 const DemoUserPicker = memo(function DemoUserPicker({
   onSelectUser,
   disabled,
 }: {
-  onSelectUser: (user: DemoUser) => void;
+  onSelectUser: (u: DemoUser) => void;
   disabled?: boolean;
 }) {
   const [expanded, setExpanded] = useState(false);
-
   if (!__DEV__) return null;
 
   const roleColors: Record<string, string> = {
@@ -304,36 +247,33 @@ const DemoUserPicker = memo(function DemoUserPicker({
   };
 
   return (
-    <Animated.View
-      entering={FadeIn.delay(500)}
-      style={styles.demoPickerContainer}
-    >
+    <Animated.View entering={FadeIn.delay(600)} style={styles.demoWrap}>
       <Pressable
-        style={styles.demoPickerToggle}
+        style={styles.demoToggle}
         onPress={() => setExpanded(!expanded)}
         disabled={disabled}
       >
-        <Ionicons name="bug-outline" size={16} color={THEME.colors.warning} />
-        <Text style={styles.demoPickerToggleText}>
+        <Ionicons name="bug-outline" size={15} color={T.warning} />
+        <Text style={styles.demoToggleTxt}>
           {expanded ? "Ẩn Demo Users" : "Chọn Demo User"}
         </Text>
         <Ionicons
           name={expanded ? "chevron-up" : "chevron-down"}
-          size={16}
-          color={THEME.colors.textMuted}
+          size={15}
+          color={T.textMuted}
         />
       </Pressable>
       {expanded && (
         <Animated.View
           entering={FadeInDown.duration(200)}
-          style={styles.demoUserList}
+          style={styles.demoList}
         >
           {DEMO_USERS.map((user) => (
             <Pressable
               key={user.id}
               style={({ pressed }) => [
-                styles.demoUserItem,
-                pressed && styles.demoUserItemPressed,
+                styles.demoItem,
+                pressed && { borderColor: T.primary, opacity: 0.85 },
               ]}
               onPress={() => {
                 onSelectUser(user);
@@ -343,17 +283,17 @@ const DemoUserPicker = memo(function DemoUserPicker({
             >
               <View
                 style={[
-                  styles.demoUserRole,
-                  { backgroundColor: roleColors[user.role] },
+                  styles.demoAvatar,
+                  { backgroundColor: roleColors[user.role] || T.primary },
                 ]}
               >
-                <Text style={styles.demoUserRoleText}>
+                <Text style={styles.demoAvatarTxt}>
                   {user.role.substring(0, 1)}
                 </Text>
               </View>
-              <View style={styles.demoUserInfo}>
-                <Text style={styles.demoUserName}>{user.name}</Text>
-                <Text style={styles.demoUserEmail}>{user.email}</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.demoName}>{user.name}</Text>
+                <Text style={styles.demoEmail}>{user.email}</Text>
               </View>
             </Pressable>
           ))}
@@ -363,19 +303,22 @@ const DemoUserPicker = memo(function DemoUserPicker({
   );
 });
 
-// ============================================================================
+// ═════════════════════════════════════════════════════════════════════════════
 // MAIN SCREEN
-// ============================================================================
+// ═════════════════════════════════════════════════════════════════════════════
 export default function ModernAuthScreen() {
   const router = useRouter();
   const {
     signIn,
     signUp,
     signInWithGoogleAccessToken,
+    twoFARegisterSendOtp,
+    twoFARegisterVerify,
+    twoFALoginRequestOtp,
+    twoFALoginVerify,
     loading: authLoading,
   } = useAuth();
 
-  // State
   const [mode, setMode] = useState<AuthMode>("login");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -385,151 +328,341 @@ export default function ModernAuthScreen() {
     password: "",
     confirmPassword: "",
   });
+  const [phone, setPhone] = useState("");
   const [errors, setErrors] = useState<FormErrors>({});
 
-  // Animation
-  const tabIndicatorPosition = useSharedValue(0);
+  // 2FA / OTP state
+  const [showOTPModal, setShowOTPModal] = useState(false);
+  const [otpCode, setOtpCode] = useState("");
+  const [otpType, setOtpType] = useState<"register" | "login">("register");
+  const [tempToken, setTempToken] = useState<string | null>(null);
+  const [otpLoading, setOtpLoading] = useState(false);
+  const [otpError, setOtpError] = useState("");
 
+  const tabPos = useSharedValue(0);
   const tabIndicatorStyle = useAnimatedStyle(() => ({
     transform: [
       {
-        translateX: withSpring((tabIndicatorPosition.value * (width - 48)) / 2),
+        translateX: withSpring(tabPos.value * ((SCREEN_W - 80) / 2), {
+          damping: 20,
+          stiffness: 180,
+        }),
       },
     ],
   }));
 
-  // Handlers
-  const switchMode = useCallback((newMode: AuthMode) => {
-    Keyboard.dismiss();
-    setMode(newMode);
-    setErrors({});
-    tabIndicatorPosition.value = newMode === "login" ? 0 : 1;
-  }, []);
+  // ───── Handlers ─────
+  const switchMode = useCallback(
+    (m: AuthMode) => {
+      Keyboard.dismiss();
+      setMode(m);
+      setErrors({});
+      tabPos.value = m === "login" ? 0 : 1;
+    },
+    [tabPos],
+  );
 
   const updateField = useCallback(
     (field: keyof FormData, value: string) => {
-      setFormData((prev) => ({ ...prev, [field]: value }));
-      if (errors[field]) {
-        setErrors((prev) => ({ ...prev, [field]: undefined }));
-      }
+      setFormData((p) => ({ ...p, [field]: value }));
+      if (errors[field]) setErrors((p) => ({ ...p, [field]: undefined }));
     },
     [errors],
   );
 
   const validate = useCallback((): boolean => {
-    const newErrors: FormErrors = {};
-
-    if (mode === "register" && !formData.name.trim()) {
-      newErrors.name = "Vui lòng nhập họ tên";
-    }
-
-    if (!formData.email.trim()) {
-      newErrors.email = "Vui lòng nhập email";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "Email không hợp lệ";
-    }
-
-    if (!formData.password) {
-      newErrors.password = "Vui lòng nhập mật khẩu";
-    } else if (formData.password.length < 6) {
-      newErrors.password = "Mật khẩu tối thiểu 6 ký tự";
-    }
-
-    if (mode === "register" && formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Mật khẩu không khớp";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  }, [mode, formData]);
+    const e: FormErrors = {};
+    if (mode === "register" && !formData.name.trim())
+      e.name = "Vui lòng nhập họ tên";
+    if (!formData.email.trim()) e.email = "Vui lòng nhập email";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
+      e.email = "Email không hợp lệ";
+    if (!formData.password) e.password = "Vui lòng nhập mật khẩu";
+    else if (formData.password.length < 6)
+      e.password = "Mật khẩu tối thiểu 6 ký tự";
+    if (mode === "register" && formData.password !== formData.confirmPassword)
+      e.confirmPassword = "Mật khẩu không khớp";
+    if (
+      mode === "register" &&
+      phone.trim() &&
+      !/^(0|\+84)[0-9]{9,10}$/.test(phone.replace(/\s/g, ""))
+    )
+      e.general = "Số điện thoại không hợp lệ";
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  }, [mode, formData, phone]);
 
   const handleSubmit = useCallback(async () => {
     if (!validate()) return;
-
     Keyboard.dismiss();
     setLoading(true);
-
     try {
       if (mode === "login") {
-        await signIn(formData.email.trim().toLowerCase(), formData.password);
+        try {
+          await signIn(formData.email.trim().toLowerCase(), formData.password);
+          router.replace("/(tabs)");
+        } catch (loginErr: any) {
+          // Check if 2FA is required
+          if (
+            loginErr?.message?.includes("2FA") ||
+            loginErr?.message?.includes("OTP") ||
+            loginErr?.requires2FA
+          ) {
+            // Initiate 2FA login flow
+            try {
+              const result = await twoFALoginRequestOtp(
+                formData.email.trim().toLowerCase(),
+                formData.password,
+              );
+              setTempToken(result?.tempToken || null);
+              setOtpType("login");
+              setOtpCode("");
+              setOtpError("");
+              setShowOTPModal(true);
+            } catch (otpErr: any) {
+              Alert.alert("Lỗi 2FA", otpErr?.message || "Không thể gửi mã OTP");
+            }
+          } else {
+            throw loginErr;
+          }
+        }
       } else {
-        await signUp(
-          formData.email.trim().toLowerCase(),
-          formData.password,
-          formData.name.trim(),
-        );
+        // Registration: Try 2FA flow first (send OTP to verify email)
+        try {
+          await twoFARegisterSendOtp(formData.email.trim().toLowerCase());
+          setOtpType("register");
+          setOtpCode("");
+          setOtpError("");
+          setShowOTPModal(true);
+        } catch (otpErr: any) {
+          // If 2FA not supported, fallback to direct registration
+          console.log(
+            "[Auth] 2FA register not available, falling back to direct signup",
+          );
+          await signUp(
+            formData.email.trim().toLowerCase(),
+            formData.password,
+            formData.name.trim(),
+            undefined, // role
+            phone.trim() || undefined,
+          );
+          router.replace("/(tabs)");
+        }
       }
-      router.replace("/(tabs)");
     } catch (error: any) {
-      const message = error?.message || "Có lỗi xảy ra. Vui lòng thử lại.";
-      if (message.includes("credentials") || message.includes("password")) {
+      const msg = error?.message || "Có lỗi xảy ra. Vui lòng thử lại.";
+      if (msg.includes("credentials") || msg.includes("password")) {
         setErrors({ password: "Email hoặc mật khẩu không đúng" });
-      } else if (message.includes("email") || message.includes("exists")) {
+      } else if (msg.includes("email") || msg.includes("exists")) {
         setErrors({ email: "Email đã được sử dụng" });
       } else {
-        Alert.alert("Lỗi", message);
+        Alert.alert("Lỗi", msg);
       }
     } finally {
       setLoading(false);
     }
-  }, [mode, formData, validate, signIn, signUp, router]);
+  }, [
+    mode,
+    formData,
+    phone,
+    validate,
+    signIn,
+    signUp,
+    twoFARegisterSendOtp,
+    twoFALoginRequestOtp,
+    router,
+  ]);
+
+  // Handle OTP verification (for both register & login 2FA flows)
+  const handleVerifyOTP = useCallback(async () => {
+    if (otpCode.length < 4) {
+      setOtpError("Vui lòng nhập đầy đủ mã OTP");
+      return;
+    }
+    setOtpLoading(true);
+    setOtpError("");
+    try {
+      if (otpType === "register") {
+        // 2FA Registration: Verify OTP + create account
+        await twoFARegisterVerify(
+          formData.email.trim().toLowerCase(),
+          otpCode,
+          formData.password,
+          formData.name.trim(),
+          phone.trim() || undefined,
+        );
+      } else {
+        // 2FA Login: Verify OTP with tempToken
+        await twoFALoginVerify(
+          formData.email.trim().toLowerCase(),
+          tempToken || "",
+          otpCode,
+        );
+      }
+      setShowOTPModal(false);
+      router.replace("/(tabs)");
+    } catch (err: any) {
+      setOtpError(err?.message || "Mã OTP không hợp lệ. Vui lòng thử lại.");
+    } finally {
+      setOtpLoading(false);
+    }
+  }, [
+    otpCode,
+    otpType,
+    formData,
+    phone,
+    tempToken,
+    twoFARegisterVerify,
+    twoFALoginVerify,
+    router,
+  ]);
+
+  // Resend OTP
+  const handleResendOTP = useCallback(async () => {
+    try {
+      setOtpLoading(true);
+      if (otpType === "register") {
+        await twoFARegisterSendOtp(formData.email.trim().toLowerCase());
+      } else {
+        await twoFALoginRequestOtp(
+          formData.email.trim().toLowerCase(),
+          formData.password,
+        );
+      }
+      Alert.alert("Đã gửi lại", "Mã OTP mới đã được gửi đến email của bạn.");
+    } catch (err: any) {
+      Alert.alert("Lỗi", err?.message || "Không thể gửi lại mã OTP");
+    } finally {
+      setOtpLoading(false);
+    }
+  }, [otpType, formData, twoFARegisterSendOtp, twoFALoginRequestOtp]);
 
   const handleSocialLogin = useCallback(
     async (provider: string) => {
       if (provider === "Google") {
         try {
           setLoading(true);
-          // Use expo-auth-session Google provider for web-based OAuth
           const { makeRedirectUri } = await import("expo-auth-session");
-
           const extras = Constants.expoConfig?.extra || {};
           const clientId =
             extras.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID ||
             extras.EXPO_PUBLIC_GOOGLE_CLIENT_ID ||
             "";
-
           if (!clientId) {
-            Alert.alert(
-              "Cấu hình thiếu",
-              "Chưa thiết lập Google Client ID. Vui lòng liên hệ quản trị viên.",
-            );
+            Alert.alert("Cấu hình thiếu", "Chưa thiết lập Google Client ID.");
             return;
           }
-
-          // Open Google OAuth in browser
           const redirectUri = makeRedirectUri({
             scheme: "appdesignbuild",
             path: "redirect",
           });
-
-          // Use WebBrowser-based auth
           const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=${encodeURIComponent("openid email profile")}`;
-
           const result = await WebBrowser.openAuthSessionAsync(
             authUrl,
             redirectUri,
           );
-
           if (result.type === "success" && result.url) {
-            // Extract access_token from URL fragment
             const params = new URLSearchParams(result.url.split("#")[1]);
             const accessToken = params.get("access_token");
-
             if (accessToken) {
               await signInWithGoogleAccessToken(accessToken);
               router.replace("/(tabs)");
             } else {
               Alert.alert("Lỗi", "Không nhận được token từ Google.");
             }
-          } else if (result.type === "cancel") {
-            // User cancelled - do nothing
           }
         } catch (error: any) {
-          console.error("[Auth] Google sign-in error:", error);
-          Alert.alert(
-            "Lỗi",
-            error?.message || "Đăng nhập Google thất bại. Vui lòng thử lại.",
+          Alert.alert("Lỗi", error?.message || "Đăng nhập Google thất bại.");
+        } finally {
+          setLoading(false);
+        }
+      } else if (provider === "Facebook") {
+        try {
+          setLoading(true);
+          const { makeRedirectUri } = await import("expo-auth-session");
+          const extras = Constants.expoConfig?.extra || {};
+          const fbAppId = extras.EXPO_PUBLIC_FACEBOOK_APP_ID || "";
+          if (!fbAppId) {
+            Alert.alert(
+              "Cấu hình thiếu",
+              "Chưa thiết lập Facebook App ID. Liên hệ admin.",
+            );
+            return;
+          }
+          const redirectUri = makeRedirectUri({
+            scheme: "appdesignbuild",
+            path: "redirect",
+          });
+          const fbAuthUrl = `https://www.facebook.com/v18.0/dialog/oauth?client_id=${fbAppId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=${encodeURIComponent("email,public_profile")}`;
+          const result = await WebBrowser.openAuthSessionAsync(
+            fbAuthUrl,
+            redirectUri,
           );
+          if (result.type === "success" && result.url) {
+            const params = new URLSearchParams(result.url.split("#")[1]);
+            const accessToken = params.get("access_token");
+            if (accessToken) {
+              // Fetch Facebook profile info
+              const fbRes = await fetch(
+                `https://graph.facebook.com/me?fields=id,name,email,picture.type(large)&access_token=${accessToken}`,
+              );
+              const fbUser = await fbRes.json();
+              // Call backend social login
+              const { socialLogin } = require("@/services/api/authApi");
+              await socialLogin("facebook", {
+                token: accessToken,
+                email: fbUser.email,
+                name: fbUser.name,
+                picture: fbUser.picture?.data?.url,
+              });
+              router.replace("/(tabs)");
+            } else {
+              Alert.alert("Lỗi", "Không nhận được token từ Facebook.");
+            }
+          }
+        } catch (error: any) {
+          Alert.alert("Lỗi", error?.message || "Đăng nhập Facebook thất bại.");
+        } finally {
+          setLoading(false);
+        }
+      } else if (provider === "Apple") {
+        try {
+          setLoading(true);
+          if (Platform.OS !== "ios") {
+            Alert.alert(
+              "Không hỗ trợ",
+              "Đăng nhập Apple chỉ khả dụng trên iOS.",
+            );
+            return;
+          }
+          // Use expo-apple-authentication if available
+          try {
+            const AppleAuth = require("expo-apple-authentication");
+            const credential = await AppleAuth.signInAsync({
+              requestedScopes: [
+                AppleAuth.AppleAuthenticationScope.FULL_NAME,
+                AppleAuth.AppleAuthenticationScope.EMAIL,
+              ],
+            });
+            if (credential.identityToken) {
+              const { socialLogin } = require("@/services/api/authApi");
+              await socialLogin("apple", {
+                token: credential.identityToken,
+                email: credential.email || "",
+                name: credential.fullName
+                  ? `${credential.fullName.givenName || ""} ${credential.fullName.familyName || ""}`.trim()
+                  : "",
+              });
+              router.replace("/(tabs)");
+            }
+          } catch (appleErr: any) {
+            if (appleErr.code !== "ERR_CANCELED") {
+              Alert.alert(
+                "Lỗi",
+                appleErr?.message || "Đăng nhập Apple thất bại.",
+              );
+            }
+          }
         } finally {
           setLoading(false);
         }
@@ -543,66 +676,70 @@ export default function ModernAuthScreen() {
     [signInWithGoogleAccessToken, router],
   );
 
-  const handleDemoUserSelect = useCallback((user: DemoUser) => {
-    setFormData({
-      name: user.name,
-      email: user.email,
-      password: user.password,
-      confirmPassword: user.password,
-    });
-    setErrors({});
-    setMode("login");
-    tabIndicatorPosition.value = 0;
-  }, []);
+  const handleDemoUserSelect = useCallback(
+    (user: DemoUser) => {
+      setFormData({
+        name: user.name,
+        email: user.email,
+        password: user.password,
+        confirmPassword: user.password,
+      });
+      setPhone("");
+      setErrors({});
+      setMode("login");
+      tabPos.value = 0;
+    },
+    [tabPos],
+  );
 
   const isLoading = loading || authLoading;
 
+  // ───── Render ─────
   return (
-    <View style={styles.container}>
-      {/* Background Gradient */}
+    <View style={styles.root}>
       <LinearGradient
-        colors={[THEME.colors.bg, THEME.colors.bgCard, THEME.colors.bg]}
+        colors={["#0B0B1A", "#151530", "#0B0B1A"]}
         style={StyleSheet.absoluteFill}
       />
 
-      {/* Decorative Circles */}
-      <View style={styles.decorCircle1} />
-      <View style={styles.decorCircle2} />
+      {/* Decorative glows */}
+      <View style={styles.glow1} />
+      <View style={styles.glow2} />
 
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView style={{ flex: 1 }}>
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
-          style={styles.keyboardView}
+          style={{ flex: 1 }}
         >
           <ScrollView
-            contentContainerStyle={styles.scrollContent}
+            contentContainerStyle={styles.scroll}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
-            {/* Logo */}
+            {/* ── Logo ── */}
             <Animated.View
-              entering={FadeInUp.delay(100).springify()}
-              style={styles.logoContainer}
+              entering={FadeInUp.delay(80).springify()}
+              style={styles.logoWrap}
             >
               <LinearGradient
-                colors={[THEME.colors.primary, THEME.colors.accent]}
+                colors={[T.primary, T.accent]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
-                style={styles.logo}
+                style={styles.logoBg}
               >
-                <Ionicons name="home" size={36} color="#fff" />
+                <Ionicons name="home" size={32} color="#fff" />
               </LinearGradient>
-              <Text style={styles.appName}>APP DESIGN BUILD</Text>
-              <Text style={styles.appSlogan}>Xây dựng ngôi nhà mơ ước</Text>
+              <Text style={styles.appTitle}>APP DESIGN BUILD</Text>
+              <Text style={styles.appSub}>Xây dựng ngôi nhà mơ ước</Text>
             </Animated.View>
 
-            {/* Auth Card */}
+            {/* ── Card ── */}
             <Animated.View
-              entering={FadeInUp.delay(200).springify()}
+              entering={FadeInUp.delay(180).springify()}
               style={styles.card}
             >
-              {/* Tab Switcher */}
-              <View style={styles.tabContainer}>
+              {/* Tab Bar */}
+              <View style={styles.tabBar}>
                 <Animated.View
                   style={[styles.tabIndicator, tabIndicatorStyle]}
                 />
@@ -612,8 +749,8 @@ export default function ModernAuthScreen() {
                 >
                   <Text
                     style={[
-                      styles.tabText,
-                      mode === "login" && styles.tabTextActive,
+                      styles.tabTxt,
+                      mode === "login" && styles.tabTxtActive,
                     ]}
                   >
                     Đăng nhập
@@ -625,8 +762,8 @@ export default function ModernAuthScreen() {
                 >
                   <Text
                     style={[
-                      styles.tabText,
-                      mode === "register" && styles.tabTextActive,
+                      styles.tabTxt,
+                      mode === "register" && styles.tabTxtActive,
                     ]}
                   >
                     Đăng ký
@@ -636,7 +773,6 @@ export default function ModernAuthScreen() {
 
               {/* Form */}
               <View style={styles.form}>
-                {/* Name (Register only) */}
                 {mode === "register" && (
                   <AnimatedInput
                     icon="person-outline"
@@ -646,10 +782,10 @@ export default function ModernAuthScreen() {
                     autoCapitalize="words"
                     error={errors.name}
                     disabled={isLoading}
+                    delay={50}
                   />
                 )}
 
-                {/* Email */}
                 <AnimatedInput
                   icon="mail-outline"
                   placeholder="Email"
@@ -658,9 +794,9 @@ export default function ModernAuthScreen() {
                   keyboardType="email-address"
                   error={errors.email}
                   disabled={isLoading}
+                  delay={100}
                 />
 
-                {/* Password */}
                 <AnimatedInput
                   icon="lock-closed-outline"
                   placeholder="Mật khẩu"
@@ -671,14 +807,13 @@ export default function ModernAuthScreen() {
                   disabled={isLoading}
                   showPasswordToggle
                   onTogglePassword={() => setShowPassword(!showPassword)}
+                  delay={150}
                 />
 
-                {/* Password Strength (Register only) */}
                 {mode === "register" && (
                   <PasswordStrength password={formData.password} />
                 )}
 
-                {/* Confirm Password (Register only) */}
                 {mode === "register" && (
                   <AnimatedInput
                     icon="shield-checkmark-outline"
@@ -688,40 +823,71 @@ export default function ModernAuthScreen() {
                     secureTextEntry={!showPassword}
                     error={errors.confirmPassword}
                     disabled={isLoading}
+                    delay={200}
                   />
                 )}
 
-                {/* Forgot Password */}
+                {mode === "register" && (
+                  <Animated.View
+                    entering={FadeInDown.delay(220).duration(350)}
+                    style={styles.inputOuter}
+                  >
+                    <View style={styles.inputRow}>
+                      <Ionicons
+                        name="call-outline"
+                        size={20}
+                        color={T.textMuted}
+                        style={{ marginRight: T.gap.md }}
+                      />
+                      <TextInput
+                        style={styles.inputText}
+                        placeholder="Số điện thoại (tuỳ chọn)"
+                        placeholderTextColor={T.textDim}
+                        value={phone}
+                        onChangeText={setPhone}
+                        keyboardType="phone-pad"
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                        editable={!isLoading}
+                        selectionColor={T.primaryLight}
+                      />
+                    </View>
+                  </Animated.View>
+                )}
+
                 {mode === "login" && (
                   <Pressable
-                    style={styles.forgotButton}
+                    style={styles.forgotBtn}
                     onPress={() => router.push("/(auth)/forgot-password")}
                   >
-                    <Text style={styles.forgotText}>Quên mật khẩu?</Text>
+                    <Text style={styles.forgotTxt}>Quên mật khẩu?</Text>
                   </Pressable>
                 )}
 
-                {/* Submit Button */}
-                <Animated.View entering={FadeInDown.delay(300).springify()}>
+                {/* Submit */}
+                <Animated.View entering={FadeInDown.delay(250).springify()}>
                   <Pressable
                     style={({ pressed }) => [
-                      styles.submitButton,
-                      pressed && styles.submitButtonPressed,
-                      isLoading && styles.submitButtonDisabled,
+                      styles.submitBtn,
+                      pressed && {
+                        opacity: 0.85,
+                        transform: [{ scale: 0.98 }],
+                      },
+                      isLoading && { opacity: 0.6 },
                     ]}
                     onPress={handleSubmit}
                     disabled={isLoading}
                   >
                     <LinearGradient
-                      colors={[THEME.colors.primary, THEME.colors.primaryDark]}
+                      colors={[T.primary, T.primaryDark]}
                       start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 0 }}
-                      style={styles.submitButtonGradient}
+                      style={styles.submitGrad}
                     >
                       {isLoading ? (
                         <ActivityIndicator color="#fff" />
                       ) : (
-                        <Text style={styles.submitButtonText}>
+                        <Text style={styles.submitTxt}>
                           {mode === "login" ? "Đăng nhập" : "Tạo tài khoản"}
                         </Text>
                       )}
@@ -733,12 +899,12 @@ export default function ModernAuthScreen() {
               {/* Divider */}
               <View style={styles.divider}>
                 <View style={styles.dividerLine} />
-                <Text style={styles.dividerText}>hoặc</Text>
+                <Text style={styles.dividerTxt}>hoặc</Text>
                 <View style={styles.dividerLine} />
               </View>
 
-              {/* Social Login */}
-              <View style={styles.socialContainer}>
+              {/* Social */}
+              <View style={styles.socialRow}>
                 <SocialButton
                   icon="logo-google"
                   label="Google"
@@ -751,9 +917,17 @@ export default function ModernAuthScreen() {
                   onPress={() => handleSocialLogin("Facebook")}
                   color="#1877F2"
                 />
+                {Platform.OS === "ios" && (
+                  <SocialButton
+                    icon="logo-apple"
+                    label="Apple"
+                    onPress={() => handleSocialLogin("Apple")}
+                    color="#000"
+                  />
+                )}
               </View>
 
-              {/* Demo User Picker (DEV only) */}
+              {/* Demo */}
               <DemoUserPicker
                 onSelectUser={handleDemoUserSelect}
                 disabled={isLoading}
@@ -761,335 +935,425 @@ export default function ModernAuthScreen() {
             </Animated.View>
 
             {/* Terms */}
-            <Animated.Text
-              entering={FadeIn.delay(400)}
-              style={styles.termsText}
-            >
+            <Animated.Text entering={FadeIn.delay(500)} style={styles.terms}>
               Bằng việc tiếp tục, bạn đồng ý với{" "}
               <Text style={styles.termsLink}>Điều khoản</Text> và{" "}
               <Text style={styles.termsLink}>Chính sách</Text> của chúng tôi
             </Animated.Text>
           </ScrollView>
+
+          {/* ══════ OTP Verification Modal (2FA) ══════ */}
+          <Modal
+            visible={showOTPModal}
+            transparent
+            animationType="slide"
+            onRequestClose={() => setShowOTPModal(false)}
+          >
+            <View style={styles.otpOverlay}>
+              <View style={styles.otpModal}>
+                <View style={styles.otpHandle} />
+
+                <Text style={styles.otpTitle}>
+                  {otpType === "register"
+                    ? "Xác thực Email"
+                    : "Xác thực 2 bước"}
+                </Text>
+                <Text style={styles.otpSubtitle}>
+                  Mã OTP đã được gửi đến{"\n"}
+                  <Text style={{ color: T.primary, fontWeight: "700" }}>
+                    {formData.email}
+                  </Text>
+                </Text>
+
+                {/* OTP Input */}
+                <View style={styles.otpInputWrap}>
+                  <Ionicons name="keypad-outline" size={18} color="#666" />
+                  <TextInput
+                    style={styles.otpInput}
+                    value={otpCode}
+                    onChangeText={(v) => {
+                      setOtpCode(v.replace(/[^0-9]/g, "").slice(0, 6));
+                      setOtpError("");
+                    }}
+                    placeholder="Nhập mã OTP (6 số)"
+                    placeholderTextColor="#666"
+                    keyboardType="number-pad"
+                    maxLength={6}
+                    autoFocus
+                  />
+                </View>
+
+                {otpError ? (
+                  <Text style={styles.otpErrorText}>{otpError}</Text>
+                ) : null}
+
+                {/* Verify button */}
+                <Pressable
+                  style={[styles.otpVerifyBtn, otpLoading && { opacity: 0.6 }]}
+                  onPress={handleVerifyOTP}
+                  disabled={otpLoading}
+                >
+                  <LinearGradient
+                    colors={[T.primary, T.primaryDark]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={styles.otpVerifyGrad}
+                  >
+                    {otpLoading ? (
+                      <ActivityIndicator color="#fff" />
+                    ) : (
+                      <Text style={styles.otpVerifyText}>Xác nhận</Text>
+                    )}
+                  </LinearGradient>
+                </Pressable>
+
+                {/* Resend */}
+                <Pressable
+                  onPress={handleResendOTP}
+                  style={styles.otpResendBtn}
+                  disabled={otpLoading}
+                >
+                  <Text style={styles.otpResendText}>Gửi lại mã OTP</Text>
+                </Pressable>
+
+                {/* Cancel */}
+                <Pressable
+                  onPress={() => setShowOTPModal(false)}
+                  style={styles.otpCancelBtn}
+                >
+                  <Text style={styles.otpCancelText}>Hủy</Text>
+                </Pressable>
+              </View>
+            </View>
+          </Modal>
         </KeyboardAvoidingView>
       </SafeAreaView>
     </View>
   );
 }
 
-// ============================================================================
+// ═════════════════════════════════════════════════════════════════════════════
 // STYLES
-// ============================================================================
+// ═════════════════════════════════════════════════════════════════════════════
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: THEME.colors.bg,
-  },
-  safeArea: {
-    flex: 1,
-  },
-  keyboardView: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    paddingHorizontal: THEME.spacing.xl,
-    paddingTop: THEME.spacing.xl,
-    paddingBottom: THEME.spacing.xxl,
-  },
+  root: { flex: 1, backgroundColor: T.bg },
 
-  // Decorative
-  decorCircle1: {
+  glow1: {
     position: "absolute",
-    top: -100,
-    right: -100,
+    top: -120,
+    right: -80,
     width: 300,
     height: 300,
     borderRadius: 150,
-    backgroundColor: THEME.colors.primary,
-    opacity: 0.1,
+    backgroundColor: T.primaryGlow,
   },
-  decorCircle2: {
+  glow2: {
     position: "absolute",
-    bottom: -50,
+    bottom: -80,
     left: -100,
-    width: 250,
-    height: 250,
-    borderRadius: 125,
-    backgroundColor: THEME.colors.accent,
-    opacity: 0.1,
+    width: 260,
+    height: 260,
+    borderRadius: 130,
+    backgroundColor: T.accentGlow,
+  },
+
+  scroll: {
+    flexGrow: 1,
+    paddingHorizontal: 24,
+    paddingTop: 16,
+    paddingBottom: 40,
   },
 
   // Logo
-  logoContainer: {
-    alignItems: "center",
-    marginBottom: THEME.spacing.xxl,
-  },
-  logo: {
-    width: 72,
-    height: 72,
-    borderRadius: THEME.radius.xl,
+  logoWrap: { alignItems: "center", marginBottom: 28 },
+  logoBg: {
+    width: 68,
+    height: 68,
+    borderRadius: T.radius.xl,
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: THEME.spacing.lg,
+    marginBottom: 14,
+    shadowColor: T.primary,
+    shadowOpacity: 0.35,
+    shadowRadius: 20,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 8,
   },
-  appName: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: THEME.colors.text,
-    marginBottom: THEME.spacing.xs,
+  appTitle: {
+    fontSize: 26,
+    fontWeight: "800",
+    color: T.white,
+    letterSpacing: 0.5,
   },
-  appSlogan: {
-    fontSize: 14,
-    color: THEME.colors.textSecondary,
-  },
+  appSub: { fontSize: 13, color: T.textSecondary, marginTop: 4 },
 
   // Card
   card: {
-    backgroundColor: THEME.colors.bgCard,
-    borderRadius: THEME.radius.xl,
-    padding: THEME.spacing.xl,
+    backgroundColor: T.bgCard,
+    borderRadius: T.radius.lg,
+    padding: T.gap.xl,
     borderWidth: 1,
-    borderColor: THEME.colors.border,
+    borderColor: T.bgCardBorder,
+    shadowColor: "#000",
+    shadowOpacity: 0.4,
+    shadowRadius: 24,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 10,
   },
 
   // Tabs
-  tabContainer: {
+  tabBar: {
     flexDirection: "row",
-    backgroundColor: THEME.colors.bgInput,
-    borderRadius: THEME.radius.md,
-    padding: 4,
-    marginBottom: THEME.spacing.xl,
+    backgroundColor: T.bgInput,
+    borderRadius: T.radius.md,
+    padding: 3,
+    marginBottom: T.gap.xl,
     position: "relative",
   },
   tabIndicator: {
     position: "absolute",
-    top: 4,
-    left: 4,
+    top: 3,
+    left: 3,
     width: "50%",
     height: "100%",
-    backgroundColor: THEME.colors.primary,
-    borderRadius: THEME.radius.sm,
+    borderRadius: T.radius.sm,
+    backgroundColor: T.primary,
   },
   tab: {
     flex: 1,
-    paddingVertical: THEME.spacing.md,
+    paddingVertical: 13,
     alignItems: "center",
     zIndex: 1,
   },
-  tabText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: THEME.colors.textMuted,
-  },
-  tabTextActive: {
-    color: THEME.colors.text,
-  },
+  tabTxt: { fontSize: 14, fontWeight: "600", color: T.textMuted },
+  tabTxtActive: { color: T.white },
 
   // Form
-  form: {
-    gap: THEME.spacing.lg,
-  },
-  inputContainer: {
-    gap: THEME.spacing.xs,
-  },
-  inputWrapper: {
+  form: { gap: T.gap.lg },
+  inputOuter: { gap: T.gap.xs },
+  inputRow: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: THEME.colors.bgInput,
-    borderRadius: THEME.radius.md,
-    borderWidth: 1,
-    borderColor: THEME.colors.border,
-    paddingHorizontal: THEME.spacing.lg,
-    height: 52,
-    gap: THEME.spacing.md,
+    backgroundColor: T.bgInput,
+    borderRadius: T.radius.md,
+    borderWidth: 1.2,
+    borderColor: T.bgInputBorder,
+    paddingHorizontal: T.gap.lg,
+    height: T.inputH,
   },
-  inputFocused: {
-    borderColor: THEME.colors.borderFocus,
+  inputRowFocused: {
+    borderColor: T.primary,
+    shadowColor: T.primary,
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 0 },
+    elevation: 3,
   },
-  inputError: {
-    borderColor: THEME.colors.error,
-  },
-  input: {
-    flex: 1,
-    fontSize: 15,
-    color: THEME.colors.text,
-  },
-  errorText: {
-    fontSize: 12,
-    color: THEME.colors.error,
-    marginLeft: THEME.spacing.xs,
-  },
+  inputRowError: { borderColor: T.error },
+  inputText: { flex: 1, fontSize: 15, color: T.text },
+  errorMsg: { fontSize: 12, color: T.error, marginLeft: 4 },
 
-  // Password Strength
-  strengthContainer: {
+  // Strength
+  strengthRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: THEME.spacing.md,
-    marginTop: -THEME.spacing.sm,
+    gap: T.gap.md,
+    marginTop: -6,
   },
-  strengthBars: {
-    flexDirection: "row",
-    gap: 4,
-  },
-  strengthBar: {
-    width: 40,
-    height: 4,
-    borderRadius: 2,
-  },
-  strengthLabel: {
-    fontSize: 12,
-    fontWeight: "500",
-  },
+  strengthBars: { flexDirection: "row", gap: 4 },
+  strengthBar: { width: 38, height: 4, borderRadius: 2 },
+  strengthLabel: { fontSize: 12, fontWeight: "600" },
 
   // Forgot
-  forgotButton: {
-    alignSelf: "flex-end",
-    marginTop: -THEME.spacing.sm,
-  },
-  forgotText: {
-    fontSize: 13,
-    color: THEME.colors.primary,
-    fontWeight: "500",
-  },
+  forgotBtn: { alignSelf: "flex-end", marginTop: -6 },
+  forgotTxt: { fontSize: 13, color: T.primaryLight, fontWeight: "500" },
 
   // Submit
-  submitButton: {
-    borderRadius: THEME.radius.md,
-    overflow: "hidden",
-  },
-  submitButtonPressed: {
-    opacity: 0.9,
-    transform: [{ scale: 0.98 }],
-  },
-  submitButtonDisabled: {
-    opacity: 0.7,
-  },
-  submitButtonGradient: {
-    height: 52,
+  submitBtn: { borderRadius: T.radius.md, overflow: "hidden" },
+  submitGrad: {
+    height: T.btnH,
     justifyContent: "center",
     alignItems: "center",
   },
-  submitButtonText: {
+  submitTxt: {
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: "700",
     color: "#fff",
+    letterSpacing: 0.3,
   },
 
   // Divider
   divider: {
     flexDirection: "row",
     alignItems: "center",
-    marginVertical: THEME.spacing.xl,
+    marginVertical: T.gap.xl,
   },
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: THEME.colors.border,
+    backgroundColor: "rgba(100,100,160,0.2)",
   },
-  dividerText: {
+  dividerTxt: {
     fontSize: 13,
-    color: THEME.colors.textMuted,
-    marginHorizontal: THEME.spacing.lg,
+    color: T.textMuted,
+    marginHorizontal: T.gap.lg,
   },
 
   // Social
-  socialContainer: {
-    flexDirection: "row",
-    gap: THEME.spacing.md,
-  },
-  socialButton: {
+  socialRow: { flexDirection: "row", gap: T.gap.md },
+  socialBtn: {
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: THEME.spacing.sm,
-    backgroundColor: THEME.colors.bgInput,
-    borderRadius: THEME.radius.md,
+    gap: T.gap.sm,
+    backgroundColor: T.bgInput,
+    borderRadius: T.radius.md,
     borderWidth: 1,
-    borderColor: THEME.colors.border,
-    paddingVertical: THEME.spacing.md,
+    borderColor: T.bgInputBorder,
+    paddingVertical: T.gap.md,
   },
-  socialButtonPressed: {
-    opacity: 0.8,
-  },
-  socialButtonText: {
-    fontSize: 13,
-    fontWeight: "500",
-    color: THEME.colors.text,
-  },
+  socialBtnTxt: { fontSize: 13, fontWeight: "600", color: T.text },
 
   // Terms
-  termsText: {
+  terms: {
     fontSize: 12,
-    color: THEME.colors.textMuted,
+    color: T.textMuted,
     textAlign: "center",
-    marginTop: THEME.spacing.xl,
+    marginTop: T.gap.xl,
     lineHeight: 18,
   },
-  termsLink: {
-    color: THEME.colors.primary,
-    fontWeight: "500",
-  },
+  termsLink: { color: T.primaryLight, fontWeight: "500" },
 
-  // Demo User Picker
-  demoPickerContainer: {
-    marginTop: THEME.spacing.lg,
+  // Demo
+  demoWrap: {
+    marginTop: T.gap.lg,
     borderTopWidth: 1,
-    borderTopColor: THEME.colors.border,
-    paddingTop: THEME.spacing.lg,
+    borderTopColor: "rgba(100,100,160,0.15)",
+    paddingTop: T.gap.lg,
   },
-  demoPickerToggle: {
+  demoToggle: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: THEME.spacing.sm,
-    paddingVertical: THEME.spacing.sm,
+    gap: T.gap.sm,
+    paddingVertical: T.gap.sm,
   },
-  demoPickerToggleText: {
-    fontSize: 13,
-    color: THEME.colors.warning,
-    fontWeight: "500",
-  },
-  demoUserList: {
-    marginTop: THEME.spacing.md,
-    gap: THEME.spacing.sm,
-  },
-  demoUserItem: {
+  demoToggleTxt: { fontSize: 13, color: T.warning, fontWeight: "500" },
+  demoList: { marginTop: T.gap.md, gap: T.gap.sm },
+  demoItem: {
     flexDirection: "row",
     alignItems: "center",
-    gap: THEME.spacing.md,
-    backgroundColor: THEME.colors.bgInput,
-    borderRadius: THEME.radius.md,
-    padding: THEME.spacing.md,
+    gap: T.gap.md,
+    backgroundColor: T.bgInput,
+    borderRadius: T.radius.md,
+    padding: T.gap.md,
     borderWidth: 1,
-    borderColor: THEME.colors.border,
+    borderColor: T.bgInputBorder,
   },
-  demoUserItemPressed: {
-    opacity: 0.8,
-    borderColor: THEME.colors.primary,
-  },
-  demoUserRole: {
-    width: 32,
-    height: 32,
-    borderRadius: THEME.radius.full,
+  demoAvatar: {
+    width: 34,
+    height: 34,
+    borderRadius: T.radius.pill,
     justifyContent: "center",
     alignItems: "center",
   },
-  demoUserRoleText: {
-    fontSize: 12,
+  demoAvatarTxt: { fontSize: 13, fontWeight: "700", color: "#fff" },
+  demoName: { fontSize: 14, fontWeight: "600", color: T.text },
+  demoEmail: { fontSize: 12, color: T.textMuted },
+
+  // OTP Modal
+  otpOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    justifyContent: "flex-end",
+  },
+  otpModal: {
+    backgroundColor: T.bgCard,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: 24,
+    paddingBottom: 40,
+    alignItems: "center",
+  },
+  otpHandle: {
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: "rgba(255,255,255,0.2)",
+    marginBottom: 20,
+  },
+  otpTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: T.text,
+    marginBottom: 8,
+  },
+  otpSubtitle: {
+    fontSize: 14,
+    color: T.textMuted,
+    textAlign: "center",
+    marginBottom: 24,
+    lineHeight: 20,
+  },
+  otpInputWrap: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: T.bgInput,
+    borderRadius: T.radius.md,
+    borderWidth: 1,
+    borderColor: T.bgInputBorder,
+    paddingHorizontal: 14,
+    height: 50,
+    width: "100%",
+    marginBottom: 12,
+    gap: 10,
+  },
+  otpInput: {
+    flex: 1,
+    fontSize: 20,
+    fontWeight: "700",
+    color: T.text,
+    letterSpacing: 8,
+    textAlign: "center",
+  },
+  otpErrorText: {
+    fontSize: 13,
+    color: T.error,
+    marginBottom: 10,
+  },
+  otpVerifyBtn: {
+    width: "100%",
+    marginTop: 8,
+    borderRadius: T.radius.md,
+    overflow: "hidden",
+  },
+  otpVerifyGrad: {
+    paddingVertical: 14,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: T.radius.md,
+  },
+  otpVerifyText: {
+    fontSize: 16,
     fontWeight: "700",
     color: "#fff",
   },
-  demoUserInfo: {
-    flex: 1,
+  otpResendBtn: {
+    marginTop: 16,
+    paddingVertical: 8,
   },
-  demoUserName: {
+  otpResendText: {
     fontSize: 14,
+    color: T.primaryLight,
     fontWeight: "600",
-    color: THEME.colors.text,
   },
-  demoUserEmail: {
-    fontSize: 12,
-    color: THEME.colors.textMuted,
+  otpCancelBtn: {
+    marginTop: 8,
+    paddingVertical: 8,
+  },
+  otpCancelText: {
+    fontSize: 14,
+    color: T.textMuted,
   },
 });

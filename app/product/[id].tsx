@@ -20,8 +20,12 @@ import { Colors } from "@/constants/theme";
 import { useCart } from "@/context/cart-context";
 import { useFavorites } from "@/context/FavoritesContext";
 import { useViewHistory } from "@/context/ViewHistoryContext";
-import type { Product as MockProduct } from "@/data/products";
+import type {
+    Product as MockProduct,
+    PriceHistoryEntry,
+} from "@/data/products";
 import { PRODUCTS } from "@/data/products";
+import { apiFetch } from "@/services/api";
 import { productService } from "@/services/api/product.service";
 import type { Product } from "@/services/api/types";
 import {
@@ -147,6 +151,8 @@ export default function ProductDetailScreen() {
   const [reviews, setReviews] = useState<Review[]>(FALLBACK_REVIEWS);
   const [reviewStats, setReviewStats] = useState<ReviewStats | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<MockProduct[]>([]);
+  const [priceHistory, setPriceHistory] = useState<PriceHistoryEntry[]>([]);
+  const [showPriceHistory, setShowPriceHistory] = useState(false);
 
   const scrollY = useRef(new Animated.Value(0)).current;
   const imageListRef = useRef<FlatList>(null);
@@ -258,6 +264,22 @@ export default function ProductDetailScreen() {
     }
   };
 
+  // Load price history
+  useEffect(() => {
+    if (!id || !isFromApi) return;
+    const loadPriceHistory = async () => {
+      try {
+        const result = await apiFetch(`/products/${id}/price-history?limit=10`);
+        if (result && (result as any).history) {
+          setPriceHistory((result as any).history);
+        }
+      } catch {
+        // Price history not available
+      }
+    };
+    loadPriceHistory();
+  }, [id, isFromApi]);
+
   const handleBack = useCallback(() => router.back(), []);
   const handleShare = useCallback(async () => {
     const displayProduct = product || mockProduct;
@@ -343,7 +365,7 @@ export default function ProductDetailScreen() {
     handleAddToCart();
     router.push("/checkout");
   }, [handleAddToCart]);
-  const handleChat = useCallback(() => router.push("/messages"), []);
+  const handleChat = useCallback(() => router.push("/chat"), []);
   const handleViewShop = useCallback(() => router.push("/shop"), []);
   const handleViewAllReviews = useCallback(
     () => router.push(`/product/${id}/reviews`),
@@ -382,7 +404,9 @@ export default function ProductDetailScreen() {
     );
   }
 
-  const originalPrice = Math.round(displayProduct.price * 1.3);
+  const originalPrice =
+    (displayProduct as any).originalPrice ||
+    Math.round(displayProduct.price * 1.3);
   const discountPercent =
     (displayProduct as any).discountPercent ||
     Math.round((1 - displayProduct.price / originalPrice) * 100);
@@ -574,6 +598,108 @@ export default function ProductDetailScreen() {
             </Text>
           </View>
         </View>
+
+        {/* Price History */}
+        {priceHistory.length > 0 && (
+          <View style={styles.section}>
+            <TouchableOpacity
+              style={styles.sectionHeader}
+              activeOpacity={0.7}
+              onPress={() => setShowPriceHistory(!showPriceHistory)}
+            >
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Ionicons
+                  name="trending-down-outline"
+                  size={18}
+                  color={THEME.primary}
+                />
+                <Text style={[styles.sectionTitle, { marginLeft: 6 }]}>
+                  Lịch sử giá
+                </Text>
+              </View>
+              <Ionicons
+                name={showPriceHistory ? "chevron-up" : "chevron-down"}
+                size={18}
+                color={THEME.textSecondary}
+              />
+            </TouchableOpacity>
+            {showPriceHistory && (
+              <View style={{ paddingHorizontal: 16, paddingBottom: 12 }}>
+                {priceHistory.map((entry, idx) => {
+                  const isDown = entry.newPrice < entry.oldPrice;
+                  const pctChange = Math.abs(
+                    Math.round(
+                      ((entry.newPrice - entry.oldPrice) / entry.oldPrice) *
+                        100,
+                    ),
+                  );
+                  return (
+                    <View
+                      key={entry.id || idx}
+                      style={{
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        paddingVertical: 8,
+                        borderBottomWidth:
+                          idx < priceHistory.length - 1 ? 1 : 0,
+                        borderBottomColor: "#F1F5F9",
+                      }}
+                    >
+                      <View style={{ flex: 1 }}>
+                        <Text
+                          style={{ fontSize: 12, color: THEME.textSecondary }}
+                        >
+                          {new Date(entry.createdAt).toLocaleDateString(
+                            "vi-VN",
+                          )}
+                        </Text>
+                        {entry.reason ? (
+                          <Text
+                            style={{
+                              fontSize: 11,
+                              color: THEME.textSecondary,
+                              marginTop: 2,
+                            }}
+                          >
+                            {entry.reason}
+                          </Text>
+                        ) : null}
+                      </View>
+                      <View style={{ alignItems: "flex-end" }}>
+                        <View
+                          style={{ flexDirection: "row", alignItems: "center" }}
+                        >
+                          <Ionicons
+                            name={isDown ? "arrow-down" : "arrow-up"}
+                            size={12}
+                            color={isDown ? "#10B981" : "#EF4444"}
+                          />
+                          <Text
+                            style={{
+                              fontSize: 13,
+                              fontWeight: "600",
+                              color: isDown ? "#10B981" : "#EF4444",
+                              marginLeft: 2,
+                            }}
+                          >
+                            {pctChange}%
+                          </Text>
+                        </View>
+                        <Text
+                          style={{ fontSize: 12, color: THEME.textSecondary }}
+                        >
+                          ₫{entry.oldPrice.toLocaleString("vi-VN")} → ₫
+                          {entry.newPrice.toLocaleString("vi-VN")}
+                        </Text>
+                      </View>
+                    </View>
+                  );
+                })}
+              </View>
+            )}
+          </View>
+        )}
 
         {/* Vouchers */}
         <TouchableOpacity style={styles.section} activeOpacity={0.7}>

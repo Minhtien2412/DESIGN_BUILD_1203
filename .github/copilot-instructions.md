@@ -40,3 +40,5 @@
 - Guest mode is allowed: `AuthNavigator` in `app/_layout.tsx` only redirects authenticated users into `(tabs)`; guard protected actions per-screen with `useAuth()` instead of forcing global redirects.
 - Cart totals drive the unified badge via `cartBadge`; bypassing the context causes stale counts.
 - Prefer typed helpers over `as any`; when navigation strings feel clumsy, add a small factory (e.g., `productRoute(id)`) rather than casting.
+
+netstat -ano | findstr 63266

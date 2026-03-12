@@ -1,22 +1,20 @@
-import { useThemeColor } from '@/hooks/use-theme-color';
-import React, { useEffect, useRef } from 'react';
-import { Animated, Easing, StyleSheet, View, ViewProps } from 'react-native';
+/**
+ * AuthBackground
+ *
+ * Premium dark animated backdrop for auth screens.
+ * Uses floating blobs with animated transforms for a modern glass feel.
+ * Consistent with the AUTH_THEME design tokens.
+ */
+
+import { AUTH_THEME as T } from "@/constants/auth-theme";
+import React, { useEffect, useRef } from "react";
+import { Animated, Easing, StyleSheet, View, ViewProps } from "react-native";
 
 type Props = ViewProps & {
   children: React.ReactNode;
 };
 
-/**
- * AuthBackground
- * Lightweight animated backdrop for auth screens using theme colors.
- * Avoids extra deps (no LinearGradient/Lottie) and runs on RN Animated.
- */
 export default function AuthBackground({ style, children, ...rest }: Props) {
-  const bg = useThemeColor({}, 'background');
-  const primary = useThemeColor({}, 'primary');
-  const accent = useThemeColor({}, 'accent');
-  const surface = useThemeColor({}, 'surface');
-
   const float1 = useRef(new Animated.Value(0)).current;
   const float2 = useRef(new Animated.Value(0)).current;
   const rotate = useRef(new Animated.Value(0)).current;
@@ -25,14 +23,30 @@ export default function AuthBackground({ style, children, ...rest }: Props) {
     const loopFloat = (anim: Animated.Value, to: number, delay = 0) =>
       Animated.loop(
         Animated.sequence([
-          Animated.timing(anim, { toValue: to, duration: 6000, easing: Easing.inOut(Easing.quad), useNativeDriver: true, delay }),
-          Animated.timing(anim, { toValue: -to, duration: 6000, easing: Easing.inOut(Easing.quad), useNativeDriver: true }),
-        ])
+          Animated.timing(anim, {
+            toValue: to,
+            duration: 6000,
+            easing: Easing.inOut(Easing.quad),
+            useNativeDriver: true,
+            delay,
+          }),
+          Animated.timing(anim, {
+            toValue: -to,
+            duration: 6000,
+            easing: Easing.inOut(Easing.quad),
+            useNativeDriver: true,
+          }),
+        ]),
       ).start();
 
     const loopRotate = () =>
       Animated.loop(
-        Animated.timing(rotate, { toValue: 1, duration: 18000, easing: Easing.linear, useNativeDriver: true })
+        Animated.timing(rotate, {
+          toValue: 1,
+          duration: 18000,
+          easing: Easing.linear,
+          useNativeDriver: true,
+        }),
       ).start();
 
     loopFloat(float1, 12);
@@ -40,17 +54,20 @@ export default function AuthBackground({ style, children, ...rest }: Props) {
     loopRotate();
   }, [float1, float2, rotate]);
 
-  const rotateInterpolate = rotate.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] });
+  const rotateInterpolate = rotate.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["0deg", "360deg"],
+  });
 
   return (
-    <View style={[styles.container, { backgroundColor: bg }, style]} {...rest}>
-      {/* Subtle radial-ish layers using large blurred circles */}
+    <View style={[styles.container, style]} {...rest}>
+      {/* Subtle floating blob - top left */}
       <Animated.View
         style={[
           styles.blob,
           {
-            backgroundColor: primary + '33', // ~20% opacity
-            pointerEvents: 'none',
+            backgroundColor: T.primaryGlow,
+            pointerEvents: "none",
             transform: [
               { translateY: float1 },
               { translateX: float2 },
@@ -60,13 +77,14 @@ export default function AuthBackground({ style, children, ...rest }: Props) {
           },
         ]}
       />
+      {/* Subtle floating blob - bottom right */}
       <Animated.View
         style={[
           styles.blob,
           styles.blobRight,
           {
-            backgroundColor: accent + '2A', // ~16% opacity
-            pointerEvents: 'none',
+            backgroundColor: T.accentGlow,
+            pointerEvents: "none",
             transform: [
               { translateY: float2 },
               { translateX: float1 },
@@ -77,9 +95,6 @@ export default function AuthBackground({ style, children, ...rest }: Props) {
         ]}
       />
 
-      {/* Soft top gradient bar imitation */}
-      <View style={[styles.topShade, { backgroundColor: surface + 'AA' }]} />
-
       {/* Content */}
       <View style={styles.content}>{children}</View>
     </View>
@@ -89,7 +104,8 @@ export default function AuthBackground({ style, children, ...rest }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    overflow: 'hidden',
+    overflow: "hidden",
+    backgroundColor: T.bg,
   },
   content: {
     flex: 1,
@@ -97,30 +113,17 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   blob: {
-    position: 'absolute',
-    width: 420,
-    height: 420,
-    borderRadius: 420 / 2,
+    position: "absolute",
+    width: 380,
+    height: 380,
+    borderRadius: 190,
     top: -120,
     left: -120,
-    // mimic blur by layering + transparency
-    shadowColor: '#000',
-    shadowOpacity: 0.15,
-    shadowRadius: 30,
-    shadowOffset: { width: 0, height: 0 },
-    elevation: 2,
   },
   blobRight: {
     top: undefined,
     bottom: -140,
     right: -140,
     left: undefined,
-  },
-  topShade: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 120,
   },
 });

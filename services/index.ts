@@ -63,7 +63,7 @@ export * from "./userProfile";
 
 // Re-export from api/ folder
 export { callService } from "./api/call.service";
-export { chatService } from "./api/chat.service";
+// chat.service.ts is DEPRECATED - use conversations.service.ts instead
 export { liveStreamService } from "./api/livestream.service";
 export { default as messagesApi } from "./api/messagesApi";
 
@@ -385,10 +385,13 @@ export type {
 
 // Admin Dashboard Service
 export {
-    getAdminDashboard, getProjectStats as getAdminProjectStats, getAdminStats,
+    getAdminDashboard,
+    getProjectStats as getAdminProjectStats,
+    getAdminStats,
     getAdminUsers,
     getDashboardOverview,
-    getFinanceStats, getProjectsByStatus,
+    getFinanceStats,
+    getProjectsByStatus,
     getRecentActivities,
     getRevenueChart,
     getSystemHealth,
@@ -398,10 +401,13 @@ export {
     updateUserRole
 } from "./adminService";
 export type {
-    AdminDashboard, ProjectStats as AdminProjectStats, AdminStats,
+    AdminDashboard,
+    ProjectStats as AdminProjectStats,
+    AdminStats,
     AdminUser,
     DashboardOverview,
-    FinanceStats, ProjectsByStatus,
+    FinanceStats,
+    ProjectsByStatus,
     RecentActivity,
     RevenueDataPoint,
     SystemHealth,

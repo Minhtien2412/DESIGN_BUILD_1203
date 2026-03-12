@@ -5,6 +5,7 @@
  * @updated 2026-01-28
  */
 
+import OfflineDataBanner from "@/components/ui/OfflineDataBanner";
 import { useUnifiedMessaging } from "@/hooks/crm/useUnifiedMessaging";
 import {
     getInteriorCompanies,
@@ -41,22 +42,22 @@ const DEMO_IMAGES = [
   "https://images.pexels.com/photos/1571453/pexels-photo-1571453.jpeg?auto=compress&cs=tinysrgb&w=600",
 ];
 
-const LOCATIONS = ["Táº¥t cáº£", "HÃ  Ná»™i", "TP.HCM", "ÄÃ  Náºµng", "Cáº§n ThÆ¡"];
+const LOCATIONS = ["Tất cả", "Hà Nội", "TP.HCM", "Đà Nẵng", "Cần Thơ"];
 const STYLES = [
-  "Táº¥t cáº£",
-  "Hiá»‡n Ä‘áº¡i",
-  "Cá»• Ä‘iá»ƒn",
-  "Tá»‘i giáº£n",
+  "Tất cả",
+  "Hiện đại",
+  "Cổ điển",
+  "Tối giản",
   "Scandinavian",
   "Industrial",
   "Indochine",
-  "Sang trá»ng",
+  "Sang trọng",
 ];
 const PRICE_RANGES = [
-  { label: "Táº¥t cáº£", min: 0, max: Infinity },
-  { label: "DÆ°á»›i 3 triá»‡u", min: 0, max: 3000000 },
-  { label: "3-5 triá»‡u", min: 3000000, max: 5000000 },
-  { label: "TrÃªn 5 triá»‡u", min: 5000000, max: Infinity },
+  { label: "Tất cả", min: 0, max: Infinity },
+  { label: "Dưới 3 triệu", min: 0, max: 3000000 },
+  { label: "3-5 triệu", min: 3000000, max: 5000000 },
+  { label: "Trên 5 triệu", min: 5000000, max: Infinity },
 ];
 
 interface InteriorCompany {
@@ -89,8 +90,8 @@ function transformCompanyData(
     reviewCount: company.reviewCount || 0,
     projectCount: Math.floor(Math.random() * 200) + 50,
     startPrice: "3.500.000",
-    location: company.location || "HÃ  Ná»™i",
-    styles: company.specialties || ["Hiá»‡n Ä‘áº¡i", "Tá»‘i giáº£n"],
+    location: company.location || "Hà Nội",
+    styles: company.specialties || ["Hiện đại", "Tối giản"],
     image: DEMO_IMAGES[(idx + startIndex) % DEMO_IMAGES.length],
     featured: idx < 2,
     verified: company.verified,
@@ -101,14 +102,14 @@ function transformCompanyData(
 const FALLBACK_COMPANIES: InteriorCompany[] = [
   {
     id: 101,
-    name: "NhÃ  Äáº¹p Interior",
+    name: "Nhà Đẹp Interior",
     logo: "https://ui-avatars.com/api/?name=ND&background=9C27B0&color=fff&size=128",
     rating: 4.9,
     reviewCount: 324,
     projectCount: 180,
     startPrice: "3.500.000",
-    location: "HÃ  Ná»™i",
-    styles: ["Hiá»‡n Ä‘áº¡i", "Tá»‘i giáº£n"],
+    location: "Hà Nội",
+    styles: ["Hiện đại", "Tối giản"],
     image: DEMO_IMAGES[0],
     featured: true,
     verified: true,
@@ -122,7 +123,7 @@ const FALLBACK_COMPANIES: InteriorCompany[] = [
     projectCount: 150,
     startPrice: "5.000.000",
     location: "TP.HCM",
-    styles: ["Cá»• Ä‘iá»ƒn", "Sang trá»ng"],
+    styles: ["Cổ điển", "Sang trọng"],
     image: DEMO_IMAGES[1],
     featured: true,
     verified: true,
@@ -135,8 +136,8 @@ const FALLBACK_COMPANIES: InteriorCompany[] = [
     reviewCount: 215,
     projectCount: 120,
     startPrice: "3.000.000",
-    location: "ÄÃ  Náºµng",
-    styles: ["Tá»‘i giáº£n", "Scandinavian"],
+    location: "Đà Nẵng",
+    styles: ["Tối giản", "Scandinavian"],
     image: DEMO_IMAGES[2],
     featured: false,
     verified: false,
@@ -149,8 +150,8 @@ const FALLBACK_COMPANIES: InteriorCompany[] = [
     reviewCount: 187,
     projectCount: 95,
     startPrice: "4.000.000",
-    location: "HÃ  Ná»™i",
-    styles: ["Cá»• Ä‘iá»ƒn", "Indochine"],
+    location: "Hà Nội",
+    styles: ["Cổ điển", "Indochine"],
     image: DEMO_IMAGES[3],
     featured: false,
     verified: true,
@@ -164,7 +165,7 @@ const FALLBACK_COMPANIES: InteriorCompany[] = [
     projectCount: 140,
     startPrice: "3.800.000",
     location: "TP.HCM",
-    styles: ["Hiá»‡n Ä‘áº¡i", "Industrial"],
+    styles: ["Hiện đại", "Industrial"],
     image: DEMO_IMAGES[4],
     featured: false,
     verified: false,
@@ -176,8 +177,9 @@ export default function InteriorDesignScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [selectedLocation, setSelectedLocation] = useState("Táº¥t cáº£");
-  const [selectedStyle, setSelectedStyle] = useState("Táº¥t cáº£");
+  const [isOffline, setIsOffline] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState("Tất cả");
+  const [selectedStyle, setSelectedStyle] = useState("Tất cả");
   const [selectedPriceRange, setSelectedPriceRange] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [showFeatured, setShowFeatured] = useState(false);
@@ -192,22 +194,25 @@ export default function InteriorDesignScreen() {
     try {
       setError(null);
       const response = await getInteriorCompanies({
-        location: selectedLocation === "Táº¥t cáº£" ? undefined : selectedLocation,
+        location: selectedLocation === "Tất cả" ? undefined : selectedLocation,
         search: searchQuery || undefined,
         limit: 20,
       });
 
       if (response.data && response.data.length > 0) {
         setCompanies(transformCompanyData(response.data, 0));
+        setIsOffline(response.offline === true);
       } else {
         // Use fallback data if no API results
         setCompanies(FALLBACK_COMPANIES);
-        setError("Äang sá»­ dá»¥ng dá»¯ liá»‡u demo");
+        setIsOffline(true);
+        setError("Đang sử dụng dữ liệu demo");
       }
     } catch (err) {
       console.error("[InteriorDesign] Error fetching companies:", err);
       setCompanies(FALLBACK_COMPANIES);
-      setError("KhÃ´ng thá»ƒ táº£i dá»¯ liá»‡u. Äang hiá»ƒn thá»‹ dá»¯ liá»‡u demo.");
+      setIsOffline(true);
+      setError("Không thể tải dữ liệu. Đang hiển thị dữ liệu demo.");
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
@@ -248,7 +253,7 @@ export default function InteriorDesignScreen() {
 
   const filteredCompanies = companies.filter((company) => {
     const matchLocation =
-      selectedLocation === "Táº¥t cáº£" || company.location === selectedLocation;
+      selectedLocation === "Tất cả" || company.location === selectedLocation;
     const price = parseFloat(company.startPrice.replace(/\./g, ""));
     const matchPrice =
       price >= PRICE_RANGES[selectedPriceRange].min &&
@@ -257,7 +262,7 @@ export default function InteriorDesignScreen() {
       searchQuery === "" ||
       company.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchStyle =
-      selectedStyle === "Táº¥t cáº£" || company.styles.includes(selectedStyle);
+      selectedStyle === "Tất cả" || company.styles.includes(selectedStyle);
     const matchFeatured = !showFeatured || company.featured;
     return (
       matchLocation && matchPrice && matchSearch && matchStyle && matchFeatured
@@ -275,7 +280,7 @@ export default function InteriorDesignScreen() {
       {company.featured && (
         <View style={styles.featuredBadge}>
           <Ionicons name="star" size={12} color="#fff" />
-          <Text style={styles.featuredBadgeText}>Ná»•i báº­t</Text>
+          <Text style={styles.featuredBadgeText}>Nổi bật</Text>
         </View>
       )}
 
@@ -319,7 +324,7 @@ export default function InteriorDesignScreen() {
           <View style={styles.divider} />
           <View style={styles.statItem}>
             <Ionicons name="images-outline" size={14} color="#666" />
-            <Text style={styles.projectText}>{company.projectCount} dá»± Ã¡n</Text>
+            <Text style={styles.projectText}>{company.projectCount} dự án</Text>
           </View>
         </View>
 
@@ -335,9 +340,9 @@ export default function InteriorDesignScreen() {
         {/* Price & Button */}
         <View style={styles.footer}>
           <View style={styles.priceSection}>
-            <Text style={styles.priceLabel}>Tá»«</Text>
-            <Text style={styles.priceValue}>{company.startPrice}â‚«</Text>
-            <Text style={styles.priceUnit}>/mÂ²</Text>
+            <Text style={styles.priceLabel}>Từ</Text>
+            <Text style={styles.priceValue}>{company.startPrice}₫</Text>
+            <Text style={styles.priceUnit}>/m²</Text>
           </View>
           <TouchableOpacity
             style={styles.contactButton}
@@ -353,7 +358,7 @@ export default function InteriorDesignScreen() {
                   size={16}
                   color="#fff"
                 />
-                <Text style={styles.contactButtonText}>TÆ° váº¥n</Text>
+                <Text style={styles.contactButtonText}>Tư vấn</Text>
               </>
             )}
           </TouchableOpacity>
@@ -367,7 +372,7 @@ export default function InteriorDesignScreen() {
       <>
         <Stack.Screen
           options={{
-            title: "Thiáº¿t káº¿ ná»™i tháº¥t",
+            title: "Thiết kế nội thất",
             headerStyle: { backgroundColor: "#0D9488" },
             headerTintColor: "#fff",
             headerTitleStyle: { fontWeight: "600" },
@@ -375,7 +380,7 @@ export default function InteriorDesignScreen() {
         />
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#0D9488" />
-          <Text style={styles.loadingText}>Äang táº£i...</Text>
+          <Text style={styles.loadingText}>Đang tải...</Text>
         </View>
       </>
     );
@@ -384,13 +389,16 @@ export default function InteriorDesignScreen() {
     <>
       <Stack.Screen
         options={{
-          title: "Thiáº¿t káº¿ ná»™i tháº¥t",
+          title: "Thiết kế nội thất",
           headerStyle: { backgroundColor: "#0D9488" },
           headerTintColor: "#fff",
           headerTitleStyle: { fontWeight: "600" },
         }}
       />
       <View style={styles.container}>
+        {/* Offline Banner */}
+        <OfflineDataBanner visible={isOffline} onRetry={fetchCompanies} />
+
         {/* Error Banner */}
         {error && (
           <View style={styles.errorBanner}>
@@ -405,7 +413,7 @@ export default function InteriorDesignScreen() {
             <Ionicons name="search" size={20} color="#999" />
             <TextInput
               style={styles.searchInput}
-              placeholder="TÃ¬m cÃ´ng ty thiáº¿t káº¿ ná»™i tháº¥t..."
+              placeholder="Tìm công ty thiết kế nội thất..."
               placeholderTextColor="#999"
               value={searchQuery}
               onChangeText={setSearchQuery}
@@ -429,7 +437,7 @@ export default function InteriorDesignScreen() {
                 showFeatured && styles.featuredButtonTextActive,
               ]}
             >
-              Ná»•i báº­t
+              Nổi bật
             </Text>
           </TouchableOpacity>
         </View>
@@ -523,19 +531,19 @@ export default function InteriorDesignScreen() {
             <View style={styles.emptyState}>
               <Ionicons name="search-outline" size={64} color="#ccc" />
               <Text style={styles.emptyText}>
-                KhÃ´ng tÃ¬m tháº¥y káº¿t quáº£ phÃ¹ há»£p
+                Không tìm thấy kết quả phù hợp
               </Text>
               <TouchableOpacity
                 style={styles.resetButton}
                 onPress={() => {
-                  setSelectedLocation("Táº¥t cáº£");
-                  setSelectedStyle("Táº¥t cáº£");
+                  setSelectedLocation("Tất cả");
+                  setSelectedStyle("Tất cả");
                   setSelectedPriceRange(0);
                   setSearchQuery("");
                   setShowFeatured(false);
                 }}
               >
-                <Text style={styles.resetButtonText}>Äáº·t láº¡i bá»™ lá»c</Text>
+                <Text style={styles.resetButtonText}>Đặt lại bộ lọc</Text>
               </TouchableOpacity>
             </View>
           }

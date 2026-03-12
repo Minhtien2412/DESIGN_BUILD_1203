@@ -10,6 +10,8 @@
  */
 
 import Avatar from "@/components/ui/avatar";
+import { getSupportUsers, type SupportUser } from "@/data/supportUsers";
+import { get } from "@/services/api";
 import {
     clearSearchHistory,
     detectSearchType,
@@ -28,8 +30,11 @@ import { router } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
     ActivityIndicator,
+    Alert,
     FlatList,
     Keyboard,
+    Linking,
+    RefreshControl,
     ScrollView,
     StyleSheet,
     Text,
@@ -63,159 +68,34 @@ const FILTER_TABS: { key: ContactFilter; label: string; icon: string }[] = [
   { key: "support", label: "CSKH", icon: "headset" },
 ];
 
-// Customer Support Team
-const SUPPORT_TEAM = [
-  {
-    id: 100,
-    name: "Hỗ trợ kỹ thuật",
-    email: "support@thietkeresort.vn",
-    role: "CSKH - Kỹ thuật",
-    avatar: "",
-    online: true,
+// Map SupportUser from data/supportUsers to Contact interface
+function mapSupportToContact(su: SupportUser): Contact {
+  return {
+    id: su.numericId,
+    name: su.displayName,
+    email: su.email || `${su.name}@designbuild.vn`,
+    role: `CSKH - ${su.department}`,
+    avatar: su.avatar,
+    online: su.isAlwaysOnline,
     isSupport: true,
-    description: "Hỗ trợ vấn đề kỹ thuật, sử dụng app",
-  },
-  {
-    id: 101,
-    name: "Tư vấn thiết kế",
-    email: "design@thietkeresort.vn",
-    role: "CSKH - Thiết kế",
-    avatar: "",
-    online: true,
-    isSupport: true,
-    description: "Tư vấn về thiết kế, báo giá",
-  },
-  {
-    id: 102,
-    name: "Chăm sóc khách hàng",
-    email: "cskh@thietkeresort.vn",
-    role: "CSKH - Tổng đài",
-    avatar: "",
-    online: true,
-    isSupport: true,
-    description: "Hỗ trợ chung, khiếu nại",
-  },
-  {
-    id: 103,
-    name: "Hotline 24/7",
-    email: "hotline@thietkeresort.vn",
-    role: "CSKH - Khẩn cấp",
-    avatar: "",
-    online: true,
-    isSupport: true,
-    description: "Hỗ trợ khẩn cấp, ngoài giờ hành chính",
-  },
-];
+    description: su.welcomeMessage,
+    responseTime: su.responseTime,
+  };
+}
 
-// Mock contacts - Staff & Customers
-const STAFF_CONTACTS = [
-  {
-    id: 2,
-    name: "Nguyễn Văn Kiến",
-    email: "kien@thietkeresort.vn",
-    role: "Kiến trúc sư",
-    avatar: "https://i.pravatar.cc/150?u=kien",
-    online: true,
-    isSupport: false,
-  },
-  {
-    id: 4,
-    name: "Lê Thị Admin",
-    email: "admin@thietkeresort.vn",
-    role: "Quản trị viên",
-    avatar: "https://i.pravatar.cc/150?u=admin",
-    online: false,
-    isSupport: false,
-  },
-  {
-    id: 5,
-    name: "Phạm Đức Long",
-    email: "long@thietkeresort.vn",
-    role: "Kỹ sư",
-    avatar: "https://i.pravatar.cc/150?u=long",
-    online: true,
-    isSupport: false,
-  },
-  {
-    id: 7,
-    name: "Đặng Minh Tú",
-    email: "tu@thietkeresort.vn",
-    role: "Designer",
-    avatar: "https://i.pravatar.cc/150?u=tu",
-    online: true,
-    isSupport: false,
-  },
-  {
-    id: 8,
-    name: "Ngô Thị Hương",
-    email: "huong@thietkeresort.vn",
-    role: "Kế toán",
-    avatar: "https://i.pravatar.cc/150?u=huong",
-    online: false,
-    isSupport: false,
-  },
-  {
-    id: 9,
-    name: "Trần Văn Bình",
-    email: "binh@thietkeresort.vn",
-    role: "PM",
-    avatar: "https://i.pravatar.cc/150?u=binh",
-    online: true,
-    isSupport: false,
-  },
-  {
-    id: 10,
-    name: "Lý Minh Châu",
-    email: "chau@thietkeresort.vn",
-    role: "Designer",
-    avatar: "https://i.pravatar.cc/150?u=chau",
-    online: false,
-    isSupport: false,
-  },
-];
+// Support team derived from centralized data
+const SUPPORT_TEAM: Contact[] = getSupportUsers().map(mapSupportToContact);
 
-const CUSTOMER_CONTACTS = [
-  {
-    id: 3,
-    name: "Trần Minh Hoàng",
-    email: "hoang@client.com",
-    phone: "0901234567",
-    role: "Khách hàng",
-    avatar: "https://i.pravatar.cc/150?u=hoang",
-    online: false,
-    isSupport: false,
-  },
-  {
-    id: 6,
-    name: "Vũ Thanh Hà",
-    email: "ha@client.com",
-    phone: "0912345678",
-    role: "Khách hàng",
-    avatar: "https://i.pravatar.cc/150?u=ha",
-    online: false,
-    isSupport: false,
-  },
-  {
-    id: 11,
-    name: "Nguyễn Thị Lan",
-    email: "lan@client.com",
-    phone: "0923456789",
-    role: "Khách hàng VIP",
-    avatar: "https://i.pravatar.cc/150?u=lan",
-    online: true,
-    isSupport: false,
-  },
-  {
-    id: 12,
-    name: "Phan Văn Đức",
-    email: "duc@client.com",
-    phone: "0934567890",
-    role: "Khách hàng",
-    avatar: "https://i.pravatar.cc/150?u=duc",
-    online: false,
-    isSupport: false,
-  },
-];
+// API user shape from GET /api/users
+interface ApiUser {
+  id: number;
+  name: string;
+  email: string;
+  phone?: string;
+  role?: string;
+  avatar?: string | null;
+  isOnline?: boolean;
+}
 
 interface Contact {
   id: number;
@@ -227,6 +107,7 @@ interface Contact {
   online: boolean;
   isSupport: boolean;
   description?: string;
+  responseTime?: string;
 }
 
 // Support Contact Item - Special UI
@@ -246,6 +127,11 @@ function SupportContactItem({
       <View style={styles.supportInfo}>
         <Text style={styles.supportName}>{contact.name}</Text>
         <Text style={styles.supportDesc}>{contact.description}</Text>
+        {contact.responseTime && (
+          <Text style={styles.supportResponseTime}>
+            ⏱ {contact.responseTime}
+          </Text>
+        )}
       </View>
 
       <View style={styles.supportActions}>
@@ -270,12 +156,17 @@ function ContactItem({
 }) {
   const isStaff = contact.email.includes("@thietkeresort.vn");
 
+  // Only pass avatar/userId when there's a real photo URL (not pravatar, not empty)
+  const hasRealAvatar =
+    !!contact.avatar &&
+    !contact.avatar.includes("pravatar.cc") &&
+    contact.avatar.length > 0;
+
   return (
     <TouchableOpacity style={styles.contactItem} onPress={onPress}>
       <View style={styles.avatarWrapper}>
         <Avatar
-          avatar={contact.avatar}
-          userId={String(contact.id)}
+          avatar={hasRealAvatar ? contact.avatar : undefined}
           name={contact.name}
           pixelSize={48}
         />
@@ -305,25 +196,86 @@ export default function NewConversationScreen() {
   const [activeFilter, setActiveFilter] = useState<ContactFilter>("all");
   const [searchResults, setSearchResults] = useState<UserSearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
   const [searchHistory, setSearchHistory] = useState<SearchHistoryItem[]>([]);
   const [detectedType, setDetectedType] = useState<SearchType>("name");
   const inputRef = useRef<TextInput>(null);
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Load search history on mount
+  // Real contacts from API
+  const [staffContacts, setStaffContacts] = useState<Contact[]>([]);
+  const [customerContacts, setCustomerContacts] = useState<Contact[]>([]);
+  const [contactsLoading, setContactsLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  // Map API user to Contact interface
+  const mapApiUser = useCallback(
+    (user: ApiUser, roleLabel: string): Contact => ({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      role: user.role || roleLabel,
+      avatar: user.avatar || "",
+      online: user.isOnline ?? false,
+      isSupport: false,
+    }),
+    [],
+  );
+
+  // Fetch contacts from API
+  const fetchContacts = useCallback(async () => {
+    try {
+      const response = await get<ApiUser[]>("/api/users");
+      const users = Array.isArray(response) ? response : [];
+      const staff: Contact[] = [];
+      const customers: Contact[] = [];
+
+      for (const u of users) {
+        const roleLower = (u.role || "").toLowerCase();
+        if (
+          roleLower === "admin" ||
+          roleLower === "staff" ||
+          roleLower === "manager" ||
+          roleLower.includes("nhân viên")
+        ) {
+          staff.push(mapApiUser(u, "Nhân viên"));
+        } else {
+          customers.push(mapApiUser(u, "Khách hàng"));
+        }
+      }
+
+      setStaffContacts(staff);
+      setCustomerContacts(customers);
+    } catch (error) {
+      console.warn("[Contacts] API fetch failed, keeping current data:", error);
+    } finally {
+      setContactsLoading(false);
+      setRefreshing(false);
+    }
+  }, [mapApiUser]);
+
+  // Load contacts and search history on mount
   useEffect(() => {
     loadSearchHistory();
-  }, []);
+    fetchContacts();
+  }, [fetchContacts]);
+
+  // Pull-to-refresh
+  const handleRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchContacts();
+  }, [fetchContacts]);
 
   const loadSearchHistory = async () => {
     const history = await getSearchHistory();
     setSearchHistory(history);
   };
 
-  // All contacts combined (fallback)
+  // All contacts combined
   const allContacts = useMemo(
-    () => [...SUPPORT_TEAM, ...STAFF_CONTACTS, ...CUSTOMER_CONTACTS],
-    [],
+    () => [...SUPPORT_TEAM, ...staffContacts, ...customerContacts],
+    [staffContacts, customerContacts],
   );
 
   // Detect search type as user types
@@ -342,12 +294,14 @@ export default function NewConversationScreen() {
 
     if (searchQuery.trim().length >= 2) {
       setIsSearching(true);
+      setSearchError(null);
       searchTimeoutRef.current = setTimeout(async () => {
         try {
           const response = await searchUsers(searchQuery, { limit: 20 });
           setSearchResults(response.users);
         } catch (error) {
           console.error("[Search] Error:", error);
+          setSearchError("Không thể tìm kiếm. Kiểm tra kết nối mạng.");
         } finally {
           setIsSearching(false);
         }
@@ -355,6 +309,7 @@ export default function NewConversationScreen() {
     } else {
       setSearchResults([]);
       setIsSearching(false);
+      setSearchError(null);
     }
 
     return () => {
@@ -377,10 +332,10 @@ export default function NewConversationScreen() {
         result = SUPPORT_TEAM;
         break;
       case "staff":
-        result = STAFF_CONTACTS;
+        result = staffContacts;
         break;
       case "customer":
-        result = CUSTOMER_CONTACTS;
+        result = customerContacts;
         break;
       default:
         result = allContacts;
@@ -401,6 +356,8 @@ export default function NewConversationScreen() {
     return result;
   }, [
     allContacts,
+    staffContacts,
+    customerContacts,
     activeFilter,
     searchQuery,
     searchResults.length,
@@ -456,11 +413,19 @@ export default function NewConversationScreen() {
   // Handle quick call to support
   const handleCallSupport = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    console.log("Calling support hotline");
+    const hotline = "tel:19001234";
+    Linking.canOpenURL(hotline).then((supported) => {
+      if (supported) {
+        Linking.openURL(hotline);
+      } else {
+        Alert.alert("Hotline", "Gọi: 1900 1234", [{ text: "OK" }]);
+      }
+    });
   }, []);
 
   // Get search type hint text
   const getSearchTypeHint = (): string => {
+    if (searchQuery.length === 1) return "Nhập thêm ký tự để tìm kiếm...";
     if (searchQuery.length < 2) return "";
     switch (detectedType) {
       case "phone":
@@ -484,8 +449,11 @@ export default function NewConversationScreen() {
       >
         <View style={styles.avatarWrapper}>
           <Avatar
-            avatar={item.avatar}
-            userId={item.id}
+            avatar={
+              item.avatar && !item.avatar.includes("pravatar.cc")
+                ? item.avatar
+                : undefined
+            }
             name={item.name}
             pixelSize={50}
           />
@@ -692,10 +660,18 @@ export default function NewConversationScreen() {
         </View>
 
         {/* Search type hint */}
-        {searchQuery.length >= 2 && (
+        {searchQuery.length >= 1 && (
           <Text style={styles.searchTypeHint}>{getSearchTypeHint()}</Text>
         )}
       </View>
+
+      {/* Search Error */}
+      {searchError && (
+        <View style={styles.searchErrorBar}>
+          <Ionicons name="warning" size={16} color="#DC2626" />
+          <Text style={styles.searchErrorText}>{searchError}</Text>
+        </View>
+      )}
 
       {/* Search Results from API */}
       {searchResults.length > 0 && (
@@ -708,6 +684,24 @@ export default function NewConversationScreen() {
           showsVerticalScrollIndicator={false}
         />
       )}
+
+      {/* Empty search results */}
+      {searchQuery.trim().length >= 2 &&
+        !isSearching &&
+        searchResults.length === 0 &&
+        !searchError && (
+          <View style={styles.emptySearchState}>
+            <Ionicons
+              name="search-outline"
+              size={40}
+              color={COLORS.textTertiary}
+            />
+            <Text style={styles.emptySearchTitle}>Không tìm thấy kết quả</Text>
+            <Text style={styles.emptySearchSubtext}>
+              Thử tìm bằng số điện thoại, email hoặc tên khác
+            </Text>
+          </View>
+        )}
 
       {/* Search History */}
       {searchQuery.length === 0 && renderSearchHistory()}
@@ -746,7 +740,10 @@ export default function NewConversationScreen() {
 
       {/* Quick Actions */}
       <View style={styles.quickActions}>
-        <TouchableOpacity style={styles.quickAction}>
+        <TouchableOpacity
+          style={styles.quickAction}
+          onPress={() => router.push("/messages/create-group")}
+        >
           <View
             style={[
               styles.quickActionIcon,
@@ -758,7 +755,13 @@ export default function NewConversationScreen() {
           <Text style={styles.quickActionText}>Tạo nhóm</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.quickAction}>
+        <TouchableOpacity
+          style={styles.quickAction}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            router.push("/messages/add-contact");
+          }}
+        >
           <View
             style={[styles.quickActionIcon, { backgroundColor: COLORS.online }]}
           >
@@ -767,7 +770,13 @@ export default function NewConversationScreen() {
           <Text style={styles.quickActionText}>Thêm liên hệ</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.quickAction}>
+        <TouchableOpacity
+          style={styles.quickAction}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            router.push("/utilities/qr-scanner");
+          }}
+        >
           <View
             style={[
               styles.quickActionIcon,
@@ -823,6 +832,22 @@ export default function NewConversationScreen() {
         keyExtractor={(item) => String(item.id)}
         contentContainerStyle={styles.listContent}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            tintColor={COLORS.primary}
+            colors={[COLORS.primary]}
+          />
+        }
+        ListHeaderComponent={
+          contactsLoading && !refreshing ? (
+            <View style={styles.loadingState}>
+              <ActivityIndicator size="small" color={COLORS.primary} />
+              <Text style={styles.loadingText}>Đang tải liên hệ...</Text>
+            </View>
+          ) : null
+        }
         ListEmptyComponent={() => (
           <View style={styles.emptyState}>
             <Ionicons
@@ -835,7 +860,9 @@ export default function NewConversationScreen() {
                 ? "Xem danh sách CSKH ở trên"
                 : searchQuery
                   ? "Không tìm thấy liên hệ"
-                  : "Chưa có liên hệ nào"}
+                  : contactsLoading
+                    ? ""
+                    : "Chưa có liên hệ nào"}
             </Text>
           </View>
         )}
@@ -1012,6 +1039,11 @@ const styles = StyleSheet.create({
   supportDesc: {
     fontSize: 12,
     color: COLORS.textSecondary,
+    marginTop: 2,
+  },
+  supportResponseTime: {
+    fontSize: 11,
+    color: COLORS.primary,
     marginTop: 2,
   },
   supportActions: {
@@ -1261,5 +1293,51 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: COLORS.textSecondary,
     marginTop: 2,
+  },
+
+  // Loading State
+  loadingState: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 20,
+  },
+  loadingText: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    marginLeft: 8,
+  },
+
+  // Search Error
+  searchErrorBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: "#FEF2F2",
+  },
+  searchErrorText: {
+    fontSize: 13,
+    color: "#DC2626",
+    marginLeft: 6,
+  },
+
+  // Empty Search State
+  emptySearchState: {
+    alignItems: "center",
+    paddingVertical: 40,
+    paddingHorizontal: 24,
+  },
+  emptySearchTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: COLORS.text,
+    marginTop: 12,
+  },
+  emptySearchSubtext: {
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    textAlign: "center",
+    marginTop: 4,
   },
 });

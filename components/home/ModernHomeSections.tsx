@@ -509,7 +509,7 @@ export const ModernFlashSale = memo(
             </View>
           </View>
           <TouchableOpacity
-            onPress={() => router.push("/flash-sale" as Href)}
+            onPress={() => router.push("/shopping/flash-sale" as Href)}
             hitSlop={8}
           >
             <Text style={flashStyles.seeAll}>Xem tất cả →</Text>
@@ -1923,33 +1923,33 @@ const aiStyles = StyleSheet.create({
 const PROMO_BANNERS = [
   {
     id: 1,
-    image: require("@/assets/banner/BANNER-1.jpg"),
-    route: "/services",
+    image: require("@/assets/banner/banner-home-1.jpg"),
+    route: "/contractor",
   },
   {
     id: 2,
-    image: require("@/assets/banner/BANNER-2.jpeg"),
-    route: "/workers",
+    image: require("@/assets/banner/banner-home-2.jpg"),
+    route: "/contractor",
   },
   {
     id: 3,
-    image: require("@/assets/banner/BANNER-3.jpeg"),
-    route: "/shop",
+    image: require("@/assets/banner/banner-home-3.jpg"),
+    route: "/workers",
   },
   {
     id: 4,
-    image: require("@/assets/banner/BANNER-4.jpeg"),
-    route: "/services/house-design",
+    image: require("@/assets/banner/banner-home-4.jpg"),
+    route: "/services",
   },
   {
     id: 5,
-    image: require("@/assets/banner/BANNER-5.jpeg"),
-    route: "/finishing",
+    image: require("@/assets/banner/banner-home-5.jpg"),
+    route: "/services",
   },
   {
     id: 6,
-    image: require("@/assets/banner/BANNER-6.jpeg"),
-    route: "/workers",
+    image: require("@/assets/banner/banner-home-6.jpg"),
+    route: "/services",
   },
 ];
 

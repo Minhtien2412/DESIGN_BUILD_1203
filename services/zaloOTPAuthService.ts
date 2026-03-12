@@ -22,6 +22,7 @@
  */
 
 import ENV from "@/config/env";
+import { ApiError, apiFetch } from "./api";
 import { getOTPService } from "./getOTPService";
 import { ZaloAuthService, ZaloUser } from "./zaloAuthService";
 
@@ -174,7 +175,7 @@ class ZaloOTPAuthService {
     options?: {
       channel?: "sms" | "viber" | "voice";
       isResend?: boolean;
-    }
+    },
   ): Promise<SendOTPResult> {
     try {
       // Validate phone
@@ -338,38 +339,17 @@ class ZaloOTPAuthService {
    * Đăng nhập/Đăng ký với backend sau khi OTP verified
    */
   private async authenticateWithBackend(
-    phone: string
+    phone: string,
   ): Promise<VerifyOTPResult> {
     try {
-      const response = await fetch(`${this.baseUrl}/auth/phone`, {
+      const data = await apiFetch<any>("/auth/phone", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-API-Key": this.apiKey,
-        },
-        body: JSON.stringify({
+        data: {
           phone: phone,
           method: "otp",
           verified: true,
-        }),
+        },
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        // Nếu backend chưa hỗ trợ, tạo user tạm
-        if (response.status === 404) {
-          console.log(
-            "[ZaloOTPAuth] Backend phone auth not available, using mock"
-          );
-          return this.createMockUser(phone);
-        }
-
-        return {
-          success: false,
-          message: data.message || "Đăng nhập thất bại",
-        };
-      }
 
       return {
         success: true,
@@ -388,6 +368,13 @@ class ZaloOTPAuthService {
         isNewUser: data.isNewUser,
       };
     } catch (error) {
+      // If endpoint not found, fallback to mock
+      if (error instanceof ApiError && error.status === 404) {
+        console.log(
+          "[ZaloOTPAuth] Backend phone auth not available, using mock",
+        );
+        return this.createMockUser(phone);
+      }
       console.error("[ZaloOTPAuth] Backend auth error:", error);
       // Fallback to mock for development
       return this.createMockUser(phone);
@@ -430,35 +417,22 @@ class ZaloOTPAuthService {
    */
   async completeRegistration(
     phone: string,
-    data: Omit<RegisterWithOTPData, "phone">
+    data: Omit<RegisterWithOTPData, "phone">,
   ): Promise<VerifyOTPResult> {
     try {
       const formattedPhone = formatVietnamesePhone(phone);
 
-      const response = await fetch(`${this.baseUrl}/auth/register-phone`, {
+      const result = await apiFetch<any>("/auth/register-phone", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-API-Key": this.apiKey,
-        },
-        body: JSON.stringify({
+        data: {
           phone: formattedPhone,
           name: data.name,
           email: data.email,
           password: data.password,
           referralCode: data.referralCode,
           method: "otp",
-        }),
+        },
       });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        return {
-          success: false,
-          message: result.message || "Đăng ký thất bại",
-        };
-      }
 
       return {
         success: true,
@@ -477,9 +451,13 @@ class ZaloOTPAuthService {
       };
     } catch (error) {
       console.error("[ZaloOTPAuth] Complete registration error:", error);
+      const message =
+        error instanceof ApiError
+          ? error.data?.message || "Đăng ký thất bại"
+          : "Có lỗi xảy ra. Vui lòng thử lại.";
       return {
         success: false,
-        message: "Có lỗi xảy ra. Vui lòng thử lại.",
+        message,
       };
     }
   }
@@ -503,27 +481,15 @@ class ZaloOTPAuthService {
       }
 
       // Gửi thông tin Zalo lên backend để liên kết
-      const response = await fetch(`${this.baseUrl}/auth/link-zalo`, {
+      await apiFetch<any>("/auth/link-zalo", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-API-Key": this.apiKey,
-        },
-        body: JSON.stringify({
+        data: {
           zaloId: zaloResult.user.id,
           zaloName: zaloResult.user.name,
           zaloPicture: zaloResult.user.picture?.data?.url,
           zaloAccessToken: zaloResult.accessToken,
-        }),
+        },
       });
-
-      if (!response.ok) {
-        const data = await response.json();
-        return {
-          success: false,
-          message: data.message || "Không thể liên kết tài khoản Zalo",
-        };
-      }
 
       return {
         success: true,
@@ -532,9 +498,13 @@ class ZaloOTPAuthService {
       };
     } catch (error) {
       console.error("[ZaloOTPAuth] Link Zalo error:", error);
+      const message =
+        error instanceof ApiError
+          ? error.data?.message || "Không thể liên kết tài khoản Zalo"
+          : "Có lỗi khi liên kết Zalo. Vui lòng thử lại.";
       return {
         success: false,
-        message: "Có lỗi khi liên kết Zalo. Vui lòng thử lại.",
+        message,
       };
     }
   }
@@ -554,27 +524,14 @@ class ZaloOTPAuthService {
       }
 
       // Xác thực với backend
-      const response = await fetch(`${this.baseUrl}/auth/zalo`, {
+      const data = await apiFetch<any>("/auth/zalo", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-API-Key": this.apiKey,
-        },
-        body: JSON.stringify({
+        data: {
           zaloId: zaloResult.user.id,
           zaloAccessToken: zaloResult.accessToken,
           zaloRefreshToken: zaloResult.refreshToken,
-        }),
+        },
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        return {
-          success: false,
-          message: data.message || "Tài khoản Zalo chưa được liên kết",
-        };
-      }
 
       return {
         success: true,
@@ -594,9 +551,13 @@ class ZaloOTPAuthService {
       };
     } catch (error) {
       console.error("[ZaloOTPAuth] Sign in with Zalo error:", error);
+      const message =
+        error instanceof ApiError
+          ? error.data?.message || "Tài khoản Zalo chưa được liên kết"
+          : "Đăng nhập Zalo thất bại. Vui lòng thử lại.";
       return {
         success: false,
-        message: "Đăng nhập Zalo thất bại. Vui lòng thử lại.",
+        message,
       };
     }
   }
@@ -654,7 +615,7 @@ class ZaloOTPAuthService {
    */
   async sendPasswordResetOTP(
     phone: string,
-    options?: { channel?: "sms" | "viber" | "voice" }
+    options?: { channel?: "sms" | "viber" | "voice" },
   ): Promise<SendOTPResult> {
     // Reuse sendOTP logic
     return this.sendOTP(phone, { ...options, isResend: false });
@@ -666,7 +627,7 @@ class ZaloOTPAuthService {
    */
   async verifyPasswordResetOTP(
     phone: string,
-    code: string
+    code: string,
   ): Promise<{
     success: boolean;
     message: string;
@@ -715,7 +676,7 @@ class ZaloOTPAuthService {
 
       console.log(
         "[ZaloOTPAuth] Password reset OTP verified for:",
-        maskPhone(formattedPhone)
+        maskPhone(formattedPhone),
       );
 
       return {
@@ -738,7 +699,7 @@ class ZaloOTPAuthService {
   async resetPassword(
     phone: string,
     newPassword: string,
-    resetToken: string
+    resetToken: string,
   ): Promise<{ success: boolean; message: string }> {
     try {
       const formattedPhone = formatVietnamesePhone(phone);
@@ -760,43 +721,14 @@ class ZaloOTPAuthService {
       }
 
       // Call backend to reset password
-      const response = await fetch(
-        `${this.baseUrl}/auth/reset-password-phone`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-API-Key": this.apiKey,
-          },
-          body: JSON.stringify({
-            phone: formattedPhone,
-            newPassword,
-            resetToken,
-          }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        // Handle specific error cases
-        if (response.status === 404) {
-          // Backend endpoint not available - mock success for development
-          console.log(
-            "[ZaloOTPAuth] Backend reset-password-phone not available, mock success"
-          );
-          otpSessions.delete(formattedPhone);
-          return {
-            success: true,
-            message: "Mật khẩu đã được đặt lại thành công! (Development mode)",
-          };
-        }
-
-        return {
-          success: false,
-          message: data.message || "Không thể đặt lại mật khẩu.",
-        };
-      }
+      const data = await apiFetch<any>("/auth/reset-password-phone", {
+        method: "POST",
+        data: {
+          phone: formattedPhone,
+          newPassword,
+          resetToken,
+        },
+      });
 
       // Clear session
       otpSessions.delete(formattedPhone);
@@ -806,6 +738,17 @@ class ZaloOTPAuthService {
         message: data.message || "Mật khẩu đã được đặt lại thành công!",
       };
     } catch (error) {
+      // Handle specific error cases
+      if (error instanceof ApiError && error.status === 404) {
+        console.log(
+          "[ZaloOTPAuth] Backend reset-password-phone not available, mock success",
+        );
+        otpSessions.delete(formattedPhone);
+        return {
+          success: true,
+          message: "Mật khẩu đã được đặt lại thành công! (Development mode)",
+        };
+      }
       console.error("[ZaloOTPAuth] Reset password error:", error);
       // Mock success for development
       return {

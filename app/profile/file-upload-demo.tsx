@@ -3,13 +3,17 @@
  * Test upload file, video lên server và get download link
  */
 
-import { ToastNotification } from '@/components/ui/toast-notification';
-import { useToast } from '@/hooks/use-toast';
-import { Ionicons } from '@expo/vector-icons';
-import * as DocumentPicker from 'expo-document-picker';
-import * as FileSystem from 'expo-file-system/legacy';
-import * as ImagePicker from 'expo-image-picker';
-import { useState } from 'react';
+import { ToastNotification } from "@/components/ui/toast-notification";
+import { useToast } from "@/hooks/use-toast";
+import {
+    PresignedUploadService,
+    UploadProgress,
+} from "@/services/PresignedUploadService";
+import { Ionicons } from "@expo/vector-icons";
+import * as DocumentPicker from "expo-document-picker";
+import * as FileSystem from "expo-file-system/legacy";
+import * as ImagePicker from "expo-image-picker";
+import { useState } from "react";
 import {
     ActivityIndicator,
     Alert,
@@ -20,8 +24,8 @@ import {
     StyleSheet,
     Text,
     TouchableOpacity,
-    View
-} from 'react-native';
+    View,
+} from "react-native";
 
 interface UploadedFile {
   id: string;
@@ -46,10 +50,11 @@ export default function FileUploadDemo() {
    */
   const pickImage = async () => {
     try {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      
-      if (status !== 'granted') {
-        showError('Cần quyền truy cập thư viện ảnh');
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+      if (status !== "granted") {
+        showError("Cần quyền truy cập thư viện ảnh");
         return;
       }
 
@@ -63,14 +68,14 @@ export default function FileUploadDemo() {
       if (!result.canceled && result.assets[0]) {
         setSelectedFile({
           uri: result.assets[0].uri,
-          type: 'image',
-          name: result.assets[0].uri.split('/').pop() || 'image.jpg',
-          mimeType: 'image/jpeg',
+          type: "image",
+          name: result.assets[0].uri.split("/").pop() || "image.jpg",
+          mimeType: "image/jpeg",
         });
-        success('Đã chọn ảnh');
+        success("Đã chọn ảnh");
       }
     } catch (err: any) {
-      showError(err.message || 'Lỗi chọn ảnh');
+      showError(err.message || "Lỗi chọn ảnh");
     }
   };
 
@@ -79,10 +84,11 @@ export default function FileUploadDemo() {
    */
   const pickVideo = async () => {
     try {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      
-      if (status !== 'granted') {
-        showError('Cần quyền truy cập thư viện video');
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+      if (status !== "granted") {
+        showError("Cần quyền truy cập thư viện video");
         return;
       }
 
@@ -95,14 +101,14 @@ export default function FileUploadDemo() {
       if (!result.canceled && result.assets[0]) {
         setSelectedFile({
           uri: result.assets[0].uri,
-          type: 'video',
-          name: result.assets[0].uri.split('/').pop() || 'video.mp4',
-          mimeType: 'video/mp4',
+          type: "video",
+          name: result.assets[0].uri.split("/").pop() || "video.mp4",
+          mimeType: "video/mp4",
         });
-        success('Đã chọn video');
+        success("Đã chọn video");
       }
     } catch (err: any) {
-      showError(err.message || 'Lỗi chọn video');
+      showError(err.message || "Lỗi chọn video");
     }
   };
 
@@ -112,22 +118,22 @@ export default function FileUploadDemo() {
   const pickDocument = async () => {
     try {
       const result = await DocumentPicker.getDocumentAsync({
-        type: '*/*',
+        type: "*/*",
         copyToCacheDirectory: true,
       });
 
-      if (result.type === 'success') {
+      if (result.type === "success") {
         setSelectedFile({
           uri: result.uri,
-          type: 'document',
+          type: "document",
           name: result.name,
-          mimeType: result.mimeType || 'application/octet-stream',
+          mimeType: result.mimeType || "application/octet-stream",
           size: result.size,
         });
-        success('Đã chọn file: ' + result.name);
+        success("Đã chọn file: " + result.name);
       }
     } catch (err: any) {
-      showError(err.message || 'Lỗi chọn file');
+      showError(err.message || "Lỗi chọn file");
     }
   };
 
@@ -136,7 +142,7 @@ export default function FileUploadDemo() {
    */
   const uploadFile = async () => {
     if (!selectedFile) {
-      showError('Vui lòng chọn file trước');
+      showError("Vui lòng chọn file trước");
       return;
     }
 
@@ -144,69 +150,37 @@ export default function FileUploadDemo() {
     setUploadProgress(0);
 
     try {
-      // Get file info
-      const fileInfo = await FileSystem.getInfoAsync(selectedFile.uri);
-      
-      if (!fileInfo.exists) {
-        throw new Error('File không tồn tại');
-      }
-
-      // Prepare FormData
-      const formData = new FormData();
-      
-      // Append file
-      formData.append('file', {
-        uri: selectedFile.uri,
-        name: selectedFile.name,
-        type: selectedFile.mimeType,
-      } as any);
-
-      // Upload with progress tracking
-      const uploadTask = FileSystem.createUploadTask(
-        'http://192.168.1.105:3000/api/upload', // Thay bằng API endpoint của bạn
-        selectedFile.uri,
-        {
-          httpMethod: 'POST',
-          uploadType: FileSystem.FileSystemUploadType.MULTIPART,
-          fieldName: 'file',
+      // Upload via presigned flow with progress
+      const result = await PresignedUploadService.upload(selectedFile.uri, {
+        filename: selectedFile.name,
+        contentType: selectedFile.mimeType,
+        onProgress: (prog: UploadProgress) => {
+          setUploadProgress(prog.progress);
         },
-        (data) => {
-          const progress = data.totalBytesSent / data.totalBytesExpectedToSend;
-          setUploadProgress(Math.round(progress * 100));
-        }
-      );
+      });
 
-      const response = await uploadTask.uploadAsync();
+      const fileInfo = await FileSystem.getInfoAsync(selectedFile.uri, {
+        size: true,
+      });
 
-      if (!response) {
-        throw new Error('Upload failed - no response');
-      }
+      const uploadedFile: UploadedFile = {
+        id: result.fileId || Date.now().toString(),
+        filename: result.filename || selectedFile.name,
+        originalName: selectedFile.name,
+        mimeType: selectedFile.mimeType,
+        size: (fileInfo as { size?: number }).size || result.fileSize || 0,
+        url: result.fileUrl || "",
+        downloadUrl: result.fileUrl || "",
+        uploadedAt: result.createdAt || new Date().toISOString(),
+      };
 
-      if (response.status === 200 || response.status === 201) {
-        const result = JSON.parse(response.body);
-        
-        // Add to uploaded files list
-        const uploadedFile: UploadedFile = {
-          id: result.id || Date.now().toString(),
-          filename: result.filename || selectedFile.name,
-          originalName: selectedFile.name,
-          mimeType: selectedFile.mimeType,
-          size: fileInfo.size || 0,
-          url: result.url || result.path || '',
-          downloadUrl: result.downloadUrl || result.url || '',
-          uploadedAt: new Date().toISOString(),
-        };
-
-        setUploadedFiles(prev => [uploadedFile, ...prev]);
-        setSelectedFile(null);
-        setUploadProgress(0);
-        success('Upload thành công!');
-      } else {
-        throw new Error(`Upload failed with status ${response.status}`);
-      }
+      setUploadedFiles((prev) => [uploadedFile, ...prev]);
+      setSelectedFile(null);
+      setUploadProgress(0);
+      success("Upload thành công!");
     } catch (err: any) {
-      console.error('Upload error:', err);
-      showError(err.message || 'Upload thất bại');
+      console.error("Upload error:", err);
+      showError(err.message || "Upload thất bại");
     } finally {
       setUploading(false);
     }
@@ -222,38 +196,42 @@ export default function FileUploadDemo() {
         FileSystem.documentDirectory + file.filename,
         {},
         (progress) => {
-          const percent = (progress.totalBytesWritten / progress.totalBytesExpectedToWrite) * 100;
+          const percent =
+            (progress.totalBytesWritten / progress.totalBytesExpectedToWrite) *
+            100;
           console.log(`Download progress: ${Math.round(percent)}%`);
-        }
+        },
       );
 
       const result = await downloadResumable.downloadAsync();
-      
+
       if (result) {
-        success('Tải xuống thành công!');
+        success("Tải xuống thành công!");
         Alert.alert(
-          'Tải xuống thành công',
+          "Tải xuống thành công",
           `File đã được lưu tại:\n${result.uri}`,
           [
-            { text: 'OK' },
+            { text: "OK" },
             {
-              text: 'Mở file',
+              text: "Mở file",
               onPress: () => {
-                if (Platform.OS === 'ios') {
+                if (Platform.OS === "ios") {
                   Linking.openURL(result.uri);
                 } else {
                   // Android: Share or open with file manager
-                  FileSystem.getContentUriAsync(result.uri).then(contentUri => {
-                    Linking.openURL(contentUri);
-                  });
+                  FileSystem.getContentUriAsync(result.uri).then(
+                    (contentUri) => {
+                      Linking.openURL(contentUri);
+                    },
+                  );
                 }
               },
             },
-          ]
+          ],
         );
       }
     } catch (err: any) {
-      showError(err.message || 'Tải xuống thất bại');
+      showError(err.message || "Tải xuống thất bại");
     }
   };
 
@@ -264,23 +242,19 @@ export default function FileUploadDemo() {
     try {
       // Use expo-clipboard if available
       // await Clipboard.setStringAsync(url);
-      
+
       // Fallback: show URL in alert
-      Alert.alert(
-        'Download Link',
-        url,
-        [
-          { text: 'Đóng' },
-          {
-            text: 'Mở link',
-            onPress: () => Linking.openURL(url),
-          },
-        ]
-      );
-      
-      success('Đã copy link');
+      Alert.alert("Download Link", url, [
+        { text: "Đóng" },
+        {
+          text: "Mở link",
+          onPress: () => Linking.openURL(url),
+        },
+      ]);
+
+      success("Đã copy link");
     } catch (err: any) {
-      showError('Lỗi copy link');
+      showError("Lỗi copy link");
     }
   };
 
@@ -288,25 +262,31 @@ export default function FileUploadDemo() {
    * Format file size
    */
   const formatFileSize = (bytes: number): string => {
-    if (bytes < 1024) return bytes + ' B';
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-    if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
-    return (bytes / (1024 * 1024 * 1024)).toFixed(1) + ' GB';
+    if (bytes < 1024) return bytes + " B";
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+    if (bytes < 1024 * 1024 * 1024)
+      return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+    return (bytes / (1024 * 1024 * 1024)).toFixed(1) + " GB";
   };
 
   return (
     <View style={styles.container}>
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.content}
+      >
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.title}>Upload & Download Test</Text>
-          <Text style={styles.subtitle}>Test upload file/video lên server và get link</Text>
+          <Text style={styles.subtitle}>
+            Test upload file/video lên server và get link
+          </Text>
         </View>
 
         {/* File Selection */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>1. Chọn File</Text>
-          
+
           <View style={styles.buttonRow}>
             <TouchableOpacity
               style={[styles.pickButton, styles.imageButton]}
@@ -342,9 +322,11 @@ export default function FileUploadDemo() {
               <View style={styles.selectedFileIcon}>
                 <Ionicons
                   name={
-                    selectedFile.type === 'image' ? 'image' :
-                    selectedFile.type === 'video' ? 'videocam' :
-                    'document'
+                    selectedFile.type === "image"
+                      ? "image"
+                      : selectedFile.type === "video"
+                        ? "videocam"
+                        : "document"
                   }
                   size={32}
                   color="#0D9488"
@@ -352,14 +334,16 @@ export default function FileUploadDemo() {
               </View>
               <View style={styles.selectedFileInfo}>
                 <Text style={styles.selectedFileName}>{selectedFile.name}</Text>
-                <Text style={styles.selectedFileType}>{selectedFile.mimeType}</Text>
+                <Text style={styles.selectedFileType}>
+                  {selectedFile.mimeType}
+                </Text>
                 {selectedFile.size && (
                   <Text style={styles.selectedFileSize}>
                     {formatFileSize(selectedFile.size)}
                   </Text>
                 )}
               </View>
-              {selectedFile.type === 'image' && (
+              {selectedFile.type === "image" && (
                 <Image
                   source={{ uri: selectedFile.uri }}
                   style={styles.previewImage}
@@ -374,9 +358,12 @@ export default function FileUploadDemo() {
         {selectedFile && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>2. Upload File</Text>
-            
+
             <TouchableOpacity
-              style={[styles.uploadButton, uploading && styles.uploadButtonDisabled]}
+              style={[
+                styles.uploadButton,
+                uploading && styles.uploadButtonDisabled,
+              ]}
               onPress={uploadFile}
               disabled={uploading}
             >
@@ -389,7 +376,11 @@ export default function FileUploadDemo() {
                 </>
               ) : (
                 <>
-                  <Ionicons name="cloud-upload-outline" size={24} color="#fff" />
+                  <Ionicons
+                    name="cloud-upload-outline"
+                    size={24}
+                    color="#fff"
+                  />
                   <Text style={styles.uploadButtonText}>Upload lên Server</Text>
                 </>
               )}
@@ -408,17 +399,21 @@ export default function FileUploadDemo() {
         {/* Uploaded Files List */}
         {uploadedFiles.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>3. Files Đã Upload ({uploadedFiles.length})</Text>
-            
+            <Text style={styles.sectionTitle}>
+              3. Files Đã Upload ({uploadedFiles.length})
+            </Text>
+
             {uploadedFiles.map((file, index) => (
               <View key={file.id} style={styles.fileCard}>
                 <View style={styles.fileCardHeader}>
                   <View style={styles.fileCardIcon}>
                     <Ionicons
                       name={
-                        file.mimeType.startsWith('image/') ? 'image' :
-                        file.mimeType.startsWith('video/') ? 'videocam' :
-                        'document'
+                        file.mimeType.startsWith("image/")
+                          ? "image"
+                          : file.mimeType.startsWith("video/")
+                            ? "videocam"
+                            : "document"
                       }
                       size={24}
                       color="#0D9488"
@@ -427,7 +422,8 @@ export default function FileUploadDemo() {
                   <View style={styles.fileCardInfo}>
                     <Text style={styles.fileCardName}>{file.originalName}</Text>
                     <Text style={styles.fileCardMeta}>
-                      {formatFileSize(file.size)} • {new Date(file.uploadedAt).toLocaleString('vi-VN')}
+                      {formatFileSize(file.size)} •{" "}
+                      {new Date(file.uploadedAt).toLocaleString("vi-VN")}
                     </Text>
                   </View>
                 </View>
@@ -493,11 +489,13 @@ export default function FileUploadDemo() {
             <Text style={styles.instructionText}>
               4. Bạn có thể copy link, tải xuống hoặc chia sẻ
             </Text>
-            <Text style={[styles.instructionText, { marginTop: 12, color: '#000000' }]}>
-              ⚠️ Cần cấu hình API endpoint server trong code
-            </Text>
-            <Text style={[styles.instructionText, { color: '#666' }]}>
-              Sửa URL: http://192.168.1.105:3000/api/upload
+            <Text
+              style={[
+                styles.instructionText,
+                { marginTop: 12, color: "#000000" },
+              ]}
+            >
+              ✅ Upload sử dụng Presigned URL flow (chuẩn)
             </Text>
           </View>
         </View>
@@ -517,7 +515,7 @@ export default function FileUploadDemo() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: "#F5F5F5",
   },
   scrollView: {
     flex: 1,
@@ -530,60 +528,60 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontWeight: '700',
-    color: '#0D9488',
+    fontWeight: "700",
+    color: "#0D9488",
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 15,
-    color: '#666',
+    color: "#666",
   },
   section: {
     marginBottom: 24,
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#1A1A1A',
+    fontWeight: "600",
+    color: "#1A1A1A",
     marginBottom: 12,
   },
   buttonRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 12,
   },
   pickButton: {
     flex: 1,
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
     paddingVertical: 16,
     paddingHorizontal: 12,
     borderRadius: 12,
     gap: 8,
   },
   imageButton: {
-    backgroundColor: '#0D9488',
+    backgroundColor: "#0D9488",
   },
   videoButton: {
-    backgroundColor: '#666666',
+    backgroundColor: "#666666",
   },
   documentButton: {
-    backgroundColor: '#0D9488',
+    backgroundColor: "#0D9488",
   },
   pickButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   selectedFileCard: {
     marginTop: 16,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 12,
     padding: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 12,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 4,
@@ -593,26 +591,26 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 8,
-    backgroundColor: '#D1FAE5',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#D1FAE5",
+    alignItems: "center",
+    justifyContent: "center",
   },
   selectedFileInfo: {
     flex: 1,
   },
   selectedFileName: {
     fontSize: 15,
-    fontWeight: '600',
-    color: '#1A1A1A',
+    fontWeight: "600",
+    color: "#1A1A1A",
     marginBottom: 4,
   },
   selectedFileType: {
     fontSize: 13,
-    color: '#666',
+    color: "#666",
   },
   selectedFileSize: {
     fontSize: 12,
-    color: '#999',
+    color: "#999",
     marginTop: 2,
   },
   previewImage: {
@@ -621,48 +619,48 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   uploadButton: {
-    backgroundColor: '#0D9488',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#0D9488",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     paddingVertical: 14,
     paddingHorizontal: 24,
     borderRadius: 12,
     gap: 8,
   },
   uploadButtonDisabled: {
-    backgroundColor: '#999',
+    backgroundColor: "#999",
   },
   uploadButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   progressBar: {
     height: 4,
-    backgroundColor: '#E5E7EB',
+    backgroundColor: "#E5E7EB",
     borderRadius: 2,
     marginTop: 12,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   progressFill: {
-    height: '100%',
-    backgroundColor: '#0D9488',
+    height: "100%",
+    backgroundColor: "#0D9488",
   },
   fileCard: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 4,
     elevation: 2,
   },
   fileCardHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 12,
     marginBottom: 12,
   },
@@ -670,85 +668,85 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 8,
-    backgroundColor: '#D1FAE5',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#D1FAE5",
+    alignItems: "center",
+    justifyContent: "center",
   },
   fileCardInfo: {
     flex: 1,
   },
   fileCardName: {
     fontSize: 15,
-    fontWeight: '600',
-    color: '#1A1A1A',
+    fontWeight: "600",
+    color: "#1A1A1A",
     marginBottom: 4,
   },
   fileCardMeta: {
     fontSize: 12,
-    color: '#999',
+    color: "#999",
   },
   linkContainer: {
     marginBottom: 12,
   },
   linkLabel: {
     fontSize: 13,
-    fontWeight: '600',
-    color: '#666',
+    fontWeight: "600",
+    color: "#666",
     marginBottom: 6,
   },
   linkButton: {
-    backgroundColor: '#F3F4F6',
+    backgroundColor: "#F3F4F6",
     padding: 12,
     borderRadius: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     gap: 8,
   },
   linkText: {
     flex: 1,
     fontSize: 13,
-    color: '#0D9488',
-    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
+    color: "#0D9488",
+    fontFamily: Platform.OS === "ios" ? "Courier" : "monospace",
   },
   fileActions: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 8,
   },
   actionButton: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     paddingVertical: 10,
     paddingHorizontal: 12,
     borderRadius: 8,
     gap: 6,
   },
   downloadActionButton: {
-    backgroundColor: '#0D9488',
+    backgroundColor: "#0D9488",
   },
   openActionButton: {
-    backgroundColor: '#0D9488',
+    backgroundColor: "#0D9488",
   },
   shareActionButton: {
-    backgroundColor: '#666666',
+    backgroundColor: "#666666",
   },
   actionButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   instructionCard: {
-    backgroundColor: '#FFF9DB',
+    backgroundColor: "#FFF9DB",
     borderLeftWidth: 4,
-    borderLeftColor: '#0D9488',
+    borderLeftColor: "#0D9488",
     padding: 16,
     borderRadius: 8,
   },
   instructionText: {
     fontSize: 14,
-    color: '#1A1A1A',
+    color: "#1A1A1A",
     marginBottom: 6,
     lineHeight: 20,
   },

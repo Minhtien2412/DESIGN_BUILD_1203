@@ -214,9 +214,9 @@ export default function AIHubScreen() {
   const handleSearchPress = useCallback((query?: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (query) {
-      router.push(`/unified-search?q=${encodeURIComponent(query)}` as any);
+      router.push(`/search?q=${encodeURIComponent(query)}` as any);
     } else {
-      router.push("/unified-search" as any);
+      router.push("/search" as any);
     }
   }, []);
 

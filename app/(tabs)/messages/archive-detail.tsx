@@ -15,25 +15,25 @@
 import { useChatArchive } from "@/hooks/useChatArchive";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import {
-    ArchivedMessage,
-    ChatArchive,
-    formatFileSize,
+  ArchivedMessage,
+  ChatArchive,
+  formatFileSize,
 } from "@/services/chatHistoryArchiveService";
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    FlatList,
-    Image,
-    Platform,
-    Share,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  Image,
+  Platform,
+  Share,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 // ============================================
@@ -97,7 +97,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onMediaPress }) => {
             onPress={() => onMediaPress(mediaUri || "", "video")}
           >
             <View style={styles.videoPlaceholder}>
-              <Ionicons name="play-circle" size={48} color="#fff" />
+              <Ionicons name="play-circle" size={36} color="#fff" />
               <Text style={styles.videoText}>Video</Text>
             </View>
           </TouchableOpacity>
@@ -111,7 +111,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onMediaPress }) => {
           style={[styles.documentContainer, { backgroundColor: bgColor }]}
           onPress={() => onMediaPress(mediaUri || "", "document")}
         >
-          <Ionicons name="document" size={32} color="#007AFF" />
+          <Ionicons name="document" size={24} color="#007AFF" />
           <View style={styles.documentInfo}>
             <Text
               style={[styles.documentName, { color: textColor }]}
@@ -125,12 +125,11 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onMediaPress }) => {
               </Text>
             )}
           </View>
-          <Ionicons name="download-outline" size={20} color={mutedColor} />
+          <Ionicons name="download-outline" size={16} color={mutedColor} />
         </TouchableOpacity>
       );
     });
   };
-
   return (
     <View style={[styles.messageContainer, isOwnMessage && styles.ownMessage]}>
       <View style={[styles.messageBubble, { backgroundColor: bubbleColor }]}>
@@ -314,8 +313,10 @@ export default function ArchiveDetailScreen() {
   // Render search bar
   const renderSearchBar = () => (
     <View style={[styles.searchContainer, { backgroundColor: bgColor }]}>
-      <Ionicons name="search" size={20} color={mutedColor} />
+      <Ionicons name="search" size={16} color={mutedColor} />
       <TextInput
+        nativeID="archive-detail-search"
+        accessibilityLabel="Tìm trong cuộc trò chuyện"
         style={[styles.searchInput, { color: textColor }]}
         placeholder="Tìm trong cuộc trò chuyện..."
         placeholderTextColor={mutedColor}
@@ -324,7 +325,7 @@ export default function ArchiveDetailScreen() {
       />
       {searchQuery.length > 0 && (
         <TouchableOpacity onPress={() => setSearchQuery("")}>
-          <Ionicons name="close-circle" size={20} color={mutedColor} />
+          <Ionicons name="close-circle" size={16} color={mutedColor} />
         </TouchableOpacity>
       )}
     </View>
@@ -379,7 +380,7 @@ export default function ArchiveDetailScreen() {
         ]}
       >
         <Stack.Screen options={{ title: "Archive" }} />
-        <Ionicons name="alert-circle-outline" size={64} color={mutedColor} />
+        <Ionicons name="alert-circle-outline" size={44} color={mutedColor} />
         <Text style={[styles.errorText, { color: textColor }]}>
           Không tìm thấy archive
         </Text>
@@ -400,15 +401,15 @@ export default function ArchiveDetailScreen() {
               <TouchableOpacity onPress={() => setIsSearching(!isSearching)}>
                 <Ionicons
                   name={isSearching ? "close" : "search"}
-                  size={24}
+                  size={20}
                   color="#007AFF"
                 />
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={handleExport}
-                style={{ marginLeft: 16 }}
+                style={{ marginLeft: 12 }}
               >
-                <Ionicons name="share-outline" size={24} color="#007AFF" />
+                <Ionicons name="share-outline" size={20} color="#007AFF" />
               </TouchableOpacity>
             </View>
           ),
@@ -435,7 +436,7 @@ export default function ArchiveDetailScreen() {
         ListHeaderComponent={renderInfo}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Ionicons name="chatbubbles-outline" size={48} color={mutedColor} />
+            <Ionicons name="chatbubbles-outline" size={36} color={mutedColor} />
             <Text style={[styles.emptyText, { color: mutedColor }]}>
               {searchQuery ? "Không tìm thấy tin nhắn" : "Không có tin nhắn"}
             </Text>
@@ -461,31 +462,31 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   listContent: {
-    padding: 16,
-    paddingBottom: 32,
+    padding: 12,
+    paddingBottom: 24,
   },
   headerButtons: {
     flexDirection: "row",
     alignItems: "center",
   },
   loadingText: {
-    marginTop: 12,
-    fontSize: 14,
+    marginTop: 10,
+    fontSize: 13,
   },
   errorText: {
-    fontSize: 16,
-    marginTop: 16,
-    marginBottom: 24,
+    fontSize: 14,
+    marginTop: 12,
+    marginBottom: 18,
   },
   backBtn: {
     backgroundColor: "#007AFF",
-    paddingHorizontal: 24,
-    paddingVertical: 12,
+    paddingHorizontal: 18,
+    paddingVertical: 9,
     borderRadius: 8,
   },
   backBtnText: {
     color: "#fff",
-    fontSize: 15,
+    fontSize: 13,
     fontWeight: "600",
   },
 
@@ -493,40 +494,40 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 10,
-    margin: 16,
+    padding: 8,
+    margin: 12,
     marginBottom: 0,
-    borderRadius: 10,
-    gap: 8,
+    borderRadius: 8,
+    gap: 6,
   },
   searchInput: {
     flex: 1,
-    fontSize: 15,
+    fontSize: 13,
   },
 
   // Info header
   infoContainer: {
-    marginBottom: 16,
+    marginBottom: 10,
   },
   infoCard: {
-    padding: 16,
-    borderRadius: 12,
+    padding: 12,
+    borderRadius: 10,
     alignItems: "center",
   },
   infoTitle: {
-    fontSize: 18,
+    fontSize: 15,
     fontWeight: "600",
-    marginBottom: 4,
+    marginBottom: 3,
   },
   infoSubtitle: {
-    fontSize: 13,
+    fontSize: 11,
   },
 
   // Date header
   dateHeader: {
     flexDirection: "row",
     alignItems: "center",
-    marginVertical: 16,
+    marginVertical: 10,
   },
   dateLine: {
     flex: 1,
@@ -534,14 +535,14 @@ const styles = StyleSheet.create({
     backgroundColor: "#E5E5E5",
   },
   dateText: {
-    paddingHorizontal: 12,
-    fontSize: 12,
+    paddingHorizontal: 8,
+    fontSize: 11,
     fontWeight: "500",
   },
 
   // Message
   messageContainer: {
-    marginVertical: 4,
+    marginVertical: 2,
     alignItems: "flex-start",
   },
   ownMessage: {
@@ -549,23 +550,23 @@ const styles = StyleSheet.create({
   },
   messageBubble: {
     maxWidth: "75%",
-    padding: 12,
-    borderRadius: 16,
+    padding: 9,
+    borderRadius: 14,
     borderBottomLeftRadius: 4,
   },
   senderName: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: "600",
     color: "#007AFF",
-    marginBottom: 4,
+    marginBottom: 2,
   },
   messageText: {
-    fontSize: 15,
-    lineHeight: 20,
+    fontSize: 13,
+    lineHeight: 18,
   },
   messageTime: {
-    fontSize: 11,
-    marginTop: 4,
+    fontSize: 10,
+    marginTop: 3,
     textAlign: "right",
   },
 
@@ -576,13 +577,13 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   mediaImage: {
-    width: 200,
-    height: 150,
+    width: 170,
+    height: 128,
     borderRadius: 8,
   },
   videoPlaceholder: {
-    width: 200,
-    height: 150,
+    width: 170,
+    height: 128,
     backgroundColor: "#333",
     justifyContent: "center",
     alignItems: "center",
@@ -590,35 +591,35 @@ const styles = StyleSheet.create({
   },
   videoText: {
     color: "#fff",
-    fontSize: 12,
-    marginTop: 4,
+    fontSize: 10,
+    marginTop: 3,
   },
   documentContainer: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 12,
+    padding: 8,
     borderRadius: 8,
-    marginBottom: 8,
-    gap: 8,
+    marginBottom: 6,
+    gap: 6,
   },
   documentInfo: {
     flex: 1,
   },
   documentName: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: "500",
   },
   documentSize: {
-    fontSize: 12,
+    fontSize: 10,
   },
 
   // Empty
   emptyContainer: {
-    padding: 40,
+    padding: 30,
     alignItems: "center",
   },
   emptyText: {
-    marginTop: 12,
-    fontSize: 14,
+    marginTop: 10,
+    fontSize: 12,
   },
 });

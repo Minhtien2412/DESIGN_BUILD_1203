@@ -378,6 +378,8 @@ export default function SupportChatScreen() {
         </TouchableOpacity>
 
         <TextInput
+          nativeID="chat-support-input"
+          accessibilityLabel="Nhập tin nhắn"
           style={[styles.textInput, { color: textColor }]}
           placeholder="Nhập tin nhắn..."
           placeholderTextColor={Colors.light.textSecondary}

@@ -14,7 +14,11 @@ export type ProductCategory =
   | "consultation" // Tư vấn
   | "furniture" // Đồ nội thất
   | "lighting" // Thiết bị chiếu sáng
-  | "sanitary"; // Thiết bị vệ sinh
+  | "sanitary" // Thiết bị vệ sinh
+  | "kitchen" // Thiết bị bếp
+  | "plumbing" // Thiết bị nước
+  | "fire-safety" // Thiết bị PCCC
+  | "study-desk"; // Bàn học
 
 // Pricing type
 export type PriceType = "fixed" | "contact";
@@ -75,6 +79,18 @@ export type Product = {
   voucher?: string; // e.g., "2.2", "SALE"
   isLive?: boolean; // Live selling badge
   ratingCount?: number; // Number of ratings
+  // Price history fields
+  originalPrice?: number; // Previous price (for strikethrough display)
+  priceHistory?: PriceHistoryEntry[];
+};
+
+export type PriceHistoryEntry = {
+  id: string;
+  oldPrice: number;
+  newPrice: number;
+  changedBy?: string;
+  reason?: string;
+  createdAt: string;
 };
 
 // Empty sellers array - data from API only
@@ -870,6 +886,402 @@ export const PRODUCTS: Product[] = [
     tags: ["giấy phép", "xây dựng", "tư vấn", "pháp lý", "hồ sơ"],
     isNew: true,
     status: "ACTIVE",
+  },
+
+  // ============================================
+  // THIẾT BỊ BẾP - Kitchen Equipment
+  // ============================================
+  {
+    id: "kitchen-001",
+    name: "Bếp Từ Đôi Bosch PPI82560MS",
+    price: 18500000,
+    priceType: "fixed",
+    image: {
+      uri: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400",
+    },
+    description:
+      "Bếp từ đôi Bosch nhập Đức, 9 mức công suất, nhận diện nồi tự động, mặt kính Schott Ceran.",
+    category: "kitchen",
+    brand: "Bosch",
+    rating: 4.9,
+    reviewCount: 342,
+    tags: ["bếp từ", "Bosch", "thiết bị bếp", "nhập khẩu", "bếp điện"],
+    isBestseller: true,
+    status: "ACTIVE",
+    stock: 80,
+  },
+  {
+    id: "kitchen-002",
+    name: "Máy Hút Mùi Âm Tủ Malloca MC-9039B",
+    price: 8900000,
+    priceType: "fixed",
+    image: {
+      uri: "https://images.unsplash.com/photo-1584568694244-14fbdf83bd30?w=400",
+    },
+    description:
+      "Máy hút mùi âm tủ Malloca, lực hút 1000m³/h, động cơ đồng nguyên chất, tiếng ồn thấp.",
+    category: "kitchen",
+    brand: "Malloca",
+    rating: 4.7,
+    reviewCount: 198,
+    tags: ["máy hút mùi", "Malloca", "thiết bị bếp", "âm tủ"],
+    status: "ACTIVE",
+    stock: 60,
+  },
+  {
+    id: "kitchen-003",
+    name: "Lò Nướng Âm Tủ Hafele HO-T60A",
+    price: 15200000,
+    priceType: "fixed",
+    image: {
+      uri: "https://images.unsplash.com/photo-1574269909862-7e1d70bb8078?w=400",
+    },
+    description:
+      "Lò nướng âm tủ Hafele 60L, 10 chế độ nướng, tự làm sạch bằng nhiệt phân, cửa kính 3 lớp.",
+    category: "kitchen",
+    brand: "Hafele",
+    rating: 4.8,
+    reviewCount: 156,
+    tags: ["lò nướng", "Hafele", "thiết bị bếp", "âm tủ"],
+    discountPercent: 15,
+    flashSale: true,
+    status: "ACTIVE",
+    stock: 45,
+  },
+  {
+    id: "kitchen-004",
+    name: "Máy Rửa Bát Electrolux ESF5206LOX",
+    price: 12800000,
+    priceType: "fixed",
+    image: {
+      uri: "https://images.unsplash.com/photo-1585659722983-3a675dabf23d?w=400",
+    },
+    description:
+      "Máy rửa bát Electrolux 13 bộ, 6 chương trình rửa, tiết kiệm nước 50%, khử trùng nhiệt độ cao.",
+    category: "kitchen",
+    brand: "Electrolux",
+    rating: 4.8,
+    reviewCount: 267,
+    tags: ["máy rửa bát", "Electrolux", "thiết bị bếp"],
+    isNew: true,
+    status: "ACTIVE",
+    stock: 55,
+  },
+  {
+    id: "kitchen-005",
+    name: "Tủ Lạnh Samsung Inverter 380L",
+    price: 16500000,
+    priceType: "fixed",
+    image: {
+      uri: "https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?w=400",
+    },
+    description:
+      "Tủ lạnh Samsung 2 cánh Inverter 380L, ngăn đông mềm, bộ lọc khử mùi than hoạt tính.",
+    category: "kitchen",
+    brand: "Samsung",
+    rating: 4.7,
+    reviewCount: 456,
+    tags: ["tủ lạnh", "Samsung", "thiết bị bếp", "inverter"],
+    isBestseller: true,
+    status: "ACTIVE",
+    stock: 70,
+  },
+  {
+    id: "kitchen-006",
+    name: "Bếp Gas Âm Rinnai RVB-2BG(B)",
+    price: 4500000,
+    priceType: "fixed",
+    image: {
+      uri: "https://images.unsplash.com/photo-1556909172-54557c7e4fb7?w=400",
+    },
+    description:
+      "Bếp gas âm Rinnai 2 lò, mặt kính cường lực, đánh lửa IC, van an toàn tự động.",
+    category: "kitchen",
+    brand: "Rinnai",
+    rating: 4.6,
+    reviewCount: 389,
+    tags: ["bếp gas", "Rinnai", "thiết bị bếp", "bếp âm"],
+    discountPercent: 10,
+    status: "ACTIVE",
+    stock: 120,
+  },
+  {
+    id: "kitchen-007",
+    name: "Chậu Rửa Inox Malloca MS-1028",
+    price: 5800000,
+    priceType: "fixed",
+    image: {
+      uri: "https://images.unsplash.com/photo-1556909190-eccf4a8bf97a?w=400",
+    },
+    description:
+      "Chậu rửa bát inox 304 Malloca 2 hố, chống xước nano, kèm vòi rửa nóng lạnh.",
+    category: "kitchen",
+    brand: "Malloca",
+    rating: 4.7,
+    reviewCount: 213,
+    tags: ["chậu rửa", "inox", "Malloca", "thiết bị bếp"],
+    status: "ACTIVE",
+    stock: 90,
+  },
+  {
+    id: "kitchen-008",
+    name: "Máy Lọc Nước Kangaroo KG100HP",
+    price: 7200000,
+    priceType: "fixed",
+    image: {
+      uri: "https://images.unsplash.com/photo-1564419320461-6b468a29fc89?w=400",
+    },
+    description:
+      "Máy lọc nước Kangaroo 10 lõi, công nghệ RO, hydrogen, nóng lạnh nguội 3 vòi.",
+    category: "kitchen",
+    brand: "Kangaroo",
+    rating: 4.8,
+    reviewCount: 534,
+    tags: ["máy lọc nước", "Kangaroo", "thiết bị bếp", "RO"],
+    isBestseller: true,
+    isNew: true,
+    status: "ACTIVE",
+    stock: 100,
+  },
+
+  // ============================================
+  // THIẾT BỊ NƯỚC - Plumbing Equipment
+  // ============================================
+  {
+    id: "plumbing-001",
+    name: "Máy Bơm Nước Panasonic GP-200JXK",
+    price: 3200000,
+    priceType: "fixed",
+    image: {
+      uri: "https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=400",
+    },
+    description:
+      "Máy bơm tăng áp Panasonic 200W, tự động ngắt, chống cháy, phù hợp nhà 2-3 tầng.",
+    category: "plumbing",
+    brand: "Panasonic",
+    rating: 4.7,
+    reviewCount: 278,
+    tags: ["máy bơm", "Panasonic", "thiết bị nước", "tăng áp"],
+    isBestseller: true,
+    status: "ACTIVE",
+    stock: 150,
+  },
+  {
+    id: "plumbing-002",
+    name: "Bình Nóng Lạnh Ariston 30L",
+    price: 4800000,
+    priceType: "fixed",
+    image: {
+      uri: "https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=400",
+    },
+    description:
+      "Bình nước nóng gián tiếp Ariston 30L, chống giật ELCB, lớp men Titanium chống ăn mòn.",
+    category: "plumbing",
+    brand: "Ariston",
+    rating: 4.8,
+    reviewCount: 367,
+    tags: ["bình nóng lạnh", "Ariston", "thiết bị nước", "nước nóng"],
+    isBestseller: true,
+    status: "ACTIVE",
+    stock: 100,
+  },
+  {
+    id: "plumbing-003",
+    name: "Bồn Nước Inox Đại Thành 1500L",
+    price: 6500000,
+    priceType: "fixed",
+    image: {
+      uri: "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=400",
+    },
+    description:
+      "Bồn nước inox 304 Đại Thành 1500L, chống rỉ sét, bảo hành 10 năm.",
+    category: "plumbing",
+    brand: "Đại Thành",
+    rating: 4.6,
+    reviewCount: 189,
+    tags: ["bồn nước", "inox", "Đại Thành", "thiết bị nước"],
+    status: "ACTIVE",
+    stock: 80,
+  },
+  {
+    id: "plumbing-004",
+    name: "Máy Nước Nóng Năng Lượng Mặt Trời 200L",
+    price: 12000000,
+    priceType: "fixed",
+    image: {
+      uri: "https://images.unsplash.com/photo-1509391366360-2e959784a276?w=400",
+    },
+    description:
+      "Máy nước nóng năng lượng mặt trời 200L, 18 ống chân không, tiết kiệm 80% điện năng.",
+    category: "plumbing",
+    brand: "Tân Á Đại Thành",
+    rating: 4.7,
+    reviewCount: 234,
+    tags: ["năng lượng mặt trời", "nước nóng", "tiết kiệm", "thiết bị nước"],
+    isNew: true,
+    discountPercent: 20,
+    flashSale: true,
+    status: "ACTIVE",
+    stock: 40,
+  },
+
+  // ============================================
+  // THIẾT BỊ PCCC - Fire Safety
+  // ============================================
+  {
+    id: "fire-001",
+    name: "Bình Chữa Cháy Bột ABC 4kg",
+    price: 350000,
+    priceType: "fixed",
+    image: {
+      uri: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400",
+    },
+    description:
+      "Bình chữa cháy bột ABC 4kg, phù hợp hộ gia đình và văn phòng nhỏ. Đạt TCVN.",
+    category: "fire-safety",
+    brand: "Yamato",
+    rating: 4.8,
+    reviewCount: 456,
+    tags: ["bình chữa cháy", "PCCC", "bột ABC", "phòng cháy"],
+    isBestseller: true,
+    status: "ACTIVE",
+    stock: 500,
+  },
+  {
+    id: "fire-002",
+    name: "Đầu Báo Cháy Khói Hochiki SLR-835B",
+    price: 850000,
+    priceType: "fixed",
+    image: {
+      uri: "https://images.unsplash.com/photo-1558002038-1055907df827?w=400",
+    },
+    description:
+      "Đầu báo cháy khói quang Hochiki, phát hiện sớm, LED báo động 360°, lắp đặt trần.",
+    category: "fire-safety",
+    brand: "Hochiki",
+    rating: 4.9,
+    reviewCount: 234,
+    tags: ["báo cháy", "Hochiki", "PCCC", "đầu báo khói"],
+    isNew: true,
+    status: "ACTIVE",
+    stock: 300,
+  },
+  {
+    id: "fire-003",
+    name: "Vòi Chữa Cháy D50 Tomoken",
+    price: 1200000,
+    priceType: "fixed",
+    image: {
+      uri: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400",
+    },
+    description:
+      "Vòi chữa cháy D50 Tomoken 20m, áp lực 13 bar, chất liệu sợi tổng hợp chống mài mòn.",
+    category: "fire-safety",
+    brand: "Tomoken",
+    rating: 4.7,
+    reviewCount: 167,
+    tags: ["vòi chữa cháy", "PCCC", "Tomoken", "phòng cháy"],
+    status: "ACTIVE",
+    stock: 200,
+  },
+  {
+    id: "fire-004",
+    name: "Tủ Chữa Cháy Trong Nhà 600x500x180",
+    price: 1800000,
+    priceType: "fixed",
+    image: {
+      uri: "https://images.unsplash.com/photo-1558002038-1055907df827?w=400",
+    },
+    description:
+      "Tủ chữa cháy trong nhà, bao gồm cuộn vòi 20m + lăng phun + van góc. Sơn tĩnh điện đỏ.",
+    category: "fire-safety",
+    brand: "PCCC Việt Nam",
+    rating: 4.6,
+    reviewCount: 123,
+    tags: ["tủ chữa cháy", "PCCC", "trong nhà", "phòng cháy"],
+    discountPercent: 10,
+    status: "ACTIVE",
+    stock: 150,
+  },
+
+  // ============================================
+  // BÀN HỌC - Study Desks
+  // ============================================
+  {
+    id: "desk-001",
+    name: "Bàn Học Sinh Chống Gù Lưng",
+    price: 4500000,
+    priceType: "fixed",
+    image: {
+      uri: "https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?w=400",
+    },
+    description:
+      "Bàn học sinh thông minh chống gù, điều chỉnh độ cao, mặt bàn nghiêng, ngăn đựng sách.",
+    category: "study-desk",
+    brand: "IDesk",
+    rating: 4.8,
+    reviewCount: 345,
+    tags: ["bàn học", "chống gù", "bàn học sinh", "thông minh"],
+    isBestseller: true,
+    status: "ACTIVE",
+    stock: 120,
+  },
+  {
+    id: "desk-002",
+    name: "Bàn Làm Việc Gỗ Sồi 120x60cm",
+    price: 6800000,
+    priceType: "fixed",
+    image: {
+      uri: "https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?w=400",
+    },
+    description:
+      "Bàn làm việc gỗ sồi tự nhiên, thiết kế tối giản, 2 ngăn kéo, chân sắt sơn tĩnh điện.",
+    category: "study-desk",
+    brand: "MOHO",
+    rating: 4.7,
+    reviewCount: 213,
+    tags: ["bàn làm việc", "gỗ sồi", "bàn học", "tối giản"],
+    isNew: true,
+    status: "ACTIVE",
+    stock: 80,
+  },
+  {
+    id: "desk-003",
+    name: "Ghế Xoay Văn Phòng Ergonomic",
+    price: 3200000,
+    priceType: "fixed",
+    image: {
+      uri: "https://images.unsplash.com/photo-1580480055273-228ff5388ef8?w=400",
+    },
+    description:
+      "Ghế xoay ergonomic, tựa đầu điều chỉnh, hỗ trợ lưng, tay vịn 3D, lưới thoáng khí.",
+    category: "study-desk",
+    brand: "Hòa Phát",
+    rating: 4.6,
+    reviewCount: 289,
+    tags: ["ghế xoay", "ergonomic", "ghế văn phòng", "bàn học"],
+    discountPercent: 15,
+    flashSale: true,
+    status: "ACTIVE",
+    stock: 200,
+  },
+  {
+    id: "desk-004",
+    name: "Bàn Học Đôi Cho Bé Gấp Gọn",
+    price: 2800000,
+    priceType: "fixed",
+    image: {
+      uri: "https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?w=400",
+    },
+    description:
+      "Bàn học đôi gấp gọn cho 2 bé, gỗ MDF chống ẩm, kệ sách tích hợp, sơn an toàn.",
+    category: "study-desk",
+    brand: "Kids Furniture",
+    rating: 4.5,
+    reviewCount: 178,
+    tags: ["bàn học đôi", "gấp gọn", "trẻ em", "bàn học"],
+    status: "ACTIVE",
+    stock: 100,
   },
 ];
 

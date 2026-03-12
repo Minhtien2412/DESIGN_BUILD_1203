@@ -4,6 +4,7 @@
  */
 
 import { useAuth } from "@/context/AuthContext";
+import { useI18n } from "@/services/i18nService";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useState } from "react";
@@ -25,6 +26,7 @@ type Step = "email" | "otp" | "profile";
 export default function Register2FAScreen() {
   const { twoFARegisterSendOtp, twoFARegisterVerify, twoFARegisterResendOtp } =
     useAuth();
+  const { t } = useI18n();
 
   const [step, setStep] = useState<Step>("email");
   const [email, setEmail] = useState("");
@@ -40,7 +42,7 @@ export default function Register2FAScreen() {
   // Step 1: Send OTP to email
   const handleSendOTP = async () => {
     if (!email.trim() || !email.includes("@")) {
-      Alert.alert("Lỗi", "Vui lòng nhập email hợp lệ");
+      Alert.alert(t("common.error"), t("register2fa.errEmailValid"));
       return;
     }
 
@@ -51,12 +53,15 @@ export default function Register2FAScreen() {
       if (result.success) {
         setStep("otp");
         startResendCooldown();
-        Alert.alert("Thành công", "Mã OTP đã được gửi đến email của bạn");
+        Alert.alert(t("common.success"), t("register2fa.otpSent"));
       } else {
-        Alert.alert("Lỗi", result.message);
+        Alert.alert(t("common.error"), result.message);
       }
     } catch (error: any) {
-      Alert.alert("Lỗi", error.message || "Không thể gửi OTP");
+      Alert.alert(
+        t("common.error"),
+        error.message || t("register2fa.errOtpSendFailed"),
+      );
     } finally {
       setLoading(false);
     }
@@ -65,7 +70,7 @@ export default function Register2FAScreen() {
   // Step 2: Verify OTP, then go to profile step
   const handleVerifyOTP = async () => {
     if (!otp.trim() || otp.length !== 6) {
-      Alert.alert("Lỗi", "Vui lòng nhập mã OTP 6 số");
+      Alert.alert(t("common.error"), t("register2fa.errOtp6"));
       return;
     }
 
@@ -76,17 +81,17 @@ export default function Register2FAScreen() {
   // Step 3: Complete registration
   const handleCompleteRegistration = async () => {
     if (!name.trim()) {
-      Alert.alert("Lỗi", "Vui lòng nhập họ tên");
+      Alert.alert(t("common.error"), t("register2fa.errName"));
       return;
     }
 
     if (!password || password.length < 6) {
-      Alert.alert("Lỗi", "Mật khẩu phải có ít nhất 6 ký tự");
+      Alert.alert(t("common.error"), t("register2fa.errPasswordMin"));
       return;
     }
 
     if (password !== confirmPassword) {
-      Alert.alert("Lỗi", "Mật khẩu xác nhận không khớp");
+      Alert.alert(t("common.error"), t("register2fa.errPasswordMismatch"));
       return;
     }
 
@@ -101,7 +106,7 @@ export default function Register2FAScreen() {
       );
 
       if (result.success) {
-        Alert.alert("Thành công", "Đăng ký thành công!", [
+        Alert.alert(t("common.success"), t("register2fa.registerSuccess"), [
           { text: "OK", onPress: () => router.replace("/(tabs)") },
         ]);
       } else {
@@ -109,10 +114,13 @@ export default function Register2FAScreen() {
         if (result.message.toLowerCase().includes("otp")) {
           setStep("otp");
         }
-        Alert.alert("Lỗi", result.message);
+        Alert.alert(t("common.error"), result.message);
       }
     } catch (error: any) {
-      Alert.alert("Lỗi", error.message || "Đăng ký thất bại");
+      Alert.alert(
+        t("common.error"),
+        error.message || t("register2fa.errRegisterFailed"),
+      );
     } finally {
       setLoading(false);
     }
@@ -127,12 +135,15 @@ export default function Register2FAScreen() {
       const result = await twoFARegisterResendOtp(email.trim());
       if (result.success) {
         startResendCooldown();
-        Alert.alert("Thành công", "Mã OTP mới đã được gửi");
+        Alert.alert(t("common.success"), t("register2fa.newOtpSent"));
       } else {
-        Alert.alert("Lỗi", result.message);
+        Alert.alert(t("common.error"), result.message);
       }
     } catch (error: any) {
-      Alert.alert("Lỗi", error.message || "Không thể gửi lại OTP");
+      Alert.alert(
+        t("common.error"),
+        error.message || t("register2fa.errResendFailed"),
+      );
     } finally {
       setLoading(false);
     }
@@ -183,7 +194,7 @@ export default function Register2FAScreen() {
           >
             <Ionicons name="arrow-back" size={24} color="#333" />
           </Pressable>
-          <Text style={styles.title}>Đăng ký 2FA</Text>
+          <Text style={styles.title}>{t("register2fa.title")}</Text>
         </View>
 
         {/* Step indicator */}
@@ -213,10 +224,8 @@ export default function Register2FAScreen() {
         {step === "email" ? (
           /* Step 1: Email */
           <View style={styles.form}>
-            <Text style={styles.stepTitle}>Bước 1: Nhập email</Text>
-            <Text style={styles.description}>
-              Nhập email để nhận mã OTP xác thực
-            </Text>
+            <Text style={styles.stepTitle}>{t("register2fa.step1Title")}</Text>
+            <Text style={styles.description}>{t("register2fa.step1Desc")}</Text>
 
             <View style={styles.inputContainer}>
               <Ionicons
@@ -244,16 +253,18 @@ export default function Register2FAScreen() {
               {loading ? (
                 <ActivityIndicator color="#fff" />
               ) : (
-                <Text style={styles.buttonText}>Gửi mã OTP</Text>
+                <Text style={styles.buttonText}>
+                  {t("register2fa.sendOtp")}
+                </Text>
               )}
             </Pressable>
           </View>
         ) : step === "otp" ? (
           /* Step 2: OTP Verification */
           <View style={styles.form}>
-            <Text style={styles.stepTitle}>Bước 2: Xác thực email</Text>
+            <Text style={styles.stepTitle}>{t("register2fa.step2Title")}</Text>
             <Text style={styles.description}>
-              Nhập mã OTP 6 số đã gửi đến {"\n"}
+              {t("register2fa.step2Desc")} {"\n"}
               <Text style={styles.emailHighlight}>{email}</Text>
             </Text>
 
@@ -279,12 +290,14 @@ export default function Register2FAScreen() {
               {loading ? (
                 <ActivityIndicator color="#fff" />
               ) : (
-                <Text style={styles.buttonText}>Tiếp tục</Text>
+                <Text style={styles.buttonText}>
+                  {t("register2fa.continue")}
+                </Text>
               )}
             </Pressable>
 
             <View style={styles.resendContainer}>
-              <Text style={styles.resendText}>Không nhận được mã? </Text>
+              <Text style={styles.resendText}>{t("register2fa.noCode")}</Text>
               <Pressable
                 onPress={handleResendOTP}
                 disabled={resendCooldown > 0 || loading}
@@ -296,8 +309,11 @@ export default function Register2FAScreen() {
                   ]}
                 >
                   {resendCooldown > 0
-                    ? `Gửi lại (${resendCooldown}s)`
-                    : "Gửi lại"}
+                    ? t("register2fa.resendCountdown").replace(
+                        "{seconds}",
+                        String(resendCooldown),
+                      )
+                    : t("register2fa.resend")}
                 </Text>
               </Pressable>
             </View>
@@ -305,8 +321,8 @@ export default function Register2FAScreen() {
         ) : (
           /* Step 3: Profile */
           <View style={styles.form}>
-            <Text style={styles.stepTitle}>Bước 3: Hoàn tất đăng ký</Text>
-            <Text style={styles.description}>Nhập thông tin tài khoản</Text>
+            <Text style={styles.stepTitle}>{t("register2fa.step3Title")}</Text>
+            <Text style={styles.description}>{t("register2fa.step3Desc")}</Text>
 
             <View style={styles.inputContainer}>
               <Ionicons
@@ -317,7 +333,7 @@ export default function Register2FAScreen() {
               />
               <TextInput
                 style={styles.input}
-                placeholder="Họ và tên *"
+                placeholder={t("register2fa.fullNameReq")}
                 value={name}
                 onChangeText={setName}
               />
@@ -332,7 +348,7 @@ export default function Register2FAScreen() {
               />
               <TextInput
                 style={styles.input}
-                placeholder="Số điện thoại (tùy chọn)"
+                placeholder={t("register2fa.phoneOptional")}
                 value={phone}
                 onChangeText={setPhone}
                 keyboardType="phone-pad"
@@ -348,7 +364,7 @@ export default function Register2FAScreen() {
               />
               <TextInput
                 style={styles.input}
-                placeholder="Mật khẩu *"
+                placeholder={t("register2fa.passwordReq")}
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry={!showPassword}
@@ -374,7 +390,7 @@ export default function Register2FAScreen() {
               />
               <TextInput
                 style={styles.input}
-                placeholder="Xác nhận mật khẩu *"
+                placeholder={t("register2fa.confirmPasswordReq")}
                 value={confirmPassword}
                 onChangeText={setConfirmPassword}
                 secureTextEntry={!showPassword}
@@ -389,7 +405,9 @@ export default function Register2FAScreen() {
               {loading ? (
                 <ActivityIndicator color="#fff" />
               ) : (
-                <Text style={styles.buttonText}>Hoàn tất đăng ký</Text>
+                <Text style={styles.buttonText}>
+                  {t("register2fa.completeRegister")}
+                </Text>
               )}
             </Pressable>
           </View>
@@ -397,9 +415,9 @@ export default function Register2FAScreen() {
 
         {/* Footer links */}
         <View style={styles.footer}>
-          <Text style={styles.footerText}>Đã có tài khoản? </Text>
+          <Text style={styles.footerText}>{t("register2fa.hasAccount")}</Text>
           <Pressable onPress={() => router.push("/(auth)/login-2fa" as any)}>
-            <Text style={styles.footerLink}>Đăng nhập 2FA</Text>
+            <Text style={styles.footerLink}>{t("register2fa.login2fa")}</Text>
           </Pressable>
         </View>
 
@@ -407,7 +425,9 @@ export default function Register2FAScreen() {
           onPress={() => router.push("/(auth)/register" as any)}
           style={styles.normalLoginButton}
         >
-          <Text style={styles.normalLoginText}>Đăng ký thường (không 2FA)</Text>
+          <Text style={styles.normalLoginText}>
+            {t("register2fa.normalRegister")}
+          </Text>
         </Pressable>
       </ScrollView>
     </KeyboardAvoidingView>

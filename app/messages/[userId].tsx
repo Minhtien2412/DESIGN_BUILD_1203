@@ -50,41 +50,76 @@ const createDemoMessages = (recipientId: number): Message[] => [
     id: 1,
     content: "Chào bạn! Dự án tiến triển thế nào rồi?",
     senderId: recipientId,
-    sender: { id: recipientId, name: `Người dùng ${recipientId}` },
+    conversationId: 0,
+    sender: {
+      id: recipientId,
+      name: `Người dùng ${recipientId}`,
+      email: `user${recipientId}@demo.com`,
+      role: "CLIENT" as const,
+    },
     createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-    read: true,
+    updatedAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
+    isRead: true,
   },
   {
     id: 2,
     content: "Chào anh/chị, dự án đang tiến triển tốt ạ!",
     senderId: 0, // Current user
-    sender: { id: 0, name: "Tôi" },
+    conversationId: 0,
+    sender: {
+      id: 0,
+      name: "Tôi",
+      email: "me@demo.com",
+      role: "ENGINEER" as const,
+    },
     createdAt: new Date(Date.now() - 1000 * 60 * 25).toISOString(),
-    read: true,
+    updatedAt: new Date(Date.now() - 1000 * 60 * 25).toISOString(),
+    isRead: true,
   },
   {
     id: 3,
     content: "Tuyệt vời! Khi nào có thể xem được bản thiết kế?",
     senderId: recipientId,
-    sender: { id: recipientId, name: `Người dùng ${recipientId}` },
+    conversationId: 0,
+    sender: {
+      id: recipientId,
+      name: `Người dùng ${recipientId}`,
+      email: `user${recipientId}@demo.com`,
+      role: "CLIENT" as const,
+    },
     createdAt: new Date(Date.now() - 1000 * 60 * 20).toISOString(),
-    read: true,
+    updatedAt: new Date(Date.now() - 1000 * 60 * 20).toISOString(),
+    isRead: true,
   },
   {
     id: 4,
     content: "Em sẽ gửi bản thiết kế trong ngày hôm nay ạ",
     senderId: 0,
-    sender: { id: 0, name: "Tôi" },
+    conversationId: 0,
+    sender: {
+      id: 0,
+      name: "Tôi",
+      email: "me@demo.com",
+      role: "ENGINEER" as const,
+    },
     createdAt: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
-    read: true,
+    updatedAt: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
+    isRead: true,
   },
   {
     id: 5,
     content: "Ok cảm ơn bạn nhé! 👍",
     senderId: recipientId,
-    sender: { id: recipientId, name: `Người dùng ${recipientId}` },
+    conversationId: 0,
+    sender: {
+      id: recipientId,
+      name: `Người dùng ${recipientId}`,
+      email: `user${recipientId}@demo.com`,
+      role: "CLIENT" as const,
+    },
     createdAt: new Date(Date.now() - 1000 * 60 * 10).toISOString(),
-    read: false,
+    updatedAt: new Date(Date.now() - 1000 * 60 * 10).toISOString(),
+    isRead: false,
   },
 ];
 
@@ -646,11 +681,10 @@ export default function MessageThreadScreen() {
         }}
         onSendAttachment={(attachment: AttachmentData) => {
           setPendingAttachment({
-            uri: attachment.uri,
+            url: attachment.uri,
             type: attachment.type === "voice" ? "file" : attachment.type,
             name: attachment.name,
             size: attachment.size,
-            mimeType: attachment.mimeType,
           } as UploadedAttachment);
           handleSendMessage();
         }}

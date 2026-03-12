@@ -1,17 +1,26 @@
-import { getCategoryById } from '@/constants/categories';
-import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { Dimensions, Platform, Pressable, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { getCategoryById } from "@/constants/categories";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import {
+    Dimensions,
+    Platform,
+    Pressable,
+    ScrollView,
+    StatusBar,
+    StyleSheet,
+    Text,
+    View,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 
 export default function CategoryScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const category = getCategoryById(id || '');
+  const category = getCategoryById(id || "");
 
   if (!category) {
     return (
@@ -25,7 +34,7 @@ export default function CategoryScreen() {
     );
   }
 
-  const gradient = category.gradient || [category.color, category.color + 'CC'];
+  const gradient = category.gradient || [category.color, category.color + "CC"];
 
   return (
     <View style={styles.wrapper}>
@@ -45,7 +54,10 @@ export default function CategoryScreen() {
             <Pressable onPress={() => router.back()} style={styles.heroNavBtn}>
               <Ionicons name="arrow-back" size={22} color="#fff" />
             </Pressable>
-            <Pressable onPress={() => router.push('/unified-search' as any)} style={styles.heroNavBtn}>
+            <Pressable
+              onPress={() => router.push("/search" as any)}
+              style={styles.heroNavBtn}
+            >
               <Ionicons name="search-outline" size={22} color="#fff" />
             </Pressable>
           </View>
@@ -61,7 +73,9 @@ export default function CategoryScreen() {
           <View style={styles.heroStatsRow}>
             <View style={styles.heroPill}>
               <Ionicons name="apps" size={14} color="rgba(255,255,255,0.8)" />
-              <Text style={styles.heroPillText}>{category.modules.length} chức năng</Text>
+              <Text style={styles.heroPillText}>
+                {category.modules.length} chức năng
+              </Text>
             </View>
             <View style={styles.heroPill}>
               <Ionicons name="star" size={14} color="#FFAB40" />
@@ -93,7 +107,11 @@ export default function CategoryScreen() {
                     end={{ x: 1, y: 1 }}
                     style={styles.moduleIconBg}
                   >
-                    <Ionicons name={module.icon as any} size={22} color="#fff" />
+                    <Ionicons
+                      name={module.icon as any}
+                      size={22}
+                      color="#fff"
+                    />
                   </LinearGradient>
                   <View style={styles.moduleInfo}>
                     <Text style={styles.moduleName} numberOfLines={1}>
@@ -121,136 +139,136 @@ export default function CategoryScreen() {
 const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
-    backgroundColor: '#F1F5F9',
+    backgroundColor: "#F1F5F9",
   },
   container: {
     flex: 1,
   },
   errorContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F1F5F9',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#F1F5F9",
     gap: 12,
   },
   errorText: {
     fontSize: 16,
-    color: '#64748B',
-    fontWeight: '600',
+    color: "#64748B",
+    fontWeight: "600",
   },
   errorBtn: {
     marginTop: 8,
-    backgroundColor: '#4338CA',
+    backgroundColor: "#4338CA",
     paddingHorizontal: 24,
     paddingVertical: 10,
     borderRadius: 12,
   },
   errorBtnText: {
     fontSize: 14,
-    fontWeight: '700',
-    color: '#fff',
+    fontWeight: "700",
+    color: "#fff",
   },
   hero: {
     paddingBottom: 24,
     paddingHorizontal: 20,
   },
   heroNav: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginBottom: 20,
   },
   heroNavBtn: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "rgba(255,255,255,0.15)",
+    alignItems: "center",
+    justifyContent: "center",
   },
   heroContent: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 16,
   },
   heroIconContainer: {
     width: 72,
     height: 72,
     borderRadius: 24,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: 14,
     borderWidth: 2,
-    borderColor: 'rgba(255,255,255,0.15)',
+    borderColor: "rgba(255,255,255,0.15)",
   },
   heroTitle: {
     fontSize: 22,
-    fontWeight: '800',
-    color: '#FFFFFF',
-    textAlign: 'center',
+    fontWeight: "800",
+    color: "#FFFFFF",
+    textAlign: "center",
     marginBottom: 6,
     letterSpacing: -0.3,
   },
   heroDescription: {
     fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.85)',
-    textAlign: 'center',
+    color: "rgba(255, 255, 255, 0.85)",
+    textAlign: "center",
     lineHeight: 20,
   },
   heroStatsRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
     gap: 12,
   },
   heroPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6,
-    backgroundColor: 'rgba(255,255,255,0.12)',
+    backgroundColor: "rgba(255,255,255,0.12)",
     paddingHorizontal: 14,
     paddingVertical: 6,
     borderRadius: 20,
   },
   heroPillText: {
     fontSize: 12,
-    fontWeight: '700',
-    color: '#fff',
+    fontWeight: "700",
+    color: "#fff",
   },
   modulesSection: {
     padding: 16,
   },
   sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     marginBottom: 14,
   },
   sectionTitle: {
     fontSize: 17,
-    fontWeight: '800',
-    color: '#0F172A',
+    fontWeight: "800",
+    color: "#0F172A",
     letterSpacing: -0.3,
   },
   sectionCount: {
     fontSize: 13,
-    fontWeight: '700',
-    color: '#4338CA',
-    backgroundColor: '#EEF2FF',
+    fontWeight: "700",
+    color: "#4338CA",
+    backgroundColor: "#EEF2FF",
     paddingHorizontal: 10,
     paddingVertical: 3,
     borderRadius: 10,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   modulesGrid: {
     gap: 10,
   },
   moduleCard: {
     borderRadius: 16,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: "#E2E8F0",
     ...Platform.select({
       ios: {
-        shadowColor: '#1E293B',
+        shadowColor: "#1E293B",
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
         shadowRadius: 6,
@@ -265,8 +283,8 @@ const styles = StyleSheet.create({
     transform: [{ scale: 0.98 }],
   },
   moduleCardInner: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: 14,
     gap: 12,
   },
@@ -274,21 +292,21 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 14,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   moduleInfo: {
     flex: 1,
   },
   moduleName: {
     fontSize: 15,
-    fontWeight: '700',
-    color: '#0F172A',
+    fontWeight: "700",
+    color: "#0F172A",
     marginBottom: 2,
   },
   moduleDescription: {
     fontSize: 12,
-    color: '#64748B',
+    color: "#64748B",
     lineHeight: 16,
   },
 });

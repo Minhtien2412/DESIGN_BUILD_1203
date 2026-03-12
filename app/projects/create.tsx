@@ -1,27 +1,19 @@
 /**
- * Project Creation Screen
+ * Create Project — Tạo dự án mới
  * Route: /projects/create
- * Purpose: Create new construction project with full details
+ * Migrated to DSFormScreen layout
  */
 
-import { useAuth } from '@/context/AuthContext';
-import { createProject, CreateProjectDto } from '@/services/api/projectsApi';
-import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
-import { useState } from 'react';
-import {
-    ActivityIndicator,
-    Alert,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View
-} from 'react-native';
+import { DSFormScreen } from "@/components/ds/layouts";
+import { useAuth } from "@/context/AuthContext";
+import { useDS } from "@/hooks/useDS";
+import { createProject, CreateProjectDto } from "@/services/api/projectsApi";
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import { useState } from "react";
+import { Alert, StyleSheet, Text, TextInput, View } from "react-native";
 
+// ── Types ──────────────────────────────────────────────────────────────
 interface FormData {
   title: string;
   description: string;
@@ -42,68 +34,97 @@ interface FormErrors {
   clientName?: string;
 }
 
+// ── Helpers ────────────────────────────────────────────────────────────
+function SectionTitle({ icon, label }: { icon: string; label: string }) {
+  const { colors } = useDS();
+  return (
+    <View style={st.sectionTitleRow}>
+      <Ionicons name={icon as any} size={18} color={colors.primary} />
+      <Text style={[st.sectionTitle, { color: colors.text }]}>{label}</Text>
+    </View>
+  );
+}
+
+function Field({
+  label,
+  required,
+  error,
+  helper,
+  children,
+}: {
+  label: string;
+  required?: boolean;
+  error?: string;
+  helper?: string;
+  children: React.ReactNode;
+}) {
+  const { colors } = useDS();
+  return (
+    <View style={st.field}>
+      <Text style={[st.label, { color: colors.textSecondary }]}>
+        {label}
+        {required && <Text style={{ color: colors.error }}> *</Text>}
+      </Text>
+      {children}
+      {error && (
+        <Text style={[st.errorText, { color: colors.error }]}>{error}</Text>
+      )}
+      {helper && !error && (
+        <Text style={[st.helperText, { color: colors.textTertiary }]}>
+          {helper}
+        </Text>
+      )}
+    </View>
+  );
+}
+
+// ── Screen ─────────────────────────────────────────────────────────────
 export default function CreateProjectScreen() {
   const { user } = useAuth();
+  const { colors, radius, shadow } = useDS();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<FormData>({
-    title: '',
-    description: '',
-    budget: '',
-    startDate: '',
-    endDate: '',
-    location: '',
-    clientName: '',
-    clientPhone: '',
-    clientEmail: '',
+    title: "",
+    description: "",
+    budget: "",
+    startDate: "",
+    endDate: "",
+    location: "",
+    clientName: "",
+    clientPhone: "",
+    clientEmail: "",
   });
   const [errors, setErrors] = useState<FormErrors>({});
 
-  // Update field
   const updateField = (field: keyof FormData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    // Clear error when user starts typing
+    setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field as keyof FormErrors]) {
-      setErrors(prev => ({ ...prev, [field]: undefined }));
+      setErrors((prev) => ({ ...prev, [field]: undefined }));
     }
   };
 
-  // Validate form
   const validate = (): boolean => {
-    const newErrors: FormErrors = {};
-
-    if (!formData.title.trim()) {
-      newErrors.title = 'Tên dự án không được để trống';
-    } else if (formData.title.length < 3) {
-      newErrors.title = 'Tên dự án phải có ít nhất 3 ký tự';
-    }
-
-    if (formData.budget && isNaN(Number(formData.budget))) {
-      newErrors.budget = 'Ngân sách phải là số';
-    }
-
+    const e: FormErrors = {};
+    if (!formData.title.trim()) e.title = "Tên dự án không được để trống";
+    else if (formData.title.length < 3)
+      e.title = "Tên dự án phải có ít nhất 3 ký tự";
+    if (formData.budget && isNaN(Number(formData.budget)))
+      e.budget = "Ngân sách phải là số";
     if (formData.startDate && formData.endDate) {
-      const start = new Date(formData.startDate);
-      const end = new Date(formData.endDate);
-      if (end < start) {
-        newErrors.endDate = 'Ngày kết thúc phải sau ngày bắt đầu';
-      }
+      if (new Date(formData.endDate) < new Date(formData.startDate))
+        e.endDate = "Ngày kết thúc phải sau ngày bắt đầu";
     }
-
-    if (formData.clientName && formData.clientName.length < 2) {
-      newErrors.clientName = 'Tên khách hàng phải có ít nhất 2 ký tự';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    if (formData.clientName && formData.clientName.length < 2)
+      e.clientName = "Tên khách hàng ít nhất 2 ký tự";
+    setErrors(e);
+    return Object.keys(e).length === 0;
   };
 
-  // Handle submit
   const handleSubmit = async () => {
     if (!validate()) {
-      Alert.alert('Lỗi', 'Vui lòng kiểm tra lại thông tin');
+      Alert.alert("Lỗi", "Vui lòng kiểm tra lại thông tin");
       return;
     }
-
     setLoading(true);
     try {
       const dto: CreateProjectDto = {
@@ -113,421 +134,260 @@ export default function CreateProjectScreen() {
         startDate: formData.startDate || undefined,
         endDate: formData.endDate || undefined,
       };
-
       const newProject = await createProject(dto);
-
-      Alert.alert(
-        'Thành công',
-        'Dự án đã được tạo thành công!',
-        [
-          {
-            text: 'Xem dự án',
-            onPress: () => router.replace(`/projects/${newProject.id}` as any),
-          },
-          {
-            text: 'Tạo dự án khác',
-            onPress: () => {
-              setFormData({
-                title: '',
-                description: '',
-                budget: '',
-                startDate: '',
-                endDate: '',
-                location: '',
-                clientName: '',
-                clientPhone: '',
-                clientEmail: '',
-              });
-            },
-          },
-        ]
-      );
+      Alert.alert("Thành công", "Dự án đã được tạo thành công!", [
+        {
+          text: "Xem dự án",
+          onPress: () => router.replace(`/projects/${newProject.id}` as any),
+        },
+        {
+          text: "Tạo dự án khác",
+          onPress: () =>
+            setFormData({
+              title: "",
+              description: "",
+              budget: "",
+              startDate: "",
+              endDate: "",
+              location: "",
+              clientName: "",
+              clientPhone: "",
+              clientEmail: "",
+            }),
+        },
+      ]);
     } catch (error: any) {
-      console.error('[CreateProject] Error:', error);
       Alert.alert(
-        'Lỗi',
-        error.message || 'Không thể tạo dự án. Vui lòng thử lại sau.'
+        "Lỗi",
+        error.message || "Không thể tạo dự án. Vui lòng thử lại sau.",
       );
     } finally {
       setLoading(false);
     }
   };
 
+  const inputStyle = [
+    st.input,
+    {
+      borderColor: colors.border,
+      backgroundColor: colors.bgMuted,
+      borderRadius: radius.md,
+      color: colors.text,
+    },
+  ];
+  const inputErrorStyle = [
+    st.input,
+    {
+      borderColor: colors.error,
+      backgroundColor: colors.bgMuted,
+      borderRadius: radius.md,
+      color: colors.text,
+    },
+  ];
+
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    <DSFormScreen
+      title="Tạo Dự Án Mới"
+      submitLabel="Tạo dự án"
+      onSubmit={handleSubmit}
+      submitLoading={loading}
     >
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color="#333" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Tạo Dự Án Mới</Text>
-        <View style={{ width: 40 }} />
-      </View>
-
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
+      {/* Project Info */}
+      <View
+        style={[
+          st.section,
+          shadow.sm,
+          { backgroundColor: colors.bgSurface, borderRadius: radius.lg },
+        ]}
       >
-        {/* Project Info Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>
-            <Ionicons name="information-circle" size={18} color="#FF6B00" />
-            {'  '}Thông tin dự án
-          </Text>
+        <SectionTitle icon="information-circle" label="Thông tin dự án" />
 
-          {/* Title */}
-          <View style={styles.fieldContainer}>
-            <Text style={styles.label}>
-              Tên dự án <Text style={styles.required}>*</Text>
-            </Text>
-            <TextInput
-              style={[styles.input, errors.title && styles.inputError]}
-              placeholder="VD: Xây dựng biệt thự 3 tầng"
-              value={formData.title}
-              onChangeText={(value) => updateField('title', value)}
-              editable={!loading}
-            />
-            {errors.title && <Text style={styles.errorText}>{errors.title}</Text>}
-          </View>
+        <Field label="Tên dự án" required error={errors.title}>
+          <TextInput
+            style={errors.title ? inputErrorStyle : inputStyle}
+            placeholder="VD: Xây dựng biệt thự 3 tầng"
+            placeholderTextColor={colors.textTertiary}
+            value={formData.title}
+            onChangeText={(v) => updateField("title", v)}
+            editable={!loading}
+          />
+        </Field>
 
-          {/* Description */}
-          <View style={styles.fieldContainer}>
-            <Text style={styles.label}>Mô tả dự án</Text>
-            <TextInput
-              style={[styles.input, styles.textArea]}
-              placeholder="Mô tả chi tiết về dự án..."
-              value={formData.description}
-              onChangeText={(value) => updateField('description', value)}
-              multiline
-              numberOfLines={4}
-              textAlignVertical="top"
-              editable={!loading}
-            />
-          </View>
+        <Field label="Mô tả dự án">
+          <TextInput
+            style={[...inputStyle, st.textArea]}
+            placeholder="Mô tả chi tiết về dự án..."
+            placeholderTextColor={colors.textTertiary}
+            value={formData.description}
+            onChangeText={(v) => updateField("description", v)}
+            multiline
+            numberOfLines={4}
+            textAlignVertical="top"
+            editable={!loading}
+          />
+        </Field>
 
-          {/* Location */}
-          <View style={styles.fieldContainer}>
-            <Text style={styles.label}>Địa điểm</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="VD: Quận 9, TP.HCM"
-              value={formData.location}
-              onChangeText={(value) => updateField('location', value)}
-              editable={!loading}
-            />
-          </View>
+        <Field label="Địa điểm">
+          <TextInput
+            style={inputStyle}
+            placeholder="VD: Quận 9, TP.HCM"
+            placeholderTextColor={colors.textTertiary}
+            value={formData.location}
+            onChangeText={(v) => updateField("location", v)}
+            editable={!loading}
+          />
+        </Field>
 
-          {/* Budget */}
-          <View style={styles.fieldContainer}>
-            <Text style={styles.label}>Ngân sách (VNĐ)</Text>
-            <TextInput
-              style={[styles.input, errors.budget && styles.inputError]}
-              placeholder="VD: 500000000"
-              value={formData.budget}
-              onChangeText={(value) => updateField('budget', value)}
-              keyboardType="numeric"
-              editable={!loading}
-            />
-            {errors.budget && <Text style={styles.errorText}>{errors.budget}</Text>}
-            {formData.budget && !errors.budget && (
-              <Text style={styles.helperText}>
-                ~ {Number(formData.budget).toLocaleString('vi-VN')} đ
-              </Text>
-            )}
-          </View>
-        </View>
-
-        {/* Timeline Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>
-            <Ionicons name="calendar" size={18} color="#FF6B00" />
-            {'  '}Thời gian thực hiện
-          </Text>
-
-          <View style={styles.row}>
-            {/* Start Date */}
-            <View style={[styles.fieldContainer, styles.halfWidth]}>
-              <Text style={styles.label}>Ngày bắt đầu</Text>
-              <TextInput
-                style={[styles.input, errors.startDate && styles.inputError]}
-                placeholder="YYYY-MM-DD"
-                value={formData.startDate}
-                onChangeText={(value) => updateField('startDate', value)}
-                editable={!loading}
-              />
-              {errors.startDate && (
-                <Text style={styles.errorText}>{errors.startDate}</Text>
-              )}
-            </View>
-
-            {/* End Date */}
-            <View style={[styles.fieldContainer, styles.halfWidth]}>
-              <Text style={styles.label}>Ngày kết thúc</Text>
-              <TextInput
-                style={[styles.input, errors.endDate && styles.inputError]}
-                placeholder="YYYY-MM-DD"
-                value={formData.endDate}
-                onChangeText={(value) => updateField('endDate', value)}
-                editable={!loading}
-              />
-              {errors.endDate && <Text style={styles.errorText}>{errors.endDate}</Text>}
-            </View>
-          </View>
-        </View>
-
-        {/* Client Info Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>
-            <Ionicons name="person" size={18} color="#FF6B00" />
-            {'  '}Thông tin khách hàng
-          </Text>
-
-          {/* Client Name */}
-          <View style={styles.fieldContainer}>
-            <Text style={styles.label}>Tên khách hàng</Text>
-            <TextInput
-              style={[styles.input, errors.clientName && styles.inputError]}
-              placeholder="VD: Nguyễn Văn A"
-              value={formData.clientName}
-              onChangeText={(value) => updateField('clientName', value)}
-              editable={!loading}
-            />
-            {errors.clientName && (
-              <Text style={styles.errorText}>{errors.clientName}</Text>
-            )}
-          </View>
-
-          {/* Client Phone */}
-          <View style={styles.fieldContainer}>
-            <Text style={styles.label}>Số điện thoại</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="VD: 0901234567"
-              value={formData.clientPhone}
-              onChangeText={(value) => updateField('clientPhone', value)}
-              keyboardType="phone-pad"
-              editable={!loading}
-            />
-          </View>
-
-          {/* Client Email */}
-          <View style={styles.fieldContainer}>
-            <Text style={styles.label}>Email</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="VD: client@example.com"
-              value={formData.clientEmail}
-              onChangeText={(value) => updateField('clientEmail', value)}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              editable={!loading}
-            />
-          </View>
-        </View>
-
-        {/* Info Box */}
-        <View style={styles.infoBox}>
-          <Ionicons name="information-circle-outline" size={20} color="#0D9488" />
-          <Text style={styles.infoText}>
-            Các thông tin đánh dấu (*) là bắt buộc. Bạn có thể cập nhật thông tin sau khi
-            tạo dự án.
-          </Text>
-        </View>
-      </ScrollView>
-
-      {/* Footer Buttons */}
-      <View style={styles.footer}>
-        <TouchableOpacity
-          style={[styles.button, styles.cancelButton]}
-          onPress={() => router.back()}
-          disabled={loading}
+        <Field
+          label="Ngân sách (VNĐ)"
+          error={errors.budget}
+          helper={
+            formData.budget && !errors.budget
+              ? `~ ${Number(formData.budget).toLocaleString("vi-VN")} đ`
+              : undefined
+          }
         >
-          <Text style={styles.cancelButtonText}>Hủy</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.button, styles.submitButton, loading && styles.buttonDisabled]}
-          onPress={handleSubmit}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator color="#FFF" />
-          ) : (
-            <>
-              <Ionicons name="checkmark-circle" size={20} color="#FFF" />
-              <Text style={styles.submitButtonText}>  Tạo dự án</Text>
-            </>
-          )}
-        </TouchableOpacity>
+          <TextInput
+            style={errors.budget ? inputErrorStyle : inputStyle}
+            placeholder="VD: 500000000"
+            placeholderTextColor={colors.textTertiary}
+            value={formData.budget}
+            onChangeText={(v) => updateField("budget", v)}
+            keyboardType="numeric"
+            editable={!loading}
+          />
+        </Field>
       </View>
-    </KeyboardAvoidingView>
+
+      {/* Timeline */}
+      <View
+        style={[
+          st.section,
+          shadow.sm,
+          { backgroundColor: colors.bgSurface, borderRadius: radius.lg },
+        ]}
+      >
+        <SectionTitle icon="calendar" label="Thời gian thực hiện" />
+        <View style={st.row}>
+          <View style={st.half}>
+            <Field label="Ngày bắt đầu" error={errors.startDate}>
+              <TextInput
+                style={errors.startDate ? inputErrorStyle : inputStyle}
+                placeholder="YYYY-MM-DD"
+                placeholderTextColor={colors.textTertiary}
+                value={formData.startDate}
+                onChangeText={(v) => updateField("startDate", v)}
+                editable={!loading}
+              />
+            </Field>
+          </View>
+          <View style={st.half}>
+            <Field label="Ngày kết thúc" error={errors.endDate}>
+              <TextInput
+                style={errors.endDate ? inputErrorStyle : inputStyle}
+                placeholder="YYYY-MM-DD"
+                placeholderTextColor={colors.textTertiary}
+                value={formData.endDate}
+                onChangeText={(v) => updateField("endDate", v)}
+                editable={!loading}
+              />
+            </Field>
+          </View>
+        </View>
+      </View>
+
+      {/* Client Info */}
+      <View
+        style={[
+          st.section,
+          shadow.sm,
+          { backgroundColor: colors.bgSurface, borderRadius: radius.lg },
+        ]}
+      >
+        <SectionTitle icon="person" label="Thông tin khách hàng" />
+
+        <Field label="Tên khách hàng" error={errors.clientName}>
+          <TextInput
+            style={errors.clientName ? inputErrorStyle : inputStyle}
+            placeholder="VD: Nguyễn Văn A"
+            placeholderTextColor={colors.textTertiary}
+            value={formData.clientName}
+            onChangeText={(v) => updateField("clientName", v)}
+            editable={!loading}
+          />
+        </Field>
+
+        <Field label="Số điện thoại">
+          <TextInput
+            style={inputStyle}
+            placeholder="VD: 0901234567"
+            placeholderTextColor={colors.textTertiary}
+            value={formData.clientPhone}
+            onChangeText={(v) => updateField("clientPhone", v)}
+            keyboardType="phone-pad"
+            editable={!loading}
+          />
+        </Field>
+
+        <Field label="Email">
+          <TextInput
+            style={inputStyle}
+            placeholder="VD: client@example.com"
+            placeholderTextColor={colors.textTertiary}
+            value={formData.clientEmail}
+            onChangeText={(v) => updateField("clientEmail", v)}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            editable={!loading}
+          />
+        </Field>
+      </View>
+
+      {/* Info Box */}
+      <View
+        style={[
+          st.infoBox,
+          { backgroundColor: colors.primaryLight, borderRadius: radius.md },
+        ]}
+      >
+        <Ionicons
+          name="information-circle-outline"
+          size={20}
+          color={colors.primary}
+        />
+        <Text style={[st.infoText, { color: colors.primary }]}>
+          Các thông tin đánh dấu (*) là bắt buộc. Bạn có thể cập nhật sau khi
+          tạo dự án.
+        </Text>
+      </View>
+    </DSFormScreen>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F5F5F5',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#FFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
-    ...Platform.select({
-      ios: {
-        paddingTop: 50,
-      },
-      android: {
-        paddingTop: 16,
-      },
-    }),
-  },
-  backButton: {
-    padding: 8,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    padding: 16,
-    paddingBottom: 100,
-  },
-  section: {
-    backgroundColor: '#FFF',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  fieldContainer: {
+// ── Styles ─────────────────────────────────────────────────────────────
+const st = StyleSheet.create({
+  section: { padding: 16, marginBottom: 16 },
+  sectionTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
     marginBottom: 16,
   },
-  label: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#555',
-    marginBottom: 8,
-  },
-  required: {
-    color: '#FF3B30',
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 15,
-    backgroundColor: '#FAFAFA',
-    color: '#333',
-  },
-  inputError: {
-    borderColor: '#FF3B30',
-  },
-  textArea: {
-    height: 100,
-    paddingTop: 12,
-  },
-  errorText: {
-    fontSize: 12,
-    color: '#FF3B30',
-    marginTop: 4,
-  },
-  helperText: {
-    fontSize: 12,
-    color: '#666',
-    marginTop: 4,
-  },
-  row: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  halfWidth: {
-    flex: 1,
-  },
+  sectionTitle: { fontSize: 16, fontWeight: "600" },
+  field: { marginBottom: 16 },
+  label: { fontSize: 14, fontWeight: "500", marginBottom: 8 },
+  input: { borderWidth: 1, padding: 12, fontSize: 15 },
+  textArea: { height: 100, paddingTop: 12 },
+  errorText: { fontSize: 12, marginTop: 4 },
+  helperText: { fontSize: 12, marginTop: 4 },
+  row: { flexDirection: "row", gap: 12 },
+  half: { flex: 1 },
   infoBox: {
-    flexDirection: 'row',
-    backgroundColor: '#F0FDFA',
-    borderRadius: 8,
+    flexDirection: "row",
     padding: 12,
     gap: 8,
-    alignItems: 'flex-start',
+    alignItems: "flex-start",
+    marginBottom: 16,
   },
-  infoText: {
-    flex: 1,
-    fontSize: 13,
-    color: '#0D9488',
-    lineHeight: 18,
-  },
-  footer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    padding: 16,
-    backgroundColor: '#FFF',
-    borderTopWidth: 1,
-    borderTopColor: '#E0E0E0',
-    gap: 12,
-    ...Platform.select({
-      ios: {
-        paddingBottom: 32,
-      },
-    }),
-  },
-  button: {
-    flex: 1,
-    paddingVertical: 14,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'row',
-  },
-  cancelButton: {
-    backgroundColor: '#F5F5F5',
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-  },
-  cancelButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#666',
-  },
-  submitButton: {
-    backgroundColor: '#FF6B00',
-  },
-  submitButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#FFF',
-  },
-  buttonDisabled: {
-    opacity: 0.6,
-  },
+  infoText: { flex: 1, fontSize: 13, lineHeight: 18 },
 });

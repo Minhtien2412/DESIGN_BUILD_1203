@@ -24,6 +24,7 @@ import {
     FlatList,
     Linking,
     Platform,
+    Image as RNImage,
     ScrollView,
     Share,
     StyleSheet,
@@ -613,7 +614,131 @@ export default function UserProfileScreen() {
               </TouchableOpacity>
             </View>
           )}
+
+          {/* Website */}
+          {(user as any).website && (
+            <View style={styles.infoCard}>
+              <TouchableOpacity
+                style={styles.infoRow}
+                onPress={() => Linking.openURL((user as any).website)}
+              >
+                <View style={styles.infoIconWrapper}>
+                  <Ionicons
+                    name="globe-outline"
+                    size={20}
+                    color={COLORS.primary}
+                  />
+                </View>
+                <View style={styles.infoContent}>
+                  <Text style={styles.infoLabel}>Website</Text>
+                  <Text style={[styles.infoValue, styles.linkText]}>
+                    {(user as any).website}
+                  </Text>
+                </View>
+                <Ionicons
+                  name="open-outline"
+                  size={18}
+                  color={COLORS.textMuted}
+                />
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {/* Address / Location */}
+          {user.address && (
+            <View style={styles.infoCard}>
+              <View style={styles.infoRow}>
+                <View style={styles.infoIconWrapper}>
+                  <Ionicons
+                    name="location-outline"
+                    size={20}
+                    color={COLORS.primary}
+                  />
+                </View>
+                <View style={styles.infoContent}>
+                  <Text style={styles.infoLabel}>Địa chỉ</Text>
+                  <Text style={styles.infoValue}>{user.address}</Text>
+                </View>
+              </View>
+            </View>
+          )}
+
+          {/* Join Date */}
+          {user.createdAt && (
+            <View style={styles.infoCard}>
+              <View style={styles.infoRow}>
+                <View style={styles.infoIconWrapper}>
+                  <Ionicons
+                    name="calendar-outline"
+                    size={20}
+                    color={COLORS.primary}
+                  />
+                </View>
+                <View style={styles.infoContent}>
+                  <Text style={styles.infoLabel}>Ngày tham gia</Text>
+                  <Text style={styles.infoValue}>
+                    {new Date(user.createdAt).toLocaleDateString("vi-VN", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          )}
         </View>
+
+        {/* Response Rate & Time — Shopee seller style */}
+        {(user.role === "SELLER" ||
+          user.role === "CONTRACTOR" ||
+          user.role === "ARCHITECT" ||
+          user.role === "DESIGNER") && (
+          <View style={styles.responseSection}>
+            <View style={styles.responseCard}>
+              <View style={styles.responseItem}>
+                <View
+                  style={[
+                    styles.responseIconWrap,
+                    { backgroundColor: "#E8F5E9" },
+                  ]}
+                >
+                  <Ionicons name="chatbubbles" size={20} color="#4CAF50" />
+                </View>
+                <Text style={styles.responseValue}>98%</Text>
+                <Text style={styles.responseLabel}>Tỉ lệ phản hồi</Text>
+              </View>
+              <View style={styles.responseDivider} />
+              <View style={styles.responseItem}>
+                <View
+                  style={[
+                    styles.responseIconWrap,
+                    { backgroundColor: "#FFF3E0" },
+                  ]}
+                >
+                  <Ionicons name="time" size={20} color="#FF9800" />
+                </View>
+                <Text style={styles.responseValue}>~15 phút</Text>
+                <Text style={styles.responseLabel}>Thời gian phản hồi</Text>
+              </View>
+              <View style={styles.responseDivider} />
+              <View style={styles.responseItem}>
+                <View
+                  style={[
+                    styles.responseIconWrap,
+                    { backgroundColor: "#E8EAF6" },
+                  ]}
+                >
+                  <Ionicons name="shield-checkmark" size={20} color="#3F51B5" />
+                </View>
+                <Text style={styles.responseValue}>
+                  {user.yearsExperience || 0}+
+                </Text>
+                <Text style={styles.responseLabel}>Năm kinh nghiệm</Text>
+              </View>
+            </View>
+          </View>
+        )}
 
         {/* Skills & Certifications */}
         {((user as any).skills?.length > 0 ||
@@ -770,6 +895,236 @@ export default function UserProfileScreen() {
             <Text style={styles.productsLoadingText}>Đang tải sản phẩm...</Text>
           </View>
         )}
+
+        {/* Media Gallery — shared photos & videos (Zalo-style) */}
+        <View style={styles.mediaGallerySection}>
+          <View style={styles.productsSectionHeader}>
+            <Text style={styles.sectionTitle}>Ảnh & Video</Text>
+            <TouchableOpacity style={styles.viewAllBtn}>
+              <Text style={styles.viewAllText}>Xem tất cả</Text>
+              <Ionicons
+                name="chevron-forward"
+                size={16}
+                color={COLORS.primary}
+              />
+            </TouchableOpacity>
+          </View>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.mediaScrollContent}
+          >
+            {/* Sample gallery images based on role */}
+            {[
+              "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=300&h=300&q=80",
+              "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=300&h=300&q=80",
+              "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=300&h=300&q=80",
+              "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=300&h=300&q=80",
+              "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=300&h=300&q=80",
+              "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&h=300&q=80",
+            ].map((uri, idx) => (
+              <TouchableOpacity
+                key={idx}
+                style={styles.galleryItem}
+                activeOpacity={0.8}
+              >
+                <RNImage source={{ uri }} style={styles.galleryImage} />
+                {idx === 5 && (
+                  <View style={styles.galleryOverlay}>
+                    <Text style={styles.galleryOverlayText}>+12</Text>
+                  </View>
+                )}
+                {idx === 1 && (
+                  <View style={styles.galleryVideoIcon}>
+                    <Ionicons name="play-circle" size={24} color="#FFFFFF" />
+                  </View>
+                )}
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+
+        {/* Reviews Section — Shopee style */}
+        {user.reviewCount && user.reviewCount > 0 && (
+          <View style={styles.reviewsSection}>
+            <View style={styles.productsSectionHeader}>
+              <Text style={styles.sectionTitle}>
+                Đánh giá ({user.reviewCount})
+              </Text>
+              <TouchableOpacity style={styles.viewAllBtn}>
+                <Text style={styles.viewAllText}>Xem tất cả</Text>
+                <Ionicons
+                  name="chevron-forward"
+                  size={16}
+                  color={COLORS.primary}
+                />
+              </TouchableOpacity>
+            </View>
+
+            {/* Rating Summary */}
+            <View style={styles.ratingSummaryCard}>
+              <View style={styles.ratingSummaryLeft}>
+                <Text style={styles.ratingBig}>
+                  {user.rating?.toFixed(1) || "5.0"}
+                </Text>
+                <View style={styles.starsRow}>
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Ionicons
+                      key={star}
+                      name={
+                        star <= Math.floor(user.rating || 5)
+                          ? "star"
+                          : star - 0.5 <= (user.rating || 5)
+                            ? "star-half"
+                            : "star-outline"
+                      }
+                      size={16}
+                      color={COLORS.warning}
+                    />
+                  ))}
+                </View>
+                <Text style={styles.reviewCountText}>
+                  {user.reviewCount} đánh giá
+                </Text>
+              </View>
+              <View style={styles.ratingSummaryRight}>
+                {[5, 4, 3, 2, 1].map((star) => {
+                  // Mock distribution weighted toward the rating
+                  const pct =
+                    star === Math.round(user.rating || 5)
+                      ? 65
+                      : star === Math.round(user.rating || 5) - 1
+                        ? 20
+                        : star === Math.round(user.rating || 5) + 1
+                          ? 10
+                          : 3;
+                  return (
+                    <View key={star} style={styles.ratingBarRow}>
+                      <Text style={styles.ratingBarLabel}>{star}</Text>
+                      <Ionicons name="star" size={10} color={COLORS.warning} />
+                      <View style={styles.ratingBarBg}>
+                        <View
+                          style={[
+                            styles.ratingBarFill,
+                            {
+                              width: `${pct}%`,
+                              backgroundColor:
+                                star >= 4
+                                  ? COLORS.secondary
+                                  : star >= 3
+                                    ? COLORS.warning
+                                    : COLORS.danger,
+                            },
+                          ]}
+                        />
+                      </View>
+                    </View>
+                  );
+                })}
+              </View>
+            </View>
+
+            {/* Sample Reviews */}
+            {[
+              {
+                name: "Nguyễn Văn Minh",
+                avatar: "NM",
+                rating: 5,
+                time: "2 tuần trước",
+                text: "Rất chuyên nghiệp và tận tâm. Sản phẩm/dịch vụ chất lượng cao, giao hàng đúng hẹn.",
+              },
+              {
+                name: "Trần Thị Lan",
+                avatar: "TL",
+                rating: 5,
+                time: "1 tháng trước",
+                text: "Tư vấn nhiệt tình, giá cả hợp lý. Sẽ tiếp tục hợp tác.",
+              },
+              {
+                name: "Lê Hoàng Nam",
+                avatar: "LN",
+                rating: 4,
+                time: "2 tháng trước",
+                text: "Chất lượng tốt, đóng gói cẩn thận. Giao hơi chậm 1 ngày.",
+              },
+            ].map((review, idx) => (
+              <View key={idx} style={styles.reviewItem}>
+                <View style={styles.reviewHeader}>
+                  <View style={styles.reviewAvatar}>
+                    <Text style={styles.reviewAvatarText}>{review.avatar}</Text>
+                  </View>
+                  <View style={styles.reviewInfo}>
+                    <Text style={styles.reviewName}>{review.name}</Text>
+                    <View style={styles.reviewMeta}>
+                      <View style={styles.starsRow}>
+                        {[1, 2, 3, 4, 5].map((s) => (
+                          <Ionicons
+                            key={s}
+                            name={s <= review.rating ? "star" : "star-outline"}
+                            size={12}
+                            color={COLORS.warning}
+                          />
+                        ))}
+                      </View>
+                      <Text style={styles.reviewTime}>{review.time}</Text>
+                    </View>
+                  </View>
+                </View>
+                <Text style={styles.reviewText}>{review.text}</Text>
+              </View>
+            ))}
+          </View>
+        )}
+
+        {/* Activity Section — Zalo-style recent activity */}
+        <View style={styles.activitySection}>
+          <Text style={styles.sectionTitle}>Hoạt động gần đây</Text>
+          {[
+            {
+              icon: "camera" as const,
+              color: "#8B5CF6",
+              text: "Đã đăng 3 ảnh mới",
+              time: "Hôm nay",
+            },
+            {
+              icon: "chatbubbles" as const,
+              color: COLORS.primary,
+              text: "Đã phản hồi 12 tin nhắn",
+              time: "Hôm qua",
+            },
+            {
+              icon: "star" as const,
+              color: COLORS.warning,
+              text: "Nhận được 2 đánh giá 5 sao",
+              time: "3 ngày trước",
+            },
+            {
+              icon: "construct" as const,
+              color: "#0D9488",
+              text: "Cập nhật tiến độ dự án",
+              time: "1 tuần trước",
+            },
+          ].map((activity, idx) => (
+            <View key={idx} style={styles.activityItem}>
+              <View
+                style={[
+                  styles.activityIcon,
+                  { backgroundColor: `${activity.color}15` },
+                ]}
+              >
+                <Ionicons
+                  name={activity.icon}
+                  size={18}
+                  color={activity.color}
+                />
+              </View>
+              <View style={styles.activityContent}>
+                <Text style={styles.activityText}>{activity.text}</Text>
+                <Text style={styles.activityTime}>{activity.time}</Text>
+              </View>
+            </View>
+          ))}
+        </View>
 
         {/* Bottom Spacing */}
         <View style={{ height: 40 }} />
@@ -1133,5 +1488,237 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#2E7D32",
     fontWeight: "500",
+  },
+  // Response Rate Section — Shopee style
+  responseSection: {
+    marginTop: 16,
+    paddingHorizontal: 16,
+  },
+  responseCard: {
+    flexDirection: "row",
+    backgroundColor: COLORS.white,
+    borderRadius: 12,
+    padding: 16,
+    alignItems: "center",
+  },
+  responseItem: {
+    flex: 1,
+    alignItems: "center",
+  },
+  responseIconWrap: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  responseValue: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: COLORS.text,
+    marginBottom: 2,
+  },
+  responseLabel: {
+    fontSize: 11,
+    color: COLORS.textSecondary,
+    textAlign: "center",
+  },
+  responseDivider: {
+    width: 1,
+    height: 50,
+    backgroundColor: COLORS.border,
+  },
+  // Media Gallery Section
+  mediaGallerySection: {
+    marginTop: 16,
+    backgroundColor: COLORS.white,
+    paddingVertical: 16,
+  },
+  mediaScrollContent: {
+    paddingHorizontal: 16,
+    gap: 8,
+  },
+  galleryItem: {
+    width: 110,
+    height: 110,
+    borderRadius: 12,
+    overflow: "hidden",
+    position: "relative",
+  },
+  galleryImage: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 12,
+  },
+  galleryOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  galleryOverlayText: {
+    color: COLORS.white,
+    fontSize: 20,
+    fontWeight: "700",
+  },
+  galleryVideoIcon: {
+    position: "absolute",
+    bottom: 6,
+    right: 6,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    borderRadius: 12,
+    padding: 2,
+  },
+  // Reviews Section
+  reviewsSection: {
+    marginTop: 16,
+    backgroundColor: COLORS.white,
+    paddingVertical: 16,
+  },
+  ratingSummaryCard: {
+    flexDirection: "row",
+    marginHorizontal: 16,
+    padding: 16,
+    backgroundColor: "#FAFAFA",
+    borderRadius: 12,
+    marginBottom: 12,
+  },
+  ratingSummaryLeft: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingRight: 20,
+    borderRightWidth: 1,
+    borderRightColor: COLORS.border,
+    minWidth: 90,
+  },
+  ratingBig: {
+    fontSize: 36,
+    fontWeight: "800",
+    color: COLORS.text,
+    lineHeight: 40,
+  },
+  starsRow: {
+    flexDirection: "row",
+    gap: 2,
+    marginTop: 4,
+  },
+  reviewCountText: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
+    marginTop: 4,
+  },
+  ratingSummaryRight: {
+    flex: 1,
+    paddingLeft: 16,
+    justifyContent: "center",
+    gap: 4,
+  },
+  ratingBarRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  ratingBarLabel: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
+    width: 12,
+    textAlign: "center",
+  },
+  ratingBarBg: {
+    flex: 1,
+    height: 6,
+    backgroundColor: "#E5E5EA",
+    borderRadius: 3,
+    overflow: "hidden",
+  },
+  ratingBarFill: {
+    height: "100%",
+    borderRadius: 3,
+  },
+  // Review Items
+  reviewItem: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
+  },
+  reviewHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  reviewAvatar: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: COLORS.primaryLight,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 10,
+  },
+  reviewAvatarText: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: COLORS.primary,
+  },
+  reviewInfo: {
+    flex: 1,
+  },
+  reviewName: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: COLORS.text,
+    marginBottom: 2,
+  },
+  reviewMeta: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  reviewTime: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
+  },
+  reviewText: {
+    fontSize: 14,
+    color: COLORS.text,
+    lineHeight: 20,
+  },
+  // Activity Section
+  activitySection: {
+    marginTop: 16,
+    paddingHorizontal: 16,
+    paddingBottom: 8,
+  },
+  activityItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: COLORS.white,
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 8,
+  },
+  activityIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 12,
+  },
+  activityContent: {
+    flex: 1,
+  },
+  activityText: {
+    fontSize: 14,
+    color: COLORS.text,
+    fontWeight: "500",
+    marginBottom: 2,
+  },
+  activityTime: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
   },
 });

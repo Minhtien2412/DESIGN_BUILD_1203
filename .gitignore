@@ -98,3 +98,5 @@ dist-test/
 .env.local
 backend-deploy.tar.gz
 *.vsix
+
+APP_DESIGN_BUILD05.12.2025.zip

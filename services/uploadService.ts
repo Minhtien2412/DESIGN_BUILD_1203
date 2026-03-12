@@ -4,6 +4,7 @@
  */
 import { ENV } from "@/config/env";
 import { getToken } from "@/utils/storage";
+import * as FileSystem from "expo-file-system/legacy";
 import { Platform } from "react-native";
 // Note: react-native-document-picker and react-native-image-picker need to be installed
 // npm install react-native-document-picker react-native-image-picker
@@ -74,7 +75,7 @@ export interface FileMetadata {
  * Pick image from gallery
  */
 export const pickImageFromGallery = async (
-  options: UploadOptions = {}
+  options: UploadOptions = {},
 ): Promise<Asset[] | null> => {
   try {
     const result: ImagePickerResponse = await launchImageLibrary({
@@ -106,7 +107,7 @@ export const pickImageFromGallery = async (
  * Take photo with camera
  */
 export const takePhoto = async (
-  options: UploadOptions = {}
+  options: UploadOptions = {},
 ): Promise<Asset | null> => {
   try {
     const result: ImagePickerResponse = await launchCamera({
@@ -138,7 +139,7 @@ export const takePhoto = async (
  * Pick document
  */
 export const pickDocument = async (
-  options: UploadOptions = {}
+  options: UploadOptions = {},
 ): Promise<DocumentPickerResponse[] | null> => {
   try {
     const result = await DocumentPicker.pick({
@@ -173,7 +174,7 @@ export const pickDocument = async (
  */
 export const uploadFile = async (
   file: Asset | DocumentPickerResponse,
-  onProgress?: (progress: UploadProgress) => void
+  onProgress?: (progress: UploadProgress) => void,
 ): Promise<UploadResult> => {
   try {
     const token = await getToken();
@@ -181,68 +182,82 @@ export const uploadFile = async (
       throw new Error("Authentication required");
     }
 
-    // Prepare form data
-    const formData = new FormData();
-
     // Handle both Asset (image-picker) and DocumentPickerResponse (document-picker)
-    const uri = "uri" in file ? file.uri : file.uri;
-    const name = "fileName" in file ? file.fileName : file.name;
-    const type = "type" in file ? file.type : file.type;
+    const uri = ("uri" in file ? file.uri : file.uri) || "";
+    const name =
+      ("fileName" in file ? file.fileName : file.name) || "upload.jpg";
+    const type = ("type" in file ? file.type : file.type) || "image/jpeg";
 
-    formData.append("file", {
-      uri: Platform.OS === "android" ? uri : uri?.replace("file://", ""),
-      name: name || "upload.jpg",
-      type: type || "image/jpeg",
-    } as any);
+    if (!uri) {
+      throw new Error("No file URI provided");
+    }
 
-    // Upload to backend
-    const xhr = new XMLHttpRequest();
+    const headers: Record<string, string> = {
+      Authorization: `Bearer ${token}`,
+      "x-api-key": ENV.API_KEY,
+    };
 
-    return new Promise((resolve, reject) => {
-      // Progress tracking
-      xhr.upload.addEventListener("progress", (event) => {
-        if (event.lengthComputable && onProgress) {
-          onProgress({
-            loaded: event.loaded,
-            total: event.total,
-            percentage: Math.round((event.loaded / event.total) * 100),
-          });
-        }
-      });
+    let status: number;
+    let body: string;
 
-      // Handle completion
-      xhr.addEventListener("load", () => {
-        if (xhr.status >= 200 && xhr.status < 300) {
-          try {
-            const response = JSON.parse(xhr.responseText);
-            resolve({
-              success: true,
-              url: response.url,
-              fileId: response.id,
+    // Native upload with progress tracking
+    if (
+      Platform.OS !== "web" &&
+      typeof (FileSystem as any).createUploadResumable === "function"
+    ) {
+      const task = (FileSystem as any).createUploadResumable(
+        uri,
+        `${ENV.API_BASE_URL}/upload`,
+        {
+          httpMethod: "POST",
+          uploadType: (FileSystem as any).FileSystemUploadType.MULTIPART,
+          fieldName: "file",
+          mimeType: type,
+          headers,
+        },
+        (data: any) => {
+          const total = data.totalBytesExpectedToSend ?? 0;
+          const sent = data.totalBytesSent ?? 0;
+          if (onProgress && total > 0) {
+            onProgress({
+              loaded: sent,
+              total,
+              percentage: Math.round((sent / total) * 100),
             });
-          } catch (error) {
-            reject(new Error("Invalid server response"));
           }
-        } else {
-          reject(new Error(`Upload failed: ${xhr.statusText}`));
-        }
+        },
+      );
+      const result = await task.uploadAsync();
+      if (!result) throw new Error("Upload cancelled");
+      status = result.status;
+      body = result.body;
+    } else {
+      // Web fallback (no progress)
+      const formData = new FormData();
+      formData.append("file", {
+        uri: Platform.OS === "android" ? uri : uri?.replace("file://", ""),
+        name: name || "upload.jpg",
+        type: type || "image/jpeg",
+      } as any);
+      const response = await fetch(`${ENV.API_BASE_URL}/upload`, {
+        method: "POST",
+        headers,
+        body: formData,
       });
+      status = response.status;
+      body = await response.text();
+    }
 
-      // Handle errors
-      xhr.addEventListener("error", () => {
-        reject(new Error("Network error during upload"));
-      });
-
-      xhr.addEventListener("abort", () => {
-        reject(new Error("Upload cancelled"));
-      });
-
-      // Send request
-      xhr.open("POST", `${ENV.API_BASE_URL}/upload`);
-      xhr.setRequestHeader("Authorization", `Bearer ${token}`);
-      xhr.setRequestHeader("x-api-key", ENV.API_KEY);
-      xhr.send(formData);
-    });
+    if (status >= 200 && status < 300) {
+      const response = JSON.parse(body);
+      return {
+        success: true,
+        url: response.url,
+        fileId: response.id,
+      };
+    } else {
+      throw new Error(`Upload failed: ${status}`);
+    }
   } catch (error) {
     console.error("[Upload] Failed to upload file:", error);
     return {
@@ -257,7 +272,7 @@ export const uploadFile = async (
  */
 export const uploadFiles = async (
   files: (Asset | DocumentPickerResponse)[],
-  onProgress?: (progress: UploadProgress) => void
+  onProgress?: (progress: UploadProgress) => void,
 ): Promise<UploadResult> => {
   try {
     const results: string[] = [];
@@ -310,7 +325,7 @@ export const uploadFiles = async (
  */
 export const uploadImageFromGallery = async (
   options: UploadOptions = {},
-  onProgress?: (progress: UploadProgress) => void
+  onProgress?: (progress: UploadProgress) => void,
 ): Promise<UploadResult> => {
   const images = await pickImageFromGallery(options);
   if (!images || images.length === 0) {
@@ -328,7 +343,7 @@ export const uploadImageFromGallery = async (
  * Upload photo from camera
  */
 export const uploadPhotoFromCamera = async (
-  onProgress?: (progress: UploadProgress) => void
+  onProgress?: (progress: UploadProgress) => void,
 ): Promise<UploadResult> => {
   const photo = await takePhoto();
   if (!photo) {
@@ -343,7 +358,7 @@ export const uploadPhotoFromCamera = async (
  */
 export const uploadDocument = async (
   options: UploadOptions = {},
-  onProgress?: (progress: UploadProgress) => void
+  onProgress?: (progress: UploadProgress) => void,
 ): Promise<UploadResult> => {
   const documents = await pickDocument(options);
   if (!documents || documents.length === 0) {
@@ -367,7 +382,7 @@ export const deleteFile = async (fileId: string): Promise<boolean> => {
       throw new Error("Authentication required");
     }
 
-    const response = await fetch(`${ENV.API_BASE_URL}/upload/${fileId}`, {
+    const response = await fetch(`${ENV.API_BASE_URL}/v1/files/${fileId}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -386,7 +401,7 @@ export const deleteFile = async (fileId: string): Promise<boolean> => {
  * Get file metadata
  */
 export const getFileMetadata = async (
-  fileId: string
+  fileId: string,
 ): Promise<FileMetadata | null> => {
   try {
     const token = await getToken();
@@ -394,7 +409,7 @@ export const getFileMetadata = async (
       throw new Error("Authentication required");
     }
 
-    const response = await fetch(`${ENV.API_BASE_URL}/upload/${fileId}`, {
+    const response = await fetch(`${ENV.API_BASE_URL}/v1/files/${fileId}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,

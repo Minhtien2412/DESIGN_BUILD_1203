@@ -24,7 +24,7 @@ import {
     Text,
     TextInput,
     TouchableOpacity,
-    View
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -116,7 +116,7 @@ export default function GroupsScreen() {
 
   const handleCreateGroup = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    // Navigate to create group screen
+    router.push("/messages/create-group");
   };
 
   const formatTime = (dateString: string) => {

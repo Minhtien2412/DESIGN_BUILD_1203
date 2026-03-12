@@ -1,13 +1,9 @@
 /**
  * Chat API Service - Tích hợp dữ liệu tin nhắn thật từ Backend
- * Kết hợp với communication.service.ts và chat.service.ts
+ * Delegates to conversations.service.ts (canonical) with communication.service fallback
+ * @module chatAPIService
  */
 
-import {
-    ChatRoom as APIChatRoom,
-    ChatMessage as APIMessage,
-    chatService,
-} from "./api/chat.service";
 import communicationService, {
     Channel,
     ChannelMember,
@@ -15,25 +11,26 @@ import communicationService, {
     MessageFilters,
 } from "./api/communication.service";
 import type {
+    Conversation,
+    Message as ConvMessage,
+} from "./api/conversations.service";
+import * as conversationsApi from "./api/conversations.service";
+import type {
     Attachment,
     ChatMessage,
     ChatParticipant,
     ChatRoom,
-    MessageStatus,
     MessageType,
 } from "./ChatService";
-
-// ==================== API ENDPOINTS ====================
-
-const API_BASE = "https://baotienweb.cloud/api/v1";
 
 // ==================== TYPE CONVERTERS ====================
 
 /**
  * Convert API Message to ChatMessage format
+ * Handles: communication.service Message, conversations.service Message
  */
 export function convertAPIMessageToChatMessage(
-  msg: Message | APIMessage,
+  msg: Message | ConvMessage,
 ): ChatMessage {
   if ("channelId" in msg) {
     // From communication.service Message
@@ -78,23 +75,42 @@ export function convertAPIMessageToChatMessage(
         : undefined,
     };
   } else {
-    // From chat.service ChatMessage
-    const chatMsg = msg as APIMessage;
+    // From conversations.service Message (canonical)
+    const convMsg = msg as ConvMessage;
     return {
-      id: String(chatMsg.id),
-      chatId: String(chatMsg.roomId),
-      senderId: String(chatMsg.senderId),
-      senderName: chatMsg.sender?.name || "Unknown",
-      senderAvatar: chatMsg.sender?.avatar,
-      type: convertMessageType(chatMsg.type as any),
-      content: chatMsg.content,
-      attachments: chatMsg.attachments?.map((url) => ({
-        type: getAttachmentType(url),
-        url,
+      id: convMsg.id,
+      chatId: convMsg.conversationId,
+      senderId: String(convMsg.senderId),
+      senderName: convMsg.sender?.name || "Unknown",
+      senderAvatar: convMsg.sender?.avatar,
+      type: convertMessageType(convMsg.type),
+      content: convMsg.content,
+      attachments: convMsg.attachments?.map((a) => ({
+        type: a.type,
+        url: a.url,
+        name: a.name,
+        size: a.size,
       })),
-      status: chatMsg.readBy?.length > 0 ? "read" : "delivered",
-      timestamp: new Date(chatMsg.createdAt).getTime(),
-      readBy: chatMsg.readBy?.map(String),
+      reactions: convMsg.reactions?.map((r) => ({
+        emoji: r.emoji,
+        userId: String(r.userId),
+        userName: r.user?.name || "",
+        timestamp: new Date(r.createdAt).getTime(),
+      })),
+      replyTo: convMsg.replyToMessage
+        ? {
+            id: convMsg.replyToMessage.id,
+            senderId: String(convMsg.replyToMessage.senderId),
+            senderName: convMsg.replyToMessage.sender?.name || "",
+            content: convMsg.replyToMessage.content,
+            type: convertMessageType(convMsg.replyToMessage.type),
+          }
+        : undefined,
+      status: convMsg.isDeleted ? "failed" : "read",
+      timestamp: new Date(convMsg.sentAt || convMsg.createdAt).getTime(),
+      editedAt: convMsg.isEdited
+        ? new Date(convMsg.updatedAt).getTime()
+        : undefined,
     };
   }
 }
@@ -126,31 +142,46 @@ export function convertChannelToChatRoom(channel: Channel): ChatRoom {
 }
 
 /**
- * Convert API ChatRoom to ChatRoom format
+ * Convert Conversation (canonical) to ChatRoom format
  */
-export function convertAPIChatRoomToChatRoom(room: APIChatRoom): ChatRoom {
+export function convertConversationToChatRoom(conv: Conversation): ChatRoom {
   return {
-    id: String(room.id),
-    name: room.name,
-    type:
-      room.type === "DIRECT"
-        ? "private"
-        : room.type === "PROJECT"
-          ? "channel"
-          : "group",
+    id: conv.id,
+    name:
+      conv.title ||
+      conv.participants
+        ?.map((p) => p.user?.name)
+        .filter(Boolean)
+        .join(", ") ||
+      "Chat",
+    avatar: conv.avatarUrl,
+    type: conv.type === "DIRECT" ? "private" : "group",
     participants:
-      room.members?.map((m) => ({
-        id: String(m.userId),
-        name: m.user?.name || "",
-        avatar: m.user?.avatar,
-        role: m.role === "OWNER" || m.role === "ADMIN" ? "admin" : "member",
+      conv.participants?.map((p) => ({
+        id: String(p.userId),
+        name: p.user?.name || p.nickname || "",
+        avatar: p.user?.avatar,
+        role: p.role === "OWNER" || p.role === "ADMIN" ? "admin" : "member",
       })) || [],
-    lastMessage: room.lastMessage
-      ? convertAPIMessageToChatMessage(room.lastMessage)
+    lastMessage: conv.lastMessagePreview
+      ? {
+          id: conv.lastMessageId || "",
+          chatId: conv.id,
+          senderId: "",
+          senderName: "",
+          type: "text",
+          content: conv.lastMessagePreview,
+          status: "read",
+          timestamp: conv.lastMessageAt
+            ? new Date(conv.lastMessageAt).getTime()
+            : Date.now(),
+        }
       : undefined,
-    unreadCount: room.unreadCount || 0,
-    createdAt: new Date(room.createdAt).getTime(),
-    updatedAt: new Date(room.updatedAt).getTime(),
+    unreadCount: conv.unreadCount || 0,
+    isPinned: conv.participants?.[0]?.isPinned || false,
+    isMuted: conv.participants?.[0]?.isMuted || false,
+    createdAt: new Date(conv.createdAt).getTime(),
+    updatedAt: new Date(conv.updatedAt).getTime(),
   };
 }
 
@@ -290,8 +321,6 @@ const MOCK_CHAT_ROOMS: ChatRoom[] = [
 // ==================== CHAT API SERVICE ====================
 
 class ChatAPIService {
-  private baseUrl = API_BASE;
-
   // ==================== CHANNELS / ROOMS ====================
 
   /**
@@ -299,17 +328,19 @@ class ChatAPIService {
    */
   async getChatRooms(projectId?: number): Promise<ChatRoom[]> {
     try {
-      // Try communication channels first
+      // Try canonical conversations API first
+      const convResponse = await conversationsApi.getConversations({
+        limit: 50,
+      });
+      if (convResponse.items && convResponse.items.length > 0) {
+        return convResponse.items.map(convertConversationToChatRoom);
+      }
+
+      // Fallback to communication channels
       const channelsResponse =
         await communicationService.getChannels(projectId);
       if (channelsResponse.data && channelsResponse.data.length > 0) {
         return channelsResponse.data.map(convertChannelToChatRoom);
-      }
-
-      // Fallback to chat rooms
-      const rooms = await chatService.getRooms({ projectId });
-      if (rooms && rooms.length > 0) {
-        return rooms.map(convertAPIChatRoomToChatRoom);
       }
 
       // Return mock data when API returns empty
@@ -327,8 +358,8 @@ class ChatAPIService {
    */
   async getChatRoom(roomId: string): Promise<ChatRoom | null> {
     try {
-      const room = await chatService.getRoom(Number(roomId));
-      return convertAPIChatRoomToChatRoom(room);
+      const conv = await conversationsApi.getConversation(roomId);
+      return convertConversationToChatRoom(conv);
     } catch (error) {
       // Try to find in mock data
       const mockRoom = MOCK_CHAT_ROOMS.find((r) => r.id === roomId);
@@ -351,18 +382,19 @@ class ChatAPIService {
     memberIds?: number[];
   }): Promise<ChatRoom | null> {
     try {
-      const room = await chatService.createRoom({
-        name: data.name,
-        projectId: data.projectId,
-        type:
-          data.type === "private"
-            ? "DIRECT"
-            : data.type === "channel"
-              ? "PROJECT"
-              : "GROUP",
-        members: data.memberIds,
+      if (data.type === "private" && data.memberIds?.length === 1) {
+        // Direct conversation
+        const conv = await conversationsApi.createOrGetDirectConversation(
+          data.memberIds[0],
+        );
+        return convertConversationToChatRoom(conv);
+      }
+      // Group conversation
+      const conv = await conversationsApi.createGroupConversation({
+        title: data.name,
+        participantIds: data.memberIds || [],
       });
-      return convertAPIChatRoomToChatRoom(room);
+      return convertConversationToChatRoom(conv);
     } catch (error) {
       console.error("[ChatAPI] Create room failed:", error);
       return null;
@@ -383,7 +415,21 @@ class ChatAPIService {
     },
   ): Promise<{ messages: ChatMessage[]; hasMore: boolean }> {
     try {
-      // Try communication messages first
+      // Try canonical conversations API first
+      const convResponse = await conversationsApi.getMessages(chatId, {
+        limit: options?.limit || 50,
+        cursor: options?.before,
+        direction: options?.before ? "before" : undefined,
+      });
+
+      if (convResponse.items && convResponse.items.length > 0) {
+        return {
+          messages: convResponse.items.map(convertAPIMessageToChatMessage),
+          hasMore: convResponse.hasMoreBefore,
+        };
+      }
+
+      // Fallback to communication messages
       const commResponse = await communicationService.getMessages({
         channelId: Number(chatId),
         limit: options?.limit || 50,
@@ -397,17 +443,7 @@ class ChatAPIService {
         };
       }
 
-      // Fallback to chat messages
-      const chatResponse = await chatService.getMessages(Number(chatId), {
-        page: options?.page || 1,
-        limit: options?.limit || 50,
-        before: options?.before,
-      });
-
-      return {
-        messages: chatResponse.messages.map(convertAPIMessageToChatMessage),
-        hasMore: chatResponse.hasMore,
-      };
+      return { messages: [], hasMore: false };
     } catch (error) {
       console.error("[ChatAPI] Get messages failed:", error);
       // Return mock messages for mock rooms
@@ -561,9 +597,9 @@ class ChatAPIService {
     replyToId?: string;
   }): Promise<ChatMessage | null> {
     try {
-      // Try communication service first
-      const commResponse = await communicationService.sendMessage({
-        channelId: Number(data.chatId),
+      // Use canonical conversations API
+      const convResponse = await conversationsApi.sendMessage(data.chatId, {
+        clientMessageId: conversationsApi.generateClientMessageId(),
         content: data.content,
         type:
           data.type === "image"
@@ -571,31 +607,39 @@ class ChatAPIService {
             : data.type === "file"
               ? "FILE"
               : "TEXT",
-        fileUrl: data.attachments?.[0]?.url,
-        fileName: data.attachments?.[0]?.name,
-        replyToId: data.replyToId ? Number(data.replyToId) : undefined,
+        attachments: data.attachments?.map((a) => ({
+          type: a.type as "image" | "video" | "file" | "audio",
+          url: a.url || "",
+          name: a.name,
+          size: a.size,
+        })),
+        replyToMessageId: data.replyToId,
       });
 
-      if (commResponse.data) {
-        return convertAPIMessageToChatMessage(commResponse.data);
-      }
-
-      // Fallback to chat service
-      const chatResponse = await chatService.sendMessage({
-        roomId: Number(data.chatId),
-        content: data.content,
-        type:
-          data.type === "image"
-            ? "IMAGE"
-            : data.type === "file"
-              ? "FILE"
-              : "TEXT",
-        attachments: data.attachments?.map((a) => a.url || "").filter(Boolean),
-      });
-
-      return convertAPIMessageToChatMessage(chatResponse);
+      return convertAPIMessageToChatMessage(convResponse);
     } catch (error) {
-      console.error("[ChatAPI] Send message failed:", error);
+      // Fallback to communication service
+      try {
+        const commResponse = await communicationService.sendMessage({
+          channelId: Number(data.chatId),
+          content: data.content,
+          type:
+            data.type === "image"
+              ? "IMAGE"
+              : data.type === "file"
+                ? "FILE"
+                : "TEXT",
+          fileUrl: data.attachments?.[0]?.url,
+          fileName: data.attachments?.[0]?.name,
+          replyToId: data.replyToId ? Number(data.replyToId) : undefined,
+        });
+
+        if (commResponse.data) {
+          return convertAPIMessageToChatMessage(commResponse.data);
+        }
+      } catch (fallbackError) {
+        console.error("[ChatAPI] Send message failed:", fallbackError);
+      }
       return null;
     }
   }
@@ -606,8 +650,18 @@ class ChatAPIService {
   async editMessage(
     messageId: string,
     content: string,
+    conversationId?: string,
   ): Promise<ChatMessage | null> {
     try {
+      if (conversationId) {
+        const response = await conversationsApi.updateMessage(
+          conversationId,
+          messageId,
+          content,
+        );
+        return convertAPIMessageToChatMessage(response);
+      }
+      // Fallback to communication service (uses numeric IDs)
       const response = await communicationService.updateMessage(
         Number(messageId),
         content,
@@ -625,8 +679,15 @@ class ChatAPIService {
   /**
    * Xóa tin nhắn
    */
-  async deleteMessage(messageId: string): Promise<boolean> {
+  async deleteMessage(
+    messageId: string,
+    conversationId?: string,
+  ): Promise<boolean> {
     try {
+      if (conversationId) {
+        await conversationsApi.deleteMessage(conversationId, messageId);
+        return true;
+      }
       await communicationService.deleteMessage(Number(messageId));
       return true;
     } catch (error) {
@@ -638,8 +699,16 @@ class ChatAPIService {
   /**
    * Thêm reaction
    */
-  async addReaction(messageId: string, emoji: string): Promise<boolean> {
+  async addReaction(
+    messageId: string,
+    emoji: string,
+    conversationId?: string,
+  ): Promise<boolean> {
     try {
+      if (conversationId) {
+        await conversationsApi.addReaction(conversationId, messageId, emoji);
+        return true;
+      }
       await communicationService.addReaction(Number(messageId), emoji);
       return true;
     } catch (error) {
@@ -651,8 +720,16 @@ class ChatAPIService {
   /**
    * Xóa reaction
    */
-  async removeReaction(messageId: string, emoji: string): Promise<boolean> {
+  async removeReaction(
+    messageId: string,
+    emoji: string,
+    conversationId?: string,
+  ): Promise<boolean> {
     try {
+      if (conversationId) {
+        await conversationsApi.removeReaction(conversationId, messageId, emoji);
+        return true;
+      }
       await communicationService.removeReaction(Number(messageId), emoji);
       return true;
     } catch (error) {
@@ -666,11 +743,17 @@ class ChatAPIService {
    */
   async markAsRead(chatId: string): Promise<boolean> {
     try {
-      await communicationService.markAsRead(Number(chatId));
+      await conversationsApi.markAsRead(chatId);
       return true;
     } catch (error) {
-      console.error("[ChatAPI] Mark as read failed:", error);
-      return false;
+      // Fallback to communication service
+      try {
+        await communicationService.markAsRead(Number(chatId));
+        return true;
+      } catch {
+        console.error("[ChatAPI] Mark as read failed:", error);
+        return false;
+      }
     }
   }
 
@@ -699,11 +782,17 @@ class ChatAPIService {
    */
   async addMember(chatId: string, userId: number): Promise<boolean> {
     try {
-      await communicationService.addMember(Number(chatId), userId);
+      await conversationsApi.addParticipants(chatId, [userId]);
       return true;
     } catch (error) {
-      console.error("[ChatAPI] Add member failed:", error);
-      return false;
+      // Fallback to communication service
+      try {
+        await communicationService.addMember(Number(chatId), userId);
+        return true;
+      } catch {
+        console.error("[ChatAPI] Add member failed:", error);
+        return false;
+      }
     }
   }
 
@@ -712,68 +801,39 @@ class ChatAPIService {
    */
   async removeMember(chatId: string, userId: number): Promise<boolean> {
     try {
-      await communicationService.removeMember(Number(chatId), userId);
+      await conversationsApi.removeParticipant(chatId, userId);
       return true;
     } catch (error) {
-      console.error("[ChatAPI] Remove member failed:", error);
-      return false;
+      // Fallback to communication service
+      try {
+        await communicationService.removeMember(Number(chatId), userId);
+        return true;
+      } catch {
+        console.error("[ChatAPI] Remove member failed:", error);
+        return false;
+      }
     }
   }
 
-  // ==================== DIRECT API CALLS ====================
-
-  /**
-   * Direct fetch messages from API (fallback)
-   */
-  async fetchMessagesDirectly(
-    channelId: number,
-    limit = 50,
-  ): Promise<ChatMessage[]> {
-    try {
-      const response = await fetch(
-        `${this.baseUrl}/messages?channelId=${channelId}&limit=${limit}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
-
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      const messages = data.data || data.messages || data;
-
-      if (Array.isArray(messages)) {
-        return messages.map((msg: any) => ({
-          id: String(msg.id),
-          chatId: String(msg.channelId || msg.roomId),
-          senderId: String(msg.userId || msg.senderId),
-          senderName: msg.userName || msg.sender?.name || "Unknown",
-          senderAvatar: msg.userAvatar || msg.sender?.avatar,
-          type: convertMessageType(msg.type || "TEXT"),
-          content: msg.content || msg.text || "",
-          status: "read" as MessageStatus,
-          timestamp: new Date(msg.createdAt || msg.timestamp).getTime(),
-        }));
-      }
-
-      return [];
-    } catch (error) {
-      console.error("[ChatAPI] Direct fetch failed:", error);
-      return [];
-    }
-  }
+  // ==================== SEARCH ====================
 
   /**
    * Search messages
    */
   async searchMessages(query: string, chatId?: string): Promise<ChatMessage[]> {
     try {
+      if (chatId) {
+        const results = await conversationsApi.searchMessages(
+          chatId,
+          query,
+          50,
+        );
+        return results.map(convertAPIMessageToChatMessage);
+      }
+
+      // Fallback to communication service for channel-based search
       const params: MessageFilters = {
-        channelId: chatId ? Number(chatId) : 0,
+        channelId: 0,
         search: query,
         limit: 50,
       };

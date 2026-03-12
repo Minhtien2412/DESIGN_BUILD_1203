@@ -66,13 +66,16 @@ export default function CategoriesHubScreen() {
         style={[styles.headerGradient, { paddingTop: insets.top + 8 }]}
       >
         <View style={styles.headerRow}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.headerBtn}>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={styles.headerBtn}
+          >
             <Ionicons name="arrow-back" size={22} color="#fff" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Danh mục</Text>
           <TouchableOpacity
             style={styles.headerBtn}
-            onPress={() => router.push("/unified-search" as any)}
+            onPress={() => router.push("/search" as any)}
           >
             <Ionicons name="search-outline" size={22} color="#fff" />
           </TouchableOpacity>
@@ -96,7 +99,11 @@ export default function CategoriesHubScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#0D9488" />
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#0D9488"
+          />
         }
       >
         {/* Featured Banner */}
@@ -116,7 +123,9 @@ export default function CategoriesHubScreen() {
                 <Ionicons name="grid" size={26} color="#fff" />
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={styles.featuredTitle}>Khám phá tất cả tiện ích</Text>
+                <Text style={styles.featuredTitle}>
+                  Khám phá tất cả tiện ích
+                </Text>
                 <Text style={styles.featuredSubtitle}>
                   {totalModules}+ công cụ chuyên nghiệp cho xây dựng
                 </Text>
@@ -136,8 +145,10 @@ export default function CategoriesHubScreen() {
           </View>
           <View style={styles.categoriesGrid}>
             {CATEGORIES.map((category) => {
-              const gradient =
-                CATEGORY_GRADIENTS[category.id] || [category.color, category.color + "CC"];
+              const gradient = CATEGORY_GRADIENTS[category.id] || [
+                category.color,
+                category.color + "CC",
+              ];
               return (
                 <TouchableOpacity
                   key={category.id}
@@ -151,7 +162,11 @@ export default function CategoriesHubScreen() {
                     end={{ x: 1, y: 1 }}
                     style={styles.categoryIconBox}
                   >
-                    <Ionicons name={category.icon as any} size={24} color="#fff" />
+                    <Ionicons
+                      name={category.icon as any}
+                      size={24}
+                      color="#fff"
+                    />
                   </LinearGradient>
                   <Text style={styles.categoryLabel} numberOfLines={2}>
                     {category.label}
@@ -165,7 +180,11 @@ export default function CategoriesHubScreen() {
                         {category.modules.length} chức năng
                       </Text>
                     </View>
-                    <Ionicons name="chevron-forward" size={14} color="#94A3B8" />
+                    <Ionicons
+                      name="chevron-forward"
+                      size={14}
+                      color="#94A3B8"
+                    />
                   </View>
                 </TouchableOpacity>
               );

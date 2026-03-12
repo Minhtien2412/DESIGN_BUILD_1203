@@ -317,7 +317,7 @@ export default function ConstructionProgressScreen() {
   };
 
   const handleChatWorker = () => {
-    router.push("/messages");
+    router.push("/chat");
   };
 
   const renderHeader = () => (

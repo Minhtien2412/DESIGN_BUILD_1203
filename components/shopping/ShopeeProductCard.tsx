@@ -29,6 +29,10 @@ export interface ProductSeller {
   avatar?: string;
   isOfficial?: boolean;
   location?: string;
+  rating?: number;
+  responseRate?: number;
+  productCount?: number;
+  followerCount?: number;
 }
 
 export interface ShopeeProduct {
@@ -45,12 +49,15 @@ export interface ShopeeProduct {
   isNew?: boolean;
   isBestseller?: boolean;
   isFlashSale?: boolean;
+  isShopeeChoice?: boolean;
+  isFreeShip?: boolean;
   flashSaleEndTime?: string;
   freeShipping?: boolean;
   voucherDiscount?: string; // e.g., "Giảm ₫10k"
   seller?: ProductSeller;
   category?: string;
   stock?: number;
+  location?: string;
 }
 
 interface ShopeeProductCardProps {

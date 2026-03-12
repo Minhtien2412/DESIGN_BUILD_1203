@@ -400,7 +400,13 @@ class ChunkedUploadServiceClass {
   ): Promise<MultipartInitResponse> {
     const response = await post<MultipartInitResponse>(
       "/api/v1/upload/multipart/initiate",
-      request,
+      {
+        filename: request.filename,
+        contentType: request.contentType,
+        totalSize: request.fileSize,
+        checksum: request.checksum,
+        metadata: request.metadata,
+      },
     );
     return response;
   }

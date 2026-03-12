@@ -9,6 +9,8 @@
  */
 
 import { MODERN_SHADOWS } from "@/constants/modern-theme";
+import { projectService } from "@/services/api/project.service";
+import type { Project as ApiProject } from "@/services/api/types";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router, useLocalSearchParams } from "expo-router";

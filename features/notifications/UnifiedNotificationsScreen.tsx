@@ -23,7 +23,7 @@ import {
     MODERN_COLORS,
     MODERN_RADIUS,
     MODERN_SHADOWS,
-    MODERN_SPACING
+    MODERN_SPACING,
 } from "@/constants/modern-theme";
 import { useUnifiedBadge } from "@/context/UnifiedBadgeContext";
 import { useUnifiedNotifications } from "@/hooks/useNotifications";
@@ -54,6 +54,7 @@ import {
 // ==================== TYPES ====================
 
 type TabType = "all" | "messages" | "calls" | "crm" | "app";
+type CommunicationTab = "messages" | "calls" | "meetings";
 
 interface NotificationGroup {
   title: string;
@@ -312,6 +313,17 @@ export default function UnifiedNotificationsScreen() {
       }
     }
   };
+
+  const openCommunicationTab = useCallback(
+    (tab: CommunicationTab) => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      router.push({
+        pathname: "/(tabs)/communication",
+        params: { tab },
+      } as any);
+    },
+    [router],
+  );
 
   const handleNotificationPress = async (item: UnifiedNotification) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -776,6 +788,35 @@ export default function UnifiedNotificationsScreen() {
             )}
           </Animated.View>
         )}
+
+        <View style={styles.commShortcutRow}>
+          <TouchableOpacity
+            style={styles.commShortcutBtn}
+            onPress={() => openCommunicationTab("messages")}
+            activeOpacity={0.75}
+          >
+            <Ionicons name="chatbubbles" size={15} color="#fff" />
+            <Text style={styles.commShortcutText}>Tin nhắn</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.commShortcutBtn}
+            onPress={() => openCommunicationTab("calls")}
+            activeOpacity={0.75}
+          >
+            <Ionicons name="call" size={15} color="#fff" />
+            <Text style={styles.commShortcutText}>Cuộc gọi</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.commShortcutBtn}
+            onPress={() => openCommunicationTab("meetings")}
+            activeOpacity={0.75}
+          >
+            <Ionicons name="videocam" size={15} color="#fff" />
+            <Text style={styles.commShortcutText}>Cuộc họp</Text>
+          </TouchableOpacity>
+        </View>
       </LinearGradient>
 
       {/* ---- Tabs ---- */}
@@ -887,6 +928,25 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 8,
     marginTop: 14,
+  },
+  commShortcutRow: {
+    flexDirection: "row",
+    gap: 8,
+    marginTop: 12,
+  },
+  commShortcutBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: "rgba(255,255,255,0.2)",
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: MODERN_RADIUS.full,
+  },
+  commShortcutText: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "600",
   },
   unreadChip: {
     flexDirection: "row",

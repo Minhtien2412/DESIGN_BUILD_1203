@@ -621,7 +621,7 @@ export default function CommunityHealthCheckScreen() {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.testBtn}
-            onPress={() => navigateTo("/unified-search")}
+            onPress={() => navigateTo("/search")}
           >
             <Ionicons name="search" size={20} color={COLORS.primary} />
             <Text style={styles.testBtnText}>Mở Tìm kiếm thống nhất</Text>

@@ -158,7 +158,11 @@ export default function EditProductScreen() {
         warranty: extendedProduct.warranty || "",
       });
 
-      setImages(product.images || []);
+      setImages(
+        (product.images || []).map((img) =>
+          typeof img === "string" ? img : ((img as any).url as string),
+        ),
+      );
     } catch (error) {
       console.error("[EditProduct] Error loading:", error);
       Alert.alert("Lỗi", "Không thể tải thông tin sản phẩm");

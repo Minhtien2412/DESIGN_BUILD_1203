@@ -4,7 +4,13 @@
  */
 
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { useFleetSummary, useVehicles } from "@/hooks/useFleet";
+import {
+    useFleetSummary,
+    useFuelEntries,
+    useMaintenanceRecords,
+    useTrips,
+    useVehicles,
+} from "@/hooks/useFleet";
 import type { VehicleStatus, VehicleType } from "@/types/fleet";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
@@ -278,155 +284,6 @@ const VehicleCard = ({
   );
 };
 
-const MOCK_MAINTENANCE = [
-  {
-    id: "mt-1",
-    vehicleNumber: "51C-123.45",
-    service: "Thay dầu máy + lọc dầu",
-    status: "COMPLETED" as const,
-    date: "2025-01-15",
-    cost: 2500000,
-    mechanic: "Garage Minh Phát",
-  },
-  {
-    id: "mt-2",
-    vehicleNumber: "51C-678.90",
-    service: "Thay lốp trước (4 chiếc)",
-    status: "IN_PROGRESS" as const,
-    date: "2025-01-14",
-    cost: 12000000,
-    mechanic: "Garage Hoàng Long",
-  },
-  {
-    id: "mt-3",
-    vehicleNumber: "51C-111.22",
-    service: "Bảo dưỡng định kỳ 50.000km",
-    status: "SCHEDULED" as const,
-    date: "2025-01-20",
-    cost: 5500000,
-    mechanic: "Toyota Service",
-  },
-  {
-    id: "mt-4",
-    vehicleNumber: "51C-333.44",
-    service: "Sửa hệ thống phanh",
-    status: "COMPLETED" as const,
-    date: "2025-01-10",
-    cost: 3800000,
-    mechanic: "Garage Minh Phát",
-  },
-  {
-    id: "mt-5",
-    vehicleNumber: "51C-555.66",
-    service: "Kiểm tra hệ thống điện",
-    status: "SCHEDULED" as const,
-    date: "2025-01-22",
-    cost: 1200000,
-    mechanic: "Bosch Car Service",
-  },
-];
-
-const MOCK_FUEL_LOGS = [
-  {
-    id: "fl-1",
-    vehicleNumber: "51C-123.45",
-    liters: 65,
-    cost: 1625000,
-    station: "Petrolimex Q7",
-    date: "2025-01-15",
-    odometer: 45230,
-  },
-  {
-    id: "fl-2",
-    vehicleNumber: "51C-678.90",
-    liters: 120,
-    cost: 3000000,
-    station: "Shell Nguyễn Hữu Thọ",
-    date: "2025-01-14",
-    odometer: 78450,
-  },
-  {
-    id: "fl-3",
-    vehicleNumber: "51C-111.22",
-    liters: 45,
-    cost: 1125000,
-    station: "PV Oil Trường Chinh",
-    date: "2025-01-13",
-    odometer: 32100,
-  },
-  {
-    id: "fl-4",
-    vehicleNumber: "51C-333.44",
-    liters: 80,
-    cost: 2000000,
-    station: "Petrolimex Q2",
-    date: "2025-01-12",
-    odometer: 56780,
-  },
-  {
-    id: "fl-5",
-    vehicleNumber: "51C-555.66",
-    liters: 55,
-    cost: 1375000,
-    station: "Shell Xa lộ Hà Nội",
-    date: "2025-01-11",
-    odometer: 23450,
-  },
-];
-
-const MOCK_TRIPS = [
-  {
-    id: "tr-1",
-    vehicleNumber: "51C-123.45",
-    driver: "Nguyễn Văn Hùng",
-    from: "Văn phòng Q1",
-    to: "Công trường Thủ Đức",
-    distance: 18.5,
-    date: "2025-01-15",
-    duration: "45 phút",
-  },
-  {
-    id: "tr-2",
-    vehicleNumber: "51C-678.90",
-    driver: "Trần Quốc Bảo",
-    from: "Kho vật tư Bình Chánh",
-    to: "Dự án Q9",
-    distance: 32.0,
-    date: "2025-01-15",
-    duration: "1h 15ph",
-  },
-  {
-    id: "tr-3",
-    vehicleNumber: "51C-111.22",
-    driver: "Lê Minh Tuấn",
-    from: "Văn phòng Q1",
-    to: "Công trường Q7",
-    distance: 12.3,
-    date: "2025-01-14",
-    duration: "30 phút",
-  },
-  {
-    id: "tr-4",
-    vehicleNumber: "51C-333.44",
-    driver: "Phạm Anh Dũng",
-    from: "Nhà máy BT Long An",
-    to: "Dự án Nhà Bè",
-    distance: 45.0,
-    date: "2025-01-14",
-    duration: "1h 30ph",
-  },
-  {
-    id: "tr-5",
-    vehicleNumber: "51C-555.66",
-    driver: "Võ Hoàng Nam",
-    from: "Văn phòng Q1",
-    to: "Đại lý VLXD Q12",
-    distance: 22.7,
-    date: "2025-01-13",
-    duration: "55 phút",
-  },
-];
-
 const getMtStatusColor = (s: string) => {
   switch (s) {
     case "COMPLETED":
@@ -456,6 +313,9 @@ export default function FleetScreen() {
 
   const { summary } = useFleetSummary();
   const { vehicles, loading } = useVehicles();
+  const { records: maintenanceRecords } = useMaintenanceRecords();
+  const { entries: fuelLogs } = useFuelEntries();
+  const { trips } = useTrips();
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
@@ -747,8 +607,9 @@ export default function FleetScreen() {
                   <Ionicons name="build" size={20} color="#f59e0b" />
                   <Text style={[styles.summaryValue, { color: textColor }]}>
                     {
-                      MOCK_MAINTENANCE.filter((m) => m.status === "SCHEDULED")
-                        .length
+                      maintenanceRecords.filter(
+                        (m: any) => m.status === "SCHEDULED",
+                      ).length
                     }
                   </Text>
                   <Text
@@ -762,8 +623,9 @@ export default function FleetScreen() {
                   <Ionicons name="hourglass" size={20} color="#0D9488" />
                   <Text style={[styles.summaryValue, { color: textColor }]}>
                     {
-                      MOCK_MAINTENANCE.filter((m) => m.status === "IN_PROGRESS")
-                        .length
+                      maintenanceRecords.filter(
+                        (m: any) => m.status === "IN_PROGRESS",
+                      ).length
                     }
                   </Text>
                   <Text
@@ -777,8 +639,9 @@ export default function FleetScreen() {
                   <Ionicons name="checkmark-circle" size={20} color="#10b981" />
                   <Text style={[styles.summaryValue, { color: textColor }]}>
                     {
-                      MOCK_MAINTENANCE.filter((m) => m.status === "COMPLETED")
-                        .length
+                      maintenanceRecords.filter(
+                        (m: any) => m.status === "COMPLETED",
+                      ).length
                     }
                   </Text>
                   <Text
@@ -790,7 +653,7 @@ export default function FleetScreen() {
               </View>
             </View>
             <View style={styles.vehiclesList}>
-              {MOCK_MAINTENANCE.map((item) => (
+              {maintenanceRecords.map((item: any) => (
                 <TouchableOpacity
                   key={item.id}
                   style={[
@@ -950,7 +813,7 @@ export default function FleetScreen() {
               </View>
             </View>
             <View style={styles.vehiclesList}>
-              {MOCK_FUEL_LOGS.map((item) => (
+              {fuelLogs.map((item: any) => (
                 <TouchableOpacity
                   key={item.id}
                   style={[
@@ -1070,7 +933,7 @@ export default function FleetScreen() {
               </View>
             </View>
             <View style={styles.vehiclesList}>
-              {MOCK_TRIPS.map((item) => (
+              {trips.map((item: any) => (
                 <TouchableOpacity
                   key={item.id}
                   style={[

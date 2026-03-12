@@ -3,6 +3,7 @@
  * Displays products from API with real seller info
  * Used for each finishing category
  */
+import { get } from "@/services/api";
 import type { Product } from "@/services/api/types";
 import { Ionicons } from "@expo/vector-icons";
 import { router, Stack, useLocalSearchParams } from "expo-router";
@@ -190,15 +191,12 @@ export default function FinishingProductsScreen() {
       }
 
       // Fetch from API
-      const response = await fetch(
-        `https://baotienweb.cloud/api/v1/products?limit=20&page=${isRefresh ? 1 : page}`,
-        {
-          headers: { "X-API-Key": "nhaxinh-api-2025-secret-key" },
-        },
-      );
+      const data = await get<{
+        data: Product[];
+        meta?: { totalPages: number };
+      }>(`/products?limit=20&page=${isRefresh ? 1 : page}`);
 
-      if (response.ok) {
-        const data = await response.json();
+      if (data) {
         const allProducts = data.data || [];
 
         // Filter by category keywords if needed

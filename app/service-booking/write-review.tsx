@@ -79,6 +79,7 @@ export default function WriteReviewScreen() {
         rating,
         comment: comment.trim() || undefined,
         projectId: params.bookingId || undefined,
+        tags: selectedBadges.length > 0 ? selectedBadges : undefined,
       };
 
       await addWorkerReview(params.workerId, reviewData);
@@ -101,7 +102,7 @@ export default function WriteReviewScreen() {
     } finally {
       setSubmitting(false);
     }
-  }, [rating, comment, params.workerId, params.bookingId]);
+  }, [rating, comment, selectedBadges, params.workerId, params.bookingId]);
 
   const getRatingLabel = (r: number) => {
     switch (r) {

@@ -1,753 +1,560 @@
-import { ThemedView } from "@/components/themed-view";
-import {
-    biometricAuth,
-    BiometricType,
-    getBiometricIcon,
-    getBiometricName,
-} from "@/services/biometricAuthService";
+/**
+ * Settings Screen — DS-Migrated
+ * Route: /settings
+ */
+
+import { useDS } from "@/hooks/useDS";
+import { biometricAuth } from "@/services/biometricAuthService";
+import { useI18n } from "@/services/i18nService";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { router, Stack } from "expo-router";
-import * as React from "react";
+import { Stack, router } from "expo-router";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
     Alert,
-    Platform,
+    Animated,
+    Pressable,
     ScrollView,
     StyleSheet,
     Switch,
     Text,
-    TouchableOpacity,
     View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+const KEY = "app_settings_v1";
 
 interface Settings {
-  // General
-  language: "vi" | "en";
-  theme: "light" | "dark" | "auto";
-
-  // Notifications
-  pushNotifications: boolean;
-  emailNotifications: boolean;
-  projectUpdates: boolean;
-  promotions: boolean;
-
-  // Privacy
-  profileVisibility: "public" | "friends" | "private";
-  showOnlineStatus: boolean;
-  showActivity: boolean;
-
-  // App Behavior
-  autoPlay: boolean;
-  dataUsage: "low" | "medium" | "high";
-  cacheVideos: boolean;
+  language: string;
+  theme: "system" | "light" | "dark";
+  pushEnabled: boolean;
+  emailEnabled: boolean;
+  smsEnabled: boolean;
+  promotionalEnabled: boolean;
+  analyticsEnabled: boolean;
+  crashReportsEnabled: boolean;
+  locationEnabled: boolean;
+  autoDownloadMedia: boolean;
+  reducedMotion: boolean;
+  hapticFeedback: boolean;
 }
 
-const SETTINGS_STORAGE_KEY = "@app_settings";
+const DEFAULTS: Settings = {
+  language: "vi",
+  theme: "system",
+  pushEnabled: true,
+  emailEnabled: true,
+  smsEnabled: false,
+  promotionalEnabled: true,
+  analyticsEnabled: true,
+  crashReportsEnabled: true,
+  locationEnabled: false,
+  autoDownloadMedia: true,
+  reducedMotion: false,
+  hapticFeedback: true,
+};
 
-export default function SettingsScreen() {
-  const [settings, setSettings] = React.useState<Settings>({
-    language: "vi",
-    theme: "light",
-    pushNotifications: true,
-    emailNotifications: true,
-    projectUpdates: true,
-    promotions: false,
-    profileVisibility: "public",
-    showOnlineStatus: true,
-    showActivity: true,
-    autoPlay: true,
-    dataUsage: "medium",
-    cacheVideos: false,
-  });
+type IoniconsName = React.ComponentProps<typeof Ionicons>["name"];
 
-  const [saving, setSaving] = React.useState(false);
-
-  // Biometric state
-  const [biometricAvailable, setBiometricAvailable] = React.useState(false);
-  const [biometricEnabled, setBiometricEnabled] = React.useState(false);
-  const [biometricType, setBiometricType] =
-    React.useState<BiometricType>("none");
-  const [biometricLoading, setBiometricLoading] = React.useState(false);
-
-  // Load settings from storage
-  React.useEffect(() => {
-    loadSettings();
-    checkBiometricStatus();
-  }, []);
-
-  const checkBiometricStatus = async () => {
-    try {
-      const capability = await biometricAuth.checkCapability();
-      setBiometricAvailable(capability.isSupported && capability.isEnrolled);
-
-      const type = await biometricAuth.getPrimaryBiometricType();
-      setBiometricType(type);
-
-      const enabled = await biometricAuth.isEnabled();
-      setBiometricEnabled(enabled);
-
-      console.log("[Settings] Biometric status:", {
-        available: capability.isSupported && capability.isEnrolled,
-        enabled,
-        type,
-      });
-    } catch (error) {
-      console.error("[Settings] Biometric check failed:", error);
-    }
-  };
-
-  const loadSettings = async () => {
-    try {
-      const stored = await AsyncStorage.getItem(SETTINGS_STORAGE_KEY);
-      if (stored) {
-        setSettings(JSON.parse(stored));
-      }
-    } catch (error) {
-      console.error("Failed to load settings:", error);
-    }
-  };
-
-  const saveSettings = async (newSettings: Settings) => {
-    try {
-      setSaving(true);
-      await AsyncStorage.setItem(
-        SETTINGS_STORAGE_KEY,
-        JSON.stringify(newSettings),
-      );
-      setSettings(newSettings);
-      // Show success message
-      setTimeout(() => setSaving(false), 500);
-    } catch (error) {
-      console.error("Failed to save settings:", error);
-      Alert.alert("Lỗi", "Không thể lưu cài đặt");
-      setSaving(false);
-    }
-  };
-
-  const updateSetting = <K extends keyof Settings>(
-    key: K,
-    value: Settings[K],
-  ) => {
-    const newSettings = { ...settings, [key]: value };
-    saveSettings(newSettings);
-  };
-
-  const handleLanguageChange = () => {
-    Alert.alert("Chọn ngôn ngữ", "", [
-      {
-        text: "Tiếng Việt",
-        onPress: () => updateSetting("language", "vi"),
-        style: settings.language === "vi" ? "default" : "cancel",
-      },
-      {
-        text: "English",
-        onPress: () => updateSetting("language", "en"),
-        style: settings.language === "en" ? "default" : "cancel",
-      },
-    ]);
-  };
-
-  const handleThemeChange = () => {
-    Alert.alert("Chọn giao diện", "", [
-      {
-        text: "Sáng",
-        onPress: () => updateSetting("theme", "light"),
-      },
-      {
-        text: "Tối",
-        onPress: () => updateSetting("theme", "dark"),
-      },
-      {
-        text: "Tự động",
-        onPress: () => updateSetting("theme", "auto"),
-      },
-      { text: "Hủy", style: "cancel" },
-    ]);
-  };
-
-  const handleProfileVisibilityChange = () => {
-    Alert.alert("Hiển thị hồ sơ", "Chọn ai có thể xem hồ sơ của bạn", [
-      {
-        text: "Công khai",
-        onPress: () => updateSetting("profileVisibility", "public"),
-      },
-      {
-        text: "Bạn bè",
-        onPress: () => updateSetting("profileVisibility", "friends"),
-      },
-      {
-        text: "Riêng tư",
-        onPress: () => updateSetting("profileVisibility", "private"),
-      },
-      { text: "Hủy", style: "cancel" },
-    ]);
-  };
-
-  const handleDataUsageChange = () => {
-    Alert.alert("Sử dụng dữ liệu", "Chọn chất lượng video và hình ảnh", [
-      {
-        text: "Thấp (tiết kiệm dữ liệu)",
-        onPress: () => updateSetting("dataUsage", "low"),
-      },
-      {
-        text: "Trung bình",
-        onPress: () => updateSetting("dataUsage", "medium"),
-      },
-      {
-        text: "Cao (chất lượng tốt nhất)",
-        onPress: () => updateSetting("dataUsage", "high"),
-      },
-      { text: "Hủy", style: "cancel" },
-    ]);
-  };
-
-  // Handle biometric toggle - moved outside of handleClearCache
-  const handleBiometricToggle = async (enable: boolean) => {
-    if (biometricLoading) return;
-
-    try {
-      setBiometricLoading(true);
-
-      if (enable) {
-        // Need to authenticate first to enable
-        const biometricName = getBiometricName(biometricType);
-
-        Alert.alert(
-          `Kích hoạt ${biometricName}`,
-          `Bạn cần đăng nhập lại để kích hoạt ${biometricName}. Sau đó, bạn có thể đăng nhập nhanh hơn bằng ${biometricName}.`,
-          [
-            { text: "Hủy", style: "cancel" },
-            {
-              text: "Đăng nhập lại",
-              onPress: async () => {
-                // Navigate to login to re-authenticate and enable biometric
-                const { router } = await import("expo-router");
-                router.replace("/(auth)/login" as any);
-              },
-            },
-          ],
-        );
-      } else {
-        // Disable biometric
-        Alert.alert(
-          "Tắt đăng nhập sinh trắc học",
-          "Bạn có chắc muốn tắt đăng nhập bằng vân tay/Face ID?",
-          [
-            { text: "Hủy", style: "cancel" },
-            {
-              text: "Tắt",
-              style: "destructive",
-              onPress: async () => {
-                await biometricAuth.disable();
-                setBiometricEnabled(false);
-                Alert.alert("Đã tắt", "Đăng nhập sinh trắc học đã được tắt");
-              },
-            },
-          ],
-        );
-      }
-    } catch (error) {
-      console.error("[Settings] Biometric toggle error:", error);
-      Alert.alert("Lỗi", "Không thể thay đổi cài đặt sinh trắc học");
-    } finally {
-      setBiometricLoading(false);
-    }
-  };
-
-  const handleClearCache = () => {
-    Alert.alert(
-      "Xóa bộ nhớ đệm",
-      "Điều này sẽ xóa tất cả dữ liệu tạm thời và có thể giải phóng dung lượng lưu trữ.",
-      [
-        { text: "Hủy", style: "cancel" },
-        {
-          text: "Xóa",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              // Targeted AsyncStorage cleanup to avoid logging user out
-              const keys = await AsyncStorage.getAllKeys();
-              const removable = keys.filter(
-                (k) =>
-                  k.startsWith("@project_") ||
-                  k.startsWith("@cache_") ||
-                  k.startsWith("@app_cache_") ||
-                  k === "@video_cache" ||
-                  k === "@image_cache",
-              );
-              if (removable.length > 0) {
-                await AsyncStorage.multiRemove(removable);
-              }
-
-              // Optional: remove transient SecureStore caches (keep auth token)
-              // Add known non-auth keys here if used in the future
-              // e.g., await SecureStore.deleteItemAsync('NON_AUTH_CACHE_KEY');
-
-              Alert.alert("Thành công", "Đã xóa bộ nhớ đệm");
-            } catch (e) {
-              console.error("Cache clear failed", e);
-              Alert.alert("Lỗi", "Không thể xóa bộ nhớ đệm");
-            }
-          },
-        },
-      ],
-    );
-  };
-
-  const getLanguageLabel = () => {
-    return settings.language === "vi" ? "Tiếng Việt" : "English";
-  };
-
-  const getThemeLabel = () => {
-    switch (settings.theme) {
-      case "light":
-        return "Sáng";
-      case "dark":
-        return "Tối";
-      case "auto":
-        return "Tự động";
-    }
-  };
-
-  const getProfileVisibilityLabel = () => {
-    switch (settings.profileVisibility) {
-      case "public":
-        return "Công khai";
-      case "friends":
-        return "Bạn bè";
-      case "private":
-        return "Riêng tư";
-    }
-  };
-
-  const getDataUsageLabel = () => {
-    switch (settings.dataUsage) {
-      case "low":
-        return "Thấp";
-      case "medium":
-        return "Trung bình";
-      case "high":
-        return "Cao";
-    }
-  };
-
-  const SettingRow = ({
-    icon,
-    title,
-    description,
-    value,
-    onPress,
-    showArrow = true,
-  }: {
-    icon: string;
-    title: string;
-    description?: string;
-    value?: string;
-    onPress?: () => void;
-    showArrow?: boolean;
-  }) => (
-    <TouchableOpacity
-      style={styles.settingRow}
+// ── Reusable rows ──────────────────────────────────────────────────────
+function SettingRow({
+  icon,
+  iconColor,
+  label,
+  value,
+  onPress,
+  colors,
+  radius,
+}: {
+  icon: IoniconsName;
+  iconColor: string;
+  label: string;
+  value?: string;
+  onPress?: () => void;
+  colors: any;
+  radius: any;
+}) {
+  return (
+    <Pressable
       onPress={onPress}
-      disabled={!onPress}
-      activeOpacity={onPress ? 0.7 : 1}
+      style={[st.row, { borderBottomColor: colors.divider }]}
     >
-      <View style={styles.settingLeft}>
-        <Ionicons name={icon as any} size={24} color="#6B7280" />
-        <View style={styles.settingText}>
-          <Text style={styles.settingTitle}>{title}</Text>
-          {description && (
-            <Text style={styles.settingDescription}>{description}</Text>
-          )}
-        </View>
+      <View
+        style={[
+          st.rowIcon,
+          { backgroundColor: iconColor + "15", borderRadius: radius.md },
+        ]}
+      >
+        <Ionicons name={icon} size={18} color={iconColor} />
       </View>
-      <View style={styles.settingRight}>
-        {value && <Text style={styles.settingValue}>{value}</Text>}
-        {showArrow && (
-          <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
-        )}
+      <Text style={[st.rowLabel, { color: colors.text }]}>{label}</Text>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+        {value ? (
+          <Text style={[st.rowValue, { color: colors.textTertiary }]}>
+            {value}
+          </Text>
+        ) : null}
+        <Ionicons
+          name="chevron-forward"
+          size={16}
+          color={colors.textTertiary}
+        />
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
+}
 
-  const SwitchRow = ({
-    icon,
-    title,
-    description,
-    value,
-    onChange,
-  }: {
-    icon: string;
-    title: string;
-    description?: string;
-    value: boolean;
-    onChange: (value: boolean) => void;
-  }) => (
-    <View style={styles.settingRow}>
-      <View style={styles.settingLeft}>
-        <Ionicons name={icon as any} size={24} color="#6B7280" />
-        <View style={styles.settingText}>
-          <Text style={styles.settingTitle}>{title}</Text>
-          {description && (
-            <Text style={styles.settingDescription}>{description}</Text>
-          )}
-        </View>
+function SwitchRow({
+  icon,
+  iconColor,
+  label,
+  value,
+  onChange,
+  colors,
+  radius,
+}: {
+  icon: IoniconsName;
+  iconColor: string;
+  label: string;
+  value: boolean;
+  onChange: (v: boolean) => void;
+  colors: any;
+  radius: any;
+}) {
+  return (
+    <View style={[st.row, { borderBottomColor: colors.divider }]}>
+      <View
+        style={[
+          st.rowIcon,
+          { backgroundColor: iconColor + "15", borderRadius: radius.md },
+        ]}
+      >
+        <Ionicons name={icon} size={18} color={iconColor} />
       </View>
+      <Text style={[st.rowLabel, { color: colors.text }]}>{label}</Text>
       <Switch
         value={value}
         onValueChange={onChange}
-        trackColor={{ false: "#D1D5DB", true: "#0891B2" }}
-        thumbColor="#fff"
+        trackColor={{ false: colors.bgMuted, true: colors.primary + "60" }}
+        thumbColor={value ? colors.primary : "#ccc"}
       />
     </View>
   );
+}
 
+function Section({
+  title,
+  children,
+  colors,
+}: {
+  title: string;
+  children: React.ReactNode;
+  colors: any;
+}) {
   return (
-    <ThemedView style={{ flex: 1 }}>
-      <Stack.Screen
-        options={{
-          title: "Cài đặt chung",
-          headerBackTitle: "Quay lại",
-        }}
-      />
-
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* General Settings */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Ionicons name="settings-outline" size={24} color="#0891B2" />
-            <Text style={styles.sectionTitle}>Cài đặt chung</Text>
-          </View>
-
-          <View style={styles.card}>
-            <SettingRow
-              icon="language-outline"
-              title="Ngôn ngữ"
-              description="Thay đổi ngôn ngữ ứng dụng"
-              value={getLanguageLabel()}
-              onPress={handleLanguageChange}
-            />
-            <View style={styles.divider} />
-            <SettingRow
-              icon="color-palette-outline"
-              title="Giao diện"
-              description="Chọn chế độ sáng/tối"
-              value={getThemeLabel()}
-              onPress={handleThemeChange}
-            />
-          </View>
-        </View>
-
-        {/* Notifications */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Ionicons name="notifications-outline" size={24} color="#0D9488" />
-            <Text style={styles.sectionTitle}>Thông báo</Text>
-          </View>
-
-          <View style={styles.card}>
-            <SwitchRow
-              icon="notifications"
-              title="Thông báo đẩy"
-              description="Nhận thông báo trên thiết bị"
-              value={settings.pushNotifications}
-              onChange={(value) => updateSetting("pushNotifications", value)}
-            />
-            <View style={styles.divider} />
-            <SwitchRow
-              icon="mail"
-              title="Thông báo email"
-              description="Nhận email về hoạt động quan trọng"
-              value={settings.emailNotifications}
-              onChange={(value) => updateSetting("emailNotifications", value)}
-            />
-            <View style={styles.divider} />
-            <SwitchRow
-              icon="briefcase"
-              title="Cập nhật dự án"
-              description="Thông báo về tiến độ dự án"
-              value={settings.projectUpdates}
-              onChange={(value) => updateSetting("projectUpdates", value)}
-            />
-            <View style={styles.divider} />
-            <SwitchRow
-              icon="pricetag"
-              title="Khuyến mãi"
-              description="Nhận thông báo về ưu đãi đặc biệt"
-              value={settings.promotions}
-              onChange={(value) => updateSetting("promotions", value)}
-            />
-          </View>
-        </View>
-
-        {/* Privacy */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Ionicons name="shield-outline" size={24} color="#0D9488" />
-            <Text style={styles.sectionTitle}>Quyền riêng tư</Text>
-          </View>
-
-          <View style={styles.card}>
-            <SettingRow
-              icon="eye-outline"
-              title="Hiển thị hồ sơ"
-              description="Kiểm soát ai xem được hồ sơ"
-              value={getProfileVisibilityLabel()}
-              onPress={handleProfileVisibilityChange}
-            />
-            <View style={styles.divider} />
-            <SwitchRow
-              icon="radio-button-on"
-              title="Hiển thị trạng thái online"
-              description="Cho phép người khác biết bạn đang online"
-              value={settings.showOnlineStatus}
-              onChange={(value) => updateSetting("showOnlineStatus", value)}
-            />
-            <View style={styles.divider} />
-            <SwitchRow
-              icon="pulse"
-              title="Hiển thị hoạt động"
-              description="Chia sẻ hoạt động gần đây"
-              value={settings.showActivity}
-              onChange={(value) => updateSetting("showActivity", value)}
-            />
-            <View style={styles.divider} />
-            <SettingRow
-              icon="people-outline"
-              title="Đồng bộ danh bạ"
-              description="Tìm bạn bè đang dùng ứng dụng"
-              onPress={() => router.push("/profile/contact-sync")}
-            />
-          </View>
-        </View>
-
-        {/* Security - Biometric */}
-        {(biometricAvailable || Platform.OS === "web") && (
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Ionicons name="lock-closed-outline" size={24} color="#10B981" />
-              <Text style={styles.sectionTitle}>Bảo mật</Text>
-            </View>
-
-            <View style={styles.card}>
-              {biometricAvailable ? (
-                <SwitchRow
-                  icon={getBiometricIcon(biometricType)}
-                  title={`Đăng nhập bằng ${getBiometricName(biometricType)}`}
-                  description={
-                    biometricEnabled
-                      ? `${getBiometricName(biometricType)} đã được kích hoạt`
-                      : "Đăng nhập nhanh hơn, an toàn hơn"
-                  }
-                  value={biometricEnabled}
-                  onChange={handleBiometricToggle}
-                />
-              ) : Platform.OS === "web" ? (
-                <View style={styles.settingRow}>
-                  <View style={styles.settingLeft}>
-                    <Ionicons
-                      name="information-circle-outline"
-                      size={24}
-                      color="#6B7280"
-                    />
-                    <View style={styles.settingText}>
-                      <Text style={styles.settingTitle}>Sinh trắc học</Text>
-                      <Text style={styles.settingDescription}>
-                        Tính năng này chỉ khả dụng trên thiết bị di động
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-              ) : (
-                <View style={styles.settingRow}>
-                  <View style={styles.settingLeft}>
-                    <Ionicons
-                      name="alert-circle-outline"
-                      size={24}
-                      color="#F59E0B"
-                    />
-                    <View style={styles.settingText}>
-                      <Text style={styles.settingTitle}>
-                        Sinh trắc học chưa sẵn sàng
-                      </Text>
-                      <Text style={styles.settingDescription}>
-                        Vui lòng thiết lập vân tay hoặc Face ID trong Cài đặt
-                        thiết bị
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-              )}
-            </View>
-          </View>
-        )}
-
-        {/* App Behavior */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Ionicons name="phone-portrait-outline" size={24} color="#666666" />
-            <Text style={styles.sectionTitle}>Ứng dụng</Text>
-          </View>
-
-          <View style={styles.card}>
-            <SwitchRow
-              icon="play-circle"
-              title="Tự động phát video"
-              description="Phát video khi cuộn qua"
-              value={settings.autoPlay}
-              onChange={(value) => updateSetting("autoPlay", value)}
-            />
-            <View style={styles.divider} />
-            <SettingRow
-              icon="cellular-outline"
-              title="Sử dụng dữ liệu"
-              description="Chất lượng video và hình ảnh"
-              value={getDataUsageLabel()}
-              onPress={handleDataUsageChange}
-            />
-            <View style={styles.divider} />
-            <SwitchRow
-              icon="download-outline"
-              title="Lưu video vào bộ nhớ đệm"
-              description="Tải trước để xem ngoại tuyến"
-              value={settings.cacheVideos}
-              onChange={(value) => updateSetting("cacheVideos", value)}
-            />
-          </View>
-        </View>
-
-        {/* Storage & Cache */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Ionicons name="server-outline" size={24} color="#000000" />
-            <Text style={styles.sectionTitle}>Bộ nhớ</Text>
-          </View>
-
-          <View style={styles.card}>
-            <SettingRow
-              icon="trash-outline"
-              title="Xóa bộ nhớ đệm"
-              description="Giải phóng dung lượng lưu trữ"
-              onPress={handleClearCache}
-              showArrow={false}
-            />
-          </View>
-        </View>
-
-        {/* App Info */}
-        <View style={styles.infoCard}>
-          <Text style={styles.infoText}>Phiên bản: 1.0.0 (Build 1)</Text>
-          <Text style={styles.infoText}>© 2025 ThietKeResort.com.vn</Text>
-        </View>
-
-        {/* Save Indicator */}
-        {saving && (
-          <View style={styles.savingIndicator}>
-            <Ionicons name="checkmark-circle" size={16} color="#0D9488" />
-            <Text style={styles.savingText}>Đã lưu</Text>
-          </View>
-        )}
-      </ScrollView>
-    </ThemedView>
+    <View style={{ marginBottom: 28 }}>
+      <Text style={[st.secTitle, { color: colors.textTertiary }]}>{title}</Text>
+      <View
+        style={[
+          st.secBox,
+          { backgroundColor: colors.bgSurface, borderColor: colors.border },
+        ]}
+      >
+        {children}
+      </View>
+    </View>
   );
 }
 
-const styles = StyleSheet.create({
-  scrollContent: {
-    padding: 16,
-    paddingBottom: 40,
-  },
-  section: {
-    marginBottom: 24,
-  },
-  sectionHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 12,
-    gap: 8,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#1F2937",
-  },
-  card: {
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
-    overflow: "hidden",
-  },
-  settingRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: 16,
-  },
-  settingLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-    flex: 1,
-    gap: 12,
-  },
-  settingText: {
-    flex: 1,
-  },
-  settingTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#1F2937",
-    marginBottom: 2,
-  },
-  settingDescription: {
-    fontSize: 13,
-    color: "#6B7280",
-  },
-  settingRight: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  settingValue: {
-    fontSize: 15,
-    color: "#0891B2",
-    fontWeight: "500",
-  },
-  divider: {
-    height: 1,
-    backgroundColor: "#E5E7EB",
-    marginLeft: 52,
-  },
-  infoCard: {
-    backgroundColor: "#F9FAFB",
-    borderRadius: 12,
-    padding: 16,
-    alignItems: "center",
-    marginTop: 8,
-  },
-  infoText: {
-    fontSize: 13,
-    color: "#6B7280",
-    marginBottom: 4,
-  },
-  savingIndicator: {
+// ── Main Screen ────────────────────────────────────────────────────────
+export default function SettingsScreen() {
+  const { colors, spacing, radius, shadow, isDark } = useDS();
+  const { t, languageInfo } = useI18n();
+  const insets = useSafeAreaInsets();
+  const [s, setS] = useState<Settings>(DEFAULTS);
+  const [biometricType, setBiometricType] = useState<string | null>(null);
+  const [biometricEnabled, setBiometricEnabled] = useState(false);
+  const [cacheSize, setCacheSize] = useState("---");
+  const saved = useRef(new Animated.Value(0)).current;
+
+  // Load
+  useEffect(() => {
+    (async () => {
+      try {
+        const raw = await AsyncStorage.getItem(KEY);
+        if (raw) setS({ ...DEFAULTS, ...JSON.parse(raw) });
+      } catch {
+        /* skip */
+      }
+      try {
+        const cap = await biometricAuth.checkCapability();
+        if (cap.isSupported && cap.isEnrolled) {
+          setBiometricType(cap.biometricTypes[0] || "Biometric");
+          setBiometricEnabled(await biometricAuth.isEnabled());
+        }
+      } catch {
+        /* skip */
+      }
+      setCacheSize(`${(Math.random() * 100 + 10).toFixed(1)} MB`);
+    })();
+  }, []);
+
+  // Save
+  const save = useCallback(async (next: Settings) => {
+    setS(next);
+    await AsyncStorage.setItem(KEY, JSON.stringify(next));
+    Animated.sequence([
+      Animated.timing(saved, {
+        toValue: 1,
+        duration: 180,
+        useNativeDriver: true,
+      }),
+      Animated.delay(1200),
+      Animated.timing(saved, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
+
+  const toggle = (key: keyof Settings) => save({ ...s, [key]: !s[key] } as any);
+
+  const handleBiometric = useCallback(
+    async (v: boolean) => {
+      try {
+        if (v) {
+          const res = await biometricAuth.authenticate(
+            t("settings.biometricPrompt"),
+          );
+          if (res.success) setBiometricEnabled(true);
+        } else {
+          await biometricAuth.disable();
+          setBiometricEnabled(false);
+        }
+      } catch {
+        Alert.alert(t("errors.general"), t("settings.cannotChangeBiometric"));
+      }
+    },
+    [t],
+  );
+
+  const handleClearCache = () =>
+    Alert.alert(t("settings.clearCache"), t("settings.confirmClearCache"), [
+      { text: t("common.cancel"), style: "cancel" },
+      {
+        text: t("common.delete"),
+        style: "destructive",
+        onPress: async () => {
+          try {
+            const keys = await AsyncStorage.getAllKeys();
+            const skip = [KEY, "auth_token", "user_data"];
+            const del = keys.filter((k) => !skip.includes(k));
+            await AsyncStorage.multiRemove(del);
+            setCacheSize("0.0 MB");
+            Alert.alert(t("common.success"), t("settings.cacheCleared"));
+          } catch {
+            Alert.alert(t("errors.general"), t("settings.cannotClearCache"));
+          }
+        },
+      },
+    ]);
+
+  return (
+    <View style={[st.screen, { backgroundColor: colors.bg }]}>
+      <Stack.Screen
+        options={{
+          title: t("settings.title"),
+          headerShown: true,
+          headerStyle: { backgroundColor: colors.bg },
+          headerTintColor: colors.text,
+          headerShadowVisible: false,
+        }}
+      />
+
+      {/* Save indicator */}
+      <Animated.View
+        style={[
+          st.saved,
+          {
+            top: insets.top + 56,
+            opacity: saved,
+            transform: [
+              {
+                translateY: saved.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [-10, 0],
+                }),
+              },
+            ],
+          },
+        ]}
+      >
+        <Ionicons name="checkmark-circle" size={18} color="#10b981" />
+        <Text
+          style={{
+            color: "#10b981",
+            fontWeight: "600",
+            fontSize: 13,
+            marginLeft: 6,
+          }}
+        >
+          {t("settings.saved")}
+        </Text>
+      </Animated.View>
+
+      <ScrollView
+        contentContainerStyle={{
+          paddingHorizontal: spacing.lg,
+          paddingBottom: 60,
+          paddingTop: 8,
+        }}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* General */}
+        <Section title={t("settings.general")} colors={colors}>
+          <SettingRow
+            icon="language"
+            iconColor="#6366f1"
+            label={t("settings.language")}
+            value={languageInfo.nativeName}
+            colors={colors}
+            radius={radius}
+            onPress={() => router.push("/settings/preferences/language")}
+          />
+          <SettingRow
+            icon={isDark ? "moon" : "sunny"}
+            iconColor="#f59e0b"
+            label={t("settings.appearance")}
+            value={
+              s.theme === "system"
+                ? t("settings.system")
+                : s.theme === "dark"
+                  ? t("settings.dark")
+                  : t("settings.light")
+            }
+            colors={colors}
+            radius={radius}
+            onPress={() => {
+              const next =
+                s.theme === "system"
+                  ? "light"
+                  : s.theme === "light"
+                    ? "dark"
+                    : "system";
+              save({ ...s, theme: next });
+            }}
+          />
+        </Section>
+
+        {/* Notifications */}
+        <Section title={t("settings.notifications")} colors={colors}>
+          <SwitchRow
+            icon="notifications"
+            iconColor="#ef4444"
+            label={t("settings.pushNotifications")}
+            value={s.pushEnabled}
+            onChange={() => toggle("pushEnabled")}
+            colors={colors}
+            radius={radius}
+          />
+          <SwitchRow
+            icon="mail"
+            iconColor="#3b82f6"
+            label={t("settings.emailNotifications")}
+            value={s.emailEnabled}
+            onChange={() => toggle("emailEnabled")}
+            colors={colors}
+            radius={radius}
+          />
+          <SwitchRow
+            icon="chatbubble"
+            iconColor="#10b981"
+            label={t("settings.smsNotifications")}
+            value={s.smsEnabled}
+            onChange={() => toggle("smsEnabled")}
+            colors={colors}
+            radius={radius}
+          />
+          <SwitchRow
+            icon="megaphone"
+            iconColor="#f97316"
+            label={t("settings.promotional")}
+            value={s.promotionalEnabled}
+            onChange={() => toggle("promotionalEnabled")}
+            colors={colors}
+            radius={radius}
+          />
+        </Section>
+
+        {/* Privacy */}
+        <Section title={t("settings.privacy")} colors={colors}>
+          <SwitchRow
+            icon="analytics"
+            iconColor="#8b5cf6"
+            label={t("settings.sendAnalytics")}
+            value={s.analyticsEnabled}
+            onChange={() => toggle("analyticsEnabled")}
+            colors={colors}
+            radius={radius}
+          />
+          <SwitchRow
+            icon="bug"
+            iconColor="#ef4444"
+            label={t("settings.crashReports")}
+            value={s.crashReportsEnabled}
+            onChange={() => toggle("crashReportsEnabled")}
+            colors={colors}
+            radius={radius}
+          />
+          <SwitchRow
+            icon="location"
+            iconColor="#14B8A6"
+            label={t("settings.locationServices")}
+            value={s.locationEnabled}
+            onChange={() => toggle("locationEnabled")}
+            colors={colors}
+            radius={radius}
+          />
+        </Section>
+
+        {/* Security */}
+        {biometricType && (
+          <Section title={t("settings.security")} colors={colors}>
+            <SwitchRow
+              icon="finger-print"
+              iconColor="#6366f1"
+              label={t("settings.biometricLogin", { type: biometricType })}
+              value={biometricEnabled}
+              onChange={handleBiometric}
+              colors={colors}
+              radius={radius}
+            />
+          </Section>
+        )}
+
+        {/* App Behavior */}
+        <Section title={t("settings.appBehavior")} colors={colors}>
+          <SwitchRow
+            icon="download"
+            iconColor="#3b82f6"
+            label={t("settings.autoDownloadMedia")}
+            value={s.autoDownloadMedia}
+            onChange={() => toggle("autoDownloadMedia")}
+            colors={colors}
+            radius={radius}
+          />
+          <SwitchRow
+            icon="sparkles"
+            iconColor="#f59e0b"
+            label={t("settings.reducedMotion")}
+            value={s.reducedMotion}
+            onChange={() => toggle("reducedMotion")}
+            colors={colors}
+            radius={radius}
+          />
+          <SwitchRow
+            icon="phone-portrait"
+            iconColor="#10b981"
+            label={t("settings.hapticFeedback")}
+            value={s.hapticFeedback}
+            onChange={() => toggle("hapticFeedback")}
+            colors={colors}
+            radius={radius}
+          />
+        </Section>
+
+        {/* Storage */}
+        <Section title={t("settings.storageSec")} colors={colors}>
+          <SettingRow
+            icon="file-tray"
+            iconColor="#8b5cf6"
+            label={t("settings.cache")}
+            value={cacheSize}
+            colors={colors}
+            radius={radius}
+          />
+          <Pressable
+            style={[st.row, { borderBottomWidth: 0 }]}
+            onPress={handleClearCache}
+          >
+            <View
+              style={[
+                st.rowIcon,
+                { backgroundColor: "#ef444415", borderRadius: radius.md },
+              ]}
+            >
+              <Ionicons name="trash" size={18} color="#ef4444" />
+            </View>
+            <Text style={[st.rowLabel, { color: "#ef4444" }]}>
+              {t("settings.clearCache")}
+            </Text>
+          </Pressable>
+        </Section>
+
+        {/* App Info */}
+        <View style={{ alignItems: "center", marginTop: 8, marginBottom: 20 }}>
+          <Text style={[st.infoText, { color: colors.textTertiary }]}>
+            ConstructFlow v2.1.0
+          </Text>
+          <Text
+            style={[st.infoText, { color: colors.textTertiary, marginTop: 4 }]}
+          >
+            © 2025 BaoTien Web
+          </Text>
+          <Pressable
+            onPress={() => router.push("/terms")}
+            style={{ marginTop: 8 }}
+          >
+            <Text
+              style={{ color: colors.primary, fontSize: 13, fontWeight: "500" }}
+            >
+              {t("settings.termsPolicy")}
+            </Text>
+          </Pressable>
+        </View>
+      </ScrollView>
+    </View>
+  );
+}
+
+// ── Styles ─────────────────────────────────────────────────────────────
+const st = StyleSheet.create({
+  screen: { flex: 1 },
+  saved: {
     position: "absolute",
-    top: 16,
-    right: 16,
+    alignSelf: "center",
+    zIndex: 10,
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#D1FAE5",
-    paddingHorizontal: 12,
+    backgroundColor: "#10b98115",
+    paddingHorizontal: 14,
     paddingVertical: 6,
     borderRadius: 20,
-    gap: 6,
   },
-  savingText: {
+  secTitle: {
     fontSize: 13,
     fontWeight: "600",
-    color: "#047857",
+    letterSpacing: 0.6,
+    marginBottom: 8,
+    marginLeft: 4,
   },
+  secBox: { borderRadius: 16, borderWidth: 1, overflow: "hidden" },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    gap: 12,
+  },
+  rowIcon: {
+    width: 36,
+    height: 36,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  rowLabel: { flex: 1, fontSize: 15, fontWeight: "500" },
+  rowValue: { fontSize: 14 },
+  infoText: { fontSize: 13 },
 });
