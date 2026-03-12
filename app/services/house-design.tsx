@@ -5,27 +5,27 @@
  * @updated 2026-01-28
  */
 
+import { SearchAppBar } from "@/components/top-app-bar/SearchAppBar";
 import { Colors } from "@/constants/theme";
 import { useUnifiedMessaging } from "@/hooks/crm/useUnifiedMessaging";
 import {
-    getDesignCompanies,
-    type CompanyListItem,
+  getDesignCompanies,
+  type CompanyListItem,
 } from "@/services/company.service";
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, router } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    Dimensions,
-    FlatList,
-    Image,
-    RefreshControl,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Dimensions,
+  FlatList,
+  Image,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from "react-native";
 
 const { width } = Dimensions.get("window");
@@ -351,6 +351,7 @@ export default function HouseDesignScreen() {
           headerTitleStyle: { fontWeight: "600" },
         }}
       />
+      <SearchAppBar searchQuery={searchQuery} onSearchChange={setSearchQuery} placeholder="Tìm công ty thiết kế..." />
       <View style={styles.container}>
         {error && (
           <View style={styles.errorBanner}>
@@ -358,24 +359,6 @@ export default function HouseDesignScreen() {
             <Text style={styles.errorText}>{error}</Text>
           </View>
         )}
-        <View style={styles.searchSection}>
-          <View style={styles.searchBar}>
-            <Ionicons name="search" size={20} color="#999" />
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Tìm công ty thiết kế..."
-              placeholderTextColor="#999"
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-              returnKeyType="search"
-            />
-            {searchQuery !== "" && (
-              <TouchableOpacity onPress={() => setSearchQuery("")}>
-                <Ionicons name="close-circle" size={20} color="#999" />
-              </TouchableOpacity>
-            )}
-          </View>
-        </View>
         <View style={styles.filterSection}>
           <ScrollView
             horizontal
@@ -395,7 +378,7 @@ export default function HouseDesignScreen() {
                   style={[
                     styles.filterChipText,
                     selectedLocation === location &&
-                      styles.filterChipTextActive,
+                    styles.filterChipTextActive,
                   ]}
                 >
                   {location}
@@ -494,27 +477,6 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 12,
     color: "#856404",
-  },
-  searchSection: {
-    backgroundColor: "#fff",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
-  },
-  searchBar: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#f5f5f5",
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    height: 40,
-  },
-  searchInput: {
-    flex: 1,
-    marginLeft: 8,
-    fontSize: 14,
-    color: "#333",
   },
   filterSection: {
     backgroundColor: "#fff",
