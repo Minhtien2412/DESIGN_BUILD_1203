@@ -4,8 +4,8 @@ import { MoreOptionsProvider } from "@/components/community/MoreOptionsMenu";
 import { ShareSheetProvider } from "@/components/community/ShareSheet";
 import { VerticalVideoFeedProvider } from "@/components/community/VerticalVideoFeed";
 import {
-    DeferredProviderWrapper,
-    LazyProvider,
+  DeferredProviderWrapper,
+  LazyProvider,
 } from "@/components/DeferredProviders";
 import { FormErrorBoundary } from "@/components/FormErrorBoundary";
 import { NotificationToast } from "@/components/notifications/NotificationToast";
