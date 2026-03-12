@@ -142,12 +142,16 @@ export const ENV: EnvConfig = {
   // Supports: SMS, Viber, Voice, Telegram
   GETOTP_API_KEY:
     extra.EXPO_PUBLIC_GETOTP_API_KEY || "b2c885626ab1e17735372aa843edb431",
-  GETOTP_SENDER_NAME: extra.GETOTP_SENDER_NAME || "ThietKe",
-  GETOTP_DEFAULT_CHANNEL: extra.GETOTP_DEFAULT_CHANNEL || "sms",
+  GETOTP_SENDER_NAME: extra.EXPO_PUBLIC_GETOTP_SENDER_NAME || "ThietKe",
+  GETOTP_DEFAULT_CHANNEL: extra.EXPO_PUBLIC_GETOTP_DEFAULT_CHANNEL || "sms",
 
   // LiveKit Configuration (Video Calls/Meetings/Livestreams)
   // Get credentials from: https://cloud.livekit.io
-  LIVEKIT_URL: extra.EXPO_PUBLIC_LIVEKIT_URL || process.env.LIVEKIT_URL || "",
+  LIVEKIT_URL:
+    extra.EXPO_PUBLIC_LIVEKIT_URL ||
+    extra.EXPO_PUBLIC_LIVEKIT_WS_URL ||
+    process.env.LIVEKIT_URL ||
+    "",
   LIVEKIT_API_KEY:
     extra.EXPO_PUBLIC_LIVEKIT_API_KEY || process.env.LIVEKIT_API_KEY || "",
   LIVEKIT_API_SECRET:
