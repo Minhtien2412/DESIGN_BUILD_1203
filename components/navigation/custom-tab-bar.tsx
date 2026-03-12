@@ -11,13 +11,13 @@ import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { LinearGradient } from "expo-linear-gradient";
 import { useCallback, useRef } from "react";
 import {
-    Animated,
-    Platform,
-    Pressable,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Animated,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -244,8 +244,11 @@ export function CustomTabBar({
 // ═══════════════════════════════════════════════════════════════════════
 const s = StyleSheet.create({
   wrapper: {
-    position: "relative",
+    position: "absolute",
     backgroundColor: "transparent",
+    bottom: 0,
+    left: 0,
+    right: 0,
   },
   container: {
     backgroundColor: "#0F172A",
@@ -302,6 +305,7 @@ const s = StyleSheet.create({
     position: "relative",
   },
   iconWrapActive: {
+    borderRadius: 16,
     backgroundColor: "rgba(96,165,250,0.18)",
   },
   badge: {

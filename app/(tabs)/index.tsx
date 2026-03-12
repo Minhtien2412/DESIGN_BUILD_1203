@@ -21,51 +21,53 @@
  * @redesigned 2026-03-05
  */
 
+import { useSafeAreaInsets } from "@/components/ui/safe-area";
 import { useCart } from "@/context/cart-context";
 import { NotificationControllerContext } from "@/context/NotificationControllerContext";
 import { useRole } from "@/context/RoleContext";
 import {
-    CATEGORY_ITEMS,
-    COMMUNITY_ITEMS,
-    CommunityItem,
-    CONSTRUCTION_WORKERS,
-    DESIGN_LIVE,
-    DESIGN_SERVICES,
-    EQUIPMENT_ITEMS,
-    FINISHING_WORKERS,
-    MAINTENANCE_WORKERS,
-    SERVICES,
-    WorkerItem,
+  CATEGORY_ITEMS,
+  COMMUNITY_ITEMS,
+  CommunityItem,
+  CONSTRUCTION_WORKERS,
+  DESIGN_LIVE,
+  DESIGN_SERVICES,
+  EQUIPMENT_ITEMS,
+  FINISHING_WORKERS,
+  MAINTENANCE_WORKERS,
+  SERVICES,
+  WorkerItem,
 } from "@/data/home-data";
 import { getPopularVideos, VideoItem } from "@/data/videos";
+import { useTabBarPadding } from "@/hooks/ui/use-tab-bar-padding";
 import { useWorkerStats, WORKER_TYPE_MAP } from "@/hooks/useWorkerStats";
 import { useI18n } from "@/services/i18nService";
 import { Ionicons } from "@expo/vector-icons";
 import { Href, router } from "expo-router";
 import {
-    memo,
-    useCallback,
-    useContext,
-    useEffect,
-    useMemo,
-    useRef,
-    useState,
+  memo,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
 } from "react";
 import {
-    Dimensions,
-    FlatList,
-    Image,
-    ImageSourcePropType,
-    NativeScrollEvent,
-    NativeSyntheticEvent,
-    RefreshControl,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Switch,
-    Text,
-    TouchableOpacity,
-    View,
+  Dimensions,
+  FlatList,
+  Image,
+  ImageSourcePropType,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  RefreshControl,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Switch,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 const { width: SW } = Dimensions.get("window");
@@ -852,6 +854,8 @@ export default function HomeScreen() {
   const { t } = useI18n();
   const notifCtx = useContext(NotificationControllerContext);
   const notifCount = notifCtx?.unreadCount ?? 0;
+  const tabBarPadding = useTabBarPadding();
+  const insets = useSafeAreaInsets();
 
   const {
     stats: workerStats,
@@ -899,7 +903,7 @@ export default function HomeScreen() {
   }, [refreshStats]);
 
   return (
-    <View style={m.container}>
+    <View style={[m.container, {paddingTop: insets.top}]}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <SearchHeader
         isCustomer={isCustomer}
@@ -913,7 +917,7 @@ export default function HomeScreen() {
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 90 }}
+        contentContainerStyle={{ paddingBottom: tabBarPadding }}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
