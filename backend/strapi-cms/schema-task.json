@@ -1,0 +1,41 @@
+{
+  "kind": "collectionType",
+  "collectionName": "tasks",
+  "info": {
+    "singularName": "task",
+    "pluralName": "tasks",
+    "displayName": "Task",
+    "description": "Cong viec trong du an"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": ["TODO", "IN_PROGRESS", "REVIEW", "DONE", "CANCELLED"],
+      "default": "TODO"
+    },
+    "priority": {
+      "type": "enumeration",
+      "enum": ["LOW", "MEDIUM", "HIGH", "URGENT"],
+      "default": "MEDIUM"
+    },
+    "dueDate": {
+      "type": "date"
+    },
+    "projectId": {
+      "type": "integer"
+    },
+    "assigneeId": {
+      "type": "integer"
+    }
+  }
+}

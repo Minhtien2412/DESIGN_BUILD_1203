@@ -1,0 +1,201 @@
+name: Deploy Backend
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - "BE-baotienweb.cloud"
+      - "BE-baotienweb.cloud/**"
+      - ".gitmodules"
+      - ".github/workflows/deploy-backend.yml"
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Deployment environment"
+        required: true
+        default: "production"
+        type: choice
+        options:
+          - production
+          - staging
+
+env:
+  DOCKER_IMAGE: baotienweb-api
+  SERVER_HOST: baotienweb.cloud
+  SERVER_USER: root
+  DEPLOY_PATH: /opt/baotienweb
+
+jobs:
+  # Build and test
+  build:
+    name: 🏗️ Build & Test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: BE-baotienweb.cloud
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Ensure BE code is present
+        working-directory: .
+        run: |
+          if [ ! -f "BE-baotienweb.cloud/package.json" ]; then
+            echo "Submodule not checked out, cloning directly..."
+            rm -rf BE-baotienweb.cloud
+            git clone https://github.com/appdesignbuild/demo28.git BE-baotienweb.cloud
+          fi
+          ls BE-baotienweb.cloud/package.json
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: BE-baotienweb.cloud/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeScript check
+        run: npm run build
+        continue-on-error: false
+
+      - name: Run tests
+        run: npm test -- --passWithNoTests
+        continue-on-error: true
+
+  # Deploy to production
+  deploy:
+    name: 🚀 Deploy to Production
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    environment:
+      name: production
+      url: https://baotienweb.cloud/api/v1/health
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Ensure BE code is present
+        run: |
+          if [ ! -f "BE-baotienweb.cloud/package.json" ]; then
+            echo "Submodule not checked out, cloning directly..."
+            rm -rf BE-baotienweb.cloud
+            git clone https://github.com/appdesignbuild/demo28.git BE-baotienweb.cloud
+          fi
+          ls BE-baotienweb.cloud/package.json
+
+      - name: Create deployment package
+        run: |
+          cd BE-baotienweb.cloud
+          # Create deploy package excluding unnecessary files
+          tar -czf ../deploy-package.tar.gz \
+            --exclude='node_modules' \
+            --exclude='.git' \
+            --exclude='*.log' \
+            --exclude='coverage' \
+            --exclude='.env.local' \
+            --exclude='perfex_crm' \
+            --exclude='crm' \
+            .
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ env.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Upload to server
+        run: |
+          scp deploy-package.tar.gz ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }}:/tmp/
+
+      - name: Deploy on server
+        run: |
+          ssh ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} << 'ENDSSH'
+            set -e
+            cd ${{ env.DEPLOY_PATH }}
+            
+            # Backup current version
+            if [ -d "dist" ]; then
+              cp -r dist dist.backup.$(date +%Y%m%d_%H%M%S)
+            fi
+            
+            # Extract new version
+            tar -xzf /tmp/deploy-package.tar.gz -C ${{ env.DEPLOY_PATH }}
+            rm /tmp/deploy-package.tar.gz
+            
+            # Rebuild Docker image
+            docker-compose -f docker-compose.prod.yml up -d --build
+            
+            # Wait for health check
+            echo "Waiting for application to start..."
+            sleep 30
+            
+            # Verify deployment
+            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/api/v1/health)
+            if [ "$HTTP_STATUS" != "200" ]; then
+              echo "Health check failed with status: $HTTP_STATUS"
+              exit 1
+            fi
+            
+            echo "✅ Deployment successful!"
+            
+            # Cleanup old backups (keep last 3)
+            ls -dt dist.backup.* 2>/dev/null | tail -n +4 | xargs rm -rf 2>/dev/null || true
+          ENDSSH
+
+      - name: Notify success
+        if: success()
+        run: |
+          echo "✅ Deployment to ${{ env.SERVER_HOST }} completed successfully!"
+          echo "API URL: https://${{ env.SERVER_HOST }}/api/v1"
+          echo "Docs URL: https://${{ env.SERVER_HOST }}/api/docs"
+
+      - name: Notify failure
+        if: failure()
+        run: |
+          echo "❌ Deployment failed! Check logs above."
+
+  # Rollback job (manual trigger)
+  rollback:
+    name: ⏪ Rollback
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && failure()
+    needs: deploy
+    steps:
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ env.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Rollback on server
+        run: |
+          ssh ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} << 'ENDSSH'
+            cd ${{ env.DEPLOY_PATH }}
+            
+            # Find latest backup
+            LATEST_BACKUP=$(ls -dt dist.backup.* 2>/dev/null | head -n 1)
+            
+            if [ -z "$LATEST_BACKUP" ]; then
+              echo "No backup found for rollback!"
+              exit 1
+            fi
+            
+            echo "Rolling back to $LATEST_BACKUP..."
+            rm -rf dist
+            mv "$LATEST_BACKUP" dist
+            
+            # Restart container
+            docker-compose -f docker-compose.prod.yml restart api
+            
+            echo "✅ Rollback completed!"
+          ENDSSH

@@ -1,0 +1,609 @@
+{
+  "totalRoutes": 95,
+  "passed": 90,
+  "failed": 5,
+  "warnings": 0,
+  "timestamp": "2025-12-22T07:39:32.176Z",
+  "results": [
+    {
+      "route": "/services/house-design",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\services\\house-design.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/construction/progress",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\construction\\progress.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/(tabs)/projects",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\(tabs)\\projects.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/construction/tracking",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\construction\\tracking.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/materials/index",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\materials\\index.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/labor/index",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\labor\\index.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/utilities/quote-request",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\utilities\\quote-request.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/utilities/sitemap",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\utilities\\sitemap.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/utilities/ep-coc",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\utilities\\ep-coc.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/utilities/dao-dat",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\utilities\\dao-dat.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/utilities/be-tong",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\utilities\\be-tong.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/utilities/vat-lieu",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\utilities\\vat-lieu.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/utilities/tho-xay",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\utilities\\tho-xay.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/utilities/tho-dien-nuoc",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\utilities\\tho-dien-nuoc.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/utilities/tho-coffa",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\utilities\\tho-coffa.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/utilities/design-team",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\utilities\\design-team.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/timeline/index",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\timeline\\index.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/budget/index",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\budget\\index.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/quality-assurance/index",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\quality-assurance\\index.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/safety/index",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\safety\\index.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/documents/folders",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\documents\\folders.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/reports/index",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\reports\\index.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/rfi/index",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\rfi\\index.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/submittal/index",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\submittal\\index.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/finishing/lat-gach",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\finishing\\lat-gach.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/finishing/son",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\finishing\\son.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/finishing/da",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\finishing\\da.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/finishing/thach-cao",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\finishing\\thach-cao.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/finishing/lam-cua",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\finishing\\lam-cua.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/finishing/lan-can",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\finishing\\lan-can.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/finishing/camera",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\finishing\\camera.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/finishing/tho-tong-hop",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\finishing\\tho-tong-hop.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/services/interior-design",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\services\\interior-design.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/services/construction-company",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\services\\construction-company.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/services/quality-supervision",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\services\\quality-supervision.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/services/feng-shui",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\services\\feng-shui.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/utilities/cost-estimator",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\utilities\\cost-estimator.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/utilities/my-qr-code",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\utilities\\my-qr-code.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/construction/map-view",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\construction\\map-view.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/utilities/store-locator",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\utilities\\store-locator.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/ai",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\ai\\index.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/(tabs)/live",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\(tabs)\\live.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/videos/index",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\videos\\index.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/messages/index",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\messages\\index.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/shopping/index?cat=construction",
+      "exists": false,
+      "error": "No file found. Checked: shopping\\index?cat=construction.tsx, shopping\\index?cat=construction.ts, shopping\\index?cat=construction\\index.tsx, shopping\\index?cat=construction\\index.ts",
+      "isDynamic": false,
+      "alternativePaths": [
+        "app\\shopping\\index?cat=construction.tsx",
+        "app\\shopping\\index?cat=construction.ts",
+        "app\\shopping\\index?cat=construction\\index.tsx",
+        "app\\shopping\\index?cat=construction\\index.ts"
+      ]
+    },
+    {
+      "route": "/shopping/index?cat=electrical",
+      "exists": false,
+      "error": "No file found. Checked: shopping\\index?cat=electrical.tsx, shopping\\index?cat=electrical.ts, shopping\\index?cat=electrical\\index.tsx, shopping\\index?cat=electrical\\index.ts",
+      "isDynamic": false,
+      "alternativePaths": [
+        "app\\shopping\\index?cat=electrical.tsx",
+        "app\\shopping\\index?cat=electrical.ts",
+        "app\\shopping\\index?cat=electrical\\index.tsx",
+        "app\\shopping\\index?cat=electrical\\index.ts"
+      ]
+    },
+    {
+      "route": "/shopping/index?cat=furniture",
+      "exists": false,
+      "error": "No file found. Checked: shopping\\index?cat=furniture.tsx, shopping\\index?cat=furniture.ts, shopping\\index?cat=furniture\\index.tsx, shopping\\index?cat=furniture\\index.ts",
+      "isDynamic": false,
+      "alternativePaths": [
+        "app\\shopping\\index?cat=furniture.tsx",
+        "app\\shopping\\index?cat=furniture.ts",
+        "app\\shopping\\index?cat=furniture\\index.tsx",
+        "app\\shopping\\index?cat=furniture\\index.ts"
+      ]
+    },
+    {
+      "route": "/shopping/index?cat=paint",
+      "exists": false,
+      "error": "No file found. Checked: shopping\\index?cat=paint.tsx, shopping\\index?cat=paint.ts, shopping\\index?cat=paint\\index.tsx, shopping\\index?cat=paint\\index.ts",
+      "isDynamic": false,
+      "alternativePaths": [
+        "app\\shopping\\index?cat=paint.tsx",
+        "app\\shopping\\index?cat=paint.ts",
+        "app\\shopping\\index?cat=paint\\index.tsx",
+        "app\\shopping\\index?cat=paint\\index.ts"
+      ]
+    },
+    {
+      "route": "/shopping/index",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\shopping\\index.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/cart",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\cart.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/construction/booking",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\construction\\booking.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/call/active",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\call\\active.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/(tabs)/notifications",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\(tabs)\\notifications.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/analytics",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\analytics.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/contracts/index",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\contracts\\index.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/weather/dashboard",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\weather\\dashboard.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/weather/index",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\weather\\index.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/fleet/index",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\fleet\\index.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/food/index",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\food\\index.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/inspection/index",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\inspection\\index.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/warranty/index",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\warranty\\index.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/risk/index",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\risk\\index.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/legal/index",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\legal\\index.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/(tabs)/index",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\(tabs)\\index.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/(tabs)/profile",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\(tabs)\\profile.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/search",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\search.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/checkout",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\checkout.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/profile/menu",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\profile\\menu.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/(auth)/login",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\(auth)\\login.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/(auth)/register",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\(auth)\\register.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/(auth)/forgot-password",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\(auth)\\forgot-password.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/(auth)/reset-password",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\(auth)\\reset-password.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/projects/create",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\projects\\create.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/projects",
+      "exists": false,
+      "error": "No file found. Checked: projects.tsx, projects.ts, projects\\index.tsx, projects\\index.ts",
+      "isDynamic": false,
+      "alternativePaths": [
+        "app\\projects.tsx",
+        "app\\projects.ts",
+        "app\\projects\\index.tsx",
+        "app\\projects\\index.ts"
+      ]
+    },
+    {
+      "route": "/live/create",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\live\\create.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/profile/settings",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\profile\\settings.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/profile/edit",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\profile\\edit.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/profile/rewards",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\profile\\rewards.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/profile/info",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\profile\\info.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/profile/privacy",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\profile\\privacy.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/profile/security",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\profile\\security.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/profile/portfolio",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\profile\\portfolio.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/profile/cloud",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\profile\\cloud.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/profile/payment",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\profile\\payment.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/profile/addresses",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\profile\\addresses.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/profile/orders",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\profile\\orders.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/profile/favorites",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\profile\\favorites.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/profile/reviews",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\profile\\reviews.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/profile/help",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\profile\\help.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/admin/dashboard",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\admin\\dashboard.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/admin/settings",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\admin\\settings.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/admin/staff",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\admin\\staff\\index.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/admin/roles",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\admin\\roles\\index.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/legal/terms",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\legal\\terms.tsx",
+      "isDynamic": false
+    },
+    {
+      "route": "/legal/privacy-policy",
+      "exists": true,
+      "filePath": "C:\\tien\\New folder\\APP_DESIGN_BUILD05.12.2025\\app\\legal\\privacy-policy.tsx",
+      "isDynamic": false
+    }
+  ]
+}

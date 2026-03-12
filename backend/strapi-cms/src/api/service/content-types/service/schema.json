@@ -1,0 +1,94 @@
+{
+  "kind": "collectionType",
+  "collectionName": "services",
+  "info": {
+    "singularName": "service",
+    "pluralName": "services",
+    "displayName": "Service",
+    "description": "Construction services - synced with backend Prisma"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true,
+      "maxLength": 255
+    },
+    "description": {
+      "type": "text",
+      "required": true
+    },
+    "category": {
+      "type": "enumeration",
+      "enum": [
+        "DESIGN",
+        "CONSTRUCTION",
+        "FINISHING",
+        "CONSULTING",
+        "INSPECTION",
+        "MAINTENANCE"
+      ],
+      "required": true
+    },
+    "price": {
+      "type": "decimal",
+      "required": true,
+      "min": 0
+    },
+    "unit": {
+      "type": "string",
+      "maxLength": 50,
+      "default": "công trình"
+    },
+    "duration": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "features": {
+      "type": "json",
+      "default": []
+    },
+    "images": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": ["ACTIVE", "INACTIVE", "PENDING", "REJECTED"],
+      "default": "PENDING"
+    },
+    "viewCount": {
+      "type": "integer",
+      "default": 0,
+      "min": 0
+    },
+    "orderCount": {
+      "type": "integer",
+      "default": 0,
+      "min": 0
+    },
+    "rating": {
+      "type": "decimal",
+      "min": 0,
+      "max": 5
+    },
+    "reviewCount": {
+      "type": "integer",
+      "default": 0,
+      "min": 0
+    },
+    "strapiId": {
+      "type": "string",
+      "unique": false
+    },
+    "backendId": {
+      "type": "integer",
+      "unique": false
+    }
+  }
+}

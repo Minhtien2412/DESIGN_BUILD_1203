@@ -1,0 +1,102 @@
+﻿# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
+
+# ============================================
+# SECURITY - Environment files with secrets
+# ============================================
+.env
+.env.local
+.env.*.local
+.env.production
+.env.staging
+.env.development
+.env.backup*
+.env.database
+web/.env
+web/.env.*
+!web/.env.example
+
+# dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Jest cache
+.jest-cache/
+
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+android/keystore.properties
+android/app/release.keystore
+
+# Metro
+.metro-health-check*
+
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# typescript
+*.tsbuildinfo
+
+app-example
+
+# generated native folders
+/ios
+# /android  <-- Keep android folder for EAS Build
+
+# Build artifacts & generated output
+android/build/
+android/app/build/
+coverage/
+dist/
+.jest-cache/
+
+# local dev backup files
+dev-backups/
+_archived/
+backups/
+
+# backup files
+*.backup
+*.old
+*.bak
+*.tmp
+
+# JVM crash logs
+hs_err_pid*.log
+replay_pid*.log
+
+# Build/tsc logs
+build-log*.txt
+build-result.json
+tsc-output.txt
+
+# test and deploy scripts (one-off)
+test-*.sh
+test-upload.txt
+websocket-test.html
+
+# misc
+uploads/
+dist-test/
+
+.env.local
+backend-deploy.tar.gz
+*.vsix
+
+APP_DESIGN_BUILD05.12.2025.zip

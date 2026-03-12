@@ -1,0 +1,116 @@
+upstream baotienweb_api_docker {
+    server 127.0.0.1:3002;
+    keepalive 32;
+}
+
+# Rate limiting zones
+limit_req_zone $binary_remote_addr zone=api_limit:10m rate=30r/s;
+limit_req_zone $binary_remote_addr zone=auth_limit:10m rate=5r/s;
+
+server {
+    listen 80;
+    server_name api.baotienweb.cloud;
+
+    # ACME challenge for SSL renewal
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+        try_files $uri =404;
+    }
+
+    # Force HTTPS
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl http2;
+    server_name api.baotienweb.cloud;
+
+    ssl_certificate /etc/letsencrypt/live/api.baotienweb.cloud/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/api.baotienweb.cloud/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+    # HSTS
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+
+    # Security headers
+    add_header X-Content-Type-Options nosniff always;
+    add_header X-Frame-Options DENY always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Referrer-Policy strict-origin-when-cross-origin always;
+
+    # Timeouts
+    proxy_connect_timeout 300s;
+    proxy_send_timeout 300s;
+    proxy_read_timeout 300s;
+    client_max_body_size 50M;
+
+    # Shared proxy settings
+    proxy_http_version 1.1;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header Connection "";
+
+    # Health check (no logging)
+    location /health {
+        proxy_pass http://baotienweb_api_docker/api/v1/health;
+        access_log off;
+    }
+
+    # Swagger documentation
+    location /api/docs {
+        proxy_pass http://baotienweb_api_docker/api/docs;
+    }
+    location /api/docs/ {
+        proxy_pass http://baotienweb_api_docker/api/docs/;
+    }
+
+    # Auth endpoints - stricter rate limit
+    location /api/v1/auth/ {
+        limit_req zone=auth_limit burst=10 nodelay;
+        proxy_pass http://baotienweb_api_docker/api/v1/auth/;
+    }
+
+    # Main API v1 endpoints
+    location /api/v1/ {
+        limit_req zone=api_limit burst=50 nodelay;
+        proxy_pass http://baotienweb_api_docker/api/v1/;
+
+        # WebSocket support
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_cache_bypass $http_upgrade;
+    }
+
+    # Backwards compatibility
+    location /api/ {
+        proxy_pass http://baotienweb_api_docker/api/v1/;
+    }
+
+    # Socket.IO for real-time features
+    location /socket.io/ {
+        proxy_pass http://baotienweb_api_docker/socket.io/;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_read_timeout 86400s;
+    }
+
+    # Static uploads with caching
+    location /uploads/ {
+        proxy_pass http://baotienweb_api_docker/uploads/;
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+    }
+
+    # Root fallback
+    location / {
+        proxy_pass http://baotienweb_api_docker/;
+    }
+
+    access_log /var/log/nginx/api_baotienweb_access.log;
+    error_log /var/log/nginx/api_baotienweb_error.log;
+}

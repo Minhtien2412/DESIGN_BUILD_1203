@@ -1,0 +1,25 @@
+{
+    // Expo/React Native debug configs for design-build
+    "version": "0.2.0",
+    "configurations": [
+        
+        {
+            "name": "Expo Start (npx)",
+            "type": "node",
+            "request": "launch",
+            "runtimeExecutable": "npx",
+            "runtimeArgs": ["expo", "start"],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Android Debug (Hermes)",
+            "type": "reactnative",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "platform": "android",
+            "enableDebug": false
+        }
+        // Add more configs as needed (e.g. iOS, web)
+    ]
+}
