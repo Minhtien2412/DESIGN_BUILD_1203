@@ -264,6 +264,12 @@ export default ({ config }: { config: any }) => ({
       EXPO_PUBLIC_API_KEY:
         process.env.EXPO_PUBLIC_API_KEY || "thietke-resort-api-key-2024",
       EXPO_PUBLIC_WS_URL: process.env.EXPO_PUBLIC_WS_URL || undefined,
+      EXPO_PUBLIC_WS_BASE_URL:
+        process.env.EXPO_PUBLIC_WS_BASE_URL || undefined,
+      EXPO_PUBLIC_WS_PROGRESS_URL:
+        process.env.EXPO_PUBLIC_WS_PROGRESS_URL || undefined,
+      EXPO_PUBLIC_AUTH_REFRESH_PATH:
+        process.env.EXPO_PUBLIC_AUTH_REFRESH_PATH || "/auth/refresh",
       EXPO_PUBLIC_AUTH_GOOGLE_PATH:
         process.env.EXPO_PUBLIC_AUTH_GOOGLE_PATH || "/auth/google",
       EXPO_PUBLIC_AUTH_FACEBOOK_PATH:
@@ -280,10 +286,89 @@ export default ({ config }: { config: any }) => ({
         process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID ||
         process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID ||
         "",
+      EXPO_PUBLIC_GOOGLE_CLIENT_SECRET:
+        process.env.EXPO_PUBLIC_GOOGLE_CLIENT_SECRET || "",
       EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID:
         process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID || "",
       EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID:
         process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID || "",
+      EXPO_PUBLIC_BACKOFF_BASE_MS:
+        process.env.EXPO_PUBLIC_BACKOFF_BASE_MS || "500",
+      EXPO_PUBLIC_BACKOFF_JITTER_MS:
+        process.env.EXPO_PUBLIC_BACKOFF_JITTER_MS || "500",
+
+      // AI
+      EXPO_PUBLIC_OPENAI_API_KEY:
+        process.env.EXPO_PUBLIC_OPENAI_API_KEY || "",
+      EXPO_PUBLIC_GEMINI_API_KEY:
+        process.env.EXPO_PUBLIC_GEMINI_API_KEY || "",
+
+      // External APIs
+      EXPO_PUBLIC_PEXELS_API_KEY:
+        process.env.EXPO_PUBLIC_PEXELS_API_KEY || "",
+      EXPO_PUBLIC_GNEWS_API_KEY:
+        process.env.EXPO_PUBLIC_GNEWS_API_KEY || "",
+
+      // Perfex CRM
+      EXPO_PUBLIC_PERFEX_CRM_URL:
+        process.env.EXPO_PUBLIC_PERFEX_CRM_URL ||
+        "https://thietkeresort.com.vn/perfex_crm",
+      EXPO_PUBLIC_PERFEX_API_TOKEN:
+        process.env.EXPO_PUBLIC_PERFEX_API_TOKEN || "",
+      EXPO_PUBLIC_PERFEX_API_KEY:
+        process.env.EXPO_PUBLIC_PERFEX_API_KEY || "",
+
+      // GetOTP SMS
+      EXPO_PUBLIC_GETOTP_API_KEY:
+        process.env.EXPO_PUBLIC_GETOTP_API_KEY || "",
+      EXPO_PUBLIC_GETOTP_SENDER_NAME:
+        process.env.EXPO_PUBLIC_GETOTP_SENDER_NAME || "ThietKe",
+      EXPO_PUBLIC_GETOTP_DEFAULT_CHANNEL:
+        process.env.EXPO_PUBLIC_GETOTP_DEFAULT_CHANNEL || "sms",
+
+      // LiveKit
+      EXPO_PUBLIC_LIVEKIT_URL:
+        process.env.EXPO_PUBLIC_LIVEKIT_URL ||
+        process.env.EXPO_PUBLIC_LIVEKIT_WS_URL ||
+        "",
+      EXPO_PUBLIC_LIVEKIT_WS_URL:
+        process.env.EXPO_PUBLIC_LIVEKIT_WS_URL || "",
+      EXPO_PUBLIC_LIVEKIT_API_KEY:
+        process.env.EXPO_PUBLIC_LIVEKIT_API_KEY || "",
+      EXPO_PUBLIC_LIVEKIT_API_SECRET:
+        process.env.EXPO_PUBLIC_LIVEKIT_API_SECRET || "",
+
+      // Agora
+      EXPO_PUBLIC_AGORA_APP_ID:
+        process.env.EXPO_PUBLIC_AGORA_APP_ID || "",
+
+      // Supabase
+      EXPO_PUBLIC_SUPABASE_URL:
+        process.env.EXPO_PUBLIC_SUPABASE_URL || "",
+      EXPO_PUBLIC_SUPABASE_ANON_KEY:
+        process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || "",
+
+      // AWS S3
+      EXPO_PUBLIC_AWS_REGION:
+        process.env.EXPO_PUBLIC_AWS_REGION || "ap-southeast-1",
+      EXPO_PUBLIC_AWS_S3_BUCKET:
+        process.env.EXPO_PUBLIC_AWS_S3_BUCKET || "",
+      EXPO_PUBLIC_AWS_ACCESS_KEY_ID:
+        process.env.EXPO_PUBLIC_AWS_ACCESS_KEY_ID || "",
+      EXPO_PUBLIC_AWS_SECRET_ACCESS_KEY:
+        process.env.EXPO_PUBLIC_AWS_SECRET_ACCESS_KEY || "",
+      EXPO_PUBLIC_AWS_CLOUDFRONT_URL:
+        process.env.EXPO_PUBLIC_AWS_CLOUDFRONT_URL || "",
+
+      // Cloudinary
+      EXPO_PUBLIC_CLOUDINARY_CLOUD_NAME:
+        process.env.EXPO_PUBLIC_CLOUDINARY_CLOUD_NAME || "",
+      EXPO_PUBLIC_CLOUDINARY_API_KEY:
+        process.env.EXPO_PUBLIC_CLOUDINARY_API_KEY || "",
+      EXPO_PUBLIC_CLOUDINARY_API_SECRET:
+        process.env.EXPO_PUBLIC_CLOUDINARY_API_SECRET || "",
+      EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET:
+        process.env.EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "app_uploads",
 
       // Misc existing extras preserved
       router: {},
@@ -301,8 +386,10 @@ export default ({ config }: { config: any }) => ({
       EXPO_PUBLIC_DEV_API_URL: DEV_API_URL,
       EXPO_PUBLIC_ENV:
         process.env.EXPO_PUBLIC_ENV || (IS_DEV ? "development" : "prod"),
+      EXPO_PUBLIC_REMOTE_AUTH: process.env.EXPO_PUBLIC_REMOTE_AUTH || "0",
+      EXPO_PUBLIC_VIDEOS_URL: process.env.EXPO_PUBLIC_VIDEOS_URL || "",
       EXPO_PUBLIC_GOOGLE_MAPS_API_KEY:
-        process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY,
+        process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY || "",
     },
   },
 });
