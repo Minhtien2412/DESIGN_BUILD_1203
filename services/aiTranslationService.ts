@@ -11,10 +11,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { post } from "./api";
 import {
-    DEFAULT_LANGUAGE,
-    SUPPORTED_LANGUAGES,
-    type SupportedLanguage,
-    type Translations,
+  DEFAULT_LANGUAGE,
+  SUPPORTED_LANGUAGES,
+  type SupportedLanguage,
+  type Translations,
 } from "./i18nService";
 
 // ==================== TYPES ====================
