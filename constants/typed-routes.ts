@@ -9,121 +9,133 @@
 // LAYER 1: Main Services (8 routes)
 // ============================================================================
 export const MAIN_SERVICES_ROUTES = {
-  HOUSE_DESIGN: '/services/house-design',
-  CONSTRUCTION_PROGRESS: '/construction/progress',
-  MY_PROJECTS: '/(tabs)/projects',
-  TRACKING: '/construction/tracking',
-  MATERIALS: '/materials/index',
-  LABOR: '/labor/index',
-  QUOTE_REQUEST: '/utilities/quote-request',
-  SITEMAP: '/utilities/sitemap',
+  HOUSE_DESIGN: "/services/house-design",
+  CONSTRUCTION_PROGRESS: "/construction/progress",
+  MY_PROJECTS: "/(tabs)/projects",
+  TRACKING: "/construction/tracking",
+  MATERIALS: "/materials/index",
+  LABOR: "/labor/index",
+  QUOTE_REQUEST: "/utilities/quote-request",
+  SITEMAP: "/utilities/sitemap",
 } as const;
 
 // ============================================================================
 // LAYER 2: Construction Services (8 routes)
 // ============================================================================
 export const CONSTRUCTION_ROUTES = {
-  EP_COC: '/utilities/ep-coc',
-  DAO_DAT: '/utilities/dao-dat',
-  BE_TONG: '/utilities/be-tong',
-  VAT_LIEU: '/utilities/vat-lieu',
-  THO_XAY: '/utilities/tho-xay',
-  THO_DIEN_NUOC: '/utilities/tho-dien-nuoc',
-  THO_COFFA: '/utilities/tho-coffa',
-  DESIGN_TEAM: '/utilities/design-team',
+  EP_COC: "/utilities/ep-coc",
+  DAO_DAT: "/utilities/dao-dat",
+  BE_TONG: "/utilities/be-tong",
+  VAT_LIEU: "/utilities/vat-lieu",
+  THO_XAY: "/utilities/tho-xay",
+  THO_DIEN_NUOC: "/utilities/tho-dien-nuoc",
+  THO_COFFA: "/utilities/tho-coffa",
+  DESIGN_TEAM: "/utilities/design-team",
 } as const;
 
 // ============================================================================
 // LAYER 3: Management Tools (8 routes)
 // ============================================================================
 export const MANAGEMENT_ROUTES = {
-  TIMELINE: '/timeline/index',
-  BUDGET: '/budget/index',
-  QUALITY_ASSURANCE: '/quality-assurance/index',
-  SAFETY: '/safety/index',
-  DOCUMENTS: '/documents/folders',
-  REPORTS: '/reports/index',
-  RFI: '/rfi/index',
-  SUBMITTAL: '/submittal/index',
+  TIMELINE: "/timeline/index",
+  BUDGET: "/budget/index",
+  QUALITY_ASSURANCE: "/quality-assurance/index",
+  SAFETY: "/safety/index",
+  DOCUMENTS: "/documents/folders",
+  REPORTS: "/reports/index",
+  RFI: "/rfi/index",
+  SUBMITTAL: "/submittal/index",
 } as const;
 
 // ============================================================================
 // LAYER 4: Finishing Works (8 routes)
 // ============================================================================
 export const FINISHING_ROUTES = {
-  LAT_GACH: '/finishing/lat-gach',
-  SON: '/finishing/son',
-  DA: '/finishing/da',
-  THACH_CAO: '/finishing/thach-cao',
-  LAM_CUA: '/finishing/lam-cua',
-  LAN_CAN: '/finishing/lan-can',
-  CAMERA: '/finishing/camera',
-  THO_TONG_HOP: '/finishing/tho-tong-hop',
+  LAT_GACH: "/finishing/lat-gach",
+  SON: "/finishing/son",
+  DA: "/finishing/da",
+  THACH_CAO: "/finishing/thach-cao",
+  LAM_CUA: "/finishing/lam-cua",
+  LAN_CAN: "/finishing/lan-can",
+  CAMERA: "/finishing/camera",
+  THO_TONG_HOP: "/finishing/tho-tong-hop",
 } as const;
 
 // ============================================================================
 // LAYER 5: Professional Services (4 routes)
 // ============================================================================
 export const PROFESSIONAL_ROUTES = {
-  INTERIOR_DESIGN: '/services/interior-design',
-  CONSTRUCTION_COMPANY: '/services/construction-company',
-  QUALITY_SUPERVISION: '/services/quality-supervision',
-  FENG_SHUI: '/services/feng-shui',
+  INTERIOR_DESIGN: "/services/interior-design",
+  CONSTRUCTION_COMPANY: "/services/construction-company",
+  QUALITY_SUPERVISION: "/services/quality-supervision",
+  FENG_SHUI: "/services/feng-shui",
 } as const;
 
 // ============================================================================
 // LAYER 6: Quick Tools (8 routes)
 // ============================================================================
 export const QUICK_TOOLS_ROUTES = {
-  COST_ESTIMATOR: '/utilities/cost-estimator',
-  MY_QR_CODE: '/utilities/my-qr-code',
-  MAP_VIEW: '/construction/map-view',
-  STORE_LOCATOR: '/utilities/store-locator',
-  AI_HUB: '/ai',
-  LIVE_STREAM: '/(tabs)/live',
-  VIDEOS: '/videos/index',
-  MESSAGES: '/messages/index',
+  COST_ESTIMATOR: "/utilities/cost-estimator",
+  MY_QR_CODE: "/utilities/my-qr-code",
+  MAP_VIEW: "/construction/map-view",
+  STORE_LOCATOR: "/utilities/store-locator",
+  AI_HUB: "/ai",
+  LIVE_STREAM: "/(tabs)/live",
+  VIDEOS: "/videos/index",
+  MESSAGES: "/messages/index",
 } as const;
 
 // ============================================================================
 // LAYER 7: Shopping Categories (4 routes + extras)
 // ============================================================================
 export const SHOPPING_ROUTES = {
-  CONSTRUCTION_MATERIALS: '/shopping/index?cat=construction',
-  ELECTRICAL_EQUIPMENT: '/shopping/index?cat=electrical',
-  FURNITURE: '/shopping/index?cat=furniture',
-  PAINT_COLORS: '/shopping/index?cat=paint',
-  SHOPPING_INDEX: '/shopping/index',
-  CART: '/cart',
+  CONSTRUCTION_MATERIALS: "/shopping/construction",
+  ELECTRICAL_EQUIPMENT: "/shopping/electrical",
+  FURNITURE: "/shopping/furniture",
+  PAINT_COLORS: "/shopping/paint",
+  SHOPPING_INDEX: "/shopping/index",
+  CART: "/cart",
 } as const;
 
 // ============================================================================
 // LAYER 8: Additional Services (9 routes)
 // ============================================================================
 export const ADDITIONAL_SERVICES_ROUTES = {
-  BOOKING: '/construction/booking',
-  VIDEO_CALL: '/call/active',
-  NOTIFICATIONS: '/(tabs)/notifications',
-  ANALYTICS: '/analytics',
-  CONTRACTS: '/contracts/index',
-  WEATHER_DASHBOARD: '/weather/dashboard',
-  WEATHER_INDEX: '/weather/index',
-  FLEET: '/fleet/index',
-  FOOD: '/food/index',
+  BOOKING: "/construction/booking",
+  VIDEO_CALL: "/call/active",
+  NOTIFICATIONS: "/(tabs)/notifications",
+  ANALYTICS: "/analytics",
+  CONTRACTS: "/contracts/index",
+  WEATHER_DASHBOARD: "/weather/dashboard",
+  WEATHER_INDEX: "/weather/index",
+  FLEET: "/fleet/index",
+  FOOD: "/food/index",
 } as const;
 
 // ============================================================================
 // LAYER 9: Advanced Features (4 routes)
 // ============================================================================
 export const ADVANCED_ROUTES = {
-  INSPECTION: '/inspection/index',
-  WARRANTY: '/warranty/index',
-  RISK_MANAGEMENT: '/risk/index',
-  LEGAL: '/legal/index',
+  INSPECTION: "/inspection/index",
+  WARRANTY: "/warranty/index",
+  RISK_MANAGEMENT: "/risk/index",
+  LEGAL: "/legal/index",
 } as const;
 
 // ============================================================================
-// Combined APP_ROUTES - All 64 Routes
+// DEMO / ROLE-BASED HOME ROUTES (6 routes)
+// ============================================================================
+export const DEMO_ROUTES = {
+  DEMO_ROLE_BASED_HOME: "/demo/role-based-home",
+  DEMO_SERVICE_CATEGORY_DETAIL: "/demo/service-category-detail",
+  DEMO_BANNER_CAMPAIGN_DETAIL: "/demo/banner-campaign-detail",
+  DEMO_PRODUCT_DETAIL: "/demo/product-detail",
+  DEMO_WORKER_REWARDS_DETAIL: "/demo/worker-rewards-detail",
+  DEMO_INTERNAL_DASHBOARD_DETAIL: "/demo/internal-dashboard-detail",
+} as const;
+
+// ============================================================================
+// Combined APP_ROUTES - Includes demo and production routes
 // ============================================================================
 export const APP_ROUTES = {
   // Layer 1: Main Services
@@ -144,63 +156,65 @@ export const APP_ROUTES = {
   ...ADDITIONAL_SERVICES_ROUTES,
   // Layer 9: Advanced
   ...ADVANCED_ROUTES,
-  
+  // Demo / Role-based home
+  ...DEMO_ROUTES,
+
   // Tab Navigation
-  HOME: '/(tabs)/index',
-  PROJECTS_TAB: '/(tabs)/projects',
-  NOTIFICATIONS_TAB: '/(tabs)/notifications',
-  PROFILE: '/(tabs)/profile',
-  LIVE_TAB: '/(tabs)/live',
-  
+  HOME: "/(tabs)/index",
+  PROJECTS_TAB: "/(tabs)/projects",
+  NOTIFICATIONS_TAB: "/(tabs)/notifications",
+  PROFILE: "/(tabs)/profile",
+  LIVE_TAB: "/(tabs)/live",
+
   // Common Routes
-  SEARCH: '/search',
-  CHECKOUT: '/checkout',
-  PROFILE_MENU: '/profile/menu',
-  
+  SEARCH: "/search",
+  CHECKOUT: "/checkout",
+  PROFILE_MENU: "/profile/menu",
+
   // Auth Routes
-  AUTH_LOGIN: '/(auth)/login',
-  AUTH_REGISTER: '/(auth)/register',
-  AUTH_FORGOT_PASSWORD: '/(auth)/forgot-password',
-  AUTH_RESET_PASSWORD: '/(auth)/reset-password',
-  
+  AUTH_LOGIN: "/(auth)/login",
+  AUTH_REGISTER: "/(auth)/register",
+  AUTH_FORGOT_PASSWORD: "/(auth)/forgot-password",
+  AUTH_RESET_PASSWORD: "/(auth)/reset-password",
+
   // Projects Routes
-  PROJECTS_CREATE: '/projects/create',
-  PROJECTS_INDEX: '/projects',
-  
+  PROJECTS_CREATE: "/projects/create",
+  PROJECTS_INDEX: "/projects",
+
   // Live Routes
-  LIVE_CREATE: '/live/create',
-  
+  LIVE_CREATE: "/live/create",
+
   // Profile Extended Routes
-  PROFILE_SETTINGS: '/profile/settings',
-  PROFILE_EDIT: '/profile/edit',
-  PROFILE_REWARDS: '/profile/rewards',
-  PROFILE_INFO: '/profile/info',
-  PROFILE_PRIVACY: '/profile/privacy',
-  PROFILE_SECURITY: '/profile/security',
-  PROFILE_PORTFOLIO: '/profile/portfolio',
-  PROFILE_CLOUD: '/profile/cloud',
-  PROFILE_PAYMENT: '/profile/payment',
-  PROFILE_ADDRESSES: '/profile/addresses',
-  PROFILE_ORDERS: '/profile/orders',
-  PROFILE_FAVORITES: '/profile/favorites',
-  PROFILE_REVIEWS: '/profile/reviews',
-  PROFILE_HELP: '/profile/help',
-  
+  PROFILE_SETTINGS: "/profile/settings",
+  PROFILE_EDIT: "/profile/edit",
+  PROFILE_REWARDS: "/profile/rewards",
+  PROFILE_INFO: "/profile/info",
+  PROFILE_PRIVACY: "/legal/privacy-policy",
+  PROFILE_SECURITY: "/profile/security",
+  PROFILE_PORTFOLIO: "/profile/portfolio",
+  PROFILE_CLOUD: "/profile/file-upload-demo",
+  PROFILE_PAYMENT: "/profile/payment",
+  PROFILE_ADDRESSES: "/profile/addresses",
+  PROFILE_ORDERS: "/profile/orders",
+  PROFILE_FAVORITES: "/profile/favorites",
+  PROFILE_REVIEWS: "/profile/reviews",
+  PROFILE_HELP: "/legal/faq",
+
   // Dashboard Routes
-  DASHBOARD_INDEX: '/dashboard/index',
-  DASHBOARD_ADMIN: '/dashboard/admin',
-  DASHBOARD_ENGINEER: '/dashboard/engineer',
-  DASHBOARD_CLIENT: '/dashboard/client',
-  
+  DASHBOARD_INDEX: "/dashboard/index",
+  DASHBOARD_ADMIN: "/dashboard/admin-dashboard",
+  DASHBOARD_ENGINEER: "/dashboard/engineer-dashboard",
+  DASHBOARD_CLIENT: "/dashboard/client",
+
   // Admin Routes
-  ADMIN_DASHBOARD: '/admin/dashboard',
-  ADMIN_SETTINGS: '/admin/settings',
-  ADMIN_STAFF: '/admin/staff',
-  ADMIN_ROLES: '/admin/roles',
-  
+  ADMIN_DASHBOARD: "/admin/dashboard",
+  ADMIN_SETTINGS: "/admin/settings",
+  ADMIN_STAFF: "/admin/staff",
+  ADMIN_ROLES: "/admin/roles",
+
   // Legal Routes Extended
-  LEGAL_TERMS: '/legal/terms',
-  LEGAL_PRIVACY: '/legal/privacy-policy',
+  LEGAL_TERMS: "/legal/terms-of-service",
+  LEGAL_PRIVACY: "/legal/privacy-policy",
 } as const;
 
 // ============================================================================
@@ -208,18 +222,28 @@ export const APP_ROUTES = {
 // ============================================================================
 
 /** All valid app routes as union type */
-export type AppRoute = typeof APP_ROUTES[keyof typeof APP_ROUTES];
+export type AppRoute = (typeof APP_ROUTES)[keyof typeof APP_ROUTES];
 
 /** Route groups by layer */
-export type MainServiceRoute = typeof MAIN_SERVICES_ROUTES[keyof typeof MAIN_SERVICES_ROUTES];
-export type ConstructionRoute = typeof CONSTRUCTION_ROUTES[keyof typeof CONSTRUCTION_ROUTES];
-export type ManagementRoute = typeof MANAGEMENT_ROUTES[keyof typeof MANAGEMENT_ROUTES];
-export type FinishingRoute = typeof FINISHING_ROUTES[keyof typeof FINISHING_ROUTES];
-export type ProfessionalRoute = typeof PROFESSIONAL_ROUTES[keyof typeof PROFESSIONAL_ROUTES];
-export type QuickToolRoute = typeof QUICK_TOOLS_ROUTES[keyof typeof QUICK_TOOLS_ROUTES];
-export type ShoppingRoute = typeof SHOPPING_ROUTES[keyof typeof SHOPPING_ROUTES];
-export type AdditionalServiceRoute = typeof ADDITIONAL_SERVICES_ROUTES[keyof typeof ADDITIONAL_SERVICES_ROUTES];
-export type AdvancedRoute = typeof ADVANCED_ROUTES[keyof typeof ADVANCED_ROUTES];
+export type MainServiceRoute =
+  (typeof MAIN_SERVICES_ROUTES)[keyof typeof MAIN_SERVICES_ROUTES];
+export type ConstructionRoute =
+  (typeof CONSTRUCTION_ROUTES)[keyof typeof CONSTRUCTION_ROUTES];
+export type ManagementRoute =
+  (typeof MANAGEMENT_ROUTES)[keyof typeof MANAGEMENT_ROUTES];
+export type FinishingRoute =
+  (typeof FINISHING_ROUTES)[keyof typeof FINISHING_ROUTES];
+export type ProfessionalRoute =
+  (typeof PROFESSIONAL_ROUTES)[keyof typeof PROFESSIONAL_ROUTES];
+export type QuickToolRoute =
+  (typeof QUICK_TOOLS_ROUTES)[keyof typeof QUICK_TOOLS_ROUTES];
+export type ShoppingRoute =
+  (typeof SHOPPING_ROUTES)[keyof typeof SHOPPING_ROUTES];
+export type AdditionalServiceRoute =
+  (typeof ADDITIONAL_SERVICES_ROUTES)[keyof typeof ADDITIONAL_SERVICES_ROUTES];
+export type AdvancedRoute =
+  (typeof ADVANCED_ROUTES)[keyof typeof ADVANCED_ROUTES];
+export type DemoRoute = (typeof DEMO_ROUTES)[keyof typeof DEMO_ROUTES];
 
 // ============================================================================
 // Dynamic Route Builders
@@ -259,27 +283,24 @@ export const videoRoute = (category: string): `/videos/${string}` => {
 
 /**
  * Build shopping route with query parameters
- * @example shoppingRoute('furniture', {sort: 'price'}) → '/shopping/index?cat=furniture&sort=price'
+ * @example shoppingRoute('furniture', {sort: 'price'}) → '/shopping/furniture?sort=price'
  */
 export const shoppingRoute = (
-  category?: 'construction' | 'electrical' | 'furniture' | 'paint',
-  params?: Record<string, string>
+  category?: "construction" | "electrical" | "furniture" | "paint",
+  params?: Record<string, string>,
 ): string => {
   const queryParams: string[] = [];
-  
-  if (category) {
-    queryParams.push(`cat=${category}`);
-  }
-  
+  const basePath = category ? `/shopping/${category}` : "/shopping/index";
+
   if (params) {
     Object.entries(params).forEach(([key, value]) => {
       queryParams.push(`${key}=${encodeURIComponent(value)}`);
     });
   }
-  
-  return queryParams.length > 0 
-    ? `/shopping/index?${queryParams.join('&')}` 
-    : '/shopping/index';
+
+  return queryParams.length > 0
+    ? `${basePath}?${queryParams.join("&")}`
+    : basePath;
 };
 
 // ============================================================================
@@ -306,7 +327,8 @@ export const getRouteLayer = (route: AppRoute): number => {
   if (Object.values(PROFESSIONAL_ROUTES).includes(route as any)) return 5;
   if (Object.values(QUICK_TOOLS_ROUTES).includes(route as any)) return 6;
   if (Object.values(SHOPPING_ROUTES).includes(route as any)) return 7;
-  if (Object.values(ADDITIONAL_SERVICES_ROUTES).includes(route as any)) return 8;
+  if (Object.values(ADDITIONAL_SERVICES_ROUTES).includes(route as any))
+    return 8;
   if (Object.values(ADVANCED_ROUTES).includes(route as any)) return 9;
   return 0;
 };
@@ -317,18 +339,18 @@ export const getRouteLayer = (route: AppRoute): number => {
 export const getRouteCategory = (route: AppRoute): string => {
   const layer = getRouteLayer(route);
   const categories = [
-    'Unknown',
-    'Main Services',
-    'Construction',
-    'Management',
-    'Finishing',
-    'Professional',
-    'Quick Tools',
-    'Shopping',
-    'Additional Services',
-    'Advanced',
+    "Unknown",
+    "Main Services",
+    "Construction",
+    "Management",
+    "Finishing",
+    "Professional",
+    "Quick Tools",
+    "Shopping",
+    "Additional Services",
+    "Advanced",
   ];
-  return categories[layer] || 'Unknown';
+  return categories[layer] || "Unknown";
 };
 
 /**
@@ -343,15 +365,18 @@ export const getAllRoutes = (): AppRoute[] => {
  */
 export const getRoutesByLayer = () => {
   return {
-    1: { name: 'Main Services', routes: Object.values(MAIN_SERVICES_ROUTES) },
-    2: { name: 'Construction', routes: Object.values(CONSTRUCTION_ROUTES) },
-    3: { name: 'Management', routes: Object.values(MANAGEMENT_ROUTES) },
-    4: { name: 'Finishing', routes: Object.values(FINISHING_ROUTES) },
-    5: { name: 'Professional', routes: Object.values(PROFESSIONAL_ROUTES) },
-    6: { name: 'Quick Tools', routes: Object.values(QUICK_TOOLS_ROUTES) },
-    7: { name: 'Shopping', routes: Object.values(SHOPPING_ROUTES) },
-    8: { name: 'Additional Services', routes: Object.values(ADDITIONAL_SERVICES_ROUTES) },
-    9: { name: 'Advanced', routes: Object.values(ADVANCED_ROUTES) },
+    1: { name: "Main Services", routes: Object.values(MAIN_SERVICES_ROUTES) },
+    2: { name: "Construction", routes: Object.values(CONSTRUCTION_ROUTES) },
+    3: { name: "Management", routes: Object.values(MANAGEMENT_ROUTES) },
+    4: { name: "Finishing", routes: Object.values(FINISHING_ROUTES) },
+    5: { name: "Professional", routes: Object.values(PROFESSIONAL_ROUTES) },
+    6: { name: "Quick Tools", routes: Object.values(QUICK_TOOLS_ROUTES) },
+    7: { name: "Shopping", routes: Object.values(SHOPPING_ROUTES) },
+    8: {
+      name: "Additional Services",
+      routes: Object.values(ADDITIONAL_SERVICES_ROUTES),
+    },
+    9: { name: "Advanced", routes: Object.values(ADVANCED_ROUTES) },
   };
 };
 
@@ -369,7 +394,7 @@ export interface RouteMetadata {
   layer: number;
   tags: string[];
   premium?: boolean;
-  badge?: 'HOT' | 'NEW' | 'PRO';
+  badge?: "HOT" | "NEW" | "PRO";
   price?: string;
   rating?: number;
 }
@@ -382,90 +407,145 @@ export const ROUTE_METADATA_MAP: Partial<Record<AppRoute, RouteMetadata>> = {
   // Layer 1: Main Services
   [APP_ROUTES.HOUSE_DESIGN]: {
     route: APP_ROUTES.HOUSE_DESIGN,
-    title: 'House Design',
-    titleVi: 'Thiết kế nhà',
-    icon: 'home-outline',
-    category: 'Main Services',
+    title: "House Design",
+    titleVi: "Thiết kế nhà",
+    icon: "home-outline",
+    category: "Main Services",
     layer: 1,
-    tags: ['design', 'architecture', 'thiết kế', 'kiến trúc'],
+    tags: ["design", "architecture", "thiết kế", "kiến trúc"],
   },
   [APP_ROUTES.CONSTRUCTION_PROGRESS]: {
     route: APP_ROUTES.CONSTRUCTION_PROGRESS,
-    title: 'Construction Progress',
-    titleVi: 'Thi công XD',
-    icon: 'construct-outline',
-    category: 'Main Services',
+    title: "Construction Progress",
+    titleVi: "Thi công XD",
+    icon: "construct-outline",
+    category: "Main Services",
     layer: 1,
-    tags: ['construction', 'progress', 'thi công', 'tiến độ'],
+    tags: ["construction", "progress", "thi công", "tiến độ"],
   },
   [APP_ROUTES.MY_PROJECTS]: {
     route: APP_ROUTES.MY_PROJECTS,
-    title: 'My Projects',
-    titleVi: 'Dự án của tôi',
-    icon: 'folder-outline',
-    category: 'Main Services',
+    title: "My Projects",
+    titleVi: "Dự án của tôi",
+    icon: "folder-outline",
+    category: "Main Services",
     layer: 1,
-    tags: ['projects', 'portfolio', 'dự án'],
+    tags: ["projects", "portfolio", "dự án"],
   },
   [APP_ROUTES.MATERIALS]: {
     route: APP_ROUTES.MATERIALS,
-    title: 'Materials',
-    titleVi: 'Vật liệu',
-    icon: 'cube-outline',
-    category: 'Main Services',
+    title: "Materials",
+    titleVi: "Vật liệu",
+    icon: "cube-outline",
+    category: "Main Services",
     layer: 1,
-    tags: ['materials', 'inventory', 'vật liệu'],
+    tags: ["materials", "inventory", "vật liệu"],
   },
   [APP_ROUTES.LABOR]: {
     route: APP_ROUTES.LABOR,
-    title: 'Labor',
-    titleVi: 'Nhân công',
-    icon: 'people-outline',
-    category: 'Main Services',
+    title: "Labor",
+    titleVi: "Nhân công",
+    icon: "people-outline",
+    category: "Main Services",
     layer: 1,
-    tags: ['labor', 'workers', 'nhân công', 'thợ'],
+    tags: ["labor", "workers", "nhân công", "thợ"],
   },
   [APP_ROUTES.AI_HUB]: {
     route: APP_ROUTES.AI_HUB,
-    title: 'AI Assistant',
-    titleVi: 'Trợ lý AI',
-    icon: 'sparkles-outline',
-    category: 'Quick Tools',
+    title: "AI Assistant",
+    titleVi: "Trợ lý AI",
+    icon: "sparkles-outline",
+    category: "Quick Tools",
     layer: 6,
-    badge: 'NEW',
-    tags: ['ai', 'assistant', 'trí tuệ nhân tạo'],
+    badge: "NEW",
+    tags: ["ai", "assistant", "trí tuệ nhân tạo"],
   },
   [APP_ROUTES.INSPECTION]: {
     route: APP_ROUTES.INSPECTION,
-    title: 'Inspection',
-    titleVi: 'Kiểm tra',
-    icon: 'search-outline',
-    category: 'Advanced',
+    title: "Inspection",
+    titleVi: "Kiểm tra",
+    icon: "search-outline",
+    category: "Advanced",
     layer: 9,
     premium: true,
-    badge: 'PRO',
-    tags: ['inspection', 'quality', 'kiểm tra', 'chất lượng'],
+    badge: "PRO",
+    tags: ["inspection", "quality", "kiểm tra", "chất lượng"],
   },
   [APP_ROUTES.WARRANTY]: {
     route: APP_ROUTES.WARRANTY,
-    title: 'Warranty',
-    titleVi: 'Bảo hành',
-    icon: 'shield-checkmark-outline',
-    category: 'Advanced',
+    title: "Warranty",
+    titleVi: "Bảo hành",
+    icon: "shield-checkmark-outline",
+    category: "Advanced",
     layer: 9,
     premium: true,
-    badge: 'PRO',
-    tags: ['warranty', 'guarantee', 'bảo hành'],
+    badge: "PRO",
+    tags: ["warranty", "guarantee", "bảo hành"],
   },
   [APP_ROUTES.LEGAL]: {
     route: APP_ROUTES.LEGAL,
-    title: 'Legal',
-    titleVi: 'Pháp lý',
-    icon: 'document-text-outline',
-    category: 'Advanced',
+    title: "Legal",
+    titleVi: "Pháp lý",
+    icon: "document-text-outline",
+    category: "Advanced",
     layer: 9,
-    badge: 'NEW',
-    tags: ['legal', 'law', 'pháp lý'],
+    badge: "NEW",
+    tags: ["legal", "law", "pháp lý"],
+  },
+  [APP_ROUTES.DEMO_ROLE_BASED_HOME]: {
+    route: APP_ROUTES.DEMO_ROLE_BASED_HOME,
+    title: "Role-based Home Demo",
+    titleVi: "Demo trang chủ theo vai trò",
+    icon: "grid-outline",
+    category: "Demo",
+    layer: 0,
+    badge: "NEW",
+    tags: ["demo", "role-based", "home", "vai trò"],
+  },
+  [APP_ROUTES.DEMO_SERVICE_CATEGORY_DETAIL]: {
+    route: APP_ROUTES.DEMO_SERVICE_CATEGORY_DETAIL,
+    title: "Service Category Detail Demo",
+    titleVi: "Demo chi tiết danh mục dịch vụ",
+    icon: "apps-outline",
+    category: "Demo",
+    layer: 0,
+    tags: ["demo", "service", "category", "chi tiết"],
+  },
+  [APP_ROUTES.DEMO_BANNER_CAMPAIGN_DETAIL]: {
+    route: APP_ROUTES.DEMO_BANNER_CAMPAIGN_DETAIL,
+    title: "Banner Campaign Demo",
+    titleVi: "Demo chi tiết chiến dịch banner",
+    icon: "image-outline",
+    category: "Demo",
+    layer: 0,
+    tags: ["demo", "banner", "campaign"],
+  },
+  [APP_ROUTES.DEMO_PRODUCT_DETAIL]: {
+    route: APP_ROUTES.DEMO_PRODUCT_DETAIL,
+    title: "Product Detail Demo",
+    titleVi: "Demo chi tiết sản phẩm",
+    icon: "cube-outline",
+    category: "Demo",
+    layer: 0,
+    tags: ["demo", "product", "detail", "shopping"],
+  },
+  [APP_ROUTES.DEMO_WORKER_REWARDS_DETAIL]: {
+    route: APP_ROUTES.DEMO_WORKER_REWARDS_DETAIL,
+    title: "Worker Rewards Demo",
+    titleVi: "Demo thưởng giới thiệu thợ",
+    icon: "gift-outline",
+    category: "Demo",
+    layer: 0,
+    tags: ["demo", "worker", "reward", "referral"],
+  },
+  [APP_ROUTES.DEMO_INTERNAL_DASHBOARD_DETAIL]: {
+    route: APP_ROUTES.DEMO_INTERNAL_DASHBOARD_DETAIL,
+    title: "Internal Dashboard Demo",
+    titleVi: "Demo dashboard nội bộ",
+    icon: "speedometer-outline",
+    category: "Demo",
+    layer: 0,
+    tags: ["demo", "internal", "dashboard", "manager"],
   },
 };
 
@@ -481,13 +561,13 @@ export const ROUTE_METADATA_MAP: Partial<Record<AppRoute, RouteMetadata>> = {
 export const searchRoutes = (keyword: string): RouteMetadata[] => {
   const lowerKeyword = keyword.toLowerCase().trim();
   if (!lowerKeyword) return [];
-  
-  return Object.values(ROUTE_METADATA_MAP).filter(meta => {
+
+  return Object.values(ROUTE_METADATA_MAP).filter((meta) => {
     if (!meta) return false;
     return (
       meta.title.toLowerCase().includes(lowerKeyword) ||
       meta.titleVi.toLowerCase().includes(lowerKeyword) ||
-      meta.tags.some(tag => tag.toLowerCase().includes(lowerKeyword)) ||
+      meta.tags.some((tag) => tag.toLowerCase().includes(lowerKeyword)) ||
       meta.category.toLowerCase().includes(lowerKeyword)
     );
   }) as RouteMetadata[];
@@ -498,7 +578,7 @@ export const searchRoutes = (keyword: string): RouteMetadata[] => {
  */
 export const getRoutesByLayerNumber = (layer: number): RouteMetadata[] => {
   return Object.values(ROUTE_METADATA_MAP).filter(
-    meta => meta && meta.layer === layer
+    (meta) => meta && meta.layer === layer,
   ) as RouteMetadata[];
 };
 
@@ -507,7 +587,7 @@ export const getRoutesByLayerNumber = (layer: number): RouteMetadata[] => {
  */
 export const getPremiumRoutes = (): RouteMetadata[] => {
   return Object.values(ROUTE_METADATA_MAP).filter(
-    meta => meta && meta.premium
+    (meta) => meta && meta.premium,
   ) as RouteMetadata[];
 };
 

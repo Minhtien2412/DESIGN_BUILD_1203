@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Dự toán xây dựng — Project Hub (DS-Migrated)
  * Route: /calculators
  */

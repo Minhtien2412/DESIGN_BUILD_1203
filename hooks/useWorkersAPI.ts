@@ -172,7 +172,7 @@ export function useWorkersAPI(
       setLoadingSpecialties(true);
       const response = await getSpecialties();
       if (response) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         setSpecialties(response as any);
       }
     } catch (err) {
@@ -219,14 +219,14 @@ export function useWorkersAPI(
       loadWorkers();
       loadSpecialties();
     }
-  }, [autoLoad]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [autoLoad]);  
 
   // Reload when params change
   useEffect(() => {
     if (Object.keys(currentParams).length > 0) {
       loadWorkers();
     }
-  }, [currentParams]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [currentParams]);  
 
   return {
     // Data

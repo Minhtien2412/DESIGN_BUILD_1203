@@ -89,7 +89,7 @@ export default function MessageSearchScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     // Navigate to conversation and highlight message
     router.push({
-      pathname: `/chat/${result.conversationId}`,
+      pathname: `/chat/${result.conversationId}` as any,
       params: {
         highlightMessageId: result.messageId,
         scrollToMessage: "true",

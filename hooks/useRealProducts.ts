@@ -377,7 +377,7 @@ export function useRealProducts(
     if (autoFetch) {
       fetchProducts(1, false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [filters]);
 
   // Cleanup

@@ -360,7 +360,8 @@ export default function CheckoutScreen() {
       setLoadingShipping(true);
       try {
         const totalWeight = items.reduce(
-          (sum, item) => sum + (item.product.weight || 0.5) * item.quantity,
+          (sum, item) =>
+            sum + ((item.product as any).weight || 0.5) * item.quantity,
           0,
         );
         const result = await estimateShipping({

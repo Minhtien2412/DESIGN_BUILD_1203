@@ -5,10 +5,16 @@
  */
 
 import { useAuth } from "@/context/AuthContext";
+import { useRole } from "@/context/RoleContext";
+import {
+    getSettingsSections,
+    resolveEffectiveRole,
+    ROLE_CONFIGS,
+} from "@/features/profile/profileConfig";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { Href, Stack, router } from "expo-router";
-import { memo, useCallback } from "react";
+import { Href, router, Stack } from "expo-router";
+import { memo, useCallback, useMemo } from "react";
 import {
     Alert,
     Platform,
@@ -48,113 +54,8 @@ interface SettingSection {
 // ============================================================================
 const STATUS_H = StatusBar.currentHeight ?? 44;
 
-const SETTINGS_SECTIONS: SettingSection[] = [
-  {
-    id: "account",
-    title: "Tài khoản",
-    items: [
-      {
-        id: "edit-profile",
-        icon: "person-outline",
-        title: "Chỉnh sửa hồ sơ",
-        subtitle: "Tên, ảnh đại diện, thông tin cá nhân",
-        route: "/profile/edit",
-        color: "#0D9488",
-        showArrow: true,
-      },
-      {
-        id: "security",
-        icon: "shield-checkmark-outline",
-        title: "Bảo mật & Quyền riêng tư",
-        subtitle: "Mật khẩu, xác thực 2 lớp",
-        route: "/profile/security",
-        color: "#8B5CF6",
-        showArrow: true,
-      },
-      {
-        id: "addresses",
-        icon: "location-outline",
-        title: "Địa chỉ",
-        subtitle: "Quản lý địa chỉ giao hàng",
-        route: "/profile/addresses",
-        color: "#10B981",
-        showArrow: true,
-      },
-      {
-        id: "payment-methods",
-        icon: "card-outline",
-        title: "Phương thức thanh toán",
-        subtitle: "Ví, thẻ ngân hàng",
-        route: "/profile/payment-methods",
-        color: "#F59E0B",
-        showArrow: true,
-      },
-    ],
-  },
-  {
-    id: "preferences",
-    title: "Tùy chỉnh",
-    items: [
-      {
-        id: "notifications",
-        icon: "notifications-outline",
-        title: "Thông báo",
-        subtitle: "Quản lý cài đặt thông báo",
-        route: "/profile/notifications-settings",
-        color: "#EF4444",
-        showArrow: true,
-      },
-      {
-        id: "language",
-        icon: "language-outline",
-        title: "Ngôn ngữ",
-        subtitle: "Tiếng Việt",
-        route: "/profile/language",
-        color: "#06B6D4",
-        showArrow: true,
-      },
-    ],
-  },
-  {
-    id: "support",
-    title: "Hỗ trợ",
-    items: [
-      {
-        id: "help",
-        icon: "help-circle-outline",
-        title: "Trung tâm trợ giúp",
-        route: "/customer-support",
-        color: "#0D9488",
-        showArrow: true,
-      },
-      {
-        id: "feedback",
-        icon: "chatbubble-ellipses-outline",
-        title: "Góp ý & Phản hồi",
-        route: "/feedback",
-        color: "#10B981",
-        showArrow: true,
-      },
-      {
-        id: "about",
-        icon: "information-circle-outline",
-        title: "Về ứng dụng",
-        subtitle: "Phiên bản 1.0.0",
-        route: "/about",
-        color: "#64748B",
-        showArrow: true,
-      },
-      {
-        id: "terms",
-        icon: "document-text-outline",
-        title: "Điều khoản dịch vụ",
-        route: "/terms",
-        color: "#64748B",
-        showArrow: true,
-      },
-    ],
-  },
-];
+// Settings sections are now generated dynamically from getSettingsSections()
+// based on the user's effective role.
 
 // ============================================================================
 // COMPONENTS
@@ -198,6 +99,32 @@ const SettingRow = memo(
 // ============================================================================
 export default function SettingsScreen() {
   const { signOut, user } = useAuth();
+  const { role: appRole } = useRole();
+
+  const effectiveRole = useMemo(
+    () => resolveEffectiveRole(user, appRole),
+    [user, appRole],
+  );
+  const config = ROLE_CONFIGS[effectiveRole];
+
+  // Build role-aware settings sections and adapt to local SettingItem shape
+  const sections = useMemo(() => {
+    const roleSections = getSettingsSections(effectiveRole);
+    return roleSections.map((s) => ({
+      id: s.title,
+      title: s.title,
+      items: s.items.map((item) => ({
+        id: item.id,
+        icon: item.icon as keyof typeof Ionicons.glyphMap,
+        title: item.title,
+        route: item.route,
+        color: item.iconColor,
+        showArrow: !item.showSwitch,
+        showSwitch: item.showSwitch,
+        switchValue: item.switchValue,
+      })),
+    }));
+  }, [effectiveRole]);
 
   const handlePress = useCallback((item: SettingItem) => {
     if (item.route) {
@@ -229,7 +156,7 @@ export default function SettingsScreen() {
 
       {/* Header */}
       <LinearGradient
-        colors={["#1E3A5F", "#0D9488"]}
+        colors={[config.gradient[0], config.gradient[1]]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.header}
@@ -252,7 +179,7 @@ export default function SettingsScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {SETTINGS_SECTIONS.map((section) => (
+        {sections.map((section) => (
           <View key={section.id} style={styles.section}>
             <Text style={styles.sectionTitle}>{section.title}</Text>
             <View style={styles.sectionCard}>

@@ -37,15 +37,15 @@ export const API_BASE = API;
 let apiKey: string | null = ENV.API_KEY;
 
 if (apiKey) {
-  console.log("[API] ? API key initialized:", apiKey.substring(0, 15) + "...");
+  console.log("[API] API key initialized:", true);
 } else {
-  console.error("[API] ? CRITICAL: No API key! Requests will fail!");
+  console.error("[API] CRITICAL: No API key configured — requests will fail");
 }
 
 export const setApiKey = (key: string | null) => {
   apiKey = key;
   if (key) {
-    console.log("[API] ? API key updated:", key.substring(0, 15) + "...");
+    console.log("[API] API key updated:", !!key);
   }
 };
 export const getApiKey = () => apiKey;
@@ -98,7 +98,7 @@ export class ApiError {
 let authToken: string | null = null;
 export const setToken = (t: string | null) => {
   authToken = t;
-  console.log("[API] Token set:", t ? `${t.substring(0, 20)}...` : "null");
+  console.log("[API] Token set:", !!t);
 };
 export const clearToken = () => {
   authToken = null;

@@ -3,13 +3,16 @@
  * Join a meeting by code or link
  */
 
-import { ThemedText } from '@/components/themed-text';
-import { useThemeColor } from '@/hooks/use-theme-color';
-import { getMeetingByCode, joinMeeting } from '@/services/scheduled-meeting.service';
-import { Ionicons } from '@expo/vector-icons';
-import * as Clipboard from 'expo-clipboard';
-import { router } from 'expo-router';
-import { useState } from 'react';
+import { ThemedText } from "@/components/themed-text";
+import { useThemeColor } from "@/hooks/use-theme-color";
+import {
+    getMeetingByCode,
+    joinMeeting,
+} from "@/services/scheduled-meeting.service";
+import { Ionicons } from "@expo/vector-icons";
+import * as Clipboard from "expo-clipboard";
+import { router } from "expo-router";
+import { useState } from "react";
 import {
     ActivityIndicator,
     Alert,
@@ -19,32 +22,35 @@ import {
     Text,
     TextInput,
     View,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function JoinMeetingScreen() {
-  const [meetingCode, setMeetingCode] = useState('');
-  const [password, setPassword] = useState('');
-  const [displayName, setDisplayName] = useState('');
+  const [meetingCode, setMeetingCode] = useState("");
+  const [password, setPassword] = useState("");
+  const [displayName, setDisplayName] = useState("");
   const [isAudioMuted, setIsAudioMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [meetingInfo, setMeetingInfo] = useState<{ title: string; requiresPassword: boolean } | null>(null);
+  const [meetingInfo, setMeetingInfo] = useState<{
+    title: string;
+    requiresPassword: boolean;
+  } | null>(null);
 
-  const backgroundColor = useThemeColor({}, 'background');
-  const cardBg = useThemeColor({}, 'surface');
-  const primary = useThemeColor({}, 'primary');
-  const textColor = useThemeColor({}, 'text');
-  const mutedColor = useThemeColor({}, 'textMuted');
-  const borderColor = useThemeColor({}, 'border');
+  const backgroundColor = useThemeColor({}, "background");
+  const cardBg = useThemeColor({}, "surface");
+  const primary = useThemeColor({}, "primary");
+  const textColor = useThemeColor({}, "text");
+  const mutedColor = useThemeColor({}, "textMuted");
+  const borderColor = useThemeColor({}, "border");
 
   // Format meeting code as user types (abc-defg-hij)
   const formatMeetingCode = (text: string) => {
-    const cleaned = text.toLowerCase().replace(/[^a-z]/g, '');
-    let formatted = '';
+    const cleaned = text.toLowerCase().replace(/[^a-z]/g, "");
+    let formatted = "";
     for (let i = 0; i < cleaned.length && i < 10; i++) {
-      if (i === 3 || i === 7) formatted += '-';
+      if (i === 3 || i === 7) formatted += "-";
       formatted += cleaned[i];
     }
     return formatted;
@@ -55,7 +61,8 @@ export default function JoinMeetingScreen() {
     setMeetingCode(formatted);
 
     // Check meeting when code is complete
-    if (formatted.length === 12) { // abc-defg-hij
+    if (formatted.length === 12) {
+      // abc-defg-hij
       try {
         const meeting = await getMeetingByCode(formatted);
         if (meeting) {
@@ -89,13 +96,13 @@ export default function JoinMeetingScreen() {
 
   const handleJoin = async () => {
     if (meetingCode.length < 12) {
-      Alert.alert('Lỗi', 'Vui lòng nhập mã cuộc họp hợp lệ');
+      Alert.alert("Lỗi", "Vui lòng nhập mã cuộc họp hợp lệ");
       return;
     }
 
     try {
       setLoading(true);
-      
+
       await joinMeeting({
         meetingCode,
         password: showPassword ? password : undefined,
@@ -105,10 +112,11 @@ export default function JoinMeetingScreen() {
       });
 
       // Navigate to meeting room
-      router.replace(`/meet/${meetingCode}`);
+      router.replace(`/meetings/room/${meetingCode}` as any);
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Không thể tham gia cuộc họp';
-      Alert.alert('Lỗi', message);
+      const message =
+        error instanceof Error ? error.message : "Không thể tham gia cuộc họp";
+      Alert.alert("Lỗi", message);
     } finally {
       setLoading(false);
     }
@@ -131,7 +139,10 @@ export default function JoinMeetingScreen() {
           <Text style={[styles.label, { color: textColor }]}>Mã cuộc họp</Text>
           <View style={styles.codeInputRow}>
             <TextInput
-              style={[styles.codeInput, { backgroundColor: cardBg, borderColor, color: textColor }]}
+              style={[
+                styles.codeInput,
+                { backgroundColor: cardBg, borderColor, color: textColor },
+              ]}
               placeholder="abc-defg-hij"
               placeholderTextColor={mutedColor}
               value={meetingCode}
@@ -141,7 +152,10 @@ export default function JoinMeetingScreen() {
               maxLength={12}
             />
             <Pressable
-              style={[styles.pasteButton, { backgroundColor: cardBg, borderColor }]}
+              style={[
+                styles.pasteButton,
+                { backgroundColor: cardBg, borderColor },
+              ]}
               onPress={handlePasteCode}
             >
               <Ionicons name="clipboard-outline" size={20} color={primary} />
@@ -154,7 +168,12 @@ export default function JoinMeetingScreen() {
 
         {/* Meeting Info */}
         {meetingInfo && (
-          <View style={[styles.meetingInfoCard, { backgroundColor: cardBg, borderColor }]}>
+          <View
+            style={[
+              styles.meetingInfoCard,
+              { backgroundColor: cardBg, borderColor },
+            ]}
+          >
             <Ionicons name="videocam" size={24} color={primary} />
             <View style={styles.meetingInfoText}>
               <Text style={[styles.meetingTitle, { color: textColor }]}>
@@ -173,7 +192,10 @@ export default function JoinMeetingScreen() {
           <View style={styles.section}>
             <Text style={[styles.label, { color: textColor }]}>Mật khẩu</Text>
             <TextInput
-              style={[styles.input, { backgroundColor: cardBg, borderColor, color: textColor }]}
+              style={[
+                styles.input,
+                { backgroundColor: cardBg, borderColor, color: textColor },
+              ]}
               placeholder="Nhập mật khẩu"
               placeholderTextColor={mutedColor}
               value={password}
@@ -185,9 +207,14 @@ export default function JoinMeetingScreen() {
 
         {/* Display Name */}
         <View style={styles.section}>
-          <Text style={[styles.label, { color: textColor }]}>Tên hiển thị (tùy chọn)</Text>
+          <Text style={[styles.label, { color: textColor }]}>
+            Tên hiển thị (tùy chọn)
+          </Text>
           <TextInput
-            style={[styles.input, { backgroundColor: cardBg, borderColor, color: textColor }]}
+            style={[
+              styles.input,
+              { backgroundColor: cardBg, borderColor, color: textColor },
+            ]}
             placeholder="Tên của bạn trong cuộc họp"
             placeholderTextColor={mutedColor}
             value={displayName}
@@ -197,12 +224,21 @@ export default function JoinMeetingScreen() {
 
         {/* Join Settings */}
         <View style={styles.section}>
-          <Text style={[styles.label, { color: textColor }]}>Tùy chọn tham gia</Text>
-          <View style={[styles.settingsCard, { backgroundColor: cardBg, borderColor }]}>
+          <Text style={[styles.label, { color: textColor }]}>
+            Tùy chọn tham gia
+          </Text>
+          <View
+            style={[
+              styles.settingsCard,
+              { backgroundColor: cardBg, borderColor },
+            ]}
+          >
             <View style={styles.settingRow}>
               <View style={styles.settingInfo}>
                 <Ionicons name="mic-off-outline" size={20} color={mutedColor} />
-                <Text style={[styles.settingLabel, { color: textColor }]}>Tắt mic khi vào</Text>
+                <Text style={[styles.settingLabel, { color: textColor }]}>
+                  Tắt mic khi vào
+                </Text>
               </View>
               <Switch
                 value={isAudioMuted}
@@ -214,8 +250,14 @@ export default function JoinMeetingScreen() {
 
             <View style={styles.settingRow}>
               <View style={styles.settingInfo}>
-                <Ionicons name="videocam-off-outline" size={20} color={mutedColor} />
-                <Text style={[styles.settingLabel, { color: textColor }]}>Tắt camera khi vào</Text>
+                <Ionicons
+                  name="videocam-off-outline"
+                  size={20}
+                  color={mutedColor}
+                />
+                <Text style={[styles.settingLabel, { color: textColor }]}>
+                  Tắt camera khi vào
+                </Text>
               </View>
               <Switch
                 value={isVideoOff}
@@ -256,9 +298,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 16,
     paddingVertical: 12,
   },
@@ -267,7 +309,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   content: {
     flex: 1,
@@ -278,11 +320,11 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 8,
   },
   codeInputRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 10,
   },
   codeInput: {
@@ -292,13 +334,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 14,
     fontSize: 18,
-    fontFamily: 'monospace',
+    fontFamily: "monospace",
     letterSpacing: 2,
   },
   pasteButton: {
     width: 50,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     borderRadius: 12,
     borderWidth: 1,
   },
@@ -314,8 +356,8 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   meetingInfoCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 12,
     padding: 16,
     borderRadius: 12,
@@ -327,7 +369,7 @@ const styles = StyleSheet.create({
   },
   meetingTitle: {
     fontSize: 15,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   meetingStatus: {
     fontSize: 13,
@@ -336,38 +378,38 @@ const styles = StyleSheet.create({
   settingsCard: {
     borderRadius: 12,
     borderWidth: 1,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   settingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 16,
     paddingVertical: 14,
   },
   settingInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 12,
   },
   settingLabel: {
     fontSize: 15,
   },
   joinButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     gap: 10,
     paddingVertical: 16,
     borderRadius: 12,
-    marginTop: 'auto',
+    marginTop: "auto",
   },
   joinButtonDisabled: {
     opacity: 0.5,
   },
   joinButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });

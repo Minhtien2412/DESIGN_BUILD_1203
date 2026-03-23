@@ -128,7 +128,7 @@ export function useNearbyWorkers(
     if (autoSearch && userLocation) {
       search(userLocation);
     }
-  }, [autoSearch, userLocation, searchRadius, category]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [autoSearch, userLocation, searchRadius, category]);  
 
   // Periodic refresh
   useEffect(() => {

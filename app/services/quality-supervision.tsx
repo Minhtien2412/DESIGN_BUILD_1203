@@ -1,76 +1,73 @@
-import { Colors } from '@/constants/theme';
-import { Ionicons } from '@expo/vector-icons';
-import { Stack } from 'expo-router';
-import React, { useState } from 'react';
+import { Ionicons } from "@expo/vector-icons";
+import { Stack } from "expo-router";
+import React, { useState } from "react";
 import {
     Alert,
     Modal,
     ScrollView,
-    StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
     View,
-} from 'react-native';
+} from "react-native";
+
+import { useDS } from "@/hooks/useDS";
 
 // Package data
 const PACKAGES = [
   {
-    id: 'basic',
-    name: 'Cơ bản',
-    price: '15.000.000₫',
-    priceUnit: '/ dự án',
-    color: '#0D9488',
+    id: "basic",
+    name: "Cơ bản",
+    price: "15.000.000₫",
+    priceUnit: "/ dự án",
     popular: false,
     features: [
-      { included: true, text: 'Giám sát 2 lần/tuần' },
-      { included: true, text: 'Báo cáo tiến độ hàng tuần' },
-      { included: true, text: 'Kiểm tra chất lượng vật liệu' },
-      { included: true, text: 'Hỗ trợ qua điện thoại' },
-      { included: false, text: 'Kiểm tra kỹ thuật chuyên sâu' },
-      { included: false, text: 'Báo cáo ảnh/video chi tiết' },
-      { included: false, text: 'Đội ngũ giám sát chuyên nghiệp' },
-      { included: false, text: 'Bảo hành sau nghiệm thu' },
+      { included: true, text: "Giám sát 2 lần/tuần" },
+      { included: true, text: "Báo cáo tiến độ hàng tuần" },
+      { included: true, text: "Kiểm tra chất lượng vật liệu" },
+      { included: true, text: "Hỗ trợ qua điện thoại" },
+      { included: false, text: "Kiểm tra kỹ thuật chuyên sâu" },
+      { included: false, text: "Báo cáo ảnh/video chi tiết" },
+      { included: false, text: "Đội ngũ giám sát chuyên nghiệp" },
+      { included: false, text: "Bảo hành sau nghiệm thu" },
     ],
-    description: 'Phù hợp với dự án nhỏ, nhà ở riêng lẻ dưới 100m²',
+    description: "Phù hợp với dự án nhỏ, nhà ở riêng lẻ dưới 100m²",
   },
   {
-    id: 'standard',
-    name: 'Tiêu chuẩn',
-    price: '30.000.000₫',
-    priceUnit: '/ dự án',
-    color: Colors.light.primary,
+    id: "standard",
+    name: "Tiêu chuẩn",
+    price: "30.000.000₫",
+    priceUnit: "/ dự án",
     popular: true,
     features: [
-      { included: true, text: 'Giám sát 3-4 lần/tuần' },
-      { included: true, text: 'Báo cáo tiến độ 2 lần/tuần' },
-      { included: true, text: 'Kiểm tra chất lượng vật liệu' },
-      { included: true, text: 'Hỗ trợ 24/7' },
-      { included: true, text: 'Kiểm tra kỹ thuật chuyên sâu' },
-      { included: true, text: 'Báo cáo ảnh/video chi tiết' },
-      { included: false, text: 'Đội ngũ giám sát chuyên nghiệp' },
-      { included: false, text: 'Bảo hành sau nghiệm thu' },
+      { included: true, text: "Giám sát 3-4 lần/tuần" },
+      { included: true, text: "Báo cáo tiến độ 2 lần/tuần" },
+      { included: true, text: "Kiểm tra chất lượng vật liệu" },
+      { included: true, text: "Hỗ trợ 24/7" },
+      { included: true, text: "Kiểm tra kỹ thuật chuyên sâu" },
+      { included: true, text: "Báo cáo ảnh/video chi tiết" },
+      { included: false, text: "Đội ngũ giám sát chuyên nghiệp" },
+      { included: false, text: "Bảo hành sau nghiệm thu" },
     ],
-    description: 'Phù hợp với nhà phố, biệt thự 100-300m²',
+    description: "Phù hợp với nhà phố, biệt thự 100-300m²",
   },
   {
-    id: 'premium',
-    name: 'Cao cấp',
-    price: '50.000.000₫',
-    priceUnit: '/ dự án',
-    color: '#0D9488',
+    id: "premium",
+    name: "Cao cấp",
+    price: "50.000.000₫",
+    priceUnit: "/ dự án",
     popular: false,
     features: [
-      { included: true, text: 'Giám sát toàn thời gian' },
-      { included: true, text: 'Báo cáo tiến độ hàng ngày' },
-      { included: true, text: 'Kiểm tra chất lượng vật liệu' },
-      { included: true, text: 'Hỗ trợ 24/7' },
-      { included: true, text: 'Kiểm tra kỹ thuật chuyên sâu' },
-      { included: true, text: 'Báo cáo ảnh/video chi tiết' },
-      { included: true, text: 'Đội ngũ giám sát chuyên nghiệp' },
-      { included: true, text: 'Bảo hành sau nghiệm thu 12 tháng' },
+      { included: true, text: "Giám sát toàn thời gian" },
+      { included: true, text: "Báo cáo tiến độ hàng ngày" },
+      { included: true, text: "Kiểm tra chất lượng vật liệu" },
+      { included: true, text: "Hỗ trợ 24/7" },
+      { included: true, text: "Kiểm tra kỹ thuật chuyên sâu" },
+      { included: true, text: "Báo cáo ảnh/video chi tiết" },
+      { included: true, text: "Đội ngũ giám sát chuyên nghiệp" },
+      { included: true, text: "Bảo hành sau nghiệm thu 12 tháng" },
     ],
-    description: 'Phù hợp với biệt thự cao cấp, công trình lớn trên 300m²',
+    description: "Phù hợp với biệt thự cao cấp, công trình lớn trên 300m²",
   },
 ];
 
@@ -79,40 +76,109 @@ interface PackageCardProps {
   onSelect: () => void;
 }
 
-const PackageCard: React.FC<PackageCardProps> = ({ package: pkg, onSelect }) => {
+const PackageCard: React.FC<PackageCardProps> = ({
+  package: pkg,
+  onSelect,
+}) => {
+  const { colors, spacing, radius, text, shadow } = useDS();
   return (
-    <View style={[styles.packageCard, pkg.popular && styles.packageCardPopular]}>
+    <View
+      style={[
+        {
+          backgroundColor: colors.card,
+          borderRadius: radius.lg,
+          marginBottom: spacing.md,
+          overflow: "hidden",
+          ...shadow,
+        },
+        pkg.popular && { borderWidth: 2, borderColor: colors.primary },
+      ]}
+    >
       {pkg.popular && (
-        <View style={styles.popularBadge}>
-          <Ionicons name="star" size={12} color="#fff" />
-          <Text style={styles.popularText}>Phổ biến nhất</Text>
+        <View
+          style={{
+            position: "absolute",
+            top: spacing.sm,
+            right: spacing.sm,
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 4,
+            backgroundColor: colors.primary,
+            paddingHorizontal: spacing.xs,
+            paddingVertical: 4,
+            borderRadius: radius.lg,
+            zIndex: 1,
+          }}
+        >
+          <Ionicons name="star" size={12} color={colors.textInverse} />
+          <Text style={[text.badge, { color: colors.textInverse }]}>
+            Phổ biến nhất
+          </Text>
         </View>
       )}
 
-      {/* Header */}
-      <View style={[styles.packageHeader, { backgroundColor: pkg.color }]}>
-        <Text style={styles.packageName}>{pkg.name}</Text>
-        <Text style={styles.packagePrice}>{pkg.price}</Text>
-        <Text style={styles.packagePriceUnit}>{pkg.priceUnit}</Text>
+      <View
+        style={{
+          backgroundColor: colors.primary,
+          padding: 20,
+          alignItems: "center",
+        }}
+      >
+        <Text
+          style={[
+            text.h3,
+            { color: colors.textInverse, marginBottom: spacing.xs },
+          ]}
+        >
+          {pkg.name}
+        </Text>
+        <Text
+          style={{ fontSize: 28, fontWeight: "700", color: colors.textInverse }}
+        >
+          {pkg.price}
+        </Text>
+        <Text style={[text.body, { color: colors.textInverse, opacity: 0.9 }]}>
+          {pkg.priceUnit}
+        </Text>
       </View>
 
-      {/* Description */}
-      <View style={styles.packageBody}>
-        <Text style={styles.packageDescription}>{pkg.description}</Text>
+      <View style={{ padding: 20 }}>
+        <Text
+          style={[
+            text.small,
+            {
+              color: colors.textSecondary,
+              marginBottom: spacing.md,
+              lineHeight: 18,
+            },
+          ]}
+        >
+          {pkg.description}
+        </Text>
 
-        {/* Features List */}
-        <View style={styles.featuresList}>
+        <View style={{ marginBottom: 20 }}>
           {pkg.features.map((feature: any, index: number) => (
-            <View key={index} style={styles.featureItem}>
+            <View
+              key={index}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginBottom: 10,
+                gap: 10,
+              }}
+            >
               <Ionicons
-                name={feature.included ? 'checkmark-circle' : 'close-circle'}
+                name={feature.included ? "checkmark-circle" : "close-circle"}
                 size={18}
-                color={feature.included ? '#0D9488' : '#e0e0e0'}
+                color={feature.included ? colors.primary : colors.divider}
               />
               <Text
                 style={[
-                  styles.featureText,
-                  !feature.included && styles.featureTextDisabled,
+                  text.small,
+                  {
+                    flex: 1,
+                    color: feature.included ? colors.text : colors.border,
+                  },
                 ]}
               >
                 {feature.text}
@@ -121,12 +187,18 @@ const PackageCard: React.FC<PackageCardProps> = ({ package: pkg, onSelect }) => 
           ))}
         </View>
 
-        {/* Select Button */}
         <TouchableOpacity
-          style={[styles.selectButton, { backgroundColor: pkg.color }]}
+          style={{
+            backgroundColor: colors.primary,
+            paddingVertical: 12,
+            borderRadius: radius.md,
+            alignItems: "center",
+          }}
           onPress={onSelect}
         >
-          <Text style={styles.selectButtonText}>Chọn gói này</Text>
+          <Text style={[text.bodySemibold, { color: colors.textInverse }]}>
+            Chọn gói này
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -137,13 +209,13 @@ export default function QualitySupervisionScreen() {
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState<any>(null);
   const [formData, setFormData] = useState({
-    name: '',
-    phone: '',
-    email: '',
-    address: '',
-    area: '',
-    startDate: '',
-    notes: '',
+    name: "",
+    phone: "",
+    email: "",
+    address: "",
+    area: "",
+    startDate: "",
+    notes: "",
   });
 
   const handleSelectPackage = (pkg: any) => {
@@ -154,116 +226,181 @@ export default function QualitySupervisionScreen() {
   const handleSubmit = () => {
     // Validate form
     if (!formData.name || !formData.phone || !formData.address) {
-      Alert.alert('Thông báo', 'Vui lòng điền đầy đủ thông tin bắt buộc');
+      Alert.alert("Thông báo", "Vui lòng điền đầy đủ thông tin bắt buộc");
       return;
     }
 
     // Submit logic here
     Alert.alert(
-      'Đăng ký thành công',
-      'Chúng tôi sẽ liên hệ với bạn trong vòng 24h để xác nhận thông tin.',
+      "Đăng ký thành công",
+      "Chúng tôi sẽ liên hệ với bạn trong vòng 24h để xác nhận thông tin.",
       [
         {
-          text: 'OK',
+          text: "OK",
           onPress: () => {
             setShowBookingModal(false);
             setFormData({
-              name: '',
-              phone: '',
-              email: '',
-              address: '',
-              area: '',
-              startDate: '',
-              notes: '',
+              name: "",
+              phone: "",
+              email: "",
+              address: "",
+              area: "",
+              startDate: "",
+              notes: "",
             });
           },
         },
-      ]
+      ],
     );
   };
+
+  const { colors, spacing, radius, text: textStyles, shadow, font } = useDS();
 
   return (
     <>
       <Stack.Screen
         options={{
-          title: 'Giám sát chất lượng',
-          headerStyle: { backgroundColor: Colors.light.primary },
-          headerTintColor: '#fff',
-          headerTitleStyle: { fontWeight: '600' },
+          title: "Giám sát chất lượng",
+          headerStyle: { backgroundColor: colors.primary },
+          headerTintColor: colors.textInverse,
+          headerTitleStyle: { fontWeight: "600" },
         }}
       />
-      <View style={styles.container}>
-        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <View style={{ flex: 1, backgroundColor: colors.bg }}>
+        <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
           {/* Hero Section */}
-          <View style={styles.heroSection}>
-            <View style={styles.heroIcon}>
-              <Ionicons name="shield-checkmark" size={48} color={Colors.light.primary} />
+          <View
+            style={{
+              backgroundColor: colors.card,
+              alignItems: "center",
+              paddingVertical: spacing.xxxl,
+              paddingHorizontal: spacing.xl,
+            }}
+          >
+            <View
+              style={{
+                width: 80,
+                height: 80,
+                borderRadius: 40,
+                backgroundColor: colors.bgMuted,
+                justifyContent: "center",
+                alignItems: "center",
+                marginBottom: spacing.xl,
+              }}
+            >
+              <Ionicons
+                name="shield-checkmark"
+                size={48}
+                color={colors.primary}
+              />
             </View>
-            <Text style={styles.heroTitle}>Dịch vụ giám sát thi công</Text>
-            <Text style={styles.heroSubtitle}>
+            <Text
+              style={[
+                textStyles.h3,
+                { color: colors.text, marginBottom: spacing.sm },
+              ]}
+            >
+              Dịch vụ giám sát thi công
+            </Text>
+            <Text
+              style={[
+                textStyles.body,
+                { color: colors.textSecondary, textAlign: "center" },
+              ]}
+            >
               Đảm bảo chất lượng công trình từ móng đến hoàn thiện
             </Text>
           </View>
 
           {/* Benefits Section */}
-          <View style={styles.benefitsSection}>
-            <Text style={styles.sectionTitle}>Lợi ích khi sử dụng dịch vụ</Text>
-            
-            <View style={styles.benefitsList}>
-              <View style={styles.benefitItem}>
-                <View style={styles.benefitIcon}>
-                  <Ionicons name="checkmark-done" size={24} color={Colors.light.success} />
+          <View
+            style={{
+              backgroundColor: colors.card,
+              padding: spacing.xl,
+              marginTop: spacing.md,
+            }}
+          >
+            <Text
+              style={[
+                textStyles.h4,
+                { color: colors.text, marginBottom: spacing.xl },
+              ]}
+            >
+              Lợi ích khi sử dụng dịch vụ
+            </Text>
+            <View style={{ gap: spacing.xl }}>
+              {[
+                {
+                  icon: "checkmark-done" as const,
+                  color: colors.success,
+                  title: "Chất lượng đảm bảo",
+                  desc: "Kiểm tra kỹ lưỡng từng công đoạn, phát hiện sớm sai sót",
+                },
+                {
+                  icon: "time" as const,
+                  color: colors.info,
+                  title: "Tiết kiệm thời gian",
+                  desc: "Tránh các rủi ro phải sửa chữa, làm lại tốn thời gian",
+                },
+                {
+                  icon: "cash" as const,
+                  color: colors.primary,
+                  title: "Tiết kiệm chi phí",
+                  desc: "Tránh lãng phí vật liệu, chi phí sửa chữa không đúng quy cách",
+                },
+                {
+                  icon: "document-text" as const,
+                  color: colors.primary,
+                  title: "Báo cáo minh bạch",
+                  desc: "Cập nhật tiến độ định kỳ với ảnh, video chi tiết",
+                },
+              ].map((b, i) => (
+                <View key={i} style={{ flexDirection: "row", gap: spacing.lg }}>
+                  <View
+                    style={{
+                      width: 48,
+                      height: 48,
+                      borderRadius: 24,
+                      backgroundColor: colors.bgMuted,
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Ionicons name={b.icon} size={24} color={b.color} />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text
+                      style={[
+                        textStyles.bodySemibold,
+                        { color: colors.text, marginBottom: spacing.xs },
+                      ]}
+                    >
+                      {b.title}
+                    </Text>
+                    <Text
+                      style={[
+                        textStyles.small,
+                        { color: colors.textSecondary, lineHeight: 18 },
+                      ]}
+                    >
+                      {b.desc}
+                    </Text>
+                  </View>
                 </View>
-                <View style={styles.benefitText}>
-                  <Text style={styles.benefitTitle}>Chất lượng đảm bảo</Text>
-                  <Text style={styles.benefitDesc}>
-                    Kiểm tra kỹ lưỡng từng công đoạn, phát hiện sớm sai sót
-                  </Text>
-                </View>
-              </View>
-
-              <View style={styles.benefitItem}>
-                <View style={styles.benefitIcon}>
-                  <Ionicons name="time" size={24} color={Colors.light.info} />
-                </View>
-                <View style={styles.benefitText}>
-                  <Text style={styles.benefitTitle}>Tiết kiệm thời gian</Text>
-                  <Text style={styles.benefitDesc}>
-                    Tránh các rủi ro phải sửa chữa, làm lại tốn thời gian
-                  </Text>
-                </View>
-              </View>
-
-              <View style={styles.benefitItem}>
-                <View style={styles.benefitIcon}>
-                  <Ionicons name="cash" size={24} color="#0D9488" />
-                </View>
-                <View style={styles.benefitText}>
-                  <Text style={styles.benefitTitle}>Tiết kiệm chi phí</Text>
-                  <Text style={styles.benefitDesc}>
-                    Tránh lãng phí vật liệu, chi phí sửa chữa không đúng quy cách
-                  </Text>
-                </View>
-              </View>
-
-              <View style={styles.benefitItem}>
-                <View style={styles.benefitIcon}>
-                  <Ionicons name="document-text" size={24} color="#0D9488" />
-                </View>
-                <View style={styles.benefitText}>
-                  <Text style={styles.benefitTitle}>Báo cáo minh bạch</Text>
-                  <Text style={styles.benefitDesc}>
-                    Cập nhật tiến độ định kỳ với ảnh, video chi tiết
-                  </Text>
-                </View>
-              </View>
+              ))}
             </View>
           </View>
 
           {/* Packages Section */}
-          <View style={styles.packagesSection}>
-            <Text style={styles.sectionTitle}>Chọn gói phù hợp</Text>
-            
+          <View style={{ padding: spacing.xl, marginTop: spacing.md }}>
+            <Text
+              style={[
+                textStyles.h4,
+                { color: colors.text, marginBottom: spacing.xl },
+              ]}
+            >
+              Chọn gói phù hợp
+            </Text>
             {PACKAGES.map((pkg) => (
               <PackageCard
                 key={pkg.id}
@@ -274,42 +411,127 @@ export default function QualitySupervisionScreen() {
           </View>
 
           {/* Comparison Table */}
-          <View style={styles.comparisonSection}>
-            <Text style={styles.sectionTitle}>So sánh chi tiết</Text>
-            
+          <View
+            style={{
+              backgroundColor: colors.card,
+              padding: spacing.xl,
+              marginTop: spacing.md,
+            }}
+          >
+            <Text
+              style={[
+                textStyles.h4,
+                { color: colors.text, marginBottom: spacing.xl },
+              ]}
+            >
+              So sánh chi tiết
+            </Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              <View style={styles.comparisonTable}>
+              <View
+                style={{
+                  borderWidth: 1,
+                  borderColor: colors.divider,
+                  borderRadius: radius.md,
+                  overflow: "hidden",
+                }}
+              >
                 {/* Header Row */}
-                <View style={styles.comparisonRow}>
-                  <View style={[styles.comparisonCell, styles.comparisonHeaderCell]}>
-                    <Text style={styles.comparisonHeaderText}>Tính năng</Text>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    borderBottomWidth: 1,
+                    borderBottomColor: colors.divider,
+                  }}
+                >
+                  <View
+                    style={{
+                      width: 120,
+                      padding: spacing.lg,
+                      justifyContent: "center",
+                      alignItems: "center",
+                      backgroundColor: colors.bgMuted,
+                    }}
+                  >
+                    <Text
+                      style={[
+                        textStyles.smallBold,
+                        { color: colors.text, textAlign: "center" },
+                      ]}
+                    >
+                      Tính năng
+                    </Text>
                   </View>
                   {PACKAGES.map((pkg) => (
                     <View
                       key={pkg.id}
-                      style={[styles.comparisonCell, styles.comparisonHeaderCell]}
+                      style={{
+                        width: 120,
+                        padding: spacing.lg,
+                        justifyContent: "center",
+                        alignItems: "center",
+                        backgroundColor: colors.bgMuted,
+                      }}
                     >
-                      <Text style={styles.comparisonHeaderText}>{pkg.name}</Text>
+                      <Text
+                        style={[
+                          textStyles.smallBold,
+                          { color: colors.text, textAlign: "center" },
+                        ]}
+                      >
+                        {pkg.name}
+                      </Text>
                     </View>
                   ))}
                 </View>
-
                 {/* Feature Rows */}
                 {PACKAGES[0].features.map((feature: any, index: number) => (
-                  <View key={index} style={styles.comparisonRow}>
-                    <View style={styles.comparisonCell}>
-                      <Text style={styles.comparisonFeatureText}>{feature.text}</Text>
+                  <View
+                    key={index}
+                    style={{
+                      flexDirection: "row",
+                      borderBottomWidth: 1,
+                      borderBottomColor: colors.divider,
+                    }}
+                  >
+                    <View
+                      style={{
+                        width: 120,
+                        padding: spacing.lg,
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Text
+                        style={[
+                          textStyles.small,
+                          { color: colors.textSecondary, textAlign: "center" },
+                        ]}
+                      >
+                        {feature.text}
+                      </Text>
                     </View>
                     {PACKAGES.map((pkg) => (
-                      <View key={pkg.id} style={styles.comparisonCell}>
+                      <View
+                        key={pkg.id}
+                        style={{
+                          width: 120,
+                          padding: spacing.lg,
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
                         <Ionicons
                           name={
                             pkg.features[index].included
-                              ? 'checkmark-circle'
-                              : 'close-circle'
+                              ? "checkmark-circle"
+                              : "close-circle"
                           }
                           size={20}
-                          color={pkg.features[index].included ? '#0D9488' : '#e0e0e0'}
+                          color={
+                            pkg.features[index].included
+                              ? colors.primary
+                              : colors.divider
+                          }
                         />
                       </View>
                     ))}
@@ -320,57 +542,111 @@ export default function QualitySupervisionScreen() {
           </View>
 
           {/* FAQ Section */}
-          <View style={styles.faqSection}>
-            <Text style={styles.sectionTitle}>Câu hỏi thường gặp</Text>
-            
-            <View style={styles.faqItem}>
-              <Text style={styles.faqQuestion}>
-                Thời gian giám sát một dự án là bao lâu?
-              </Text>
-              <Text style={styles.faqAnswer}>
-                Thời gian giám sát phụ thuộc vào quy mô công trình, thường từ 3-6 tháng
-                cho nhà ở riêng lẻ.
-              </Text>
-            </View>
-
-            <View style={styles.faqItem}>
-              <Text style={styles.faqQuestion}>
-                Có thể thay đổi gói dịch vụ giữa chừng không?
-              </Text>
-              <Text style={styles.faqAnswer}>
-                Có thể nâng cấp gói dịch vụ bất cứ lúc nào, bạn chỉ cần thanh toán
-                phần chênh lệch.
-              </Text>
-            </View>
-
-            <View style={styles.faqItem}>
-              <Text style={styles.faqQuestion}>
-                Giám sát viên có kinh nghiệm như thế nào?
-              </Text>
-              <Text style={styles.faqAnswer}>
-                Tất cả giám sát viên đều là kỹ sư xây dựng có tối thiểu 5 năm kinh
-                nghiệm và được đào tạo chuyên sâu.
-              </Text>
-            </View>
+          <View
+            style={{
+              backgroundColor: colors.card,
+              padding: spacing.xl,
+              marginTop: spacing.md,
+            }}
+          >
+            <Text
+              style={[
+                textStyles.h4,
+                { color: colors.text, marginBottom: spacing.xl },
+              ]}
+            >
+              Câu hỏi thường gặp
+            </Text>
+            {[
+              {
+                q: "Thời gian giám sát một dự án là bao lâu?",
+                a: "Thời gian giám sát phụ thuộc vào quy mô công trình, thường từ 3-6 tháng cho nhà ở riêng lẻ.",
+              },
+              {
+                q: "Có thể thay đổi gói dịch vụ giữa chừng không?",
+                a: "Có thể nâng cấp gói dịch vụ bất cứ lúc nào, bạn chỉ cần thanh toán phần chênh lệch.",
+              },
+              {
+                q: "Giám sát viên có kinh nghiệm như thế nào?",
+                a: "Tất cả giám sát viên đều là kỹ sư xây dựng có tối thiểu 5 năm kinh nghiệm và được đào tạo chuyên sâu.",
+              },
+            ].map((faq, i) => (
+              <View
+                key={i}
+                style={{
+                  marginBottom: spacing.xl,
+                  paddingBottom: spacing.xl,
+                  borderBottomWidth: 1,
+                  borderBottomColor: colors.divider,
+                }}
+              >
+                <Text
+                  style={[
+                    textStyles.bodySemibold,
+                    { color: colors.text, marginBottom: spacing.sm },
+                  ]}
+                >
+                  {faq.q}
+                </Text>
+                <Text
+                  style={[
+                    textStyles.small,
+                    { color: colors.textSecondary, lineHeight: 20 },
+                  ]}
+                >
+                  {faq.a}
+                </Text>
+              </View>
+            ))}
           </View>
 
           <View style={{ height: 100 }} />
         </ScrollView>
 
         {/* CTA Footer */}
-        <View style={styles.ctaFooter}>
-          <View style={styles.ctaInfo}>
-            <Text style={styles.ctaText}>Tư vấn miễn phí</Text>
-            <Text style={styles.ctaSubtext}>Hotline: 1900 123 456</Text>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            backgroundColor: colors.card,
+            paddingHorizontal: spacing.xl,
+            paddingVertical: spacing.lg,
+            borderTopWidth: 1,
+            borderTopColor: colors.divider,
+            ...shadow,
+          }}
+        >
+          <View>
+            <Text style={[textStyles.bodySemibold, { color: colors.text }]}>
+              Tư vấn miễn phí
+            </Text>
+            <Text
+              style={[
+                textStyles.small,
+                { color: colors.primary, marginTop: 2 },
+              ]}
+            >
+              Hotline: 1900 123 456
+            </Text>
           </View>
           <TouchableOpacity
-            style={styles.ctaButton}
+            style={{
+              backgroundColor: colors.primary,
+              paddingHorizontal: spacing.xxl,
+              paddingVertical: spacing.md,
+              borderRadius: radius.md,
+            }}
             onPress={() => {
-              setSelectedPackage(PACKAGES[1]); // Default to Standard
+              setSelectedPackage(PACKAGES[1]);
               setShowBookingModal(true);
             }}
           >
-            <Text style={styles.ctaButtonText}>Đăng ký ngay</Text>
+            <Text
+              style={[textStyles.bodySemibold, { color: colors.textInverse }]}
+            >
+              Đăng ký ngay
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -382,121 +658,288 @@ export default function QualitySupervisionScreen() {
         animationType="slide"
         onRequestClose={() => setShowBookingModal(false)}
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Đăng ký dịch vụ</Text>
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: "rgba(0,0,0,0.5)",
+            justifyContent: "flex-end",
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: colors.card,
+              borderTopLeftRadius: radius.xl,
+              borderTopRightRadius: radius.xl,
+              maxHeight: "90%",
+            }}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: spacing.xl,
+                borderBottomWidth: 1,
+                borderBottomColor: colors.divider,
+              }}
+            >
+              <Text style={[textStyles.h4, { color: colors.text }]}>
+                Đăng ký dịch vụ
+              </Text>
               <TouchableOpacity onPress={() => setShowBookingModal(false)}>
-                <Ionicons name="close" size={24} color="#333" />
+                <Ionicons name="close" size={24} color={colors.text} />
               </TouchableOpacity>
             </View>
 
-            <ScrollView style={styles.modalBody}>
+            <ScrollView style={{ padding: spacing.xl }}>
               {/* Selected Package Info */}
               {selectedPackage && (
-                <View style={styles.selectedPackageInfo}>
-                  <Text style={styles.selectedPackageLabel}>Gói đã chọn:</Text>
-                  <View style={styles.selectedPackageCard}>
-                    <Text style={styles.selectedPackageName}>{selectedPackage.name}</Text>
-                    <Text style={styles.selectedPackagePrice}>
+                <View style={{ marginBottom: spacing.xxl }}>
+                  <Text
+                    style={[
+                      textStyles.smallBold,
+                      { color: colors.textSecondary, marginBottom: spacing.sm },
+                    ]}
+                  >
+                    Gói đã chọn:
+                  </Text>
+                  <View
+                    style={{
+                      backgroundColor: colors.primaryBg,
+                      borderWidth: 1,
+                      borderColor: colors.primary,
+                      borderRadius: radius.md,
+                      padding: spacing.lg,
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Text
+                      style={[textStyles.bodySemibold, { color: colors.text }]}
+                    >
+                      {selectedPackage.name}
+                    </Text>
+                    <Text
+                      style={[
+                        textStyles.bodyLarge,
+                        { fontWeight: font.weight.bold, color: colors.primary },
+                      ]}
+                    >
                       {selectedPackage.price}
                     </Text>
                   </View>
                 </View>
               )}
 
-              {/* Form */}
-              <View style={styles.form}>
-                <View style={styles.formGroup}>
-                  <Text style={styles.formLabel}>
-                    Họ và tên <Text style={styles.required}>*</Text>
+              {/* Form Fields */}
+              {[
+                {
+                  label: "Họ và tên",
+                  required: true,
+                  placeholder: "Nguyễn Văn A",
+                  key: "name",
+                  keyboard: "default" as const,
+                },
+                {
+                  label: "Số điện thoại",
+                  required: true,
+                  placeholder: "0901234567",
+                  key: "phone",
+                  keyboard: "phone-pad" as const,
+                },
+                {
+                  label: "Email",
+                  required: false,
+                  placeholder: "email@example.com",
+                  key: "email",
+                  keyboard: "email-address" as const,
+                },
+              ].map((field) => (
+                <View key={field.key} style={{ marginBottom: spacing.xl }}>
+                  <Text
+                    style={[
+                      textStyles.smallBold,
+                      { color: colors.text, marginBottom: spacing.sm },
+                    ]}
+                  >
+                    {field.label}{" "}
+                    {field.required && (
+                      <Text style={{ color: colors.primary }}>*</Text>
+                    )}
                   </Text>
                   <TextInput
-                    style={styles.formInput}
-                    placeholder="Nguyễn Văn A"
-                    value={formData.name}
-                    onChangeText={(text) => setFormData({ ...formData, name: text })}
+                    style={{
+                      backgroundColor: colors.bgInput,
+                      borderRadius: radius.md,
+                      paddingHorizontal: spacing.lg,
+                      paddingVertical: spacing.md,
+                      fontSize: 14,
+                      color: colors.text,
+                      borderWidth: 1,
+                      borderColor: colors.border,
+                    }}
+                    placeholder={field.placeholder}
+                    placeholderTextColor={colors.textTertiary}
+                    keyboardType={field.keyboard}
+                    value={(formData as any)[field.key]}
+                    onChangeText={(t) =>
+                      setFormData({ ...formData, [field.key]: t })
+                    }
                   />
                 </View>
+              ))}
 
-                <View style={styles.formGroup}>
-                  <Text style={styles.formLabel}>
-                    Số điện thoại <Text style={styles.required}>*</Text>
-                  </Text>
-                  <TextInput
-                    style={styles.formInput}
-                    placeholder="0901234567"
-                    keyboardType="phone-pad"
-                    value={formData.phone}
-                    onChangeText={(text) => setFormData({ ...formData, phone: text })}
-                  />
-                </View>
-
-                <View style={styles.formGroup}>
-                  <Text style={styles.formLabel}>Email</Text>
-                  <TextInput
-                    style={styles.formInput}
-                    placeholder="email@example.com"
-                    keyboardType="email-address"
-                    value={formData.email}
-                    onChangeText={(text) => setFormData({ ...formData, email: text })}
-                  />
-                </View>
-
-                <View style={styles.formGroup}>
-                  <Text style={styles.formLabel}>
-                    Địa chỉ công trình <Text style={styles.required}>*</Text>
-                  </Text>
-                  <TextInput
-                    style={[styles.formInput, styles.formTextArea]}
-                    placeholder="Địa chỉ đầy đủ"
-                    multiline
-                    numberOfLines={3}
-                    value={formData.address}
-                    onChangeText={(text) => setFormData({ ...formData, address: text })}
-                  />
-                </View>
-
-                <View style={styles.formGroup}>
-                  <Text style={styles.formLabel}>Diện tích (m²)</Text>
-                  <TextInput
-                    style={styles.formInput}
-                    placeholder="100"
-                    keyboardType="numeric"
-                    value={formData.area}
-                    onChangeText={(text) => setFormData({ ...formData, area: text })}
-                  />
-                </View>
-
-                <View style={styles.formGroup}>
-                  <Text style={styles.formLabel}>Ngày dự kiến khởi công</Text>
-                  <TextInput
-                    style={styles.formInput}
-                    placeholder="DD/MM/YYYY"
-                    value={formData.startDate}
-                    onChangeText={(text) => setFormData({ ...formData, startDate: text })}
-                  />
-                </View>
-
-                <View style={styles.formGroup}>
-                  <Text style={styles.formLabel}>Ghi chú</Text>
-                  <TextInput
-                    style={[styles.formInput, styles.formTextArea]}
-                    placeholder="Yêu cầu hoặc ghi chú thêm..."
-                    multiline
-                    numberOfLines={4}
-                    value={formData.notes}
-                    onChangeText={(text) => setFormData({ ...formData, notes: text })}
-                  />
-                </View>
+              {/* Address - textarea */}
+              <View style={{ marginBottom: spacing.xl }}>
+                <Text
+                  style={[
+                    textStyles.smallBold,
+                    { color: colors.text, marginBottom: spacing.sm },
+                  ]}
+                >
+                  Địa chỉ công trình{" "}
+                  <Text style={{ color: colors.primary }}>*</Text>
+                </Text>
+                <TextInput
+                  style={{
+                    backgroundColor: colors.bgInput,
+                    borderRadius: radius.md,
+                    paddingHorizontal: spacing.lg,
+                    paddingVertical: spacing.md,
+                    fontSize: 14,
+                    color: colors.text,
+                    borderWidth: 1,
+                    borderColor: colors.border,
+                    height: 80,
+                    textAlignVertical: "top",
+                  }}
+                  placeholder="Địa chỉ đầy đủ"
+                  placeholderTextColor={colors.textTertiary}
+                  multiline
+                  numberOfLines={3}
+                  value={formData.address}
+                  onChangeText={(t) => setFormData({ ...formData, address: t })}
+                />
               </View>
 
-              {/* Submit Button */}
-              <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-                <Text style={styles.submitButtonText}>Gửi đăng ký</Text>
-              </TouchableOpacity>
+              {/* Area + Start Date */}
+              <View style={{ marginBottom: spacing.xl }}>
+                <Text
+                  style={[
+                    textStyles.smallBold,
+                    { color: colors.text, marginBottom: spacing.sm },
+                  ]}
+                >
+                  Diện tích (m²)
+                </Text>
+                <TextInput
+                  style={{
+                    backgroundColor: colors.bgInput,
+                    borderRadius: radius.md,
+                    paddingHorizontal: spacing.lg,
+                    paddingVertical: spacing.md,
+                    fontSize: 14,
+                    color: colors.text,
+                    borderWidth: 1,
+                    borderColor: colors.border,
+                  }}
+                  placeholder="100"
+                  placeholderTextColor={colors.textTertiary}
+                  keyboardType="numeric"
+                  value={formData.area}
+                  onChangeText={(t) => setFormData({ ...formData, area: t })}
+                />
+              </View>
+              <View style={{ marginBottom: spacing.xl }}>
+                <Text
+                  style={[
+                    textStyles.smallBold,
+                    { color: colors.text, marginBottom: spacing.sm },
+                  ]}
+                >
+                  Ngày dự kiến khởi công
+                </Text>
+                <TextInput
+                  style={{
+                    backgroundColor: colors.bgInput,
+                    borderRadius: radius.md,
+                    paddingHorizontal: spacing.lg,
+                    paddingVertical: spacing.md,
+                    fontSize: 14,
+                    color: colors.text,
+                    borderWidth: 1,
+                    borderColor: colors.border,
+                  }}
+                  placeholder="DD/MM/YYYY"
+                  placeholderTextColor={colors.textTertiary}
+                  value={formData.startDate}
+                  onChangeText={(t) =>
+                    setFormData({ ...formData, startDate: t })
+                  }
+                />
+              </View>
+              <View style={{ marginBottom: spacing.xl }}>
+                <Text
+                  style={[
+                    textStyles.smallBold,
+                    { color: colors.text, marginBottom: spacing.sm },
+                  ]}
+                >
+                  Ghi chú
+                </Text>
+                <TextInput
+                  style={{
+                    backgroundColor: colors.bgInput,
+                    borderRadius: radius.md,
+                    paddingHorizontal: spacing.lg,
+                    paddingVertical: spacing.md,
+                    fontSize: 14,
+                    color: colors.text,
+                    borderWidth: 1,
+                    borderColor: colors.border,
+                    height: 100,
+                    textAlignVertical: "top",
+                  }}
+                  placeholder="Yêu cầu hoặc ghi chú thêm..."
+                  placeholderTextColor={colors.textTertiary}
+                  multiline
+                  numberOfLines={4}
+                  value={formData.notes}
+                  onChangeText={(t) => setFormData({ ...formData, notes: t })}
+                />
+              </View>
 
-              <Text style={styles.formNote}>
+              {/* Submit */}
+              <TouchableOpacity
+                style={{
+                  backgroundColor: colors.primary,
+                  paddingVertical: spacing.lg,
+                  borderRadius: radius.md,
+                  alignItems: "center",
+                  marginBottom: spacing.lg,
+                }}
+                onPress={handleSubmit}
+              >
+                <Text
+                  style={[
+                    textStyles.bodySemibold,
+                    { color: colors.textInverse },
+                  ]}
+                >
+                  Gửi đăng ký
+                </Text>
+              </TouchableOpacity>
+              <Text
+                style={[
+                  textStyles.small,
+                  {
+                    color: colors.textTertiary,
+                    textAlign: "center",
+                    marginBottom: spacing.xxl,
+                  },
+                ]}
+              >
                 * Thông tin của bạn sẽ được bảo mật tuyệt đối
               </Text>
             </ScrollView>
@@ -506,369 +949,3 @@ export default function QualitySupervisionScreen() {
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  content: {
-    flex: 1,
-  },
-  heroSection: {
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    paddingVertical: 32,
-    paddingHorizontal: 16,
-  },
-  heroIcon: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: Colors.light.chipBackground,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  heroTitle: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#333',
-    marginBottom: 8,
-  },
-  heroSubtitle: {
-    fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
-  },
-  benefitsSection: {
-    backgroundColor: '#fff',
-    padding: 16,
-    marginTop: 12,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#333',
-    marginBottom: 16,
-  },
-  benefitsList: {
-    gap: 16,
-  },
-  benefitItem: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  benefitIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#f5f5f5',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  benefitText: {
-    flex: 1,
-  },
-  benefitTitle: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 4,
-  },
-  benefitDesc: {
-    fontSize: 13,
-    color: '#666',
-    lineHeight: 18,
-  },
-  packagesSection: {
-    padding: 16,
-    marginTop: 12,
-  },
-  packageCard: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    marginBottom: 16,
-    overflow: 'hidden',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-  },
-  packageCardPopular: {
-    borderWidth: 2,
-    borderColor: Colors.light.primary,
-  },
-  popularBadge: {
-    position: 'absolute',
-    top: 12,
-    right: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.light.primary,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    zIndex: 1,
-    gap: 4,
-  },
-  popularText: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: '#fff',
-  },
-  packageHeader: {
-    padding: 20,
-    alignItems: 'center',
-  },
-  packageName: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#fff',
-    marginBottom: 8,
-  },
-  packagePrice: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#fff',
-  },
-  packagePriceUnit: {
-    fontSize: 14,
-    color: 'rgba(255,255,255,0.9)',
-  },
-  packageBody: {
-    padding: 20,
-  },
-  packageDescription: {
-    fontSize: 13,
-    color: '#666',
-    marginBottom: 16,
-    lineHeight: 18,
-  },
-  featuresList: {
-    marginBottom: 20,
-  },
-  featureItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-    gap: 10,
-  },
-  featureText: {
-    fontSize: 13,
-    color: '#333',
-    flex: 1,
-  },
-  featureTextDisabled: {
-    color: '#ccc',
-  },
-  selectButton: {
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  selectButtonText: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#fff',
-  },
-  comparisonSection: {
-    backgroundColor: '#fff',
-    padding: 16,
-    marginTop: 12,
-  },
-  comparisonTable: {
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-    borderRadius: 8,
-    overflow: 'hidden',
-  },
-  comparisonRow: {
-    flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  comparisonCell: {
-    width: 120,
-    padding: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  comparisonHeaderCell: {
-    backgroundColor: '#f5f5f5',
-  },
-  comparisonHeaderText: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#333',
-    textAlign: 'center',
-  },
-  comparisonFeatureText: {
-    fontSize: 12,
-    color: '#666',
-    textAlign: 'center',
-  },
-  faqSection: {
-    backgroundColor: '#fff',
-    padding: 16,
-    marginTop: 12,
-  },
-  faqItem: {
-    marginBottom: 16,
-    paddingBottom: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  faqQuestion: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
-  },
-  faqAnswer: {
-    fontSize: 13,
-    color: '#666',
-    lineHeight: 20,
-  },
-  ctaFooter: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#fff',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
-    elevation: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  ctaInfo: {},
-  ctaText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
-  },
-  ctaSubtext: {
-    fontSize: 12,
-    color: Colors.light.primary,
-    marginTop: 2,
-  },
-  ctaButton: {
-    backgroundColor: Colors.light.primary,
-    paddingHorizontal: 24,
-    paddingVertical: 10,
-    borderRadius: 8,
-  },
-  ctaButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#fff',
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'flex-end',
-  },
-  modalContent: {
-    backgroundColor: '#fff',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    maxHeight: '90%',
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#333',
-  },
-  modalBody: {
-    padding: 16,
-  },
-  selectedPackageInfo: {
-    marginBottom: 20,
-  },
-  selectedPackageLabel: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#666',
-    marginBottom: 8,
-  },
-  selectedPackageCard: {
-    backgroundColor: '#fff5f0',
-    borderWidth: 1,
-    borderColor: Colors.light.primary,
-    borderRadius: 8,
-    padding: 12,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  selectedPackageName: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#333',
-  },
-  selectedPackagePrice: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: Colors.light.primary,
-  },
-  form: {
-    marginBottom: 16,
-  },
-  formGroup: {
-    marginBottom: 16,
-  },
-  formLabel: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
-  },
-  required: {
-    color: Colors.light.primary,
-  },
-  formInput: {
-    backgroundColor: '#f5f5f5',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 14,
-    color: '#333',
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-  },
-  formTextArea: {
-    height: 80,
-    textAlignVertical: 'top',
-  },
-  submitButton: {
-    backgroundColor: Colors.light.primary,
-    paddingVertical: 14,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  submitButtonText: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#fff',
-  },
-  formNote: {
-    fontSize: 12,
-    color: '#999',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-});

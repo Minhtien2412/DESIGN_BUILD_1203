@@ -4,6 +4,7 @@
  * Migrated to DS tokens
  */
 
+import { APP_ROUTES } from "@/constants/typed-routes";
 import { useAuth } from "@/context/AuthContext";
 import { useDS } from "@/hooks/useDS";
 import { Ionicons } from "@expo/vector-icons";
@@ -31,7 +32,7 @@ const DASHBOARDS = [
     titleVi: "Trung tâm Admin",
     desc: "Quản lý hệ thống, người dùng, báo cáo",
     icon: "shield-checkmark" as const,
-    route: "/dashboard/admin",
+    route: APP_ROUTES.DASHBOARD_ADMIN,
     gradient: ["#1a1a2e", "#16213e"] as [string, string],
     stats: { users: 128, reports: 45 },
     roles: ["admin"],
@@ -41,7 +42,7 @@ const DASHBOARDS = [
     titleVi: "Trung tâm Kỹ sư",
     desc: "Dự án, tiến độ, chất lượng công trình",
     icon: "construct" as const,
-    route: "/dashboard/engineer",
+    route: APP_ROUTES.DASHBOARD_ENGINEER,
     gradient: ["#0f3460", "#16213e"] as [string, string],
     stats: { projects: 12, tasks: 67 },
     roles: ["engineer", "employee"],
@@ -51,7 +52,7 @@ const DASHBOARDS = [
     titleVi: "Trung tâm Khách hàng",
     desc: "Theo dõi dự án, thanh toán, hỗ trợ",
     icon: "home" as const,
-    route: "/dashboard/client",
+    route: APP_ROUTES.DASHBOARD_CLIENT,
     gradient: ["#1a1a2e", "#0f3460"] as [string, string],
     stats: { active: 3, pending: 2 },
     roles: ["user", "client"],
@@ -222,9 +223,10 @@ export default function DashboardIndexScreen() {
   const [greeting, setGreeting] = useState("");
 
   useEffect(() => {
-    if (user?.role === "admin") router.replace("/dashboard/admin");
+    if (user?.role === "admin")
+      router.replace(APP_ROUTES.DASHBOARD_ADMIN as any);
     else if (user?.role === "engineer" || user?.role === "employee")
-      router.replace("/dashboard/engineer");
+      router.replace(APP_ROUTES.DASHBOARD_ENGINEER as any);
   }, [user]);
 
   useEffect(() => {

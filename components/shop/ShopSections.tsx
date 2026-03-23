@@ -231,7 +231,9 @@ export const PromoBannerCarousel = memo(function PromoBannerCarousel({
             onPress={() => onBannerPress?.(banner.id)}
           >
             <LinearGradient
-              colors={banner.gradient as unknown as string[]}
+              colors={
+                banner.gradient as unknown as [string, string, ...string[]]
+              }
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={[s.bannerGradient, { borderRadius: radius.md }]}
@@ -604,9 +606,9 @@ export const RecentViewedSection = memo(function RecentViewedSection({
           >
             <Image
               source={
-                typeof item.image === "string"
+                typeof item.image === "string" && item.image
                   ? { uri: item.image }
-                  : { uri: "" }
+                  : undefined
               }
               style={s.recentImage}
             />

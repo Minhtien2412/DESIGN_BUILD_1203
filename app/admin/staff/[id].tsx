@@ -1,11 +1,15 @@
-import { Colors } from '@/constants/theme';
-import { useAuth } from '@/context/AuthContext';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import { useStaffDetail } from '@/hooks/useAdmin';
-import { getCapabilityLabel, getFeatureLabel, usePermissions } from '@/utils/permissions';
-import { Ionicons } from '@expo/vector-icons';
-import { router, Stack, useLocalSearchParams } from 'expo-router';
-import { useEffect } from 'react';
+import { Colors } from "@/constants/theme";
+import { useAuth } from "@/context/AuthContext";
+import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useStaffDetail } from "@/hooks/useAdmin";
+import {
+    getCapabilityLabel,
+    getFeatureLabel,
+    usePermissions,
+} from "@/utils/permissions";
+import { Ionicons } from "@expo/vector-icons";
+import { router, Stack, useLocalSearchParams } from "expo-router";
+import { useEffect } from "react";
 import {
     ActivityIndicator,
     Alert,
@@ -15,11 +19,11 @@ import {
     Text,
     TouchableOpacity,
     View,
-} from 'react-native';
+} from "react-native";
 
 export default function StaffDetailScreen() {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? 'light'];
+  const colors = Colors[colorScheme ?? "light"];
   const { id } = useLocalSearchParams<{ id: string }>();
   const { isAuthenticated } = useAuth();
   const { hasPermission } = usePermissions();
@@ -28,47 +32,59 @@ export default function StaffDetailScreen() {
 
   // Require view permission
   useEffect(() => {
-    if (!loading && (!isAuthenticated || !hasPermission('view', 'staff'))) {
-      Alert.alert('Không có quyền', 'Bạn không có quyền xem thông tin nhân viên');
+    if (!loading && (!isAuthenticated || !hasPermission("view", "staff"))) {
+      Alert.alert(
+        "Không có quyền",
+        "Bạn không có quyền xem thông tin nhân viên",
+      );
       router.back();
     }
   }, [isAuthenticated, hasPermission, loading]);
 
-  if (!isAuthenticated || !hasPermission('view', 'staff')) {
+  if (!isAuthenticated || !hasPermission("view", "staff")) {
     return null;
   }
 
   if (loading && !staff) {
     return (
-      <View style={[styles.centerContainer, { backgroundColor: colors.background }]}>
+      <View
+        style={[styles.centerContainer, { backgroundColor: colors.background }]}
+      >
         <Stack.Screen
           options={{
-            title: 'Chi tiết nhân viên',
+            title: "Chi tiết nhân viên",
             headerStyle: { backgroundColor: colors.accent },
-            headerTintColor: '#fff',
+            headerTintColor: "#fff",
           }}
         />
         <ActivityIndicator size="large" color={colors.accent} />
-        <Text style={[styles.loadingText, { color: colors.textMuted }]}>Đang tải...</Text>
+        <Text style={[styles.loadingText, { color: colors.textMuted }]}>
+          Đang tải...
+        </Text>
       </View>
     );
   }
 
   if (error || !staff) {
     return (
-      <View style={[styles.centerContainer, { backgroundColor: colors.background }]}>
+      <View
+        style={[styles.centerContainer, { backgroundColor: colors.background }]}
+      >
         <Stack.Screen
           options={{
-            title: 'Chi tiết nhân viên',
+            title: "Chi tiết nhân viên",
             headerStyle: { backgroundColor: colors.accent },
-            headerTintColor: '#fff',
+            headerTintColor: "#fff",
           }}
         />
         <Ionicons name="warning-outline" size={48} color={colors.textMuted} />
         <Text style={[styles.errorText, { color: colors.text }]}>
-          {error || 'Không tìm thấy nhân viên'}
+          {error || "Không tìm thấy nhân viên"}
         </Text>
-        <TouchableOpacity style={[styles.retryButton, { backgroundColor: colors.accent }]} onPress={refresh}>
+        <TouchableOpacity
+          style={[styles.retryButton, { backgroundColor: colors.accent }]}
+          onPress={refresh}
+        >
           <Text style={styles.retryButtonText}>Thử lại</Text>
         </TouchableOpacity>
       </View>
@@ -78,32 +94,32 @@ export default function StaffDetailScreen() {
   const isActive = staff.active === 1;
 
   const handleEdit = () => {
-    if (!hasPermission('edit', 'staff')) {
-      Alert.alert('Không có quyền', 'Bạn không có quyền chỉnh sửa nhân viên');
+    if (!hasPermission("edit", "staff")) {
+      Alert.alert("Không có quyền", "Bạn không có quyền chỉnh sửa nhân viên");
       return;
     }
-    router.push(`/admin/staff/${id}/edit`);
+    router.push(`/admin/staff/edit/${id}`);
   };
 
   const handleDelete = () => {
-    if (!hasPermission('delete', 'staff')) {
-      Alert.alert('Không có quyền', 'Bạn không có quyền xóa nhân viên');
+    if (!hasPermission("delete", "staff")) {
+      Alert.alert("Không có quyền", "Bạn không có quyền xóa nhân viên");
       return;
     }
     Alert.alert(
-      'Xác nhận xóa',
-      'Bạn có chắc muốn xóa nhân viên này? Dữ liệu sẽ được chuyển sang nhân viên khác.',
+      "Xác nhận xóa",
+      "Bạn có chắc muốn xóa nhân viên này? Dữ liệu sẽ được chuyển sang nhân viên khác.",
       [
-        { text: 'Hủy', style: 'cancel' },
+        { text: "Hủy", style: "cancel" },
         {
-          text: 'Xóa',
-          style: 'destructive',
+          text: "Xóa",
+          style: "destructive",
           onPress: () => {
             // Navigate to transfer data screen
-            router.push(`/admin/staff/${id}/delete`);
+            router.push(`/coming-soon/staff-delete` as any);
           },
         },
-      ]
+      ],
     );
   };
 
@@ -113,25 +129,42 @@ export default function StaffDetailScreen() {
         options={{
           title: `${staff.firstname} ${staff.lastname}`,
           headerStyle: { backgroundColor: colors.accent },
-          headerTintColor: '#fff',
+          headerTintColor: "#fff",
           headerRight: () =>
-            hasPermission('edit', 'staff') ? (
-              <TouchableOpacity onPress={handleEdit} style={styles.headerButton}>
+            hasPermission("edit", "staff") ? (
+              <TouchableOpacity
+                onPress={handleEdit}
+                style={styles.headerButton}
+              >
                 <Ionicons name="create-outline" size={24} color="#fff" />
               </TouchableOpacity>
             ) : null,
         }}
       />
 
-      <ScrollView style={[styles.container, { backgroundColor: colors.background }]} contentContainerStyle={styles.contentContainer}>
+      <ScrollView
+        style={[styles.container, { backgroundColor: colors.background }]}
+        contentContainerStyle={styles.contentContainer}
+      >
         {/* Profile Header */}
-        <View style={[styles.profileHeader, { backgroundColor: colors.surface }]}>
+        <View
+          style={[styles.profileHeader, { backgroundColor: colors.surface }]}
+        >
           {staff.profile_image ? (
-            <Image source={{ uri: staff.profile_image }} style={styles.profileImage} />
+            <Image
+              source={{ uri: staff.profile_image }}
+              style={styles.profileImage}
+            />
           ) : (
-            <View style={[styles.profileImagePlaceholder, { backgroundColor: colors.accent }]}>
+            <View
+              style={[
+                styles.profileImagePlaceholder,
+                { backgroundColor: colors.accent },
+              ]}
+            >
               <Text style={styles.profileImageText}>
-                {staff.firstname?.[0]}{staff.lastname?.[0]}
+                {staff.firstname?.[0]}
+                {staff.lastname?.[0]}
               </Text>
             </View>
           )}
@@ -139,45 +172,91 @@ export default function StaffDetailScreen() {
             {staff.firstname} {staff.lastname}
           </Text>
           <Text style={[styles.profileRole, { color: colors.textMuted }]}>
-            {staff.role?.name || 'N/A'}
+            {staff.role?.name || "N/A"}
           </Text>
-          <View style={[styles.profileStatus, { backgroundColor: isActive ? '#0D9488' : '#000000' }]}>
-            <Text style={styles.profileStatusText}>{isActive ? 'Active' : 'Inactive'}</Text>
+          <View
+            style={[
+              styles.profileStatus,
+              { backgroundColor: isActive ? "#0D9488" : "#000000" },
+            ]}
+          >
+            <Text style={styles.profileStatusText}>
+              {isActive ? "Active" : "Inactive"}
+            </Text>
           </View>
         </View>
 
         {/* Contact Info */}
-        <View style={[styles.section, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>Thông tin liên hệ</Text>
+        <View
+          style={[
+            styles.section,
+            { backgroundColor: colors.surface, borderColor: colors.border },
+          ]}
+        >
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>
+            Thông tin liên hệ
+          </Text>
 
           <View style={styles.infoRow}>
             <View style={styles.infoLabel}>
               <Ionicons name="mail-outline" size={20} color={colors.accent} />
-              <Text style={[styles.infoLabelText, { color: colors.textMuted }]}>Email</Text>
+              <Text style={[styles.infoLabelText, { color: colors.textMuted }]}>
+                Email
+              </Text>
             </View>
-            <Text style={[styles.infoValue, { color: colors.text }]}>{staff.email}</Text>
+            <Text style={[styles.infoValue, { color: colors.text }]}>
+              {staff.email}
+            </Text>
           </View>
 
           {staff.phonenumber && (
             <View style={styles.infoRow}>
               <View style={styles.infoLabel}>
                 <Ionicons name="call-outline" size={20} color={colors.accent} />
-                <Text style={[styles.infoLabelText, { color: colors.textMuted }]}>Số điện thoại</Text>
+                <Text
+                  style={[styles.infoLabelText, { color: colors.textMuted }]}
+                >
+                  Số điện thoại
+                </Text>
               </View>
-              <Text style={[styles.infoValue, { color: colors.text }]}>{staff.phonenumber}</Text>
+              <Text style={[styles.infoValue, { color: colors.text }]}>
+                {staff.phonenumber}
+              </Text>
             </View>
           )}
         </View>
 
         {/* Departments */}
         {staff.departments && staff.departments.length > 0 && (
-          <View style={[styles.section, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>Phòng ban</Text>
+          <View
+            style={[
+              styles.section,
+              { backgroundColor: colors.surface, borderColor: colors.border },
+            ]}
+          >
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>
+              Phòng ban
+            </Text>
             <View style={styles.tagsContainer}>
               {staff.departments.map((dept) => (
-                <View key={dept.departmentid} style={[styles.tag, { backgroundColor: colors.accent + '20', borderColor: colors.accent }]}>
-                  <Ionicons name="business-outline" size={14} color={colors.accent} />
-                  <Text style={[styles.tagText, { color: colors.accent }]}>{dept.name}</Text>
+                <View
+                  key={dept.departmentid}
+                  style={[
+                    styles.tag,
+                    {
+                      backgroundColor: colors.accent + "20",
+                      borderColor: colors.accent,
+                    },
+                  ]}
+                >
+                  <Ionicons
+                    name="business-outline"
+                    size={14}
+                    color={colors.accent}
+                  />
+                  <Text style={[styles.tagText, { color: colors.accent }]}>
+                    {dept.name}
+                  </Text>
                 </View>
               ))}
             </View>
@@ -186,17 +265,37 @@ export default function StaffDetailScreen() {
 
         {/* Permissions */}
         {staff.permissions && staff.permissions.length > 0 && (
-          <View style={[styles.section, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>Quyền hạn</Text>
+          <View
+            style={[
+              styles.section,
+              { backgroundColor: colors.surface, borderColor: colors.border },
+            ]}
+          >
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>
+              Quyền hạn
+            </Text>
             {staff.permissions.map((perm, index) => (
               <View key={index} style={styles.permissionItem}>
-                <Text style={[styles.permissionFeature, { color: colors.text }]}>
+                <Text
+                  style={[styles.permissionFeature, { color: colors.text }]}
+                >
                   {getFeatureLabel(perm.feature as any)}
                 </Text>
                 <View style={styles.permissionCaps}>
                   {perm.capabilities.map((cap, capIndex) => (
-                    <View key={capIndex} style={[styles.permissionCap, { backgroundColor: colors.background }]}>
-                      <Text style={[styles.permissionCapText, { color: colors.textMuted }]}>
+                    <View
+                      key={capIndex}
+                      style={[
+                        styles.permissionCap,
+                        { backgroundColor: colors.background },
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.permissionCapText,
+                          { color: colors.textMuted },
+                        ]}
+                      >
                         {getCapabilityLabel(cap as any)}
                       </Text>
                     </View>
@@ -209,58 +308,100 @@ export default function StaffDetailScreen() {
 
         {/* Statistics */}
         {staff.statistics && (
-          <View style={[styles.section, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>Thống kê</Text>
+          <View
+            style={[
+              styles.section,
+              { backgroundColor: colors.surface, borderColor: colors.border },
+            ]}
+          >
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>
+              Thống kê
+            </Text>
             <View style={styles.statsGrid}>
               <View style={styles.statItem}>
-                <Text style={[styles.statValue, { color: colors.accent }]}>{staff.statistics.total_projects}</Text>
-                <Text style={[styles.statLabel, { color: colors.textMuted }]}>Dự án</Text>
+                <Text style={[styles.statValue, { color: colors.accent }]}>
+                  {staff.statistics.total_projects}
+                </Text>
+                <Text style={[styles.statLabel, { color: colors.textMuted }]}>
+                  Dự án
+                </Text>
               </View>
               <View style={styles.statItem}>
-                <Text style={[styles.statValue, { color: colors.accent }]}>{staff.statistics.active_tasks}</Text>
-                <Text style={[styles.statLabel, { color: colors.textMuted }]}>Công việc</Text>
+                <Text style={[styles.statValue, { color: colors.accent }]}>
+                  {staff.statistics.active_tasks}
+                </Text>
+                <Text style={[styles.statLabel, { color: colors.textMuted }]}>
+                  Công việc
+                </Text>
               </View>
               <View style={styles.statItem}>
-                <Text style={[styles.statValue, { color: colors.accent }]}>{staff.statistics.completed_tasks}</Text>
-                <Text style={[styles.statLabel, { color: colors.textMuted }]}>Hoàn thành</Text>
+                <Text style={[styles.statValue, { color: colors.accent }]}>
+                  {staff.statistics.completed_tasks}
+                </Text>
+                <Text style={[styles.statLabel, { color: colors.textMuted }]}>
+                  Hoàn thành
+                </Text>
               </View>
               <View style={styles.statItem}>
-                <Text style={[styles.statValue, { color: colors.accent }]}>{staff.statistics.total_hours_logged}h</Text>
-                <Text style={[styles.statLabel, { color: colors.textMuted }]}>Giờ làm</Text>
+                <Text style={[styles.statValue, { color: colors.accent }]}>
+                  {staff.statistics.total_hours_logged}h
+                </Text>
+                <Text style={[styles.statLabel, { color: colors.textMuted }]}>
+                  Giờ làm
+                </Text>
               </View>
             </View>
           </View>
         )}
 
         {/* Activity Info */}
-        <View style={[styles.section, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>Hoạt động</Text>
+        <View
+          style={[
+            styles.section,
+            { backgroundColor: colors.surface, borderColor: colors.border },
+          ]}
+        >
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>
+            Hoạt động
+          </Text>
           {staff.last_login && (
             <View style={styles.infoRow}>
               <View style={styles.infoLabel}>
                 <Ionicons name="time-outline" size={20} color={colors.accent} />
-                <Text style={[styles.infoLabelText, { color: colors.textMuted }]}>Đăng nhập cuối</Text>
+                <Text
+                  style={[styles.infoLabelText, { color: colors.textMuted }]}
+                >
+                  Đăng nhập cuối
+                </Text>
               </View>
               <Text style={[styles.infoValue, { color: colors.text }]}>
-                {new Date(staff.last_login).toLocaleString('vi-VN')}
+                {new Date(staff.last_login).toLocaleString("vi-VN")}
               </Text>
             </View>
           )}
           {staff.created_at && (
             <View style={styles.infoRow}>
               <View style={styles.infoLabel}>
-                <Ionicons name="calendar-outline" size={20} color={colors.accent} />
-                <Text style={[styles.infoLabelText, { color: colors.textMuted }]}>Ngày tạo</Text>
+                <Ionicons
+                  name="calendar-outline"
+                  size={20}
+                  color={colors.accent}
+                />
+                <Text
+                  style={[styles.infoLabelText, { color: colors.textMuted }]}
+                >
+                  Ngày tạo
+                </Text>
               </View>
               <Text style={[styles.infoValue, { color: colors.text }]}>
-                {new Date(staff.created_at).toLocaleDateString('vi-VN')}
+                {new Date(staff.created_at).toLocaleDateString("vi-VN")}
               </Text>
             </View>
           )}
         </View>
 
         {/* Delete Button */}
-        {hasPermission('delete', 'staff') && (
+        {hasPermission("delete", "staff") && (
           <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
             <Ionicons name="trash-outline" size={20} color="#000000" />
             <Text style={styles.deleteButtonText}>Xóa nhân viên</Text>
@@ -279,8 +420,8 @@ const styles = StyleSheet.create({
   },
   centerContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 24,
   },
   contentContainer: {
@@ -293,9 +434,9 @@ const styles = StyleSheet.create({
   errorText: {
     marginTop: 12,
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: "500",
     marginBottom: 16,
-    textAlign: 'center',
+    textAlign: "center",
   },
   retryButton: {
     paddingHorizontal: 24,
@@ -303,15 +444,15 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   retryButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 15,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   headerButton: {
     marginRight: 16,
   },
   profileHeader: {
-    alignItems: 'center',
+    alignItems: "center",
     padding: 24,
     borderRadius: 16,
     marginBottom: 16,
@@ -326,18 +467,18 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: 16,
   },
   profileImageText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 36,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   profileName: {
     fontSize: 24,
-    fontWeight: '700',
+    fontWeight: "700",
     marginBottom: 4,
   },
   profileRole: {
@@ -350,9 +491,9 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   profileStatusText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   section: {
     borderRadius: 12,
@@ -362,34 +503,34 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 16,
   },
   infoRow: {
     marginBottom: 16,
   },
   infoLabel: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
     marginBottom: 6,
   },
   infoLabelText: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   infoValue: {
     fontSize: 15,
     marginLeft: 28,
   },
   tagsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 8,
   },
   tag: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6,
     paddingHorizontal: 12,
     paddingVertical: 6,
@@ -398,19 +539,19 @@ const styles = StyleSheet.create({
   },
   tagText: {
     fontSize: 13,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   permissionItem: {
     marginBottom: 16,
   },
   permissionFeature: {
     fontSize: 15,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 8,
   },
   permissionCaps: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 6,
   },
   permissionCap: {
@@ -420,42 +561,42 @@ const styles = StyleSheet.create({
   },
   permissionCapText: {
     fontSize: 12,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   statsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 16,
   },
   statItem: {
     flex: 1,
-    minWidth: '45%',
-    alignItems: 'center',
+    minWidth: "45%",
+    alignItems: "center",
     paddingVertical: 12,
   },
   statValue: {
     fontSize: 28,
-    fontWeight: '700',
+    fontWeight: "700",
     marginBottom: 4,
   },
   statLabel: {
     fontSize: 13,
   },
   deleteButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     gap: 8,
     padding: 16,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#000000',
+    borderColor: "#000000",
     marginTop: 8,
   },
   deleteButtonText: {
-    color: '#000000',
+    color: "#000000",
     fontSize: 15,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   bottomSpacing: {
     height: 32,

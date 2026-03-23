@@ -65,16 +65,34 @@ Sentry.init({
 });
 
 function RoleNavigator() {
-  const { role, roleLoaded } = useRole();
+  const { role, roleLoaded, onboardingSeen, initialized } = useRole();
   const pathname = usePathname();
   const router = useRouter();
   const hasRedirected = useRef(false);
 
   useEffect(() => {
-    if (!roleLoaded) return;
+    if (!initialized) return;
+
+    // Splash screen handles its own routing — let it run
+    if (pathname === "/splash") return;
+
+    // If onboarding not yet seen, send to onboarding
+    if (!onboardingSeen && !pathname.startsWith("/onboarding")) {
+      if (!hasRedirected.current) {
+        hasRedirected.current = true;
+        requestAnimationFrame(() => {
+          router.replace("/onboarding");
+        });
+      }
+      return;
+    }
 
     // If no role selected and not already on role-select screen
-    if (!role && !pathname.startsWith("/role-select")) {
+    if (
+      !role &&
+      !pathname.startsWith("/role-select") &&
+      !pathname.startsWith("/onboarding")
+    ) {
       if (!hasRedirected.current) {
         hasRedirected.current = true;
         requestAnimationFrame(() => {
@@ -93,10 +111,13 @@ function RoleNavigator() {
       return;
     }
 
-    if (!pathname.startsWith("/role-select")) {
+    if (
+      !pathname.startsWith("/role-select") &&
+      !pathname.startsWith("/onboarding")
+    ) {
       hasRedirected.current = false;
     }
-  }, [role, roleLoaded, pathname]);
+  }, [role, roleLoaded, onboardingSeen, initialized, pathname]);
 
   return null;
 }
@@ -212,13 +233,30 @@ export default Sentry.wrap(function RootLayout() {
                                                                     </LazyProvider>
                                                                     <NotificationToast />
                                                                     <AuthNavigator />
+                                                                    <RoleNavigator />
                                                                     {/* Main navigation */}
                                                                     <Stack
                                                                       screenOptions={{
                                                                         headerShown: false,
                                                                       }}
-                                                                      initialRouteName="(tabs)"
+                                                                      initialRouteName="splash"
                                                                     >
+                                                                      <Stack.Screen
+                                                                        name="splash"
+                                                                        options={{
+                                                                          headerShown: false,
+                                                                          animation:
+                                                                            "fade",
+                                                                        }}
+                                                                      />
+                                                                      <Stack.Screen
+                                                                        name="onboarding"
+                                                                        options={{
+                                                                          headerShown: false,
+                                                                          animation:
+                                                                            "slide_from_right",
+                                                                        }}
+                                                                      />
                                                                       <Stack.Screen
                                                                         name="(tabs)"
                                                                         options={{

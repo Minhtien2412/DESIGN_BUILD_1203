@@ -393,7 +393,9 @@ export default function ConstructionProgressScreen() {
       <View style={styles.workerSection}>
         <View style={styles.workerInfo}>
           <Image
-            source={{ uri: project.workerAvatar }}
+            source={
+              project.workerAvatar ? { uri: project.workerAvatar } : undefined
+            }
             style={styles.workerAvatar}
           />
           <View style={styles.workerDetails}>

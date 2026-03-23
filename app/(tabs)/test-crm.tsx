@@ -89,7 +89,7 @@ export default function TestCRMScreen() {
           </Text>
           <TouchableOpacity
             style={[styles.button, { backgroundColor: primaryColor }]}
-            onPress={() => router.push("/(auth)/sign-in" as const)}
+            onPress={() => router.push("/(auth)/sign-in" as any)}
           >
             <Text style={styles.buttonText}>Go to Login</Text>
           </TouchableOpacity>

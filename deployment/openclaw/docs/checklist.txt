@@ -1,0 +1,101 @@
+═══════════════════════════════════════════════════════════
+  OpenClaw Deployment Verification Checklist
+  VPS: baotienweb.cloud (103.200.20.100)
+═══════════════════════════════════════════════════════════
+
+PRE-DEPLOYMENT
+─────────────────────────────────────────────────────────
+[ ] VPS survey script ran successfully (survey.sh)
+[ ] RAM status reviewed — at least 500MB free (or swap added)
+[ ] Swap space configured (2GB recommended)
+[ ] Port 18789 is available
+[ ] DNS A record created: openclaw.baotienweb.cloud → 103.200.20.100
+[ ] Existing services verified running (PM2, Nginx, Docker)
+[ ] Backup of /etc/nginx created
+
+INSTALLATION
+─────────────────────────────────────────────────────────
+[ ] User 'openclaw' created with home directory
+[ ] User lingering enabled (loginctl enable-linger openclaw)
+[ ] /opt/openclaw directory created and owned by openclaw
+[ ] nvm installed for openclaw user
+[ ] Node.js 22 LTS installed via nvm
+[ ] openclaw npm package installed globally
+[ ] openclaw --version shows correct version
+[ ] openclaw onboard completed — mode=local, bind=loopback
+
+CONFIGURATION
+─────────────────────────────────────────────────────────
+[ ] ~/.openclaw/openclaw.json configured (loopback, token auth)
+[ ] ~/.openclaw/.env created with OPENCLAW_GATEWAY_TOKEN
+[ ] Gateway token is long random string (openssl rand -hex 32)
+[ ] ~/.openclaw permissions set to 700
+[ ] ~/.openclaw/openclaw.json permissions set to 600
+[ ] timezone set to Asia/Ho_Chi_Minh in config
+[ ] trustedProxies includes 127.0.0.1
+
+SYSTEMD SERVICE
+─────────────────────────────────────────────────────────
+[ ] openclaw-gateway.service file placed correctly
+[ ] ExecStart path matches actual nvm node path
+[ ] systemctl --user daemon-reload ran
+[ ] service enabled: systemctl --user enable openclaw-gateway
+[ ] service started: systemctl --user start openclaw-gateway
+[ ] service status: active (running)
+[ ] Memory limit set (MemoryMax=1G)
+
+GATEWAY HEALTH
+─────────────────────────────────────────────────────────
+[ ] curl http://127.0.0.1:18789/healthz returns OK
+[ ] curl http://127.0.0.1:18789/readyz returns OK
+[ ] Port 18789 bound to 127.0.0.1 only (ss -tlnp | grep 18789)
+[ ] Control UI accessible via SSH tunnel (localhost:18789)
+
+NGINX REVERSE PROXY
+─────────────────────────────────────────────────────────
+[ ] openclaw.conf placed in /etc/nginx/sites-available/
+[ ] Symlink created in /etc/nginx/sites-enabled/
+[ ] nginx -t passes
+[ ] nginx reloaded
+[ ] WebSocket proxy headers configured (Upgrade, Connection)
+[ ] X-Forwarded-For set to $remote_addr (NOT $proxy_add_x_forwarded_for)
+[ ] Rate limiting configured
+
+SSL / HTTPS
+─────────────────────────────────────────────────────────
+[ ] certbot --nginx -d openclaw.baotienweb.cloud ran
+[ ] HTTPS redirect working
+[ ] https://openclaw.baotienweb.cloud/healthz responds
+[ ] Certificate auto-renewal configured (certbot renew --dry-run)
+
+SECURITY
+─────────────────────────────────────────────────────────
+[ ] Gateway auth mode: token (not 'none')
+[ ] Gateway bind: loopback
+[ ] tools.elevated: disabled
+[ ] discovery.mdns: off
+[ ] OpenClaw security audit passes
+[ ] File permissions tight (700/600)
+
+POST-DEPLOYMENT
+─────────────────────────────────────────────────────────
+[ ] verify.sh ran with all checks passing
+[ ] Memory usage stable after 10 minutes
+[ ] No impact on existing PM2 services
+[ ] No impact on existing Docker containers
+[ ] Backup script configured (backup.sh)
+[ ] Rollback procedure documented and tested
+
+ACCESS VERIFICATION
+─────────────────────────────────────────────────────────
+[ ] SSH tunnel access works (ssh -NL 18789:127.0.0.1:18789)
+[ ] Control UI loads in browser
+[ ] Token authentication works
+[ ] AI model responds to test prompt
+
+═══════════════════════════════════════════════════════════
+  SIGN OFF
+  Verified by: ________________
+  Date:        ________________
+  Status:      [ ] PRODUCTION READY  [ ] NEEDS FIXES
+═══════════════════════════════════════════════════════════

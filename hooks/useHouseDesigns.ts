@@ -174,7 +174,7 @@ export function useHouseDesigns(
       setLoadingTypes(true);
       const response = await getDesignTypes();
       if (response) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         setDesignTypes(response as any);
       }
     } catch (err) {
@@ -190,7 +190,7 @@ export function useHouseDesigns(
       setLoadingStyles(true);
       const response = await getDesignStyles();
       if (response) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         setDesignStyles(response as any);
       }
     } catch (err) {
@@ -225,14 +225,14 @@ export function useHouseDesigns(
       loadDesignTypes();
       loadDesignStyles();
     }
-  }, [autoLoad]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [autoLoad]);  
 
   // Reload when params change
   useEffect(() => {
     if (Object.keys(currentParams).length > 0) {
       loadDesigns();
     }
-  }, [currentParams]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [currentParams]);  
 
   return {
     // Data

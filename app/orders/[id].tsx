@@ -53,6 +53,7 @@ type OrderStatus =
   | "processing"
   | "shipping"
   | "delivered"
+  | "completed"
   | "cancelled";
 
 interface OrderItem {
@@ -176,6 +177,11 @@ const STATUS_CONFIG: Record<
     label: "Đã hủy",
     color: "#EF4444",
     icon: "close-circle-outline",
+  },
+  completed: {
+    label: "Hoàn thành",
+    color: "#059669",
+    icon: "trophy-outline",
   },
 };
 

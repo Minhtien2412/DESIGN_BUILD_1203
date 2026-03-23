@@ -1,17 +1,17 @@
 /**
  * Weather Widget Component
  * ========================
- * 
+ *
  * Component hiển thị thông tin thời tiết với animation và auto-refresh.
  * Sử dụng weatherApi service với fallback tự động.
- * 
+ *
  * @author ThietKeResort Team
  * @created 2025-01-12
  */
 
-import { Ionicons } from '@expo/vector-icons';
-import * as Location from 'expo-location';
-import { useCallback, useEffect, useState } from 'react';
+import { Ionicons } from "@expo/vector-icons";
+import * as Location from "expo-location";
+import { useCallback, useEffect, useState } from "react";
 import {
     ActivityIndicator,
     Animated,
@@ -22,16 +22,16 @@ import {
     Text,
     TouchableOpacity,
     View,
-} from 'react-native';
+} from "react-native";
 
-import { useThemeColor } from '@/hooks/use-theme-color';
+import { useThemeColor } from "@/hooks/use-theme-color";
 import {
     getWeather,
     getWeatherByCity,
     getWeatherEmoji,
     type WeatherData,
-    type WeatherLocation
-} from '../../services/weatherApi';
+    type WeatherLocation,
+} from "../../services/weatherApi";
 
 // ============================================
 // Types
@@ -79,69 +79,71 @@ export function WeatherWidget({
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-  
+
   const fadeAnim = useState(new Animated.Value(0))[0];
-  
+
   // Theme colors
-  const backgroundColor = useThemeColor({}, 'background');
-  const textColor = useThemeColor({}, 'text');
-  const cardColor = useThemeColor({}, 'card');
-  const primaryColor = useThemeColor({}, 'tint');
-  const secondaryText = useThemeColor({}, 'tabIconDefault');
+  const backgroundColor = useThemeColor({}, "background");
+  const textColor = useThemeColor({}, "text");
+  const cardColor = useThemeColor({}, "card");
+  const primaryColor = useThemeColor({}, "tint");
+  const secondaryText = useThemeColor({}, "tabIconDefault");
 
   // Fetch weather data
-  const fetchWeather = useCallback(async (isRefresh = false) => {
-    try {
-      if (!isRefresh) setLoading(true);
-      setError(null);
-      
-      let data: WeatherData;
-      
-      if (city) {
-        // Fetch by city name
-        data = await getWeatherByCity(city);
-      } else if (location) {
-        // Fetch by provided coordinates
-        data = await getWeather(location);
-      } else {
-        // Get current location
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        
-        if (status === 'granted') {
-          const currentLocation = await Location.getCurrentPositionAsync({
-            accuracy: Location.Accuracy.Balanced,
-          });
-          
-          data = await getWeather({
-            lat: currentLocation.coords.latitude,
-            lon: currentLocation.coords.longitude,
-          });
+  const fetchWeather = useCallback(
+    async (isRefresh = false) => {
+      try {
+        if (!isRefresh) setLoading(true);
+        setError(null);
+
+        let data: WeatherData;
+
+        if (city) {
+          // Fetch by city name
+          data = await getWeatherByCity(city);
+        } else if (location) {
+          // Fetch by provided coordinates
+          data = await getWeather(location);
         } else {
-          // Default to Ho Chi Minh City
-          data = await getWeatherByCity('Hồ Chí Minh');
+          // Get current location
+          const { status } = await Location.requestForegroundPermissionsAsync();
+
+          if (status === "granted") {
+            const currentLocation = await Location.getCurrentPositionAsync({
+              accuracy: Location.Accuracy.Balanced,
+            });
+
+            data = await getWeather({
+              lat: currentLocation.coords.latitude,
+              lon: currentLocation.coords.longitude,
+            });
+          } else {
+            // Default to Ho Chi Minh City
+            data = await getWeatherByCity("Hồ Chí Minh");
+          }
         }
+
+        setWeather(data);
+        setLastUpdated(new Date());
+        onWeatherLoaded?.(data);
+
+        // Fade in animation
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }).start();
+      } catch (err: any) {
+        console.error("[WeatherWidget] Error:", err);
+        setError(err.message || "Không thể tải dữ liệu thời tiết");
+        onError?.(err);
+      } finally {
+        setLoading(false);
+        setRefreshing(false);
       }
-      
-      setWeather(data);
-      setLastUpdated(new Date());
-      onWeatherLoaded?.(data);
-      
-      // Fade in animation
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 500,
-        useNativeDriver: true,
-      }).start();
-      
-    } catch (err: any) {
-      console.error('[WeatherWidget] Error:', err);
-      setError(err.message || 'Không thể tải dữ liệu thời tiết');
-      onError?.(err);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, [city, location, onWeatherLoaded, onError, fadeAnim]);
+    },
+    [city, location, onWeatherLoaded, onError, fadeAnim],
+  );
 
   // Initial fetch
   useEffect(() => {
@@ -151,10 +153,13 @@ export function WeatherWidget({
   // Auto refresh
   useEffect(() => {
     if (refreshInterval > 0) {
-      const interval = setInterval(() => {
-        fetchWeather(true);
-      }, refreshInterval * 60 * 1000);
-      
+      const interval = setInterval(
+        () => {
+          fetchWeather(true);
+        },
+        refreshInterval * 60 * 1000,
+      );
+
       return () => clearInterval(interval);
     }
   }, [refreshInterval, fetchWeather]);
@@ -168,19 +173,33 @@ export function WeatherWidget({
   // Format time
   const formatTime = (isoString: string) => {
     const date = new Date(isoString);
-    return date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+    return date.toLocaleTimeString("vi-VN", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   // Format date
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('vi-VN', { weekday: 'short', day: 'numeric', month: 'numeric' });
+    return date.toLocaleDateString("vi-VN", {
+      weekday: "short",
+      day: "numeric",
+      month: "numeric",
+    });
   };
 
   // Loading state
   if (loading && !weather) {
     return (
-      <View style={[styles.container, styles.loadingContainer, { backgroundColor: cardColor }, style]}>
+      <View
+        style={[
+          styles.container,
+          styles.loadingContainer,
+          { backgroundColor: cardColor },
+          style,
+        ]}
+      >
         <ActivityIndicator size="large" color={primaryColor} />
         <Text style={[styles.loadingText, { color: secondaryText }]}>
           Đang tải thời tiết...
@@ -192,10 +211,21 @@ export function WeatherWidget({
   // Error state
   if (error && !weather) {
     return (
-      <View style={[styles.container, styles.errorContainer, { backgroundColor: cardColor }, style]}>
-        <Ionicons name="cloud-offline-outline" size={48} color={secondaryText} />
+      <View
+        style={[
+          styles.container,
+          styles.errorContainer,
+          { backgroundColor: cardColor },
+          style,
+        ]}
+      >
+        <Ionicons
+          name="cloud-offline-outline"
+          size={48}
+          color={secondaryText}
+        />
         <Text style={[styles.errorText, { color: textColor }]}>{error}</Text>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={[styles.retryButton, { backgroundColor: primaryColor }]}
           onPress={() => fetchWeather()}
         >
@@ -210,9 +240,20 @@ export function WeatherWidget({
   // Compact version
   if (compact) {
     return (
-      <Animated.View style={[styles.compactContainer, { backgroundColor: cardColor, opacity: fadeAnim }, style]}>
+      <Animated.View
+        style={[
+          styles.compactContainer,
+          { backgroundColor: cardColor, opacity: fadeAnim },
+          style,
+        ]}
+      >
         <View style={styles.compactContent}>
-          <Image source={{ uri: weather.current.icon }} style={styles.compactIcon} />
+          {weather.current.icon ? (
+            <Image
+              source={{ uri: weather.current.icon }}
+              style={styles.compactIcon}
+            />
+          ) : null}
           <View style={styles.compactInfo}>
             <Text style={[styles.compactTemp, { color: textColor }]}>
               {weather.current.temp}°C
@@ -234,7 +275,11 @@ export function WeatherWidget({
     <ScrollView
       style={[styles.container, { backgroundColor: cardColor }, style]}
       refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[primaryColor]} />
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          colors={[primaryColor]}
+        />
       }
       showsVerticalScrollIndicator={false}
     >
@@ -249,7 +294,11 @@ export function WeatherWidget({
           </View>
           {lastUpdated && (
             <Text style={[styles.lastUpdated, { color: secondaryText }]}>
-              Cập nhật: {lastUpdated.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
+              Cập nhật:{" "}
+              {lastUpdated.toLocaleTimeString("vi-VN", {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
             </Text>
           )}
         </View>
@@ -257,7 +306,12 @@ export function WeatherWidget({
         {/* Current Weather */}
         <View style={styles.currentWeather}>
           <View style={styles.currentMain}>
-            <Image source={{ uri: weather.current.icon }} style={styles.weatherIcon} />
+            {weather.current.icon ? (
+              <Image
+                source={{ uri: weather.current.icon }}
+                style={styles.weatherIcon}
+              />
+            ) : null}
             <View style={styles.tempContainer}>
               <Text style={[styles.temperature, { color: textColor }]}>
                 {weather.current.temp}°
@@ -267,43 +321,64 @@ export function WeatherWidget({
               </Text>
             </View>
           </View>
-          
+
           <Text style={[styles.description, { color: textColor }]}>
-            {getWeatherEmoji(weather.current.description)} {weather.current.description}
+            {getWeatherEmoji(weather.current.description)}{" "}
+            {weather.current.description}
           </Text>
-          
+
           {/* Weather Details Grid */}
           <View style={styles.detailsGrid}>
-            <View style={[styles.detailItem, { backgroundColor: backgroundColor }]}>
+            <View
+              style={[styles.detailItem, { backgroundColor: backgroundColor }]}
+            >
               <Ionicons name="water-outline" size={20} color={primaryColor} />
               <Text style={[styles.detailValue, { color: textColor }]}>
                 {weather.current.humidity}%
               </Text>
-              <Text style={[styles.detailLabel, { color: secondaryText }]}>Độ ẩm</Text>
+              <Text style={[styles.detailLabel, { color: secondaryText }]}>
+                Độ ẩm
+              </Text>
             </View>
-            
-            <View style={[styles.detailItem, { backgroundColor: backgroundColor }]}>
-              <Ionicons name="speedometer-outline" size={20} color={primaryColor} />
+
+            <View
+              style={[styles.detailItem, { backgroundColor: backgroundColor }]}
+            >
+              <Ionicons
+                name="speedometer-outline"
+                size={20}
+                color={primaryColor}
+              />
               <Text style={[styles.detailValue, { color: textColor }]}>
                 {weather.current.windSpeed.toFixed(1)} m/s
               </Text>
-              <Text style={[styles.detailLabel, { color: secondaryText }]}>Gió</Text>
+              <Text style={[styles.detailLabel, { color: secondaryText }]}>
+                Gió
+              </Text>
             </View>
-            
-            <View style={[styles.detailItem, { backgroundColor: backgroundColor }]}>
+
+            <View
+              style={[styles.detailItem, { backgroundColor: backgroundColor }]}
+            >
               <Ionicons name="eye-outline" size={20} color={primaryColor} />
               <Text style={[styles.detailValue, { color: textColor }]}>
                 {weather.current.visibility} km
               </Text>
-              <Text style={[styles.detailLabel, { color: secondaryText }]}>Tầm nhìn</Text>
+              <Text style={[styles.detailLabel, { color: secondaryText }]}>
+                Tầm nhìn
+              </Text>
             </View>
-            
-            <View style={[styles.detailItem, { backgroundColor: backgroundColor }]}>
+
+            <View
+              style={[styles.detailItem, { backgroundColor: backgroundColor }]}
+            >
               <Ionicons name="cloud-outline" size={20} color={primaryColor} />
               <Text style={[styles.detailValue, { color: textColor }]}>
                 {weather.current.clouds}%
               </Text>
-              <Text style={[styles.detailLabel, { color: secondaryText }]}>Mây</Text>
+              <Text style={[styles.detailLabel, { color: secondaryText }]}>
+                Mây
+              </Text>
             </View>
           </View>
         </View>
@@ -314,27 +389,37 @@ export function WeatherWidget({
             <Text style={[styles.sectionTitle, { color: textColor }]}>
               <Ionicons name="time-outline" size={16} /> Dự báo theo giờ
             </Text>
-            <ScrollView 
-              horizontal 
+            <ScrollView
+              horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.hourlyContainer}
             >
               {weather.hourly.map((hour, index) => (
-                <View 
-                  key={index} 
-                  style={[styles.hourlyItem, { backgroundColor: backgroundColor }]}
+                <View
+                  key={index}
+                  style={[
+                    styles.hourlyItem,
+                    { backgroundColor: backgroundColor },
+                  ]}
                 >
                   <Text style={[styles.hourlyTime, { color: secondaryText }]}>
                     {formatTime(hour.time)}
                   </Text>
-                  <Image source={{ uri: hour.icon }} style={styles.hourlyIcon} />
+                  {hour.icon ? (
+                    <Image
+                      source={{ uri: hour.icon }}
+                      style={styles.hourlyIcon}
+                    />
+                  ) : null}
                   <Text style={[styles.hourlyTemp, { color: textColor }]}>
                     {Math.round(hour.temp)}°
                   </Text>
                   {hour.precipitation > 0 && (
                     <View style={styles.precipRow}>
                       <Ionicons name="water" size={10} color="#0D9488" />
-                      <Text style={styles.precipText}>{Math.round(hour.precipitation)}%</Text>
+                      <Text style={styles.precipText}>
+                        {Math.round(hour.precipitation)}%
+                      </Text>
                     </View>
                   )}
                 </View>
@@ -347,22 +432,30 @@ export function WeatherWidget({
         {showDaily && weather.daily && weather.daily.length > 0 && (
           <View style={styles.forecastSection}>
             <Text style={[styles.sectionTitle, { color: textColor }]}>
-              <Ionicons name="calendar-outline" size={16} /> Dự báo {forecastDays} ngày
+              <Ionicons name="calendar-outline" size={16} /> Dự báo{" "}
+              {forecastDays} ngày
             </Text>
             {weather.daily.slice(0, forecastDays).map((day, index) => (
-              <View 
-                key={index} 
+              <View
+                key={index}
                 style={[styles.dailyItem, { backgroundColor: backgroundColor }]}
               >
                 <Text style={[styles.dailyDate, { color: textColor }]}>
-                  {index === 0 ? 'Hôm nay' : formatDate(day.date)}
+                  {index === 0 ? "Hôm nay" : formatDate(day.date)}
                 </Text>
                 <View style={styles.dailyCenter}>
-                  <Image source={{ uri: day.icon }} style={styles.dailyIcon} />
+                  {day.icon ? (
+                    <Image
+                      source={{ uri: day.icon }}
+                      style={styles.dailyIcon}
+                    />
+                  ) : null}
                   {day.precipitation > 0 && (
                     <View style={styles.dailyPrecip}>
                       <Ionicons name="water" size={12} color="#0D9488" />
-                      <Text style={styles.dailyPrecipText}>{Math.round(day.precipitation)}%</Text>
+                      <Text style={styles.dailyPrecipText}>
+                        {Math.round(day.precipitation)}%
+                      </Text>
                     </View>
                   )}
                 </View>
@@ -381,8 +474,12 @@ export function WeatherWidget({
 
         {/* Source attribution */}
         <Text style={[styles.sourceText, { color: secondaryText }]}>
-          Nguồn: {weather.source === 'openweathermap' ? 'OpenWeatherMap' : 
-                  weather.source === 'weatherapi' ? 'WeatherAPI' : 'Visual Crossing'}
+          Nguồn:{" "}
+          {weather.source === "openweathermap"
+            ? "OpenWeatherMap"
+            : weather.source === "weatherapi"
+              ? "WeatherAPI"
+              : "Visual Crossing"}
         </Text>
       </Animated.View>
     </ScrollView>
@@ -399,8 +496,8 @@ const styles = StyleSheet.create({
     marginVertical: 8,
   },
   loadingContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     minHeight: 200,
   },
   loadingText: {
@@ -408,15 +505,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   errorContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     minHeight: 200,
     padding: 20,
   },
   errorText: {
     marginTop: 12,
     fontSize: 14,
-    textAlign: 'center',
+    textAlign: "center",
   },
   retryButton: {
     marginTop: 16,
@@ -425,18 +522,18 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   retryButtonText: {
-    color: '#fff',
-    fontWeight: '600',
+    color: "#fff",
+    fontWeight: "600",
   },
-  
+
   // Compact styles
   compactContainer: {
     borderRadius: 12,
     padding: 12,
   },
   compactContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   compactIcon: {
     width: 40,
@@ -448,7 +545,7 @@ const styles = StyleSheet.create({
   },
   compactTemp: {
     fontSize: 20,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   compactLocation: {
     fontSize: 12,
@@ -456,35 +553,35 @@ const styles = StyleSheet.create({
   compactEmoji: {
     fontSize: 24,
   },
-  
+
   // Header
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 16,
   },
   locationRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 4,
   },
   locationText: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   lastUpdated: {
     fontSize: 11,
   },
-  
+
   // Current weather
   currentWeather: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 20,
   },
   currentMain: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 8,
   },
   weatherIcon: {
@@ -492,11 +589,11 @@ const styles = StyleSheet.create({
     height: 100,
   },
   tempContainer: {
-    alignItems: 'flex-start',
+    alignItems: "flex-start",
   },
   temperature: {
     fontSize: 56,
-    fontWeight: '200',
+    fontWeight: "200",
   },
   feelsLike: {
     fontSize: 13,
@@ -504,49 +601,49 @@ const styles = StyleSheet.create({
   },
   description: {
     fontSize: 16,
-    textTransform: 'capitalize',
+    textTransform: "capitalize",
     marginBottom: 16,
   },
-  
+
   // Details grid
   detailsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 8,
-    width: '100%',
+    width: "100%",
   },
   detailItem: {
     flex: 1,
-    minWidth: '45%',
-    alignItems: 'center',
+    minWidth: "45%",
+    alignItems: "center",
     padding: 12,
     borderRadius: 12,
     gap: 4,
   },
   detailValue: {
     fontSize: 15,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   detailLabel: {
     fontSize: 11,
   },
-  
+
   // Forecast sections
   forecastSection: {
     marginTop: 20,
   },
   sectionTitle: {
     fontSize: 15,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 12,
   },
-  
+
   // Hourly
   hourlyContainer: {
     gap: 8,
   },
   hourlyItem: {
-    alignItems: 'center',
+    alignItems: "center",
     padding: 10,
     borderRadius: 12,
     minWidth: 60,
@@ -561,24 +658,24 @@ const styles = StyleSheet.create({
   },
   hourlyTemp: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   precipRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 2,
     marginTop: 2,
   },
   precipText: {
     fontSize: 10,
-    color: '#0D9488',
+    color: "#0D9488",
   },
-  
+
   // Daily
   dailyItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     padding: 12,
     borderRadius: 12,
     marginBottom: 8,
@@ -586,13 +683,13 @@ const styles = StyleSheet.create({
   dailyDate: {
     flex: 1,
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   dailyCenter: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     gap: 4,
   },
   dailyIcon: {
@@ -600,32 +697,32 @@ const styles = StyleSheet.create({
     height: 36,
   },
   dailyPrecip: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 2,
   },
   dailyPrecipText: {
     fontSize: 11,
-    color: '#0D9488',
+    color: "#0D9488",
   },
   dailyTemps: {
     flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
+    flexDirection: "row",
+    justifyContent: "flex-end",
     gap: 8,
   },
   dailyTempMax: {
     fontSize: 15,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   dailyTempMin: {
     fontSize: 15,
   },
-  
+
   // Source
   sourceText: {
     fontSize: 10,
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: 16,
   },
 });

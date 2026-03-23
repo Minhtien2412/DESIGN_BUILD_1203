@@ -36,6 +36,11 @@
     "my-new-expo-app",
     // exclude perfex-crm-ai-architect separate project
     "perfex-crm-ai-architect/**",
+    // exclude separate projects with own dependencies
+    "ai-brain/**",
+    "domain/**",
+    "presentation/**",
+    "features/progress-report-source/**",
   // exclude server/backend code from app typecheck
   "server/**",
   "backend-implementation/**",
@@ -57,6 +62,8 @@
   "lib/construction-map/examples/**",
   "lib/construction-map/vite.config.ts",
   "services/api/__tests__.ts",
+  // exclude legacy src folder (also excluded by tsconfig.app.json and eslint)
+  "src/**",
     // common excludes
     "node_modules",
     "dist",

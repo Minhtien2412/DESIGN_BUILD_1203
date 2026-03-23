@@ -9,17 +9,17 @@
  */
 
 import type { ServiceItem } from "@/data/home-data";
+import { createShadow } from "@/utils/shadowStyles";
 import { Ionicons } from "@expo/vector-icons";
 import { Href, router } from "expo-router";
 import { memo } from "react";
 import {
     Image,
-    Platform,
     ScrollView,
     StyleSheet,
     Text,
     TouchableOpacity,
-    View,
+    View
 } from "react-native";
 
 export interface LibraryGridProps {
@@ -63,15 +63,7 @@ const s = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: "#fff",
     overflow: "hidden",
-    ...Platform.select({
-      ios: {
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.06,
-        shadowRadius: 4,
-      },
-      android: { elevation: 1 },
-    }),
+    ...createShadow({ offsetY: 1, blurRadius: 4, opacity: 0.06 }),
   },
   imgWrap: {
     width: 100,

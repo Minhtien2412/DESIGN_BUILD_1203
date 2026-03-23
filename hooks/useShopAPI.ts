@@ -184,7 +184,7 @@ export function useShopAPI(options: UseShopAPIOptions = {}): UseShopAPIResult {
       setLoadingCategories(true);
       const response = await getCategories();
       if (response) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         setCategories(response as any);
       }
     } catch (err) {
@@ -226,14 +226,14 @@ export function useShopAPI(options: UseShopAPIOptions = {}): UseShopAPIResult {
       loadProducts();
       loadCategories();
     }
-  }, [autoLoad]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [autoLoad]);  
 
   // Reload when params change
   useEffect(() => {
     if (Object.keys(currentParams).length > 0) {
       loadProducts();
     }
-  }, [currentParams]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [currentParams]);  
 
   return {
     // Data

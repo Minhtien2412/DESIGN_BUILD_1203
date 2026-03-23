@@ -701,9 +701,8 @@ class ZaloOTPAuthService {
     newPassword: string,
     resetToken: string,
   ): Promise<{ success: boolean; message: string }> {
+    const formattedPhone = formatVietnamesePhone(phone);
     try {
-      const formattedPhone = formatVietnamesePhone(phone);
-
       // Validate token format
       if (!resetToken || !resetToken.startsWith("reset_")) {
         return {

@@ -294,7 +294,8 @@ export function translate(
   if (!entry) return fallback || key;
 
   // Try exact language
-  if (entry[lang]) return entry[lang];
+  const langEntry = (entry as Record<string, string | undefined>)[lang];
+  if (langEntry) return langEntry;
 
   // Fallback to Vietnamese then English
   if (entry.vi) return entry.vi;

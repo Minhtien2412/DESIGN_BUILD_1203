@@ -444,8 +444,9 @@ const TemplateCard: React.FC<{
         {/* Thumbnail */}
         <View style={styles.thumbnailContainer}>
           <Image
-            source={{ uri: template.thumbnail }}
-            style={styles.thumbnail}
+            source={
+              template.thumbnail ? { uri: template.thumbnail } : undefined
+            }
             resizeMode="cover"
           />
 

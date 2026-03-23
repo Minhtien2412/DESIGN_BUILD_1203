@@ -159,9 +159,7 @@ export default function FileUploadDemo() {
         },
       });
 
-      const fileInfo = await FileSystem.getInfoAsync(selectedFile.uri, {
-        size: true,
-      });
+      const fileInfo = await FileSystem.getInfoAsync(selectedFile.uri);
 
       const uploadedFile: UploadedFile = {
         id: result.fileId || Date.now().toString(),

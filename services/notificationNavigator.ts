@@ -67,7 +67,7 @@ const ROUTE_MAP: Record<string, string> = {
   new_message: "/chat/[chatId]",
 
   // Meetings & Calls
-  meeting: "/meet/[meetingId]/room",
+  meeting: "/meetings/room/[meetingId]",
   call: "/call",
   video_call: "/call",
 
@@ -318,7 +318,7 @@ function getFallbackRoute(type: string): string {
     case "order":
       return "/order";
     case "meeting":
-      return "/meet";
+      return "/meetings";
     case "construction":
       return "/construction";
     case "document":

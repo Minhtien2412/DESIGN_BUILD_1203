@@ -1,7 +1,8 @@
 /**
  * Services Hub — Dịch vụ
  * Route: /services
- * Migrated to DSModuleScreen layout
+ * Refactored: full DS design system (useDS tokens, no StyleSheet.create).
+ * AI section uses a local purple palette (not in DS — brand accent for AI features).
  */
 
 import { DSModuleScreen } from "@/components/ds/layouts";
@@ -12,19 +13,26 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Href, router } from "expo-router";
 import { useRef } from "react";
 import {
-    Animated,
-    Image,
-    Platform,
-    Pressable,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Animated,
+  Image,
+  Platform,
+  Pressable,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
+
+/** AI section branding — purple palette not in DS (AI-specific accent) */
+const AI_PURPLE = {
+  gradient: ["#7C3AED", "#A855F7"] as const,
+  title: "#6D28D9",
+  bg: "#FAF5FF",
+  border: "#E9D5FF",
+};
 
 // ── AI Service Card ────────────────────────────────────────────────────
 function AIServiceCard({ item }: { item: (typeof AI_SERVICES)[0] }) {
-  const { colors, radius } = useDS();
+  const { colors, spacing, radius, font } = useDS();
   const scale = useRef(new Animated.Value(1)).current;
 
   const onIn = () =>
@@ -50,29 +58,55 @@ function AIServiceCard({ item }: { item: (typeof AI_SERVICES)[0] }) {
       onPressOut={onOut}
     >
       <Animated.View
-        style={[
-          st.aiCard,
-          {
-            backgroundColor: colors.bgSurface,
-            borderColor: colors.border,
-            borderRadius: radius.lg,
-            transform: [{ scale }],
-          },
-        ]}
+        style={{
+          width: 68,
+          alignItems: "center",
+          padding: spacing.sm,
+          borderWidth: 1,
+          position: "relative",
+          backgroundColor: colors.bgSurface,
+          borderColor: colors.border,
+          borderRadius: radius.lg,
+          transform: [{ scale }],
+        }}
       >
         <View
-          style={[
-            st.aiIconBox,
-            { backgroundColor: item.color + "15", borderRadius: radius.md },
-          ]}
+          style={{
+            width: 40,
+            height: 40,
+            alignItems: "center",
+            justifyContent: "center",
+            marginBottom: spacing.xs,
+            backgroundColor: item.color + "15",
+            borderRadius: radius.md,
+          }}
         >
-          <Text style={st.aiIcon}>{item.icon}</Text>
+          <Text style={{ fontSize: font.size.lg }}>{item.icon}</Text>
         </View>
-        <Text style={[st.aiName, { color: colors.text }]} numberOfLines={2}>
+        <Text
+          style={{
+            fontSize: font.size.xxs,
+            fontWeight: font.weight.bold,
+            textAlign: "center",
+            lineHeight: 13,
+            color: colors.text,
+          }}
+          numberOfLines={2}
+        >
           {item.name}
         </Text>
         {item.isNew && (
-          <View style={[st.hotDot, { backgroundColor: item.color }]} />
+          <View
+            style={{
+              position: "absolute",
+              top: spacing.xs,
+              right: spacing.xs,
+              width: 8,
+              height: 8,
+              borderRadius: 4,
+              backgroundColor: item.color,
+            }}
+          />
         )}
       </Animated.View>
     </TouchableOpacity>
@@ -81,7 +115,7 @@ function AIServiceCard({ item }: { item: (typeof AI_SERVICES)[0] }) {
 
 // ── Service Card ───────────────────────────────────────────────────────
 function ServiceCard({ item }: { item: (typeof SERVICES)[0] }) {
-  const { colors, radius, shadow } = useDS();
+  const { colors, spacing, radius, shadow, font } = useDS();
   const scale = useRef(new Animated.Value(1)).current;
 
   const onIn = () =>
@@ -101,7 +135,7 @@ function ServiceCard({ item }: { item: (typeof SERVICES)[0] }) {
 
   return (
     <TouchableOpacity
-      style={st.serviceCard}
+      style={{ width: "31%" as any, aspectRatio: 1 }}
       activeOpacity={1}
       onPress={() => router.push(item.route as Href)}
       onPressIn={onIn}
@@ -109,9 +143,13 @@ function ServiceCard({ item }: { item: (typeof SERVICES)[0] }) {
     >
       <Animated.View
         style={[
-          st.serviceInner,
           shadow.xs,
           {
+            flex: 1,
+            padding: spacing.md,
+            alignItems: "center",
+            justifyContent: "center",
+            borderWidth: 1,
             backgroundColor: colors.bgSurface,
             borderColor: colors.border,
             borderRadius: radius.xl,
@@ -120,15 +158,30 @@ function ServiceCard({ item }: { item: (typeof SERVICES)[0] }) {
         ]}
       >
         <View
-          style={[
-            st.iconWrap,
-            { backgroundColor: colors.primaryLight, borderRadius: radius.lg },
-          ]}
+          style={{
+            width: 52,
+            height: 52,
+            justifyContent: "center",
+            alignItems: "center",
+            marginBottom: spacing.sm,
+            backgroundColor: colors.primaryLight,
+            borderRadius: radius.lg,
+          }}
         >
-          <Image source={item.icon} style={st.icon} resizeMode="contain" />
+          <Image
+            source={item.icon}
+            style={{ width: 32, height: 32 }}
+            resizeMode="contain"
+          />
         </View>
         <Text
-          style={[st.serviceName, { color: colors.text }]}
+          style={{
+            fontSize: font.size.xs,
+            fontWeight: font.weight.bold,
+            textAlign: "center",
+            lineHeight: 16,
+            color: colors.text,
+          }}
           numberOfLines={2}
         >
           {item.name}
@@ -140,7 +193,7 @@ function ServiceCard({ item }: { item: (typeof SERVICES)[0] }) {
 
 // ── Main Screen ────────────────────────────────────────────────────────
 export default function ServicesHubScreen() {
-  const { colors, spacing, radius, shadow } = useDS();
+  const { colors, spacing, radius, shadow, font } = useDS();
 
   return (
     <DSModuleScreen
@@ -148,42 +201,105 @@ export default function ServicesHubScreen() {
       gradientHeader
       headerRight={
         <Pressable
-          style={st.headerBtn}
+          style={{
+            width: 40,
+            height: 40,
+            borderRadius: radius.full,
+            backgroundColor: "rgba(255,255,255,0.12)",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
           onPress={() => router.push("/search" as any)}
           hitSlop={8}
         >
-          <Ionicons name="search-outline" size={22} color="#FFF" />
+          <Ionicons
+            name="search-outline"
+            size={22}
+            color={colors.textInverse}
+          />
         </Pressable>
       }
     >
       {/* AI Services Banner */}
       <View
-        style={[
-          st.aiSection,
-          {
-            borderColor: colors.border,
-            borderRadius: radius.xl,
-            marginHorizontal: spacing.md,
-            marginTop: spacing.md,
-          },
-        ]}
+        style={{
+          backgroundColor: AI_PURPLE.bg,
+          padding: spacing.lg,
+          borderWidth: 1,
+          borderColor: AI_PURPLE.border,
+          borderRadius: radius.xl,
+          marginHorizontal: spacing.md,
+          marginTop: spacing.md,
+        }}
       >
-        <View style={st.aiHeader}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: spacing.sm,
+            marginBottom: spacing.xs,
+          }}
+        >
           <LinearGradient
-            colors={["#7C3AED", "#A855F7"]}
-            style={st.aiGradientIcon}
+            colors={[AI_PURPLE.gradient[0], AI_PURPLE.gradient[1]]}
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: radius.md,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
           >
-            <MaterialCommunityIcons name="robot-happy" size={18} color="#fff" />
+            <MaterialCommunityIcons
+              name="robot-happy"
+              size={18}
+              color={colors.textInverse}
+            />
           </LinearGradient>
-          <Text style={[st.aiTitle, { color: "#6D28D9" }]}>Tư vấn AI</Text>
-          <View style={[st.newBadge, { backgroundColor: colors.primary }]}>
-            <Text style={st.newBadgeText}>MỚI</Text>
+          <Text
+            style={{
+              fontSize: font.size.md,
+              fontWeight: font.weight.heavy,
+              color: AI_PURPLE.title,
+            }}
+          >
+            Tư vấn AI
+          </Text>
+          <View
+            style={{
+              paddingHorizontal: spacing.sm,
+              paddingVertical: 2,
+              borderRadius: radius.md,
+              backgroundColor: colors.primary,
+            }}
+          >
+            <Text
+              style={{
+                color: colors.textInverse,
+                fontSize: font.size.xxs,
+                fontWeight: font.weight.heavy,
+              }}
+            >
+              MỚI
+            </Text>
           </View>
         </View>
-        <Text style={[st.aiSubtitle, { color: colors.textSecondary }]}>
+        <Text
+          style={{
+            fontSize: font.size.sm,
+            color: colors.textSecondary,
+            marginBottom: spacing.md,
+          }}
+        >
           Trợ lý AI thông minh tư vấn mọi vấn đề về xây dựng
         </Text>
-        <View style={st.aiRow}>
+        <View
+          style={{
+            flexDirection: "row",
+            flexWrap: "wrap",
+            gap: spacing.sm,
+          }}
+        >
           {AI_SERVICES.map((svc) => (
             <AIServiceCard key={svc.id} item={svc} />
           ))}
@@ -193,62 +309,146 @@ export default function ServicesHubScreen() {
       {/* Marketplace Banner */}
       <Pressable
         style={[
-          st.marketBanner,
           {
+            overflow: "hidden",
             marginHorizontal: spacing.md,
             marginTop: spacing.md,
             borderRadius: radius.xl,
           },
+          Platform.select({
+            ios: {
+              shadowColor: colors.primaryDark,
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.2,
+              shadowRadius: 10,
+            },
+            android: { elevation: 4 },
+          }),
         ]}
         onPress={() => router.push("/services/marketplace" as Href)}
       >
         <LinearGradient
-          colors={[colors.primary, "#14B8A6"]}
+          colors={[colors.primary, colors.primaryLight]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
-          style={[st.marketGradient, { borderRadius: radius.xl }]}
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: spacing.xl,
+            borderRadius: radius.xl,
+          }}
         >
-          <View style={st.bannerLeft}>
-            <View style={st.bannerIcon}>
-              <Ionicons name="storefront" size={24} color="#fff" />
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: spacing.md,
+              flex: 1,
+            }}
+          >
+            <View
+              style={{
+                width: 48,
+                height: 48,
+                borderRadius: radius.lg,
+                backgroundColor: "rgba(255,255,255,0.18)",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Ionicons
+                name="storefront"
+                size={24}
+                color={colors.textInverse}
+              />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={st.bannerTitle}>Services Marketplace</Text>
-              <Text style={st.bannerSub}>Tìm & đặt dịch vụ chuyên nghiệp</Text>
+              <Text
+                style={{
+                  fontSize: font.size.md,
+                  fontWeight: font.weight.heavy,
+                  color: colors.textInverse,
+                  marginBottom: 2,
+                }}
+              >
+                Services Marketplace
+              </Text>
+              <Text
+                style={{
+                  fontSize: font.size.xs,
+                  color: "rgba(255,255,255,0.8)",
+                }}
+              >
+                Tìm & đặt dịch vụ chuyên nghiệp
+              </Text>
             </View>
           </View>
-          <View style={st.bannerArrow}>
-            <Ionicons name="chevron-forward" size={18} color="#fff" />
+          <View
+            style={{
+              width: 34,
+              height: 34,
+              borderRadius: 17,
+              backgroundColor: "rgba(255,255,255,0.15)",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Ionicons
+              name="chevron-forward"
+              size={18}
+              color={colors.textInverse}
+            />
           </View>
         </LinearGradient>
       </Pressable>
 
       {/* Section Header */}
       <View
-        style={[
-          st.sectionHead,
-          { paddingHorizontal: spacing.md, marginTop: spacing.md },
-        ]}
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          paddingBottom: spacing.xs,
+          paddingHorizontal: spacing.md,
+          marginTop: spacing.md,
+        }}
       >
-        <Text style={[st.sectionTitle, { color: colors.text }]}>
+        <Text
+          style={{
+            fontSize: font.size.lg,
+            fontWeight: font.weight.heavy,
+            letterSpacing: -0.3,
+            color: colors.text,
+          }}
+        >
           Tất cả dịch vụ
         </Text>
         <Text
-          style={[
-            st.sectionCount,
-            {
-              color: colors.primary,
-              backgroundColor: colors.primaryLight,
-              borderRadius: radius.sm,
-            },
-          ]}
+          style={{
+            fontSize: font.size.sm,
+            fontWeight: font.weight.bold,
+            paddingHorizontal: spacing.md,
+            paddingVertical: spacing.xs,
+            overflow: "hidden",
+            color: colors.primary,
+            backgroundColor: colors.primaryLight,
+            borderRadius: radius.sm,
+          }}
         >
           {SERVICES.length}
         </Text>
       </View>
 
       {/* Services Grid */}
-      <View style={[st.grid, { padding: spacing.sm, gap: spacing.sm }]}>
+      <View
+        style={{
+          flexDirection: "row",
+          flexWrap: "wrap",
+          padding: spacing.sm,
+          gap: spacing.sm,
+        }}
+      >
         {SERVICES.map((svc) => (
           <ServiceCard key={svc.id} item={svc} />
         ))}
@@ -258,155 +458,3 @@ export default function ServicesHubScreen() {
     </DSModuleScreen>
   );
 }
-
-// ── Styles ─────────────────────────────────────────────────────────────
-const st = StyleSheet.create({
-  headerBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "rgba(255,255,255,0.12)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  // AI Section
-  aiSection: {
-    backgroundColor: "#FAF5FF",
-    padding: 16,
-    borderWidth: 1,
-    borderColor: "#E9D5FF",
-  },
-  aiHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    marginBottom: 6,
-  },
-  aiGradientIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  aiTitle: { fontSize: 16, fontWeight: "800" },
-  newBadge: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10 },
-  newBadgeText: { color: "#fff", fontSize: 10, fontWeight: "800" },
-  aiSubtitle: { fontSize: 13, marginBottom: 12 },
-  aiRow: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
-  aiCard: {
-    width: 68,
-    alignItems: "center",
-    padding: 8,
-    borderWidth: 1,
-    position: "relative",
-  },
-  aiIconBox: {
-    width: 40,
-    height: 40,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 4,
-  },
-  aiIcon: { fontSize: 20 },
-  aiName: {
-    fontSize: 10,
-    fontWeight: "700",
-    textAlign: "center",
-    lineHeight: 13,
-  },
-  hotDot: {
-    position: "absolute",
-    top: 4,
-    right: 4,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-
-  // Marketplace Banner
-  marketBanner: {
-    overflow: "hidden",
-    ...Platform.select({
-      ios: {
-        shadowColor: "#0F766E",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 10,
-      },
-      android: { elevation: 4 },
-    }),
-  },
-  marketGradient: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: 18,
-  },
-  bannerLeft: { flexDirection: "row", alignItems: "center", gap: 12, flex: 1 },
-  bannerIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 14,
-    backgroundColor: "rgba(255,255,255,0.18)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  bannerTitle: {
-    fontSize: 15,
-    fontWeight: "800",
-    color: "#fff",
-    marginBottom: 2,
-  },
-  bannerSub: { fontSize: 12, color: "rgba(255,255,255,0.8)" },
-  bannerArrow: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: "rgba(255,255,255,0.15)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  // Section
-  sectionHead: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingBottom: 6,
-  },
-  sectionTitle: { fontSize: 17, fontWeight: "800", letterSpacing: -0.3 },
-  sectionCount: {
-    fontSize: 13,
-    fontWeight: "700",
-    paddingHorizontal: 10,
-    paddingVertical: 3,
-    overflow: "hidden",
-  },
-
-  // Grid
-  grid: { flexDirection: "row", flexWrap: "wrap" },
-  serviceCard: { width: "31%", aspectRatio: 1 },
-  serviceInner: {
-    flex: 1,
-    padding: 12,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-  },
-  iconWrap: {
-    width: 52,
-    height: 52,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 8,
-  },
-  icon: { width: 32, height: 32 },
-  serviceName: {
-    fontSize: 12,
-    fontWeight: "700",
-    textAlign: "center",
-    lineHeight: 16,
-  },
-});

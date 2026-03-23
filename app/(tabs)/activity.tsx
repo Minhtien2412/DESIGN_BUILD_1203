@@ -1,3 +1,4 @@
+import { useRole } from "@/context/RoleContext";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
@@ -7,32 +8,151 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 type ActivityFilter = "all" | "finding" | "working" | "scheduled";
 
-const FILTERS: { key: ActivityFilter; label: string }[] = [
-  { key: "all", label: "Tất cả" },
-  { key: "finding", label: "Đang tìm" },
-  { key: "working", label: "Đang tiến hành" },
-  { key: "scheduled", label: "Đặt lịch" },
-];
+const FILTERS_BY_ROLE: Record<
+  string,
+  { key: ActivityFilter; label: string }[]
+> = {
+  customer: [
+    { key: "all", label: "Tất cả" },
+    { key: "finding", label: "Đang tìm thợ" },
+    { key: "working", label: "Đang thi công" },
+    { key: "scheduled", label: "Đặt lịch" },
+  ],
+  worker: [
+    { key: "all", label: "Tất cả" },
+    { key: "finding", label: "Mời mới" },
+    { key: "working", label: "Đang làm" },
+    { key: "scheduled", label: "Lịch hẹn" },
+  ],
+  engineer: [
+    { key: "all", label: "Tất cả" },
+    { key: "finding", label: "Chờ duyệt" },
+    { key: "working", label: "Đang triển khai" },
+    { key: "scheduled", label: "Lên lịch" },
+  ],
+  contractor: [
+    { key: "all", label: "Tất cả" },
+    { key: "finding", label: "Đang tuyển" },
+    { key: "working", label: "Đang thi công" },
+    { key: "scheduled", label: "Kế hoạch" },
+  ],
+};
 
-export default function ActivityTabScreen() {
-  const [activeFilter, setActiveFilter] = useState<ActivityFilter>("all");
+interface RoleConfig {
+  subtitle: string;
+  emptyTitle: string;
+  emptyDesc: string;
+  ctaLabel: string;
+  ctaRoute: string;
+  history: {
+    id: string;
+    title: string;
+    subtitle: string;
+    icon: keyof typeof Ionicons.glyphMap;
+  }[];
+}
 
-  const history = useMemo(
-    () => [
+const ROLE_CONFIG: Record<string, RoleConfig> = {
+  customer: {
+    subtitle: "Theo dõi mọi đơn và lịch hẹn của bạn",
+    emptyTitle: "Bạn chưa có công việc đang mở",
+    emptyDesc:
+      "Tạo yêu cầu mới để hệ thống gợi ý thợ phù hợp theo khu vực và thời gian.",
+    ctaLabel: "Tạo yêu cầu mới",
+    ctaRoute: "/quote-request",
+    history: [
       {
         id: "1",
         title: "Bảo trì điện lạnh",
         subtitle: "Đã hoàn thành • Hôm qua",
-        icon: "construct-outline" as const,
+        icon: "construct-outline",
       },
       {
         id: "2",
         title: "Sơn lại phòng ngủ",
         subtitle: "Đã hủy • 3 ngày trước",
-        icon: "color-fill-outline" as const,
+        icon: "color-fill-outline",
       },
     ],
-    [],
+  },
+  worker: {
+    subtitle: "Quản lý việc làm và lịch trình của bạn",
+    emptyTitle: "Chưa có việc nào được giao",
+    emptyDesc: "Cập nhật hồ sơ và kỹ năng để nhận được nhiều lời mời hơn.",
+    ctaLabel: "Xem việc làm mới",
+    ctaRoute: "/(tabs)/jobs",
+    history: [
+      {
+        id: "1",
+        title: "Lắp đặt điện nhà phố",
+        subtitle: "Hoàn thành • Hôm qua",
+        icon: "flash-outline",
+      },
+      {
+        id: "2",
+        title: "Sửa ống nước",
+        subtitle: "Hoàn thành • 2 ngày trước",
+        icon: "water-outline",
+      },
+    ],
+  },
+  engineer: {
+    subtitle: "Theo dõi dự án và phê duyệt hồ sơ",
+    emptyTitle: "Chưa có hồ sơ cần duyệt",
+    emptyDesc: "Các yêu cầu mới từ dự án sẽ hiện tại đây.",
+    ctaLabel: "Xem dự án",
+    ctaRoute: "/(tabs)/projects",
+    history: [
+      {
+        id: "1",
+        title: "Duyệt bản vẽ kết cấu",
+        subtitle: "Đã duyệt • Hôm qua",
+        icon: "document-text-outline",
+      },
+      {
+        id: "2",
+        title: "Kiểm tra tiến độ Block A",
+        subtitle: "Hoàn thành • 3 ngày trước",
+        icon: "checkmark-circle-outline",
+      },
+    ],
+  },
+  contractor: {
+    subtitle: "Quản lý tiến độ và nhân lực dự án",
+    emptyTitle: "Chưa có hoạt động nào",
+    emptyDesc: "Tạo dự án mới hoặc tuyển thợ để bắt đầu.",
+    ctaLabel: "Tạo dự án mới",
+    ctaRoute: "/projects/create",
+    history: [
+      {
+        id: "1",
+        title: "Dự án Biệt thự Q7",
+        subtitle: "Đang chạy • Cập nhật hôm nay",
+        icon: "business-outline",
+      },
+      {
+        id: "2",
+        title: "Tuyển 5 thợ sơn",
+        subtitle: "Đã đủ • 2 ngày trước",
+        icon: "people-outline",
+      },
+    ],
+  },
+};
+
+export default function ActivityTabScreen() {
+  const { role } = useRole();
+  const currentRole = role || "customer";
+  const [activeFilter, setActiveFilter] = useState<ActivityFilter>("all");
+
+  const filters = useMemo(
+    () => FILTERS_BY_ROLE[currentRole] || FILTERS_BY_ROLE.customer,
+    [currentRole],
+  );
+
+  const config = useMemo(
+    () => ROLE_CONFIG[currentRole] || ROLE_CONFIG.customer,
+    [currentRole],
   );
 
   return (
@@ -46,16 +166,14 @@ export default function ActivityTabScreen() {
           showsVerticalScrollIndicator={false}
         >
           <Text style={styles.title}>Hoạt động</Text>
-          <Text style={styles.subtitle}>
-            Theo dõi mọi đơn và lịch hẹn của bạn
-          </Text>
+          <Text style={styles.subtitle}>{config.subtitle}</Text>
 
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.filterRow}
           >
-            {FILTERS.map((filter) => {
+            {filters.map((filter) => {
               const active = activeFilter === filter.key;
               return (
                 <Pressable
@@ -80,16 +198,13 @@ export default function ActivityTabScreen() {
             <View style={styles.emptyIconWrap}>
               <Ionicons name="time-outline" size={30} color="#60A5FA" />
             </View>
-            <Text style={styles.emptyTitle}>Bạn chưa có công việc đang mở</Text>
-            <Text style={styles.emptyDescription}>
-              Tạo yêu cầu mới để hệ thống gợi ý thợ phù hợp theo khu vực và thời
-              gian.
-            </Text>
+            <Text style={styles.emptyTitle}>{config.emptyTitle}</Text>
+            <Text style={styles.emptyDescription}>{config.emptyDesc}</Text>
             <Pressable
               style={styles.primaryButton}
-              onPress={() => router.push("/quote-request" as any)}
+              onPress={() => router.push(config.ctaRoute as any)}
             >
-              <Text style={styles.primaryButtonText}>Tạo yêu cầu mới</Text>
+              <Text style={styles.primaryButtonText}>{config.ctaLabel}</Text>
             </Pressable>
           </View>
 
@@ -100,7 +215,7 @@ export default function ActivityTabScreen() {
             </Pressable>
           </View>
 
-          {history.map((item) => (
+          {config.history.map((item) => (
             <View key={item.id} style={styles.historyCard}>
               <View style={styles.historyIconWrap}>
                 <Ionicons name={item.icon} size={18} color="#C4B5FD" />

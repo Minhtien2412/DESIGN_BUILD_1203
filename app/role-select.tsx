@@ -1,141 +1,157 @@
 /**
- * Role Selection Screen — "Bạn là Khách hay là Thợ?"
+ * Role Selection Screen — 4 roles: Thợ, KS/KTS, Nhà thầu, Khách hàng
  *
- * Dark blue themed screen with two role cards (KHÁCH / THỢ).
- * Shown on first app launch before registration.
- * Design matches the provided Figma screenshot.
+ * Bright, modern card-based selection. Lime green accent.
+ * Shown on first app launch or when role is cleared.
  *
  * @created 2026-03-05
+ * @updated 2026-03-21 — Expanded from 2 roles to 4 roles
  */
 
-import { AppRole, useRole } from "@/context/RoleContext";
+import {
+    type AppRole,
+    ROLE_LIST,
+    ROLE_THEME,
+    type RoleMeta,
+} from "@/constants/roleTheme";
+import { useRole } from "@/context/RoleContext";
 import { Ionicons } from "@expo/vector-icons";
 import { Href, router } from "expo-router";
 import { useState } from "react";
 import {
     Dimensions,
-    Image,
-    Platform,
+    ScrollView,
     StatusBar,
     StyleSheet,
     Text,
     TouchableOpacity,
-    View,
+    View
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const { width: SW, height: SH } = Dimensions.get("window");
+const { width: SW } = Dimensions.get("window");
+const CARD_GAP = 12;
+const HORIZONTAL_PADDING = 20;
+const CARD_WIDTH = (SW - HORIZONTAL_PADDING * 2 - CARD_GAP) / 2;
 
 export default function RoleSelectScreen() {
+  const insets = useSafeAreaInsets();
   const { setRole } = useRole();
-  const [selected, setSelected] = useState<AppRole>("khach");
+  const [selected, setSelected] = useState<AppRole>("customer");
 
   const handleContinue = async () => {
     await setRole(selected);
-    // Navigate to main app (tabs)
     router.replace("/(tabs)" as Href);
   };
 
+  const renderRoleCard = (roleMeta: RoleMeta) => {
+    const isActive = selected === roleMeta.key;
+    return (
+      <TouchableOpacity
+        key={roleMeta.key}
+        style={[
+          s.card,
+          isActive && {
+            borderColor: roleMeta.accent,
+            backgroundColor: roleMeta.accentLight,
+          },
+        ]}
+        onPress={() => setSelected(roleMeta.key)}
+        activeOpacity={0.75}
+      >
+        {/* Icon circle */}
+        <View
+          style={[
+            s.cardIcon,
+            {
+              backgroundColor: isActive ? roleMeta.accent : ROLE_THEME.bgMuted,
+            },
+          ]}
+        >
+          <Ionicons
+            name={roleMeta.icon as any}
+            size={28}
+            color={isActive ? "#FFFFFF" : ROLE_THEME.textSecondary}
+          />
+        </View>
+
+        {/* Label */}
+        <Text style={[s.cardLabel, isActive && { color: roleMeta.accent }]}>
+          {roleMeta.shortLabel}
+        </Text>
+        <Text style={s.cardDesc} numberOfLines={2}>
+          {roleMeta.description}
+        </Text>
+
+        {/* Selected indicator */}
+        {isActive ? (
+          <View style={[s.selectedBadge, { backgroundColor: roleMeta.accent }]}>
+            <Ionicons name="checkmark" size={14} color="#FFFFFF" />
+            <Text style={s.selectedText}>Đã chọn</Text>
+          </View>
+        ) : (
+          <View style={s.unselectedBadge}>
+            <View style={s.emptyCircle} />
+            <Text style={s.unselectedText}>Chọn</Text>
+          </View>
+        )}
+      </TouchableOpacity>
+    );
+  };
+
   return (
-    <View style={s.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#0F1B2D" />
+    <View style={[s.container, { paddingTop: insets.top + 16 }]}>
+      <StatusBar barStyle="dark-content" backgroundColor={ROLE_THEME.bg} />
 
-      {/* Top icon */}
-      <View style={s.topIcon}>
-        <Ionicons name="people-outline" size={36} color="#4DA8DA" />
-      </View>
-
-      {/* Title */}
-      <Text style={s.title}>Bạn là Khách hay là Thợ?</Text>
-      <Text style={s.subtitle}>Chọn vai trò của bạn</Text>
-
-      {/* Role Cards */}
-      <View style={s.cardsContainer}>
-        {/* KHÁCH Card */}
-        <TouchableOpacity
-          style={[s.card, selected === "khach" && s.cardSelected]}
-          onPress={() => setSelected("khach")}
-          activeOpacity={0.8}
-        >
-          <View style={s.cardContent}>
-            <View style={s.cardLeft}>
-              <View
-                style={[
-                  s.roleIconBox,
-                  { backgroundColor: "rgba(77,168,218,0.15)" },
-                ]}
-              >
-                <Ionicons name="person-outline" size={22} color="#4DA8DA" />
-              </View>
-              <Text style={s.roleTitle}>KHÁCH</Text>
-              <Text style={s.roleDesc}>Tìm thợ uy tín</Text>
-              {selected === "khach" ? (
-                <View style={s.selectedBadge}>
-                  <Ionicons name="checkmark-circle" size={18} color="#4DA8DA" />
-                  <Text style={s.selectedText}>Đã chọn</Text>
-                </View>
-              ) : (
-                <View style={s.unselectedBadge}>
-                  <View style={s.emptyCircle} />
-                  <Text style={s.unselectedText}>Nhấn để chọn</Text>
-                </View>
-              )}
-            </View>
-            <Image
-              source={require("@/assets/icon-home-page/Generated Image March 04, 2026 - 10_09AM.jpeg")}
-              style={s.cardImage}
-              resizeMode="contain"
+      <ScrollView
+        style={s.scroll}
+        contentContainerStyle={s.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Header */}
+        <View style={s.header}>
+          <View style={s.topIcon}>
+            <Ionicons
+              name="people-outline"
+              size={32}
+              color={ROLE_THEME.primary}
             />
           </View>
-        </TouchableOpacity>
+          <Text style={s.title}>Bạn là ai?</Text>
+          <Text style={s.subtitle}>
+            Chọn vai trò phù hợp để trải nghiệm giao diện riêng
+          </Text>
+        </View>
 
-        {/* THỢ Card */}
-        <TouchableOpacity
-          style={[s.card, selected === "tho" && s.cardSelected]}
-          onPress={() => setSelected("tho")}
-          activeOpacity={0.8}
-        >
-          <View style={s.cardContent}>
-            <View style={s.cardLeft}>
-              <View
-                style={[
-                  s.roleIconBox,
-                  { backgroundColor: "rgba(77,168,218,0.15)" },
-                ]}
-              >
-                <Ionicons name="construct-outline" size={22} color="#4DA8DA" />
-              </View>
-              <Text style={s.roleTitle}>THỢ</Text>
-              <Text style={s.roleDesc}>Phát triển công việc</Text>
-              {selected === "tho" ? (
-                <View style={s.selectedBadge}>
-                  <Ionicons name="checkmark-circle" size={18} color="#4DA8DA" />
-                  <Text style={s.selectedText}>Đã chọn</Text>
-                </View>
-              ) : (
-                <View style={s.unselectedBadge}>
-                  <View style={s.emptyCircle} />
-                  <Text style={s.unselectedText}>Nhấn để chọn</Text>
-                </View>
-              )}
-            </View>
-            <Image
-              source={require("@/assets/icon-home-page/Generated Image March 04, 2026 - 10_09AM.jpeg")}
-              style={s.cardImage}
-              resizeMode="contain"
-            />
-          </View>
-        </TouchableOpacity>
-      </View>
+        {/* Role Card Grid (2×2) */}
+        <View style={s.grid}>{ROLE_LIST.map(renderRoleCard)}</View>
+
+        {/* Info note */}
+        <View style={s.infoRow}>
+          <Ionicons
+            name="information-circle-outline"
+            size={16}
+            color={ROLE_THEME.textMuted}
+          />
+          <Text style={s.infoText}>
+            Bạn có thể đổi vai trò bất cứ lúc nào từ góc trên màn hình
+          </Text>
+        </View>
+      </ScrollView>
 
       {/* Continue Button */}
-      <TouchableOpacity
-        style={s.continueBtn}
-        onPress={handleContinue}
-        activeOpacity={0.85}
+      <View
+        style={[s.bottomArea, { paddingBottom: Math.max(insets.bottom, 24) }]}
       >
-        <Text style={s.continueTxt}>Tiếp tục</Text>
-        <Ionicons name="arrow-forward" size={20} color="#1A1A2E" />
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={s.continueBtn}
+          onPress={handleContinue}
+          activeOpacity={0.85}
+        >
+          <Text style={s.continueTxt}>Tiếp tục</Text>
+          <Ionicons name="arrow-forward" size={20} color="#FFFFFF" />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -143,137 +159,156 @@ export default function RoleSelectScreen() {
 const s = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#0F1B2D",
-    paddingTop: Platform.OS === "ios" ? 60 : 40,
-    paddingHorizontal: 20,
+    backgroundColor: ROLE_THEME.bg,
+  },
+  scroll: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingHorizontal: HORIZONTAL_PADDING,
+    paddingBottom: 20,
+  },
+  header: {
     alignItems: "center",
+    marginBottom: 28,
+    marginTop: 12,
   },
   topIcon: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    backgroundColor: "rgba(77,168,218,0.15)",
+    width: 68,
+    height: 68,
+    borderRadius: 20,
+    backgroundColor: ROLE_THEME.primaryLight,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 20,
+    marginBottom: 16,
   },
   title: {
-    fontSize: 24,
+    fontSize: ROLE_THEME.fontSize.heading,
     fontWeight: "800",
-    color: "#FFFFFF",
+    color: ROLE_THEME.textPrimary,
     textAlign: "center",
-    marginBottom: 6,
+    marginBottom: 8,
   },
   subtitle: {
-    fontSize: 14,
-    color: "rgba(255,255,255,0.5)",
+    fontSize: ROLE_THEME.fontSize.md,
+    color: ROLE_THEME.textSecondary,
     textAlign: "center",
-    marginBottom: 30,
+    lineHeight: 20,
+    maxWidth: 280,
   },
-  cardsContainer: {
-    width: "100%",
-    gap: 16,
-    flex: 1,
-    justifyContent: "center",
-    maxHeight: SH * 0.55,
+  grid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: CARD_GAP,
   },
   card: {
-    backgroundColor: "#1A2744",
-    borderRadius: 16,
-    paddingVertical: 24,
-    paddingHorizontal: 20,
+    width: CARD_WIDTH,
+    backgroundColor: ROLE_THEME.card,
+    borderRadius: ROLE_THEME.radius.lg,
+    padding: 16,
     borderWidth: 2,
-    borderColor: "transparent",
-    minHeight: 180,
-  },
-  cardSelected: {
-    borderColor: "#4DA8DA",
-    backgroundColor: "#1E2E4A",
-  },
-  cardContent: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  cardLeft: {
-    flex: 1,
+    borderColor: ROLE_THEME.borderLight,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
     gap: 8,
   },
-  roleIconBox: {
-    width: 42,
-    height: 42,
-    borderRadius: 12,
-    alignItems: "center",
+  cardIcon: {
+    width: 52,
+    height: 52,
+    borderRadius: 16,
     justifyContent: "center",
-    marginBottom: 4,
+    alignItems: "center",
   },
-  roleTitle: {
-    fontSize: 22,
-    fontWeight: "900",
-    color: "#FFFFFF",
-    letterSpacing: 2,
+  cardLabel: {
+    fontSize: ROLE_THEME.fontSize.xl,
+    fontWeight: "700",
+    color: ROLE_THEME.textPrimary,
+    marginTop: 4,
   },
-  roleDesc: {
-    fontSize: 13,
-    color: "rgba(255,255,255,0.45)",
-    marginBottom: 8,
+  cardDesc: {
+    fontSize: ROLE_THEME.fontSize.sm,
+    color: ROLE_THEME.textSecondary,
+    lineHeight: 17,
   },
   selectedBadge: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 6,
-    backgroundColor: "rgba(77,168,218,0.15)",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: ROLE_THEME.radius.full,
     alignSelf: "flex-start",
+    marginTop: 4,
   },
   selectedText: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: "#4DA8DA",
+    fontSize: 11,
+    fontWeight: "700",
+    color: "#FFFFFF",
   },
   unselectedBadge: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 6,
-    backgroundColor: "rgba(255,255,255,0.08)",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: ROLE_THEME.radius.full,
     alignSelf: "flex-start",
+    marginTop: 4,
+    backgroundColor: ROLE_THEME.bgMuted,
   },
   emptyCircle: {
-    width: 18,
-    height: 18,
-    borderRadius: 9,
+    width: 14,
+    height: 14,
+    borderRadius: 7,
     borderWidth: 2,
-    borderColor: "rgba(255,255,255,0.3)",
+    borderColor: ROLE_THEME.border,
   },
   unselectedText: {
-    fontSize: 13,
+    fontSize: 11,
     fontWeight: "600",
-    color: "rgba(255,255,255,0.5)",
+    color: ROLE_THEME.textMuted,
   },
-  cardImage: {
-    width: 140,
-    height: 140,
-    borderRadius: 12,
+  infoRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginTop: 20,
+    justifyContent: "center",
+  },
+  infoText: {
+    fontSize: 12,
+    color: ROLE_THEME.textMuted,
+    flex: 1,
+    textAlign: "center",
+  },
+  bottomArea: {
+    paddingHorizontal: HORIZONTAL_PADDING,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: ROLE_THEME.borderLight,
+    backgroundColor: ROLE_THEME.bg,
   },
   continueBtn: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
-    backgroundColor: "#F5C542",
+    backgroundColor: ROLE_THEME.primary,
     width: "100%",
     paddingVertical: 16,
-    borderRadius: 30,
-    marginBottom: Platform.OS === "ios" ? 40 : 30,
+    borderRadius: ROLE_THEME.radius.full,
+    shadowColor: ROLE_THEME.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
   },
   continueTxt: {
     fontSize: 17,
     fontWeight: "700",
-    color: "#1A1A2E",
+    color: "#FFFFFF",
   },
 });

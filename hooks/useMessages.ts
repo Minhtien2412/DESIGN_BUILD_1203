@@ -6,7 +6,7 @@
  * Updated: 24/01/2026
  */
 
-/* eslint-disable react-hooks/rules-of-hooks -- Context may not be available, using safe wrapper pattern */
+ 
 
 import { useUnifiedBadge } from "@/context/UnifiedBadgeContext";
 import { useCallback, useEffect, useState } from "react";
@@ -92,7 +92,7 @@ export function useMessages(): UseMessagesResult {
     } finally {
       setLoading(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []); // Remove badgeContext from deps to prevent infinite loop
 
   const fetchUnreadCount = useCallback(async () => {
@@ -107,7 +107,7 @@ export function useMessages(): UseMessagesResult {
     } catch (err) {
       console.error("[useMessages] Error fetching unread count:", err);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []); // Remove badgeContext from deps to prevent infinite loop
 
   // Mark conversation as read and update badges
@@ -146,7 +146,7 @@ export function useMessages(): UseMessagesResult {
         console.error("[useMessages] Error marking as read:", err);
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
     [], // Remove badgeContext from deps
   );
 
@@ -322,7 +322,7 @@ export function useConversation(
     } catch (err) {
       console.error("[useConversation] Error marking as read:", err);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [conversationId]); // Remove badgeContext from deps
 
   const refresh = useCallback(async () => {

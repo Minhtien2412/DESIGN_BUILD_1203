@@ -575,7 +575,7 @@ export async function get<T = any>(
         }
       }, debounceMs);
 
-      debounceTimers.set(cacheKey, timer);
+      debounceTimers.set(cacheKey, timer as unknown as NodeJS.Timeout);
     });
   }
 

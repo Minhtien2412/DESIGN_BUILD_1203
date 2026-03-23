@@ -162,7 +162,7 @@ const MODULE_CATEGORIES: ModuleCategory[] = [
         id: "c5",
         label: "Nhân công",
         icon: "people-outline",
-        route: "/coming-soon/labor",
+        route: "/labor",
       },
       {
         id: "c6",
@@ -891,7 +891,7 @@ const MODULE_CATEGORIES: ModuleCategory[] = [
         id: "eq2",
         label: "Inventory",
         icon: "cube-outline",
-        route: "/coming-soon/inventory",
+        route: "/inventory",
       },
       {
         id: "eq3",
@@ -1078,7 +1078,7 @@ const MODULE_CATEGORIES: ModuleCategory[] = [
         id: "ut8",
         label: "Weather",
         icon: "partly-sunny-outline",
-        route: "/coming-soon/weather",
+        route: "/weather",
       },
       {
         id: "ut9",
@@ -1124,7 +1124,7 @@ const MODULE_CATEGORIES: ModuleCategory[] = [
         id: "ch4",
         label: "Submittals",
         icon: "paper-plane-outline",
-        route: "/coming-soon/submittals",
+        route: "/submittal",
       },
     ],
   },
@@ -1152,7 +1152,7 @@ const MODULE_CATEGORIES: ModuleCategory[] = [
         id: "sc3",
         label: "Meetings",
         icon: "people-outline",
-        route: "/coming-soon/meetings",
+        route: "/meeting-minutes",
       },
       {
         id: "sc4",

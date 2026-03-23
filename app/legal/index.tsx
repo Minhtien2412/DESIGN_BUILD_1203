@@ -9,6 +9,7 @@ import {
     MODERN_SHADOWS,
     MODERN_SPACING,
 } from "@/constants/modern-theme";
+import { APP_ROUTES } from "@/constants/typed-routes";
 import { Ionicons } from "@expo/vector-icons";
 import { router, Stack } from "expo-router";
 import {
@@ -36,21 +37,21 @@ const LEGAL_DOCUMENTS: LegalItem[] = [
     title: "Điều khoản sử dụng",
     description: "Quy định sử dụng ứng dụng và dịch vụ",
     icon: "document-text-outline",
-    route: "/legal/terms-of-service",
+    route: APP_ROUTES.LEGAL_TERMS,
   },
   {
     id: "2",
     title: "Chính sách bảo mật",
     description: "Cách chúng tôi thu thập và bảo vệ dữ liệu",
     icon: "shield-checkmark-outline",
-    route: "/legal/privacy-policy",
+    route: APP_ROUTES.LEGAL_PRIVACY,
   },
   {
     id: "3",
     title: "Điều khoản dịch vụ",
     description: "Quy định chi tiết về các dịch vụ",
     icon: "reader-outline",
-    route: "/legal/terms",
+    route: APP_ROUTES.LEGAL_TERMS,
   },
   {
     id: "4",

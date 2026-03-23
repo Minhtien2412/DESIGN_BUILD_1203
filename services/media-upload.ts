@@ -73,7 +73,14 @@ async function uploadViaPresigned(
     filename,
     contentType,
     context: {
-      type: type === "file" ? "document" : type === "audio" ? "document" : type,
+      type:
+        type === "image"
+          ? "project"
+          : type === "file"
+            ? "document"
+            : type === "audio"
+              ? "document"
+              : type,
     },
   });
   return toUploadedMedia(result, type);

@@ -6,6 +6,7 @@
  * @updated 29/01/2026 - Integrated VideoPlayerController
  */
 import { useVideoPlayback } from "@/hooks/useVideoPlayback";
+import { createShadow } from "@/utils/shadowStyles";
 import { Ionicons } from "@expo/vector-icons";
 import { useVideoPlayer, VideoView } from "expo-video";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -546,11 +547,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,102,204,0.9)",
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.4,
-    shadowRadius: 6,
-    elevation: 8,
+    ...createShadow({ offsetY: 2, blurRadius: 6, opacity: 0.4 }),
   },
   skipButton: {
     alignItems: "center",

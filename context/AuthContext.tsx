@@ -262,7 +262,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await import("../services/api");
 
       // Auto-logout when token refresh fails
+      // Skip during initial session load — loadSession handles 401 itself
       setLogoutCallback(async () => {
+        if (authSessionLoading) {
+          console.log(
+            "[AuthContext] Auto-logout skipped (session loading handles it)",
+          );
+          return;
+        }
         console.log("[AuthContext] Auto-logout triggered by API");
         await signOut();
       });
@@ -344,8 +351,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           accessToken: token,
         });
       } catch (userError) {
-        console.warn("[Auth] Failed to get profile, clearing session");
+        console.log("[Auth] Session expired, clearing local tokens");
         await clearTokens();
+        // Also clear in-memory tokens in api.ts to prevent stale state
+        const { setToken: clearApiToken, setRefreshToken: clearApiRefresh } =
+          await import("../services/api");
+        clearApiToken(null);
+        clearApiRefresh(null);
         authSessionLoaded = true;
         authSessionLoading = false;
         setState({

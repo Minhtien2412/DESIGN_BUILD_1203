@@ -213,7 +213,7 @@ export default function FinishingProductsScreen() {
           setProducts((prev) => [...prev, ...filteredProducts]);
         }
 
-        setHasMore(data.meta?.totalPages > (isRefresh ? 1 : page));
+        setHasMore((data.meta?.totalPages ?? 0) > (isRefresh ? 1 : page));
       }
     } catch (error) {
       console.error("[FinishingProducts] Failed to load:", error);

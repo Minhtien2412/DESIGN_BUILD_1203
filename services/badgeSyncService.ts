@@ -329,7 +329,7 @@ class BadgeSyncService {
       (data: { conversationId: string; unreadCount: number }) => {
         console.log("[BadgeSync] Unread count update:", data);
         // Trigger local sync to recalculate
-        this.syncFromLocal();
+        this.fullSyncFromAPI();
       },
     );
 

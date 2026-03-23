@@ -13,17 +13,17 @@
  */
 
 import type { FlashSaleItem } from "@/hooks/useHomePageData";
+import { createShadow } from "@/utils/shadowStyles";
 import { Ionicons } from "@expo/vector-icons";
 import { Href, router } from "expo-router";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import {
     Image,
-    Platform,
     ScrollView,
     StyleSheet,
     Text,
     TouchableOpacity,
-    View,
+    View
 } from "react-native";
 
 // ────────── Countdown Timer ──────────
@@ -205,15 +205,7 @@ const fc = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 10,
     overflow: "hidden",
-    ...Platform.select({
-      ios: {
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.08,
-        shadowRadius: 4,
-      },
-      android: { elevation: 2 },
-    }),
+    ...createShadow({ offsetY: 1, blurRadius: 4, opacity: 0.08 }),
   },
   imgWrap: { width: 120, height: 120, position: "relative" },
   img: {

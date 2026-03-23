@@ -3,15 +3,15 @@
  * Chat với AI Kiến trúc sư
  */
 
-import { Container } from '@/components/ui/container';
+import { Container } from "@/components/ui/container";
 import {
     ArchitectMessage,
     CONSULTING_TOPICS,
     geminiArchitectService,
-} from '@/services/geminiArchitectService';
-import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
+} from "@/services/geminiArchitectService";
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import { useEffect, useRef, useState } from "react";
 import {
     ActivityIndicator,
     FlatList,
@@ -22,23 +22,23 @@ import {
     TextInput,
     TouchableOpacity,
     View,
-} from 'react-native';
+} from "react-native";
 
 export default function ConsultantScreen() {
   const [messages, setMessages] = useState<ArchitectMessage[]>([]);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
   const flatListRef = useRef<FlatList>(null);
 
   useEffect(() => {
     geminiArchitectService.initChatSession();
-    
+
     // Welcome message
     setMessages([
       {
-        role: 'model',
-        text: 'Xin chào! Tôi là AI Kiến trúc sư, chuyên gia về:\n\n• Thiết kế kiến trúc resort, biệt thự\n• Tích hợp Perfex CRM\n• Phát triển module PHP\n• Tích hợp AI Gemini\n\nBạn cần tư vấn gì?',
+        role: "model",
+        text: "Xin chào! Tôi là AI Kiến trúc sư, chuyên gia về:\n\n• Thiết kế kiến trúc resort, biệt thự\n• Tích hợp Perfex CRM\n• Phát triển module PHP\n• Tích hợp AI Gemini\n\nBạn cần tư vấn gì?",
         timestamp: new Date(),
       },
     ]);
@@ -49,32 +49,32 @@ export default function ConsultantScreen() {
     if (!messageText) return;
 
     const userMessage: ArchitectMessage = {
-      role: 'user',
+      role: "user",
       text: messageText,
       timestamp: new Date(),
     };
 
     setMessages((prev) => [...prev, userMessage]);
-    setInput('');
+    setInput("");
     setIsTyping(true);
 
     try {
       const result = await geminiArchitectService.sendMessage(messageText);
 
       const aiMessage: ArchitectMessage = {
-        role: 'model',
-        text: result.text || result.error || 'Không thể trả lời.',
+        role: "model",
+        text: result.text || result.error || "Không thể trả lời.",
         timestamp: new Date(),
       };
 
       setMessages((prev) => [...prev, aiMessage]);
     } catch (error) {
-      console.error('Chat error:', error);
+      console.error("Chat error:", error);
       setMessages((prev) => [
         ...prev,
         {
-          role: 'model',
-          text: 'Xin lỗi, đã có lỗi xảy ra. Vui lòng thử lại.',
+          role: "model",
+          text: "Xin lỗi, đã có lỗi xảy ra. Vui lòng thử lại.",
           timestamp: new Date(),
         },
       ]);
@@ -92,10 +92,10 @@ export default function ConsultantScreen() {
     <View
       style={[
         styles.messageBubble,
-        item.role === 'user' ? styles.userMessage : styles.aiMessage,
+        item.role === "user" ? styles.userMessage : styles.aiMessage,
       ]}
     >
-      {item.role === 'model' && (
+      {item.role === "model" && (
         <View style={styles.aiAvatar}>
           <Text style={styles.aiAvatarText}>🤖</Text>
         </View>
@@ -103,14 +103,14 @@ export default function ConsultantScreen() {
       <View
         style={[
           styles.messageContent,
-          item.role === 'user' ? styles.userContent : styles.aiContent,
+          item.role === "user" ? styles.userContent : styles.aiContent,
         ]}
       >
         <Text style={styles.messageText}>{item.text}</Text>
         <Text style={styles.messageTime}>
-          {item.timestamp.toLocaleTimeString('vi-VN', {
-            hour: '2-digit',
-            minute: '2-digit',
+          {item.timestamp.toLocaleTimeString("vi-VN", {
+            hour: "2-digit",
+            minute: "2-digit",
           })}
         </Text>
       </View>
@@ -121,8 +121,8 @@ export default function ConsultantScreen() {
     <Container>
       <KeyboardAvoidingView
         style={styles.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
       >
         {/* Header */}
         <View style={styles.header}>
@@ -134,18 +134,18 @@ export default function ConsultantScreen() {
           </TouchableOpacity>
           <View style={styles.headerContent}>
             <Text style={styles.headerTitle}>🤖 AI Consultant</Text>
-            <Text style={styles.headerSubtitle}>Gemini 2.0 Flash</Text>
+            <Text style={styles.headerSubtitle}>OpenClaw • Claude Sonnet</Text>
           </View>
           <TouchableOpacity
             style={styles.menuButton}
-            onPress={() => setSelectedTopic(selectedTopic ? null : 'topics')}
+            onPress={() => setSelectedTopic(selectedTopic ? null : "topics")}
           >
             <Ionicons name="menu" size={24} color="#fff" />
           </TouchableOpacity>
         </View>
 
         {/* Topics Sidebar */}
-        {selectedTopic === 'topics' && (
+        {selectedTopic === "topics" && (
           <View style={styles.topicsPanel}>
             <Text style={styles.topicsPanelTitle}>📚 Chuyên Mục Tư Vấn</Text>
             {CONSULTING_TOPICS.map((topic) => (
@@ -194,17 +194,19 @@ export default function ConsultantScreen() {
         {/* Quick Questions */}
         {messages.length <= 1 && (
           <View style={styles.quickQuestions}>
-            {['Tạo module CRM cho kiến trúc', 'Tích hợp AI vào dự án', 'Xu hướng thiết kế 2025'].map(
-              (q, idx) => (
-                <TouchableOpacity
-                  key={idx}
-                  style={styles.quickQuestion}
-                  onPress={() => handleSend(q)}
-                >
-                  <Text style={styles.quickQuestionText}>{q}</Text>
-                </TouchableOpacity>
-              )
-            )}
+            {[
+              "Tạo module CRM cho kiến trúc",
+              "Tích hợp AI vào dự án",
+              "Xu hướng thiết kế 2025",
+            ].map((q, idx) => (
+              <TouchableOpacity
+                key={idx}
+                style={styles.quickQuestion}
+                onPress={() => handleSend(q)}
+              >
+                <Text style={styles.quickQuestionText}>{q}</Text>
+              </TouchableOpacity>
+            ))}
           </View>
         )}
 
@@ -220,14 +222,17 @@ export default function ConsultantScreen() {
             maxLength={2000}
           />
           <TouchableOpacity
-            style={[styles.sendButton, !input.trim() && styles.sendButtonDisabled]}
+            style={[
+              styles.sendButton,
+              !input.trim() && styles.sendButtonDisabled,
+            ]}
             onPress={() => handleSend()}
             disabled={!input.trim() || isTyping}
           >
             <Ionicons
               name="send"
               size={20}
-              color={input.trim() ? '#fff' : '#64748b'}
+              color={input.trim() ? "#fff" : "#64748b"}
             />
           </TouchableOpacity>
         </View>
@@ -239,14 +244,14 @@ export default function ConsultantScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f172a',
+    backgroundColor: "#0f172a",
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#1e293b',
+    borderBottomColor: "#1e293b",
   },
   backButton: {
     padding: 8,
@@ -257,33 +262,33 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontWeight: "bold",
+    color: "#fff",
   },
   headerSubtitle: {
     fontSize: 12,
-    color: '#94a3b8',
+    color: "#94a3b8",
   },
   menuButton: {
     padding: 8,
   },
   topicsPanel: {
-    backgroundColor: '#1e293b',
+    backgroundColor: "#1e293b",
     padding: 16,
     maxHeight: 300,
   },
   topicsPanelTitle: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#fff',
+    fontWeight: "600",
+    color: "#fff",
     marginBottom: 12,
   },
   topicSection: {
     marginBottom: 12,
   },
   topicHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
     marginBottom: 6,
   },
@@ -291,16 +296,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   topicTitle: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   questionItem: {
     paddingVertical: 6,
     paddingLeft: 24,
   },
   questionText: {
-    color: '#94a3b8',
+    color: "#94a3b8",
     fontSize: 12,
   },
   messagesList: {
@@ -310,112 +315,112 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   messageBubble: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: 16,
   },
   userMessage: {
-    justifyContent: 'flex-end',
+    justifyContent: "flex-end",
   },
   aiMessage: {
-    justifyContent: 'flex-start',
+    justifyContent: "flex-start",
   },
   aiAvatar: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#1e293b',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#1e293b",
+    justifyContent: "center",
+    alignItems: "center",
     marginRight: 8,
   },
   aiAvatarText: {
     fontSize: 16,
   },
   messageContent: {
-    maxWidth: '80%',
+    maxWidth: "80%",
     padding: 12,
     borderRadius: 16,
   },
   userContent: {
-    backgroundColor: '#14B8A6',
+    backgroundColor: "#14B8A6",
     borderBottomRightRadius: 4,
   },
   aiContent: {
-    backgroundColor: '#1e293b',
+    backgroundColor: "#1e293b",
     borderBottomLeftRadius: 4,
   },
   messageText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 14,
     lineHeight: 20,
   },
   messageTime: {
-    color: 'rgba(255,255,255,0.5)',
+    color: "rgba(255,255,255,0.5)",
     fontSize: 10,
     marginTop: 6,
-    textAlign: 'right',
+    textAlign: "right",
   },
   typingContainer: {
     paddingHorizontal: 16,
     paddingBottom: 8,
   },
   typingBubble: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
-    backgroundColor: '#1e293b',
-    alignSelf: 'flex-start',
+    backgroundColor: "#1e293b",
+    alignSelf: "flex-start",
     padding: 10,
     borderRadius: 12,
   },
   typingText: {
-    color: '#94a3b8',
+    color: "#94a3b8",
     fontSize: 12,
   },
   quickQuestions: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 8,
     paddingHorizontal: 16,
     paddingBottom: 12,
   },
   quickQuestion: {
-    backgroundColor: '#1e293b',
+    backgroundColor: "#1e293b",
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 16,
   },
   quickQuestionText: {
-    color: '#14B8A6',
+    color: "#14B8A6",
     fontSize: 12,
   },
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
+    flexDirection: "row",
+    alignItems: "flex-end",
     padding: 12,
     gap: 10,
     borderTopWidth: 1,
-    borderTopColor: '#1e293b',
+    borderTopColor: "#1e293b",
   },
   textInput: {
     flex: 1,
-    backgroundColor: '#1e293b',
+    backgroundColor: "#1e293b",
     borderRadius: 20,
     paddingHorizontal: 16,
     paddingVertical: 10,
-    color: '#fff',
+    color: "#fff",
     fontSize: 14,
     maxHeight: 100,
   },
   sendButton: {
-    backgroundColor: '#14B8A6',
+    backgroundColor: "#14B8A6",
     width: 44,
     height: 44,
     borderRadius: 22,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   sendButtonDisabled: {
-    backgroundColor: '#1e293b',
+    backgroundColor: "#1e293b",
   },
 });

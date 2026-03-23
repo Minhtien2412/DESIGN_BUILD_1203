@@ -10,7 +10,7 @@ import { apiFetch } from "./api";
 import {
     mockBanners,
     mockFeaturedServices,
-    mockVideos
+    mockVideos,
 } from "./mockDataService";
 
 // ============================================================================
@@ -418,12 +418,13 @@ export async function fetchLibraryCategories(): Promise<CategoryItem[]> {
 }
 
 /**
- * Fetch construction workers
+ * Fetch construction workers (all types in the construction category)
+ * Backend resolves ?category=construction to 7 Prisma workerTypes internally.
  */
 export async function fetchConstructionWorkers(): Promise<WorkerItem[]> {
   try {
     const response = await apiFetch<{ data: ApiWorkerItem[] }>(
-      "/workers?category=construction",
+      "/workers?category=construction&sortBy=rating&sortOrder=desc",
     );
     return (response.data || []).map(transformApiWorker);
   } catch (error) {
@@ -436,12 +437,13 @@ export async function fetchConstructionWorkers(): Promise<WorkerItem[]> {
 }
 
 /**
- * Fetch finishing workers
+ * Fetch finishing workers (all types in the finishing category)
+ * Backend resolves ?category=finishing to 10 Prisma workerTypes internally.
  */
 export async function fetchFinishingWorkers(): Promise<WorkerItem[]> {
   try {
     const response = await apiFetch<{ data: ApiWorkerItem[] }>(
-      "/workers?category=finishing",
+      "/workers?category=finishing&sortBy=rating&sortOrder=desc",
     );
     return (response.data || []).map(transformApiWorker);
   } catch (error) {

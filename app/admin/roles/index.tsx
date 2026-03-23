@@ -1,30 +1,36 @@
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Button } from '@/components/ui/button';
-import { Container } from '@/components/ui/container';
-import { Loader } from '@/components/ui/loader';
-import { Section } from '@/components/ui/section';
-import { useAuth } from '@/context/AuthContext';
-import { useRoles } from '@/hooks/useAdmin';
-import { useThemeColor } from '@/hooks/use-theme-color';
-import { hasPermission } from '@/utils/permissions';
-import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
-import { useEffect } from 'react';
-import { Alert, FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
+import { Button } from "@/components/ui/button";
+import { Container } from "@/components/ui/container";
+import { Loader } from "@/components/ui/loader";
+import { Section } from "@/components/ui/section";
+import { useAuth } from "@/context/AuthContext";
+import { useThemeColor } from "@/hooks/use-theme-color";
+import { useRoles } from "@/hooks/useAdmin";
+import { hasPermission } from "@/utils/permissions";
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import { useEffect } from "react";
+import {
+    Alert,
+    FlatList,
+    StyleSheet,
+    TouchableOpacity,
+    View,
+} from "react-native";
 
 export default function RolesManagementScreen() {
   const { user } = useAuth();
-  const iconColor = useThemeColor({}, 'icon');
-  const borderColor = useThemeColor({}, 'border');
-  const mutedColor = useThemeColor({}, 'tabIconDefault');
-  const cardBg = useThemeColor({}, 'surface');
+  const iconColor = useThemeColor({}, "icon");
+  const borderColor = useThemeColor({}, "border");
+  const mutedColor = useThemeColor({}, "tabIconDefault");
+  const cardBg = useThemeColor({}, "surface");
 
   // Permission check
   useEffect(() => {
-    if (!user?.admin || !hasPermission(user.permissions, 'roles', 'view')) {
-      Alert.alert('Không có quyền', 'Bạn không có quyền xem vai trò', [
-        { text: 'OK', onPress: () => router.back() }
+    if (!user?.admin || !hasPermission(user.permissions, "roles", "view")) {
+      Alert.alert("Không có quyền", "Bạn không có quyền xem vai trò", [
+        { text: "OK", onPress: () => router.back() },
       ]);
     }
   }, [user]);
@@ -69,14 +75,18 @@ export default function RolesManagementScreen() {
                     {roles.length} vai trò
                   </ThemedText>
                 </View>
-                {hasPermission(user?.permissions, 'roles', 'create') && (
+                {hasPermission(user?.permissions, "roles", "create") && (
                   <Button
                     variant="default"
                     size="sm"
-                    onPress={() => router.push('/admin/roles/create')}
+                    onPress={() =>
+                      router.push("/coming-soon/roles-create" as any)
+                    }
                   >
                     <Ionicons name="add" size={20} color="#fff" />
-                    <ThemedText style={styles.buttonText}>Tạo vai trò</ThemedText>
+                    <ThemedText style={styles.buttonText}>
+                      Tạo vai trò
+                    </ThemedText>
                   </Button>
                 )}
               </View>
@@ -87,17 +97,25 @@ export default function RolesManagementScreen() {
           <Container fullWidth>
             <TouchableOpacity
               onPress={() => router.push(`/admin/roles/${item.roleid}`)}
-              style={[styles.roleCard, { backgroundColor: cardBg, borderColor }]}
+              style={[
+                styles.roleCard,
+                { backgroundColor: cardBg, borderColor },
+              ]}
               activeOpacity={0.7}
             >
               <View style={styles.roleHeader}>
                 <View style={styles.roleIcon}>
-                  <Ionicons name="shield-checkmark" size={24} color={iconColor} />
+                  <Ionicons
+                    name="shield-checkmark"
+                    size={24}
+                    color={iconColor}
+                  />
                 </View>
                 <View style={styles.roleInfo}>
                   <ThemedText type="defaultSemiBold">{item.name}</ThemedText>
                   <ThemedText style={[styles.roleStats, { color: mutedColor }]}>
-                    {item.total_staff || 0} nhân viên • {Object.keys(item.permissions).length} tính năng
+                    {item.total_staff || 0} nhân viên •{" "}
+                    {Object.keys(item.permissions).length} tính năng
                   </ThemedText>
                 </View>
                 <Ionicons name="chevron-forward" size={20} color={mutedColor} />
@@ -105,17 +123,28 @@ export default function RolesManagementScreen() {
 
               {/* Permission Preview */}
               <View style={styles.permissionPreview}>
-                {Object.entries(item.permissions).slice(0, 3).map(([feature, capabilities]) => (
-                  <View key={feature} style={[styles.featureChip, { borderColor }]}>
-                    <ThemedText style={styles.featureText}>{feature}</ThemedText>
-                    <ThemedText style={[styles.capabilityCount, { color: mutedColor }]}>
-                      {(capabilities as string[]).length}
-                    </ThemedText>
-                  </View>
-                ))}
+                {Object.entries(item.permissions)
+                  .slice(0, 3)
+                  .map(([feature, capabilities]) => (
+                    <View
+                      key={feature}
+                      style={[styles.featureChip, { borderColor }]}
+                    >
+                      <ThemedText style={styles.featureText}>
+                        {feature}
+                      </ThemedText>
+                      <ThemedText
+                        style={[styles.capabilityCount, { color: mutedColor }]}
+                      >
+                        {(capabilities as string[]).length}
+                      </ThemedText>
+                    </View>
+                  ))}
                 {Object.keys(item.permissions).length > 3 && (
                   <View style={[styles.moreChip, { borderColor }]}>
-                    <ThemedText style={[styles.moreText, { color: mutedColor }]}>
+                    <ThemedText
+                      style={[styles.moreText, { color: mutedColor }]}
+                    >
                       +{Object.keys(item.permissions).length - 3}
                     </ThemedText>
                   </View>
@@ -138,9 +167,9 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
     gap: 16,
   },
   subtitle: {
@@ -148,7 +177,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   buttonText: {
-    color: '#fff',
+    color: "#fff",
     marginLeft: 4,
   },
   roleCard: {
@@ -158,8 +187,8 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   roleHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 12,
     marginBottom: 12,
   },
@@ -167,9 +196,9 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "rgba(59, 130, 246, 0.1)",
+    alignItems: "center",
+    justifyContent: "center",
   },
   roleInfo: {
     flex: 1,
@@ -179,13 +208,13 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   permissionPreview: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 8,
   },
   featureChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
@@ -197,7 +226,7 @@ const styles = StyleSheet.create({
   },
   capabilityCount: {
     fontSize: 11,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   moreChip: {
     paddingHorizontal: 12,
@@ -207,6 +236,6 @@ const styles = StyleSheet.create({
   },
   moreText: {
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });

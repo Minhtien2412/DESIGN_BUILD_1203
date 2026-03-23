@@ -378,7 +378,7 @@ export default function ConstructionMenuScreen() {
           <Text style={[st.sectionTitle, { color: colors.text }]}>
             Thuê dịch vụ
           </Text>
-          <Pressable onPress={() => router.push("/utilities/index" as any)}>
+          <Pressable onPress={() => router.push("/utilities" as any)}>
             <Text style={[st.seeAll, { color: colors.primary }]}>
               Xem tất cả
             </Text>

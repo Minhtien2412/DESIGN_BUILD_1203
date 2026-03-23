@@ -426,7 +426,10 @@ function CompanyCard({
 }) {
   return (
     <TouchableOpacity style={styles.companyCard} onPress={onPress}>
-      <Image source={{ uri: item.logo }} style={styles.companyLogo} />
+      <Image
+        source={item.logo ? { uri: item.logo } : undefined}
+        style={styles.companyLogo}
+      />
       <View style={styles.companyInfo}>
         <View style={styles.companyHeader}>
           <Text style={styles.companyName} numberOfLines={1}>

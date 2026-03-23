@@ -5,18 +5,18 @@
  * @date 13/01/2026
  */
 
-import VoiceInput, { VoiceOutput } from '@/components/ai/VoiceInput';
-import { useColors } from '@/hooks/use-colors';
+import VoiceInput, { VoiceOutput } from "@/components/ai/VoiceInput";
+import { useDS } from "@/hooks/useDS";
 import {
     AIMessage,
     ConsultantContext,
     getConsultantConfig,
-    sendConsultMessage
-} from '@/services/aiConsultantService';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Stack, router } from 'expo-router';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+    sendConsultMessage,
+} from "@/services/aiConsultantService";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { Stack, router } from "expo-router";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
     ActivityIndicator,
     Animated,
@@ -24,14 +24,16 @@ import {
     KeyboardAvoidingView,
     Platform,
     ScrollView,
-    StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
-    View
-} from 'react-native';
+    View,
+} from "react-native";
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
+
+const ACCENT = "#8B5A2B";
+const ACCENT_DARK = "#6B4423";
 
 // ==================== TYPES ====================
 
@@ -46,42 +48,62 @@ interface RoomInfo {
 // ==================== DATA ====================
 
 const INTERIOR_STYLES = [
-  { id: 'modern', name: 'Hiện đại', icon: '🏢', color: '#0D9488' },
-  { id: 'classic', name: 'Cổ điển', icon: '🏛️', color: '#8B5A2B' },
-  { id: 'minimalist', name: 'Tối giản', icon: '⬜', color: '#6B7280' },
-  { id: 'scandinavian', name: 'Scandinavian', icon: '🌲', color: '#10B981' },
-  { id: 'industrial', name: 'Industrial', icon: '🏭', color: '#374151' },
-  { id: 'indochine', name: 'Indochine', icon: '🏮', color: '#DC2626' },
-  { id: 'japanese', name: 'Nhật Bản', icon: '🎎', color: '#F59E0B' },
-  { id: 'tropical', name: 'Nhiệt đới', icon: '🌴', color: '#059669' },
+  { id: "modern", name: "Hiện đại", icon: "🏢", color: "#0D9488" },
+  { id: "classic", name: "Cổ điển", icon: "🏛️", color: "#8B5A2B" },
+  { id: "minimalist", name: "Tối giản", icon: "⬜", color: "#6B7280" },
+  { id: "scandinavian", name: "Scandinavian", icon: "🌲", color: "#10B981" },
+  { id: "industrial", name: "Industrial", icon: "🏭", color: "#374151" },
+  { id: "indochine", name: "Indochine", icon: "🏮", color: "#DC2626" },
+  { id: "japanese", name: "Nhật Bản", icon: "🎎", color: "#F59E0B" },
+  { id: "tropical", name: "Nhiệt đới", icon: "🌴", color: "#059669" },
 ];
 
 const ROOM_TYPES = [
-  { id: 'living', name: 'Phòng khách', icon: '🛋️' },
-  { id: 'bedroom', name: 'Phòng ngủ', icon: '🛏️' },
-  { id: 'kitchen', name: 'Bếp', icon: '🍳' },
-  { id: 'bathroom', name: 'Phòng tắm', icon: '🚿' },
-  { id: 'dining', name: 'Phòng ăn', icon: '🍽️' },
-  { id: 'office', name: 'Phòng làm việc', icon: '💼' },
-  { id: 'kids', name: 'Phòng trẻ em', icon: '🧸' },
-  { id: 'balcony', name: 'Ban công', icon: '🌿' },
+  { id: "living", name: "Phòng khách", icon: "🛋️" },
+  { id: "bedroom", name: "Phòng ngủ", icon: "🛏️" },
+  { id: "kitchen", name: "Bếp", icon: "🍳" },
+  { id: "bathroom", name: "Phòng tắm", icon: "🚿" },
+  { id: "dining", name: "Phòng ăn", icon: "🍽️" },
+  { id: "office", name: "Phòng làm việc", icon: "💼" },
+  { id: "kids", name: "Phòng trẻ em", icon: "🧸" },
+  { id: "balcony", name: "Ban công", icon: "🌿" },
 ];
 
 const COLOR_PALETTES = [
-  { id: 'neutral', name: 'Trung tính', colors: ['#F5F5F4', '#D6D3D1', '#78716C', '#44403C'] },
-  { id: 'warm', name: 'Ấm áp', colors: ['#FEF3C7', '#FBBF24', '#D97706', '#92400E'] },
-  { id: 'cool', name: 'Mát mẻ', colors: ['#E0F2FE', '#38BDF8', '#0D9488', '#075985'] },
-  { id: 'earth', name: 'Đất', colors: ['#ECFCCB', '#84CC16', '#65A30D', '#3F6212'] },
-  { id: 'luxury', name: 'Sang trọng', colors: ['#1E1E1E', '#4A3728', '#C49A6C', '#E5D5C5'] },
+  {
+    id: "neutral",
+    name: "Trung tính",
+    colors: ["#F5F5F4", "#D6D3D1", "#78716C", "#44403C"],
+  },
+  {
+    id: "warm",
+    name: "Ấm áp",
+    colors: ["#FEF3C7", "#FBBF24", "#D97706", "#92400E"],
+  },
+  {
+    id: "cool",
+    name: "Mát mẻ",
+    colors: ["#E0F2FE", "#38BDF8", "#0D9488", "#075985"],
+  },
+  {
+    id: "earth",
+    name: "Đất",
+    colors: ["#ECFCCB", "#84CC16", "#65A30D", "#3F6212"],
+  },
+  {
+    id: "luxury",
+    name: "Sang trọng",
+    colors: ["#1E1E1E", "#4A3728", "#C49A6C", "#E5D5C5"],
+  },
 ];
 
 const FURNITURE_ITEMS = [
-  { id: 'sofa', name: 'Sofa', icon: '🛋️' },
-  { id: 'bed', name: 'Giường', icon: '🛏️' },
-  { id: 'table', name: 'Bàn', icon: '🪑' },
-  { id: 'cabinet', name: 'Tủ', icon: '🗄️' },
-  { id: 'light', name: 'Đèn', icon: '💡' },
-  { id: 'curtain', name: 'Rèm', icon: '🪟' },
+  { id: "sofa", name: "Sofa", icon: "🛋️" },
+  { id: "bed", name: "Giường", icon: "🛏️" },
+  { id: "table", name: "Bàn", icon: "🪑" },
+  { id: "cabinet", name: "Tủ", icon: "🗄️" },
+  { id: "light", name: "Đèn", icon: "💡" },
+  { id: "curtain", name: "Rèm", icon: "🪟" },
 ];
 
 // ==================== COMPONENTS ====================
@@ -90,43 +112,60 @@ const ChatMessage: React.FC<{
   message: AIMessage;
   colors: any;
 }> = ({ message, colors }) => {
-  const isUser = message.role === 'user';
-  
+  const isUser = message.role === "user";
+
   return (
-    <View style={[
-      styles.messageContainer,
-      isUser ? styles.userMessage : styles.aiMessage,
-    ]}>
+    <View
+      style={[
+        styles.messageContainer,
+        isUser ? styles.userMessage : styles.aiMessage,
+      ]}
+    >
       {!isUser && (
-        <View style={[styles.aiAvatar, { backgroundColor: '#8B5A2B' }]}>
-          <MaterialCommunityIcons name="sofa" size={18} color="#fff" />
+        <View style={[styles.aiAvatar, { backgroundColor: ACCENT }]}>
+          <MaterialCommunityIcons
+            name="sofa"
+            size={18}
+            color={colors.textInverse}
+          />
         </View>
       )}
-      <View style={[
-        styles.messageBubble,
-        isUser 
-          ? { backgroundColor: '#8B5A2B' } 
-          : { backgroundColor: colors.card },
-      ]}>
-        <Text style={[
-          styles.messageText,
-          { color: isUser ? '#fff' : colors.text },
-        ]}>
+      <View
+        style={[
+          styles.messageBubble,
+          isUser
+            ? { backgroundColor: ACCENT }
+            : { backgroundColor: colors.card },
+        ]}
+      >
+        <Text
+          style={[
+            styles.messageText,
+            { color: isUser ? colors.textInverse : colors.text },
+          ]}
+        >
           {message.content}
         </Text>
         <View style={styles.messageFooter}>
-          <Text style={[
-            styles.messageTime,
-            { color: isUser ? 'rgba(255,255,255,0.7)' : colors.textMuted },
-          ]}>
-            {message.timestamp.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
+          <Text
+            style={[
+              styles.messageTime,
+              {
+                color: isUser ? "rgba(255,255,255,0.7)" : colors.textSecondary,
+              },
+            ]}
+          >
+            {message.timestamp.toLocaleTimeString("vi-VN", {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
           </Text>
           {!isUser && (
-            <VoiceOutput 
-              text={message.content} 
-              size={18} 
-              color={colors.textMuted}
-              activeColor="#8B5A2B"
+            <VoiceOutput
+              text={message.content}
+              size={18}
+              color={colors.textSecondary}
+              activeColor={ACCENT}
             />
           )}
         </View>
@@ -136,7 +175,7 @@ const ChatMessage: React.FC<{
 };
 
 const StyleCard: React.FC<{
-  style: typeof INTERIOR_STYLES[0];
+  style: (typeof INTERIOR_STYLES)[0];
   selected: boolean;
   onPress: () => void;
   colors: any;
@@ -150,20 +189,22 @@ const StyleCard: React.FC<{
     onPress={onPress}
     activeOpacity={0.7}
   >
-    <View style={[styles.styleIconBg, { backgroundColor: style.color + '20' }]}>
+    <View style={[styles.styleIconBg, { backgroundColor: style.color + "20" }]}>
       <Text style={styles.styleCardIcon}>{style.icon}</Text>
     </View>
-    <Text style={[styles.styleCardName, { color: colors.text }]}>{style.name}</Text>
+    <Text style={[styles.styleCardName, { color: colors.text }]}>
+      {style.name}
+    </Text>
     {selected && (
       <View style={[styles.checkmark, { backgroundColor: style.color }]}>
-        <Ionicons name="checkmark" size={12} color="#fff" />
+        <Ionicons name="checkmark" size={12} color={colors.textInverse} />
       </View>
     )}
   </TouchableOpacity>
 );
 
 const ColorPaletteCard: React.FC<{
-  palette: typeof COLOR_PALETTES[0];
+  palette: (typeof COLOR_PALETTES)[0];
   onPress: () => void;
   colors: any;
 }> = ({ palette, onPress, colors }) => (
@@ -172,10 +213,15 @@ const ColorPaletteCard: React.FC<{
     onPress={onPress}
     activeOpacity={0.7}
   >
-    <Text style={[styles.paletteName, { color: colors.text }]}>{palette.name}</Text>
+    <Text style={[styles.paletteName, { color: colors.text }]}>
+      {palette.name}
+    </Text>
     <View style={styles.paletteColors}>
       {palette.colors.map((color, idx) => (
-        <View key={idx} style={[styles.paletteColor, { backgroundColor: color }]} />
+        <View
+          key={idx}
+          style={[styles.paletteColor, { backgroundColor: color }]}
+        />
       ))}
     </View>
   </TouchableOpacity>
@@ -184,167 +230,216 @@ const ColorPaletteCard: React.FC<{
 // ==================== MAIN SCREEN ====================
 
 export default function InteriorDesignAIScreen() {
-  const colors = useColors();
-  const config = getConsultantConfig('interior_design');
-  
+  const { colors, spacing, radius, screen } = useDS();
+  const config = getConsultantConfig("interior_design");
+
   // State
-  const [activeTab, setActiveTab] = useState<'chat' | 'styles' | 'room'>('chat');
+  const [activeTab, setActiveTab] = useState<"chat" | "styles" | "room">(
+    "chat",
+  );
   const [messages, setMessages] = useState<AIMessage[]>([]);
-  const [inputText, setInputText] = useState('');
+  const [inputText, setInputText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedStyle, setSelectedStyle] = useState<string>('');
+  const [selectedStyle, setSelectedStyle] = useState<string>("");
   const [roomInfo, setRoomInfo] = useState<RoomInfo>({
-    roomType: '',
-    area: '',
-    budget: '',
-    style: '',
+    roomType: "",
+    area: "",
+    budget: "",
+    style: "",
     features: [],
   });
-  
+
   // Refs
   const scrollViewRef = useRef<ScrollView>(null);
-  
+
   // Animation
   const fadeAnim = useRef(new Animated.Value(0)).current;
-  
+
   useEffect(() => {
     Animated.timing(fadeAnim, {
       toValue: 1,
       duration: 500,
       useNativeDriver: true,
     }).start();
-    
+
     // Welcome message
     const welcomeMsg: AIMessage = {
       id: Date.now().toString(),
-      role: 'ai',
+      role: "ai",
       content: `🛋️ **Chào mừng bạn đến với Tư vấn Nội thất AI!**\n\nTôi là chuyên gia thiết kế nội thất AI, sẵn sàng giúp bạn:\n\n• Tư vấn phong cách nội thất\n• Gợi ý phối màu, chọn đồ\n• Tối ưu không gian phòng\n• Ước tính chi phí nội thất\n\nBạn đang cần tư vấn cho phòng nào?`,
       timestamp: new Date(),
     };
     setMessages([welcomeMsg]);
   }, []);
-  
+
   // Build context
   const buildContext = useCallback((): ConsultantContext => {
     const ctx: ConsultantContext = {};
     if (roomInfo.area) ctx.area = parseFloat(roomInfo.area);
     if (roomInfo.budget) ctx.budget = roomInfo.budget;
-    if (roomInfo.style || selectedStyle) ctx.style = roomInfo.style || selectedStyle;
+    if (roomInfo.style || selectedStyle)
+      ctx.style = roomInfo.style || selectedStyle;
     if (roomInfo.roomType) ctx.projectType = roomInfo.roomType;
     return ctx;
   }, [roomInfo, selectedStyle]);
-  
+
   // Send message
-  const handleSendMessage = useCallback(async (text?: string) => {
-    const messageText = text || inputText.trim();
-    if (!messageText || isLoading) return;
-    
-    const userMessage: AIMessage = {
-      id: Date.now().toString(),
-      role: 'user',
-      content: messageText,
-      timestamp: new Date(),
-    };
-    
-    setMessages(prev => [...prev, userMessage]);
-    setInputText('');
-    setIsLoading(true);
-    
-    setTimeout(() => {
-      scrollViewRef.current?.scrollToEnd({ animated: true });
-    }, 100);
-    
-    try {
-      const context = buildContext();
-      const response = await sendConsultMessage(messageText, 'interior_design', context);
-      
-      const aiMessage: AIMessage = {
-        id: (Date.now() + 1).toString(),
-        role: 'ai',
-        content: response,
+  const handleSendMessage = useCallback(
+    async (text?: string) => {
+      const messageText = text || inputText.trim();
+      if (!messageText || isLoading) return;
+
+      const userMessage: AIMessage = {
+        id: Date.now().toString(),
+        role: "user",
+        content: messageText,
         timestamp: new Date(),
       };
-      
-      setMessages(prev => [...prev, aiMessage]);
-    } catch (error) {
-      console.error('Send message error:', error);
-      const errorMessage: AIMessage = {
-        id: (Date.now() + 1).toString(),
-        role: 'ai',
-        content: '❌ Xin lỗi, đã có lỗi xảy ra. Vui lòng thử lại sau.',
-        timestamp: new Date(),
-      };
-      setMessages(prev => [...prev, errorMessage]);
-    } finally {
-      setIsLoading(false);
+
+      setMessages((prev) => [...prev, userMessage]);
+      setInputText("");
+      setIsLoading(true);
+
       setTimeout(() => {
         scrollViewRef.current?.scrollToEnd({ animated: true });
       }, 100);
-    }
-  }, [inputText, isLoading, buildContext]);
-  
+
+      try {
+        const context = buildContext();
+        const response = await sendConsultMessage(
+          messageText,
+          "interior_design",
+          context,
+        );
+
+        const aiMessage: AIMessage = {
+          id: (Date.now() + 1).toString(),
+          role: "ai",
+          content: response,
+          timestamp: new Date(),
+        };
+
+        setMessages((prev) => [...prev, aiMessage]);
+      } catch (error) {
+        console.error("Send message error:", error);
+        const errorMessage: AIMessage = {
+          id: (Date.now() + 1).toString(),
+          role: "ai",
+          content: "❌ Xin lỗi, đã có lỗi xảy ra. Vui lòng thử lại sau.",
+          timestamp: new Date(),
+        };
+        setMessages((prev) => [...prev, errorMessage]);
+      } finally {
+        setIsLoading(false);
+        setTimeout(() => {
+          scrollViewRef.current?.scrollToEnd({ animated: true });
+        }, 100);
+      }
+    },
+    [inputText, isLoading, buildContext],
+  );
+
   // Handle quick question
-  const handleQuickQuestion = useCallback((question: string) => {
-    handleSendMessage(question);
-    setActiveTab('chat');
-  }, [handleSendMessage]);
-  
+  const handleQuickQuestion = useCallback(
+    (question: string) => {
+      handleSendMessage(question);
+      setActiveTab("chat");
+    },
+    [handleSendMessage],
+  );
+
   // Render tabs
   const renderTabs = () => (
     <View style={[styles.tabContainer, { backgroundColor: colors.card }]}>
       <TouchableOpacity
-        style={[styles.tab, activeTab === 'chat' && { backgroundColor: '#8B5A2B' }]}
-        onPress={() => setActiveTab('chat')}
+        style={[
+          styles.tab,
+          activeTab === "chat" && { backgroundColor: ACCENT },
+        ]}
+        onPress={() => setActiveTab("chat")}
       >
-        <Ionicons 
-          name="chatbubbles" 
-          size={18} 
-          color={activeTab === 'chat' ? '#fff' : colors.textMuted} 
+        <Ionicons
+          name="chatbubbles"
+          size={18}
+          color={
+            activeTab === "chat" ? colors.textInverse : colors.textSecondary
+          }
         />
-        <Text style={[
-          styles.tabText,
-          { color: activeTab === 'chat' ? '#fff' : colors.textMuted }
-        ]}>
+        <Text
+          style={[
+            styles.tabText,
+            {
+              color:
+                activeTab === "chat"
+                  ? colors.textInverse
+                  : colors.textSecondary,
+            },
+          ]}
+        >
           Chat
         </Text>
       </TouchableOpacity>
-      
+
       <TouchableOpacity
-        style={[styles.tab, activeTab === 'styles' && { backgroundColor: '#8B5A2B' }]}
-        onPress={() => setActiveTab('styles')}
+        style={[
+          styles.tab,
+          activeTab === "styles" && { backgroundColor: ACCENT },
+        ]}
+        onPress={() => setActiveTab("styles")}
       >
-        <Ionicons 
-          name="color-palette" 
-          size={18} 
-          color={activeTab === 'styles' ? '#fff' : colors.textMuted} 
+        <Ionicons
+          name="color-palette"
+          size={18}
+          color={
+            activeTab === "styles" ? colors.textInverse : colors.textSecondary
+          }
         />
-        <Text style={[
-          styles.tabText,
-          { color: activeTab === 'styles' ? '#fff' : colors.textMuted }
-        ]}>
+        <Text
+          style={[
+            styles.tabText,
+            {
+              color:
+                activeTab === "styles"
+                  ? colors.textInverse
+                  : colors.textSecondary,
+            },
+          ]}
+        >
           Phong cách
         </Text>
       </TouchableOpacity>
-      
+
       <TouchableOpacity
-        style={[styles.tab, activeTab === 'room' && { backgroundColor: '#8B5A2B' }]}
-        onPress={() => setActiveTab('room')}
+        style={[
+          styles.tab,
+          activeTab === "room" && { backgroundColor: ACCENT },
+        ]}
+        onPress={() => setActiveTab("room")}
       >
-        <Ionicons 
-          name="home" 
-          size={18} 
-          color={activeTab === 'room' ? '#fff' : colors.textMuted} 
+        <Ionicons
+          name="home"
+          size={18}
+          color={
+            activeTab === "room" ? colors.textInverse : colors.textSecondary
+          }
         />
-        <Text style={[
-          styles.tabText,
-          { color: activeTab === 'room' ? '#fff' : colors.textMuted }
-        ]}>
+        <Text
+          style={[
+            styles.tabText,
+            {
+              color:
+                activeTab === "room"
+                  ? colors.textInverse
+                  : colors.textSecondary,
+            },
+          ]}
+        >
           Phòng
         </Text>
       </TouchableOpacity>
     </View>
   );
-  
+
   // Render chat tab
   const renderChatTab = () => (
     <>
@@ -357,34 +452,44 @@ export default function InteriorDesignAIScreen() {
         {messages.map((msg) => (
           <ChatMessage key={msg.id} message={msg} colors={colors} />
         ))}
-        
+
         {isLoading && (
-          <View style={[styles.loadingContainer, { backgroundColor: colors.card }]}>
-            <ActivityIndicator size="small" color="#8B5A2B" />
-            <Text style={[styles.loadingText, { color: colors.textMuted }]}>
+          <View
+            style={[styles.loadingContainer, { backgroundColor: colors.card }]}
+          >
+            <ActivityIndicator size="small" color={ACCENT} />
+            <Text style={[styles.loadingText, { color: colors.textSecondary }]}>
               Đang trả lời...
             </Text>
           </View>
         )}
       </ScrollView>
-      
+
       {messages.length <= 2 && (
         <View style={styles.quickQuestionsContainer}>
-          <Text style={[styles.quickQuestionsTitle, { color: colors.textMuted }]}>
+          <Text
+            style={[
+              styles.quickQuestionsTitle,
+              { color: colors.textSecondary },
+            ]}
+          >
             💡 Câu hỏi gợi ý:
           </Text>
-          <ScrollView 
-            horizontal 
+          <ScrollView
+            horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.quickQuestionsScroll}
           >
             {config.quickQuestions.map((q, idx) => (
               <TouchableOpacity
                 key={idx}
-                style={[styles.quickQuestionBtn, { borderColor: '#8B5A2B' }]}
+                style={[styles.quickQuestionBtn, { borderColor: ACCENT }]}
                 onPress={() => handleQuickQuestion(q)}
               >
-                <Text style={[styles.quickQuestionText, { color: '#8B5A2B' }]} numberOfLines={2}>
+                <Text
+                  style={[styles.quickQuestionText, { color: ACCENT }]}
+                  numberOfLines={2}
+                >
                   {q}
                 </Text>
               </TouchableOpacity>
@@ -392,43 +497,49 @@ export default function InteriorDesignAIScreen() {
           </ScrollView>
         </View>
       )}
-      
+
       <View style={[styles.inputContainer, { backgroundColor: colors.card }]}>
-        <VoiceInput 
+        <VoiceInput
           onTextReceived={(text) => handleSendMessage(text)}
           disabled={isLoading}
         />
         <TextInput
-          style={[styles.textInput, { 
-            backgroundColor: colors.background, 
-            color: colors.text,
-            borderColor: colors.border,
-          }]}
+          style={[
+            styles.textInput,
+            {
+              backgroundColor: colors.bg,
+              color: colors.text,
+              borderColor: colors.border,
+            },
+          ]}
           value={inputText}
           onChangeText={setInputText}
           placeholder="Nhập câu hỏi về nội thất..."
-          placeholderTextColor={colors.textMuted}
+          placeholderTextColor={colors.textSecondary}
           multiline
           maxLength={500}
           onSubmitEditing={() => handleSendMessage()}
           returnKeyType="send"
         />
         <TouchableOpacity
-          style={[styles.sendButton, { 
-            backgroundColor: inputText.trim() ? '#8B5A2B' : colors.border,
-          }]}
+          style={[
+            styles.sendButton,
+            {
+              backgroundColor: inputText.trim() ? ACCENT : colors.border,
+            },
+          ]}
           onPress={() => handleSendMessage()}
           disabled={!inputText.trim() || isLoading}
         >
-          <Ionicons name="send" size={20} color="#fff" />
+          <Ionicons name="send" size={20} color={colors.textInverse} />
         </TouchableOpacity>
       </View>
     </>
   );
-  
+
   // Render styles tab
   const renderStylesTab = () => (
-    <ScrollView 
+    <ScrollView
       style={styles.stylesContainer}
       contentContainerStyle={styles.stylesContent}
       showsVerticalScrollIndicator={false}
@@ -436,10 +547,10 @@ export default function InteriorDesignAIScreen() {
       <Text style={[styles.sectionTitle, { color: colors.text }]}>
         🎨 Phong cách nội thất
       </Text>
-      <Text style={[styles.sectionSubtitle, { color: colors.textMuted }]}>
+      <Text style={[styles.sectionSubtitle, { color: colors.textSecondary }]}>
         Chọn phong cách yêu thích để được tư vấn
       </Text>
-      
+
       <View style={styles.stylesGrid}>
         {INTERIOR_STYLES.map((style) => (
           <StyleCard
@@ -451,42 +562,57 @@ export default function InteriorDesignAIScreen() {
           />
         ))}
       </View>
-      
-      <Text style={[styles.sectionTitle, { color: colors.text, marginTop: 24 }]}>
+
+      <Text
+        style={[styles.sectionTitle, { color: colors.text, marginTop: 24 }]}
+      >
         🎨 Bảng màu gợi ý
       </Text>
-      
+
       <View style={styles.palettesContainer}>
         {COLOR_PALETTES.map((palette) => (
           <ColorPaletteCard
             key={palette.id}
             palette={palette}
-            onPress={() => handleQuickQuestion(`Tư vấn phối màu theo bảng màu ${palette.name.toLowerCase()}`)}
+            onPress={() =>
+              handleQuickQuestion(
+                `Tư vấn phối màu theo bảng màu ${palette.name.toLowerCase()}`,
+              )
+            }
             colors={colors}
           />
         ))}
       </View>
-      
+
       {selectedStyle && (
         <TouchableOpacity
-          style={[styles.consultButton, { backgroundColor: '#8B5A2B' }]}
+          style={[styles.consultButton, { backgroundColor: ACCENT }]}
           onPress={() => {
-            const styleName = INTERIOR_STYLES.find(s => s.id === selectedStyle)?.name;
-            handleQuickQuestion(`Tư vấn chi tiết về phong cách nội thất ${styleName}`);
+            const styleName = INTERIOR_STYLES.find(
+              (s) => s.id === selectedStyle,
+            )?.name;
+            handleQuickQuestion(
+              `Tư vấn chi tiết về phong cách nội thất ${styleName}`,
+            );
           }}
         >
-          <MaterialCommunityIcons name="robot" size={24} color="#fff" />
+          <MaterialCommunityIcons
+            name="robot"
+            size={24}
+            color={colors.textInverse}
+          />
           <Text style={styles.consultButtonText}>
-            Tư vấn phong cách {INTERIOR_STYLES.find(s => s.id === selectedStyle)?.name}
+            Tư vấn phong cách{" "}
+            {INTERIOR_STYLES.find((s) => s.id === selectedStyle)?.name}
           </Text>
         </TouchableOpacity>
       )}
     </ScrollView>
   );
-  
+
   // Render room tab
   const renderRoomTab = () => (
-    <ScrollView 
+    <ScrollView
       style={styles.roomContainer}
       contentContainerStyle={styles.roomContent}
       showsVerticalScrollIndicator={false}
@@ -494,7 +620,7 @@ export default function InteriorDesignAIScreen() {
       <Text style={[styles.sectionTitle, { color: colors.text }]}>
         🏠 Chọn loại phòng
       </Text>
-      
+
       <View style={styles.roomsGrid}>
         {ROOM_TYPES.map((room) => (
           <TouchableOpacity
@@ -502,59 +628,82 @@ export default function InteriorDesignAIScreen() {
             style={[
               styles.roomCard,
               { backgroundColor: colors.card },
-              roomInfo.roomType === room.id && { borderColor: '#8B5A2B', borderWidth: 2 },
+              roomInfo.roomType === room.id && {
+                borderColor: ACCENT,
+                borderWidth: 2,
+              },
             ]}
-            onPress={() => setRoomInfo(prev => ({ ...prev, roomType: room.id }))}
+            onPress={() =>
+              setRoomInfo((prev) => ({ ...prev, roomType: room.id }))
+            }
           >
             <Text style={styles.roomIcon}>{room.icon}</Text>
-            <Text style={[styles.roomName, { color: colors.text }]}>{room.name}</Text>
+            <Text style={[styles.roomName, { color: colors.text }]}>
+              {room.name}
+            </Text>
           </TouchableOpacity>
         ))}
       </View>
-      
+
       <View style={[styles.roomFormSection, { backgroundColor: colors.card }]}>
         <Text style={[styles.formTitle, { color: colors.text }]}>
           📐 Thông tin phòng
         </Text>
-        
+
         <View style={styles.formRow}>
           <View style={styles.formField}>
-            <Text style={[styles.formLabel, { color: colors.textMuted }]}>Diện tích</Text>
+            <Text style={[styles.formLabel, { color: colors.textSecondary }]}>
+              Diện tích
+            </Text>
             <TextInput
-              style={[styles.formInput, { 
-                backgroundColor: colors.background, 
-                color: colors.text,
-                borderColor: colors.border,
-              }]}
+              style={[
+                styles.formInput,
+                {
+                  backgroundColor: colors.bg,
+                  color: colors.text,
+                  borderColor: colors.border,
+                },
+              ]}
               value={roomInfo.area}
-              onChangeText={(text) => setRoomInfo(prev => ({ ...prev, area: text }))}
+              onChangeText={(text) =>
+                setRoomInfo((prev) => ({ ...prev, area: text }))
+              }
               placeholder="VD: 25"
-              placeholderTextColor={colors.textMuted}
+              placeholderTextColor={colors.textSecondary}
               keyboardType="numeric"
             />
           </View>
-          
+
           <View style={styles.formField}>
-            <Text style={[styles.formLabel, { color: colors.textMuted }]}>Ngân sách</Text>
+            <Text style={[styles.formLabel, { color: colors.textSecondary }]}>
+              Ngân sách
+            </Text>
             <TextInput
-              style={[styles.formInput, { 
-                backgroundColor: colors.background, 
-                color: colors.text,
-                borderColor: colors.border,
-              }]}
+              style={[
+                styles.formInput,
+                {
+                  backgroundColor: colors.bg,
+                  color: colors.text,
+                  borderColor: colors.border,
+                },
+              ]}
               value={roomInfo.budget}
-              onChangeText={(text) => setRoomInfo(prev => ({ ...prev, budget: text }))}
+              onChangeText={(text) =>
+                setRoomInfo((prev) => ({ ...prev, budget: text }))
+              }
               placeholder="VD: 50 triệu"
-              placeholderTextColor={colors.textMuted}
+              placeholderTextColor={colors.textSecondary}
             />
           </View>
         </View>
       </View>
-      
-      <Text style={[styles.sectionTitle, { color: colors.text, marginTop: 20 }]}>
+
+      <Text
+        style={[styles.sectionTitle, { color: colors.text, marginTop: 20 }]}
+      >
         🛋️ Đồ nội thất quan tâm
       </Text>
-      
+
       <View style={styles.furnitureGrid}>
         {FURNITURE_ITEMS.map((item) => (
           <TouchableOpacity
@@ -562,105 +711,138 @@ export default function InteriorDesignAIScreen() {
             style={[
               styles.furnitureChip,
               { backgroundColor: colors.card },
-              roomInfo.features.includes(item.id) && { backgroundColor: '#8B5A2B' },
+              roomInfo.features.includes(item.id) && {
+                backgroundColor: ACCENT,
+              },
             ]}
             onPress={() => {
-              setRoomInfo(prev => ({
+              setRoomInfo((prev) => ({
                 ...prev,
                 features: prev.features.includes(item.id)
-                  ? prev.features.filter(f => f !== item.id)
+                  ? prev.features.filter((f) => f !== item.id)
                   : [...prev.features, item.id],
               }));
             }}
           >
             <Text style={styles.furnitureIcon}>{item.icon}</Text>
-            <Text style={[
-              styles.furnitureName,
-              { color: roomInfo.features.includes(item.id) ? '#fff' : colors.text },
-            ]}>
+            <Text
+              style={[
+                styles.furnitureName,
+                {
+                  color: roomInfo.features.includes(item.id)
+                    ? colors.textInverse
+                    : colors.text,
+                },
+              ]}
+            >
               {item.name}
             </Text>
           </TouchableOpacity>
         ))}
       </View>
-      
+
       <TouchableOpacity
-        style={[styles.consultButton, { backgroundColor: '#8B5A2B', marginTop: 20 }]}
+        style={[
+          styles.consultButton,
+          { backgroundColor: ACCENT, marginTop: 20 },
+        ]}
         onPress={() => {
           const parts = [];
-          const roomName = ROOM_TYPES.find(r => r.id === roomInfo.roomType)?.name;
+          const roomName = ROOM_TYPES.find(
+            (r) => r.id === roomInfo.roomType,
+          )?.name;
           if (roomName) parts.push(roomName);
           if (roomInfo.area) parts.push(`diện tích ${roomInfo.area}m²`);
           if (roomInfo.budget) parts.push(`ngân sách ${roomInfo.budget}`);
-          
+
           const furnitureNames = roomInfo.features
-            .map(f => FURNITURE_ITEMS.find(item => item.id === f)?.name)
+            .map((f) => FURNITURE_ITEMS.find((item) => item.id === f)?.name)
             .filter(Boolean);
-          if (furnitureNames.length) parts.push(`quan tâm: ${furnitureNames.join(', ')}`);
-          
-          const question = parts.length > 0
-            ? `Tư vấn thiết kế nội thất ${parts.join(', ')}`
-            : 'Tư vấn thiết kế nội thất cho tôi';
-          
+          if (furnitureNames.length)
+            parts.push(`quan tâm: ${furnitureNames.join(", ")}`);
+
+          const question =
+            parts.length > 0
+              ? `Tư vấn thiết kế nội thất ${parts.join(", ")}`
+              : "Tư vấn thiết kế nội thất cho tôi";
+
           handleQuickQuestion(question);
         }}
       >
-        <MaterialCommunityIcons name="robot" size={24} color="#fff" />
+        <MaterialCommunityIcons
+          name="robot"
+          size={24}
+          color={colors.textInverse}
+        />
         <Text style={styles.consultButtonText}>Tư vấn theo thông tin</Text>
       </TouchableOpacity>
-      
+
       {/* Category questions */}
-      <Text style={[styles.sectionTitle, { color: colors.text, marginTop: 24 }]}>
+      <Text
+        style={[styles.sectionTitle, { color: colors.text, marginTop: 24 }]}
+      >
         ❓ Câu hỏi theo chủ đề
       </Text>
-      
+
       {config.categories.map((cat) => (
-        <View key={cat.id} style={[styles.categorySection, { backgroundColor: colors.card }]}>
+        <View
+          key={cat.id}
+          style={[styles.categorySection, { backgroundColor: colors.card }]}
+        >
           <View style={styles.categoryHeader}>
             <Text style={styles.categoryIcon}>{cat.icon}</Text>
-            <Text style={[styles.categoryName, { color: colors.text }]}>{cat.name}</Text>
+            <Text style={[styles.categoryName, { color: colors.text }]}>
+              {cat.name}
+            </Text>
           </View>
-          
+
           {cat.questions.map((q, idx) => (
             <TouchableOpacity
               key={idx}
               style={styles.categoryQuestion}
               onPress={() => handleQuickQuestion(q)}
             >
-              <Ionicons name="chatbubble-outline" size={16} color="#8B5A2B" />
-              <Text style={[styles.categoryQuestionText, { color: colors.text }]}>{q}</Text>
+              <Ionicons name="chatbubble-outline" size={16} color={ACCENT} />
+              <Text
+                style={[styles.categoryQuestionText, { color: colors.text }]}
+              >
+                {q}
+              </Text>
             </TouchableOpacity>
           ))}
         </View>
       ))}
     </ScrollView>
   );
-  
+
   return (
     <>
       <Stack.Screen
         options={{
-          title: 'Tư vấn Nội thất AI',
+          title: "Tư vấn Nội thất AI",
           headerShown: true,
           headerStyle: { backgroundColor: colors.card },
           headerTintColor: colors.text,
           headerLeft: () => (
-            <TouchableOpacity onPress={() => router.back()} style={{ marginLeft: 8 }}>
+            <TouchableOpacity
+              onPress={() => router.back()}
+              style={{ marginLeft: 8 }}
+            >
               <Ionicons name="arrow-back" size={24} color={colors.text} />
             </TouchableOpacity>
           ),
         }}
       />
-      
+
       <KeyboardAvoidingView
-        style={[styles.container, { backgroundColor: colors.background }]}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={[styles.container, { backgroundColor: colors.bg }]}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
         keyboardVerticalOffset={90}
       >
         <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
           {/* Header */}
           <LinearGradient
-            colors={['#8B5A2B', '#6B4423']}
+            colors={[ACCENT, ACCENT_DARK]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.header}
@@ -673,12 +855,12 @@ export default function InteriorDesignAIScreen() {
               </View>
             </View>
           </LinearGradient>
-          
+
           {renderTabs()}
-          
-          {activeTab === 'chat' && renderChatTab()}
-          {activeTab === 'styles' && renderStylesTab()}
-          {activeTab === 'room' && renderRoomTab()}
+
+          {activeTab === "chat" && renderChatTab()}
+          {activeTab === "styles" && renderStylesTab()}
+          {activeTab === "room" && renderRoomTab()}
         </Animated.View>
       </KeyboardAvoidingView>
     </>
@@ -687,7 +869,7 @@ export default function InteriorDesignAIScreen() {
 
 // ==================== STYLES ====================
 
-const styles = StyleSheet.create({
+const styles = {
   container: {
     flex: 1,
   },
@@ -699,8 +881,8 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   headerContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row" as const,
+    alignItems: "center" as const,
   },
   headerIcon: {
     fontSize: 40,
@@ -711,27 +893,27 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 20,
-    fontWeight: '700',
-    color: '#fff',
+    fontWeight: "700" as const,
+    color: "#fff",
     marginBottom: 4,
   },
   headerSubtitle: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.8)',
+    color: "rgba(255,255,255,0.8)",
   },
-  
+
   // Tabs
   tabContainer: {
-    flexDirection: 'row',
+    flexDirection: "row" as const,
     paddingHorizontal: 16,
     paddingVertical: 8,
     gap: 8,
   },
   tab: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row" as const,
+    alignItems: "center" as const,
+    justifyContent: "center" as const,
     paddingVertical: 10,
     paddingHorizontal: 12,
     borderRadius: 20,
@@ -739,9 +921,9 @@ const styles = StyleSheet.create({
   },
   tabText: {
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: "600" as const,
   },
-  
+
   // Messages
   messagesContainer: {
     flex: 1,
@@ -751,58 +933,58 @@ const styles = StyleSheet.create({
     paddingBottom: 80,
   },
   messageContainer: {
-    flexDirection: 'row',
+    flexDirection: "row" as const,
     marginBottom: 12,
-    maxWidth: '85%',
+    maxWidth: "85%" as const,
   },
   userMessage: {
-    alignSelf: 'flex-end',
-    justifyContent: 'flex-end',
+    alignSelf: "flex-end" as const,
+    justifyContent: "flex-end" as const,
   },
   aiMessage: {
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start" as const,
   },
   aiAvatar: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center" as const,
+    justifyContent: "center" as const,
     marginRight: 8,
   },
   messageBubble: {
     padding: 12,
     borderRadius: 16,
-    maxWidth: '100%',
+    maxWidth: "100%" as const,
   },
   messageText: {
     fontSize: 15,
     lineHeight: 22,
   },
   messageFooter: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
+    flexDirection: "row" as const,
+    alignItems: "center" as const,
+    justifyContent: "flex-end" as const,
     marginTop: 4,
     gap: 8,
   },
   messageTime: {
     fontSize: 10,
   },
-  
+
   // Loading
   loadingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row" as const,
+    alignItems: "center" as const,
     padding: 12,
     borderRadius: 16,
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start" as const,
     gap: 8,
   },
   loadingText: {
     fontSize: 14,
   },
-  
+
   // Quick questions
   quickQuestionsContainer: {
     paddingHorizontal: 16,
@@ -825,15 +1007,15 @@ const styles = StyleSheet.create({
   quickQuestionText: {
     fontSize: 13,
   },
-  
+
   // Input
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
+    flexDirection: "row" as const,
+    alignItems: "flex-end" as const,
     padding: 12,
     gap: 8,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(0,0,0,0.1)',
+    borderTopColor: "rgba(0,0,0,0.1)",
   },
   textInput: {
     flex: 1,
@@ -849,10 +1031,10 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center" as const,
+    justifyContent: "center" as const,
   },
-  
+
   // Styles tab
   stylesContainer: {
     flex: 1,
@@ -862,7 +1044,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600" as const,
     marginBottom: 8,
   },
   sectionSubtitle: {
@@ -870,23 +1052,23 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   stylesGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row" as const,
+    flexWrap: "wrap" as const,
     gap: 12,
   },
   styleCard: {
     width: (width - 44) / 2,
     padding: 16,
     borderRadius: 12,
-    alignItems: 'center',
-    position: 'relative',
+    alignItems: "center" as const,
+    position: "relative" as const,
   },
   styleIconBg: {
     width: 48,
     height: 48,
     borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center" as const,
+    justifyContent: "center" as const,
     marginBottom: 8,
   },
   styleCardIcon: {
@@ -894,37 +1076,37 @@ const styles = StyleSheet.create({
   },
   styleCardName: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600" as const,
   },
   checkmark: {
-    position: 'absolute',
+    position: "absolute" as const,
     top: 8,
     right: 8,
     width: 20,
     height: 20,
     borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center" as const,
+    justifyContent: "center" as const,
   },
-  
+
   // Palettes
   palettesContainer: {
     gap: 8,
   },
   paletteCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row" as const,
+    alignItems: "center" as const,
     padding: 12,
     borderRadius: 10,
   },
   paletteName: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500" as const,
     width: 80,
   },
   paletteColors: {
     flex: 1,
-    flexDirection: 'row',
+    flexDirection: "row" as const,
     gap: 4,
   },
   paletteColor: {
@@ -932,7 +1114,7 @@ const styles = StyleSheet.create({
     height: 32,
     borderRadius: 4,
   },
-  
+
   // Room tab
   roomContainer: {
     flex: 1,
@@ -942,8 +1124,8 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   roomsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row" as const,
+    flexWrap: "wrap" as const,
     gap: 8,
     marginBottom: 16,
   },
@@ -951,7 +1133,7 @@ const styles = StyleSheet.create({
     width: (width - 40) / 4,
     padding: 12,
     borderRadius: 10,
-    alignItems: 'center',
+    alignItems: "center" as const,
   },
   roomIcon: {
     fontSize: 24,
@@ -959,9 +1141,9 @@ const styles = StyleSheet.create({
   },
   roomName: {
     fontSize: 11,
-    textAlign: 'center',
+    textAlign: "center" as const,
   },
-  
+
   // Form
   roomFormSection: {
     padding: 16,
@@ -969,11 +1151,11 @@ const styles = StyleSheet.create({
   },
   formTitle: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600" as const,
     marginBottom: 12,
   },
   formRow: {
-    flexDirection: 'row',
+    flexDirection: "row" as const,
     gap: 12,
   },
   formField: {
@@ -990,16 +1172,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     fontSize: 14,
   },
-  
+
   // Furniture
   furnitureGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row" as const,
+    flexWrap: "wrap" as const,
     gap: 8,
   },
   furnitureChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row" as const,
+    alignItems: "center" as const,
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 20,
@@ -1011,12 +1193,12 @@ const styles = StyleSheet.create({
   furnitureName: {
     fontSize: 13,
   },
-  
+
   // Consult button
   consultButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row" as const,
+    alignItems: "center" as const,
+    justifyContent: "center" as const,
     padding: 16,
     borderRadius: 12,
     marginTop: 16,
@@ -1024,10 +1206,10 @@ const styles = StyleSheet.create({
   },
   consultButtonText: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#fff',
+    fontWeight: "600" as const,
+    color: "#fff",
   },
-  
+
   // Category section
   categorySection: {
     padding: 14,
@@ -1035,8 +1217,8 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   categoryHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row" as const,
+    alignItems: "center" as const,
     marginBottom: 10,
     gap: 8,
   },
@@ -1045,11 +1227,11 @@ const styles = StyleSheet.create({
   },
   categoryName: {
     fontSize: 15,
-    fontWeight: '600',
+    fontWeight: "600" as const,
   },
   categoryQuestion: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row" as const,
+    alignItems: "center" as const,
     paddingVertical: 8,
     gap: 10,
   },
@@ -1057,4 +1239,4 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 13,
   },
-});
+};

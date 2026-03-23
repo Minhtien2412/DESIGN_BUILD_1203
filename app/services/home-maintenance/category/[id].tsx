@@ -3,275 +3,207 @@
  * Chi tiết danh mục dịch vụ bảo trì nhà
  */
 
-import { ServiceWorkerItem } from '@/components/home-maintenance';
+import { DSModuleScreen } from "@/components/ds/layouts";
+import { ServiceWorkerItem } from "@/components/home-maintenance";
+import { useDS } from "@/hooks/useDS";
 import {
     SERVICE_CATEGORIES,
     SERVICE_WORKERS,
-    ServiceWorker
-} from '@/services/api/homeMaintenanceApi';
-import { mediumImpact } from '@/utils/haptics';
-import { Ionicons } from '@expo/vector-icons';
-import { router, useLocalSearchParams } from 'expo-router';
-import { useMemo, useState } from 'react';
-import {
-    FlatList,
-    Linking,
-    RefreshControl,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+    ServiceWorker,
+} from "@/services/api/homeMaintenanceApi";
+import { mediumImpact } from "@/utils/haptics";
+import { Ionicons } from "@expo/vector-icons";
+import { router, useLocalSearchParams } from "expo-router";
+import { useMemo, useState } from "react";
+import { Linking, Text, TouchableOpacity, View } from "react-native";
 
 export default function CategoryDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const insets = useSafeAreaInsets();
+  const { colors, spacing, radius, font, text: textStyles } = useDS();
   const [refreshing, setRefreshing] = useState(false);
-  const [sortBy, setSortBy] = useState<'rating' | 'reviews' | 'price'>('rating');
-  
-  // Find category
-  const category = useMemo(() => 
-    SERVICE_CATEGORIES.find(c => c.id === id), [id]
+  const [sortBy, setSortBy] = useState<"rating" | "reviews" | "price">(
+    "rating",
   );
-  
-  // Get workers for this category (mock: return all for demo)
+
+  const category = useMemo(
+    () => SERVICE_CATEGORIES.find((c) => c.id === id),
+    [id],
+  );
+
   const workers = useMemo(() => {
     let sorted = [...SERVICE_WORKERS];
-    
     switch (sortBy) {
-      case 'rating':
+      case "rating":
         sorted.sort((a, b) => b.rating - a.rating);
         break;
-      case 'reviews':
+      case "reviews":
         sorted.sort((a, b) => b.reviews - a.reviews);
         break;
-      case 'price':
+      case "price":
         sorted.sort((a, b) => (a.price?.min || 0) - (b.price?.min || 0));
         break;
     }
-    
     return sorted;
   }, [sortBy]);
-  
+
   const handleRefresh = async () => {
     setRefreshing(true);
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     setRefreshing(false);
   };
-  
+
   const handleWorkerPress = (worker: ServiceWorker) => {
     mediumImpact();
     router.push(`/services/home-maintenance/worker/${worker.id}` as any);
   };
-  
+
   const handleWorkerCall = (worker: ServiceWorker) => {
     mediumImpact();
     if (worker.phone) {
       Linking.openURL(`tel:${worker.phone}`);
     }
   };
-  
+
   const handleWorkerMessage = (worker: ServiceWorker) => {
     mediumImpact();
     router.push(`/messages/${worker.id}`);
   };
-  
-  const renderSortButton = (key: 'rating' | 'reviews' | 'price', label: string) => (
+
+  const renderSortButton = (
+    key: "rating" | "reviews" | "price",
+    label: string,
+  ) => (
     <TouchableOpacity
-      style={[styles.sortButton, sortBy === key && styles.sortButtonActive]}
+      style={{
+        paddingHorizontal: spacing.lg,
+        paddingVertical: spacing.sm,
+        borderRadius: radius.full,
+        backgroundColor: sortBy === key ? colors.primaryBg : colors.bgMuted,
+      }}
       onPress={() => setSortBy(key)}
     >
-      <Text style={[styles.sortButtonText, sortBy === key && styles.sortButtonTextActive]}>
+      <Text
+        style={[
+          textStyles.badge,
+          {
+            color: sortBy === key ? colors.primary : colors.textSecondary,
+            fontWeight: sortBy === key ? "600" : "500",
+          },
+        ]}
+      >
         {label}
       </Text>
     </TouchableOpacity>
   );
-  
-  const renderWorker = ({ item }: { item: ServiceWorker }) => (
-    <ServiceWorkerItem
-      worker={item}
-      variant="card"
-      onPress={handleWorkerPress}
-      onCall={handleWorkerCall}
-      onMessage={handleWorkerMessage}
-    />
-  );
-  
-  const renderHeader = () => (
-    <View style={styles.listHeader}>
+
+  return (
+    <DSModuleScreen
+      title={category?.name?.replace("\n", " ") || "Dịch vụ"}
+      refreshing={refreshing}
+      onRefresh={handleRefresh}
+      headerRight={
+        <TouchableOpacity style={{ padding: spacing.xs }}>
+          <Ionicons
+            name="filter-outline"
+            size={24}
+            color={colors.textInverse}
+          />
+        </TouchableOpacity>
+      }
+    >
       {/* Category Info */}
-      <View style={styles.categoryInfo}>
-        <View 
-          style={[
-            styles.categoryIcon, 
-            { backgroundColor: category?.color || '#1877F2' }
-          ]}
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          backgroundColor: colors.card,
+          padding: spacing.lg,
+          marginBottom: spacing.sm,
+        }}
+      >
+        <View
+          style={{
+            width: 64,
+            height: 64,
+            borderRadius: radius.lg,
+            justifyContent: "center",
+            alignItems: "center",
+            marginRight: spacing.lg,
+            backgroundColor: category?.color || colors.primary,
+          }}
         >
-          <Ionicons 
-            name={(category?.iconName || 'construct-outline') as any} 
-            size={32} 
-            color="#fff" 
+          <Ionicons
+            name={(category?.iconName || "construct-outline") as any}
+            size={32}
+            color={colors.textInverse}
           />
         </View>
-        <View style={styles.categoryText}>
-          <Text style={styles.categoryName}>
-            {category?.name?.replace('\n', ' ') || 'Danh mục'}
+        <View style={{ flex: 1 }}>
+          <Text
+            style={[
+              textStyles.h2,
+              { color: colors.text, marginBottom: spacing.xs },
+            ]}
+          >
+            {category?.name?.replace("\n", " ") || "Danh mục"}
           </Text>
-          <Text style={styles.categoryDescription}>
-            {category?.description || ''}
+          <Text style={[textStyles.body, { color: colors.textSecondary }]}>
+            {category?.description || ""}
           </Text>
         </View>
       </View>
-      
+
       {/* Sort Options */}
-      <View style={styles.sortContainer}>
-        <Text style={styles.sortLabel}>Sắp xếp theo:</Text>
-        <View style={styles.sortButtons}>
-          {renderSortButton('rating', 'Đánh giá')}
-          {renderSortButton('reviews', 'Phổ biến')}
-          {renderSortButton('price', 'Giá')}
+      <View
+        style={{
+          backgroundColor: colors.card,
+          paddingHorizontal: spacing.lg,
+          paddingVertical: spacing.md,
+          marginBottom: spacing.sm,
+        }}
+      >
+        <Text
+          style={[
+            textStyles.badge,
+            { color: colors.textSecondary, marginBottom: spacing.sm },
+          ]}
+        >
+          Sắp xếp theo:
+        </Text>
+        <View style={{ flexDirection: "row", gap: spacing.sm }}>
+          {renderSortButton("rating", "Đánh giá")}
+          {renderSortButton("reviews", "Phổ biến")}
+          {renderSortButton("price", "Giá")}
         </View>
       </View>
-      
+
       {/* Results count */}
-      <Text style={styles.resultsCount}>
+      <Text
+        style={[
+          textStyles.badge,
+          {
+            color: colors.textSecondary,
+            paddingHorizontal: spacing.lg,
+            paddingVertical: spacing.sm,
+          },
+        ]}
+      >
         {workers.length} thợ có thể phục vụ
       </Text>
-    </View>
-  );
-  
-  return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      <StatusBar barStyle="dark-content" />
-      
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color="#1c1e21" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>
-          {category?.name?.replace('\n', ' ') || 'Dịch vụ'}
-        </Text>
-        <TouchableOpacity>
-          <Ionicons name="filter-outline" size={24} color="#1c1e21" />
-        </TouchableOpacity>
-      </View>
-      
+
       {/* Workers List */}
-      <FlatList
-        data={workers}
-        renderItem={renderWorker}
-        keyExtractor={(item) => item.id}
-        ListHeaderComponent={renderHeader}
-        contentContainerStyle={styles.listContent}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-        }
-      />
-    </View>
+      {workers.map((worker) => (
+        <ServiceWorkerItem
+          key={worker.id}
+          worker={worker}
+          variant="card"
+          onPress={handleWorkerPress}
+          onCall={handleWorkerCall}
+          onMessage={handleWorkerMessage}
+        />
+      ))}
+
+      <View style={{ height: 40 }} />
+    </DSModuleScreen>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f0f2f5',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e4e6eb',
-  },
-  headerTitle: {
-    fontSize: 17,
-    fontWeight: '600',
-    color: '#1c1e21',
-  },
-  listContent: {
-    paddingBottom: 20,
-  },
-  listHeader: {
-    paddingBottom: 8,
-  },
-  
-  // Category Info
-  categoryInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    padding: 16,
-    marginBottom: 8,
-  },
-  categoryIcon: {
-    width: 64,
-    height: 64,
-    borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 16,
-  },
-  categoryText: {
-    flex: 1,
-  },
-  categoryName: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#1c1e21',
-    marginBottom: 4,
-  },
-  categoryDescription: {
-    fontSize: 14,
-    color: '#65676b',
-  },
-  
-  // Sort
-  sortContainer: {
-    backgroundColor: '#fff',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    marginBottom: 8,
-  },
-  sortLabel: {
-    fontSize: 13,
-    color: '#65676b',
-    marginBottom: 8,
-  },
-  sortButtons: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  sortButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: '#f0f2f5',
-  },
-  sortButtonActive: {
-    backgroundColor: '#e7f3ff',
-  },
-  sortButtonText: {
-    fontSize: 13,
-    color: '#65676b',
-    fontWeight: '500',
-  },
-  sortButtonTextActive: {
-    color: '#1877F2',
-    fontWeight: '600',
-  },
-  
-  // Results
-  resultsCount: {
-    fontSize: 13,
-    color: '#65676b',
-    paddingHorizontal: 16,
-    paddingTop: 8,
-  },
-});

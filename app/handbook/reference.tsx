@@ -223,6 +223,22 @@ export default function HandbookReferenceScreen() {
     });
   }, []);
 
+  // Group checklist items by category
+  const groupedChecklist = useMemo(() => {
+    if (!item?.checklist) return null;
+    const groups: Record<string, ChecklistItem[]> = {};
+    item.checklist.forEach((ci) => {
+      const cat = ci.category || "Chung";
+      if (!groups[cat]) groups[cat] = [];
+      groups[cat].push(ci);
+    });
+    return groups;
+  }, [item?.checklist]);
+
+  const progress = item?.checklist
+    ? Math.round((checkedItems.size / item.checklist.length) * 100)
+    : 0;
+
   if (!item) {
     return (
       <View
@@ -260,22 +276,6 @@ export default function HandbookReferenceScreen() {
   };
 
   const info = typeInfo[item.type] || typeInfo.guide;
-
-  // Group checklist items by category
-  const groupedChecklist = useMemo(() => {
-    if (!item.checklist) return null;
-    const groups: Record<string, ChecklistItem[]> = {};
-    item.checklist.forEach((ci) => {
-      const cat = ci.category || "Chung";
-      if (!groups[cat]) groups[cat] = [];
-      groups[cat].push(ci);
-    });
-    return groups;
-  }, [item.checklist]);
-
-  const progress = item.checklist
-    ? Math.round((checkedItems.size / item.checklist.length) * 100)
-    : 0;
 
   return (
     <View style={[styles.container, { backgroundColor: C.bg }]}>

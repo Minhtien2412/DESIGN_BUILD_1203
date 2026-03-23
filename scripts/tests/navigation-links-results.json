@@ -1,544 +1,282 @@
 {
-  "totalFiles": 838,
-  "filesWithNavigation": 169,
-  "totalNavigationCalls": 360,
-  "validCalls": 265,
-  "invalidCalls": 95,
+  "totalFiles": 1383,
+  "filesWithNavigation": 219,
+  "totalNavigationCalls": 438,
+  "validCalls": 273,
+  "invalidCalls": 165,
   "warnings": 0,
-  "timestamp": "2025-12-22T07:39:32.616Z",
+  "timestamp": "2026-03-19T01:34:39.485Z",
   "calls": [
     {
-      "file": "app\\(auth)\\auth-3d-flip.tsx",
-      "line": 54,
-      "code": "router.replace('/(tabs)');",
+      "file": "app\\(auth)\\auth.tsx",
+      "line": 403,
+      "code": "router.replace(\"/(tabs)\");",
       "route": "/(tabs)",
       "isValid": false,
       "error": "Route not found in APP_ROUTES"
     },
     {
-      "file": "app\\(auth)\\forgot-password.tsx",
-      "line": 151,
-      "code": "<TouchableOpacity onPress={() => router.push('/(auth)/login')} style={styles.backButton} disabled={loading}>",
-      "route": "/(auth)/login",
-      "isValid": true
-    },
-    {
-      "file": "app\\(auth)\\login.tsx",
-      "line": 11,
-      "code": "router.replace('/(auth)/auth-3d-flip');",
-      "route": "/(auth)/auth-3d-flip",
+      "file": "app\\(auth)\\auth.tsx",
+      "line": 454,
+      "code": "router.replace(\"/(tabs)\");",
+      "route": "/(tabs)",
       "isValid": false,
       "error": "Route not found in APP_ROUTES"
     },
     {
-      "file": "app\\(auth)\\register.tsx",
-      "line": 9,
-      "code": "router.replace('/(auth)/auth-3d-flip');",
-      "route": "/(auth)/auth-3d-flip",
+      "file": "app\\(auth)\\auth.tsx",
+      "line": 510,
+      "code": "router.replace(\"/(tabs)\");",
+      "route": "/(tabs)",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\(auth)\\auth.tsx",
+      "line": 588,
+      "code": "router.replace(\"/(tabs)\");",
+      "route": "/(tabs)",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\(auth)\\auth.tsx",
+      "line": 637,
+      "code": "router.replace(\"/(tabs)\");",
+      "route": "/(tabs)",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\(auth)\\auth.tsx",
+      "line": 675,
+      "code": "router.replace(\"/(tabs)\");",
+      "route": "/(tabs)",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\(auth)\\auth.tsx",
+      "line": 880,
+      "code": "onPress={() => router.push(\"/(auth)/forgot-password\")}",
+      "route": "/(auth)/forgot-password",
+      "isValid": true
+    },
+    {
+      "file": "app\\(auth)\\forgot-password.tsx",
+      "line": 222,
+      "code": "onPress: () => router.replace(\"/(auth)/login\"),",
+      "route": "/(auth)/login",
+      "isValid": true
+    },
+    {
+      "file": "app\\(auth)\\forgot-password.tsx",
+      "line": 237,
+      "code": "onPress: () => router.replace(\"/(auth)/login\"),",
+      "route": "/(auth)/login",
+      "isValid": true
+    },
+    {
+      "file": "app\\(auth)\\login-2fa.tsx",
+      "line": 76,
+      "code": "{ text: \"OK\", onPress: () => router.replace(\"/(tabs)\") },",
+      "route": "/(tabs)",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\(auth)\\otp-verify.tsx",
+      "line": 190,
+      "code": "router.replace(\"/(tabs)\");",
+      "route": "/(tabs)",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\(auth)\\register-2fa.tsx",
+      "line": 110,
+      "code": "{ text: \"OK\", onPress: () => router.replace(\"/(tabs)\") },",
+      "route": "/(tabs)",
       "isValid": false,
       "error": "Route not found in APP_ROUTES"
     },
     {
       "file": "app\\(auth)\\reset-password.tsx",
-      "line": 59,
-      "code": "onPress: () => router.replace('/(auth)/login'),",
+      "line": 67,
+      "code": "{ text: \"Đăng nhập\", onPress: () => router.replace(\"/(auth)/login\") },",
       "route": "/(auth)/login",
+      "isValid": true
+    },
+    {
+      "file": "app\\(tabs)\\communication.tsx",
+      "line": 214,
+      "code": "onPress={() => router.push(`/messages/${item.id}`)}",
+      "route": "/messages/${item.id}",
+      "isValid": true
+    },
+    {
+      "file": "app\\(tabs)\\communication.tsx",
+      "line": 282,
+      "code": "router.push(`/call/${item.otherUser.id}?type=${item.type}`)",
+      "route": "/call/${item.otherUser.id}?type=${item.type}",
+      "isValid": true
+    },
+    {
+      "file": "app\\(tabs)\\communication.tsx",
+      "line": 323,
+      "code": "router.push(`/call/${item.otherUser.id}?type=audio`)",
+      "route": "/call/${item.otherUser.id}?type=audio",
+      "isValid": true
+    },
+    {
+      "file": "app\\(tabs)\\communication.tsx",
+      "line": 331,
+      "code": "router.push(`/call/${item.otherUser.id}?type=video`)",
+      "route": "/call/${item.otherUser.id}?type=video",
       "isValid": true
     },
     {
       "file": "app\\(tabs)\\contacts.tsx",
-      "line": 49,
-      "code": "// router.push(`/chat/${userId}`);",
-      "route": "/chat/${userId}",
+      "line": 142,
+      "code": "router.push(`/chat/${friend.id}`);",
+      "route": "/chat/${friend.id}",
       "isValid": true
     },
     {
-      "file": "app\\(tabs)\\index.tsx",
-      "line": 216,
-      "code": "<TouchableOpacity style={styles.iconButton} onPress={() => navigateTo(APP_ROUTES.CART)}>",
-      "route": "/cart",
-      "isValid": true
-    },
-    {
-      "file": "app\\(tabs)\\index.tsx",
-      "line": 219,
-      "code": "<TouchableOpacity style={styles.iconButton} onPress={() => navigateTo(APP_ROUTES.PROFILE_MENU)}>",
-      "route": "/profile/menu",
-      "isValid": true
-    },
-    {
-      "file": "app\\(tabs)\\index.tsx",
-      "line": 226,
-      "code": "<TouchableOpacity onPress={() => navigateTo(APP_ROUTES.PROFILE)}>",
-      "route": "/(tabs)/profile",
-      "isValid": true
-    },
-    {
-      "file": "app\\(tabs)\\index.tsx",
-      "line": 251,
-      "code": "<TouchableOpacity onPress={() => navigateTo('/utilities/sitemap')}>",
-      "route": "/utilities/sitemap",
-      "isValid": true
-    },
-    {
-      "file": "app\\(tabs)\\index.tsx",
-      "line": 288,
-      "code": "onPress={() => navigateTo(APP_ROUTES.AI_HUB)}",
-      "route": "/ai",
-      "isValid": true
-    },
-    {
-      "file": "app\\(tabs)\\index.tsx",
-      "line": 307,
-      "code": "<TouchableOpacity onPress={() => navigateTo(APP_ROUTES.CONSTRUCTION_PROGRESS)}>",
-      "route": "/construction/progress",
-      "isValid": true
-    },
-    {
-      "file": "app\\(tabs)\\index.tsx",
-      "line": 340,
-      "code": "<TouchableOpacity onPress={() => navigateTo(APP_ROUTES.ANALYTICS)}>",
-      "route": "/analytics",
-      "isValid": true
-    },
-    {
-      "file": "app\\(tabs)\\index.tsx",
-      "line": 367,
-      "code": "<TouchableOpacity onPress={() => navigateTo('/finishing/lat-gach')}>",
-      "route": "/finishing/lat-gach",
-      "isValid": true
-    },
-    {
-      "file": "app\\(tabs)\\index.tsx",
-      "line": 403,
-      "code": "<TouchableOpacity onPress={() => navigateTo(APP_ROUTES.INTERIOR_DESIGN)}>",
-      "route": "/services/interior-design",
-      "isValid": true
-    },
-    {
-      "file": "app\\(tabs)\\index.tsx",
-      "line": 465,
-      "code": "<TouchableOpacity onPress={() => navigateTo('/shopping/index')}>",
-      "route": "/shopping/index",
-      "isValid": true
-    },
-    {
-      "file": "app\\(tabs)\\index.tsx",
-      "line": 504,
-      "code": "<TouchableOpacity onPress={() => navigateTo('/utilities/sitemap')}>",
-      "route": "/utilities/sitemap",
-      "isValid": true
-    },
-    {
-      "file": "app\\(tabs)\\index.tsx",
-      "line": 566,
-      "code": "onPress={() => navigateTo(APP_ROUTES.PROJECTS_CREATE)}",
-      "route": "/projects/create",
-      "isValid": true
-    },
-    {
-      "file": "app\\(tabs)\\index.tsx",
-      "line": 574,
-      "code": "onPress={() => navigateTo(APP_ROUTES.LIVE_CREATE)}",
-      "route": "/live/create",
+      "file": "app\\(tabs)\\contacts.tsx",
+      "line": 149,
+      "code": "router.push(`/call/${userId}?type=${callType}`);",
+      "route": "/call/${userId}?type=${callType}",
       "isValid": true
     },
     {
       "file": "app\\(tabs)\\live.tsx",
-      "line": 408,
-      "code": "onPress={() => router.push('/live/create')}",
+      "line": 591,
+      "code": "onPress={() => router.push(\"/live/create\")}",
       "route": "/live/create",
       "isValid": true
     },
     {
-      "file": "app\\(tabs)\\live.tsx",
-      "line": 427,
-      "code": "onPress={() => router.push('/live/create')}",
-      "route": "/live/create",
-      "isValid": true
-    },
-    {
-      "file": "app\\(tabs)\\menu9.tsx",
-      "line": 68,
-      "code": "router.replace('/(auth)/login');",
-      "route": "/(auth)/login",
-      "isValid": true
-    },
-    {
-      "file": "app\\(tabs)\\modern-home.tsx",
-      "line": 71,
+      "file": "app\\(tabs)\\shop.tsx",
+      "line": 215,
       "code": "router.push(`/product/${product.id}`);",
       "route": "/product/${product.id}",
       "isValid": true
     },
     {
-      "file": "app\\(tabs)\\notifications-timeline.tsx",
-      "line": 249,
-      "code": "case 'message': router.push('/messages'); break;",
-      "route": "/messages",
+      "file": "app\\(tabs)\\shop.tsx",
+      "line": 267,
+      "code": "onCartPress={() => router.push(\"/cart\")}",
+      "route": "/cart",
+      "isValid": true
+    },
+    {
+      "file": "app\\(tabs)\\shop.tsx",
+      "line": 270,
+      "code": "onMessagePress={() => router.push(\"/chat\")}",
+      "route": "/chat",
       "isValid": false,
       "error": "Route not found in APP_ROUTES"
     },
     {
-      "file": "app\\(tabs)\\notifications-timeline.tsx",
-      "line": 250,
-      "code": "case 'live': router.push('/communications'); break;",
-      "route": "/communications",
-      "isValid": false,
-      "error": "Route not found in APP_ROUTES"
-    },
-    {
-      "file": "app\\(tabs)\\notifications-timeline.tsx",
-      "line": 251,
-      "code": "case 'event': router.push('/projects'); break;",
-      "route": "/projects",
+      "file": "app\\(tabs)\\shop.tsx",
+      "line": 295,
+      "code": "onItemPress={(id) => router.push(`/product/${id}`)}",
+      "route": "/product/${id}",
       "isValid": true
     },
     {
-      "file": "app\\(tabs)\\profile-luxury.tsx",
-      "line": 141,
-      "code": "onPress={() => router.push('/(auth)/login')}",
-      "route": "/(auth)/login",
-      "isValid": true
-    },
-    {
-      "file": "app\\(tabs)\\profile-luxury.tsx",
-      "line": 149,
-      "code": "onPress={() => router.push('/(auth)/register')}",
-      "route": "/(auth)/register",
-      "isValid": true
-    },
-    {
-      "file": "app\\(tabs)\\profile-luxury.tsx",
-      "line": 191,
-      "code": "<TouchableOpacity style={styles.settingsButton} onPress={() => router.push('/profile/settings')}>",
-      "route": "/profile/settings",
-      "isValid": true
-    },
-    {
-      "file": "app\\(tabs)\\profile-luxury.tsx",
-      "line": 233,
-      "code": "<TouchableOpacity style={styles.quickAction} onPress={() => router.push('/profile/edit')}>",
-      "route": "/profile/edit",
-      "isValid": true
-    },
-    {
-      "file": "app\\(tabs)\\profile-luxury.tsx",
-      "line": 239,
-      "code": "<TouchableOpacity style={styles.quickAction} onPress={() => router.push('/profile/portfolio')}>",
-      "route": "/profile/portfolio",
-      "isValid": true
-    },
-    {
-      "file": "app\\(tabs)\\profile-luxury.tsx",
-      "line": 245,
-      "code": "<TouchableOpacity style={styles.quickAction} onPress={() => router.push('/profile/rewards')}>",
-      "route": "/profile/rewards",
-      "isValid": true
-    },
-    {
-      "file": "app\\(tabs)\\profile-luxury.tsx",
-      "line": 251,
-      "code": "<TouchableOpacity style={styles.quickAction} onPress={() => router.push('/profile/cloud')}>",
-      "route": "/profile/cloud",
-      "isValid": true
-    },
-    {
-      "file": "app\\(tabs)\\profile-luxury.tsx",
-      "line": 271,
-      "code": "onPress={() => router.push('/profile/info')}",
-      "route": "/profile/info",
-      "isValid": true
-    },
-    {
-      "file": "app\\(tabs)\\profile-luxury.tsx",
-      "line": 278,
-      "code": "onPress={() => router.push('/profile/payment')}",
-      "route": "/profile/payment",
-      "isValid": true
-    },
-    {
-      "file": "app\\(tabs)\\profile-luxury.tsx",
-      "line": 285,
-      "code": "onPress={() => router.push('/profile/addresses')}",
-      "route": "/profile/addresses",
-      "isValid": true
-    },
-    {
-      "file": "app\\(tabs)\\profile-luxury.tsx",
-      "line": 301,
-      "code": "onPress={() => router.push('/profile/orders')}",
-      "route": "/profile/orders",
-      "isValid": true
-    },
-    {
-      "file": "app\\(tabs)\\profile-luxury.tsx",
-      "line": 309,
-      "code": "onPress={() => router.push('/profile/favorites')}",
+      "file": "app\\(tabs)\\shop.tsx",
+      "line": 296,
+      "code": "onSeeAll={() => router.push(\"/profile/favorites\")}",
       "route": "/profile/favorites",
       "isValid": true
     },
     {
-      "file": "app\\(tabs)\\profile-luxury.tsx",
-      "line": 316,
-      "code": "onPress={() => router.push('/profile/reviews')}",
-      "route": "/profile/reviews",
-      "isValid": true
-    },
-    {
-      "file": "app\\(tabs)\\profile-luxury.tsx",
-      "line": 332,
-      "code": "onPress={() => router.push('/profile/privacy')}",
-      "route": "/profile/privacy",
-      "isValid": true
-    },
-    {
-      "file": "app\\(tabs)\\profile-luxury.tsx",
-      "line": 339,
-      "code": "onPress={() => router.push('/profile/security')}",
-      "route": "/profile/security",
-      "isValid": true
-    },
-    {
-      "file": "app\\(tabs)\\profile-luxury.tsx",
-      "line": 346,
-      "code": "onPress={() => router.push('/profile/permissions')}",
-      "route": "/profile/permissions",
-      "isValid": false,
-      "error": "Route not found in APP_ROUTES"
-    },
-    {
-      "file": "app\\(tabs)\\profile-luxury.tsx",
-      "line": 362,
-      "code": "onPress={() => router.push('/profile/help')}",
-      "route": "/profile/help",
-      "isValid": true
-    },
-    {
-      "file": "app\\(tabs)\\profile-luxury.tsx",
-      "line": 369,
-      "code": "onPress={() => router.push('/legal/terms')}",
-      "route": "/legal/terms",
-      "isValid": true
-    },
-    {
-      "file": "app\\(tabs)\\profile-new.tsx",
-      "line": 37,
-      "code": "<TouchableOpacity style={styles.loginButton} onPress={() => router.push('/(auth)/login')}>",
-      "route": "/(auth)/login",
-      "isValid": true
-    },
-    {
-      "file": "app\\(tabs)\\profile-new.tsx",
-      "line": 40,
-      "code": "<TouchableOpacity style={styles.registerButton} onPress={() => router.push('/(auth)/register')}>",
-      "route": "/(auth)/register",
-      "isValid": true
-    },
-    {
-      "file": "app\\(tabs)\\profile-new.tsx",
-      "line": 94,
-      "code": "<TouchableOpacity style={styles.headerButton} onPress={() => router.push('/profile/settings')}>",
-      "route": "/profile/settings",
-      "isValid": true
-    },
-    {
-      "file": "app\\(tabs)\\profile-new.tsx",
-      "line": 106,
-      "code": "onPress={() => router.push('/profile/portfolio')}",
-      "route": "/profile/portfolio",
-      "isValid": true
-    },
-    {
-      "file": "app\\(tabs)\\profile-new.tsx",
-      "line": 111,
-      "code": "onPress={() => router.push('/profile/cloud')}",
-      "route": "/profile/cloud",
-      "isValid": true
-    },
-    {
-      "file": "app\\(tabs)\\profile-new.tsx",
-      "line": 116,
-      "code": "onPress={() => router.push('/profile/payment')}",
-      "route": "/profile/payment",
-      "isValid": true
-    },
-    {
-      "file": "app\\(tabs)\\profile-new.tsx",
-      "line": 127,
-      "code": "onPress={() => router.push('/profile/info')}",
-      "route": "/profile/info",
-      "isValid": true
-    },
-    {
-      "file": "app\\(tabs)\\profile-new.tsx",
-      "line": 133,
-      "code": "onPress={() => router.push('/profile/privacy')}",
-      "route": "/profile/privacy",
-      "isValid": true
-    },
-    {
-      "file": "app\\(tabs)\\profile-new.tsx",
-      "line": 139,
-      "code": "onPress={() => router.push('/profile/security')}",
-      "route": "/profile/security",
-      "isValid": true
-    },
-    {
-      "file": "app\\(tabs)\\profile-new.tsx",
-      "line": 145,
-      "code": "onPress={() => router.push('/profile/settings')}",
-      "route": "/profile/settings",
-      "isValid": true
-    },
-    {
-      "file": "app\\(tabs)\\profile-new.tsx",
-      "line": 156,
-      "code": "onPress={() => router.push('/communications')}",
-      "route": "/communications",
-      "isValid": false,
-      "error": "Route not found in APP_ROUTES"
-    },
-    {
-      "file": "app\\(tabs)\\profile-new.tsx",
-      "line": 162,
-      "code": "onPress={() => router.push('/legal/terms')}",
-      "route": "/legal/terms",
-      "isValid": true
-    },
-    {
       "file": "app\\admin\\dashboard-rbac.tsx",
-      "line": 253,
-      "code": "router.replace('/(tabs)');",
+      "line": 288,
+      "code": "router.replace(\"/(tabs)\");",
       "route": "/(tabs)",
       "isValid": false,
       "error": "Route not found in APP_ROUTES"
     },
     {
       "file": "app\\admin\\dashboard-rbac.tsx",
-      "line": 307,
-      "code": "onPress={() => router.push('/admin/permissions')}",
+      "line": 353,
+      "code": "onPress={() => router.push(\"/admin/permissions\")}",
       "route": "/admin/permissions",
       "isValid": false,
       "error": "Route not found in APP_ROUTES"
     },
     {
       "file": "app\\admin\\dashboard-rbac.tsx",
-      "line": 315,
-      "code": "onPress={() => router.push('/admin/settings')}",
+      "line": 361,
+      "code": "onPress={() => router.push(\"/admin/settings\")}",
       "route": "/admin/settings",
       "isValid": true
     },
     {
       "file": "app\\admin\\dashboard-rbac.tsx",
-      "line": 419,
-      "code": "<TouchableOpacity onPress={() => router.push('/projects')}>",
+      "line": 480,
+      "code": "<TouchableOpacity onPress={() => router.push(\"/projects\")}>",
       "route": "/projects",
       "isValid": true
     },
     {
       "file": "app\\admin\\dashboard-rbac.tsx",
-      "line": 434,
-      "code": "<TouchableOpacity onPress={() => router.push('/admin/activity-log')}>",
-      "route": "/admin/activity-log",
-      "isValid": false,
-      "error": "Route not found in APP_ROUTES"
-    },
-    {
-      "file": "app\\admin\\dashboard-rbac.tsx",
-      "line": 469,
+      "line": 549,
       "code": "onPress={() => router.push(`/projects/${project.id}`)}",
       "route": "/projects/${project.id}",
       "isValid": true
     },
     {
       "file": "app\\admin\\dashboard.tsx",
-      "line": 50,
+      "line": 57,
       "code": "onPress={() => router.push(`/projects/${project.id}`)}",
       "route": "/projects/${project.id}",
       "isValid": true
     },
     {
       "file": "app\\admin\\dashboard.tsx",
-      "line": 125,
-      "code": "router.replace('/(tabs)');",
+      "line": 162,
+      "code": "router.replace(\"/(tabs)\");",
       "route": "/(tabs)",
       "isValid": false,
       "error": "Route not found in APP_ROUTES"
     },
     {
       "file": "app\\admin\\dashboard.tsx",
-      "line": 176,
-      "code": "<TouchableOpacity onPress={() => router.push('/admin/settings')} style={styles.headerButton}>",
+      "line": 225,
+      "code": "onPress={() => router.push(\"/admin/settings\")}",
       "route": "/admin/settings",
       "isValid": true
     },
     {
       "file": "app\\admin\\dashboard.tsx",
-      "line": 204,
-      "code": "onPress={() => router.push('/admin/projects')}",
-      "route": "/admin/projects",
-      "isValid": false,
-      "error": "Route not found in APP_ROUTES"
-    },
-    {
-      "file": "app\\admin\\dashboard.tsx",
-      "line": 211,
-      "code": "onPress={() => router.push('/admin/projects?status=active')}",
-      "route": "/admin/projects?status=active",
-      "isValid": false,
-      "error": "Route not found in APP_ROUTES"
-    },
-    {
-      "file": "app\\admin\\dashboard.tsx",
-      "line": 218,
-      "code": "onPress={() => router.push('/admin/staff')}",
+      "line": 275,
+      "code": "onPress={() => router.push(\"/admin/staff\")}",
       "route": "/admin/staff",
       "isValid": true
     },
     {
       "file": "app\\admin\\dashboard.tsx",
-      "line": 225,
-      "code": "onPress={() => router.push('/admin/clients')}",
-      "route": "/admin/clients",
-      "isValid": false,
-      "error": "Route not found in APP_ROUTES"
-    },
-    {
-      "file": "app\\admin\\dashboard.tsx",
-      "line": 235,
-      "code": "<TouchableOpacity onPress={() => router.push('/projects')}>",
+      "line": 294,
+      "code": "<TouchableOpacity onPress={() => router.push(\"/projects\")}>",
       "route": "/projects",
       "isValid": true
     },
     {
       "file": "app\\admin\\dashboard.tsx",
-      "line": 250,
-      "code": "<TouchableOpacity onPress={() => router.push('/admin/activity-log')}>",
-      "route": "/admin/activity-log",
-      "isValid": false,
-      "error": "Route not found in APP_ROUTES"
-    },
-    {
-      "file": "app\\admin\\dashboard.tsx",
-      "line": 267,
-      "code": "onPress={() => router.push('/projects/create')}",
+      "line": 350,
+      "code": "onPress={() => router.push(\"/projects/create\")}",
       "route": "/projects/create",
       "isValid": true
     },
     {
       "file": "app\\admin\\dashboard.tsx",
-      "line": 276,
-      "code": "onPress={() => router.push('/admin/staff/create')}",
+      "line": 371,
+      "code": "onPress={() => router.push(\"/admin/staff/create\")}",
       "route": "/admin/staff/create",
-      "isValid": false,
-      "error": "Route not found in APP_ROUTES"
-    },
-    {
-      "file": "app\\admin\\dashboard.tsx",
-      "line": 284,
-      "code": "onPress={() => router.push('/admin/reports')}",
-      "route": "/admin/reports",
       "isValid": false,
       "error": "Route not found in APP_ROUTES"
     },
@@ -558,38 +296,15 @@
     },
     {
       "file": "app\\admin\\products\\index.tsx",
-      "line": 219,
-      "code": "<TouchableOpacity onPress={() => router.push('/admin/products/create')}>",
+      "line": 238,
+      "code": "<TouchableOpacity onPress={() => router.push(\"/admin/products/create\")}>",
       "route": "/admin/products/create",
       "isValid": false,
       "error": "Route not found in APP_ROUTES"
     },
     {
-      "file": "app\\admin\\products.tsx",
-      "line": 183,
-      "code": "router.push(`/product/${productId}`);",
-      "route": "/product/${productId}",
-      "isValid": true
-    },
-    {
-      "file": "app\\admin\\products.tsx",
-      "line": 235,
-      "code": "onViewAll={() => router.push('/shopping/products-catalog')}",
-      "route": "/shopping/products-catalog",
-      "isValid": false,
-      "error": "Route not found in APP_ROUTES"
-    },
-    {
       "file": "app\\admin\\roles\\index.tsx",
-      "line": 76,
-      "code": "onPress={() => router.push('/admin/roles/create')}",
-      "route": "/admin/roles/create",
-      "isValid": false,
-      "error": "Route not found in APP_ROUTES"
-    },
-    {
-      "file": "app\\admin\\roles\\index.tsx",
-      "line": 89,
+      "line": 99,
       "code": "onPress={() => router.push(`/admin/roles/${item.roleid}`)}",
       "route": "/admin/roles/${item.roleid}",
       "isValid": true
@@ -597,20 +312,13 @@
     {
       "file": "app\\admin\\roles\\[id].tsx",
       "line": 78,
-      "code": "{ text: 'OK', onPress: () => router.replace('/admin/roles') }",
+      "code": "{ text: \"OK\", onPress: () => router.replace(\"/admin/roles\") },",
       "route": "/admin/roles",
       "isValid": true
     },
     {
       "file": "app\\admin\\roles\\[id].tsx",
-      "line": 140,
-      "code": "onPress={() => router.push(`/admin/roles/edit/${id}`)}",
-      "route": "/admin/roles/edit/${id}",
-      "isValid": true
-    },
-    {
-      "file": "app\\admin\\roles\\[id].tsx",
-      "line": 221,
+      "line": 239,
       "code": "onPress={() => router.push(`/admin/staff?role=${id}`)}",
       "route": "/admin/staff?role=${id}",
       "isValid": true
@@ -647,16 +355,63 @@
     },
     {
       "file": "app\\admin\\staff\\[id].tsx",
-      "line": 85,
-      "code": "router.push(`/admin/staff/${id}/edit`);",
-      "route": "/admin/staff/${id}/edit",
+      "line": 101,
+      "code": "router.push(`/admin/staff/edit/${id}`);",
+      "route": "/admin/staff/edit/${id}",
       "isValid": true
     },
     {
-      "file": "app\\admin\\staff\\[id].tsx",
-      "line": 103,
-      "code": "router.push(`/admin/staff/${id}/delete`);",
-      "route": "/admin/staff/${id}/delete",
+      "file": "app\\ai-architect\\index.tsx",
+      "line": 178,
+      "code": "navigateTo(\"/ai-architect/architecture\");",
+      "route": "/ai-architect/architecture",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\ai-architect\\index.tsx",
+      "line": 180,
+      "code": "navigateTo(\"/ai-architect/implementation\");",
+      "route": "/ai-architect/implementation",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\ai-architect\\index.tsx",
+      "line": 182,
+      "code": "navigateTo(\"/ai-architect/consultant\");",
+      "route": "/ai-architect/consultant",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\ai-architect\\index.tsx",
+      "line": 225,
+      "code": "onPress={() => navigateTo(\"/ai-architect/visualizer\")}",
+      "route": "/ai-architect/visualizer",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\ai-architect\\index.tsx",
+      "line": 239,
+      "code": "onPress={() => navigateTo(\"/ai-architect/visualizer\")}",
+      "route": "/ai-architect/visualizer",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\ai-customer-support.tsx",
+      "line": 263,
+      "code": "{ text: \"Đăng nhập\", onPress: () => router.push(\"/(auth)/login\") },",
+      "route": "/(auth)/login",
+      "isValid": true
+    },
+    {
+      "file": "app\\analytics\\index.tsx",
+      "line": 270,
+      "code": "onPress={() => router.push(`/projects/${task.projectId}`)}",
+      "route": "/projects/${task.projectId}",
       "isValid": true
     },
     {
@@ -705,27 +460,6 @@
     },
     {
       "file": "app\\budget\\invoices.tsx",
-      "line": 266,
-      "code": "onPress={() => router.push(`/budget/invoice/${invoice.id}?projectId=${projectId}`)}",
-      "route": "/budget/invoice/${invoice.id}?projectId=${projectId}",
-      "isValid": true
-    },
-    {
-      "file": "app\\budget\\invoices.tsx",
-      "line": 374,
-      "code": "router.push(`/budget/invoice/${invoice.id}?projectId=${projectId}&action=payment`);",
-      "route": "/budget/invoice/${invoice.id}?projectId=${projectId}&action=payment",
-      "isValid": true
-    },
-    {
-      "file": "app\\budget\\invoices.tsx",
-      "line": 386,
-      "code": "router.push(`/budget/invoice/${invoice.id}?projectId=${projectId}`);",
-      "route": "/budget/invoice/${invoice.id}?projectId=${projectId}",
-      "isValid": true
-    },
-    {
-      "file": "app\\budget\\invoices.tsx",
       "line": 416,
       "code": "router.push(`/budget/create-invoice?projectId=${projectId}`)",
       "route": "/budget/create-invoice?projectId=${projectId}",
@@ -733,45 +467,131 @@
     },
     {
       "file": "app\\call\\history.tsx",
-      "line": 96,
-      "code": "router.push(`/call/video-call?userId=${call.otherUser.id}`);",
-      "route": "/call/video-call?userId=${call.otherUser.id}",
+      "line": 77,
+      "code": "router.push(`/call/${otherUserId}?type=${call.type}`);",
+      "route": "/call/${otherUserId}?type=${call.type}",
       "isValid": true
     },
     {
+      "file": "app\\call\\history.tsx",
+      "line": 179,
+      "code": "router.push(`/call/${item.otherUser.id}?type=${item.type}`)",
+      "route": "/call/${item.otherUser.id}?type=${item.type}",
+      "isValid": true
+    },
+    {
+      "file": "app\\call\\history.tsx",
+      "line": 239,
+      "code": "onSearchPress={() => router.push(\"/search-messages\")}",
+      "route": "/search-messages",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\call\\unified-history.tsx",
+      "line": 257,
+      "code": "router.push(`/messages/${call.otherUser.id}`);",
+      "route": "/messages/${call.otherUser.id}",
+      "isValid": true
+    },
+    {
+      "file": "app\\call\\unified-history.tsx",
+      "line": 407,
+      "code": "onPress={() => router.push(\"/call\")}",
+      "route": "/call",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
       "file": "app\\cart.tsx",
-      "line": 48,
-      "code": "router.push('/checkout');",
+      "line": 248,
+      "code": "router.push(\"/checkout\");",
       "route": "/checkout",
       "isValid": true
     },
     {
       "file": "app\\cart.tsx",
-      "line": 100,
-      "code": "onPress={() => router.push('/(tabs)')}",
+      "line": 320,
+      "code": "onPress={() => router.push(\"/(tabs)\")}",
       "route": "/(tabs)",
       "isValid": false,
       "error": "Route not found in APP_ROUTES"
     },
     {
-      "file": "app\\change-management\\index.tsx",
-      "line": 252,
-      "code": "onPress={() => router.push(`/change-management/${request.id}`)}",
-      "route": "/change-management/${request.id}",
-      "isValid": true
+      "file": "app\\cart.tsx",
+      "line": 466,
+      "code": "onPress={() => router.push(\"/profile/vouchers\")}",
+      "route": "/profile/vouchers",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
     },
     {
-      "file": "app\\change-management\\index.tsx",
-      "line": 325,
-      "code": "onPress={() => router.push('/change-management/create')}",
-      "route": "/change-management/create",
+      "file": "app\\checkout\\payment.tsx",
+      "line": 368,
+      "code": "[{ text: \"Về trang chủ\", onPress: () => router.push(\"/(tabs)\") }],",
+      "route": "/(tabs)",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\checkout\\payment.tsx",
+      "line": 380,
+      "code": "router.push(\"/profile/payment/add-card\");",
+      "route": "/profile/payment/add-card",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\checkout\\payment.tsx",
+      "line": 382,
+      "code": "router.push(\"/profile/payment/add-bank\");",
+      "route": "/profile/payment/add-bank",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\checkout\\payment.tsx",
+      "line": 384,
+      "code": "router.push(\"/profile/payment/add-wallet\");",
+      "route": "/profile/payment/add-wallet",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\checkout\\payment.tsx",
+      "line": 680,
+      "code": "router.push(\"/profile/vouchers\");",
+      "route": "/profile/vouchers",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\checkout\\payment.tsx",
+      "line": 1273,
+      "code": "router.push(\"/profile/addresses/new\");",
+      "route": "/profile/addresses/new",
       "isValid": false,
       "error": "Route not found in APP_ROUTES"
     },
     {
       "file": "app\\checkout.tsx",
-      "line": 118,
-      "code": "router.replace('/(tabs)');",
+      "line": 413,
+      "code": "{ text: \"Đăng nhập\", onPress: () => router.push(\"/(auth)/login\") },",
+      "route": "/(auth)/login",
+      "isValid": true
+    },
+    {
+      "file": "app\\checkout.tsx",
+      "line": 1084,
+      "code": "onPress={() => router.replace(\"/(tabs)\")}",
+      "route": "/(tabs)",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\coming-soon\\[feature].tsx",
+      "line": 135,
+      "code": "onPress={() => router.push(\"/(tabs)\")}",
       "route": "/(tabs)",
       "isValid": false,
       "error": "Route not found in APP_ROUTES"
@@ -785,59 +605,168 @@
     },
     {
       "file": "app\\communications\\index.tsx",
-      "line": 243,
+      "line": 266,
       "code": "onPress={() => router.push(`/messages/${item.otherUser.id}`)}",
       "route": "/messages/${item.otherUser.id}",
       "isValid": true
     },
     {
       "file": "app\\communications\\index.tsx",
-      "line": 289,
+      "line": 321,
       "code": "onPress={() => router.push(`/messages/${item.otherUser.id}`)}",
       "route": "/messages/${item.otherUser.id}",
       "isValid": true
     },
     {
       "file": "app\\communications\\index.tsx",
-      "line": 328,
-      "code": "router.push(`/call/video-call?userId=${item.otherUser.id}&type=${item.type}`);",
-      "route": "/call/video-call?userId=${item.otherUser.id}&type=${item.type}",
+      "line": 371,
+      "code": "router.push(`/call/${item.otherUser.id}?type=${item.type}`);",
+      "route": "/call/${item.otherUser.id}?type=${item.type}",
+      "isValid": true
+    },
+    {
+      "file": "app\\community-health-check.tsx",
+      "line": 576,
+      "code": "onPress={() => navigateTo(\"/(tabs)/social\")}",
+      "route": "/(tabs)/social",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\community-health-check.tsx",
+      "line": 588,
+      "code": "onPress={() => navigateTo(\"/social/explore\")}",
+      "route": "/social/explore",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\community-health-check.tsx",
+      "line": 600,
+      "code": "onPress={() => navigateTo(\"/social/shorts\")}",
+      "route": "/social/shorts",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\community-health-check.tsx",
+      "line": 612,
+      "code": "onPress={() => navigateTo(\"/social/create-post\")}",
+      "route": "/social/create-post",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\community-health-check.tsx",
+      "line": 624,
+      "code": "onPress={() => navigateTo(\"/search\")}",
+      "route": "/search",
       "isValid": true
     },
     {
       "file": "app\\construction\\map\\index.tsx",
-      "line": 193,
+      "line": 226,
       "code": "router.push(`/construction/map/${projectId}`);",
       "route": "/construction/map/${projectId}",
       "isValid": true
     },
     {
       "file": "app\\construction\\map-view.tsx",
-      "line": 136,
+      "line": 255,
       "code": "router.push(`/construction/progress?id=${siteId}`);",
       "route": "/construction/progress?id=${siteId}",
       "isValid": true
     },
     {
       "file": "app\\construction\\progress.tsx",
-      "line": 137,
-      "code": "router.push('/checkout/payment');",
-      "route": "/checkout/payment",
+      "line": 320,
+      "code": "router.push(\"/chat\");",
+      "route": "/chat",
       "isValid": false,
       "error": "Route not found in APP_ROUTES"
     },
     {
-      "file": "app\\construction\\progress.tsx",
-      "line": 162,
-      "code": "router.push('/messages');",
-      "route": "/messages",
+      "file": "app\\construction\\project-info.tsx",
+      "line": 328,
+      "code": "onPress={() => router.push(\"/crm/tasks\")}",
+      "route": "/crm/tasks",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\construction\\project-info.tsx",
+      "line": 341,
+      "code": "onPress={() => router.push(\"/crm/invoices\")}",
+      "route": "/crm/invoices",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\construction\\project-info.tsx",
+      "line": 354,
+      "code": "onPress={() => router.push(\"/documents\")}",
+      "route": "/documents",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\construction\\project-info.tsx",
+      "line": 386,
+      "code": "onPress={() => router.push(\"/construction/map-view\")}",
+      "route": "/construction/map-view",
+      "isValid": true
+    },
+    {
+      "file": "app\\construction\\project-info.tsx",
+      "line": 606,
+      "code": "onPress={() => router.push(\"/documents\")}",
+      "route": "/documents",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\construction\\project-info.tsx",
+      "line": 621,
+      "code": "onPress={() => router.push(\"/crm/invoices\")}",
+      "route": "/crm/invoices",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\construction\\project-info.tsx",
+      "line": 632,
+      "code": "onPress={() => router.push(\"/contracts\")}",
+      "route": "/contracts",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\construction\\project-info.tsx",
+      "line": 647,
+      "code": "onPress={() => router.push(\"/file-upload\")}",
+      "route": "/file-upload",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\construction\\project-info.tsx",
+      "line": 681,
+      "code": "onPress={() => router.push(\"/construction/progress\")}",
+      "route": "/construction/progress",
+      "isValid": true
+    },
+    {
+      "file": "app\\construction\\project-info.tsx",
+      "line": 687,
+      "code": "onPress={() => router.push(\"/crm/tasks\")}",
+      "route": "/crm/tasks",
       "isValid": false,
       "error": "Route not found in APP_ROUTES"
     },
     {
       "file": "app\\construction\\tracking.tsx",
-      "line": 288,
-      "code": "onPress={() => router.push('/construction/progress')}",
+      "line": 346,
+      "code": "onPress={() => router.push(\"/construction/progress\")}",
       "route": "/construction/progress",
       "isValid": true
     },
@@ -849,10 +778,18 @@
       "isValid": true
     },
     {
-      "file": "app\\construction-old-backup\\index.tsx",
-      "line": 123,
-      "code": "router.push('/ride/tracking');",
-      "route": "/ride/tracking",
+      "file": "app\\construction-progress\\edit\\[id].tsx",
+      "line": 168,
+      "code": "onPress: () => router.replace(\"/construction-progress\"),",
+      "route": "/construction-progress",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\consultation\\design-process.tsx",
+      "line": 98,
+      "code": "router.push(\"/consultation/kts-form\");",
+      "route": "/consultation/kts-form",
       "isValid": false,
       "error": "Route not found in APP_ROUTES"
     },
@@ -907,6 +844,89 @@
       "isValid": true
     },
     {
+      "file": "app\\crm\\invoices.tsx",
+      "line": 271,
+      "code": "router.push(`/crm/invoice-detail?id=${invoice.id}`);",
+      "route": "/crm/invoice-detail?id=${invoice.id}",
+      "isValid": true
+    },
+    {
+      "file": "app\\customer-support.tsx",
+      "line": 138,
+      "code": "{ text: \"Đăng nhập\", onPress: () => router.push(\"/(auth)/login\") },",
+      "route": "/(auth)/login",
+      "isValid": true
+    },
+    {
+      "file": "app\\dashboard\\engineer-dashboard\\index.tsx",
+      "line": 140,
+      "code": "router.push(\"/quality-assurance/inspections/create\")",
+      "route": "/quality-assurance/inspections/create",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\dashboard\\engineer-dashboard\\index.tsx",
+      "line": 151,
+      "code": "onPress={() => router.push(\"/daily-report\")}",
+      "route": "/daily-report",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\dashboard\\engineer-dashboard\\index.tsx",
+      "line": 165,
+      "code": "onPress={() => router.push(\"/materials\")}",
+      "route": "/materials",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\dashboard\\engineer-dashboard\\index.tsx",
+      "line": 175,
+      "code": "onPress={() => router.push(\"/safety\")}",
+      "route": "/safety",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\dashboard\\index.tsx",
+      "line": 280,
+      "code": "onPress={() => router.push(\"/(tabs)/notifications\")}",
+      "route": "/(tabs)/notifications",
+      "isValid": true
+    },
+    {
+      "file": "app\\delivery-tracking.tsx",
+      "line": 615,
+      "code": "router.push(\"/chat\");",
+      "route": "/chat",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\delivery-tracking.tsx",
+      "line": 727,
+      "code": "onPress={() => router.push(\"/customer-support\")}",
+      "route": "/customer-support",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\demo\\contractor-info.tsx",
+      "line": 164,
+      "code": "onPress={() => router.push(`/profile/${contractor.id}`)}",
+      "route": "/profile/${contractor.id}",
+      "isValid": true
+    },
+    {
+      "file": "app\\design-library\\gallery.tsx",
+      "line": 273,
+      "code": "router.push(`/design-library/${design.id}`);",
+      "route": "/design-library/${design.id}",
+      "isValid": true
+    },
+    {
       "file": "app\\document-control\\index.tsx",
       "line": 89,
       "code": "router.push(`/document-control/${documentId}`);",
@@ -915,23 +935,9 @@
     },
     {
       "file": "app\\documents\\documents.tsx",
-      "line": 273,
-      "code": "onPress={() => router.push(`/documents/upload?projectId=${projectId}`)}",
-      "route": "/documents/upload?projectId=${projectId}",
-      "isValid": true
-    },
-    {
-      "file": "app\\documents\\documents.tsx",
       "line": 401,
       "code": "router.push(`/documents/share?documentId=${doc.id}&projectId=${projectId}`)",
       "route": "/documents/share?documentId=${doc.id}&projectId=${projectId}",
-      "isValid": true
-    },
-    {
-      "file": "app\\documents\\documents.tsx",
-      "line": 427,
-      "code": "onPress={() => router.push(`/documents/upload?projectId=${projectId}`)}",
-      "route": "/documents/upload?projectId=${projectId}",
       "isValid": true
     },
     {
@@ -950,93 +956,115 @@
     },
     {
       "file": "app\\documents\\index.tsx",
-      "line": 175,
-      "code": "onPress={() => router.push(`/documents/documents?projectId=${projectId}`)}",
+      "line": 401,
+      "code": "router.push(`/documents/documents?projectId=${projectId}`)",
       "route": "/documents/documents?projectId=${projectId}",
       "isValid": true
     },
     {
       "file": "app\\documents\\index.tsx",
-      "line": 195,
-      "code": "router.push(`/documents/document-detail?id=${doc.id}&projectId=${projectId}`)",
-      "route": "/documents/document-detail?id=${doc.id}&projectId=${projectId}",
-      "isValid": true
-    },
-    {
-      "file": "app\\documents\\index.tsx",
-      "line": 243,
-      "code": "router.push(`/documents/document-detail?id=${doc.id}&projectId=${projectId}`)",
-      "route": "/documents/document-detail?id=${doc.id}&projectId=${projectId}",
-      "isValid": true
-    },
-    {
-      "file": "app\\documents\\index.tsx",
-      "line": 318,
-      "code": "onPress={() => router.push(`/documents/upload?projectId=${projectId}`)}",
-      "route": "/documents/upload?projectId=${projectId}",
-      "isValid": true
-    },
-    {
-      "file": "app\\documents\\index.tsx",
-      "line": 329,
-      "code": "onPress={() => router.push(`/documents/create-folder?projectId=${projectId}`)}",
+      "line": 574,
+      "code": "router.push(`/documents/create-folder?projectId=${projectId}`)",
       "route": "/documents/create-folder?projectId=${projectId}",
       "isValid": true
     },
     {
       "file": "app\\documents\\index.tsx",
-      "line": 340,
-      "code": "onPress={() => router.push(`/documents/folders?projectId=${projectId}`)}",
+      "line": 587,
+      "code": "router.push(`/documents/folders?projectId=${projectId}`)",
       "route": "/documents/folders?projectId=${projectId}",
       "isValid": true
     },
     {
       "file": "app\\environmental\\index.tsx",
-      "line": 239,
+      "line": 516,
       "code": "onPress={() => router.push(`/environmental/${item.id}`)}",
       "route": "/environmental/${item.id}",
       "isValid": true
     },
     {
       "file": "app\\environmental\\index.tsx",
-      "line": 327,
+      "line": 685,
       "code": "onPress={() => router.push(`/environmental/${waste.id}`)}",
       "route": "/environmental/${waste.id}",
       "isValid": true
     },
     {
-      "file": "app\\equipment\\index.tsx",
-      "line": 237,
-      "code": "onPress={() => router.push(`/equipment/${equipment.id}`)}",
-      "route": "/equipment/${equipment.id}",
-      "isValid": true
-    },
-    {
-      "file": "app\\equipment\\maintenance.tsx",
-      "line": 177,
-      "code": "onPress={() => router.push(`/equipment/maintenance/${record.id}`)}",
-      "route": "/equipment/maintenance/${record.id}",
-      "isValid": true
-    },
-    {
-      "file": "app\\finishing\\lat-gach.tsx",
-      "line": 103,
-      "code": "router.push(`/finishing/worker-profile/${worker.id}`);",
-      "route": "/finishing/worker-profile/${worker.id}",
-      "isValid": true
-    },
-    {
-      "file": "app\\finishing\\worker-profile\\[id].tsx",
+      "file": "app\\finishing\\index.tsx",
       "line": 276,
+      "code": "router.push(`/finishing/product/${productId}?category=finishing`);",
+      "route": "/finishing/product/${productId}?category=finishing",
+      "isValid": true
+    },
+    {
+      "file": "app\\finishing\\index.tsx",
+      "line": 280,
+      "code": "router.push(\"/finishing/products/noi-that\");",
+      "route": "/finishing/products/noi-that",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\finishing\\product\\[id].tsx",
+      "line": 203,
+      "code": "router.push(\"/cart\");",
+      "route": "/cart",
+      "isValid": true
+    },
+    {
+      "file": "app\\finishing\\product\\[id].tsx",
+      "line": 208,
+      "code": "router.push(`/messages/${seller.id}`);",
+      "route": "/messages/${seller.id}",
+      "isValid": true
+    },
+    {
+      "file": "app\\finishing\\product\\[id].tsx",
+      "line": 213,
+      "code": "router.push(`/profile/${seller.id}/shop`);",
+      "route": "/profile/${seller.id}/shop",
+      "isValid": true
+    },
+    {
+      "file": "app\\finishing\\product\\[id].tsx",
+      "line": 288,
+      "code": "onPress={() => router.push(\"/cart\")}",
+      "route": "/cart",
+      "isValid": true
+    },
+    {
+      "file": "app\\finishing\\product\\[id].tsx",
+      "line": 540,
+      "code": "onPress={() => router.push(\"/cart\")}",
+      "route": "/cart",
+      "isValid": true
+    },
+    {
+      "file": "app\\finishing\\product\\[id].tsx",
+      "line": 560,
+      "code": "router.push(\"/checkout\");",
+      "route": "/checkout",
+      "isValid": true
+    },
+    {
+      "file": "app\\finishing\\worker-profile-new\\[id].tsx",
+      "line": 145,
+      "code": "router.push(`/messages/${workerId}`);",
+      "route": "/messages/${workerId}",
+      "isValid": true
+    },
+    {
+      "file": "app\\finishing\\worker-profile-new\\[id].tsx",
+      "line": 323,
       "code": "onPress={() => router.push(`/finishing/project-detail/${project.id}`)}",
       "route": "/finishing/project-detail/${project.id}",
       "isValid": true
     },
     {
       "file": "app\\fleet\\index.tsx",
-      "line": 211,
-      "code": "onPress={() => router.push(`/fleet/${vehicle.id}`)}",
-      "route": "/fleet/${vehicle.id}",
+      "line": 346,
+      "code": "router.push(`/fleet/${vehicleId}`);",
+      "route": "/fleet/${vehicleId}",
       "isValid": true
     },
     {
@@ -1049,8 +1077,8 @@
     {
       "file": "app\\food\\order-tracking.tsx",
       "line": 138,
-      "code": "router.push('/messages');",
-      "route": "/messages",
+      "code": "router.push(\"/chat\");",
+      "route": "/chat",
       "isValid": false,
       "error": "Route not found in APP_ROUTES"
     },
@@ -1063,74 +1091,33 @@
       "error": "Route not found in APP_ROUTES"
     },
     {
-      "file": "app\\intro\\index.tsx",
-      "line": 87,
-      "code": "<Text onPress={() => router.push('/(auth)/login')} style={[styles.ctaGhost, { color: textMuted }]}>Đăng nhập</Text>",
-      "route": "/(auth)/login",
-      "isValid": true
+      "file": "app\\help\\index.tsx",
+      "line": 105,
+      "code": "onPress={() => router.push(\"/chat\")}",
+      "route": "/chat",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
     },
     {
       "file": "app\\intro\\index.tsx",
-      "line": 88,
-      "code": "<Text onPress={() => router.push('/(tabs)')} style={[styles.cta, { backgroundColor: primary }]}>Bắt đầu</Text>",
+      "line": 168,
+      "code": "router.push(\"/(tabs)\");",
       "route": "/(tabs)",
       "isValid": false,
       "error": "Route not found in APP_ROUTES"
     },
     {
-      "file": "app\\inventory\\index.tsx",
-      "line": 120,
-      "code": "onPress={() => router.push(`/inventory/alerts?projectId=${projectId}`)}",
-      "route": "/inventory/alerts?projectId=${projectId}",
+      "file": "app\\intro\\index.tsx",
+      "line": 173,
+      "code": "router.push(\"/(auth)/login\");",
+      "route": "/(auth)/login",
       "isValid": true
     },
     {
-      "file": "app\\inventory\\index.tsx",
-      "line": 148,
-      "code": "onPress={() => router.push(`/inventory/materials?projectId=${projectId}`)}",
-      "route": "/inventory/materials?projectId=${projectId}",
-      "isValid": true
-    },
-    {
-      "file": "app\\inventory\\index.tsx",
-      "line": 217,
-      "code": "onPress={() => router.push(`/inventory/materials?projectId=${projectId}&filter=low`)}",
-      "route": "/inventory/materials?projectId=${projectId}&filter=low",
-      "isValid": true
-    },
-    {
-      "file": "app\\inventory\\index.tsx",
-      "line": 232,
-      "code": "router.push(`/inventory/material/${material.id}?projectId=${projectId}`)",
-      "route": "/inventory/material/${material.id}?projectId=${projectId}",
-      "isValid": true
-    },
-    {
-      "file": "app\\inventory\\index.tsx",
-      "line": 314,
-      "code": "onPress={() => router.push(`/inventory/materials?projectId=${projectId}`)}",
-      "route": "/inventory/materials?projectId=${projectId}",
-      "isValid": true
-    },
-    {
-      "file": "app\\inventory\\index.tsx",
-      "line": 322,
-      "code": "onPress={() => router.push(`/inventory/orders?projectId=${projectId}`)}",
-      "route": "/inventory/orders?projectId=${projectId}",
-      "isValid": true
-    },
-    {
-      "file": "app\\inventory\\index.tsx",
-      "line": 330,
-      "code": "onPress={() => router.push(`/inventory/suppliers?projectId=${projectId}`)}",
-      "route": "/inventory/suppliers?projectId=${projectId}",
-      "isValid": true
-    },
-    {
-      "file": "app\\inventory\\index.tsx",
-      "line": 338,
-      "code": "onPress={() => router.push(`/inventory/transactions?projectId=${projectId}`)}",
-      "route": "/inventory/transactions?projectId=${projectId}",
+      "file": "app\\intro\\index.tsx",
+      "line": 178,
+      "code": "router.push(\"/(auth)/login\");",
+      "route": "/(auth)/login",
       "isValid": true
     },
     {
@@ -1138,20 +1125,6 @@
       "line": 206,
       "code": "router.push(`/inventory/create-material?projectId=${projectId}`)",
       "route": "/inventory/create-material?projectId=${projectId}",
-      "isValid": true
-    },
-    {
-      "file": "app\\inventory\\materials.tsx",
-      "line": 226,
-      "code": "router.push(`/inventory/material/${material.id}?projectId=${projectId}`)",
-      "route": "/inventory/material/${material.id}?projectId=${projectId}",
-      "isValid": true
-    },
-    {
-      "file": "app\\inventory\\materials.tsx",
-      "line": 355,
-      "code": "router.push(`/inventory/material/${material.id}?projectId=${projectId}`)",
-      "route": "/inventory/material/${material.id}?projectId=${projectId}",
       "isValid": true
     },
     {
@@ -1164,34 +1137,6 @@
     {
       "file": "app\\inventory\\orders.tsx",
       "line": 155,
-      "code": "router.push(`/inventory/create-order?projectId=${projectId}`)",
-      "route": "/inventory/create-order?projectId=${projectId}",
-      "isValid": true
-    },
-    {
-      "file": "app\\inventory\\orders.tsx",
-      "line": 240,
-      "code": "router.push(`/inventory/order-detail?orderId=${order.id}&projectId=${projectId}`)",
-      "route": "/inventory/order-detail?orderId=${order.id}&projectId=${projectId}",
-      "isValid": true
-    },
-    {
-      "file": "app\\inventory\\orders.tsx",
-      "line": 253,
-      "code": "router.push(`/inventory/order-detail?orderId=${order.id}&projectId=${projectId}`)",
-      "route": "/inventory/order-detail?orderId=${order.id}&projectId=${projectId}",
-      "isValid": true
-    },
-    {
-      "file": "app\\inventory\\orders.tsx",
-      "line": 264,
-      "code": "router.push(`/inventory/order-detail?orderId=${order.id}&projectId=${projectId}`)",
-      "route": "/inventory/order-detail?orderId=${order.id}&projectId=${projectId}",
-      "isValid": true
-    },
-    {
-      "file": "app\\inventory\\orders.tsx",
-      "line": 280,
       "code": "router.push(`/inventory/create-order?projectId=${projectId}`)",
       "route": "/inventory/create-order?projectId=${projectId}",
       "isValid": true
@@ -1215,55 +1160,6 @@
       "line": 287,
       "code": "router.push(`/labor/create-attendance?projectId=${projectId}&date=${dateString}`)",
       "route": "/labor/create-attendance?projectId=${projectId}&date=${dateString}",
-      "isValid": true
-    },
-    {
-      "file": "app\\labor\\index.tsx",
-      "line": 117,
-      "code": "router.push(`/labor/attendance?projectId=${projectId}&date=${today}`)",
-      "route": "/labor/attendance?projectId=${projectId}&date=${today}",
-      "isValid": true
-    },
-    {
-      "file": "app\\labor\\index.tsx",
-      "line": 183,
-      "code": "onPress={() => router.push(`/labor/workers?projectId=${projectId}`)}",
-      "route": "/labor/workers?projectId=${projectId}",
-      "isValid": true
-    },
-    {
-      "file": "app\\labor\\index.tsx",
-      "line": 220,
-      "code": "onPress={() => router.push(`/labor/workers?projectId=${projectId}`)}",
-      "route": "/labor/workers?projectId=${projectId}",
-      "isValid": true
-    },
-    {
-      "file": "app\\labor\\index.tsx",
-      "line": 229,
-      "code": "router.push(`/labor/attendance?projectId=${projectId}&date=${today}`)",
-      "route": "/labor/attendance?projectId=${projectId}&date=${today}",
-      "isValid": true
-    },
-    {
-      "file": "app\\labor\\index.tsx",
-      "line": 238,
-      "code": "onPress={() => router.push(`/labor/shifts?projectId=${projectId}`)}",
-      "route": "/labor/shifts?projectId=${projectId}",
-      "isValid": true
-    },
-    {
-      "file": "app\\labor\\index.tsx",
-      "line": 246,
-      "code": "onPress={() => router.push(`/labor/leave-requests?projectId=${projectId}`)}",
-      "route": "/labor/leave-requests?projectId=${projectId}",
-      "isValid": true
-    },
-    {
-      "file": "app\\labor\\index.tsx",
-      "line": 254,
-      "code": "onPress={() => router.push(`/labor/payroll?projectId=${projectId}`)}",
-      "route": "/labor/payroll?projectId=${projectId}",
       "isValid": true
     },
     {
@@ -1309,16 +1205,9 @@
       "isValid": true
     },
     {
-      "file": "app\\live\\index.tsx",
-      "line": 48,
-      "code": "<Pressable style={[styles.card, { borderColor }]} onPress={() => router.push(`/live/${item.id}`)}>",
-      "route": "/live/${item.id}",
-      "isValid": true
-    },
-    {
       "file": "app\\materials\\index.tsx",
-      "line": 139,
-      "code": "router.push('/shopping/cart');",
+      "line": 165,
+      "code": "router.push(\"/shopping/cart\");",
       "route": "/shopping/cart",
       "isValid": false,
       "error": "Route not found in APP_ROUTES"
@@ -1339,17 +1228,199 @@
       "isValid": true
     },
     {
+      "file": "app\\meetings\\index.tsx",
+      "line": 92,
+      "code": "router.push(`/meetings/join/${response.meeting.meetingCode}`);",
+      "route": "/meetings/join/${response.meeting.meetingCode}",
+      "isValid": true
+    },
+    {
+      "file": "app\\meetings\\index.tsx",
+      "line": 100,
+      "code": "const handleJoinMeeting = () => router.push(\"/meetings/join\");",
+      "route": "/meetings/join",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\meetings\\index.tsx",
+      "line": 101,
+      "code": "const handleScheduleMeeting = () => router.push(\"/meetings/create\");",
+      "route": "/meetings/create",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\meetings\\index.tsx",
+      "line": 103,
+      "code": "router.push(`/meetings/join/${m.meetingCode}`);",
+      "route": "/meetings/join/${m.meetingCode}",
+      "isValid": true
+    },
+    {
+      "file": "app\\meetings\\index.tsx",
+      "line": 104,
+      "code": "const handleVideoRoom = () => router.push(\"/meetings/room\");",
+      "route": "/meetings/room",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\meetings\\join\\[code].tsx",
+      "line": 96,
+      "code": "router.replace(`/meetings/room?meetingId=${meeting.id}`);",
+      "route": "/meetings/room?meetingId=${meeting.id}",
+      "isValid": true
+    },
+    {
+      "file": "app\\meetings\\[id].tsx",
+      "line": 79,
+      "code": "router.push(`/meetings/room?meetingId=${meeting.id}`);",
+      "route": "/meetings/room?meetingId=${meeting.id}",
+      "isValid": true
+    },
+    {
+      "file": "app\\meetings\\[id].tsx",
+      "line": 303,
+      "code": "onPress={() => router.push(`/meetings/create?edit=${id}`)}",
+      "route": "/meetings/create?edit=${id}",
+      "isValid": true
+    },
+    {
+      "file": "app\\messages\\add-contact.tsx",
+      "line": 73,
+      "code": "router.push(`/messages/${user.id}`);",
+      "route": "/messages/${user.id}",
+      "isValid": true
+    },
+    {
+      "file": "app\\messages\\contacts.tsx",
+      "line": 223,
+      "code": "router.push(`/messages/${contact.id}`);",
+      "route": "/messages/${contact.id}",
+      "isValid": true
+    },
+    {
+      "file": "app\\messages\\contacts.tsx",
+      "line": 360,
+      "code": "onNewConversation={() => router.push(\"/messages/new-conversation\")}",
+      "route": "/messages/new-conversation",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\messages\\contacts.tsx",
+      "line": 390,
+      "code": "onPress={() => router.push(\"/messages/new-conversation\")}",
+      "route": "/messages/new-conversation",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\messages\\groups.tsx",
+      "line": 119,
+      "code": "router.push(\"/messages/create-group\");",
+      "route": "/messages/create-group",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
       "file": "app\\messages\\index.tsx",
-      "line": 45,
+      "line": 65,
       "code": "router.push(`/messages/${otherParticipant.id}`);",
       "route": "/messages/${otherParticipant.id}",
       "isValid": true
     },
     {
-      "file": "app\\messages\\[userId].tsx",
-      "line": 275,
-      "code": "onPress={() => router.push(`/call/video-call?userId=${recipientId}`)}",
-      "route": "/call/video-call?userId=${recipientId}",
+      "file": "app\\messages\\index.tsx",
+      "line": 195,
+      "code": "onPress={() => router.push(\"/messages/ai-assistant\")}",
+      "route": "/messages/ai-assistant",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\messages\\index.tsx",
+      "line": 220,
+      "code": "onPress={() => router.push(\"/messages/customer-service\")}",
+      "route": "/messages/customer-service",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\messages\\index.tsx",
+      "line": 298,
+      "code": "onNewConversation={() => router.push(\"/messages/new-conversation\")}",
+      "route": "/messages/new-conversation",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\messages\\index.tsx",
+      "line": 299,
+      "code": "onSearchPress={() => router.push(\"/messages/new-conversation\")}",
+      "route": "/messages/new-conversation",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\messages\\index.tsx",
+      "line": 305,
+      "code": "onPress={() => router.push(\"/messages/new-conversation\")}",
+      "route": "/messages/new-conversation",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\messages\\new-conversation.tsx",
+      "line": 371,
+      "code": "router.push(`/messages/${contact.id}`);",
+      "route": "/messages/${contact.id}",
+      "isValid": true
+    },
+    {
+      "file": "app\\messages\\new-conversation.tsx",
+      "line": 384,
+      "code": "router.push(`/messages/${user.id}`);",
+      "route": "/messages/${user.id}",
+      "isValid": true
+    },
+    {
+      "file": "app\\messages\\new-conversation.tsx",
+      "line": 745,
+      "code": "onPress={() => router.push(\"/messages/create-group\")}",
+      "route": "/messages/create-group",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\messages\\new-conversation.tsx",
+      "line": 762,
+      "code": "router.push(\"/messages/add-contact\");",
+      "route": "/messages/add-contact",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\messages\\new-conversation.tsx",
+      "line": 777,
+      "code": "router.push(\"/utilities/qr-scanner\");",
+      "route": "/utilities/qr-scanner",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\messages\\_layout.tsx",
+      "line": 56,
+      "code": "onPress={() => router.push(\"/(auth)/login\")}",
+      "route": "/(auth)/login",
+      "isValid": true
+    },
+    {
+      "file": "app\\messages\\_layout.tsx",
+      "line": 64,
+      "code": "onPress={() => router.push(\"/(auth)/register\")}",
+      "route": "/(auth)/register",
       "isValid": true
     },
     {
@@ -1358,6 +1429,142 @@
       "code": "onPress={() => router.push(`/om-manuals/${pkg.id}`)}",
       "route": "/om-manuals/${pkg.id}",
       "isValid": true
+    },
+    {
+      "file": "app\\orders\\index.tsx",
+      "line": 381,
+      "code": "router.push(`/orders/${orderId}`);",
+      "route": "/orders/${orderId}",
+      "isValid": true
+    },
+    {
+      "file": "app\\orders\\index.tsx",
+      "line": 386,
+      "code": "router.push(\"/cart\");",
+      "route": "/cart",
+      "isValid": true
+    },
+    {
+      "file": "app\\orders\\index.tsx",
+      "line": 390,
+      "code": "router.push(`/reviews/create?orderId=${order.id}`);",
+      "route": "/reviews/create?orderId=${order.id}",
+      "isValid": true
+    },
+    {
+      "file": "app\\orders\\index.tsx",
+      "line": 602,
+      "code": "onPress={() => router.push(\"/shop\")}",
+      "route": "/shop",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\orders\\index.tsx",
+      "line": 626,
+      "code": "onPress={() => router.push(\"/search\")}",
+      "route": "/search",
+      "isValid": true
+    },
+    {
+      "file": "app\\orders\\[id].tsx",
+      "line": 360,
+      "code": "router.push(\"/cart\");",
+      "route": "/cart",
+      "isValid": true
+    },
+    {
+      "file": "app\\orders\\[id].tsx",
+      "line": 379,
+      "code": "router.push(\"/customer-support\");",
+      "route": "/customer-support",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\orders\\[id].tsx",
+      "line": 709,
+      "code": "onPress={() => router.push(`/orders/${order.id}/refund`)}",
+      "route": "/orders/${order.id}/refund",
+      "isValid": true
+    },
+    {
+      "file": "app\\orders\\[id].tsx",
+      "line": 721,
+      "code": "onPress={() => router.push(`/orders/${order.id}/refund`)}",
+      "route": "/orders/${order.id}/refund",
+      "isValid": true
+    },
+    {
+      "file": "app\\payment\\bank-transfer.tsx",
+      "line": 496,
+      "code": "onPress={() => router.replace(\"/(tabs)\")}",
+      "route": "/(tabs)",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\payment\\pending.tsx",
+      "line": 188,
+      "code": "onPress={() => router.replace(\"/(tabs)\")}",
+      "route": "/(tabs)",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\payment\\pending.tsx",
+      "line": 200,
+      "code": "onPress={() => router.push(\"/orders\")}",
+      "route": "/orders",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\payment\\success.tsx",
+      "line": 63,
+      "code": "router.replace(\"/(tabs)\");",
+      "route": "/(tabs)",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\payment\\success.tsx",
+      "line": 141,
+      "code": "onPress={() => router.replace(\"/(tabs)\")}",
+      "route": "/(tabs)",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\payment\\success.tsx",
+      "line": 152,
+      "code": "onPress={() => router.push(\"/orders\")}",
+      "route": "/orders",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\payment-callback.tsx",
+      "line": 102,
+      "code": "router.push(\"/\");",
+      "route": "/",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\payment-progress.tsx",
+      "line": 689,
+      "code": "router.push(`/orders/${milestone.invoiceId}`);",
+      "route": "/orders/${milestone.invoiceId}",
+      "isValid": true
+    },
+    {
+      "file": "app\\payment-progress.tsx",
+      "line": 696,
+      "code": "router.push(\"/payment/success\");",
+      "route": "/payment/success",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
     },
     {
       "file": "app\\procurement\\index.tsx",
@@ -1391,208 +1598,228 @@
     },
     {
       "file": "app\\product\\[id].tsx",
-      "line": 100,
-      "code": "router.push('/cart');",
-      "route": "/cart",
+      "line": 366,
+      "code": "router.push(\"/checkout\");",
+      "route": "/checkout",
       "isValid": true
     },
     {
-      "file": "app\\profile\\addresses.tsx",
-      "line": 73,
-      "code": "router.push(`/profile/addresses/${id}/edit`);",
-      "route": "/profile/addresses/${id}/edit",
-      "isValid": true
-    },
-    {
-      "file": "app\\profile\\addresses.tsx",
-      "line": 94,
-      "code": "router.push('/profile/addresses/new');",
-      "route": "/profile/addresses/new",
+      "file": "app\\product\\[id].tsx",
+      "line": 368,
+      "code": "const handleChat = useCallback(() => router.push(\"/chat\"), []);",
+      "route": "/chat",
       "isValid": false,
       "error": "Route not found in APP_ROUTES"
     },
     {
+      "file": "app\\product\\[id].tsx",
+      "line": 369,
+      "code": "const handleViewShop = useCallback(() => router.push(\"/shop\"), []);",
+      "route": "/shop",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\product\\[id].tsx",
+      "line": 371,
+      "code": "() => router.push(`/product/${id}/reviews`),",
+      "route": "/product/${id}/reviews",
+      "isValid": true
+    },
+    {
+      "file": "app\\product\\[id].tsx",
+      "line": 455,
+      "code": "onPress={() => router.push(\"/cart\")}",
+      "route": "/cart",
+      "isValid": true
+    },
+    {
+      "file": "app\\product\\[id].tsx",
+      "line": 481,
+      "code": "onPress={() => router.push(\"/cart\")}",
+      "route": "/cart",
+      "isValid": true
+    },
+    {
+      "file": "app\\product\\[id].tsx",
+      "line": 1040,
+      "code": "onPress={() => router.push(`/product/${item.id}`)}",
+      "route": "/product/${item.id}",
+      "isValid": true
+    },
+    {
+      "file": "app\\product\\[id].tsx",
+      "line": 1086,
+      "code": "onPress={() => router.push(\"/cart\")}",
+      "route": "/cart",
+      "isValid": true
+    },
+    {
       "file": "app\\profile\\edit.tsx",
-      "line": 173,
-      "code": "[{ text: 'OK', onPress: () => router.replace('/') }]",
+      "line": 198,
+      "code": "{ text: \"OK\", onPress: () => router.replace(\"/\") },",
       "route": "/",
       "isValid": false,
       "error": "Route not found in APP_ROUTES"
     },
     {
-      "file": "app\\profile\\enhanced.tsx",
-      "line": 600,
-      "code": "<TouchableOpacity style={styles.actionRow} onPress={() => router.push('/profile/security')}>",
-      "route": "/profile/security",
-      "isValid": true
-    },
-    {
-      "file": "app\\profile\\enhanced.tsx",
-      "line": 609,
-      "code": "<TouchableOpacity style={styles.actionRow} onPress={() => router.push('/profile/privacy')}>",
-      "route": "/profile/privacy",
-      "isValid": true
-    },
-    {
-      "file": "app\\profile\\favorites.tsx",
-      "line": 42,
-      "code": "router.push(`/product/${item.id}`);",
-      "route": "/product/${item.id}",
-      "isValid": true
-    },
-    {
       "file": "app\\profile\\history.tsx",
-      "line": 42,
-      "code": "router.push(`/product/${item.id}`);",
-      "route": "/product/${item.id}",
-      "isValid": true
-    },
-    {
-      "file": "app\\profile\\my-products.tsx",
-      "line": 177,
-      "code": "router.push(`/product/${productId}`);",
-      "route": "/product/${productId}",
-      "isValid": true
-    },
-    {
-      "file": "app\\profile\\orders.tsx",
-      "line": 372,
-      "code": "onPress={() => router.push('/(tabs)')}",
+      "line": 371,
+      "code": "onPress={() => router.push(\"/(tabs)\")}",
       "route": "/(tabs)",
       "isValid": false,
       "error": "Route not found in APP_ROUTES"
     },
     {
-      "file": "app\\profile\\privacy.tsx",
-      "line": 146,
-      "code": "router.replace('/(auth)/login');",
-      "route": "/(auth)/login",
-      "isValid": true
-    },
-    {
-      "file": "app\\profile\\privacy.tsx",
-      "line": 171,
-      "code": "router.replace('/(auth)/login');",
-      "route": "/(auth)/login",
-      "isValid": true
-    },
-    {
-      "file": "app\\profile\\privacy.tsx",
-      "line": 434,
-      "code": "Đọc thêm tại <Text style={styles.linkText} onPress={() => router.push('/legal/privacy')}>Chính sách bảo mật</Text>.",
-      "route": "/legal/privacy",
+      "file": "app\\profile\\payment-history.tsx",
+      "line": 351,
+      "code": "onPress={() => router.push(\"/(tabs)\")}",
+      "route": "/(tabs)",
       "isValid": false,
       "error": "Route not found in APP_ROUTES"
     },
     {
-      "file": "app\\profile\\reviews.tsx",
-      "line": 115,
-      "code": "onPress={() => router.push(`/product/${item.productId}`)}",
-      "route": "/product/${item.productId}",
+      "file": "app\\profile\\vouchers.tsx",
+      "line": 154,
+      "code": "onPress: () => router.push(\"/cart\"),",
+      "route": "/cart",
       "isValid": true
     },
     {
-      "file": "app\\profile\\settings-luxury.tsx",
-      "line": 146,
-      "code": "onPress={() => router.push('/profile/edit')}",
+      "file": "app\\profile\\[slug]\\index.tsx",
+      "line": 473,
+      "code": "router.push(`/messages/${profile.id}`);",
+      "route": "/messages/${profile.id}",
+      "isValid": true
+    },
+    {
+      "file": "app\\profile\\[slug]\\index.tsx",
+      "line": 479,
+      "code": "router.push(`/call/${profile.id}?type=voice`);",
+      "route": "/call/${profile.id}?type=voice",
+      "isValid": true
+    },
+    {
+      "file": "app\\profile\\[slug]\\index.tsx",
+      "line": 497,
+      "code": "router.push(\"/profile/edit\");",
       "route": "/profile/edit",
       "isValid": true
     },
     {
-      "file": "app\\profile\\settings-luxury.tsx",
-      "line": 153,
-      "code": "onPress={() => router.push('/profile/security')}",
-      "route": "/profile/security",
-      "isValid": true
-    },
-    {
-      "file": "app\\profile\\settings-luxury.tsx",
-      "line": 200,
-      "code": "onPress={() => router.push('/profile/notifications')}",
-      "route": "/profile/notifications",
+      "file": "app\\profile\\[slug]\\index.tsx",
+      "line": 583,
+      "code": "onHistory={() => router.push(\"/profile/payment-history\")}",
+      "route": "/profile/payment-history",
       "isValid": false,
       "error": "Route not found in APP_ROUTES"
     },
     {
-      "file": "app\\profile\\settings-luxury.tsx",
-      "line": 257,
-      "code": "onPress={() => router.push('/profile/security')}",
-      "route": "/profile/security",
+      "file": "app\\profile\\[slug]\\index.tsx",
+      "line": 601,
+      "code": "onSeeAll={() => router.push(`/profile/${slug}/reviews`)}",
+      "route": "/profile/${slug}/reviews",
       "isValid": true
     },
     {
-      "file": "app\\profile\\settings-luxury.tsx",
-      "line": 264,
-      "code": "onPress={() => router.push('/profile/privacy')}",
-      "route": "/profile/privacy",
+      "file": "app\\profile\\[userId].tsx",
+      "line": 192,
+      "code": "router.push(`/messages/${userId}`);",
+      "route": "/messages/${userId}",
       "isValid": true
     },
     {
-      "file": "app\\profile\\settings-luxury.tsx",
-      "line": 317,
-      "code": "onPress={() => router.push('/legal/terms')}",
-      "route": "/legal/terms",
+      "file": "app\\profile\\[userId].tsx",
+      "line": 197,
+      "code": "router.push(`/call/${userId}?type=voice`);",
+      "route": "/call/${userId}?type=voice",
       "isValid": true
     },
     {
-      "file": "app\\profile\\settings-luxury.tsx",
-      "line": 323,
-      "code": "onPress={() => router.push('/legal/privacy')}",
-      "route": "/legal/privacy",
-      "isValid": false,
-      "error": "Route not found in APP_ROUTES"
-    },
-    {
-      "file": "app\\profile\\settings-luxury.tsx",
-      "line": 329,
-      "code": "onPress={() => router.push('/profile/help')}",
-      "route": "/profile/help",
+      "file": "app\\profile\\[userId].tsx",
+      "line": 202,
+      "code": "router.push(`/call/${userId}?type=video`);",
+      "route": "/call/${userId}?type=video",
       "isValid": true
     },
     {
-      "file": "app\\projects\\architecture-portfolio.tsx",
-      "line": 89,
-      "code": "router.push(`/projects/architecture/${item.id}`);",
-      "route": "/projects/architecture/${item.id}",
+      "file": "app\\profile\\[userId].tsx",
+      "line": 207,
+      "code": "router.push(`/call/${userId}?type=${callType}`);",
+      "route": "/call/${userId}?type=${callType}",
       "isValid": true
     },
     {
-      "file": "app\\projects\\library.tsx",
-      "line": 56,
-      "code": "onPress={() => router.push('/projects')}",
+      "file": "app\\profile\\[userId].tsx",
+      "line": 849,
+      "code": "router.push(`/shopping/products-catalog?sellerId=${userId}`)",
+      "route": "/shopping/products-catalog?sellerId=${userId}",
+      "isValid": true
+    },
+    {
+      "file": "app\\profile\\[userId].tsx",
+      "line": 880,
+      "code": "router.push(`/shopping/product/${item.id}`)",
+      "route": "/shopping/product/${item.id}",
+      "isValid": true
+    },
+    {
+      "file": "app\\projects\\library\\index.tsx",
+      "line": 71,
+      "code": "router.push(\"/projects\");",
       "route": "/projects",
       "isValid": true
     },
     {
-      "file": "app\\projects\\project-management.tsx",
-      "line": 284,
-      "code": "<TouchableOpacity style={styles.navItem} onPress={() => router.push('/')}>",
+      "file": "app\\projects\\management\\customer-projects.tsx",
+      "line": 488,
+      "code": "onPress={() => router.push(`/projects/timeline-mindmap?id=${item.id}`)}",
+      "route": "/projects/timeline-mindmap?id=${item.id}",
+      "isValid": true
+    },
+    {
+      "file": "app\\projects\\management\\customer-projects.tsx",
+      "line": 731,
+      "code": "onPress={() => router.push(\"/projects/create\")}",
+      "route": "/projects/create",
+      "isValid": true
+    },
+    {
+      "file": "app\\projects\\management\\index.tsx",
+      "line": 311,
+      "code": "onPress={() => router.push(\"/\")}",
       "route": "/",
       "isValid": false,
       "error": "Route not found in APP_ROUTES"
     },
     {
-      "file": "app\\projects\\project-management.tsx",
-      "line": 289,
-      "code": "<TouchableOpacity style={styles.navItem} onPress={() => router.push('/projects')}>",
+      "file": "app\\projects\\management\\index.tsx",
+      "line": 319,
+      "code": "onPress={() => router.push(\"/projects\")}",
       "route": "/projects",
       "isValid": true
     },
     {
-      "file": "app\\projects\\project-management.tsx",
-      "line": 299,
-      "code": "<TouchableOpacity style={styles.navItem} onPress={() => router.push('/notifications')}>",
-      "route": "/notifications",
+      "file": "app\\projects\\management\\index.tsx",
+      "line": 336,
+      "code": "onPress={() => router.push(\"/(tabs)/notifications\")}",
+      "route": "/(tabs)/notifications",
+      "isValid": true
+    },
+    {
+      "file": "app\\projects\\management\\index.tsx",
+      "line": 348,
+      "code": "onPress={() => router.push(\"/profile\")}",
+      "route": "/profile",
       "isValid": false,
       "error": "Route not found in APP_ROUTES"
     },
     {
-      "file": "app\\projects\\project-management.tsx",
-      "line": 304,
-      "code": "<TouchableOpacity style={styles.navItem} onPress={() => router.push('/profile')}>",
-      "route": "/profile",
-      "isValid": false,
-      "error": "Route not found in APP_ROUTES"
+      "file": "app\\projects\\portfolios\\architecture.tsx",
+      "line": 76,
+      "code": "router.push(`/projects/architecture/${item.id}`);",
+      "route": "/projects/architecture/${item.id}",
+      "isValid": true
     },
     {
       "file": "app\\projects\\[id]\\ai-analysis\\index.tsx",
@@ -1855,35 +2082,42 @@
       "isValid": true
     },
     {
-      "file": "app\\quote-request.tsx",
-      "line": 115,
-      "code": "onPress: () => router.push('/my-requests'),",
-      "route": "/my-requests",
-      "isValid": false,
-      "error": "Route not found in APP_ROUTES"
-    },
-    {
-      "file": "app\\safety\\incidents\\index.migrated.tsx",
-      "line": 46,
-      "code": "<TouchableOpacity onPress={() => router.push('/safety/incidents/create')}>",
-      "route": "/safety/incidents/create",
-      "isValid": false,
-      "error": "Route not found in APP_ROUTES"
-    },
-    {
-      "file": "app\\safety\\incidents\\index.migrated.tsx",
-      "line": 147,
-      "code": "onPress: () => router.push('/safety/incidents/create'),",
-      "route": "/safety/incidents/create",
-      "isValid": false,
-      "error": "Route not found in APP_ROUTES"
-    },
-    {
-      "file": "app\\safety\\incidents\\index.migrated.tsx",
-      "line": 169,
-      "code": "onPress={() => router.push(`/safety/incidents/${incident.id}`)}",
-      "route": "/safety/incidents/${incident.id}",
+      "file": "app\\quality-assurance\\inspections\\create.tsx",
+      "line": 75,
+      "code": "onPress: () => router.replace(`/quality-assurance/inspections/${inspection.id}`),",
+      "route": "/quality-assurance/inspections/${inspection.id}",
       "isValid": true
+    },
+    {
+      "file": "app\\quality-assurance\\inspections\\index.tsx",
+      "line": 127,
+      "code": "onPress={() => router.push(`/quality-assurance/inspections/${inspection.id}`)}",
+      "route": "/quality-assurance/inspections/${inspection.id}",
+      "isValid": true
+    },
+    {
+      "file": "app\\quality-assurance\\inspections\\index.tsx",
+      "line": 218,
+      "code": "onPress={() => router.push('/quality-assurance/inspections/create')}",
+      "route": "/quality-assurance/inspections/create",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\quality-assurance\\inspections\\index.tsx",
+      "line": 319,
+      "code": "router.push('/quality-assurance/inspections/create')",
+      "route": "/quality-assurance/inspections/create",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\quality-assurance\\inspections\\index.tsx",
+      "line": 337,
+      "code": "onPress={() => router.push('/quality-assurance/inspections/create')}",
+      "route": "/quality-assurance/inspections/create",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
     },
     {
       "file": "app\\safety\\incidents\\index.tsx",
@@ -1908,16 +2142,9 @@
     },
     {
       "file": "app\\safety\\index.tsx",
-      "line": 222,
+      "line": 538,
       "code": "onPress={() => router.push(`/safety/${incident.id}`)}",
       "route": "/safety/${incident.id}",
-      "isValid": true
-    },
-    {
-      "file": "app\\safety\\ppe\\index.migrated.tsx",
-      "line": 136,
-      "code": "onPress={() => router.push(`/safety/ppe/${item.id}`)}",
-      "route": "/safety/ppe/${item.id}",
       "isValid": true
     },
     {
@@ -1928,24 +2155,10 @@
       "isValid": true
     },
     {
-      "file": "app\\safety\\training\\index.migrated.tsx",
-      "line": 147,
-      "code": "onPress={() => router.push(`/safety/training/${program.id}`)}",
-      "route": "/safety/training/${program.id}",
-      "isValid": true
-    },
-    {
       "file": "app\\safety\\training\\index.tsx",
       "line": 165,
       "code": "onPress={() => router.push(`/safety/training/${program.id}`)}",
       "route": "/safety/training/${program.id}",
-      "isValid": true
-    },
-    {
-      "file": "app\\safety\\training\\sessions.migrated.tsx",
-      "line": 169,
-      "code": "onPress={() => router.push(`/safety/training/sessions/${session.id}`)}",
-      "route": "/safety/training/sessions/${session.id}",
       "isValid": true
     },
     {
@@ -1956,92 +2169,140 @@
       "isValid": true
     },
     {
-      "file": "app\\seller\\dashboard.tsx",
-      "line": 76,
-      "code": "<Pressable style={styles.actionButton} onPress={() => router.push('/products/create')}>",
-      "route": "/products/create",
-      "isValid": false,
-      "error": "Route not found in APP_ROUTES"
-    },
-    {
-      "file": "app\\seller\\dashboard.tsx",
-      "line": 90,
-      "code": "<Pressable style={styles.actionButton} onPress={() => router.push('/orders')}>",
-      "route": "/orders",
-      "isValid": false,
-      "error": "Route not found in APP_ROUTES"
-    },
-    {
-      "file": "app\\seller\\dashboard.tsx",
-      "line": 107,
-      "code": "<Pressable style={styles.actionButton} onPress={() => router.push('/analytics')}>",
-      "route": "/analytics",
-      "isValid": true
-    },
-    {
-      "file": "app\\seller\\dashboard.tsx",
-      "line": 124,
-      "code": "<Pressable style={styles.actionButton} onPress={() => router.push('/team')}>",
-      "route": "/team",
+      "file": "app\\service-booking\\schedule.tsx",
+      "line": 151,
+      "code": "onPress: () => router.replace(\"/(tabs)\"),",
+      "route": "/(tabs)",
       "isValid": false,
       "error": "Route not found in APP_ROUTES"
     },
     {
       "file": "app\\services\\ai-assistant\\history.tsx",
-      "line": 43,
+      "line": 40,
       "code": "router.push(`/services/ai-assistant/progress-report?reportId=${reportId}`);",
       "route": "/services/ai-assistant/progress-report?reportId=${reportId}",
       "isValid": true
     },
     {
-      "file": "app\\services\\construction-company.tsx",
-      "line": 462,
+      "file": "app\\services\\architect-listing.tsx",
+      "line": 232,
+      "code": "onPress={() => router.push(`/services/company-detail?id=${a.id}`)}",
+      "route": "/services/company-detail?id=${a.id}",
+      "isValid": true
+    },
+    {
+      "file": "app\\services\\engineer-listing.tsx",
+      "line": 239,
+      "code": "onPress={() => router.push(`/services/company-detail?id=${e.id}`)}",
+      "route": "/services/company-detail?id=${e.id}",
+      "isValid": true
+    },
+    {
+      "file": "app\\services\\home-maintenance\\category\\[id].tsx",
+      "line": 69,
+      "code": "router.push(`/messages/${worker.id}`);",
+      "route": "/messages/${worker.id}",
+      "isValid": true
+    },
+    {
+      "file": "app\\services\\home-maintenance\\index.tsx",
+      "line": 69,
+      "code": "router.push(`/messages/${worker.id}`);",
+      "route": "/messages/${worker.id}",
+      "isValid": true
+    },
+    {
+      "file": "app\\services\\home-maintenance\\worker\\[id].tsx",
+      "line": 45,
+      "code": "router.push(`/messages/${id}`);",
+      "route": "/messages/${id}",
+      "isValid": true
+    },
+    {
+      "file": "app\\services\\house-design.tsx",
+      "line": 238,
       "code": "onPress={() => router.push(`/services/company-detail?id=${company.id}`)}",
       "route": "/services/company-detail?id=${company.id}",
       "isValid": true
     },
     {
-      "file": "app\\services\\house-design.tsx",
-      "line": 188,
-      "code": "router.push(`/services/company-detail?id=${company.id}`);",
+      "file": "app\\services\\interior-company.tsx",
+      "line": 238,
+      "code": "onPress={() => router.push(`/services/company-detail?id=${c.id}`)}",
+      "route": "/services/company-detail?id=${c.id}",
+      "isValid": true
+    },
+    {
+      "file": "app\\services\\interior-design.tsx",
+      "line": 192,
+      "code": "onPress={() => router.push(`/services/company-detail?id=${company.id}`)}",
       "route": "/services/company-detail?id=${company.id}",
       "isValid": true
     },
     {
-      "file": "app\\services\\index.tsx",
-      "line": 24,
-      "code": "onPress={() => router.push('/services/marketplace')}",
-      "route": "/services/marketplace",
+      "file": "app\\services\\mep-electrical.tsx",
+      "line": 246,
+      "code": "onPress={() => router.push(`/services/company-detail?id=${e.id}`)}",
+      "route": "/services/company-detail?id=${e.id}",
+      "isValid": true
+    },
+    {
+      "file": "app\\services\\mep-plumbing.tsx",
+      "line": 239,
+      "code": "onPress={() => router.push(`/services/company-detail?id=${e.id}`)}",
+      "route": "/services/company-detail?id=${e.id}",
+      "isValid": true
+    },
+    {
+      "file": "app\\services\\structural-engineer.tsx",
+      "line": 239,
+      "code": "onPress={() => router.push(`/services/company-detail?id=${e.id}`)}",
+      "route": "/services/company-detail?id=${e.id}",
+      "isValid": true
+    },
+    {
+      "file": "app\\settings\\account\\privacy.tsx",
+      "line": 146,
+      "code": "router.replace('/(auth)/login');",
+      "route": "/(auth)/login",
+      "isValid": true
+    },
+    {
+      "file": "app\\settings\\account\\privacy.tsx",
+      "line": 171,
+      "code": "router.replace('/(auth)/login');",
+      "route": "/(auth)/login",
+      "isValid": true
+    },
+    {
+      "file": "app\\settings\\data\\contact-sync.tsx",
+      "line": 362,
+      "code": "onPress={() => router.push(\"/(tabs)/contacts\")}",
+      "route": "/(tabs)/contacts",
       "isValid": false,
       "error": "Route not found in APP_ROUTES"
     },
     {
-      "file": "app\\services\\interior-design.tsx",
-      "line": 246,
-      "code": "router.push(`/services/company-detail?id=${company.id}`);",
-      "route": "/services/company-detail?id=${company.id}",
-      "isValid": true
+      "file": "app\\settings\\index.tsx",
+      "line": 323,
+      "code": "onPress={() => router.push(\"/settings/preferences/language\")}",
+      "route": "/settings/preferences/language",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
     },
     {
-      "file": "app\\services\\marketplace.tsx",
-      "line": 166,
-      "code": "router.push(`/services/${service.id}`);",
-      "route": "/services/${service.id}",
-      "isValid": true
-    },
-    {
-      "file": "app\\shopping\\equipment.tsx",
-      "line": 56,
-      "code": "onPress={() => router.push('/shopping')}",
-      "route": "/shopping",
+      "file": "app\\settings\\index.tsx",
+      "line": 506,
+      "code": "onPress={() => router.push(\"/terms\")}",
+      "route": "/terms",
       "isValid": false,
       "error": "Route not found in APP_ROUTES"
     },
     {
       "file": "app\\shopping\\flash-sale.tsx",
-      "line": 88,
-      "code": "onPress={() => router.push(`/shopping/product/${product.id}`)}",
-      "route": "/shopping/product/${product.id}",
+      "line": 117,
+      "code": "onPress={() => router.push(`/product/${product.id}`)}",
+      "route": "/product/${product.id}",
       "isValid": true
     },
     {
@@ -2068,68 +2329,100 @@
       "isValid": true
     },
     {
-      "file": "app\\shopping\\product-detail.tsx",
-      "line": 404,
-      "code": "onPress={() => router.push(`/shopping/product-detail?id=${item}`)}",
-      "route": "/shopping/product-detail?id=${item}",
+      "file": "app\\shopping\\product\\[id].tsx",
+      "line": 382,
+      "code": "router.push(\"/cart\");",
+      "route": "/cart",
+      "isValid": true
+    },
+    {
+      "file": "app\\shopping\\product\\[id].tsx",
+      "line": 387,
+      "code": "router.push(\"/checkout\");",
+      "route": "/checkout",
+      "isValid": true
+    },
+    {
+      "file": "app\\shopping\\product\\[id].tsx",
+      "line": 501,
+      "code": "onPress={() => router.push(\"/cart\")}",
+      "route": "/cart",
       "isValid": true
     },
     {
       "file": "app\\shopping\\products-catalog.tsx",
-      "line": 442,
-      "code": "onPress={() => router.push('/shopping/products-catalog')}",
+      "line": 548,
+      "code": "onPress={() => router.push(`/shopping/product/${item.id}`)}",
+      "route": "/shopping/product/${item.id}",
+      "isValid": true
+    },
+    {
+      "file": "app\\shopping\\products-catalog.tsx",
+      "line": 559,
+      "code": "onPress={() => router.push(\"/shopping/products-catalog\")}",
       "route": "/shopping/products-catalog",
       "isValid": false,
       "error": "Route not found in APP_ROUTES"
     },
     {
       "file": "app\\shopping\\products-catalog.tsx",
-      "line": 520,
-      "code": "<TouchableOpacity style={styles.cartBtn} onPress={() => router.push('/shopping/cart')}>",
+      "line": 651,
+      "code": "onPress={() => router.push(\"/shopping/cart\")}",
       "route": "/shopping/cart",
       "isValid": false,
       "error": "Route not found in APP_ROUTES"
     },
     {
-      "file": "app\\shopping\\products-from-backend.tsx",
-      "line": 126,
-      "code": "router.push(`/shopping/product-detail?id=${product.id}`);",
-      "route": "/shopping/product-detail?id=${product.id}",
+      "file": "app\\shopping\\[category].tsx",
+      "line": 177,
+      "code": "router.push(`/product/${product.id}`);",
+      "route": "/product/${product.id}",
       "isValid": true
     },
     {
-      "file": "app\\shopping\\[category].tsx",
-      "line": 120,
-      "code": "router.push(`/shopping/product/${product.id}`);",
-      "route": "/shopping/product/${product.id}",
+      "file": "app\\social\\explore.tsx",
+      "line": 432,
+      "code": "onSeeAll={() => router.push(\"/social/shorts\")}",
+      "route": "/social/shorts",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\stories\\index.tsx",
+      "line": 30,
+      "code": "<Pressable onPress={() => router.push(\"/stories/create\")}>",
+      "route": "/stories/create",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\stories\\index.tsx",
+      "line": 43,
+      "code": "onPress={() => router.push(`/stories/${item.id}`)}",
+      "route": "/stories/${item.id}",
       "isValid": true
+    },
+    {
+      "file": "app\\terms.tsx",
+      "line": 201,
+      "code": "onPress={() => router.push(\"/customer-support\")}",
+      "route": "/customer-support",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\tiktok\\index.tsx",
+      "line": 88,
+      "code": "router.push('/tiktok/search');",
+      "route": "/tiktok/search",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
     },
     {
       "file": "app\\timeline\\index.tsx",
       "line": 180,
       "code": "router.push(`/timeline/create-phase?projectId=${currentProjectId}`);",
       "route": "/timeline/create-phase?projectId=${currentProjectId}",
-      "isValid": true
-    },
-    {
-      "file": "app\\timeline\\index.tsx",
-      "line": 307,
-      "code": "onPress={() => router.push(`/timeline/phase/${item.id}`)}",
-      "route": "/timeline/phase/${item.id}",
-      "isValid": true
-    },
-    {
-      "file": "app\\timeline\\phases.migrated.tsx",
-      "line": 78,
-      "code": "onPress={() => router.push(`/timeline/create-phase?projectId=${projectId}`)}",
-      "route": "/timeline/create-phase?projectId=${projectId}",
-      "isValid": true
-    },
-    {
-      "file": "app\\timeline\\phases.migrated.tsx",
-      "line": 102,
-      "code": "onPress: () => router.push(`/timeline/create-phase?projectId=${projectId}`),",
-      "route": "/timeline/create-phase?projectId=${projectId}",
       "isValid": true
     },
     {
@@ -2147,6 +2440,28 @@
       "isValid": true
     },
     {
+      "file": "app\\tools\\qr-scanner.tsx",
+      "line": 102,
+      "code": "router.push(`/product/${productId}`);",
+      "route": "/product/${productId}",
+      "isValid": true
+    },
+    {
+      "file": "app\\tools\\qr-scanner.tsx",
+      "line": 238,
+      "code": "onPress={() => router.push(\"/tools\")}",
+      "route": "/tools",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\utilities\\be-tong.tsx",
+      "line": 291,
+      "code": "onPress={() => router.push(`/utilities/team-detail?id=${supplier.id}&type=be-tong`)}",
+      "route": "/utilities/team-detail?id=${supplier.id}&type=be-tong",
+      "isValid": true
+    },
+    {
       "file": "app\\utilities\\cost-estimator.tsx",
       "line": 55,
       "code": "{ text: 'Xem lịch sử', onPress: () => router.push('/utilities/history') },",
@@ -2161,6 +2476,13 @@
       "route": "/utilities/history",
       "isValid": false,
       "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\utilities\\dao-dat.tsx",
+      "line": 302,
+      "code": "onPress={() => router.push(`/utilities/team-detail?id=${provider.id}&type=dao-dat`)}",
+      "route": "/utilities/team-detail?id=${provider.id}&type=dao-dat",
+      "isValid": true
     },
     {
       "file": "app\\utilities\\design-team.tsx",
@@ -2190,6 +2512,20 @@
       "line": 397,
       "code": "onPress={() => router.push('/utilities/quote-request')}",
       "route": "/utilities/quote-request",
+      "isValid": true
+    },
+    {
+      "file": "app\\utilities\\my-qr-code.tsx",
+      "line": 99,
+      "code": "<Pressable style={styles.loginBtn} onPress={() => router.push('/(auth)/login')}>",
+      "route": "/(auth)/login",
+      "isValid": true
+    },
+    {
+      "file": "app\\utilities\\nhan-cong.tsx",
+      "line": 289,
+      "code": "onPress={() => router.push(`/utilities/team-detail?id=${worker.id}&type=nhan-cong`)}",
+      "route": "/utilities/team-detail?id=${worker.id}&type=nhan-cong",
       "isValid": true
     },
     {
@@ -2225,12 +2561,55 @@
       "error": "Route not found in APP_ROUTES"
     },
     {
+      "file": "app\\utilities\\tho-coffa.tsx",
+      "line": 289,
+      "code": "onPress={() => router.push(`/utilities/team-detail?id=${team.id}&type=coffa`)}",
+      "route": "/utilities/team-detail?id=${team.id}&type=coffa",
+      "isValid": true
+    },
+    {
+      "file": "app\\utilities\\tho-dien-nuoc.tsx",
+      "line": 299,
+      "code": "onPress={() => router.push(`/utilities/team-detail?id=${contractor.id}&type=dien-nuoc`)}",
+      "route": "/utilities/team-detail?id=${contractor.id}&type=dien-nuoc",
+      "isValid": true
+    },
+    {
+      "file": "app\\utilities\\tho-xay.tsx",
+      "line": 295,
+      "code": "onPress={() => router.push(`/utilities/team-detail?id=${mason.id}&type=xay`)}",
+      "route": "/utilities/team-detail?id=${mason.id}&type=xay",
+      "isValid": true
+    },
+    {
+      "file": "app\\utilities\\vat-lieu.tsx",
+      "line": 291,
+      "code": "onPress={() => router.push(`/utilities/team-detail?id=${provider.id}&type=vat-lieu`)}",
+      "route": "/utilities/team-detail?id=${provider.id}&type=vat-lieu",
+      "isValid": true
+    },
+    {
       "file": "app\\videos\\[category].tsx",
-      "line": 87,
+      "line": 94,
       "code": "onPress={() => router.push('/videos')}",
       "route": "/videos",
       "isValid": false,
       "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\wallet\\index.tsx",
+      "line": 135,
+      "code": "router.push(\"/profile/vouchers\");",
+      "route": "/profile/vouchers",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\wallet\\index.tsx",
+      "line": 138,
+      "code": "router.push(\"/profile/orders\");",
+      "route": "/profile/orders",
+      "isValid": true
     },
     {
       "file": "app\\warranty\\index.tsx",
@@ -2247,9 +2626,49 @@
       "isValid": true
     },
     {
+      "file": "app\\zalo-login.tsx",
+      "line": 130,
+      "code": "[{ text: \"OK\", onPress: () => router.replace(\"/(tabs)\") }],",
+      "route": "/(tabs)",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\zalo-login.tsx",
+      "line": 230,
+      "code": "[{ text: \"OK\", onPress: () => router.replace(\"/(tabs)\") }],",
+      "route": "/(tabs)",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\zalo-login.tsx",
+      "line": 381,
+      "code": "onPress={() => router.replace(\"/(tabs)\")}",
+      "route": "/(tabs)",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
       "file": "app\\_layout.tsx",
-      "line": 49,
-      "code": "router.replace('/(tabs)');",
+      "line": 81,
+      "code": "router.replace(\"/role-select\");",
+      "route": "/role-select",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\_layout.tsx",
+      "line": 91,
+      "code": "router.replace(\"/(tabs)\");",
+      "route": "/(tabs)",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "app\\_layout.tsx",
+      "line": 138,
+      "code": "router.replace(\"/(tabs)\");",
       "route": "/(tabs)",
       "isValid": false,
       "error": "Route not found in APP_ROUTES"
@@ -2302,18 +2721,16 @@
     {
       "file": "components\\auth\\AuthGate.tsx",
       "line": 22,
-      "code": "router.replace('/login');",
-      "route": "/login",
-      "isValid": false,
-      "error": "Route not found in APP_ROUTES"
+      "code": "router.replace('/(auth)/login');",
+      "route": "/(auth)/login",
+      "isValid": true
     },
     {
       "file": "components\\auth\\AuthGate.tsx",
       "line": 39,
-      "code": "<Button title=\"Đăng nhập\" onPress={() => router.push('/login')} />",
-      "route": "/login",
-      "isValid": false,
-      "error": "Route not found in APP_ROUTES"
+      "code": "<Button title=\"Đăng nhập\" onPress={() => router.push('/(auth)/login')} />",
+      "route": "/(auth)/login",
+      "isValid": true
     },
     {
       "file": "components\\auth\\EnhancedLoginScreen.tsx",
@@ -2326,10 +2743,9 @@
     {
       "file": "components\\auth\\EnhancedLoginScreen.tsx",
       "line": 127,
-      "code": "router.push('/register');",
-      "route": "/register",
-      "isValid": false,
-      "error": "Route not found in APP_ROUTES"
+      "code": "router.push('/(auth)/register');",
+      "route": "/(auth)/register",
+      "isValid": true
     },
     {
       "file": "components\\auth\\EnhancedRegisterScreen.tsx",
@@ -2402,6 +2818,44 @@
       "error": "Route not found in APP_ROUTES"
     },
     {
+      "file": "components\\chat\\SupportChatList.tsx",
+      "line": 258,
+      "code": "router.push(\"/(tabs)/messages/chat-archives\");",
+      "route": "/(tabs)/messages/chat-archives",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "components\\communication\\ContactActionCard.tsx",
+      "line": 39,
+      "code": "router.push(`/messages/${contact.id}`);",
+      "route": "/messages/${contact.id}",
+      "isValid": true
+    },
+    {
+      "file": "components\\community\\FacebookFeedCard.tsx",
+      "line": 902,
+      "code": "router.push(`/crm-notifications`);",
+      "route": "/crm-notifications",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "components\\community\\FacebookFeedCard.tsx",
+      "line": 905,
+      "code": "router.push(`/progress-tracking`);",
+      "route": "/progress-tracking",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "components\\community\\FeedCards.tsx",
+      "line": 424,
+      "code": "router.push(`/demo-videos?videoUrl=${encodeURIComponent(item.videoUrl)}`);",
+      "route": "/demo-videos?videoUrl=${encodeURIComponent(item.videoUrl)}",
+      "isValid": true
+    },
+    {
       "file": "components\\construction\\MinimapWithControls.tsx",
       "line": 107,
       "code": "router.push(`/projects/${params.id}/minimap-editor`);",
@@ -2416,10 +2870,32 @@
       "isValid": true
     },
     {
-      "file": "components\\home\\mobile-menu-complete.tsx",
-      "line": 192,
-      "code": "onPress={() => { onClose(); setTimeout(() => router.push('/search'), 200); }}",
-      "route": "/search",
+      "file": "components\\examples\\VideoCallExample.tsx",
+      "line": 137,
+      "code": "<Button onPress={() => router.push(\"/notifications\")}>",
+      "route": "/notifications",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "components\\finishing\\CategoryWorkerList.tsx",
+      "line": 103,
+      "code": "router.push(`/finishing/worker-profile-new/${worker.id}?category=${categoryKey}`);",
+      "route": "/finishing/worker-profile-new/${worker.id}?category=${categoryKey}",
+      "isValid": true
+    },
+    {
+      "file": "components\\finishing\\CategoryWorkerList.tsx",
+      "line": 112,
+      "code": "router.push(`/messages/${worker.id}`);",
+      "route": "/messages/${worker.id}",
+      "isValid": true
+    },
+    {
+      "file": "components\\finishing\\CategoryWorkerList.tsx",
+      "line": 470,
+      "code": "onPress={() => router.push(`/messages/${selectedWorker.id}`)}",
+      "route": "/messages/${selectedWorker.id}",
       "isValid": true
     },
     {
@@ -2429,6 +2905,117 @@
       "route": "/notifications",
       "isValid": false,
       "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "components\\meeting\\MeetingTrackingCard.tsx",
+      "line": 21,
+      "code": "router.push('/progress-meetings');",
+      "route": "/progress-meetings",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "components\\modals\\OrderTrackingModal.tsx",
+      "line": 198,
+      "code": "router.push(`/orders/${order.id}`);",
+      "route": "/orders/${order.id}",
+      "isValid": true
+    },
+    {
+      "file": "components\\modals\\ProductQuickViewModal.tsx",
+      "line": 203,
+      "code": "router.push(\"/cart\");",
+      "route": "/cart",
+      "isValid": true
+    },
+    {
+      "file": "components\\modals\\ProductQuickViewModal.tsx",
+      "line": 209,
+      "code": "router.push(`/product/${product.id}`);",
+      "route": "/product/${product.id}",
+      "isValid": true
+    },
+    {
+      "file": "components\\modals\\WorkerBookingModal.tsx",
+      "line": 151,
+      "code": "router.push(`/chat/conversation?workerId=${worker.id}`);",
+      "route": "/chat/conversation?workerId=${worker.id}",
+      "isValid": true
+    },
+    {
+      "file": "components\\modals\\WorkerBookingModal.tsx",
+      "line": 157,
+      "code": "router.push(`/workers/${worker.id}`);",
+      "route": "/workers/${worker.id}",
+      "isValid": true
+    },
+    {
+      "file": "components\\navigation\\quick-action-sheet.tsx",
+      "line": 161,
+      "code": "router.push(\"/call/history\");",
+      "route": "/call/history",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "components\\navigation\\quick-action-sheet.tsx",
+      "line": 164,
+      "code": "router.push(\"/messages\");",
+      "route": "/messages",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "components\\navigation\\quick-action-sheet.tsx",
+      "line": 167,
+      "code": "router.push(\"/live\");",
+      "route": "/live",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "components\\navigation\\quick-action-sheet.tsx",
+      "line": 170,
+      "code": "router.push(\"/communication\");",
+      "route": "/communication",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "components\\navigation\\quick-action-sheet.tsx",
+      "line": 173,
+      "code": "router.push(\"/(tabs)/projects\");",
+      "route": "/(tabs)/projects",
+      "isValid": true
+    },
+    {
+      "file": "components\\navigation\\quick-action-sheet.tsx",
+      "line": 176,
+      "code": "router.push(\"/utilities/cost-estimator\");",
+      "route": "/utilities/cost-estimator",
+      "isValid": true
+    },
+    {
+      "file": "components\\navigation\\quick-action-sheet.tsx",
+      "line": 179,
+      "code": "router.push(\"/utilities/store-locator\");",
+      "route": "/utilities/store-locator",
+      "isValid": true
+    },
+    {
+      "file": "components\\navigation\\quick-action-sheet.tsx",
+      "line": 182,
+      "code": "router.push(\"/utilities/schedule\");",
+      "route": "/utilities/schedule",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "components\\navigation\\quick-action-sheet.tsx",
+      "line": 185,
+      "code": "router.push(\"/utilities/quote-request\");",
+      "route": "/utilities/quote-request",
+      "isValid": true
     },
     {
       "file": "components\\permissions\\PermissionRequestScreen.tsx",
@@ -2454,22 +3041,29 @@
       "error": "Route not found in APP_ROUTES"
     },
     {
+      "file": "components\\products\\VideoThumbnailGrid.tsx",
+      "line": 126,
+      "code": "router.push(`/social/shorts?id=${video.id}`);",
+      "route": "/social/shorts?id=${video.id}",
+      "isValid": true
+    },
+    {
       "file": "components\\shopping\\category-product-list.tsx",
-      "line": 112,
+      "line": 122,
       "code": "onPress={() => router.push(`/product/${item.id}`)}",
       "route": "/product/${item.id}",
       "isValid": true
     },
     {
       "file": "components\\shopping\\category-product-list.tsx",
-      "line": 303,
+      "line": 357,
       "code": "onPress={() => router.push(`/product/${item.id}`)}",
       "route": "/product/${item.id}",
       "isValid": true
     },
     {
       "file": "components\\shopping\\product-card-grid.tsx",
-      "line": 67,
+      "line": 81,
       "code": "onPress={() => router.push(`/shopping/product/${product.id}`)}",
       "route": "/shopping/product/${product.id}",
       "isValid": true
@@ -2486,6 +3080,28 @@
       "line": 39,
       "code": "router.push('/profile');",
       "route": "/profile",
+      "isValid": false,
+      "error": "Route not found in APP_ROUTES"
+    },
+    {
+      "file": "components\\ui\\contractor-info-card.tsx",
+      "line": 105,
+      "code": "router.push(`/messages/${user.id}`);",
+      "route": "/messages/${user.id}",
+      "isValid": true
+    },
+    {
+      "file": "components\\ui\\contractor-info-card.tsx",
+      "line": 114,
+      "code": "router.push(`/profile/${user.id}`);",
+      "route": "/profile/${user.id}",
+      "isValid": true
+    },
+    {
+      "file": "components\\ui\\CRMTestButton.tsx",
+      "line": 17,
+      "code": "onPress={() => router.push('/(tabs)/test-crm')}",
+      "route": "/(tabs)/test-crm",
       "isValid": false,
       "error": "Route not found in APP_ROUTES"
     },

@@ -1,22 +1,17 @@
+import { DSModuleScreen } from "@/components/ds/layouts";
+import { useDS } from "@/hooks/useDS";
 import { Ionicons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
-import { router } from "expo-router";
 import { useState } from "react";
 import {
     Alert,
-    Dimensions,
     Image,
     Modal,
     ScrollView,
     Share,
-    StyleSheet,
     Text,
     TouchableOpacity,
     View,
 } from "react-native";
-
-const { width } = Dimensions.get("window");
-const CARD_WIDTH = (width - 48) / 2;
 
 // Mock data for color trends
 const TREND_YEARS = [
@@ -167,6 +162,9 @@ const TREND_ARTICLES = [
 ];
 
 export default function ColorTrendsScreen() {
+  const { colors, spacing, radius, text: textStyles, screen, shadow } = useDS();
+  const CARD_WIDTH = (screen.width - 48) / 2;
+
   const [selectedYear, setSelectedYear] = useState("2025");
   const [selectedStyle, setSelectedStyle] = useState("all");
   const [selectedColor, setSelectedColor] = useState<ColorTrend | null>(null);
@@ -202,37 +200,31 @@ export default function ColorTrendsScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <LinearGradient colors={["#0D9488", "#14B8A6"]} style={styles.header}>
-        <View style={styles.headerTop}>
-          <TouchableOpacity
-            onPress={() => router.back()}
-            style={styles.backButton}
-          >
-            <Ionicons name="arrow-back" size={24} color="#fff" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Xu Hướng Màu Sắc</Text>
-          <TouchableOpacity style={styles.headerRight}>
-            <Ionicons name="heart-outline" size={24} color="#fff" />
-          </TouchableOpacity>
-        </View>
-
-        {/* Year selector */}
-        <View style={styles.yearSelector}>
+    <DSModuleScreen title="Xu Hướng Màu Sắc" gradientHeader>
+      {/* Year selector */}
+      <View style={{ backgroundColor: colors.primary, paddingHorizontal: spacing.lg, paddingBottom: spacing.lg }}>
+        <View style={{ flexDirection: "row", gap: spacing.md }}>
           {TREND_YEARS.map((year) => (
             <TouchableOpacity
               key={year.id}
-              style={[
-                styles.yearButton,
-                selectedYear === year.id && styles.yearButtonActive,
-              ]}
+              style={{
+                paddingVertical: spacing.sm,
+                paddingHorizontal: spacing.xl,
+                borderRadius: radius.full,
+                backgroundColor:
+                  selectedYear === year.id ? colors.card : "rgba(255,255,255,0.2)",
+              }}
               onPress={() => setSelectedYear(year.id)}
             >
               <Text
                 style={[
-                  styles.yearText,
-                  selectedYear === year.id && styles.yearTextActive,
+                  textStyles.bodySemibold,
+                  {
+                    color:
+                      selectedYear === year.id
+                        ? colors.primary
+                        : colors.textInverse,
+                  },
                 ]}
               >
                 {year.label}
@@ -240,125 +232,209 @@ export default function ColorTrendsScreen() {
             </TouchableOpacity>
           ))}
         </View>
-      </LinearGradient>
+      </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Style filter */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Phong cách</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <View style={styles.styleRow}>
-              {INTERIOR_STYLES.map((style) => (
-                <TouchableOpacity
-                  key={style.id}
-                  style={[
-                    styles.styleChip,
-                    selectedStyle === style.id && styles.styleChipActive,
-                  ]}
-                  onPress={() => setSelectedStyle(style.id)}
-                >
-                  <Ionicons
-                    name={style.icon as any}
-                    size={18}
-                    color={selectedStyle === style.id ? "#fff" : "#666"}
-                  />
-                  <Text
-                    style={[
-                      styles.styleChipText,
-                      selectedStyle === style.id && styles.styleChipTextActive,
-                    ]}
-                  >
-                    {style.name}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </ScrollView>
-        </View>
-
-        {/* Color trends grid */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>
-            Màu xu hướng {selectedYear} ({filteredTrends.length})
-          </Text>
-          <View style={styles.trendsGrid}>
-            {filteredTrends.map((color) => (
+      {/* Style filter */}
+      <View style={{ padding: spacing.lg }}>
+        <Text style={[textStyles.sectionTitle, { color: colors.text, marginBottom: spacing.md }]}>
+          Phong cách
+        </Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <View style={{ flexDirection: "row", gap: spacing.sm }}>
+            {INTERIOR_STYLES.map((style) => (
               <TouchableOpacity
-                key={color.id}
-                style={styles.colorCard}
-                onPress={() => handleColorPress(color)}
-                activeOpacity={0.7}
+                key={style.id}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: spacing.xs,
+                  paddingVertical: spacing.sm,
+                  paddingHorizontal: spacing.lg,
+                  borderRadius: radius.full,
+                  backgroundColor:
+                    selectedStyle === style.id ? colors.primary : colors.card,
+                  borderWidth: 1,
+                  borderColor:
+                    selectedStyle === style.id
+                      ? colors.primary
+                      : colors.border,
+                }}
+                onPress={() => setSelectedStyle(style.id)}
               >
-                <View
+                <Ionicons
+                  name={style.icon as any}
+                  size={18}
+                  color={
+                    selectedStyle === style.id
+                      ? colors.textInverse
+                      : colors.textSecondary
+                  }
+                />
+                <Text
                   style={[
-                    styles.colorSwatch,
-                    { backgroundColor: color.hexCode },
+                    textStyles.body,
+                    {
+                      color:
+                        selectedStyle === style.id
+                          ? colors.textInverse
+                          : colors.textSecondary,
+                      fontWeight: selectedStyle === style.id ? "500" : "400",
+                    },
                   ]}
                 >
-                  <TouchableOpacity
-                    style={styles.favoriteIcon}
-                    onPress={() => toggleFavorite(color.id)}
-                  >
-                    <Ionicons
-                      name={
-                        favorites.includes(color.id) ? "heart" : "heart-outline"
-                      }
-                      size={20}
-                      color={favorites.includes(color.id) ? "#ff4444" : "#fff"}
-                    />
-                  </TouchableOpacity>
-                  <View style={styles.popularityBadge}>
-                    <Ionicons name="trending-up" size={12} color="#fff" />
-                    <Text style={styles.popularityText}>
-                      {color.popularity}%
-                    </Text>
-                  </View>
-                </View>
-                <View style={styles.colorInfo}>
-                  <Text style={styles.colorName} numberOfLines={1}>
-                    {color.name}
-                  </Text>
-                  <Text style={styles.colorCode}>{color.hexCode}</Text>
-                  <Text style={styles.colorPantone} numberOfLines={1}>
-                    {color.pantone}
-                  </Text>
-                </View>
+                  {style.name}
+                </Text>
               </TouchableOpacity>
             ))}
           </View>
-        </View>
+        </ScrollView>
+      </View>
 
-        {/* Trend articles */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Bài viết xu hướng</Text>
-            <TouchableOpacity>
-              <Text style={styles.seeAllText}>Xem tất cả</Text>
-            </TouchableOpacity>
-          </View>
-          {TREND_ARTICLES.map((article) => (
-            <TouchableOpacity key={article.id} style={styles.articleCard}>
-              <Image
-                source={{ uri: article.image }}
-                style={styles.articleImage}
-              />
-              <View style={styles.articleContent}>
-                <Text style={styles.articleTitle}>{article.title}</Text>
-                <View style={styles.articleMeta}>
-                  <View style={styles.metaItem}>
-                    <Ionicons name="calendar-outline" size={14} color="#999" />
-                    <Text style={styles.metaText}>{article.date}</Text>
-                  </View>
-                  <View style={styles.metaItem}>
-                    <Ionicons name="eye-outline" size={14} color="#999" />
-                    <Text style={styles.metaText}>{article.views}</Text>
-                  </View>
+      {/* Color trends grid */}
+      <View style={{ paddingHorizontal: spacing.lg, paddingBottom: spacing.lg }}>
+        <Text style={[textStyles.sectionTitle, { color: colors.text, marginBottom: spacing.md }]}>
+          Màu xu hướng {selectedYear} ({filteredTrends.length})
+        </Text>
+        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: spacing.md }}>
+          {filteredTrends.map((color) => (
+            <TouchableOpacity
+              key={color.id}
+              style={{
+                width: CARD_WIDTH,
+                backgroundColor: colors.card,
+                borderRadius: radius.lg,
+                overflow: "hidden",
+                ...shadow.sm,
+              }}
+              onPress={() => handleColorPress(color)}
+              activeOpacity={0.7}
+            >
+              <View
+                style={{
+                  height: 120,
+                  justifyContent: "space-between",
+                  padding: spacing.md,
+                  backgroundColor: color.hexCode,
+                }}
+              >
+                <TouchableOpacity
+                  style={{
+                    alignSelf: "flex-end",
+                    backgroundColor: "rgba(0,0,0,0.3)",
+                    borderRadius: radius.full,
+                    padding: spacing.xs,
+                  }}
+                  onPress={() => toggleFavorite(color.id)}
+                >
+                  <Ionicons
+                    name={
+                      favorites.includes(color.id) ? "heart" : "heart-outline"
+                    }
+                    size={20}
+                    color={favorites.includes(color.id) ? colors.error : colors.textInverse}
+                  />
+                </TouchableOpacity>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: spacing.xxs,
+                    backgroundColor: "rgba(0,0,0,0.5)",
+                    alignSelf: "flex-start",
+                    paddingVertical: spacing.xxs,
+                    paddingHorizontal: spacing.sm,
+                    borderRadius: radius.lg,
+                  }}
+                >
+                  <Ionicons name="trending-up" size={12} color={colors.textInverse} />
+                  <Text
+                    style={[
+                      textStyles.caption,
+                      { color: colors.textInverse, fontWeight: "600" },
+                    ]}
+                  >
+                    {color.popularity}%
+                  </Text>
                 </View>
+              </View>
+              <View style={{ padding: spacing.md }}>
+                <Text
+                  style={[textStyles.bodySemibold, { color: colors.text, marginBottom: spacing.xxs }]}
+                  numberOfLines={1}
+                >
+                  {color.name}
+                </Text>
+                <Text style={[textStyles.caption, { color: colors.textSecondary, marginBottom: spacing.xxs }]}>
+                  {color.hexCode}
+                </Text>
+                <Text style={[textStyles.caption, { color: colors.textTertiary }]} numberOfLines={1}>
+                  {color.pantone}
+                </Text>
               </View>
             </TouchableOpacity>
           ))}
         </View>
-      </ScrollView>
+      </View>
+
+      {/* Trend articles */}
+      <View style={{ paddingHorizontal: spacing.lg, paddingBottom: spacing.lg }}>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: spacing.md,
+          }}
+        >
+          <Text style={[textStyles.sectionTitle, { color: colors.text }]}>
+            Bài viết xu hướng
+          </Text>
+          <TouchableOpacity>
+            <Text style={[textStyles.body, { color: colors.textLink }]}>Xem tất cả</Text>
+          </TouchableOpacity>
+        </View>
+        {TREND_ARTICLES.map((article) => (
+          <TouchableOpacity
+            key={article.id}
+            style={{
+              backgroundColor: colors.card,
+              borderRadius: radius.lg,
+              overflow: "hidden",
+              marginBottom: spacing.md,
+              ...shadow.sm,
+            }}
+          >
+            <Image
+              source={{ uri: article.image }}
+              style={{ width: "100%", height: 150, resizeMode: "cover" } as any}
+            />
+            <View style={{ padding: spacing.md }}>
+              <Text
+                style={[
+                  textStyles.bodySemibold,
+                  { color: colors.text, marginBottom: spacing.sm },
+                ]}
+              >
+                {article.title}
+              </Text>
+              <View style={{ flexDirection: "row", gap: spacing.lg }}>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.xxs }}>
+                  <Ionicons name="calendar-outline" size={14} color={colors.textTertiary} />
+                  <Text style={[textStyles.caption, { color: colors.textTertiary }]}>
+                    {article.date}
+                  </Text>
+                </View>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.xxs }}>
+                  <Ionicons name="eye-outline" size={14} color={colors.textTertiary} />
+                  <Text style={[textStyles.caption, { color: colors.textTertiary }]}>
+                    {article.views}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </TouchableOpacity>
+        ))}
+      </View>
 
       {/* Color detail modal */}
       <Modal
@@ -367,91 +443,205 @@ export default function ColorTrendsScreen() {
         transparent={true}
         onRequestClose={() => setShowDetail(false)}
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Chi tiết màu sắc</Text>
+        <View style={{ flex: 1, backgroundColor: colors.overlay, justifyContent: "flex-end" }}>
+          <View
+            style={{
+              backgroundColor: colors.card,
+              borderTopLeftRadius: radius.xxl,
+              borderTopRightRadius: radius.xxl,
+              maxHeight: "90%",
+              paddingBottom: spacing.xl,
+            }}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: spacing.lg,
+                borderBottomWidth: 1,
+                borderBottomColor: colors.divider,
+              }}
+            >
+              <Text style={[textStyles.h3, { color: colors.text }]}>
+                Chi tiết màu sắc
+              </Text>
               <TouchableOpacity onPress={() => setShowDetail(false)}>
-                <Ionicons name="close" size={28} color="#333" />
+                <Ionicons name="close" size={28} color={colors.text} />
               </TouchableOpacity>
             </View>
 
             {selectedColor && (
               <ScrollView showsVerticalScrollIndicator={false}>
                 <View
-                  style={[
-                    styles.modalColorSwatch,
-                    { backgroundColor: selectedColor.hexCode },
-                  ]}
+                  style={{
+                    height: 150,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: selectedColor.hexCode,
+                  }}
                 >
-                  <Text style={styles.modalColorName}>
+                  <Text style={[textStyles.h1, { color: colors.textInverse }]}>
                     {selectedColor.name}
                   </Text>
                 </View>
 
-                <View style={styles.modalSection}>
-                  <Text style={styles.modalLabel}>Mã màu</Text>
-                  <View style={styles.codeRow}>
-                    <Text style={styles.codeText}>
+                <View
+                  style={{
+                    padding: spacing.lg,
+                    borderBottomWidth: 1,
+                    borderBottomColor: colors.divider,
+                  }}
+                >
+                  <Text style={[textStyles.bodySemibold, { color: colors.textSecondary, marginBottom: spacing.sm }]}>
+                    Mã màu
+                  </Text>
+                  <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                    <Text style={[textStyles.body, { color: colors.text, fontFamily: "monospace" }]}>
                       HEX: {selectedColor.hexCode}
                     </Text>
-                    <Text style={styles.codeText}>{selectedColor.pantone}</Text>
+                    <Text style={[textStyles.body, { color: colors.text, fontFamily: "monospace" }]}>
+                      {selectedColor.pantone}
+                    </Text>
                   </View>
                 </View>
 
-                <View style={styles.modalSection}>
-                  <Text style={styles.modalLabel}>Mô tả</Text>
-                  <Text style={styles.modalDescription}>
+                <View
+                  style={{
+                    padding: spacing.lg,
+                    borderBottomWidth: 1,
+                    borderBottomColor: colors.divider,
+                  }}
+                >
+                  <Text style={[textStyles.bodySemibold, { color: colors.textSecondary, marginBottom: spacing.sm }]}>
+                    Mô tả
+                  </Text>
+                  <Text style={[textStyles.body, { color: colors.textSecondary, lineHeight: 20 }]}>
                     {selectedColor.description}
                   </Text>
                 </View>
 
-                <View style={styles.modalSection}>
-                  <Text style={styles.modalLabel}>Độ phổ biến</Text>
-                  <View style={styles.popularityBar}>
+                <View
+                  style={{
+                    padding: spacing.lg,
+                    borderBottomWidth: 1,
+                    borderBottomColor: colors.divider,
+                  }}
+                >
+                  <Text style={[textStyles.bodySemibold, { color: colors.textSecondary, marginBottom: spacing.sm }]}>
+                    Độ phổ biến
+                  </Text>
+                  <View
+                    style={{
+                      height: 8,
+                      backgroundColor: colors.bgMuted,
+                      borderRadius: radius.sm,
+                      overflow: "hidden",
+                      marginBottom: spacing.sm,
+                    }}
+                  >
                     <View
-                      style={[
-                        styles.popularityFill,
-                        { width: `${selectedColor.popularity}%` },
-                      ]}
+                      style={{
+                        height: "100%",
+                        width: `${selectedColor.popularity}%`,
+                        backgroundColor: colors.primary,
+                      }}
                     />
                   </View>
-                  <Text style={styles.popularityLabel}>
+                  <Text style={[textStyles.caption, { color: colors.textSecondary }]}>
                     {selectedColor.popularity}% người dùng yêu thích
                   </Text>
                 </View>
 
-                <View style={styles.modalSection}>
-                  <Text style={styles.modalLabel}>Phù hợp với</Text>
-                  <View style={styles.roomTags}>
+                <View
+                  style={{
+                    padding: spacing.lg,
+                    borderBottomWidth: 1,
+                    borderBottomColor: colors.divider,
+                  }}
+                >
+                  <Text style={[textStyles.bodySemibold, { color: colors.textSecondary, marginBottom: spacing.sm }]}>
+                    Phù hợp với
+                  </Text>
+                  <View style={{ flexDirection: "row", flexWrap: "wrap", gap: spacing.sm }}>
                     {selectedColor.usageRooms.map((room, index) => (
-                      <View key={index} style={styles.roomTag}>
-                        <Text style={styles.roomTagText}>{room}</Text>
+                      <View
+                        key={index}
+                        style={{
+                          backgroundColor: colors.primaryBg,
+                          paddingVertical: spacing.xs,
+                          paddingHorizontal: spacing.md,
+                          borderRadius: radius.full,
+                          borderWidth: 1,
+                          borderColor: colors.primary,
+                        }}
+                      >
+                        <Text style={[textStyles.caption, { color: colors.primary }]}>
+                          {room}
+                        </Text>
                       </View>
                     ))}
                   </View>
                 </View>
 
-                <View style={styles.modalSection}>
-                  <Text style={styles.modalLabel}>Kết hợp với</Text>
-                  <View style={styles.combinationRow}>
+                <View
+                  style={{
+                    padding: spacing.lg,
+                    borderBottomWidth: 1,
+                    borderBottomColor: colors.divider,
+                  }}
+                >
+                  <Text style={[textStyles.bodySemibold, { color: colors.textSecondary, marginBottom: spacing.sm }]}>
+                    Kết hợp với
+                  </Text>
+                  <View style={{ flexDirection: "row", gap: spacing.md }}>
                     {selectedColor.combinations.map((combo, index) => (
                       <View
                         key={index}
-                        style={[
-                          styles.combinationSwatch,
-                          { backgroundColor: combo },
-                        ]}
+                        style={{
+                          flex: 1,
+                          height: 60,
+                          borderRadius: radius.md,
+                          justifyContent: "center",
+                          alignItems: "center",
+                          borderWidth: 1,
+                          borderColor: colors.border,
+                          backgroundColor: combo,
+                        }}
                       >
-                        <Text style={styles.combinationCode}>{combo}</Text>
+                        <Text
+                          style={[
+                            textStyles.caption,
+                            { color: colors.textInverse, fontWeight: "600" },
+                          ]}
+                        >
+                          {combo}
+                        </Text>
                       </View>
                     ))}
                   </View>
                 </View>
 
-                <View style={styles.modalActions}>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    gap: spacing.md,
+                    padding: spacing.lg,
+                  }}
+                >
                   <TouchableOpacity
-                    style={styles.actionButton}
+                    style={{
+                      flex: 1,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: spacing.sm,
+                      paddingVertical: spacing.md,
+                      borderRadius: radius.md,
+                      backgroundColor: colors.primaryBg,
+                      borderWidth: 1,
+                      borderColor: colors.primary,
+                    }}
                     onPress={() => toggleFavorite(selectedColor.id)}
                   >
                     <Ionicons
@@ -461,16 +651,31 @@ export default function ColorTrendsScreen() {
                           : "heart-outline"
                       }
                       size={24}
-                      color="#0D9488"
+                      color={colors.primary}
                     />
-                    <Text style={styles.actionButtonText}>Yêu thích</Text>
+                    <Text style={[textStyles.bodySemibold, { color: colors.primary }]}>
+                      Yêu thích
+                    </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    style={styles.actionButton}
+                    style={{
+                      flex: 1,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: spacing.sm,
+                      paddingVertical: spacing.md,
+                      borderRadius: radius.md,
+                      backgroundColor: colors.primaryBg,
+                      borderWidth: 1,
+                      borderColor: colors.primary,
+                    }}
                     onPress={() => handleShare(selectedColor)}
                   >
-                    <Ionicons name="share-outline" size={24} color="#0D9488" />
-                    <Text style={styles.actionButtonText}>Chia sẻ</Text>
+                    <Ionicons name="share-outline" size={24} color={colors.primary} />
+                    <Text style={[textStyles.bodySemibold, { color: colors.primary }]}>
+                      Chia sẻ
+                    </Text>
                   </TouchableOpacity>
                 </View>
               </ScrollView>
@@ -478,335 +683,6 @@ export default function ColorTrendsScreen() {
           </View>
         </View>
       </Modal>
-    </View>
+    </DSModuleScreen>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f5f5f5",
-  },
-  header: {
-    paddingTop: 50,
-    paddingBottom: 16,
-    paddingHorizontal: 16,
-  },
-  headerTop: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 16,
-  },
-  backButton: {
-    padding: 8,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#fff",
-  },
-  headerRight: {
-    padding: 8,
-  },
-  yearSelector: {
-    flexDirection: "row",
-    gap: 12,
-  },
-  yearButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 20,
-    borderRadius: 20,
-    backgroundColor: "rgba(255,255,255,0.2)",
-  },
-  yearButtonActive: {
-    backgroundColor: "#fff",
-  },
-  yearText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#fff",
-  },
-  yearTextActive: {
-    color: "#0D9488",
-  },
-  content: {
-    flex: 1,
-  },
-  section: {
-    padding: 16,
-  },
-  sectionHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 12,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#333",
-    marginBottom: 12,
-  },
-  seeAllText: {
-    fontSize: 14,
-    color: "#0D9488",
-  },
-  styleRow: {
-    flexDirection: "row",
-    gap: 8,
-  },
-  styleChip: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 20,
-    backgroundColor: "#fff",
-    borderWidth: 1,
-    borderColor: "#e0e0e0",
-  },
-  styleChipActive: {
-    backgroundColor: "#0D9488",
-    borderColor: "#0D9488",
-  },
-  styleChipText: {
-    fontSize: 14,
-    color: "#666",
-  },
-  styleChipTextActive: {
-    color: "#fff",
-    fontWeight: "500",
-  },
-  trendsGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 12,
-  },
-  colorCard: {
-    width: CARD_WIDTH,
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    overflow: "hidden",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  colorSwatch: {
-    height: 120,
-    justifyContent: "space-between",
-    padding: 12,
-  },
-  favoriteIcon: {
-    alignSelf: "flex-end",
-    backgroundColor: "rgba(0,0,0,0.3)",
-    borderRadius: 20,
-    padding: 6,
-  },
-  popularityBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    alignSelf: "flex-start",
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderRadius: 12,
-  },
-  popularityText: {
-    fontSize: 11,
-    color: "#fff",
-    fontWeight: "600",
-  },
-  colorInfo: {
-    padding: 12,
-  },
-  colorName: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#333",
-    marginBottom: 4,
-  },
-  colorCode: {
-    fontSize: 13,
-    color: "#666",
-    marginBottom: 2,
-  },
-  colorPantone: {
-    fontSize: 11,
-    color: "#999",
-  },
-  articleCard: {
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    overflow: "hidden",
-    marginBottom: 12,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  articleImage: {
-    width: "100%",
-    height: 150,
-    resizeMode: "cover",
-  },
-  articleContent: {
-    padding: 12,
-  },
-  articleTitle: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#333",
-    marginBottom: 8,
-  },
-  articleMeta: {
-    flexDirection: "row",
-    gap: 16,
-  },
-  metaItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-  },
-  metaText: {
-    fontSize: 12,
-    color: "#999",
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "flex-end",
-  },
-  modalContent: {
-    backgroundColor: "#fff",
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    maxHeight: "90%",
-    paddingBottom: 20,
-  },
-  modalHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#333",
-  },
-  modalColorSwatch: {
-    height: 150,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalColorName: {
-    fontSize: 24,
-    fontWeight: "700",
-    color: "#fff",
-  },
-  modalSection: {
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
-  },
-  modalLabel: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#666",
-    marginBottom: 8,
-  },
-  codeRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  codeText: {
-    fontSize: 14,
-    color: "#333",
-    fontFamily: "monospace",
-  },
-  modalDescription: {
-    fontSize: 14,
-    color: "#666",
-    lineHeight: 20,
-  },
-  popularityBar: {
-    height: 8,
-    backgroundColor: "#f0f0f0",
-    borderRadius: 4,
-    overflow: "hidden",
-    marginBottom: 8,
-  },
-  popularityFill: {
-    height: "100%",
-    backgroundColor: "#0D9488",
-  },
-  popularityLabel: {
-    fontSize: 12,
-    color: "#666",
-  },
-  roomTags: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-  },
-  roomTag: {
-    backgroundColor: "#fff5f0",
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: "#0D9488",
-  },
-  roomTagText: {
-    fontSize: 13,
-    color: "#0D9488",
-  },
-  combinationRow: {
-    flexDirection: "row",
-    gap: 12,
-  },
-  combinationSwatch: {
-    flex: 1,
-    height: 60,
-    borderRadius: 8,
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#e0e0e0",
-  },
-  combinationCode: {
-    fontSize: 11,
-    fontWeight: "600",
-    color: "#fff",
-  },
-  modalActions: {
-    flexDirection: "row",
-    gap: 12,
-    padding: 16,
-  },
-  actionButton: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    paddingVertical: 12,
-    borderRadius: 8,
-    backgroundColor: "#fff5f0",
-    borderWidth: 1,
-    borderColor: "#0D9488",
-  },
-  actionButtonText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#0D9488",
-  },
-});

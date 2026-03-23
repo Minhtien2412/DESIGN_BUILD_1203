@@ -158,7 +158,7 @@ export default function ProjectEstimateScreen() {
     if (floors.length === 0 || Math.abs(floors.length - n) > 0) {
       setFloors(defaultFloors(buildingType, n, area));
     }
-  }, [numFloors, buildingType]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [numFloors, buildingType]);  
 
   // ── Build project object ──
   const buildProject = useCallback(

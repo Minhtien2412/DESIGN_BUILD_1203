@@ -2,17 +2,17 @@
  * Unified Call History Screen
  * Màn hình lịch sử cuộc gọi kiểu Zalo
  * Tích hợp với messaging system
- * 
+ *
  * @author AI Assistant
  * @date 29/12/2025
  */
 
-import Avatar from '@/components/ui/avatar';
-import { useCall } from '@/hooks/useCall';
-import { CallHistoryItem, CallType } from '@/services/api/call.service';
-import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
-import { useCallback, useMemo, useState } from 'react';
+import Avatar from "@/components/ui/avatar";
+import { useCall } from "@/hooks/useCall";
+import { CallHistoryItem, CallType } from "@/services/api/call.service";
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import { useCallback, useMemo, useState } from "react";
 import {
     ActivityIndicator,
     Alert,
@@ -21,34 +21,37 @@ import {
     StyleSheet,
     Text,
     TouchableOpacity,
-    View
-} from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+    View,
+} from "react-native";
+import {
+    SafeAreaView,
+    useSafeAreaInsets,
+} from "react-native-safe-area-context";
 
 // ==================== THEME ====================
 
 const COLORS = {
-  primary: '#0068FF',
-  background: '#FFFFFF',
-  surface: '#F5F5F5',
-  text: '#1A1A1A',
-  textSecondary: '#666666',
-  textTertiary: '#999999',
-  border: '#E5E5E5',
-  success: '#0D9488',
-  danger: '#000000',
-  warning: '#0D9488',
+  primary: "#0068FF",
+  background: "#FFFFFF",
+  surface: "#F5F5F5",
+  text: "#1A1A1A",
+  textSecondary: "#666666",
+  textTertiary: "#999999",
+  border: "#E5E5E5",
+  success: "#0D9488",
+  danger: "#000000",
+  warning: "#0D9488",
 };
 
 // ==================== FILTER TABS ====================
 
-type FilterTab = 'all' | 'missed' | 'outgoing' | 'incoming';
+type FilterTab = "all" | "missed" | "outgoing" | "incoming";
 
 const FILTER_TABS: { key: FilterTab; label: string; icon: string }[] = [
-  { key: 'all', label: 'Tất cả', icon: 'call' },
-  { key: 'missed', label: 'Gọi nhỡ', icon: 'call-outline' },
-  { key: 'outgoing', label: 'Gọi đi', icon: 'arrow-up' },
-  { key: 'incoming', label: 'Gọi đến', icon: 'arrow-down' },
+  { key: "all", label: "Tất cả", icon: "call" },
+  { key: "missed", label: "Gọi nhỡ", icon: "call-outline" },
+  { key: "outgoing", label: "Gọi đi", icon: "arrow-up" },
+  { key: "incoming", label: "Gọi đến", icon: "arrow-down" },
 ];
 
 // ==================== CALL ITEM ====================
@@ -61,7 +64,7 @@ interface CallItemProps {
 
 function CallItem({ call, onPress, onCallBack }: CallItemProps) {
   const { otherUser, type, status, duration, isOutgoing, createdAt } = call;
-  
+
   // Format time
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
@@ -71,26 +74,29 @@ function CallItem({ call, onPress, onCallBack }: CallItemProps) {
     const diffHours = Math.floor(diffMins / 60);
     const diffDays = Math.floor(diffHours / 24);
 
-    const time = date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+    const time = date.toLocaleTimeString("vi-VN", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
 
     if (diffMins < 60) return time;
     if (diffHours < 24) return time;
     if (diffDays === 1) return `Hôm qua ${time}`;
     if (diffDays < 7) {
-      const days = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+      const days = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
       return `${days[date.getDay()]} ${time}`;
     }
-    return date.toLocaleDateString('vi-VN', { 
-      day: '2-digit', 
-      month: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
+    return date.toLocaleDateString("vi-VN", {
+      day: "2-digit",
+      month: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
   // Format duration
   const formatDuration = (seconds: number) => {
-    if (!seconds) return '';
+    if (!seconds) return "";
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     if (mins > 0) {
@@ -101,26 +107,26 @@ function CallItem({ call, onPress, onCallBack }: CallItemProps) {
 
   // Get call icon and color
   const getCallIndicator = () => {
-    const isMissed = status === 'missed';
-    const isRejected = status === 'rejected';
-    
+    const isMissed = status === "missed";
+    const isRejected = status === "rejected";
+
     if (isMissed || isRejected) {
       return {
-        icon: isOutgoing ? 'arrow-up' : 'arrow-down',
+        icon: isOutgoing ? "arrow-up" : "arrow-down",
         color: COLORS.danger,
-        text: isMissed ? 'Cuộc gọi nhỡ' : 'Từ chối',
+        text: isMissed ? "Cuộc gọi nhỡ" : "Từ chối",
       };
     }
 
     return {
-      icon: isOutgoing ? 'arrow-up' : 'arrow-down',
+      icon: isOutgoing ? "arrow-up" : "arrow-down",
       color: COLORS.success,
-      text: duration ? formatDuration(duration) : 'Đã kết nối',
+      text: duration ? formatDuration(duration) : "Đã kết nối",
     };
   };
 
   const indicator = getCallIndicator();
-  const isVideo = type === 'video';
+  const isVideo = type === "video";
 
   return (
     <TouchableOpacity style={styles.callItem} onPress={onPress}>
@@ -133,11 +139,13 @@ function CallItem({ call, onPress, onCallBack }: CallItemProps) {
           pixelSize={50}
         />
         {/* Call type badge */}
-        <View style={[styles.callTypeBadge, { backgroundColor: indicator.color }]}>
-          <Ionicons 
-            name={isVideo ? 'videocam' : 'call'} 
-            size={10} 
-            color="#FFFFFF" 
+        <View
+          style={[styles.callTypeBadge, { backgroundColor: indicator.color }]}
+        >
+          <Ionicons
+            name={isVideo ? "videocam" : "call"}
+            size={10}
+            color="#FFFFFF"
           />
         </View>
       </View>
@@ -148,10 +156,10 @@ function CallItem({ call, onPress, onCallBack }: CallItemProps) {
           {otherUser.name}
         </Text>
         <View style={styles.callMeta}>
-          <Ionicons 
-            name={indicator.icon as any} 
-            size={14} 
-            color={indicator.color} 
+          <Ionicons
+            name={indicator.icon as any}
+            size={14}
+            color={indicator.color}
           />
           <Text style={[styles.callStatus, { color: indicator.color }]}>
             {indicator.text}
@@ -162,15 +170,15 @@ function CallItem({ call, onPress, onCallBack }: CallItemProps) {
 
       {/* Actions */}
       <View style={styles.callActions}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.callButton}
-          onPress={() => onCallBack('audio')}
+          onPress={() => onCallBack("audio")}
         >
           <Ionicons name="call" size={22} color={COLORS.primary} />
         </TouchableOpacity>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.callButton}
-          onPress={() => onCallBack('video')}
+          onPress={() => onCallBack("video")}
         >
           <Ionicons name="videocam" size={22} color={COLORS.primary} />
         </TouchableOpacity>
@@ -183,7 +191,7 @@ function CallItem({ call, onPress, onCallBack }: CallItemProps) {
 
 export default function UnifiedCallHistoryScreen() {
   const insets = useSafeAreaInsets();
-  const [activeFilter, setActiveFilter] = useState<FilterTab>('all');
+  const [activeFilter, setActiveFilter] = useState<FilterTab>("all");
 
   const {
     callHistory,
@@ -200,12 +208,14 @@ export default function UnifiedCallHistoryScreen() {
   // Filter calls
   const filteredCalls = useMemo(() => {
     switch (activeFilter) {
-      case 'missed':
-        return callHistory.filter(c => c.status === 'missed' || c.status === 'rejected');
-      case 'outgoing':
-        return callHistory.filter(c => c.isOutgoing);
-      case 'incoming':
-        return callHistory.filter(c => !c.isOutgoing);
+      case "missed":
+        return callHistory.filter(
+          (c) => c.status === "missed" || c.status === "rejected",
+        );
+      case "outgoing":
+        return callHistory.filter((c) => c.isOutgoing);
+      case "incoming":
+        return callHistory.filter((c) => !c.isOutgoing);
       default:
         return callHistory;
     }
@@ -214,8 +224,8 @@ export default function UnifiedCallHistoryScreen() {
   // Group by date
   const groupedCalls = useMemo(() => {
     const groups: Record<string, CallHistoryItem[]> = {};
-    
-    filteredCalls.forEach(call => {
+
+    filteredCalls.forEach((call) => {
       const date = new Date(call.createdAt);
       const today = new Date();
       const yesterday = new Date(today);
@@ -223,14 +233,14 @@ export default function UnifiedCallHistoryScreen() {
 
       let key: string;
       if (date.toDateString() === today.toDateString()) {
-        key = 'Hôm nay';
+        key = "Hôm nay";
       } else if (date.toDateString() === yesterday.toDateString()) {
-        key = 'Hôm qua';
+        key = "Hôm qua";
       } else {
-        key = date.toLocaleDateString('vi-VN', { 
-          weekday: 'long', 
-          day: 'numeric', 
-          month: 'long' 
+        key = date.toLocaleDateString("vi-VN", {
+          weekday: "long",
+          day: "numeric",
+          month: "long",
         });
       }
 
@@ -247,36 +257,45 @@ export default function UnifiedCallHistoryScreen() {
     router.push(`/messages/${call.otherUser.id}`);
   }, []);
 
-  const handleCallBack = useCallback((userId: number, type: CallType) => {
-    startCall(userId, type);
-  }, [startCall]);
+  const handleCallBack = useCallback(
+    (userId: number, type: CallType) => {
+      startCall(userId, type);
+    },
+    [startCall],
+  );
 
   const handleClearMissed = useCallback(() => {
     Alert.alert(
-      'Xóa cuộc gọi nhỡ',
-      'Bạn có chắc muốn đánh dấu tất cả cuộc gọi nhỡ là đã xem?',
+      "Xóa cuộc gọi nhỡ",
+      "Bạn có chắc muốn đánh dấu tất cả cuộc gọi nhỡ là đã xem?",
       [
-        { text: 'Hủy', style: 'cancel' },
-        { text: 'Đồng ý', onPress: () => clearMissedCalls() },
-      ]
+        { text: "Hủy", style: "cancel" },
+        { text: "Đồng ý", onPress: () => clearMissedCalls() },
+      ],
     );
   }, [clearMissedCalls]);
 
   // Render section header
-  const renderSectionHeader = useCallback(({ section }: { section: { title: string } }) => (
-    <View style={styles.sectionHeader}>
-      <Text style={styles.sectionTitle}>{section.title}</Text>
-    </View>
-  ), []);
+  const renderSectionHeader = useCallback(
+    ({ section }: { section: { title: string } }) => (
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitle}>{section.title}</Text>
+      </View>
+    ),
+    [],
+  );
 
   // Render call item
-  const renderCall = useCallback(({ item }: { item: CallHistoryItem }) => (
-    <CallItem
-      call={item}
-      onPress={() => handleCallPress(item)}
-      onCallBack={(type) => handleCallBack(item.otherUser.id, type)}
-    />
-  ), [handleCallPress, handleCallBack]);
+  const renderCall = useCallback(
+    ({ item }: { item: CallHistoryItem }) => (
+      <CallItem
+        call={item}
+        onPress={() => handleCallPress(item)}
+        onCallBack={(type) => handleCallBack(item.otherUser.id, type)}
+      />
+    ),
+    [handleCallPress, handleCallBack],
+  );
 
   // Empty state
   const renderEmptyState = () => (
@@ -284,27 +303,35 @@ export default function UnifiedCallHistoryScreen() {
       <Ionicons name="call-outline" size={64} color={COLORS.textTertiary} />
       <Text style={styles.emptyTitle}>Chưa có cuộc gọi</Text>
       <Text style={styles.emptySubtitle}>
-        {activeFilter === 'missed' 
-          ? 'Không có cuộc gọi nhỡ'
-          : 'Bắt đầu cuộc gọi với đồng nghiệp'}
+        {activeFilter === "missed"
+          ? "Không có cuộc gọi nhỡ"
+          : "Bắt đầu cuộc gọi với đồng nghiệp"}
       </Text>
     </View>
   );
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={["top"]}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => router.back()}
+        >
           <Ionicons name="arrow-back" size={24} color={COLORS.text} />
         </TouchableOpacity>
-        
+
         <Text style={styles.headerTitle}>Lịch sử cuộc gọi</Text>
-        
+
         <View style={styles.headerRight}>
           {missedCallsCount > 0 && (
-            <TouchableOpacity style={styles.clearButton} onPress={handleClearMissed}>
-              <Text style={styles.clearButtonText}>Xóa nhỡ ({missedCallsCount})</Text>
+            <TouchableOpacity
+              style={styles.clearButton}
+              onPress={handleClearMissed}
+            >
+              <Text style={styles.clearButtonText}>
+                Xóa nhỡ ({missedCallsCount})
+              </Text>
             </TouchableOpacity>
           )}
         </View>
@@ -312,27 +339,29 @@ export default function UnifiedCallHistoryScreen() {
 
       {/* Filter Tabs */}
       <View style={styles.filterTabs}>
-        {FILTER_TABS.map(tab => {
+        {FILTER_TABS.map((tab) => {
           const isActive = activeFilter === tab.key;
-          const count = tab.key === 'missed' ? missedCallsCount : null;
-          
+          const count = tab.key === "missed" ? missedCallsCount : null;
+
           return (
             <TouchableOpacity
               key={tab.key}
               style={[styles.filterTab, isActive && styles.filterTabActive]}
               onPress={() => setActiveFilter(tab.key)}
             >
-              <Ionicons 
-                name={tab.icon as any} 
-                size={16} 
-                color={isActive ? '#FFFFFF' : COLORS.textSecondary} 
+              <Ionicons
+                name={tab.icon as any}
+                size={16}
+                color={isActive ? "#FFFFFF" : COLORS.textSecondary}
               />
-              <Text style={[
-                styles.filterTabText,
-                isActive && styles.filterTabTextActive,
-              ]}>
+              <Text
+                style={[
+                  styles.filterTabText,
+                  isActive && styles.filterTabTextActive,
+                ]}
+              >
                 {tab.label}
-                {count ? ` (${count})` : ''}
+                {count ? ` (${count})` : ""}
               </Text>
             </TouchableOpacity>
           );
@@ -350,7 +379,7 @@ export default function UnifiedCallHistoryScreen() {
           sections={groupedCalls}
           renderItem={renderCall}
           renderSectionHeader={renderSectionHeader}
-          keyExtractor={item => String(item.id)}
+          keyExtractor={(item) => String(item.id)}
           contentContainerStyle={[
             styles.listContent,
             groupedCalls.length === 0 && styles.emptyListContent,
@@ -373,9 +402,9 @@ export default function UnifiedCallHistoryScreen() {
       )}
 
       {/* Quick Dial FAB */}
-      <TouchableOpacity 
+      <TouchableOpacity
         style={[styles.fab, { bottom: insets.bottom + 16 }]}
-        onPress={() => router.push('/call/dial')}
+        onPress={() => router.push("/call")}
       >
         <Ionicons name="keypad" size={24} color="#FFFFFF" />
       </TouchableOpacity>
@@ -393,8 +422,8 @@ const styles = StyleSheet.create({
 
   // Header
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 8,
     paddingVertical: 12,
     borderBottomWidth: 1,
@@ -406,13 +435,13 @@ const styles = StyleSheet.create({
   headerTitle: {
     flex: 1,
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.text,
     marginLeft: 8,
   },
   headerRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   clearButton: {
     paddingHorizontal: 12,
@@ -422,13 +451,13 @@ const styles = StyleSheet.create({
   },
   clearButtonText: {
     fontSize: 12,
-    fontWeight: '500',
-    color: '#FFFFFF',
+    fontWeight: "500",
+    color: "#FFFFFF",
   },
 
   // Filter Tabs
   filterTabs: {
-    flexDirection: 'row',
+    flexDirection: "row",
     paddingHorizontal: 12,
     paddingVertical: 8,
     backgroundColor: COLORS.surface,
@@ -437,9 +466,9 @@ const styles = StyleSheet.create({
   },
   filterTab: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     paddingVertical: 8,
     paddingHorizontal: 8,
     borderRadius: 20,
@@ -451,12 +480,12 @@ const styles = StyleSheet.create({
   },
   filterTabText: {
     fontSize: 12,
-    fontWeight: '500',
+    fontWeight: "500",
     color: COLORS.textSecondary,
     marginLeft: 4,
   },
   filterTabTextActive: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
   },
 
   // Section
@@ -467,32 +496,32 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textSecondary,
-    textTransform: 'uppercase',
+    textTransform: "uppercase",
   },
 
   // Call Item
   callItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 16,
     paddingVertical: 12,
     backgroundColor: COLORS.background,
   },
   avatarWrapper: {
-    position: 'relative',
+    position: "relative",
     marginRight: 12,
   },
   callTypeBadge: {
-    position: 'absolute',
+    position: "absolute",
     bottom: -2,
     right: -2,
     width: 18,
     height: 18,
     borderRadius: 9,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     borderWidth: 2,
     borderColor: COLORS.background,
   },
@@ -501,13 +530,13 @@ const styles = StyleSheet.create({
   },
   callName: {
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: "500",
     color: COLORS.text,
     marginBottom: 4,
   },
   callMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   callStatus: {
     fontSize: 13,
@@ -519,8 +548,8 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   callActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   callButton: {
     padding: 8,
@@ -543,28 +572,28 @@ const styles = StyleSheet.create({
   // Empty State
   emptyState: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 32,
   },
   emptyTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.text,
     marginTop: 16,
   },
   emptySubtitle: {
     fontSize: 14,
     color: COLORS.textSecondary,
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: 8,
   },
 
   // Loading
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   loadingText: {
     marginTop: 12,
@@ -574,16 +603,16 @@ const styles = StyleSheet.create({
 
   // FAB
   fab: {
-    position: 'absolute',
+    position: "absolute",
     right: 16,
     width: 56,
     height: 56,
     borderRadius: 28,
     backgroundColor: COLORS.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     elevation: 6,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 4,

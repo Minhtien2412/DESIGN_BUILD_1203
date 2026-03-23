@@ -249,7 +249,7 @@ export function useUnifiedMessaging(options: UseUnifiedMessagingOptions = {}) {
         currentConversation.id,
         {
           limit: pageSize,
-          before: oldestMessage?.createdAt,
+          cursor: oldestMessage?.id,
         },
       );
 

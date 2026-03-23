@@ -100,13 +100,11 @@ export const ENV: EnvConfig = {
   ENABLE_SOCIAL_GOOGLE: (extra.EXPO_PUBLIC_ENABLE_SOCIAL_GOOGLE ?? "1") !== "0",
   ENABLE_SOCIAL_FACEBOOK:
     (extra.EXPO_PUBLIC_ENABLE_SOCIAL_FACEBOOK ?? "1") !== "0",
-  GOOGLE_CLIENT_ID:
-    extra.EXPO_PUBLIC_GOOGLE_CLIENT_ID || "",
+  GOOGLE_CLIENT_ID: extra.EXPO_PUBLIC_GOOGLE_CLIENT_ID || "",
   GOOGLE_WEB_CLIENT_ID:
     extra.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID ||
     extra.EXPO_PUBLIC_GOOGLE_CLIENT_ID,
-  GOOGLE_CLIENT_SECRET:
-    extra.EXPO_PUBLIC_GOOGLE_CLIENT_SECRET || "",
+  GOOGLE_CLIENT_SECRET: extra.EXPO_PUBLIC_GOOGLE_CLIENT_SECRET || "",
   GOOGLE_ANDROID_CLIENT_ID: extra.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
   GOOGLE_IOS_CLIENT_ID: extra.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
   BACKOFF_BASE_MS: parseInt(extra.EXPO_PUBLIC_BACKOFF_BASE_MS || "500", 10),
@@ -194,10 +192,7 @@ export const ENV: EnvConfig = {
 console.log("[ENV] Configuration loaded:");
 console.log("[ENV] API_BASE_URL:", ENV.API_BASE_URL);
 console.log("[ENV] API_PREFIX:", ENV.API_PREFIX);
-console.log(
-  "[ENV] API_KEY:",
-  ENV.API_KEY ? ENV.API_KEY.substring(0, 15) + "..." : "NOT SET ⚠️",
-);
+console.log("[ENV] API_KEY:", ENV.API_KEY ? "✅ Configured" : "❌ NOT SET");
 console.log("[ENV] WS_BASE_URL:", ENV.WS_BASE_URL);
 console.log(
   "[ENV] WS Namespaces:",

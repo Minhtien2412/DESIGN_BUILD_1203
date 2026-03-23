@@ -20,7 +20,7 @@ export default function SearchMessagesScreen() {
   const handleSelectResult = useCallback((result: SearchResult) => {
     // Navigate to conversation and scroll to message
     router.push({
-      pathname: "/conversation/[id]",
+      pathname: "/conversation/[id]" as any,
       params: {
         id: result.message.conversationId,
         scrollToMessageId: result.message.id,

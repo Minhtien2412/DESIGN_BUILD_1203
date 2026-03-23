@@ -200,13 +200,19 @@ export default function DesignTemplateDetailScreen() {
               );
               setSelectedImageIndex(index);
             }}
-            renderItem={({ item }) => (
-              <Image
-                source={{ uri: item }}
-                style={styles.mainImage}
-                resizeMode="cover"
-              />
-            )}
+            renderItem={({ item }) =>
+              item ? (
+                <Image
+                  source={{ uri: item }}
+                  style={styles.mainImage}
+                  resizeMode="cover"
+                />
+              ) : (
+                <View
+                  style={[styles.mainImage, { backgroundColor: "#f0f0f0" }]}
+                />
+              )
+            }
             keyExtractor={(item, index) => index.toString()}
           />
 

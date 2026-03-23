@@ -1,11 +1,11 @@
 import WorkerService, {
     type Worker,
     type WorkerStatus,
-    STATUS_LABELS
-} from '@/services/workerService';
-import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
-import { useCallback, useEffect, useRef, useState } from 'react';
+    STATUS_LABELS,
+} from "@/services/workerService";
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
     ActivityIndicator,
     Alert,
@@ -17,10 +17,10 @@ import {
     Text,
     TouchableOpacity,
     View,
-} from 'react-native';
+} from "react-native";
 
 export default function WorkerTrackingScreen() {
-  const [status, setStatus] = useState<WorkerStatus>('finding');
+  const [status, setStatus] = useState<WorkerStatus>("finding");
   const [currentStep, setCurrentStep] = useState(0);
   const [eta, setEta] = useState(15);
   const [worker, setWorker] = useState<Worker | null>(null);
@@ -31,11 +31,19 @@ export default function WorkerTrackingScreen() {
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
   const steps = [
-    { key: 'finding', label: STATUS_LABELS.finding, icon: 'search' },
-    { key: 'accepted', label: STATUS_LABELS.accepted, icon: 'checkmark-circle' },
-    { key: 'traveling', label: STATUS_LABELS.traveling, icon: 'car' },
-    { key: 'working', label: STATUS_LABELS.working, icon: 'hammer' },
-    { key: 'completed', label: STATUS_LABELS.completed, icon: 'checkmark-done-circle' },
+    { key: "finding", label: STATUS_LABELS.finding, icon: "search" },
+    {
+      key: "accepted",
+      label: STATUS_LABELS.accepted,
+      icon: "checkmark-circle",
+    },
+    { key: "traveling", label: STATUS_LABELS.traveling, icon: "car" },
+    { key: "working", label: STATUS_LABELS.working, icon: "hammer" },
+    {
+      key: "completed",
+      label: STATUS_LABELS.completed,
+      icon: "checkmark-done-circle",
+    },
   ];
 
   // Fetch initial worker data
@@ -48,7 +56,7 @@ export default function WorkerTrackingScreen() {
         setWorker(workers[0]);
       }
     } catch (err) {
-      console.error('Error fetching worker:', err);
+      console.error("Error fetching worker:", err);
     } finally {
       setLoading(false);
     }
@@ -67,11 +75,11 @@ export default function WorkerTrackingScreen() {
     // Simulate status progression for demo
     // In real app, this would poll API or use websocket
     const statusSequence: { status: WorkerStatus; delay: number }[] = [
-      { status: 'finding', delay: 0 },
-      { status: 'accepted', delay: 3000 },
-      { status: 'traveling', delay: 6000 },
-      { status: 'working', delay: 10000 },
-      { status: 'completed', delay: 15000 },
+      { status: "finding", delay: 0 },
+      { status: "accepted", delay: 3000 },
+      { status: "traveling", delay: 6000 },
+      { status: "working", delay: 10000 },
+      { status: "completed", delay: 15000 },
     ];
 
     const timeouts: ReturnType<typeof setTimeout>[] = [];
@@ -104,12 +112,12 @@ export default function WorkerTrackingScreen() {
           duration: 1000,
           useNativeDriver: true,
         }),
-      ])
+      ]),
     ).start();
 
     return () => {
       clearInterval(etaInterval);
-      timeouts.forEach(t => clearTimeout(t));
+      timeouts.forEach((t) => clearTimeout(t));
     };
   }, []);
 
@@ -123,57 +131,56 @@ export default function WorkerTrackingScreen() {
 
   const handleCall = () => {
     if (worker) {
-      Alert.alert('Gọi cho thợ', `Số điện thoại: ${worker.phone}`);
+      Alert.alert("Gọi cho thợ", `Số điện thoại: ${worker.phone}`);
     }
   };
 
   const handleChat = () => {
-    router.push('/messages' as any);
+    router.push("/messages" as any);
   };
 
   const handleCancel = async () => {
-    Alert.alert(
-      'Hủy dịch vụ',
-      'Bạn có chắc muốn hủy dịch vụ này?',
-      [
-        { text: 'Không', style: 'cancel' },
-        {
-          text: 'Hủy dịch vụ',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              // Call cancel API
-              await WorkerService.cancelAssignment('assignment_id', 'Khách hàng hủy');
-              Alert.alert('Đã hủy', 'Dịch vụ đã được hủy');
-              router.back();
-            } catch (err) {
-              Alert.alert('Lỗi', 'Không thể hủy dịch vụ');
-            }
-          },
+    Alert.alert("Hủy dịch vụ", "Bạn có chắc muốn hủy dịch vụ này?", [
+      { text: "Không", style: "cancel" },
+      {
+        text: "Hủy dịch vụ",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            // Call cancel API
+            await WorkerService.cancelAssignment(
+              "assignment_id",
+              "Khách hàng hủy",
+            );
+            Alert.alert("Đã hủy", "Dịch vụ đã được hủy");
+            router.back();
+          } catch (err) {
+            Alert.alert("Lỗi", "Không thể hủy dịch vụ");
+          }
         },
-      ]
-    );
+      },
+    ]);
   };
 
   const progressWidth = progressAnim.interpolate({
     inputRange: [0, steps.length - 1],
-    outputRange: ['0%', '100%'],
+    outputRange: ["0%", "100%"],
   });
 
   const getStatusMessage = () => {
     switch (status) {
-      case 'finding':
-        return 'Đang tìm thợ phù hợp...';
-      case 'accepted':
-        return 'Thợ đã chấp nhận yêu cầu';
-      case 'traveling':
+      case "finding":
+        return "Đang tìm thợ phù hợp...";
+      case "accepted":
+        return "Thợ đã chấp nhận yêu cầu";
+      case "traveling":
         return `Thợ đang đến - ${eta} phút`;
-      case 'working':
-        return 'Đang làm việc...';
-      case 'completed':
-        return 'Công việc đã hoàn thành!';
+      case "working":
+        return "Đang làm việc...";
+      case "completed":
+        return "Công việc đã hoàn thành!";
       default:
-        return '';
+        return "";
     }
   };
 
@@ -188,7 +195,7 @@ export default function WorkerTrackingScreen() {
         <View style={{ width: 24 }} />
       </View>
 
-      <ScrollView 
+      <ScrollView
         style={styles.scrollView}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -210,8 +217,10 @@ export default function WorkerTrackingScreen() {
           </View>
 
           {/* Worker Pin */}
-          {(status === 'traveling' || status === 'working') && (
-            <Animated.View style={[styles.workerPin, { transform: [{ scale: pulseAnim }] }]}>
+          {(status === "traveling" || status === "working") && (
+            <Animated.View
+              style={[styles.workerPin, { transform: [{ scale: pulseAnim }] }]}
+            >
               <Ionicons name="person" size={30} color="#00B14F" />
             </Animated.View>
           )}
@@ -220,7 +229,9 @@ export default function WorkerTrackingScreen() {
         {/* Progress Timeline */}
         <View style={styles.timelineContainer}>
           <View style={styles.progressBar}>
-            <Animated.View style={[styles.progressFill, { width: progressWidth }]} />
+            <Animated.View
+              style={[styles.progressFill, { width: progressWidth }]}
+            />
           </View>
           <View style={styles.stepsRow}>
             {steps.map((step, index) => {
@@ -239,7 +250,7 @@ export default function WorkerTrackingScreen() {
                     <Ionicons
                       name={step.icon as any}
                       size={16}
-                      color={isCompleted || isActive ? '#fff' : '#ccc'}
+                      color={isCompleted || isActive ? "#fff" : "#ccc"}
                     />
                   </Animated.View>
                   <Text
@@ -257,9 +268,12 @@ export default function WorkerTrackingScreen() {
         </View>
 
         {/* Worker Card */}
-        {worker && status !== 'finding' && (
+        {worker && status !== "finding" && (
           <View style={styles.workerCard}>
-            <Image source={{ uri: worker.avatar }} style={styles.workerAvatar} />
+            <Image
+              source={worker.avatar ? { uri: worker.avatar } : undefined}
+              style={styles.workerAvatar}
+            />
             <View style={styles.workerInfo}>
               <Text style={styles.workerName}>{worker.name}</Text>
               <Text style={styles.workerSpecialty}>{worker.specialty}</Text>
@@ -269,10 +283,16 @@ export default function WorkerTrackingScreen() {
               </View>
             </View>
             <View style={styles.workerActions}>
-              <TouchableOpacity style={styles.actionButton} onPress={handleCall}>
+              <TouchableOpacity
+                style={styles.actionButton}
+                onPress={handleCall}
+              >
                 <Ionicons name="call" size={20} color="#00B14F" />
               </TouchableOpacity>
-              <TouchableOpacity style={styles.actionButton} onPress={handleChat}>
+              <TouchableOpacity
+                style={styles.actionButton}
+                onPress={handleChat}
+              >
                 <Ionicons name="chatbubble" size={20} color="#00B14F" />
               </TouchableOpacity>
             </View>
@@ -308,26 +328,31 @@ export default function WorkerTrackingScreen() {
         </View>
 
         {/* Action Buttons */}
-        {status !== 'completed' && status !== 'finding' && (
+        {status !== "completed" && status !== "finding" && (
           <View style={styles.actionButtonsContainer}>
-            <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
+            <TouchableOpacity
+              style={styles.cancelButton}
+              onPress={handleCancel}
+            >
               <Text style={styles.cancelButtonText}>Hủy dịch vụ</Text>
             </TouchableOpacity>
           </View>
         )}
 
-        {status === 'completed' && (
+        {status === "completed" && (
           <View style={styles.actionButtonsContainer}>
             <TouchableOpacity
               style={styles.progressButton}
-              onPress={() => router.push('/construction/progress')}
+              onPress={() => router.push("/construction/progress")}
             >
               <Ionicons name="stats-chart" size={20} color="#00B14F" />
-              <Text style={styles.progressButtonText}>Xem Tiến Độ & Thanh Toán</Text>
+              <Text style={styles.progressButtonText}>
+                Xem Tiến Độ & Thanh Toán
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.rateButton}
-              onPress={() => Alert.alert('Đánh giá', 'Màn hình đánh giá')}
+              onPress={() => Alert.alert("Đánh giá", "Màn hình đánh giá")}
             >
               <Ionicons name="star" size={20} color="#fff" />
               <Text style={styles.rateButtonText}>Đánh giá dịch vụ</Text>
@@ -344,101 +369,101 @@ export default function WorkerTrackingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     padding: 16,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: "#eee",
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   scrollView: {
     flex: 1,
   },
   mapPlaceholder: {
     height: 250,
-    backgroundColor: '#E8F5E9',
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'relative',
+    backgroundColor: "#E8F5E9",
+    justifyContent: "center",
+    alignItems: "center",
+    position: "relative",
   },
   mapOverlay: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   mapText: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#00B14F',
+    fontWeight: "600",
+    color: "#00B14F",
     marginTop: 8,
   },
   mapSubtext: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
     marginTop: 4,
   },
   workerPin: {
-    position: 'absolute',
+    position: "absolute",
     top: 100,
-    left: '50%',
+    left: "50%",
     marginLeft: -20,
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#fff',
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
+    backgroundColor: "#fff",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
     elevation: 5,
   },
   timelineContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     padding: 16,
     marginTop: 8,
   },
   progressBar: {
     height: 4,
-    backgroundColor: '#e0e0e0',
+    backgroundColor: "#e0e0e0",
     borderRadius: 2,
     marginBottom: 16,
   },
   progressFill: {
-    height: '100%',
-    backgroundColor: '#00B14F',
+    height: "100%",
+    backgroundColor: "#00B14F",
     borderRadius: 2,
   },
   stepsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   stepItem: {
-    alignItems: 'center',
+    alignItems: "center",
     flex: 1,
   },
   stepDot: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#e0e0e0',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#e0e0e0",
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: 6,
   },
   stepDotCompleted: {
-    backgroundColor: '#00B14F',
+    backgroundColor: "#00B14F",
   },
   stepDotActive: {
-    backgroundColor: '#00B14F',
-    shadowColor: '#00B14F',
+    backgroundColor: "#00B14F",
+    shadowColor: "#00B14F",
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.4,
     shadowRadius: 8,
@@ -446,17 +471,17 @@ const styles = StyleSheet.create({
   },
   stepLabel: {
     fontSize: 10,
-    color: '#999',
-    textAlign: 'center',
+    color: "#999",
+    textAlign: "center",
   },
   stepLabelActive: {
-    color: '#00B14F',
-    fontWeight: '600',
+    color: "#00B14F",
+    fontWeight: "600",
   },
   workerCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
     padding: 16,
     marginTop: 8,
   },
@@ -471,47 +496,47 @@ const styles = StyleSheet.create({
   },
   workerName: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 4,
   },
   workerSpecialty: {
     fontSize: 13,
-    color: '#666',
+    color: "#666",
     marginBottom: 4,
   },
   workerRating: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   ratingText: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
     marginLeft: 4,
   },
   workerActions: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 8,
   },
   actionButton: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#E8F5E9',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#E8F5E9",
+    justifyContent: "center",
+    alignItems: "center",
   },
   detailsCard: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     padding: 16,
     marginTop: 8,
   },
   detailsTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 16,
   },
   detailRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: 16,
   },
   detailContent: {
@@ -520,13 +545,13 @@ const styles = StyleSheet.create({
   },
   detailLabel: {
     fontSize: 13,
-    color: '#666',
+    color: "#666",
     marginBottom: 4,
   },
   detailValue: {
     fontSize: 15,
-    color: '#333',
-    fontWeight: '500',
+    color: "#333",
+    fontWeight: "500",
   },
   actionButtonsContainer: {
     padding: 16,
@@ -534,57 +559,57 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   cancelButton: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderWidth: 1,
-    borderColor: '#0D9488',
+    borderColor: "#0D9488",
     borderRadius: 8,
     padding: 16,
-    alignItems: 'center',
+    alignItems: "center",
   },
   cancelButtonText: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#0D9488',
+    fontWeight: "600",
+    color: "#0D9488",
   },
   progressButton: {
-    backgroundColor: '#E8F5E9',
+    backgroundColor: "#E8F5E9",
     borderWidth: 1,
-    borderColor: '#00B14F',
+    borderColor: "#00B14F",
     borderRadius: 8,
     padding: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     gap: 8,
   },
   progressButtonText: {
     fontSize: 16,
-    fontWeight: '700',
-    color: '#00B14F',
+    fontWeight: "700",
+    color: "#00B14F",
   },
   rateButton: {
-    backgroundColor: '#00B14F',
+    backgroundColor: "#00B14F",
     borderRadius: 8,
     padding: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     gap: 8,
   },
   rateButtonText: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#fff',
+    fontWeight: "600",
+    color: "#fff",
     marginLeft: 8,
   },
   loadingOverlay: {
     padding: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   loadingText: {
     marginTop: 12,
     fontSize: 14,
-    color: '#666',
+    color: "#666",
   },
 });

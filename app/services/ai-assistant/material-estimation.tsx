@@ -3,7 +3,7 @@
  * AI-generated material quantity estimates
  */
 
-import { useThemeColor } from '@/hooks/use-theme-color';
+import { useDS } from '@/hooks/useDS';
 import { useMaterialEstimation } from '@/hooks/useAI';
 import { Ionicons } from '@expo/vector-icons';
 import { Stack, useLocalSearchParams } from 'expo-router';
@@ -17,28 +17,26 @@ import {
 
 export default function MaterialEstimationScreen() {
   const params = useLocalSearchParams<{ projectId: string }>();
-  const backgroundColor = useThemeColor({}, 'background');
-  const textColor = useThemeColor({}, 'text');
-  const tintColor = useThemeColor({}, 'tint');
+  const { colors, spacing, radius } = useDS();
 
   const { result, loading, error } = useMaterialEstimation();
 
   const renderEmpty = () => (
     <View style={styles.emptyContainer}>
-      <Ionicons name="cube-outline" size={64} color="#ccc" />
-      <Text style={[styles.emptyTitle, { color: textColor }]}>
+      <Ionicons name="cube-outline" size={64} color={colors.border} />
+      <Text style={[styles.emptyTitle, { color: colors.text }]}>
         Chưa có ước tính
       </Text>
       <Text style={styles.emptyText}>
         Sử dụng AI để ước tính số lượng vật liệu cần thiết
       </Text>
       <TouchableOpacity
-        style={[styles.button, { backgroundColor: tintColor }]}
+        style={[styles.button, { backgroundColor: colors.primary }]}
         onPress={() => {
           // Navigate to analysis screen
         }}
       >
-        <Ionicons name="camera" size={20} color="#fff" />
+        <Ionicons name="camera" size={20} color={colors.textInverse} />
         <Text style={styles.buttonText}>Phân tích ảnh</Text>
       </TouchableOpacity>
     </View>
@@ -52,7 +50,7 @@ export default function MaterialEstimationScreen() {
             title: 'Ước tính vật liệu',
           }}
         />
-        <View style={[styles.container, { backgroundColor }]}>
+        <View style={[styles.container, { backgroundColor: colors.bg }]}>
           {renderEmpty()}
         </View>
       </>
@@ -72,22 +70,22 @@ export default function MaterialEstimationScreen() {
           title: 'Ước tính vật liệu',
         }}
       />
-      <ScrollView style={[styles.container, { backgroundColor }]}>
+      <ScrollView style={[styles.container, { backgroundColor: colors.bg }]}>
         {/* Summary Card */}
         <View style={styles.summaryCard}>
-          <Text style={[styles.summaryTitle, { color: textColor }]}>
+          <Text style={[styles.summaryTitle, { color: colors.text }]}>
             Tổng quan ước tính
           </Text>
           <View style={styles.summaryRow}>
             <View style={styles.summaryItem}>
-              <Ionicons name="cube" size={32} color={tintColor} />
+              <Ionicons name="cube" size={32} color={colors.primary} />
               <Text style={styles.summaryValue}>
                 {result.materials?.length || 0}
               </Text>
               <Text style={styles.summaryLabel}>Loại vật liệu</Text>
             </View>
             <View style={styles.summaryItem}>
-              <Ionicons name="cash" size={32} color="#0D9488" />
+              <Ionicons name="cash" size={32} color={colors.primary} />
               <Text style={styles.summaryValue}>
                 {(totalCost / 1000000).toFixed(1)}M
               </Text>
@@ -97,7 +95,7 @@ export default function MaterialEstimationScreen() {
               <Ionicons
                 name="speedometer"
                 size={32}
-                color={(result.confidenceScore || 0.8) > 0.7 ? '#0D9488' : '#0D9488'}
+                color={(result.confidenceScore || 0.8) > 0.7 ? colors.primary : colors.primary}
               />
               <Text style={styles.summaryValue}>
                 {Math.round((result.confidenceScore || 0.8) * 100)}%
@@ -109,23 +107,23 @@ export default function MaterialEstimationScreen() {
 
         {/* Materials List */}
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: textColor }]}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>
             Danh sách vật liệu
           </Text>
           {result.materials?.map((material, index) => (
             <View key={index} style={styles.materialCard}>
               <View style={styles.materialHeader}>
-                <Text style={[styles.materialName, { color: textColor }]}>
+                <Text style={[styles.materialName, { color: colors.text }]}>
                   {material.name}
                 </Text>
                 {material.category && (
                   <View
                     style={[
                       styles.categoryBadge,
-                      { backgroundColor: tintColor + '20' },
+                      { backgroundColor: colors.primary + '20' },
                     ]}
                   >
-                    <Text style={[styles.categoryText, { color: tintColor }]}>
+                    <Text style={[styles.categoryText, { color: colors.primary }]}>
                       {material.category}
                     </Text>
                   </View>
@@ -134,18 +132,18 @@ export default function MaterialEstimationScreen() {
 
               <View style={styles.materialDetails}>
                 <View style={styles.detailRow}>
-                  <Ionicons name="layers-outline" size={16} color="#666" />
+                  <Ionicons name="layers-outline" size={16} color={colors.textSecondary} />
                   <Text style={styles.detailLabel}>Số lượng ước tính:</Text>
-                  <Text style={[styles.detailValue, { color: textColor }]}>
+                  <Text style={[styles.detailValue, { color: colors.text }]}>
                     {material.estimatedQuantity} {material.unit}
                   </Text>
                 </View>
 
                 {material.unitPrice && (
                   <View style={styles.detailRow}>
-                    <Ionicons name="pricetag-outline" size={16} color="#666" />
+                    <Ionicons name="pricetag-outline" size={16} color={colors.textSecondary} />
                     <Text style={styles.detailLabel}>Đơn giá:</Text>
-                    <Text style={[styles.detailValue, { color: textColor }]}>
+                    <Text style={[styles.detailValue, { color: colors.text }]}>
                       {material.unitPrice.toLocaleString('vi-VN')} ₫/{material.unit}
                     </Text>
                   </View>
@@ -153,13 +151,13 @@ export default function MaterialEstimationScreen() {
 
                 {material.unitPrice && (
                   <View style={styles.detailRow}>
-                    <Ionicons name="calculator-outline" size={16} color="#666" />
+                    <Ionicons name="calculator-outline" size={16} color={colors.textSecondary} />
                     <Text style={styles.detailLabel}>Thành tiền:</Text>
                     <Text
                       style={[
                         styles.detailValue,
                         styles.priceValue,
-                        { color: '#0D9488' },
+                        { color: colors.primary },
                       ]}
                     >
                       {(
@@ -172,7 +170,7 @@ export default function MaterialEstimationScreen() {
 
                 {material.specifications && (
                   <View style={styles.specsRow}>
-                    <Ionicons name="document-text-outline" size={16} color="#666" />
+                    <Ionicons name="document-text-outline" size={16} color={colors.textSecondary} />
                     <Text style={styles.specsText}>
                       {material.specifications}
                     </Text>
@@ -187,10 +185,10 @@ export default function MaterialEstimationScreen() {
         {result.notes && (
           <View style={styles.notesSection}>
             <View style={styles.notesHeader}>
-              <Ionicons name="information-circle" size={20} color="#0D9488" />
+              <Ionicons name="information-circle" size={20} color={colors.primary} />
               <Text style={styles.notesTitle}>Ghi chú</Text>
             </View>
-            <Text style={[styles.notesText, { color: textColor }]}>
+            <Text style={[styles.notesText, { color: colors.text }]}>
               {result.notes}
             </Text>
           </View>
@@ -198,9 +196,9 @@ export default function MaterialEstimationScreen() {
 
         {/* Export Button */}
         <TouchableOpacity
-          style={[styles.exportButton, { backgroundColor: tintColor }]}
+          style={[styles.exportButton, { backgroundColor: colors.primary }]}
         >
-          <Ionicons name="download-outline" size={20} color="#fff" />
+          <Ionicons name="download-outline" size={20} color={colors.textInverse} />
           <Text style={styles.exportButtonText}>Xuất báo cáo Excel</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -208,68 +206,68 @@ export default function MaterialEstimationScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   container: {
     flex: 1,
   },
   emptyContainer: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
     padding: 32,
   },
   emptyTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: '600' as const,
     marginTop: 16,
   },
   emptyText: {
     fontSize: 14,
-    color: '#666',
+    color: '#6B7280',
     marginTop: 8,
-    textAlign: 'center',
+    textAlign: 'center' as const,
     marginBottom: 24,
   },
   button: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
     gap: 8,
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
   },
   buttonText: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '600' as const,
   },
   summaryCard: {
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#F3F4F6',
     padding: 20,
     margin: 16,
     borderRadius: 12,
   },
   summaryTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: '600' as const,
     marginBottom: 16,
   },
   summaryRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexDirection: 'row' as const,
+    justifyContent: 'space-around' as const,
   },
   summaryItem: {
-    alignItems: 'center',
+    alignItems: 'center' as const,
   },
   summaryValue: {
     fontSize: 24,
-    fontWeight: '700',
-    color: '#333',
+    fontWeight: '700' as const,
+    color: '#374151',
     marginTop: 8,
   },
   summaryLabel: {
     fontSize: 12,
-    color: '#666',
+    color: '#6B7280',
     marginTop: 4,
   },
   section: {
@@ -277,11 +275,11 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: '600' as const,
     marginBottom: 16,
   },
   materialCard: {
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
@@ -292,14 +290,14 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   materialHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: 'row' as const,
+    justifyContent: 'space-between' as const,
+    alignItems: 'center' as const,
     marginBottom: 12,
   },
   materialName: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '600' as const,
     flex: 1,
   },
   categoryBadge: {
@@ -309,41 +307,41 @@ const styles = StyleSheet.create({
   },
   categoryText: {
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: '600' as const,
   },
   materialDetails: {
     gap: 8,
   },
   detailRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
     gap: 8,
   },
   detailLabel: {
     fontSize: 14,
-    color: '#666',
+    color: '#6B7280',
     flex: 1,
   },
   detailValue: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: '500' as const,
   },
   priceValue: {
-    fontWeight: '600',
+    fontWeight: '600' as const,
   },
   specsRow: {
-    flexDirection: 'row',
+    flexDirection: 'row' as const,
     gap: 8,
     marginTop: 8,
     paddingTop: 8,
     borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
+    borderTopColor: '#F3F4F6',
   },
   specsText: {
     flex: 1,
     fontSize: 13,
-    color: '#666',
-    fontStyle: 'italic',
+    color: '#6B7280',
+    fontStyle: 'italic' as const,
   },
   notesSection: {
     margin: 16,
@@ -354,14 +352,14 @@ const styles = StyleSheet.create({
     borderLeftColor: '#0D9488',
   },
   notesHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
     gap: 8,
     marginBottom: 8,
   },
   notesTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '600' as const,
     color: '#0D9488',
   },
   notesText: {
@@ -369,17 +367,17 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   exportButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
     gap: 8,
     margin: 16,
     padding: 16,
     borderRadius: 12,
   },
   exportButtonText: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '600' as const,
   },
-});
+};

@@ -1,10 +1,10 @@
-import { Colors } from "@/constants/theme";
+import { DSCard } from "@/components/ds";
+import { useDS } from "@/hooks/useDS";
 import { Ionicons } from "@expo/vector-icons";
 import { Stack } from "expo-router";
 import React, { useMemo, useState } from "react";
 import {
     ScrollView,
-    StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
@@ -189,103 +189,279 @@ const AccordionItem: React.FC<AccordionItemProps> = ({
   isExpanded,
   onToggle,
 }) => {
+  const { colors, spacing, radius, text: textStyles, shadow } = useDS();
   return (
-    <View style={styles.accordionItem}>
+    <DSCard
+      variant="elevated"
+      style={{ marginHorizontal: spacing.lg, marginBottom: spacing.sm }}
+    >
       <TouchableOpacity
-        style={styles.accordionHeader}
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: spacing.xl,
+        }}
         onPress={onToggle}
         activeOpacity={0.7}
       >
-        <View style={styles.accordionTitleSection}>
-          <View style={styles.iconCircle}>
-            <Ionicons
-              name="cube-outline"
-              size={20}
-              color={Colors.light.primary}
-            />
+        <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
+          <View
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: 18,
+              backgroundColor: colors.primaryBg,
+              justifyContent: "center",
+              alignItems: "center",
+              marginRight: spacing.lg,
+            }}
+          >
+            <Ionicons name="cube-outline" size={20} color={colors.primary} />
           </View>
-          <Text style={styles.accordionTitle}>
+          <Text
+            style={[textStyles.bodySemibold, { color: colors.text, flex: 1 }]}
+          >
             {item.category || item.code}
           </Text>
         </View>
         <Ionicons
           name={isExpanded ? "chevron-up" : "chevron-down"}
           size={20}
-          color="#999"
+          color={colors.textTertiary}
         />
       </TouchableOpacity>
 
       {isExpanded && (
-        <View style={styles.accordionContent}>
+        <View
+          style={{
+            paddingHorizontal: spacing.xl,
+            paddingBottom: spacing.xl,
+            borderTopWidth: 1,
+            borderTopColor: colors.divider,
+          }}
+        >
           {item.items ? (
-            // Material standards or labor prices
             item.items.map((subItem: any, idx: number) => (
-              <View key={idx} style={styles.subItem}>
-                <View style={styles.subItemHeader}>
-                  <Text style={styles.subItemName}>{subItem.name}</Text>
-                  <View style={styles.unitBadge}>
-                    <Text style={styles.unitText}>{subItem.unit}</Text>
+              <View
+                key={idx}
+                style={{
+                  backgroundColor: colors.bgMuted,
+                  padding: spacing.lg,
+                  borderRadius: radius.md,
+                  marginTop: spacing.lg,
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    marginBottom: spacing.sm,
+                  }}
+                >
+                  <Text
+                    style={[
+                      textStyles.bodySemibold,
+                      { color: colors.text, flex: 1 },
+                    ]}
+                  >
+                    {subItem.name}
+                  </Text>
+                  <View
+                    style={{
+                      backgroundColor: colors.primaryBg,
+                      paddingHorizontal: spacing.sm,
+                      paddingVertical: 2,
+                      borderRadius: radius.xs,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 11,
+                        fontWeight: "600",
+                        color: colors.info,
+                      }}
+                    >
+                      {subItem.unit}
+                    </Text>
                   </View>
                 </View>
-                <View style={styles.subItemRow}>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    marginBottom: spacing.xs,
+                  }}
+                >
                   <Ionicons
                     name="checkmark-circle"
                     size={16}
-                    color={Colors.light.success}
+                    color={colors.success}
                   />
-                  <Text style={styles.subItemStandard}>
+                  <Text
+                    style={{
+                      fontSize: 13,
+                      fontWeight: "600",
+                      color: colors.primary,
+                      marginLeft: spacing.xs,
+                    }}
+                  >
                     {subItem.standard || subItem.price}
                   </Text>
                 </View>
                 {subItem.region && (
-                  <View style={styles.subItemRow}>
-                    <Ionicons
-                      name="location"
-                      size={16}
-                      color={Colors.light.info}
-                    />
-                    <Text style={styles.subItemRegion}>{subItem.region}</Text>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      marginBottom: spacing.xs,
+                    }}
+                  >
+                    <Ionicons name="location" size={16} color={colors.info} />
+                    <Text
+                      style={{
+                        fontSize: 13,
+                        color: colors.primary,
+                        marginLeft: spacing.xs,
+                      }}
+                    >
+                      {subItem.region}
+                    </Text>
                   </View>
                 )}
-                <Text style={styles.subItemDescription}>
+                <Text
+                  style={[
+                    textStyles.small,
+                    {
+                      color: colors.textSecondary,
+                      lineHeight: 18,
+                      marginTop: spacing.xs,
+                    },
+                  ]}
+                >
                   {subItem.description || subItem.note}
                 </Text>
               </View>
             ))
           ) : (
-            // Building codes
-            <View style={styles.codeDetail}>
-              <View style={styles.codeRow}>
-                <Text style={styles.codeLabel}>Tiêu đề:</Text>
-                <Text style={styles.codeValue}>{item.title}</Text>
+            <View style={{ paddingTop: spacing.lg }}>
+              <View style={{ marginBottom: spacing.lg }}>
+                <Text
+                  style={[
+                    textStyles.small,
+                    {
+                      fontWeight: "600",
+                      color: colors.textTertiary,
+                      marginBottom: spacing.xs,
+                    },
+                  ]}
+                >
+                  Tiêu đề:
+                </Text>
+                <Text
+                  style={[
+                    textStyles.bodySemibold,
+                    { color: colors.text, lineHeight: 20 },
+                  ]}
+                >
+                  {item.title}
+                </Text>
               </View>
-              <View style={styles.codeRow}>
-                <Text style={styles.codeLabel}>Lĩnh vực:</Text>
-                <View style={styles.categoryBadge}>
-                  <Text style={styles.categoryText}>{item.category}</Text>
+              <View style={{ marginBottom: spacing.lg }}>
+                <Text
+                  style={[
+                    textStyles.small,
+                    {
+                      fontWeight: "600",
+                      color: colors.textTertiary,
+                      marginBottom: spacing.xs,
+                    },
+                  ]}
+                >
+                  Lĩnh vực:
+                </Text>
+                <View
+                  style={{
+                    backgroundColor: colors.primaryBg,
+                    paddingHorizontal: spacing.lg,
+                    paddingVertical: spacing.xs,
+                    borderRadius: radius.full,
+                    alignSelf: "flex-start",
+                  }}
+                >
+                  <Text
+                    style={[
+                      textStyles.small,
+                      { fontWeight: "600", color: colors.success },
+                    ]}
+                  >
+                    {item.category}
+                  </Text>
                 </View>
               </View>
-              <View style={styles.codeRow}>
-                <Text style={styles.codeLabel}>Mô tả:</Text>
-                <Text style={styles.codeDescription}>{item.description}</Text>
+              <View style={{ marginBottom: spacing.lg }}>
+                <Text
+                  style={[
+                    textStyles.small,
+                    {
+                      fontWeight: "600",
+                      color: colors.textTertiary,
+                      marginBottom: spacing.xs,
+                    },
+                  ]}
+                >
+                  Mô tả:
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 13,
+                    color: colors.textSecondary,
+                    lineHeight: 20,
+                  }}
+                >
+                  {item.description}
+                </Text>
               </View>
-              <TouchableOpacity style={styles.downloadButton}>
+              <TouchableOpacity
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: colors.primaryBg,
+                  borderWidth: 1,
+                  borderColor: colors.primary,
+                  paddingVertical: spacing.sm,
+                  borderRadius: radius.md,
+                  marginTop: spacing.sm,
+                }}
+              >
                 <Ionicons
                   name="download-outline"
                   size={18}
-                  color={Colors.light.primary}
+                  color={colors.primary}
                 />
-                <Text style={styles.downloadButtonText}>Tải tài liệu</Text>
+                <Text
+                  style={{
+                    fontSize: 13,
+                    fontWeight: "600",
+                    color: colors.primary,
+                    marginLeft: spacing.xs,
+                  }}
+                >
+                  Tải tài liệu
+                </Text>
               </TouchableOpacity>
             </View>
           )}
         </View>
       )}
-    </View>
+    </DSCard>
   );
 };
 
 export default function ConstructionLookupScreen() {
+  const { colors, spacing, radius, text: textStyles } = useDS();
   const [activeTab, setActiveTab] = useState("area");
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedId, setExpandedId] = useState<number | null>(null);
@@ -335,41 +511,80 @@ export default function ConstructionLookupScreen() {
       <Stack.Screen
         options={{
           title: "Tra cứu xây dựng",
-          headerStyle: { backgroundColor: Colors.light.primary },
-          headerTintColor: "#fff",
+          headerStyle: { backgroundColor: colors.primary },
+          headerTintColor: colors.textInverse,
           headerTitleStyle: { fontWeight: "600" },
         }}
       />
-      <View style={styles.container}>
+      <View style={{ flex: 1, backgroundColor: colors.bgMuted }}>
         {/* Search Bar or Calculator Header */}
         {activeTab === "area" ? (
-          <View style={styles.searchSection}>
-            <Text style={{ fontSize: 16, fontWeight: "700", color: "#333" }}>
+          <View
+            style={{
+              backgroundColor: colors.card,
+              paddingHorizontal: spacing.xl,
+              paddingVertical: spacing.lg,
+              borderBottomWidth: 1,
+              borderBottomColor: colors.divider,
+            }}
+          >
+            <Text style={[textStyles.bodySemibold, { color: colors.text }]}>
               Tính diện tích xây dựng
             </Text>
-            <Text style={{ marginTop: 6, fontSize: 12, color: "#666" }}>
+            <Text
+              style={[
+                textStyles.small,
+                { marginTop: spacing.xs, color: colors.textSecondary },
+              ]}
+            >
               Nhập kích thước lô đất và thông số công trình để ước tính tổng
               diện tích xây dựng.
             </Text>
           </View>
         ) : (
-          <View style={styles.searchSection}>
-            <View className="search-bar" style={styles.searchBar}>
-              <Ionicons name="search" size={20} color="#999" />
+          <View
+            style={{
+              backgroundColor: colors.card,
+              paddingHorizontal: spacing.xl,
+              paddingVertical: spacing.lg,
+              borderBottomWidth: 1,
+              borderBottomColor: colors.divider,
+            }}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                backgroundColor: colors.bgMuted,
+                borderRadius: radius.md,
+                paddingHorizontal: spacing.lg,
+                height: 40,
+              }}
+            >
+              <Ionicons name="search" size={20} color={colors.textTertiary} />
               <TextInput
-                style={styles.searchInput}
+                style={{
+                  flex: 1,
+                  marginLeft: spacing.sm,
+                  fontSize: 14,
+                  color: colors.text,
+                }}
                 placeholder={
                   activeTab === "codes"
                     ? "Tìm mã quy chuẩn, tiêu đề..."
                     : "Tìm kiếm vật tư, công việc..."
                 }
-                placeholderTextColor="#999"
+                placeholderTextColor={colors.textTertiary}
                 value={searchQuery}
                 onChangeText={setSearchQuery}
               />
               {searchQuery.length > 0 && (
                 <TouchableOpacity onPress={() => setSearchQuery("")}>
-                  <Ionicons name="close-circle" size={20} color="#999" />
+                  <Ionicons
+                    name="close-circle"
+                    size={20}
+                    color={colors.textTertiary}
+                  />
                 </TouchableOpacity>
               )}
             </View>
@@ -377,12 +592,28 @@ export default function ConstructionLookupScreen() {
         )}
 
         {/* Tabs */}
-        <View style={styles.tabs}>
+        <View
+          style={{
+            backgroundColor: colors.card,
+            borderBottomWidth: 1,
+            borderBottomColor: colors.divider,
+            paddingHorizontal: spacing.lg,
+          }}
+        >
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             {TABS.map((tab) => (
               <TouchableOpacity
                 key={tab.id}
-                style={[styles.tab, activeTab === tab.id && styles.tabActive]}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  paddingHorizontal: spacing.xl,
+                  paddingVertical: spacing.lg,
+                  marginRight: spacing.sm,
+                  borderBottomWidth: 2,
+                  borderBottomColor:
+                    activeTab === tab.id ? colors.primary : "transparent",
+                }}
                 onPress={() => {
                   setActiveTab(tab.id);
                   setExpandedId(null);
@@ -392,12 +623,21 @@ export default function ConstructionLookupScreen() {
                 <Ionicons
                   name={tab.icon as any}
                   size={20}
-                  color={activeTab === tab.id ? Colors.light.primary : "#999"}
+                  color={
+                    activeTab === tab.id ? colors.primary : colors.textTertiary
+                  }
                 />
                 <Text
                   style={[
-                    styles.tabText,
-                    activeTab === tab.id && styles.tabTextActive,
+                    textStyles.body,
+                    {
+                      marginLeft: spacing.xs,
+                      fontWeight: activeTab === tab.id ? "600" : "500",
+                      color:
+                        activeTab === tab.id
+                          ? colors.primary
+                          : colors.textTertiary,
+                    },
                   ]}
                 >
                   {tab.name}
@@ -408,9 +648,34 @@ export default function ConstructionLookupScreen() {
         </View>
 
         {/* Info Banner */}
-        <View style={styles.infoBanner}>
-          <Ionicons name="information-circle" size={20} color="#0D9488" />
-          <Text style={styles.infoBannerText}>
+        <View
+          style={{
+            backgroundColor: colors.primaryBg,
+            flexDirection: "row",
+            alignItems: "center",
+            paddingHorizontal: spacing.xl,
+            paddingVertical: spacing.md,
+            marginTop: spacing.sm,
+            marginHorizontal: spacing.lg,
+            borderRadius: radius.md,
+          }}
+        >
+          <Ionicons
+            name="information-circle"
+            size={20}
+            color={colors.primary}
+          />
+          <Text
+            style={[
+              textStyles.small,
+              {
+                flex: 1,
+                color: colors.info,
+                marginLeft: spacing.sm,
+                lineHeight: 18,
+              },
+            ]}
+          >
             {activeTab === "area"
               ? "Kết quả chỉ mang tính tham khảo, chưa thay thế hồ sơ thiết kế."
               : activeTab === "standards"
@@ -426,113 +691,281 @@ export default function ConstructionLookupScreen() {
         {/* Content */}
         {activeTab === "area" ? (
           <ScrollView
-            style={styles.content}
+            style={{ flex: 1, paddingTop: spacing.sm }}
             showsVerticalScrollIndicator={false}
           >
             {/* Calculator form */}
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>Thông số lô đất (m)</Text>
-              <View style={styles.row2}>
-                <View style={{ flex: 1, marginRight: 8 }}>
-                  <Text style={styles.label}>Chiều dài</Text>
+            <DSCard
+              variant="elevated"
+              style={{
+                marginHorizontal: spacing.lg,
+                marginBottom: spacing.sm,
+                padding: spacing.xl,
+              }}
+            >
+              <Text
+                style={[
+                  textStyles.bodySemibold,
+                  { color: colors.text, marginBottom: spacing.md },
+                ]}
+              >
+                Thông số lô đất (m)
+              </Text>
+              <View style={{ flexDirection: "row" }}>
+                <View style={{ flex: 1, marginRight: spacing.sm }}>
+                  <Text
+                    style={[
+                      textStyles.small,
+                      { color: colors.textSecondary, marginBottom: spacing.xs },
+                    ]}
+                  >
+                    Chiều dài
+                  </Text>
                   <TextInput
                     keyboardType="numeric"
                     value={length}
                     onChangeText={setLength}
-                    style={styles.input}
+                    style={{
+                      height: 40,
+                      borderRadius: radius.md,
+                      borderWidth: 1,
+                      borderColor: colors.border,
+                      paddingHorizontal: spacing.lg,
+                      backgroundColor: colors.card,
+                      color: colors.text,
+                    }}
                     placeholder="VD: 10"
                   />
                 </View>
-                <View style={{ flex: 1, marginLeft: 8 }}>
-                  <Text style={styles.label}>Chiều rộng</Text>
+                <View style={{ flex: 1, marginLeft: spacing.sm }}>
+                  <Text
+                    style={[
+                      textStyles.small,
+                      { color: colors.textSecondary, marginBottom: spacing.xs },
+                    ]}
+                  >
+                    Chiều rộng
+                  </Text>
                   <TextInput
                     keyboardType="numeric"
                     value={width}
                     onChangeText={setWidth}
-                    style={styles.input}
+                    style={{
+                      height: 40,
+                      borderRadius: radius.md,
+                      borderWidth: 1,
+                      borderColor: colors.border,
+                      paddingHorizontal: spacing.lg,
+                      backgroundColor: colors.card,
+                      color: colors.text,
+                    }}
                     placeholder="VD: 5"
                   />
                 </View>
               </View>
 
-              <Text style={[styles.cardTitle, { marginTop: 16 }]}>
+              <Text
+                style={[
+                  textStyles.bodySemibold,
+                  {
+                    color: colors.text,
+                    marginTop: spacing.xl,
+                    marginBottom: spacing.md,
+                  },
+                ]}
+              >
                 Khoảng lùi (m)
               </Text>
-              <View style={styles.row2}>
-                <View style={{ flex: 1, marginRight: 8 }}>
-                  <Text style={styles.label}>Trước</Text>
+              <View style={{ flexDirection: "row" }}>
+                <View style={{ flex: 1, marginRight: spacing.sm }}>
+                  <Text
+                    style={[
+                      textStyles.small,
+                      { color: colors.textSecondary, marginBottom: spacing.xs },
+                    ]}
+                  >
+                    Trước
+                  </Text>
                   <TextInput
                     keyboardType="numeric"
                     value={setbackFront}
                     onChangeText={setSetbackFront}
-                    style={styles.input}
+                    style={{
+                      height: 40,
+                      borderRadius: radius.md,
+                      borderWidth: 1,
+                      borderColor: colors.border,
+                      paddingHorizontal: spacing.lg,
+                      backgroundColor: colors.card,
+                      color: colors.text,
+                    }}
                     placeholder="0"
                   />
                 </View>
-                <View style={{ flex: 1, marginLeft: 8 }}>
-                  <Text style={styles.label}>Sau</Text>
+                <View style={{ flex: 1, marginLeft: spacing.sm }}>
+                  <Text
+                    style={[
+                      textStyles.small,
+                      { color: colors.textSecondary, marginBottom: spacing.xs },
+                    ]}
+                  >
+                    Sau
+                  </Text>
                   <TextInput
                     keyboardType="numeric"
                     value={setbackBack}
                     onChangeText={setSetbackBack}
-                    style={styles.input}
+                    style={{
+                      height: 40,
+                      borderRadius: radius.md,
+                      borderWidth: 1,
+                      borderColor: colors.border,
+                      paddingHorizontal: spacing.lg,
+                      backgroundColor: colors.card,
+                      color: colors.text,
+                    }}
                     placeholder="0"
                   />
                 </View>
               </View>
-              <View style={styles.row2}>
-                <View style={{ flex: 1, marginRight: 8 }}>
-                  <Text style={styles.label}>Trái</Text>
+              <View style={{ flexDirection: "row", marginTop: spacing.sm }}>
+                <View style={{ flex: 1, marginRight: spacing.sm }}>
+                  <Text
+                    style={[
+                      textStyles.small,
+                      { color: colors.textSecondary, marginBottom: spacing.xs },
+                    ]}
+                  >
+                    Trái
+                  </Text>
                   <TextInput
                     keyboardType="numeric"
                     value={setbackLeft}
                     onChangeText={setSetbackLeft}
-                    style={styles.input}
+                    style={{
+                      height: 40,
+                      borderRadius: radius.md,
+                      borderWidth: 1,
+                      borderColor: colors.border,
+                      paddingHorizontal: spacing.lg,
+                      backgroundColor: colors.card,
+                      color: colors.text,
+                    }}
                     placeholder="0"
                   />
                 </View>
-                <View style={{ flex: 1, marginLeft: 8 }}>
-                  <Text style={styles.label}>Phải</Text>
+                <View style={{ flex: 1, marginLeft: spacing.sm }}>
+                  <Text
+                    style={[
+                      textStyles.small,
+                      { color: colors.textSecondary, marginBottom: spacing.xs },
+                    ]}
+                  >
+                    Phải
+                  </Text>
                   <TextInput
                     keyboardType="numeric"
                     value={setbackRight}
                     onChangeText={setSetbackRight}
-                    style={styles.input}
+                    style={{
+                      height: 40,
+                      borderRadius: radius.md,
+                      borderWidth: 1,
+                      borderColor: colors.border,
+                      paddingHorizontal: spacing.lg,
+                      backgroundColor: colors.card,
+                      color: colors.text,
+                    }}
                     placeholder="0"
                   />
                 </View>
               </View>
-            </View>
+            </DSCard>
 
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>Cấu hình công trình</Text>
-              <View style={styles.row2}>
-                <View style={{ flex: 1, marginRight: 8 }}>
-                  <Text style={styles.label}>Số tầng</Text>
+            <DSCard
+              variant="elevated"
+              style={{
+                marginHorizontal: spacing.lg,
+                marginBottom: spacing.sm,
+                padding: spacing.xl,
+              }}
+            >
+              <Text
+                style={[
+                  textStyles.bodySemibold,
+                  { color: colors.text, marginBottom: spacing.md },
+                ]}
+              >
+                Cấu hình công trình
+              </Text>
+              <View style={{ flexDirection: "row" }}>
+                <View style={{ flex: 1, marginRight: spacing.sm }}>
+                  <Text
+                    style={[
+                      textStyles.small,
+                      { color: colors.textSecondary, marginBottom: spacing.xs },
+                    ]}
+                  >
+                    Số tầng
+                  </Text>
                   <TextInput
                     keyboardType="numeric"
                     value={floors}
                     onChangeText={setFloors}
-                    style={styles.input}
+                    style={{
+                      height: 40,
+                      borderRadius: radius.md,
+                      borderWidth: 1,
+                      borderColor: colors.border,
+                      paddingHorizontal: spacing.lg,
+                      backgroundColor: colors.card,
+                      color: colors.text,
+                    }}
                     placeholder="VD: 2"
                   />
                 </View>
-                <View style={{ flex: 1, marginLeft: 8 }}>
-                  <Text style={styles.label}>Sân thượng</Text>
-                  <View style={styles.chipsRow}>
+                <View style={{ flex: 1, marginLeft: spacing.sm }}>
+                  <Text
+                    style={[
+                      textStyles.small,
+                      { color: colors.textSecondary, marginBottom: spacing.xs },
+                    ]}
+                  >
+                    Sân thượng
+                  </Text>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      flexWrap: "wrap",
+                      gap: spacing.sm,
+                      marginTop: spacing.xs,
+                    }}
+                  >
                     {(["none", "slab", "tile"] as const).map((rt) => (
                       <TouchableOpacity
                         key={rt}
                         onPress={() => setRoofType(rt)}
-                        style={[
-                          styles.chip,
-                          roofType === rt && styles.chipActive,
-                        ]}
+                        style={{
+                          borderWidth: 1,
+                          borderColor:
+                            roofType === rt ? colors.info : colors.border,
+                          paddingHorizontal: spacing.md,
+                          paddingVertical: spacing.xs,
+                          borderRadius: radius.full,
+                          backgroundColor:
+                            roofType === rt ? colors.primaryBg : colors.card,
+                        }}
                       >
                         <Text
                           style={[
-                            styles.chipText,
-                            roofType === rt && styles.chipTextActive,
+                            textStyles.small,
+                            {
+                              fontWeight: "600",
+                              color:
+                                roofType === rt
+                                  ? colors.info
+                                  : colors.textSecondary,
+                            },
                           ]}
                         >
                           {rt === "none"
@@ -547,17 +980,45 @@ export default function ConstructionLookupScreen() {
                 </View>
               </View>
 
-              <View style={{ marginTop: 12 }}>
-                <Text style={styles.label}>Tầng lửng</Text>
-                <View style={styles.chipsRow}>
+              <View style={{ marginTop: spacing.lg }}>
+                <Text
+                  style={[
+                    textStyles.small,
+                    { color: colors.textSecondary, marginBottom: spacing.xs },
+                  ]}
+                >
+                  Tầng lửng
+                </Text>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    flexWrap: "wrap",
+                    gap: spacing.sm,
+                    marginTop: spacing.xs,
+                  }}
+                >
                   <TouchableOpacity
                     onPress={() => setMezzanine(false)}
-                    style={[styles.chip, !mezzanine && styles.chipActive]}
+                    style={{
+                      borderWidth: 1,
+                      borderColor: !mezzanine ? colors.info : colors.border,
+                      paddingHorizontal: spacing.md,
+                      paddingVertical: spacing.xs,
+                      borderRadius: radius.full,
+                      backgroundColor: !mezzanine
+                        ? colors.primaryBg
+                        : colors.card,
+                    }}
                   >
                     <Text
                       style={[
-                        styles.chipText,
-                        !mezzanine && styles.chipTextActive,
+                        textStyles.small,
+                        {
+                          fontWeight: "600",
+                          color: !mezzanine
+                            ? colors.info
+                            : colors.textSecondary,
+                        },
                       ]}
                     >
                       Không
@@ -565,12 +1026,24 @@ export default function ConstructionLookupScreen() {
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => setMezzanine(true)}
-                    style={[styles.chip, mezzanine && styles.chipActive]}
+                    style={{
+                      borderWidth: 1,
+                      borderColor: mezzanine ? colors.info : colors.border,
+                      paddingHorizontal: spacing.md,
+                      paddingVertical: spacing.xs,
+                      borderRadius: radius.full,
+                      backgroundColor: mezzanine
+                        ? colors.primaryBg
+                        : colors.card,
+                    }}
                   >
                     <Text
                       style={[
-                        styles.chipText,
-                        mezzanine && styles.chipTextActive,
+                        textStyles.small,
+                        {
+                          fontWeight: "600",
+                          color: mezzanine ? colors.info : colors.textSecondary,
+                        },
                       ]}
                     >
                       Có (70%)
@@ -578,9 +1051,8 @@ export default function ConstructionLookupScreen() {
                   </TouchableOpacity>
                 </View>
               </View>
-            </View>
+            </DSCard>
 
-            {/* Results */}
             <AreaResult
               length={length}
               width={width}
@@ -592,12 +1064,11 @@ export default function ConstructionLookupScreen() {
               mezzanine={mezzanine}
               roofType={roofType}
             />
-
             <View style={{ height: 20 }} />
           </ScrollView>
         ) : (
           <ScrollView
-            style={styles.content}
+            style={{ flex: 1, paddingTop: spacing.sm }}
             showsVerticalScrollIndicator={false}
           >
             {filteredData.map((item) => (
@@ -610,26 +1081,80 @@ export default function ConstructionLookupScreen() {
             ))}
 
             {filteredData.length === 0 && (
-              <View style={styles.emptyState}>
-                <Ionicons name="search-outline" size={64} color="#ccc" />
-                <Text style={styles.emptyText}>Không tìm thấy kết quả</Text>
+              <View
+                style={{
+                  alignItems: "center",
+                  justifyContent: "center",
+                  paddingVertical: 60,
+                }}
+              >
+                <Ionicons
+                  name="search-outline"
+                  size={64}
+                  color={colors.border}
+                />
+                <Text
+                  style={[
+                    textStyles.body,
+                    {
+                      color: colors.textTertiary,
+                      marginTop: spacing.xl,
+                      marginBottom: spacing.xxl,
+                    },
+                  ]}
+                >
+                  Không tìm thấy kết quả
+                </Text>
                 <TouchableOpacity
-                  style={styles.resetButton}
+                  style={{
+                    backgroundColor: colors.primary,
+                    paddingHorizontal: spacing.xxl,
+                    paddingVertical: spacing.md,
+                    borderRadius: radius.md,
+                  }}
                   onPress={() => setSearchQuery("")}
                 >
-                  <Text style={styles.resetButtonText}>Xóa tìm kiếm</Text>
+                  <Text
+                    style={[
+                      textStyles.bodySemibold,
+                      { color: colors.textInverse },
+                    ]}
+                  >
+                    Xóa tìm kiếm
+                  </Text>
                 </TouchableOpacity>
               </View>
             )}
-
             <View style={{ height: 20 }} />
           </ScrollView>
         )}
 
         {/* Bottom Info */}
-        <View style={styles.bottomInfo}>
-          <Ionicons name="alert-circle-outline" size={16} color="#0D9488" />
-          <Text style={styles.bottomInfoText}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            backgroundColor: colors.infoBg,
+            paddingHorizontal: spacing.xl,
+            paddingVertical: spacing.md,
+            borderTopWidth: 1,
+            borderTopColor: colors.divider,
+          }}
+        >
+          <Ionicons
+            name="alert-circle-outline"
+            size={16}
+            color={colors.primary}
+          />
+          <Text
+            style={{
+              flex: 1,
+              fontSize: 11,
+              color: colors.primary,
+              marginLeft: spacing.sm,
+              lineHeight: 16,
+            }}
+          >
             Thông tin mang tính chất tham khảo. Liên hệ chuyên gia để được tư
             vấn chi tiết.
           </Text>
@@ -680,6 +1205,7 @@ function computeArea(p: AreaProps) {
 }
 
 const AreaResult: React.FC<AreaProps> = (props) => {
+  const { colors, spacing, radius, text: textStyles } = useDS();
   const result = useMemo(
     () => computeArea(props),
     [
@@ -695,398 +1221,112 @@ const AreaResult: React.FC<AreaProps> = (props) => {
     ],
   );
   return (
-    <View style={styles.card}>
-      <Text style={styles.cardTitle}>Kết quả ước tính</Text>
-      <View style={styles.resultRow}>
-        <Ionicons
-          name="resize-outline"
-          size={18}
-          color={Colors.light.primary}
-        />
-        <Text style={styles.resultText}>
+    <DSCard
+      variant="elevated"
+      style={{
+        marginHorizontal: spacing.lg,
+        marginBottom: spacing.sm,
+        padding: spacing.xl,
+      }}
+    >
+      <Text
+        style={[
+          textStyles.bodySemibold,
+          { color: colors.text, marginBottom: spacing.md },
+        ]}
+      >
+        Kết quả ước tính
+      </Text>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          marginTop: spacing.sm,
+        }}
+      >
+        <Ionicons name="resize-outline" size={18} color={colors.primary} />
+        <Text
+          style={{ marginLeft: spacing.sm, fontSize: 14, color: colors.text }}
+        >
           Kích thước hiệu dụng: {result.effW.toFixed(2)} x{" "}
           {result.effL.toFixed(2)} m
         </Text>
       </View>
-      <View style={styles.resultRow}>
-        <Ionicons name="grid-outline" size={18} color={Colors.light.primary} />
-        <Text style={styles.resultText}>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          marginTop: spacing.sm,
+        }}
+      >
+        <Ionicons name="grid-outline" size={18} color={colors.primary} />
+        <Text
+          style={{ marginLeft: spacing.sm, fontSize: 14, color: colors.text }}
+        >
           Diện tích 1 sàn: {result.floorArea.toFixed(2)} m²
         </Text>
       </View>
       {props.mezzanine && (
-        <View style={styles.resultRow}>
-          <Ionicons
-            name="layers-outline"
-            size={18}
-            color={Colors.light.primary}
-          />
-          <Text style={styles.resultText}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            marginTop: spacing.sm,
+          }}
+        >
+          <Ionicons name="layers-outline" size={18} color={colors.primary} />
+          <Text
+            style={{ marginLeft: spacing.sm, fontSize: 14, color: colors.text }}
+          >
             Tầng lửng (70%): {result.mezz.toFixed(2)} m²
           </Text>
         </View>
       )}
       {props.roofType !== "none" && (
-        <View style={styles.resultRow}>
-          <Ionicons
-            name="home-outline"
-            size={18}
-            color={Colors.light.primary}
-          />
-          <Text style={styles.resultText}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            marginTop: spacing.sm,
+          }}
+        >
+          <Ionicons name="home-outline" size={18} color={colors.primary} />
+          <Text
+            style={{ marginLeft: spacing.sm, fontSize: 14, color: colors.text }}
+          >
             Mái ({props.roofType === "slab" ? "BTCT 50%" : "Ngói 30%"}):{" "}
             {result.roof.toFixed(2)} m²
           </Text>
         </View>
       )}
-      <View style={[styles.resultRow, { marginTop: 6 }]}>
-        <Ionicons
-          name="calculator-outline"
-          size={18}
-          color={Colors.light.success}
-        />
-        <Text style={[styles.resultText, { fontWeight: "700", color: "#111" }]}>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          marginTop: spacing.md,
+        }}
+      >
+        <Ionicons name="calculator-outline" size={18} color={colors.success} />
+        <Text
+          style={{
+            marginLeft: spacing.sm,
+            fontSize: 14,
+            fontWeight: "700",
+            color: colors.text,
+          }}
+        >
           Tổng diện tích: {result.total.toFixed(2)} m²
         </Text>
       </View>
-      <Text style={{ marginTop: 8, fontSize: 12, color: "#777" }}>
+      <Text
+        style={[
+          textStyles.small,
+          { marginTop: spacing.sm, color: colors.textTertiary, lineHeight: 18 },
+        ]}
+      >
         Lưu ý: Công thức tham khảo (tầng lửng 70%, sân thượng BTCT 50%, mái ngói
         30%). Quy chuẩn có thể thay đổi theo địa phương và hồ sơ thiết kế.
       </Text>
-    </View>
+    </DSCard>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f5f5f5",
-  },
-  searchSection: {
-    backgroundColor: "#fff",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
-  },
-  searchBar: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#f5f5f5",
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    height: 40,
-  },
-  searchInput: {
-    flex: 1,
-    marginLeft: 8,
-    fontSize: 14,
-    color: "#333",
-  },
-  tabs: {
-    backgroundColor: "#fff",
-    borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
-    paddingHorizontal: 12,
-  },
-  tab: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    marginRight: 8,
-    borderBottomWidth: 2,
-    borderBottomColor: "transparent",
-  },
-  tabActive: {
-    borderBottomColor: Colors.light.primary,
-  },
-  tabText: {
-    fontSize: 14,
-    fontWeight: "500",
-    color: "#999",
-    marginLeft: 6,
-  },
-  tabTextActive: {
-    color: Colors.light.primary,
-    fontWeight: "600",
-  },
-  infoBanner: {
-    backgroundColor: "#F0FDFA",
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    marginTop: 8,
-    marginHorizontal: 12,
-    borderRadius: 8,
-  },
-  infoBannerText: {
-    flex: 1,
-    fontSize: 12,
-    color: "#1976d2",
-    marginLeft: 8,
-    lineHeight: 18,
-  },
-  content: {
-    flex: 1,
-    paddingTop: 8,
-  },
-  accordionItem: {
-    backgroundColor: "#fff",
-    marginHorizontal: 12,
-    marginBottom: 8,
-    borderRadius: 12,
-    overflow: "hidden",
-    elevation: 1,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-  },
-  accordionHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: 16,
-  },
-  accordionTitleSection: {
-    flexDirection: "row",
-    alignItems: "center",
-    flex: 1,
-  },
-  iconCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: Colors.light.chipBackground,
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 12,
-  },
-  accordionTitle: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#333",
-    flex: 1,
-  },
-  accordionContent: {
-    paddingHorizontal: 16,
-    paddingBottom: 16,
-    borderTopWidth: 1,
-    borderTopColor: "#f5f5f5",
-  },
-  subItem: {
-    backgroundColor: "#fafafa",
-    padding: 12,
-    borderRadius: 8,
-    marginTop: 12,
-  },
-  subItemHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 8,
-  },
-  subItemName: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#333",
-    flex: 1,
-  },
-  unitBadge: {
-    backgroundColor: "#F0FDFA",
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  unitText: {
-    fontSize: 11,
-    fontWeight: "600",
-    color: "#1976d2",
-  },
-  subItemRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 6,
-  },
-  subItemStandard: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: "#0D9488",
-    marginLeft: 6,
-  },
-  subItemRegion: {
-    fontSize: 13,
-    color: "#0D9488",
-    marginLeft: 6,
-  },
-  subItemDescription: {
-    fontSize: 12,
-    color: "#666",
-    lineHeight: 18,
-    marginTop: 4,
-  },
-  codeDetail: {
-    paddingTop: 12,
-  },
-  codeRow: {
-    marginBottom: 12,
-  },
-  codeLabel: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: "#999",
-    marginBottom: 4,
-  },
-  codeValue: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#333",
-    lineHeight: 20,
-  },
-  categoryBadge: {
-    backgroundColor: Colors.light.chipBackground,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
-    alignSelf: "flex-start",
-  },
-  categoryText: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: Colors.light.success,
-  },
-  codeDescription: {
-    fontSize: 13,
-    color: "#666",
-    lineHeight: 20,
-  },
-  downloadButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: Colors.light.chipBackground,
-    borderWidth: 1,
-    borderColor: Colors.light.primary,
-    paddingVertical: 8,
-    borderRadius: 8,
-    marginTop: 8,
-  },
-  downloadButtonText: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: Colors.light.primary,
-    marginLeft: 6,
-  },
-  emptyState: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 60,
-  },
-  emptyText: {
-    fontSize: 15,
-    color: "#999",
-    marginTop: 16,
-    marginBottom: 20,
-  },
-  resetButton: {
-    backgroundColor: Colors.light.primary,
-    paddingHorizontal: 24,
-    paddingVertical: 10,
-    borderRadius: 8,
-  },
-  resetButtonText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#fff",
-  },
-  bottomInfo: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#F0F8FF",
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderTopWidth: 1,
-    borderTopColor: "#f0f0f0",
-  },
-  bottomInfoText: {
-    flex: 1,
-    fontSize: 11,
-    color: "#0D9488",
-    marginLeft: 8,
-    lineHeight: 16,
-  },
-  // --- Calculator styles ---
-  card: {
-    backgroundColor: "#fff",
-    marginHorizontal: 12,
-    marginBottom: 8,
-    borderRadius: 12,
-    padding: 16,
-    elevation: 1,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-  },
-  cardTitle: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: "#333",
-    marginBottom: 10,
-  },
-  row2: {
-    flexDirection: "row",
-  },
-  label: {
-    fontSize: 12,
-    color: "#666",
-    marginBottom: 6,
-  },
-  input: {
-    height: 40,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#e5e5e5",
-    paddingHorizontal: 12,
-    backgroundColor: "#fff",
-    color: "#333",
-  },
-  chipsRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-    marginTop: 6,
-  },
-  chip: {
-    borderWidth: 1,
-    borderColor: "#e5e5e5",
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 16,
-    backgroundColor: "#fff",
-  },
-  chipActive: {
-    backgroundColor: "#F0FDFA",
-    borderColor: "#90caf9",
-  },
-  chipText: {
-    fontSize: 12,
-    color: "#555",
-    fontWeight: "600",
-  },
-  chipTextActive: {
-    color: "#1976d2",
-  },
-  resultRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 8,
-  },
-  resultText: {
-    marginLeft: 8,
-    fontSize: 14,
-    color: "#333",
-  },
-});

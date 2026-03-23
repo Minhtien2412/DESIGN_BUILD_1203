@@ -1,19 +1,16 @@
+import { DSEmptyState } from '@/components/ds';
+import { DSModuleScreen } from '@/components/ds/layouts';
+import { useDS } from '@/hooks/useDS';
 import { Ionicons } from '@expo/vector-icons';
-import { Stack } from 'expo-router';
 import { useState } from 'react';
 import {
-    Dimensions,
     ScrollView,
     Share,
-    StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
     View,
 } from 'react-native';
-
-const { width } = Dimensions.get('window');
-const CARD_WIDTH = (width - 48) / 2;
 
 // Mock data - Document templates
 const DOCUMENTS = [
@@ -118,22 +115,25 @@ const CATEGORIES = [
 
 const FILE_TYPES = ['Tất cả', 'PDF', 'DOC', 'DWG', 'XLSX'];
 
-const getFileIcon = (type: string) => {
-  switch (type) {
-    case 'PDF':
-      return { name: 'document-text', color: '#000000' };
-    case 'DOC':
-      return { name: 'document', color: '#0D9488' };
-    case 'DWG':
-      return { name: 'cube', color: '#0D9488' };
-    case 'XLSX':
-      return { name: 'stats-chart', color: '#0D9488' };
-    default:
-      return { name: 'document-outline', color: '#999' };
-  }
-};
-
 export default function SampleDocsScreen() {
+  const { colors, spacing, radius, text: textStyles, shadow, screen } = useDS();
+  const CARD_WIDTH = (screen.width - spacing.xl * 2 - spacing.md) / 2;
+
+  const getFileIcon = (type: string) => {
+    switch (type) {
+      case 'PDF':
+        return { name: 'document-text', color: colors.text };
+      case 'DOC':
+        return { name: 'document', color: colors.primary };
+      case 'DWG':
+        return { name: 'cube', color: colors.primary };
+      case 'XLSX':
+        return { name: 'stats-chart', color: colors.primary };
+      default:
+        return { name: 'document-outline', color: colors.textTertiary };
+    }
+  };
+
   const [selectedCategory, setSelectedCategory] = useState('Tất cả');
   const [selectedFileType, setSelectedFileType] = useState('Tất cả');
   const [searchQuery, setSearchQuery] = useState('');
@@ -177,56 +177,76 @@ export default function SampleDocsScreen() {
   };
 
   return (
-    <>
-      <Stack.Screen
-        options={{
-          title: 'Hồ sơ mẫu',
-          headerStyle: { backgroundColor: '#0D9488' },
-          headerTintColor: '#fff',
-          headerTitleStyle: { fontWeight: '600' },
-        }}
-      />
-      <View style={styles.container}>
+    <DSModuleScreen title="Hồ sơ mẫu" gradientHeader>
         {/* Search Bar */}
-        <View style={styles.searchSection}>
-          <View style={styles.searchBar}>
-            <Ionicons name="search" size={20} color="#999" />
+        <View style={{
+          backgroundColor: colors.card,
+          paddingHorizontal: spacing.md,
+          paddingVertical: spacing.sm,
+          borderBottomWidth: 1,
+          borderBottomColor: colors.borderLight,
+        }}>
+          <View style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            backgroundColor: colors.bgInput,
+            borderRadius: radius.md,
+            paddingHorizontal: spacing.sm,
+            height: 40,
+          }}>
+            <Ionicons name="search" size={20} color={colors.textTertiary} />
             <TextInput
-              style={styles.searchInput}
+              style={{
+                flex: 1,
+                marginLeft: spacing.xs,
+                fontSize: 14,
+                color: colors.text,
+              }}
               placeholder="Tìm hồ sơ, tài liệu..."
-              placeholderTextColor="#999"
+              placeholderTextColor={colors.textTertiary}
               value={searchQuery}
               onChangeText={setSearchQuery}
             />
             {searchQuery.length > 0 && (
               <TouchableOpacity onPress={() => setSearchQuery('')}>
-                <Ionicons name="close-circle" size={20} color="#999" />
+                <Ionicons name="close-circle" size={20} color={colors.textTertiary} />
               </TouchableOpacity>
             )}
           </View>
         </View>
 
         {/* Filter Section */}
-        <View style={styles.filterSection}>
+        <View style={{
+          backgroundColor: colors.card,
+          paddingVertical: spacing.xs,
+          borderBottomWidth: 1,
+          borderBottomColor: colors.borderLight,
+        }}>
           {/* Category Filter */}
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            style={styles.filterScroll}
+            style={{ paddingHorizontal: spacing.sm, marginBottom: spacing.xs }}
           >
             {CATEGORIES.map((category) => (
               <TouchableOpacity
                 key={category}
-                style={[
-                  styles.filterChip,
-                  selectedCategory === category && styles.filterChipActive,
-                ]}
+                style={{
+                  paddingHorizontal: spacing.md,
+                  paddingVertical: spacing.xs,
+                  borderRadius: radius.full,
+                  backgroundColor: selectedCategory === category ? colors.primary : colors.chipBg,
+                  marginHorizontal: 4,
+                }}
                 onPress={() => setSelectedCategory(category)}
               >
                 <Text
                   style={[
-                    styles.filterChipText,
-                    selectedCategory === category && styles.filterChipTextActive,
+                    textStyles.caption,
+                    {
+                      color: selectedCategory === category ? colors.textInverse : colors.chipText,
+                      fontWeight: '500',
+                    },
                   ]}
                 >
                   {category}
@@ -236,26 +256,36 @@ export default function SampleDocsScreen() {
           </ScrollView>
 
           {/* File Type Filter */}
-          <View style={styles.fileTypeRow}>
+          <View style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            paddingHorizontal: spacing.sm,
+          }}>
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
-              style={styles.fileTypeScroll}
+              style={{ flex: 1 }}
             >
               {FILE_TYPES.map((type) => (
                 <TouchableOpacity
                   key={type}
-                  style={[
-                    styles.fileTypeChip,
-                    selectedFileType === type && styles.fileTypeChipActive,
-                  ]}
+                  style={{
+                    paddingHorizontal: spacing.sm,
+                    paddingVertical: 4,
+                    borderRadius: radius.lg,
+                    backgroundColor: selectedFileType === type ? colors.primaryBg : colors.chipBg,
+                    marginHorizontal: 4,
+                    borderWidth: 1,
+                    borderColor: selectedFileType === type ? colors.primary : 'transparent',
+                  }}
                   onPress={() => setSelectedFileType(type)}
                 >
                   <Text
-                    style={[
-                      styles.fileTypeText,
-                      selectedFileType === type && styles.fileTypeTextActive,
-                    ]}
+                    style={{
+                      fontSize: 11,
+                      color: selectedFileType === type ? colors.primary : colors.textSecondary,
+                      fontWeight: '600',
+                    }}
                   >
                     {type}
                   </Text>
@@ -265,100 +295,191 @@ export default function SampleDocsScreen() {
 
             {/* Sort Button */}
             <TouchableOpacity
-              style={styles.sortButton}
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: radius.full,
+                backgroundColor: colors.bgMuted,
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginLeft: spacing.xs,
+              }}
               onPress={() => setSortBy(sortBy === 'downloads' ? 'date' : 'downloads')}
             >
               <Ionicons
                 name={sortBy === 'downloads' ? 'arrow-down' : 'calendar-outline'}
                 size={16}
-                color="#666"
+                color={colors.textSecondary}
               />
             </TouchableOpacity>
           </View>
         </View>
 
         {/* Stats Bar */}
-        <View style={styles.statsBar}>
-          <Text style={styles.statsText}>
+        <View style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          paddingHorizontal: spacing.md,
+          paddingVertical: spacing.sm,
+          backgroundColor: colors.card,
+          borderBottomWidth: 1,
+          borderBottomColor: colors.borderLight,
+        }}>
+          <Text style={[textStyles.bodySemibold, { color: colors.text, fontSize: 13 }]}>
             Tìm thấy {filteredDocs.length} tài liệu
           </Text>
-          <Text style={styles.sortLabel}>
+          <Text style={[textStyles.caption, { color: colors.textTertiary }]}>
             {sortBy === 'downloads' ? 'Phổ biến nhất' : 'Mới nhất'}
           </Text>
         </View>
 
         {/* Document Grid */}
-        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-          <View style={styles.grid}>
+        <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
+          <View style={{
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            padding: spacing.sm,
+            gap: spacing.sm,
+          }}>
             {filteredDocs.map((doc) => (
               <TouchableOpacity
                 key={doc.id}
-                style={styles.docCard}
+                style={{
+                  width: CARD_WIDTH,
+                  backgroundColor: colors.card,
+                  borderRadius: radius.lg,
+                  padding: spacing.sm,
+                  ...shadow.sm,
+                }}
                 onPress={() => handlePreview(doc)}
               >
                 {/* Featured Badge */}
                 {doc.featured && (
-                  <View style={styles.featuredBadge}>
-                    <Ionicons name="star" size={10} color="#fff" />
+                  <View style={{
+                    position: 'absolute',
+                    top: spacing.xs,
+                    right: spacing.xs,
+                    backgroundColor: colors.primary,
+                    borderRadius: 10,
+                    width: 20,
+                    height: 20,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    zIndex: 10,
+                  }}>
+                    <Ionicons name="star" size={10} color={colors.textInverse} />
                   </View>
                 )}
 
                 {/* File Icon */}
                 <View
-                  style={[
-                    styles.fileIconContainer,
-                    { backgroundColor: `${getFileIcon(doc.type).color}15` },
-                  ]}
+                  style={{
+                    width: '100%',
+                    height: 80,
+                    borderRadius: radius.md,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginBottom: spacing.sm,
+                    position: 'relative',
+                    backgroundColor: `${getFileIcon(doc.type).color}15`,
+                  }}
                 >
                   <Ionicons
                     name={getFileIcon(doc.type).name as any}
                     size={32}
                     color={getFileIcon(doc.type).color}
                   />
-                  <View style={styles.fileTypeBadge}>
-                    <Text style={styles.fileTypeBadgeText}>{doc.type}</Text>
+                  <View style={{
+                    position: 'absolute',
+                    bottom: 6,
+                    right: 6,
+                    backgroundColor: colors.overlay,
+                    paddingHorizontal: 6,
+                    paddingVertical: 2,
+                    borderRadius: radius.xs,
+                  }}>
+                    <Text style={{ fontSize: 9, fontWeight: '700', color: colors.textInverse }}>
+                      {doc.type}
+                    </Text>
                   </View>
                 </View>
 
                 {/* Doc Info */}
-                <View style={styles.docInfo}>
-                  <Text style={styles.docTitle} numberOfLines={2}>
+                <View style={{ marginBottom: spacing.sm }}>
+                  <Text
+                    style={[textStyles.bodySemibold, {
+                      color: colors.text,
+                      fontSize: 13,
+                      marginBottom: 4,
+                      lineHeight: 18,
+                      minHeight: 36,
+                    }]}
+                    numberOfLines={2}
+                  >
                     {doc.title}
                   </Text>
-                  <Text style={styles.docCategory}>{doc.category}</Text>
+                  <Text style={[textStyles.caption, { color: colors.textTertiary, marginBottom: spacing.xs }]}>
+                    {doc.category}
+                  </Text>
 
                   {/* Stats Row */}
-                  <View style={styles.docStats}>
-                    <View style={styles.statItem}>
-                      <Ionicons name="download-outline" size={12} color="#999" />
-                      <Text style={styles.statText}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                      <Ionicons name="download-outline" size={12} color={colors.textTertiary} />
+                      <Text style={[textStyles.caption, { color: colors.textTertiary, marginLeft: 4 }]}>
                         {doc.downloads > 1000
                           ? `${(doc.downloads / 1000).toFixed(1)}k`
                           : doc.downloads}
                       </Text>
                     </View>
-                    <View style={styles.statDivider} />
-                    <View style={styles.statItem}>
-                      <Ionicons name="document-outline" size={12} color="#999" />
-                      <Text style={styles.statText}>{doc.size}</Text>
+                    <View style={{
+                      width: 1,
+                      height: 10,
+                      backgroundColor: colors.divider,
+                      marginHorizontal: spacing.xs,
+                    }} />
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                      <Ionicons name="document-outline" size={12} color={colors.textTertiary} />
+                      <Text style={[textStyles.caption, { color: colors.textTertiary, marginLeft: 4 }]}>
+                        {doc.size}
+                      </Text>
                     </View>
                   </View>
                 </View>
 
                 {/* Action Buttons */}
-                <View style={styles.actionRow}>
+                <View style={{ flexDirection: 'row', gap: spacing.xs }}>
                   <TouchableOpacity
-                    style={styles.actionButtonSecondary}
+                    style={{
+                      flex: 1,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backgroundColor: colors.bgMuted,
+                      paddingVertical: spacing.xs,
+                      borderRadius: radius.sm,
+                    }}
                     onPress={() => handleShare(doc)}
                   >
-                    <Ionicons name="share-social-outline" size={16} color="#666" />
+                    <Ionicons name="share-social-outline" size={16} color={colors.textSecondary} />
                   </TouchableOpacity>
                   <TouchableOpacity
-                    style={styles.actionButtonPrimary}
+                    style={{
+                      flex: 2,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backgroundColor: colors.primary,
+                      paddingVertical: spacing.xs,
+                      borderRadius: radius.sm,
+                    }}
                     onPress={() => handleDownload(doc)}
                   >
-                    <Ionicons name="download" size={16} color="#fff" />
-                    <Text style={styles.actionButtonText}>Tải về</Text>
+                    <Ionicons name="download" size={16} color={colors.textInverse} />
+                    <Text style={[textStyles.buttonSmall, { color: colors.textInverse, marginLeft: 4 }]}>
+                      Tải về
+                    </Text>
                   </TouchableOpacity>
                 </View>
               </TouchableOpacity>
@@ -367,302 +488,42 @@ export default function SampleDocsScreen() {
 
           {/* Empty State */}
           {filteredDocs.length === 0 && (
-            <View style={styles.emptyState}>
-              <Ionicons name="folder-open-outline" size={64} color="#ccc" />
-              <Text style={styles.emptyText}>Không tìm thấy tài liệu</Text>
-              <TouchableOpacity
-                style={styles.resetButton}
-                onPress={() => {
-                  setSelectedCategory('Tất cả');
-                  setSelectedFileType('Tất cả');
-                  setSearchQuery('');
-                }}
-              >
-                <Text style={styles.resetButtonText}>Đặt lại bộ lọc</Text>
-              </TouchableOpacity>
-            </View>
+            <DSEmptyState
+              icon="folder-open-outline"
+              title="Không tìm thấy tài liệu"
+              description="Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm"
+              actionLabel="Đặt lại bộ lọc"
+              onAction={() => {
+                setSelectedCategory('Tất cả');
+                setSelectedFileType('Tất cả');
+                setSearchQuery('');
+              }}
+            />
           )}
 
-          <View style={{ height: 20 }} />
+          <View style={{ height: spacing.lg }} />
         </ScrollView>
 
         {/* Bottom Info */}
-        <View style={styles.bottomInfo}>
-          <Ionicons name="information-circle" size={16} color="#0D9488" />
-          <Text style={styles.bottomInfoText}>
+        <View style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          backgroundColor: colors.primaryBg,
+          paddingHorizontal: spacing.md,
+          paddingVertical: spacing.sm,
+          borderTopWidth: 1,
+          borderTopColor: colors.borderLight,
+        }}>
+          <Ionicons name="information-circle" size={16} color={colors.primary} />
+          <Text style={[textStyles.caption, {
+            flex: 1,
+            color: colors.info,
+            marginLeft: spacing.xs,
+            lineHeight: 16,
+          }]}>
             Tài liệu mang tính tham khảo. Vui lòng kiểm tra quy định mới nhất.
           </Text>
         </View>
-      </View>
-    </>
+    </DSModuleScreen>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  searchSection: {
-    backgroundColor: '#fff',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  searchBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f5f5f5',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    height: 40,
-  },
-  searchInput: {
-    flex: 1,
-    marginLeft: 8,
-    fontSize: 14,
-    color: '#333',
-  },
-  filterSection: {
-    backgroundColor: '#fff',
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  filterScroll: {
-    paddingHorizontal: 12,
-    marginBottom: 8,
-  },
-  filterChip: {
-    paddingHorizontal: 16,
-    paddingVertical: 6,
-    borderRadius: 16,
-    backgroundColor: '#f5f5f5',
-    marginHorizontal: 4,
-  },
-  filterChipActive: {
-    backgroundColor: '#0D9488',
-  },
-  filterChipText: {
-    fontSize: 13,
-    color: '#666',
-    fontWeight: '500',
-  },
-  filterChipTextActive: {
-    color: '#fff',
-  },
-  fileTypeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-  },
-  fileTypeScroll: {
-    flex: 1,
-  },
-  fileTypeChip: {
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
-    backgroundColor: '#f5f5f5',
-    marginHorizontal: 4,
-    borderWidth: 1,
-    borderColor: 'transparent',
-  },
-  fileTypeChipActive: {
-    backgroundColor: '#F0FDFA',
-    borderColor: '#0D9488',
-  },
-  fileTypeText: {
-    fontSize: 11,
-    color: '#666',
-    fontWeight: '600',
-  },
-  fileTypeTextActive: {
-    color: '#0D9488',
-  },
-  sortButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#f5f5f5',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginLeft: 8,
-  },
-  statsBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  statsText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#333',
-  },
-  sortLabel: {
-    fontSize: 12,
-    color: '#999',
-  },
-  content: {
-    flex: 1,
-  },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    padding: 12,
-    gap: 12,
-  },
-  docCard: {
-    width: CARD_WIDTH,
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 12,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-  },
-  featuredBadge: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    backgroundColor: '#0D9488',
-    borderRadius: 10,
-    width: 20,
-    height: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 10,
-  },
-  fileIconContainer: {
-    width: '100%',
-    height: 80,
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 10,
-    position: 'relative',
-  },
-  fileTypeBadge: {
-    position: 'absolute',
-    bottom: 6,
-    right: 6,
-    backgroundColor: 'rgba(0,0,0,0.6)',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  fileTypeBadgeText: {
-    fontSize: 9,
-    fontWeight: '700',
-    color: '#fff',
-  },
-  docInfo: {
-    marginBottom: 10,
-  },
-  docTitle: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 4,
-    lineHeight: 18,
-    minHeight: 36,
-  },
-  docCategory: {
-    fontSize: 11,
-    color: '#999',
-    marginBottom: 8,
-  },
-  docStats: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  statItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  statText: {
-    fontSize: 11,
-    color: '#999',
-    marginLeft: 4,
-  },
-  statDivider: {
-    width: 1,
-    height: 10,
-    backgroundColor: '#e0e0e0',
-    marginHorizontal: 8,
-  },
-  actionRow: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  actionButtonSecondary: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#f5f5f5',
-    paddingVertical: 8,
-    borderRadius: 6,
-  },
-  actionButtonPrimary: {
-    flex: 2,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#0D9488',
-    paddingVertical: 8,
-    borderRadius: 6,
-  },
-  actionButtonText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#fff',
-    marginLeft: 4,
-  },
-  emptyState: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 60,
-  },
-  emptyText: {
-    fontSize: 15,
-    color: '#999',
-    marginTop: 16,
-    marginBottom: 20,
-  },
-  resetButton: {
-    backgroundColor: '#0D9488',
-    paddingHorizontal: 24,
-    paddingVertical: 10,
-    borderRadius: 8,
-  },
-  resetButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#fff',
-  },
-  bottomInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F0FDFA',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
-  },
-  bottomInfoText: {
-    flex: 1,
-    fontSize: 11,
-    color: '#1976d2',
-    marginLeft: 8,
-    lineHeight: 16,
-  },
-});

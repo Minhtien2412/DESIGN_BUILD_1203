@@ -1,0 +1,28 @@
+# Gitleaks ignore file - Safe patterns to ignore during secret scanning
+
+# Example files (contain placeholder values, not real secrets)
+
+.env.example
+**/.env.example
+**/env.example
+
+# Test fixtures with fake data
+
+**tests**/**
+tests/**
+**/\*.test.ts
+**/\*.spec.ts
+mocks/\*\*
+
+# Documentation examples
+
+docs/\*\*
+\*.md
+
+# Config files with placeholder values
+
+config/env.example.ts
+
+# Known false positives
+
+services/api.ts:thietke-resort-api-key-2024 # Public API key for demo

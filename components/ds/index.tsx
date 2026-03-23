@@ -42,7 +42,7 @@ import {
     TextInputProps,
     TouchableOpacity,
     View,
-    ViewStyle
+    ViewStyle,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -1324,7 +1324,7 @@ export const DSProductCard = memo<DSProductCardProps>(
           }}
         >
           <Image
-            source={{ uri: image }}
+            source={image ? { uri: image } : undefined}
             style={{ width: "100%", height: "100%" }}
             resizeMode="cover"
           />

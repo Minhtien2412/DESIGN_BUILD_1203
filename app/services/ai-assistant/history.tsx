@@ -3,30 +3,27 @@
  * View past AI analyses with filtering
  */
 
-import { useThemeColor } from '@/hooks/use-theme-color';
-import { useAIReports } from '@/hooks/useAI';
-import type { AIReport } from '@/types/ai';
-import { Ionicons } from '@expo/vector-icons';
-import { router, Stack, useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useAIReports } from "@/hooks/useAI";
+import { useDS } from "@/hooks/useDS";
+import type { AIReport } from "@/types/ai";
+import { Ionicons } from "@expo/vector-icons";
+import { router, Stack, useLocalSearchParams } from "expo-router";
+import { useEffect, useState } from "react";
 import {
     ActivityIndicator,
     FlatList,
-    StyleSheet,
     Text,
     TouchableOpacity,
     View,
-} from 'react-native';
+} from "react-native";
 
 export default function AIHistoryScreen() {
   const params = useLocalSearchParams<{ projectId: string }>();
-  const backgroundColor = useThemeColor({}, 'background');
-  const textColor = useThemeColor({}, 'text');
-  const tintColor = useThemeColor({}, 'tint');
+  const { colors, spacing, radius } = useDS();
 
   const [filter, setFilter] = useState<string | undefined>();
   const { reports, loading, error, pagination, loadReports } = useAIReports(
-    params.projectId
+    params.projectId,
   );
 
   useEffect(() => {
@@ -45,26 +42,28 @@ export default function AIHistoryScreen() {
 
   const renderEmpty = () => (
     <View style={styles.emptyContainer}>
-      <Ionicons name="document-text-outline" size={64} color="#ccc" />
-      <Text style={[styles.emptyTitle, { color: textColor }]}>
+      <Ionicons name="document-text-outline" size={64} color={colors.border} />
+      <Text style={[styles.emptyTitle, { color: colors.text }]}>
         Chưa có báo cáo
       </Text>
-      <Text style={styles.emptyText}>
-        Các báo cáo AI sẽ xuất hiện ở đây
-      </Text>
+      <Text style={styles.emptyText}>Các báo cáo AI sẽ xuất hiện ở đây</Text>
     </View>
   );
 
   const renderReport = ({ item }: { item: AIReport }) => (
     <TouchableOpacity
-      style={styles.reportCard}
+      style={[styles.reportCard, { backgroundColor: colors.card }]}
       onPress={() => handleReportPress(item.id)}
     >
       <View style={styles.reportHeader}>
-        <Text style={[styles.reportTitle, { color: textColor }]}>
+        <Text style={[styles.reportTitle, { color: colors.text }]}>
           {item.title}
         </Text>
-        <Ionicons name="chevron-forward" size={20} color="#999" />
+        <Ionicons
+          name="chevron-forward"
+          size={20}
+          color={colors.textTertiary}
+        />
       </View>
 
       <Text style={styles.reportSummary} numberOfLines={2}>
@@ -73,13 +72,19 @@ export default function AIHistoryScreen() {
 
       <View style={styles.reportFooter}>
         <View style={styles.reportMeta}>
-          <Ionicons name="calendar-outline" size={14} color="#666" />
+          <Ionicons
+            name="calendar-outline"
+            size={14}
+            color={colors.textSecondary}
+          />
           <Text style={styles.reportMetaText}>
-            {new Date(item.generatedAt).toLocaleDateString('vi-VN')}
+            {new Date(item.generatedAt).toLocaleDateString("vi-VN")}
           </Text>
         </View>
-        <View style={[styles.typeBadge, { backgroundColor: tintColor + '20' }]}>
-          <Text style={[styles.typeBadgeText, { color: tintColor }]}>
+        <View
+          style={[styles.typeBadge, { backgroundColor: colors.primary + "20" }]}
+        >
+          <Text style={[styles.typeBadgeText, { color: colors.primary }]}>
             {item.reportType}
           </Text>
         </View>
@@ -91,16 +96,16 @@ export default function AIHistoryScreen() {
     <>
       <Stack.Screen
         options={{
-          title: 'Lịch sử phân tích AI',
+          title: "Lịch sử phân tích AI",
         }}
       />
-      <View style={[styles.container, { backgroundColor }]}>
+      <View style={[styles.container, { backgroundColor: colors.bg }]}>
         {/* Filter Chips */}
         <View style={styles.filterContainer}>
           <TouchableOpacity
             style={[
               styles.filterChip,
-              !filter && { backgroundColor: tintColor },
+              !filter && { backgroundColor: colors.primary },
             ]}
             onPress={() => handleFilterChange(undefined)}
           >
@@ -116,14 +121,14 @@ export default function AIHistoryScreen() {
           <TouchableOpacity
             style={[
               styles.filterChip,
-              filter === 'progress' && { backgroundColor: tintColor },
+              filter === "progress" && { backgroundColor: colors.primary },
             ]}
-            onPress={() => handleFilterChange('progress')}
+            onPress={() => handleFilterChange("progress")}
           >
             <Text
               style={[
                 styles.filterChipText,
-                filter === 'progress' && styles.filterChipTextActive,
+                filter === "progress" && styles.filterChipTextActive,
               ]}
             >
               Tiến độ
@@ -132,14 +137,14 @@ export default function AIHistoryScreen() {
           <TouchableOpacity
             style={[
               styles.filterChip,
-              filter === 'quality' && { backgroundColor: tintColor },
+              filter === "quality" && { backgroundColor: colors.primary },
             ]}
-            onPress={() => handleFilterChange('quality')}
+            onPress={() => handleFilterChange("quality")}
           >
             <Text
               style={[
                 styles.filterChipText,
-                filter === 'quality' && styles.filterChipTextActive,
+                filter === "quality" && styles.filterChipTextActive,
               ]}
             >
               Chất lượng
@@ -148,14 +153,14 @@ export default function AIHistoryScreen() {
           <TouchableOpacity
             style={[
               styles.filterChip,
-              filter === 'safety' && { backgroundColor: tintColor },
+              filter === "safety" && { backgroundColor: colors.primary },
             ]}
-            onPress={() => handleFilterChange('safety')}
+            onPress={() => handleFilterChange("safety")}
           >
             <Text
               style={[
                 styles.filterChipText,
-                filter === 'safety' && styles.filterChipTextActive,
+                filter === "safety" && styles.filterChipTextActive,
               ]}
             >
               An toàn
@@ -166,7 +171,7 @@ export default function AIHistoryScreen() {
         {/* Reports List */}
         {loading && reports.length === 0 ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={tintColor} />
+            <ActivityIndicator size="large" color={colors.primary} />
           </View>
         ) : (
           <FlatList
@@ -191,30 +196,30 @@ export default function AIHistoryScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   container: {
     flex: 1,
   },
   filterContainer: {
-    flexDirection: 'row',
+    flexDirection: "row" as const,
     gap: 8,
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: "#E5E7EB",
   },
   filterChip: {
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: "#F3F4F6",
   },
   filterChipText: {
     fontSize: 14,
-    color: '#666',
-    fontWeight: '500',
+    color: "#6B7280",
+    fontWeight: "500" as const,
   },
   filterChipTextActive: {
-    color: '#fff',
+    color: "#FFFFFF",
   },
   listContent: {
     padding: 16,
@@ -222,66 +227,60 @@ const styles = StyleSheet.create({
   },
   loadingContainer: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center" as const,
+    justifyContent: "center" as const,
   },
   emptyContainer: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center" as const,
+    justifyContent: "center" as const,
     paddingVertical: 64,
   },
   emptyTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600" as const,
     marginTop: 16,
   },
   emptyText: {
     fontSize: 14,
-    color: '#666',
+    color: "#6B7280",
     marginTop: 8,
   },
   reportCard: {
-    backgroundColor: '#fff',
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
   },
   reportHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row" as const,
+    justifyContent: "space-between" as const,
+    alignItems: "center" as const,
     marginBottom: 8,
   },
   reportTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600" as const,
     flex: 1,
   },
   reportSummary: {
     fontSize: 14,
-    color: '#666',
+    color: "#6B7280",
     lineHeight: 20,
     marginBottom: 12,
   },
   reportFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row" as const,
+    justifyContent: "space-between" as const,
+    alignItems: "center" as const,
   },
   reportMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row" as const,
+    alignItems: "center" as const,
     gap: 6,
   },
   reportMetaText: {
     fontSize: 13,
-    color: '#666',
+    color: "#6B7280",
   },
   typeBadge: {
     paddingHorizontal: 12,
@@ -290,16 +289,16 @@ const styles = StyleSheet.create({
   },
   typeBadgeText: {
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: "600" as const,
   },
   paginationContainer: {
     padding: 16,
     borderTopWidth: 1,
-    borderTopColor: '#eee',
-    alignItems: 'center',
+    borderTopColor: "#E5E7EB",
+    alignItems: "center" as const,
   },
   paginationText: {
     fontSize: 13,
-    color: '#666',
+    color: "#6B7280",
   },
-});
+};

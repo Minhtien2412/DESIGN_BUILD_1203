@@ -6,8 +6,8 @@
 import { AIChatBubble } from "@/components/ai/AIChatBubble";
 import { AIThinkingIndicator } from "@/components/ai/AIThinkingIndicator";
 import { MessageInput } from "@/components/ai/MessageInput";
-import { useThemeColor } from "@/hooks/use-theme-color";
 import { useAIChat } from "@/hooks/useAI";
+import { useDS } from "@/hooks/useDS";
 import type { AIChatMessage } from "@/types/ai";
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, useLocalSearchParams } from "expo-router";
@@ -17,7 +17,6 @@ import {
     FlatList,
     KeyboardAvoidingView,
     Platform,
-    StyleSheet,
     Text,
     TouchableOpacity,
     View,
@@ -25,8 +24,7 @@ import {
 
 export default function AIAssistantScreen() {
   const params = useLocalSearchParams<{ projectId?: string }>();
-  const backgroundColor = useThemeColor({}, "background");
-  const tintColor = useThemeColor({}, "tint");
+  const { colors, spacing, radius, text: textStyles } = useDS();
 
   const {
     messages,
@@ -93,33 +91,35 @@ export default function AIAssistantScreen() {
 
   const renderEmpty = () => (
     <View style={styles.emptyContainer}>
-      <Ionicons name="chatbubbles-outline" size={64} color="#ccc" />
-      <Text style={styles.emptyTitle}>Trợ lý AI xây dựng</Text>
-      <Text style={styles.emptySubtitle}>
+      <Ionicons name="chatbubbles-outline" size={64} color={colors.border} />
+      <Text style={[styles.emptyTitle, { color: colors.text }]}>
+        Trợ lý AI xây dựng
+      </Text>
+      <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
         Hỏi bất kỳ điều gì về dự án của bạn
       </Text>
       <View style={styles.suggestionsContainer}>
         <TouchableOpacity
-          style={[styles.suggestionChip, { borderColor: tintColor }]}
+          style={[styles.suggestionChip, { borderColor: colors.primary }]}
           onPress={() => handleSend("Phân tích tiến độ dự án hiện tại")}
         >
-          <Text style={[styles.suggestionText, { color: tintColor }]}>
+          <Text style={[styles.suggestionText, { color: colors.primary }]}>
             Phân tích tiến độ
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.suggestionChip, { borderColor: tintColor }]}
+          style={[styles.suggestionChip, { borderColor: colors.primary }]}
           onPress={() => handleSend("Kiểm tra chất lượng thi công")}
         >
-          <Text style={[styles.suggestionText, { color: tintColor }]}>
+          <Text style={[styles.suggestionText, { color: colors.primary }]}>
             Kiểm tra chất lượng
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.suggestionChip, { borderColor: tintColor }]}
+          style={[styles.suggestionChip, { borderColor: colors.primary }]}
           onPress={() => handleSend("Ước tính vật liệu cần thiết")}
         >
-          <Text style={[styles.suggestionText, { color: tintColor }]}>
+          <Text style={[styles.suggestionText, { color: colors.primary }]}>
             Ước tính vật liệu
           </Text>
         </TouchableOpacity>
@@ -137,13 +137,13 @@ export default function AIAssistantScreen() {
               onPress={handleClearChat}
               style={{ marginRight: 16 }}
             >
-              <Ionicons name="trash-outline" size={22} color={tintColor} />
+              <Ionicons name="trash-outline" size={22} color={colors.primary} />
             </TouchableOpacity>
           ),
         }}
       />
       <KeyboardAvoidingView
-        style={[styles.container, { backgroundColor }]}
+        style={[styles.container, { backgroundColor: colors.bg }]}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         keyboardVerticalOffset={100}
       >
@@ -161,8 +161,14 @@ export default function AIAssistantScreen() {
         {/* Error Message */}
         {error && !loading && (
           <View style={styles.errorContainer}>
-            <Ionicons name="alert-circle-outline" size={16} color="#000000" />
-            <Text style={styles.errorText}>{error}</Text>
+            <Ionicons
+              name="alert-circle-outline"
+              size={16}
+              color={colors.error}
+            />
+            <Text style={[styles.errorText, { color: colors.text }]}>
+              {error}
+            </Text>
           </View>
         )}
 
@@ -178,7 +184,7 @@ export default function AIAssistantScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   container: {
     flex: 1,
   },
@@ -188,26 +194,24 @@ const styles = StyleSheet.create({
   },
   emptyContainer: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: "center" as const,
+    justifyContent: "center" as const,
     paddingHorizontal: 32,
   },
   emptyTitle: {
     fontSize: 20,
-    fontWeight: "600",
+    fontWeight: "600" as const,
     marginTop: 16,
-    color: "#333",
   },
   emptySubtitle: {
     fontSize: 15,
-    color: "#666",
     marginTop: 8,
-    textAlign: "center",
+    textAlign: "center" as const,
   },
   suggestionsContainer: {
     marginTop: 24,
     gap: 12,
-    alignItems: "center",
+    alignItems: "center" as const,
   },
   suggestionChip: {
     paddingHorizontal: 20,
@@ -217,19 +221,17 @@ const styles = StyleSheet.create({
   },
   suggestionText: {
     fontSize: 14,
-    fontWeight: "500",
+    fontWeight: "500" as const,
   },
   errorContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: "row" as const,
+    alignItems: "center" as const,
     gap: 8,
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: "#F5F5F5",
   },
   errorText: {
     flex: 1,
     fontSize: 13,
-    color: "#000000",
   },
-});
+};

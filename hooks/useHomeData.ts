@@ -403,7 +403,7 @@ export function useHomeData(
     }, 500); // Wait 500ms before fetching
 
     return () => clearTimeout(timeoutId);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [enabled]); // Only depend on enabled, not fetchData to prevent loops
 
   // Refresh function

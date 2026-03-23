@@ -155,16 +155,16 @@ export function useGoogleOAuth(options: UseGoogleOAuthOptions = {}) {
         // Authorization Code Flow
         result.code = response.params.code;
         console.log(
-          "[Google OAuth] Authorization Code:",
-          result.code?.substring(0, 20) + "...",
+          "[Google OAuth] Authorization code received:",
+          !!result.code,
         );
       } else {
         // Implicit Flow
         result.accessToken = response.params.access_token;
         result.idToken = response.params.id_token;
         console.log(
-          "[Google OAuth] Access Token:",
-          result.accessToken?.substring(0, 20) + "...",
+          "[Google OAuth] Access token received:",
+          !!result.accessToken,
         );
       }
 

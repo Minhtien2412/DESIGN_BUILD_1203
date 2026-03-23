@@ -1,3 +1,4 @@
+import { APP_ROUTES } from "@/constants/typed-routes";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { Ionicons } from "@expo/vector-icons";
 import { Href, Stack, useRouter } from "expo-router";
@@ -130,7 +131,7 @@ export default function ProfileMenuScreen() {
       icon: "lock-closed-outline",
       title: "Bảo mật & Riêng tư",
       description: "Kiểm soát dữ liệu cá nhân",
-      route: "/profile/privacy",
+      route: APP_ROUTES.PROFILE_PRIVACY,
       color: "#0D9488",
     },
   ];
@@ -140,21 +141,21 @@ export default function ProfileMenuScreen() {
       icon: "help-circle-outline",
       title: "Trợ giúp",
       description: "FAQ và hỗ trợ khách hàng",
-      route: "/profile/help",
+      route: APP_ROUTES.PROFILE_HELP,
       color: "#0D9488",
     },
     {
       icon: "document-text-outline",
       title: "Điều khoản dịch vụ",
       description: "Quy định và chính sách",
-      route: "/profile/terms",
+      route: APP_ROUTES.LEGAL_TERMS,
       color: "#6B7280",
     },
     {
       icon: "information-circle-outline",
       title: "Về chúng tôi",
       description: "Thông tin ứng dụng",
-      route: "/profile/about",
+      route: "/legal/about-us",
       color: "#666666",
     },
   ];

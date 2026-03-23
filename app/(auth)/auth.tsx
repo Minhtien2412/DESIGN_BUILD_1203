@@ -409,18 +409,21 @@ export default function ModernAuthScreen() {
             loginErr?.requires2FA
           ) {
             // Initiate 2FA login flow
-            try {
-              const result = await twoFALoginRequestOtp(
-                formData.email.trim().toLowerCase(),
-                formData.password,
-              );
-              setTempToken(result?.tempToken || null);
+            const otpResult = await twoFALoginRequestOtp(
+              formData.email.trim().toLowerCase(),
+              formData.password,
+            );
+            if (otpResult.success) {
+              setTempToken(otpResult.tempToken || null);
               setOtpType("login");
               setOtpCode("");
               setOtpError("");
               setShowOTPModal(true);
-            } catch (otpErr: any) {
-              Alert.alert("Lỗi 2FA", otpErr?.message || "Không thể gửi mã OTP");
+            } else {
+              Alert.alert(
+                "Lỗi 2FA",
+                otpResult.message || "Không thể gửi mã OTP",
+              );
             }
           } else {
             throw loginErr;
@@ -428,14 +431,16 @@ export default function ModernAuthScreen() {
         }
       } else {
         // Registration: Try 2FA flow first (send OTP to verify email)
-        try {
-          await twoFARegisterSendOtp(formData.email.trim().toLowerCase());
+        const otpResult = await twoFARegisterSendOtp(
+          formData.email.trim().toLowerCase(),
+        );
+        if (otpResult.success) {
           setOtpType("register");
           setOtpCode("");
           setOtpError("");
           setShowOTPModal(true);
-        } catch (otpErr: any) {
-          // If 2FA not supported, fallback to direct registration
+        } else {
+          // 2FA not available or OTP send failed, fallback to direct registration
           console.log(
             "[Auth] 2FA register not available, falling back to direct signup",
           );
@@ -482,9 +487,10 @@ export default function ModernAuthScreen() {
     setOtpLoading(true);
     setOtpError("");
     try {
+      let verifyResult;
       if (otpType === "register") {
         // 2FA Registration: Verify OTP + create account
-        await twoFARegisterVerify(
+        verifyResult = await twoFARegisterVerify(
           formData.email.trim().toLowerCase(),
           otpCode,
           formData.password,
@@ -493,14 +499,20 @@ export default function ModernAuthScreen() {
         );
       } else {
         // 2FA Login: Verify OTP with tempToken
-        await twoFALoginVerify(
+        verifyResult = await twoFALoginVerify(
           formData.email.trim().toLowerCase(),
           tempToken || "",
           otpCode,
         );
       }
-      setShowOTPModal(false);
-      router.replace("/(tabs)");
+      if (verifyResult.success) {
+        setShowOTPModal(false);
+        router.replace("/(tabs)");
+      } else {
+        setOtpError(
+          verifyResult.message || "Mã OTP không hợp lệ. Vui lòng thử lại.",
+        );
+      }
     } catch (err: any) {
       setOtpError(err?.message || "Mã OTP không hợp lệ. Vui lòng thử lại.");
     } finally {
@@ -521,15 +533,22 @@ export default function ModernAuthScreen() {
   const handleResendOTP = useCallback(async () => {
     try {
       setOtpLoading(true);
+      let resendResult;
       if (otpType === "register") {
-        await twoFARegisterSendOtp(formData.email.trim().toLowerCase());
+        resendResult = await twoFARegisterSendOtp(
+          formData.email.trim().toLowerCase(),
+        );
       } else {
-        await twoFALoginRequestOtp(
+        resendResult = await twoFALoginRequestOtp(
           formData.email.trim().toLowerCase(),
           formData.password,
         );
       }
-      Alert.alert("Đã gửi lại", "Mã OTP mới đã được gửi đến email của bạn.");
+      if (resendResult.success) {
+        Alert.alert("Đã gửi lại", "Mã OTP mới đã được gửi đến email của bạn.");
+      } else {
+        Alert.alert("Lỗi", resendResult.message || "Không thể gửi lại mã OTP");
+      }
     } catch (err: any) {
       Alert.alert("Lỗi", err?.message || "Không thể gửi lại mã OTP");
     } finally {

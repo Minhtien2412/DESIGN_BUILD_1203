@@ -89,7 +89,7 @@ export function convertChatMessage(msg: Message): UnifiedMessage {
           avatar: msg.sender.avatar,
           onlineStatus: "offline" as const,
         }
-      : undefined,
+      : ({ id: 0, name: "Unknown", onlineStatus: "offline" as const } as any),
     type:
       msg.type === "SYSTEM"
         ? "text"
@@ -111,7 +111,11 @@ export function convertChatMessage(msg: Message): UnifiedMessage {
     createdAt: msg.createdAt,
     updatedAt: msg.updatedAt,
     replyTo: msg.replyToMessage
-      ? convertChatMessage(msg.replyToMessage)
+      ? {
+          id: msg.replyToMessage.id,
+          content: msg.replyToMessage.content,
+          senderName: msg.replyToMessage.sender?.name || "Unknown",
+        }
       : undefined,
   };
 }

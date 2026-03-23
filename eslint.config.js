@@ -1,6 +1,8 @@
 // https://docs.expo.dev/guides/using-eslint/
 const { defineConfig } = require("eslint/config");
 const expoConfig = require("eslint-config-expo/flat");
+const tseslint = require("@typescript-eslint/eslint-plugin");
+const tsparser = require("@typescript-eslint/parser");
 
 module.exports = defineConfig([
   expoConfig,
@@ -34,10 +36,21 @@ module.exports = defineConfig([
       "deployment/**/*",
       "prisma/**/*",
       "openapi/**/*",
+      "jest.setup.js",
+      "tmp-*.js",
+      "domain/**/*",
+      "presentation/**/*",
+      "index.js",
     ],
   },
   {
     // Customize rules for the main app - reduce noise for production
+    plugins: {
+      "@typescript-eslint": tseslint,
+    },
+    languageOptions: {
+      parser: tsparser,
+    },
     rules: {
       // exhaustive-deps - downgrade to off for animations (common pattern)
       "react-hooks/exhaustive-deps": "off",

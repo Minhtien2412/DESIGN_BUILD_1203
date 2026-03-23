@@ -496,7 +496,7 @@ export function NotificationControllerProvider({
     (category: NotificationCategory) => {
       return notificationSystem.getUnreadCountByCategory(category);
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
     [notifications], // re-compute when notifications change
   );
 

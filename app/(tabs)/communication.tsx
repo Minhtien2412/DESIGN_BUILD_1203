@@ -353,7 +353,7 @@ export default function CommunicationHubScreen() {
           icon: "call",
           label: "Gọi điện",
           color: success,
-          onPress: () => router.push("/call/contacts" as any),
+          onPress: () => router.push("/call" as any),
         },
         {
           icon: "videocam",
@@ -587,7 +587,7 @@ export default function CommunicationHubScreen() {
           if (activeTab === "messages") {
             router.push("/messages/new-conversation" as any);
           } else if (activeTab === "calls") {
-            router.push("/call/contacts" as any);
+            router.push("/call" as any);
           } else {
             router.push("/meetings/create" as any);
           }

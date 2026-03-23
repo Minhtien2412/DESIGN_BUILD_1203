@@ -182,7 +182,7 @@ export function WebSocketProvider({
         clearTimeout(reconnectTimeoutRef.current);
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []); // Empty deps - run only once on mount
 
   // ============================================================================
@@ -198,7 +198,7 @@ export function WebSocketProvider({
       disconnect();
       hasAttemptedRef.current = false; // Reset for next login
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [user]); // Only depend on user
 
   // ============================================================================

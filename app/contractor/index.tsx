@@ -157,7 +157,7 @@ const FILTER_CONFIG = [
 // CONTRACTOR CARD
 // ============================================================================
 interface ContractorCardProps {
-  item: (typeof CONTRACTORS)[0];
+  item: (typeof FALLBACK_CONTRACTORS)[0];
   onPress: () => void;
   onContact: () => void;
 }
@@ -222,7 +222,7 @@ const ContractorCard = ({ item, onPress, onContact }: ContractorCardProps) => (
 
     {/* Specialties */}
     <View style={styles.tagsRow}>
-      {item.specialties.slice(0, 3).map((spec, idx) => (
+      {item.specialties.slice(0, 3).map((spec: string, idx: number) => (
         <View key={idx} style={styles.tag}>
           <Text style={styles.tagText}>{spec}</Text>
         </View>
@@ -422,7 +422,7 @@ export default function ContractorScreen() {
           <ContractorCard
             item={item}
             onPress={() => router.push(`/contractor/${item.id}` as any)}
-            onContact={() => router.push(`/chat/contractor/${item.id}` as any)}
+            onContact={() => router.push(`/chat/${item.id}` as any)}
           />
         )}
         keyExtractor={(item) => item.id}

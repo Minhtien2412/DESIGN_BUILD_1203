@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useState } from 'react';
-import tasksApi, { Task } from '../services/api/tasksApi';
+import { useCallback, useEffect, useState } from "react";
+import { useAuth } from "../context/AuthContext";
+import tasksApi, { Task } from "../services/api/tasksApi";
 
 /**
  * Hook to fetch and manage tasks from backend API
  * Uses real API endpoints: GET /tasks (protected)
- * 
+ *
  * Features:
  * - Fetch all tasks or filter by project
  * - Create, update, delete tasks
@@ -12,88 +13,112 @@ import tasksApi, { Task } from '../services/api/tasksApi';
  * - Real-time task status updates
  */
 export function useTasks(projectId?: number) {
+  const { isAuthenticated } = useAuth(); // Guard: only fetch if authenticated
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(isAuthenticated);
   const [error, setError] = useState<Error | null>(null);
   const [retrying, setRetrying] = useState(false);
 
-  const fetchTasks = useCallback(async (isRetry = false) => {
-    try {
-      if (isRetry) {
-        setRetrying(true);
-      } else {
-        setLoading(true);
+  const fetchTasks = useCallback(
+    async (isRetry = false) => {
+      try {
+        if (isRetry) {
+          setRetrying(true);
+        } else {
+          setLoading(true);
+        }
+        setError(null);
+        const response = await tasksApi.getTasks(projectId);
+        // Backend returns { value: Task[], Count: number }
+        setTasks(response.value || []);
+      } catch (err) {
+        const error =
+          err instanceof Error ? err : new Error("Failed to load tasks");
+        setError(error);
+        console.error("[useTasks] Error:", err);
+        setTasks([]);
+      } finally {
+        setLoading(false);
+        setRetrying(false);
       }
-      setError(null);
-      const response = await tasksApi.getTasks(projectId);
-      // Backend returns { value: Task[], Count: number }
-      setTasks(response.value || []);
-    } catch (err) {
-      const error = err instanceof Error ? err : new Error('Failed to load tasks');
-      setError(error);
-      console.error('[useTasks] Error:', err);
-      setTasks([]);
-    } finally {
-      setLoading(false);
-      setRetrying(false);
-    }
-  }, [projectId]);
+    },
+    [projectId],
+  );
 
-  const createTask = useCallback(async (data: {
-    title: string;
-    description?: string;
-    projectId: number;
-    assignedToId?: number;
-    priority?: Task['priority'];
-    dueDate?: string;
-  }) => {
-    try {
-      const newTask = await tasksApi.createTask(data);
-      setTasks(prev => [newTask, ...prev]);
-      return newTask;
-    } catch (err) {
-      console.error('[useTasks] Create task error:', err);
-      throw err;
-    }
-  }, []);
+  const createTask = useCallback(
+    async (data: {
+      title: string;
+      description?: string;
+      projectId: number;
+      assignedToId?: number;
+      priority?: Task["priority"];
+      dueDate?: string;
+    }) => {
+      try {
+        const newTask = await tasksApi.createTask(data);
+        setTasks((prev) => [newTask, ...prev]);
+        return newTask;
+      } catch (err) {
+        console.error("[useTasks] Create task error:", err);
+        throw err;
+      }
+    },
+    [],
+  );
 
-  const updateTask = useCallback(async (taskId: number, data: {
-    title?: string;
-    description?: string;
-    status?: Task['status'];
-    priority?: Task['priority'];
-    assignedToId?: number;
-    dueDate?: string;
-  }) => {
-    try {
-      const updatedTask = await tasksApi.updateTask(taskId, data);
-      setTasks(prev => 
-        prev.map(t => t.id === taskId ? updatedTask : t)
-      );
-      return updatedTask;
-    } catch (err) {
-      console.error('[useTasks] Update task error:', err);
-      throw err;
-    }
-  }, []);
+  const updateTask = useCallback(
+    async (
+      taskId: number,
+      data: {
+        title?: string;
+        description?: string;
+        status?: Task["status"];
+        priority?: Task["priority"];
+        assignedToId?: number;
+        dueDate?: string;
+      },
+    ) => {
+      try {
+        const updatedTask = await tasksApi.updateTask(taskId, data);
+        setTasks((prev) =>
+          prev.map((t) => (t.id === taskId ? updatedTask : t)),
+        );
+        return updatedTask;
+      } catch (err) {
+        console.error("[useTasks] Update task error:", err);
+        throw err;
+      }
+    },
+    [],
+  );
 
   const deleteTask = useCallback(async (taskId: number) => {
     try {
       await tasksApi.deleteTask(taskId);
-      setTasks(prev => prev.filter(t => t.id !== taskId));
+      setTasks((prev) => prev.filter((t) => t.id !== taskId));
     } catch (err) {
-      console.error('[useTasks] Delete task error:', err);
+      console.error("[useTasks] Delete task error:", err);
       throw err;
     }
   }, []);
 
-  const updateTaskStatus = useCallback(async (taskId: number, status: Task['status']) => {
-    return updateTask(taskId, { status });
-  }, [updateTask]);
+  const updateTaskStatus = useCallback(
+    async (taskId: number, status: Task["status"]) => {
+      return updateTask(taskId, { status });
+    },
+    [updateTask],
+  );
 
   useEffect(() => {
-    fetchTasks();
-  }, [fetchTasks]);
+    if (isAuthenticated) {
+      fetchTasks();
+    } else {
+      // Clear tasks when user logs out
+      setTasks([]);
+      setError(null);
+      setLoading(false);
+    }
+  }, [fetchTasks, isAuthenticated]);
 
   const handleRetry = useCallback(async () => {
     await fetchTasks(true);
@@ -132,9 +157,10 @@ export function useMyTasks() {
       const response = await tasksApi.getMyTasks();
       setTasks(response.value || []);
     } catch (err) {
-      const error = err instanceof Error ? err : new Error('Failed to load my tasks');
+      const error =
+        err instanceof Error ? err : new Error("Failed to load my tasks");
       setError(error);
-      console.error('[useMyTasks] Error:', err);
+      console.error("[useMyTasks] Error:", err);
       setTasks([]);
     } finally {
       setLoading(false);

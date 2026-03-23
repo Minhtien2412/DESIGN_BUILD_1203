@@ -1,19 +1,17 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Stack } from 'expo-router';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
-    Dimensions,
     Modal,
     ScrollView,
-    StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
     View,
 } from 'react-native';
 
-const { width } = Dimensions.get('window');
-const COLOR_SIZE = (width - 48) / 4;
+import { DSEmptyState } from '@/components/ds';
+import { DSModuleScreen } from '@/components/ds/layouts';
+import { useDS } from '@/hooks/useDS';
 
 // Mock data - Paint colors
 const PAINT_COLORS = [
@@ -45,56 +43,11 @@ const PAINT_COLORS = [
 const BRANDS = ['Tất cả', 'Dulux', 'Nippon', 'Jotun'];
 const CATEGORIES = ['Tất cả', 'Trắng', 'Xám', 'Be', 'Vàng', 'Xanh dương', 'Xanh lá', 'Hồng', 'Cam', 'Tím'];
 
-interface ColorItemProps {
-  color: any;
-  selected: boolean;
-  comparing: boolean;
-  onPress: () => void;
-  onCompare: () => void;
-}
-
-const ColorItem: React.FC<ColorItemProps> = ({ color, selected, comparing, onPress, onCompare }) => {
-  return (
-    <TouchableOpacity
-      style={[styles.colorItem, selected && styles.colorItemSelected]}
-      onPress={onPress}
-      activeOpacity={0.8}
-    >
-      {/* Compare Checkbox */}
-      <TouchableOpacity
-        style={styles.compareCheckbox}
-        onPress={onCompare}
-        hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
-      >
-        <View style={[styles.checkbox, comparing && styles.checkboxActive]}>
-          {comparing && <Ionicons name="checkmark" size={12} color="#fff" />}
-        </View>
-      </TouchableOpacity>
-
-      {/* Color Swatch */}
-      <View style={[styles.colorSwatch, { backgroundColor: color.hex }]}>
-        {selected && (
-          <View style={styles.selectedBadge}>
-            <Ionicons name="eye" size={16} color="#fff" />
-          </View>
-        )}
-      </View>
-
-      {/* Color Info */}
-      <View style={styles.colorInfo}>
-        <Text style={styles.colorName} numberOfLines={1}>
-          {color.name}
-        </Text>
-        <Text style={styles.colorCode}>{color.code}</Text>
-        <View style={styles.brandBadge}>
-          <Text style={styles.brandText}>{color.brand}</Text>
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
-};
-
 export default function ColorChartScreen() {
+  const { colors, spacing, radius, text, screen } = useDS();
+
+  const COLOR_SIZE = (screen.width - 48) / 4;
+
   const [selectedBrand, setSelectedBrand] = useState('Tất cả');
   const [selectedCategory, setSelectedCategory] = useState('Tất cả');
   const [searchQuery, setSearchQuery] = useState('');
@@ -124,61 +77,149 @@ export default function ColorChartScreen() {
     }
   };
 
-  const compareColors = PAINT_COLORS.filter((color) => comparingColors.includes(color.id));
+  const compareColorsData = PAINT_COLORS.filter((color) => comparingColors.includes(color.id));
+
+  const renderColorItem = (color: typeof PAINT_COLORS[0]) => {
+    const selected = selectedColor?.id === color.id;
+    const comparing = comparingColors.includes(color.id);
+
+    return (
+      <TouchableOpacity
+        key={color.id}
+        style={{
+          width: COLOR_SIZE,
+          marginBottom: spacing.md,
+          paddingHorizontal: spacing.xs,
+          ...(selected ? { transform: [{ scale: 0.95 }] } : {}),
+        }}
+        onPress={() => setSelectedColor(color)}
+        activeOpacity={0.8}
+      >
+        {/* Compare Checkbox */}
+        <TouchableOpacity
+          style={{ position: 'absolute', top: spacing.xs, right: spacing.sm, zIndex: 10 }}
+          onPress={() => handleCompareToggle(color.id)}
+          hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
+        >
+          <View style={{
+            width: 20,
+            height: 20,
+            borderRadius: 10,
+            backgroundColor: comparing ? colors.primary : colors.card,
+            borderWidth: 2,
+            borderColor: comparing ? colors.primary : colors.border,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+            {comparing && <Ionicons name="checkmark" size={12} color={colors.textInverse} />}
+          </View>
+        </TouchableOpacity>
+
+        {/* Color Swatch - uses paint hex from mock data */}
+        <View style={{
+          width: '100%',
+          height: COLOR_SIZE * 0.8,
+          borderRadius: radius.lg,
+          marginBottom: spacing.xs,
+          borderWidth: 1,
+          borderColor: colors.border,
+          backgroundColor: color.hex,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+          {selected && (
+            <View style={{ backgroundColor: colors.overlay, borderRadius: 12, padding: spacing.xs }}>
+              <Ionicons name="eye" size={16} color={colors.textInverse} />
+            </View>
+          )}
+        </View>
+
+        {/* Color Info */}
+        <View style={{ alignItems: 'center' }}>
+          <Text style={[text.caption, { color: colors.text, fontWeight: '600', textAlign: 'center', marginBottom: 2 }]} numberOfLines={1}>
+            {color.name}
+          </Text>
+          <Text style={[text.caption, { color: colors.textTertiary, fontSize: 9, marginBottom: spacing.xs }]}>
+            {color.code}
+          </Text>
+          <View style={{ backgroundColor: colors.bgMuted, paddingHorizontal: spacing.xs, paddingVertical: 2, borderRadius: radius.xs }}>
+            <Text style={[text.caption, { color: colors.textSecondary, fontSize: 9, fontWeight: '600' }]}>
+              {color.brand}
+            </Text>
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <>
-      <Stack.Screen
-        options={{
-          title: 'Bảng màu sơn',
-          headerStyle: { backgroundColor: '#0D9488' },
-          headerTintColor: '#fff',
-          headerTitleStyle: { fontWeight: '600' },
-        }}
-      />
-      <View style={styles.container}>
+      <DSModuleScreen title="Bảng màu sơn" gradientHeader>
         {/* Search Bar */}
-        <View style={styles.searchSection}>
-          <View style={styles.searchBar}>
-            <Ionicons name="search" size={20} color="#999" />
+        <View style={{
+          backgroundColor: colors.card,
+          paddingHorizontal: spacing.lg,
+          paddingVertical: spacing.md,
+          borderBottomWidth: 1,
+          borderBottomColor: colors.borderLight,
+        }}>
+          <View style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            backgroundColor: colors.bgInput,
+            borderRadius: radius.md,
+            paddingHorizontal: spacing.md,
+            height: 40,
+          }}>
+            <Ionicons name="search" size={20} color={colors.textTertiary} />
             <TextInput
-              style={styles.searchInput}
+              style={{
+                flex: 1,
+                marginLeft: spacing.sm,
+                fontSize: 14,
+                color: colors.text,
+              }}
               placeholder="Tìm tên màu, mã màu..."
-              placeholderTextColor="#999"
+              placeholderTextColor={colors.textTertiary}
               value={searchQuery}
               onChangeText={setSearchQuery}
             />
             {searchQuery.length > 0 && (
               <TouchableOpacity onPress={() => setSearchQuery('')}>
-                <Ionicons name="close-circle" size={20} color="#999" />
+                <Ionicons name="close-circle" size={20} color={colors.textTertiary} />
               </TouchableOpacity>
             )}
           </View>
         </View>
 
         {/* Filter Section */}
-        <View style={styles.filterSection}>
+        <View style={{
+          backgroundColor: colors.card,
+          paddingVertical: spacing.sm,
+          borderBottomWidth: 1,
+          borderBottomColor: colors.borderLight,
+        }}>
           {/* Brand Filter */}
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.filterScroll}
-          >
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ paddingHorizontal: spacing.md, marginBottom: spacing.sm }}>
             {BRANDS.map((brand) => (
               <TouchableOpacity
                 key={brand}
-                style={[
-                  styles.filterChip,
-                  selectedBrand === brand && styles.filterChipActive,
-                ]}
+                style={{
+                  paddingHorizontal: spacing.lg,
+                  paddingVertical: spacing.xs,
+                  borderRadius: radius.full,
+                  backgroundColor: selectedBrand === brand ? colors.primary : colors.bgMuted,
+                  marginHorizontal: spacing.xs,
+                }}
                 onPress={() => setSelectedBrand(brand)}
               >
-                <Text
-                  style={[
-                    styles.filterChipText,
-                    selectedBrand === brand && styles.filterChipTextActive,
-                  ]}
-                >
+                <Text style={[
+                  text.caption,
+                  {
+                    fontWeight: '500',
+                    color: selectedBrand === brand ? colors.textInverse : colors.textSecondary,
+                  },
+                ]}>
                   {brand}
                 </Text>
               </TouchableOpacity>
@@ -186,26 +227,29 @@ export default function ColorChartScreen() {
           </ScrollView>
 
           {/* Category Filter */}
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.filterScroll}
-          >
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ paddingHorizontal: spacing.md, marginBottom: spacing.sm }}>
             {CATEGORIES.map((category) => (
               <TouchableOpacity
                 key={category}
-                style={[
-                  styles.categoryChip,
-                  selectedCategory === category && styles.categoryChipActive,
-                ]}
+                style={{
+                  paddingHorizontal: 14,
+                  paddingVertical: 5,
+                  borderRadius: radius.lg,
+                  backgroundColor: selectedCategory === category ? colors.primaryBg : colors.bgMuted,
+                  marginHorizontal: spacing.xs,
+                  borderWidth: 1,
+                  borderColor: selectedCategory === category ? colors.primary : 'transparent',
+                }}
                 onPress={() => setSelectedCategory(category)}
               >
-                <Text
-                  style={[
-                    styles.categoryChipText,
-                    selectedCategory === category && styles.categoryChipTextActive,
-                  ]}
-                >
+                <Text style={[
+                  text.caption,
+                  {
+                    fontSize: 12,
+                    fontWeight: '500',
+                    color: selectedCategory === category ? colors.primary : colors.textSecondary,
+                  },
+                ]}>
                   {category}
                 </Text>
               </TouchableOpacity>
@@ -215,24 +259,40 @@ export default function ColorChartScreen() {
 
         {/* Compare Bar */}
         {comparingColors.length > 0 && (
-          <View style={styles.compareBar}>
-            <View style={styles.compareInfo}>
-              <Ionicons name="git-compare-outline" size={18} color="#0D9488" />
-              <Text style={styles.compareText}>
+          <View style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            backgroundColor: colors.primaryBg,
+            paddingHorizontal: spacing.lg,
+            paddingVertical: spacing.sm,
+            borderBottomWidth: 1,
+            borderBottomColor: colors.borderLight,
+          }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Ionicons name="git-compare-outline" size={18} color={colors.primary} />
+              <Text style={[text.caption, { fontWeight: '600', color: colors.primary, marginLeft: spacing.xs }]}>
                 Đã chọn {comparingColors.length}/3 màu
               </Text>
             </View>
             <TouchableOpacity
-              style={styles.compareButton}
+              style={{
+                backgroundColor: colors.primary,
+                paddingHorizontal: spacing.lg,
+                paddingVertical: spacing.xs,
+                borderRadius: radius.sm,
+              }}
               onPress={() => setShowCompare(true)}
               disabled={comparingColors.length < 2}
             >
-              <Text
-                style={[
-                  styles.compareButtonText,
-                  comparingColors.length < 2 && styles.compareButtonTextDisabled,
-                ]}
-              >
+              <Text style={[
+                text.caption,
+                {
+                  fontWeight: '600',
+                  color: colors.textInverse,
+                  ...(comparingColors.length < 2 ? { opacity: 0.5 } : {}),
+                },
+              ]}>
                 So sánh
               </Text>
             </TouchableOpacity>
@@ -240,41 +300,29 @@ export default function ColorChartScreen() {
         )}
 
         {/* Color Grid */}
-        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-          <View style={styles.colorGrid}>
-            {filteredColors.map((color) => (
-              <ColorItem
-                key={color.id}
-                color={color}
-                selected={selectedColor?.id === color.id}
-                comparing={comparingColors.includes(color.id)}
-                onPress={() => setSelectedColor(color)}
-                onCompare={() => handleCompareToggle(color.id)}
-              />
-            ))}
+        <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', padding: spacing.md }}>
+            {filteredColors.map((color) => renderColorItem(color))}
           </View>
 
           {/* Empty State */}
           {filteredColors.length === 0 && (
-            <View style={styles.emptyState}>
-              <Ionicons name="color-palette-outline" size={64} color="#ccc" />
-              <Text style={styles.emptyText}>Không tìm thấy màu phù hợp</Text>
-              <TouchableOpacity
-                style={styles.resetButton}
-                onPress={() => {
-                  setSelectedBrand('Tất cả');
-                  setSelectedCategory('Tất cả');
-                  setSearchQuery('');
-                }}
-              >
-                <Text style={styles.resetButtonText}>Đặt lại bộ lọc</Text>
-              </TouchableOpacity>
-            </View>
+            <DSEmptyState
+              icon="color-palette-outline"
+              title="Không tìm thấy màu phù hợp"
+              description="Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm"
+              actionLabel="Đặt lại bộ lọc"
+              onAction={() => {
+                setSelectedBrand('Tất cả');
+                setSelectedCategory('Tất cả');
+                setSearchQuery('');
+              }}
+            />
           )}
 
           <View style={{ height: 20 }} />
         </ScrollView>
-      </View>
+      </DSModuleScreen>
 
       {/* Color Detail Modal */}
       <Modal
@@ -284,60 +332,120 @@ export default function ColorChartScreen() {
         onRequestClose={() => setSelectedColor(null)}
       >
         <TouchableOpacity
-          style={styles.modalOverlay}
+          style={{
+            flex: 1,
+            backgroundColor: colors.overlay,
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: spacing.xl,
+          }}
           activeOpacity={1}
           onPress={() => setSelectedColor(null)}
         >
-          <View style={styles.modalContent}>
+          <View style={{
+            backgroundColor: colors.card,
+            borderRadius: radius.xl,
+            width: '100%',
+            maxWidth: 400,
+            overflow: 'hidden',
+          }}>
             {selectedColor && (
               <>
-                {/* Large Color Swatch */}
-                <View
-                  style={[styles.modalColorSwatch, { backgroundColor: selectedColor.hex }]}
-                />
+                {/* Large Color Swatch - uses paint hex from mock data */}
+                <View style={{
+                  width: '100%',
+                  height: 200,
+                  borderTopLeftRadius: radius.xl,
+                  borderTopRightRadius: radius.xl,
+                  backgroundColor: selectedColor.hex,
+                }} />
 
                 {/* Color Details */}
-                <View style={styles.modalDetails}>
-                  <Text style={styles.modalColorName}>{selectedColor.name}</Text>
-                  
-                  <View style={styles.modalInfoRow}>
-                    <View style={styles.modalInfoItem}>
-                      <Text style={styles.modalInfoLabel}>Mã màu</Text>
-                      <Text style={styles.modalInfoValue}>{selectedColor.code}</Text>
+                <View style={{ padding: spacing.xl }}>
+                  <Text style={[text.h2, { color: colors.text, marginBottom: spacing.lg }]}>
+                    {selectedColor.name}
+                  </Text>
+
+                  <View style={{ flexDirection: 'row', marginBottom: spacing.md, gap: spacing.lg }}>
+                    <View style={{ flex: 1 }}>
+                      <Text style={[text.caption, { fontWeight: '600', color: colors.textTertiary, marginBottom: spacing.xs }]}>
+                        Mã màu
+                      </Text>
+                      <Text style={[text.bodySemibold, { color: colors.text }]}>
+                        {selectedColor.code}
+                      </Text>
                     </View>
-                    <View style={styles.modalInfoItem}>
-                      <Text style={styles.modalInfoLabel}>Hex</Text>
-                      <Text style={styles.modalInfoValue}>{selectedColor.hex}</Text>
+                    <View style={{ flex: 1 }}>
+                      <Text style={[text.caption, { fontWeight: '600', color: colors.textTertiary, marginBottom: spacing.xs }]}>
+                        Hex
+                      </Text>
+                      <Text style={[text.bodySemibold, { color: colors.text }]}>
+                        {selectedColor.hex}
+                      </Text>
                     </View>
                   </View>
 
-                  <View style={styles.modalInfoRow}>
-                    <View style={styles.modalInfoItem}>
-                      <Text style={styles.modalInfoLabel}>Thương hiệu</Text>
-                      <Text style={styles.modalInfoValue}>{selectedColor.brand}</Text>
+                  <View style={{ flexDirection: 'row', marginBottom: spacing.md, gap: spacing.lg }}>
+                    <View style={{ flex: 1 }}>
+                      <Text style={[text.caption, { fontWeight: '600', color: colors.textTertiary, marginBottom: spacing.xs }]}>
+                        Thương hiệu
+                      </Text>
+                      <Text style={[text.bodySemibold, { color: colors.text }]}>
+                        {selectedColor.brand}
+                      </Text>
                     </View>
-                    <View style={styles.modalInfoItem}>
-                      <Text style={styles.modalInfoLabel}>Loại</Text>
-                      <Text style={styles.modalInfoValue}>{selectedColor.category}</Text>
+                    <View style={{ flex: 1 }}>
+                      <Text style={[text.caption, { fontWeight: '600', color: colors.textTertiary, marginBottom: spacing.xs }]}>
+                        Loại
+                      </Text>
+                      <Text style={[text.bodySemibold, { color: colors.text }]}>
+                        {selectedColor.category}
+                      </Text>
                     </View>
                   </View>
 
-                  <View style={styles.modalPriceRow}>
+                  <View style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'flex-end',
+                    marginVertical: spacing.lg,
+                    paddingTop: spacing.lg,
+                    borderTopWidth: 1,
+                    borderTopColor: colors.borderLight,
+                  }}>
                     <View>
-                      <Text style={styles.modalPriceLabel}>Giá tham khảo</Text>
-                      <Text style={styles.modalPriceValue}>{selectedColor.price}</Text>
-                      <Text style={styles.modalPriceUnit}>/ 5 lít</Text>
+                      <Text style={[text.caption, { color: colors.textTertiary, marginBottom: spacing.xs }]}>
+                        Giá tham khảo
+                      </Text>
+                      <Text style={[text.h3, { color: colors.primary }]}>
+                        {selectedColor.price}
+                      </Text>
+                      <Text style={[text.caption, { color: colors.textTertiary, marginTop: 2 }]}>
+                        / 5 lít
+                      </Text>
                     </View>
-                    <View style={styles.modalStoreInfo}>
-                      <Ionicons name="storefront-outline" size={16} color="#666" />
-                      <Text style={styles.modalStoreText}>{selectedColor.store}</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                      <Ionicons name="storefront-outline" size={16} color={colors.textSecondary} />
+                      <Text style={[text.caption, { color: colors.textSecondary, marginLeft: spacing.xs }]}>
+                        {selectedColor.store}
+                      </Text>
                     </View>
                   </View>
 
                   {/* Action Buttons */}
-                  <View style={styles.modalActions}>
+                  <View style={{ flexDirection: 'row', gap: spacing.md }}>
                     <TouchableOpacity
-                      style={styles.modalActionButton}
+                      style={{
+                        flex: 1,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backgroundColor: colors.primaryBg,
+                        borderWidth: 1,
+                        borderColor: colors.primary,
+                        paddingVertical: spacing.md,
+                        borderRadius: radius.md,
+                      }}
                       onPress={() => handleCompareToggle(selectedColor.id)}
                     >
                       <Ionicons
@@ -347,17 +455,27 @@ export default function ColorChartScreen() {
                             : 'add-circle-outline'
                         }
                         size={20}
-                        color="#0D9488"
+                        color={colors.primary}
                       />
-                      <Text style={styles.modalActionText}>
+                      <Text style={[text.bodySemibold, { color: colors.primary, marginLeft: spacing.xs }]}>
                         {comparingColors.includes(selectedColor.id)
                           ? 'Đã thêm'
                           : 'So sánh'}
                       </Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.modalActionButtonPrimary}>
-                      <Ionicons name="location" size={20} color="#fff" />
-                      <Text style={styles.modalActionTextPrimary}>Tìm cửa hàng</Text>
+                    <TouchableOpacity style={{
+                      flex: 1,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backgroundColor: colors.primary,
+                      paddingVertical: spacing.md,
+                      borderRadius: radius.md,
+                    }}>
+                      <Ionicons name="location" size={20} color={colors.textInverse} />
+                      <Text style={[text.bodySemibold, { color: colors.textInverse, marginLeft: spacing.xs }]}>
+                        Tìm cửa hàng
+                      </Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -374,24 +492,42 @@ export default function ColorChartScreen() {
         animationType="slide"
         onRequestClose={() => setShowCompare(false)}
       >
-        <View style={styles.compareModalOverlay}>
-          <View style={styles.compareModalContent}>
-            <View style={styles.compareModalHeader}>
-              <Text style={styles.compareModalTitle}>So sánh màu sắc</Text>
+        <View style={{ flex: 1, backgroundColor: colors.overlay, justifyContent: 'flex-end' }}>
+          <View style={{
+            backgroundColor: colors.card,
+            borderTopLeftRadius: radius.xxl,
+            borderTopRightRadius: radius.xxl,
+            maxHeight: '80%',
+          }}>
+            <View style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: spacing.lg,
+              borderBottomWidth: 1,
+              borderBottomColor: colors.borderLight,
+            }}>
+              <Text style={[text.h3, { color: colors.text }]}>So sánh màu sắc</Text>
               <TouchableOpacity onPress={() => setShowCompare(false)}>
-                <Ionicons name="close" size={24} color="#333" />
+                <Ionicons name="close" size={24} color={colors.text} />
               </TouchableOpacity>
             </View>
 
             <ScrollView>
               {/* Color Swatches Row */}
-              <View style={styles.compareSwatchRow}>
-                {compareColors.map((color) => (
-                  <View key={color.id} style={styles.compareSwatchItem}>
-                    <View
-                      style={[styles.compareColorSwatch, { backgroundColor: color.hex }]}
-                    />
-                    <Text style={styles.compareColorName} numberOfLines={1}>
+              <View style={{ flexDirection: 'row', padding: spacing.lg, gap: spacing.md }}>
+                {compareColorsData.map((color) => (
+                  <View key={color.id} style={{ flex: 1, alignItems: 'center' }}>
+                    <View style={{
+                      width: '100%',
+                      height: 80,
+                      borderRadius: radius.lg,
+                      marginBottom: spacing.sm,
+                      borderWidth: 1,
+                      borderColor: colors.border,
+                      backgroundColor: color.hex,
+                    }} />
+                    <Text style={[text.caption, { fontWeight: '600', color: colors.text, textAlign: 'center' }]} numberOfLines={1}>
                       {color.name}
                     </Text>
                   </View>
@@ -399,56 +535,31 @@ export default function ColorChartScreen() {
               </View>
 
               {/* Comparison Table */}
-              <View style={styles.compareTable}>
-                {/* Brand Row */}
-                <View style={styles.compareRow}>
-                  <Text style={styles.compareRowLabel}>Thương hiệu</Text>
-                  {compareColors.map((color) => (
-                    <Text key={color.id} style={styles.compareRowValue}>
-                      {color.brand}
+              <View style={{ padding: spacing.lg }}>
+                {[
+                  { label: 'Thương hiệu', key: 'brand' as const },
+                  { label: 'Mã màu', key: 'code' as const },
+                  { label: 'Loại', key: 'category' as const },
+                  { label: 'Giá', key: 'price' as const },
+                  { label: 'Cửa hàng', key: 'store' as const },
+                ].map((row) => (
+                  <View key={row.key} style={{
+                    flexDirection: 'row',
+                    paddingVertical: spacing.md,
+                    borderBottomWidth: 1,
+                    borderBottomColor: colors.borderLight,
+                    gap: spacing.sm,
+                  }}>
+                    <Text style={[text.caption, { width: 80, fontWeight: '600', color: colors.textTertiary }]}>
+                      {row.label}
                     </Text>
-                  ))}
-                </View>
-
-                {/* Code Row */}
-                <View style={styles.compareRow}>
-                  <Text style={styles.compareRowLabel}>Mã màu</Text>
-                  {compareColors.map((color) => (
-                    <Text key={color.id} style={styles.compareRowValue}>
-                      {color.code}
-                    </Text>
-                  ))}
-                </View>
-
-                {/* Category Row */}
-                <View style={styles.compareRow}>
-                  <Text style={styles.compareRowLabel}>Loại</Text>
-                  {compareColors.map((color) => (
-                    <Text key={color.id} style={styles.compareRowValue}>
-                      {color.category}
-                    </Text>
-                  ))}
-                </View>
-
-                {/* Price Row */}
-                <View style={styles.compareRow}>
-                  <Text style={styles.compareRowLabel}>Giá</Text>
-                  {compareColors.map((color) => (
-                    <Text key={color.id} style={styles.compareRowValue}>
-                      {color.price}
-                    </Text>
-                  ))}
-                </View>
-
-                {/* Store Row */}
-                <View style={styles.compareRow}>
-                  <Text style={styles.compareRowLabel}>Cửa hàng</Text>
-                  {compareColors.map((color) => (
-                    <Text key={color.id} style={styles.compareRowValue}>
-                      {color.store}
-                    </Text>
-                  ))}
-                </View>
+                    {compareColorsData.map((color) => (
+                      <Text key={color.id} style={[text.caption, { flex: 1, color: colors.text, textAlign: 'center' }]}>
+                        {color[row.key]}
+                      </Text>
+                    ))}
+                  </View>
+                ))}
               </View>
             </ScrollView>
           </View>
@@ -457,399 +568,3 @@ export default function ColorChartScreen() {
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  searchSection: {
-    backgroundColor: '#fff',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  searchBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f5f5f5',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    height: 40,
-  },
-  searchInput: {
-    flex: 1,
-    marginLeft: 8,
-    fontSize: 14,
-    color: '#333',
-  },
-  filterSection: {
-    backgroundColor: '#fff',
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  filterScroll: {
-    paddingHorizontal: 12,
-    marginBottom: 8,
-  },
-  filterChip: {
-    paddingHorizontal: 16,
-    paddingVertical: 6,
-    borderRadius: 16,
-    backgroundColor: '#f5f5f5',
-    marginHorizontal: 4,
-  },
-  filterChipActive: {
-    backgroundColor: '#0D9488',
-  },
-  filterChipText: {
-    fontSize: 13,
-    color: '#666',
-    fontWeight: '500',
-  },
-  filterChipTextActive: {
-    color: '#fff',
-  },
-  categoryChip: {
-    paddingHorizontal: 14,
-    paddingVertical: 5,
-    borderRadius: 12,
-    backgroundColor: '#f5f5f5',
-    marginHorizontal: 4,
-    borderWidth: 1,
-    borderColor: 'transparent',
-  },
-  categoryChipActive: {
-    backgroundColor: '#F0FDFA',
-    borderColor: '#0D9488',
-  },
-  categoryChipText: {
-    fontSize: 12,
-    color: '#666',
-    fontWeight: '500',
-  },
-  categoryChipTextActive: {
-    color: '#0D9488',
-  },
-  compareBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#fff5f0',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  compareInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  compareText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#0D9488',
-    marginLeft: 6,
-  },
-  compareButton: {
-    backgroundColor: '#0D9488',
-    paddingHorizontal: 16,
-    paddingVertical: 6,
-    borderRadius: 6,
-  },
-  compareButtonText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#fff',
-  },
-  compareButtonTextDisabled: {
-    opacity: 0.5,
-  },
-  content: {
-    flex: 1,
-  },
-  colorGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    padding: 12,
-  },
-  colorItem: {
-    width: COLOR_SIZE,
-    marginBottom: 12,
-    paddingHorizontal: 4,
-  },
-  colorItemSelected: {
-    transform: [{ scale: 0.95 }],
-  },
-  compareCheckbox: {
-    position: 'absolute',
-    top: 4,
-    right: 8,
-    zIndex: 10,
-  },
-  checkbox: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: '#fff',
-    borderWidth: 2,
-    borderColor: '#ddd',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  checkboxActive: {
-    backgroundColor: '#0D9488',
-    borderColor: '#0D9488',
-  },
-  colorSwatch: {
-    width: '100%',
-    height: COLOR_SIZE * 0.8,
-    borderRadius: 8,
-    marginBottom: 6,
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  selectedBadge: {
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    borderRadius: 12,
-    padding: 4,
-  },
-  colorInfo: {
-    alignItems: 'center',
-  },
-  colorName: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: '#333',
-    textAlign: 'center',
-    marginBottom: 2,
-  },
-  colorCode: {
-    fontSize: 9,
-    color: '#999',
-    marginBottom: 4,
-  },
-  brandBadge: {
-    backgroundColor: '#f5f5f5',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  brandText: {
-    fontSize: 9,
-    fontWeight: '600',
-    color: '#666',
-  },
-  emptyState: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 60,
-  },
-  emptyText: {
-    fontSize: 15,
-    color: '#999',
-    marginTop: 16,
-    marginBottom: 20,
-  },
-  resetButton: {
-    backgroundColor: '#0D9488',
-    paddingHorizontal: 24,
-    paddingVertical: 10,
-    borderRadius: 8,
-  },
-  resetButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#fff',
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  modalContent: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    width: '100%',
-    maxWidth: 400,
-    overflow: 'hidden',
-  },
-  modalColorSwatch: {
-    width: '100%',
-    height: 200,
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-  },
-  modalDetails: {
-    padding: 20,
-  },
-  modalColorName: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#333',
-    marginBottom: 16,
-  },
-  modalInfoRow: {
-    flexDirection: 'row',
-    marginBottom: 12,
-    gap: 16,
-  },
-  modalInfoItem: {
-    flex: 1,
-  },
-  modalInfoLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#999',
-    marginBottom: 4,
-  },
-  modalInfoValue: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
-  },
-  modalPriceRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
-    marginVertical: 16,
-    paddingTop: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
-  },
-  modalPriceLabel: {
-    fontSize: 12,
-    color: '#999',
-    marginBottom: 4,
-  },
-  modalPriceValue: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#0D9488',
-  },
-  modalPriceUnit: {
-    fontSize: 12,
-    color: '#999',
-    marginTop: 2,
-  },
-  modalStoreInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  modalStoreText: {
-    fontSize: 13,
-    color: '#666',
-    marginLeft: 4,
-  },
-  modalActions: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  modalActionButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#fff5f0',
-    borderWidth: 1,
-    borderColor: '#0D9488',
-    paddingVertical: 12,
-    borderRadius: 8,
-  },
-  modalActionText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#0D9488',
-    marginLeft: 6,
-  },
-  modalActionButtonPrimary: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#0D9488',
-    paddingVertical: 12,
-    borderRadius: 8,
-  },
-  modalActionTextPrimary: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#fff',
-    marginLeft: 6,
-  },
-  compareModalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'flex-end',
-  },
-  compareModalContent: {
-    backgroundColor: '#fff',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    maxHeight: '80%',
-  },
-  compareModalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  compareModalTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#333',
-  },
-  compareSwatchRow: {
-    flexDirection: 'row',
-    padding: 16,
-    gap: 12,
-  },
-  compareSwatchItem: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  compareColorSwatch: {
-    width: '100%',
-    height: 80,
-    borderRadius: 8,
-    marginBottom: 8,
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-  },
-  compareColorName: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: '#333',
-    textAlign: 'center',
-  },
-  compareTable: {
-    padding: 16,
-  },
-  compareRow: {
-    flexDirection: 'row',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f5f5f5',
-    gap: 8,
-  },
-  compareRowLabel: {
-    width: 80,
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#999',
-  },
-  compareRowValue: {
-    flex: 1,
-    fontSize: 13,
-    color: '#333',
-    textAlign: 'center',
-  },
-});

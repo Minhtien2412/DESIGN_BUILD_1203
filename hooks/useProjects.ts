@@ -1,12 +1,20 @@
-import { useCallback, useEffect, useState } from 'react';
-import projectsApi, { Project as BackendProject } from '../services/api/projectsApi';
-import { cache, CacheTTL } from '../utils/cache';
-import { getOfflineData, saveOfflineData } from '../utils/offlineStorage';
-import { useNetworkStatus } from './useNetworkStatus';
+import { useCallback, useEffect, useState } from "react";
+import { useAuth } from "../context/AuthContext";
+import projectsApi, {
+    Project as BackendProject,
+} from "../services/api/projectsApi";
+import { cache, CacheTTL } from "../utils/cache";
+import { getOfflineData, saveOfflineData } from "../utils/offlineStorage";
+import { useNetworkStatus } from "./useNetworkStatus";
 
 // Define backward-compatible types for existing UI code
-export type ProjectStatus = 'planning' | 'active' | 'paused' | 'completed';
-export type ProjectType = 'residential' | 'commercial' | 'landscape' | 'interior' | 'renovation';
+export type ProjectStatus = "planning" | "active" | "paused" | "completed";
+export type ProjectType =
+  | "residential"
+  | "commercial"
+  | "landscape"
+  | "interior"
+  | "renovation";
 
 // TeamMember type for project team
 export interface TeamMemberInfo {
@@ -21,7 +29,10 @@ export interface TeamMemberInfo {
 }
 
 // Extended Project type that combines backend data with UI expectations
-export interface Project extends Omit<BackendProject, 'status' | 'client' | 'id'> {
+export interface Project extends Omit<
+  BackendProject,
+  "status" | "client" | "id"
+> {
   id: number | string; // Accept both for backward compatibility with mock data
   name: string; // Maps from backend 'title'
   type?: ProjectType; // Not in backend yet
@@ -41,7 +52,15 @@ export interface Project extends Omit<BackendProject, 'status' | 'client' | 'id'
   } | null;
   teamMembers?: TeamMemberInfo[]; // Team members on the project
   team?: { id: string; name: string; role: string }[]; // Mock data format
-  documents?: number | { id: string; name: string; url: string; size: number; uploaded_at: string }[]; // Document count or array for mock
+  documents?:
+    | number
+    | {
+        id: string;
+        name: string;
+        url: string;
+        size: number;
+        uploaded_at: string;
+      }[]; // Document count or array for mock
 }
 
 interface UseProjectsOptions {
@@ -69,27 +88,30 @@ interface UseProjectsReturn {
 /**
  * Hook to fetch and manage list of projects from backend API
  * Uses real API endpoint: GET /projects (protected)
- * 
+ *
  * Note: Currently backend doesn't support query params (status, search, type, pagination).
  * Client-side filtering is handled by the UI component.
  */
-export function useProjects(options: UseProjectsOptions = {}): UseProjectsReturn {
+export function useProjects(
+  options: UseProjectsOptions = {},
+): UseProjectsReturn {
   const { autoFetch = true } = options;
-  
+  const { isAuthenticated } = useAuth(); // Guard: only fetch if authenticated
+
   const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(autoFetch);
+  const [loading, setLoading] = useState(autoFetch && isAuthenticated);
   const [error, setError] = useState<Error | null>(null);
   const [retrying, setRetrying] = useState(false);
   const { isOffline } = useNetworkStatus();
 
   const fetchProjects = useCallback(async (isRetry = false) => {
-    const CACHE_KEY = 'projects:all';
-    const OFFLINE_KEY = 'projects_offline';
-    
+    const CACHE_KEY = "projects:all";
+    const OFFLINE_KEY = "projects_offline";
+
     try {
       // If offline, use offline storage
       if (isOffline) {
-        console.log('[useProjects] Device offline, using offline storage');
+        console.log("[useProjects] Device offline, using offline storage");
         const offlineData = await getOfflineData<Project[]>(OFFLINE_KEY);
         if (offlineData) {
           setProjects(offlineData);
@@ -97,48 +119,56 @@ export function useProjects(options: UseProjectsOptions = {}): UseProjectsReturn
           setError(null);
           return;
         }
-        throw new Error('No offline data available. Please connect to the internet.');
+        throw new Error(
+          "No offline data available. Please connect to the internet.",
+        );
       }
-      
+
       // Try cache first (unless retrying)
       if (!isRetry) {
         const cachedProjects = cache.get<Project[]>(CACHE_KEY);
         if (cachedProjects) {
-          console.log('[useProjects] Using cached data');
+          console.log("[useProjects] Using cached data");
           setProjects(cachedProjects);
           setLoading(false);
           setError(null);
-          
+
           // Background refresh
-          projectsApi.getProjects()
-            .then(response => {
-              const mappedProjects = (response.value || []).map(p => ({
+          projectsApi
+            .getProjects()
+            .then((response) => {
+              const mappedProjects = (response.value || []).map((p) => ({
                 ...p,
                 name: p.title,
-                type: 'commercial' as ProjectType,
-                location: '',
+                type: "commercial" as ProjectType,
+                location: "",
                 start_date: p.startDate,
                 end_date: p.endDate,
                 created_at: p.createdAt,
-                client: p.client ? { ...p.client, phone: '' } : undefined,
-                status: p.status === 'PLANNING' ? 'planning' as ProjectStatus
-                  : p.status === 'IN_PROGRESS' ? 'active' as ProjectStatus
-                  : p.status === 'COMPLETED' ? 'completed' as ProjectStatus
-                  : p.status === 'ON_HOLD' ? 'paused' as ProjectStatus
-                  : 'planning' as ProjectStatus,
+                client: p.client ? { ...p.client, phone: "" } : undefined,
+                status:
+                  p.status === "PLANNING"
+                    ? ("planning" as ProjectStatus)
+                    : p.status === "IN_PROGRESS"
+                      ? ("active" as ProjectStatus)
+                      : p.status === "COMPLETED"
+                        ? ("completed" as ProjectStatus)
+                        : p.status === "ON_HOLD"
+                          ? ("paused" as ProjectStatus)
+                          : ("planning" as ProjectStatus),
               })) as Project[];
               cache.set(CACHE_KEY, mappedProjects, CacheTTL.MEDIUM);
               saveOfflineData(OFFLINE_KEY, mappedProjects); // Persist for offline
               setProjects(mappedProjects);
             })
-            .catch(err => {
-              console.error('[useProjects] Background refresh failed:', err);
+            .catch((err) => {
+              console.error("[useProjects] Background refresh failed:", err);
             });
-          
+
           return;
         }
       }
-      
+
       if (isRetry) {
         setRetrying(true);
       } else {
@@ -148,39 +178,47 @@ export function useProjects(options: UseProjectsOptions = {}): UseProjectsReturn
       const response = await projectsApi.getProjects();
       // Backend returns { value: Project[], Count: number }
       // Map backend projects to UI-compatible format
-      const mappedProjects = (response.value || []).map(p => ({
+      const mappedProjects = (response.value || []).map((p) => ({
         ...p,
         // Map backend fields to UI expectations
         name: p.title, // UI uses 'name', backend uses 'title'
-        type: 'commercial' as ProjectType, // Backend doesn't have type yet, default
-        location: '', // Backend doesn't have location yet
+        type: "commercial" as ProjectType, // Backend doesn't have type yet, default
+        location: "", // Backend doesn't have location yet
         // Legacy aliases for backward compatibility
         start_date: p.startDate,
         end_date: p.endDate,
         created_at: p.createdAt,
-        client: p.client ? {
-          ...p.client,
-          phone: '', // Backend doesn't have phone yet
-        } : undefined,
+        client: p.client
+          ? {
+              ...p.client,
+              phone: "", // Backend doesn't have phone yet
+            }
+          : undefined,
         // Map backend status (PLANNING, IN_PROGRESS, etc) to UI status (planning, active, etc)
-        status: p.status === 'PLANNING' ? 'planning' as ProjectStatus
-          : p.status === 'IN_PROGRESS' ? 'active' as ProjectStatus
-          : p.status === 'COMPLETED' ? 'completed' as ProjectStatus
-          : p.status === 'ON_HOLD' ? 'paused' as ProjectStatus
-          : 'planning' as ProjectStatus,
+        status:
+          p.status === "PLANNING"
+            ? ("planning" as ProjectStatus)
+            : p.status === "IN_PROGRESS"
+              ? ("active" as ProjectStatus)
+              : p.status === "COMPLETED"
+                ? ("completed" as ProjectStatus)
+                : p.status === "ON_HOLD"
+                  ? ("paused" as ProjectStatus)
+                  : ("planning" as ProjectStatus),
       })) as Project[];
-      
+
       // Cache the mapped projects
       cache.set(CACHE_KEY, mappedProjects, CacheTTL.MEDIUM);
-      
+
       // Save to offline storage
       await saveOfflineData(OFFLINE_KEY, mappedProjects);
-      
+
       setProjects(mappedProjects);
     } catch (err) {
-      const error = err instanceof Error ? err : new Error('Failed to load projects');
+      const error =
+        err instanceof Error ? err : new Error("Failed to load projects");
       setError(error);
-      console.error('[useProjects] Error:', err);
+      console.error("[useProjects] Error:", err);
       setProjects([]);
     } finally {
       setLoading(false);
@@ -189,10 +227,15 @@ export function useProjects(options: UseProjectsOptions = {}): UseProjectsReturn
   }, []);
 
   useEffect(() => {
-    if (autoFetch) {
+    if (autoFetch && isAuthenticated) {
       fetchProjects();
+    } else if (!isAuthenticated) {
+      // Clear projects when user logs out
+      setProjects([]);
+      setError(null);
+      setLoading(false);
     }
-  }, [autoFetch, fetchProjects]);
+  }, [autoFetch, isAuthenticated, fetchProjects]);
 
   const handleRetry = useCallback(async () => {
     await fetchProjects(true);
@@ -235,27 +278,34 @@ export function useProjectDetail(projectId: number | null) {
       const mappedProject: Project = {
         ...data,
         name: data.title,
-        type: 'commercial' as ProjectType,
-        location: '',
+        type: "commercial" as ProjectType,
+        location: "",
         progress: undefined,
         // Legacy aliases for backward compatibility
         start_date: data.startDate,
         end_date: data.endDate,
         created_at: data.createdAt,
-        client: data.client ? {
-          ...data.client,
-          phone: '',
-        } : null,
-        status: data.status === 'PLANNING' ? 'planning'
-          : data.status === 'IN_PROGRESS' ? 'active'
-          : data.status === 'COMPLETED' ? 'completed'
-          : data.status === 'ON_HOLD' ? 'paused'
-          : 'planning',
+        client: data.client
+          ? {
+              ...data.client,
+              phone: "",
+            }
+          : null,
+        status:
+          data.status === "PLANNING"
+            ? "planning"
+            : data.status === "IN_PROGRESS"
+              ? "active"
+              : data.status === "COMPLETED"
+                ? "completed"
+                : data.status === "ON_HOLD"
+                  ? "paused"
+                  : "planning",
       };
       setProject(mappedProject);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load project');
-      console.error('[useProjectDetail] Error:', err);
+      setError(err instanceof Error ? err.message : "Failed to load project");
+      console.error("[useProjectDetail] Error:", err);
       setProject(null);
     } finally {
       setLoading(false);

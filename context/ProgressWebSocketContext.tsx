@@ -202,7 +202,7 @@ export function ProgressWebSocketProvider({
         clearTimeout(reconnectTimeoutRef.current);
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [user]); // Only depend on user
 
   // ============================================================================

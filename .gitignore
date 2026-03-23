@@ -11,9 +11,36 @@
 .env.development
 .env.backup*
 .env.database
+.env.docker
+.env.dev.*
 web/.env
 web/.env.*
 !web/.env.example
+!.env.example
+!**/.env.example
+
+# Backend sensitive files
+BE-baotienweb.cloud/.env
+BE-baotienweb.cloud/.env.*
+!BE-baotienweb.cloud/.env.example
+backend/**/.env
+backend/**/.env.*
+!backend/**/.env.example
+ai-brain/.env
+!ai-brain/.env.example
+
+# Perfex CRM sensitive
+BE-baotienweb.cloud/perfex_crm/application/config/config.php
+BE-baotienweb.cloud/crm/application/config/config.php
+
+# Secret keys
+*.pem
+*.key
+*.p12
+*.p8
+*.jks
+google-services.json
+GoogleService-Info.plist
 
 # dependencies
 node_modules/
@@ -100,3 +127,39 @@ backend-deploy.tar.gz
 *.vsix
 
 APP_DESIGN_BUILD05.12.2025.zip
+
+# ============================================
+# SECURITY - Sensitive/confidential files
+# ============================================
+# API keys & secrets
+*.secret
+*.secrets
+secrets/
+credentials/
+*.credential
+
+# Private keys & certificates
+*.pem
+*.key
+*.p12
+*.p8
+*.jks
+*.keystore
+*.cert
+*.crt
+
+# Database dumps
+*.sql
+*.dump
+*.sqlite
+
+# Deployment secrets
+deployment/*.env
+deployment/*.secret
+docker/.env
+docker/*.secret
+
+# Sensitive config backups
+*.env.backup*
+config/*.local.ts
+config/*.local.js

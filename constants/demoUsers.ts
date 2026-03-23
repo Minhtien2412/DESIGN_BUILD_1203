@@ -1,9 +1,10 @@
 /**
- * Demo Users - Real users created on baotienweb.cloud server
- * Password for all users: Demo@123
+ * Demo Users - Real users on baotienweb.cloud server
+ * Admin password: Admin@2024!
+ * Demo user password: Demo@2024!
  *
  * Use these credentials to test the app with real API data
- * @updated 2026-03-03
+ * @updated 2026-06-13
  */
 
 export interface DemoUser {
@@ -11,52 +12,45 @@ export interface DemoUser {
   email: string;
   password: string;
   name: string;
-  role: "CLIENT" | "STAFF" | "CONTRACTOR" | "ADMIN" | "DESIGNER";
+  role: "CLIENT" | "STAFF" | "CONTRACTOR" | "ADMIN" | "ENGINEER";
   phone?: string;
   avatar?: string;
 }
 
 export const DEMO_USERS: DemoUser[] = [
   {
-    id: 3,
+    id: 1,
     email: "admin@baotienweb.cloud",
-    password: "Demo@123",
+    password: "Admin@2024!",
     name: "Admin BaoTien",
     role: "ADMIN",
   },
   {
     id: 4,
-    email: "manager@baotienweb.cloud",
-    password: "Demo@123",
-    name: "Nguyễn Văn Manager",
-    role: "STAFF",
+    email: "demo.user3@baotienweb.cloud",
+    password: "Demo@2024!",
+    name: "Tran Minh Duc",
+    role: "ENGINEER",
   },
   {
     id: 5,
-    email: "worker@baotienweb.cloud",
-    password: "Demo@123",
-    name: "Trần Thợ Xây",
+    email: "demo.contractor@baotienweb.cloud",
+    password: "Demo@2024!",
+    name: "Le Van Hung",
     role: "CONTRACTOR",
   },
   {
     id: 6,
-    email: "customer@baotienweb.cloud",
-    password: "Demo@123",
-    name: "Lê Khách Hàng",
+    email: "demo.client1@baotienweb.cloud",
+    password: "Demo@2024!",
+    name: "Nguyen Thi Mai",
     role: "CLIENT",
   },
   {
     id: 7,
-    email: "designer@baotienweb.cloud",
-    password: "Demo@123",
-    name: "Phạm Thiết Kế",
-    role: "DESIGNER",
-  },
-  {
-    id: 8,
-    email: "demo@baotienweb.cloud",
-    password: "Demo@123",
-    name: "Demo User",
+    email: "demo.client2@baotienweb.cloud",
+    password: "Demo@2024!",
+    name: "Hoang Van Son",
     role: "CLIENT",
   },
 ];
@@ -76,5 +70,5 @@ export const getDemoUserById = (id: number): DemoUser | undefined => {
   return DEMO_USERS.find((u) => u.id === id);
 };
 
-// All passwords are the same for demo
-export const DEMO_PASSWORD = "Demo@123";
+// Default demo password (non-admin accounts)
+export const DEMO_PASSWORD = "Demo@2024!";

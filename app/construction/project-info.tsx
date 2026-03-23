@@ -515,7 +515,9 @@ export default function ProjectInfoScreen() {
         </View>
         <View style={styles.personCard}>
           <Image
-            source={{ uri: project.client.avatar }}
+            source={
+              project.client.avatar ? { uri: project.client.avatar } : undefined
+            }
             style={styles.personAvatar}
           />
           <View style={styles.personInfo}>
@@ -541,7 +543,11 @@ export default function ProjectInfoScreen() {
         </View>
         <View style={styles.personCard}>
           <Image
-            source={{ uri: project.projectManager.avatar }}
+            source={
+              project.projectManager.avatar
+                ? { uri: project.projectManager.avatar }
+                : undefined
+            }
             style={styles.personAvatar}
           />
           <View style={styles.personInfo}>
@@ -567,7 +573,11 @@ export default function ProjectInfoScreen() {
         </View>
         <View style={styles.personCard}>
           <Image
-            source={{ uri: project.engineer.avatar }}
+            source={
+              project.engineer.avatar
+                ? { uri: project.engineer.avatar }
+                : undefined
+            }
             style={styles.personAvatar}
           />
           <View style={styles.personInfo}>

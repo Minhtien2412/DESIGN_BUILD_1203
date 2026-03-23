@@ -178,7 +178,7 @@ export function useWorkerTracking(
     return () => {
       stopTracking();
     };
-  }, [autoStart, workerId, customerLocation]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [autoStart, workerId, customerLocation]);  
 
   // Stop tracking when completed or cancelled
   useEffect(() => {

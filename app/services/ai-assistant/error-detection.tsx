@@ -3,37 +3,30 @@
  * View AI-detected construction errors with severity levels
  */
 
-import { useThemeColor } from '@/hooks/use-theme-color';
-import { useErrorDetection } from '@/hooks/useAI';
-import { getSeverityColor } from '@/services/ai';
-import type { DetectedIssue, IssueSeverity } from '@/types/ai';
-import { Ionicons } from '@expo/vector-icons';
-import { Stack, useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
-import {
-    FlatList,
-    Modal,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
-} from 'react-native';
+import { useErrorDetection } from "@/hooks/useAI";
+import { useDS } from "@/hooks/useDS";
+import { getSeverityColor } from "@/services/ai";
+import type { DetectedIssue, IssueSeverity } from "@/types/ai";
+import { Ionicons } from "@expo/vector-icons";
+import { Stack, useLocalSearchParams } from "expo-router";
+import { useState } from "react";
+import { FlatList, Modal, Text, TouchableOpacity, View } from "react-native";
 
 export default function ErrorDetectionScreen() {
   const params = useLocalSearchParams<{ projectId: string }>();
-  const backgroundColor = useThemeColor({}, 'background');
-  const textColor = useThemeColor({}, 'text');
-  const tintColor = useThemeColor({}, 'tint');
+  const { colors, spacing, radius } = useDS();
 
-  const [selectedIssue, setSelectedIssue] = useState<DetectedIssue | null>(null);
+  const [selectedIssue, setSelectedIssue] = useState<DetectedIssue | null>(
+    null,
+  );
   const { result, loading, error } = useErrorDetection();
 
   const severityLabels: Record<IssueSeverity, string> = {
-    CRITICAL: 'Nghiêm trọng',
-    HIGH: 'Cao',
-    MEDIUM: 'Trung bình',
-    LOW: 'Thấp',
-    INFO: 'Thông tin',
+    CRITICAL: "Nghiêm trọng",
+    HIGH: "Cao",
+    MEDIUM: "Trung bình",
+    LOW: "Thấp",
+    INFO: "Thông tin",
   };
 
   const renderIssue = ({ item }: { item: DetectedIssue }) => {
@@ -48,14 +41,14 @@ export default function ErrorDetectionScreen() {
           <View style={styles.issueTitleRow}>
             <Ionicons
               name={
-                item.severity === 'CRITICAL' || item.severity === 'HIGH'
-                  ? 'warning'
-                  : 'alert-circle'
+                item.severity === "CRITICAL" || item.severity === "HIGH"
+                  ? "warning"
+                  : "alert-circle"
               }
               size={20}
               color={severityColor}
             />
-            <Text style={[styles.issueTitle, { color: textColor }]}>
+            <Text style={[styles.issueTitle, { color: colors.text }]}>
               {item.title || item.type}
             </Text>
           </View>
@@ -74,14 +67,18 @@ export default function ErrorDetectionScreen() {
 
         {item.location && (
           <View style={styles.locationRow}>
-            <Ionicons name="location-outline" size={14} color="#666" />
+            <Ionicons
+              name="location-outline"
+              size={14}
+              color={colors.textSecondary}
+            />
             <Text style={styles.locationText}>{item.location}</Text>
           </View>
         )}
 
         {item.recommendations && item.recommendations.length > 0 && (
           <View style={styles.recommendationPreview}>
-            <Ionicons name="bulb-outline" size={14} color="#0D9488" />
+            <Ionicons name="bulb-outline" size={14} color={colors.primary} />
             <Text style={styles.recommendationText} numberOfLines={1}>
               {item.recommendations[0]}
             </Text>
@@ -93,8 +90,12 @@ export default function ErrorDetectionScreen() {
 
   const renderEmpty = () => (
     <View style={styles.emptyContainer}>
-      <Ionicons name="checkmark-circle-outline" size={64} color="#0D9488" />
-      <Text style={[styles.emptyTitle, { color: textColor }]}>
+      <Ionicons
+        name="checkmark-circle-outline"
+        size={64}
+        color={colors.primary}
+      />
+      <Text style={[styles.emptyTitle, { color: colors.text }]}>
         Không phát hiện lỗi
       </Text>
       <Text style={styles.emptyText}>
@@ -109,10 +110,10 @@ export default function ErrorDetectionScreen() {
     <>
       <Stack.Screen
         options={{
-          title: 'Phát hiện lỗi AI',
+          title: "Phát hiện lỗi AI",
         }}
       />
-      <View style={[styles.container, { backgroundColor }]}>
+      <View style={[styles.container, { backgroundColor: colors.bg }]}>
         {/* Summary Stats */}
         {detectedIssues.length > 0 && (
           <View style={styles.statsContainer}>
@@ -120,27 +121,27 @@ export default function ErrorDetectionScreen() {
               icon="alert-circle"
               label="Tổng số"
               value={detectedIssues.length}
-              color="#666"
+              color={colors.textSecondary}
             />
             <StatCard
               icon="warning"
               label="Nghiêm trọng"
               value={
                 detectedIssues.filter(
-                  (i) => i.severity === 'CRITICAL' || i.severity === 'HIGH'
+                  (i) => i.severity === "CRITICAL" || i.severity === "HIGH",
                 ).length
               }
-              color="#000000"
+              color={colors.error}
             />
             <StatCard
               icon="information-circle"
               label="Khác"
               value={
                 detectedIssues.filter(
-                  (i) => i.severity === 'MEDIUM' || i.severity === 'LOW'
+                  (i) => i.severity === "MEDIUM" || i.severity === "LOW",
                 ).length
               }
-              color="#0D9488"
+              color={colors.primary}
             />
           </View>
         )}
@@ -162,15 +163,15 @@ export default function ErrorDetectionScreen() {
           onRequestClose={() => setSelectedIssue(null)}
         >
           <View style={styles.modalContainer}>
-            <View style={[styles.modalContent, { backgroundColor }]}>
+            <View style={[styles.modalContent, { backgroundColor: colors.bg }]}>
               {selectedIssue && (
                 <>
                   <View style={styles.modalHeader}>
-                    <Text style={[styles.modalTitle, { color: textColor }]}>
+                    <Text style={[styles.modalTitle, { color: colors.text }]}>
                       Chi tiết vấn đề
                     </Text>
                     <TouchableOpacity onPress={() => setSelectedIssue(null)}>
-                      <Ionicons name="close" size={28} color={textColor} />
+                      <Ionicons name="close" size={28} color={colors.text} />
                     </TouchableOpacity>
                   </View>
 
@@ -179,9 +180,9 @@ export default function ErrorDetectionScreen() {
                       styles.severityBadge,
                       {
                         backgroundColor: getSeverityColor(
-                          selectedIssue.severity
+                          selectedIssue.severity,
                         ),
-                        alignSelf: 'flex-start',
+                        alignSelf: "flex-start",
                       },
                     ]}
                   >
@@ -190,17 +191,19 @@ export default function ErrorDetectionScreen() {
                     </Text>
                   </View>
 
-                  <Text style={[styles.detailTitle, { color: textColor }]}>
+                  <Text style={[styles.detailTitle, { color: colors.text }]}>
                     {selectedIssue.title}
                   </Text>
-                  <Text style={[styles.detailDescription, { color: textColor }]}>
+                  <Text
+                    style={[styles.detailDescription, { color: colors.text }]}
+                  >
                     {selectedIssue.description}
                   </Text>
 
                   {selectedIssue.location && (
                     <View style={styles.detailSection}>
                       <Text style={styles.detailLabel}>Vị trí:</Text>
-                      <Text style={[styles.detailText, { color: textColor }]}>
+                      <Text style={[styles.detailText, { color: colors.text }]}>
                         {selectedIssue.location}
                       </Text>
                     </View>
@@ -215,12 +218,12 @@ export default function ErrorDetectionScreen() {
                             <Ionicons
                               name="bulb-outline"
                               size={16}
-                              color="#0D9488"
+                              color={colors.primary}
                             />
                             <Text
                               style={[
                                 styles.recommendationFullText,
-                                { color: textColor },
+                                { color: colors.text },
                               ]}
                             >
                               {rec}
@@ -259,31 +262,31 @@ function StatCard({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   container: {
     flex: 1,
   },
   statsContainer: {
-    flexDirection: 'row',
+    flexDirection: "row" as const,
     padding: 16,
     gap: 12,
   },
   statCard: {
     flex: 1,
-    alignItems: 'center',
-    backgroundColor: '#f9f9f9',
+    alignItems: "center" as const,
+    backgroundColor: "#F9FAFB",
     padding: 16,
     borderRadius: 12,
   },
   statValue: {
     fontSize: 24,
-    fontWeight: '700',
-    color: '#333',
+    fontWeight: "700" as const,
+    color: "#374151",
     marginTop: 8,
   },
   statLabel: {
     fontSize: 12,
-    color: '#666',
+    color: "#6B7280",
     marginTop: 4,
   },
   listContent: {
@@ -292,47 +295,47 @@ const styles = StyleSheet.create({
   },
   emptyContainer: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center" as const,
+    justifyContent: "center" as const,
     paddingVertical: 64,
   },
   emptyTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600" as const,
     marginTop: 16,
   },
   emptyText: {
     fontSize: 14,
-    color: '#666',
+    color: "#6B7280",
     marginTop: 8,
   },
   issueCard: {
-    backgroundColor: '#fff',
+    backgroundColor: "#FFFFFF",
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
     borderLeftWidth: 4,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 2,
   },
   issueHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row" as const,
+    justifyContent: "space-between" as const,
+    alignItems: "center" as const,
     marginBottom: 8,
   },
   issueTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row" as const,
+    alignItems: "center" as const,
     gap: 8,
     flex: 1,
   },
   issueTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600" as const,
     flex: 1,
   },
   severityBadge: {
@@ -342,63 +345,63 @@ const styles = StyleSheet.create({
   },
   severityText: {
     fontSize: 11,
-    fontWeight: '600',
-    color: '#fff',
+    fontWeight: "600" as const,
+    color: "#FFFFFF",
   },
   issueDescription: {
     fontSize: 14,
-    color: '#666',
+    color: "#6B7280",
     lineHeight: 20,
     marginBottom: 8,
   },
   locationRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row" as const,
+    alignItems: "center" as const,
     gap: 4,
     marginBottom: 8,
   },
   locationText: {
     fontSize: 13,
-    color: '#666',
-    fontStyle: 'italic',
+    color: "#6B7280",
+    fontStyle: "italic" as const,
   },
   recommendationPreview: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row" as const,
+    alignItems: "center" as const,
     gap: 6,
     paddingTop: 8,
     borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
+    borderTopColor: "#F3F4F6",
   },
   recommendationText: {
     flex: 1,
     fontSize: 13,
-    color: '#0D9488',
+    color: "#0D9488",
   },
   modalContainer: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'flex-end',
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "flex-end" as const,
   },
   modalContent: {
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 24,
-    maxHeight: '80%',
+    maxHeight: "80%" as const,
   },
   modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row" as const,
+    justifyContent: "space-between" as const,
+    alignItems: "center" as const,
     marginBottom: 20,
   },
   modalTitle: {
     fontSize: 20,
-    fontWeight: '700',
+    fontWeight: "700" as const,
   },
   detailTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600" as const,
     marginTop: 16,
     marginBottom: 8,
   },
@@ -412,8 +415,8 @@ const styles = StyleSheet.create({
   },
   detailLabel: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#666',
+    fontWeight: "600" as const,
+    color: "#6B7280",
     marginBottom: 8,
   },
   detailText: {
@@ -421,8 +424,8 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   recommendationItem: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
+    flexDirection: "row" as const,
+    alignItems: "flex-start" as const,
     gap: 8,
     marginBottom: 8,
   },
@@ -431,4 +434,4 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
   },
-});
+};

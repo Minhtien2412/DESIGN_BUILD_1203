@@ -1,33 +1,29 @@
 /**
  * Architect Listing Screen — Danh sách Kiến trúc sư
  * Route: /services/architect-listing
- * @created 2026-03-05
+ * Refactored: DS design system (useDS, DSCard, DSChip, DSEmptyState, DSModuleScreen).
  */
 
-import { Colors } from "@/constants/theme";
+import { DSCard, DSChip, DSEmptyState } from "@/components/ds";
+import { DSModuleScreen } from "@/components/ds/layouts";
 import { useUnifiedMessaging } from "@/hooks/crm/useUnifiedMessaging";
+import { useDS } from "@/hooks/useDS";
 import {
     getDesignCompanies,
     type CompanyListItem,
 } from "@/services/company.service";
 import { Ionicons } from "@expo/vector-icons";
-import { Stack, router } from "expo-router";
+import { router } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import {
     ActivityIndicator,
-    Dimensions,
-    FlatList,
     Image,
-    RefreshControl,
     ScrollView,
-    StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
     View,
 } from "react-native";
-
-const { width } = Dimensions.get("window");
 
 const DEMO_IMAGES = [
   "https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=600",
@@ -166,6 +162,7 @@ const FALLBACK: Architect[] = [
 ];
 
 export default function ArchitectListingScreen() {
+  const { colors, spacing, radius, shadow, text: textStyles, font } = useDS();
   const [architects, setArchitects] = useState<Architect[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -229,329 +226,376 @@ export default function ArchitectListingScreen() {
     return matchLoc && matchSearch;
   });
 
-  const renderCard = ({ item: a }: { item: Architect }) => (
-    <TouchableOpacity
-      style={s.card}
+  const renderCard = (a: Architect) => (
+    <DSCard
+      key={String(a.id)}
       onPress={() => router.push(`/services/company-detail?id=${a.id}`)}
-      activeOpacity={0.7}
+      variant="elevated"
+      padding={0}
+      style={{ marginBottom: spacing.lg, overflow: "hidden" }}
     >
-      <Image source={{ uri: a.image }} style={s.cardImage} resizeMode="cover" />
+      <Image
+        source={{ uri: a.image }}
+        style={{ width: "100%", height: 180, backgroundColor: colors.bgMuted }}
+        resizeMode="cover"
+      />
       {a.verified && (
-        <View style={s.verifiedBadge}>
-          <Ionicons name="checkmark-circle" size={14} color="#fff" />
-          <Text style={s.verifiedText}>Xác thực</Text>
+        <View
+          style={{
+            position: "absolute",
+            top: spacing.md,
+            left: spacing.md,
+            flexDirection: "row",
+            alignItems: "center",
+            backgroundColor: colors.primary,
+            paddingHorizontal: spacing.md,
+            paddingVertical: spacing.xs,
+            borderRadius: radius.sm,
+            gap: spacing.xs,
+          }}
+        >
+          <Ionicons
+            name="checkmark-circle"
+            size={14}
+            color={colors.textInverse}
+          />
+          <Text style={[textStyles.badge, { color: colors.textInverse }]}>
+            Xác thực
+          </Text>
         </View>
       )}
-      <View style={s.expBadge}>
-        <Ionicons name="time-outline" size={12} color="#fff" />
-        <Text style={s.expText}>{a.experience}</Text>
+      <View
+        style={{
+          position: "absolute",
+          top: spacing.md,
+          right: spacing.md,
+          flexDirection: "row",
+          alignItems: "center",
+          backgroundColor: "rgba(0,0,0,0.6)",
+          paddingHorizontal: spacing.md,
+          paddingVertical: spacing.xs,
+          borderRadius: radius.sm,
+          gap: spacing.xs,
+        }}
+      >
+        <Ionicons name="time-outline" size={12} color={colors.textInverse} />
+        <Text style={[textStyles.badge, { color: colors.textInverse }]}>
+          {a.experience}
+        </Text>
       </View>
-      <View style={s.cardBody}>
-        <View style={s.header}>
-          <Image source={{ uri: a.avatar }} style={s.avatar} />
+
+      <View style={{ padding: spacing.xl }}>
+        {/* Header: avatar + name + location */}
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: spacing.md,
+            marginBottom: spacing.md,
+          }}
+        >
+          <Image
+            source={{ uri: a.avatar }}
+            style={{
+              width: 48,
+              height: 48,
+              borderRadius: 24,
+              borderWidth: 2,
+              borderColor: colors.primary,
+            }}
+          />
           <View style={{ flex: 1 }}>
-            <Text style={s.name} numberOfLines={1}>
+            <Text
+              style={[textStyles.bodySemibold, { color: colors.text }]}
+              numberOfLines={1}
+            >
               {a.name}
             </Text>
-            <View style={s.locRow}>
-              <Ionicons name="location-outline" size={12} color="#666" />
-              <Text style={s.locText}>{a.location}</Text>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 2,
+                marginTop: 2,
+              }}
+            >
+              <Ionicons
+                name="location-outline"
+                size={12}
+                color={colors.textSecondary}
+              />
+              <Text
+                style={[textStyles.caption, { color: colors.textSecondary }]}
+              >
+                {a.location}
+              </Text>
             </View>
           </View>
         </View>
-        <View style={s.statsRow}>
-          <View style={s.stat}>
-            <Ionicons name="star" size={14} color={Colors.light.primary} />
-            <Text style={s.ratingText}>{a.rating.toFixed(1)}</Text>
-            <Text style={s.reviewText}>({a.reviewCount})</Text>
+
+        {/* Stats */}
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            marginBottom: spacing.sm,
+            gap: spacing.md,
+          }}
+        >
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: spacing.xs,
+            }}
+          >
+            <Ionicons name="star" size={14} color={colors.primary} />
+            <Text style={[textStyles.smallBold, { fontSize: font.size.sm }]}>
+              {a.rating.toFixed(1)}
+            </Text>
+            <Text style={[textStyles.caption, { color: colors.textTertiary }]}>
+              ({a.reviewCount})
+            </Text>
           </View>
-          <View style={s.divider} />
-          <View style={s.stat}>
-            <Ionicons name="briefcase-outline" size={14} color="#666" />
-            <Text style={s.projectText}>{a.projectCount} dự án</Text>
+          <View
+            style={{ width: 1, height: 16, backgroundColor: colors.divider }}
+          />
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: spacing.xs,
+            }}
+          >
+            <Ionicons
+              name="briefcase-outline"
+              size={14}
+              color={colors.textSecondary}
+            />
+            <Text style={[textStyles.caption, { color: colors.textSecondary }]}>
+              {a.projectCount} dự án
+            </Text>
           </View>
         </View>
-        <View style={s.tagRow}>
+
+        {/* Tags */}
+        <View
+          style={{
+            flexDirection: "row",
+            flexWrap: "wrap",
+            gap: spacing.xs,
+            marginBottom: spacing.md,
+          }}
+        >
           {a.specialties.slice(0, 3).map((sp, i) => (
-            <View key={i} style={s.tag}>
-              <Text style={s.tagText}>{sp}</Text>
+            <View
+              key={i}
+              style={{
+                backgroundColor: colors.primaryBg,
+                paddingHorizontal: spacing.sm,
+                paddingVertical: spacing.xs,
+                borderRadius: radius.sm,
+              }}
+            >
+              <Text
+                style={[
+                  textStyles.caption,
+                  { color: colors.primary, fontWeight: font.weight.bold },
+                ]}
+              >
+                {sp}
+              </Text>
             </View>
           ))}
         </View>
-        <View style={s.footer}>
+
+        {/* Footer: price + CTA */}
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <View>
-            <Text style={s.priceLabel}>Từ</Text>
-            <Text style={s.priceValue}>{a.pricePerM2}₫/m²</Text>
+            <Text style={[textStyles.caption, { color: colors.textTertiary }]}>
+              Từ
+            </Text>
+            <Text
+              style={[
+                textStyles.bodySemibold,
+                { color: colors.primary, fontWeight: font.weight.bold },
+              ]}
+            >
+              {a.pricePerM2}₫/m²
+            </Text>
           </View>
           <TouchableOpacity
-            style={s.contactBtn}
+            style={{
+              backgroundColor: colors.primary,
+              paddingHorizontal: spacing.xl,
+              paddingVertical: spacing.md,
+              borderRadius: radius.md,
+            }}
             onPress={() => handleContact(a)}
             disabled={consultingId === a.id}
           >
             {consultingId === a.id ? (
-              <ActivityIndicator size="small" color="#fff" />
+              <ActivityIndicator size="small" color={colors.textInverse} />
             ) : (
-              <Text style={s.contactText}>Tư vấn</Text>
+              <Text
+                style={[textStyles.buttonSmall, { color: colors.textInverse }]}
+              >
+                Tư vấn
+              </Text>
             )}
           </TouchableOpacity>
         </View>
       </View>
-    </TouchableOpacity>
+    </DSCard>
   );
 
-  if (loading)
+  if (loading) {
     return (
-      <>
-        <Stack.Screen
-          options={{
-            title: "Kiến trúc sư",
-            headerStyle: { backgroundColor: Colors.light.primary },
-            headerTintColor: "#fff",
+      <DSModuleScreen title="Kiến trúc sư" gradientHeader>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            paddingVertical: spacing.xxxl,
           }}
-        />
-        <View style={s.center}>
-          <ActivityIndicator size="large" color={Colors.light.primary} />
-          <Text style={s.loadText}>Đang tải danh sách kiến trúc sư...</Text>
+        >
+          <ActivityIndicator size="large" color={colors.primary} />
+          <Text
+            style={[
+              textStyles.body,
+              { color: colors.textSecondary, marginTop: spacing.md },
+            ]}
+          >
+            Đang tải danh sách kiến trúc sư...
+          </Text>
         </View>
-      </>
+      </DSModuleScreen>
     );
+  }
 
   return (
-    <>
-      <Stack.Screen
-        options={{
-          title: "Kiến trúc sư",
-          headerStyle: { backgroundColor: Colors.light.primary },
-          headerTintColor: "#fff",
-          headerTitleStyle: { fontWeight: "600" },
-        }}
-      />
-      <View style={s.container}>
-        {error && (
-          <View style={s.errorBanner}>
-            <Ionicons name="information-circle" size={16} color="#856404" />
-            <Text style={s.errorText}>{error}</Text>
-          </View>
-        )}
-        <View style={s.searchSection}>
-          <View style={s.searchBar}>
-            <Ionicons name="search" size={20} color="#999" />
-            <TextInput
-              style={s.searchInput}
-              placeholder="Tìm kiến trúc sư..."
-              placeholderTextColor="#999"
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-              returnKeyType="search"
-            />
-            {searchQuery !== "" && (
-              <TouchableOpacity onPress={() => setSearchQuery("")}>
-                <Ionicons name="close-circle" size={20} color="#999" />
-              </TouchableOpacity>
-            )}
-          </View>
-        </View>
-        <View style={s.filterSection}>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={s.filterScroll}
+    <DSModuleScreen
+      title="Kiến trúc sư"
+      gradientHeader
+      refreshing={refreshing}
+      onRefresh={handleRefresh}
+    >
+      {/* Error banner */}
+      {error && (
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            backgroundColor: colors.warningBg,
+            paddingHorizontal: spacing.lg,
+            paddingVertical: spacing.md,
+            gap: spacing.sm,
+          }}
+        >
+          <Ionicons
+            name="information-circle"
+            size={16}
+            color={colors.warning}
+          />
+          <Text
+            style={[textStyles.caption, { flex: 1, color: colors.warning }]}
           >
-            {LOCATIONS.map((loc) => (
-              <TouchableOpacity
-                key={loc}
-                style={[s.chip, selectedLocation === loc && s.chipActive]}
-                onPress={() => setSelectedLocation(loc)}
-              >
-                <Text
-                  style={[
-                    s.chipText,
-                    selectedLocation === loc && s.chipTextActive,
-                  ]}
-                >
-                  {loc}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
+            {error}
+          </Text>
         </View>
-        <FlatList
-          data={filtered}
-          renderItem={renderCard}
-          keyExtractor={(item) => String(item.id)}
-          contentContainerStyle={{ padding: 16 }}
-          showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={handleRefresh}
-              colors={[Colors.light.primary]}
-              tintColor={Colors.light.primary}
-            />
-          }
-          ListEmptyComponent={
-            <View style={s.empty}>
-              <Ionicons name="search-outline" size={64} color="#ccc" />
-              <Text style={s.emptyText}>
-                Không tìm thấy kiến trúc sư phù hợp
-              </Text>
-              <TouchableOpacity
-                style={s.resetBtn}
-                onPress={() => {
-                  setSelectedLocation("Tất cả");
-                  setSearchQuery("");
-                }}
-              >
-                <Text style={s.resetText}>Đặt lại bộ lọc</Text>
-              </TouchableOpacity>
-            </View>
-          }
-        />
+      )}
+
+      {/* Search bar */}
+      <View
+        style={{
+          backgroundColor: colors.bgSurface,
+          paddingHorizontal: spacing.lg,
+          paddingVertical: spacing.md,
+        }}
+      >
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            backgroundColor: colors.bgMuted,
+            borderRadius: radius.md,
+            paddingHorizontal: spacing.md,
+            height: 44,
+          }}
+        >
+          <Ionicons name="search" size={20} color={colors.textTertiary} />
+          <TextInput
+            style={{
+              flex: 1,
+              fontSize: font.size.sm,
+              color: colors.text,
+              marginLeft: spacing.sm,
+            }}
+            placeholder="Tìm kiến trúc sư..."
+            placeholderTextColor={colors.textTertiary}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            returnKeyType="search"
+          />
+          {searchQuery !== "" && (
+            <TouchableOpacity onPress={() => setSearchQuery("")}>
+              <Ionicons
+                name="close-circle"
+                size={20}
+                color={colors.textTertiary}
+              />
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
-    </>
+
+      {/* Location filter */}
+      <View
+        style={{ backgroundColor: colors.bgSurface, paddingBottom: spacing.sm }}
+      >
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingHorizontal: spacing.md,
+            gap: spacing.sm,
+          }}
+        >
+          {LOCATIONS.map((loc) => (
+            <DSChip
+              key={loc}
+              label={loc}
+              selected={selectedLocation === loc}
+              onPress={() => setSelectedLocation(loc)}
+            />
+          ))}
+        </ScrollView>
+      </View>
+
+      {/* Architect list */}
+      <View style={{ padding: spacing.lg }}>
+        {filtered.length > 0 ? (
+          filtered.map((a) => renderCard(a))
+        ) : (
+          <DSEmptyState
+            icon="search-outline"
+            title="Không tìm thấy kiến trúc sư phù hợp"
+            description="Thử thay đổi bộ lọc để xem thêm kết quả"
+            actionLabel="Đặt lại bộ lọc"
+            onAction={() => {
+              setSelectedLocation("Tất cả");
+              setSearchQuery("");
+            }}
+          />
+        )}
+      </View>
+    </DSModuleScreen>
   );
 }
-
-const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#f5f5f5" },
-  center: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#f5f5f5",
-  },
-  loadText: { marginTop: 12, fontSize: 14, color: "#666" },
-  errorBanner: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#fff3cd",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    gap: 8,
-  },
-  errorText: { flex: 1, fontSize: 12, color: "#856404" },
-  searchSection: {
-    backgroundColor: "#fff",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  searchBar: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#f5f5f5",
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    height: 44,
-  },
-  searchInput: { flex: 1, fontSize: 14, color: "#333", marginLeft: 8 },
-  filterSection: { backgroundColor: "#fff", paddingBottom: 8 },
-  filterScroll: { paddingHorizontal: 12, paddingVertical: 4 },
-  chip: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: "#f5f5f5",
-    marginHorizontal: 4,
-  },
-  chipActive: { backgroundColor: Colors.light.primary },
-  chipText: { fontSize: 13, color: "#666" },
-  chipTextActive: { color: "#fff", fontWeight: "600" },
-  card: {
-    backgroundColor: "#fff",
-    borderRadius: 16,
-    marginBottom: 16,
-    overflow: "hidden",
-    elevation: 2,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-  },
-  cardImage: { width: "100%", height: 180 },
-  verifiedBadge: {
-    position: "absolute",
-    top: 12,
-    left: 12,
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "rgba(13,148,136,0.9)",
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    gap: 4,
-  },
-  verifiedText: { color: "#fff", fontSize: 11, fontWeight: "600" },
-  expBadge: {
-    position: "absolute",
-    top: 12,
-    right: 12,
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.6)",
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    gap: 4,
-  },
-  expText: { color: "#fff", fontSize: 11, fontWeight: "500" },
-  cardBody: { padding: 16 },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    marginBottom: 12,
-  },
-  avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    borderWidth: 2,
-    borderColor: Colors.light.primary,
-  },
-  name: { fontSize: 16, fontWeight: "700", color: "#1a1a1a" },
-  locRow: { flexDirection: "row", alignItems: "center", gap: 2, marginTop: 2 },
-  locText: { fontSize: 12, color: "#666" },
-  statsRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 10,
-    gap: 12,
-  },
-  stat: { flexDirection: "row", alignItems: "center", gap: 4 },
-  ratingText: { fontSize: 14, fontWeight: "700", color: "#333" },
-  reviewText: { fontSize: 12, color: "#999" },
-  divider: { width: 1, height: 16, backgroundColor: "#e5e5e5" },
-  projectText: { fontSize: 12, color: "#666" },
-  tagRow: { flexDirection: "row", flexWrap: "wrap", gap: 6, marginBottom: 12 },
-  tag: {
-    backgroundColor: "#f0fdf4",
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  tagText: { fontSize: 12, color: Colors.light.primary, fontWeight: "500" },
-  footer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  priceLabel: { fontSize: 11, color: "#999" },
-  priceValue: { fontSize: 16, fontWeight: "700", color: Colors.light.primary },
-  contactBtn: {
-    backgroundColor: Colors.light.primary,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 12,
-  },
-  contactText: { color: "#fff", fontSize: 14, fontWeight: "600" },
-  empty: { alignItems: "center", paddingVertical: 60 },
-  emptyText: { fontSize: 14, color: "#999", marginTop: 12 },
-  resetBtn: {
-    marginTop: 16,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 12,
-    backgroundColor: Colors.light.primary,
-  },
-  resetText: { color: "#fff", fontSize: 14, fontWeight: "600" },
-});

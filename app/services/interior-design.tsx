@@ -1,36 +1,38 @@
-﻿/**
- * Interior Design Screen - API-Integrated Version
- * Fetches data from server and displays interior design companies
- * Uses real images from API or Pexels for demos
- * @updated 2026-01-28
+/**
+ * Interior Design Screen — Danh sách công ty thiết kế nội thất
+ * API-integrated: fetches from backend, falls back to mock data
+ *
+ * Refactored: migrated to DS design system (useDS, DSModuleScreen, DSCard,
+ * DSChip, DSEmptyState). All business logic, API calls, filters, and
+ * navigation preserved from original.
+ *
+ * @updated 2026-03-18
  */
 
+import { DSCard, DSChip, DSEmptyState } from "@/components/ds";
+import { DSModuleScreen } from "@/components/ds/layouts";
 import OfflineDataBanner from "@/components/ui/OfflineDataBanner";
 import { useUnifiedMessaging } from "@/hooks/crm/useUnifiedMessaging";
+import { useDS } from "@/hooks/useDS";
 import {
     getInteriorCompanies,
     type CompanyListItem,
 } from "@/services/company.service";
 import { Ionicons } from "@expo/vector-icons";
-import { Stack, router } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
+import { router } from "expo-router";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
     ActivityIndicator,
-    Dimensions,
-    FlatList,
     Image,
-    RefreshControl,
     ScrollView,
-    StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
     View,
 } from "react-native";
 
-const { width } = Dimensions.get("window");
+// ─── Constants (data / filter values unchanged) ──────────────────────────────
 
-// Pexels API images for demo (interior design related)
 const DEMO_IMAGES = [
   "https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=600",
   "https://images.pexels.com/photos/1457842/pexels-photo-1457842.jpeg?auto=compress&cs=tinysrgb&w=600",
@@ -172,7 +174,256 @@ const FALLBACK_COMPANIES: InteriorCompany[] = [
   },
 ];
 
+// ─── Sub-components (DS-based) ───────────────────────────────────────────────
+
+function CompanyCard({
+  company,
+  onContact,
+  contacting,
+}: {
+  company: InteriorCompany;
+  onContact: () => void;
+  contacting: boolean;
+}) {
+  const { colors, spacing, radius, text: textStyles } = useDS();
+
+  return (
+    <DSCard
+      onPress={() => router.push(`/services/company-detail?id=${company.id}`)}
+      variant="elevated"
+      padding={0}
+      style={{ marginBottom: spacing.lg, overflow: "hidden" }}
+    >
+      {/* Cover image */}
+      <View>
+        <Image
+          source={company.image ? { uri: company.image } : undefined}
+          style={{
+            width: "100%",
+            height: 180,
+            backgroundColor: colors.bgMuted,
+          }}
+        />
+        {company.featured && (
+          <View
+            style={{
+              position: "absolute",
+              top: spacing.md,
+              right: spacing.md,
+              flexDirection: "row",
+              alignItems: "center",
+              backgroundColor: colors.primary,
+              paddingHorizontal: spacing.md,
+              paddingVertical: spacing.xs,
+              borderRadius: radius.sm,
+              gap: spacing.xs,
+            }}
+          >
+            <Ionicons name="star" size={12} color={colors.textInverse} />
+            <Text style={[textStyles.badge, { color: colors.textInverse }]}>
+              Nổi bật
+            </Text>
+          </View>
+        )}
+      </View>
+
+      {/* Info section */}
+      <View style={{ padding: spacing.xl }}>
+        {/* Header: logo + name + location */}
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            marginBottom: spacing.md,
+          }}
+        >
+          <Image
+            source={company.logo ? { uri: company.logo } : undefined}
+            style={{
+              width: 42,
+              height: 42,
+              borderRadius: radius.md,
+              backgroundColor: colors.bgMuted,
+            }}
+          />
+          <View style={{ flex: 1, marginLeft: spacing.md }}>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Text
+                style={[
+                  textStyles.bodySemibold,
+                  { color: colors.text, flex: 1 },
+                ]}
+                numberOfLines={1}
+              >
+                {company.name}
+              </Text>
+              {company.verified && (
+                <Ionicons
+                  name="checkmark-circle"
+                  size={14}
+                  color={colors.primary}
+                  style={{ marginLeft: spacing.xs }}
+                />
+              )}
+            </View>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: spacing.xxs,
+                marginTop: 2,
+              }}
+            >
+              <Ionicons
+                name="location-sharp"
+                size={12}
+                color={colors.textSecondary}
+              />
+              <Text
+                style={[textStyles.caption, { color: colors.textSecondary }]}
+              >
+                {company.location}
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Stats: rating + projects */}
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            marginBottom: spacing.md,
+            gap: spacing.xs,
+          }}
+        >
+          <Ionicons name="star" size={14} color={colors.primary} />
+          <Text style={[textStyles.smallBold, { color: colors.primary }]}>
+            {company.rating.toFixed(1)}
+          </Text>
+          <Text style={[textStyles.caption, { color: colors.textTertiary }]}>
+            ({company.reviewCount})
+          </Text>
+          <View
+            style={{
+              width: 1,
+              height: 12,
+              backgroundColor: colors.divider,
+              marginHorizontal: spacing.md,
+            }}
+          />
+          <Ionicons
+            name="images-outline"
+            size={13}
+            color={colors.textSecondary}
+          />
+          <Text
+            style={[
+              textStyles.small,
+              { color: colors.textSecondary, marginLeft: 2 },
+            ]}
+          >
+            {company.projectCount} dự án
+          </Text>
+        </View>
+
+        {/* Style tags */}
+        <View
+          style={{
+            flexDirection: "row",
+            flexWrap: "wrap",
+            gap: spacing.sm,
+            marginBottom: spacing.lg,
+          }}
+        >
+          {company.styles.slice(0, 3).map((style) => (
+            <View
+              key={style}
+              style={{
+                borderWidth: 1,
+                borderColor: colors.primary,
+                borderRadius: radius.sm,
+                paddingHorizontal: spacing.md,
+                paddingVertical: spacing.xs,
+                backgroundColor: colors.primaryBg,
+              }}
+            >
+              <Text style={[textStyles.badge, { color: colors.primary }]}>
+                {style}
+              </Text>
+            </View>
+          ))}
+        </View>
+
+        {/* Footer: price + contact */}
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "baseline",
+              gap: spacing.xs,
+            }}
+          >
+            <Text style={[textStyles.caption, { color: colors.textTertiary }]}>
+              Từ
+            </Text>
+            <Text style={[textStyles.h4, { color: colors.primaryDark }]}>
+              {company.startPrice}₫
+            </Text>
+            <Text style={[textStyles.caption, { color: colors.textTertiary }]}>
+              /m²
+            </Text>
+          </View>
+          <TouchableOpacity
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              backgroundColor: colors.primary,
+              paddingHorizontal: spacing.xxl,
+              paddingVertical: spacing.md,
+              borderRadius: radius.sm,
+              gap: spacing.xs,
+            }}
+            onPress={onContact}
+            disabled={contacting}
+            activeOpacity={0.7}
+          >
+            {contacting ? (
+              <ActivityIndicator size="small" color={colors.textInverse} />
+            ) : (
+              <>
+                <Ionicons
+                  name="chatbubble-ellipses-outline"
+                  size={16}
+                  color={colors.textInverse}
+                />
+                <Text
+                  style={[
+                    textStyles.buttonSmall,
+                    { color: colors.textInverse },
+                  ]}
+                >
+                  Tư vấn
+                </Text>
+              </>
+            )}
+          </TouchableOpacity>
+        </View>
+      </View>
+    </DSCard>
+  );
+}
+
+// ─── Main Screen ─────────────────────────────────────────────────────────────
+
 export default function InteriorDesignScreen() {
+  const { colors, spacing, radius, text: textStyles } = useDS();
   const [companies, setCompanies] = useState<InteriorCompany[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -269,590 +520,211 @@ export default function InteriorDesignScreen() {
     );
   });
 
-  const renderCompanyCard = ({ item: company }: { item: InteriorCompany }) => (
-    <TouchableOpacity
-      style={styles.companyCard}
-      onPress={() => {
-        router.push(`/services/company-detail?id=${company.id}`);
-      }}
+  // ─── Memoised filter chips ────────────────────────────────────────────
+
+  const allChips = useMemo(
+    () => [
+      ...STYLES.map((s) => ({
+        key: `s-${s}`,
+        label: s,
+        group: "style" as const,
+        value: s,
+      })),
+      ...LOCATIONS.map((l) => ({
+        key: `l-${l}`,
+        label: l,
+        group: "location" as const,
+        value: l,
+      })),
+      ...PRICE_RANGES.map((r, i) => ({
+        key: `p-${i}`,
+        label: r.label,
+        group: "price" as const,
+        value: i,
+      })),
+    ],
+    [],
+  );
+
+  const handleChip = (chip: (typeof allChips)[number]) => {
+    if (chip.group === "style") setSelectedStyle(chip.value as string);
+    else if (chip.group === "location")
+      setSelectedLocation(chip.value as string);
+    else setSelectedPriceRange(chip.value as number);
+  };
+
+  const isChipActive = (chip: (typeof allChips)[number]) => {
+    if (chip.group === "style") return selectedStyle === chip.value;
+    if (chip.group === "location") return selectedLocation === chip.value;
+    return selectedPriceRange === chip.value;
+  };
+
+  const resetFilters = () => {
+    setSelectedLocation("Tất cả");
+    setSelectedStyle("Tất cả");
+    setSelectedPriceRange(0);
+    setSearchQuery("");
+    setShowFeatured(false);
+  };
+
+  // ─── Render ──────────────────────────────────────────────────────────
+
+  return (
+    <DSModuleScreen
+      title="Thiết kế nội thất"
+      loading={isLoading}
+      refreshing={isRefreshing}
+      onRefresh={onRefresh}
     >
-      {/* Featured Badge */}
-      {company.featured && (
-        <View style={styles.featuredBadge}>
-          <Ionicons name="star" size={12} color="#fff" />
-          <Text style={styles.featuredBadgeText}>Nổi bật</Text>
+      {/* Offline Banner */}
+      <OfflineDataBanner visible={isOffline} onRetry={fetchCompanies} />
+
+      {/* Error / demo-data banner */}
+      {error && (
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            backgroundColor: colors.warningBg,
+            paddingHorizontal: spacing.xl,
+            paddingVertical: spacing.md,
+            marginHorizontal: spacing.lg,
+            marginTop: spacing.lg,
+            borderRadius: radius.md,
+            borderLeftWidth: 3,
+            borderLeftColor: colors.warning,
+          }}
+        >
+          <Ionicons
+            name="information-circle"
+            size={16}
+            color={colors.warning}
+          />
+          <Text
+            style={[
+              textStyles.small,
+              { color: colors.warning, marginLeft: spacing.sm, flex: 1 },
+            ]}
+          >
+            {error}
+          </Text>
         </View>
       )}
 
-      {/* Company Image */}
-      <Image
-        source={{ uri: company.image }}
-        style={styles.companyImage}
-        resizeMode="cover"
-      />
-
-      {/* Company Info */}
-      <View style={styles.companyInfo}>
-        {/* Header */}
-        <View style={styles.companyHeader}>
-          <Image source={{ uri: company.logo }} style={styles.companyLogo} />
-          <View style={styles.companyNameSection}>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Text style={styles.companyName} numberOfLines={1}>
-                {company.name}
-              </Text>
-              {company.verified && (
-                <View style={styles.verifiedBadge}>
-                  <Ionicons name="checkmark-circle" size={14} color="#0D9488" />
-                </View>
-              )}
-            </View>
-            <View style={styles.locationRow}>
-              <Ionicons name="location-outline" size={12} color="#666" />
-              <Text style={styles.locationText}>{company.location}</Text>
-            </View>
-          </View>
+      {/* Search bar + featured toggle */}
+      <View
+        style={{
+          backgroundColor: colors.bgSurface,
+          paddingHorizontal: spacing.xl,
+          paddingVertical: spacing.lg,
+          borderBottomWidth: 1,
+          borderBottomColor: colors.divider,
+          flexDirection: "row",
+          alignItems: "center",
+          gap: spacing.sm,
+        }}
+      >
+        <View
+          style={{
+            flex: 1,
+            flexDirection: "row",
+            alignItems: "center",
+            backgroundColor: colors.bgMuted,
+            borderRadius: radius.md,
+            paddingHorizontal: spacing.lg,
+            height: 40,
+          }}
+        >
+          <Ionicons name="search" size={20} color={colors.textTertiary} />
+          <TextInput
+            style={[
+              textStyles.body,
+              { flex: 1, marginLeft: spacing.sm, color: colors.text },
+            ]}
+            placeholder="Tìm công ty thiết kế nội thất..."
+            placeholderTextColor={colors.textTertiary}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
         </View>
+        <TouchableOpacity
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            backgroundColor: showFeatured ? colors.primary : colors.bgSurface,
+            borderWidth: 1,
+            borderColor: colors.primary,
+            borderRadius: radius.md,
+            paddingHorizontal: spacing.lg,
+            height: 40,
+            gap: spacing.xs,
+          }}
+          onPress={() => setShowFeatured(!showFeatured)}
+        >
+          <Ionicons
+            name={showFeatured ? "star" : "star-outline"}
+            size={18}
+            color={showFeatured ? colors.textInverse : colors.primary}
+          />
+          <Text
+            style={[
+              textStyles.smallBold,
+              { color: showFeatured ? colors.textInverse : colors.primary },
+            ]}
+          >
+            Nổi bật
+          </Text>
+        </TouchableOpacity>
+      </View>
 
-        {/* Rating & Projects */}
-        <View style={styles.statsRow}>
-          <View style={styles.statItem}>
-            <Ionicons name="star" size={14} color="#0D9488" />
-            <Text style={styles.ratingText}>{company.rating}</Text>
-            <Text style={styles.reviewText}>({company.reviewCount})</Text>
-          </View>
-          <View style={styles.divider} />
-          <View style={styles.statItem}>
-            <Ionicons name="images-outline" size={14} color="#666" />
-            <Text style={styles.projectText}>{company.projectCount} dự án</Text>
-          </View>
-        </View>
+      {/* Filter chips */}
+      <View
+        style={{
+          backgroundColor: colors.bgSurface,
+          paddingVertical: spacing.sm,
+          borderBottomWidth: 1,
+          borderBottomColor: colors.divider,
+        }}
+      >
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingHorizontal: spacing.lg,
+            gap: spacing.sm,
+          }}
+        >
+          {allChips.map((chip) => (
+            <DSChip
+              key={chip.key}
+              label={chip.label}
+              selected={isChipActive(chip)}
+              onPress={() => handleChip(chip)}
+            />
+          ))}
+        </ScrollView>
+      </View>
 
-        {/* Styles */}
-        <View style={styles.styleRow}>
-          {company.styles.slice(0, 3).map((style, idx) => (
-            <View key={idx} style={styles.styleTag}>
-              <Text style={styles.styleText}>{style}</Text>
-            </View>
+      {/* Company list */}
+      {filteredCompanies.length === 0 ? (
+        <DSEmptyState
+          icon="search-outline"
+          title="Không tìm thấy kết quả phù hợp"
+          actionLabel="Đặt lại bộ lọc"
+          onAction={resetFilters}
+        />
+      ) : (
+        <View style={{ paddingHorizontal: spacing.lg, paddingTop: spacing.lg }}>
+          {filteredCompanies.map((company) => (
+            <CompanyCard
+              key={String(company.id)}
+              company={company}
+              onContact={() => handleConsult(company)}
+              contacting={consultingId === company.id}
+            />
           ))}
         </View>
-
-        {/* Price & Button */}
-        <View style={styles.footer}>
-          <View style={styles.priceSection}>
-            <Text style={styles.priceLabel}>Từ</Text>
-            <Text style={styles.priceValue}>{company.startPrice}₫</Text>
-            <Text style={styles.priceUnit}>/m²</Text>
-          </View>
-          <TouchableOpacity
-            style={styles.contactButton}
-            onPress={() => handleConsult(company)}
-            disabled={consultingId === company.id}
-          >
-            {consultingId === company.id ? (
-              <ActivityIndicator size="small" color="#fff" />
-            ) : (
-              <>
-                <Ionicons
-                  name="chatbubble-ellipses-outline"
-                  size={16}
-                  color="#fff"
-                />
-                <Text style={styles.contactButtonText}>Tư vấn</Text>
-              </>
-            )}
-          </TouchableOpacity>
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
-
-  if (isLoading) {
-    return (
-      <>
-        <Stack.Screen
-          options={{
-            title: "Thiết kế nội thất",
-            headerStyle: { backgroundColor: "#0D9488" },
-            headerTintColor: "#fff",
-            headerTitleStyle: { fontWeight: "600" },
-          }}
-        />
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#0D9488" />
-          <Text style={styles.loadingText}>Đang tải...</Text>
-        </View>
-      </>
-    );
-  }
-  return (
-    <>
-      <Stack.Screen
-        options={{
-          title: "Thiết kế nội thất",
-          headerStyle: { backgroundColor: "#0D9488" },
-          headerTintColor: "#fff",
-          headerTitleStyle: { fontWeight: "600" },
-        }}
-      />
-      <View style={styles.container}>
-        {/* Offline Banner */}
-        <OfflineDataBanner visible={isOffline} onRetry={fetchCompanies} />
-
-        {/* Error Banner */}
-        {error && (
-          <View style={styles.errorBanner}>
-            <Ionicons name="information-circle" size={16} color="#856404" />
-            <Text style={styles.errorText}>{error}</Text>
-          </View>
-        )}
-
-        {/* Search Bar */}
-        <View style={styles.searchSection}>
-          <View style={styles.searchBar}>
-            <Ionicons name="search" size={20} color="#999" />
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Tìm công ty thiết kế nội thất..."
-              placeholderTextColor="#999"
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-            />
-          </View>
-          <TouchableOpacity
-            style={[
-              styles.featuredButton,
-              showFeatured && styles.featuredButtonActive,
-            ]}
-            onPress={() => setShowFeatured(!showFeatured)}
-          >
-            <Ionicons
-              name={showFeatured ? "star" : "star-outline"}
-              size={18}
-              color={showFeatured ? "#fff" : "#0D9488"}
-            />
-            <Text
-              style={[
-                styles.featuredButtonText,
-                showFeatured && styles.featuredButtonTextActive,
-              ]}
-            >
-              Nổi bật
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Filter Section - All in one row */}
-        <View style={styles.filterSection}>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.filterScroll}
-          >
-            {STYLES.map((style) => (
-              <TouchableOpacity
-                key={style}
-                style={[
-                  styles.filterChip,
-                  selectedStyle === style && styles.filterChipActive,
-                ]}
-                onPress={() => setSelectedStyle(style)}
-              >
-                <Text
-                  style={[
-                    styles.filterChipText,
-                    selectedStyle === style && styles.filterChipTextActive,
-                  ]}
-                >
-                  {style}
-                </Text>
-              </TouchableOpacity>
-            ))}
-
-            {LOCATIONS.map((location) => (
-              <TouchableOpacity
-                key={location}
-                style={[
-                  styles.filterChip,
-                  selectedLocation === location && styles.filterChipActive,
-                ]}
-                onPress={() => setSelectedLocation(location)}
-              >
-                <Text
-                  style={[
-                    styles.filterChipText,
-                    selectedLocation === location &&
-                      styles.filterChipTextActive,
-                  ]}
-                >
-                  {location}
-                </Text>
-              </TouchableOpacity>
-            ))}
-
-            {PRICE_RANGES.map((range, index) => (
-              <TouchableOpacity
-                key={index}
-                style={[
-                  styles.filterChip,
-                  selectedPriceRange === index && styles.filterChipActive,
-                ]}
-                onPress={() => setSelectedPriceRange(index)}
-              >
-                <Text
-                  style={[
-                    styles.filterChipText,
-                    selectedPriceRange === index && styles.filterChipTextActive,
-                  ]}
-                >
-                  {range.label}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </View>
-
-        {/* Company List */}
-        <FlatList
-          data={filteredCompanies}
-          renderItem={renderCompanyCard}
-          keyExtractor={(item) => String(item.id)}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.listContent}
-          refreshControl={
-            <RefreshControl
-              refreshing={isRefreshing}
-              onRefresh={onRefresh}
-              colors={["#0D9488"]}
-              tintColor="#0D9488"
-            />
-          }
-          ListEmptyComponent={
-            <View style={styles.emptyState}>
-              <Ionicons name="search-outline" size={64} color="#ccc" />
-              <Text style={styles.emptyText}>
-                Không tìm thấy kết quả phù hợp
-              </Text>
-              <TouchableOpacity
-                style={styles.resetButton}
-                onPress={() => {
-                  setSelectedLocation("Tất cả");
-                  setSelectedStyle("Tất cả");
-                  setSelectedPriceRange(0);
-                  setSearchQuery("");
-                  setShowFeatured(false);
-                }}
-              >
-                <Text style={styles.resetButtonText}>Đặt lại bộ lọc</Text>
-              </TouchableOpacity>
-            </View>
-          }
-        />
-      </View>
-    </>
+      )}
+    </DSModuleScreen>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f5f5f5",
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#f5f5f5",
-  },
-  loadingText: {
-    marginTop: 12,
-    fontSize: 14,
-    color: "#666",
-  },
-  errorBanner: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#fff3cd",
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    marginHorizontal: 12,
-    marginTop: 12,
-    borderRadius: 8,
-    borderLeftWidth: 3,
-    borderLeftColor: "#ffc107",
-  },
-  errorText: {
-    marginLeft: 8,
-    fontSize: 13,
-    color: "#856404",
-    flex: 1,
-  },
-  searchSection: {
-    backgroundColor: "#fff",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  searchBar: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#f5f5f5",
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    height: 40,
-  },
-  searchInput: {
-    flex: 1,
-    marginLeft: 8,
-    fontSize: 14,
-    color: "#333",
-  },
-  featuredButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#fff",
-    borderWidth: 1,
-    borderColor: "#0D9488",
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    height: 40,
-  },
-  featuredButtonActive: {
-    backgroundColor: "#0D9488",
-  },
-  featuredButtonText: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: "#0D9488",
-    marginLeft: 4,
-  },
-  featuredButtonTextActive: {
-    color: "#fff",
-  },
-  filterSection: {
-    backgroundColor: "#fff",
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
-  },
-  filterLabel: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: "#333",
-    paddingHorizontal: 16,
-    marginTop: 8,
-    marginBottom: 6,
-  },
-  filterScroll: {
-    paddingHorizontal: 12,
-    marginBottom: 8,
-  },
-  filterChip: {
-    paddingHorizontal: 16,
-    paddingVertical: 6,
-    borderRadius: 16,
-    backgroundColor: "#f5f5f5",
-    marginHorizontal: 4,
-  },
-  filterChipActive: {
-    backgroundColor: "#0D9488",
-  },
-  filterChipText: {
-    fontSize: 13,
-    color: "#666",
-    fontWeight: "500",
-  },
-  filterChipTextActive: {
-    color: "#fff",
-  },
-  listContent: {
-    paddingBottom: 20,
-  },
-  companyCard: {
-    backgroundColor: "#fff",
-    marginHorizontal: 12,
-    marginTop: 12,
-    borderRadius: 12,
-    overflow: "hidden",
-    elevation: 2,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-  },
-  featuredBadge: {
-    position: "absolute",
-    top: 8,
-    right: 8,
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#0D9488",
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    zIndex: 10,
-  },
-  featuredBadgeText: {
-    fontSize: 10,
-    fontWeight: "700",
-    color: "#fff",
-    marginLeft: 4,
-  },
-  verifiedBadge: {
-    marginLeft: 4,
-  },
-  companyImage: {
-    width: "100%",
-    height: 180,
-    backgroundColor: "#f0f0f0",
-  },
-  companyInfo: {
-    padding: 12,
-  },
-  companyHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  companyLogo: {
-    width: 40,
-    height: 40,
-    borderRadius: 8,
-    backgroundColor: "#f5f5f5",
-  },
-  companyNameSection: {
-    flex: 1,
-    marginLeft: 10,
-  },
-  companyName: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#333",
-    marginBottom: 4,
-  },
-  locationRow: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  locationText: {
-    fontSize: 12,
-    color: "#666",
-    marginLeft: 4,
-  },
-  statsRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  statItem: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  ratingText: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: "#0D9488",
-    marginLeft: 4,
-  },
-  reviewText: {
-    fontSize: 12,
-    color: "#999",
-    marginLeft: 4,
-  },
-  divider: {
-    width: 1,
-    height: 12,
-    backgroundColor: "#e0e0e0",
-    marginHorizontal: 12,
-  },
-  projectText: {
-    fontSize: 13,
-    color: "#666",
-    marginLeft: 4,
-  },
-  styleRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    marginBottom: 12,
-  },
-  styleTag: {
-    backgroundColor: "#f3e5f5",
-    borderWidth: 1,
-    borderColor: "#0D9488",
-    borderRadius: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    marginRight: 8,
-    marginBottom: 4,
-  },
-  styleText: {
-    fontSize: 11,
-    color: "#0D9488",
-    fontWeight: "500",
-  },
-  footer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  priceSection: {
-    flexDirection: "row",
-    alignItems: "baseline",
-  },
-  priceLabel: {
-    fontSize: 12,
-    color: "#999",
-    marginRight: 4,
-  },
-  priceValue: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#0D9488",
-  },
-  priceUnit: {
-    fontSize: 12,
-    color: "#999",
-    marginLeft: 2,
-  },
-  contactButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#0D9488",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 6,
-  },
-  contactButtonText: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: "#fff",
-    marginLeft: 4,
-  },
-  emptyState: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 60,
-  },
-  emptyText: {
-    fontSize: 15,
-    color: "#999",
-    marginTop: 16,
-    marginBottom: 20,
-  },
-  resetButton: {
-    backgroundColor: "#0D9488",
-    paddingHorizontal: 24,
-    paddingVertical: 10,
-    borderRadius: 8,
-  },
-  resetButtonText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#fff",
-  },
-});

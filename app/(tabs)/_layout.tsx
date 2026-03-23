@@ -144,6 +144,20 @@ export default function TabsLayout() {
           title: "Thông báo",
         }}
       />
+      <Tabs.Screen
+        name="design-services"
+        options={{
+          href: null,
+          title: "Dịch vụ thiết kế",
+        }}
+      />
+      <Tabs.Screen
+        name="construction-services"
+        options={{
+          href: null,
+          title: "Dịch vụ xây dựng",
+        }}
+      />
     </Tabs>
   );
 }

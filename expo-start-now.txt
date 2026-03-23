@@ -1,0 +1,54 @@
+﻿env: load .env.local .env.development .env
+env: export PUBLIC_BUILDER_KEY PUBLIC_BASE_URL EXPO_PUBLIC_API_BASE_URL EXPO_PUBLIC_WS_URL EXPO_PUBLIC_GOOGLE_CLIENT_ID EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID EXPO_PUBLIC_API_KEY EXPO_PUBLIC_ENV EXPO_PUBLIC_API_DEBUG EXPO_PUBLIC_DISABLE_MOCK_AUTH EXPO_PUBLIC_SUPPRESS_KEY_WARN EXPO_PUBLIC_DISABLE_REMOTE_CONTACTS EXPO_PUBLIC_SHOW_ENV_CARD EXPO_PUBLIC_SUPPRESS_EXPO_GO_WARNINGS EXPO_PUBLIC_ENABLE_PERFORMANCE_MONITORING EXPO_PUBLIC_MAX_CONCURRENT_REQUESTS EXPO_PUBLIC_IMAGE_CACHE_SIZE EXPO_PUBLIC_ENABLE_REQUEST_DEDUPLICATION EXPO_PUBLIC_MEMORY_WARNING_THRESHOLD GOOGLE_CLIENT_SECRET SMTP_PASS OPENAI_API_KEY EXPO_PUBLIC_OPENAI_API_KEY GEMINI_API_KEY EXPO_PUBLIC_GEMINI_API_KEY EXPO_PUBLIC_GETOTP_API_KEY GETOTP_API_KEY GETOTP_SENDER_NAME GETOTP_DEFAULT_CHANNEL GETOTP_CODE_LENGTH TWILIO_ACCOUNT_SID TWILIO_AUTH_TOKEN TWILIO_PHONE_NUMBER TWILIO_VERIFY_SERVICE_SID ESMS_API_KEY ESMS_SECRET_KEY ESMS_BRAND_NAME ESMS_SMS_TYPE STRINGEEX_API_KEY STRINGEEX_API_SECRET VONAGE_API_KEY VONAGE_API_SECRET VONAGE_BRAND_NAME OPENWEATHERMAP_API_KEY EXPO_PUBLIC_OPENWEATHERMAP_API_KEY OPENWEATHERMAP_BASE_URL WEATHERAPI_KEY EXPO_PUBLIC_WEATHERAPI_KEY WEATHERAPI_BASE_URL VISUALCROSSING_API_KEY EXPO_PUBLIC_VISUALCROSSING_API_KEY VISUALCROSSING_BASE_URL PEXELS_API_KEY EXPO_PUBLIC_PEXELS_API_KEY NEWSAPI_KEY EXPO_PUBLIC_NEWSAPI_KEY NEWSAPI_BASE_URL GNEWS_API_KEY EXPO_PUBLIC_GNEWS_API_KEY THENEWSAPI_KEY MEDIASTACK_API_KEY GOOGLE_MAPS_API_KEY EXPO_PUBLIC_GOOGLE_MAPS_API_KEY MAPBOX_ACCESS_TOKEN EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN GOONG_API_KEY EXPO_PUBLIC_GOONG_API_KEY GOONG_MAPTILES_KEY HERE_API_KEY VNPAY_TMN_CODE VNPAY_HASH_SECRET VNPAY_URL VNPAY_RETURN_URL MOMO_PARTNER_CODE MOMO_ACCESS_KEY MOMO_SECRET_KEY MOMO_ENDPOINT ZALOPAY_APP_ID ZALOPAY_KEY1 ZALOPAY_KEY2 ZALOPAY_ENDPOINT STRIPE_SECRET_KEY STRIPE_PUBLISHABLE_KEY EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY FIREBASE_API_KEY FIREBASE_AUTH_DOMAIN FIREBASE_PROJECT_ID FIREBASE_STORAGE_BUCKET FIREBASE_MESSAGING_SENDER_ID FIREBASE_APP_ID FIREBASE_MEASUREMENT_ID FCM_SERVER_KEY CLOUDINARY_CLOUD_NAME CLOUDINARY_API_KEY CLOUDINARY_API_SECRET CLOUDINARY_URL AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_REGION AWS_S3_BUCKET SUPABASE_URL SUPABASE_ANON_KEY SUPABASE_SERVICE_ROLE_KEY SENDGRID_API_KEY SENDGRID_FROM_EMAIL MAILGUN_API_KEY MAILGUN_DOMAIN RESEND_API_KEY LIVEKIT_API_KEY LIVEKIT_API_SECRET LIVEKIT_URL AGORA_APP_ID AGORA_APP_CERTIFICATE PUSHER_APP_ID PUSHER_KEY PUSHER_SECRET PUSHER_CLUSTER MIXPANEL_TOKEN EXPO_PUBLIC_MIXPANEL_TOKEN AMPLITUDE_API_KEY EXPO_PUBLIC_AMPLITUDE_API_KEY FACEBOOK_APP_ID FACEBOOK_APP_SECRET ZALO_APP_ID ZALO_APP_SECRET ZALO_OA_ACCESS_TOKEN EXPO_PUBLIC_ZALO_APP_ID TIKTOK_CLIENT_KEY TIKTOK_CLIENT_SECRET TIKTOK_VERIFICATION_CODE EXPO_PUBLIC_TIKTOK_VERIFICATION_CODE AUTODESK_CLIENT_ID AUTODESK_CLIENT_SECRET PROCORE_CLIENT_ID PROCORE_CLIENT_SECRET PROCORE_REDIRECT_URI PROCORE_APP_URL EXPO_PUBLIC_PROCORE_APP_URL PROCORE_SANDBOX_CLIENT_ID PROCORE_SANDBOX_CLIENT_SECRET PROCORE_SANDBOX_URL PROCORE_SANDBOX_REDIRECT_URI EXCHANGERATE_API_KEY EXPO_PUBLIC_EXCHANGERATE_API_KEY EXCHANGERATE_BASE_URL FIXER_API_KEY ALGOLIA_APP_ID ALGOLIA_API_KEY ALGOLIA_SEARCH_KEY PINECONE_API_KEY PINECONE_ENVIRONMENT PINECONE_INDEX PINECONE_HOST EXPO_PUBLIC_PINECONE_API_KEY EXPO_PUBLIC_PINECONE_HOST ANTHROPIC_API_KEY ANTHROPIC_ORGANIZATION_ID EXPO_PUBLIC_ANTHROPIC_ORGANIZATION_ID SENTRY_DSN SENTRY_ORG SENTRY_PROJECT EXPO_PUBLIC_SENTRY_DSN COHERE_API_KEY PERFEX_CRM_URL PERFEX_API_TOKEN PERFEX_API_USER PERFEX_API_NAME EXPO_PUBLIC_PERFEX_CRM_URL EXPO_PUBLIC_WS_BASE_URL EXPO_PUBLIC_LIVEKIT_WS_URL SENTRY_AUTH_TOKEN
+Starting project at C:\tien\New folder\APP_DESIGN_BUILD05.12.2025
+Starting Metro Bundler
+Waiting on http://localhost:8081
+Logs for your project will appear below.
+Android node_modules\expo-auth-session\build\index.js ΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ  0.0% (0/1)
+ WARN  Attempted to import the module "C:\tien\New folder\APP_DESIGN_BUILD05.12.2025\node_modules\event-target-shim\index" which is not listed in the "exports" of "C:\tien\New folder\APP_DESIGN_BUILD05.12.2025\node_modules\event-target-shim" under the requested subpath "./index". Falling back to file-based resolution. Consider updating the call site or asking the package maintainer(s) to expose this API.
+Android Bundled 3279ms node_modules\expo-auth-session\build\index.js (645 modules)
+Android Bundled 202ms node_modules\expo-router\entry.js (1 module)
+Android services\api.ts ΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ  0.0% (0/1)
+Android Bundled 182ms services\api.ts (503 modules)
+ LOG  [ENV] Configuration loaded:
+ LOG  [ENV] API_BASE_URL: https://baotienweb.cloud/api
+ LOG  [ENV] API_PREFIX: 
+ LOG  [ENV] API_KEY: thietke-resort-...
+ LOG  [ENV] WS_BASE_URL: wss://baotienweb.cloud
+ LOG  [ENV] WS Namespaces: /chat /call /progress /notifications
+ LOG  [ENV] AUTH_REFRESH_PATH: /auth/refresh
+ LOG  [ENV] ENABLE_SOCIAL (G, F): true true
+ LOG  [ENV] LIVEKIT_URL: Γ¥î NOT SET
+ LOG  [ENV] LIVEKIT_API_KEY: Γ¥î NOT SET
+ LOG  [API] ? API key initialized: thietke-resort-...
+ LOG  [authApi] BASE_URL: https://baotienweb.cloud/api/auth
+ LOG  [authApi] ENV.API_BASE_URL: https://baotienweb.cloud/api
+ WARN  [WebRTC] Native module not available - running in fallback mode
+ WARN  [WebRTC] To use WebRTC, create a development build: npx expo run:android
+ WARN  Due to changes in Androids permission requirements, Expo Go can no longer provide full access to the media library. To test the full functionality of this module, you can create a development build. https://docs.expo.dev/develop/development-builds/create-a-build
+ LOG  [ApiKeyManager] Γ£à Loading API key from ENV: thietke-resort-...
+ LOG  [PerfexAPI] Config: {"baseURL": "https://thietkeresort.com.vn/perfex_crm", "hasToken": true}
+ LOG  react-native-maps not available
+ LOG  [VideoService] Starting video load process...
+ LOG  [VideoService] Using local video data (remote API disabled)
+ LOG  [VideoService] Video loading complete. Total videos: 12
+ LOG  [BackendStorage] Initialized with API: https://baotienweb.cloud/api
+ LOG  [UnifiedStorage] Supabase not configured, using backend as default
+ LOG  [ZaloMiniApp] Service initialized, inMiniApp: false
+ LOG  [Communication] Network status: ONLINE
+ LOG  [BudgetTracking] Network status: ONLINE
+ LOG  [PhotoTimeline] Network status: ONLINE
+ LOG  [DocumentManagement] Network status: ONLINE
+ LOG  [Notification] Network status: ONLINE
+ LOG  [API] ? API key updated: thietke-resort-...
+ LOG  [ApiKeyManager] Γ£à API key set in api.ts
+ LOG  [VideoPlayerController] Initialized {"isMuted": false, "savedPositions": 0}
+ LOG  [PerfexAuthContext] Loading session...
+ LOG  [PerfexAuthContext] No session found
+ LOG  [Permissions] Notifications not available, skipping background tasks
+ LOG  [API] GET /workers/stats (API key)
+ LOG  [NotificationRenderer] Started
+ LOG  [Chat] WebSocket disabled - using REST API fallback
+ LOG  [Call] WebSocket disabled - using REST API fallback
+ LOG  [NotificationSystem] Initialized with 0 dedupe keys, 0 cached items
+ LOG  [UnifiedNotification] Push not available in Expo Go

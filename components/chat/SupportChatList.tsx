@@ -54,7 +54,10 @@ const SupportUserItem: React.FC<SupportUserItemProps> = ({ user, onPress }) => {
     >
       {/* Avatar with online indicator */}
       <View style={styles.avatarContainer}>
-        <Image source={{ uri: user.avatar }} style={styles.avatar} />
+        <Image
+          source={user.avatar ? { uri: user.avatar } : undefined}
+          style={styles.avatar}
+        />
         <View style={styles.onlineIndicator} />
       </View>
 
@@ -288,7 +291,7 @@ export const SupportWidget: React.FC<SupportWidgetProps> = ({ onPress }) => {
         {previewUsers.map((user, index) => (
           <Image
             key={user.id}
-            source={{ uri: user.avatar }}
+            source={user.avatar ? { uri: user.avatar } : undefined}
             style={[
               styles.widgetAvatar,
               { marginLeft: index > 0 ? -10 : 0, zIndex: 3 - index },

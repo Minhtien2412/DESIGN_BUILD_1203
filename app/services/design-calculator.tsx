@@ -1,62 +1,62 @@
-import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Stack } from 'expo-router';
-import { useState } from 'react';
+import { useDS } from "@/hooks/useDS";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { Stack } from "expo-router";
+import { useState } from "react";
 import {
     Alert,
-    Dimensions,
     ScrollView,
-    StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
     View,
-} from 'react-native';
-
-const { width } = Dimensions.get('window');
+} from "react-native";
 
 // Calculator Types
 const CALCULATOR_TYPES = [
-  { id: 'paint', name: 'Sơn tường', icon: 'color-palette', unit: 'lít' },
-  { id: 'tiles', name: 'Gạch lát', icon: 'grid', unit: 'm²' },
-  { id: 'wood', name: 'Sàn gỗ', icon: 'leaf', unit: 'm²' },
-  { id: 'wallpaper', name: 'Giấy dán', icon: 'document', unit: 'cuộn' },
-  { id: 'concrete', name: 'Bê tông', icon: 'cube', unit: 'm³' },
-  { id: 'steel', name: 'Thép', icon: 'barbell', unit: 'kg' },
+  { id: "paint", name: "Sơn tường", icon: "color-palette", unit: "lít" },
+  { id: "tiles", name: "Gạch lát", icon: "grid", unit: "m²" },
+  { id: "wood", name: "Sàn gỗ", icon: "leaf", unit: "m²" },
+  { id: "wallpaper", name: "Giấy dán", icon: "document", unit: "cuộn" },
+  { id: "concrete", name: "Bê tông", icon: "cube", unit: "m³" },
+  { id: "steel", name: "Thép", icon: "barbell", unit: "kg" },
 ];
 
 // Room Types
 const ROOM_TYPES = [
-  { id: 'living', name: 'Phòng khách', avgArea: 25 },
-  { id: 'bedroom', name: 'Phòng ngủ', avgArea: 16 },
-  { id: 'kitchen', name: 'Nhà bếp', avgArea: 12 },
-  { id: 'bathroom', name: 'Phòng tắm', avgArea: 8 },
-  { id: 'balcony', name: 'Ban công', avgArea: 6 },
-  { id: 'custom', name: 'Tùy chỉnh', avgArea: 0 },
+  { id: "living", name: "Phòng khách", avgArea: 25 },
+  { id: "bedroom", name: "Phòng ngủ", avgArea: 16 },
+  { id: "kitchen", name: "Nhà bếp", avgArea: 12 },
+  { id: "bathroom", name: "Phòng tắm", avgArea: 8 },
+  { id: "balcony", name: "Ban công", avgArea: 6 },
+  { id: "custom", name: "Tùy chỉnh", avgArea: 0 },
 ];
 
 export default function DesignCalculatorScreen() {
-  const [selectedCalculator, setSelectedCalculator] = useState('paint');
-  const [selectedRoom, setSelectedRoom] = useState('custom');
-  
-  // Paint Calculator States
-  const [wallLength, setWallLength] = useState('');
-  const [wallHeight, setWallHeight] = useState('');
-  const [doorWidth, setDoorWidth] = useState('0.9');
-  const [doorHeight, setDoorHeight] = useState('2.1');
-  const [windowWidth, setWindowWidth] = useState('1.2');
-  const [windowHeight, setWindowHeight] = useState('1.5');
-  const [doorCount, setDoorCount] = useState('1');
-  const [windowCount, setWindowCount] = useState('2');
-  const [coats, setCoats] = useState('2');
-  
-  // Tiles Calculator States
-  const [floorLength, setFloorLength] = useState('');
-  const [floorWidth, setFloorWidth] = useState('');
-  const [tileSize, setTileSize] = useState('60');
-  const [wastePercent, setWastePercent] = useState('10');
+  const { colors, spacing, radius, shadow, screen } = useDS();
+  const [selectedCalculator, setSelectedCalculator] = useState("paint");
+  const [selectedRoom, setSelectedRoom] = useState("custom");
 
-  const currentCalculator = CALCULATOR_TYPES.find((c) => c.id === selectedCalculator);
+  // Paint Calculator States
+  const [wallLength, setWallLength] = useState("");
+  const [wallHeight, setWallHeight] = useState("");
+  const [doorWidth, setDoorWidth] = useState("0.9");
+  const [doorHeight, setDoorHeight] = useState("2.1");
+  const [windowWidth, setWindowWidth] = useState("1.2");
+  const [windowHeight, setWindowHeight] = useState("1.5");
+  const [doorCount, setDoorCount] = useState("1");
+  const [windowCount, setWindowCount] = useState("2");
+  const [coats, setCoats] = useState("2");
+
+  // Tiles Calculator States
+  const [floorLength, setFloorLength] = useState("");
+  const [floorWidth, setFloorWidth] = useState("");
+  const [tileSize, setTileSize] = useState("60");
+  const [wastePercent, setWastePercent] = useState("10");
+
+  const currentCalculator = CALCULATOR_TYPES.find(
+    (c) => c.id === selectedCalculator,
+  );
 
   const calculatePaint = () => {
     const length = parseFloat(wallLength) || 0;
@@ -71,34 +71,34 @@ export default function DesignCalculatorScreen() {
 
     // Calculate wall area
     const wallArea = length * height;
-    
+
     // Calculate openings area
     const doorArea = dWidth * dHeight * dCount;
     const windowArea = wWidth * wHeight * wCount;
-    
+
     // Net area to paint
     const paintArea = wallArea - doorArea - windowArea;
-    
+
     // Paint coverage (1 liter covers ~10m² per coat)
     const coverage = 10;
     const paintNeeded = (paintArea * layers) / coverage;
-    
+
     // Add 10% buffer
     const paintWithBuffer = paintNeeded * 1.1;
 
     if (paintArea <= 0) {
-      Alert.alert('Lỗi', 'Vui lòng nhập đúng kích thước');
+      Alert.alert("Lỗi", "Vui lòng nhập đúng kích thước");
       return;
     }
 
     Alert.alert(
-      'Kết quả tính toán',
+      "Kết quả tính toán",
       `Diện tích tường: ${wallArea.toFixed(2)} m²\n` +
-      `Diện tích cửa: ${(doorArea + windowArea).toFixed(2)} m²\n` +
-      `Diện tích cần sơn: ${paintArea.toFixed(2)} m²\n\n` +
-      `Số lượng sơn cần: ${paintWithBuffer.toFixed(2)} lít\n` +
-      `(Đã tính ${layers} lớp và dự phòng 10%)`,
-      [{ text: 'OK' }]
+        `Diện tích cửa: ${(doorArea + windowArea).toFixed(2)} m²\n` +
+        `Diện tích cần sơn: ${paintArea.toFixed(2)} m²\n\n` +
+        `Số lượng sơn cần: ${paintWithBuffer.toFixed(2)} lít\n` +
+        `(Đã tính ${layers} lớp và dự phòng 10%)`,
+      [{ text: "OK" }],
     );
   };
 
@@ -110,30 +110,30 @@ export default function DesignCalculatorScreen() {
 
     // Floor area in m²
     const floorArea = length * width;
-    
+
     // Tile area in m²
     const tileAreaCm = size * size;
     const tileAreaM = tileAreaCm / 10000;
-    
+
     // Number of tiles needed
     const tilesNeeded = floorArea / tileAreaM;
-    
+
     // Add waste percentage
     const tilesWithWaste = tilesNeeded * (1 + waste / 100);
 
     if (floorArea <= 0) {
-      Alert.alert('Lỗi', 'Vui lòng nhập đúng kích thước');
+      Alert.alert("Lỗi", "Vui lòng nhập đúng kích thước");
       return;
     }
 
     Alert.alert(
-      'Kết quả tính toán',
+      "Kết quả tính toán",
       `Diện tích sàn: ${floorArea.toFixed(2)} m²\n` +
-      `Kích thước gạch: ${size}x${size} cm\n\n` +
-      `Số viên gạch cần: ${Math.ceil(tilesWithWaste)} viên\n` +
-      `(Đã tính thêm ${waste}% dự phòng)\n\n` +
-      `Số m² gạch: ${(Math.ceil(tilesWithWaste) * tileAreaM).toFixed(2)} m²`,
-      [{ text: 'OK' }]
+        `Kích thước gạch: ${size}x${size} cm\n\n` +
+        `Số viên gạch cần: ${Math.ceil(tilesWithWaste)} viên\n` +
+        `(Đã tính thêm ${waste}% dự phòng)\n\n` +
+        `Số m² gạch: ${(Math.ceil(tilesWithWaste) * tileAreaM).toFixed(2)} m²`,
+      [{ text: "OK" }],
     );
   };
 
@@ -143,27 +143,27 @@ export default function DesignCalculatorScreen() {
     const waste = parseFloat(wastePercent) || 10;
 
     const floorArea = length * width;
-    
+
     // Sàn gỗ thường được bán theo m² (12-15mm thick)
     const woodAreaNeeded = floorArea * (1 + waste / 100);
-    
+
     // Average cost per m² (example: 500k VND)
     const avgCostPerSqm = 500000;
     const totalCost = woodAreaNeeded * avgCostPerSqm;
 
     if (floorArea <= 0) {
-      Alert.alert('Lỗi', 'Vui lòng nhập đúng kích thước');
+      Alert.alert("Lỗi", "Vui lòng nhập đúng kích thước");
       return;
     }
 
     Alert.alert(
-      'Kết quả tính toán - Sàn gỗ',
+      "Kết quả tính toán - Sàn gỗ",
       `Diện tích sàn: ${floorArea.toFixed(2)} m²\n\n` +
-      `Diện tích gỗ cần: ${woodAreaNeeded.toFixed(2)} m²\n` +
-      `(Đã tính thêm ${waste}% dự phòng)\n\n` +
-      `Ước tính chi phí: ${totalCost.toLocaleString('vi-VN')} VND\n` +
-      `(Giá trung bình 500k/m²)`,
-      [{ text: 'OK' }]
+        `Diện tích gỗ cần: ${woodAreaNeeded.toFixed(2)} m²\n` +
+        `(Đã tính thêm ${waste}% dự phòng)\n\n` +
+        `Ước tính chi phí: ${totalCost.toLocaleString("vi-VN")} VND\n` +
+        `(Giá trung bình 500k/m²)`,
+      [{ text: "OK" }],
     );
   };
 
@@ -172,31 +172,31 @@ export default function DesignCalculatorScreen() {
     const width = parseFloat(floorWidth) || 0;
     const height = parseFloat(wallHeight) || 2.8; // Default thickness
 
-    const volume = (length * width * height);
-    
+    const volume = length * width * height;
+
     // Add 5% waste
     const concreteNeeded = volume * 1.05;
-    
+
     // Cement bags (30 bags per m³ for M200 concrete)
     const bags = Math.ceil(concreteNeeded * 30);
-    
+
     // Cost estimation (180k per bag)
     const cost = bags * 180000;
 
     if (volume <= 0) {
-      Alert.alert('Lỗi', 'Vui lòng nhập đúng kích thước');
+      Alert.alert("Lỗi", "Vui lòng nhập đúng kích thước");
       return;
     }
 
     Alert.alert(
-      'Kết quả tính toán - Bê tông',
+      "Kết quả tính toán - Bê tông",
       `Kích thước: ${length}m × ${width}m × ${height}m\n` +
-      `Thể tích: ${volume.toFixed(2)} m³\n\n` +
-      `Bê tông cần: ${concreteNeeded.toFixed(2)} m³\n` +
-      `(Đã tính thêm 5% dự phòng)\n\n` +
-      `Số bao xi măng (M200): ${bags} bao\n` +
-      `Ước tính chi phí: ${cost.toLocaleString('vi-VN')} VND`,
-      [{ text: 'OK' }]
+        `Thể tích: ${volume.toFixed(2)} m³\n\n` +
+        `Bê tông cần: ${concreteNeeded.toFixed(2)} m³\n` +
+        `(Đã tính thêm 5% dự phòng)\n\n` +
+        `Số bao xi măng (M200): ${bags} bao\n` +
+        `Ước tính chi phí: ${cost.toLocaleString("vi-VN")} VND`,
+      [{ text: "OK" }],
     );
   };
 
@@ -206,35 +206,35 @@ export default function DesignCalculatorScreen() {
 
     const area = length * width;
     const spacing = 0.2; // 20cm spacing standard
-    
+
     // Length bars
     const lengthBars = Math.ceil(width / spacing) * length;
-    
-    // Width bars  
+
+    // Width bars
     const widthBars = Math.ceil(length / spacing) * width;
-    
+
     const totalLength = lengthBars + widthBars;
-    
+
     // Weight (10mm rebar = 0.617kg/m)
     const weight = totalLength * 0.617;
-    
+
     // Cost (18k per kg)
     const cost = weight * 18000;
 
     if (area <= 0) {
-      Alert.alert('Lỗi', 'Vui lòng nhập đúng kích thước');
+      Alert.alert("Lỗi", "Vui lòng nhập đúng kích thước");
       return;
     }
 
     Alert.alert(
-      'Kết quả tính toán - Thép D10',
+      "Kết quả tính toán - Thép D10",
       `Diện tích đan lưới: ${area.toFixed(2)} m²\n` +
-      `Khoảng cách: ${spacing * 100}cm\n\n` +
-      `Tổng chiều dài thép: ${totalLength.toFixed(2)} m\n` +
-      `Trọng lượng (D10): ${weight.toFixed(2)} kg\n\n` +
-      `Ước tính chi phí: ${cost.toLocaleString('vi-VN')} VND\n` +
-      `(Giá 18k/kg)`,
-      [{ text: 'OK' }]
+        `Khoảng cách: ${spacing * 100}cm\n\n` +
+        `Tổng chiều dài thép: ${totalLength.toFixed(2)} m\n` +
+        `Trọng lượng (D10): ${weight.toFixed(2)} kg\n\n` +
+        `Ước tính chi phí: ${cost.toLocaleString("vi-VN")} VND\n` +
+        `(Giá 18k/kg)`,
+      [{ text: "OK" }],
     );
   };
 
@@ -252,45 +252,45 @@ export default function DesignCalculatorScreen() {
     const doorArea = dWidth * dHeight * dCount;
     const windowArea = wWidth * wHeight * wCount;
     const netArea = wallArea - doorArea - windowArea;
-    
+
     // Standard wallpaper roll: 0.53m × 10m = 5.3m²
     const rollCoverage = 5.3;
     const rollsNeeded = Math.ceil((netArea * 1.1) / rollCoverage); // +10% waste
-    
+
     // Average cost per roll
     const costPerRoll = 250000;
     const totalCost = rollsNeeded * costPerRoll;
 
     if (netArea <= 0) {
-      Alert.alert('Lỗi', 'Vui lòng nhập đúng kích thước');
+      Alert.alert("Lỗi", "Vui lòng nhập đúng kích thước");
       return;
     }
 
     Alert.alert(
-      'Kết quả tính toán - Giấy dán tường',
+      "Kết quả tính toán - Giấy dán tường",
       `Diện tích tường: ${wallArea.toFixed(2)} m²\n` +
-      `Diện tích cửa: ${(doorArea + windowArea).toFixed(2)} m²\n` +
-      `Diện tích cần dán: ${netArea.toFixed(2)} m²\n\n` +
-      `Số cuộn giấy cần: ${rollsNeeded} cuộn\n` +
-      `(Đã tính thêm 10% dự phòng)\n\n` +
-      `Ước tính chi phí: ${totalCost.toLocaleString('vi-VN')} VND\n` +
-      `(Giá 250k/cuộn)`,
-      [{ text: 'OK' }]
+        `Diện tích cửa: ${(doorArea + windowArea).toFixed(2)} m²\n` +
+        `Diện tích cần dán: ${netArea.toFixed(2)} m²\n\n` +
+        `Số cuộn giấy cần: ${rollsNeeded} cuộn\n` +
+        `(Đã tính thêm 10% dự phòng)\n\n` +
+        `Ước tính chi phí: ${totalCost.toLocaleString("vi-VN")} VND\n` +
+        `(Giá 250k/cuộn)`,
+      [{ text: "OK" }],
     );
   };
 
   const handleCalculate = () => {
-    if (selectedCalculator === 'paint') {
+    if (selectedCalculator === "paint") {
       calculatePaint();
-    } else if (selectedCalculator === 'tiles') {
+    } else if (selectedCalculator === "tiles") {
       calculateTiles();
-    } else if (selectedCalculator === 'wood') {
+    } else if (selectedCalculator === "wood") {
       calculateWood();
-    } else if (selectedCalculator === 'concrete') {
+    } else if (selectedCalculator === "concrete") {
       calculateConcrete();
-    } else if (selectedCalculator === 'steel') {
+    } else if (selectedCalculator === "steel") {
       calculateSteel();
-    } else if (selectedCalculator === 'wallpaper') {
+    } else if (selectedCalculator === "wallpaper") {
       calculateWallpaper();
     }
   };
@@ -307,53 +307,141 @@ export default function DesignCalculatorScreen() {
     }
   };
 
+  // Helper: input style
+  const inputStyle = {
+    backgroundColor: colors.bgInput,
+    borderRadius: radius.sm,
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.lg,
+    fontSize: 15,
+    color: colors.text,
+    borderWidth: 1,
+    borderColor: colors.border,
+  } as const;
+
+  // Helper: selector button
+  const selectorBtn = (active: boolean) => ({
+    flex: 1,
+    paddingVertical: spacing.lg,
+    borderRadius: radius.sm,
+    backgroundColor: active ? colors.primary : colors.bgMuted,
+    alignItems: "center" as const,
+    borderWidth: 1,
+    borderColor: active ? colors.primary : colors.border,
+  });
+
   return (
     <>
       <Stack.Screen
         options={{
-          title: 'Máy tính thiết kế',
-          headerStyle: { backgroundColor: '#0D9488' },
-          headerTintColor: '#fff',
-          headerTitleStyle: { fontWeight: '600' },
+          title: "Máy tính thiết kế",
+          headerStyle: { backgroundColor: colors.primary },
+          headerTintColor: colors.textInverse,
+          headerTitleStyle: { fontWeight: "600" },
         }}
       />
-      <View style={styles.container}>
+      <View style={{ flex: 1, backgroundColor: colors.bg }}>
         {/* Hero */}
         <LinearGradient
-          colors={['#0D9488', '#14B8A6']}
+          colors={[colors.primary, colors.primaryLight]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
-          style={styles.hero}
+          style={{
+            alignItems: "center",
+            paddingVertical: spacing.xxl,
+            paddingHorizontal: spacing.xl,
+          }}
         >
-          <Ionicons name="calculator" size={40} color="#fff" />
-          <Text style={styles.heroTitle}>Tính toán vật liệu xây dựng</Text>
-          <Text style={styles.heroSubtitle}>Nhanh chóng & chính xác</Text>
+          <Ionicons name="calculator" size={40} color={colors.textInverse} />
+          <Text
+            style={{
+              fontSize: 20,
+              fontWeight: "700",
+              color: colors.textInverse,
+              marginTop: spacing.lg,
+            }}
+          >
+            Tính toán vật liệu xây dựng
+          </Text>
+          <Text
+            style={{
+              fontSize: 13,
+              color: "rgba(255,255,255,0.9)",
+              marginTop: 4,
+            }}
+          >
+            Nhanh chóng & chính xác
+          </Text>
         </LinearGradient>
 
-        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
           {/* Calculator Type Selector */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Chọn loại tính toán</Text>
-            <View style={styles.calculatorGrid}>
+          <View
+            style={{
+              backgroundColor: colors.card,
+              padding: spacing.xl,
+              marginTop: spacing.lg,
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 16,
+                fontWeight: "700",
+                color: colors.text,
+                marginBottom: spacing.xl,
+              }}
+            >
+              Chọn loại tính toán
+            </Text>
+            <View
+              style={{
+                flexDirection: "row",
+                flexWrap: "wrap",
+                gap: spacing.lg,
+              }}
+            >
               {CALCULATOR_TYPES.map((calc) => (
                 <TouchableOpacity
                   key={calc.id}
-                  style={[
-                    styles.calculatorCard,
-                    selectedCalculator === calc.id && styles.calculatorCardActive,
-                  ]}
+                  style={{
+                    width: (screen.width - spacing.xl * 2 - spacing.lg * 2) / 3,
+                    aspectRatio: 1,
+                    backgroundColor:
+                      selectedCalculator === calc.id
+                        ? colors.primary
+                        : colors.card,
+                    borderRadius: radius.md,
+                    borderWidth: 2,
+                    borderColor:
+                      selectedCalculator === calc.id
+                        ? colors.primary
+                        : colors.border,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    padding: spacing.sm,
+                  }}
                   onPress={() => setSelectedCalculator(calc.id)}
                 >
                   <Ionicons
                     name={calc.icon as any}
                     size={32}
-                    color={selectedCalculator === calc.id ? '#fff' : '#0D9488'}
+                    color={
+                      selectedCalculator === calc.id
+                        ? colors.textInverse
+                        : colors.primary
+                    }
                   />
                   <Text
-                    style={[
-                      styles.calculatorName,
-                      selectedCalculator === calc.id && styles.calculatorNameActive,
-                    ]}
+                    style={{
+                      fontSize: 12,
+                      fontWeight: "600",
+                      color:
+                        selectedCalculator === calc.id
+                          ? colors.textInverse
+                          : colors.text,
+                      marginTop: spacing.sm,
+                      textAlign: "center",
+                    }}
                   >
                     {calc.name}
                   </Text>
@@ -363,32 +451,69 @@ export default function DesignCalculatorScreen() {
           </View>
 
           {/* Room Type Quick Select */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Chọn nhanh theo phòng</Text>
+          <View
+            style={{
+              backgroundColor: colors.card,
+              padding: spacing.xl,
+              marginTop: spacing.lg,
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 16,
+                fontWeight: "700",
+                color: colors.text,
+                marginBottom: spacing.xl,
+              }}
+            >
+              Chọn nhanh theo phòng
+            </Text>
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.roomsScroll}
+              contentContainerStyle={{ gap: spacing.sm }}
             >
               {ROOM_TYPES.map((room) => (
                 <TouchableOpacity
                   key={room.id}
-                  style={[
-                    styles.roomChip,
-                    selectedRoom === room.id && styles.roomChipActive,
-                  ]}
+                  style={{
+                    paddingHorizontal: spacing.xl,
+                    paddingVertical: spacing.sm,
+                    borderRadius: 20,
+                    backgroundColor:
+                      selectedRoom === room.id
+                        ? colors.primaryBg
+                        : colors.bgMuted,
+                    borderWidth: 1,
+                    borderColor:
+                      selectedRoom === room.id
+                        ? colors.primary
+                        : colors.bgMuted,
+                  }}
                   onPress={() => handleRoomSelect(room.id)}
                 >
                   <Text
-                    style={[
-                      styles.roomChipText,
-                      selectedRoom === room.id && styles.roomChipTextActive,
-                    ]}
+                    style={{
+                      fontSize: 13,
+                      fontWeight: selectedRoom === room.id ? "600" : "500",
+                      color:
+                        selectedRoom === room.id
+                          ? colors.primary
+                          : colors.textSecondary,
+                    }}
                   >
                     {room.name}
                   </Text>
                   {room.avgArea > 0 && (
-                    <Text style={styles.roomAreaText}>~{room.avgArea}m²</Text>
+                    <Text
+                      style={{
+                        fontSize: 10,
+                        color: colors.textTertiary,
+                        marginTop: 2,
+                      }}
+                    >
+                      ~{room.avgArea}m²
+                    </Text>
                   )}
                 </TouchableOpacity>
               ))}
@@ -396,50 +521,127 @@ export default function DesignCalculatorScreen() {
           </View>
 
           {/* Paint Calculator */}
-          {selectedCalculator === 'paint' && (
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Thông số tường cần sơn</Text>
-              
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Chiều dài tường (m)</Text>
+          {selectedCalculator === "paint" && (
+            <View
+              style={{
+                backgroundColor: colors.card,
+                padding: spacing.xl,
+                marginTop: spacing.lg,
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: "700",
+                  color: colors.text,
+                  marginBottom: spacing.xl,
+                }}
+              >
+                Thông số tường cần sơn
+              </Text>
+
+              <View style={{ marginBottom: spacing.xl }}>
+                <Text
+                  style={{
+                    fontSize: 13,
+                    fontWeight: "600",
+                    color: colors.text,
+                    marginBottom: spacing.sm,
+                  }}
+                >
+                  Chiều dài tường (m)
+                </Text>
                 <TextInput
-                  style={styles.input}
+                  style={inputStyle}
                   placeholder="Ví dụ: 10"
+                  placeholderTextColor={colors.textTertiary}
                   keyboardType="decimal-pad"
                   value={wallLength}
                   onChangeText={setWallLength}
                 />
               </View>
 
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Chiều cao tường (m)</Text>
+              <View style={{ marginBottom: spacing.xl }}>
+                <Text
+                  style={{
+                    fontSize: 13,
+                    fontWeight: "600",
+                    color: colors.text,
+                    marginBottom: spacing.sm,
+                  }}
+                >
+                  Chiều cao tường (m)
+                </Text>
                 <TextInput
-                  style={styles.input}
+                  style={inputStyle}
                   placeholder="Ví dụ: 2.8"
+                  placeholderTextColor={colors.textTertiary}
                   keyboardType="decimal-pad"
                   value={wallHeight}
                   onChangeText={setWallHeight}
                 />
               </View>
 
-              <Text style={styles.subsectionTitle}>Cửa ra vào</Text>
-              
-              <View style={styles.row}>
-                <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
-                  <Text style={styles.inputLabel}>Rộng (m)</Text>
+              <Text
+                style={{
+                  fontSize: 14,
+                  fontWeight: "600",
+                  color: colors.textSecondary,
+                  marginTop: spacing.xl,
+                  marginBottom: spacing.lg,
+                }}
+              >
+                Cửa ra vào
+              </Text>
+
+              <View style={{ flexDirection: "row" }}>
+                <View
+                  style={{
+                    flex: 1,
+                    marginRight: spacing.sm,
+                    marginBottom: spacing.xl,
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 13,
+                      fontWeight: "600",
+                      color: colors.text,
+                      marginBottom: spacing.sm,
+                    }}
+                  >
+                    Rộng (m)
+                  </Text>
                   <TextInput
-                    style={styles.input}
+                    style={inputStyle}
                     placeholder="0.9"
+                    placeholderTextColor={colors.textTertiary}
                     keyboardType="decimal-pad"
                     value={doorWidth}
                     onChangeText={setDoorWidth}
                   />
                 </View>
-                <View style={[styles.inputGroup, { flex: 1, marginLeft: 8 }]}>
-                  <Text style={styles.inputLabel}>Cao (m)</Text>
+                <View
+                  style={{
+                    flex: 1,
+                    marginLeft: spacing.sm,
+                    marginBottom: spacing.xl,
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 13,
+                      fontWeight: "600",
+                      color: colors.text,
+                      marginBottom: spacing.sm,
+                    }}
+                  >
+                    Cao (m)
+                  </Text>
                   <TextInput
-                    style={styles.input}
+                    style={inputStyle}
                     placeholder="2.1"
+                    placeholderTextColor={colors.textTertiary}
                     keyboardType="decimal-pad"
                     value={doorHeight}
                     onChangeText={setDoorHeight}
@@ -447,35 +649,87 @@ export default function DesignCalculatorScreen() {
                 </View>
               </View>
 
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Số lượng cửa</Text>
+              <View style={{ marginBottom: spacing.xl }}>
+                <Text
+                  style={{
+                    fontSize: 13,
+                    fontWeight: "600",
+                    color: colors.text,
+                    marginBottom: spacing.sm,
+                  }}
+                >
+                  Số lượng cửa
+                </Text>
                 <TextInput
-                  style={styles.input}
+                  style={inputStyle}
                   placeholder="1"
+                  placeholderTextColor={colors.textTertiary}
                   keyboardType="number-pad"
                   value={doorCount}
                   onChangeText={setDoorCount}
                 />
               </View>
 
-              <Text style={styles.subsectionTitle}>Cửa sổ</Text>
-              
-              <View style={styles.row}>
-                <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
-                  <Text style={styles.inputLabel}>Rộng (m)</Text>
+              <Text
+                style={{
+                  fontSize: 14,
+                  fontWeight: "600",
+                  color: colors.textSecondary,
+                  marginTop: spacing.xl,
+                  marginBottom: spacing.lg,
+                }}
+              >
+                Cửa sổ
+              </Text>
+
+              <View style={{ flexDirection: "row" }}>
+                <View
+                  style={{
+                    flex: 1,
+                    marginRight: spacing.sm,
+                    marginBottom: spacing.xl,
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 13,
+                      fontWeight: "600",
+                      color: colors.text,
+                      marginBottom: spacing.sm,
+                    }}
+                  >
+                    Rộng (m)
+                  </Text>
                   <TextInput
-                    style={styles.input}
+                    style={inputStyle}
                     placeholder="1.2"
+                    placeholderTextColor={colors.textTertiary}
                     keyboardType="decimal-pad"
                     value={windowWidth}
                     onChangeText={setWindowWidth}
                   />
                 </View>
-                <View style={[styles.inputGroup, { flex: 1, marginLeft: 8 }]}>
-                  <Text style={styles.inputLabel}>Cao (m)</Text>
+                <View
+                  style={{
+                    flex: 1,
+                    marginLeft: spacing.sm,
+                    marginBottom: spacing.xl,
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 13,
+                      fontWeight: "600",
+                      color: colors.text,
+                      marginBottom: spacing.sm,
+                    }}
+                  >
+                    Cao (m)
+                  </Text>
                   <TextInput
-                    style={styles.input}
+                    style={inputStyle}
                     placeholder="1.5"
+                    placeholderTextColor={colors.textTertiary}
                     keyboardType="decimal-pad"
                     value={windowHeight}
                     onChangeText={setWindowHeight}
@@ -483,34 +737,54 @@ export default function DesignCalculatorScreen() {
                 </View>
               </View>
 
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Số lượng cửa sổ</Text>
+              <View style={{ marginBottom: spacing.xl }}>
+                <Text
+                  style={{
+                    fontSize: 13,
+                    fontWeight: "600",
+                    color: colors.text,
+                    marginBottom: spacing.sm,
+                  }}
+                >
+                  Số lượng cửa sổ
+                </Text>
                 <TextInput
-                  style={styles.input}
+                  style={inputStyle}
                   placeholder="2"
+                  placeholderTextColor={colors.textTertiary}
                   keyboardType="number-pad"
                   value={windowCount}
                   onChangeText={setWindowCount}
                 />
               </View>
 
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Số lớp sơn</Text>
-                <View style={styles.coatSelector}>
-                  {['1', '2', '3'].map((coat) => (
+              <View style={{ marginBottom: spacing.xl }}>
+                <Text
+                  style={{
+                    fontSize: 13,
+                    fontWeight: "600",
+                    color: colors.text,
+                    marginBottom: spacing.sm,
+                  }}
+                >
+                  Số lớp sơn
+                </Text>
+                <View style={{ flexDirection: "row", gap: spacing.sm }}>
+                  {["1", "2", "3"].map((coat) => (
                     <TouchableOpacity
                       key={coat}
-                      style={[
-                        styles.coatButton,
-                        coats === coat && styles.coatButtonActive,
-                      ]}
+                      style={selectorBtn(coats === coat)}
                       onPress={() => setCoats(coat)}
                     >
                       <Text
-                        style={[
-                          styles.coatButtonText,
-                          coats === coat && styles.coatButtonTextActive,
-                        ]}
+                        style={{
+                          fontSize: 14,
+                          fontWeight: "600",
+                          color:
+                            coats === coat
+                              ? colors.textInverse
+                              : colors.textSecondary,
+                        }}
                       >
                         {coat} lớp
                       </Text>
@@ -522,49 +796,94 @@ export default function DesignCalculatorScreen() {
           )}
 
           {/* Tiles Calculator */}
-          {selectedCalculator === 'tiles' && (
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Thông số sàn cần lát</Text>
-              
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Chiều dài sàn (m)</Text>
+          {selectedCalculator === "tiles" && (
+            <View
+              style={{
+                backgroundColor: colors.card,
+                padding: spacing.xl,
+                marginTop: spacing.lg,
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: "700",
+                  color: colors.text,
+                  marginBottom: spacing.xl,
+                }}
+              >
+                Thông số sàn cần lát
+              </Text>
+
+              <View style={{ marginBottom: spacing.xl }}>
+                <Text
+                  style={{
+                    fontSize: 13,
+                    fontWeight: "600",
+                    color: colors.text,
+                    marginBottom: spacing.sm,
+                  }}
+                >
+                  Chiều dài sàn (m)
+                </Text>
                 <TextInput
-                  style={styles.input}
+                  style={inputStyle}
                   placeholder="Ví dụ: 5"
+                  placeholderTextColor={colors.textTertiary}
                   keyboardType="decimal-pad"
                   value={floorLength}
                   onChangeText={setFloorLength}
                 />
               </View>
 
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Chiều rộng sàn (m)</Text>
+              <View style={{ marginBottom: spacing.xl }}>
+                <Text
+                  style={{
+                    fontSize: 13,
+                    fontWeight: "600",
+                    color: colors.text,
+                    marginBottom: spacing.sm,
+                  }}
+                >
+                  Chiều rộng sàn (m)
+                </Text>
                 <TextInput
-                  style={styles.input}
+                  style={inputStyle}
                   placeholder="Ví dụ: 4"
+                  placeholderTextColor={colors.textTertiary}
                   keyboardType="decimal-pad"
                   value={floorWidth}
                   onChangeText={setFloorWidth}
                 />
               </View>
 
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Kích thước gạch (cm)</Text>
-                <View style={styles.tileSizeSelector}>
-                  {['30', '40', '60', '80'].map((size) => (
+              <View style={{ marginBottom: spacing.xl }}>
+                <Text
+                  style={{
+                    fontSize: 13,
+                    fontWeight: "600",
+                    color: colors.text,
+                    marginBottom: spacing.sm,
+                  }}
+                >
+                  Kích thước gạch (cm)
+                </Text>
+                <View style={{ flexDirection: "row", gap: spacing.sm }}>
+                  {["30", "40", "60", "80"].map((size) => (
                     <TouchableOpacity
                       key={size}
-                      style={[
-                        styles.sizeButton,
-                        tileSize === size && styles.sizeButtonActive,
-                      ]}
+                      style={selectorBtn(tileSize === size)}
                       onPress={() => setTileSize(size)}
                     >
                       <Text
-                        style={[
-                          styles.sizeButtonText,
-                          tileSize === size && styles.sizeButtonTextActive,
-                        ]}
+                        style={{
+                          fontSize: 13,
+                          fontWeight: "600",
+                          color:
+                            tileSize === size
+                              ? colors.textInverse
+                              : colors.textSecondary,
+                        }}
                       >
                         {size}x{size}
                       </Text>
@@ -573,106 +892,254 @@ export default function DesignCalculatorScreen() {
                 </View>
               </View>
 
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Dự phòng thất thoát (%)</Text>
+              <View style={{ marginBottom: spacing.xl }}>
+                <Text
+                  style={{
+                    fontSize: 13,
+                    fontWeight: "600",
+                    color: colors.text,
+                    marginBottom: spacing.sm,
+                  }}
+                >
+                  Dự phòng thất thoát (%)
+                </Text>
                 <TextInput
-                  style={styles.input}
+                  style={inputStyle}
                   placeholder="10"
+                  placeholderTextColor={colors.textTertiary}
                   keyboardType="number-pad"
                   value={wastePercent}
                   onChangeText={setWastePercent}
                 />
-                <Text style={styles.inputHint}>Khuyến nghị: 10-15%</Text>
+                <Text
+                  style={{
+                    fontSize: 11,
+                    color: colors.textTertiary,
+                    marginTop: 4,
+                  }}
+                >
+                  Khuyến nghị: 10-15%
+                </Text>
               </View>
             </View>
           )}
 
           {/* Wood Calculator */}
-          {selectedCalculator === 'wood' && (
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Thông số sàn gỗ</Text>
-              
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Chiều dài sàn (m)</Text>
+          {selectedCalculator === "wood" && (
+            <View
+              style={{
+                backgroundColor: colors.card,
+                padding: spacing.xl,
+                marginTop: spacing.lg,
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: "700",
+                  color: colors.text,
+                  marginBottom: spacing.xl,
+                }}
+              >
+                Thông số sàn gỗ
+              </Text>
+
+              <View style={{ marginBottom: spacing.xl }}>
+                <Text
+                  style={{
+                    fontSize: 13,
+                    fontWeight: "600",
+                    color: colors.text,
+                    marginBottom: spacing.sm,
+                  }}
+                >
+                  Chiều dài sàn (m)
+                </Text>
                 <TextInput
-                  style={styles.input}
+                  style={inputStyle}
                   placeholder="Ví dụ: 5"
+                  placeholderTextColor={colors.textTertiary}
                   keyboardType="decimal-pad"
                   value={floorLength}
                   onChangeText={setFloorLength}
                 />
               </View>
 
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Chiều rộng sàn (m)</Text>
+              <View style={{ marginBottom: spacing.xl }}>
+                <Text
+                  style={{
+                    fontSize: 13,
+                    fontWeight: "600",
+                    color: colors.text,
+                    marginBottom: spacing.sm,
+                  }}
+                >
+                  Chiều rộng sàn (m)
+                </Text>
                 <TextInput
-                  style={styles.input}
+                  style={inputStyle}
                   placeholder="Ví dụ: 4"
+                  placeholderTextColor={colors.textTertiary}
                   keyboardType="decimal-pad"
                   value={floorWidth}
                   onChangeText={setFloorWidth}
                 />
               </View>
 
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Dự phòng thất thoát (%)</Text>
+              <View style={{ marginBottom: spacing.xl }}>
+                <Text
+                  style={{
+                    fontSize: 13,
+                    fontWeight: "600",
+                    color: colors.text,
+                    marginBottom: spacing.sm,
+                  }}
+                >
+                  Dự phòng thất thoát (%)
+                </Text>
                 <TextInput
-                  style={styles.input}
+                  style={inputStyle}
                   placeholder="10"
+                  placeholderTextColor={colors.textTertiary}
                   keyboardType="number-pad"
                   value={wastePercent}
                   onChangeText={setWastePercent}
                 />
-                <Text style={styles.inputHint}>Khuyến nghị: 10-15%</Text>
+                <Text
+                  style={{
+                    fontSize: 11,
+                    color: colors.textTertiary,
+                    marginTop: 4,
+                  }}
+                >
+                  Khuyến nghị: 10-15%
+                </Text>
               </View>
             </View>
           )}
 
           {/* Wallpaper Calculator */}
-          {selectedCalculator === 'wallpaper' && (
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Thông số tường cần dán</Text>
-              
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Chiều dài tường (m)</Text>
+          {selectedCalculator === "wallpaper" && (
+            <View
+              style={{
+                backgroundColor: colors.card,
+                padding: spacing.xl,
+                marginTop: spacing.lg,
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: "700",
+                  color: colors.text,
+                  marginBottom: spacing.xl,
+                }}
+              >
+                Thông số tường cần dán
+              </Text>
+
+              <View style={{ marginBottom: spacing.xl }}>
+                <Text
+                  style={{
+                    fontSize: 13,
+                    fontWeight: "600",
+                    color: colors.text,
+                    marginBottom: spacing.sm,
+                  }}
+                >
+                  Chiều dài tường (m)
+                </Text>
                 <TextInput
-                  style={styles.input}
+                  style={inputStyle}
                   placeholder="Ví dụ: 10"
+                  placeholderTextColor={colors.textTertiary}
                   keyboardType="decimal-pad"
                   value={wallLength}
                   onChangeText={setWallLength}
                 />
               </View>
 
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Chiều cao tường (m)</Text>
+              <View style={{ marginBottom: spacing.xl }}>
+                <Text
+                  style={{
+                    fontSize: 13,
+                    fontWeight: "600",
+                    color: colors.text,
+                    marginBottom: spacing.sm,
+                  }}
+                >
+                  Chiều cao tường (m)
+                </Text>
                 <TextInput
-                  style={styles.input}
+                  style={inputStyle}
                   placeholder="Ví dụ: 2.8"
+                  placeholderTextColor={colors.textTertiary}
                   keyboardType="decimal-pad"
                   value={wallHeight}
                   onChangeText={setWallHeight}
                 />
               </View>
 
-              <Text style={styles.subsectionTitle}>Cửa ra vào</Text>
-              
-              <View style={styles.row}>
-                <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
-                  <Text style={styles.inputLabel}>Rộng (m)</Text>
+              <Text
+                style={{
+                  fontSize: 14,
+                  fontWeight: "600",
+                  color: colors.textSecondary,
+                  marginTop: spacing.xl,
+                  marginBottom: spacing.lg,
+                }}
+              >
+                Cửa ra vào
+              </Text>
+
+              <View style={{ flexDirection: "row" }}>
+                <View
+                  style={{
+                    flex: 1,
+                    marginRight: spacing.sm,
+                    marginBottom: spacing.xl,
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 13,
+                      fontWeight: "600",
+                      color: colors.text,
+                      marginBottom: spacing.sm,
+                    }}
+                  >
+                    Rộng (m)
+                  </Text>
                   <TextInput
-                    style={styles.input}
+                    style={inputStyle}
                     placeholder="0.9"
+                    placeholderTextColor={colors.textTertiary}
                     keyboardType="decimal-pad"
                     value={doorWidth}
                     onChangeText={setDoorWidth}
                   />
                 </View>
-                <View style={[styles.inputGroup, { flex: 1, marginLeft: 8 }]}>
-                  <Text style={styles.inputLabel}>Cao (m)</Text>
+                <View
+                  style={{
+                    flex: 1,
+                    marginLeft: spacing.sm,
+                    marginBottom: spacing.xl,
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 13,
+                      fontWeight: "600",
+                      color: colors.text,
+                      marginBottom: spacing.sm,
+                    }}
+                  >
+                    Cao (m)
+                  </Text>
                   <TextInput
-                    style={styles.input}
+                    style={inputStyle}
                     placeholder="2.1"
+                    placeholderTextColor={colors.textTertiary}
                     keyboardType="decimal-pad"
                     value={doorHeight}
                     onChangeText={setDoorHeight}
@@ -680,35 +1147,87 @@ export default function DesignCalculatorScreen() {
                 </View>
               </View>
 
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Số lượng cửa</Text>
+              <View style={{ marginBottom: spacing.xl }}>
+                <Text
+                  style={{
+                    fontSize: 13,
+                    fontWeight: "600",
+                    color: colors.text,
+                    marginBottom: spacing.sm,
+                  }}
+                >
+                  Số lượng cửa
+                </Text>
                 <TextInput
-                  style={styles.input}
+                  style={inputStyle}
                   placeholder="1"
+                  placeholderTextColor={colors.textTertiary}
                   keyboardType="number-pad"
                   value={doorCount}
                   onChangeText={setDoorCount}
                 />
               </View>
 
-              <Text style={styles.subsectionTitle}>Cửa sổ</Text>
-              
-              <View style={styles.row}>
-                <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
-                  <Text style={styles.inputLabel}>Rộng (m)</Text>
+              <Text
+                style={{
+                  fontSize: 14,
+                  fontWeight: "600",
+                  color: colors.textSecondary,
+                  marginTop: spacing.xl,
+                  marginBottom: spacing.lg,
+                }}
+              >
+                Cửa sổ
+              </Text>
+
+              <View style={{ flexDirection: "row" }}>
+                <View
+                  style={{
+                    flex: 1,
+                    marginRight: spacing.sm,
+                    marginBottom: spacing.xl,
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 13,
+                      fontWeight: "600",
+                      color: colors.text,
+                      marginBottom: spacing.sm,
+                    }}
+                  >
+                    Rộng (m)
+                  </Text>
                   <TextInput
-                    style={styles.input}
+                    style={inputStyle}
                     placeholder="1.2"
+                    placeholderTextColor={colors.textTertiary}
                     keyboardType="decimal-pad"
                     value={windowWidth}
                     onChangeText={setWindowWidth}
                   />
                 </View>
-                <View style={[styles.inputGroup, { flex: 1, marginLeft: 8 }]}>
-                  <Text style={styles.inputLabel}>Cao (m)</Text>
+                <View
+                  style={{
+                    flex: 1,
+                    marginLeft: spacing.sm,
+                    marginBottom: spacing.xl,
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 13,
+                      fontWeight: "600",
+                      color: colors.text,
+                      marginBottom: spacing.sm,
+                    }}
+                  >
+                    Cao (m)
+                  </Text>
                   <TextInput
-                    style={styles.input}
+                    style={inputStyle}
                     placeholder="1.5"
+                    placeholderTextColor={colors.textTertiary}
                     keyboardType="decimal-pad"
                     value={windowHeight}
                     onChangeText={setWindowHeight}
@@ -716,11 +1235,21 @@ export default function DesignCalculatorScreen() {
                 </View>
               </View>
 
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Số lượng cửa sổ</Text>
+              <View style={{ marginBottom: spacing.xl }}>
+                <Text
+                  style={{
+                    fontSize: 13,
+                    fontWeight: "600",
+                    color: colors.text,
+                    marginBottom: spacing.sm,
+                  }}
+                >
+                  Số lượng cửa sổ
+                </Text>
                 <TextInput
-                  style={styles.input}
+                  style={inputStyle}
                   placeholder="2"
+                  placeholderTextColor={colors.textTertiary}
                   keyboardType="number-pad"
                   value={windowCount}
                   onChangeText={setWindowCount}
@@ -730,106 +1259,291 @@ export default function DesignCalculatorScreen() {
           )}
 
           {/* Concrete Calculator */}
-          {selectedCalculator === 'concrete' && (
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Thông số móng/sàn bê tông</Text>
-              
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Chiều dài (m)</Text>
+          {selectedCalculator === "concrete" && (
+            <View
+              style={{
+                backgroundColor: colors.card,
+                padding: spacing.xl,
+                marginTop: spacing.lg,
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: "700",
+                  color: colors.text,
+                  marginBottom: spacing.xl,
+                }}
+              >
+                Thông số móng/sàn bê tông
+              </Text>
+
+              <View style={{ marginBottom: spacing.xl }}>
+                <Text
+                  style={{
+                    fontSize: 13,
+                    fontWeight: "600",
+                    color: colors.text,
+                    marginBottom: spacing.sm,
+                  }}
+                >
+                  Chiều dài (m)
+                </Text>
                 <TextInput
-                  style={styles.input}
+                  style={inputStyle}
                   placeholder="Ví dụ: 5"
+                  placeholderTextColor={colors.textTertiary}
                   keyboardType="decimal-pad"
                   value={floorLength}
                   onChangeText={setFloorLength}
                 />
               </View>
 
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Chiều rộng (m)</Text>
+              <View style={{ marginBottom: spacing.xl }}>
+                <Text
+                  style={{
+                    fontSize: 13,
+                    fontWeight: "600",
+                    color: colors.text,
+                    marginBottom: spacing.sm,
+                  }}
+                >
+                  Chiều rộng (m)
+                </Text>
                 <TextInput
-                  style={styles.input}
+                  style={inputStyle}
                   placeholder="Ví dụ: 3"
+                  placeholderTextColor={colors.textTertiary}
                   keyboardType="decimal-pad"
                   value={floorWidth}
                   onChangeText={setFloorWidth}
                 />
               </View>
 
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Độ dày/Chiều cao (m)</Text>
+              <View style={{ marginBottom: spacing.xl }}>
+                <Text
+                  style={{
+                    fontSize: 13,
+                    fontWeight: "600",
+                    color: colors.text,
+                    marginBottom: spacing.sm,
+                  }}
+                >
+                  Độ dày/Chiều cao (m)
+                </Text>
                 <TextInput
-                  style={styles.input}
+                  style={inputStyle}
                   placeholder="Ví dụ: 0.3"
+                  placeholderTextColor={colors.textTertiary}
                   keyboardType="decimal-pad"
                   value={wallHeight}
                   onChangeText={setWallHeight}
                 />
-                <Text style={styles.inputHint}>Móng: 0.2-0.5m, Sàn: 0.1-0.15m</Text>
+                <Text
+                  style={{
+                    fontSize: 11,
+                    color: colors.textTertiary,
+                    marginTop: 4,
+                  }}
+                >
+                  Móng: 0.2-0.5m, Sàn: 0.1-0.15m
+                </Text>
               </View>
             </View>
           )}
 
           {/* Steel Calculator */}
-          {selectedCalculator === 'steel' && (
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Thông số lưới thép</Text>
-              
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Chiều dài lưới (m)</Text>
+          {selectedCalculator === "steel" && (
+            <View
+              style={{
+                backgroundColor: colors.card,
+                padding: spacing.xl,
+                marginTop: spacing.lg,
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: "700",
+                  color: colors.text,
+                  marginBottom: spacing.xl,
+                }}
+              >
+                Thông số lưới thép
+              </Text>
+
+              <View style={{ marginBottom: spacing.xl }}>
+                <Text
+                  style={{
+                    fontSize: 13,
+                    fontWeight: "600",
+                    color: colors.text,
+                    marginBottom: spacing.sm,
+                  }}
+                >
+                  Chiều dài lưới (m)
+                </Text>
                 <TextInput
-                  style={styles.input}
+                  style={inputStyle}
                   placeholder="Ví dụ: 10"
+                  placeholderTextColor={colors.textTertiary}
                   keyboardType="decimal-pad"
                   value={floorLength}
                   onChangeText={setFloorLength}
                 />
               </View>
 
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Chiều rộng lưới (m)</Text>
+              <View style={{ marginBottom: spacing.xl }}>
+                <Text
+                  style={{
+                    fontSize: 13,
+                    fontWeight: "600",
+                    color: colors.text,
+                    marginBottom: spacing.sm,
+                  }}
+                >
+                  Chiều rộng lưới (m)
+                </Text>
                 <TextInput
-                  style={styles.input}
+                  style={inputStyle}
                   placeholder="Ví dụ: 8"
+                  placeholderTextColor={colors.textTertiary}
                   keyboardType="decimal-pad"
                   value={floorWidth}
                   onChangeText={setFloorWidth}
                 />
               </View>
 
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputHint}>Mặc định: D10 (Φ10mm), khoảng cách 20cm</Text>
+              <View style={{ marginBottom: spacing.xl }}>
+                <Text style={{ fontSize: 11, color: colors.textTertiary }}>
+                  Mặc định: D10 (Φ10mm), khoảng cách 20cm
+                </Text>
               </View>
             </View>
           )}
 
           {/* Calculate Button */}
-          <TouchableOpacity style={styles.calculateButton} onPress={handleCalculate}>
-            <Ionicons name="calculator" size={24} color="#fff" />
-            <Text style={styles.calculateButtonText}>Tính toán ngay</Text>
+          <TouchableOpacity
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: colors.primary,
+              marginHorizontal: spacing.xl,
+              marginTop: spacing.xxl,
+              paddingVertical: spacing.xl,
+              borderRadius: radius.md,
+              gap: spacing.sm,
+              ...shadow.md,
+            }}
+            onPress={handleCalculate}
+          >
+            <Ionicons name="calculator" size={24} color={colors.textInverse} />
+            <Text
+              style={{
+                fontSize: 16,
+                fontWeight: "700",
+                color: colors.textInverse,
+              }}
+            >
+              Tính toán ngay
+            </Text>
           </TouchableOpacity>
 
           {/* Tips */}
-          <View style={styles.tipsSection}>
-            <View style={styles.tipsHeader}>
-              <Ionicons name="bulb" size={20} color="#FFFFFF" />
-              <Text style={styles.tipsTitle}>Mẹo hữu ích</Text>
+          <View
+            style={{
+              backgroundColor: colors.warningBg,
+              margin: spacing.xl,
+              padding: spacing.xl,
+              borderRadius: radius.md,
+              borderWidth: 1,
+              borderColor: colors.warning,
+            }}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginBottom: spacing.lg,
+                gap: spacing.sm,
+              }}
+            >
+              <Ionicons name="bulb" size={20} color={colors.warning} />
+              <Text
+                style={{ fontSize: 15, fontWeight: "700", color: colors.text }}
+              >
+                Mẹo hữu ích
+              </Text>
             </View>
-            <View style={styles.tip}>
-              <Ionicons name="checkmark-circle" size={16} color="#52c41a" />
-              <Text style={styles.tipText}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "flex-start",
+                marginBottom: spacing.sm,
+                gap: spacing.sm,
+              }}
+            >
+              <Ionicons
+                name="checkmark-circle"
+                size={16}
+                color={colors.success}
+              />
+              <Text
+                style={{
+                  flex: 1,
+                  fontSize: 13,
+                  color: colors.textSecondary,
+                  lineHeight: 20,
+                }}
+              >
                 Luôn tính thêm 10-15% vật liệu dự phòng cho thất thoát
               </Text>
             </View>
-            <View style={styles.tip}>
-              <Ionicons name="checkmark-circle" size={16} color="#52c41a" />
-              <Text style={styles.tipText}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "flex-start",
+                marginBottom: spacing.sm,
+                gap: spacing.sm,
+              }}
+            >
+              <Ionicons
+                name="checkmark-circle"
+                size={16}
+                color={colors.success}
+              />
+              <Text
+                style={{
+                  flex: 1,
+                  fontSize: 13,
+                  color: colors.textSecondary,
+                  lineHeight: 20,
+                }}
+              >
                 Đo kỹ kích thước trước khi đặt mua để tránh lãng phí
               </Text>
             </View>
-            <View style={styles.tip}>
-              <Ionicons name="checkmark-circle" size={16} color="#52c41a" />
-              <Text style={styles.tipText}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "flex-start",
+                gap: spacing.sm,
+              }}
+            >
+              <Ionicons
+                name="checkmark-circle"
+                size={16}
+                color={colors.success}
+              />
+              <Text
+                style={{
+                  flex: 1,
+                  fontSize: 13,
+                  color: colors.textSecondary,
+                  lineHeight: 20,
+                }}
+              >
                 Tham khảo ý kiến chuyên gia nếu công trình phức tạp
               </Text>
             </View>
@@ -841,250 +1555,3 @@ export default function DesignCalculatorScreen() {
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8f9fa',
-  },
-  hero: {
-    alignItems: 'center',
-    paddingVertical: 32,
-    paddingHorizontal: 20,
-  },
-  heroTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#fff',
-    marginTop: 12,
-  },
-  heroSubtitle: {
-    fontSize: 13,
-    color: 'rgba(255,255,255,0.9)',
-    marginTop: 4,
-  },
-  content: {
-    flex: 1,
-  },
-  section: {
-    backgroundColor: '#fff',
-    padding: 16,
-    marginTop: 12,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#333',
-    marginBottom: 16,
-  },
-  subsectionTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#666',
-    marginTop: 16,
-    marginBottom: 12,
-  },
-  calculatorGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-  },
-  calculatorCard: {
-    width: (width - 44) / 3,
-    aspectRatio: 1,
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: '#f0f0f0',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 8,
-  },
-  calculatorCardActive: {
-    backgroundColor: '#0D9488',
-    borderColor: '#0D9488',
-  },
-  calculatorName: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#333',
-    marginTop: 8,
-    textAlign: 'center',
-  },
-  calculatorNameActive: {
-    color: '#fff',
-  },
-  roomsScroll: {
-    gap: 8,
-  },
-  roomChip: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: '#f5f5f5',
-    borderWidth: 1,
-    borderColor: '#f5f5f5',
-  },
-  roomChipActive: {
-    backgroundColor: '#fff5f0',
-    borderColor: '#0D9488',
-  },
-  roomChipText: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: '#666',
-  },
-  roomChipTextActive: {
-    color: '#0D9488',
-    fontWeight: '600',
-  },
-  roomAreaText: {
-    fontSize: 10,
-    color: '#999',
-    marginTop: 2,
-  },
-  inputGroup: {
-    marginBottom: 16,
-  },
-  inputLabel: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
-  },
-  input: {
-    backgroundColor: '#f8f9fa',
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 15,
-    color: '#333',
-    borderWidth: 1,
-    borderColor: '#e8e8e8',
-  },
-  inputHint: {
-    fontSize: 11,
-    color: '#999',
-    marginTop: 4,
-  },
-  row: {
-    flexDirection: 'row',
-  },
-  coatSelector: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  coatButton: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: 8,
-    backgroundColor: '#f5f5f5',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#e8e8e8',
-  },
-  coatButtonActive: {
-    backgroundColor: '#0D9488',
-    borderColor: '#0D9488',
-  },
-  coatButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#666',
-  },
-  coatButtonTextActive: {
-    color: '#fff',
-  },
-  tileSizeSelector: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  sizeButton: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: 8,
-    backgroundColor: '#f5f5f5',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#e8e8e8',
-  },
-  sizeButtonActive: {
-    backgroundColor: '#0D9488',
-    borderColor: '#0D9488',
-  },
-  sizeButtonText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#666',
-  },
-  sizeButtonTextActive: {
-    color: '#fff',
-  },
-  placeholder: {
-    alignItems: 'center',
-    paddingVertical: 60,
-  },
-  placeholderText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#999',
-    marginTop: 16,
-  },
-  placeholderSubtext: {
-    fontSize: 13,
-    color: '#bbb',
-    marginTop: 8,
-  },
-  calculateButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#0D9488',
-    marginHorizontal: 16,
-    marginTop: 24,
-    paddingVertical: 16,
-    borderRadius: 12,
-    gap: 8,
-    shadowColor: '#0D9488',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  calculateButtonText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#fff',
-  },
-  tipsSection: {
-    backgroundColor: '#fffbf0',
-    margin: 16,
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#FFE58F',
-  },
-  tipsHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-    gap: 8,
-  },
-  tipsTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#333',
-  },
-  tip: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: 8,
-    gap: 8,
-  },
-  tipText: {
-    flex: 1,
-    fontSize: 13,
-    color: '#666',
-    lineHeight: 20,
-  },
-});

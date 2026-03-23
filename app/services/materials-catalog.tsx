@@ -1,34 +1,34 @@
+﻿import { DSModuleScreen } from "@/components/ds/layouts";
+import { useDS } from "@/hooks/useDS";
 import MaterialsCatalogService, {
     Material,
     MATERIAL_CATEGORIES,
-    MOCK_MATERIALS
-} from '@/services/materialsCatalogService';
-import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Stack } from 'expo-router';
-import { useEffect, useState } from 'react';
+    MOCK_MATERIALS,
+} from "@/services/materialsCatalogService";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { useEffect, useState } from "react";
 import {
     ActivityIndicator,
-    Dimensions,
     Image,
     Modal,
-    RefreshControl,
     ScrollView,
-    StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
     View,
-} from 'react-native';
-
-const { width } = Dimensions.get('window');
-const CARD_WIDTH = (width - 36) / 2;
+} from "react-native";
 
 export default function MaterialsCatalogScreen() {
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedMaterial, setSelectedMaterial] = useState<Material | null>(null);
-  const [sortBy, setSortBy] = useState('popular');
+  const { colors, spacing, radius, text, shadow, screen } = useDS();
+  const CARD_WIDTH = (screen.width - 36) / 2;
+
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedMaterial, setSelectedMaterial] = useState<Material | null>(
+    null,
+  );
+  const [sortBy, setSortBy] = useState("popular");
   const [showARPreview, setShowARPreview] = useState(false);
   const [materials, setMaterials] = useState<Material[]>([]);
   const [loading, setLoading] = useState(true);
@@ -40,14 +40,14 @@ export default function MaterialsCatalogScreen() {
     try {
       if (!isRefresh) setLoading(true);
       setError(false);
-      
+
       const data = await MaterialsCatalogService.getMaterials(
         selectedCategory as any,
-        searchQuery || undefined
+        searchQuery || undefined,
       );
       setMaterials(data);
     } catch (err) {
-      console.error('Materials load error:', err);
+      console.error("Materials load error:", err);
       setError(true);
       setMaterials(MOCK_MATERIALS);
     } finally {
@@ -70,9 +70,10 @@ export default function MaterialsCatalogScreen() {
   };
 
   const filteredMaterials = materials.filter((material) => {
-    const matchCategory = selectedCategory === 'all' || material.category === selectedCategory;
+    const matchCategory =
+      selectedCategory === "all" || material.category === selectedCategory;
     const matchSearch =
-      searchQuery === '' ||
+      searchQuery === "" ||
       material.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       material.brand.toLowerCase().includes(searchQuery.toLowerCase());
     return matchCategory && matchSearch;
@@ -80,11 +81,17 @@ export default function MaterialsCatalogScreen() {
 
   const sortedMaterials = [...filteredMaterials].sort((a, b) => {
     switch (sortBy) {
-      case 'price-low':
-        return parseFloat(a.price.replace(/\./g, '')) - parseFloat(b.price.replace(/\./g, ''));
-      case 'price-high':
-        return parseFloat(b.price.replace(/\./g, '')) - parseFloat(a.price.replace(/\./g, ''));
-      case 'rating':
+      case "price-low":
+        return (
+          parseFloat(a.price.replace(/\./g, "")) -
+          parseFloat(b.price.replace(/\./g, ""))
+        );
+      case "price-high":
+        return (
+          parseFloat(b.price.replace(/\./g, "")) -
+          parseFloat(a.price.replace(/\./g, ""))
+        );
+      case "rating":
         return b.rating - a.rating;
       default:
         return 0;
@@ -93,196 +100,434 @@ export default function MaterialsCatalogScreen() {
 
   return (
     <>
-      <Stack.Screen
-        options={{
-          title: 'Catalog Vật Liệu',
-          headerStyle: { backgroundColor: '#0D9488' },
-          headerTintColor: '#fff',
-          headerTitleStyle: { fontWeight: '600' },
-        }}
-      />
-      <View style={styles.container}>
+      <DSModuleScreen
+        title="Catalog Váº­t Liá»‡u"
+        gradientHeader
+        refreshing={refreshing}
+        onRefresh={onRefresh}
+      >
         {/* Hero Section */}
         <LinearGradient
-          colors={['#0D9488', '#14B8A6']}
+          colors={[colors.primary, colors.primaryLight]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
-          style={styles.hero}
+          style={{
+            paddingHorizontal: spacing.lg,
+            paddingTop: spacing.xl,
+            paddingBottom: 70,
+          }}
         >
           {error && (
-            <View style={styles.errorBanner}>
-              <Ionicons name="alert-circle" size={18} color="#fff" />
-              <Text style={styles.errorText}>Server không khả dụng - Dùng dữ liệu demo</Text>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                backgroundColor: "rgba(255,255,255,0.2)",
+                paddingHorizontal: spacing.md,
+                paddingVertical: 6,
+                borderRadius: 20,
+                marginBottom: spacing.md,
+                alignSelf: "flex-start",
+                gap: 6,
+              }}
+            >
+              <Ionicons
+                name="alert-circle"
+                size={18}
+                color={colors.textInverse}
+              />
+              <Text style={[text.caption, { color: colors.textInverse }]}>
+                Server khÃ´ng kháº£ dá»¥ng - DÃ¹ng dá»¯ liá»‡u demo
+              </Text>
             </View>
           )}
-          
-          <Text style={styles.heroTitle}>Khám phá vật liệu xây dựng</Text>
-          <Text style={styles.heroSubtitle}>Hơn 10,000+ sản phẩm chất lượng</Text>
+
+          <Text
+            style={[text.h2, { color: colors.textInverse, marginBottom: 6 }]}
+          >
+            KhÃ¡m phÃ¡ váº­t liá»‡u xÃ¢y dá»±ng
+          </Text>
+          <Text
+            style={[
+              text.caption,
+              { color: "rgba(255,255,255,0.9)", marginBottom: spacing.xl },
+            ]}
+          >
+            HÆ¡n 10,000+ sáº£n pháº©m cháº¥t lÆ°á»£ng
+          </Text>
 
           {/* Search Bar */}
-          <View style={styles.searchBar}>
-            <Ionicons name="search" size={20} color="#999" />
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              backgroundColor: colors.card,
+              borderRadius: radius.lg,
+              paddingHorizontal: spacing.lg,
+              height: 48,
+              ...shadow.sm,
+              marginTop: spacing.xl,
+            }}
+          >
+            <Ionicons name="search" size={20} color={colors.textTertiary} />
             <TextInput
-              style={styles.searchInput}
-              placeholder="Tìm vật liệu, thương hiệu..."
-              placeholderTextColor="#999"
+              style={[
+                text.body,
+                { flex: 1, marginLeft: spacing.md, color: colors.text },
+              ]}
+              placeholder="TÃ¬m váº­t liá»‡u, thÆ°Æ¡ng hiá»‡u..."
+              placeholderTextColor={colors.textTertiary}
               value={searchQuery}
               onChangeText={setSearchQuery}
               onSubmitEditing={handleSearch}
               returnKeyType="search"
             />
-            {searchQuery !== '' && (
-              <TouchableOpacity onPress={() => setSearchQuery('')}>
-                <Ionicons name="close-circle" size={20} color="#999" />
+            {searchQuery !== "" && (
+              <TouchableOpacity onPress={() => setSearchQuery("")}>
+                <Ionicons
+                  name="close-circle"
+                  size={20}
+                  color={colors.textTertiary}
+                />
               </TouchableOpacity>
             )}
           </View>
         </LinearGradient>
 
         {loading && !materials.length ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#0D9488" />
-            <Text style={styles.loadingText}>Đang tải vật liệu...</Text>
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              paddingTop: 100,
+            }}
+          >
+            <ActivityIndicator size="large" color={colors.primary} />
+            <Text
+              style={[
+                text.body,
+                { marginTop: spacing.md, color: colors.textSecondary },
+              ]}
+            >
+              Äang táº£i váº­t liá»‡u...
+            </Text>
           </View>
         ) : (
-        <>
-        {/* Categories */}
-        <View style={styles.categoriesSection}>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.categoriesScroll}
-          >
-            {MATERIAL_CATEGORIES.map((category) => (
-              <TouchableOpacity
-                key={category.id}
+          <>
+            {/* Categories */}
+            <View
+              style={{
+                backgroundColor: colors.card,
+                paddingVertical: spacing.md,
+                marginTop: -50,
+                borderBottomWidth: 1,
+                borderBottomColor: colors.divider,
+              }}
+            >
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{
+                  paddingHorizontal: spacing.md,
+                  gap: spacing.sm,
+                }}
+              >
+                {MATERIAL_CATEGORIES.map((category) => (
+                  <TouchableOpacity
+                    key={category.id}
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      paddingHorizontal: spacing.lg,
+                      paddingVertical: spacing.sm,
+                      borderRadius: 20,
+                      backgroundColor:
+                        selectedCategory === category.id
+                          ? colors.primary
+                          : colors.chipBg,
+                      gap: 6,
+                    }}
+                    onPress={() => setSelectedCategory(category.id)}
+                  >
+                    <Ionicons
+                      name={category.icon as any}
+                      size={18}
+                      color={
+                        selectedCategory === category.id
+                          ? colors.textInverse
+                          : colors.textSecondary
+                      }
+                    />
+                    <Text
+                      style={[
+                        text.caption,
+                        {
+                          color:
+                            selectedCategory === category.id
+                              ? colors.textInverse
+                              : colors.textSecondary,
+                        },
+                      ]}
+                    >
+                      {category.name}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
+
+            {/* Sort Options */}
+            <View
+              style={{
+                backgroundColor: colors.card,
+                paddingVertical: spacing.md,
+                paddingHorizontal: spacing.lg,
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                borderBottomWidth: 1,
+                borderBottomColor: colors.divider,
+              }}
+            >
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ gap: spacing.sm }}
+              >
+                {[
+                  { id: "popular", label: "Phá»• biáº¿n", icon: "star" },
+                  {
+                    id: "price-low",
+                    label: "GiÃ¡ tháº¥p",
+                    icon: "trending-down",
+                  },
+                  { id: "price-high", label: "GiÃ¡ cao", icon: "trending-up" },
+                  { id: "rating", label: "ÄÃ¡nh giÃ¡", icon: "star-half" },
+                ].map((option) => (
+                  <TouchableOpacity
+                    key={option.id}
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      paddingHorizontal: spacing.md,
+                      paddingVertical: 6,
+                      borderRadius: 16,
+                      backgroundColor:
+                        sortBy === option.id ? colors.primary : colors.card,
+                      borderWidth: 1,
+                      borderColor: colors.primary,
+                      gap: 4,
+                    }}
+                    onPress={() => setSortBy(option.id)}
+                  >
+                    <Ionicons
+                      name={option.icon as any}
+                      size={14}
+                      color={
+                        sortBy === option.id
+                          ? colors.textInverse
+                          : colors.primary
+                      }
+                    />
+                    <Text
+                      style={[
+                        text.buttonSmall,
+                        {
+                          color:
+                            sortBy === option.id
+                              ? colors.textInverse
+                              : colors.primary,
+                        },
+                      ]}
+                    >
+                      {option.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+              <Text
                 style={[
-                  styles.categoryChip,
-                  selectedCategory === category.id && styles.categoryChipActive,
+                  text.caption,
+                  { color: colors.textTertiary, marginLeft: spacing.sm },
                 ]}
-                onPress={() => setSelectedCategory(category.id)}
               >
-                <Ionicons
-                  name={category.icon as any}
-                  size={18}
-                  color={selectedCategory === category.id ? '#fff' : '#666'}
-                />
-                <Text
-                  style={[
-                    styles.categoryText,
-                    selectedCategory === category.id && styles.categoryTextActive,
-                  ]}
+                {sortedMaterials.length} sáº£n pháº©m
+              </Text>
+            </View>
+
+            {/* Materials Grid */}
+            <View
+              style={{
+                flexDirection: "row",
+                flexWrap: "wrap",
+                paddingHorizontal: spacing.sm,
+                paddingTop: spacing.md,
+              }}
+            >
+              {sortedMaterials.map((material) => (
+                <TouchableOpacity
+                  key={material.id}
+                  style={{
+                    width: CARD_WIDTH,
+                    backgroundColor: colors.card,
+                    borderRadius: radius.lg,
+                    margin: 6,
+                    overflow: "hidden",
+                    ...shadow.sm,
+                  }}
+                  onPress={() => setSelectedMaterial(material)}
+                  activeOpacity={0.7}
                 >
-                  {category.name}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </View>
+                  <Image
+                    source={material.image}
+                    style={{
+                      width: "100%",
+                      height: 140,
+                      backgroundColor: colors.bgMuted,
+                    }}
+                  />
 
-        {/* Sort Options */}
-        <View style={styles.sortSection}>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.sortScroll}
-          >
-            {[
-              { id: 'popular', label: 'Phổ biến', icon: 'star' },
-              { id: 'price-low', label: 'Giá thấp', icon: 'trending-down' },
-              { id: 'price-high', label: 'Giá cao', icon: 'trending-up' },
-              { id: 'rating', label: 'Đánh giá', icon: 'star-half' },
-            ].map((option) => (
-              <TouchableOpacity
-                key={option.id}
-                style={[
-                  styles.sortChip,
-                  sortBy === option.id && styles.sortChipActive,
-                ]}
-                onPress={() => setSortBy(option.id)}
-              >
-                <Ionicons
-                  name={option.icon as any}
-                  size={14}
-                  color={sortBy === option.id ? '#fff' : '#0D9488'}
-                />
-                <Text
-                  style={[
-                    styles.sortText,
-                    sortBy === option.id && styles.sortTextActive,
-                  ]}
-                >
-                  {option.label}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-          <Text style={styles.resultCount}>{sortedMaterials.length} sản phẩm</Text>
-        </View>
-
-        {/* Materials Grid */}
-        <ScrollView 
-          style={styles.content} 
-          showsVerticalScrollIndicator={false}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-        >
-          <View style={styles.grid}>
-            {sortedMaterials.map((material) => (
-              <TouchableOpacity
-                key={material.id}
-                style={styles.card}
-                onPress={() => setSelectedMaterial(material)}
-                activeOpacity={0.7}
-              >
-                <Image source={material.image} style={styles.cardImage} />
-                
-                {/* Badges */}
-                <View style={styles.badges}>
-                  {material.arAvailable && (
-                    <View style={styles.arBadge}>
-                      <Ionicons name="cube" size={10} color="#fff" />
-                      <Text style={styles.arBadgeText}>AR</Text>
-                    </View>
-                  )}
-                  {material.inStock && (
-                    <View style={styles.stockBadge}>
-                      <Text style={styles.stockBadgeText}>Còn hàng</Text>
-                    </View>
-                  )}
-                </View>
-
-                {/* Card Content */}
-                <View style={styles.cardContent}>
-                  <Text style={styles.brandText}>{material.brand}</Text>
-                  <Text style={styles.materialName} numberOfLines={2}>
-                    {material.name}
-                  </Text>
-
-                  {/* Rating */}
-                  <View style={styles.rating}>
-                    <Ionicons name="star" size={12} color="#FFFFFF" />
-                    <Text style={styles.ratingText}>{material.rating}</Text>
-                    <Text style={styles.reviewsText}>({material.reviews})</Text>
+                  {/* Badges */}
+                  <View
+                    style={{
+                      position: "absolute",
+                      top: spacing.sm,
+                      right: spacing.sm,
+                      gap: 4,
+                    }}
+                  >
+                    {material.arAvailable && (
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          backgroundColor: colors.danger,
+                          paddingHorizontal: 6,
+                          paddingVertical: 3,
+                          borderRadius: radius.sm,
+                          gap: 3,
+                        }}
+                      >
+                        <Ionicons
+                          name="cube"
+                          size={10}
+                          color={colors.textInverse}
+                        />
+                        <Text
+                          style={[text.badge, { color: colors.textInverse }]}
+                        >
+                          AR
+                        </Text>
+                      </View>
+                    )}
+                    {material.inStock && (
+                      <View
+                        style={{
+                          backgroundColor: colors.success,
+                          paddingHorizontal: 6,
+                          paddingVertical: 3,
+                          borderRadius: radius.sm,
+                        }}
+                      >
+                        <Text
+                          style={[text.badge, { color: colors.textInverse }]}
+                        >
+                          CÃ²n hÃ ng
+                        </Text>
+                      </View>
+                    )}
                   </View>
 
-                  {/* Price */}
-                  <View style={styles.priceRow}>
-                    <View>
-                      <Text style={styles.price}>{material.price}</Text>
-                      <Text style={styles.unit}>/{material.unit}</Text>
+                  {/* Card Content */}
+                  <View style={{ padding: 10 }}>
+                    <Text
+                      style={[
+                        text.smallBold,
+                        { color: colors.primary, marginBottom: 4 },
+                      ]}
+                    >
+                      {material.brand}
+                    </Text>
+                    <Text
+                      style={[
+                        text.bodySemibold,
+                        {
+                          fontSize: 13,
+                          color: colors.text,
+                          marginBottom: 6,
+                          height: 36,
+                        },
+                      ]}
+                      numberOfLines={2}
+                    >
+                      {material.name}
+                    </Text>
+
+                    {/* Rating */}
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        marginBottom: spacing.sm,
+                        gap: 4,
+                      }}
+                    >
+                      <Ionicons name="star" size={12} color={colors.gold} />
+                      <Text style={[text.smallBold, { color: colors.text }]}>
+                        {material.rating}
+                      </Text>
+                      <Text
+                        style={[text.caption, { color: colors.textTertiary }]}
+                      >
+                        ({material.reviews})
+                      </Text>
                     </View>
-                    <TouchableOpacity style={styles.addButton}>
-                      <Ionicons name="add" size={18} color="#fff" />
-                    </TouchableOpacity>
+
+                    {/* Price */}
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      <View>
+                        <Text
+                          style={[text.bodySemibold, { color: colors.primary }]}
+                        >
+                          {material.price}
+                        </Text>
+                        <Text
+                          style={[text.caption, { color: colors.textTertiary }]}
+                        >
+                          /{material.unit}
+                        </Text>
+                      </View>
+                      <TouchableOpacity
+                        style={{
+                          backgroundColor: colors.primary,
+                          width: 32,
+                          height: 32,
+                          borderRadius: 16,
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <Ionicons
+                          name="add"
+                          size={18}
+                          color={colors.textInverse}
+                        />
+                      </TouchableOpacity>
+                    </View>
                   </View>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </ScrollView>
-        </>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </>
         )}
-      </View>
+      </DSModuleScreen>
 
       {/* Material Detail Modal */}
       <Modal
@@ -291,83 +536,264 @@ export default function MaterialsCatalogScreen() {
         animationType="slide"
         onRequestClose={() => setSelectedMaterial(null)}
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: colors.overlay,
+            justifyContent: "flex-end",
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: colors.card,
+              borderTopLeftRadius: 20,
+              borderTopRightRadius: 20,
+              maxHeight: "90%",
+            }}
+          >
             <TouchableOpacity
-              style={styles.closeButton}
+              style={{
+                position: "absolute",
+                top: spacing.lg,
+                right: spacing.lg,
+                zIndex: 10,
+                backgroundColor: "rgba(255,255,255,0.9)",
+                borderRadius: 20,
+                padding: 4,
+              }}
               onPress={() => setSelectedMaterial(null)}
             >
-              <Ionicons name="close" size={24} color="#333" />
+              <Ionicons name="close" size={24} color={colors.text} />
             </TouchableOpacity>
 
             {selectedMaterial && (
               <ScrollView>
-                <Image source={selectedMaterial.image} style={styles.modalImage} />
-                
-                <View style={styles.modalBody}>
-                  <View style={styles.modalHeader}>
-                    <View style={styles.modalBrand}>
-                      <Text style={styles.modalBrandText}>{selectedMaterial.brand}</Text>
+                <Image
+                  source={selectedMaterial.image}
+                  style={{
+                    width: "100%",
+                    height: 300,
+                    backgroundColor: colors.bgMuted,
+                  }}
+                />
+
+                <View style={{ padding: spacing.xl }}>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      marginBottom: spacing.md,
+                    }}
+                  >
+                    <View
+                      style={{
+                        backgroundColor: colors.primaryBg,
+                        paddingHorizontal: spacing.md,
+                        paddingVertical: 6,
+                        borderRadius: 16,
+                      }}
+                    >
+                      <Text
+                        style={[
+                          text.bodySemibold,
+                          { fontSize: 13, color: colors.primary },
+                        ]}
+                      >
+                        {selectedMaterial.brand}
+                      </Text>
                     </View>
-                    <View style={styles.modalRating}>
-                      <Ionicons name="star" size={16} color="#FFFFFF" />
-                      <Text style={styles.modalRatingText}>{selectedMaterial.rating}</Text>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: 4,
+                      }}
+                    >
+                      <Ionicons name="star" size={16} color={colors.gold} />
+                      <Text style={[text.bodySemibold, { color: colors.text }]}>
+                        {selectedMaterial.rating}
+                      </Text>
                     </View>
                   </View>
 
-                  <Text style={styles.modalTitle}>{selectedMaterial.name}</Text>
+                  <Text
+                    style={[
+                      text.h3,
+                      { color: colors.text, marginBottom: spacing.xl },
+                    ]}
+                  >
+                    {selectedMaterial.name}
+                  </Text>
 
                   {/* Specs */}
-                  <View style={styles.specs}>
-                    <Text style={styles.specsTitle}>Thông số kỹ thuật</Text>
-                    {Object.entries(selectedMaterial.specs).map(([key, value]) => (
-                      <View key={key} style={styles.specRow}>
-                        <Text style={styles.specLabel}>
-                          {key === 'size' && 'Kích thước'}
-                          {key === 'thickness' && 'Độ dày'}
-                          {key === 'finish' && 'Hoàn thiện'}
-                          {key === 'origin' && 'Xuất xứ'}
-                          {key === 'waterResist' && 'Chống nước'}
-                          {key === 'warranty' && 'Bảo hành'}
-                          {key === 'hardness' && 'Độ cứng'}
-                          {key === 'type' && 'Loại'}
-                          {key === 'safety' && 'An toàn'}
-                          {key === 'grade' && 'Cấp'}
-                        </Text>
-                        <Text style={styles.specValue}>{String(value)}</Text>
-                      </View>
-                    ))}
+                  <View
+                    style={{
+                      backgroundColor: colors.bgMuted,
+                      borderRadius: radius.lg,
+                      padding: spacing.lg,
+                      marginBottom: spacing.xl,
+                    }}
+                  >
+                    <Text
+                      style={[
+                        text.bodySemibold,
+                        { color: colors.text, marginBottom: spacing.md },
+                      ]}
+                    >
+                      ThÃ´ng sá»‘ ká»¹ thuáº­t
+                    </Text>
+                    {Object.entries(selectedMaterial.specs).map(
+                      ([key, value]) => (
+                        <View
+                          key={key}
+                          style={{
+                            flexDirection: "row",
+                            justifyContent: "space-between",
+                            paddingVertical: spacing.sm,
+                            borderBottomWidth: 1,
+                            borderBottomColor: colors.divider,
+                          }}
+                        >
+                          <Text
+                            style={[text.body, { color: colors.textSecondary }]}
+                          >
+                            {key === "size" && "KÃ­ch thÆ°á»›c"}
+                            {key === "thickness" && "Äá»™ dÃ y"}
+                            {key === "finish" && "HoÃ n thiá»‡n"}
+                            {key === "origin" && "Xuáº¥t xá»©"}
+                            {key === "waterResist" && "Chá»‘ng nÆ°á»›c"}
+                            {key === "warranty" && "Báº£o hÃ nh"}
+                            {key === "hardness" && "Äá»™ cá»©ng"}
+                            {key === "type" && "Loáº¡i"}
+                            {key === "safety" && "An toÃ n"}
+                            {key === "grade" && "Cáº¥p"}
+                          </Text>
+                          <Text
+                            style={[
+                              text.bodySemibold,
+                              { fontSize: 13, color: colors.text },
+                            ]}
+                          >
+                            {String(value)}
+                          </Text>
+                        </View>
+                      ),
+                    )}
                   </View>
 
                   {/* Actions */}
-                  <View style={styles.modalActions}>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      gap: spacing.md,
+                      marginBottom: spacing.xl,
+                    }}
+                  >
                     {selectedMaterial.arAvailable && (
                       <TouchableOpacity
-                        style={styles.arButton}
+                        style={{
+                          flex: 1,
+                          flexDirection: "row",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          backgroundColor: colors.primaryBg,
+                          borderWidth: 1,
+                          borderColor: colors.primary,
+                          paddingVertical: spacing.md,
+                          borderRadius: radius.md,
+                          gap: 6,
+                        }}
                         onPress={() => {
                           setSelectedMaterial(null);
                           setShowARPreview(true);
                         }}
                       >
-                        <Ionicons name="cube" size={20} color="#0D9488" />
-                        <Text style={styles.arButtonText}>Xem AR</Text>
+                        <Ionicons
+                          name="cube"
+                          size={20}
+                          color={colors.primary}
+                        />
+                        <Text
+                          style={[text.bodySemibold, { color: colors.primary }]}
+                        >
+                          Xem AR
+                        </Text>
                       </TouchableOpacity>
                     )}
-                    <TouchableOpacity style={styles.contactButton}>
-                      <Ionicons name="call" size={20} color="#fff" />
-                      <Text style={styles.contactButtonText}>Liên hệ</Text>
+                    <TouchableOpacity
+                      style={{
+                        flex: 1,
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        backgroundColor: colors.success,
+                        paddingVertical: spacing.md,
+                        borderRadius: radius.md,
+                        gap: 6,
+                      }}
+                    >
+                      <Ionicons
+                        name="call"
+                        size={20}
+                        color={colors.textInverse}
+                      />
+                      <Text
+                        style={[
+                          text.bodySemibold,
+                          { color: colors.textInverse },
+                        ]}
+                      >
+                        LiÃªn há»‡
+                      </Text>
                     </TouchableOpacity>
                   </View>
 
                   {/* Price & Add */}
-                  <View style={styles.modalFooter}>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      paddingTop: spacing.xl,
+                      borderTopWidth: 1,
+                      borderTopColor: colors.divider,
+                    }}
+                  >
                     <View>
-                      <Text style={styles.modalPrice}>{selectedMaterial.price}</Text>
-                      <Text style={styles.modalUnit}>/{selectedMaterial.unit}</Text>
+                      <Text style={[text.h2, { color: colors.primary }]}>
+                        {selectedMaterial.price}
+                      </Text>
+                      <Text
+                        style={[text.caption, { color: colors.textTertiary }]}
+                      >
+                        /{selectedMaterial.unit}
+                      </Text>
                     </View>
-                    <TouchableOpacity style={styles.addToCartButton}>
-                      <Ionicons name="cart" size={20} color="#fff" />
-                      <Text style={styles.addToCartText}>Thêm vào giỏ</Text>
+                    <TouchableOpacity
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        backgroundColor: colors.primary,
+                        paddingHorizontal: 24,
+                        paddingVertical: spacing.md,
+                        borderRadius: 24,
+                        gap: spacing.sm,
+                      }}
+                    >
+                      <Ionicons
+                        name="cart"
+                        size={20}
+                        color={colors.textInverse}
+                      />
+                      <Text
+                        style={[
+                          text.bodySemibold,
+                          { color: colors.textInverse },
+                        ]}
+                      >
+                        ThÃªm vÃ o giá»
+                      </Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -384,22 +810,63 @@ export default function MaterialsCatalogScreen() {
         animationType="fade"
         onRequestClose={() => setShowARPreview(false)}
       >
-        <View style={styles.arModalOverlay}>
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: colors.text,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
           <TouchableOpacity
-            style={styles.arCloseButton}
+            style={{
+              position: "absolute",
+              top: 50,
+              right: spacing.xl,
+              zIndex: 10,
+            }}
             onPress={() => setShowARPreview(false)}
           >
-            <Ionicons name="close-circle" size={40} color="#fff" />
+            <Ionicons
+              name="close-circle"
+              size={40}
+              color={colors.textInverse}
+            />
           </TouchableOpacity>
 
-          <View style={styles.arPlaceholder}>
-            <Ionicons name="cube-outline" size={100} color="#fff" />
-            <Text style={styles.arPlaceholderText}>AR Preview</Text>
-            <Text style={styles.arPlaceholderSubtext}>
-              Tính năng AR đang phát triển
+          <View style={{ alignItems: "center", padding: 40 }}>
+            <Ionicons
+              name="cube-outline"
+              size={100}
+              color={colors.textInverse}
+            />
+            <Text
+              style={[
+                text.h1,
+                { color: colors.textInverse, marginTop: spacing.xl },
+              ]}
+            >
+              AR Preview
             </Text>
-            <Text style={styles.arPlaceholderDesc}>
-              Sẽ cho phép xem vật liệu trên không gian thực tế
+            <Text
+              style={[
+                text.bodyLarge,
+                { color: "rgba(255,255,255,0.7)", marginTop: spacing.md },
+              ]}
+            >
+              TÃ­nh nÄƒng AR Ä‘ang phÃ¡t triá»ƒn
+            </Text>
+            <Text
+              style={[
+                text.body,
+                {
+                  color: "rgba(255,255,255,0.5)",
+                  marginTop: spacing.sm,
+                  textAlign: "center",
+                },
+              ]}
+            >
+              Sáº½ cho phÃ©p xem váº­t liá»‡u trÃªn khÃ´ng gian thá»±c táº¿
             </Text>
           </View>
         </View>
@@ -407,443 +874,3 @@ export default function MaterialsCatalogScreen() {
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8f9fa',
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingTop: 100,
-  },
-  loadingText: {
-    marginTop: 12,
-    fontSize: 14,
-    color: '#666',
-  },
-  errorBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-    marginBottom: 12,
-    alignSelf: 'flex-start',
-    gap: 6,
-  },
-  errorText: {
-    color: '#fff',
-    fontSize: 12,
-  },
-  hero: {
-    paddingHorizontal: 16,
-    paddingTop: 20,
-    paddingBottom: 70,
-  },
-  heroTitle: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#fff',
-    marginBottom: 6,
-  },
-  heroSubtitle: {
-    fontSize: 13,
-    color: 'rgba(255,255,255,0.9)',
-    marginBottom: 20,
-  },
-  searchBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    height: 48,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-    marginTop: 20,
-  },
-  searchInput: {
-    flex: 1,
-    marginLeft: 12,
-    fontSize: 15,
-    color: '#333',
-  },
-  categoriesSection: {
-    backgroundColor: '#fff',
-    paddingVertical: 12,
-    marginTop: -50,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  categoriesScroll: {
-    paddingHorizontal: 12,
-    gap: 8,
-  },
-  categoryChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: '#f5f5f5',
-    gap: 6,
-  },
-  categoryChipActive: {
-    backgroundColor: '#0D9488',
-  },
-  categoryText: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: '#666',
-  },
-  categoryTextActive: {
-    color: '#fff',
-  },
-  sortSection: {
-    backgroundColor: '#fff',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  sortScroll: {
-    gap: 8,
-  },
-  sortChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#0D9488',
-    gap: 4,
-  },
-  sortChipActive: {
-    backgroundColor: '#0D9488',
-  },
-  sortText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#0D9488',
-  },
-  sortTextActive: {
-    color: '#fff',
-  },
-  resultCount: {
-    fontSize: 12,
-    color: '#999',
-    marginLeft: 8,
-  },
-  content: {
-    flex: 1,
-  },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    paddingHorizontal: 8,
-    paddingTop: 12,
-  },
-  card: {
-    width: CARD_WIDTH,
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    margin: 6,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 3,
-    elevation: 2,
-  },
-  cardImage: {
-    width: '100%',
-    height: 140,
-    backgroundColor: '#f0f0f0',
-  },
-  badges: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    gap: 4,
-  },
-  arBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(238, 77, 45, 0.9)',
-    paddingHorizontal: 6,
-    paddingVertical: 3,
-    borderRadius: 4,
-    gap: 3,
-  },
-  arBadgeText: {
-    fontSize: 9,
-    fontWeight: '700',
-    color: '#fff',
-  },
-  stockBadge: {
-    backgroundColor: 'rgba(52, 199, 89, 0.9)',
-    paddingHorizontal: 6,
-    paddingVertical: 3,
-    borderRadius: 4,
-  },
-  stockBadgeText: {
-    fontSize: 9,
-    fontWeight: '600',
-    color: '#fff',
-  },
-  cardContent: {
-    padding: 10,
-  },
-  brandText: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: '#0D9488',
-    marginBottom: 4,
-  },
-  materialName: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 6,
-    height: 36,
-  },
-  rating: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-    gap: 4,
-  },
-  ratingText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#333',
-  },
-  reviewsText: {
-    fontSize: 11,
-    color: '#999',
-  },
-  priceRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  price: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#0D9488',
-  },
-  unit: {
-    fontSize: 11,
-    color: '#999',
-  },
-  addButton: {
-    backgroundColor: '#0D9488',
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'flex-end',
-  },
-  modalContent: {
-    backgroundColor: '#fff',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    maxHeight: '90%',
-  },
-  closeButton: {
-    position: 'absolute',
-    top: 16,
-    right: 16,
-    zIndex: 10,
-    backgroundColor: 'rgba(255,255,255,0.9)',
-    borderRadius: 20,
-    padding: 4,
-  },
-  modalImage: {
-    width: '100%',
-    height: 300,
-    backgroundColor: '#f0f0f0',
-  },
-  modalBody: {
-    padding: 20,
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  modalBrand: {
-    backgroundColor: '#fff5f0',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-  },
-  modalBrandText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#0D9488',
-  },
-  modalRating: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  modalRatingText: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#333',
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#333',
-    marginBottom: 20,
-  },
-  specs: {
-    backgroundColor: '#f8f9fa',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 20,
-  },
-  specsTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#333',
-    marginBottom: 12,
-  },
-  specRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  specLabel: {
-    fontSize: 13,
-    color: '#666',
-  },
-  specValue: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#333',
-  },
-  modalActions: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 20,
-  },
-  arButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#fff5f0',
-    borderWidth: 1,
-    borderColor: '#0D9488',
-    paddingVertical: 12,
-    borderRadius: 8,
-    gap: 6,
-  },
-  arButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#0D9488',
-  },
-  contactButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#52c41a',
-    paddingVertical: 12,
-    borderRadius: 8,
-    gap: 6,
-  },
-  contactButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#fff',
-  },
-  modalFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingTop: 20,
-    borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
-  },
-  modalPrice: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#0D9488',
-  },
-  modalUnit: {
-    fontSize: 13,
-    color: '#999',
-  },
-  addToCartButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#0D9488',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 24,
-    gap: 8,
-  },
-  addToCartText: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#fff',
-  },
-  arModalOverlay: {
-    flex: 1,
-    backgroundColor: '#000',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  arCloseButton: {
-    position: 'absolute',
-    top: 50,
-    right: 20,
-    zIndex: 10,
-  },
-  arPlaceholder: {
-    alignItems: 'center',
-    padding: 40,
-  },
-  arPlaceholderText: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#fff',
-    marginTop: 20,
-  },
-  arPlaceholderSubtext: {
-    fontSize: 16,
-    color: 'rgba(255,255,255,0.7)',
-    marginTop: 12,
-  },
-  arPlaceholderDesc: {
-    fontSize: 14,
-    color: 'rgba(255,255,255,0.5)',
-    marginTop: 8,
-    textAlign: 'center',
-  },
-});

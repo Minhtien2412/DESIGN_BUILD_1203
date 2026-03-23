@@ -43,6 +43,11 @@ export function JobProgressOverlay() {
   const [collapsed, setCollapsed] = useState(false);
   const slideAnim = useRef(new Animated.Value(1)).current; // 1 = visible, 0 = collapsed
 
+  const toggleCollapse = useCallback(() => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setCollapsed((prev) => !prev);
+  }, []);
+
   // Don't render if no active jobs
   if (!hasActiveJobs && pendingJobs.length === 0) return null;
 
@@ -52,11 +57,6 @@ export function JobProgressOverlay() {
   const recentCompletedJobs = pendingJobs.filter(
     (j) => j.status === "completed" || j.status === "failed",
   );
-
-  const toggleCollapse = useCallback(() => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setCollapsed((prev) => !prev);
-  }, []);
 
   return (
     <View style={styles.container}>

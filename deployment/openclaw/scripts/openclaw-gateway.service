@@ -1,0 +1,29 @@
+[Unit]
+Description=OpenClaw Gateway
+Documentation=https://docs.openclaw.ai
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=%h/.nvm/versions/node/v22.16.0/bin/openclaw gateway --port 18789
+Restart=always
+RestartSec=5
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+# Environment
+Environment=NODE_ENV=production
+EnvironmentFile=-%h/.openclaw/.env
+
+# Memory limits — protect VPS from runaway processes
+MemoryMax=1G
+MemoryHigh=800M
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=openclaw
+
+[Install]
+WantedBy=default.target

@@ -8,9 +8,10 @@
  */
 
 import type { HomeStats } from "@/hooks/useHomePageData";
+import { createShadow } from "@/utils/shadowStyles";
 import { Ionicons } from "@expo/vector-icons";
 import { memo } from "react";
-import { Platform, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 function shortNum(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
@@ -120,15 +121,7 @@ const s = StyleSheet.create({
     borderRadius: 14,
     borderWidth: 1,
     borderColor: "#E2E8F0",
-    ...Platform.select({
-      ios: {
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.04,
-        shadowRadius: 3,
-      },
-      android: { elevation: 1 },
-    }),
+    ...createShadow({ offsetY: 1, blurRadius: 3, opacity: 0.04 }),
   },
   item: { alignItems: "center" },
   iconWrap: {

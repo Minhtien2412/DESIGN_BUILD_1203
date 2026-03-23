@@ -1,15 +1,17 @@
 /**
  * Custom Tab Bar - Vua Tho style
- * 4 main tabs + centered AI button
+ * 4 main tabs + centered AI button — role-aware labels & icons
  *
- * @updated 2026-03-11
+ * @updated 2026-03-21 — Role-aware tab config from constants/tabConfig
  */
+import { DEFAULT_TABS, TAB_CONFIG } from "@/constants/tabConfig";
+import { useRole } from "@/context/RoleContext";
 import { useUnifiedBadge } from "@/context/UnifiedBadgeContext";
 import { useI18n } from "@/services/i18nService";
 import { Ionicons } from "@expo/vector-icons";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { LinearGradient } from "expo-linear-gradient";
-import { useCallback, useRef } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import {
     Animated,
     Platform,
@@ -26,38 +28,6 @@ const ICON_SIZE = 21;
 const TAB_HEIGHT = 62;
 
 // ═══════════════════════════════════════════════════════════════════════
-// TAB CONFIG — 2 left | AI | 2 right
-// ═══════════════════════════════════════════════════════════════════════
-const TABS = [
-  {
-    name: "index",
-    label: "Trang chủ",
-    labelKey: "nav.home",
-    icon: "home-outline" as const,
-    activeIcon: "home" as const,
-  },
-  {
-    name: "activity",
-    label: "Hoạt động",
-    icon: "list-outline" as const,
-    activeIcon: "list" as const,
-  },
-  {
-    name: "communication",
-    label: "Liên lạc",
-    icon: "chatbubbles-outline" as const,
-    activeIcon: "chatbubbles" as const,
-  },
-  {
-    name: "profile",
-    label: "Tài khoản",
-    labelKey: "nav.profile",
-    icon: "person-outline" as const,
-    activeIcon: "person" as const,
-  },
-];
-
-// ═══════════════════════════════════════════════════════════════════════
 // MAIN COMPONENT
 // ═══════════════════════════════════════════════════════════════════════
 export function CustomTabBar({
@@ -67,6 +37,10 @@ export function CustomTabBar({
 }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
   const { t } = useI18n();
+  const { role } = useRole();
+
+  // ── Role-aware tab config ──────────────────────────
+  const TABS = useMemo(() => (role ? TAB_CONFIG[role] : DEFAULT_TABS), [role]);
 
   const scaleAnims = useRef(TABS.map(() => new Animated.Value(1))).current;
   const fabScaleAnim = useRef(new Animated.Value(1)).current;
@@ -162,7 +136,7 @@ export function CustomTabBar({
         android_ripple={{ color: "rgba(13,148,136,0.15)", borderless: true }}
         hitSlop={6}
         accessibilityRole="button"
-        accessibilityLabel={tab.labelKey ? t(tab.labelKey) : tab.label}
+        accessibilityLabel={tab.label}
         accessibilityState={{ selected: isFocused }}
       >
         <Animated.View
@@ -186,7 +160,7 @@ export function CustomTabBar({
             style={[s.label, isFocused ? s.labelActive : s.labelInactive]}
             numberOfLines={1}
           >
-            {tab.labelKey ? t(tab.labelKey) : tab.label}
+            {tab.label}
           </Text>
         </Animated.View>
       </Pressable>
@@ -232,7 +206,7 @@ export function CustomTabBar({
           </Animated.View>
         </TouchableOpacity>
         <Text style={s.aiLabel} pointerEvents="none">
-          Vua Thợ AI
+          Trợ lý AI
         </Text>
       </View>
     </View>

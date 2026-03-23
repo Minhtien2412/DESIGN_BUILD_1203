@@ -14,17 +14,17 @@
  */
 
 import type { TopWorkerItem } from "@/hooks/useHomePageData";
+import { createShadow } from "@/utils/shadowStyles";
 import { Ionicons } from "@expo/vector-icons";
 import { Href, router } from "expo-router";
 import { memo, useCallback } from "react";
 import {
-    Image,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from "react-native";
 
 // ────────── Single Worker Card ──────────
@@ -200,15 +200,7 @@ const s = StyleSheet.create({
     paddingVertical: 14,
     paddingHorizontal: 10,
     alignItems: "center",
-    ...Platform.select({
-      ios: {
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.08,
-        shadowRadius: 4,
-      },
-      android: { elevation: 2 },
-    }),
+    ...createShadow({ offsetY: 1, blurRadius: 4, opacity: 0.08 }),
   },
   avatarWrap: { position: "relative" },
   avatar: {

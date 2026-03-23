@@ -81,6 +81,8 @@ export interface WorkerQueryParams {
   search?: string;
   specialty?: string;
   workerType?: WorkerType;
+  /** Backend category group: construction, finishing, electrical, etc. */
+  category?: string;
   location?: string;
   available?: boolean;
   verified?: boolean;

@@ -1,6 +1,6 @@
-import { useThemeColor } from '@/hooks/use-theme-color';
-import { Ionicons } from '@expo/vector-icons';
-import { useState } from 'react';
+import { useThemeColor } from "@/hooks/use-theme-color";
+import { Ionicons } from "@expo/vector-icons";
+import { useState } from "react";
 import {
     Alert,
     Dimensions,
@@ -12,9 +12,9 @@ import {
     Text,
     TouchableOpacity,
     View,
-} from 'react-native';
+} from "react-native";
 
-const { width: screenWidth } = Dimensions.get('window');
+const { width: screenWidth } = Dimensions.get("window");
 
 export interface PortfolioProject {
   id: string;
@@ -41,13 +41,13 @@ interface ContractorPortfolioProps {
 }
 
 const PROJECT_CATEGORIES = [
-  'Tất cả',
-  'Thiết kế kiến trúc',
-  'Thiết kế nội thất',
-  'Xây dựng nhà ở',
-  'Xây dựng thương mại',
-  'Cảnh quan',
-  'Hoàn thiện',
+  "Tất cả",
+  "Thiết kế kiến trúc",
+  "Thiết kế nội thất",
+  "Xây dựng nhà ở",
+  "Xây dựng thương mại",
+  "Cảnh quan",
+  "Hoàn thiện",
 ];
 
 export function ContractorPortfolio({
@@ -57,19 +57,21 @@ export function ContractorPortfolio({
   onEditProject,
   onDeleteProject,
 }: ContractorPortfolioProps) {
-  const [selectedCategory, setSelectedCategory] = useState('Tất cả');
-  const [selectedProject, setSelectedProject] = useState<PortfolioProject | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState("Tất cả");
+  const [selectedProject, setSelectedProject] =
+    useState<PortfolioProject | null>(null);
   const [imageViewerVisible, setImageViewerVisible] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
 
-  const backgroundColor = useThemeColor({}, 'background');
-  const textColor = useThemeColor({}, 'text');
-  const primaryColor = useThemeColor({}, 'tint');
+  const backgroundColor = useThemeColor({}, "background");
+  const textColor = useThemeColor({}, "text");
+  const primaryColor = useThemeColor({}, "tint");
 
-  const filteredProjects = selectedCategory === 'Tất cả'
-    ? projects
-    : projects.filter(project => project.category === selectedCategory);
+  const filteredProjects =
+    selectedCategory === "Tất cả"
+      ? projects
+      : projects.filter((project) => project.category === selectedCategory);
 
   const openImageViewer = (images: string[], startIndex: number = 0) => {
     setSelectedImages(images);
@@ -84,13 +86,30 @@ export function ContractorPortfolio({
       activeOpacity={0.7}
     >
       <View style={styles.imageContainer}>
-        <Image 
-          source={{ uri: item.images[0] }} 
-          style={styles.projectImage}
-          resizeMode="cover"
-        />
+        {item.images[0] ? (
+          <Image
+            source={{ uri: item.images[0] }}
+            style={styles.projectImage}
+            resizeMode="cover"
+          />
+        ) : (
+          <View
+            style={[
+              styles.projectImage,
+              {
+                backgroundColor: "#f0f0f0",
+                justifyContent: "center",
+                alignItems: "center",
+              },
+            ]}
+          >
+            <Ionicons name="image-outline" size={32} color="#ccc" />
+          </View>
+        )}
         {item.images.length > 1 && (
-          <View style={[styles.imageCount, { backgroundColor: 'rgba(0,0,0,0.7)' }]}>
+          <View
+            style={[styles.imageCount, { backgroundColor: "rgba(0,0,0,0.7)" }]}
+          >
             <Ionicons name="images-outline" size={12} color="white" />
             <Text style={styles.imageCountText}>{item.images.length}</Text>
           </View>
@@ -108,16 +127,20 @@ export function ContractorPortfolio({
               <Ionicons name="create-outline" size={16} color="white" />
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.actionButton, { backgroundColor: '#000000' }]}
+              style={[styles.actionButton, { backgroundColor: "#000000" }]}
               onPress={(e) => {
                 e.stopPropagation();
                 Alert.alert(
-                  'Xóa dự án',
-                  'Bạn có chắc chắn muốn xóa dự án này?',
+                  "Xóa dự án",
+                  "Bạn có chắc chắn muốn xóa dự án này?",
                   [
-                    { text: 'Hủy', style: 'cancel' },
-                    { text: 'Xóa', style: 'destructive', onPress: () => onDeleteProject?.(item.id) },
-                  ]
+                    { text: "Hủy", style: "cancel" },
+                    {
+                      text: "Xóa",
+                      style: "destructive",
+                      onPress: () => onDeleteProject?.(item.id),
+                    },
+                  ],
                 );
               }}
               activeOpacity={0.8}
@@ -129,22 +152,28 @@ export function ContractorPortfolio({
       </View>
 
       <View style={styles.projectInfo}>
-        <Text style={[styles.projectTitle, { color: textColor }]} numberOfLines={2}>
+        <Text
+          style={[styles.projectTitle, { color: textColor }]}
+          numberOfLines={2}
+        >
           {item.title}
         </Text>
         <Text style={[styles.projectCategory, { color: primaryColor }]}>
           {item.category}
         </Text>
-        <Text style={[styles.projectLocation, { color: textColor }]} numberOfLines={1}>
+        <Text
+          style={[styles.projectLocation, { color: textColor }]}
+          numberOfLines={1}
+        >
           📍 {item.location}
         </Text>
-        
+
         {item.rating && (
           <View style={styles.ratingContainer}>
             {[1, 2, 3, 4, 5].map((star) => (
               <Ionicons
                 key={star}
-                name={star <= item.rating! ? 'star' : 'star-outline'}
+                name={star <= item.rating! ? "star" : "star-outline"}
                 size={12}
                 color="#FFB800"
               />
@@ -170,16 +199,18 @@ export function ContractorPortfolio({
           key={category}
           style={[
             styles.categoryChip,
-            selectedCategory === category && { 
+            selectedCategory === category && {
               backgroundColor: primaryColor,
-            }
+            },
           ]}
           onPress={() => setSelectedCategory(category)}
         >
-          <Text style={[
-            styles.categoryText,
-            selectedCategory === category && { color: 'white' }
-          ]}>
+          <Text
+            style={[
+              styles.categoryText,
+              selectedCategory === category && { color: "white" },
+            ]}
+          >
             {category}
           </Text>
         </TouchableOpacity>
@@ -198,7 +229,9 @@ export function ContractorPortfolio({
           <TouchableOpacity onPress={() => setSelectedProject(null)}>
             <Ionicons name="close" size={24} color={textColor} />
           </TouchableOpacity>
-          <Text style={[styles.modalTitle, { color: textColor }]}>Chi tiết dự án</Text>
+          <Text style={[styles.modalTitle, { color: textColor }]}>
+            Chi tiết dự án
+          </Text>
           <View style={{ width: 24 }} />
         </View>
 
@@ -225,35 +258,55 @@ export function ContractorPortfolio({
               <Text style={[styles.detailTitle, { color: textColor }]}>
                 {selectedProject.title}
               </Text>
-              
+
               <View style={styles.projectMeta}>
                 <View style={styles.metaItem}>
-                  <Ionicons name="folder-outline" size={16} color={primaryColor} />
+                  <Ionicons
+                    name="folder-outline"
+                    size={16}
+                    color={primaryColor}
+                  />
                   <Text style={[styles.metaText, { color: textColor }]}>
                     {selectedProject.category}
                   </Text>
                 </View>
                 <View style={styles.metaItem}>
-                  <Ionicons name="location-outline" size={16} color={primaryColor} />
+                  <Ionicons
+                    name="location-outline"
+                    size={16}
+                    color={primaryColor}
+                  />
                   <Text style={[styles.metaText, { color: textColor }]}>
                     {selectedProject.location}
                   </Text>
                 </View>
                 <View style={styles.metaItem}>
-                  <Ionicons name="calendar-outline" size={16} color={primaryColor} />
+                  <Ionicons
+                    name="calendar-outline"
+                    size={16}
+                    color={primaryColor}
+                  />
                   <Text style={[styles.metaText, { color: textColor }]}>
-                    {selectedProject.completionDate.toLocaleDateString('vi-VN')}
+                    {selectedProject.completionDate.toLocaleDateString("vi-VN")}
                   </Text>
                 </View>
                 <View style={styles.metaItem}>
-                  <Ionicons name="time-outline" size={16} color={primaryColor} />
+                  <Ionicons
+                    name="time-outline"
+                    size={16}
+                    color={primaryColor}
+                  />
                   <Text style={[styles.metaText, { color: textColor }]}>
                     {selectedProject.duration}
                   </Text>
                 </View>
                 {selectedProject.budget && (
                   <View style={styles.metaItem}>
-                    <Ionicons name="cash-outline" size={16} color={primaryColor} />
+                    <Ionicons
+                      name="cash-outline"
+                      size={16}
+                      color={primaryColor}
+                    />
                     <Text style={[styles.metaText, { color: textColor }]}>
                       {selectedProject.budget}
                     </Text>
@@ -261,22 +314,31 @@ export function ContractorPortfolio({
                 )}
               </View>
 
-              <Text style={[styles.sectionTitle, { color: textColor }]}>Mô tả</Text>
+              <Text style={[styles.sectionTitle, { color: textColor }]}>
+                Mô tả
+              </Text>
               <Text style={[styles.description, { color: textColor }]}>
                 {selectedProject.description}
               </Text>
 
-              <Text style={[styles.sectionTitle, { color: textColor }]}>Khách hàng</Text>
+              <Text style={[styles.sectionTitle, { color: textColor }]}>
+                Khách hàng
+              </Text>
               <Text style={[styles.clientName, { color: textColor }]}>
                 {selectedProject.client}
               </Text>
 
               {selectedProject.tags.length > 0 && (
                 <>
-                  <Text style={[styles.sectionTitle, { color: textColor }]}>Tags</Text>
+                  <Text style={[styles.sectionTitle, { color: textColor }]}>
+                    Tags
+                  </Text>
                   <View style={styles.tagsContainer}>
                     {selectedProject.tags.map((tag, index) => (
-                      <View key={index} style={[styles.tag, { borderColor: primaryColor }]}>
+                      <View
+                        key={index}
+                        style={[styles.tag, { borderColor: primaryColor }]}
+                      >
                         <Text style={[styles.tagText, { color: primaryColor }]}>
                           {tag}
                         </Text>
@@ -292,7 +354,11 @@ export function ContractorPortfolio({
                     Nhận xét từ khách hàng
                   </Text>
                   <View style={styles.testimonialContainer}>
-                    <Ionicons name="chatbubble-outline" size={20} color={primaryColor} />
+                    <Ionicons
+                      name="chatbubble-outline"
+                      size={20}
+                      color={primaryColor}
+                    />
                     <Text style={[styles.testimonial, { color: textColor }]}>
                       &quot;{selectedProject.testimonial}&quot;
                     </Text>
@@ -319,12 +385,16 @@ export function ContractorPortfolio({
         >
           <Ionicons name="close" size={30} color="white" />
         </TouchableOpacity>
-        
+
         <FlatList
           data={selectedImages}
           horizontal
           pagingEnabled
-          initialScrollIndex={selectedImageIndex > 0 && selectedImageIndex < selectedImages.length ? selectedImageIndex : 0}
+          initialScrollIndex={
+            selectedImageIndex > 0 && selectedImageIndex < selectedImages.length
+              ? selectedImageIndex
+              : 0
+          }
           getItemLayout={(data, index) => ({
             length: screenWidth,
             offset: screenWidth * index,
@@ -384,12 +454,11 @@ export function ContractorPortfolio({
             Chưa có dự án nào
           </Text>
           <Text style={[styles.emptyDescription, { color: textColor }]}>
-            {selectedCategory === 'Tất cả' 
-              ? 'Bắt đầu thêm dự án đầu tiên của bạn'
-              : `Không có dự án nào trong danh mục "${selectedCategory}"`
-            }
+            {selectedCategory === "Tất cả"
+              ? "Bắt đầu thêm dự án đầu tiên của bạn"
+              : `Không có dự án nào trong danh mục "${selectedCategory}"`}
           </Text>
-          {editable && onAddProject && selectedCategory === 'Tất cả' && (
+          {editable && onAddProject && selectedCategory === "Tất cả" && (
             <TouchableOpacity
               style={[styles.emptyButton, { backgroundColor: primaryColor }]}
               onPress={onAddProject}
@@ -412,27 +481,27 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: 20,
     paddingVertical: 16,
   },
   headerTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   addButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 8,
     gap: 4,
   },
   addButtonText: {
-    color: 'white',
-    fontWeight: '500',
+    color: "white",
+    fontWeight: "500",
   },
   categoryFilter: {
     marginBottom: 16,
@@ -441,81 +510,81 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: "#F3F4F6",
     marginRight: 8,
   },
   categoryText: {
     fontSize: 14,
-    color: '#374151',
-    fontWeight: '500',
+    color: "#374151",
+    fontWeight: "500",
   },
   projectsGrid: {
     paddingHorizontal: 16,
     paddingBottom: 20,
   },
   projectRow: {
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
   },
   projectCard: {
     width: (screenWidth - 48) / 2,
     marginBottom: 16,
     borderRadius: 12,
-    overflow: 'hidden',
+    overflow: "hidden",
     elevation: 2,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },
   imageContainer: {
-    position: 'relative',
+    position: "relative",
   },
   projectImage: {
-    width: '100%',
+    width: "100%",
     height: 120,
   },
   imageCount: {
-    position: 'absolute',
+    position: "absolute",
     top: 8,
     right: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.6)',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.6)",
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 10,
     gap: 2,
   },
   imageCountText: {
-    color: 'white',
+    color: "white",
     fontSize: 10,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   cardActions: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 8,
     right: 8,
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 4,
   },
   actionButton: {
     width: 24,
     height: 24,
     borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   projectInfo: {
     padding: 12,
   },
   projectTitle: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 4,
   },
   projectCategory: {
     fontSize: 12,
-    fontWeight: '500',
+    fontWeight: "500",
     marginBottom: 4,
   },
   projectLocation: {
@@ -524,8 +593,8 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   ratingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 2,
   },
   ratingText: {
@@ -535,20 +604,20 @@ const styles = StyleSheet.create({
   },
   emptyState: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     paddingHorizontal: 40,
   },
   emptyTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     marginTop: 16,
     marginBottom: 8,
   },
   emptyDescription: {
     fontSize: 14,
     opacity: 0.7,
-    textAlign: 'center',
+    textAlign: "center",
     lineHeight: 20,
     marginBottom: 24,
   },
@@ -558,24 +627,24 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   emptyButtonText: {
-    color: 'white',
-    fontWeight: '600',
+    color: "white",
+    fontWeight: "600",
   },
   modalContainer: {
     flex: 1,
   },
   modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: 20,
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: "#E5E7EB",
   },
   modalTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   modalContent: {
     flex: 1,
@@ -592,15 +661,15 @@ const styles = StyleSheet.create({
   },
   detailTitle: {
     fontSize: 22,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 16,
   },
   projectMeta: {
     marginBottom: 20,
   },
   metaItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 8,
     gap: 8,
   },
@@ -609,7 +678,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     marginTop: 16,
     marginBottom: 8,
   },
@@ -620,11 +689,11 @@ const styles = StyleSheet.create({
   },
   clientName: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   tagsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 8,
   },
   tag: {
@@ -635,57 +704,57 @@ const styles = StyleSheet.create({
   },
   tagText: {
     fontSize: 12,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   testimonialContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    alignItems: "flex-start",
     gap: 8,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: "#F9FAFB",
     padding: 12,
     borderRadius: 8,
     borderLeftWidth: 3,
-    borderLeftColor: '#0D9488',
+    borderLeftColor: "#0D9488",
   },
   testimonial: {
     flex: 1,
     fontSize: 14,
-    fontStyle: 'italic',
+    fontStyle: "italic",
     lineHeight: 18,
   },
   imageViewerContainer: {
     flex: 1,
-    backgroundColor: 'black',
+    backgroundColor: "black",
   },
   closeImageViewer: {
-    position: 'absolute',
+    position: "absolute",
     top: 50,
     right: 20,
     zIndex: 1,
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   imageViewerSlide: {
     width: screenWidth,
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   fullScreenImage: {
     width: screenWidth,
-    height: '80%',
-    resizeMode: 'contain',
+    height: "80%",
+    resizeMode: "contain",
   },
   imageCounter: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 50,
-    color: 'white',
+    color: "white",
     fontSize: 16,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: "rgba(0,0,0,0.5)",
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,

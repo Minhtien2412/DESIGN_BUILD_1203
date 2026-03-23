@@ -187,7 +187,7 @@ export default function SupportChatScreen() {
           >
             <View style={styles.supportAvatar}>
               <Image
-                source={{ uri: support.avatar }}
+                source={support.avatar ? { uri: support.avatar } : undefined}
                 style={styles.avatarImage}
               />
               <View style={styles.onlineDot} />
@@ -282,7 +282,11 @@ export default function SupportChatScreen() {
         </TouchableOpacity>
 
         <Image
-          source={{ uri: selectedSupport?.avatar }}
+          source={
+            selectedSupport?.avatar
+              ? { uri: selectedSupport.avatar }
+              : undefined
+          }
           style={styles.chatAvatar}
         />
 
