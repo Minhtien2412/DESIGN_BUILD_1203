@@ -254,8 +254,8 @@ class OfflineSyncManager {
   }
 
   private async syncItem(item: SyncItem): Promise<void> {
-    // Import API dynamically to avoid circular dependencies
-    const { apiFetch } = await import('@/services/api');
+    // Use require() for Jest compatibility (dynamic import needs vm modules in Node tests)
+    const { apiFetch } = require('@/services/api');
 
     const endpoints: Record<string, string> = {
       project: '/projects',
