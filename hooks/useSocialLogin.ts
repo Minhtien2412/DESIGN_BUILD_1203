@@ -3,93 +3,32 @@
  * Handle Google, Facebook, and Apple sign-in
  */
 
-import ENV from '@/config/env';
 import { useAuth } from '@/context/AuthContext';
+import { useGoogleAuth } from '@/hooks/useGoogleAuth';
 import { authenticateWithGoogle } from '@/services/google-auth';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Alert, Platform } from 'react-native';
 
 export type SocialProvider = 'google' | 'facebook' | 'apple';
 
-// Safely import Google Sign-In (may not be available in Expo Go)
-let GoogleSignin: any = null;
-try {
-  const GoogleSigninModule = require('@react-native-google-signin/google-signin');
-  GoogleSignin = GoogleSigninModule.GoogleSignin;
-  
-  // Configure Google Sign-In only if available
-  if (GoogleSignin) {
-    GoogleSignin.configure({
-      webClientId: ENV.GOOGLE_WEB_CLIENT_ID || ENV.GOOGLE_CLIENT_ID,
-      iosClientId: ENV.GOOGLE_IOS_CLIENT_ID,
-      offlineAccess: true,
-      hostedDomain: '',
-      forceCodeForRefreshToken: true,
-      accountName: '',
-    });
-  }
-} catch (error) {
-  console.warn('[useSocialLogin] Google Sign-In not available (Expo Go limitation)');
-}
-
 export function useSocialLogin() {
   const [loading, setLoading] = useState(false);
   const { signIn } = useAuth();
-
-  // Check if Google Play Services are available (Android)
-  useEffect(() => {
-    if (GoogleSignin && Platform.OS === 'android') {
-      GoogleSignin.hasPlayServices().catch((error: any) => {
-        console.warn('[GoogleSignIn] Play Services not available:', error);
-      });
-    }
-  }, []);
+  const { signInWithGoogle } = useGoogleAuth();
 
   const loginWithGoogle = useCallback(async () => {
-    if (!GoogleSignin) {
-      Alert.alert(
-        'Not Available',
-        'Google Sign-In requires a development build. It is not available in Expo Go.',
-        [{ text: 'OK' }]
-      );
-      return;
-    }
-
     setLoading(true);
     try {
-      console.log('[useSocialLogin] Starting Google Sign-In...');
-      
-      // Check if Google Play Services are available (Android only)
-      if (Platform.OS === 'android') {
-        await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
-      }
-
-      // Perform Google Sign-In
-      const signInResult = await GoogleSignin.signIn();
-      
-      // Type guard to check if sign-in was successful
-      if (!signInResult || typeof signInResult === 'undefined') {
-        throw new Error('Sign-in result is undefined');
-      }
-
-      // Access data property for user info
-      const userEmail = (signInResult as any).data?.user?.email || '';
-      const userName = (signInResult as any).data?.user?.name || '';
-      const userPhoto = (signInResult as any).data?.user?.photo || '';
-      
-      console.log('[useSocialLogin] Google Sign-In successful:', userEmail);
-
-      // Get ID token
-      const tokens = await GoogleSignin.getTokens();
-      console.log('[useSocialLogin] Got Google tokens');
+      console.log('[useSocialLogin] Starting Google OAuth (expo-auth-session)...');
+      const oauthResult = await signInWithGoogle();
+      console.log('[useSocialLogin] Google OAuth successful:', oauthResult.email);
 
       // Authenticate with backend
       const authResult = await authenticateWithGoogle({
-        idToken: tokens.idToken,
-        serverAuthCode: (signInResult as any).serverAuthCode,
-        email: userEmail,
-        name: userName || undefined,
-        photoUrl: userPhoto || undefined,
+        idToken: oauthResult.token,
+        email: oauthResult.email,
+        name: oauthResult.name,
+        photoUrl: oauthResult.picture,
       });
 
       if (authResult.accessToken && authResult.user) {
@@ -113,25 +52,6 @@ export function useSocialLogin() {
       }
     } catch (error: any) {
       console.error('[useSocialLogin] Google error:', error);
-      
-      // Handle specific error codes
-      if (error.code === 'SIGN_IN_CANCELLED') {
-        console.log('[useSocialLogin] User cancelled Google Sign-In');
-        return { success: false, cancelled: true };
-      }
-      
-      if (error.code === 'IN_PROGRESS') {
-        Alert.alert('Đang xử lý', 'Đăng nhập Google đang được xử lý');
-        return { success: false };
-      }
-      
-      if (error.code === 'PLAY_SERVICES_NOT_AVAILABLE') {
-        Alert.alert(
-          'Lỗi',
-          'Google Play Services không khả dụng. Vui lòng cập nhật Google Play Services.'
-        );
-        return { success: false };
-      }
 
       Alert.alert('Lỗi', error.message || 'Đăng nhập Google thất bại');
       return { success: false, error: error.message };

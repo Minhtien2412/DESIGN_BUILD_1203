@@ -136,10 +136,12 @@ export default ({ config }: { config: any }) => ({
 
     plugins: [
       "expo-router",
+      "expo-font",
       "expo-secure-store",
       "expo-web-browser",
       "expo-sqlite",
       "expo-localization",
+      "@sentry/react-native",
 
       // Contacts for phone book sync (Zalo-style find friends)
       [
@@ -279,6 +281,20 @@ export default ({ config }: { config: any }) => ({
       EXPO_PUBLIC_ENABLE_SOCIAL_FACEBOOK:
         process.env.EXPO_PUBLIC_ENABLE_SOCIAL_FACEBOOK || "1",
 
+      // Firebase (Web SDK config) - required for Firebase Auth on web
+      EXPO_PUBLIC_FIREBASE_API_KEY:
+        process.env.EXPO_PUBLIC_FIREBASE_API_KEY || "",
+      EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN:
+        process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN || "",
+      EXPO_PUBLIC_FIREBASE_PROJECT_ID:
+        process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID || "",
+      EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET:
+        process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET || "",
+      EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID:
+        process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "",
+      EXPO_PUBLIC_FIREBASE_APP_ID:
+        process.env.EXPO_PUBLIC_FIREBASE_APP_ID || "",
+
       // Google OAuth Client IDs (Required for React Native)
       EXPO_PUBLIC_GOOGLE_CLIENT_ID:
         process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID || "",
@@ -393,5 +409,3 @@ export default ({ config }: { config: any }) => ({
     },
   },
 });
-
-// Note: We set android.googleServicesFile and ios.googleServicesFile above when files exist.

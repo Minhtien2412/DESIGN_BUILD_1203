@@ -11,38 +11,48 @@
  * @redesigned 2026-02-25
  */
 
+import { ENV } from "@/config/env";
 import { AUTH_THEME as T } from "@/constants/auth-theme";
 import { DEMO_USERS, DemoUser } from "@/constants/demoUsers";
 import { useAuth } from "@/context/AuthContext";
+import { assertFirebaseReady } from "@/firebase";
+import { useGoogleAuth } from "@/hooks/useGoogleAuth";
+// import { assertFirebaseReady } from "@/services/firebase";
 import { Ionicons } from "@expo/vector-icons";
-import Constants from "expo-constants";
+import * as Facebook from "expo-auth-session/providers/facebook";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import * as WebBrowser from "expo-web-browser";
-import { memo, useCallback, useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    Dimensions,
-    Keyboard,
-    KeyboardAvoidingView,
-    Modal,
-    Platform,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    View,
+  FacebookAuthProvider,
+  getRedirectResult,
+  signInWithCredential,
+  signInWithPopup,
+  signInWithRedirect,
+} from "firebase/auth";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  Dimensions,
+  Keyboard,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
 } from "react-native";
 import Animated, {
-    FadeIn,
-    FadeInDown,
-    FadeInUp,
-    FadeOut,
-    useAnimatedStyle,
-    useSharedValue,
-    withSpring,
+  FadeIn,
+  FadeInDown,
+  FadeInUp,
+  FadeOut,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
 } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -312,12 +322,26 @@ export default function ModernAuthScreen() {
     signIn,
     signUp,
     signInWithGoogleAccessToken,
+    signInWithFacebookAccessToken,
     twoFARegisterSendOtp,
     twoFARegisterVerify,
     twoFALoginRequestOtp,
     twoFALoginVerify,
     loading: authLoading,
   } = useAuth();
+  const {
+    signInWithGoogle: signInWithGoogleOAuth,
+    loading: googleOAuthLoading,
+  } = useGoogleAuth();
+
+  // Facebook OAuth (Meta Developer)
+  const fbAppId = ENV.FACEBOOK_APP_ID || "";
+  const [, , fbPromptAsync] = Facebook.useAuthRequest({
+    clientId: fbAppId,
+    // NOTE: Some Meta app configurations reject "email" scope in dev,
+    // causing "Invalid Scopes: email". Keep minimal scope for stable login.
+    scopes: ["public_profile"],
+  });
 
   const [mode, setMode] = useState<AuthMode>("login");
   const [showPassword, setShowPassword] = useState(false);
@@ -338,6 +362,7 @@ export default function ModernAuthScreen() {
   const [tempToken, setTempToken] = useState<string | null>(null);
   const [otpLoading, setOtpLoading] = useState(false);
   const [otpError, setOtpError] = useState("");
+  const socialInFlightRef = useRef<string | null>(null);
 
   const tabPos = useSharedValue(0);
   const tabIndicatorStyle = useAnimatedStyle(() => ({
@@ -537,92 +562,150 @@ export default function ModernAuthScreen() {
     }
   }, [otpType, formData, twoFARegisterSendOtp, twoFALoginRequestOtp]);
 
+  useEffect(() => {
+    if (Platform.OS !== "web") return;
+    let mounted = true;
+
+    const hydrateFacebookRedirectResult = async () => {
+      try {
+        const firebaseAuth = assertFirebaseReady();
+        const redirectResult = await getRedirectResult(firebaseAuth);
+        if (!mounted || !redirectResult) return;
+        const cred = FacebookAuthProvider.credentialFromResult(redirectResult);
+        const accessToken = (cred as any)?.accessToken as string | undefined;
+        if (!accessToken) return;
+
+        setLoading(true);
+        await signInWithFacebookAccessToken(accessToken);
+        router.replace("/(tabs)");
+      } catch (error) {
+        // Best-effort on first load; don't block screen if no redirect result.
+        console.warn("[Facebook Login] Redirect result skipped:", error);
+      } finally {
+        if (mounted) {
+          setLoading(false);
+          socialInFlightRef.current = null;
+        }
+      }
+    };
+
+    hydrateFacebookRedirectResult();
+    return () => {
+      mounted = false;
+    };
+  }, [router, signInWithFacebookAccessToken]);
+
   const handleSocialLogin = useCallback(
     async (provider: string) => {
+      if (socialInFlightRef.current) {
+        return;
+      }
+      socialInFlightRef.current = provider;
       if (provider === "Google") {
         try {
           setLoading(true);
-          const { makeRedirectUri } = await import("expo-auth-session");
-          const extras = Constants.expoConfig?.extra || {};
-          const clientId =
-            extras.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID ||
-            extras.EXPO_PUBLIC_GOOGLE_CLIENT_ID ||
-            "";
-          if (!clientId) {
-            Alert.alert("Cấu hình thiếu", "Chưa thiết lập Google Client ID.");
-            return;
-          }
-          const redirectUri = makeRedirectUri({
-            scheme: "appdesignbuild",
-            path: "redirect",
-          });
-          const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=${encodeURIComponent("openid email profile")}`;
-          const result = await WebBrowser.openAuthSessionAsync(
-            authUrl,
-            redirectUri,
-          );
-          if (result.type === "success" && result.url) {
-            const params = new URLSearchParams(result.url.split("#")[1]);
-            const accessToken = params.get("access_token");
-            if (accessToken) {
-              await signInWithGoogleAccessToken(accessToken);
-              router.replace("/(tabs)");
-            } else {
-              Alert.alert("Lỗi", "Không nhận được token từ Google.");
-            }
+          // Use unified Google OAuth flow (expo-auth-session) for better reliability.
+          const oauthRes = await signInWithGoogleOAuth();
+          if (oauthRes?.token) {
+            await signInWithGoogleAccessToken(oauthRes.token);
+            router.replace("/(tabs)");
+          } else {
+            Alert.alert("Lỗi", "Không nhận được token từ Google.");
           }
         } catch (error: any) {
           Alert.alert("Lỗi", error?.message || "Đăng nhập Google thất bại.");
         } finally {
+          socialInFlightRef.current = null;
           setLoading(false);
         }
       } else if (provider === "Facebook") {
         try {
           setLoading(true);
-          const { makeRedirectUri } = await import("expo-auth-session");
-          const extras = Constants.expoConfig?.extra || {};
-          const fbAppId = extras.EXPO_PUBLIC_FACEBOOK_APP_ID || "";
-          if (!fbAppId) {
-            Alert.alert(
-              "Cấu hình thiếu",
-              "Chưa thiết lập Facebook App ID. Liên hệ admin.",
+          let firebaseAuth: ReturnType<typeof assertFirebaseReady> | null = null;
+          try {
+            firebaseAuth = assertFirebaseReady();
+          } catch (firebaseConfigError: any) {
+            console.warn(
+              "[Facebook Login] Firebase config missing, trying fallback:",
+              firebaseConfigError?.message,
             );
+          }
+
+          // Web: prefer Firebase popup, fallback to expo-auth-session if Firebase config missing
+          if (Platform.OS === "web") {
+            if (firebaseAuth) {
+              const provider = new FacebookAuthProvider();
+              provider.addScope("public_profile");
+              let res: any;
+              try {
+                res = await signInWithPopup(firebaseAuth, provider);
+              } catch (popupError: any) {
+                const popupCode = popupError?.code || "";
+                if (
+                  popupCode.includes("auth/cancelled-popup-request") ||
+                  popupCode.includes("auth/popup-blocked")
+                ) {
+                  await signInWithRedirect(firebaseAuth, provider);
+                  return;
+                }
+                throw popupError;
+              }
+              const cred = FacebookAuthProvider.credentialFromResult(res);
+              const accessToken = (cred as any)?.accessToken as string | undefined;
+              if (!accessToken) {
+                throw new Error(
+                  "Không nhận được access token từ Firebase/Facebook.",
+                );
+              }
+              await signInWithFacebookAccessToken(accessToken);
+              router.replace("/(tabs)");
+              return;
+            }
+
+            if (!fbAppId) {
+              throw new Error(
+                "Thiếu cấu hình Facebook: hãy thêm EXPO_PUBLIC_FACEBOOK_APP_ID trong .env",
+              );
+            }
+
+            const webFallbackResult = await fbPromptAsync();
+            const fallbackToken = (webFallbackResult as any)?.authentication
+              ?.accessToken as string | undefined;
+
+            if (webFallbackResult?.type === "success" && fallbackToken) {
+              await signInWithFacebookAccessToken(fallbackToken);
+              router.replace("/(tabs)");
+              return;
+            }
+
+            throw new Error(
+              "Không nhận được token từ Facebook (web fallback). Hãy kiểm tra Meta redirect URI.",
+            );
+          }
+
+          // Native/Expo: use Meta OAuth to get access_token, then link with Firebase credential
+          if (!fbAppId) {
+            Alert.alert("Cấu hình thiếu", "Chưa thiết lập Facebook App ID.");
             return;
           }
-          const redirectUri = makeRedirectUri({
-            scheme: "appdesignbuild",
-            path: "redirect",
-          });
-          const fbAuthUrl = `https://www.facebook.com/v18.0/dialog/oauth?client_id=${fbAppId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=${encodeURIComponent("email,public_profile")}`;
-          const result = await WebBrowser.openAuthSessionAsync(
-            fbAuthUrl,
-            redirectUri,
-          );
-          if (result.type === "success" && result.url) {
-            const params = new URLSearchParams(result.url.split("#")[1]);
-            const accessToken = params.get("access_token");
-            if (accessToken) {
-              // Fetch Facebook profile info
-              const fbRes = await fetch(
-                `https://graph.facebook.com/me?fields=id,name,email,picture.type(large)&access_token=${accessToken}`,
-              );
-              const fbUser = await fbRes.json();
-              // Call backend social login
-              const { socialLogin } = require("@/services/api/authApi");
-              await socialLogin("facebook", {
-                token: accessToken,
-                email: fbUser.email,
-                name: fbUser.name,
-                picture: fbUser.picture?.data?.url,
-              });
-              router.replace("/(tabs)");
-            } else {
-              Alert.alert("Lỗi", "Không nhận được token từ Facebook.");
+          const result = await fbPromptAsync();
+          const accessToken = (result as any)?.authentication?.accessToken;
+
+          if (result?.type === "success" && accessToken) {
+            const credential = FacebookAuthProvider.credential(accessToken);
+            if (firebaseAuth) {
+              await signInWithCredential(firebaseAuth, credential);
             }
+            await signInWithFacebookAccessToken(accessToken);
+            router.replace("/(tabs)");
+          } else {
+            Alert.alert("Lỗi", "Không nhận được token từ Facebook.");
           }
         } catch (error: any) {
+          console.error("[Facebook Login] Error:", error);
           Alert.alert("Lỗi", error?.message || "Đăng nhập Facebook thất bại.");
         } finally {
+          socialInFlightRef.current = null;
           setLoading(false);
         }
       } else if (provider === "Apple") {
@@ -664,6 +747,7 @@ export default function ModernAuthScreen() {
             }
           }
         } finally {
+          socialInFlightRef.current = null;
           setLoading(false);
         }
       } else {
@@ -671,9 +755,16 @@ export default function ModernAuthScreen() {
           "Thông báo",
           `Đăng nhập với ${provider} sẽ sớm được hỗ trợ!`,
         );
+        socialInFlightRef.current = null;
       }
     },
-    [signInWithGoogleAccessToken, router],
+    [
+      signInWithGoogleAccessToken,
+      signInWithGoogleOAuth,
+      signInWithFacebookAccessToken,
+      fbPromptAsync,
+      router,
+    ],
   );
 
   const handleDemoUserSelect = useCallback(
@@ -693,6 +784,7 @@ export default function ModernAuthScreen() {
   );
 
   const isLoading = loading || authLoading;
+  const isLoadingCombined = isLoading || googleOAuthLoading;
 
   // ───── Render ─────
   return (
@@ -781,7 +873,7 @@ export default function ModernAuthScreen() {
                     onChangeText={(v) => updateField("name", v)}
                     autoCapitalize="words"
                     error={errors.name}
-                    disabled={isLoading}
+                    disabled={isLoadingCombined}
                     delay={50}
                   />
                 )}
@@ -793,7 +885,7 @@ export default function ModernAuthScreen() {
                   onChangeText={(v) => updateField("email", v)}
                   keyboardType="email-address"
                   error={errors.email}
-                  disabled={isLoading}
+                  disabled={isLoadingCombined}
                   delay={100}
                 />
 
@@ -804,7 +896,7 @@ export default function ModernAuthScreen() {
                   onChangeText={(v) => updateField("password", v)}
                   secureTextEntry={!showPassword}
                   error={errors.password}
-                  disabled={isLoading}
+                  disabled={isLoadingCombined}
                   showPasswordToggle
                   onTogglePassword={() => setShowPassword(!showPassword)}
                   delay={150}
@@ -822,7 +914,7 @@ export default function ModernAuthScreen() {
                     onChangeText={(v) => updateField("confirmPassword", v)}
                     secureTextEntry={!showPassword}
                     error={errors.confirmPassword}
-                    disabled={isLoading}
+                    disabled={isLoadingCombined}
                     delay={200}
                   />
                 )}
@@ -848,7 +940,7 @@ export default function ModernAuthScreen() {
                         keyboardType="phone-pad"
                         autoCapitalize="none"
                         autoCorrect={false}
-                        editable={!isLoading}
+                        editable={!isLoadingCombined}
                         selectionColor={T.primaryLight}
                       />
                     </View>
@@ -876,7 +968,7 @@ export default function ModernAuthScreen() {
                       isLoading && { opacity: 0.6 },
                     ]}
                     onPress={handleSubmit}
-                    disabled={isLoading}
+                    disabled={isLoadingCombined}
                   >
                     <LinearGradient
                       colors={[T.primary, T.primaryDark]}
@@ -930,7 +1022,7 @@ export default function ModernAuthScreen() {
               {/* Demo */}
               <DemoUserPicker
                 onSelectUser={handleDemoUserSelect}
-                disabled={isLoading}
+                disabled={isLoadingCombined}
               />
             </Animated.View>
 

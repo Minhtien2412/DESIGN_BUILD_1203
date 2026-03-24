@@ -42,22 +42,44 @@ interface UseGoogleAuthReturn {
 export function useGoogleAuth(): UseGoogleAuthReturn {
   const [loading, setLoading] = useState(false);
 
-  // Get Google Client ID from env
-  // This MUST be a Web Application OAuth Client ID
-  const googleClientId = ENV.GOOGLE_CLIENT_ID || '702679918765-ikhpcev251dh2ndd5cpqkqearkmips34.apps.googleusercontent.com';
+  const isLocalhostWeb =
+    Platform.OS === 'web' &&
+    typeof window !== 'undefined' &&
+    (window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1');
 
-  // Build redirect URI - use Expo proxy for mobile (required for Expo Go)
-  const redirectUri = AuthSession.makeRedirectUri({
-    // For standalone/dev builds, use custom scheme
-    scheme: 'appdesignbuild',
-    // Note: useProxy removed - handled automatically by Expo
-  });
+  // Select correct OAuth client for each platform.
+  // - Web must use GOOGLE_WEB_CLIENT_ID (otherwise redirectUri validation may fail)
+  // - Native must use the platform-specific clientId.
+  const googleClientId =
+    Platform.OS === "web"
+      ? ENV.GOOGLE_WEB_CLIENT_ID || ENV.GOOGLE_CLIENT_ID || ""
+      : Platform.OS === "android"
+        ? ENV.GOOGLE_ANDROID_CLIENT_ID || ENV.GOOGLE_CLIENT_ID || ""
+        : ENV.GOOGLE_IOS_CLIENT_ID || ENV.GOOGLE_CLIENT_ID || "";
+
+  // Build redirect URI.
+  // - Mobile uses custom scheme
+  // - Web uses the current origin + "/redirect" (must be whitelisted in Google Console)
+  // In dev (localhost), using Expo proxy is often more reliable because Google redirect whitelist is strict.
+  const useProxy = Platform.OS !== 'web' || isLocalhostWeb;
+  const redirectUri =
+    Platform.OS === "web"
+      ? AuthSession.makeRedirectUri({
+          path: "redirect",
+          ...(useProxy ? ({ useProxy } as any) : {}),
+        } as any)
+      : AuthSession.makeRedirectUri({
+          scheme: "appdesignbuild",
+          path: "redirect",
+          ...(useProxy ? ({ useProxy } as any) : {}),
+        } as any);
 
   console.log('[Google OAuth] Config:', {
-    clientId: googleClientId.substring(0, 20) + '...',
+    clientId: googleClientId ? googleClientId.substring(0, 20) + "..." : "",
     redirectUri,
     platform: Platform.OS,
-    useProxy: Platform.OS !== 'web',
+    useProxy,
   });
 
   /**
@@ -74,6 +96,9 @@ export function useGoogleAuth(): UseGoogleAuthReturn {
 
     try {
       console.log('[Google OAuth] Starting OAuth flow...');
+      if (!googleClientId) {
+        throw new Error("Missing Google OAuth client id for this platform.");
+      }
 
       // Create auth request with proper configuration
       const authRequest = new AuthSession.AuthRequest({
@@ -82,10 +107,16 @@ export function useGoogleAuth(): UseGoogleAuthReturn {
         redirectUri,
         responseType: AuthSession.ResponseType.Token,
         usePKCE: false, // Implicit flow doesn't use PKCE
+        extraParams: {
+          prompt: 'select_account',
+        },
       });
 
       // Prompt user to authenticate
-      const result = await authRequest.promptAsync(discovery);
+      const result = await authRequest.promptAsync(
+        discovery,
+        (useProxy ? ({ useProxy } as any) : undefined) as any,
+      );
 
       console.log('[Google OAuth] Result type:', result.type);
 

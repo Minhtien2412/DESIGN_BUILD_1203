@@ -2,23 +2,34 @@ import { hasPermission as checkRolePermission } from "@/constants/roles";
 import type { User as ApiUser } from "@/services/api/authApi";
 import authApi, { getCurrentUser, socialLogin } from "@/services/api/authApi";
 import {
-    calculateExpiryTimestamp,
-    clearTokens,
-    getAccessToken,
-    getRefreshToken as getStoredRefreshToken,
-    saveTokens,
+  calculateExpiryTimestamp,
+  clearTokens,
+  getAccessToken,
+  getRefreshToken as getStoredRefreshToken,
+  saveTokens,
 } from "@/services/token.service";
 import { UserType } from "@/types/auth";
 import { Permission } from "@/utils/permissions";
 import { deleteItem, setItem } from "@/utils/storage";
 import { router } from "expo-router";
 import {
-    createContext,
-    ReactNode,
-    useContext,
-    useEffect,
-    useState,
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
 } from "react";
+
+const ALLOWED_BACKEND_ROLES = new Set([
+  "CLIENT",
+  "ENGINEER",
+  "CONTRACTOR",
+  "ARCHITECT",
+  "DESIGNER",
+  "SUPPLIER",
+  "STAFF",
+  "ADMIN",
+]);
 
 export interface User {
   id: string;
@@ -176,6 +187,7 @@ interface AuthContextType extends AuthState {
     clientId?: string,
   ) => Promise<void>; // ID Token verification
   signInWithGoogleAccessToken: (accessToken: string) => Promise<void>; // Implicit Flow
+  signInWithFacebookAccessToken: (accessToken: string) => Promise<void>; // Implicit Flow
   signInWithFacebook: () => Promise<void>;
   signOut: () => Promise<void>;
   refreshUser: () => Promise<void>;
@@ -410,6 +422,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setRefreshToken(authResponse.refreshToken);
 
       const user = mapUser(authResponse.user);
+      if (!user.role || !ALLOWED_BACKEND_ROLES.has(user.role)) {
+        await clearTokens();
+        setState({
+          user: null,
+          loading: false,
+          isAuthenticated: false,
+          accessToken: null,
+        });
+        throw new Error("Tài khoản của bạn không có quyền truy cập (role).");
+      }
 
       console.log("[AuthContext] Sign in successful");
       setState({
@@ -740,6 +762,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setRefreshToken(response.refreshToken);
 
         const user = mapUser(response.user);
+        if (!user.role || !ALLOWED_BACKEND_ROLES.has(user.role)) {
+          await clearTokens();
+          setState({
+            user: null,
+            loading: false,
+            isAuthenticated: false,
+            accessToken: null,
+          });
+          throw new Error("Tài khoản Google của bạn không có quyền truy cập (role).");
+        }
         setState({
           user,
           loading: false,
@@ -775,6 +807,63 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setRefreshToken(response.refreshToken);
 
         const user = mapUser(response.user);
+        if (!user.role || !ALLOWED_BACKEND_ROLES.has(user.role)) {
+          await clearTokens();
+          setState({
+            user: null,
+            loading: false,
+            isAuthenticated: false,
+            accessToken: null,
+          });
+          throw new Error("Tài khoản Google của bạn không có quyền truy cập (role).");
+        }
+        setState({
+          user,
+          loading: false,
+          isAuthenticated: true,
+          accessToken: response.accessToken,
+        });
+      }
+    } catch (error: any) {
+      setState((prev) => ({ ...prev, loading: false }));
+      throw error;
+    }
+  };
+
+  // Send Facebook access token to backend via unified social login endpoint
+  const signInWithFacebookAccessToken = async (accessToken: string) => {
+    try {
+      setState((prev) => ({ ...prev, loading: true }));
+
+      const response = await socialLogin("FACEBOOK", {
+        token: accessToken,
+      });
+
+      if (response.accessToken && response.user) {
+        const expiresAt = calculateExpiryTimestamp("30d");
+        await saveTokens({
+          accessToken: response.accessToken,
+          refreshToken: response.refreshToken,
+          expiresAt,
+        });
+
+        const { setToken, setRefreshToken } = await import("../services/api");
+        setToken(response.accessToken);
+        setRefreshToken(response.refreshToken);
+
+        const user = mapUser(response.user);
+        if (!user.role || !ALLOWED_BACKEND_ROLES.has(user.role)) {
+          await clearTokens();
+          setState({
+            user: null,
+            loading: false,
+            isAuthenticated: false,
+            accessToken: null,
+          });
+          throw new Error(
+            "Tài khoản Facebook của bạn không có quyền truy cập (role).",
+          );
+        }
         setState({
           user,
           loading: false,
@@ -1559,6 +1648,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signInWithGoogleCode,
         signInWithGoogleToken,
         signInWithGoogleAccessToken,
+        signInWithFacebookAccessToken,
         signInWithFacebook,
         signOut,
         refreshUser,
