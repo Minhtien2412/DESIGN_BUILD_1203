@@ -6,7 +6,51 @@
 import {
     canManageDepartments,
     canViewDepartment,
+} from "@/constants/staffPermissions";/**
+ * Departments Management Screen — Quản lý phòng ban
+ * New permission system from constants/staffPermissions
+ */
+
+import {
+    canManageDepartments,
+    canViewDepartment,
 } from "@/constants/staffPermissions";
+import { Colors } from "@/constants/theme";
+import { useAuth } from "@/context/AuthContext";
+import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useDepartments } from "@/hooks/useDepartments";
+import { createDepartment, updateDepartment } from "@/services/staffService";
+import { CompanyRole, type Department } from "@/types/staff";
+import { Ionicons } from "@expo/vector-icons";
+import { Stack } from "expo-router";
+import { useCallback, useMemo, useState } from "react";
+import {
+    ActivityIndicator,
+    Alert,
+    FlatList,
+    Modal,
+    Pressable,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
+} from "react-native";
+
+export default function DepartmentsScreen() {
+  const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme ?? "light"];
+  const { user } = useAuth();
+
+  const userRole = useMemo<CompanyRole>(() => {
+    const r = user?.role as CompanyRole | undefined;
+    if (r && Object.values(CompanyRole).includes(r)) return r;
+    if (user?.admin) return CompanyRole.ADMIN;
+    return CompanyRole.STAFF;
+  }, [user]);
+
+  const canView = canViewDepartment(userRole) || !!user?.admin;
+  const canManage = canManageDepartments(userRole) || !…
 import { Colors } from "@/constants/theme";
 import { useAuth } from "@/context/AuthContext";
 import { useColorScheme } from "@/hooks/use-color-scheme";
