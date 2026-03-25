@@ -69,6 +69,70 @@ export const customerDesignItems: HomeIconItem[] = [
   { id: "design-ai", label: "Công cụ AI", icon: HOME_UI_ICONS.congCuAi },
 ];
 
+export const customerConstructionItems: HomeIconItem[] = [
+  { id: "construction-ep-coc", label: "Ép cọc", icon: HOME_UI_ICONS.epCoc },
+  { id: "construction-dao-dat", label: "Đào đất", icon: HOME_UI_ICONS.daoDat },
+  {
+    id: "construction-vat-lieu",
+    label: "Vật liệu",
+    icon: HOME_UI_ICONS.vatLieu,
+  },
+  {
+    id: "construction-nhan-cong",
+    label: "Nhân công",
+    icon: HOME_UI_ICONS.nhanCongXayDung,
+  },
+  { id: "construction-tho-xay", label: "Thợ xây", icon: HOME_UI_ICONS.thoXay },
+  { id: "construction-tho-sat", label: "Thợ sắt", icon: HOME_UI_ICONS.thoSat },
+  {
+    id: "construction-tho-coffa",
+    label: "Thợ cốt pha",
+    icon: HOME_UI_ICONS.thoCoffa,
+  },
+  {
+    id: "construction-tho-dien-nuoc",
+    label: "Điện nước",
+    icon: HOME_UI_ICONS.thoDienNuoc,
+  },
+  { id: "construction-be-tong", label: "Bê tông", icon: HOME_UI_ICONS.beTong },
+  {
+    id: "construction-xem-them",
+    label: "Xem thêm",
+    icon: HOME_UI_ICONS.xemThem,
+  },
+];
+
+export const customerFinishingItems: HomeIconItem[] = [
+  {
+    id: "finishing-op-gach",
+    label: "Thợ lát gạch",
+    icon: HOME_UI_ICONS.thoOpGach,
+  },
+  {
+    id: "finishing-thach-cao",
+    label: "Thợ thạch cao",
+    icon: HOME_UI_ICONS.thoThachCao,
+  },
+  { id: "finishing-tho-son", label: "Thợ sơn", icon: HOME_UI_ICONS.thoSon },
+  { id: "finishing-tho-da", label: "Thợ đá", icon: HOME_UI_ICONS.thoDa },
+  {
+    id: "finishing-tho-lam-cua",
+    label: "Thợ làm cửa",
+    icon: HOME_UI_ICONS.thoLamCua,
+  },
+  {
+    id: "finishing-tho-lan-can",
+    label: "Lan can",
+    icon: HOME_UI_ICONS.thoLanCan,
+  },
+  { id: "finishing-tho-cong", label: "Thợ cổng", icon: HOME_UI_ICONS.thoCong },
+  {
+    id: "finishing-tho-camera",
+    label: "Thợ camera",
+    icon: HOME_UI_ICONS.thoCamera,
+  },
+];
+
 export const customerMaintenanceItems: HomeIconItem[] = [
   {
     id: "maintenance-may-giat",
@@ -164,6 +228,8 @@ export const customerFurnitureProducts: HomeProductItem[] = [
 export const customerHomeBanners = {
   hero: HOME_UI_BANNERS.heroCustomer,
   design: HOME_UI_BANNERS.design,
+  construction: HOME_UI_BANNERS.construction,
+  finishing: HOME_UI_BANNERS.finishing,
   maintenance: HOME_UI_BANNERS.maintenance,
   interiorDeal: HOME_UI_BANNERS.interiorDeal,
 };

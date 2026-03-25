@@ -76,11 +76,11 @@ export const HOME_UI_CONTROL_ICONS = {
 export const HOME_UI_BANNERS = {
   heroWorker: require("@/assets/banner/banner-home-1.jpg"),
   heroCustomer: require("@/assets/banner/banner-home-2.jpg"),
-  design: require("@/assets/banner/Bộ Banner/tiện ích thiết kế.jpg"),
+  design: require("@/assets/banner/bo-banner/tien-ich-thiet-ke.jpg"),
   construction: require("@/assets/banner/Bộ Banner/tìm thợ nhanh.jpg"),
   finishing: require("@/assets/banner/Bộ Banner/Tìm thợ.jpg"),
   maintenance: require("@/assets/banner/Bộ Banner/tiện ích bảo trì.jpg"),
-  interiorDeal: require("@/assets/banner/Bộ Banner/TIỆN ÍCH NỘI THẤT 2.jpg"),
+  interiorDeal: require("@/assets/banner/bo-banner/tien-ich-noi-that-2.jpg"),
 } satisfies Record<string, ImageSourcePropType>;
 
 export const HOME_UI_MEDIA = {

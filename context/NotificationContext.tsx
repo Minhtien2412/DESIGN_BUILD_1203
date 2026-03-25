@@ -1,6 +1,6 @@
-import { ENV } from "@/config/env";
 import { NOTIFICATION_ENDPOINTS } from "@/constants/api-endpoints";
 import { apiFetch } from "@/services/api";
+import { notificationSocket } from "@/services/socket/notificationSocket";
 import {
     createContext,
     ReactNode,
@@ -11,8 +11,6 @@ import {
     useState,
 } from "react";
 import Toast from "react-native-toast-message";
-import { getSocketIo } from "@/utils/socketIo";
-import type { Socket } from "@/utils/socketIo";
 import { useAuth } from "./AuthContext";
 
 // Types
@@ -67,7 +65,8 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
 
-  const socketRef = useRef<Socket | null>(null);
+  /** Cleanup functions for shared socket subscriptions */
+  const unsubsRef = useRef<Array<() => void>>([]);
 
   // Fetch notifications from backend
   const fetchNotifications = async () => {
@@ -196,180 +195,76 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  // WebSocket connection setup - DISABLED to prevent infinite loop
+  // ── WebSocket via shared singleton (NO duplicate io() call) ──
   useEffect(() => {
-    // ENABLED: Using BadgeSyncService for unified WebSocket handling
-    // Real-time notifications now handled by BadgeSyncService in UnifiedBadgeContext
-    const ENABLE_NOTIFICATION_WEBSOCKET = true;
-
     if (!user) {
-      // Cleanup socket if user logs out
-      if (socketRef.current) {
-        console.log(
-          "[Notifications] User logged out - disconnecting WebSocket",
-        );
-        socketRef.current.disconnect();
-        socketRef.current = null;
-        setIsConnected(false);
-      }
+      unsubsRef.current.forEach((fn) => fn());
+      unsubsRef.current = [];
+      setIsConnected(false);
       return;
     }
 
-    if (!ENABLE_NOTIFICATION_WEBSOCKET) {
-      console.log(
-        "[Notifications] WebSocket disabled - using REST API polling",
-      );
+    const userId =
+      typeof user.id === "number" ? user.id : parseInt(String(user.id), 10);
+    if (isNaN(userId) || userId <= 0) {
+      console.warn("[Notifications] Invalid userId, skipping WS");
       return;
     }
 
     console.log(
-      "[Notifications] Setting up WebSocket connection for user:",
-      user.id,
+      "[Notifications] Subscribing to shared socket for user:",
+      userId,
     );
 
-    // Build WebSocket URL with proper notifications namespace
-    const wsBaseUrl = ENV.WS_BASE_URL || ENV.WS_URL || "wss://baotienweb.cloud";
-    const notificationNs = ENV.WS_NOTIFICATION_NS || "/notifications";
-    const wsUrl = `${wsBaseUrl}${notificationNs}`;
+    notificationSocket.connect(userId).then(() => {
+      // Clean previous subscriptions
+      unsubsRef.current.forEach((fn) => fn());
+      unsubsRef.current = [];
 
-    if (!wsBaseUrl) {
-      console.warn(
-        "[Notifications] WS_BASE_URL not configured, skipping WebSocket connection",
+      const unsubs: Array<() => void> = [];
+
+      unsubs.push(
+        notificationSocket.on("connect", () => {
+          console.log("[Notifications] Shared socket connected");
+          setIsConnected(true);
+        }),
       );
-      return;
-    }
-    console.log("[Notifications] Connecting to:", wsUrl);
-
-    // Ensure userId is a valid number
-    const userId =
-      typeof user.id === "number" ? user.id : parseInt(String(user.id), 10);
-    if (isNaN(userId) || userId <= 0) {
-      console.warn(
-        "[Notifications] Invalid userId, skipping WebSocket connection",
+      unsubs.push(
+        notificationSocket.on("disconnect", () => {
+          setIsConnected(false);
+        }),
       );
-      return;
-    }
-
-    let pingInterval: ReturnType<typeof setInterval> | null = null;
-
-    // Create Socket.IO connection
-    getSocketIo()
-      .then((io) => {
-        const socket = io(wsUrl, {
-      transports: ["websocket", "polling"], // Try WebSocket first, fallback to polling
-      reconnection: false, // Disable auto-reconnection to prevent loop
-      timeout: 10000,
-        });
-
-    // Connection event
-    socket.on("connect", () => {
-      console.log(
-        "[Notifications] WebSocket connected - Socket ID:",
-        socket.id,
+      unsubs.push(
+        notificationSocket.on("notification", (notification: Notification) => {
+          setNotifications((prev) => {
+            const exists = prev.find((n) => n.id === notification.id);
+            if (exists) return prev;
+            return [notification, ...prev];
+          });
+          if (!notification.read) {
+            setUnreadCount((prev) => prev + 1);
+          }
+          showNotificationToast(notification);
+        }),
       );
-      setIsConnected(true);
-
-      // Register user for notifications with valid number userId
-      console.log("[Notifications] Registering user:", userId);
-      socket.emit("register", { userId: userId });
-    });
-
-    // Connection confirmation
-    socket.on("connected", (data: { message?: string; socketId?: string }) => {
-      console.log("[Notifications] Connected to server:", data);
-    });
-
-    // Registration confirmation
-    socket.on("registered", (data: { userId?: string; success?: boolean }) => {
-      console.log("[Notifications] ✅ Registered successfully:", data);
-    });
-
-    // Receive real-time notification
-    socket.on("notification", (notification: Notification) => {
-      console.log(
-        "[Notifications] 🔔 Received real-time notification:",
-        notification,
+      unsubs.push(
+        notificationSocket.on("broadcast", (notification: any) => {
+          showNotificationToast(notification);
+        }),
       );
 
-      // Add to state at the beginning
-      setNotifications((prev) => {
-        // Avoid duplicates (check by ID)
-        const exists = prev.find((n) => n.id === notification.id);
-        if (exists) return prev;
-        return [notification, ...prev];
-      });
-
-      // Increment unread count if not read
-      if (!notification.read) {
-        setUnreadCount((prev) => prev + 1);
-      }
-
-      // Show toast
-      showNotificationToast(notification);
+      unsubsRef.current = unsubs;
+      setIsConnected(notificationSocket.connected);
     });
 
-    // Broadcast notifications (system-wide)
-    socket.on("broadcast", (notification: any) => {
-      console.log("[Notifications] 📢 Broadcast received:", notification);
-      showNotificationToast(notification);
-    });
-
-    // Disconnect event
-    socket.on("disconnect", (reason: string) => {
-      console.log("[Notifications] WebSocket disconnected:", reason);
-      setIsConnected(false);
-    });
-
-    // Connection error
-    socket.on("connect_error", (error: Error) => {
-      console.error(
-        "[Notifications] WebSocket connection error:",
-        error.message,
-      );
-      setIsConnected(false);
-    });
-
-    // General error
-    socket.on("error", (error: Error) => {
-      console.error("[Notifications] WebSocket error:", error);
-    });
-
-    // Ping-pong for connection health check
-    pingInterval = setInterval(() => {
-      if (socket.connected) {
-        socket.emit("ping");
-      }
-    }, 30000); // Every 30 seconds
-
-    socket.on("pong", (data: unknown) => {
-      console.log("[Notifications] Pong received:", data);
-    });
-
-    socketRef.current = socket;
-      })
-      .catch((error) => {
-        console.warn(
-          "[Notifications] WebSocket init failed (skipping):",
-          error,
-        );
-        setIsConnected(false);
-      });
-
-    // Cleanup on unmount
     return () => {
-      console.log("[Notifications] Cleaning up WebSocket connection");
-      if (pingInterval) {
-        clearInterval(pingInterval);
-      }
-      if (socketRef.current) {
-        socketRef.current.disconnect();
-        socketRef.current = null;
-      }
+      unsubsRef.current.forEach((fn) => fn());
+      unsubsRef.current = [];
       setIsConnected(false);
     };
   }, [user, showNotificationToast]);
 
-  // Initial fetch and polling setup (fallback if WebSocket fails)
+  // Initial fetch + fallback polling (only when WS is down)
   useEffect(() => {
     if (!user) {
       setNotifications([]);
@@ -377,21 +272,16 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    // Delay initial fetch to ensure token is set in API service
     const initialFetchTimer = setTimeout(() => {
       fetchNotifications();
     }, 100);
 
-    // Poll every 60 seconds (increased since WebSocket handles real-time)
     const pollInterval = setInterval(() => {
-      // Only poll if WebSocket is not connected (fallback)
       if (!isConnected) {
-        console.log("[Notifications] WebSocket offline - polling via REST API");
         fetchNotifications();
       }
-    }, 60000); // 60 seconds
+    }, 60000);
 
-    // Cleanup
     return () => {
       clearTimeout(initialFetchTimer);
       clearInterval(pollInterval);
@@ -402,7 +292,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     notifications,
     unreadCount,
     loading,
-    isConnected, // Expose connection status
+    isConnected,
     refreshNotifications,
     markAsRead,
     markAllAsRead,

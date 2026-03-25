@@ -1,7 +1,7 @@
 /**
  * Socket Module - Real-time Communication
  * Socket.IO client for chat, notifications, and signaling
- * 
+ *
  * Features:
  * - Auto-reconnection with exponential backoff
  * - Room management
@@ -10,16 +10,13 @@
  * - Message acknowledgments
  */
 
-import {
-    CallEvent,
-    ChatEvent,
-    StreamEvent
-} from './types';
+import { getWsBaseUrl } from "@/services/socket/socketConfig";
+import { CallEvent, ChatEvent, StreamEvent } from "./types";
 
 // ==================== CONSTANTS ====================
 
 const DEFAULT_OPTIONS: SocketConfig = {
-  url: process.env.EXPO_PUBLIC_WS_URL || 'wss://baotienweb.cloud',
+  url: getWsBaseUrl(),
   autoConnect: true,
   reconnection: true,
   reconnectionAttempts: 10,
@@ -41,7 +38,12 @@ export interface SocketConfig {
   auth?: Record<string, string>;
 }
 
-export type SocketStatus = 'disconnected' | 'connecting' | 'connected' | 'reconnecting' | 'error';
+export type SocketStatus =
+  | "disconnected"
+  | "connecting"
+  | "connected"
+  | "reconnecting"
+  | "error";
 
 export type CommunicationEventType = CallEvent | ChatEvent | StreamEvent;
 
@@ -52,7 +54,7 @@ type EventCallback<T = unknown> = (data: T) => void;
 export class SocketManager {
   private socket: WebSocket | null = null;
   private config: SocketConfig;
-  private status: SocketStatus = 'disconnected';
+  private status: SocketStatus = "disconnected";
   private reconnectAttempts = 0;
   private reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
   private heartbeatInterval: ReturnType<typeof setInterval> | null = null;
@@ -62,7 +64,7 @@ export class SocketManager {
 
   constructor(config: Partial<SocketConfig> = {}) {
     this.config = { ...DEFAULT_OPTIONS, ...config };
-    
+
     if (this.config.autoConnect) {
       this.connect();
     }
@@ -75,14 +77,14 @@ export class SocketManager {
    */
   connect(auth?: { userId: string; token: string }): void {
     if (this.socket?.readyState === WebSocket.OPEN) {
-      console.log('[Socket] Already connected');
+      console.log("[Socket] Already connected");
       return;
     }
 
-    this.status = 'connecting';
-    this.emit('status', this.status);
+    this.status = "connecting";
+    this.emit("status", this.status);
 
-    const url = auth 
+    const url = auth
       ? `${this.config.url}?userId=${auth.userId}&token=${auth.token}`
       : this.config.url;
 
@@ -94,7 +96,7 @@ export class SocketManager {
       this.socket = new WebSocket(url);
       this.setupSocketHandlers();
     } catch (error) {
-      console.error('[Socket] Connection error:', error);
+      console.error("[Socket] Connection error:", error);
       this.handleConnectionError();
     }
   }
@@ -105,14 +107,14 @@ export class SocketManager {
   disconnect(): void {
     this.stopHeartbeat();
     this.clearReconnectTimeout();
-    
+
     if (this.socket) {
       this.socket.close();
       this.socket = null;
     }
-    
-    this.status = 'disconnected';
-    this.emit('status', this.status);
+
+    this.status = "disconnected";
+    this.emit("status", this.status);
   }
 
   /**
@@ -122,31 +124,31 @@ export class SocketManager {
     if (!this.socket) return;
 
     this.socket.onopen = () => {
-      console.log('[Socket] Connected');
-      this.status = 'connected';
+      console.log("[Socket] Connected");
+      this.status = "connected";
       this.reconnectAttempts = 0;
-      this.emit('status', this.status);
-      this.emit('connected');
+      this.emit("status", this.status);
+      this.emit("connected");
       this.startHeartbeat();
       this.flushMessageQueue();
     };
 
     this.socket.onclose = (event) => {
-      console.log('[Socket] Disconnected:', event.code, event.reason);
+      console.log("[Socket] Disconnected:", event.code, event.reason);
       this.stopHeartbeat();
-      
+
       if (event.code !== 1000 && this.config.reconnection) {
         this.handleReconnect();
       } else {
-        this.status = 'disconnected';
-        this.emit('status', this.status);
-        this.emit('disconnected', { code: event.code, reason: event.reason });
+        this.status = "disconnected";
+        this.emit("status", this.status);
+        this.emit("disconnected", { code: event.code, reason: event.reason });
       }
     };
 
     this.socket.onerror = (error) => {
-      console.error('[Socket] Error:', error);
-      this.emit('error', error);
+      console.error("[Socket] Error:", error);
+      this.emit("error", error);
     };
 
     this.socket.onmessage = (event) => {
@@ -154,7 +156,7 @@ export class SocketManager {
         const data = JSON.parse(event.data);
         this.handleMessage(data);
       } catch (error) {
-        console.error('[Socket] Failed to parse message:', error);
+        console.error("[Socket] Failed to parse message:", error);
       }
     };
   }
@@ -166,7 +168,7 @@ export class SocketManager {
     const { type, payload } = data;
 
     // Handle pong
-    if (type === 'pong') {
+    if (type === "pong") {
       return;
     }
 
@@ -174,15 +176,15 @@ export class SocketManager {
     this.emit(type, payload);
 
     // Also emit to 'message' for generic handling
-    this.emit('message', data);
+    this.emit("message", data);
   }
 
   // ==================== RECONNECTION ====================
 
   private handleConnectionError(): void {
-    this.status = 'error';
-    this.emit('status', this.status);
-    
+    this.status = "error";
+    this.emit("status", this.status);
+
     if (this.config.reconnection) {
       this.handleReconnect();
     }
@@ -190,23 +192,26 @@ export class SocketManager {
 
   private handleReconnect(): void {
     if (this.reconnectAttempts >= (this.config.reconnectionAttempts || 10)) {
-      console.log('[Socket] Max reconnection attempts reached');
-      this.status = 'error';
-      this.emit('status', this.status);
-      this.emit('reconnectFailed');
+      console.log("[Socket] Max reconnection attempts reached");
+      this.status = "error";
+      this.emit("status", this.status);
+      this.emit("reconnectFailed");
       return;
     }
 
-    this.status = 'reconnecting';
-    this.emit('status', this.status);
+    this.status = "reconnecting";
+    this.emit("status", this.status);
 
     const delay = Math.min(
-      (this.config.reconnectionDelay || 1000) * Math.pow(2, this.reconnectAttempts),
-      this.config.reconnectionDelayMax || 30000
+      (this.config.reconnectionDelay || 1000) *
+        Math.pow(2, this.reconnectAttempts),
+      this.config.reconnectionDelayMax || 30000,
     );
 
     this.reconnectAttempts++;
-    console.log(`[Socket] Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts})`);
+    console.log(
+      `[Socket] Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts})`,
+    );
 
     this.reconnectTimeout = setTimeout(() => {
       this.connect();
@@ -224,7 +229,7 @@ export class SocketManager {
 
   private startHeartbeat(): void {
     this.heartbeatInterval = setInterval(() => {
-      this.send('ping', {});
+      this.send("ping", {});
     }, 30000);
   }
 
@@ -265,14 +270,14 @@ export class SocketManager {
    * Join a room
    */
   joinRoom(roomId: string): void {
-    this.send('room:join', { roomId });
+    this.send("room:join", { roomId });
   }
 
   /**
    * Leave a room
    */
   leaveRoom(roomId: string): void {
-    this.send('room:leave', { roomId });
+    this.send("room:leave", { roomId });
   }
 
   // ==================== CHAT METHODS ====================
@@ -280,8 +285,12 @@ export class SocketManager {
   /**
    * Send chat message
    */
-  sendMessage(conversationId: string, content: string, type: string = 'text'): void {
-    this.send('message:send', {
+  sendMessage(
+    conversationId: string,
+    content: string,
+    type: string = "text",
+  ): void {
+    this.send("message:send", {
       conversationId,
       content,
       type,
@@ -293,7 +302,7 @@ export class SocketManager {
    * Mark message as read
    */
   markAsRead(conversationId: string, messageId: string): void {
-    this.send('message:read', {
+    this.send("message:read", {
       conversationId,
       messageId,
       userId: this.userId,
@@ -304,7 +313,7 @@ export class SocketManager {
    * Start typing indicator
    */
   startTyping(conversationId: string): void {
-    this.send('typing:start', {
+    this.send("typing:start", {
       conversationId,
       userId: this.userId,
     });
@@ -314,7 +323,7 @@ export class SocketManager {
    * Stop typing indicator
    */
   stopTyping(conversationId: string): void {
-    this.send('typing:stop', {
+    this.send("typing:stop", {
       conversationId,
       userId: this.userId,
     });
@@ -326,8 +335,15 @@ export class SocketManager {
    * Send call signal
    */
   sendCallSignal(
-    type: 'offer' | 'answer' | 'ice-candidate' | 'call' | 'accept' | 'reject' | 'end',
-    data: unknown
+    type:
+      | "offer"
+      | "answer"
+      | "ice-candidate"
+      | "call"
+      | "accept"
+      | "reject"
+      | "end",
+    data: unknown,
   ): void {
     this.send(`call:${type}`, data);
   }
@@ -335,8 +351,8 @@ export class SocketManager {
   /**
    * Initiate call
    */
-  initiateCall(calleeId: string, callType: 'video' | 'audio'): void {
-    this.send('call:initiate', {
+  initiateCall(calleeId: string, callType: "video" | "audio"): void {
+    this.send("call:initiate", {
       callerId: this.userId,
       calleeId,
       type: callType,
@@ -347,21 +363,21 @@ export class SocketManager {
    * Accept incoming call
    */
   acceptCall(callId: string): void {
-    this.send('call:accept', { callId, userId: this.userId });
+    this.send("call:accept", { callId, userId: this.userId });
   }
 
   /**
    * Reject incoming call
    */
   rejectCall(callId: string, reason?: string): void {
-    this.send('call:reject', { callId, userId: this.userId, reason });
+    this.send("call:reject", { callId, userId: this.userId, reason });
   }
 
   /**
    * End call
    */
   endCall(callId: string): void {
-    this.send('call:end', { callId, userId: this.userId });
+    this.send("call:end", { callId, userId: this.userId });
   }
 
   // ==================== LIVESTREAM METHODS ====================
@@ -370,21 +386,21 @@ export class SocketManager {
    * Join live stream
    */
   joinStream(streamId: string): void {
-    this.send('stream:join', { streamId, userId: this.userId });
+    this.send("stream:join", { streamId, userId: this.userId });
   }
 
   /**
    * Leave live stream
    */
   leaveStream(streamId: string): void {
-    this.send('stream:leave', { streamId, userId: this.userId });
+    this.send("stream:leave", { streamId, userId: this.userId });
   }
 
   /**
    * Send stream comment
    */
   sendStreamComment(streamId: string, content: string): void {
-    this.send('stream:comment', {
+    this.send("stream:comment", {
       streamId,
       userId: this.userId,
       content,
@@ -395,7 +411,7 @@ export class SocketManager {
    * Send stream gift
    */
   sendStreamGift(streamId: string, giftType: string, message?: string): void {
-    this.send('stream:gift', {
+    this.send("stream:gift", {
       streamId,
       userId: this.userId,
       giftType,
@@ -408,8 +424,8 @@ export class SocketManager {
   /**
    * Update online status
    */
-  updatePresence(status: 'online' | 'away' | 'busy' | 'offline'): void {
-    this.send('presence:update', { userId: this.userId, status });
+  updatePresence(status: "online" | "away" | "busy" | "offline"): void {
+    this.send("presence:update", { userId: this.userId, status });
   }
 
   // ==================== EVENT EMITTER ====================
@@ -419,7 +435,7 @@ export class SocketManager {
       this.eventListeners.set(event, new Set());
     }
     this.eventListeners.get(event)!.add(callback as EventCallback);
-    
+
     // Return unsubscribe function
     return () => this.off(event, callback);
   }
@@ -437,7 +453,7 @@ export class SocketManager {
   }
 
   private emit<T = unknown>(event: string, data?: T): void {
-    this.eventListeners.get(event)?.forEach(callback => callback(data));
+    this.eventListeners.get(event)?.forEach((callback) => callback(data));
   }
 
   // ==================== GETTERS ====================
@@ -447,7 +463,9 @@ export class SocketManager {
   }
 
   isConnected(): boolean {
-    return this.status === 'connected' && this.socket?.readyState === WebSocket.OPEN;
+    return (
+      this.status === "connected" && this.socket?.readyState === WebSocket.OPEN
+    );
   }
 
   getUserId(): string | null {
@@ -459,7 +477,9 @@ export class SocketManager {
 
 let socketInstance: SocketManager | null = null;
 
-export function getSocketManager(config?: Partial<SocketConfig>): SocketManager {
+export function getSocketManager(
+  config?: Partial<SocketConfig>,
+): SocketManager {
   if (!socketInstance) {
     socketInstance = new SocketManager(config);
   }

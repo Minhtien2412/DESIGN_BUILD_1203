@@ -1,8 +1,11 @@
 import { apiFetch } from "@/services/api";
 import { getAccessToken as getFreshAccessToken } from "@/services/apiClient";
+import {
+    buildSocketOptions,
+    getWsBaseUrl,
+} from "@/services/socket/socketConfig";
 import type { Socket } from "@/utils/socketIo";
 import { getSocketIo } from "@/utils/socketIo";
-import { getItem } from "@/utils/storage";
 import { VideoCallManager } from "@/utils/VideoCallManager";
 import React, {
     createContext,
@@ -79,7 +82,8 @@ interface CallContextValue {
 
 const CallContext = createContext<CallContextValue | undefined>(undefined);
 
-const WS_URL = "wss://baotienweb.cloud";
+// Call socket URL resolved from single source of truth
+const getCallWsUrl = () => `${getWsBaseUrl()}/call`;
 
 export function CallProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
@@ -120,12 +124,11 @@ export function CallProvider({ children }: { children: React.ReactNode }) {
 
     const connectSocket = async () => {
       try {
-        // Get access token for WebSocket authentication
-        const accessToken = await getItem("accessToken");
+        // Get access token via centralized token service
+        const accessToken = await getFreshAccessToken();
 
         if (!isMounted) return;
 
-        // Skip connection if no token (user not fully authenticated)
         if (!accessToken) {
           console.log(
             "📞 Call WebSocket: No access token, skipping connection",
@@ -135,26 +138,22 @@ export function CallProvider({ children }: { children: React.ReactNode }) {
 
         connectionAttemptedRef.current = true;
 
+        const wsUrl = getCallWsUrl();
+        console.log("📞 Call WebSocket: Connecting to", wsUrl);
+
         const io = await getSocketIo();
-        const newSocket = io(`${WS_URL}/call`, {
-          transports: ["websocket", "polling"], // Fallback to polling if websocket fails
-          reconnection: true, // Enable reconnection for better network handling
-          reconnectionAttempts: 5, // Retry 5 times
-          reconnectionDelay: 1000, // Start with 1s delay
-          reconnectionDelayMax: 10000, // Max 10s delay
-          timeout: 5000,
-          auth: {
-            token: accessToken,
-          },
-          query: {
-            userId: user.id,
-          },
-        });
+        const newSocket = io(
+          wsUrl,
+          buildSocketOptions(accessToken, {
+            reconnectionAttempts: 5,
+            timeout: 5000,
+          }),
+        );
 
         socketRef.current = newSocket;
 
         // Refresh token before each reconnect attempt to avoid jwt expired errors
-        newSocket.on("reconnect_attempt", async () => {
+        newSocket.io.on("reconnect_attempt", async () => {
           try {
             const freshToken = await getFreshAccessToken();
             if (freshToken && newSocket) {
@@ -193,9 +192,7 @@ export function CallProvider({ children }: { children: React.ReactNode }) {
             errorMsg.includes("Invalid token") ||
             errorMsg.includes("Authentication")
           ) {
-            console.log(
-              "📞 Call WebSocket: Token expired, refreshing for next reconnect...",
-            );
+            console.log("📞 Call WebSocket: Token issue, refreshing...");
             try {
               const freshToken = await getFreshAccessToken();
               if (freshToken && newSocket) {
@@ -203,11 +200,18 @@ export function CallProvider({ children }: { children: React.ReactNode }) {
                 console.log(
                   "📞 Call WebSocket: Token updated for reconnection",
                 );
+              } else {
+                // Token refresh failed (401) — stop reconnecting with stale token
+                console.warn(
+                  "📞 Call WebSocket: No fresh token — disconnecting to avoid spam",
+                );
+                newSocket.disconnect();
               }
             } catch {
               console.warn(
-                "📞 Call WebSocket: Token refresh failed on connect_error",
+                "📞 Call WebSocket: Token refresh failed — disconnecting",
               );
+              newSocket.disconnect();
             }
           } else {
             console.warn(

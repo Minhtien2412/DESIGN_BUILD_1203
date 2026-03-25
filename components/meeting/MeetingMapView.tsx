@@ -1,13 +1,23 @@
-import { Coordinates, Meeting, Participant } from '@/types/meeting';
-import { Ionicons } from '@expo/vector-icons';
-import { StyleSheet, Text, View } from 'react-native';
+import { Coordinates, Meeting, Participant } from "@/types/meeting";
+import { fitToCoordinates, type LatLng } from "@/utils/geo";
+import { Ionicons } from "@expo/vector-icons";
+import { useMemo } from "react";
+import {
+    Platform,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from "react-native";
 
 /**
  * MeetingMapView Component
- * Hiển thị bản đồ với route tracking tương tự Shopee delivery
- * 
- * Note: Hiện tại sử dụng mock component vì react-native-maps được mock trong package.json
- * Khi deploy thực tế, cần cài đặt react-native-maps thật và remove mock
+ * Grab-style map with participant tracking for meeting navigation.
+ *
+ * - Native (iOS/Android): uses react-native-maps with real MapView + Markers
+ * - Web: rich fallback with positioned participant markers on a grid
+ *
+ * Follows the same dynamic-import pattern as WorkerMapView.
  */
 
 interface MeetingMapViewProps {
@@ -15,103 +25,298 @@ interface MeetingMapViewProps {
   userLocation?: Coordinates | null;
   focusedParticipant?: Participant | null;
   showAllRoutes?: boolean;
+  height?: number;
+  onParticipantPress?: (participant: Participant) => void;
 }
+
+// Map Coordinates → LatLng helper
+const toLatLng = (c: Coordinates): LatLng => ({
+  latitude: c.lat,
+  longitude: c.lng,
+});
+
+const STATUS_COLORS: Record<string, string> = {
+  "en-route": "#0D9488",
+  arrived: "#10B981",
+  late: "#EF4444",
+  waiting: "#F59E0B",
+};
 
 export function MeetingMapView({
   meeting,
   userLocation,
   focusedParticipant,
-  showAllRoutes = true
+  showAllRoutes = true,
+  height = 300,
+  onParticipantPress,
 }: MeetingMapViewProps) {
-  
-  // Mock map view cho development
-  // Trong production, sẽ sử dụng MapView từ react-native-maps
-  
-  return (
-    <View style={styles.container}>
-      <View style={styles.mockMap}>
-        {/* Destination marker */}
-        <View style={[styles.marker, styles.destinationMarker]}>
-          <Ionicons name="location" size={32} color="#EF4444" />
-          <Text style={styles.markerLabel}>{meeting.location.name}</Text>
-        </View>
+  const destination: LatLng = useMemo(
+    () => toLatLng(meeting.location.coordinates),
+    [meeting.location.coordinates],
+  );
 
-        {/* Route polyline visualization */}
-        {meeting.participants
-          .filter(p => p.currentLocation)
-          .map((participant, index) => (
-            <View
-              key={participant.id}
-              style={[
-                styles.routeLine,
-                { 
-                  top: `${20 + index * 15}%`,
-                  opacity: focusedParticipant 
-                    ? (focusedParticipant.id === participant.id ? 1 : 0.3)
-                    : 1
-                }
-              ]}
-            />
-          ))}
+  const movingParticipants = useMemo(
+    () =>
+      meeting.participants.filter(
+        (p) => p.currentLocation && p.status !== "arrived",
+      ),
+    [meeting.participants],
+  );
 
-        {/* Participant markers */}
-        {meeting.participants
-          .filter(p => p.currentLocation && p.status !== 'arrived')
-          .map((participant, index) => (
-            <View
-              key={participant.id}
-              style={[
-                styles.marker,
-                styles.participantMarker,
-                { 
-                  top: `${25 + index * 20}%`,
-                  left: `${30 + index * 15}%`,
-                  opacity: focusedParticipant 
-                    ? (focusedParticipant.id === participant.id ? 1 : 0.5)
-                    : 1
-                }
-              ]}
-            >
-              <Ionicons name="car" size={24} color="#0D9488" />
-              <Text style={styles.participantName} numberOfLines={1}>
-                {participant.name.split(' ')[0]}
+  const arrivedCount = meeting.participants.filter(
+    (p) => p.status === "arrived",
+  ).length;
+
+  // Native map region that fits all markers
+  const region = useMemo(() => {
+    const pts: LatLng[] = [destination];
+    if (userLocation) pts.push(toLatLng(userLocation));
+    movingParticipants.forEach((p) => {
+      if (p.currentLocation) pts.push(toLatLng(p.currentLocation));
+    });
+    return fitToCoordinates(pts, 0.4);
+  }, [destination, userLocation, movingParticipants]);
+
+  // ===========================================================================
+  // WEB FALLBACK RENDERER
+  // ===========================================================================
+  if (Platform.OS === "web") {
+    // Compute % positions for participants on a grid
+    const all: LatLng[] = [destination];
+    if (userLocation) all.push(toLatLng(userLocation));
+    movingParticipants.forEach((p) => {
+      if (p.currentLocation) all.push(toLatLng(p.currentLocation));
+    });
+    const minLat = Math.min(...all.map((p) => p.latitude));
+    const maxLat = Math.max(...all.map((p) => p.latitude));
+    const minLng = Math.min(...all.map((p) => p.longitude));
+    const maxLng = Math.max(...all.map((p) => p.longitude));
+    const latR = Math.max(maxLat - minLat, 0.005);
+    const lngR = Math.max(maxLng - minLng, 0.005);
+    const PAD = 12;
+    const toPos = (pt: LatLng) => ({
+      top: PAD + (1 - (pt.latitude - minLat) / latR) * (100 - PAD * 2),
+      left: PAD + ((pt.longitude - minLng) / lngR) * (100 - PAD * 2),
+    });
+
+    const destPos = toPos(destination);
+
+    return (
+      <View style={[styles.container, { height }]}>
+        <View style={styles.webMap}>
+          {/* Grid bg */}
+          <View style={StyleSheet.absoluteFill}>
+            {Array.from({ length: 10 }).map((_, i) => (
+              <View
+                key={`h${i}`}
+                style={[
+                  styles.gridLine,
+                  { top: `${(i + 1) * 10}%`, width: "100%", height: 1 },
+                ]}
+              />
+            ))}
+            {Array.from({ length: 10 }).map((_, i) => (
+              <View
+                key={`v${i}`}
+                style={[
+                  styles.gridLine,
+                  { left: `${(i + 1) * 10}%`, height: "100%", width: 1 },
+                ]}
+              />
+            ))}
+          </View>
+
+          {/* Destination marker */}
+          <View
+            style={[
+              styles.absCenter,
+              { top: `${destPos.top}%`, left: `${destPos.left}%` },
+            ]}
+          >
+            <View style={styles.destPin}>
+              <Ionicons name="flag" size={16} color="#fff" />
+            </View>
+            <View style={styles.destLabel}>
+              <Text style={styles.pinLabelText} numberOfLines={1}>
+                {meeting.location.name}
               </Text>
             </View>
-          ))}
-
-        {/* User location marker */}
-        {userLocation && (
-          <View style={[styles.marker, styles.userMarker]}>
-            <View style={styles.userDot} />
-            <Text style={styles.markerLabel}>Vị trí của bạn</Text>
           </View>
-        )}
 
-        {/* Map info overlay */}
-        <View style={styles.mapInfo}>
-          <Text style={styles.mapInfoText}>
-            📍 {meeting.location.address}
-          </Text>
-        </View>
+          {/* Moving participant markers */}
+          {movingParticipants.map((p) => {
+            if (!p.currentLocation) return null;
+            const pos = toPos(toLatLng(p.currentLocation));
+            const color = STATUS_COLORS[p.status] || "#0D9488";
+            const isFocused =
+              !focusedParticipant || focusedParticipant.id === p.id;
+            return (
+              <TouchableOpacity
+                key={p.id}
+                activeOpacity={0.7}
+                onPress={() => onParticipantPress?.(p)}
+                style={[
+                  styles.absCenter,
+                  {
+                    top: `${pos.top}%`,
+                    left: `${pos.left}%`,
+                    opacity: isFocused ? 1 : 0.4,
+                    zIndex: isFocused ? 20 : 10,
+                  },
+                ]}
+              >
+                <View
+                  style={[styles.participantPin, { backgroundColor: color }]}
+                >
+                  <Ionicons name="car" size={16} color="#fff" />
+                </View>
+                <Text style={styles.participantLabel} numberOfLines={1}>
+                  {p.name.split(" ")[0]}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
 
-        {/* Legend */}
-        <View style={styles.legend}>
-          <View style={styles.legendItem}>
-            <View style={[styles.legendDot, { backgroundColor: '#EF4444' }]} />
-            <Text style={styles.legendText}>Điểm đến</Text>
+          {/* User location */}
+          {userLocation && (
+            <View
+              style={[
+                styles.absCenter,
+                {
+                  top: `${toPos(toLatLng(userLocation)).top}%`,
+                  left: `${toPos(toLatLng(userLocation)).left}%`,
+                },
+              ]}
+            >
+              <View style={styles.userDotOuter}>
+                <View style={styles.userDotInner} />
+              </View>
+              <Text style={styles.pinLabelSmall}>Bạn</Text>
+            </View>
+          )}
+
+          {/* Address overlay */}
+          <View style={styles.addressOverlay}>
+            <Ionicons name="location" size={14} color="#EF4444" />
+            <Text style={styles.addressText} numberOfLines={1}>
+              {meeting.location.address}
+            </Text>
           </View>
-          <View style={styles.legendItem}>
-            <View style={[styles.legendDot, { backgroundColor: '#0D9488' }]} />
-            <Text style={styles.legendText}>Đang di chuyển</Text>
+
+          {/* Legend */}
+          <View style={styles.legend}>
+            <View style={styles.legendRow}>
+              <View
+                style={[styles.legendDot, { backgroundColor: "#EF4444" }]}
+              />
+              <Text style={styles.legendText}>Điểm hẹn</Text>
+            </View>
+            <View style={styles.legendRow}>
+              <View
+                style={[styles.legendDot, { backgroundColor: "#0D9488" }]}
+              />
+              <Text style={styles.legendText}>
+                Đang đến ({movingParticipants.length})
+              </Text>
+            </View>
+            {arrivedCount > 0 && (
+              <View style={styles.legendRow}>
+                <View
+                  style={[styles.legendDot, { backgroundColor: "#10B981" }]}
+                />
+                <Text style={styles.legendText}>Đã đến ({arrivedCount})</Text>
+              </View>
+            )}
           </View>
         </View>
       </View>
+    );
+  }
 
-      {/* Info banner */}
-      <View style={styles.infoBanner}>
-        <Ionicons name="information-circle-outline" size={20} color="#6366F1" />
-        <Text style={styles.infoBannerText}>
-          Bản đồ thực tế sẽ hiển thị khi deploy với react-native-maps
+  // ===========================================================================
+  // NATIVE MAP RENDERER (react-native-maps)
+  // ===========================================================================
+  let MapView: any;
+  let Marker: any;
+  let Circle: any;
+  try {
+    const maps = require("react-native-maps");
+    MapView = maps.default;
+    Marker = maps.Marker;
+    Circle = maps.Circle;
+  } catch {
+    // Fallback if maps not installed
+    return (
+      <View style={[styles.container, { height }]}>
+        <View style={styles.webMap}>
+          <Text style={styles.fallbackText}>
+            Cần cài react-native-maps để hiển thị bản đồ
+          </Text>
+        </View>
+      </View>
+    );
+  }
+
+  return (
+    <View style={[styles.container, { height }]}>
+      <MapView
+        style={StyleSheet.absoluteFill}
+        initialRegion={region}
+        region={region}
+        showsUserLocation={!!userLocation}
+        showsMyLocationButton={false}
+        rotateEnabled={false}
+        pitchEnabled={false}
+      >
+        {/* Destination marker */}
+        <Marker
+          coordinate={destination}
+          title={meeting.location.name}
+          description={meeting.location.address}
+        >
+          <View style={styles.destPin}>
+            <Ionicons name="flag" size={16} color="#fff" />
+          </View>
+        </Marker>
+
+        {/* Participant markers */}
+        {movingParticipants.map((p) => {
+          if (!p.currentLocation) return null;
+          const coord = toLatLng(p.currentLocation);
+          const color = STATUS_COLORS[p.status] || "#0D9488";
+          const isActive =
+            !focusedParticipant || focusedParticipant.id === p.id;
+          return (
+            <Marker
+              key={p.id}
+              coordinate={coord}
+              title={p.name}
+              description={p.eta ? `ETA: ${p.eta}` : undefined}
+              opacity={isActive ? 1 : 0.4}
+              onPress={() => onParticipantPress?.(p)}
+            >
+              <View style={[styles.participantPin, { backgroundColor: color }]}>
+                <Ionicons name="car" size={16} color="#fff" />
+              </View>
+            </Marker>
+          );
+        })}
+
+        {/* Accuracy circle around destination */}
+        <Circle
+          center={destination}
+          radius={200}
+          fillColor="rgba(239, 68, 68, 0.08)"
+          strokeColor="rgba(239, 68, 68, 0.25)"
+          strokeWidth={1}
+        />
+      </MapView>
+
+      {/* Participant count badge */}
+      <View style={styles.nativeBadge}>
+        <Ionicons name="people" size={14} color="#6366F1" />
+        <Text style={styles.nativeBadgeText}>
+          {arrivedCount}/{meeting.participants.length} đã đến
         </Text>
       </View>
     </View>
@@ -120,132 +325,125 @@ export function MeetingMapView({
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#F9FAFB'
-  },
-  mockMap: {
-    flex: 1,
-    backgroundColor: '#E5E7EB',
-    position: 'relative',
     borderRadius: 12,
-    overflow: 'hidden'
+    overflow: "hidden",
+    backgroundColor: "#E5E7EB",
   },
-  marker: {
-    position: 'absolute',
-    alignItems: 'center',
-    gap: 4
+  // Web map
+  webMap: { flex: 1, backgroundColor: "#E5E7EB", position: "relative" },
+  gridLine: { position: "absolute", backgroundColor: "#D1D5DB" },
+  absCenter: {
+    position: "absolute",
+    alignItems: "center",
+    transform: [{ translateX: -16 }, { translateY: -20 }],
+    zIndex: 10,
   },
-  destinationMarker: {
-    top: '70%',
-    left: '60%',
-    transform: [{ translateX: -16 }, { translateY: -32 }]
+  destPin: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "#EF4444",
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 4,
   },
-  participantMarker: {
-    backgroundColor: 'white',
+  destLabel: {
+    backgroundColor: "#fff",
     paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3
-  },
-  userMarker: {
-    bottom: '20%',
-    left: '20%'
-  },
-  userDot: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    backgroundColor: '#10B981',
-    borderWidth: 3,
-    borderColor: 'white'
-  },
-  markerLabel: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: '#1F2937',
-    backgroundColor: 'white',
-    paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 4,
-    overflow: 'hidden'
+    marginTop: 4,
+    maxWidth: 120,
+    elevation: 2,
   },
-  participantName: {
+  pinLabelText: { fontSize: 11, fontWeight: "600", color: "#1F2937" },
+  pinLabelSmall: {
     fontSize: 10,
-    fontWeight: '500',
-    color: '#0D9488'
+    fontWeight: "500",
+    color: "#10B981",
+    marginTop: 2,
   },
-  routeLine: {
-    position: 'absolute',
-    left: '25%',
-    right: '35%',
-    height: 3,
-    backgroundColor: '#0D9488',
-    opacity: 0.6,
-    borderRadius: 2
+  participantPin: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 3,
   },
-  mapInfo: {
-    position: 'absolute',
-    top: 16,
-    left: 16,
-    right: 16,
-    backgroundColor: 'white',
-    padding: 12,
-    borderRadius: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3
+  participantLabel: {
+    fontSize: 10,
+    fontWeight: "600",
+    color: "#0D9488",
+    backgroundColor: "#fff",
+    paddingHorizontal: 4,
+    paddingVertical: 1,
+    borderRadius: 3,
+    marginTop: 2,
+    overflow: "hidden",
   },
-  mapInfoText: {
-    fontSize: 13,
-    color: '#374151',
-    fontWeight: '500'
+  userDotOuter: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: "rgba(16,185,129,0.25)",
+    justifyContent: "center",
+    alignItems: "center",
   },
-  legend: {
-    position: 'absolute',
-    bottom: 16,
-    left: 16,
-    backgroundColor: 'white',
-    padding: 8,
-    borderRadius: 8,
-    gap: 6,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 2
-  },
-  legendItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6
-  },
-  legendDot: {
+  userDotInner: {
     width: 12,
     height: 12,
-    borderRadius: 6
+    borderRadius: 6,
+    backgroundColor: "#10B981",
+    borderWidth: 2,
+    borderColor: "#fff",
   },
-  legendText: {
-    fontSize: 11,
-    color: '#6B7280'
+  addressOverlay: {
+    position: "absolute",
+    top: 12,
+    left: 12,
+    right: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: "#fff",
+    padding: 10,
+    borderRadius: 8,
+    elevation: 3,
   },
-  infoBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    backgroundColor: '#EEF2FF',
-    padding: 12,
-    marginTop: 12,
-    borderRadius: 8
+  addressText: { flex: 1, fontSize: 12, color: "#374151", fontWeight: "500" },
+  legend: {
+    position: "absolute",
+    bottom: 12,
+    left: 12,
+    backgroundColor: "#fff",
+    padding: 8,
+    borderRadius: 8,
+    gap: 4,
+    elevation: 2,
   },
-  infoBannerText: {
-    flex: 1,
-    fontSize: 12,
-    color: '#4F46E5'
-  }
+  legendRow: { flexDirection: "row", alignItems: "center", gap: 6 },
+  legendDot: { width: 10, height: 10, borderRadius: 5 },
+  legendText: { fontSize: 10, color: "#6B7280" },
+  fallbackText: {
+    textAlign: "center",
+    color: "#6B7280",
+    marginTop: 40,
+    fontSize: 13,
+  },
+  // Native overlay
+  nativeBadge: {
+    position: "absolute",
+    top: 12,
+    right: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: "#fff",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    elevation: 3,
+  },
+  nativeBadgeText: { fontSize: 12, fontWeight: "600", color: "#6366F1" },
 });

@@ -4,11 +4,18 @@
  * Using native WebSocket API
  */
 
+import { getWsBaseUrl } from "@/services/socket/socketConfig";
+
 // ============================================
 // Configuration
 // ============================================
 
-const WEBSOCKET_URL = process.env.EXPO_PUBLIC_WS_URL || 'ws://api.thietkeresort.com.vn:3002';
+// Use centralized WS config — falls back to env or production URL
+const getWebSocketUrl = () => {
+  const base = getWsBaseUrl();
+  // Convert wss:// to ws:// or keep as-is for native WebSocket
+  return base.replace(/^https:\/\//, "wss://").replace(/^http:\/\//, "ws://");
+};
 
 // ============================================
 // Event Interfaces
@@ -24,7 +31,7 @@ export interface TaskMovedEvent {
 
 export interface TaskStatusChangedEvent {
   taskId: string;
-  status: 'pending' | 'in-progress' | 'completed' | 'blocked';
+  status: "pending" | "in-progress" | "completed" | "blocked";
   userId: string;
   timestamp: string;
 }
@@ -71,37 +78,45 @@ class ConstructionSocket {
   /**
    * Connect to WebSocket server
    */
-  connect(projectId: string, userId?: string, userName?: string): WebSocket | null {
+  connect(
+    projectId: string,
+    userId?: string,
+    userName?: string,
+  ): WebSocket | null {
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-      console.log('[ConstructionSocket] Already connected');
+      console.log("[ConstructionSocket] Already connected");
       return this.socket;
     }
 
     this.projectId = projectId;
-    this.userId = userId || 'anonymous';
-    this.userName = userName || 'Guest';
+    this.userId = userId || "anonymous";
+    this.userName = userName || "Guest";
 
     try {
-      const url = `${WEBSOCKET_URL}?projectId=${projectId}&userId=${this.userId}&userName=${encodeURIComponent(this.userName)}`;
+      const url = `${getWebSocketUrl()}?projectId=${projectId}&userId=${this.userId}&userName=${encodeURIComponent(this.userName)}`;
       this.socket = new WebSocket(url);
 
       this.socket.onopen = () => {
-        console.log('[ConstructionSocket] Connected');
+        console.log("[ConstructionSocket] Connected");
         this.reconnectAttempts = 0;
         this.startPing();
-        this.emit('connect', {});
+        this.emit("connect", {});
       };
 
       this.socket.onclose = (event: CloseEvent) => {
-        console.log('[ConstructionSocket] Disconnected:', event.code, event.reason);
+        console.log(
+          "[ConstructionSocket] Disconnected:",
+          event.code,
+          event.reason,
+        );
         this.stopPing();
-        this.emit('disconnect', { code: event.code, reason: event.reason });
+        this.emit("disconnect", { code: event.code, reason: event.reason });
         this.handleReconnect();
       };
 
       this.socket.onerror = (error: Event) => {
-        console.error('[ConstructionSocket] Error:', error);
-        this.emit('error', { error });
+        console.error("[ConstructionSocket] Error:", error);
+        this.emit("error", { error });
       };
 
       this.socket.onmessage = (event: MessageEvent) => {
@@ -109,13 +124,13 @@ class ConstructionSocket {
           const message = JSON.parse(event.data);
           this.handleMessage(message);
         } catch (error) {
-          console.error('[ConstructionSocket] Parse error:', error);
+          console.error("[ConstructionSocket] Parse error:", error);
         }
       };
 
       return this.socket;
     } catch (error) {
-      console.error('[ConstructionSocket] Connection error:', error);
+      console.error("[ConstructionSocket] Connection error:", error);
       return null;
     }
   }
@@ -124,7 +139,7 @@ class ConstructionSocket {
    * Handle incoming messages
    */
   private handleMessage(message: { type: string; payload: any }) {
-    console.log('[ConstructionSocket] Message:', message.type);
+    console.log("[ConstructionSocket] Message:", message.type);
     this.emit(message.type, message.payload);
   }
 
@@ -134,7 +149,7 @@ class ConstructionSocket {
   private startPing() {
     this.pingInterval = setInterval(() => {
       if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-        this.send('ping', {});
+        this.send("ping", {});
       }
     }, 30000); // Every 30 seconds
   }
@@ -154,18 +169,24 @@ class ConstructionSocket {
    */
   private handleReconnect() {
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-      console.log('[ConstructionSocket] Max reconnect attempts reached');
+      console.log("[ConstructionSocket] Max reconnect attempts reached");
       return;
     }
 
     this.reconnectAttempts++;
     const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1);
-    
-    console.log(`[ConstructionSocket] Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
-    
+
+    console.log(
+      `[ConstructionSocket] Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})`,
+    );
+
     setTimeout(() => {
       if (this.projectId) {
-        this.connect(this.projectId, this.userId || undefined, this.userName || undefined);
+        this.connect(
+          this.projectId,
+          this.userId || undefined,
+          this.userName || undefined,
+        );
       }
     }, delay);
   }
@@ -175,7 +196,7 @@ class ConstructionSocket {
    */
   send(type: string, payload: any) {
     if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
-      console.warn('[ConstructionSocket] Socket not connected');
+      console.warn("[ConstructionSocket] Socket not connected");
       return false;
     }
 
@@ -183,7 +204,7 @@ class ConstructionSocket {
       this.socket.send(JSON.stringify({ type, payload }));
       return true;
     } catch (error) {
-      console.error('[ConstructionSocket] Send error:', error);
+      console.error("[ConstructionSocket] Send error:", error);
       return false;
     }
   }
@@ -214,11 +235,14 @@ class ConstructionSocket {
   private emit(event: string, data: any) {
     const handlers = this.eventHandlers.get(event);
     if (handlers) {
-      handlers.forEach(handler => {
+      handlers.forEach((handler) => {
         try {
           handler(data);
         } catch (error) {
-          console.error(`[ConstructionSocket] Handler error for ${event}:`, error);
+          console.error(
+            `[ConstructionSocket] Handler error for ${event}:`,
+            error,
+          );
         }
       });
     }
@@ -235,7 +259,7 @@ class ConstructionSocket {
     }
     this.projectId = null;
     this.eventHandlers.clear();
-    console.log('[ConstructionSocket] Disconnected manually');
+    console.log("[ConstructionSocket] Disconnected manually");
   }
 
   /**
@@ -260,7 +284,7 @@ class ConstructionSocket {
    * Emit task moved event
    */
   emitTaskMoved(taskId: string, x: number, y: number) {
-    this.send('task-moved', {
+    this.send("task-moved", {
       taskId,
       x,
       y,
@@ -273,7 +297,7 @@ class ConstructionSocket {
    * Emit task status changed event
    */
   emitTaskStatusChanged(taskId: string, status: string) {
-    this.send('task-status-changed', {
+    this.send("task-status-changed", {
       taskId,
       status,
       userId: this.userId,
@@ -285,7 +309,7 @@ class ConstructionSocket {
    * Emit zoom changed event
    */
   emitZoomChanged(zoom: number) {
-    this.send('zoom-changed', {
+    this.send("zoom-changed", {
       zoom,
       userId: this.userId,
       timestamp: new Date().toISOString(),
@@ -296,7 +320,7 @@ class ConstructionSocket {
    * Emit pan changed event
    */
   emitPanChanged(x: number, y: number) {
-    this.send('pan-changed', {
+    this.send("pan-changed", {
       x,
       y,
       userId: this.userId,
@@ -308,42 +332,42 @@ class ConstructionSocket {
    * Listen for task moved events
    */
   onTaskMoved(handler: (event: TaskMovedEvent) => void) {
-    this.on('task-moved', handler);
+    this.on("task-moved", handler);
   }
 
   /**
    * Listen for task status changed events
    */
   onTaskStatusChanged(handler: (event: TaskStatusChangedEvent) => void) {
-    this.on('task-status-changed', handler);
+    this.on("task-status-changed", handler);
   }
 
   /**
    * Listen for zoom changed events
    */
   onZoomChanged(handler: (event: ZoomChangedEvent) => void) {
-    this.on('zoom-changed', handler);
+    this.on("zoom-changed", handler);
   }
 
   /**
    * Listen for pan changed events
    */
   onPanChanged(handler: (event: PanChangedEvent) => void) {
-    this.on('pan-changed', handler);
+    this.on("pan-changed", handler);
   }
 
   /**
    * Listen for user joined events
    */
   onUserJoined(handler: (event: UserJoinedEvent) => void) {
-    this.on('user-joined', handler);
+    this.on("user-joined", handler);
   }
 
   /**
    * Listen for user left events
    */
   onUserLeft(handler: (event: UserLeftEvent) => void) {
-    this.on('user-left', handler);
+    this.on("user-left", handler);
   }
 }
 

@@ -3,18 +3,18 @@
  * Modern implementation with Timeline API integration + Real-time WebSocket updates
  */
 
-import { MilestoneCard } from '@/components/timeline/MilestoneCard';
-import { ProgressDashboard } from '@/components/timeline/ProgressDashboard';
-import { useThemeColor } from '@/hooks/use-theme-color';
-import { useTimelineWebSocket } from '@/hooks/useTimelineWebSocket';
+import { MilestoneCard } from "@/components/timeline/MilestoneCard";
+import { ProgressDashboard } from "@/components/timeline/ProgressDashboard";
+import { useThemeColor } from "@/hooks/use-theme-color";
+import { useTimelineWebSocket } from "@/hooks/useTimelineWebSocket";
 import {
     Phase,
     ProjectTimeline,
     getProjectTimeline,
-} from '@/services/timeline-api';
-import { Ionicons } from '@expo/vector-icons';
-import { Href, router, useLocalSearchParams } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
+} from "@/services/timeline-api";
+import { Ionicons } from "@expo/vector-icons";
+import { Href, router, useLocalSearchParams } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
 import {
     ActivityIndicator,
     Alert,
@@ -25,30 +25,37 @@ import {
     Text,
     TouchableOpacity,
     View,
-} from 'react-native';
+} from "react-native";
 
 export default function TimelineScreen() {
   const { projectId } = useLocalSearchParams<{ projectId?: string }>();
-  const backgroundColor = useThemeColor({}, 'background');
-  const textColor = useThemeColor({}, 'text');
+  const backgroundColor = useThemeColor({}, "background");
+  const textColor = useThemeColor({}, "text");
 
   const [timeline, setTimeline] = useState<ProjectTimeline | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [filter, setFilter] = useState<'all' | 'active' | 'delayed' | 'completed'>('all');
+  const [filter, setFilter] = useState<
+    "all" | "active" | "delayed" | "completed"
+  >("all");
 
   // Use default project ID if not provided
-  const currentProjectId = projectId || '1';
+  const currentProjectId = projectId || "1";
 
   // Fetch timeline data
   const fetchTimeline = async () => {
     try {
       setLoading(true);
       const data = await getProjectTimeline(Number(currentProjectId));
-      setTimeline(data);
+      setTimeline({
+        ...data,
+        phases: data.phases ?? [],
+        delayedPhases: data.delayedPhases ?? [],
+        criticalPath: data.criticalPath ?? [],
+      });
     } catch (error) {
-      console.error('Error fetching timeline:', error);
-      Alert.alert('Lỗi', 'Không thể tải timeline. Vui lòng thử lại.');
+      console.error("Error fetching timeline:", error);
+      Alert.alert("Lỗi", "Không thể tải timeline. Vui lòng thử lại.");
     } finally {
       setLoading(false);
     }
@@ -86,8 +93,8 @@ export default function TimelineScreen() {
       if (!prev) return prev;
       return {
         ...prev,
-        phases: prev.phases.map((p) => 
-          p.id === updatedPhase.id ? updatedPhase : p
+        phases: prev.phases.map((p) =>
+          p.id === updatedPhase.id ? updatedPhase : p,
         ),
       };
     });
@@ -112,12 +119,12 @@ export default function TimelineScreen() {
         return {
           ...prev,
           phases: prev.phases.map((p) =>
-            p.id === data.phaseId ? { ...p, progress: data.progress } : p
+            p.id === data.phaseId ? { ...p, progress: data.progress } : p,
           ),
         };
       });
     },
-    []
+    [],
   );
 
   // Handle phases reordered
@@ -137,7 +144,7 @@ export default function TimelineScreen() {
         };
       });
     },
-    []
+    [],
   );
 
   // Connect to WebSocket timeline updates
@@ -162,12 +169,12 @@ export default function TimelineScreen() {
     if (!timeline) return [];
 
     switch (filter) {
-      case 'active':
-        return timeline.phases.filter((p) => p.status === 'IN_PROGRESS');
-      case 'delayed':
+      case "active":
+        return timeline.phases.filter((p) => p.status === "IN_PROGRESS");
+      case "delayed":
         return timeline.delayedPhases;
-      case 'completed':
-        return timeline.phases.filter((p) => p.status === 'COMPLETED');
+      case "completed":
+        return timeline.phases.filter((p) => p.status === "COMPLETED");
       default:
         return timeline.phases;
     }
@@ -184,7 +191,9 @@ export default function TimelineScreen() {
     return (
       <View style={[styles.loadingContainer, { backgroundColor }]}>
         <ActivityIndicator size="large" color="#0D9488" />
-        <Text style={[styles.loadingText, { color: textColor }]}>Đang tải timeline...</Text>
+        <Text style={[styles.loadingText, { color: textColor }]}>
+          Đang tải timeline...
+        </Text>
       </View>
     );
   }
@@ -207,8 +216,13 @@ export default function TimelineScreen() {
     <View style={[styles.container, { backgroundColor }]}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={[styles.headerTitle, { color: textColor }]}>Timeline Dự Án</Text>
-        <TouchableOpacity style={styles.createButton} onPress={handleCreatePhase}>
+        <Text style={[styles.headerTitle, { color: textColor }]}>
+          Timeline Dự Án
+        </Text>
+        <TouchableOpacity
+          style={styles.createButton}
+          onPress={handleCreatePhase}
+        >
           <Ionicons name="add-circle" size={24} color="#0D9488" />
           <Text style={styles.createButtonText}>Tạo giai đoạn</Text>
         </TouchableOpacity>
@@ -222,13 +236,13 @@ export default function TimelineScreen() {
         contentContainerStyle={styles.filterContent}
       >
         <TouchableOpacity
-          style={[styles.filterTab, filter === 'all' && styles.filterTabActive]}
-          onPress={() => setFilter('all')}
+          style={[styles.filterTab, filter === "all" && styles.filterTabActive]}
+          onPress={() => setFilter("all")}
         >
           <Text
             style={[
               styles.filterTabText,
-              filter === 'all' && styles.filterTabTextActive,
+              filter === "all" && styles.filterTabTextActive,
             ]}
           >
             Tất cả ({timeline.phases.length})
@@ -236,27 +250,34 @@ export default function TimelineScreen() {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.filterTab, filter === 'active' && styles.filterTabActive]}
-          onPress={() => setFilter('active')}
+          style={[
+            styles.filterTab,
+            filter === "active" && styles.filterTabActive,
+          ]}
+          onPress={() => setFilter("active")}
         >
           <Text
             style={[
               styles.filterTabText,
-              filter === 'active' && styles.filterTabTextActive,
+              filter === "active" && styles.filterTabTextActive,
             ]}
           >
-            Đang làm ({timeline.phases.filter((p) => p.status === 'IN_PROGRESS').length})
+            Đang làm (
+            {timeline.phases.filter((p) => p.status === "IN_PROGRESS").length})
           </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.filterTab, filter === 'delayed' && styles.filterTabActive]}
-          onPress={() => setFilter('delayed')}
+          style={[
+            styles.filterTab,
+            filter === "delayed" && styles.filterTabActive,
+          ]}
+          onPress={() => setFilter("delayed")}
         >
           <Text
             style={[
               styles.filterTabText,
-              filter === 'delayed' && styles.filterTabTextActive,
+              filter === "delayed" && styles.filterTabTextActive,
             ]}
           >
             Trễ hạn ({timeline.delayedPhases.length})
@@ -264,16 +285,20 @@ export default function TimelineScreen() {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.filterTab, filter === 'completed' && styles.filterTabActive]}
-          onPress={() => setFilter('completed')}
+          style={[
+            styles.filterTab,
+            filter === "completed" && styles.filterTabActive,
+          ]}
+          onPress={() => setFilter("completed")}
         >
           <Text
             style={[
               styles.filterTabText,
-              filter === 'completed' && styles.filterTabTextActive,
+              filter === "completed" && styles.filterTabTextActive,
             ]}
           >
-            Hoàn thành ({timeline.phases.filter((p) => p.status === 'COMPLETED').length})
+            Hoàn thành (
+            {timeline.phases.filter((p) => p.status === "COMPLETED").length})
           </Text>
         </TouchableOpacity>
       </ScrollView>
@@ -295,9 +320,14 @@ export default function TimelineScreen() {
             <Text style={[styles.emptyText, { color: textColor }]}>
               Chưa có giai đoạn nào
             </Text>
-            <TouchableOpacity style={styles.createButton} onPress={handleCreatePhase}>
+            <TouchableOpacity
+              style={styles.createButton}
+              onPress={handleCreatePhase}
+            >
               <Ionicons name="add-circle" size={20} color="#0D9488" />
-              <Text style={styles.createButtonText}>Tạo giai đoạn đầu tiên</Text>
+              <Text style={styles.createButtonText}>
+                Tạo giai đoạn đầu tiên
+              </Text>
             </TouchableOpacity>
           </View>
         }
@@ -318,8 +348,8 @@ const styles = StyleSheet.create({
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   loadingText: {
     marginTop: 12,
@@ -327,8 +357,8 @@ const styles = StyleSheet.create({
   },
   errorContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
   },
   errorText: {
@@ -337,42 +367,42 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   retryButton: {
-    backgroundColor: '#0D9488',
+    backgroundColor: "#0D9488",
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
   },
   retryButtonText: {
-    color: '#FFF',
+    color: "#FFF",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: "#E5E7EB",
   },
   headerTitle: {
     fontSize: 20,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   createButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6,
   },
   createButtonText: {
-    color: '#0D9488',
+    color: "#0D9488",
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   filterContainer: {
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: "#E5E7EB",
   },
   filterContent: {
     paddingHorizontal: 16,
@@ -383,25 +413,25 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: "#F3F4F6",
     marginRight: 8,
   },
   filterTabActive: {
-    backgroundColor: '#0D9488',
+    backgroundColor: "#0D9488",
   },
   filterTabText: {
     fontSize: 14,
-    color: '#6B7280',
-    fontWeight: '500',
+    color: "#6B7280",
+    fontWeight: "500",
   },
   filterTabTextActive: {
-    color: '#FFF',
+    color: "#FFF",
   },
   listContent: {
     padding: 16,
   },
   emptyContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     paddingVertical: 40,
   },
   emptyText: {

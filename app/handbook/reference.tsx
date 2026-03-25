@@ -199,7 +199,10 @@ function MarkdownContent({
 
   if (inTable) flushTable();
 
-  return <View>{elements}</View>;
+  // Filter out any non-JSX elements and wrap text safely
+  const safeElements = elements.filter(el => el != null && typeof el !== 'string');
+  
+  return <View>{safeElements.length > 0 ? safeElements : <Text>No content</Text>}</View>;
 }
 
 export default function HandbookReferenceScreen() {

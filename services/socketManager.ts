@@ -13,10 +13,11 @@
  * @updated 2026-01-26
  */
 
-import ENV from "@/config/env";
 import { getAccessToken } from "@/services/apiClient";
+import { getWsBaseUrl } from "@/services/socket/socketConfig";
+import type { Socket } from "@/utils/socketIo";
+import { getSocketIo } from "@/utils/socketIo";
 import { Platform } from "react-native";
-import io, { Socket } from "socket.io-client";
 
 // ==================== TYPES ====================
 
@@ -131,7 +132,7 @@ class UnifiedSocketManager {
   /**
    * Connect to WebSocket server
    */
-  connect(config: SocketConfig): void {
+  async connect(config: SocketConfig): Promise<void> {
     if (this.socket?.connected) {
       console.log("[SocketManager] Already connected");
       return;
@@ -145,7 +146,8 @@ class UnifiedSocketManager {
     console.log("[SocketManager] Connecting to:", wsUrl);
 
     try {
-      this.socket = io(wsUrl, {
+      const ioFactory = await getSocketIo();
+      this.socket = ioFactory(wsUrl, {
         auth: { token: config.token, userId: config.userId },
         transports:
           Platform.OS === "web"
@@ -157,7 +159,7 @@ class UnifiedSocketManager {
         reconnectionDelayMax: this.maxReconnectDelay,
         timeout: 20000,
         forceNew: true,
-      });
+      }) as Socket;
 
       this.setupSocketHandlers();
     } catch (error) {
@@ -167,36 +169,10 @@ class UnifiedSocketManager {
   }
 
   /**
-   * Get WebSocket URL based on environment and platform
+   * Get WebSocket URL using centralized socketConfig
    */
   private getWebSocketUrl(): string {
-    let url =
-      ENV.WS_BASE_URL ||
-      ENV.WS_URL ||
-      ENV.API_BASE_URL ||
-      "wss://baotienweb.cloud";
-
-    // Remove trailing slash
-    url = url.replace(/\/$/, "");
-
-    // Convert http to ws for API URLs
-    if (url.startsWith("http://")) {
-      url = url.replace("http://", "ws://");
-    } else if (url.startsWith("https://")) {
-      url = url.replace("https://", "wss://");
-    }
-
-    // Android emulator cannot reach localhost
-    if (
-      Platform.OS === "android" &&
-      (url.includes("localhost") || url.includes("127.0.0.1"))
-    ) {
-      url = url
-        .replace("localhost", "10.0.2.2")
-        .replace("127.0.0.1", "10.0.2.2");
-    }
-
-    return url;
+    return getWsBaseUrl();
   }
 
   /**
@@ -234,7 +210,7 @@ class UnifiedSocketManager {
       this.handleConnectionError(error);
     });
 
-    this.socket.on("reconnect", (attemptNumber: number) => {
+    this.socket.io.on("reconnect", (attemptNumber: number) => {
       console.log(
         "[SocketManager] Reconnected after",
         attemptNumber,
@@ -244,10 +220,9 @@ class UnifiedSocketManager {
       this.config?.onReconnect?.(attemptNumber);
     });
 
-    this.socket.on("reconnect_attempt", () => {
+    this.socket.io.on("reconnect_attempt", () => {
       this.status = "reconnecting";
       this.emitStatusChange();
-      // Refresh token before reconnecting to avoid jwt expired errors
       this.refreshAuthToken();
     });
 

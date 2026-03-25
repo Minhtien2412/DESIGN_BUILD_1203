@@ -223,6 +223,7 @@ export const DASHBOARD = {
   CLIENT: "/dashboard/client",
   ADMIN: "/dashboard/admin-dashboard",
   ENGINEER: "/dashboard/engineer-dashboard",
+  SMART_PROGRESS: "/dashboard/smart-progress",
 } as const;
 
 // ────── Admin ──────
@@ -484,6 +485,12 @@ export const CONTRACTS = {
 } as const;
 
 // ────── Reports / Analytics ──────
+export const REPORTS = {
+  INDEX: "/reports",
+  KPI: "/reports/kpi",
+  ANALYTICS: "/reports/analytics",
+} as const;
+
 export const ANALYTICS = {
   INDEX: "/analytics",
   PROJECT: (projectId: string) => `/analytics/${projectId}` as const,
@@ -555,6 +562,7 @@ export const SETTINGS = {
 export const ORDERS = {
   INDEX: "/orders",
   DETAIL: (id: string) => `/orders/${id}` as const,
+  TRACKING: (id: string) => `/orders/${id}/tracking` as const,
   REFUND: (id: string) => `/orders/${id}/refund` as const,
 } as const;
 
@@ -577,6 +585,7 @@ export const LABOR = {
   SHIFTS: "/labor/shifts",
   LEAVE_REQUESTS: "/labor/leave-requests",
   CREATE_LEAVE_REQUEST: "/labor/create-leave-request",
+  REPORTS: "/labor/reports",
 } as const;
 
 // ────── Inventory ──────

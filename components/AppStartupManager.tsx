@@ -14,8 +14,8 @@
  * @created 2026-01-29
  */
 
-import { ENV } from "@/config/env";
 import { lazyLoader } from "@/services/lazyLoader";
+import { getWsBaseUrl } from "@/services/socket/socketConfig";
 import { wsManager } from "@/services/wsManager";
 import {
     createContext,
@@ -122,9 +122,7 @@ export function AppStartupManager({
   // Initialize WebSocket Manager
   const initializeWebSocket = useCallback(() => {
     try {
-      const wsBaseUrl =
-        ENV.WS_URL ||
-        ENV.API_BASE_URL.replace(/^http/, "ws").replace("/api", "");
+      const wsBaseUrl = getWsBaseUrl();
       wsManager.initialize(wsBaseUrl);
       console.log("[Startup] WebSocket manager initialized");
     } catch (error) {

@@ -6,7 +6,7 @@
  * @created 19/01/2026
  */
 
-import ENV from "@/config/env";
+import { getWsBaseUrl } from "@/services/socket/socketConfig";
 import { getItem } from "@/utils/storage";
 import { io, Socket } from "socket.io-client";
 
@@ -197,7 +197,7 @@ export class LivestreamSocket {
   private wsUrl: string;
 
   constructor() {
-    this.wsUrl = `${ENV.WS_BASE_URL}/livestream`;
+    this.wsUrl = `${getWsBaseUrl()}/livestream`;
   }
 
   // Connect to livestream namespace
@@ -283,7 +283,7 @@ export class LivestreamSocket {
 
   updateStream(
     streamId: string,
-    data: { title?: string; description?: string }
+    data: { title?: string; description?: string },
   ): void {
     this.socket?.emit("stream:update", { streamId, ...data });
   }
@@ -332,7 +332,7 @@ export class LivestreamSocket {
     streamId: string,
     question: string,
     options: string[],
-    duration: number
+    duration: number,
   ): void {
     this.socket?.emit("poll:create", { streamId, question, options, duration });
   }
@@ -369,7 +369,7 @@ export class LivestreamSocket {
     callback: (data: {
       stream: LivestreamInfo;
       credentials: StreamCredentials;
-    }) => void
+    }) => void,
   ): () => void {
     this.socket?.on("stream:created", callback);
     return () => this.socket?.off("stream:created", callback);
@@ -381,28 +381,28 @@ export class LivestreamSocket {
   }
 
   onStreamEnded(
-    callback: (data: { streamId: string; reason: string }) => void
+    callback: (data: { streamId: string; reason: string }) => void,
   ): () => void {
     this.socket?.on("stream:ended", callback);
     return () => this.socket?.off("stream:ended", callback);
   }
 
   onViewerJoined(
-    callback: (data: { streamId: string; viewer: LivestreamViewer }) => void
+    callback: (data: { streamId: string; viewer: LivestreamViewer }) => void,
   ): () => void {
     this.socket?.on("viewer:joined", callback);
     return () => this.socket?.off("viewer:joined", callback);
   }
 
   onViewerLeft(
-    callback: (data: { streamId: string; userId: number }) => void
+    callback: (data: { streamId: string; userId: number }) => void,
   ): () => void {
     this.socket?.on("viewer:left", callback);
     return () => this.socket?.off("viewer:left", callback);
   }
 
   onViewerCount(
-    callback: (data: { streamId: string; count: number }) => void
+    callback: (data: { streamId: string; count: number }) => void,
   ): () => void {
     this.socket?.on("viewer:count", callback);
     return () => this.socket?.off("viewer:count", callback);
@@ -423,7 +423,7 @@ export class LivestreamSocket {
       streamId: string;
       userId: number;
       totalLikes: number;
-    }) => void
+    }) => void,
   ): () => void {
     this.socket?.on("like:received", callback);
     return () => this.socket?.off("like:received", callback);
@@ -440,7 +440,7 @@ export class LivestreamSocket {
   }
 
   onError(
-    callback: (data: { message: string; code?: string }) => void
+    callback: (data: { message: string; code?: string }) => void,
   ): () => void {
     this.socket?.on("error", callback);
     return () => this.socket?.off("error", callback);

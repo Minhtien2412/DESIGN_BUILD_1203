@@ -3,18 +3,18 @@
  * Replaces polling with instant message delivery
  */
 
-import { ENV } from '@/config/env';
-import { getAuthToken } from '@/services/api';
+import { getAuthToken } from "@/services/api";
+import { getWsBaseUrl } from "@/services/socket/socketConfig";
 
-type MessageEventType = 
-  | 'message:new'
-  | 'message:read'
-  | 'message:deleted'
-  | 'message:reaction'
-  | 'typing:start'
-  | 'typing:stop'
-  | 'user:online'
-  | 'user:offline';
+type MessageEventType =
+  | "message:new"
+  | "message:read"
+  | "message:deleted"
+  | "message:reaction"
+  | "typing:start"
+  | "typing:stop"
+  | "user:online"
+  | "user:offline";
 
 interface MessageSocketEvent {
   type: MessageEventType;
@@ -37,30 +37,30 @@ class MessageSocketService {
    */
   async connect() {
     if (this.socket?.readyState === WebSocket.OPEN || this.isConnecting) {
-      console.log('[MessageSocket] Already connected or connecting');
+      console.log("[MessageSocket] Already connected or connecting");
       return;
     }
 
     try {
       this.isConnecting = true;
       const token = await getAuthToken();
-      
+
       if (!token) {
-        console.warn('[MessageSocket] No auth token, skipping connection');
+        console.warn("[MessageSocket] No auth token, skipping connection");
         this.isConnecting = false;
         return;
       }
 
-      // Use WS_URL from config, fallback to constructing from API_BASE_URL
-      const wsUrl = ENV.WS_URL || 
-        `${ENV.API_BASE_URL?.replace('https://', 'wss://').replace('http://', 'ws://')}/ws/messages`;
+      // Use centralized WS URL builder (handles Android emulator, protocol, etc.)
+      const baseWs = getWsBaseUrl();
+      const wsUrl = `${baseWs}/ws/messages`;
 
-      console.log('[MessageSocket] Connecting to:', wsUrl);
+      console.log("[MessageSocket] Connecting to:", wsUrl);
 
       this.socket = new WebSocket(`${wsUrl}?token=${token}`);
 
       this.socket.onopen = () => {
-        console.log('[MessageSocket] ✅ Connected');
+        console.log("[MessageSocket] ✅ Connected");
         this.reconnectAttempts = 0;
         this.isConnecting = false;
         this.startHeartbeat();
@@ -71,24 +71,23 @@ class MessageSocketService {
           const message: MessageSocketEvent = JSON.parse(event.data);
           this.handleEvent(message);
         } catch (error) {
-          console.error('[MessageSocket] Failed to parse message:', error);
+          console.error("[MessageSocket] Failed to parse message:", error);
         }
       };
 
       this.socket.onerror = (error) => {
-        console.error('[MessageSocket] Error:', error);
+        console.error("[MessageSocket] Error:", error);
         this.isConnecting = false;
       };
 
       this.socket.onclose = () => {
-        console.log('[MessageSocket] Disconnected');
+        console.log("[MessageSocket] Disconnected");
         this.isConnecting = false;
         this.stopHeartbeat();
         this.attemptReconnect();
       };
-
     } catch (error) {
-      console.error('[MessageSocket] Connection failed:', error);
+      console.error("[MessageSocket] Connection failed:", error);
       this.isConnecting = false;
       this.attemptReconnect();
     }
@@ -98,10 +97,10 @@ class MessageSocketService {
    * Disconnect from WebSocket
    */
   disconnect() {
-    console.log('[MessageSocket] Disconnecting...');
+    console.log("[MessageSocket] Disconnecting...");
     this.reconnectAttempts = this.maxReconnectAttempts; // Prevent auto-reconnect
     this.stopHeartbeat();
-    
+
     if (this.socket) {
       this.socket.close();
       this.socket = null;
@@ -128,7 +127,7 @@ class MessageSocketService {
    */
   sendTyping(conversationId: number, isTyping: boolean) {
     this.send({
-      type: isTyping ? 'typing:start' : 'typing:stop',
+      type: isTyping ? "typing:start" : "typing:stop",
       data: { conversationId },
     });
   }
@@ -138,7 +137,7 @@ class MessageSocketService {
    */
   markAsRead(messageIds: number[]) {
     this.send({
-      type: 'message:read',
+      type: "message:read",
       data: { messageIds },
     });
   }
@@ -148,8 +147,8 @@ class MessageSocketService {
    */
   addReaction(messageId: number, reaction: string) {
     this.send({
-      type: 'message:reaction',
-      data: { messageId, reaction, action: 'add' },
+      type: "message:reaction",
+      data: { messageId, reaction, action: "add" },
     });
   }
 
@@ -158,8 +157,8 @@ class MessageSocketService {
    */
   removeReaction(messageId: number, reaction: string) {
     this.send({
-      type: 'message:reaction',
-      data: { messageId, reaction, action: 'remove' },
+      type: "message:reaction",
+      data: { messageId, reaction, action: "remove" },
     });
   }
 
@@ -170,7 +169,7 @@ class MessageSocketService {
     if (this.socket?.readyState === WebSocket.OPEN) {
       this.socket.send(JSON.stringify(message));
     } else {
-      console.warn('[MessageSocket] Cannot send, socket not open');
+      console.warn("[MessageSocket] Cannot send, socket not open");
     }
   }
 
@@ -180,11 +179,11 @@ class MessageSocketService {
   private handleEvent(event: MessageSocketEvent) {
     const handlers = this.eventHandlers.get(event.type);
     if (handlers) {
-      handlers.forEach(handler => {
+      handlers.forEach((handler) => {
         try {
           handler(event.data);
         } catch (error) {
-          console.error('[MessageSocket] Handler error:', error);
+          console.error("[MessageSocket] Handler error:", error);
         }
       });
     }
@@ -195,14 +194,16 @@ class MessageSocketService {
    */
   private attemptReconnect() {
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-      console.log('[MessageSocket] Max reconnect attempts reached');
+      console.log("[MessageSocket] Max reconnect attempts reached");
       return;
     }
 
     this.reconnectAttempts++;
     const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1);
-    
-    console.log(`[MessageSocket] Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
+
+    console.log(
+      `[MessageSocket] Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})`,
+    );
 
     setTimeout(() => {
       this.connect();
@@ -215,7 +216,7 @@ class MessageSocketService {
   private startHeartbeat() {
     this.heartbeatInterval = setInterval(() => {
       if (this.socket?.readyState === WebSocket.OPEN) {
-        this.socket.send(JSON.stringify({ type: 'ping' }));
+        this.socket.send(JSON.stringify({ type: "ping" }));
       }
     }, 30000); // Ping every 30 seconds
   }

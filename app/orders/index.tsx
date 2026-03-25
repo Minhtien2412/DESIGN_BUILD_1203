@@ -150,163 +150,6 @@ const TABS: { key: OrderStatus; label: string }[] = [
   { key: "return", label: "Trả hàng" },
 ];
 
-// Mock Orders Data
-const MOCK_ORDERS: Order[] = [
-  {
-    id: "1",
-    orderNumber: "#DH240201001",
-    createdAt: "2026-02-01T10:30:00",
-    status: "shipping",
-    shopName: "Nhà Xinh Official",
-    shopAvatar: "https://picsum.photos/100/100?random=shop1",
-    total: 3630000,
-    canCancel: false,
-    canReview: false,
-    canReorder: true,
-    items: [
-      {
-        id: "1",
-        name: "Xi măng PCB40 Holcim",
-        quantity: 10,
-        price: 100000,
-        image: "https://picsum.photos/200/200?random=p1",
-        variant: "50kg/bao",
-      },
-      {
-        id: "2",
-        name: "Gạch ốp lát Viglacera 60x60",
-        quantity: 50,
-        price: 25600,
-        image: "https://picsum.photos/200/200?random=p2",
-        variant: "Trắng ngà",
-      },
-    ],
-  },
-  {
-    id: "2",
-    orderNumber: "#DH240131002",
-    createdAt: "2026-01-31T15:45:00",
-    status: "delivered",
-    shopName: "Vật liệu XD Hoàng Gia",
-    shopAvatar: "https://picsum.photos/100/100?random=shop2",
-    total: 1580000,
-    canCancel: false,
-    canReview: true,
-    canReorder: true,
-    items: [
-      {
-        id: "3",
-        name: "Sơn Dulux Weathershield 18L",
-        quantity: 2,
-        price: 680000,
-        image: "https://picsum.photos/200/200?random=p3",
-        variant: "Màu trắng",
-      },
-    ],
-  },
-  {
-    id: "3",
-    orderNumber: "#DH240130003",
-    createdAt: "2026-01-30T09:15:00",
-    status: "pending",
-    shopName: "Thiết bị điện ABC",
-    shopAvatar: "https://picsum.photos/100/100?random=shop3",
-    total: 2450000,
-    canCancel: true,
-    canReview: false,
-    canReorder: true,
-    items: [
-      {
-        id: "4",
-        name: "Đèn LED Panel 600x600 48W",
-        quantity: 10,
-        price: 185000,
-        image: "https://picsum.photos/200/200?random=p4",
-        variant: "Ánh sáng trắng",
-      },
-      {
-        id: "5",
-        name: "Dây điện Cadivi 2x2.5mm",
-        quantity: 5,
-        price: 120000,
-        image: "https://picsum.photos/200/200?random=p5",
-        variant: "Cuộn 100m",
-      },
-    ],
-  },
-  {
-    id: "4",
-    orderNumber: "#DH240128004",
-    createdAt: "2026-01-28T14:30:00",
-    status: "cancelled",
-    shopName: "Nhà Xinh Official",
-    shopAvatar: "https://picsum.photos/100/100?random=shop1",
-    total: 890000,
-    canCancel: false,
-    canReview: false,
-    canReorder: true,
-    items: [
-      {
-        id: "6",
-        name: "Bồn cầu Inax 1 khối AC-900",
-        quantity: 1,
-        price: 890000,
-        image: "https://picsum.photos/200/200?random=p6",
-      },
-    ],
-  },
-  {
-    id: "5",
-    orderNumber: "#DH240125005",
-    createdAt: "2026-01-25T11:00:00",
-    status: "delivered",
-    shopName: "Nội thất Đại Phát",
-    shopAvatar: "https://picsum.photos/100/100?random=shop4",
-    total: 15800000,
-    canCancel: false,
-    canReview: true,
-    canReorder: true,
-    items: [
-      {
-        id: "7",
-        name: "Bộ bàn ghế gỗ sồi 6 người",
-        quantity: 1,
-        price: 12500000,
-        image: "https://picsum.photos/200/200?random=p7",
-      },
-      {
-        id: "8",
-        name: "Tủ giày gỗ 3 tầng",
-        quantity: 1,
-        price: 3300000,
-        image: "https://picsum.photos/200/200?random=p8",
-        variant: "Màu nâu",
-      },
-    ],
-  },
-  {
-    id: "6",
-    orderNumber: "#DH240120006",
-    createdAt: "2026-01-20T08:45:00",
-    status: "return",
-    shopName: "Sen vòi Việt Đức",
-    shopAvatar: "https://picsum.photos/100/100?random=shop5",
-    total: 2150000,
-    canCancel: false,
-    canReview: false,
-    canReorder: true,
-    items: [
-      {
-        id: "9",
-        name: "Vòi sen tắm đứng inox 304",
-        quantity: 1,
-        price: 2150000,
-        image: "https://picsum.photos/200/200?random=p9",
-      },
-    ],
-  },
-];
-
 export default function OrderListScreen() {
   const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState<OrderStatus>("all");
@@ -358,10 +201,10 @@ export default function OrderListScreen() {
           variant: (item as any).variant,
         })),
       }));
-      setOrders(mapped.length > 0 ? mapped : MOCK_ORDERS);
+      setOrders(mapped);
     } catch (error) {
       console.error("[Orders] Error loading orders:", error);
-      setOrders(MOCK_ORDERS); // Fallback to mock
+      setOrders([]); // Show empty state on error
     } finally {
       setLoading(false);
       setRefreshing(false);

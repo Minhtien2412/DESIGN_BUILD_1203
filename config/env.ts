@@ -78,7 +78,7 @@ export const ENV: EnvConfig = {
     "https://baotienweb.cloud/api",
   // Mobile app uses /auth/* endpoints directly (NO /api prefix)
   API_PREFIX: "",
-  API_KEY: extra.EXPO_PUBLIC_API_KEY || "thietke-resort-api-key-2024",
+  API_KEY: extra.EXPO_PUBLIC_API_KEY || process.env.EXPO_PUBLIC_API_KEY || "",
 
   // WebSocket Configuration - Backend uses Socket.IO with namespaces
   // Base URL (without namespace)
@@ -123,23 +123,25 @@ export const ENV: EnvConfig = {
   // GNews API (Free News Service - 100 requests/day)
   GNEWS_API_KEY: extra.EXPO_PUBLIC_GNEWS_API_KEY || process.env.GNEWS_API_KEY,
 
-  // Perfex CRM Integration (API Module đã kích hoạt)
-  // TESTED: Token 2 works - 2 Customers, 1 Project available
+  // Perfex CRM Integration
   PERFEX_CRM_URL:
     extra.EXPO_PUBLIC_PERFEX_CRM_URL ||
-    "https://thietkeresort.com.vn/perfex_crm",
-  // Working Token (Alternate) - Expires: Long-term
+    process.env.EXPO_PUBLIC_PERFEX_CRM_URL ||
+    "",
   PERFEX_API_TOKEN:
     extra.EXPO_PUBLIC_PERFEX_API_TOKEN ||
-    "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoibmhheGluaGQiLCJuYW1lIjoidGhpZXRrZXJlc29ydCIsIkFQSV9USU1FIjoxNzY3MDYzNzE1fQ.L9Mcg_xEOdcEYXbz9BprB93RD7ZuonhsshYPPInQm4Q",
-  // Custom API Key for /custom_api endpoints (authentication)
-  PERFEX_API_KEY: extra.EXPO_PUBLIC_PERFEX_API_KEY || "67890abcdef!@#$%^&*",
+    process.env.EXPO_PUBLIC_PERFEX_API_TOKEN ||
+    "",
+  PERFEX_API_KEY:
+    extra.EXPO_PUBLIC_PERFEX_API_KEY ||
+    process.env.EXPO_PUBLIC_PERFEX_API_KEY ||
+    "",
 
   // GetOTP Service Configuration (https://otp.dev)
-  // Dashboard: https://otp.dev/en/dashboard/
-  // Supports: SMS, Viber, Voice, Telegram
   GETOTP_API_KEY:
-    extra.EXPO_PUBLIC_GETOTP_API_KEY || "b2c885626ab1e17735372aa843edb431",
+    extra.EXPO_PUBLIC_GETOTP_API_KEY ||
+    process.env.EXPO_PUBLIC_GETOTP_API_KEY ||
+    "",
   GETOTP_SENDER_NAME: extra.GETOTP_SENDER_NAME || "ThietKe",
   GETOTP_DEFAULT_CHANNEL: extra.GETOTP_DEFAULT_CHANNEL || "sms",
 

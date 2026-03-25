@@ -9,7 +9,9 @@ import {
 } from "@/components/role-home/mobile-home";
 import { useRole } from "@/context/RoleContext";
 import {
+    customerConstructionItems,
     customerDesignItems,
+    customerFinishingItems,
     customerFurnitureProducts,
     customerHomeBanners,
     customerLiveItems,
@@ -81,6 +83,24 @@ export function CustomerHomeScreen() {
           onItemPress={handleItemPress}
         />
         <PromoBanner image={customerHomeBanners.design} />
+
+        <IconGridSection
+          title="TIỆN ÍCH XÂY DỰNG"
+          titleColor="#7FAF4D"
+          searchPlaceholder="Vật liệu, thợ, nhân công xây dựng..."
+          items={customerConstructionItems}
+          onItemPress={handleItemPress}
+        />
+        <PromoBanner image={customerHomeBanners.construction} />
+
+        <IconGridSection
+          title="TIỆN ÍCH HOÀN THIỆN"
+          titleColor="#7FAF4D"
+          searchPlaceholder="Thợ hoàn thiện, thợ sơn, thợ gạch..."
+          items={customerFinishingItems}
+          onItemPress={handleItemPress}
+        />
+        <PromoBanner image={customerHomeBanners.finishing} />
 
         <IconGridSection
           title="TIỆN ÍCH BẢO TRÌ - SỬA CHỮA"

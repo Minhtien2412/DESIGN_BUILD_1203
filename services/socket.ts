@@ -10,10 +10,14 @@
  */
 
 import ENV from "@/config/env";
+import {
+  buildSocketOptions,
+  getAccessToken,
+  getWsBaseUrl,
+  logConnectError,
+} from "@/services/socket/socketConfig";
 import type { Socket } from "@/utils/socketIo";
 import { getSocketIo } from "@/utils/socketIo";
-import { Platform } from "react-native";
-import { getAccessToken } from "./apiClient";
 
 // ============================================================================
 // Types
@@ -118,24 +122,22 @@ class SocketManager {
       throw new Error("No access token available for socket connection");
     }
 
-    // Use base URL + namespace (e.g., wss://baotienweb.cloud + /chat)
-    const baseUrl = this.normalizeWsUrl(
-      ENV.WS_BASE_URL || ENV.WS_URL || ENV.API_BASE_URL,
-    );
+    // Use centralized URL builder (handles Android emulator + normalisation)
+    const baseUrl = getWsBaseUrl();
     const wsUrl = `${baseUrl}${namespace}`;
 
     console.log("[Socket] Connecting to:", wsUrl);
     this.namespace = namespace;
 
     const io = await getSocketIo();
-    this.socket = io(wsUrl, {
-      auth: { token },
-      transports: ["websocket", "polling"],
-      reconnection: true,
-      reconnectionAttempts: this.maxReconnectAttempts,
-      reconnectionDelay: 1000,
-      reconnectionDelayMax: 5000,
-    });
+    this.socket = io(
+      wsUrl,
+      buildSocketOptions(token, {
+        reconnectionAttempts: this.maxReconnectAttempts,
+        reconnectionDelay: 1000,
+        reconnectionDelayMax: 5000,
+      }),
+    );
 
     this.setupEventListeners();
 
@@ -164,37 +166,6 @@ class SocketManager {
   }
 
   /**
-   * Normalize WebSocket URL for different platforms
-   */
-  private normalizeWsUrl(url: string): string {
-    try {
-      const wsUrl = new URL(url);
-
-      // Android emulator cannot reach localhost on host machine
-      if (
-        Platform.OS === "android" &&
-        (wsUrl.hostname === "localhost" || wsUrl.hostname === "127.0.0.1")
-      ) {
-        wsUrl.hostname = "10.0.2.2";
-      }
-
-      return wsUrl.toString().replace(/\/$/, "");
-    } catch {
-      // Fallback for non-URL strings
-      if (
-        Platform.OS === "android" &&
-        (url.includes("localhost") || url.includes("127.0.0.1"))
-      ) {
-        return url
-          .replace("localhost", "10.0.2.2")
-          .replace("127.0.0.1", "10.0.2.2")
-          .replace(/\/$/, "");
-      }
-      return url.replace(/\/$/, "");
-    }
-  }
-
-  /**
    * Setup socket event listeners
    */
   private setupEventListeners() {
@@ -209,29 +180,31 @@ class SocketManager {
       console.log("[Socket] ❌ Disconnected:", reason);
     });
 
-    // Refresh token before each reconnect attempt to avoid jwt expired errors
-    this.socket.on("reconnect_attempt", async () => {
+    // Refresh token before each reconnect attempt (use .io manager)
+    this.socket.io.on("reconnect_attempt", async () => {
       try {
         const freshToken = await getAccessToken();
         if (freshToken && this.socket) {
           (this.socket as any).auth = { token: freshToken };
           console.log("[Socket] Token refreshed for reconnection");
+        } else {
+          console.warn("[Socket] No fresh token — stopping reconnect");
+          this.socket?.disconnect();
         }
       } catch (err) {
         console.warn("[Socket] Failed to refresh token for reconnection:", err);
+        this.socket?.disconnect();
       }
     });
 
     this.socket.on("connect_error", (error: Error) => {
-      // Safely log error to prevent Babel construct.js crash
-      try {
-        console.warn(
-          "[Socket] Connection error:",
-          error?.message || "Unknown error",
-        );
-      } catch (e) {
-        console.warn("[Socket] Connection error occurred");
-      }
+      logConnectError(
+        "Socket",
+        this.namespace,
+        `${getWsBaseUrl()}${this.namespace}`,
+        error as any,
+        null,
+      );
       this.reconnectAttempts++;
 
       if (this.reconnectAttempts >= this.maxReconnectAttempts) {

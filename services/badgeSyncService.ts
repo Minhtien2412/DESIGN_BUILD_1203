@@ -12,13 +12,20 @@
  * @created 2025-01-27
  */
 
-import ENV from "@/config/env";
+import { notificationSocket } from "@/services/socket/notificationSocket";
+import {
+    buildNamespaceUrl,
+    buildSocketOptions,
+    getAccessToken,
+    logConnectError,
+} from "@/services/socket/socketConfig";
 import type { Socket } from "@/utils/socketIo";
 import { getSocketIo } from "@/utils/socketIo";
 import Constants from "expo-constants";
 import { Platform } from "react-native";
-import { getAccessToken } from "./apiClient";
 import { chatAPIService } from "./chatAPIService";
+
+// normalizeWsUrl and getTransports are now imported from socketConfig
 
 // Lazy import expo-notifications to avoid crash in Expo Go SDK 53+
 let Notifications: typeof import("expo-notifications") | null = null;
@@ -66,7 +73,8 @@ class BadgeSyncService {
 
   // WebSocket connections
   private chatSocket: Socket | null = null;
-  private notificationSocket: Socket | null = null;
+  // notificationSocket is now the shared singleton — no own instance
+  private notificationUnsubs: Array<() => void> = [];
 
   // Current badge counts
   private _counts: BadgeCounts = {
@@ -110,12 +118,7 @@ class BadgeSyncService {
   }
 
   get isConnected(): boolean {
-    return (
-      this.chatSocket?.connected ||
-      false ||
-      this.notificationSocket?.connected ||
-      false
-    );
+    return this.chatSocket?.connected || false || notificationSocket.connected;
   }
 
   /**
@@ -151,7 +154,11 @@ class BadgeSyncService {
    */
   disconnect(): void {
     // Skip if already disconnected
-    if (!this.isInitialized && !this.chatSocket && !this.notificationSocket) {
+    if (
+      !this.isInitialized &&
+      !this.chatSocket &&
+      this.notificationUnsubs.length === 0
+    ) {
       return;
     }
 
@@ -168,11 +175,9 @@ class BadgeSyncService {
       this.chatSocket = null;
     }
 
-    if (this.notificationSocket) {
-      this.notificationSocket.removeAllListeners();
-      this.notificationSocket.disconnect();
-      this.notificationSocket = null;
-    }
+    // Unsubscribe from shared notification socket (do NOT disconnect)
+    this.notificationUnsubs.forEach((fn) => fn());
+    this.notificationUnsubs = [];
 
     this.isInitialized = false;
     this.userId = null;
@@ -266,47 +271,67 @@ class BadgeSyncService {
   private async connectWebSockets(): Promise<void> {
     const token = await getAccessToken();
     if (!token) {
-      console.warn("[BadgeSync] No access token for WebSocket");
+      console.warn(
+        "[BadgeSync] No access token for WebSocket — skipping connection",
+      );
       return;
     }
 
-    const baseUrl = ENV.WS_BASE_URL || ENV.WS_URL || ENV.API_BASE_URL;
-    if (!baseUrl) {
-      console.warn("[BadgeSync] No WebSocket URL configured");
-      return;
-    }
+    // Use centralized URL builder
+    const chatUrl = buildNamespaceUrl("chat");
 
-    // Connect to chat namespace
-    await this.connectChatSocket(baseUrl, token);
+    // Connect to chat namespace (own socket — separate namespace)
+    await this.connectChatSocket(chatUrl, token);
 
-    // Connect to notifications namespace
-    await this.connectNotificationSocket(baseUrl, token);
+    // Subscribe to shared notification singleton (no own socket)
+    this.subscribeToNotificationSingleton();
   }
 
   private async connectChatSocket(
-    baseUrl: string,
+    chatUrl: string,
     token: string,
   ): Promise<void> {
     const io = await getSocketIo();
-    const chatUrl = `${baseUrl}${ENV.WS_CHAT_NS || "/chat"}`;
     console.log("[BadgeSync] Connecting to chat WebSocket:", chatUrl);
 
-    this.chatSocket = io(chatUrl, {
-      auth: { token },
-      transports: ["websocket", "polling"],
-      reconnection: true,
-      reconnectionAttempts: this.maxReconnectAttempts,
-      reconnectionDelay: 1000,
-      reconnectionDelayMax: 5000,
-    });
+    this.chatSocket = io(
+      chatUrl,
+      buildSocketOptions(token, {
+        reconnectionAttempts: this.maxReconnectAttempts,
+        reconnectionDelay: 1000,
+        reconnectionDelayMax: 5000,
+      }),
+    );
 
     this.chatSocket.on("connect", () => {
-      console.log("[BadgeSync] ✅ Chat WebSocket connected");
+      console.log(
+        "[BadgeSync] ✅ Chat WebSocket connected, id:",
+        this.chatSocket?.id,
+      );
       this.reconnectAttempts = 0;
 
       // Register user
       if (this.userId) {
         this.chatSocket?.emit("register", { userId: this.userId });
+      }
+    });
+
+    // Refresh token before each reconnect attempt (use .io manager)
+    this.chatSocket.io.on("reconnect_attempt", async () => {
+      try {
+        const freshToken = await getAccessToken();
+        if (freshToken && this.chatSocket) {
+          (this.chatSocket as any).auth = { token: freshToken };
+          console.log("[BadgeSync] Chat token refreshed for reconnection");
+        } else {
+          console.warn(
+            "[BadgeSync] No fresh token — disconnecting chat socket",
+          );
+          this.chatSocket?.disconnect();
+        }
+      } catch (err) {
+        console.warn("[BadgeSync] Failed to refresh chat token:", err);
+        this.chatSocket?.disconnect();
       }
     });
 
@@ -346,96 +371,72 @@ class BadgeSyncService {
     });
 
     this.chatSocket.on("connect_error", (error) => {
-      console.error("[BadgeSync] Chat WebSocket error:", error.message);
+      logConnectError("BadgeSync", "chat", chatUrl, error as any, token);
       this.scheduleReconnect();
     });
   }
 
-  private async connectNotificationSocket(
-    baseUrl: string,
-    token: string,
-  ): Promise<void> {
-    const io = await getSocketIo();
-    const notificationUrl = `${baseUrl}/notifications`;
-    console.log(
-      "[BadgeSync] Connecting to notification WebSocket:",
-      notificationUrl,
-    );
+  private subscribeToNotificationSingleton(): void {
+    // Clean up previous subscriptions if any
+    this.notificationUnsubs.forEach((fn) => fn());
+    this.notificationUnsubs = [];
 
-    this.notificationSocket = io(notificationUrl, {
-      auth: { token },
-      transports: ["websocket", "polling"],
-      reconnection: true,
-      reconnectionAttempts: 3, // Reduced to avoid excessive retries
-      reconnectionDelay: 2000,
-    });
+    console.log("[BadgeSync] Subscribing to shared notification socket");
 
-    this.notificationSocket.on("connect", () => {
-      console.log("[BadgeSync] ✅ Notification WebSocket connected");
-
-      // Register user
-      if (this.userId) {
-        this.notificationSocket?.emit("register", { userId: this.userId });
-      }
-    });
+    // Ensure singleton is connected (idempotent if already connected)
+    if (this.userId) {
+      notificationSocket.connect(this.userId);
+    }
 
     // Handle new notification
-    this.notificationSocket.on("notification", (notification: any) => {
-      console.log("[BadgeSync] 🔔 New notification received:", notification.id);
-
-      // Increment notification count
-      this.updateCounts(
-        { notifications: this._counts.notifications + 1 },
-        "websocket",
-      );
-
-      // Notify listeners
-      this.newNotificationCallbacks.forEach((cb) => cb(notification));
-    });
+    this.notificationUnsubs.push(
+      notificationSocket.on("notification", (notification: any) => {
+        console.log(
+          "[BadgeSync] 🔔 New notification received:",
+          notification.id,
+        );
+        this.updateCounts(
+          { notifications: this._counts.notifications + 1 },
+          "websocket",
+        );
+        this.newNotificationCallbacks.forEach((cb) => cb(notification));
+      }),
+    );
 
     // Also listen for notification:new (some backends use this format)
-    this.notificationSocket.on("notification:new", (notification: any) => {
-      console.log(
-        "[BadgeSync] 🔔 New notification (alt event):",
-        notification.id,
-      );
-
-      this.updateCounts(
-        { notifications: this._counts.notifications + 1 },
-        "websocket",
-      );
-
-      this.newNotificationCallbacks.forEach((cb) => cb(notification));
-    });
+    this.notificationUnsubs.push(
+      notificationSocket.on("notification:new", (notification: any) => {
+        console.log(
+          "[BadgeSync] 🔔 New notification (alt event):",
+          notification.id,
+        );
+        this.updateCounts(
+          { notifications: this._counts.notifications + 1 },
+          "websocket",
+        );
+        this.newNotificationCallbacks.forEach((cb) => cb(notification));
+      }),
+    );
 
     // Handle missed call notification
-    this.notificationSocket.on("missedCall", (call: any) => {
-      console.log("[BadgeSync] 📞 Missed call:", call);
-
-      this.updateCounts(
-        { missedCalls: this._counts.missedCalls + 1 },
-        "websocket",
-      );
-
-      // Also notify as notification
-      this.newNotificationCallbacks.forEach((cb) =>
-        cb({
-          id: call.id,
-          type: "call",
-          title: "Cuộc gọi nhỡ",
-          message: `Bạn có cuộc gọi nhỡ từ ${call.callerName}`,
-          ...call,
-        }),
-      );
-    });
-
-    this.notificationSocket.on("disconnect", (reason) => {
-      console.log("[BadgeSync] Notification WebSocket disconnected:", reason);
-    });
-
-    this.notificationSocket.on("connect_error", (error) => {
-      console.error("[BadgeSync] Notification WebSocket error:", error.message);
-    });
+    this.notificationUnsubs.push(
+      notificationSocket.on("missedCall", (call: any) => {
+        console.log("[BadgeSync] 📞 Missed call:", call);
+        this.updateCounts(
+          { missedCalls: this._counts.missedCalls + 1 },
+          "websocket",
+        );
+        this.newNotificationCallbacks.forEach((cb) =>
+          cb({
+            id: call.id,
+            type: "call",
+            title: "Cuộc gọi nhỡ",
+            message: `Bạn có cuộc gọi nhỡ từ ${call.callerName}`,
+            ...call,
+          }),
+        );
+      }),
+    );
   }
 
   private scheduleReconnect(): void {

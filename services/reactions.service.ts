@@ -15,8 +15,8 @@
  * @date 27/01/2026
  */
 
+import { getWsBaseUrl } from "@/services/socket/socketConfig";
 import { io, Socket } from "socket.io-client";
-import ENV from "../config/env";
 import { apiFetch } from "./api";
 
 // ==================== TYPES ====================
@@ -254,13 +254,16 @@ export async function getMyReactions(
   contentType?: string,
   limit = 50,
   offset = 0,
-): Promise<{
-  id: number;
-  contentType: string;
-  contentId: number;
-  type: ReactionType;
-  createdAt: string;
-}[] | null> {
+): Promise<
+  | {
+      id: number;
+      contentType: string;
+      contentId: number;
+      type: ReactionType;
+      createdAt: string;
+    }[]
+  | null
+> {
   try {
     let url = `/reactions/me?limit=${limit}&offset=${offset}`;
     if (contentType) {
@@ -314,7 +317,7 @@ class ReactionsSocketManager {
     this.userId = userId;
     this.userName = userName;
 
-    const wsUrl = ENV.WS_BASE_URL || ENV.API_BASE_URL.replace("/api/v1", "");
+    const wsUrl = getWsBaseUrl();
 
     this.socket = io(`${wsUrl}/reactions`, {
       transports: ["websocket"],
@@ -405,9 +408,7 @@ class ReactionsSocketManager {
   /**
    * Subscribe to multiple contents at once
    */
-  batchSubscribe(
-    contents: { contentType: string; contentId: number }[],
-  ): void {
+  batchSubscribe(contents: { contentType: string; contentId: number }[]): void {
     contents.forEach((c) => {
       this.subscriptions.add(`${c.contentType}:${c.contentId}`);
     });

@@ -6,7 +6,7 @@
  * @created 19/01/2026
  */
 
-import ENV from "@/config/env";
+import { getWsBaseUrl } from "@/services/socket/socketConfig";
 import { getItem } from "@/utils/storage";
 import { io, Socket } from "socket.io-client";
 
@@ -175,7 +175,7 @@ export class MeetingSocket {
   private wsUrl: string;
 
   constructor() {
-    this.wsUrl = `${ENV.WS_BASE_URL}/meeting`;
+    this.wsUrl = `${getWsBaseUrl()}/meeting`;
   }
 
   // Connect to meeting namespace
@@ -331,7 +331,7 @@ export class MeetingSocket {
   promoteParticipant(
     roomId: string,
     userId: number,
-    role: "co-host" | "participant"
+    role: "co-host" | "participant",
   ): void {
     this.socket?.emit("participant:promote", { roomId, userId, role });
   }
@@ -341,21 +341,24 @@ export class MeetingSocket {
   // =========================================================================
 
   onMeetingCreated(
-    callback: (data: { room: MeetingRoom }) => void
+    callback: (data: { room: MeetingRoom }) => void,
   ): () => void {
     this.socket?.on("meeting:created", callback);
     return () => this.socket?.off("meeting:created", callback);
   }
 
   onMeetingJoined(
-    callback: (data: { room: MeetingRoom; livekit: LiveKitCredentials }) => void
+    callback: (data: {
+      room: MeetingRoom;
+      livekit: LiveKitCredentials;
+    }) => void,
   ): () => void {
     this.socket?.on("meeting:joined", callback);
     return () => this.socket?.off("meeting:joined", callback);
   }
 
   onMeetingEnded(
-    callback: (data: { roomId: string; reason: string }) => void
+    callback: (data: { roomId: string; reason: string }) => void,
   ): () => void {
     this.socket?.on("meeting:ended", callback);
     return () => this.socket?.off("meeting:ended", callback);
@@ -365,14 +368,14 @@ export class MeetingSocket {
     callback: (data: {
       roomId: string;
       participant: MeetingParticipant;
-    }) => void
+    }) => void,
   ): () => void {
     this.socket?.on("participant:joined", callback);
     return () => this.socket?.off("participant:joined", callback);
   }
 
   onParticipantLeft(
-    callback: (data: { roomId: string; userId: number }) => void
+    callback: (data: { roomId: string; userId: number }) => void,
   ): () => void {
     this.socket?.on("participant:left", callback);
     return () => this.socket?.off("participant:left", callback);
@@ -382,7 +385,7 @@ export class MeetingSocket {
     callback: (data: {
       roomId: string;
       participant: Partial<MeetingParticipant>;
-    }) => void
+    }) => void,
   ): () => void {
     this.socket?.on("participant:updated", callback);
     return () => this.socket?.off("participant:updated", callback);
@@ -394,7 +397,7 @@ export class MeetingSocket {
   }
 
   onHandRaised(
-    callback: (data: { roomId: string; userId: number }) => void
+    callback: (data: { roomId: string; userId: number }) => void,
   ): () => void {
     this.socket?.on("hand:raised", callback);
     return () => this.socket?.off("hand:raised", callback);
@@ -405,28 +408,28 @@ export class MeetingSocket {
       roomId: string;
       userId: number;
       reaction: string;
-    }) => void
+    }) => void,
   ): () => void {
     this.socket?.on("reaction", callback);
     return () => this.socket?.off("reaction", callback);
   }
 
   onRecordingStarted(
-    callback: (data: { roomId: string; recordingId: string }) => void
+    callback: (data: { roomId: string; recordingId: string }) => void,
   ): () => void {
     this.socket?.on("recording:started", callback);
     return () => this.socket?.off("recording:started", callback);
   }
 
   onRecordingStopped(
-    callback: (data: { roomId: string; recordingUrl?: string }) => void
+    callback: (data: { roomId: string; recordingUrl?: string }) => void,
   ): () => void {
     this.socket?.on("recording:stopped", callback);
     return () => this.socket?.off("recording:stopped", callback);
   }
 
   onError(
-    callback: (data: { message: string; code?: string }) => void
+    callback: (data: { message: string; code?: string }) => void,
   ): () => void {
     this.socket?.on("error", callback);
     return () => this.socket?.off("error", callback);

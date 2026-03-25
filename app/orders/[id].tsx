@@ -248,8 +248,7 @@ export default function OrderDetailScreen() {
         });
       } catch (error) {
         console.error("[OrderDetail] Error loading order:", error);
-        // Fallback to mock data
-        setOrder({ ...MOCK_ORDER, id: id || "1" });
+        setOrder(null); // Show error state instead of mock
       } finally {
         setLoading(false);
         setRefreshing(false);
@@ -380,7 +379,7 @@ export default function OrderDetailScreen() {
   };
 
   const handleTrackShipping = () => {
-    setShowTracking(true);
+    router.push(`/orders/${id}/tracking` as any);
   };
 
   const formatCurrency = (amount: number) => {

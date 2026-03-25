@@ -34,11 +34,38 @@
 └── 🔙 BE-baotienweb.cloud/    # NestJS Backend API
 ```
 
+## � Environment Setup
+
+Copy `.env.example` to `.env` and fill in the required values:
+
+```bash
+cp .env.example .env
+```
+
+**Required variables** (app will not function without these):
+
+| Variable                       | Description          |
+| ------------------------------ | -------------------- |
+| `EXPO_PUBLIC_API_KEY`          | Fastify API key      |
+| `EXPO_PUBLIC_API_URL`          | Backend API base URL |
+| `EXPO_PUBLIC_WS_URL`           | WebSocket server URL |
+| `EXPO_PUBLIC_PERFEX_API_TOKEN` | Perfex CRM JWT token |
+| `EXPO_PUBLIC_PERFEX_API_KEY`   | Perfex CRM API key   |
+| `EXPO_PUBLIC_GETOTP_API_KEY`   | GetOTP service key   |
+
+See `.env.example` for the full list including optional AI, LiveKit, and cloud storage keys.
+
+> **⚠️ Never commit real secrets.** All sensitive values must live in `.env` (git-ignored).
+
 ## 🚀 Quick Start
 
 ```bash
 # Install dependencies
 npm install
+
+# Copy environment template
+cp .env.example .env
+# ➡️ Edit .env with your real keys
 
 # Start development server
 npm start

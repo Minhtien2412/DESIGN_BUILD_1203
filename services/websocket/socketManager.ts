@@ -2,9 +2,15 @@
  * WebSocket Manager - Centralized Socket.IO Connection Management
  * Handles real-time connections for Chat, Notifications, Progress Tracking
  */
-import { ENV } from '@/config/env';
-import { getToken } from '@/utils/storage';
-import { io, Socket } from 'socket.io-client';
+import {
+    buildNamespaceUrl,
+    buildSocketOptions,
+    getAccessToken,
+    logConnectError,
+    type SocketNamespace
+} from "@/services/socket/socketConfig";
+import type { Socket } from "@/utils/socketIo";
+import { getSocketIo } from "@/utils/socketIo";
 
 // ============================================================================
 // Types
@@ -19,7 +25,7 @@ export interface SocketConfig {
   timeout: number;
 }
 
-export type SocketNamespace = 'chat' | 'call' | 'progress' | 'notifications';
+export type { SocketNamespace };
 
 interface SocketEventCallback {
   (data: any): void;
@@ -34,7 +40,7 @@ class WebSocketManager {
   private eventListeners: Map<string, SocketEventCallback[]> = new Map();
   private reconnectAttempts: Map<SocketNamespace, number> = new Map();
   private maxReconnectAttempts = 5;
-  
+
   /**
    * Get socket instance for a namespace
    */
@@ -54,21 +60,22 @@ class WebSocketManager {
     }
 
     try {
-      const token = await getToken();
-      const namespaceUrl = this.getNamespaceUrl(namespace);
-      
+      const token = await getAccessToken();
+      if (!token) {
+        throw new Error("No access token available for socket connection");
+      }
+      const namespaceUrl = buildNamespaceUrl(namespace);
+
       console.log(`[WebSocket] Connecting to ${namespaceUrl}...`);
 
-      const socket = io(namespaceUrl, {
-        auth: { token },
-        transports: ['websocket', 'polling'],
-        reconnection: true,
-        reconnectionAttempts: this.maxReconnectAttempts,
-        reconnectionDelay: 1000,
-        reconnectionDelayMax: 5000,
-        timeout: 10000,
-        autoConnect: true,
-      });
+      const io = await getSocketIo();
+      const socket = io(
+        namespaceUrl,
+        buildSocketOptions(token, {
+          reconnectionAttempts: this.maxReconnectAttempts,
+          timeout: 10000,
+        }),
+      ) as Socket;
 
       // Setup event listeners
       this.setupSocketListeners(socket, namespace);
@@ -101,7 +108,7 @@ class WebSocketManager {
    * Disconnect all sockets
    */
   disconnectAll(): void {
-    console.log('[WebSocket] Disconnecting all sockets');
+    console.log("[WebSocket] Disconnecting all sockets");
     this.sockets.forEach((socket, namespace) => {
       socket.disconnect();
     });
@@ -118,14 +125,20 @@ class WebSocketManager {
     if (socket?.connected) {
       socket.emit(event, data);
     } else {
-      console.warn(`[WebSocket] Cannot emit ${event} - ${namespace} not connected`);
+      console.warn(
+        `[WebSocket] Cannot emit ${event} - ${namespace} not connected`,
+      );
     }
   }
 
   /**
    * Listen to an event on a namespace
    */
-  on(namespace: SocketNamespace, event: string, callback: SocketEventCallback): void {
+  on(
+    namespace: SocketNamespace,
+    event: string,
+    callback: SocketEventCallback,
+  ): void {
     const key = `${namespace}:${event}`;
     const listeners = this.eventListeners.get(key) || [];
     listeners.push(callback);
@@ -141,7 +154,11 @@ class WebSocketManager {
   /**
    * Remove event listener
    */
-  off(namespace: SocketNamespace, event: string, callback?: SocketEventCallback): void {
+  off(
+    namespace: SocketNamespace,
+    event: string,
+    callback?: SocketEventCallback,
+  ): void {
     const socket = this.sockets.get(namespace);
     if (socket) {
       if (callback) {
@@ -157,7 +174,7 @@ class WebSocketManager {
       this.eventListeners.delete(key);
     } else {
       const listeners = this.eventListeners.get(key) || [];
-      const filtered = listeners.filter(l => l !== callback);
+      const filtered = listeners.filter((l) => l !== callback);
       if (filtered.length > 0) {
         this.eventListeners.set(key, filtered);
       } else {
@@ -177,62 +194,80 @@ class WebSocketManager {
   // Private Methods
   // ========================================================================
 
-  private getNamespaceUrl(namespace: SocketNamespace): string {
-    const base = ENV.WS_BASE_URL || 'wss://baotienweb.cloud';
-    
-    switch (namespace) {
-      case 'chat':
-        return `${base}${ENV.WS_CHAT_NS || '/chat'}`;
-      case 'call':
-        return `${base}${ENV.WS_CALL_NS || '/call'}`;
-      case 'progress':
-        return `${base}${ENV.WS_PROGRESS_NS || '/progress'}`;
-      case 'notifications':
-        return `${base}/notifications`;
-      default:
-        return base;
-    }
-  }
+  // getNamespaceUrl is now delegated to buildNamespaceUrl from socketConfig
 
-  private setupSocketListeners(socket: Socket, namespace: SocketNamespace): void {
-    socket.on('connect', () => {
-      console.log(`[WebSocket] ✅ Connected to ${namespace} (ID: ${socket.id})`);
+  private setupSocketListeners(
+    socket: Socket,
+    namespace: SocketNamespace,
+  ): void {
+    socket.on("connect", () => {
+      console.log(
+        `[WebSocket] ✅ Connected to ${namespace} (ID: ${socket.id})`,
+      );
       this.reconnectAttempts.set(namespace, 0);
     });
 
-    socket.on('disconnect', (reason) => {
+    socket.on("disconnect", (reason) => {
       console.log(`[WebSocket] ❌ Disconnected from ${namespace}: ${reason}`);
     });
 
-    socket.on('connect_error', (error) => {
+    // Refresh token before each reconnect attempt to avoid jwt expired errors
+    (socket as any).on("reconnect_attempt", async () => {
+      try {
+        const freshToken = await getAccessToken();
+        if (freshToken) {
+          (socket as any).auth = { token: freshToken };
+          console.log(
+            `[WebSocket] Token refreshed for ${namespace} reconnection`,
+          );
+        }
+      } catch (err) {
+        console.warn(
+          `[WebSocket] Failed to refresh token for ${namespace}:`,
+          err,
+        );
+      }
+    });
+
+    socket.on("connect_error", (error) => {
       const attempts = this.reconnectAttempts.get(namespace) || 0;
-      console.error(`[WebSocket] Connection error to ${namespace} (attempt ${attempts + 1}):`, error.message);
+      logConnectError(
+        "WebSocket",
+        namespace,
+        buildNamespaceUrl(namespace),
+        error as any,
+        null,
+      );
       this.reconnectAttempts.set(namespace, attempts + 1);
 
       if (attempts >= this.maxReconnectAttempts) {
-        console.error(`[WebSocket] Max reconnection attempts reached for ${namespace}`);
+        console.error(
+          `[WebSocket] Max reconnection attempts reached for ${namespace}`,
+        );
         socket.disconnect();
       }
     });
 
-    socket.on('reconnect', (attemptNumber) => {
-      console.log(`[WebSocket] ♻️ Reconnected to ${namespace} after ${attemptNumber} attempts`);
+    socket.on("reconnect", (attemptNumber) => {
+      console.log(
+        `[WebSocket] ♻️ Reconnected to ${namespace} after ${attemptNumber} attempts`,
+      );
       this.reconnectAttempts.set(namespace, 0);
     });
 
-    socket.on('reconnect_failed', () => {
+    socket.on("reconnect_failed", () => {
       console.error(`[WebSocket] 💥 Failed to reconnect to ${namespace}`);
     });
 
-    socket.on('error', (error) => {
+    socket.on("error", (error) => {
       console.error(`[WebSocket] Error on ${namespace}:`, error);
     });
 
     // Re-attach event listeners after connection
     this.eventListeners.forEach((callbacks, key) => {
-      const [ns, event] = key.split(':');
+      const [ns, event] = key.split(":");
       if (ns === namespace) {
-        callbacks.forEach(callback => {
+        callbacks.forEach((callback) => {
           socket.on(event, callback);
         });
       }
@@ -253,22 +288,23 @@ export const socketManager = new WebSocketManager();
 /**
  * Connect to chat namespace
  */
-export const connectChat = () => socketManager.connect('chat');
+export const connectChat = () => socketManager.connect("chat");
 
 /**
  * Connect to call namespace
  */
-export const connectCall = () => socketManager.connect('call');
+export const connectCall = () => socketManager.connect("call");
 
 /**
  * Connect to progress namespace
  */
-export const connectProgress = () => socketManager.connect('progress');
+export const connectProgress = () => socketManager.connect("progress");
 
 /**
  * Connect to notifications namespace
  */
-export const connectNotifications = () => socketManager.connect('notifications');
+export const connectNotifications = () =>
+  socketManager.connect("notifications");
 
 /**
  * Disconnect all sockets (call on logout)

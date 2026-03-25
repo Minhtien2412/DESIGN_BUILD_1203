@@ -11,10 +11,14 @@
  * @created 19/01/2026
  */
 
-import { ENV } from "@/config/env";
-import { getAccessToken } from "@/services/apiClient";
-import { Platform } from "react-native";
-import io, { Socket } from "socket.io-client";
+import {
+    buildNamespaceUrl,
+    buildSocketOptions,
+    getAccessToken,
+    logConnectError,
+} from "@/services/socket/socketConfig";
+import type { Socket } from "@/utils/socketIo";
+import { getSocketIo } from "@/utils/socketIo";
 
 // ============================================================================
 // Types
@@ -182,7 +186,7 @@ class CallSocketService {
       return new Promise((resolve, reject) => {
         const timeout = setTimeout(
           () => reject(new Error("Connection timeout")),
-          10000
+          10000,
         );
         const checkConnection = setInterval(() => {
           if (this.socket?.connected) {
@@ -202,26 +206,24 @@ class CallSocketService {
         throw new Error("No access token available");
       }
 
-      const wsUrl = this.getWebSocketUrl("/call");
+      const wsUrl = buildNamespaceUrl("call");
       console.log("[CallSocket] Connecting to:", wsUrl);
 
-      this.socket = io(wsUrl, {
-        auth: { token },
-        transports: ["websocket", "polling"],
-        reconnection: true,
-        reconnectionAttempts: this.maxReconnectAttempts,
-        reconnectionDelay: 1000,
-        reconnectionDelayMax: 5000,
-        timeout: 10000,
-        forceNew: true,
-      });
+      const io = await getSocketIo();
+      this.socket = io(
+        wsUrl,
+        buildSocketOptions(token, {
+          reconnectionAttempts: this.maxReconnectAttempts,
+          timeout: 10000,
+        }),
+      );
 
       this.setupEventListeners();
 
       await new Promise<void>((resolve, reject) => {
         const timeout = setTimeout(
           () => reject(new Error("Connection timeout")),
-          10000
+          10000,
         );
 
         this.socket!.on("connect", () => {
@@ -347,7 +349,7 @@ class CallSocketService {
     callId: string,
     candidate: string,
     sdpMid?: string,
-    sdpMLineIndex?: number
+    sdpMLineIndex?: number,
   ): void {
     if (!this.socket?.connected) return;
     this.socket.emit("signal:ice-candidate", {
@@ -426,7 +428,7 @@ class CallSocketService {
    * Listen for busy signal
    */
   onCallBusy(
-    callback: (data: { callId: string; calleeId: number }) => void
+    callback: (data: { callId: string; calleeId: number }) => void,
   ): () => void {
     return this.addEventListener("call:busy", callback);
   }
@@ -461,7 +463,7 @@ class CallSocketService {
       token: string;
       roomName: string;
       serverUrl: string;
-    }) => void
+    }) => void,
   ): () => void {
     return this.addEventListener("livekit:token", callback);
   }
@@ -474,7 +476,7 @@ class CallSocketService {
       callId: string;
       userId: number;
       isMuted: boolean;
-    }) => void
+    }) => void,
   ): () => void {
     return this.addEventListener("call:muted", callback);
   }
@@ -487,7 +489,7 @@ class CallSocketService {
       callId: string;
       userId: number;
       isVideoEnabled: boolean;
-    }) => void
+    }) => void,
   ): () => void {
     return this.addEventListener("call:video-toggled", callback);
   }
@@ -496,18 +498,7 @@ class CallSocketService {
   // Private Methods
   // =========================================================================
 
-  private getWebSocketUrl(namespace: string): string {
-    let baseUrl = ENV.WS_BASE_URL || ENV.WS_URL || ENV.API_BASE_URL;
-
-    if (Platform.OS === "android") {
-      baseUrl = baseUrl
-        .replace("localhost", "10.0.2.2")
-        .replace("127.0.0.1", "10.0.2.2");
-    }
-
-    baseUrl = baseUrl.replace(/\/$/, "");
-    return `${baseUrl}${namespace}`;
-  }
+  // getWebSocketUrl removed — using centralized buildNamespaceUrl from socketConfig
 
   private setupEventListeners(): void {
     if (!this.socket) return;
@@ -521,19 +512,37 @@ class CallSocketService {
       console.log("[CallSocket] ❌ Disconnected:", reason);
     });
 
-    this.socket.on("connect_error", (error) => {
-      console.warn("[CallSocket] Connection error:", error.message);
+    // Refresh token before reconnect
+    (this.socket as any).on("reconnect_attempt", async () => {
+      try {
+        const freshToken = await getAccessToken();
+        if (freshToken && this.socket) {
+          (this.socket as any).auth = { token: freshToken };
+        }
+      } catch (err) {
+        console.warn("[CallSocket] Token refresh failed:", err);
+      }
+    });
+
+    this.socket.on("connect_error", (error: Error) => {
+      logConnectError(
+        "CallSocket",
+        "call",
+        buildNamespaceUrl("call"),
+        error as any,
+        null,
+      );
       this.reconnectAttempts++;
     });
 
-    this.socket.on("error", (data) => {
+    this.socket.on("error", (data: any) => {
       console.warn("[CallSocket] Error:", data.message);
     });
   }
 
   private addEventListener<T>(
     event: string,
-    callback: (data: T) => void
+    callback: (data: T) => void,
   ): () => void {
     if (!this.eventListeners.has(event)) {
       this.eventListeners.set(event, new Set());

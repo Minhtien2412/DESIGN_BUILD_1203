@@ -19,38 +19,36 @@
  * @created 2026-03-05
  */
 
-import { ENV } from "@/config/env";
 import { NOTIFICATION_ENDPOINTS } from "@/constants/api-endpoints";
 import { useAuth } from "@/context/AuthContext";
 import { apiFetch } from "@/services/api";
-import type { Socket } from "@/utils/socketIo";
-import { getSocketIo } from "@/utils/socketIo";
+import { notificationSocket } from "@/services/socket/notificationSocket";
 import { router } from "expo-router";
 import {
-    createContext,
-    ReactNode,
-    useCallback,
-    useContext,
-    useEffect,
-    useMemo,
-    useRef,
-    useState,
+  createContext,
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
 } from "react";
 import { AppState, type AppStateStatus } from "react-native";
 
 import type {
-    JobEvent,
-    NotificationCategory,
-    NotificationItem,
-    NotificationUserSettings,
-    PendingJob,
-    PushNotificationEvent,
+  JobEvent,
+  NotificationCategory,
+  NotificationItem,
+  NotificationUserSettings,
+  PendingJob,
+  PushNotificationEvent,
 } from "@/services/notification-system";
 import {
-    jobProgressManager,
-    notificationRenderer,
-    notificationSystem,
-    setDeeplinkHandler,
+  jobProgressManager,
+  notificationRenderer,
+  notificationSystem,
+  setDeeplinkHandler,
 } from "@/services/notification-system";
 
 // ============================================================================
@@ -116,9 +114,10 @@ export function NotificationControllerProvider({
     notificationSystem.getSettings(),
   );
 
-  const socketRef = useRef<Socket | null>(null);
   const initRef = useRef(false);
   const fetchRetryCount = useRef(0);
+  /** Holds cleanup fns for shared notification socket subscriptions */
+  const socketUnsubsRef = useRef<Array<() => void>>([]);
 
   // ==========================================================================
   // 1. INITIALIZE SYSTEM + RENDERER
@@ -184,17 +183,16 @@ export function NotificationControllerProvider({
   }, []);
 
   // ==========================================================================
-  // 3. WEBSOCKET CONNECTION (JWT auth)
+  // 3. SHARED NOTIFICATION SOCKET (subscribe to singleton)
   // ==========================================================================
 
   useEffect(() => {
     if (!user) {
-      // Disconnect on logout
-      if (socketRef.current) {
-        socketRef.current.disconnect();
-        socketRef.current = null;
-        setIsWsConnected(false);
-      }
+      // Unsubscribe on logout — do NOT disconnect the singleton
+      // (UnifiedNotificationContext may still be mounted)
+      socketUnsubsRef.current.forEach((fn) => fn());
+      socketUnsubsRef.current = [];
+      setIsWsConnected(false);
       return;
     }
 
@@ -202,120 +200,111 @@ export function NotificationControllerProvider({
       typeof user.id === "number" ? user.id : parseInt(String(user.id), 10);
     if (isNaN(userId) || userId <= 0) return;
 
-    const wsBaseUrl = ENV.WS_BASE_URL || ENV.WS_URL || "wss://baotienweb.cloud";
-    const notificationNs = ENV.WS_NOTIFICATION_NS || "/notifications";
-    const wsUrl = `${wsBaseUrl}${notificationNs}`;
-
-    if (!wsBaseUrl) return;
-
     let pingInterval: ReturnType<typeof setInterval> | null = null;
 
-    getSocketIo()
-      .then((io) => {
-        const socket = io(wsUrl, {
-          transports: ["websocket", "polling"],
-          reconnection: true,
-          reconnectionAttempts: 5,
-          reconnectionDelay: 2000,
-          reconnectionDelayMax: 10000,
-          timeout: 15000,
-        });
+    // Connect the shared singleton (no-ops if already connected)
+    notificationSocket.connect(userId).then(() => {
+      // Clean any previous subscriptions
+      socketUnsubsRef.current.forEach((fn) => fn());
+      socketUnsubsRef.current = [];
 
-        // ---- Connection events ----
-        socket.on("connect", () => {
-          console.log("[NotificationController] WS connected");
-          setIsWsConnected(true);
-          socket.emit("register", { userId });
-        });
+      const unsubs: Array<() => void> = [];
 
-        // Re-register on reconnect (socket.io fires this after disconnect → reconnect)
-        socket.io.on("reconnect", () => {
-          console.log(
-            "[NotificationController] WS reconnected, re-registering",
-          );
+      unsubs.push(
+        notificationSocket.on("connect", (data) => {
+          console.log("[NotificationController] Shared socket connected");
           setIsWsConnected(true);
-          socket.emit("register", { userId });
+
           // Sync stale data on reconnect
-          fetchNotifications();
-        });
+          if (data?.reconnected) {
+            fetchNotifications();
+          }
+        }),
+      );
 
-        socket.on("disconnect", () => {
-          console.log("[NotificationController] WS disconnected");
+      unsubs.push(
+        notificationSocket.on("disconnect", () => {
+          console.log("[NotificationController] Shared socket disconnected");
           setIsWsConnected(false);
-        });
+        }),
+      );
 
-        socket.on("connect_error", (error: Error) => {
-          console.warn("[NotificationController] WS error:", error.message);
-          setIsWsConnected(false);
-        });
-
-        // ---- Push notification events ----
-        socket.on("notification", (data: PushNotificationEvent) => {
-          // Normalize: ensure type field
+      // ---- Push notification events ----
+      unsubs.push(
+        notificationSocket.on("notification", (data: PushNotificationEvent) => {
           const event: PushNotificationEvent = {
             ...data,
             type: "notification.created",
           };
           notificationSystem.ingest(event);
-        });
+        }),
+      );
 
-        socket.on("notification.created", (data: PushNotificationEvent) => {
-          notificationSystem.ingest(data);
-        });
+      unsubs.push(
+        notificationSocket.on(
+          "notification.created",
+          (data: PushNotificationEvent) => {
+            notificationSystem.ingest(data);
+          },
+        ),
+      );
 
-        // Broadcast notifications
-        socket.on("broadcast", (data: PushNotificationEvent) => {
+      unsubs.push(
+        notificationSocket.on("broadcast", (data: PushNotificationEvent) => {
           const event: PushNotificationEvent = {
             ...data,
             type: "notification.created",
-            category: data.category || "system",
+            category: data.category || ("system" as any),
             severity: data.severity || "info",
           };
           notificationSystem.ingest(event);
-        });
+        }),
+      );
 
-        // ---- Job progress events ----
-        socket.on("job.progress", (data: JobEvent) => {
+      // ---- Job progress events ----
+      unsubs.push(
+        notificationSocket.on("job.progress", (data: JobEvent) => {
           jobProgressManager.handleEvent(data);
-        });
+        }),
+      );
 
-        socket.on("job.done", (data: JobEvent) => {
+      unsubs.push(
+        notificationSocket.on("job.done", (data: JobEvent) => {
           jobProgressManager.handleEvent(data);
-        });
+        }),
+      );
 
-        socket.on("job.failed", (data: JobEvent) => {
+      unsubs.push(
+        notificationSocket.on("job.failed", (data: JobEvent) => {
           jobProgressManager.handleEvent(data);
-        });
+        }),
+      );
 
-        // ---- Badge sync event ----
-        socket.on(
+      // ---- Badge sync event ----
+      unsubs.push(
+        notificationSocket.on(
           "badge.sync",
           (data: { counts: Record<string, number>; total: number }) => {
-            // Server can push badge counts directly
             setUnreadCount(data.total);
           },
-        );
+        ),
+      );
 
-        // Ping-pong health check
-        pingInterval = setInterval(() => {
-          if (socket.connected) {
-            socket.emit("ping");
-          }
-        }, 30000);
+      // Ping-pong health check via shared socket
+      pingInterval = setInterval(() => {
+        notificationSocket.emitToServer("ping");
+      }, 30000);
 
-        socketRef.current = socket;
-      })
-      .catch((error) => {
-        console.warn("[NotificationController] WS init failed:", error);
-        setIsWsConnected(false);
-      });
+      socketUnsubsRef.current = unsubs;
+
+      // Set initial connected state
+      setIsWsConnected(notificationSocket.connected);
+    });
 
     return () => {
       if (pingInterval) clearInterval(pingInterval);
-      if (socketRef.current) {
-        socketRef.current.disconnect();
-        socketRef.current = null;
-      }
+      socketUnsubsRef.current.forEach((fn) => fn());
+      socketUnsubsRef.current = [];
       setIsWsConnected(false);
     };
   }, [user]);
@@ -496,7 +485,7 @@ export function NotificationControllerProvider({
     (category: NotificationCategory) => {
       return notificationSystem.getUnreadCountByCategory(category);
     },
-     
+
     [notifications], // re-compute when notifications change
   );
 

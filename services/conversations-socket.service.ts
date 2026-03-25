@@ -16,9 +16,13 @@
  * @created 2026-01-22
  */
 
-import { ENV } from "@/config/env";
-import { getToken } from "@/utils/storage";
-import { io, Socket } from "socket.io-client";
+import {
+    buildNamespaceUrl,
+    buildSocketOptions,
+    getAccessToken
+} from "@/services/socket/socketConfig";
+import type { Socket } from "@/utils/socketIo";
+import { getSocketIo } from "@/utils/socketIo";
 
 // ============================================================================
 // Types
@@ -115,23 +119,25 @@ class ConversationsSocketService {
       return;
     }
 
-    const token = await getToken();
+    const token = await getAccessToken();
     if (!token) {
       console.warn("[ConversationsSocket] No auth token available");
       return;
     }
 
-    const wsUrl = `${ENV.WS_BASE_URL || ENV.API_BASE_URL}/conversations`;
+    const wsUrl = buildNamespaceUrl("conversations");
     console.log("[ConversationsSocket] Connecting to:", wsUrl);
 
-    this.socket = io(wsUrl, {
-      auth: { token },
-      transports: ["websocket", "polling"],
-      reconnection: true,
-      reconnectionAttempts: this.maxReconnectAttempts,
-      reconnectionDelay: this.reconnectDelay,
-      timeout: 10000,
-    });
+    const io = await getSocketIo();
+    this.socket = io(
+      wsUrl,
+      buildSocketOptions(token, {
+        reconnection: true,
+        reconnectionAttempts: this.maxReconnectAttempts,
+        reconnectionDelay: this.reconnectDelay,
+        timeout: 10000,
+      }),
+    ) as unknown as Socket;
 
     this.setupEventHandlers();
 

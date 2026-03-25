@@ -18,12 +18,10 @@
  * @created 2026-01-27
  */
 
-import { ENV } from "@/config/env";
 import { NOTIFICATION_ENDPOINTS } from "@/constants/api-endpoints";
 import { apiFetch } from "@/services/api";
 import { handleNotificationTap } from "@/services/notificationNavigator";
-import type { Socket } from "@/utils/socketIo";
-import { getSocketIo } from "@/utils/socketIo";
+import { notificationSocket } from "@/services/socket/notificationSocket";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Constants from "expo-constants";
 import * as Device from "expo-device";
@@ -217,9 +215,8 @@ export function UnifiedNotificationProvider({
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  // WebSocket state
+  // WebSocket state — provided by shared notificationSocket singleton
   const [isConnected, setIsConnected] = useState(false);
-  const socketRef = useRef<Socket | null>(null);
 
   // Push notification state
   const [pushToken, setPushToken] = useState<string | null>(null);
@@ -285,11 +282,10 @@ export function UnifiedNotificationProvider({
   };
 
   const cleanup = () => {
-    // Disconnect WebSocket
-    if (socketRef.current) {
-      socketRef.current.disconnect();
-      socketRef.current = null;
-    }
+    // Unsubscribe from shared notification socket (do NOT disconnect it —
+    // other consumers rely on the same singleton)
+    unsubsRef.current.forEach((unsub) => unsub());
+    unsubsRef.current = [];
 
     // Remove push notification listeners
     if (notificationListenerRef.current) {
@@ -299,6 +295,9 @@ export function UnifiedNotificationProvider({
       responseListenerRef.current.remove();
     }
   };
+
+  // Ref to hold unsubscribe functions for the shared socket events
+  const unsubsRef = useRef<Array<() => void>>([]);
 
   // ========================================================================
   // CACHED NOTIFICATIONS
@@ -350,115 +349,58 @@ export function UnifiedNotificationProvider({
       return;
     }
 
-    const wsBaseUrl = ENV.WS_BASE_URL || ENV.WS_URL || "wss://baotienweb.cloud";
-    const notificationNs = ENV.WS_NOTIFICATION_NS || "/notifications";
-    const wsUrl = `${wsBaseUrl}${notificationNs}`;
+    console.log(
+      "[UnifiedNotification] Subscribing to shared notificationSocket for userId:",
+      userId,
+    );
 
-    console.log("[UnifiedNotification] 🔌 Connecting to:", wsUrl);
-    console.log("[UnifiedNotification] 👤 User ID:", userId);
+    // Connect the shared singleton (no-ops if already connected for this user)
+    await notificationSocket.connect(userId);
 
-    try {
-      const io = await getSocketIo();
-      const socket = io(wsUrl, {
-        transports: ["websocket", "polling"],
-        reconnection: true,
-        reconnectionAttempts: 10,
-        reconnectionDelay: 2000,
-        reconnectionDelayMax: 10000,
-        timeout: 15000,
-        forceNew: true,
-      });
+    // Clean up previous subscriptions
+    unsubsRef.current.forEach((unsub) => unsub());
+    unsubsRef.current = [];
 
-      // Connection established
-      socket.on("connect", () => {
-        console.log(
-          "[UnifiedNotification] ✅ WebSocket connected, socketId:",
-          socket.id,
-        );
+    // Subscribe to events from the shared socket
+    unsubsRef.current.push(
+      notificationSocket.on("connect", () => {
+        console.log("[UnifiedNotification] ✅ Shared socket connected");
         setIsConnected(true);
+      }),
+    );
 
-        // Register user immediately after connect
-        console.log("[UnifiedNotification] 📝 Registering userId:", userId);
-        socket.emit("register", { userId });
-      });
-
-      // Server confirms registration
-      socket.on("registered", (data) => {
-        console.log(
-          "[UnifiedNotification] ✅ Registered successfully:",
-          JSON.stringify(data),
-        );
-      });
-
-      // Connected event from server (if backend sends it)
-      socket.on("connected", (data) => {
-        console.log(
-          "[UnifiedNotification] 🔗 Server connected event:",
-          JSON.stringify(data),
-        );
-      });
-
-      socket.on("disconnect", (reason) => {
-        console.log(
-          "[UnifiedNotification] ❌ WebSocket disconnected. Reason:",
-          reason,
-        );
+    unsubsRef.current.push(
+      notificationSocket.on("disconnect", () => {
         setIsConnected(false);
-      });
+      }),
+    );
 
-      socket.on("connect_error", (error) => {
-        console.error(
-          "[UnifiedNotification] 🚨 Connection error:",
-          error?.message || error,
-        );
-        setIsConnected(false);
-      });
+    unsubsRef.current.push(
+      notificationSocket.on(
+        "notification",
+        (notification: UnifiedNotification) => {
+          console.log(
+            "[UnifiedNotification] 🔔 Received notification:",
+            JSON.stringify(notification),
+          );
+          handleIncomingNotification(notification);
+        },
+      ),
+    );
 
-      socket.on("error", (error) => {
-        console.error("[UnifiedNotification] 🚨 Socket error:", error);
-      });
+    unsubsRef.current.push(
+      notificationSocket.on(
+        "broadcast",
+        (notification: UnifiedNotification) => {
+          console.log("[UnifiedNotification] 📢 Broadcast:", notification);
+          handleIncomingNotification({ ...notification, source: "system" });
+        },
+      ),
+    );
 
-      // Reconnection events
-      socket.io.on("reconnect_attempt", (attemptNumber) => {
-        console.log(
-          "[UnifiedNotification] 🔄 Reconnecting... attempt:",
-          attemptNumber,
-        );
-      });
-
-      socket.io.on("reconnect", (attemptNumber) => {
-        console.log(
-          "[UnifiedNotification] ✅ Reconnected after",
-          attemptNumber,
-          "attempts",
-        );
-        // Re-register after reconnect
-        socket.emit("register", { userId });
-      });
-
-      socket.io.on("reconnect_failed", () => {
-        console.error(
-          "[UnifiedNotification] 🚨 Reconnection failed after max attempts",
-        );
-      });
-
-      // Real-time notification from server
-      socket.on("notification", (notification: UnifiedNotification) => {
-        console.log(
-          "[UnifiedNotification] 🔔 Received notification:",
-          JSON.stringify(notification),
-        );
-        handleIncomingNotification(notification);
-      });
-
-      // Broadcast notification
-      socket.on("broadcast", (notification: UnifiedNotification) => {
-        console.log("[UnifiedNotification] 📢 Broadcast:", notification);
-        handleIncomingNotification({ ...notification, source: "system" });
-      });
-
-      // Friend Activity Events
-      socket.on("friend_new_post", (data: FriendActivityData) => {
+    // Friend Activity Events
+    unsubsRef.current.push(
+      notificationSocket.on("friend_new_post", (data: FriendActivityData) => {
         if (!isFriendActivityEnabled) return;
         console.log("[UnifiedNotification] 📝 Friend new post:", data);
         handleFriendActivity(
@@ -466,19 +408,26 @@ export function UnifiedNotificationProvider({
           data,
           `${data.actorName} đã đăng bài viết mới`,
         );
-      });
+      }),
+    );
 
-      socket.on("friend_start_livestream", (data: FriendActivityData) => {
-        if (!isFriendActivityEnabled) return;
-        console.log("[UnifiedNotification] 🔴 Friend livestream:", data);
-        handleFriendActivity(
-          "friend_livestream",
-          data,
-          `${data.actorName} đang phát trực tiếp`,
-        );
-      });
+    unsubsRef.current.push(
+      notificationSocket.on(
+        "friend_start_livestream",
+        (data: FriendActivityData) => {
+          if (!isFriendActivityEnabled) return;
+          console.log("[UnifiedNotification] 🔴 Friend livestream:", data);
+          handleFriendActivity(
+            "friend_livestream",
+            data,
+            `${data.actorName} đang phát trực tiếp`,
+          );
+        },
+      ),
+    );
 
-      socket.on("friend_new_story", (data: FriendActivityData) => {
+    unsubsRef.current.push(
+      notificationSocket.on("friend_new_story", (data: FriendActivityData) => {
         if (!isFriendActivityEnabled) return;
         console.log("[UnifiedNotification] 📸 Friend new story:", data);
         handleFriendActivity(
@@ -486,9 +435,11 @@ export function UnifiedNotificationProvider({
           data,
           `${data.actorName} đã đăng tin mới`,
         );
-      });
+      }),
+    );
 
-      socket.on("friend_new_reel", (data: FriendActivityData) => {
+    unsubsRef.current.push(
+      notificationSocket.on("friend_new_reel", (data: FriendActivityData) => {
         if (!isFriendActivityEnabled) return;
         console.log("[UnifiedNotification] 🎬 Friend new reel:", data);
         handleFriendActivity(
@@ -496,16 +447,11 @@ export function UnifiedNotificationProvider({
           data,
           `${data.actorName} đã đăng video ngắn`,
         );
-      });
+      }),
+    );
 
-      socketRef.current = socket;
-    } catch (error) {
-      console.warn(
-        "[UnifiedNotification] WebSocket init failed (skipping):",
-        error,
-      );
-      setIsConnected(false);
-    }
+    // Set connected state based on current singleton status
+    setIsConnected(notificationSocket.connected);
   }, [user, isFriendActivityEnabled]);
 
   // ========================================================================
@@ -572,7 +518,7 @@ export function UnifiedNotificationProvider({
   };
 
   const subscribeFriendActivities = useCallback((friendIds: string[]) => {
-    if (!socketRef.current || !socketRef.current.connected) {
+    if (!notificationSocket.connected) {
       console.warn(
         "[UnifiedNotification] Cannot subscribe - socket not connected",
       );
@@ -580,7 +526,9 @@ export function UnifiedNotificationProvider({
     }
 
     subscribedFriendsRef.current = friendIds;
-    socketRef.current.emit("subscribe_friend_activities", { friendIds });
+    notificationSocket.emitToServer("subscribe_friend_activities", {
+      friendIds,
+    });
     console.log(
       "[UnifiedNotification] Subscribed to friend activities:",
       friendIds.length,
@@ -589,9 +537,9 @@ export function UnifiedNotificationProvider({
   }, []);
 
   const unsubscribeFriendActivities = useCallback(() => {
-    if (!socketRef.current || !socketRef.current.connected) return;
+    if (!notificationSocket.connected) return;
 
-    socketRef.current.emit("unsubscribe_friend_activities", {
+    notificationSocket.emitToServer("unsubscribe_friend_activities", {
       friendIds: subscribedFriendsRef.current,
     });
     subscribedFriendsRef.current = [];

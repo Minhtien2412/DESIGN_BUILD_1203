@@ -1,114 +1,68 @@
 /**
  * Projects Index — Danh sách dự án
  * Route: /projects
- * Migrated to DS layout templates
+ * Migrated to DS layout templates + REAL API via useProjects hook
  */
 
 import { DSChip } from "@/components/ds";
 import { DSListScreen } from "@/components/ds/layouts";
 import { useDS } from "@/hooks/useDS";
+import { type Project, useProjects } from "@/hooks/useProjects";
 import { Ionicons } from "@expo/vector-icons";
 import { Href, router } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-// ── Types ──────────────────────────────────────────────────────────────
-interface Project {
-  id: string;
-  name: string;
-  description: string;
-  status: "planning" | "in_progress" | "completed" | "on_hold";
-  progress: number;
-  budget: number;
-  spent: number;
-  startDate: string;
-  endDate?: string;
-  location: string;
-  manager: string;
-}
-
 // ── Data ───────────────────────────────────────────────────────────────
-const STATUS_CONFIG = {
+const STATUS_CONFIG: Record<
+  string,
+  { label: string; color: string; icon: keyof typeof Ionicons.glyphMap }
+> = {
   planning: {
     label: "Lập kế hoạch",
     color: "#FF9800",
-    icon: "clipboard-outline" as const,
+    icon: "clipboard-outline",
+  },
+  active: {
+    label: "Đang thi công",
+    color: "#2196F3",
+    icon: "construct-outline",
   },
   in_progress: {
     label: "Đang thi công",
     color: "#2196F3",
-    icon: "construct-outline" as const,
+    icon: "construct-outline",
   },
   completed: {
     label: "Hoàn thành",
     color: "#4CAF50",
-    icon: "checkmark-circle-outline" as const,
+    icon: "checkmark-circle-outline",
+  },
+  paused: {
+    label: "Tạm dừng",
+    color: "#F44336",
+    icon: "pause-circle-outline",
   },
   on_hold: {
     label: "Tạm dừng",
     color: "#F44336",
-    icon: "pause-circle-outline" as const,
+    icon: "pause-circle-outline",
   },
 };
 
-const MOCK_PROJECTS: Project[] = [
-  {
-    id: "proj-1",
-    name: "Nhà phố 3 tầng Quận 7",
-    description: "Xây dựng nhà phố hiện đại 3 tầng với tầng hầm để xe",
-    status: "in_progress",
-    progress: 65,
-    budget: 2500000000,
-    spent: 1625000000,
-    startDate: "2024-03-15",
-    endDate: "2024-12-30",
-    location: "Quận 7, TP.HCM",
-    manager: "Nguyễn Văn Hùng",
-  },
-  {
-    id: "proj-2",
-    name: "Biệt thự vườn Thủ Đức",
-    description: "Thiết kế và thi công biệt thự vườn phong cách Pháp",
-    status: "planning",
-    progress: 15,
-    budget: 5000000000,
-    spent: 150000000,
-    startDate: "2024-06-01",
-    location: "TP. Thủ Đức",
-    manager: "Trần Minh Đức",
-  },
-  {
-    id: "proj-3",
-    name: "Căn hộ Penthouse Q1",
-    description: "Nội thất cao cấp căn hộ Penthouse",
-    status: "completed",
-    progress: 100,
-    budget: 800000000,
-    spent: 785000000,
-    startDate: "2024-01-10",
-    endDate: "2024-04-20",
-    location: "Quận 1, TP.HCM",
-    manager: "Lê Thị Mai",
-  },
-  {
-    id: "proj-4",
-    name: "Văn phòng Startup Hub",
-    description: "Cải tạo và fit-out văn phòng coworking space",
-    status: "on_hold",
-    progress: 40,
-    budget: 1200000000,
-    spent: 480000000,
-    startDate: "2024-02-20",
-    location: "Quận Bình Thạnh",
-    manager: "Phạm Anh Tuấn",
-  },
-];
-
 const FILTERS = [
   { key: "all", label: "Tất cả" },
-  { key: "in_progress", label: "Đang làm" },
+  { key: "active", label: "Đang làm" },
+  { key: "planning", label: "Lập kế hoạch" },
   { key: "completed", label: "Hoàn thành" },
+  { key: "paused", label: "Tạm dừng" },
 ] as const;
+
+const DEFAULT_STATUS = {
+  label: "Không rõ",
+  color: "#9E9E9E",
+  icon: "help-circle-outline" as keyof typeof Ionicons.glyphMap,
+};
 
 // ── Helpers ────────────────────────────────────────────────────────────
 function formatCurrency(amount: number): string {
@@ -126,8 +80,16 @@ function ProjectCard({
   onPress: () => void;
 }) {
   const { colors, spacing, radius, shadow } = useDS();
-  const cfg = STATUS_CONFIG[project.status];
-  const budgetPct = (project.spent / project.budget) * 100;
+  const cfg = STATUS_CONFIG[project.status] || DEFAULT_STATUS;
+  const budget = (project as any).budget || 0;
+  const spent = (project as any).spent || 0;
+  const progress = project.progress || 0;
+  const budgetPct = budget > 0 ? (spent / budget) * 100 : 0;
+  const location = (project as any).location || "";
+  const manager = project.client?.name || (project as any).engineerName || "";
+  const description = project.description || "";
+  const startDate =
+    (project as any).start_date || project.startDate || project.createdAt || "";
 
   return (
     <Pressable
@@ -171,20 +133,22 @@ function ProjectCard({
         style={[st.projectDesc, { color: colors.textSecondary }]}
         numberOfLines={2}
       >
-        {project.description}
+        {description}
       </Text>
 
       {/* Location */}
-      <View style={st.row}>
-        <Ionicons
-          name="location-outline"
-          size={14}
-          color={colors.textTertiary}
-        />
-        <Text style={[st.locText, { color: colors.textTertiary }]}>
-          {project.location}
-        </Text>
-      </View>
+      {location ? (
+        <View style={st.row}>
+          <Ionicons
+            name="location-outline"
+            size={14}
+            color={colors.textTertiary}
+          />
+          <Text style={[st.locText, { color: colors.textTertiary }]}>
+            {location}
+          </Text>
+        </View>
+      ) : null}
 
       {/* Progress */}
       <View style={{ marginTop: spacing.sm }}>
@@ -192,9 +156,7 @@ function ProjectCard({
           <Text style={[st.label, { color: colors.textSecondary }]}>
             Tiến độ
           </Text>
-          <Text style={[st.pctText, { color: colors.text }]}>
-            {project.progress}%
-          </Text>
+          <Text style={[st.pctText, { color: colors.text }]}>{progress}%</Text>
         </View>
         <View
           style={[
@@ -206,7 +168,7 @@ function ProjectCard({
             style={[
               st.progressFill,
               {
-                width: `${project.progress}%`,
+                width: `${progress}%`,
                 backgroundColor: cfg.color,
                 borderRadius: radius.xs,
               },
@@ -216,37 +178,41 @@ function ProjectCard({
       </View>
 
       {/* Budget */}
-      <View
-        style={[
-          st.budgetRow,
-          {
-            borderTopColor: colors.divider,
-            marginTop: spacing.sm,
-            paddingTop: spacing.sm,
-          },
-        ]}
-      >
-        <View style={st.budgetItem}>
-          <Text style={[st.label, { color: colors.textTertiary }]}>
-            Ngân sách
-          </Text>
-          <Text style={[st.budgetVal, { color: colors.text }]}>
-            {formatCurrency(project.budget)}
-          </Text>
+      {budget > 0 ? (
+        <View
+          style={[
+            st.budgetRow,
+            {
+              borderTopColor: colors.divider,
+              marginTop: spacing.sm,
+              paddingTop: spacing.sm,
+            },
+          ]}
+        >
+          <View style={st.budgetItem}>
+            <Text style={[st.label, { color: colors.textTertiary }]}>
+              Ngân sách
+            </Text>
+            <Text style={[st.budgetVal, { color: colors.text }]}>
+              {formatCurrency(budget)}
+            </Text>
+          </View>
+          <View style={[st.budgetDiv, { backgroundColor: colors.divider }]} />
+          <View style={st.budgetItem}>
+            <Text style={[st.label, { color: colors.textTertiary }]}>
+              Đã chi
+            </Text>
+            <Text
+              style={[
+                st.budgetVal,
+                { color: budgetPct > 90 ? colors.error : colors.text },
+              ]}
+            >
+              {formatCurrency(spent)}
+            </Text>
+          </View>
         </View>
-        <View style={[st.budgetDiv, { backgroundColor: colors.divider }]} />
-        <View style={st.budgetItem}>
-          <Text style={[st.label, { color: colors.textTertiary }]}>Đã chi</Text>
-          <Text
-            style={[
-              st.budgetVal,
-              { color: budgetPct > 90 ? colors.error : colors.text },
-            ]}
-          >
-            {formatCurrency(project.spent)}
-          </Text>
-        </View>
-      </View>
+      ) : null}
 
       {/* Footer */}
       <View style={[st.cardFooter, { borderTopColor: colors.divider }]}>
@@ -257,12 +223,14 @@ function ProjectCard({
             color={colors.textTertiary}
           />
           <Text style={[st.managerName, { color: colors.textSecondary }]}>
-            {project.manager}
+            {manager || "Chưa gán"}
           </Text>
         </View>
-        <Text style={[st.dateText, { color: colors.textTertiary }]}>
-          {new Date(project.startDate).toLocaleDateString("vi-VN")}
-        </Text>
+        {startDate ? (
+          <Text style={[st.dateText, { color: colors.textTertiary }]}>
+            {new Date(startDate).toLocaleDateString("vi-VN")}
+          </Text>
+        ) : null}
       </View>
     </Pressable>
   );
@@ -272,27 +240,25 @@ function ProjectCard({
 export default function ProjectsIndexScreen() {
   const { colors, spacing } = useDS();
   const [filter, setFilter] = useState<string>("all");
-  const [refreshing, setRefreshing] = useState(false);
+  const { projects, loading, error, refresh } = useProjects();
 
   const filteredProjects = useMemo(() => {
-    if (filter === "all") return MOCK_PROJECTS;
-    return MOCK_PROJECTS.filter((p) => p.status === filter);
-  }, [filter]);
+    if (filter === "all") return projects;
+    return projects.filter((p) => p.status === filter);
+  }, [filter, projects]);
 
   const stats = useMemo(
     () => ({
-      total: MOCK_PROJECTS.length,
-      inProgress: MOCK_PROJECTS.filter((p) => p.status === "in_progress")
-        .length,
-      completed: MOCK_PROJECTS.filter((p) => p.status === "completed").length,
+      total: projects.length,
+      inProgress: projects.filter((p) => p.status === "active").length,
+      completed: projects.filter((p) => p.status === "completed").length,
     }),
-    [],
+    [projects],
   );
 
   const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 1000);
-  }, []);
+    refresh();
+  }, [refresh]);
 
   const renderItem = useCallback(
     ({ item }: { item: Project }) => (
@@ -398,8 +364,8 @@ export default function ProjectsIndexScreen() {
       gradientHeader
       data={filteredProjects}
       renderItem={renderItem}
-      keyExtractor={(item) => item.id}
-      refreshing={refreshing}
+      keyExtractor={(item) => String(item.id)}
+      refreshing={loading}
       onRefresh={onRefresh}
       ListHeaderComponent={ListHeader}
       emptyIcon="folder-open-outline"

@@ -50,7 +50,15 @@ import {
 export type AppRole = "worker" | "engineer" | "contractor" | "customer";
 
 /** Feature readiness level */
-export type FeatureStatus = "ready" | "partial" | "hidden" | "internal";
+export type FeatureStatus =
+  | "ready" // Fully functional, wired to backend
+  | "ui-only" // UI done, using mock data (needs backend)
+  | "partial" // Partially implemented
+  | "placeholder" // Shell/stub screen only
+  | "coming-soon" // Planned but not started
+  | "disabled" // Temporarily disabled
+  | "hidden" // Not visible to users
+  | "internal"; // Admin/dev only
 
 /** Where this feature is surfaced in the UI */
 export type FeatureVisibility =
@@ -62,11 +70,16 @@ export type FeatureVisibility =
   | "flow-step"
   | "hidden";
 
+/** Data source classification */
+export type DataSource = "api" | "mock" | "local" | "websocket" | "none";
+
 export interface FeatureMapping {
   /** Unique identifier matching the data item `id` */
   id: string;
   /** Display label */
   label: string;
+  /** Short description shown in tooltips/cards */
+  description?: string;
   /** Target route path */
   targetRoute: string;
   /** Optional params passed via router.push */
@@ -85,6 +98,14 @@ export interface FeatureMapping {
   entryPoint?: string;
   /** Requires prior data (e.g. an active booking) before accessible */
   requiresData?: string;
+  /** Whether this feature needs backend API to function */
+  requiresBackend?: boolean;
+  /** Current data source for this feature */
+  dataSource?: DataSource;
+  /** Badge text to show on the icon (e.g. "Mới", "Hot") */
+  badge?: string;
+  /** Whether the icon should appear greyed out / disabled */
+  isDisabled?: boolean;
 }
 
 // ────────────────────────────────────────────────
@@ -92,78 +113,114 @@ export interface FeatureMapping {
 // ────────────────────────────────────────────────
 export const CUSTOMER_SERVICE_MAP: FeatureMapping[] = [
   {
-    id: "sv1",
+    id: "service-thiet-ke-nha",
     label: "Thiết kế nhà",
     targetRoute: SERVICES.HOUSE_DESIGN,
     allowedRoles: ["customer"],
+    status: "ui-only",
+    dataSource: "mock",
+    visibility: "home-cta",
   },
   {
-    id: "sv2",
+    id: "service-thiet-ke-noi-that",
     label: "Thiết kế nội thất",
     targetRoute: SERVICES.INTERIOR_DESIGN,
     allowedRoles: ["customer"],
+    status: "ui-only",
+    dataSource: "mock",
+    visibility: "home-cta",
   },
   {
-    id: "sv3",
+    id: "service-tra-cuu",
     label: "Tra cứu xây dựng",
     targetRoute: SERVICES.CONSTRUCTION_LOOKUP,
     allowedRoles: ["customer"],
+    status: "ready",
+    dataSource: "api",
+    visibility: "home-cta",
   },
   {
-    id: "sv4",
+    id: "service-xin-phep",
     label: "Xin phép",
     targetRoute: SERVICES.PERMIT,
     allowedRoles: ["customer"],
+    status: "ui-only",
+    dataSource: "mock",
+    visibility: "home-cta",
   },
   {
-    id: "sv5",
+    id: "service-ho-so",
     label: "Hồ sơ mẫu",
     targetRoute: SERVICES.SAMPLE_DOCS,
     allowedRoles: ["customer"],
+    status: "ui-only",
+    dataSource: "local",
+    visibility: "home-cta",
   },
   {
-    id: "sv6",
+    id: "service-sua-nha",
     label: "Sửa nhà",
     targetRoute: SERVICES.HOME_MAINTENANCE,
     allowedRoles: ["customer"],
     reusesTemplate: "home-maintenance",
+    status: "ready",
+    dataSource: "api",
+    visibility: "home-cta",
   },
   {
-    id: "sv7",
+    id: "service-mau-nha",
     label: "Mẫu nhà",
     targetRoute: DESIGN_LIBRARY.INDEX,
     allowedRoles: ["customer"],
     reusesTemplate: "design-library",
+    status: "ui-only",
+    dataSource: "local",
+    visibility: "home-cta",
   },
   {
-    id: "sv8",
+    id: "service-tu-van",
     label: "Tư vấn chất lượng",
     targetRoute: SERVICES.QUALITY_CONSULTING,
     allowedRoles: ["customer"],
+    status: "ui-only",
+    dataSource: "mock",
+    visibility: "home-cta",
   },
   {
-    id: "sv9",
+    id: "service-cong-ty-xay-dung",
     label: "Công ty xây dựng",
     targetRoute: SERVICES.CONSTRUCTION_COMPANY,
     allowedRoles: ["customer"],
+    status: "ui-only",
+    dataSource: "mock",
+    visibility: "home-cta",
   },
   {
-    id: "sv10",
+    id: "service-cong-ty-noi-that",
     label: "Công ty nội thất",
     targetRoute: SERVICES.INTERIOR_COMPANY,
     allowedRoles: ["customer"],
+    status: "ui-only",
+    dataSource: "mock",
+    visibility: "home-cta",
   },
   {
-    id: "sv11",
+    id: "service-giam-sat",
     label: "Giám sát thi công",
     targetRoute: SERVICES.QUALITY_SUPERVISION,
     allowedRoles: ["customer"],
+    status: "ui-only",
+    dataSource: "mock",
+    visibility: "home-cta",
   },
   {
-    id: "sv12",
+    id: "service-xem-them",
     label: "Xem thêm",
     targetRoute: SERVICES.INDEX,
     allowedRoles: ["customer"],
+    status: "ready",
+    dataSource: "none",
+    visibility: "home-cta",
   },
 ];
 
@@ -172,55 +229,79 @@ export const CUSTOMER_SERVICE_MAP: FeatureMapping[] = [
 // ────────────────────────────────────────────────
 export const CUSTOMER_DESIGN_UTILITY_MAP: FeatureMapping[] = [
   {
-    id: "d1",
+    id: "design-kien-truc-su",
     label: "Kiến trúc sư",
     targetRoute: SERVICES.ARCHITECT_LISTING,
     allowedRoles: ["customer"],
     reusesTemplate: "professional-listing",
+    status: "ui-only",
+    dataSource: "mock",
+    visibility: "home-cta",
   },
   {
-    id: "d2",
+    id: "design-ky-su",
     label: "Kỹ sư",
     targetRoute: SERVICES.ENGINEER_LISTING,
     allowedRoles: ["customer"],
     reusesTemplate: "professional-listing",
+    status: "ui-only",
+    dataSource: "mock",
+    visibility: "home-cta",
   },
   {
-    id: "d3",
+    id: "design-ket-cau",
     label: "Kết cấu",
     targetRoute: SERVICES.STRUCTURAL_ENGINEER,
     allowedRoles: ["customer"],
     reusesTemplate: "professional-listing",
+    status: "ui-only",
+    dataSource: "mock",
+    visibility: "home-cta",
   },
   {
-    id: "d4",
+    id: "design-dien",
     label: "Điện",
     targetRoute: SERVICES.MEP_ELECTRICAL,
     allowedRoles: ["customer"],
+    status: "ui-only",
+    dataSource: "mock",
+    visibility: "home-cta",
   },
   {
-    id: "d5",
+    id: "design-nuoc",
     label: "Nước",
     targetRoute: SERVICES.MEP_PLUMBING,
     allowedRoles: ["customer"],
+    status: "ui-only",
+    dataSource: "mock",
+    visibility: "home-cta",
   },
   {
-    id: "d6",
+    id: "design-du-toan",
     label: "Dự toán",
     targetRoute: SERVICES.COST_ESTIMATE_AI,
     allowedRoles: ["customer"],
+    status: "ui-only",
+    dataSource: "mock",
+    visibility: "home-cta",
   },
   {
-    id: "d7",
+    id: "design-noi-that",
     label: "Nội thất",
     targetRoute: SERVICES.INTERIOR_DESIGN,
     allowedRoles: ["customer"],
+    status: "ui-only",
+    dataSource: "mock",
+    visibility: "home-cta",
   },
   {
-    id: "d8",
+    id: "design-ai",
     label: "Công Cụ AI",
     targetRoute: AI.HUB,
     allowedRoles: ["customer"],
+    status: "ready",
+    dataSource: "api",
+    visibility: "home-cta",
   },
 ];
 
@@ -229,54 +310,118 @@ export const CUSTOMER_DESIGN_UTILITY_MAP: FeatureMapping[] = [
 // ────────────────────────────────────────────────
 export const CUSTOMER_CONSTRUCTION_UTILITY_MAP: FeatureMapping[] = [
   {
-    id: "c1",
+    id: "construction-ep-coc",
     label: "Ép cọc",
     targetRoute: UTILITIES.EP_COC,
     allowedRoles: ["customer", "contractor"],
+    status: "ui-only",
+    dataSource: "mock",
+    visibility: "home-cta",
   },
   {
-    id: "c2",
+    id: "construction-dao-dat",
     label: "Đào đất",
     targetRoute: UTILITIES.DAO_DAT,
     allowedRoles: ["customer", "contractor"],
+    status: "ui-only",
+    dataSource: "mock",
+    visibility: "home-cta",
   },
   {
-    id: "c3",
+    id: "construction-vat-lieu",
     label: "Vật liệu",
     targetRoute: UTILITIES.VAT_LIEU,
     allowedRoles: ["customer", "contractor"],
+    status: "ui-only",
+    dataSource: "mock",
+    visibility: "home-cta",
   },
   {
-    id: "c4",
+    id: "construction-nhan-cong",
     label: "Nhân công xây dựng",
     targetRoute: UTILITIES.NHAN_CONG,
     allowedRoles: ["customer", "contractor"],
+    status: "ui-only",
+    dataSource: "mock",
+    visibility: "home-cta",
   },
   {
-    id: "c5",
+    id: "construction-tho-xay",
     label: "Thợ xây",
     targetRoute: UTILITIES.THO_XAY,
     allowedRoles: ["customer", "contractor"],
+    status: "ui-only",
+    dataSource: "mock",
+    visibility: "home-cta",
   },
   {
-    id: "c6",
+    id: "construction-tho-sat",
+    label: "Thợ sắt",
+    targetRoute: WORKERS.INDEX,
+    params: { specialty: "ironworker" },
+    allowedRoles: ["customer", "contractor"],
+    reusesTemplate: "worker-listing",
+    status: "ready",
+    dataSource: "api",
+    visibility: "home-cta",
+  },
+  {
+    id: "construction-tho-coffa",
     label: "Thợ cốt pha",
     targetRoute: UTILITIES.THO_COFFA,
     allowedRoles: ["customer", "contractor"],
+    status: "ui-only",
+    dataSource: "mock",
+    visibility: "home-cta",
   },
   {
-    id: "c7",
+    id: "construction-tho-co-khi",
     label: "Thợ cơ khí",
     targetRoute: WORKERS.INDEX,
     params: { specialty: "mechanic" },
     allowedRoles: ["customer", "contractor"],
     reusesTemplate: "worker-listing",
+    status: "ready",
+    dataSource: "api",
+    visibility: "home-cta",
   },
   {
-    id: "c8",
+    id: "construction-tho-to-tuong",
+    label: "Tô tường",
+    targetRoute: WORKERS.INDEX,
+    params: { specialty: "plasterer" },
+    allowedRoles: ["customer", "contractor"],
+    reusesTemplate: "worker-listing",
+    status: "ready",
+    dataSource: "api",
+    visibility: "home-cta",
+  },
+  {
+    id: "construction-tho-dien-nuoc",
+    label: "Điện nước",
+    targetRoute: UTILITIES.THO_DIEN_NUOC,
+    allowedRoles: ["customer", "contractor"],
+    status: "ui-only",
+    dataSource: "mock",
+    visibility: "home-cta",
+  },
+  {
+    id: "construction-be-tong",
+    label: "Bê tông",
+    targetRoute: UTILITIES.BE_TONG,
+    allowedRoles: ["customer", "contractor"],
+    status: "ui-only",
+    dataSource: "mock",
+    visibility: "home-cta",
+  },
+  {
+    id: "construction-xem-them",
     label: "Xem thêm",
     targetRoute: UTILITIES.INDEX,
     allowedRoles: ["customer", "contractor"],
+    status: "ready",
+    dataSource: "none",
+    visibility: "home-cta",
   },
 ];
 
@@ -285,58 +430,80 @@ export const CUSTOMER_CONSTRUCTION_UTILITY_MAP: FeatureMapping[] = [
 // ────────────────────────────────────────────────
 export const CUSTOMER_FINISHING_UTILITY_MAP: FeatureMapping[] = [
   {
-    id: "f1",
+    id: "finishing-op-gach",
     label: "Thợ lát gạch",
     targetRoute: FINISHING.LAT_GACH,
     allowedRoles: ["customer"],
+    status: "ui-only",
+    dataSource: "mock",
+    visibility: "home-cta",
   },
   {
-    id: "f2",
+    id: "finishing-thach-cao",
     label: "Thợ thạch cao",
     targetRoute: FINISHING.THACH_CAO,
     allowedRoles: ["customer"],
+    status: "ui-only",
+    dataSource: "mock",
+    visibility: "home-cta",
   },
   {
-    id: "f3",
+    id: "finishing-tho-son",
     label: "Thợ sơn",
     targetRoute: FINISHING.SON,
     params: { trade: "painter" },
     allowedRoles: ["customer"],
     reusesTemplate: "finishing-worker",
+    status: "ui-only",
+    dataSource: "mock",
+    visibility: "home-cta",
   },
   {
-    id: "f4",
+    id: "finishing-tho-da",
     label: "Thợ đá",
     targetRoute: FINISHING.DA,
     allowedRoles: ["customer"],
+    status: "ui-only",
+    dataSource: "mock",
+    visibility: "home-cta",
   },
   {
-    id: "f5",
-    label: "Thợ trần cáo",
+    id: "finishing-tho-lam-cua",
+    label: "Thợ làm cửa",
     targetRoute: FINISHING.LAM_CUA,
-    params: { trade: "ceiling" },
     allowedRoles: ["customer"],
-    reusesTemplate: "finishing-worker",
+    status: "ui-only",
+    dataSource: "mock",
+    visibility: "home-cta",
   },
   {
-    id: "f6",
+    id: "finishing-tho-lan-can",
     label: "Thợ lan can",
     targetRoute: FINISHING.LAN_CAN,
     allowedRoles: ["customer"],
+    status: "ui-only",
+    dataSource: "mock",
+    visibility: "home-cta",
   },
   {
-    id: "f7",
+    id: "finishing-tho-cong",
     label: "Thợ cổng",
     targetRoute: WORKERS.INDEX,
     params: { specialty: "gate" },
     allowedRoles: ["customer"],
     reusesTemplate: "worker-listing",
+    status: "ready",
+    dataSource: "api",
+    visibility: "home-cta",
   },
   {
-    id: "f8",
+    id: "finishing-tho-camera",
     label: "Thợ camera",
     targetRoute: FINISHING.CAMERA,
     allowedRoles: ["customer"],
+    status: "ui-only",
+    dataSource: "mock",
+    visibility: "home-cta",
   },
 ];
 
@@ -345,66 +512,90 @@ export const CUSTOMER_FINISHING_UTILITY_MAP: FeatureMapping[] = [
 // ────────────────────────────────────────────────
 export const CUSTOMER_MAINTENANCE_UTILITY_MAP: FeatureMapping[] = [
   {
-    id: "m1",
+    id: "maintenance-may-giat",
     label: "Thợ sửa máy giặt",
     targetRoute: SERVICES.HOME_MAINTENANCE,
     params: { category: "washing-machine" },
     allowedRoles: ["customer"],
     reusesTemplate: "home-maintenance",
+    status: "ready",
+    dataSource: "api",
+    visibility: "home-cta",
   },
   {
-    id: "m2",
+    id: "maintenance-tu-lanh",
     label: "Thợ sửa tủ lạnh",
     targetRoute: SERVICES.HOME_MAINTENANCE,
     params: { category: "refrigerator" },
     allowedRoles: ["customer"],
     reusesTemplate: "home-maintenance",
+    status: "ready",
+    dataSource: "api",
+    visibility: "home-cta",
   },
   {
-    id: "m3",
+    id: "maintenance-thong-tac",
     label: "Thợ thống tắc cống",
     targetRoute: SERVICES.HOME_MAINTENANCE,
     params: { category: "drainage" },
     allowedRoles: ["customer"],
     reusesTemplate: "home-maintenance",
+    status: "ready",
+    dataSource: "api",
+    visibility: "home-cta",
   },
   {
-    id: "m4",
+    id: "maintenance-dien",
     label: "Thợ điện",
     targetRoute: SERVICES.HOME_MAINTENANCE,
     params: { category: "electrical" },
     allowedRoles: ["customer"],
     reusesTemplate: "home-maintenance",
+    status: "ready",
+    dataSource: "api",
+    visibility: "home-cta",
   },
   {
-    id: "m5",
+    id: "maintenance-cap-nuoc",
     label: "Thợ cấp nước",
     targetRoute: SERVICES.HOME_MAINTENANCE,
     params: { category: "water-supply" },
     allowedRoles: ["customer"],
     reusesTemplate: "home-maintenance",
+    status: "ready",
+    dataSource: "api",
+    visibility: "home-cta",
   },
   {
-    id: "m6",
+    id: "maintenance-wifi",
     label: "Thợ mạng - wifi",
     targetRoute: SERVICES.HOME_MAINTENANCE,
     params: { category: "network" },
     allowedRoles: ["customer"],
     reusesTemplate: "home-maintenance",
+    status: "ready",
+    dataSource: "api",
+    visibility: "home-cta",
   },
   {
-    id: "m7",
+    id: "maintenance-may-lanh",
     label: "Thợ sửa máy lạnh",
     targetRoute: SERVICES.HOME_MAINTENANCE,
     params: { category: "air-conditioning" },
     allowedRoles: ["customer"],
     reusesTemplate: "home-maintenance",
+    status: "ready",
+    dataSource: "api",
+    visibility: "home-cta",
   },
   {
-    id: "m8",
+    id: "maintenance-xem-them",
     label: "Xem thêm",
     targetRoute: SERVICES.HOME_MAINTENANCE,
     allowedRoles: ["customer"],
+    status: "ready",
+    dataSource: "none",
+    visibility: "home-cta",
   },
 ];
 
@@ -413,66 +604,92 @@ export const CUSTOMER_MAINTENANCE_UTILITY_MAP: FeatureMapping[] = [
 // ────────────────────────────────────────────────
 export const CUSTOMER_MARKETPLACE_MAP: FeatureMapping[] = [
   {
-    id: "mp1",
+    id: "market-bep",
     label: "Thiết bị bếp",
     targetRoute: TABS.SHOP,
     params: { category: "kitchen-equipment" },
     allowedRoles: ["customer"],
     reusesTemplate: "shop-category",
+    status: "ready",
+    dataSource: "api",
+    visibility: "home-cta",
   },
   {
-    id: "mp2",
+    id: "market-ve-sinh",
     label: "Thiết bị vệ sinh",
     targetRoute: TABS.SHOP,
     params: { category: "sanitary-equipment" },
     allowedRoles: ["customer"],
     reusesTemplate: "shop-category",
+    status: "ready",
+    dataSource: "api",
+    visibility: "home-cta",
   },
   {
-    id: "mp3",
+    id: "market-dien",
     label: "Điện",
     targetRoute: TABS.SHOP,
     params: { category: "electrical" },
     allowedRoles: ["customer"],
     reusesTemplate: "shop-category",
+    status: "ready",
+    dataSource: "api",
+    visibility: "home-cta",
   },
   {
-    id: "mp4",
+    id: "market-nuoc",
+    label: "Nước",
+    targetRoute: TABS.SHOP,
+    params: { category: "plumbing" },
+    allowedRoles: ["customer"],
+    reusesTemplate: "shop-category",
+    status: "ready",
+    dataSource: "api",
+    visibility: "home-cta",
+  },
+  {
+    id: "market-pccc",
     label: "PCCC",
     targetRoute: TABS.SHOP,
     params: { category: "fire-safety" },
     allowedRoles: ["customer"],
     reusesTemplate: "shop-category",
+    status: "ready",
+    dataSource: "api",
+    visibility: "home-cta",
   },
   {
-    id: "mp5",
+    id: "market-giuong",
     label: "Giường",
     targetRoute: TABS.SHOP,
     params: { category: "bedroom" },
     allowedRoles: ["customer"],
     reusesTemplate: "shop-category",
+    status: "ready",
+    dataSource: "api",
+    visibility: "home-cta",
   },
   {
-    id: "mp6",
+    id: "market-ban-lam-viec",
     label: "Bàn làm việc",
     targetRoute: TABS.SHOP,
     params: { category: "study-desks" },
     allowedRoles: ["customer"],
     reusesTemplate: "shop-category",
+    status: "ready",
+    dataSource: "api",
+    visibility: "home-cta",
   },
   {
-    id: "mp7",
+    id: "market-sofa",
     label: "Sofa",
     targetRoute: TABS.SHOP,
     params: { category: "sofas" },
     allowedRoles: ["customer"],
     reusesTemplate: "shop-category",
-  },
-  {
-    id: "mp8",
-    label: "Xem thêm",
-    targetRoute: TABS.SHOP,
-    allowedRoles: ["customer"],
+    status: "ready",
+    dataSource: "api",
+    visibility: "home-cta",
   },
 ];
 
@@ -481,21 +698,21 @@ export const CUSTOMER_MARKETPLACE_MAP: FeatureMapping[] = [
 // ────────────────────────────────────────────────
 export const CUSTOMER_FURNITURE_MAP: FeatureMapping[] = [
   {
-    id: "fp1",
+    id: "furniture-1",
     label: "Sofa hiện đại",
     targetRoute: "/product/fp1",
     allowedRoles: ["customer"],
     reusesTemplate: "product-detail",
   },
   {
-    id: "fp2",
+    id: "furniture-2",
     label: "Bàn ăn gỗ sồi",
     targetRoute: "/product/fp2",
     allowedRoles: ["customer"],
     reusesTemplate: "product-detail",
   },
   {
-    id: "fp3",
+    id: "furniture-3",
     label: "Đèn học",
     targetRoute: "/product/fp3",
     allowedRoles: ["customer"],
@@ -512,6 +729,9 @@ export const WORKER_SHORTCUT_MAP: FeatureMapping[] = [
     label: "Nhận việc",
     targetRoute: WORKERS.BOOKINGS,
     allowedRoles: ["worker"],
+    status: "ready",
+    dataSource: "api",
+    visibility: "home-shortcut",
   },
   {
     id: "w2",
@@ -520,6 +740,9 @@ export const WORKER_SHORTCUT_MAP: FeatureMapping[] = [
     params: { sort: "nearest" },
     allowedRoles: ["worker"],
     reusesTemplate: "find-workers",
+    status: "ready",
+    dataSource: "api",
+    visibility: "home-shortcut",
   },
   {
     id: "w3",
@@ -527,12 +750,18 @@ export const WORKER_SHORTCUT_MAP: FeatureMapping[] = [
     targetRoute: BOOKING.SCAN_WORKERS,
     allowedRoles: ["worker"],
     reusesTemplate: "scan-workers",
+    status: "ready",
+    dataSource: "api",
+    visibility: "home-shortcut",
   },
   {
     id: "w4",
     label: "Vật tư",
     targetRoute: VLXD.INDEX,
     allowedRoles: ["worker"],
+    status: "ready",
+    dataSource: "api",
+    visibility: "home-shortcut",
   },
   {
     id: "w5",
@@ -540,6 +769,9 @@ export const WORKER_SHORTCUT_MAP: FeatureMapping[] = [
     targetRoute: WORKERS.SCHEDULE,
     allowedRoles: ["worker"],
     reusesTemplate: "worker-schedule",
+    status: "ready",
+    dataSource: "api",
+    visibility: "home-shortcut",
   },
   {
     id: "w6",
@@ -547,6 +779,9 @@ export const WORKER_SHORTCUT_MAP: FeatureMapping[] = [
     targetRoute: WORKERS.SCHEDULE,
     allowedRoles: ["worker"],
     reusesTemplate: "worker-schedule",
+    status: "ready",
+    dataSource: "api",
+    visibility: "home-shortcut",
   },
   {
     id: "w7",
@@ -554,12 +789,18 @@ export const WORKER_SHORTCUT_MAP: FeatureMapping[] = [
     targetRoute: BUDGET.INDEX,
     allowedRoles: ["worker"],
     reusesTemplate: "budget",
+    status: "ui-only",
+    dataSource: "mock",
+    visibility: "home-shortcut",
   },
   {
     id: "w8",
     label: "Live công trình",
     targetRoute: TABS.LIVE,
     allowedRoles: ["worker"],
+    status: "ready",
+    dataSource: "websocket",
+    visibility: "home-shortcut",
   },
 ];
 
@@ -680,12 +921,18 @@ export const ENGINEER_TOOL_MAP: FeatureMapping[] = [
     label: "Hồ sơ năng lực",
     targetRoute: TABS.PROFILE,
     allowedRoles: ["engineer"],
+    status: "ready",
+    dataSource: "api",
+    visibility: "home-shortcut",
   },
   {
     id: "e2",
     label: "Dự án",
     targetRoute: PROJECTS.INDEX,
     allowedRoles: ["engineer"],
+    status: "ready",
+    dataSource: "api",
+    visibility: "home-shortcut",
   },
   {
     id: "e3",
@@ -693,6 +940,9 @@ export const ENGINEER_TOOL_MAP: FeatureMapping[] = [
     targetRoute: TABS.PROFILE,
     params: { section: "certifications" },
     allowedRoles: ["engineer"],
+    status: "ready",
+    dataSource: "api",
+    visibility: "home-shortcut",
   },
   {
     id: "e4",
@@ -700,6 +950,9 @@ export const ENGINEER_TOOL_MAP: FeatureMapping[] = [
     targetRoute: CALCULATORS.PROJECT_ESTIMATE,
     allowedRoles: ["engineer"],
     reusesTemplate: "calculators",
+    status: "ui-only",
+    dataSource: "mock",
+    visibility: "home-shortcut",
   },
   {
     id: "e5",
@@ -707,6 +960,9 @@ export const ENGINEER_TOOL_MAP: FeatureMapping[] = [
     targetRoute: CRM.CONTRACTS,
     allowedRoles: ["engineer"],
     reusesTemplate: "crm-contracts",
+    status: "ui-only",
+    dataSource: "mock",
+    visibility: "home-shortcut",
   },
   {
     id: "e6",
@@ -714,12 +970,18 @@ export const ENGINEER_TOOL_MAP: FeatureMapping[] = [
     targetRoute: QUALITY.INDEX,
     allowedRoles: ["engineer"],
     reusesTemplate: "quality-assurance",
+    status: "ui-only",
+    dataSource: "mock",
+    visibility: "home-shortcut",
   },
   {
     id: "e7",
     label: "Live Preview",
     targetRoute: TABS.LIVE,
     allowedRoles: ["engineer"],
+    status: "ready",
+    dataSource: "websocket",
+    visibility: "home-shortcut",
   },
   {
     id: "e8",
@@ -727,6 +989,9 @@ export const ENGINEER_TOOL_MAP: FeatureMapping[] = [
     targetRoute: COMMUNICATIONS.CREATE_MEETING,
     allowedRoles: ["engineer"],
     reusesTemplate: "communications",
+    status: "ready",
+    dataSource: "api",
+    visibility: "home-shortcut",
   },
 ];
 
@@ -739,6 +1004,9 @@ export const ENGINEER_ACTION_MAP: FeatureMapping[] = [
     label: "VR/AR Mặt bằng",
     targetRoute: MISC.VR_PREVIEW,
     allowedRoles: ["engineer"],
+    status: "coming-soon",
+    dataSource: "none",
+    visibility: "home-cta",
   },
   {
     id: "ea2",
@@ -746,12 +1014,18 @@ export const ENGINEER_ACTION_MAP: FeatureMapping[] = [
     targetRoute: CONSTRUCTION.PROGRESS,
     allowedRoles: ["engineer"],
     reusesTemplate: "construction-progress",
+    status: "ui-only",
+    dataSource: "mock",
+    visibility: "home-cta",
   },
   {
     id: "ea3",
     label: "Bản vẽ 2D/3D",
     targetRoute: AI_DESIGN.VISUALIZER,
     allowedRoles: ["engineer"],
+    status: "ui-only",
+    dataSource: "mock",
+    visibility: "home-cta",
   },
   {
     id: "ea4",
@@ -759,6 +1033,9 @@ export const ENGINEER_ACTION_MAP: FeatureMapping[] = [
     targetRoute: CHAT.INDEX,
     allowedRoles: ["engineer"],
     reusesTemplate: "chat",
+    status: "ready",
+    dataSource: "api",
+    visibility: "home-cta",
   },
 ];
 
@@ -772,6 +1049,9 @@ export const CONTRACTOR_ACTION_MAP: FeatureMapping[] = [
     targetRoute: CRM.STAFF,
     allowedRoles: ["contractor"],
     reusesTemplate: "crm-staff",
+    status: "ready",
+    dataSource: "api",
+    visibility: "home-shortcut",
   },
   {
     id: "ca2",
@@ -780,12 +1060,18 @@ export const CONTRACTOR_ACTION_MAP: FeatureMapping[] = [
     params: { view: "team" },
     allowedRoles: ["contractor"],
     reusesTemplate: "worker-listing",
+    status: "ready",
+    dataSource: "api",
+    visibility: "home-shortcut",
   },
   {
     id: "ca3",
     label: "Dự án",
     targetRoute: PROJECTS.INDEX,
     allowedRoles: ["contractor"],
+    status: "ready",
+    dataSource: "api",
+    visibility: "home-shortcut",
   },
   {
     id: "ca4",
@@ -793,6 +1079,9 @@ export const CONTRACTOR_ACTION_MAP: FeatureMapping[] = [
     targetRoute: CRM.CONTRACTS,
     allowedRoles: ["contractor"],
     reusesTemplate: "crm-contracts",
+    status: "ui-only",
+    dataSource: "mock",
+    visibility: "home-shortcut",
   },
   {
     id: "ca5",
@@ -800,6 +1089,9 @@ export const CONTRACTOR_ACTION_MAP: FeatureMapping[] = [
     targetRoute: VLXD.INDEX,
     allowedRoles: ["contractor"],
     reusesTemplate: "vlxd",
+    status: "ready",
+    dataSource: "api",
+    visibility: "home-shortcut",
   },
   {
     id: "ca6",
@@ -807,6 +1099,9 @@ export const CONTRACTOR_ACTION_MAP: FeatureMapping[] = [
     targetRoute: TIMELINE.INDEX,
     allowedRoles: ["contractor"],
     reusesTemplate: "timeline",
+    status: "ready",
+    dataSource: "websocket",
+    visibility: "home-shortcut",
   },
   {
     id: "ca7",
@@ -814,6 +1109,9 @@ export const CONTRACTOR_ACTION_MAP: FeatureMapping[] = [
     targetRoute: CALCULATORS.PROJECT_ESTIMATE,
     allowedRoles: ["contractor"],
     reusesTemplate: "calculators",
+    status: "ui-only",
+    dataSource: "mock",
+    visibility: "home-shortcut",
   },
   {
     id: "ca8",
@@ -821,6 +1119,9 @@ export const CONTRACTOR_ACTION_MAP: FeatureMapping[] = [
     targetRoute: CRM.REPORTS,
     allowedRoles: ["contractor"],
     reusesTemplate: "crm-reports",
+    status: "ui-only",
+    dataSource: "mock",
+    visibility: "home-shortcut",
   },
 ];
 
@@ -909,36 +1210,63 @@ export const CONTRACTOR_LABOR_MAP: FeatureMapping[] = [
     label: "DS Công nhân",
     targetRoute: LABOR.WORKERS,
     allowedRoles: ["contractor"],
+    status: "ready",
+    dataSource: "api",
+    visibility: "tools",
   },
   {
     id: "cl2",
     label: "Chấm công",
     targetRoute: LABOR.ATTENDANCE,
     allowedRoles: ["contractor"],
+    status: "ready",
+    dataSource: "api",
+    visibility: "tools",
   },
   {
     id: "cl3",
     label: "Bảng lương",
     targetRoute: LABOR.PAYROLL,
     allowedRoles: ["contractor"],
+    status: "ready",
+    dataSource: "api",
+    visibility: "tools",
   },
   {
     id: "cl4",
     label: "Ca làm việc",
     targetRoute: LABOR.SHIFTS,
     allowedRoles: ["contractor"],
+    status: "ready",
+    dataSource: "api",
+    visibility: "tools",
   },
   {
     id: "cl5",
     label: "Thiết bị",
     targetRoute: EQUIPMENT.INDEX,
     allowedRoles: ["contractor", "engineer"],
+    status: "ui-only",
+    dataSource: "mock",
+    visibility: "tools",
   },
   {
     id: "cl6",
     label: "Nghỉ phép",
     targetRoute: LABOR.LEAVE_REQUESTS,
     allowedRoles: ["contractor"],
+    status: "ready",
+    dataSource: "api",
+    visibility: "tools",
+  },
+  {
+    id: "cl7",
+    label: "Báo cáo nhân sự",
+    targetRoute: LABOR.REPORTS,
+    allowedRoles: ["contractor", "admin"],
+    status: "ready",
+    dataSource: "api",
+    visibility: "tools",
   },
 ];
 
@@ -1153,6 +1481,38 @@ export const UTILITY_PROMO_MAP: FeatureMapping[] = [
 ];
 
 // ════════════════════════════════════════════════
+// LIVE / VIDEO — Media Items (referencing by UI data id)
+// ════════════════════════════════════════════════
+export const LIVE_VIDEO_MAP: FeatureMapping[] = [
+  {
+    id: "live-1",
+    label: "Live công trình 1",
+    targetRoute: TABS.LIVE,
+    allowedRoles: ["customer", "worker", "engineer", "contractor"],
+  },
+  {
+    id: "live-2",
+    label: "Live công trình 2",
+    targetRoute: TABS.LIVE,
+    allowedRoles: ["customer", "worker", "engineer", "contractor"],
+  },
+  {
+    id: "video-1",
+    label: "Video xây dựng 1",
+    targetRoute: TABS.LIVE,
+    params: { tab: "video" },
+    allowedRoles: ["customer", "worker", "engineer", "contractor"],
+  },
+  {
+    id: "video-2",
+    label: "Video xây dựng 2",
+    targetRoute: TABS.LIVE,
+    params: { tab: "video" },
+    allowedRoles: ["customer", "worker", "engineer", "contractor"],
+  },
+];
+
+// ════════════════════════════════════════════════
 // Utility section → mapping registry (for generic mapping lookup)
 // ════════════════════════════════════════════════
 
@@ -1176,6 +1536,7 @@ const ALL_MAPS: FeatureMapping[][] = [
   CUSTOMER_MAINTENANCE_UTILITY_MAP,
   CUSTOMER_MARKETPLACE_MAP,
   CUSTOMER_FURNITURE_MAP,
+  LIVE_VIDEO_MAP,
   UTILITY_PROMO_MAP,
   WORKER_SHORTCUT_MAP,
   WORKER_CATEGORY_MAP,

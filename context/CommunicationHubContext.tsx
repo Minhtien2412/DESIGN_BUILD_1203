@@ -10,6 +10,7 @@
  * @date Updated: 26/12/2025
  */
 
+import { getWsBaseUrl } from "@/services/socket/socketConfig";
 import {
     Contact,
     ContactGroup,
@@ -19,6 +20,8 @@ import {
     MOCK_CONTACTS,
     MOCK_GROUPS,
 } from "@/services/unifiedContacts";
+import type { Socket } from "@/utils/socketIo";
+import { getSocketIo } from "@/utils/socketIo";
 import { getItem } from "@/utils/storage";
 import React, {
     createContext,
@@ -29,8 +32,6 @@ import React, {
     useState,
 } from "react";
 import { AppState, AppStateStatus } from "react-native";
-import { getSocketIo } from "@/utils/socketIo";
-import type { Socket } from "@/utils/socketIo";
 import { useAuth } from "./AuthContext";
 
 // Type for Socket.IO client socket
@@ -154,8 +155,8 @@ const CommunicationHubContext = createContext<
   CommunicationHubContextValue | undefined
 >(undefined);
 
-// WebSocket URL
-const WS_URL = process.env.EXPO_PUBLIC_WS_URL || "wss://baotienweb.cloud";
+// WebSocket URL from single source of truth
+const WS_URL = getWsBaseUrl();
 
 // ==================== PROVIDER ====================
 
@@ -258,85 +259,91 @@ export function CommunicationHubProvider({
 
         chatSocketRef.current = chatSocket;
 
-    // Connection events
-    chatSocket.on("connect", () => {
-      console.log("[Chat] 🟢 Connected to /chat namespace");
-      setConnected(true);
-      setConnectionError(null);
-    });
-
-    chatSocket.on("disconnect", (reason: string) => {
-      console.log("[Chat] 🔴 Disconnected:", reason);
-      setConnected(false);
-    });
-
-    chatSocket.on("connect_error", (error: Error) => {
-      console.error("[Chat] Connection error:", error.message);
-      setConnectionError(error.message);
-    });
-
-    // User online/offline events (from BE)
-    chatSocket.on("userOnline", (data: { userId: number; timestamp: Date }) => {
-      setOnlineStatuses((prev) => {
-        const next = new Map(prev);
-        next.set(data.userId, { userId: data.userId, status: "online" });
-        return next;
-      });
-    });
-
-    chatSocket.on(
-      "userOffline",
-      (data: { userId: number; timestamp: Date }) => {
-        setOnlineStatuses((prev) => {
-          const next = new Map(prev);
-          next.set(data.userId, {
-            userId: data.userId,
-            status: "offline",
-            lastSeen: new Date(data.timestamp).toISOString(),
-          });
-          return next;
+        // Connection events
+        chatSocket.on("connect", () => {
+          console.log("[Chat] 🟢 Connected to /chat namespace");
+          setConnected(true);
+          setConnectionError(null);
         });
-      },
-    );
 
-    // Typing events (from BE)
-    chatSocket.on("userTyping", (data: { userId: number; roomId: number }) => {
-      setTypingUsers((prev) => {
-        const next = new Map(prev);
-        const existing = next.get(data.roomId) || [];
-        if (!existing.find((t) => t.userId === data.userId)) {
-          next.set(data.roomId, [
-            ...existing,
-            { roomId: data.roomId, userId: data.userId },
-          ]);
-        }
-        return next;
-      });
-    });
-
-    chatSocket.on(
-      "userStoppedTyping",
-      (data: { userId: number; roomId: number }) => {
-        setTypingUsers((prev) => {
-          const next = new Map(prev);
-          const existing = next.get(data.roomId) || [];
-          next.set(
-            data.roomId,
-            existing.filter((t) => t.userId !== data.userId),
-          );
-          return next;
+        chatSocket.on("disconnect", (reason: string) => {
+          console.log("[Chat] 🔴 Disconnected:", reason);
+          setConnected(false);
         });
-      },
-    );
 
-    // New message event (from BE)
-    chatSocket.on("newMessage", (data: ChatMessage) => {
-      console.log("[Chat] 📩 New message:", data);
-      setUnreadCounts((prev) => ({
-        ...prev,
-        messages: prev.messages + 1,
-      }));
-    });
+        chatSocket.on("connect_error", (error: Error) => {
+          console.error("[Chat] Connection error:", error.message);
+          setConnectionError(error.message);
+        });
+
+        // User online/offline events (from BE)
+        chatSocket.on(
+          "userOnline",
+          (data: { userId: number; timestamp: Date }) => {
+            setOnlineStatuses((prev) => {
+              const next = new Map(prev);
+              next.set(data.userId, { userId: data.userId, status: "online" });
+              return next;
+            });
+          },
+        );
+
+        chatSocket.on(
+          "userOffline",
+          (data: { userId: number; timestamp: Date }) => {
+            setOnlineStatuses((prev) => {
+              const next = new Map(prev);
+              next.set(data.userId, {
+                userId: data.userId,
+                status: "offline",
+                lastSeen: new Date(data.timestamp).toISOString(),
+              });
+              return next;
+            });
+          },
+        );
+
+        // Typing events (from BE)
+        chatSocket.on(
+          "userTyping",
+          (data: { userId: number; roomId: number }) => {
+            setTypingUsers((prev) => {
+              const next = new Map(prev);
+              const existing = next.get(data.roomId) || [];
+              if (!existing.find((t) => t.userId === data.userId)) {
+                next.set(data.roomId, [
+                  ...existing,
+                  { roomId: data.roomId, userId: data.userId },
+                ]);
+              }
+              return next;
+            });
+          },
+        );
+
+        chatSocket.on(
+          "userStoppedTyping",
+          (data: { userId: number; roomId: number }) => {
+            setTypingUsers((prev) => {
+              const next = new Map(prev);
+              const existing = next.get(data.roomId) || [];
+              next.set(
+                data.roomId,
+                existing.filter((t) => t.userId !== data.userId),
+              );
+              return next;
+            });
+          },
+        );
+
+        // New message event (from BE)
+        chatSocket.on("newMessage", (data: ChatMessage) => {
+          console.log("[Chat] 📩 New message:", data);
+          setUnreadCounts((prev) => ({
+            ...prev,
+            messages: prev.messages + 1,
+          }));
+        });
       })
       .catch((error) => {
         const message =
@@ -390,83 +397,83 @@ export function CommunicationHubProvider({
 
         callSocketRef.current = callSocket;
 
-      // Connection events
-      callSocket.on("connect", () => {
-        console.log("[Call] 🟢 Connected to /call namespace");
-        callSocket.emit("register", { userId: user.id });
-      });
+        // Connection events
+        callSocket.on("connect", () => {
+          console.log("[Call] 🟢 Connected to /call namespace");
+          callSocket.emit("register", { userId: user.id });
+        });
 
-      callSocket.on(
-        "connected",
-        (data: { userId: number; socketId: string }) => {
-          console.log("[Call] ✅ Registered as user:", data.userId);
-        },
-      );
+        callSocket.on(
+          "connected",
+          (data: { userId: number; socketId: string }) => {
+            console.log("[Call] ✅ Registered as user:", data.userId);
+          },
+        );
 
-      callSocket.on("disconnect", (reason: string) => {
-        console.log("[Call] 🔴 Disconnected:", reason);
-      });
+        callSocket.on("disconnect", (reason: string) => {
+          console.log("[Call] 🔴 Disconnected:", reason);
+        });
 
-      callSocket.on("error", (error: { message: string }) => {
-        console.error("[Call] Error:", error.message);
-        setConnectionError(error.message);
-      });
+        callSocket.on("error", (error: { message: string }) => {
+          console.error("[Call] Error:", error.message);
+          setConnectionError(error.message);
+        });
 
-      // Incoming call (from BE)
-      callSocket.on("incoming_call", (data: IncomingCall) => {
-        console.log("[Call] 📞 Incoming call from:", data.callerName);
-        setIncomingCall(data);
-      });
+        // Incoming call (from BE)
+        callSocket.on("incoming_call", (data: IncomingCall) => {
+          console.log("[Call] 📞 Incoming call from:", data.callerName);
+          setIncomingCall(data);
+        });
 
-      // Call accepted (from BE)
-      callSocket.on(
-        "call_accepted",
-        (data: { callId: number; roomId: string; callee: unknown }) => {
-          console.log("[Call] ✅ Call accepted, room:", data.roomId);
-        },
-      );
+        // Call accepted (from BE)
+        callSocket.on(
+          "call_accepted",
+          (data: { callId: number; roomId: string; callee: unknown }) => {
+            console.log("[Call] ✅ Call accepted, room:", data.roomId);
+          },
+        );
 
-      // Call rejected (from BE)
-      callSocket.on(
-        "call_rejected",
-        (data: { callId: number; callee: unknown }) => {
-          console.log("[Call] ❌ Call rejected");
-          setIncomingCall(null);
-        },
-      );
+        // Call rejected (from BE)
+        callSocket.on(
+          "call_rejected",
+          (data: { callId: number; callee: unknown }) => {
+            console.log("[Call] ❌ Call rejected");
+            setIncomingCall(null);
+          },
+        );
 
-      // Call ended (from BE)
-      callSocket.on(
-        "call_ended",
-        (data: { callId: number; reason: string }) => {
-          console.log("[Call] 📵 Call ended:", data.reason);
-          setIncomingCall(null);
-        },
-      );
+        // Call ended (from BE)
+        callSocket.on(
+          "call_ended",
+          (data: { callId: number; reason: string }) => {
+            console.log("[Call] 📵 Call ended:", data.reason);
+            setIncomingCall(null);
+          },
+        );
 
-      // WebRTC signal from peer (from BE)
-      callSocket.on(
-        "call_signal",
-        (data: { from: number; signal: unknown }) => {
-          console.log("[Call] 📡 Signal from:", data.from);
-        },
-      );
+        // WebRTC signal from peer (from BE)
+        callSocket.on(
+          "call_signal",
+          (data: { from: number; signal: unknown }) => {
+            console.log("[Call] 📡 Signal from:", data.from);
+          },
+        );
 
-      // User joined call room
-      callSocket.on(
-        "user_joined",
-        (data: { socketId: string; userId: number }) => {
-          console.log("[Call] 👤 User joined:", data.userId);
-        },
-      );
+        // User joined call room
+        callSocket.on(
+          "user_joined",
+          (data: { socketId: string; userId: number }) => {
+            console.log("[Call] 👤 User joined:", data.userId);
+          },
+        );
 
-      // User left call room
-      callSocket.on(
-        "user_left",
-        (data: { socketId: string; userId: number }) => {
-          console.log("[Call] 👤 User left:", data.userId);
-        },
-      );
+        // User left call room
+        callSocket.on(
+          "user_left",
+          (data: { socketId: string; userId: number }) => {
+            console.log("[Call] 👤 User left:", data.userId);
+          },
+        );
 
         // Missed call
         callSocket.on("call_missed", () => {
@@ -781,5 +788,3 @@ export function useCommunicationHub() {
 
 // Export types
 export type { CommunicationHubContextValue };
-
-

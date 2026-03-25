@@ -16,6 +16,7 @@
  */
 
 import { ENV } from "@/config/env";
+import { getWsBaseUrl } from "@/services/socket/socketConfig";
 import EventEmitter from "eventemitter3";
 import { io, Socket } from "socket.io-client";
 import { getAccessToken } from "./token.service";
@@ -132,10 +133,8 @@ class RealtimeMessagingService extends EventEmitter {
       return;
     }
 
-    // Use WS_BASE_URL from config, fallback to API_BASE_URL conversion
-    const wsUrl =
-      ENV.WS_BASE_URL ||
-      ENV.API_BASE_URL.replace("/api/v1", "").replace("http", "ws");
+    // Use centralized WS URL from socketConfig
+    const wsUrl = getWsBaseUrl();
     // Namespace must match BE: @WebSocketGateway({ namespace: '/chat' })
     const namespace = ENV.WS_CHAT_NS || "/chat";
 

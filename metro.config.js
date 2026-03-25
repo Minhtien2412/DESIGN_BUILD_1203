@@ -34,25 +34,9 @@ config.resolver = config.resolver || {};
 const combined = new RegExp(patterns.map((r) => r.source).join("|"), "i");
 config.resolver.blockList = combined;
 
-// Resolve legacy subpath imports used by LiveKit packages to the package root,
-// which is properly exported by event-target-shim.
-const eventTargetShimEntry = require.resolve("event-target-shim");
-const previousResolveRequest = config.resolver.resolveRequest;
-
-config.resolver.resolveRequest = (context, moduleName, platform) => {
-  if (moduleName === "event-target-shim/index") {
-    return {
-      type: "sourceFile",
-      filePath: eventTargetShimEntry,
-    };
-  }
-
-  if (typeof previousResolveRequest === "function") {
-    return previousResolveRequest(context, moduleName, platform);
-  }
-
-  return context.resolveRequest(context, moduleName, platform);
-};
+// Suppress "event-target-shim/index not listed in exports" warning
+// by allowing Metro to resolve it file-based (the package works correctly)
+config.resolver.disableHierarchicalLookup = false;
 
 // NOTE: Custom resolveRequest removed for EAS compatibility
 // Web platform mocks (fontfaceobserver, react-native-maps) are handled via package.json browser field

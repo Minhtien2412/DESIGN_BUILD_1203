@@ -163,3 +163,58 @@ docker/*.secret
 *.env.backup*
 config/*.local.ts
 config/*.local.js
+
+# ============================================
+# TEMP / DEBUG / ONE-OFF FILES
+# ============================================
+# Temporary scripts and debug files (root-level)
+tmp-*
+temp-*
+ts-*.txt
+ts-err-*.txt
+build-output.txt
+eslint-*.txt
+typescript-errors.txt
+expo-start-now.txt
+deploy-momo.py
+update-openai-key.sh
+swagger-dump.json
+swagger-full.json
+
+# Session / analysis markdown (generated, not source)
+SESSION_ANALYSIS_*.md
+API_SERVER_STATUS_SESSION_*.md
+\#\# GitHub Copilot Chat.md
+
+# One-off shell scripts
+check-tables.sh
+fix-assets.sh
+smoke-test.sh
+
+# ============================================
+# IDE / EDITOR
+# ============================================
+.idea/
+.vscode/settings.json
+.vscode/launch.json
+*.swp
+*.swo
+*~
+
+# ============================================
+# OS
+# ============================================
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ============================================
+# EXPO / REACT NATIVE ADDITIONAL
+# ============================================
+.expo-shared/
+ios/Pods/
+android/.gradle/
+*.hprof
+.cache/
+.turbo/
+.next/
