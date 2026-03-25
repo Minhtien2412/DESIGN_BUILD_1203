@@ -1,172 +1,131 @@
-import { Colors } from '@/constants/theme';
-import { useAuth } from '@/context/AuthContext';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import { StaffMember, useStaff } from '@/hooks/useAdmin';
-import { usePermissions } from '@/utils/permissions';
-import { Ionicons } from '@expo/vector-icons';
-import { router, Stack } from 'expo-router';
-import { useEffect, useState } from 'react';
+/**
+ * Staff List Screen — Danh sách nhân sự nội bộ
+ * Uses new role-based permission system from constants/staffPermissions
+ */
+
+import StaffCard from "@/components/staff/StaffCard";
+import StaffFilters, {
+    type StaffFilterValues,
+} from "@/components/staff/StaffFilters";
+import {
+    canCreateStaff,
+    canViewStaff,
+    isInternalRole,
+} from "@/constants/staffPermissions";
+import { Colors } from "@/constants/theme";
+import { useAuth } from "@/context/AuthContext";
+import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useDepartments } from "@/hooks/useDepartments";
+import { useStaffList } from "@/hooks/useStaffList";
+import { useTeams } from "@/hooks/useTeams";
+import { CompanyRole, type StaffMemberFull } from "@/types/staff";
+import { Ionicons } from "@expo/vector-icons";
+import { router, Stack } from "expo-router";
+import { useCallback, useMemo, useState } from "react";
 import {
     ActivityIndicator,
     Alert,
-    Dimensions,
     FlatList,
-    Image,
     RefreshControl,
     StyleSheet,
     Text,
-    TextInput,
     TouchableOpacity,
     View,
-} from 'react-native';
-
-const { width } = Dimensions.get('window');
-
-// Staff Card Component
-function StaffCard({ staff, colors, onPress }: { staff: StaffMember; colors: any; onPress: () => void }) {
-  const isActive = staff.active === 1;
-
-  return (
-    <TouchableOpacity
-      style={[styles.staffCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
-      onPress={onPress}
-      activeOpacity={0.7}
-    >
-      <View style={styles.staffHeader}>
-        {staff.profile_image ? (
-          <Image source={{ uri: staff.profile_image }} style={styles.staffAvatar} />
-        ) : (
-          <View style={[styles.staffAvatarPlaceholder, { backgroundColor: colors.accent }]}>
-            <Text style={styles.staffAvatarText}>
-              {staff.firstname?.[0]}{staff.lastname?.[0]}
-            </Text>
-          </View>
-        )}
-        <View style={styles.staffInfo}>
-          <Text style={[styles.staffName, { color: colors.text }]}>
-            {staff.firstname} {staff.lastname}
-          </Text>
-          <Text style={[styles.staffEmail, { color: colors.textMuted }]}>{staff.email}</Text>
-          {staff.phonenumber && (
-            <Text style={[styles.staffPhone, { color: colors.textMuted }]}>📞 {staff.phonenumber}</Text>
-          )}
-        </View>
-        <View style={[styles.staffStatus, { backgroundColor: isActive ? '#0D9488' : '#000000' }]}>
-          <Text style={styles.staffStatusText}>{isActive ? 'Active' : 'Inactive'}</Text>
-        </View>
-      </View>
-
-      <View style={styles.staffDetails}>
-        <View style={styles.staffDetailItem}>
-          <Ionicons name="briefcase-outline" size={16} color={colors.textMuted} />
-          <Text style={[styles.staffDetailText, { color: colors.textMuted }]}>
-            {staff.role?.name || 'N/A'}
-          </Text>
-        </View>
-        {staff.departments && staff.departments.length > 0 && (
-          <View style={styles.staffDetailItem}>
-            <Ionicons name="business-outline" size={16} color={colors.textMuted} />
-            <Text style={[styles.staffDetailText, { color: colors.textMuted }]}>
-              {staff.departments.map(d => d.name).join(', ')}
-            </Text>
-          </View>
-        )}
-        {staff.last_login && (
-          <View style={styles.staffDetailItem}>
-            <Ionicons name="time-outline" size={16} color={colors.textMuted} />
-            <Text style={[styles.staffDetailText, { color: colors.textMuted }]}>
-              {new Date(staff.last_login).toLocaleDateString('vi-VN')}
-            </Text>
-          </View>
-        )}
-      </View>
-    </TouchableOpacity>
-  );
-}
-
-// Filter Chip Component
-function FilterChip({ label, active, onPress }: { label: string; active: boolean; onPress: () => void }) {
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? 'light'];
-
-  return (
-    <TouchableOpacity
-      style={[
-        styles.filterChip,
-        {
-          backgroundColor: active ? colors.accent : colors.surface,
-          borderColor: active ? colors.accent : colors.border,
-        },
-      ]}
-      onPress={onPress}
-      activeOpacity={0.7}
-    >
-      <Text style={[styles.filterChipText, { color: active ? '#fff' : colors.text }]}>{label}</Text>
-    </TouchableOpacity>
-  );
-}
+} from "react-native";
 
 export default function StaffListScreen() {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? 'light'];
-  const { isAuthenticated } = useAuth();
-  const { hasPermission, isAdmin } = usePermissions();
+  const colors = Colors[colorScheme ?? "light"];
+  const { user } = useAuth();
 
-  const [searchQuery, setSearchQuery] = useState('');
-  const [activeFilter, setActiveFilter] = useState<1 | 0 | undefined>(undefined);
+  // Derive CompanyRole from user — fallback to STAFF
+  const userRole = useMemo<CompanyRole>(() => {
+    const r = user?.role as CompanyRole | undefined;
+    if (r && Object.values(CompanyRole).includes(r)) return r;
+    if (user?.admin) return CompanyRole.ADMIN;
+    return CompanyRole.STAFF;
+  }, [user]);
 
-  const {
-    staff,
-    pagination,
-    loading,
-    error,
-    refresh,
-    fetchMore,
-    hasMore,
-  } = useStaff({
-    filters: {
-      search: searchQuery || undefined,
-      active: activeFilter,
-    },
-    limit: 20,
+  // Permission guard
+  const canView = canViewStaff(userRole) || !!user?.admin;
+  const canCreate = canCreateStaff(userRole) || !!user?.admin;
+
+  // Filters
+  const [filterValues, setFilterValues] = useState<StaffFilterValues>({
+    search: "",
   });
 
-  // Require view permission
-  useEffect(() => {
-    if (!loading && (!isAuthenticated || !hasPermission('view', 'staff'))) {
-      Alert.alert('Không có quyền', 'Bạn không có quyền xem danh sách nhân viên');
-      router.replace('/(tabs)');
-    }
-  }, [isAuthenticated, hasPermission, loading]);
+  // Data hooks
+  const { departments } = useDepartments();
+  const { teams } = useTeams();
 
-  if (!isAuthenticated || !hasPermission('view', 'staff')) {
-    return null;
-  }
+  const { staff, pagination, loading, refreshing, error, refresh, loadMore } =
+    useStaffList({
+      filters: {
+        search: filterValues.search || undefined,
+        role: filterValues.role,
+        department_id: filterValues.department_id,
+        team_id: filterValues.team_id,
+        status: filterValues.status,
+      },
+    });
 
-  const handleStaffPress = (staffid: number) => {
-    router.push(`/admin/staff/${staffid}`);
-  };
+  const handlePress = useCallback((item: StaffMemberFull) => {
+    router.push(`/admin/staff/${item.id}`);
+  }, []);
 
-  const handleCreateStaff = () => {
-    if (!hasPermission('create', 'staff')) {
-      Alert.alert('Không có quyền', 'Bạn không có quyền tạo nhân viên mới');
+  const handleCreate = useCallback(() => {
+    if (!canCreate) {
+      Alert.alert("Không có quyền", "Bạn không có quyền tạo nhân sự mới");
       return;
     }
-    router.push('/admin/staff/create');
-  };
+    router.push("/admin/staff/create");
+  }, [canCreate]);
+
+  // Guard: customer or no permission
+  if (!isInternalRole(userRole) || !canView) {
+    return (
+      <View style={[styles.guard, { backgroundColor: colors.background }]}>
+        <Stack.Screen options={{ title: "Nhân sự", headerShown: false }} />
+        <Ionicons
+          name="lock-closed-outline"
+          size={48}
+          color={colors.textMuted}
+        />
+        <Text style={[styles.guardTitle, { color: colors.text }]}>
+          Không có quyền truy cập
+        </Text>
+        <Text style={[styles.guardSubtitle, { color: colors.textMuted }]}>
+          Bạn không có quyền xem danh sách nhân sự
+        </Text>
+      </View>
+    );
+  }
+
+  // Renderers
+  const renderItem = useCallback(
+    ({ item }: { item: StaffMemberFull }) => (
+      <StaffCard staff={item} onPress={() => handlePress(item)} />
+    ),
+    [handlePress],
+  );
 
   const renderEmpty = () => {
     if (loading) return null;
-
     return (
-      <View style={styles.emptyContainer}>
-        <Ionicons name="people-outline" size={64} color={colors.textMuted} />
+      <View style={styles.emptyWrap}>
+        <Ionicons name="people-outline" size={56} color={colors.textMuted} />
         <Text style={[styles.emptyText, { color: colors.text }]}>
-          {searchQuery ? 'Không tìm thấy nhân viên' : 'Chưa có nhân viên nào'}
+          {filterValues.search
+            ? "Không tìm thấy nhân sự phù hợp"
+            : "Chưa có nhân sự nào"}
         </Text>
-        {!searchQuery && hasPermission('create', 'staff') && (
-          <TouchableOpacity style={[styles.emptyButton, { backgroundColor: colors.accent }]} onPress={handleCreateStaff}>
-            <Text style={styles.emptyButtonText}>Thêm nhân viên đầu tiên</Text>
+        {!filterValues.search && canCreate && (
+          <TouchableOpacity
+            style={[styles.emptyBtn, { backgroundColor: colors.primary }]}
+            onPress={handleCreate}
+          >
+            <Text style={styles.emptyBtnText}>Thêm nhân sự đầu tiên</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -174,12 +133,12 @@ export default function StaffListScreen() {
   };
 
   const renderFooter = () => {
-    if (!hasMore || loading) return null;
-
+    if (!loading || staff.length === 0) return null;
     return (
-      <TouchableOpacity style={styles.loadMoreButton} onPress={fetchMore}>
-        <Text style={[styles.loadMoreText, { color: colors.accent }]}>Tải thêm</Text>
-      </TouchableOpacity>
+      <ActivityIndicator
+        style={{ paddingVertical: 16 }}
+        color={colors.primary}
+      />
     );
   };
 
@@ -187,12 +146,12 @@ export default function StaffListScreen() {
     <>
       <Stack.Screen
         options={{
-          title: 'Quản lý nhân viên',
-          headerStyle: { backgroundColor: colors.accent },
-          headerTintColor: '#fff',
+          title: "Quản lý nhân sự",
+          headerStyle: { backgroundColor: colors.primary },
+          headerTintColor: "#fff",
           headerRight: () =>
-            hasPermission('create', 'staff') ? (
-              <TouchableOpacity onPress={handleCreateStaff} style={styles.headerButton}>
+            canCreate ? (
+              <TouchableOpacity onPress={handleCreate} style={styles.headerBtn}>
                 <Ionicons name="add-circle-outline" size={28} color="#fff" />
               </TouchableOpacity>
             ) : null,
@@ -200,63 +159,80 @@ export default function StaffListScreen() {
       />
 
       <View style={[styles.container, { backgroundColor: colors.background }]}>
-        {/* Search Bar */}
-        <View style={[styles.searchContainer, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-          <Ionicons name="search-outline" size={20} color={colors.textMuted} />
-          <TextInput
-            style={[styles.searchInput, { color: colors.text }]}
-            placeholder="Tìm theo tên, email..."
-            placeholderTextColor={colors.textMuted}
-            value={searchQuery}
-            onChangeText={setSearchQuery}
+        {/* Summary bar */}
+        <View style={[styles.summaryBar, { backgroundColor: colors.surface }]}>
+          <SummaryChip
+            icon="people"
+            label="Tổng"
+            value={pagination.total}
+            color={colors.primary}
+            colors={colors}
           />
-          {searchQuery ? (
-            <TouchableOpacity onPress={() => setSearchQuery('')}>
-              <Ionicons name="close-circle" size={20} color={colors.textMuted} />
-            </TouchableOpacity>
-          ) : null}
+          <TouchableOpacity
+            style={styles.summaryLink}
+            onPress={() => router.push("/admin/staff/departments" as any)}
+          >
+            <Ionicons name="business" size={16} color={colors.primary} />
+            <Text style={[styles.summaryLinkText, { color: colors.primary }]}>
+              Phòng ban
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.summaryLink}
+            onPress={() => router.push("/admin/staff/teams" as any)}
+          >
+            <Ionicons name="git-branch" size={16} color={colors.primary} />
+            <Text style={[styles.summaryLinkText, { color: colors.primary }]}>
+              Teams
+            </Text>
+          </TouchableOpacity>
         </View>
 
         {/* Filters */}
-        <View style={styles.filtersContainer}>
-          <FilterChip label="Tất cả" active={activeFilter === undefined} onPress={() => setActiveFilter(undefined)} />
-          <FilterChip label="Active" active={activeFilter === 1} onPress={() => setActiveFilter(1)} />
-          <FilterChip label="Inactive" active={activeFilter === 0} onPress={() => setActiveFilter(0)} />
-        </View>
+        <StaffFilters
+          values={filterValues}
+          onChange={setFilterValues}
+          departments={departments}
+          teams={teams}
+        />
 
-        {/* Error Banner */}
+        {/* Error */}
         {error && (
-          <View style={[styles.errorBanner, { backgroundColor: '#fee2e2' }]}>
-            <Ionicons name="warning-outline" size={20} color="#000000" />
-            <Text style={[styles.errorText, { color: '#000000' }]}>{error}</Text>
-            <TouchableOpacity onPress={() => refresh()}>
-              <Text style={[styles.retryText, { color: '#000000' }]}>Thử lại</Text>
+          <View style={[styles.errorBanner, { backgroundColor: "#FEE2E2" }]}>
+            <Ionicons name="warning-outline" size={18} color="#DC2626" />
+            <Text style={styles.errorBannerText}>{error}</Text>
+            <TouchableOpacity onPress={refresh} hitSlop={8}>
+              <Text style={styles.retryLink}>Thử lại</Text>
             </TouchableOpacity>
           </View>
         )}
 
-        {/* Staff List */}
+        {/* List */}
         <FlatList
           data={staff}
-          keyExtractor={(item) => item.staffid.toString()}
-          renderItem={({ item }) => <StaffCard staff={item} colors={colors} onPress={() => handleStaffPress(item.staffid)} />}
-          contentContainerStyle={styles.listContent}
-          refreshControl={<RefreshControl refreshing={loading && !staff.length} onRefresh={refresh} colors={[colors.accent]} />}
+          keyExtractor={(item) => String(item.id)}
+          renderItem={renderItem}
+          contentContainerStyle={styles.list}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={refresh}
+              colors={[colors.primary]}
+            />
+          }
           ListEmptyComponent={renderEmpty}
           ListFooterComponent={renderFooter}
-          onEndReached={() => {
-            if (hasMore && !loading) {
-              fetchMore();
-            }
-          }}
-          onEndReachedThreshold={0.5}
+          onEndReached={loadMore}
+          onEndReachedThreshold={0.4}
         />
 
-        {/* Loading Overlay */}
+        {/* Initial loading */}
         {loading && staff.length === 0 && (
           <View style={styles.loadingOverlay}>
-            <ActivityIndicator size="large" color={colors.accent} />
-            <Text style={[styles.loadingText, { color: colors.text }]}>Đang tải...</Text>
+            <ActivityIndicator size="large" color={colors.primary} />
+            <Text style={[styles.loadingText, { color: colors.text }]}>
+              Đang tải danh sách nhân sự...
+            </Text>
           </View>
         )}
       </View>
@@ -264,171 +240,135 @@ export default function StaffListScreen() {
   );
 }
 
+// ---- Summary Chip ----
+
+function SummaryChip({
+  icon,
+  label,
+  value,
+  color,
+  colors,
+}: {
+  icon: keyof typeof Ionicons.glyphMap;
+  label: string;
+  value: number;
+  color: string;
+  colors: any;
+}) {
+  return (
+    <View style={summaryStyles.chip}>
+      <Ionicons name={icon} size={18} color={color} />
+      <Text style={[summaryStyles.value, { color: colors.text }]}>{value}</Text>
+      <Text style={[summaryStyles.label, { color: colors.textMuted }]}>
+        {label}
+      </Text>
+    </View>
+  );
+}
+
+const summaryStyles = StyleSheet.create({
+  chip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  value: {
+    fontSize: 16,
+    fontWeight: "700",
+  },
+  label: {
+    fontSize: 13,
+  },
+});
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  headerButton: {
-    marginRight: 16,
-  },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    margin: 16,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderRadius: 12,
-    borderWidth: 1,
-    gap: 8,
-  },
-  searchInput: {
+  guard: {
     flex: 1,
-    fontSize: 15,
-    paddingVertical: 0,
-  },
-  filtersContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 24,
     gap: 8,
-    marginBottom: 12,
   },
-  filterChip: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    borderWidth: 1,
+  guardTitle: {
+    fontSize: 18,
+    fontWeight: "700",
   },
-  filterChipText: {
+  guardSubtitle: {
     fontSize: 14,
-    fontWeight: '500',
+    textAlign: "center",
   },
-  errorBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 12,
-    marginHorizontal: 16,
-    marginBottom: 12,
-    borderRadius: 8,
-    gap: 8,
+  headerBtn: {
+    marginRight: 12,
   },
-  errorText: {
-    flex: 1,
-    fontSize: 13,
-    fontWeight: '500',
-  },
-  retryText: {
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  listContent: {
+  summaryBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 16,
-    paddingBottom: 16,
+    paddingVertical: 10,
   },
-  staffCard: {
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    borderWidth: 1,
+  summaryLink: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
   },
-  staffHeader: {
-    flexDirection: 'row',
-    marginBottom: 12,
-  },
-  staffAvatar: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-  },
-  staffAvatarPlaceholder: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  staffAvatarText: {
-    color: '#fff',
-    fontSize: 20,
-    fontWeight: '600',
-  },
-  staffInfo: {
-    flex: 1,
-    marginLeft: 12,
-    justifyContent: 'center',
-  },
-  staffName: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  staffEmail: {
+  summaryLinkText: {
     fontSize: 13,
-    marginBottom: 2,
+    fontWeight: "600",
   },
-  staffPhone: {
-    fontSize: 13,
+  list: {
+    paddingTop: 4,
+    paddingBottom: 40,
   },
-  staffStatus: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-    height: 24,
-    justifyContent: 'center',
-  },
-  staffStatusText: {
-    color: '#fff',
-    fontSize: 11,
-    fontWeight: '600',
-  },
-  staffDetails: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-  },
-  staffDetailItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  staffDetailText: {
-    fontSize: 12,
-  },
-  emptyContainer: {
-    paddingVertical: 60,
-    alignItems: 'center',
+  emptyWrap: {
+    alignItems: "center",
+    paddingTop: 60,
+    gap: 10,
   },
   emptyText: {
-    fontSize: 16,
-    fontWeight: '500',
-    marginTop: 16,
-    marginBottom: 24,
+    fontSize: 15,
+    fontWeight: "600",
   },
-  emptyButton: {
-    paddingHorizontal: 24,
-    paddingVertical: 12,
+  emptyBtn: {
+    marginTop: 10,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
     borderRadius: 8,
   },
-  emptyButtonText: {
-    color: '#fff',
-    fontSize: 15,
-    fontWeight: '600',
+  emptyBtnText: {
+    color: "#fff",
+    fontWeight: "700",
+    fontSize: 14,
   },
-  loadMoreButton: {
-    paddingVertical: 16,
-    alignItems: 'center',
+  errorBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginHorizontal: 16,
+    padding: 10,
+    borderRadius: 10,
   },
-  loadMoreText: {
-    fontSize: 15,
-    fontWeight: '600',
+  errorBannerText: {
+    flex: 1,
+    fontSize: 13,
+    color: "#DC2626",
+  },
+  retryLink: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#DC2626",
   },
   loadingOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(255,255,255,0.9)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(255,255,255,0.85)",
   },
   loadingText: {
-    marginTop: 12,
-    fontSize: 15,
+    marginTop: 10,
+    fontSize: 14,
   },
 });
