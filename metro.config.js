@@ -38,7 +38,19 @@ config.resolver.blockList = combined;
 // by allowing Metro to resolve it file-based (the package works correctly)
 config.resolver.disableHierarchicalLookup = false;
 
-// NOTE: Custom resolveRequest removed for EAS compatibility
-// Web platform mocks (fontfaceobserver, react-native-maps) are handled via package.json browser field
+// Web-only: substitute react-native-maps with the mock so it never crashes on web.
+// Native (Android/iOS) gets the REAL react-native-maps so the map actually renders.
+// WorkerMapView.web.tsx handles the map on web and never imports react-native-maps,
+// but this resolver is a safety-net for any other file that might still require it on web.
+const path = require("path");
+const mockMapsPath = path.resolve(__dirname, "mocks/mock-react-native-maps.js");
+
+config.resolver.resolveRequest = (context, moduleName, platform) => {
+  if (platform === "web" && moduleName === "react-native-maps") {
+    return { filePath: mockMapsPath, type: "sourceFile" };
+  }
+  // Fall back to default resolution for everything else
+  return context.resolveRequest(context, moduleName, platform);
+};
 
 module.exports = config;

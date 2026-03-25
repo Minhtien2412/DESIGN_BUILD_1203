@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      html, body, #map {
+        height: 100%;
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+
+```
+<script>
+  // Debug lỗi auth
+  window.gm_authFailure = function () {
+    document.body.innerHTML =
+      '<h2 style="color:red;padding:20px">❌ gm_authFailure (Key bị chặn)</h2>';
+  };
+
+  function initMap() {
+    try {
+      const center = { lat: 10.7769, lng: 106.7009 };
+
+      const map = new google.maps.Map(document.getElementById("map"), {
+        center,
+        zoom: 14,
+      });
+
+      // Marker test
+      const marker = new google.maps.Marker({
+        position: center,
+        map,
+        title: "Test Marker",
+      });
+
+      const info = new google.maps.InfoWindow({
+        content: "<b>Marker OK ✅</b>",
+      });
+
+      marker.addListener("click", () => {
+        info.open(map, marker);
+      });
+
+      console.log("✅ Map + Marker OK");
+    } catch (e) {
+      document.body.innerHTML =
+        '<h2 style="color:red;padding:20px">❌ initMap error</h2>';
+      console.error(e);
+    }
+  }
+</script>
+
+<script
+  async
+  defer
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDW2sqiom4_xtyj3jMfUA5kuT4NR7ZGyss&callback=initMap"
+></script>
+```
+
+  </body>
+</html>

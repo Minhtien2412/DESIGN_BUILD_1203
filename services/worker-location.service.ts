@@ -105,6 +105,23 @@ export interface WorkProcessGuide {
 // ============================================================================
 
 /**
+ * Convert a BOOKING_SERVICES serviceId to a WorkerType string.
+ * Used by scan-workers to send the correct workerType filter to the real API.
+ */
+export function serviceIdToWorkerType(serviceId: string): string | undefined {
+  return WORKER_TYPE_MAP[serviceId];
+}
+
+/**
+ * Get human-readable specialty label for a serviceId.
+ */
+export function serviceIdToLabel(serviceId: string): string {
+  return (SERVICE_META_MAP[serviceId] ?? DEFAULT_SERVICE_META).label;
+}
+
+// ============================================================================
+
+/**
  * Search for nearby workers with location
  */
 export async function getNearbyWorkers(
@@ -436,7 +453,25 @@ const MOCK_WORKER_NAMES = [
   "Phan Văn Nam",
 ];
 
+// Maps both Vietnamese serviceId (from BOOKING_SERVICES) and legacy English keys
+// to a WorkerType string used for filtering and display.
 const WORKER_TYPE_MAP: Record<string, string> = {
+  // ── Vietnamese service IDs (from types/booking.ts BOOKING_SERVICES) ──
+  "sua-may-giat": "THO_DIEN",      // Sửa máy giặt
+  "sua-tu-lanh": "THO_DIEN",       // Sửa tủ lạnh
+  "thong-tac-cong": "THO_NUOC",    // Thông tắc cống
+  "sua-dien": "THO_DIEN",          // Sửa điện
+  "cap-nuoc": "THO_NUOC",          // Sửa cấp nước
+  "mang-wifi": "THO_DIEN",         // Sửa mạng/wifi
+  "sua-may-lanh": "THO_DIEN",      // Sửa máy lạnh
+  "tho-xay": "THO_XAY",            // Thợ xây
+  "tho-son": "THO_SON",            // Thợ sơn
+  "tho-dien-nuoc": "THO_DIEN",     // Thợ điện nước
+  "tho-lat-gach": "THO_XAY",       // Thợ lát gạch
+  "tho-thach-cao": "THO_XAY",      // Thợ thạch cao
+  "kien-truc-su": "THO_XAY",       // Kiến trúc sư
+  "noi-that": "THO_MOC",           // Thiết kế nội thất
+  // ── Legacy English keys ──
   "ac-cleaning": "THO_DIEN",
   "ac-repair": "THO_DIEN",
   electrical: "THO_DIEN",
@@ -449,6 +484,109 @@ const WORKER_TYPE_MAP: Record<string, string> = {
   welding: "THO_HAN",
 };
 
+// Per-service display metadata used in mock worker profiles
+interface ServiceMeta {
+  label: string;         // Human-readable specialty shown in profile
+  skills: string[];      // Skills tags
+  bio: string;           // Short bio sentence
+  priceMin: number;      // Min daily rate (VND)
+  priceMax: number;      // Max daily rate (VND)
+}
+
+const SERVICE_META_MAP: Record<string, ServiceMeta> = {
+  "sua-may-giat": {
+    label: "Sửa máy giặt",
+    skills: ["Sửa máy giặt", "Điện lạnh", "Bảo trì thiết bị"],
+    bio: "Chuyên sửa chữa, bảo dưỡng máy giặt các hãng: Samsung, LG, Electrolux...",
+    priceMin: 200000, priceMax: 500000,
+  },
+  "sua-tu-lanh": {
+    label: "Sửa tủ lạnh",
+    skills: ["Sửa tủ lạnh", "Điện lạnh", "Nạp gas"],
+    bio: "Chuyên sửa tủ lạnh, tủ đông, nạp gas, thay linh kiện chính hãng.",
+    priceMin: 300000, priceMax: 800000,
+  },
+  "thong-tac-cong": {
+    label: "Thông tắc cống",
+    skills: ["Thông tắc cống", "Thợ nước", "Đường ống"],
+    bio: "Chuyên thông tắc cống, bồn cầu, đường ống thoát nước nhanh chóng.",
+    priceMin: 200000, priceMax: 1000000,
+  },
+  "sua-dien": {
+    label: "Thợ điện",
+    skills: ["Sửa điện", "Điện dân dụng", "Lắp đặt"],
+    bio: "Chuyên sửa chữa hệ thống điện dân dụng, lắp đặt điện an toàn.",
+    priceMin: 150000, priceMax: 500000,
+  },
+  "cap-nuoc": {
+    label: "Thợ nước",
+    skills: ["Sửa ống nước", "Van nước", "Bồn nước"],
+    bio: "Chuyên sửa ống nước, van, lavabo, bồn nước các loại.",
+    priceMin: 200000, priceMax: 600000,
+  },
+  "mang-wifi": {
+    label: "Thợ mạng & wifi",
+    skills: ["Cài đặt wifi", "Mạng LAN", "Modem router"],
+    bio: "Chuyên cài đặt, sửa chữa mạng wifi, kéo dây mạng, cấu hình router.",
+    priceMin: 100000, priceMax: 300000,
+  },
+  "sua-may-lanh": {
+    label: "Sửa máy lạnh",
+    skills: ["Sửa máy lạnh", "Vệ sinh máy lạnh", "Nạp gas"],
+    bio: "Chuyên vệ sinh, sửa chữa, nạp gas máy lạnh tất cả các hãng.",
+    priceMin: 200000, priceMax: 800000,
+  },
+  "tho-xay": {
+    label: "Thợ xây",
+    skills: ["Xây tường", "Trát xi măng", "Đổ bê tông"],
+    bio: "Thợ xây có kinh nghiệm, nhận xây mới, sửa chữa công trình dân dụng.",
+    priceMin: 400000, priceMax: 600000,
+  },
+  "tho-son": {
+    label: "Thợ sơn",
+    skills: ["Sơn tường", "Sơn nhà", "Sơn nước"],
+    bio: "Chuyên sơn nhà, sơn tường, sơn dầu nội ngoại thất, kỹ thuật cao.",
+    priceMin: 300000, priceMax: 500000,
+  },
+  "tho-dien-nuoc": {
+    label: "Thợ điện nước",
+    skills: ["Lắp điện nước", "Đi dây điện", "Ống nước"],
+    bio: "Thợ điện nước công trình, lắp đặt hệ thống điện và cấp thoát nước.",
+    priceMin: 400000, priceMax: 700000,
+  },
+  "tho-lat-gach": {
+    label: "Thợ lát gạch",
+    skills: ["Lát gạch nền", "Ốp tường", "Gạch ceramic"],
+    bio: "Chuyên lát gạch nền, ốp tường nhà vệ sinh, phòng bếp cẩn thận, đẹp.",
+    priceMin: 350000, priceMax: 600000,
+  },
+  "tho-thach-cao": {
+    label: "Thợ thạch cao",
+    skills: ["Trần thạch cao", "Vách ngăn", "Khung xương"],
+    bio: "Chuyên làm trần thạch cao, vách ngăn thạch cao mọi kiểu dáng.",
+    priceMin: 400000, priceMax: 700000,
+  },
+  "kien-truc-su": {
+    label: "Kiến trúc sư",
+    skills: ["Thiết kế kiến trúc", "Bản vẽ", "AutoCAD"],
+    bio: "Kiến trúc sư có kinh nghiệm thiết kế nhà ở, thương mại, nội thất.",
+    priceMin: 500000, priceMax: 1500000,
+  },
+  "noi-that": {
+    label: "Thiết kế nội thất",
+    skills: ["Thiết kế nội thất", "3D phối cảnh", "Thi công nội thất"],
+    bio: "Chuyên thiết kế & thi công nội thất nhà ở, căn hộ, văn phòng.",
+    priceMin: 400000, priceMax: 1200000,
+  },
+};
+
+const DEFAULT_SERVICE_META: ServiceMeta = {
+  label: "Thợ đa năng",
+  skills: ["Đa năng", "Chuyên nghiệp", "Đúng giờ"],
+  bio: "Thợ chuyên nghiệp, nhiều năm kinh nghiệm, uy tín.",
+  priceMin: 300000, priceMax: 700000,
+};
+
 function generateMockNearbyWorkers(
   query: NearbyWorkerQuery,
 ): WorkerWithLocation[] {
@@ -458,31 +596,38 @@ function generateMockNearbyWorkers(
   };
   const count = Math.min(query.limit || 15, 15);
   const radiusKm = query.radiusKm || 10;
+  const category = query.category || "";
+  const meta = SERVICE_META_MAP[category] ?? DEFAULT_SERVICE_META;
+  const workerType = (WORKER_TYPE_MAP[category] || "THO_XAY") as WorkerType;
 
   return Array.from({ length: count }, (_, i) => {
-    // Spread workers across the radius
     const jittered = addJitter(center, radiusKm * 800);
     const dist = haversineDistance(center, jittered);
     const arrival = Math.ceil((dist / 25) * 60);
+    const exp = Math.floor(2 + Math.random() * 15);
+    const rate =
+      Math.floor(
+        meta.priceMin / 1000 +
+          (Math.random() * (meta.priceMax - meta.priceMin)) / 1000,
+      ) * 1000;
 
     return {
-      id: `worker-mock-${i + 1}`,
+      id: `worker-mock-${category}-${i + 1}`,
       name: MOCK_WORKER_NAMES[i % MOCK_WORKER_NAMES.length],
       phone: `090${Math.floor(1000000 + Math.random() * 9000000)}`,
-      workerType: (WORKER_TYPE_MAP[query.category || ""] ||
-        "THO_XAY") as WorkerType,
+      workerType,
       location: `Quận ${Math.floor(1 + Math.random() * 12)}`,
       district: `Quận ${Math.floor(1 + Math.random() * 12)}`,
       latitude: jittered.latitude,
       longitude: jittered.longitude,
       distance: Math.round(dist * 10) / 10,
       estimatedArrival: Math.max(5, arrival),
-      experience: Math.floor(2 + Math.random() * 15),
-      skills: ["Chuyên nghiệp", "Đúng giờ"],
+      experience: exp,
+      skills: [...meta.skills, exp >= 5 ? "Nhiều kinh nghiệm" : "Nhiệt tình"],
       hasEquipment: Math.random() > 0.3,
-      dailyRate: Math.floor(300 + Math.random() * 500) * 1000,
+      dailyRate: rate,
       avatar: `https://i.pravatar.cc/150?img=${10 + i}`,
-      bio: "Thợ chuyên nghiệp, nhiều năm kinh nghiệm",
+      bio: meta.bio,
       rating: Math.round((4 + Math.random()) * 10) / 10,
       reviewCount: Math.floor(10 + Math.random() * 200),
       completedJobs: Math.floor(50 + Math.random() * 500),

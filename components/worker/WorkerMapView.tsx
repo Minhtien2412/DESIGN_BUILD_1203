@@ -1,29 +1,35 @@
 /**
  * WorkerMapView Component
- * Grab-style map showing workers as markers with distance/ETA
- * Uses react-native-maps with web-safe fallback
+ * Google Maps native view for nearby worker discovery
+ * - User marker with radar pulse
+ * - Search radius circle
+ * - Worker avatar markers + rating badge
+ * - Single tap: select worker and show name
+ * - Double tap: open worker profile
+ * Uses react-native-maps with Google provider
  */
 
 import type { WorkerWithLocation } from "@/services/worker-location.service";
 import {
-    fitToCoordinates,
-    formatDistance,
-    formatTravelTime,
-    haversineDistance,
-    type LatLng,
+  fitToCoordinates,
+  formatDistance,
+  formatTravelTime,
+  haversineDistance,
+  type LatLng,
 } from "@/utils/geo";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import {
-    Dimensions,
-    Platform,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Animated,
+  Dimensions,
+  Easing,
+  Image,
+  StyleSheet,
+  Text,
+  View
 } from "react-native";
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
+const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 // ============================================================================
 // Props
@@ -36,8 +42,10 @@ interface WorkerMapViewProps {
   workers: WorkerWithLocation[];
   /** Currently selected worker */
   selectedWorker?: WorkerWithLocation | null;
-  /** Callback when a worker marker is tapped */
+  /** Callback when a worker marker is tapped once */
   onWorkerSelect?: (worker: WorkerWithLocation) => void;
+  /** Callback when a worker marker is double tapped / callout tapped */
+  onWorkerOpenProfile?: (worker: WorkerWithLocation) => void;
   /** Map height */
   height?: number;
   /** Show radius circle */
@@ -71,6 +79,7 @@ export function WorkerMapView({
   workers,
   selectedWorker,
   onWorkerSelect,
+  onWorkerOpenProfile,
   height = SCREEN_HEIGHT * 0.45,
   showRadius = false,
   radiusKm = 10,
@@ -84,8 +93,81 @@ export function WorkerMapView({
   vehicleColor = "#4CAF50",
 }: WorkerMapViewProps) {
   const mapRef = useRef<any>(null);
+  const lastTapRef = useRef<{ workerId: string | null; ts: number }>({
+    workerId: null,
+    ts: 0,
+  });
 
-  // Calculate map region to show all markers
+  // Radar pulse animation
+  const radarScale1 = useRef(new Animated.Value(0.5)).current;
+  const radarOpacity1 = useRef(new Animated.Value(0.28)).current;
+  const radarScale2 = useRef(new Animated.Value(0.8)).current;
+  const radarOpacity2 = useRef(new Animated.Value(0.18)).current;
+
+  useEffect(() => {
+    const startLoop = (
+      scale: Animated.Value,
+      opacity: Animated.Value,
+      delay: number,
+    ) =>
+      Animated.loop(
+        Animated.sequence([
+          Animated.delay(delay),
+          Animated.parallel([
+            Animated.timing(scale, {
+              toValue: 2.8,
+              duration: 2200,
+              easing: Easing.out(Easing.ease),
+              useNativeDriver: true,
+            }),
+            Animated.timing(opacity, {
+              toValue: 0,
+              duration: 2200,
+              easing: Easing.out(Easing.ease),
+              useNativeDriver: true,
+            }),
+          ]),
+          Animated.parallel([
+            Animated.timing(scale, {
+              toValue: 0.5,
+              duration: 0,
+              useNativeDriver: true,
+            }),
+            Animated.timing(opacity, {
+              toValue: delay === 0 ? 0.28 : 0.18,
+              duration: 0,
+              useNativeDriver: true,
+            }),
+          ]),
+        ]),
+      );
+
+    const loop1 = startLoop(radarScale1, radarOpacity1, 0);
+    const loop2 = startLoop(radarScale2, radarOpacity2, 700);
+
+    loop1.start();
+    loop2.start();
+
+    return () => {
+      loop1.stop();
+      loop2.stop();
+    };
+  }, [radarOpacity1, radarOpacity2, radarScale1, radarScale2]);
+
+  const visibleWorkers = useMemo(() => {
+    return workers.filter((worker) => {
+      const distanceKm =
+        typeof worker.distance === "number"
+          ? worker.distance
+          : haversineDistance(userLocation, {
+              latitude: worker.latitude,
+              longitude: worker.longitude,
+            });
+
+      return distanceKm <= radiusKm;
+    });
+  }, [workers, userLocation, radiusKm]);
+
   const region = useMemo(() => {
     const points: LatLng[] = [userLocation];
 
@@ -97,271 +179,64 @@ export function WorkerMapView({
         longitude: selectedWorker.longitude,
       });
     } else {
-      // Show nearest 5 workers
-      workers.slice(0, 5).forEach((w) => {
-        points.push({ latitude: w.latitude, longitude: w.longitude });
+      visibleWorkers.slice(0, 8).forEach((w) => {
+        points.push({
+          latitude: w.latitude,
+          longitude: w.longitude,
+        });
       });
     }
 
     return fitToCoordinates(points, 0.4);
-  }, [userLocation, workers, selectedWorker, workerMovingLocation]);
+  }, [userLocation, visibleWorkers, selectedWorker, workerMovingLocation]);
 
-  const handleWorkerPress = useCallback(
+  const handleWorkerMarkerPress = useCallback(
     (worker: WorkerWithLocation) => {
+      const now = Date.now();
+      const isDoubleTap =
+        lastTapRef.current.workerId === worker.id &&
+        now - lastTapRef.current.ts < 320;
+
+      lastTapRef.current = { workerId: worker.id, ts: now };
+
+      if (isDoubleTap) {
+        onWorkerOpenProfile?.(worker);
+        return;
+      }
+
       onWorkerSelect?.(worker);
     },
-    [onWorkerSelect],
+    [onWorkerOpenProfile, onWorkerSelect],
   );
 
-  // Detect tracking mode
   const isTrackingMode =
     !!workerMovingLocation && !!routePoints && routePoints.length > 1;
 
-  // ============================================================================
-  // WEB TRACKING RENDERER (Shopee-style real-time tracking)
-  // ============================================================================
-  if (Platform.OS === "web" && isTrackingMode) {
-    const allPts = [...routePoints!, userLocation, workerMovingLocation!];
-    const minLat = Math.min(...allPts.map((p) => p.latitude));
-    const maxLat = Math.max(...allPts.map((p) => p.latitude));
-    const minLng = Math.min(...allPts.map((p) => p.longitude));
-    const maxLng = Math.max(...allPts.map((p) => p.longitude));
-    const latRange = Math.max(maxLat - minLat, 0.005);
-    const lngRange = Math.max(maxLng - minLng, 0.005);
-    const PAD = 12;
-    const toPos = (pt: LatLng) => ({
-      top: PAD + (1 - (pt.latitude - minLat) / latRange) * (100 - PAD * 2),
-      left: PAD + ((pt.longitude - minLng) / lngRange) * (100 - PAD * 2),
-    });
-
-    const originPt = routePoints![0];
-    const destPt = userLocation;
-    const workerPos = toPos(workerMovingLocation!);
-    const originPos = toPos(originPt);
-    const destPos = toPos(destPt);
-    const distKm = haversineDistance(workerMovingLocation!, destPt);
-
-    return (
-      <View style={[s.mapContainer, { height }]}>
-        <View style={s.trackingWebBg}>
-          {/* Street grid */}
-          <View style={s.webGrid}>
-            {Array.from({ length: 12 }).map((_, i) => (
-              <View
-                key={`th${i}`}
-                style={[
-                  s.webGridLine,
-                  { top: `${(i + 1) * 8}%`, width: "100%", height: 1 },
-                ]}
-              />
-            ))}
-            {Array.from({ length: 12 }).map((_, i) => (
-              <View
-                key={`tv${i}`}
-                style={[
-                  s.webGridLine,
-                  { left: `${(i + 1) * 8}%`, height: "100%", width: 1 },
-                ]}
-              />
-            ))}
-          </View>
-
-          {/* Route path (dotted line) */}
-          {routePoints!
-            .filter((_, i) => i % 2 === 0)
-            .map((pt, idx) => {
-              const pos = toPos(pt);
-              return (
-                <View
-                  key={`rd${idx}`}
-                  style={{
-                    position: "absolute",
-                    top: `${pos.top}%`,
-                    left: `${pos.left}%`,
-                    width: 6,
-                    height: 6,
-                    borderRadius: 3,
-                    backgroundColor: "#FF6B00",
-                    opacity: 0.5,
-                    transform: [{ translateX: -3 }, { translateY: -3 }],
-                  }}
-                />
-              );
-            })}
-
-          {/* Origin marker */}
-          <View
-            style={{
-              position: "absolute",
-              top: `${originPos.top}%`,
-              left: `${originPos.left}%`,
-              alignItems: "center",
-              transform: [{ translateX: -18 }, { translateY: -42 }],
-              zIndex: 20,
-            }}
-          >
-            <View style={s.originPin}>
-              <Ionicons name="location" size={16} color="#fff" />
-            </View>
-            <View style={s.originPinLabel}>
-              <Text style={s.pinLabelText}>{originLabel}</Text>
-            </View>
-          </View>
-
-          {/* Destination marker */}
-          <View
-            style={{
-              position: "absolute",
-              top: `${destPos.top}%`,
-              left: `${destPos.left}%`,
-              alignItems: "center",
-              transform: [{ translateX: -18 }, { translateY: -42 }],
-              zIndex: 20,
-            }}
-          >
-            <View style={s.destPin}>
-              <Ionicons name="flag" size={16} color="#fff" />
-            </View>
-            <View style={s.destPinLabel}>
-              <Text style={s.pinLabelText}>{destinationLabel}</Text>
-            </View>
-          </View>
-
-          {/* Vehicle marker */}
-          <View
-            style={{
-              position: "absolute",
-              top: `${workerPos.top}%`,
-              left: `${workerPos.left}%`,
-              transform: [{ translateX: -22 }, { translateY: -22 }],
-              zIndex: 30,
-            }}
-          >
-            <View style={[s.vehicleWebPin, { backgroundColor: vehicleColor }]}>
-              <MaterialCommunityIcons
-                name={vehicleIcon as any}
-                size={24}
-                color="#fff"
-              />
-            </View>
-          </View>
-
-          {/* Distance info */}
-          <View style={s.trackingDistBadge}>
-            <Ionicons name="navigate" size={14} color="#0D9488" />
-            <Text style={s.trackingDistText}>Còn {formatDistance(distKm)}</Text>
-          </View>
-        </View>
-      </View>
-    );
-  }
-
-  // ============================================================================
-  // WEB FALLBACK RENDERER (static map view)
-  // ============================================================================
-  if (Platform.OS === "web") {
-    return (
-      <View style={[s.mapContainer, { height }]}>
-        <View style={s.webMapFallback}>
-          {/* Grid background */}
-          <View style={s.webGrid}>
-            {Array.from({ length: 20 }).map((_, i) => (
-              <View
-                key={`h${i}`}
-                style={[
-                  s.webGridLine,
-                  { top: `${(i + 1) * 5}%`, width: "100%", height: 1 },
-                ]}
-              />
-            ))}
-            {Array.from({ length: 20 }).map((_, i) => (
-              <View
-                key={`v${i}`}
-                style={[
-                  s.webGridLine,
-                  { left: `${(i + 1) * 5}%`, height: "100%", width: 1 },
-                ]}
-              />
-            ))}
-          </View>
-
-          {/* User marker (center) */}
-          {showUserMarker && (
-            <View style={[s.webMarker, s.webUserMarker]}>
-              <View style={s.userDotOuter}>
-                <View style={s.userDotInner} />
-              </View>
-              <Text style={s.webMarkerLabel}>Bạn</Text>
-            </View>
-          )}
-
-          {/* Worker markers (spread around center) */}
-          {workers.slice(0, 8).map((worker, idx) => {
-            const isSelected = selectedWorker?.id === worker.id;
-            // Position relative to center using angle
-            const angle = (idx / Math.min(workers.length, 8)) * 2 * Math.PI;
-            const radius = 25 + (idx % 3) * 10;
-            const left = 50 + radius * Math.cos(angle);
-            const top = 50 + radius * Math.sin(angle);
-
-            return (
-              <TouchableOpacity
-                key={worker.id}
-                style={[
-                  s.webWorkerMarker,
-                  {
-                    left: `${Math.max(10, Math.min(90, left))}%`,
-                    top: `${Math.max(10, Math.min(90, top))}%`,
-                  },
-                  isSelected && s.webWorkerMarkerSelected,
-                ]}
-                onPress={() => handleWorkerPress(worker)}
-                activeOpacity={0.7}
-              >
-                <MaterialCommunityIcons
-                  name="account-hard-hat"
-                  size={isSelected ? 22 : 18}
-                  color={isSelected ? "#fff" : "#FF6B00"}
-                />
-                {isSelected && (
-                  <Text style={s.webWorkerName} numberOfLines={1}>
-                    {worker.name.split(" ").pop()}
-                  </Text>
-                )}
-              </TouchableOpacity>
-            );
-          })}
-
-          {/* Info overlay */}
-          <View style={s.webMapInfo}>
-            <Ionicons name="location" size={14} color="#FF6B00" />
-            <Text style={s.webMapInfoText}>{workers.length} thợ gần bạn</Text>
-          </View>
-        </View>
-      </View>
-    );
-  }
-
-  // ============================================================================
-  // NATIVE MAP RENDERER (react-native-maps)
-  // ============================================================================
-  // Import dynamically so web build doesn't break
+  // Native-only Google Maps (web handled by WorkerMapView.web.tsx)
   let MapView: any;
   let Marker: any;
   let Circle: any;
   let Polyline: any;
+  let Callout: any;
+  let PROVIDER_GOOGLE: any;
+
   try {
     const maps = require("react-native-maps");
     MapView = maps.default;
     Marker = maps.Marker;
     Circle = maps.Circle;
     Polyline = maps.Polyline;
-  } catch {
-    // Maps not available — use same web fallback
+    Callout = maps.Callout;
+    PROVIDER_GOOGLE = maps.PROVIDER_GOOGLE;
+    console.log( "maps", JSON.stringify(maps, null, 2));
+  } catch (error) {
+    console.error("[WorkerMapView] react-native-maps load failed:", error);
     return (
       <View style={[s.mapContainer, { height }]}>
-        <View style={s.webMapFallback}>
-          <Text style={s.fallbackText}>Bản đồ chỉ khả dụng trên thiết bị</Text>
+        <View style={s.fallbackContainer}>
+          <Text style={s.fallbackText}>
+            Google Maps chỉ khả dụng trên build native
+          </Text>
         </View>
       </View>
     );
@@ -371,34 +246,72 @@ export function WorkerMapView({
     <View style={[s.mapContainer, { height }]}>
       <MapView
         ref={mapRef}
+        provider={PROVIDER_GOOGLE}
         style={s.map}
         initialRegion={region}
         region={region}
-        showsUserLocation={showUserMarker}
-        showsMyLocationButton={false}
+        mapType="standard"
+        showsUserLocation
+        showsMyLocationButton
+        showsCompass
+        toolbarEnabled={false}
+        moveOnMarkerPress={false}
         scrollEnabled={interactive}
         zoomEnabled={interactive}
         rotateEnabled={false}
         pitchEnabled={false}
       >
-        {/* User location marker */}
+        {console.log( "region", JSON.stringify(region, null, 2))}
+        {/* User location marker + radar */}
         {showUserMarker && (
           <Marker
             coordinate={userLocation}
-            title="Vị trí của bạn"
             anchor={{ x: 0.5, y: 0.5 }}
+            tracksViewChanges={false}
+            zIndex={999}
           >
-            <View style={s.userMarkerNative}>
-              <View style={s.userDotOuter}>
-                <View style={s.userDotInner} />
+            <View style={s.userMarkerWrap}>
+              <Animated.View
+                pointerEvents="none"
+                style={[
+                  s.radarRing,
+                  {
+                    opacity: radarOpacity1,
+                    transform: [{ scale: radarScale1 }],
+                  },
+                ]}
+              />
+              <Animated.View
+                pointerEvents="none"
+                style={[
+                  s.radarRingSecondary,
+                  {
+                    opacity: radarOpacity2,
+                    transform: [{ scale: radarScale2 }],
+                  },
+                ]}
+              />
+              <View style={s.userMarkerNative}>
+                <View style={s.userDotOuter}>
+                  <View style={s.userDotInner} />
+                </View>
               </View>
             </View>
           </Marker>
         )}
+        {console.log( "visibleWorkers", JSON.stringify(visibleWorkers, null, 2))}
 
-        {/* Worker markers */}
-        {workers.map((worker) => {
+        {/* Worker markers within radius */}
+        {visibleWorkers.map((worker) => {
           const isSelected = selectedWorker?.id === worker.id;
+          const distanceKm =
+            typeof worker.distance === "number"
+              ? worker.distance
+              : haversineDistance(userLocation, {
+                  latitude: worker.latitude,
+                  longitude: worker.longitude,
+                });
+
           return (
             <Marker
               key={worker.id}
@@ -406,32 +319,64 @@ export function WorkerMapView({
                 latitude: worker.latitude,
                 longitude: worker.longitude,
               }}
-              title={worker.name}
-              description={`${formatDistance(worker.distance || 0)} • ${formatTravelTime(worker.estimatedArrival || 0)}`}
-              onPress={() => handleWorkerPress(worker)}
+              anchor={{ x: 0.5, y: 1 }}
+              onPress={() => handleWorkerMarkerPress(worker)}
+              tracksViewChanges={false}
             >
-              <View
-                style={[
-                  s.workerMarkerNative,
-                  isSelected && s.workerMarkerSelected,
-                ]}
-              >
-                <MaterialCommunityIcons
-                  name="account-hard-hat"
-                  size={isSelected ? 24 : 20}
-                  color="#fff"
-                />
+              <View style={s.workerMarkerWrap}>
                 {isSelected && (
-                  <View style={s.workerCallout}>
-                    <Text style={s.workerCalloutName} numberOfLines={1}>
+                  <View style={s.workerNameBubble}>
+                    <Text style={s.workerNameBubbleText} numberOfLines={1}>
                       {worker.name}
-                    </Text>
-                    <Text style={s.workerCalloutDist}>
-                      {formatDistance(worker.distance || 0)}
                     </Text>
                   </View>
                 )}
+
+                <View
+                  style={[
+                    s.workerAvatarMarker,
+                    isSelected && s.workerAvatarMarkerSelected,
+                  ]}
+                >
+                  <Image
+                    source={{
+                      uri:
+                        worker.avatar ||
+                        `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                          worker.name,
+                        )}&background=FF6B00&color=fff`,
+                    }}
+                    style={s.workerAvatarImage}
+                  />
+
+                  <View style={s.workerRatingBadge}>
+                    <Ionicons name="star" size={10} color="#FFC107" />
+                    <Text style={s.workerRatingText}>
+                      {Number(worker.rating || 0).toFixed(1)}
+                    </Text>
+                  </View>
+                </View>
               </View>
+
+              {isSelected && (
+                <Callout tooltip onPress={() => onWorkerOpenProfile?.(worker)}>
+                  <View style={s.calloutCard}>
+                    <Text style={s.calloutTitle} numberOfLines={1}>
+                      {worker.name}
+                    </Text>
+                    <Text style={s.calloutSub}>
+                      ⭐ {Number(worker.rating || 0).toFixed(1)} •{" "}
+                      {formatDistance(distanceKm)}
+                    </Text>
+                    {!!worker.estimatedArrival && (
+                      <Text style={s.calloutSub}>
+                        {formatTravelTime(worker.estimatedArrival)}
+                      </Text>
+                    )}
+                    <Text style={s.calloutHint}>Chạm để mở hồ sơ thợ</Text>
+                  </View>
+                </Callout>
+              )}
             </Marker>
           );
         })}
@@ -457,7 +402,6 @@ export function WorkerMapView({
             coordinates={routePoints}
             strokeColor="#FF6B00"
             strokeWidth={4}
-            lineDashPattern={[0]}
           />
         )}
 
@@ -470,6 +414,7 @@ export function WorkerMapView({
                 <Text style={s.nativePinText}>{originLabel}</Text>
               </View>
             </Marker>
+
             <Marker coordinate={userLocation} anchor={{ x: 0.5, y: 1 }}>
               <View style={s.nativeDestPin}>
                 <Ionicons name="flag" size={14} color="#fff" />
@@ -479,15 +424,24 @@ export function WorkerMapView({
           </>
         )}
 
-        {/* Search radius circle */}
+        {/* Search radius */}
         {showRadius && (
-          <Circle
-            center={userLocation}
-            radius={radiusKm * 1000}
-            strokeColor="rgba(255, 107, 0, 0.3)"
-            fillColor="rgba(255, 107, 0, 0.05)"
-            strokeWidth={1}
-          />
+          <>
+            <Circle
+              center={userLocation}
+              radius={radiusKm * 1000}
+              strokeColor="rgba(25, 118, 210, 0.35)"
+              fillColor="rgba(25, 118, 210, 0.08)"
+              strokeWidth={2}
+            />
+            <Circle
+              center={userLocation}
+              radius={120}
+              strokeColor="rgba(25, 118, 210, 0.20)"
+              fillColor="rgba(25, 118, 210, 0.12)"
+              strokeWidth={1}
+            />
+          </>
         )}
       </MapView>
     </View>
@@ -508,98 +462,68 @@ const s = StyleSheet.create({
   map: {
     ...StyleSheet.absoluteFillObject,
   },
-
-  // Web fallback
-  webMapFallback: {
-    flex: 1,
-    backgroundColor: "#E8F0E8",
-    position: "relative",
-    overflow: "hidden",
-  },
-  webGrid: {
+  webMapImage: {
     ...StyleSheet.absoluteFillObject,
   },
-  webGridLine: {
-    position: "absolute",
-    backgroundColor: "rgba(180,200,180,0.4)",
-  },
-  webMarker: {
-    position: "absolute",
-    alignItems: "center",
-  },
-  webUserMarker: {
-    left: "48%",
-    top: "46%",
-    zIndex: 10,
-  },
-  webMarkerLabel: {
-    fontSize: 10,
-    fontWeight: "600",
-    color: "#1976D2",
-    marginTop: 2,
-  },
-  webWorkerMarker: {
-    position: "absolute",
-    transform: [{ translateX: -15 }, { translateY: -15 }],
-    backgroundColor: "#FFF3E0",
-    borderRadius: 20,
-    width: 32,
-    height: 32,
+
+  fallbackContainer: {
+    flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 2,
-    borderColor: "#FF6B00",
-    zIndex: 5,
-  },
-  webWorkerMarkerSelected: {
-    backgroundColor: "#FF6B00",
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    borderColor: "#E65100",
-    zIndex: 8,
-  },
-  webWorkerName: {
-    position: "absolute",
-    bottom: -14,
-    fontSize: 9,
-    fontWeight: "600",
-    color: "#fff",
-    backgroundColor: "#FF6B00",
-    paddingHorizontal: 4,
-    paddingVertical: 1,
-    borderRadius: 4,
-  },
-  webMapInfo: {
-    position: "absolute",
-    top: 10,
-    left: 10,
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "rgba(255,255,255,0.95)",
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 12,
-    gap: 4,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 2,
-  },
-  webMapInfoText: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: "#333",
+    backgroundColor: "#F3F4F6",
+    paddingHorizontal: 24,
   },
   fallbackText: {
     textAlign: "center",
-    marginTop: 40,
-    color: "#999",
+    color: "#6B7280",
     fontSize: 14,
+    fontWeight: "500",
+    lineHeight: 20,
+  },
+  webRadiusRing: {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    width: 220,
+    height: 220,
+    borderRadius: 999,
+    transform: [{ translateX: -110 }, { translateY: -110 }],
+    borderWidth: 2,
+    borderColor: "rgba(25,118,210,0.35)",
+    backgroundColor: "rgba(25,118,210,0.08)",
+  },
+  webUserMarkerWrap: {
+    position: "absolute",
+    transform: [{ translateX: -12 }, { translateY: -12 }],
+    zIndex: 99,
+  },
+  webWorkerMarkerWrap: {
+    position: "absolute",
+    transform: [{ translateX: -27 }, { translateY: -54 }],
+    zIndex: 50,
+    alignItems: "center",
   },
 
-  // Native markers
+  userMarkerWrap: {
+    width: 64,
+    height: 64,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  radarRing: {
+    position: "absolute",
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: "rgba(25,118,210,0.22)",
+  },
+  radarRingSecondary: {
+    position: "absolute",
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: "rgba(25,118,210,0.14)",
+  },
   userMarkerNative: {
     alignItems: "center",
     justifyContent: "center",
@@ -608,7 +532,7 @@ const s = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: "rgba(33, 150, 243, 0.2)",
+    backgroundColor: "rgba(33, 150, 243, 0.22)",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -620,57 +544,106 @@ const s = StyleSheet.create({
     borderWidth: 2,
     borderColor: "#fff",
   },
-  workerMarkerNative: {
-    backgroundColor: "#FF6B00",
-    borderRadius: 20,
-    width: 36,
-    height: 36,
+
+  workerMarkerWrap: {
+    alignItems: "center",
+  },
+  workerAvatarMarker: {
+    width: 54,
+    height: 54,
+    borderRadius: 27,
+    backgroundColor: "#fff",
+    borderWidth: 3,
+    borderColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 2,
-    borderColor: "#fff",
+    overflow: "visible",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
+    shadowOpacity: 0.22,
+    shadowRadius: 5,
+    elevation: 6,
   },
-  workerMarkerSelected: {
-    backgroundColor: "#E65100",
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    borderWidth: 3,
+  workerAvatarMarkerSelected: {
+    transform: [{ scale: 1.08 }],
+    borderColor: "#FF6B00",
   },
-  workerCallout: {
+  workerAvatarImage: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: "#F0F0F0",
+  },
+  workerRatingBadge: {
     position: "absolute",
-    top: -30,
+    bottom: -6,
+    right: -8,
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: "#fff",
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
+    borderRadius: 12,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderWidth: 1,
+    borderColor: "#F2F2F2",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 3,
-    flexDirection: "row",
-    gap: 4,
-    minWidth: 80,
+    shadowOpacity: 0.12,
+    shadowRadius: 2,
+    elevation: 2,
+    gap: 2,
   },
-  workerCalloutName: {
-    fontSize: 11,
+  workerRatingText: {
+    fontSize: 10,
     fontWeight: "700",
     color: "#333",
-    maxWidth: 60,
   },
-  workerCalloutDist: {
-    fontSize: 10,
+  workerNameBubble: {
+    marginBottom: 8,
+    maxWidth: 140,
+    backgroundColor: "#1F2937",
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 12,
+  },
+  workerNameBubbleText: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "700",
+  },
+
+  calloutCard: {
+    minWidth: 160,
+    maxWidth: 220,
+    backgroundColor: "#fff",
+    borderRadius: 14,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.18,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  calloutTitle: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: "#111827",
+    marginBottom: 4,
+  },
+  calloutSub: {
+    fontSize: 12,
+    color: "#4B5563",
+    marginBottom: 2,
+  },
+  calloutHint: {
+    marginTop: 4,
+    fontSize: 11,
     color: "#FF6B00",
     fontWeight: "600",
   },
+
   movingWorkerMarker: {
-    backgroundColor: "#4CAF50",
     borderRadius: 24,
     width: 48,
     height: 48,
@@ -684,83 +657,7 @@ const s = StyleSheet.create({
     shadowRadius: 6,
     elevation: 8,
   },
-  // Tracking web styles
-  trackingWebBg: {
-    flex: 1,
-    backgroundColor: "#D4EDDA",
-    position: "relative",
-    overflow: "hidden",
-  },
-  originPin: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: "#3B82F6",
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 3,
-    borderColor: "#fff",
-    elevation: 5,
-  },
-  originPinLabel: {
-    backgroundColor: "#3B82F6",
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 8,
-    marginTop: 3,
-  },
-  destPin: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: "#EF4444",
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 3,
-    borderColor: "#fff",
-    elevation: 5,
-  },
-  destPinLabel: {
-    backgroundColor: "#EF4444",
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 8,
-    marginTop: 3,
-  },
-  pinLabelText: {
-    fontSize: 11,
-    fontWeight: "700",
-    color: "#fff",
-  },
-  vehicleWebPin: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 3,
-    borderColor: "#fff",
-    elevation: 8,
-  },
-  trackingDistBadge: {
-    position: "absolute",
-    bottom: 12,
-    right: 12,
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "rgba(255,255,255,0.95)",
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 16,
-    gap: 6,
-    elevation: 3,
-  },
-  trackingDistText: {
-    fontSize: 13,
-    fontWeight: "700",
-    color: "#0D9488",
-  },
-  // Native tracking markers
+
   nativeOriginPin: {
     flexDirection: "row",
     alignItems: "center",
