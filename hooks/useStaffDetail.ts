@@ -2,9 +2,13 @@
  * useStaffDetail — Hook for fetching a single staff member detail
  */
 
-import { useCallback, useEffect, useState } from 'react';
-import { getStaffDetail } from '@/services/staffService';
-import type { StaffActivityEntry, StaffMemberFull, StaffReportRef } from '@/types/staff';
+import { getStaffDetail } from "@/services/staffService";
+import type {
+    StaffActivityEntry,
+    StaffMemberFull,
+    StaffReportRef,
+} from "@/types/staff";
+import { useCallback, useEffect, useState } from "react";
 
 export function useStaffDetail(staffId: number | null) {
   const [staff, setStaff] = useState<StaffMemberFull | null>(null);
@@ -24,7 +28,8 @@ export function useStaffDetail(staffId: number | null) {
       setActivityLog(data.activity_log ?? []);
       setReports(data.reports ?? []);
     } catch (err: any) {
-      const msg = err?.data?.message || err?.message || 'Không thể tải thông tin nhân sự';
+      const msg =
+        err?.data?.message || err?.message || "Không thể tải thông tin nhân sự";
       setError(msg);
     } finally {
       setLoading(false);

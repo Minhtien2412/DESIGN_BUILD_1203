@@ -2,15 +2,15 @@
  * useStaffList — Hook for fetching paginated/filtered staff list
  */
 
-import { useCallback, useEffect, useState } from 'react';
-import { getStaffList } from '@/services/staffService';
+import { getStaffList } from "@/services/staffService";
 import type {
-  StaffFilters,
-  StaffListResponse,
-  StaffMemberFull,
-  StaffSortField,
-  SortDirection,
-} from '@/types/staff';
+    SortDirection,
+    StaffFilters,
+    StaffListResponse,
+    StaffMemberFull,
+    StaffSortField,
+} from "@/types/staff";
+import { useCallback, useEffect, useState } from "react";
 
 interface UseStaffOptions {
   page?: number;
@@ -26,8 +26,8 @@ export function useStaffList(options: UseStaffOptions = {}) {
     page = 1,
     limit = 20,
     filters = {},
-    sortBy = 'full_name',
-    sortDir = 'asc',
+    sortBy = "full_name",
+    sortDir = "asc",
     autoFetch = true,
   } = options;
 
@@ -60,7 +60,10 @@ export function useStaffList(options: UseStaffOptions = {}) {
         setStaff(data.staff);
         setPagination(data.pagination);
       } catch (err: any) {
-        const msg = err?.data?.message || err?.message || 'Không thể tải danh sách nhân sự';
+        const msg =
+          err?.data?.message ||
+          err?.message ||
+          "Không thể tải danh sách nhân sự";
         setError(msg);
       } finally {
         setLoading(false);
