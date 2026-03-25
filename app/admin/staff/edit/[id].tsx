@@ -1,493 +1,246 @@
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Button } from '@/components/ui/button';
-import { Container } from '@/components/ui/container';
-import { Input } from '@/components/ui/input';
-import { Loader } from '@/components/ui/loader';
-import { Section } from '@/components/ui/section';
-import { useAuth } from '@/context/AuthContext';
-import { useDepartments, useRoles, useStaffDetail } from '@/hooks/useAdmin';
-import { useThemeColor } from '@/hooks/use-theme-color';
-import { apiFetch } from '@/services/api';
-import { hasPermission } from '@/utils/permissions';
-import { Ionicons } from '@expo/vector-icons';
-import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { Alert, ScrollView, StyleSheet, View } from 'react-native';
+/**
+ * Staff Edit Screen — Chỉnh sửa nhân sự
+ * Uses StaffForm component + new permission system
+ */
+
+import StaffForm, { type StaffFormValues } from "@/components/staff/StaffForm";
+import { canEditStaff } from "@/constants/staffPermissions";
+import { Colors } from "@/constants/theme";
+import { useAuth } from "@/context/AuthContext";
+import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useDepartments } from "@/hooks/useDepartments";
+import { useStaffDetail } from "@/hooks/useStaffDetail";
+import { useTeams } from "@/hooks/useTeams";
+import { updateStaff } from "@/services/staffService";
+import { CompanyRole, type StaffFormData } from "@/types/staff";
+import { Ionicons } from "@expo/vector-icons";
+import { router, Stack, useLocalSearchParams } from "expo-router";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+    ActivityIndicator,
+    Alert,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from "react-native";
 
 export default function StaffEditScreen() {
+  const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme ?? "light"];
   const { id } = useLocalSearchParams<{ id: string }>();
   const { user } = useAuth();
-  const iconColor = useThemeColor({}, 'icon');
-  const borderColor = useThemeColor({}, 'border');
-  const mutedColor = useThemeColor({}, 'tabIconDefault');
 
-  // Permission check
-  useEffect(() => {
-    if (!user?.admin || !hasPermission(user.permissions, 'staff', 'edit')) {
-      Alert.alert('Không có quyền', 'Bạn không có quyền chỉnh sửa nhân viên', [
-        { text: 'OK', onPress: () => router.back() }
-      ]);
-    }
+  const staffId = id ? parseInt(id, 10) : null;
+
+  const userRole = useMemo<CompanyRole>(() => {
+    const r = user?.role as CompanyRole | undefined;
+    if (r && Object.values(CompanyRole).includes(r)) return r;
+    if (user?.admin) return CompanyRole.ADMIN;
+    return CompanyRole.STAFF;
   }, [user]);
 
-  // Fetch staff detail
-  const { staff, loading: staffLoading, error, refresh } = useStaffDetail(id ? parseInt(id) : 0);
-  const { roles, loading: rolesLoading } = useRoles();
-  const { departments, loading: deptsLoading } = useDepartments();
+  const canEdit = canEditStaff(userRole) || !!user?.admin;
 
-  // Form state
-  const [formData, setFormData] = useState({
-    firstname: '',
-    lastname: '',
-    email: '',
-    phonenumber: '',
-    role: '',
-    departments: [] as number[],
-    active: true,
-    changePassword: false,
-    password: '',
-    confirmPassword: '',
-  });
+  const { staff, loading, error } = useStaffDetail(staffId);
+  const { departments } = useDepartments(true);
+  const { teams } = useTeams(undefined, true);
 
-  const [submitting, setSubmitting] = useState(false);
+  const [values, setValues] = useState<StaffFormValues | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitting, setSubmitting] = useState(false);
 
-  // Initialize form with staff data
+  // Populate form once staff loads
   useEffect(() => {
-    if (staff) {
-      setFormData({
-        firstname: staff.firstname,
-        lastname: staff.lastname,
-        email: staff.email,
-        phonenumber: staff.phonenumber || '',
-        role: staff.role.roleid.toString(),
-        departments: staff.departments?.map(d => d.departmentid) || [],
-        active: staff.active === 1,
-        changePassword: false,
-        password: '',
-        confirmPassword: '',
+    if (staff && !values) {
+      setValues({
+        first_name: staff.first_name ?? "",
+        last_name: staff.last_name ?? "",
+        email: staff.email ?? "",
+        phone: staff.phone ?? "",
+        role: staff.role,
+        job_title: staff.job_title ?? "",
+        department_id: staff.department_id ?? null,
+        team_id: staff.team_id ?? null,
+        manager_id: staff.manager_id ?? null,
+        status: staff.status,
+        skills: staff.skills?.join(", ") ?? "",
+        password: "",
+        confirm_password: "",
       });
     }
-  }, [staff]);
+  }, [staff, values]);
 
-  // Validation
-  const validate = () => {
-    const newErrors: Record<string, string> = {};
+  const validate = useCallback((): boolean => {
+    if (!values) return false;
+    const e: Record<string, string> = {};
+    if (!values.first_name.trim()) e.first_name = "Vui lòng nhập tên";
+    if (!values.last_name.trim()) e.last_name = "Vui lòng nhập họ";
+    if (!values.email.trim()) {
+      e.email = "Vui lòng nhập email";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
+      e.email = "Email không hợp lệ";
+    }
+    // Password optional on edit — only validate if provided
+    if (values.password && values.password.length < 6) {
+      e.password = "Mật khẩu phải có ít nhất 6 ký tự";
+    }
+    if (values.password && values.password !== values.confirm_password) {
+      e.confirm_password = "Mật khẩu không khớp";
+    }
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  }, [values]);
 
-    if (!formData.firstname.trim()) {
-      newErrors.firstname = 'Vui lòng nhập tên';
-    }
-    if (!formData.lastname.trim()) {
-      newErrors.lastname = 'Vui lòng nhập họ';
-    }
-    if (!formData.email.trim()) {
-      newErrors.email = 'Vui lòng nhập email';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Email không hợp lệ';
-    }
-    if (!formData.role) {
-      newErrors.role = 'Vui lòng chọn vai trò';
-    }
-
-    // Password validation only if changing password
-    if (formData.changePassword) {
-      if (!formData.password) {
-        newErrors.password = 'Vui lòng nhập mật khẩu mới';
-      } else if (formData.password.length < 6) {
-        newErrors.password = 'Mật khẩu phải có ít nhất 6 ký tự';
-      }
-      if (formData.password !== formData.confirmPassword) {
-        newErrors.confirmPassword = 'Mật khẩu không khớp';
-      }
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  // Submit handler
-  const handleSubmit = async () => {
-    if (!validate()) {
-      Alert.alert('Lỗi', 'Vui lòng kiểm tra lại thông tin');
-      return;
-    }
-
+  const handleSubmit = useCallback(async () => {
+    if (!values || !staffId || !validate()) return;
     setSubmitting(true);
-    console.log('[StaffEdit] Updating staff...', formData);
-
     try {
-      const payload: any = {
-        firstname: formData.firstname.trim(),
-        lastname: formData.lastname.trim(),
-        email: formData.email.trim().toLowerCase(),
-        phonenumber: formData.phonenumber.trim() || null,
-        role: parseInt(formData.role),
-        departments: formData.departments,
-        active: formData.active ? 1 : 0,
+      const payload: StaffFormData = {
+        first_name: values.first_name.trim(),
+        last_name: values.last_name.trim(),
+        email: values.email.trim().toLowerCase(),
+        phone: values.phone.trim() || undefined,
+        role: values.role,
+        job_title: values.job_title.trim() || undefined,
+        department_id: values.department_id,
+        team_id: values.team_id,
+        manager_id: values.manager_id,
+        status: values.status,
+        skills: values.skills
+          ? values.skills
+              .split(",")
+              .map((s) => s.trim())
+              .filter(Boolean)
+          : undefined,
       };
-
-      // Add password only if changing
-      if (formData.changePassword && formData.password) {
-        payload.password = formData.password;
-      }
-
-      const response = await apiFetch(`/admin/staff/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify(payload),
-      });
-
-      console.log('[StaffEdit] Success:', response);
-      Alert.alert(
-        'Thành công',
-        'Thông tin nhân viên đã được cập nhật',
-        [{ text: 'OK', onPress: () => router.back() }]
-      );
-    } catch (error: any) {
-      console.error('[StaffEdit] Error:', error);
-      Alert.alert('Lỗi', error.message || 'Không thể cập nhật nhân viên');
+      await updateStaff(staffId, payload);
+      Alert.alert("Thành công", "Thông tin nhân sự đã được cập nhật", [
+        { text: "OK", onPress: () => router.back() },
+      ]);
+    } catch (err: any) {
+      Alert.alert("Lỗi", err?.message ?? "Không thể cập nhật nhân sự");
     } finally {
       setSubmitting(false);
     }
-  };
+  }, [values, staffId, validate]);
 
-  // Toggle department selection
-  const toggleDepartment = (deptId: number) => {
-    setFormData(prev => ({
-      ...prev,
-      departments: prev.departments.includes(deptId)
-        ? prev.departments.filter(id => id !== deptId)
-        : [...prev.departments, deptId]
-    }));
-  };
-
-  // Handle delete
-  const handleDelete = () => {
-    Alert.alert(
-      'Xác nhận xóa',
-      `Bạn có chắc muốn xóa nhân viên ${staff?.firstname} ${staff?.lastname}?`,
-      [
-        { text: 'Hủy', style: 'cancel' },
-        {
-          text: 'Xóa',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await apiFetch(`/admin/staff/${id}`, { method: 'DELETE' });
-              Alert.alert('Thành công', 'Nhân viên đã được xóa', [
-                { text: 'OK', onPress: () => router.replace('/admin/staff') }
-              ]);
-            } catch (error: any) {
-              Alert.alert('Lỗi', error.message || 'Không thể xóa nhân viên');
-            }
-          }
-        }
-      ]
-    );
-  };
-
-  const isLoading = staffLoading || rolesLoading || deptsLoading;
-
-  if (isLoading) {
+  // Guard
+  if (!canEdit) {
     return (
-      <ThemedView style={styles.container}>
-        <Loader />
-      </ThemedView>
+      <View style={[styles.center, { backgroundColor: colors.background }]}>
+        <Stack.Screen options={{ title: "Chỉnh sửa nhân sự" }} />
+        <Ionicons
+          name="lock-closed-outline"
+          size={48}
+          color={colors.textMuted}
+        />
+        <Text style={[styles.guardText, { color: colors.text }]}>
+          Không có quyền chỉnh sửa
+        </Text>
+      </View>
     );
   }
 
+  // Loading
+  if (loading || !values) {
+    return (
+      <View style={[styles.center, { backgroundColor: colors.background }]}>
+        <Stack.Screen
+          options={{
+            title: "Chỉnh sửa nhân sự",
+            headerStyle: { backgroundColor: colors.primary },
+            headerTintColor: "#fff",
+          }}
+        />
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text style={[styles.loadingText, { color: colors.textMuted }]}>
+          Đang tải...
+        </Text>
+      </View>
+    );
+  }
+
+  // Error
   if (error || !staff) {
     return (
-      <ThemedView style={styles.container}>
-        <Container>
-          <Section>
-            <ThemedText>Không tìm thấy nhân viên</ThemedText>
-            <Button onPress={() => router.back()}>Quay lại</Button>
-          </Section>
-        </Container>
-      </ThemedView>
+      <View style={[styles.center, { backgroundColor: colors.background }]}>
+        <Stack.Screen
+          options={{
+            title: "Chỉnh sửa nhân sự",
+            headerStyle: { backgroundColor: colors.primary },
+            headerTintColor: "#fff",
+          }}
+        />
+        <Ionicons name="warning-outline" size={48} color={colors.textMuted} />
+        <Text style={[styles.errorText, { color: colors.text }]}>
+          {error || "Không tìm thấy nhân sự"}
+        </Text>
+        <TouchableOpacity
+          style={[styles.retryBtn, { backgroundColor: colors.primary }]}
+          onPress={() => router.back()}
+        >
+          <Text style={styles.retryBtnText}>Quay lại</Text>
+        </TouchableOpacity>
+      </View>
     );
   }
 
   return (
-    <ThemedView style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <Container>
-          {/* Header */}
-          <Section>
-            <View style={styles.header}>
-              <Button
-                variant="ghost"
-                size="sm"
-                onPress={() => router.back()}
-                style={styles.backButton}
-              >
-                <Ionicons name="arrow-back" size={24} color={iconColor} />
-              </Button>
-              <ThemedText type="title">Chỉnh sửa nhân viên</ThemedText>
-            </View>
-          </Section>
-
-          {/* Personal Info */}
-          <Section>
-            <ThemedText type="subtitle" style={styles.sectionTitle}>
-              Thông tin cá nhân
-            </ThemedText>
-            
-            <Input
-              label="Tên *"
-              value={formData.firstname}
-              onChangeText={(text) => setFormData(prev => ({ ...prev, firstname: text }))}
-              placeholder="Nhập tên"
-              error={errors.firstname}
-              autoCapitalize="words"
-            />
-
-            <Input
-              label="Họ *"
-              value={formData.lastname}
-              onChangeText={(text) => setFormData(prev => ({ ...prev, lastname: text }))}
-              placeholder="Nhập họ"
-              error={errors.lastname}
-              autoCapitalize="words"
-            />
-
-            <Input
-              label="Email *"
-              value={formData.email}
-              onChangeText={(text) => setFormData(prev => ({ ...prev, email: text }))}
-              placeholder="email@example.com"
-              error={errors.email}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoComplete="email"
-            />
-
-            <Input
-              label="Số điện thoại"
-              value={formData.phonenumber}
-              onChangeText={(text) => setFormData(prev => ({ ...prev, phonenumber: text }))}
-              placeholder="0123456789"
-              keyboardType="phone-pad"
-              autoComplete="tel"
-            />
-          </Section>
-
-          {/* Password Change Section */}
-          <Section>
-            <View style={[styles.passwordSection, { borderColor }]}>
-              <View style={styles.passwordHeader}>
-                <ThemedText type="defaultSemiBold">Đổi mật khẩu</ThemedText>
-                <Button
-                  variant={formData.changePassword ? 'primary' : 'ghost'}
-                  size="sm"
-                  onPress={() => setFormData(prev => ({ 
-                    ...prev, 
-                    changePassword: !prev.changePassword,
-                    password: '',
-                    confirmPassword: ''
-                  }))}
-                >
-                  {formData.changePassword ? 'Hủy' : 'Đổi mật khẩu'}
-                </Button>
-              </View>
-
-              {formData.changePassword && (
-                <View style={styles.passwordFields}>
-                  <Input
-                    label="Mật khẩu mới *"
-                    value={formData.password}
-                    onChangeText={(text) => setFormData(prev => ({ ...prev, password: text }))}
-                    placeholder="Tối thiểu 6 ký tự"
-                    error={errors.password}
-                    secureTextEntry
-                    autoComplete="password-new"
-                  />
-
-                  <Input
-                    label="Xác nhận mật khẩu *"
-                    value={formData.confirmPassword}
-                    onChangeText={(text) => setFormData(prev => ({ ...prev, confirmPassword: text }))}
-                    placeholder="Nhập lại mật khẩu"
-                    error={errors.confirmPassword}
-                    secureTextEntry
-                    autoComplete="password-new"
-                  />
-                </View>
-              )}
-            </View>
-          </Section>
-
-          {/* Role Selection */}
-          <Section>
-            <ThemedText type="subtitle" style={styles.sectionTitle}>
-              Vai trò *
-            </ThemedText>
-            {errors.role && (
-              <ThemedText style={styles.errorText}>{errors.role}</ThemedText>
-            )}
-            <View style={styles.roleGrid}>
-              {roles.map((role) => (
-                <Button
-                  key={role.roleid}
-                  variant={formData.role === role.roleid.toString() ? 'primary' : 'ghost'}
-                  size="sm"
-                  onPress={() => setFormData(prev => ({ ...prev, role: role.roleid.toString() }))}
-                  style={styles.roleButton}
-                >
-                  {role.name}
-                </Button>
-              ))}
-            </View>
-          </Section>
-
-          {/* Departments Selection */}
-          <Section>
-            <ThemedText type="subtitle" style={styles.sectionTitle}>
-              Phòng ban
-            </ThemedText>
-            <ThemedText style={[styles.helperText, { color: mutedColor }]}>
-              Chọn các phòng ban mà nhân viên này thuộc về
-            </ThemedText>
-            <View style={styles.deptGrid}>
-              {departments.map((dept) => (
-                <Button
-                  key={dept.departmentid}
-                  variant={formData.departments.includes(dept.departmentid) ? 'primary' : 'ghost'}
-                  size="sm"
-                  onPress={() => toggleDepartment(dept.departmentid)}
-                  style={styles.deptButton}
-                >
-                  {dept.name}
-                </Button>
-              ))}
-            </View>
-          </Section>
-
-          {/* Status Toggle */}
-          <Section>
-            <View style={[styles.statusRow, { borderColor }]}>
-              <View style={styles.statusInfo}>
-                <ThemedText type="defaultSemiBold">Trạng thái hoạt động</ThemedText>
-                <ThemedText style={[styles.helperText, { color: mutedColor }]}>
-                  {formData.active ? 'Nhân viên có thể đăng nhập' : 'Nhân viên bị vô hiệu hóa'}
-                </ThemedText>
-              </View>
-              <Button
-                variant={formData.active ? 'primary' : 'ghost'}
-                size="sm"
-                onPress={() => setFormData(prev => ({ ...prev, active: !prev.active }))}
-              >
-                {formData.active ? 'Hoạt động' : 'Vô hiệu hóa'}
-              </Button>
-            </View>
-          </Section>
-
-          {/* Action Buttons */}
-          <Section>
-            <View style={styles.actions}>
-              <Button
-                onPress={handleSubmit}
-                loading={submitting}
-                disabled={submitting}
-                style={styles.submitButton}
-              >
-                Cập nhật
-              </Button>
-
-              {hasPermission(user?.permissions, 'staff', 'delete') && (
-                <Button
-                  variant="secondary"
-                  onPress={handleDelete}
-                  disabled={submitting}
-                  style={styles.deleteButton}
-                >
-                  Xóa nhân viên
-                </Button>
-              )}
-            </View>
-          </Section>
-        </Container>
-      </ScrollView>
-    </ThemedView>
+    <>
+      <Stack.Screen
+        options={{
+          title: `Sửa: ${staff.full_name}`,
+          headerStyle: { backgroundColor: colors.primary },
+          headerTintColor: "#fff",
+        }}
+      />
+      <StaffForm
+        values={values}
+        onChange={setValues}
+        departments={departments}
+        teams={teams}
+        errors={errors}
+        isEdit
+        submitting={submitting}
+        onSubmit={handleSubmit}
+        onCancel={() => router.back()}
+      />
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  center: {
     flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 24,
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
+  guardText: {
+    fontSize: 16,
+    fontWeight: "600",
+    marginTop: 10,
   },
-  backButton: {
-    width: 40,
-    height: 40,
-    padding: 0,
-  },
-  sectionTitle: {
-    marginBottom: 16,
-  },
-  passwordSection: {
-    padding: 16,
-    borderWidth: 1,
-    borderRadius: 8,
-  },
-  passwordHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  passwordFields: {
-    marginTop: 16,
-    gap: 12,
-  },
-  roleGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  roleButton: {
-    minWidth: 100,
-  },
-  deptGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginTop: 8,
-  },
-  deptButton: {
-    minWidth: 100,
-  },
-  statusRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
-    borderWidth: 1,
-    borderRadius: 8,
-  },
-  statusInfo: {
-    flex: 1,
-  },
-  helperText: {
-    fontSize: 13,
-    marginTop: 4,
+  loadingText: {
+    marginTop: 12,
+    fontSize: 14,
   },
   errorText: {
-    color: '#000000',
-    fontSize: 13,
-    marginBottom: 8,
+    marginTop: 12,
+    fontSize: 15,
+    fontWeight: "500",
+    textAlign: "center",
   },
-  actions: {
-    gap: 12,
+  retryBtn: {
+    marginTop: 16,
+    paddingHorizontal: 24,
+    paddingVertical: 10,
+    borderRadius: 8,
   },
-  submitButton: {
-    flex: 1,
-  },
-  deleteButton: {
-    flex: 1,
+  retryBtnText: {
+    color: "#fff",
+    fontWeight: "700",
+    fontSize: 14,
   },
 });
