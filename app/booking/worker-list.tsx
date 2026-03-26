@@ -1,13 +1,18 @@
 /**
  * Worker List Screen — Step 4 of booking flow
  * Shows list of nearby workers found during scan, sorted by proximity
+ *
+ * Data: API getWorkers() → fallback generateMockWorkers()
  */
 
-import { generateMockWorkers, NearbyWorker } from "@/types/booking";
+import { generateMockWorkers } from "@/__mocks__/booking-mocks";
+import { getWorkers, type Worker } from "@/services/workers.api";
+import { NearbyWorker } from "@/types/booking";
 import { Ionicons } from "@expo/vector-icons";
 import { Href, router, useLocalSearchParams } from "expo-router";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
+    ActivityIndicator,
     FlatList,
     Image,
     Platform,
@@ -18,6 +23,29 @@ import {
 } from "react-native";
 
 type SortBy = "distance" | "rating" | "price";
+
+/** Map API Worker → NearbyWorker shape for the card */
+function toNearbyWorker(w: Worker): NearbyWorker {
+  return {
+    id: String(w.id),
+    name: w.name || "Thợ",
+    avatar:
+      w.avatar ||
+      `https://ui-avatars.com/api/?name=${encodeURIComponent(w.name || "T")}&background=0D9488&color=fff&size=80`,
+    specialty: w.workerType || "",
+    rating: w.rating ?? 0,
+    reviewCount: w.reviewCount ?? 0,
+    completedJobs: w.completedJobs ?? 0,
+    yearsExperience: w.experience ?? 0,
+    distance: "—",
+    estimatedArrival: "15–30 phút",
+    pricePerHour: w.dailyRate ? Math.round(w.dailyRate / 8) : 150000,
+    online: w.availability === "available",
+    verified: w.verified ?? false,
+    location: { latitude: 0, longitude: 0 },
+    skills: w.skills ?? [],
+  };
+}
 
 export default function WorkerListScreen() {
   const params = useLocalSearchParams<{
@@ -33,11 +61,37 @@ export default function WorkerListScreen() {
   }>();
 
   const [sortBy, setSortBy] = useState<SortBy>("distance");
+  const [workers, setWorkers] = useState<NearbyWorker[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const workers = useMemo(() => {
-    const count = parseInt(params.workerCount || "8", 10);
-    return generateMockWorkers(params.serviceId || "", count);
-  }, [params.serviceId, params.workerCount]);
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await getWorkers({
+          search: params.serviceName,
+          available: true,
+          limit: 20,
+        });
+        if (!cancelled && res.data?.length) {
+          setWorkers(res.data.map(toNearbyWorker));
+        } else if (!cancelled) {
+          // Fallback to mock workers
+          const count = parseInt(params.workerCount || "8", 10);
+          setWorkers(generateMockWorkers(params.serviceId || "", count));
+        }
+      } catch {
+        const count = parseInt(params.workerCount || "8", 10);
+        if (!cancelled)
+          setWorkers(generateMockWorkers(params.serviceId || "", count));
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [params.serviceId, params.serviceName, params.workerCount]);
 
   const sorted = useMemo(() => {
     const copy = [...workers];
@@ -205,13 +259,24 @@ export default function WorkerListScreen() {
       </View>
 
       {/* Worker list */}
-      <FlatList
-        data={sorted}
-        renderItem={renderWorker}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={{ paddingBottom: 30, paddingTop: 8 }}
-        showsVerticalScrollIndicator={false}
-      />
+      {loading ? (
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <ActivityIndicator size="large" color="#0D9488" />
+          <Text style={{ fontSize: 14, color: "#6B7280", marginTop: 12 }}>
+            Đang tìm thợ...
+          </Text>
+        </View>
+      ) : (
+        <FlatList
+          data={sorted}
+          renderItem={renderWorker}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={{ paddingBottom: 30, paddingTop: 8 }}
+          showsVerticalScrollIndicator={false}
+        />
+      )}
     </View>
   );
 }

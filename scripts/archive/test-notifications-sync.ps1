@@ -9,7 +9,7 @@ Write-Host "  TEST NOTIFICATIONS SYNC" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 
 $API_BASE = "https://baotienweb.cloud/api/v1"
-$API_KEY = "thietke-resort-api-key-2024"
+$API_KEY = "dbuild_client_7d3a9f41c2b84e6d9a5f0e1c7b2a4d88"
 
 Write-Host "`n[1/3] Testing notifications endpoint..." -ForegroundColor Yellow
 

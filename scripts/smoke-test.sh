@@ -10,7 +10,7 @@
 set -euo pipefail
 
 BASE="${1:-https://baotienweb.cloud/api}"
-API_KEY="thietke-resort-api-key-2024"
+API_KEY="dbuild_client_7d3a9f41c2b84e6d9a5f0e1c7b2a4d88"
 EMAIL="admin@baotienweb.cloud"
 PASS="Demo@123"
 

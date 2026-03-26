@@ -15,8 +15,8 @@ export interface FileValidationResult {
 
 /** Prepared model data after loading and normalizing */
 export interface PreparedModel {
-  scene: import("three").Group;
+  scene: any; // three.Group
   radius: number;
-  size: import("three").Vector3;
-  target: import("three").Vector3;
+  size: any; // three.Vector3
+  target: any; // three.Vector3
 }

@@ -4,6 +4,7 @@
  */
 
 import Avatar from "@/components/ui/avatar";
+import { CALL, MEETINGS, MESSAGES, TABS } from "@/constants/route-registry";
 import { useAuth } from "@/context/AuthContext";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { get } from "@/services/api";
@@ -12,24 +13,24 @@ import * as Haptics from "expo-haptics";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    Dimensions,
-    FlatList,
-    Pressable,
-    RefreshControl,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Dimensions,
+  FlatList,
+  Pressable,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import Animated, {
-    FadeInRight,
-    useAnimatedStyle,
-    useSharedValue,
-    withSpring,
-    withTiming,
+  FadeInRight,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -211,7 +212,7 @@ export default function CommunicationHubScreen() {
     <Animated.View entering={FadeInRight.delay(index * 30).duration(200)}>
       <TouchableOpacity
         style={styles.listItem}
-        onPress={() => router.push(`/messages/${item.id}`)}
+        onPress={() => router.push(MESSAGES.USER(item.id))}
         activeOpacity={0.7}
       >
         <View style={styles.avatarContainer}>
@@ -279,7 +280,9 @@ export default function CommunicationHubScreen() {
         <TouchableOpacity
           style={styles.listItem}
           onPress={() =>
-            router.push(`/call/${item.otherUser.id}?type=${item.type}`)
+            router.push(
+              `${CALL.USER(String(item.otherUser.id))}?type=${item.type}`,
+            )
           }
           activeOpacity={0.7}
         >
@@ -320,7 +323,9 @@ export default function CommunicationHubScreen() {
             <Pressable
               style={[styles.callButton, { backgroundColor: `${success}15` }]}
               onPress={() =>
-                router.push(`/call/${item.otherUser.id}?type=audio`)
+                router.push(
+                  `${CALL.USER(String(item.otherUser.id))}?type=audio`,
+                )
               }
             >
               <Ionicons name="call" size={20} color={success} />
@@ -328,7 +333,9 @@ export default function CommunicationHubScreen() {
             <Pressable
               style={[styles.callButton, { backgroundColor: `${primary}15` }]}
               onPress={() =>
-                router.push(`/call/${item.otherUser.id}?type=video`)
+                router.push(
+                  `${CALL.USER(String(item.otherUser.id))}?type=video`,
+                )
               }
             >
               <Ionicons name="videocam" size={20} color={primary} />
@@ -347,25 +354,25 @@ export default function CommunicationHubScreen() {
           icon: "chatbubble-ellipses",
           label: "Chat mới",
           color: primary,
-          onPress: () => router.push("/messages/new-conversation" as any),
+          onPress: () => router.push(MESSAGES.NEW_CONVERSATION as any),
         },
         {
           icon: "call",
           label: "Gọi điện",
           color: success,
-          onPress: () => router.push("/call" as any),
+          onPress: () => router.push(CALL.INDEX as any),
         },
         {
           icon: "videocam",
           label: "Tạo họp",
           color: "#9C27B0",
-          onPress: () => router.push("/meetings/create" as any),
+          onPress: () => router.push(MEETINGS.CREATE as any),
         },
         {
           icon: "notifications",
           label: "Thông báo",
           color: "#F59E0B",
-          onPress: () => router.push("/(tabs)/notifications" as any),
+          onPress: () => router.push(TABS.NOTIFICATIONS as any),
         },
       ].map((action, index) => (
         <TouchableOpacity
@@ -403,7 +410,7 @@ export default function CommunicationHubScreen() {
       </Text>
       <TouchableOpacity
         style={[styles.syncButton, { backgroundColor: primary }]}
-        onPress={() => router.push("/meetings" as any)}
+        onPress={() => router.push(MEETINGS.INDEX as any)}
       >
         <Ionicons name="videocam" size={18} color="#fff" />
         <Text style={styles.syncButtonText}>Mở danh sách cuộc họp</Text>
@@ -414,7 +421,7 @@ export default function CommunicationHubScreen() {
           styles.syncButton,
           { backgroundColor: "#7C3AED", marginTop: 12 },
         ]}
-        onPress={() => router.push("/meetings/create" as any)}
+        onPress={() => router.push(MEETINGS.CREATE as any)}
       >
         <Ionicons name="add-circle" size={18} color="#fff" />
         <Text style={styles.syncButtonText}>Tạo cuộc họp mới</Text>
@@ -585,11 +592,11 @@ export default function CommunicationHubScreen() {
         onPress={() => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
           if (activeTab === "messages") {
-            router.push("/messages/new-conversation" as any);
+            router.push(MESSAGES.NEW_CONVERSATION as any);
           } else if (activeTab === "calls") {
-            router.push("/call" as any);
+            router.push(CALL.INDEX as any);
           } else {
-            router.push("/meetings/create" as any);
+            router.push(MEETINGS.CREATE as any);
           }
         }}
       >

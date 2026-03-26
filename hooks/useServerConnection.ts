@@ -51,7 +51,7 @@ export function useServerConnection(autoCheck = true, intervalMs = 60000) {
           signal: controller.signal,
           headers: {
             "Content-Type": "application/json",
-            "X-API-Key": ENV.API_KEY || "thietke-resort-api-key-2024",
+            "X-API-Key": ENV.API_KEY || "",
           },
         });
 

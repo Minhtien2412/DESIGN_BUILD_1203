@@ -1,12 +1,16 @@
 /**
  * Worker Detail Screen — Step 5 of booking flow
  * Full worker profile with stats, reviews, chat and book buttons
+ *
+ * Data: API getWorkerReviews() → fallback inline reviews
  */
 
+import { getWorkerReviews } from "@/services/workers.api";
 import { Ionicons } from "@expo/vector-icons";
 import { Href, router, useLocalSearchParams } from "expo-router";
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
+    ActivityIndicator,
     Image,
     Platform,
     ScrollView,
@@ -16,29 +20,12 @@ import {
     View,
 } from "react-native";
 
-const MOCK_REVIEWS = [
-  {
-    id: "r1",
-    name: "Anh Minh",
-    rating: 5,
-    comment: "Thợ làm rất nhanh, sạch sẽ, giá cả hợp lý. Sẽ book lại!",
-    time: "2 ngày trước",
-  },
-  {
-    id: "r2",
-    name: "Chị Lan",
-    rating: 5,
-    comment: "Tận tâm, đúng giờ, tay nghề cao. Rất hài lòng!",
-    time: "1 tuần trước",
-  },
-  {
-    id: "r3",
-    name: "Anh Hùng",
-    rating: 4,
-    comment: "Làm tốt, đến đúng hẹn. Giá hơi cao hơn dự kiến.",
-    time: "2 tuần trước",
-  },
-];
+import {
+    FALLBACK_REVIEWS,
+    type FallbackReviewItem,
+} from "@/__mocks__/booking-mocks";
+
+type ReviewItem = FallbackReviewItem;
 
 export default function WorkerDetailScreen() {
   const p = useLocalSearchParams<{
@@ -65,6 +52,42 @@ export default function WorkerDetailScreen() {
 
   const verified = p.workerVerified === "true";
   const price = parseInt(p.workerPrice || "0", 10);
+
+  const [reviews, setReviews] = useState<ReviewItem[]>(FALLBACK_REVIEWS);
+  const [loadingReviews, setLoadingReviews] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      if (!p.workerId) {
+        setLoadingReviews(false);
+        return;
+      }
+      try {
+        const res = await getWorkerReviews(p.workerId);
+        if (!cancelled && res?.data?.length) {
+          setReviews(
+            res.data.map((r) => ({
+              id: String(r.id),
+              name: r.userName || "Khách hàng",
+              rating: r.rating ?? 5,
+              comment: r.comment || "",
+              time: r.createdAt
+                ? new Date(r.createdAt).toLocaleDateString("vi-VN")
+                : "",
+            })),
+          );
+        }
+      } catch {
+        // keep fallback
+      } finally {
+        if (!cancelled) setLoadingReviews(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [p.workerId]);
 
   const onBook = useCallback(() => {
     router.push({
@@ -232,27 +255,40 @@ export default function WorkerDetailScreen() {
             </TouchableOpacity>
           </View>
 
-          {MOCK_REVIEWS.map((review) => (
-            <View key={review.id} style={s.reviewCard}>
-              <View style={s.reviewHeader}>
-                <View style={s.reviewAvatar}>
-                  <Text style={s.reviewAvatarText}>
-                    {review.name.charAt(0)}
-                  </Text>
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={s.reviewName}>{review.name}</Text>
-                  <View style={s.reviewStars}>
-                    {Array.from({ length: review.rating }).map((_, i) => (
-                      <Ionicons key={i} name="star" size={10} color="#F59E0B" />
-                    ))}
+          {loadingReviews ? (
+            <ActivityIndicator
+              size="small"
+              color="#0D9488"
+              style={{ marginVertical: 16 }}
+            />
+          ) : (
+            reviews.map((review) => (
+              <View key={review.id} style={s.reviewCard}>
+                <View style={s.reviewHeader}>
+                  <View style={s.reviewAvatar}>
+                    <Text style={s.reviewAvatarText}>
+                      {review.name.charAt(0)}
+                    </Text>
                   </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={s.reviewName}>{review.name}</Text>
+                    <View style={s.reviewStars}>
+                      {Array.from({ length: review.rating }).map((_, i) => (
+                        <Ionicons
+                          key={i}
+                          name="star"
+                          size={10}
+                          color="#F59E0B"
+                        />
+                      ))}
+                    </View>
+                  </View>
+                  <Text style={s.reviewTime}>{review.time}</Text>
                 </View>
-                <Text style={s.reviewTime}>{review.time}</Text>
+                <Text style={s.reviewComment}>{review.comment}</Text>
               </View>
-              <Text style={s.reviewComment}>{review.comment}</Text>
-            </View>
-          ))}
+            ))
+          )}
         </View>
       </ScrollView>
 

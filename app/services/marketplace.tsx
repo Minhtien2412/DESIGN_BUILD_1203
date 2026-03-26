@@ -10,7 +10,7 @@ import { SafeScrollView } from "@/components/ui/safe-area";
 import { SkeletonCard } from "@/components/ui/skeleton";
 import { useDS } from "@/hooks/useDS";
 import { useServices } from "@/hooks/useServices";
-import { Service } from "@/services/api/servicesApi";
+import { Service } from "@/services/servicesApi";
 import { Ionicons } from "@expo/vector-icons";
 import { Href, router } from "expo-router";
 import { useState } from "react";
@@ -161,25 +161,29 @@ export default function ServicesMarketplaceScreen() {
                 paddingVertical: spacing.sm,
                 borderRadius: radius.full,
                 backgroundColor:
-                  selectedCategory === cat.id ? colors.primary : colors.card,
+                  selectedCategory === String(cat.id)
+                    ? colors.primary
+                    : colors.card,
                 borderWidth: 1,
                 borderColor:
-                  selectedCategory === cat.id ? colors.primary : colors.border,
+                  selectedCategory === String(cat.id)
+                    ? colors.primary
+                    : colors.border,
               }}
-              onPress={() => setSelectedCategory(cat.id)}
+              onPress={() => setSelectedCategory(String(cat.id))}
             >
               <Text
                 style={[
                   textStyles.smallBold,
                   {
                     color:
-                      selectedCategory === cat.id
+                      selectedCategory === String(cat.id)
                         ? colors.textInverse
                         : colors.textSecondary,
                   },
                 ]}
               >
-                {cat.name} ({cat.count})
+                {cat.name} ({cat.serviceCount ?? 0})
               </Text>
             </TouchableOpacity>
           ))}
@@ -357,7 +361,7 @@ function ServiceCard({ service }: ServiceCardProps) {
           >
             <Ionicons name="star" size={14} color={colors.warning} />
             <Text style={[textStyles.bodySemibold, { color: colors.text }]}>
-              {service.rating !== null ? service.rating.toFixed(1) : "N/A"}
+              {service.rating != null ? service.rating.toFixed(1) : "N/A"}
             </Text>
             <Text style={[textStyles.small, { color: colors.textTertiary }]}>
               ({service.reviewCount || 0})

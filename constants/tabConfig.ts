@@ -28,30 +28,32 @@ export interface TabItem {
  * 4 visible tabs per role.
  * Home + Communication + Profile are universal.
  * The "activity" tab adapts label/icon per role.
+ *
+ * `labelKey` is an i18n key — resolved in CustomTabBar via `t()`.
  */
 export const TAB_CONFIG: Record<AppRole, TabItem[]> = {
   worker: [
     {
       name: "index",
-      label: "Trang chủ",
+      label: "tabs.home",
       icon: "home-outline",
       activeIcon: "home",
     },
     {
       name: "activity",
-      label: "Việc làm",
+      label: "tabs.jobs",
       icon: "briefcase-outline",
       activeIcon: "briefcase",
     },
     {
       name: "communication",
-      label: "Liên lạc",
+      label: "tabs.communication",
       icon: "chatbubbles-outline",
       activeIcon: "chatbubbles",
     },
     {
       name: "profile",
-      label: "Tài khoản",
+      label: "tabs.account",
       icon: "person-outline",
       activeIcon: "person",
     },
@@ -59,25 +61,25 @@ export const TAB_CONFIG: Record<AppRole, TabItem[]> = {
   engineer: [
     {
       name: "index",
-      label: "Trang chủ",
+      label: "tabs.home",
       icon: "home-outline",
       activeIcon: "home",
     },
     {
       name: "activity",
-      label: "Dự án",
+      label: "tabs.projects",
       icon: "layers-outline",
       activeIcon: "layers",
     },
     {
       name: "communication",
-      label: "Liên lạc",
+      label: "tabs.communication",
       icon: "chatbubbles-outline",
       activeIcon: "chatbubbles",
     },
     {
       name: "profile",
-      label: "Tài khoản",
+      label: "tabs.account",
       icon: "person-outline",
       activeIcon: "person",
     },
@@ -85,25 +87,25 @@ export const TAB_CONFIG: Record<AppRole, TabItem[]> = {
   contractor: [
     {
       name: "index",
-      label: "Trang chủ",
+      label: "tabs.home",
       icon: "home-outline",
       activeIcon: "home",
     },
     {
       name: "activity",
-      label: "Quản lý",
+      label: "tabs.management",
       icon: "bar-chart-outline",
       activeIcon: "bar-chart",
     },
     {
       name: "communication",
-      label: "Liên lạc",
+      label: "tabs.communication",
       icon: "chatbubbles-outline",
       activeIcon: "chatbubbles",
     },
     {
       name: "profile",
-      label: "Tài khoản",
+      label: "tabs.account",
       icon: "person-outline",
       activeIcon: "person",
     },
@@ -111,25 +113,25 @@ export const TAB_CONFIG: Record<AppRole, TabItem[]> = {
   customer: [
     {
       name: "index",
-      label: "Trang chủ",
+      label: "tabs.home",
       icon: "home-outline",
       activeIcon: "home",
     },
     {
       name: "activity",
-      label: "Hoạt động",
+      label: "tabs.activity",
       icon: "list-outline",
       activeIcon: "list",
     },
     {
       name: "communication",
-      label: "Liên lạc",
+      label: "tabs.communication",
       icon: "chatbubbles-outline",
       activeIcon: "chatbubbles",
     },
     {
       name: "profile",
-      label: "Tài khoản",
+      label: "tabs.account",
       icon: "person-outline",
       activeIcon: "person",
     },

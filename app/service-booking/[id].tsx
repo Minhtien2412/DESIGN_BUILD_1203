@@ -2,11 +2,15 @@
  * Service Order Detail Screen
  * Shows order info with Work Process timeline + Cost breakdown tabs
  * Matches Vua Thợ-style order detail UI
+ *
+ * Data: BookingContext.getBookingById() → params fallback
  */
 
+import { useBooking } from "@/context/BookingContext";
+import { fromApiStatus, type ServiceOrderStatus } from "@/types/service-order";
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, router, useLocalSearchParams } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
     Alert,
     Dimensions,
@@ -23,18 +27,44 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 // ============================================================================
-// WORK PROCESS STEPS
+// WORK PROCESS STEPS (mapped to ServiceOrderStatus)
 // ============================================================================
 const WORK_STEPS = [
-  { id: 1, label: "Bắt đầu đi", icon: "walk" as const },
-  { id: 2, label: "Đã đến nhà", icon: "home" as const },
-  { id: 3, label: "Đang thoả thuận", icon: "handshake" as const },
-  { id: 4, label: "Đang làm việc", icon: "wrench" as const },
-  { id: 5, label: "Thanh toán", icon: "cash" as const },
+  {
+    id: 1,
+    label: "Bắt đầu đi",
+    icon: "walk" as const,
+    status: "provider_on_the_way" as ServiceOrderStatus,
+  },
+  {
+    id: 2,
+    label: "Đã đến nhà",
+    icon: "home" as const,
+    status: "scheduled" as ServiceOrderStatus,
+  },
+  {
+    id: 3,
+    label: "Đang thoả thuận",
+    icon: "handshake" as const,
+    status: "awaiting_customer_confirmation" as ServiceOrderStatus,
+  },
+  {
+    id: 4,
+    label: "Đang làm việc",
+    icon: "wrench" as const,
+    status: "in_progress" as ServiceOrderStatus,
+  },
+  {
+    id: 5,
+    label: "Thanh toán",
+    icon: "cash" as const,
+    status: "completed" as ServiceOrderStatus,
+  },
 ];
 
 export default function ServiceOrderDetailScreen() {
   const insets = useSafeAreaInsets();
+  const { getBookingById } = useBooking();
   const params = useLocalSearchParams<{
     id: string;
     name: string;
@@ -44,14 +74,35 @@ export default function ServiceOrderDetailScreen() {
     avatar: string;
   }>();
 
-  const [activeTab, setActiveTab] = useState<"process" | "cost">("cost");
-  const [currentStep, setCurrentStep] = useState(0); // 0 = not started yet
+  // Try to get real booking data from context
+  const booking = useMemo(() => {
+    if (!params.id) return null;
+    return getBookingById?.(params.id) ?? null;
+  }, [params.id, getBookingById]);
 
-  const workerName = params.name || "Thợ";
-  const workerAvatar = params.avatar || "https://i.pravatar.cc/150?img=11";
-  const price = parseInt(params.price || "150000", 10);
-  const categoryLabel = params.categoryLabel || "Dịch vụ";
-  const orderCode = Math.floor(10000 + Math.random() * 90000).toString();
+  const [activeTab, setActiveTab] = useState<"process" | "cost">("cost");
+
+  const workerName = booking?.workerInfo?.name || params.name || "Thợ";
+  const workerAvatar =
+    params.avatar ||
+    booking?.workerInfo?.avatar ||
+    "https://i.pravatar.cc/150?img=11";
+  const price = booking?.price || parseInt(params.price || "150000", 10);
+  const categoryLabel =
+    params.categoryLabel || booking?.serviceCategory || "Dịch vụ";
+  const orderCode = useMemo(() => {
+    if (booking?.apiBookingId) return String(booking.apiBookingId);
+    return params.id || Math.floor(10000 + Math.random() * 90000).toString();
+  }, [booking?.apiBookingId, params.id]);
+
+  // Determine current step from booking status
+  const bookingStatus = booking?.status
+    ? fromApiStatus(booking.status)
+    : ("draft" as ServiceOrderStatus);
+  const currentStep = useMemo(() => {
+    const idx = WORK_STEPS.findIndex((s) => s.status === bookingStatus);
+    return idx >= 0 ? idx : 0;
+  }, [bookingStatus]);
 
   const formatPrice = (p: number) => p.toLocaleString("vi-VN") + "đ";
 

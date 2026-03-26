@@ -2,7 +2,7 @@ Write-Host "`nTesting Notifications Sync..." -ForegroundColor Cyan
 
 # Test API
 try {
-    $r = Invoke-RestMethod -Uri "https://baotienweb.cloud/api/v1/notifications" -Method Get -Headers @{"X-API-Key"="thietke-resort-api-key-2024"}
+    $r = Invoke-RestMethod -Uri "https://baotienweb.cloud/api/v1/notifications" -Method Get -Headers @{"X-API-Key"="dbuild_client_7d3a9f41c2b84e6d9a5f0e1c7b2a4d88"}
     Write-Host "OK API: Total=$($r.data.Count)" -ForegroundColor Green
     $unread = ($r.data | Where-Object { -not $_.isRead }).Count
     Write-Host "OK Unread: $unread" -ForegroundColor Cyan

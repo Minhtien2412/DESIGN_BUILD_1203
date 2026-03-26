@@ -1,11 +1,15 @@
 /**
  * Confirm Booking Screen — Step 6 of booking flow
  * Summary of booking + payment method selection (MoMo, VNPay, Bank — NO cash)
+ *
+ * Data: BookingContext.createNewBooking() → API POST /services/bookings
  */
 
+import { R } from "@/constants/route-registry";
+import { useBooking } from "@/context/BookingContext";
 import { PaymentMethod } from "@/types/booking";
 import { Ionicons } from "@expo/vector-icons";
-import { Href, router, useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useState } from "react";
 import {
     Alert,
@@ -49,6 +53,7 @@ const PAYMENT_METHODS: {
 ];
 
 export default function ConfirmBookingScreen() {
+  const { createNewBooking } = useBooking();
   const p = useLocalSearchParams<{
     serviceId: string;
     serviceName: string;
@@ -78,7 +83,7 @@ export default function ConfirmBookingScreen() {
 
   const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(p.workerName || "T")}&background=0D9488&color=fff&size=128`;
 
-  const onConfirm = useCallback(() => {
+  const onConfirm = useCallback(async () => {
     if (!selectedPayment) {
       Alert.alert("Chọn phương thức", "Vui lòng chọn phương thức thanh toán");
       return;
@@ -86,27 +91,44 @@ export default function ConfirmBookingScreen() {
 
     setIsSubmitting(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
-      const bookingId = `BK-${Date.now().toString(36).toUpperCase()}`;
-      router.push({
-        pathname: "/booking/tracking",
-        params: {
-          bookingId,
-          serviceId: p.serviceId,
-          serviceName: p.serviceName,
-          workerId: p.workerId,
-          workerName: p.workerName,
-          workerSpecialty: p.workerSpecialty,
-          workerArrival: p.workerArrival,
-          address: p.address,
-          paymentMethod: selectedPayment,
-          totalPrice: String(totalEstimate),
+    try {
+      const booking = await createNewBooking(
+        {
+          id: p.workerId || "",
+          name: p.workerName || "",
+          rating: parseFloat(p.workerRating || "0"),
+          category: p.workerSpecialty || "",
         },
-      } as Href);
-    }, 1500);
-  }, [selectedPayment, p, totalEstimate]);
+        {
+          serviceId: parseInt(p.serviceId || "0", 10),
+          startDate: p.date || new Date().toISOString().split("T")[0],
+          endDate: p.date || new Date().toISOString().split("T")[0],
+          notes: p.note
+            ? `${p.note}\nĐịa chỉ: ${p.address}${p.district ? `, ${p.district}` : ""}${p.city ? `, ${p.city}` : ""}\nThanh toán: ${selectedPayment}`
+            : `Địa chỉ: ${p.address}\nThanh toán: ${selectedPayment}`,
+        },
+        totalEstimate,
+        p.time,
+      );
+
+      router.replace({
+        pathname: R.SERVICE_BOOKING.REQUEST_SENT as any,
+        params: {
+          bookingId: booking.apiBookingId
+            ? String(booking.apiBookingId)
+            : booking.id,
+          serviceName: p.serviceName,
+          address: p.address,
+          scheduledDate: p.date || new Date().toISOString().split("T")[0],
+          scheduledTime: p.time || "Càng sớm càng tốt",
+        },
+      });
+    } catch (error) {
+      Alert.alert("Lỗi", "Không thể tạo đơn. Vui lòng thử lại.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [selectedPayment, p, totalEstimate, createNewBooking]);
 
   return (
     <View style={s.container}>

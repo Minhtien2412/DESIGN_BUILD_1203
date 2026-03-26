@@ -29,7 +29,7 @@ try {
 # Test 2: Main API Projects
 Write-Host "[TEST 2] Main API Projects Endpoint" -ForegroundColor Yellow
 try {
-    $headers = @{ "x-api-key" = "thietke-resort-api-key-2024" }
+    $headers = @{ "x-api-key" = "dbuild_client_7d3a9f41c2b84e6d9a5f0e1c7b2a4d88" }
     $response = Invoke-RestMethod -Uri "$mainApi/projects" -Headers $headers -Method Get -TimeoutSec 10
     $count = if ($response.items) { $response.items.Count } elseif ($response -is [Array]) { $response.Count } else { 0 }
     Write-Host "  [PASS] Found $count projects" -ForegroundColor Green

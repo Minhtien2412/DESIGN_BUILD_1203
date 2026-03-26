@@ -148,7 +148,7 @@ export function resolveEffectiveRole(
   }
 
   // AppRole from RoleContext (khach/tho)
-  if (appRole === "tho") {
+  if ((appRole as string) === "tho") {
     return "worker";
   }
 

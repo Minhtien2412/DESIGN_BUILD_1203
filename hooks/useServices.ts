@@ -3,11 +3,11 @@
  * React hook for managing services marketplace with caching and offline support
  */
 
-import { useCallback, useEffect, useState } from 'react';
-import servicesApi, { Service, ServiceCategory } from '../services/api/servicesApi';
-import { cache, CacheTTL } from '../utils/cache';
-import { getOfflineData, saveOfflineData } from '../utils/offlineStorage';
-import { useNetworkStatus } from './useNetworkStatus';
+import { useCallback, useEffect, useState } from "react";
+import servicesApi, { Service, ServiceCategory } from "../services/servicesApi";
+import { cache, CacheTTL } from "../utils/cache";
+import { getOfflineData, saveOfflineData } from "../utils/offlineStorage";
+import { useNetworkStatus } from "./useNetworkStatus";
 
 // ==================== TYPES ====================
 
@@ -33,7 +33,7 @@ export function useServices(): UseServicesResult {
   const [error, setError] = useState<Error | null>(null);
   const [retrying, setRetrying] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const { isOffline } = useNetworkStatus();
 
   const fetchCategories = useCallback(async () => {
@@ -41,91 +41,101 @@ export function useServices(): UseServicesResult {
       const data = await servicesApi.getCategories();
       setCategories(data);
     } catch (err) {
-      console.error('[useServices] Error fetching categories:', err);
+      console.error("[useServices] Error fetching categories:", err);
       // Don't set error for categories, just log it
     }
   }, []);
 
-  const fetchServices = useCallback(async (isRetry = false) => {
-    const CACHE_KEY = 'services:all';
-    const OFFLINE_KEY = 'services_offline';
-    
-    try {
-      // If offline, try offline storage first
-      if (isOffline) {
-        console.log('[useServices] Device offline, using offline storage');
-        const offlineData = await getOfflineData<Service[]>(OFFLINE_KEY);
-        if (offlineData) {
-          setServices(offlineData);
-          setLoading(false);
-          setError(null);
-          return;
-        }
-        // No offline data available
-        throw new Error('No offline data available. Please connect to the internet.');
-      }
-      
-      // Try cache first (unless retrying)
-      if (!isRetry) {
-        const cachedData = cache.get<Service[]>(CACHE_KEY);
-        if (cachedData) {
-          console.log('[useServices] Using cached data');
-          setServices(cachedData);
-          setLoading(false);
-          setError(null);
-          
-          // Background refresh after returning cached data
-          servicesApi.getServices(selectedCategory || undefined)
-            .then(response => {
-              cache.set(CACHE_KEY, response.data, CacheTTL.MEDIUM);
-              saveOfflineData(OFFLINE_KEY, response.data); // Persist for offline
-              setServices(response.data);
-            })
-            .catch(err => {
-              console.error('[useServices] Background refresh failed:', err);
-            });
-          
-          return;
-        }
-      }
-      
-      if (isRetry) {
-        setRetrying(true);
-      } else {
-        setLoading(true);
-      }
-      setError(null);
+  const fetchServices = useCallback(
+    async (isRetry = false) => {
+      const CACHE_KEY = "services:all";
+      const OFFLINE_KEY = "services_offline";
 
-      const response = await servicesApi.getServices(selectedCategory || undefined);
-      
-      // Cache the response
-      cache.set(CACHE_KEY, response.data, CacheTTL.MEDIUM);
-      
-      // Save to offline storage for offline access
-      await saveOfflineData(OFFLINE_KEY, response.data);
-      
-      // Filter by search query client-side (backend doesn't support search yet)
-      let filteredServices = response.data;
-      if (searchQuery.trim()) {
-        const query = searchQuery.toLowerCase();
-        filteredServices = response.data.filter(service => 
-          service.name.toLowerCase().includes(query) ||
-          service.description.toLowerCase().includes(query) ||
-          service.category.toLowerCase().includes(query)
+      try {
+        // If offline, try offline storage first
+        if (isOffline) {
+          console.log("[useServices] Device offline, using offline storage");
+          const offlineData = await getOfflineData<Service[]>(OFFLINE_KEY);
+          if (offlineData) {
+            setServices(offlineData);
+            setLoading(false);
+            setError(null);
+            return;
+          }
+          // No offline data available
+          throw new Error(
+            "No offline data available. Please connect to the internet.",
+          );
+        }
+
+        // Try cache first (unless retrying)
+        if (!isRetry) {
+          const cachedData = cache.get<Service[]>(CACHE_KEY);
+          if (cachedData) {
+            console.log("[useServices] Using cached data");
+            setServices(cachedData);
+            setLoading(false);
+            setError(null);
+
+            // Background refresh after returning cached data
+            servicesApi
+              .getServices(selectedCategory || undefined)
+              .then((response) => {
+                cache.set(CACHE_KEY, response.data, CacheTTL.MEDIUM);
+                saveOfflineData(OFFLINE_KEY, response.data); // Persist for offline
+                setServices(response.data);
+              })
+              .catch((err) => {
+                console.error("[useServices] Background refresh failed:", err);
+              });
+
+            return;
+          }
+        }
+
+        if (isRetry) {
+          setRetrying(true);
+        } else {
+          setLoading(true);
+        }
+        setError(null);
+
+        const response = await servicesApi.getServices(
+          selectedCategory || undefined,
         );
-      }
 
-      setServices(filteredServices);
-    } catch (err) {
-      const error = err instanceof Error ? err : new Error('Failed to load services');
-      setError(error);
-      console.error('[useServices] Error fetching services:', err);
-      setServices([]); // Clear stale data on error
-    } finally {
-      setLoading(false);
-      setRetrying(false);
-    }
-  }, [selectedCategory, searchQuery]);
+        // Cache the response
+        cache.set(CACHE_KEY, response.data, CacheTTL.MEDIUM);
+
+        // Save to offline storage for offline access
+        await saveOfflineData(OFFLINE_KEY, response.data);
+
+        // Filter by search query client-side (backend doesn't support search yet)
+        let filteredServices = response.data;
+        if (searchQuery.trim()) {
+          const query = searchQuery.toLowerCase();
+          filteredServices = response.data.filter(
+            (service) =>
+              service.name.toLowerCase().includes(query) ||
+              (service.description ?? "").toLowerCase().includes(query) ||
+              service.category.toLowerCase().includes(query),
+          );
+        }
+
+        setServices(filteredServices);
+      } catch (err) {
+        const error =
+          err instanceof Error ? err : new Error("Failed to load services");
+        setError(error);
+        console.error("[useServices] Error fetching services:", err);
+        setServices([]); // Clear stale data on error
+      } finally {
+        setLoading(false);
+        setRetrying(false);
+      }
+    },
+    [selectedCategory, searchQuery],
+  );
 
   // Fetch categories on mount
   useEffect(() => {
@@ -176,8 +186,8 @@ export function useServiceDetail(serviceId: number): UseServiceDetailResult {
       const data = await servicesApi.getService(serviceId);
       setService(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load service');
-      console.error('[useServiceDetail] Error:', err);
+      setError(err instanceof Error ? err.message : "Failed to load service");
+      console.error("[useServiceDetail] Error:", err);
     } finally {
       setLoading(false);
     }
@@ -191,7 +201,7 @@ export function useServiceDetail(serviceId: number): UseServiceDetailResult {
     service,
     loading,
     error,
-    refresh: fetchService
+    refresh: fetchService,
   };
 }
 

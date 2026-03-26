@@ -19,7 +19,7 @@ const DEV_API_URL = "http://127.0.0.1:4000";
 const PROD_API_URL = "https://baotienweb.cloud/api";
 const ENV_API_BASE = process.env.EXPO_PUBLIC_API_BASE_URL || PROD_API_URL;
 
-export default function getConfig(props) {
+export default function getConfig(props: { config: any }) {
   const { config } = props;
   return {
     ...config,

@@ -159,6 +159,16 @@ export const en: Translations = {
     contacts: "Contacts",
     back: "Back",
   },
+  tabs: {
+    home: "Home",
+    activity: "Activity",
+    jobs: "Jobs",
+    projects: "Projects",
+    management: "Management",
+    communication: "Chat",
+    account: "Account",
+    aiAssistant: "AI Assistant",
+  },
   nav: {
     home: "Home",
     explore: "Explore",

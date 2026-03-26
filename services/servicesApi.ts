@@ -1,7 +1,7 @@
 /**
  * Services Booking API
  * Backend: https://baotienweb.cloud/api/v1/services
- * 
+ *
  * Endpoints theo BACKEND_API_SPECS.md:
  * - GET    /services              - List all services (public)
  * - GET    /services/:id          - Get service details (public)
@@ -11,14 +11,19 @@
  * - GET    /services/categories   - Get service categories (public)
  */
 
-import { apiFetch } from './api';
+import { apiFetch } from "./api";
 
 // ============================================================================
 // Type Definitions
 // ============================================================================
 
-export type ServiceStatus = 'ACTIVE' | 'INACTIVE' | 'DRAFT';
-export type BookingStatus = 'PENDING' | 'CONFIRMED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+export type ServiceStatus = "ACTIVE" | "INACTIVE" | "DRAFT";
+export type BookingStatus =
+  | "PENDING"
+  | "CONFIRMED"
+  | "IN_PROGRESS"
+  | "COMPLETED"
+  | "CANCELLED";
 
 export interface ServiceCreator {
   id: number;
@@ -30,7 +35,7 @@ export interface ServiceCreator {
 export interface ServiceReview {
   id: number;
   userId: number;
-  rating: number;  // 1-5
+  rating: number; // 1-5
   comment: string;
   createdAt: string;
   user: {
@@ -45,13 +50,13 @@ export interface Service {
   name: string;
   description?: string;
   category: string;
-  price: number;          // VND
-  unit?: string;          // e.g., "m²", "project", "day"
-  duration?: string;      // e.g., "30 ngày"
+  price: number; // VND
+  unit?: string; // e.g., "m²", "project", "day"
+  duration?: string; // e.g., "30 ngày"
   features?: string[];
   images?: string[];
   status: ServiceStatus;
-  rating?: number;        // Average rating (1-5)
+  rating?: number; // Average rating (1-5)
   reviewCount?: number;
   viewCount?: number;
   orderCount?: number;
@@ -78,8 +83,8 @@ export interface ServiceBooking {
   serviceId: number;
   userId: number;
   status: BookingStatus;
-  startDate: string;      // ISO date YYYY-MM-DD
-  endDate: string;        // ISO date YYYY-MM-DD
+  startDate: string; // ISO date YYYY-MM-DD
+  endDate: string; // ISO date YYYY-MM-DD
   totalPrice?: number;
   notes?: string;
   createdAt: string;
@@ -90,9 +95,9 @@ export interface ServiceBooking {
 // Request/Response Types
 export interface CreateBookingData {
   serviceId: number;
-  startDate: string;      // Format: YYYY-MM-DD
-  endDate: string;        // Format: YYYY-MM-DD
-  notes?: string;         // Max 1000 chars
+  startDate: string; // Format: YYYY-MM-DD
+  endDate: string; // Format: YYYY-MM-DD
+  notes?: string; // Max 1000 chars
 }
 
 export interface ServiceFilters {
@@ -103,8 +108,8 @@ export interface ServiceFilters {
   priceMin?: number;
   priceMax?: number;
   search?: string;
-  sortBy?: 'name' | 'price' | 'rating' | 'createdAt';
-  sortOrder?: 'asc' | 'desc';
+  sortBy?: "name" | "price" | "rating" | "createdAt";
+  sortOrder?: "asc" | "desc";
 }
 
 export interface PaginatedServicesResponse {
@@ -134,28 +139,32 @@ export interface BookingResponse {
  * Get list of services with filters
  * GET /services
  */
-export async function getServices(filters?: ServiceFilters): Promise<PaginatedServicesResponse> {
+export async function getServices(
+  filters?: ServiceFilters,
+): Promise<PaginatedServicesResponse> {
   try {
     const params = new URLSearchParams();
-    
+
     if (filters) {
-      if (filters.page) params.append('page', filters.page.toString());
-      if (filters.limit) params.append('limit', filters.limit.toString());
-      if (filters.category) params.append('category', filters.category);
-      if (filters.status) params.append('status', filters.status);
-      if (filters.priceMin) params.append('priceMin', filters.priceMin.toString());
-      if (filters.priceMax) params.append('priceMax', filters.priceMax.toString());
-      if (filters.search) params.append('search', filters.search);
-      if (filters.sortBy) params.append('sortBy', filters.sortBy);
-      if (filters.sortOrder) params.append('sortOrder', filters.sortOrder);
+      if (filters.page) params.append("page", filters.page.toString());
+      if (filters.limit) params.append("limit", filters.limit.toString());
+      if (filters.category) params.append("category", filters.category);
+      if (filters.status) params.append("status", filters.status);
+      if (filters.priceMin)
+        params.append("priceMin", filters.priceMin.toString());
+      if (filters.priceMax)
+        params.append("priceMax", filters.priceMax.toString());
+      if (filters.search) params.append("search", filters.search);
+      if (filters.sortBy) params.append("sortBy", filters.sortBy);
+      if (filters.sortOrder) params.append("sortOrder", filters.sortOrder);
     }
 
     const query = params.toString();
-    const url = `/services${query ? `?${query}` : ''}`;
-    
+    const url = `/services${query ? `?${query}` : ""}`;
+
     return await apiFetch<PaginatedServicesResponse>(url);
   } catch (error) {
-    console.error('[ServicesAPI] Error fetching services:', error);
+    console.error("[ServicesAPI] Error fetching services:", error);
     throw error;
   }
 }
@@ -164,9 +173,13 @@ export async function getServices(filters?: ServiceFilters): Promise<PaginatedSe
  * Get service by ID
  * GET /services/:id
  */
-export async function getServiceById(id: number): Promise<{ success: boolean; data: Service }> {
+export async function getServiceById(
+  id: number,
+): Promise<{ success: boolean; data: Service }> {
   try {
-    return await apiFetch<{ success: boolean; data: Service }>(`/services/${id}`);
+    return await apiFetch<{ success: boolean; data: Service }>(
+      `/services/${id}`,
+    );
   } catch (error) {
     console.error(`[ServicesAPI] Error fetching service ${id}:`, error);
     throw error;
@@ -177,9 +190,13 @@ export async function getServiceById(id: number): Promise<{ success: boolean; da
  * Get enhanced service details with reviews
  * GET /services/:id/details
  */
-export async function getServiceDetails(id: number): Promise<{ success: boolean; data: ServiceDetails }> {
+export async function getServiceDetails(
+  id: number,
+): Promise<{ success: boolean; data: ServiceDetails }> {
   try {
-    return await apiFetch<{ success: boolean; data: ServiceDetails }>(`/services/${id}/details`);
+    return await apiFetch<{ success: boolean; data: ServiceDetails }>(
+      `/services/${id}/details`,
+    );
   } catch (error) {
     console.error(`[ServicesAPI] Error fetching service details ${id}:`, error);
     throw error;
@@ -190,11 +207,16 @@ export async function getServiceDetails(id: number): Promise<{ success: boolean;
  * Get service categories
  * GET /services/categories
  */
-export async function getServiceCategories(): Promise<{ success: boolean; data: ServiceCategory[] }> {
+export async function getServiceCategories(): Promise<{
+  success: boolean;
+  data: ServiceCategory[];
+}> {
   try {
-    return await apiFetch<{ success: boolean; data: ServiceCategory[] }>('/services/categories');
+    return await apiFetch<{ success: boolean; data: ServiceCategory[] }>(
+      "/services/categories",
+    );
   } catch (error) {
-    console.error('[ServicesAPI] Error fetching categories:', error);
+    console.error("[ServicesAPI] Error fetching categories:", error);
     throw error;
   }
 }
@@ -206,66 +228,68 @@ export async function getServiceCategories(): Promise<{ success: boolean; data: 
 /**
  * Create service booking
  * POST /services/bookings
- * 
+ *
  * @param data - Booking data
  * @returns Created booking
  */
-export async function createBooking(data: CreateBookingData): Promise<BookingResponse> {
+export async function createBooking(
+  data: CreateBookingData,
+): Promise<BookingResponse> {
   // Client-side validation
   if (!data.serviceId) {
     return {
       success: false,
-      message: 'Vui lòng chọn dịch vụ',
+      message: "Vui lòng chọn dịch vụ",
       data: {} as ServiceBooking,
-      error: 'VALIDATION_ERROR',
+      error: "VALIDATION_ERROR",
     };
   }
 
   if (!data.startDate || !data.endDate) {
     return {
       success: false,
-      message: 'Vui lòng chọn ngày bắt đầu và kết thúc',
+      message: "Vui lòng chọn ngày bắt đầu và kết thúc",
       data: {} as ServiceBooking,
-      error: 'VALIDATION_ERROR',
+      error: "VALIDATION_ERROR",
     };
   }
 
   const startDate = new Date(data.startDate);
   const endDate = new Date(data.endDate);
-  
+
   if (endDate <= startDate) {
     return {
       success: false,
-      message: 'Ngày kết thúc phải sau ngày bắt đầu',
+      message: "Ngày kết thúc phải sau ngày bắt đầu",
       data: {} as ServiceBooking,
-      error: 'VALIDATION_ERROR',
-      details: { endDate: ['Ngày kết thúc phải sau ngày bắt đầu'] },
+      error: "VALIDATION_ERROR",
+      details: { endDate: ["Ngày kết thúc phải sau ngày bắt đầu"] },
     };
   }
 
   if (data.notes && data.notes.length > 1000) {
     return {
       success: false,
-      message: 'Ghi chú không được vượt quá 1000 ký tự',
+      message: "Ghi chú không được vượt quá 1000 ký tự",
       data: {} as ServiceBooking,
-      error: 'VALIDATION_ERROR',
-      details: { notes: ['Ghi chú tối đa 1000 ký tự'] },
+      error: "VALIDATION_ERROR",
+      details: { notes: ["Ghi chú tối đa 1000 ký tự"] },
     };
   }
 
   try {
-    const response = await apiFetch<BookingResponse>('/services/bookings', {
-      method: 'POST',
+    const response = await apiFetch<BookingResponse>("/services/bookings", {
+      method: "POST",
       data,
     });
     return response;
   } catch (error: any) {
-    console.error('[ServicesAPI] Error creating booking:', error);
+    console.error("[ServicesAPI] Error creating booking:", error);
     return {
       success: false,
-      message: error.message || 'Đặt dịch vụ thất bại',
+      message: error.message || "Đặt dịch vụ thất bại",
       data: {} as ServiceBooking,
-      error: error.code || 'BOOKING_FAILED',
+      error: error.code || "BOOKING_FAILED",
     };
   }
 }
@@ -278,19 +302,23 @@ export async function getUserBookings(filters?: {
   page?: number;
   limit?: number;
   status?: BookingStatus;
-}): Promise<{ success: boolean; data: ServiceBooking[]; meta: { total: number; page: number; limit: number } }> {
+}): Promise<{
+  success: boolean;
+  data: ServiceBooking[];
+  meta: { total: number; page: number; limit: number };
+}> {
   try {
     const params = new URLSearchParams();
-    if (filters?.page) params.append('page', filters.page.toString());
-    if (filters?.limit) params.append('limit', filters.limit.toString());
-    if (filters?.status) params.append('status', filters.status);
+    if (filters?.page) params.append("page", filters.page.toString());
+    if (filters?.limit) params.append("limit", filters.limit.toString());
+    if (filters?.status) params.append("status", filters.status);
 
     const query = params.toString();
-    const url = `/services/bookings${query ? `?${query}` : ''}`;
-    
+    const url = `/services/bookings${query ? `?${query}` : ""}`;
+
     return await apiFetch(url);
   } catch (error) {
-    console.error('[ServicesAPI] Error fetching bookings:', error);
+    console.error("[ServicesAPI] Error fetching bookings:", error);
     throw error;
   }
 }
@@ -299,18 +327,26 @@ export async function getUserBookings(filters?: {
  * Cancel booking
  * PATCH /services/bookings/:id/cancel
  */
-export async function cancelBooking(bookingId: number): Promise<BookingResponse> {
+export async function cancelBooking(
+  bookingId: number,
+): Promise<BookingResponse> {
   try {
-    return await apiFetch<BookingResponse>(`/services/bookings/${bookingId}/cancel`, {
-      method: 'PATCH',
-    });
+    return await apiFetch<BookingResponse>(
+      `/services/bookings/${bookingId}/cancel`,
+      {
+        method: "PATCH",
+      },
+    );
   } catch (error: any) {
-    console.error(`[ServicesAPI] Error cancelling booking ${bookingId}:`, error);
+    console.error(
+      `[ServicesAPI] Error cancelling booking ${bookingId}:`,
+      error,
+    );
     return {
       success: false,
-      message: error.message || 'Hủy đặt dịch vụ thất bại',
+      message: error.message || "Hủy đặt dịch vụ thất bại",
       data: {} as ServiceBooking,
-      error: error.code || 'CANCEL_FAILED',
+      error: error.code || "CANCEL_FAILED",
     };
   }
 }
@@ -323,9 +359,9 @@ export async function cancelBooking(bookingId: number): Promise<BookingResponse>
  * Format price in VND
  */
 export function formatPrice(price: number): string {
-  return new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND',
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
     maximumFractionDigits: 0,
   }).format(price);
 }
@@ -335,11 +371,11 @@ export function formatPrice(price: number): string {
  */
 export function getBookingStatusText(status: BookingStatus): string {
   const statusMap: Record<BookingStatus, string> = {
-    PENDING: 'Chờ xác nhận',
-    CONFIRMED: 'Đã xác nhận',
-    IN_PROGRESS: 'Đang thực hiện',
-    COMPLETED: 'Hoàn thành',
-    CANCELLED: 'Đã hủy',
+    PENDING: "Chờ xác nhận",
+    CONFIRMED: "Đã xác nhận",
+    IN_PROGRESS: "Đang thực hiện",
+    COMPLETED: "Hoàn thành",
+    CANCELLED: "Đã hủy",
   };
   return statusMap[status] || status;
 }
@@ -349,11 +385,47 @@ export function getBookingStatusText(status: BookingStatus): string {
  */
 export function getBookingStatusColor(status: BookingStatus): string {
   const colorMap: Record<BookingStatus, string> = {
-    PENDING: '#0D9488',     // Orange
-    CONFIRMED: '#0D9488',   // Blue
-    IN_PROGRESS: '#999999', // Purple
-    COMPLETED: '#0D9488',   // Green
-    CANCELLED: '#000000',   // Red
+    PENDING: "#0D9488", // Orange
+    CONFIRMED: "#0D9488", // Blue
+    IN_PROGRESS: "#999999", // Purple
+    COMPLETED: "#0D9488", // Green
+    CANCELLED: "#000000", // Red
   };
-  return colorMap[status] || '#999999';
+  return colorMap[status] || "#999999";
 }
+
+/**
+ * Search services by query
+ * GET /services?search=query
+ */
+export async function searchServices(
+  query: string,
+): Promise<PaginatedServicesResponse> {
+  return getServices({ search: query });
+}
+
+// ============================================================================
+// Backward-compatible object export
+// (used by hooks/useServices.ts — will be phased out)
+// ============================================================================
+
+export const servicesApi = {
+  getServices: async (category?: string, page = 1, limit = 20) => {
+    const res = await getServices({ category, page, limit });
+    return { data: res.data, meta: res.meta };
+  },
+  getService: async (id: number) => {
+    const res = await getServiceById(id);
+    return res.data;
+  },
+  getCategories: async () => {
+    const res = await getServiceCategories();
+    return res.data;
+  },
+  searchServices,
+  createBooking,
+  getUserBookings,
+  cancelBooking,
+};
+
+export default servicesApi;

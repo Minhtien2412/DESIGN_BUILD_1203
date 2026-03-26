@@ -1,11 +1,14 @@
 /**
+ * @deprecated Use `services/servicesApi.ts` instead.
+ * This file is kept for reference only — all consumers have been migrated.
+ *
  * Services API Client
  * Backend: https://baotienweb.cloud/api/v1/services
  * Note: This is a PUBLIC API - no authentication required!
  */
 
-import ENV from '../../config/env';
-import { apiFetch } from '../api';
+import ENV from "../../config/env";
+import { apiFetch } from "../api";
 
 const BASE_URL = `${ENV.API_BASE_URL}/services`;
 
@@ -77,7 +80,7 @@ export interface ServiceBooking {
   id: number;
   serviceId: number;
   userId: number;
-  status: 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED';
+  status: "PENDING" | "CONFIRMED" | "CANCELLED" | "COMPLETED";
   startDate: string;
   endDate: string;
   totalPrice: number;
@@ -91,19 +94,23 @@ export interface ServiceBooking {
  * Get all services
  * Endpoint: GET /services
  */
-export async function getServices(category?: string, page = 1, limit = 20): Promise<ServiceListResponse> {
+export async function getServices(
+  category?: string,
+  page = 1,
+  limit = 20,
+): Promise<ServiceListResponse> {
   try {
     const params = new URLSearchParams();
-    if (category) params.append('category', category);
-    params.append('page', page.toString());
-    params.append('limit', limit.toString());
+    if (category) params.append("category", category);
+    params.append("page", page.toString());
+    params.append("limit", limit.toString());
 
     const queryString = params.toString();
-    const url = `/services${queryString ? `?${queryString}` : ''}`;
+    const url = `/services${queryString ? `?${queryString}` : ""}`;
 
     return await apiFetch<ServiceListResponse>(url);
   } catch (error) {
-    console.error('[servicesApi] getServices error:', error);
+    console.error("[servicesApi] getServices error:", error);
     throw error;
   }
 }
@@ -116,7 +123,7 @@ export async function getService(id: number): Promise<Service> {
   try {
     return await apiFetch<Service>(`/services/${id}`);
   } catch (error) {
-    console.error('[servicesApi] getService error:', error);
+    console.error("[servicesApi] getService error:", error);
     throw error;
   }
 }
@@ -128,10 +135,10 @@ export async function getService(id: number): Promise<Service> {
 export async function getCategories(): Promise<ServiceCategory[]> {
   try {
     const response = await fetch(`${BASE_URL}/categories`, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json'
-      }
+        "Content-Type": "application/json",
+      },
     });
 
     if (!response.ok) {
@@ -140,7 +147,7 @@ export async function getCategories(): Promise<ServiceCategory[]> {
 
     return await response.json();
   } catch (error) {
-    console.error('[servicesApi] getCategories error:', error);
+    console.error("[servicesApi] getCategories error:", error);
     throw error;
   }
 }
@@ -149,13 +156,15 @@ export async function getCategories(): Promise<ServiceCategory[]> {
  * Get reviews for a service
  * Endpoint: GET /services/:id/reviews
  */
-export async function getServiceReviews(serviceId: number): Promise<ServiceReview[]> {
+export async function getServiceReviews(
+  serviceId: number,
+): Promise<ServiceReview[]> {
   try {
     const response = await fetch(`${BASE_URL}/${serviceId}/reviews`, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json'
-      }
+        "Content-Type": "application/json",
+      },
     });
 
     if (!response.ok) {
@@ -164,7 +173,7 @@ export async function getServiceReviews(serviceId: number): Promise<ServiceRevie
 
     return await response.json();
   } catch (error) {
-    console.error('[servicesApi] getServiceReviews error:', error);
+    console.error("[servicesApi] getServiceReviews error:", error);
     throw error;
   }
 }
@@ -178,11 +187,11 @@ export async function searchServices(query: string): Promise<Service[]> {
     const response = await fetch(
       `${BASE_URL}/search?q=${encodeURIComponent(query)}`,
       {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'Content-Type': 'application/json'
-        }
-      }
+          "Content-Type": "application/json",
+        },
+      },
     );
 
     if (!response.ok) {
@@ -191,7 +200,7 @@ export async function searchServices(query: string): Promise<Service[]> {
 
     return await response.json();
   } catch (error) {
-    console.error('[servicesApi] searchServices error:', error);
+    console.error("[servicesApi] searchServices error:", error);
     throw error;
   }
 }
@@ -202,19 +211,21 @@ export async function searchServices(query: string): Promise<Service[]> {
  * Create a booking (requires authentication)
  * Endpoint: POST /services/bookings
  */
-export async function createBooking(dto: CreateBookingDto): Promise<ServiceBooking> {
+export async function createBooking(
+  dto: CreateBookingDto,
+): Promise<ServiceBooking> {
   try {
-    const token = await import('expo-secure-store').then(m => 
-      m.getItemAsync('accessToken')
+    const token = await import("expo-secure-store").then((m) =>
+      m.getItemAsync("accessToken"),
     );
 
     const response = await fetch(`${BASE_URL}/bookings`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(dto)
+      body: JSON.stringify(dto),
     });
 
     if (!response.ok) {
@@ -223,7 +234,7 @@ export async function createBooking(dto: CreateBookingDto): Promise<ServiceBooki
 
     return await response.json();
   } catch (error) {
-    console.error('[servicesApi] createBooking error:', error);
+    console.error("[servicesApi] createBooking error:", error);
     throw error;
   }
 }
@@ -234,16 +245,16 @@ export async function createBooking(dto: CreateBookingDto): Promise<ServiceBooki
  */
 export async function getMyBookings(): Promise<ServiceBooking[]> {
   try {
-    const token = await import('expo-secure-store').then(m => 
-      m.getItemAsync('accessToken')
+    const token = await import("expo-secure-store").then((m) =>
+      m.getItemAsync("accessToken"),
     );
 
     const response = await fetch(`${BASE_URL}/bookings/my`, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      }
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     if (!response.ok) {
@@ -252,7 +263,7 @@ export async function getMyBookings(): Promise<ServiceBooking[]> {
 
     return await response.json();
   } catch (error) {
-    console.error('[servicesApi] getMyBookings error:', error);
+    console.error("[servicesApi] getMyBookings error:", error);
     throw error;
   }
 }
@@ -266,7 +277,7 @@ export const servicesApi = {
   getServiceReviews,
   searchServices,
   createBooking,
-  getMyBookings
+  getMyBookings,
 };
 
 export default servicesApi;

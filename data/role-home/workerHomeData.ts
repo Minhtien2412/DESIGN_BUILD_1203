@@ -47,15 +47,15 @@ export interface CategoryItem {
 export const workerShortcuts: ShortcutItem[] = [
   {
     id: "w1",
-    label: "Nhận việc",
-    icon: "briefcase-outline",
+    label: "Việc được giao",
+    icon: "clipboard-outline",
     color: "#F59E0B",
     bgColor: "#FEF3C7",
   },
   {
     id: "w2",
-    label: "Việc gần đây",
-    icon: "location-outline",
+    label: "Lịch sử việc",
+    icon: "time-outline",
     color: "#EF4444",
     bgColor: "#FEE2E2",
   },
@@ -96,8 +96,8 @@ export const workerShortcuts: ShortcutItem[] = [
   },
   {
     id: "w8",
-    label: "Live công trình",
-    icon: "videocam-outline",
+    label: "Tiến độ",
+    icon: "trending-up-outline",
     color: "#3B82F6",
     bgColor: "#DBEAFE",
   },

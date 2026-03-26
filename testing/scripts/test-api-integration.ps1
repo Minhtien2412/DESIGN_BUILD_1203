@@ -103,7 +103,7 @@ try {
 Write-Host "[5/5] Testing Main API Projects..." -ForegroundColor Yellow
 try {
     $headers = @{
-        "x-api-key" = "thietke-resort-api-key-2024"
+        "x-api-key" = "dbuild_client_7d3a9f41c2b84e6d9a5f0e1c7b2a4d88"
     }
     $response = Invoke-RestMethod -Uri "$baseUrl/projects" -Method Get -Headers $headers -TimeoutSec 10
     $count = if ($response.items) { $response.items.Count } elseif ($response -is [Array]) { $response.Count } else { 0 }

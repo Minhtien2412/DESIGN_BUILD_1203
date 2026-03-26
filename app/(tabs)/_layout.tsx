@@ -16,25 +16,25 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Trang chủ",
+          title: t("tabs.home"),
         }}
       />
       <Tabs.Screen
         name="activity"
         options={{
-          title: "Hoạt động",
+          title: t("tabs.activity"),
         }}
       />
       <Tabs.Screen
         name="communication"
         options={{
-          title: "Liên lạc",
+          title: t("tabs.communication"),
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
-          title: "Tài khoản",
+          title: t("tabs.account"),
         }}
       />
 
@@ -64,7 +64,7 @@ export default function TabsLayout() {
         name="home-construction"
         options={{
           href: null,
-          title: "Home XD",
+          title: t("nav.home"),
         }}
       />
       <Tabs.Screen
@@ -106,7 +106,7 @@ export default function TabsLayout() {
         name="test-crm"
         options={{
           href: null,
-          title: "CRM",
+          title: "CRM", // internal debug tab
         }}
       />
       <Tabs.Screen
@@ -120,14 +120,14 @@ export default function TabsLayout() {
         name="ai-assistant"
         options={{
           href: null,
-          title: "AI Assistant",
+          title: t("tabs.aiAssistant"),
         }}
       />
       <Tabs.Screen
         name="api-status"
         options={{
           href: null,
-          title: "API Status",
+          title: "API Status", // internal debug tab
         }}
       />
       <Tabs.Screen
@@ -141,21 +141,21 @@ export default function TabsLayout() {
         name="notifications"
         options={{
           href: null,
-          title: "Thông báo",
+          title: t("nav.notifications"),
         }}
       />
       <Tabs.Screen
         name="design-services"
         options={{
           href: null,
-          title: "Dịch vụ thiết kế",
+          title: t("home.services"),
         }}
       />
       <Tabs.Screen
         name="construction-services"
         options={{
           href: null,
-          title: "Dịch vụ xây dựng",
+          title: t("home.constructionUtils"),
         }}
       />
     </Tabs>

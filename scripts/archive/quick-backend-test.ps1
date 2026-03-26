@@ -25,7 +25,7 @@ try {
 
     $headers = @{
         'Content-Type' = 'application/json'
-        'x-api-key' = 'thietke-resort-api-key-2024'
+        'x-api-key' = 'dbuild_client_7d3a9f41c2b84e6d9a5f0e1c7b2a4d88'
     }
 
     $auth = Invoke-RestMethod -Uri "$BaseUrl/auth/login" -Method POST `
@@ -47,7 +47,7 @@ if ($token) {
     try {
         $headers = @{
             'Authorization' = "Bearer $token"
-            'x-api-key' = 'thietke-resort-api-key-2024'
+            'x-api-key' = 'dbuild_client_7d3a9f41c2b84e6d9a5f0e1c7b2a4d88'
         }
 
         $profile = Invoke-RestMethod -Uri "$BaseUrl/profile" -Method GET `
@@ -68,7 +68,7 @@ if ($token) {
     try {
         $headers = @{
             'Authorization' = "Bearer $token"
-            'x-api-key' = 'thietke-resort-api-key-2024'
+            'x-api-key' = 'dbuild_client_7d3a9f41c2b84e6d9a5f0e1c7b2a4d88'
         }
 
         $projects = Invoke-RestMethod -Uri "$BaseUrl/projects?page=1&limit=5" -Method GET `

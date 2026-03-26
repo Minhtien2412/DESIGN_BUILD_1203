@@ -136,7 +136,7 @@ export function CustomTabBar({
         android_ripple={{ color: "rgba(13,148,136,0.15)", borderless: true }}
         hitSlop={6}
         accessibilityRole="button"
-        accessibilityLabel={tab.label}
+        accessibilityLabel={t(tab.label)}
         accessibilityState={{ selected: isFocused }}
       >
         <Animated.View
@@ -160,7 +160,7 @@ export function CustomTabBar({
             style={[s.label, isFocused ? s.labelActive : s.labelInactive]}
             numberOfLines={1}
           >
-            {tab.label}
+            {t(tab.label)}
           </Text>
         </Animated.View>
       </Pressable>
@@ -206,7 +206,7 @@ export function CustomTabBar({
           </Animated.View>
         </TouchableOpacity>
         <Text style={s.aiLabel} pointerEvents="none">
-          Trợ lý AI
+          {t("tabs.aiAssistant")}
         </Text>
       </View>
     </View>

@@ -30,7 +30,7 @@ function Test-Endpoint {
         $headers = @{
             'Content-Type' = 'application/json'
             'Accept' = 'application/json'
-            'x-api-key' = 'thietke-resort-api-key-2024'
+            'x-api-key' = 'dbuild_client_7d3a9f41c2b84e6d9a5f0e1c7b2a4d88'
         }
         
         if ($RequiresAuth -and $Token) {

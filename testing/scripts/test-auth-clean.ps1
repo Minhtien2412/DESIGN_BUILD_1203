@@ -1,10 +1,10 @@
-﻿# Authentication Endpoints Test
+# Authentication Endpoints Test
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "AUTHENTICATION ENDPOINTS TEST" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 
 $BaseUrl = "https://baotienweb.cloud/api/v1"
-$ApiKey = "thietke-resort-api-key-2024"
+$ApiKey = "dbuild_client_7d3a9f41c2b84e6d9a5f0e1c7b2a4d88"
 $timestamp = Get-Date -Format "yyyyMMddHHmmss"
 $testEmail = "testuser${timestamp}@test.com"
 $testPassword = "TestPassword123!"

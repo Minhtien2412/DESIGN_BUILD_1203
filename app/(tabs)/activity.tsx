@@ -1,3 +1,4 @@
+import { MISC, PROFILE, PROJECTS, TABS } from "@/constants/route-registry";
 import { useRole } from "@/context/RoleContext";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -59,7 +60,7 @@ const ROLE_CONFIG: Record<string, RoleConfig> = {
     emptyDesc:
       "Tạo yêu cầu mới để hệ thống gợi ý thợ phù hợp theo khu vực và thời gian.",
     ctaLabel: "Tạo yêu cầu mới",
-    ctaRoute: "/quote-request",
+    ctaRoute: MISC.QUOTE_REQUEST,
     history: [
       {
         id: "1",
@@ -80,7 +81,7 @@ const ROLE_CONFIG: Record<string, RoleConfig> = {
     emptyTitle: "Chưa có việc nào được giao",
     emptyDesc: "Cập nhật hồ sơ và kỹ năng để nhận được nhiều lời mời hơn.",
     ctaLabel: "Xem việc làm mới",
-    ctaRoute: "/(tabs)/jobs",
+    ctaRoute: TABS.ACTIVITY,
     history: [
       {
         id: "1",
@@ -101,7 +102,7 @@ const ROLE_CONFIG: Record<string, RoleConfig> = {
     emptyTitle: "Chưa có hồ sơ cần duyệt",
     emptyDesc: "Các yêu cầu mới từ dự án sẽ hiện tại đây.",
     ctaLabel: "Xem dự án",
-    ctaRoute: "/(tabs)/projects",
+    ctaRoute: TABS.PROJECTS,
     history: [
       {
         id: "1",
@@ -122,7 +123,7 @@ const ROLE_CONFIG: Record<string, RoleConfig> = {
     emptyTitle: "Chưa có hoạt động nào",
     emptyDesc: "Tạo dự án mới hoặc tuyển thợ để bắt đầu.",
     ctaLabel: "Tạo dự án mới",
-    ctaRoute: "/projects/create",
+    ctaRoute: PROJECTS.CREATE,
     history: [
       {
         id: "1",
@@ -210,7 +211,7 @@ export default function ActivityTabScreen() {
 
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Lịch sử gần đây</Text>
-            <Pressable onPress={() => router.push("/profile/history" as any)}>
+            <Pressable onPress={() => router.push(PROFILE.HISTORY as any)}>
               <Text style={styles.sectionLink}>Xem tất cả</Text>
             </Pressable>
           </View>

@@ -230,7 +230,7 @@ describe("PresignedUploadService", () => {
         expect.objectContaining({
           filename: "photo.jpg",
           contentType: "image/jpeg",
-          fileSize: 1024 * 1024,
+          size: 1024 * 1024,
         }),
       );
     });
@@ -476,7 +476,7 @@ describe("PresignedUploadService", () => {
 
       expect(result).toEqual(mockResponse);
       expect(post).toHaveBeenCalledWith(
-        "/api/v1/upload/complete",
+        "/api/v1/upload/presign/complete",
         expect.objectContaining({
           uploadId: "upload-123",
           checksum: "sha256hash",
@@ -503,7 +503,7 @@ describe("PresignedUploadService", () => {
       });
 
       expect(post).toHaveBeenCalledWith(
-        "/api/v1/upload/complete",
+        "/api/v1/upload/presign/complete",
         expect.objectContaining({
           metadata: { projectId: "proj-123", tags: ["construction"] },
         }),

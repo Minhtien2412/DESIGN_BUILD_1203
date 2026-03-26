@@ -1,11 +1,14 @@
 /**
  * Enter Address Screen — Step 2 of booking flow
  * Customer enters the address where they need the service
+ *
+ * Data: AsyncStorage saved addresses → fallback inline defaults
  */
 
+import { getItem, setItem } from "@/utils/storage";
 import { Ionicons } from "@expo/vector-icons";
 import { Href, router, useLocalSearchParams } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
     KeyboardAvoidingView,
     Platform,
@@ -17,20 +20,29 @@ import {
     View,
 } from "react-native";
 
-const SAVED_ADDRESSES = [
+interface SavedAddress {
+  id: string;
+  label: string;
+  address: string;
+  icon: "home-outline" | "business-outline" | "location-outline";
+}
+
+const DEFAULT_ADDRESSES: SavedAddress[] = [
   {
     id: "1",
     label: "Nhà",
     address: "123 Nguyễn Huệ, Q.1, TP.HCM",
-    icon: "home-outline" as const,
+    icon: "home-outline",
   },
   {
     id: "2",
     label: "Cơ quan",
     address: "456 Lê Lợi, Q.3, TP.HCM",
-    icon: "business-outline" as const,
+    icon: "business-outline",
   },
 ];
+
+const SAVED_ADDRESSES_KEY = "user_saved_addresses";
 
 export default function EnterAddressScreen() {
   const { serviceId, serviceName } = useLocalSearchParams<{
@@ -38,6 +50,8 @@ export default function EnterAddressScreen() {
     serviceName: string;
   }>();
 
+  const [savedAddresses, setSavedAddresses] =
+    useState<SavedAddress[]>(DEFAULT_ADDRESSES);
   const [address, setAddress] = useState("");
   const [district, setDistrict] = useState("");
   const [city, setCity] = useState("TP. Hồ Chí Minh");
@@ -45,9 +59,38 @@ export default function EnterAddressScreen() {
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
 
+  // Load saved addresses from storage
+  useEffect(() => {
+    (async () => {
+      try {
+        const stored = await getItem(SAVED_ADDRESSES_KEY);
+        if (stored) {
+          const parsed = JSON.parse(stored) as SavedAddress[];
+          if (parsed.length) setSavedAddresses(parsed);
+        }
+      } catch {
+        // keep defaults
+      }
+    })();
+  }, []);
+
   const isValid = address.trim().length >= 5;
 
   const onContinue = useCallback(() => {
+    // Save the address for future use
+    const newAddr: SavedAddress = {
+      id: String(Date.now()),
+      label: district || "Khác",
+      address: address.trim(),
+      icon: "location-outline",
+    };
+    const existing = savedAddresses.find((a) => a.address === newAddr.address);
+    if (!existing) {
+      const updated = [...savedAddresses, newAddr].slice(-5); // keep max 5
+      setSavedAddresses(updated);
+      setItem(SAVED_ADDRESSES_KEY, JSON.stringify(updated)).catch(() => {});
+    }
+
     router.push({
       pathname: "/booking/scan-workers",
       params: {
@@ -61,9 +104,19 @@ export default function EnterAddressScreen() {
         time: time || "Càng sớm càng tốt",
       },
     } as Href);
-  }, [serviceId, serviceName, address, district, city, note, date, time]);
+  }, [
+    serviceId,
+    serviceName,
+    address,
+    district,
+    city,
+    note,
+    date,
+    time,
+    savedAddresses,
+  ]);
 
-  const onSelectSaved = useCallback((saved: (typeof SAVED_ADDRESSES)[0]) => {
+  const onSelectSaved = useCallback((saved: SavedAddress) => {
     setAddress(saved.address);
     setDistrict("");
   }, []);
@@ -101,7 +154,7 @@ export default function EnterAddressScreen() {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={s.savedRow}
           >
-            {SAVED_ADDRESSES.map((saved) => (
+            {savedAddresses.map((saved) => (
               <TouchableOpacity
                 key={saved.id}
                 style={s.savedCard}

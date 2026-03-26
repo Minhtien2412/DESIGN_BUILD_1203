@@ -21,7 +21,7 @@ $perfexApi = "https://thietkeresort.com.vn/perfex_crm"
 
 # Multiple API Keys to test
 $apiKeys = @(
-    @{ name = "Primary"; key = "thietke-resort-api-key-2024" }
+    @{ name = "Primary"; key = "dbuild_client_7d3a9f41c2b84e6d9a5f0e1c7b2a4d88" }
     @{ name = "Fallback"; key = "thietke-resort-2024" }
     @{ name = "Development"; key = "dev-key-2024" }
 )

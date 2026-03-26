@@ -92,7 +92,7 @@ const WIDGET_CONFIGS: WidgetConfig[] = [
     action: PermissionAction.VIEW,
     getValue: (stats) => stats?.total_tasks || 0,
     color: "#666666",
-    route: "/coming-soon/admin-tasks",
+    route: "/(tabs)/projects",
   },
   {
     id: "staff",
@@ -114,7 +114,7 @@ const WIDGET_CONFIGS: WidgetConfig[] = [
     minRoleLevel: ROLE_HIERARCHY.PROJECT_MANAGER,
     getValue: (stats) => stats?.total_clients || 0,
     color: "#666666",
-    route: "/coming-soon/admin-clients",
+    route: "/admin/staff",
   },
   {
     id: "qc",
@@ -134,7 +134,7 @@ const WIDGET_CONFIGS: WidgetConfig[] = [
     action: PermissionAction.VIEW,
     getValue: (stats) => stats?.safety_incidents || 0,
     color: "#000000",
-    route: "/coming-soon/admin-safety",
+    route: "/safety",
   },
   {
     id: "materials",
@@ -144,7 +144,7 @@ const WIDGET_CONFIGS: WidgetConfig[] = [
     action: PermissionAction.VIEW,
     getValue: (stats) => stats?.total_materials || 0,
     color: "#0D9488",
-    route: "/coming-soon/admin-materials",
+    route: "/materials",
   },
   {
     id: "equipment",
@@ -154,7 +154,7 @@ const WIDGET_CONFIGS: WidgetConfig[] = [
     action: PermissionAction.VIEW,
     getValue: (stats) => stats?.total_equipment || 0,
     color: "#14b8a6",
-    route: "/coming-soon/admin-equipment",
+    route: "/equipment",
   },
 ];
 
@@ -432,7 +432,7 @@ export default function AdminDashboardRBAC() {
             <QuickActionButton
               icon="stats-chart-outline"
               label="Báo cáo"
-              route="/coming-soon/admin-reports"
+              route="/reports"
               module={PermissionModule.REPORTS}
               action={PermissionAction.VIEW}
               color={colors.accent}
@@ -450,7 +450,7 @@ export default function AdminDashboardRBAC() {
             <QuickActionButton
               icon="camera-outline"
               label="Ảnh tiến độ"
-              route="/coming-soon/admin-photos"
+              route="/(tabs)/projects"
               module={PermissionModule.PHOTOS}
               action={PermissionAction.VIEW}
               color={colors.accent}
@@ -459,7 +459,7 @@ export default function AdminDashboardRBAC() {
             <QuickActionButton
               icon="shield-checkmark-outline"
               label="An toàn"
-              route="/coming-soon/admin-safety"
+              route="/safety"
               module={PermissionModule.SAFETY}
               action={PermissionAction.VIEW}
               color={colors.accent}
@@ -501,7 +501,7 @@ export default function AdminDashboardRBAC() {
                 Hoạt động gần đây
               </Text>
               <TouchableOpacity
-                onPress={() => router.push("/coming-soon/activity-log" as Href)}
+                onPress={() => router.push("/admin/staff" as Href)}
               >
                 <Text style={[styles.sectionLink, { color: colors.accent }]}>
                   Xem tất cả

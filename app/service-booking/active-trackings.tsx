@@ -2,18 +2,11 @@
  * Active Trackings Screen - Danh sách đang theo dõi
  * Shows all active bookings/deliveries being tracked in real-time
  *
- * Like Shopee's "Đơn hàng đang giao" or Grab's active rides,
- * this lists all workers/drivers/vehicles currently en route.
- *
- * Features:
- * - Active booking cards with live status + mini-map preview
- * - Vehicle type badges (xe máy, xe tải, xe bê tông, xe cẩu)
- * - Quick ETA display per booking
- * - Tap to open full route tracking
- * - Empty state when no active trackings
- * - Pull-to-refresh
+ * Data: BookingContext.activeBookings → fallback MOCK_TRACKINGS
  */
 
+import { MOCK_TRACKINGS as MOCK_TRACKINGS_RAW } from "@/__mocks__/booking-mocks";
+import { useBooking } from "@/context/BookingContext";
 import {
     getTrackingStatusDisplay,
     type UnifiedTrackingStatus,
@@ -22,7 +15,7 @@ import { formatDistance, formatTravelTime, type LatLng } from "@/utils/geo";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router, Stack } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
     Dimensions,
     FlatList,
@@ -31,7 +24,7 @@ import {
     StyleSheet,
     Text,
     TouchableOpacity,
-    View
+    View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -112,102 +105,67 @@ const VEHICLE_CONFIG: Record<
 };
 
 // ============================================================================
-// Mock data
+// Mock data (from centralized __mocks__)
 // ============================================================================
-const MOCK_TRACKINGS: ActiveTracking[] = [
-  {
-    id: "1",
-    bookingId: "BK-2026-0301",
-    workerName: "Nguyễn Văn An",
-    workerAvatar: "",
-    workerPhone: "0901234567",
-    vehicleType: "motorbike",
-    vehiclePlate: "59A-123.45",
-    status: "arriving",
-    eta: 12,
-    distanceRemaining: 2.5,
-    progress: 65,
-    category: "Thợ điện",
-    totalPrice: 350000,
-    customerAddress: "123 Nguyễn Huệ, Q.1, TP.HCM",
-    workerLocation: { latitude: 10.78, longitude: 106.703 },
-    customerLocation: { latitude: 10.777, longitude: 106.701 },
-    startedAt: "14:30",
-  },
-  {
-    id: "2",
-    bookingId: "BK-2026-0302",
-    workerName: "Trần Bê Tông",
-    workerAvatar: "",
-    workerPhone: "0912345678",
-    vehicleType: "concrete_mixer",
-    vehiclePlate: "51D-789.01",
-    status: "accepted",
-    eta: 28,
-    distanceRemaining: 7.2,
-    progress: 30,
-    category: "Đổ bê tông sàn",
-    totalPrice: 5500000,
-    customerAddress: "456 Điện Biên Phủ, Q.3, TP.HCM",
-    workerLocation: { latitude: 10.79, longitude: 106.72 },
-    customerLocation: { latitude: 10.779, longitude: 106.69 },
-    startedAt: "13:45",
-  },
-  {
-    id: "3",
-    bookingId: "BK-2026-0303",
-    workerName: "Lê Cẩu Đại",
-    workerAvatar: "",
-    workerPhone: "0923456789",
-    vehicleType: "crane",
-    vehiclePlate: "51D-456.78",
-    status: "arriving",
-    eta: 18,
-    distanceRemaining: 3.8,
-    progress: 52,
-    category: "Cẩu vật liệu lên tầng 3",
-    totalPrice: 3200000,
-    customerAddress: "789 Lý Tự Trọng, Q.1, TP.HCM",
-    workerLocation: { latitude: 10.774, longitude: 106.698 },
-    customerLocation: { latitude: 10.77, longitude: 106.694 },
-    startedAt: "14:00",
-  },
-  {
-    id: "4",
-    bookingId: "BK-2026-0304",
-    workerName: "Phạm Văn Tải",
-    workerAvatar: "",
-    workerPhone: "0934567890",
-    vehicleType: "truck",
-    vehiclePlate: "61C-234.56",
-    status: "accepted",
-    eta: 35,
-    distanceRemaining: 12.0,
-    progress: 15,
-    category: "Chuyển vật liệu xây dựng",
-    totalPrice: 2800000,
-    customerAddress: "321 Võ Văn Tần, Q.3, TP.HCM",
-    workerLocation: { latitude: 10.8, longitude: 106.73 },
-    customerLocation: { latitude: 10.775, longitude: 106.688 },
-    startedAt: "13:15",
-  },
-];
+const MOCK_TRACKINGS = MOCK_TRACKINGS_RAW as unknown as ActiveTracking[];
 
 // ============================================================================
 // Screen
 // ============================================================================
 export default function ActiveTrackingsScreen() {
   const insets = useSafeAreaInsets();
-  const [trackings, setTrackings] = useState<ActiveTracking[]>(MOCK_TRACKINGS);
+  const { activeBookings, refreshBookings, loadingBookings } = useBooking();
+
+  // Map real bookings to ActiveTracking shape, falling back to mock for display
+  const realTrackings = useMemo<ActiveTracking[]>(() => {
+    if (!activeBookings?.length) return MOCK_TRACKINGS;
+    const activeStatuses = ["PENDING", "CONFIRMED", "IN_PROGRESS", "ACCEPTED"];
+    const live = activeBookings.filter((b) =>
+      activeStatuses.includes(b.status),
+    );
+    if (!live.length) return MOCK_TRACKINGS;
+    return live.map(
+      (b): ActiveTracking => ({
+        id: b.id,
+        bookingId: b.apiBookingId ? `BK-${b.apiBookingId}` : b.id,
+        workerName: b.workerInfo?.name || "Thợ",
+        workerAvatar: b.workerInfo?.avatar || "",
+        workerPhone: b.workerInfo?.phone || "",
+        vehicleType: "motorbike",
+        vehiclePlate: "",
+        status: b.status === "IN_PROGRESS" ? "in_progress" : "accepted",
+        eta: 15,
+        distanceRemaining: 2,
+        progress: b.status === "IN_PROGRESS" ? 60 : 30,
+        category: b.serviceCategory || "Dịch vụ",
+        totalPrice: b.price || 0,
+        customerAddress: b.notes?.match(/Địa chỉ: (.+?)(\n|$)/)?.[1] || "",
+        workerLocation: { latitude: 10.78, longitude: 106.7 },
+        customerLocation: { latitude: 10.77, longitude: 106.7 },
+        startedAt: b.scheduledTime || "—",
+      }),
+    );
+  }, [activeBookings]);
+
+  const [trackings, setTrackings] = useState<ActiveTracking[]>(realTrackings);
   const [refreshing, setRefreshing] = useState(false);
   const [filter, setFilter] = useState<"all" | VehicleType>("all");
 
+  // Sync when real data changes
+  useEffect(() => {
+    setTrackings(realTrackings);
+  }, [realTrackings]);
+
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    // Simulate API refresh
-    await new Promise((r) => setTimeout(r, 1000));
-    setRefreshing(false);
-  }, []);
+    try {
+      await refreshBookings();
+    } catch {
+      // silent
+    } finally {
+      setRefreshing(false);
+    }
+  }, [refreshBookings]);
 
   const filteredTrackings =
     filter === "all"

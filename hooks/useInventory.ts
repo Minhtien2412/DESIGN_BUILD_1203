@@ -1,21 +1,29 @@
-import * as inventoryService from '@/services/inventory';
+import * as inventoryService from "@/services/inventory";
 import type {
     AdjustStockRequest,
+    CreateHandoverRequest,
     CreateMaterialOrderRequest,
     CreateMaterialRequest,
     CreateSupplierRequest,
+    CreateTransferOrderRequest,
+    HandoverRecord,
     InventorySummary,
     Material,
+    MaterialManager,
     MaterialOrder,
     RecordStockTransactionRequest,
     StockAlert,
+    StockSnapshot,
     StockTransaction,
     Supplier,
+    TransferOrder,
     UpdateMaterialOrderRequest,
     UpdateMaterialRequest,
     UpdateSupplierRequest,
-} from '@/types/inventory';
-import { useCallback, useEffect, useState } from 'react';
+    Warehouse,
+    WarehouseStockSummary,
+} from "@/types/inventory";
+import { useCallback, useEffect, useState } from "react";
 
 // Materials Hook
 export const useMaterials = (projectId: string) => {
@@ -41,24 +49,21 @@ export const useMaterials = (projectId: string) => {
     fetchMaterials();
   }, [fetchMaterials]);
 
-  const createMaterial = useCallback(
-    async (data: CreateMaterialRequest) => {
-      const newMaterial = await inventoryService.createMaterial(data);
-      setMaterials((prev) => [...prev, newMaterial]);
-      return newMaterial;
-    },
-    []
-  );
+  const createMaterial = useCallback(async (data: CreateMaterialRequest) => {
+    const newMaterial = await inventoryService.createMaterial(data);
+    setMaterials((prev) => [...prev, newMaterial]);
+    return newMaterial;
+  }, []);
 
   const updateMaterial = useCallback(
     async (materialId: string, data: UpdateMaterialRequest) => {
       const updated = await inventoryService.updateMaterial(materialId, data);
       setMaterials((prev) =>
-        prev.map((m) => (m.id === materialId ? updated : m))
+        prev.map((m) => (m.id === materialId ? updated : m)),
       );
       return updated;
     },
-    []
+    [],
   );
 
   const deleteMaterial = useCallback(async (materialId: string) => {
@@ -126,24 +131,21 @@ export const useSuppliers = (projectId?: string) => {
     fetchSuppliers();
   }, [fetchSuppliers]);
 
-  const createSupplier = useCallback(
-    async (data: CreateSupplierRequest) => {
-      const newSupplier = await inventoryService.createSupplier(data);
-      setSuppliers((prev) => [...prev, newSupplier]);
-      return newSupplier;
-    },
-    []
-  );
+  const createSupplier = useCallback(async (data: CreateSupplierRequest) => {
+    const newSupplier = await inventoryService.createSupplier(data);
+    setSuppliers((prev) => [...prev, newSupplier]);
+    return newSupplier;
+  }, []);
 
   const updateSupplier = useCallback(
     async (supplierId: string, data: UpdateSupplierRequest) => {
       const updated = await inventoryService.updateSupplier(supplierId, data);
       setSuppliers((prev) =>
-        prev.map((s) => (s.id === supplierId ? updated : s))
+        prev.map((s) => (s.id === supplierId ? updated : s)),
       );
       return updated;
     },
-    []
+    [],
   );
 
   const deleteSupplier = useCallback(async (supplierId: string) => {
@@ -186,14 +188,11 @@ export const useMaterialOrders = (projectId: string) => {
     fetchOrders();
   }, [fetchOrders]);
 
-  const createOrder = useCallback(
-    async (data: CreateMaterialOrderRequest) => {
-      const newOrder = await inventoryService.createMaterialOrder(data);
-      setOrders((prev) => [...prev, newOrder]);
-      return newOrder;
-    },
-    []
-  );
+  const createOrder = useCallback(async (data: CreateMaterialOrderRequest) => {
+    const newOrder = await inventoryService.createMaterialOrder(data);
+    setOrders((prev) => [...prev, newOrder]);
+    return newOrder;
+  }, []);
 
   const updateOrder = useCallback(
     async (orderId: string, data: UpdateMaterialOrderRequest) => {
@@ -201,7 +200,7 @@ export const useMaterialOrders = (projectId: string) => {
       setOrders((prev) => prev.map((o) => (o.id === orderId ? updated : o)));
       return updated;
     },
-    []
+    [],
   );
 
   const deleteOrder = useCallback(async (orderId: string) => {
@@ -235,7 +234,10 @@ export const useMaterialOrders = (projectId: string) => {
 };
 
 // Stock Transactions Hook
-export const useStockTransactions = (projectId: string, materialId?: string) => {
+export const useStockTransactions = (
+  projectId: string,
+  materialId?: string,
+) => {
   const [transactions, setTransactions] = useState<StockTransaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -246,7 +248,7 @@ export const useStockTransactions = (projectId: string, materialId?: string) => 
     try {
       const data = await inventoryService.getStockTransactions(
         projectId,
-        materialId
+        materialId,
       );
       setTransactions(data);
       setError(null);
@@ -263,11 +265,12 @@ export const useStockTransactions = (projectId: string, materialId?: string) => 
 
   const recordTransaction = useCallback(
     async (data: RecordStockTransactionRequest) => {
-      const newTransaction = await inventoryService.recordStockTransaction(data);
+      const newTransaction =
+        await inventoryService.recordStockTransaction(data);
       setTransactions((prev) => [newTransaction, ...prev]);
       return newTransaction;
     },
-    []
+    [],
   );
 
   const adjustStock = useCallback(async (data: AdjustStockRequest) => {
@@ -365,4 +368,252 @@ export const useLowStockMaterials = (projectId: string) => {
   }, [fetchLowStock]);
 
   return { materials, loading, error, refetch: fetchLowStock };
+};
+
+// ============================================================================
+// Advanced Inventory Hooks — Transfers, Handovers, Stock Snapshots, Managers
+// ============================================================================
+
+// Warehouses Hook
+export const useWarehouses = (projectId?: string) => {
+  const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  const fetchWarehouses = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await inventoryService.getWarehouses(projectId);
+      setWarehouses(data);
+      setError(null);
+    } catch (err) {
+      setError(err as Error);
+    } finally {
+      setLoading(false);
+    }
+  }, [projectId]);
+
+  useEffect(() => {
+    fetchWarehouses();
+  }, [fetchWarehouses]);
+
+  return { warehouses, loading, error, refetch: fetchWarehouses };
+};
+
+// Transfer Orders Hook
+export const useTransferOrders = (projectId: string) => {
+  const [transfers, setTransfers] = useState<TransferOrder[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  const fetchTransfers = useCallback(async () => {
+    if (!projectId) return;
+    setLoading(true);
+    try {
+      const data = await inventoryService.getTransferOrders(projectId);
+      setTransfers(data);
+      setError(null);
+    } catch (err) {
+      setError(err as Error);
+    } finally {
+      setLoading(false);
+    }
+  }, [projectId]);
+
+  useEffect(() => {
+    fetchTransfers();
+  }, [fetchTransfers]);
+
+  const createTransfer = useCallback(
+    async (data: CreateTransferOrderRequest) => {
+      const newTransfer = await inventoryService.createTransferOrder(data);
+      setTransfers((prev) => [newTransfer, ...prev]);
+      return newTransfer;
+    },
+    [],
+  );
+
+  const approveTransfer = useCallback(async (transferId: string) => {
+    const updated = await inventoryService.approveTransferOrder(transferId);
+    setTransfers((prev) =>
+      prev.map((t) => (t.id === transferId ? updated : t)),
+    );
+    return updated;
+  }, []);
+
+  const cancelTransfer = useCallback(async (transferId: string) => {
+    const updated = await inventoryService.cancelTransferOrder(transferId);
+    setTransfers((prev) =>
+      prev.map((t) => (t.id === transferId ? updated : t)),
+    );
+    return updated;
+  }, []);
+
+  return {
+    transfers,
+    loading,
+    error,
+    refetch: fetchTransfers,
+    createTransfer,
+    approveTransfer,
+    cancelTransfer,
+  };
+};
+
+// Handover Records Hook
+export const useHandoverRecords = (projectId: string) => {
+  const [handovers, setHandovers] = useState<HandoverRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  const fetchHandovers = useCallback(async () => {
+    if (!projectId) return;
+    setLoading(true);
+    try {
+      const data = await inventoryService.getHandoverRecords(projectId);
+      setHandovers(data);
+      setError(null);
+    } catch (err) {
+      setError(err as Error);
+    } finally {
+      setLoading(false);
+    }
+  }, [projectId]);
+
+  useEffect(() => {
+    fetchHandovers();
+  }, [fetchHandovers]);
+
+  const createHandover = useCallback(async (data: CreateHandoverRequest) => {
+    const newHandover = await inventoryService.createHandoverRecord(data);
+    setHandovers((prev) => [newHandover, ...prev]);
+    return newHandover;
+  }, []);
+
+  const confirmHandover = useCallback(
+    async (handoverId: string, signatureTo: string) => {
+      const updated = await inventoryService.confirmHandoverRecord({
+        handoverId,
+        signatureTo,
+      });
+      setHandovers((prev) =>
+        prev.map((h) => (h.id === handoverId ? updated : h)),
+      );
+      return updated;
+    },
+    [],
+  );
+
+  const cancelHandover = useCallback(async (handoverId: string) => {
+    const updated = await inventoryService.cancelHandoverRecord(handoverId);
+    setHandovers((prev) =>
+      prev.map((h) => (h.id === handoverId ? updated : h)),
+    );
+    return updated;
+  }, []);
+
+  return {
+    handovers,
+    loading,
+    error,
+    refetch: fetchHandovers,
+    createHandover,
+    confirmHandover,
+    cancelHandover,
+  };
+};
+
+// Stock Snapshots Hook
+export const useStockSnapshots = (projectId: string, warehouseId?: string) => {
+  const [snapshots, setSnapshots] = useState<StockSnapshot[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  const fetchSnapshots = useCallback(async () => {
+    if (!projectId) return;
+    setLoading(true);
+    try {
+      const data = await inventoryService.getStockSnapshots(
+        projectId,
+        warehouseId,
+      );
+      setSnapshots(data);
+      setError(null);
+    } catch (err) {
+      setError(err as Error);
+    } finally {
+      setLoading(false);
+    }
+  }, [projectId, warehouseId]);
+
+  useEffect(() => {
+    fetchSnapshots();
+  }, [fetchSnapshots]);
+
+  return { snapshots, loading, error, refetch: fetchSnapshots };
+};
+
+// Warehouse Stock Summaries Hook
+export const useWarehouseStockSummaries = (projectId: string) => {
+  const [summaries, setSummaries] = useState<WarehouseStockSummary[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  const fetchSummaries = useCallback(async () => {
+    if (!projectId) return;
+    setLoading(true);
+    try {
+      const data = await inventoryService.getWarehouseStockSummaries(projectId);
+      setSummaries(data);
+      setError(null);
+    } catch (err) {
+      setError(err as Error);
+    } finally {
+      setLoading(false);
+    }
+  }, [projectId]);
+
+  useEffect(() => {
+    fetchSummaries();
+  }, [fetchSummaries]);
+
+  return { summaries, loading, error, refetch: fetchSummaries };
+};
+
+// Material Managers Hook
+export const useMaterialManagers = (
+  projectId: string,
+  warehouseId?: string,
+) => {
+  const [managers, setManagers] = useState<MaterialManager[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  const fetchManagers = useCallback(async () => {
+    if (!projectId) return;
+    setLoading(true);
+    try {
+      const data = await inventoryService.getMaterialManagers(
+        projectId,
+        warehouseId,
+      );
+      setManagers(data);
+      setError(null);
+    } catch (err) {
+      setError(err as Error);
+    } finally {
+      setLoading(false);
+    }
+  }, [projectId, warehouseId]);
+
+  useEffect(() => {
+    fetchManagers();
+  }, [fetchManagers]);
+
+  const removeManager = useCallback(async (managerId: string) => {
+    await inventoryService.removeManager(managerId);
+    setManagers((prev) => prev.filter((m) => m.id !== managerId));
+  }, []);
+
+  return { managers, loading, error, refetch: fetchManagers, removeManager };
 };

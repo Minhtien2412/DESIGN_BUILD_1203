@@ -159,6 +159,16 @@ export const vi: Translations = {
     contacts: "Danh bạ",
     back: "Quay lại",
   },
+  tabs: {
+    home: "Trang chủ",
+    activity: "Hoạt động",
+    jobs: "Việc làm",
+    projects: "Dự án",
+    management: "Quản lý",
+    communication: "Liên lạc",
+    account: "Tài khoản",
+    aiAssistant: "Trợ lý AI",
+  },
   nav: {
     home: "Trang chủ",
     explore: "Khám phá",

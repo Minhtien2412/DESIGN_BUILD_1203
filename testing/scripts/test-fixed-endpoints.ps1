@@ -2,7 +2,7 @@
 # Chạy: .\test-fixed-endpoints.ps1
 
 $baseUrl = "https://baotienweb.cloud/api/v1"
-$apiKey = "thietke-resort-api-key-2024"
+$apiKey = "dbuild_client_7d3a9f41c2b84e6d9a5f0e1c7b2a4d88"
 
 Write-Host "`n========================================" -ForegroundColor Cyan
 Write-Host "   TEST ENDPOINTS DA FIX - 29/12/2025" -ForegroundColor Cyan

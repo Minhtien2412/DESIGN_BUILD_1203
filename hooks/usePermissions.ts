@@ -3,7 +3,7 @@
  * React hooks for checking user permissions
  */
 
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from "@/context/AuthContext";
 import {
     PermissionAction,
     PermissionCheck,
@@ -11,55 +11,50 @@ import {
     PermissionModule,
     ROLE_HIERARCHY,
     UserRole,
-} from '@/types/permission';
+} from "@/types/permission";
 import {
     getRoleModuleActions,
     getRoleModules,
     hasMinimumRoleLevel,
     hasRolePermission,
     isHigherRole,
-} from '@/utils/permission-presets';
-import { useMemo } from 'react';
+} from "@/utils/permission-presets";
+import { useMemo } from "react";
 
 /**
  * Get user's role from auth context
  */
 export function useUserRole(): UserRole | null {
   const { user } = useAuth();
-  
+
   // Map backend role to UserRole enum
   if (!user) return null;
-  
+
   // Check if user has role from API
   const apiRole = (user as any).role;
   if (apiRole) {
     // Map backend role strings to UserRole enum
     const roleMap: Record<string, UserRole> = {
-      'super_admin': UserRole.SUPER_ADMIN,
-      'admin': UserRole.ADMIN,
-      'project_manager': UserRole.PROJECT_MANAGER,
-      'site_manager': UserRole.SITE_MANAGER,
-      'engineer': UserRole.ENGINEER,
-      'architect': UserRole.ARCHITECT,
-      'foreman': UserRole.FOREMAN,
-      'contractor': UserRole.CONTRACTOR,
-      'subcontractor': UserRole.SUBCONTRACTOR,
-      'worker': UserRole.WORKER,
-      'client': UserRole.CLIENT,
-      'client_rep': UserRole.CLIENT_REP,
-      'consultant': UserRole.CONSULTANT,
-      'supplier': UserRole.SUPPLIER,
-      'viewer': UserRole.VIEWER,
+      super_admin: UserRole.SUPER_ADMIN,
+      admin: UserRole.ADMIN,
+      project_manager: UserRole.PROJECT_MANAGER,
+      site_manager: UserRole.SITE_MANAGER,
+      engineer: UserRole.ENGINEER,
+      architect: UserRole.ARCHITECT,
+      foreman: UserRole.FOREMAN,
+      contractor: UserRole.CONTRACTOR,
+      subcontractor: UserRole.SUBCONTRACTOR,
+      worker: UserRole.WORKER,
+      client: UserRole.CLIENT,
+      client_rep: UserRole.CLIENT_REP,
+      consultant: UserRole.CONSULTANT,
+      supplier: UserRole.SUPPLIER,
+      viewer: UserRole.VIEWER,
     };
-    
+
     return roleMap[apiRole.toLowerCase()] || UserRole.VIEWER;
   }
-  
-  // Fallback to email-based admin check (temporary)
-  if (user.email?.includes('admin')) {
-    return UserRole.ADMIN;
-  }
-  
+
   return UserRole.VIEWER;
 }
 
@@ -69,7 +64,7 @@ export function useUserRole(): UserRole | null {
 export function usePermission(
   module: PermissionModule,
   action: PermissionAction,
-  projectId?: number
+  projectId?: number,
 ): PermissionCheckResult {
   const role = useUserRole();
 
@@ -77,7 +72,7 @@ export function usePermission(
     if (!role) {
       return {
         allowed: false,
-        reason: 'Not authenticated',
+        reason: "Not authenticated",
       };
     }
 
@@ -98,14 +93,16 @@ export function usePermission(
 /**
  * Check multiple permissions at once
  */
-export function usePermissions(checks: PermissionCheck[]): PermissionCheckResult[] {
+export function usePermissions(
+  checks: PermissionCheck[],
+): PermissionCheckResult[] {
   const role = useUserRole();
 
   return useMemo(() => {
     if (!role) {
       return checks.map(() => ({
         allowed: false,
-        reason: 'Not authenticated',
+        reason: "Not authenticated",
       }));
     }
 
@@ -224,7 +221,7 @@ export function useRoleLevel(): number {
  */
 export function useCanViewWidget(
   requiredPermissions: { module: PermissionModule; action: PermissionAction }[],
-  minRoleLevel?: number
+  minRoleLevel?: number,
 ): boolean {
   const hasAllPerms = useHasAllPermissions(requiredPermissions);
   const hasMinLevel = useHasMinRoleLevel(minRoleLevel || 0);

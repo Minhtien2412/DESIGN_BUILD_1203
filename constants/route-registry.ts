@@ -145,6 +145,14 @@ export const WORKERS = {
   SCHEDULE: "/worker-schedule",
 } as const;
 
+// ────── Tasks (Worker-facing) ──────
+export const TASKS = {
+  INDEX: "/tasks",
+  ASSIGNED: "/tasks/assigned",
+  HISTORY: "/tasks/history",
+  DETAIL: (id: string) => `/tasks/${id}` as const,
+} as const;
+
 // ────── Projects ──────
 export const PROJECTS = {
   INDEX: "/(tabs)/projects",
@@ -421,6 +429,16 @@ export const STORAGE = {
 // ────── Profile / Settings ──────
 export const PROFILE = {
   INDEX: "/(tabs)/profile",
+  INFO: "/profile/info",
+  REWARDS: "/profile/rewards",
+  ORDERS: "/profile/orders",
+  VOUCHERS: "/profile/vouchers",
+  PAYMENT_HISTORY: "/profile/payment-history",
+  FAVORITES: "/profile/favorites",
+  HISTORY: "/profile/history",
+  PAYMENT_METHODS: "/profile/payment-methods",
+  ADDRESSES: "/profile/addresses",
+  PORTFOLIO: "/profile/portfolio",
   FEEDBACK: "/feedback",
   HELP: "/help",
   FAQ: "/faq",
@@ -593,10 +611,20 @@ export const INVENTORY = {
   INDEX: "/inventory",
   MATERIALS: "/inventory/materials",
   CREATE_MATERIAL: "/inventory/create-material",
+  MATERIAL_DETAIL: (id: string) => `/inventory/material/${id}` as const,
   ORDERS: "/inventory/orders",
   CREATE_ORDER: "/inventory/create-order",
+  ORDER_DETAIL: (id: string) => `/inventory/order/${id}` as const,
   SUPPLIERS: "/inventory/suppliers",
   CREATE_SUPPLIER: "/inventory/create-supplier",
+  TRANSACTIONS: "/inventory/transactions",
+  ALERTS: "/inventory/alerts",
+  TRANSFERS: "/inventory/transfers",
+  CREATE_TRANSFER: "/inventory/create-transfer",
+  HANDOVERS: "/inventory/handovers",
+  CREATE_HANDOVER: "/inventory/create-handover",
+  STOCK: "/inventory/stock",
+  MANAGERS: "/inventory/managers",
 } as const;
 
 // ────── Equipment ──────
@@ -746,6 +774,15 @@ export const LIVE = {
   VIEWER: "/live/viewer",
 } as const;
 
+// ────── Meetings ──────
+export const MEETINGS = {
+  INDEX: "/meetings",
+  CREATE: "/meetings/create",
+  JOIN: "/meetings/join",
+  ROOM: "/meetings/room",
+  DETAIL: (id: string) => `/meetings/${id}` as const,
+} as const;
+
 // ────── Consultation ──────
 export const CONSULTATION = {
   INDEX: "/consultation",
@@ -767,6 +804,9 @@ export const SERVICE_BOOKING = {
   WORKER_ROUTE_TRACKING: "/service-booking/worker-route-tracking",
   ACTIVE_TRACKINGS: "/service-booking/active-trackings",
   TRACKING_HISTORY: "/service-booking/tracking-history",
+  REQUEST_SENT: "/service-booking/request-sent",
+  AGREEMENT: "/service-booking/agreement",
+  RESCHEDULE: "/service-booking/reschedule",
   DETAIL: (id: string) => `/service-booking/${id}` as const,
 } as const;
 
@@ -839,7 +879,9 @@ export const R = {
   MESSAGES,
   LIVE,
   CONSULTATION,
+  MEETINGS,
   SERVICE_BOOKING,
+  TASKS,
 } as const;
 
 export default R;

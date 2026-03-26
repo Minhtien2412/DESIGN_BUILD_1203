@@ -1,13 +1,18 @@
 /**
  * Search Service Screen — Step 1 of booking flow
  * Customer searches and selects the service they need
+ *
+ * Data: API getServiceCategories() → fallback BOOKING_SERVICES
  */
 
-import { BOOKING_SERVICES, BookingService } from "@/types/booking";
+import { BOOKING_SERVICES } from "@/__mocks__/booking-mocks";
+import { getServiceCategories } from "@/services/servicesApi";
+import { BookingService } from "@/types/booking";
 import { Ionicons } from "@expo/vector-icons";
 import { Href, router } from "expo-router";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
+    ActivityIndicator,
     Platform,
     ScrollView,
     StyleSheet,
@@ -19,9 +24,40 @@ import {
 
 export default function SearchServiceScreen() {
   const [query, setQuery] = useState("");
+  const [services, setServices] = useState<BookingService[]>(BOOKING_SERVICES);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await getServiceCategories();
+        if (!cancelled && res.success && res.data?.length) {
+          // Map API categories → BookingService shape for the list
+          const mapped: BookingService[] = res.data.map((cat: any) => ({
+            id: String(cat.id),
+            name: cat.name,
+            description: cat.description || cat.name,
+            icon: cat.icon || "construct-outline",
+            category: cat.parentName || cat.group || "Dịch vụ",
+            priceRange: cat.priceRange || "",
+            estimatedTime: cat.estimatedTime || "",
+          }));
+          setServices(mapped);
+        }
+      } catch {
+        // Keep fallback BOOKING_SERVICES
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const filtered = useMemo(() => {
-    let items = BOOKING_SERVICES;
+    let items = services;
     if (query.trim()) {
       const q = query.toLowerCase();
       items = items.filter(
@@ -31,7 +67,7 @@ export default function SearchServiceScreen() {
       );
     }
     return items;
-  }, [query]);
+  }, [query, services]);
 
   const grouped = useMemo(() => {
     const map: Record<string, BookingService[]> = {};
@@ -79,6 +115,12 @@ export default function SearchServiceScreen() {
       </View>
 
       {/* Service list */}
+      {loading && (
+        <View style={s.empty}>
+          <ActivityIndicator size="large" color="#0D9488" />
+          <Text style={s.emptyText}>Đang tải dịch vụ...</Text>
+        </View>
+      )}
       <ScrollView
         style={s.listWrap}
         showsVerticalScrollIndicator={false}

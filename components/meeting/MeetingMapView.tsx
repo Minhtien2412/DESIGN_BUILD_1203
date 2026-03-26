@@ -31,8 +31,8 @@ interface MeetingMapViewProps {
 
 // Map Coordinates → LatLng helper
 const toLatLng = (c: Coordinates): LatLng => ({
-  latitude: c.lat,
-  longitude: c.lng,
+  latitude: c.latitude,
+  longitude: c.longitude,
 });
 
 const STATUS_COLORS: Record<string, string> = {
@@ -51,8 +51,8 @@ export function MeetingMapView({
   onParticipantPress,
 }: MeetingMapViewProps) {
   const destination: LatLng = useMemo(
-    () => toLatLng(meeting.location.coordinates),
-    [meeting.location.coordinates],
+    () => toLatLng(meeting.location),
+    [meeting.location],
   );
 
   const movingParticipants = useMemo(
@@ -291,7 +291,9 @@ export function MeetingMapView({
               key={p.id}
               coordinate={coord}
               title={p.name}
-              description={p.eta ? `ETA: ${p.eta}` : undefined}
+              description={
+                p.estimatedArrival ? `ETA: ${p.estimatedArrival}` : undefined
+              }
               opacity={isActive ? 1 : 0.4}
               onPress={() => onParticipantPress?.(p)}
             >

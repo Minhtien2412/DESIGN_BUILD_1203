@@ -10,6 +10,7 @@ import {
 } from "@/services/token.service";
 import { UserType } from "@/types/auth";
 import { Permission } from "@/utils/permissions";
+import { isAdminRole } from "@/utils/roleMapping";
 import { deleteItem, setItem } from "@/utils/storage";
 import { router } from "expo-router";
 import {
@@ -215,7 +216,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     phone: apiUser.phone || undefined,
     avatar: undefined, // Backend doesn't provide avatar yet
     role: apiUser.role,
-    admin: apiUser.role === "ADMIN" ? 1 : 0,
+    admin: isAdminRole(apiUser.role) ? 1 : 0,
     permissions: undefined, // TODO: Add when backend supports
     staffid: undefined,
     global_roles: undefined,

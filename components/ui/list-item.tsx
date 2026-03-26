@@ -181,6 +181,10 @@ const styles = StyleSheet.create({
     fontSize: TextVariants.h6.fontSize,
     fontWeight: TextVariants.h6.fontWeight,
   },
+  actionText: {
+    fontSize: TextVariants.body2.fontSize,
+    fontWeight: "500",
+  },
 });
 
 // Section Header Component
